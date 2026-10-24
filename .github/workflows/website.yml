@@ -1,0 +1,76 @@
+# Builds the website (website/, Fumadocs) with the mock-mode web app at /demo/ and
+# publishes it to GitHub Pages (docs/plan/16-website-and-releases.md).
+#
+# Until the versioned builds land in Phase 0 (/ = stable, /next/ = develop), the site
+# is published from develop so the UI preview is always the latest work.
+#
+# Set up once: Settings > Pages > Build and deployment > Source: GitHub Actions, then
+# Settings > Environments > github-pages > Deployment branches: allow develop and main.
+name: Website
+run-name: ${{ github.event_name == 'pull_request' && 'Build the website' || 'Publish the website' }}
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "web/**"
+      - "website/**"
+      - "scripts/build-pages-site.ts"
+      - ".github/workflows/website.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "website/**"
+      - "scripts/build-pages-site.ts"
+      - ".github/workflows/website.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: website-${{ github.event_name == 'pull_request' && github.ref || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install web app
+        working-directory: web
+        run: bun install --frozen-lockfile
+
+      - name: Install website
+        working-directory: website
+        run: bun install --frozen-lockfile
+
+      - name: Build website with the demo at /demo/
+        env:
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+        run: bun scripts/build-pages-site.ts
+
+      - name: Upload
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/out
+
+  deploy:
+    name: Publish to GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
