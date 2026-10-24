@@ -179,6 +179,20 @@ test("grouped notification toasts can all be cleared at once", async ({
   await expect(clearAllButton).toBeHidden();
 });
 
+test("the sidebar and browser tab show the SendMock logo", async ({
+  page,
+  request,
+}) => {
+  const homeLink = page.getByRole("link", { name: /SendMock/ }).first();
+  await expect(homeLink.locator("svg")).toBeVisible();
+
+  const faviconPath = await page.locator("link[rel='icon']").getAttribute("href");
+  expect(faviconPath).toMatch(/favicon\.svg$/);
+  const faviconResponse = await request.get(faviconPath ?? "");
+  expect(faviconResponse.ok()).toBe(true);
+  expect(await faviconResponse.text()).toContain("<svg");
+});
+
 test("UI-02.3 simulated server errors show an error state", async ({
   page,
 }, testInfo) => {

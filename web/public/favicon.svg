@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0D9488"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <mask id="flap">
+      <rect width="64" height="64" fill="#fff"/>
+      <path d="M23.5 26 L32 32 L40.5 26" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#brand)"/>
+  <g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <path d="M17 20 L9 32 L17 44"/>
+    <path d="M47 20 L55 32 L47 44"/>
+  </g>
+  <rect x="20" y="21" width="24" height="22" rx="4" fill="#fff" mask="url(#flap)"/>
+</svg>
