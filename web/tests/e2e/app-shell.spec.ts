@@ -82,6 +82,11 @@ test("UI-01.3 keyboard shortcuts navigate and open the palette and help", async 
 
   await page.keyboard.press("ControlOrMeta+k");
   await page.getByPlaceholder("Type a page or an action...").fill("logs");
+  // Wait for the filter to settle; pressing Enter earlier selects the first item.
+  await expect(page.getByRole("option", { name: /Logs/ })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/logs$/);
 });
