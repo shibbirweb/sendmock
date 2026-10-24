@@ -85,7 +85,8 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            {/* gap-1 keeps hover and active backgrounds from touching. */}
+            <SidebarMenu className="gap-1">
               {navigationItems.map((navigationItem) => (
                 <SidebarMenuItem key={navigationItem.title}>
                   <SidebarMenuButton
@@ -105,7 +106,7 @@ export function AppSidebar() {
                   )}
                   {navigationItem.children !== undefined &&
                     isSectionActive(currentPath, navigationItem) && (
-                      <SidebarMenuSub>
+                      <SidebarMenuSub className="mt-1">
                         {navigationItem.children.map((childItem) => (
                           <SidebarMenuSubItem key={childItem.title}>
                             <SidebarMenuSubButton
