@@ -15,6 +15,8 @@ import { Route as LogsRouteImport } from './routes/logs'
 import { Route as MailRouteImport } from './routes/mail'
 import { Route as NumbersRouteImport } from './routes/numbers'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as MailIndexRouteImport } from './routes/mail/index'
+import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
 import { Route as SmsIndexRouteImport } from './routes/sms/index'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
 import { Route as WebhooksDeliveriesRouteImport } from './routes/webhooks/deliveries'
@@ -53,6 +55,16 @@ const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MailIndexRoute = MailIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailEmailIdRoute = MailEmailIdRouteImport.update({
+  id: '/$emailId',
+  path: '/$emailId',
+  getParentRoute: () => MailRoute,
 } as any)
 const SmsIndexRoute = SmsIndexRouteImport.update({
   id: '/sms/',
@@ -99,9 +111,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
-  '/mail': typeof MailRoute
+  '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
   '/settings': typeof SettingsRoute
+  '/mail/$emailId': typeof MailEmailIdRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
@@ -109,15 +122,16 @@ export interface FileRoutesByFullPath {
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
+  '/mail/': typeof MailIndexRoute
   '/sms/': typeof SmsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
-  '/mail': typeof MailRoute
   '/numbers': typeof NumbersRoute
   '/settings': typeof SettingsRoute
+  '/mail/$emailId': typeof MailEmailIdRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
@@ -125,6 +139,7 @@ export interface FileRoutesByTo {
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
+  '/mail': typeof MailIndexRoute
   '/sms': typeof SmsIndexRoute
 }
 export interface FileRoutesById {
@@ -132,9 +147,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
-  '/mail': typeof MailRoute
+  '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
   '/settings': typeof SettingsRoute
+  '/mail/$emailId': typeof MailEmailIdRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
@@ -142,6 +158,7 @@ export interface FileRoutesById {
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
+  '/mail/': typeof MailIndexRoute
   '/sms/': typeof SmsIndexRoute
 }
 export interface FileRouteTypes {
@@ -153,6 +170,7 @@ export interface FileRouteTypes {
     | '/mail'
     | '/numbers'
     | '/settings'
+    | '/mail/$emailId'
     | '/sms/verify'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
@@ -160,15 +178,16 @@ export interface FileRouteTypes {
     | '/webhooks/saved'
     | '/webhooks/templates'
     | '/webhooks/variables'
+    | '/mail/'
     | '/sms/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/http'
     | '/logs'
-    | '/mail'
     | '/numbers'
     | '/settings'
+    | '/mail/$emailId'
     | '/sms/verify'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
@@ -176,6 +195,7 @@ export interface FileRouteTypes {
     | '/webhooks/saved'
     | '/webhooks/templates'
     | '/webhooks/variables'
+    | '/mail'
     | '/sms'
   id:
     | '__root__'
@@ -185,6 +205,7 @@ export interface FileRouteTypes {
     | '/mail'
     | '/numbers'
     | '/settings'
+    | '/mail/$emailId'
     | '/sms/verify'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
@@ -192,6 +213,7 @@ export interface FileRouteTypes {
     | '/webhooks/saved'
     | '/webhooks/templates'
     | '/webhooks/variables'
+    | '/mail/'
     | '/sms/'
   fileRoutesById: FileRoutesById
 }
@@ -199,7 +221,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HttpRoute: typeof HttpRoute
   LogsRoute: typeof LogsRoute
-  MailRoute: typeof MailRoute
+  MailRoute: typeof MailRouteWithChildren
   NumbersRoute: typeof NumbersRoute
   SettingsRoute: typeof SettingsRoute
   SmsVerifyRoute: typeof SmsVerifyRoute
@@ -255,6 +277,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/mail/': {
+      id: '/mail/'
+      path: '/'
+      fullPath: '/mail/'
+      preLoaderRoute: typeof MailIndexRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/mail/$emailId': {
+      id: '/mail/$emailId'
+      path: '/$emailId'
+      fullPath: '/mail/$emailId'
+      preLoaderRoute: typeof MailEmailIdRouteImport
+      parentRoute: typeof MailRoute
     }
     '/sms/': {
       id: '/sms/'
@@ -315,11 +351,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MailRouteChildren {
+  MailEmailIdRoute: typeof MailEmailIdRoute
+  MailIndexRoute: typeof MailIndexRoute
+}
+
+const MailRouteChildren: MailRouteChildren = {
+  MailEmailIdRoute: MailEmailIdRoute,
+  MailIndexRoute: MailIndexRoute,
+}
+
+const MailRouteWithChildren = MailRoute._addFileChildren(MailRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HttpRoute: HttpRoute,
   LogsRoute: LogsRoute,
-  MailRoute: MailRoute,
+  MailRoute: MailRouteWithChildren,
   NumbersRoute: NumbersRoute,
   SettingsRoute: SettingsRoute,
   SmsVerifyRoute: SmsVerifyRoute,

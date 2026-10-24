@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { ApiError, buildRealtimeUrl, requestApi } from "@/lib/api/api-client";
+import {
+  ApiError,
+  buildApiUrl,
+  buildRealtimeUrl,
+  requestApi,
+  requestApiText,
+} from "@/lib/api/api-client";
 
 function stubFetchResponse(response: Response) {
   const fetchStub = vi.fn().mockResolvedValue(response);
@@ -86,5 +92,35 @@ describe("requestApi", () => {
 describe("buildRealtimeUrl", () => {
   test("uses ws:// on the same origin as the UI", () => {
     expect(buildRealtimeUrl()).toBe(`ws://${window.location.host}/api/v1/ws`);
+  });
+});
+
+describe("requestApiText", () => {
+  test("returns the body as text, e.g. the raw email source", async () => {
+    stubFetchResponse(new Response("From: app@acme.test\r\n\r\nHello"));
+
+    await expect(requestApiText("/emails/01JB/raw")).resolves.toBe(
+      "From: app@acme.test\r\n\r\nHello",
+    );
+  });
+
+  test("throws ApiError for error responses", async () => {
+    stubFetchResponse(
+      Response.json(
+        { error: { code: "not_found", message: "Email not found" } },
+        { status: 404 },
+      ),
+    );
+
+    await expect(requestApiText("/emails/missing/raw")).rejects.toMatchObject({
+      statusCode: 404,
+      errorCode: "not_found",
+    });
+  });
+});
+
+describe("buildApiUrl", () => {
+  test("prefixes /api/v1 for links the browser opens directly", () => {
+    expect(buildApiUrl("/emails/01JB/raw")).toBe("/api/v1/emails/01JB/raw");
   });
 });

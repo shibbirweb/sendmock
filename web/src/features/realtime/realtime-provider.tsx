@@ -15,6 +15,11 @@ export type RealtimeConnectionState =
 const RealtimeConnectionContext =
   React.createContext<RealtimeConnectionState>("connecting");
 
+type AppEventListener = (appEvent: AppEvent) => void;
+
+/** Lets features react to events (e.g. browser notifications for new mail). */
+const appEventListeners = new Set<AppEventListener>();
+
 const reconnectDelayMs = 3000;
 
 /**
@@ -34,6 +39,10 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     const handleAppEvent = (appEvent: AppEvent) => {
       for (const queryKey of listQueryKeysToRefresh(appEvent.type)) {
         void queryClient.invalidateQueries({ queryKey });
+      }
+
+      for (const appEventListener of appEventListeners) {
+        appEventListener(appEvent);
       }
 
       const toastMessage = describeEventForToast(appEvent);
@@ -84,4 +93,24 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
 export function useRealtimeConnectionState(): RealtimeConnectionState {
   return React.useContext(RealtimeConnectionContext);
+}
+
+/** Calls the listener for every realtime event while the component is mounted. */
+export function useAppEventListener(appEventListener: AppEventListener) {
+  const latestListenerRef = React.useRef(appEventListener);
+
+  React.useEffect(() => {
+    latestListenerRef.current = appEventListener;
+  });
+
+  React.useEffect(() => {
+    const forwardAppEvent: AppEventListener = (appEvent) => {
+      latestListenerRef.current(appEvent);
+    };
+    appEventListeners.add(forwardAppEvent);
+
+    return () => {
+      appEventListeners.delete(forwardAppEvent);
+    };
+  }, []);
 }

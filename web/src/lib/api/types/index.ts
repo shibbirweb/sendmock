@@ -1,5 +1,6 @@
 export type * from "@/lib/api/types/common";
 export type * from "@/lib/api/types/email";
+export type * from "@/lib/api/types/email-checks";
 export type * from "@/lib/api/types/sms";
 export type * from "@/lib/api/types/verify-and-numbers";
 export type * from "@/lib/api/types/webhooks";
