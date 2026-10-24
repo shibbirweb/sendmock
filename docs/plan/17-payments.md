@@ -1,6 +1,6 @@
 # 17. Payment Gateway Emulation
 
-MessageHook also acts as a **fake payment gateway**. Apps create payments or checkout sessions against provider-compatible APIs (Stripe, PayPal, SSLCommerz, bKash, Razorpay, ...), the user "pays" on a MessageHook-hosted test checkout page (or the API confirms with a test card), and MessageHook sends the gateway's callbacks: redirects to the app's success/fail/cancel URLs plus **IPN / webhook events**, signed like the real provider. Refunds, captures, disputes and subscriptions can be simulated too.
+SendMock also acts as a **fake payment gateway**. Apps create payments or checkout sessions against provider-compatible APIs (Stripe, PayPal, SSLCommerz, bKash, Razorpay, ...), the user "pays" on a SendMock-hosted test checkout page (or the API confirms with a test card), and SendMock sends the gateway's callbacks: redirects to the app's success/fail/cancel URLs plus **IPN / webhook events**, signed like the real provider. Refunds, captures, disputes and subscriptions can be simulated too.
 
 This lets developers build and test the whole payment flow, including IPN handlers, signature checks, order validation and failure paths, locally and offline, with no sandbox account and no internet.
 
@@ -12,7 +12,7 @@ This lets developers build and test the whole payment flow, including IPN handle
 
 ## Safety rules (non-negotiable)
 
-- **No real money, ever.** MessageHook never contacts a real gateway or card network.
+- **No real money, ever.** SendMock never contacts a real gateway or card network.
 - **Only test card numbers are accepted.** Any card number that passes the Luhn check but is not a documented test card is rejected with "Use a test card" and is **never stored or logged** (not even masked). This protects developers who paste a real card by mistake.
 - Stored payment methods are reduced to brand, last 4 and expiry; no full PAN or CVC is ever kept.
 - Hosted checkout pages show a permanent "TEST MODE: no real payment" banner.
@@ -22,11 +22,11 @@ This lets developers build and test the whole payment flow, including IPN handle
 ### 1. Hosted checkout (redirect flow)
 
 1. The app creates a session (e.g. Stripe `POST /v1/checkout/sessions`, PayPal `POST /v2/checkout/orders`, SSLCommerz `POST /gwprocess/v4/api.php`, bKash create payment).
-2. MessageHook returns the provider-shaped response with a redirect URL to the **MessageHook test checkout page** (`http://127.0.0.1:8025/pay/{sessionId}`).
+2. SendMock returns the provider-shaped response with a redirect URL to the **SendMock test checkout page** (`http://127.0.0.1:8025/pay/{sessionId}`).
 3. The checkout page shows the order (amount, currency, items, merchant) and test controls: **Pay successfully**, **Decline** (choose a reason: insufficient funds, expired card, incorrect CVC, generic decline, fraud), **Cancel**, **Require 3-D Secure** (then approve or fail the challenge), and **Delay** (stay pending, settle later). Card, wallet (bKash/Nagad style PIN/OTP screens) or bank options follow the provider being emulated.
-4. MessageHook redirects the browser to the app's `success_url` / `fail_url` / `cancel_url` with the provider's parameters (GET or POST, as the provider does).
-5. MessageHook fires the provider's **server-to-server notification** (IPN / webhook) to the app, signed, through the webhook engine (retries, delivery log, replay).
-6. The app can call the provider's **validation / retrieve API** on MessageHook (e.g. SSLCommerz order validation with `val_id`, PayPal IPN postback `cmd=_notify-validate`, Stripe `GET /v1/checkout/sessions/{id}`), which answers consistently with what happened.
+4. SendMock redirects the browser to the app's `success_url` / `fail_url` / `cancel_url` with the provider's parameters (GET or POST, as the provider does).
+5. SendMock fires the provider's **server-to-server notification** (IPN / webhook) to the app, signed, through the webhook engine (retries, delivery log, replay).
+6. The app can call the provider's **validation / retrieve API** on SendMock (e.g. SSLCommerz order validation with `val_id`, PayPal IPN postback `cmd=_notify-validate`, Stripe `GET /v1/checkout/sessions/{id}`), which answers consistently with what happened.
 
 ### 2. Direct API (server-side) payments
 
@@ -87,7 +87,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | Provider | Scheme emulated |
 |----------|-----------------|
 | Stripe | `Stripe-Signature: t=<ts>,v1=<HMAC-SHA256(whsec, "t.payload")>` with the endpoint's `whsec_` secret, so `stripe.webhooks.constructEvent` works unchanged |
-| PayPal | webhook headers (`PAYPAL-TRANSMISSION-ID`, `-SIG`, ...) plus a `verify-webhook-signature` endpoint on MessageHook that returns `SUCCESS`; IPN postback returns `VERIFIED` / `INVALID` |
+| PayPal | webhook headers (`PAYPAL-TRANSMISSION-ID`, `-SIG`, ...) plus a `verify-webhook-signature` endpoint on SendMock that returns `SUCCESS`; IPN postback returns `VERIFIED` / `INVALID` |
 | SSLCommerz | `verify_sign` (MD5 over the sorted `verify_key` fields with the hashed store password) |
 | Razorpay | `X-Razorpay-Signature` HMAC-SHA256 of the body with the webhook secret; checkout `razorpay_signature` over `order_id|payment_id` |
 | Paddle | `Paddle-Signature: ts=..;h1=..` |
@@ -107,7 +107,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 - **Settings > Payments**: merchant credentials per provider, default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), test card and wallet tables.
 - Overview: payments count, success rate, revenue (test) per currency.
 
-## API (MessageHook native)
+## API (SendMock native)
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -119,7 +119,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | GET | `/payments/test-cards` | the test card and wallet tables |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
 
-CLI: `messagehook payments list|show|simulate|notify|test-cards`. MCP toolset `payments`: `messagehook_payment_list`, `messagehook_payment_get`, `messagehook_payment_simulate`, `messagehook_payment_notify`, `messagehook_payment_create_checkout`, `messagehook_payment_wait`.
+CLI: `sendmock payments list|show|simulate|notify|test-cards`. MCP toolset `payments`: `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_create_checkout`, `sendmock_payment_wait`.
 
 ## Roadmap placement
 

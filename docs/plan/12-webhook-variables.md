@@ -49,7 +49,7 @@ Highest wins:
 1. **Send-time overrides:** values typed into the manual send dialog, or passed in the API call (`"variables": { ... }`).
 2. **Endpoint variables:** defined on one endpoint.
 3. **Global variables:** shared by all endpoints.
-4. **Environment variables:** `MESSAGEHOOK_VAR_<NAME>` from the process env, exposed as `vars.<name>` (lowercased). Only this prefix is read, so other secrets in the environment are never reachable. Useful for CI.
+4. **Environment variables:** `SENDMOCK_VAR_<NAME>` from the process env, exposed as `vars.<name>` (lowercased). Only this prefix is read, so other secrets in the environment are never reachable. Useful for CI.
 
 ### Random value stability
 
@@ -73,7 +73,7 @@ Available in every template without defining anything:
 | `endpoint.name`, `endpoint.url` | the target endpoint |
 | `delivery.id`, `delivery.attempt`, `delivery.trigger` | `auto`, `manual`, `replay` |
 | `rule.id`, `rule.name` | the rule that fired (null for manual) |
-| `messagehook.version`, `messagehook.http_url` | instance info, e.g. to build attachment links |
+| `sendmock.version`, `sendmock.http_url` | instance info, e.g. to build attachment links |
 | `request_id` | a ULID unique to this delivery, stable across retries |
 
 ## Built-in functions (random and generated values)
@@ -139,7 +139,7 @@ The endpoint editor and manual composer offer:
 | Mode | Use |
 |------|-----|
 | **Template** | a built-in service template (Twilio, SendGrid, Slack, ...) or a saved custom template ([13-webhook-templates.md](13-webhook-templates.md)), plus an optional "Extra fields" table merged in, each value a template |
-| **Fields** | key/value rows; each value is a template with a type (text, number, boolean, JSON, file for multipart). Encoded as JSON, `x-www-form-urlencoded` or `multipart/form-data`. MessageHook handles quoting and escaping, so users cannot produce invalid JSON. Nested keys via dot notation (`user.email`). |
+| **Fields** | key/value rows; each value is a template with a type (text, number, boolean, JSON, file for multipart). Encoded as JSON, `x-www-form-urlencoded` or `multipart/form-data`. SendMock handles quoting and escaping, so users cannot produce invalid JSON. Nested keys via dot notation (`user.email`). |
 | **Raw** | free-text template with a content type (JSON, XML, plain text, HTML, custom). JSON raw bodies are validated after rendering and show a warning if invalid. |
 | **None** | no body (for GET or pure ping requests) |
 

@@ -6,7 +6,7 @@ import type {
   Ulid,
 } from "@/lib/api/types/common";
 
-/** How the message reached MessageHook. */
+/** How the message reached SendMock. */
 export type EmailSource =
   | "smtp"
   | "sendmail"

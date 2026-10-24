@@ -8,7 +8,7 @@ export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: "MessageHook",
+      title: "SendMock",
     },
     links: [
       { text: "Docs", url: "/docs" },

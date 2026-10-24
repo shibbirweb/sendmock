@@ -11,7 +11,7 @@ Almost every app sends email and SMS: sign-up verification, OTP codes, password 
 
 ## The solution
 
-MessageHook is a local "communications sandbox" that:
+SendMock is a local "communications sandbox" that:
 
 - **Acts as a mail server and email provider.** Accepts any email over SMTP or through SendGrid / Mailgun / Postmark / Resend / SES / Brevo compatible HTTP APIs, stores it, shows it in the browser, and simulates delivery outcomes (delivered, bounced, complained).
 - **Acts as an SMS vendor.** Exposes an HTTP API that looks like popular SMS providers, including Twilio Verify for OTP flows (plus a simple native API), stores every message, and simulates delivery status with Twilio's real test numbers.
@@ -23,9 +23,9 @@ MessageHook is a local "communications sandbox" that:
 
 ## Landscape
 
-Closest tools (October 2026) and where MessageHook differs:
+Closest tools (October 2026) and where SendMock differs:
 
-| Tool | What it covers | Gap MessageHook fills |
+| Tool | What it covers | Gap SendMock fills |
 |------|----------------|-----------------------|
 | Mailpit, MailHog, smtp4dev, Sendria | Local email capture | SMS, payments, provider APIs, webhook workbench |
 | Mailtrap (cloud) and Mailtrap Local (open source, July 2026) | Email sandbox, now also self-hosted | SMS, payments, provider emulation, one binary for all |
@@ -46,7 +46,7 @@ Closest tools (October 2026) and where MessageHook differs:
 ## Goals
 
 1. **Super lightweight.** Target: release binary under 20 MB, idle memory under 30 MB, cold start under 200 ms.
-2. **Zero config to start.** `messagehook` with no flags works with sensible defaults.
+2. **Zero config to start.** `sendmock` with no flags works with sensible defaults.
 3. **Cross platform.** macOS (Apple Silicon and Intel), Linux (x64, arm64, static musl), Windows (x64, arm64).
 4. **Excellent UI.** Fast, keyboard friendly, dark/light mode, realtime updates, built with shadcn/ui.
 5. **First-class webhooks.** Auto and manual triggers, delivery logs, retries, replay, signing, provider-shaped payloads.
@@ -63,6 +63,6 @@ Closest tools (October 2026) and where MessageHook differs:
 
 ## Success criteria for v1.0
 
-- A developer in any of the 8 listed languages can point their app at MessageHook and see email and SMS in under 5 minutes, following [08-integrations.md](08-integrations.md).
+- A developer in any of the 8 listed languages can point their app at SendMock and see email and SMS in under 5 minutes, following [08-integrations.md](08-integrations.md).
 - Webhook rules can forward every received email/SMS to a local URL, with full request/response logs and one-click replay.
 - One binary per platform is published on GitHub Releases, Homebrew, Scoop and Docker Hub / GHCR.

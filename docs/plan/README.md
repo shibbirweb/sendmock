@@ -1,6 +1,6 @@
 # Project Plan
 
-Product name: **MessageHook**: messages (email, SMS) and webhooks, with payment IPNs delivered as hooks too. Binary and package name `messagehook`; published from the `shibbirweb` GitHub account. How the name was chosen: [10-open-questions.md](10-open-questions.md#1-product-name-decided-2026-10-25-messagehook).
+Product name: **SendMock**: "send it to the mock". Your app sends email, SMS, payments and webhooks to SendMock instead of the real services. Binary and package name `sendmock`; published from the `shibbirweb` GitHub account. How the name was chosen: [10-open-questions.md](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock).
 
 ## One-line pitch
 

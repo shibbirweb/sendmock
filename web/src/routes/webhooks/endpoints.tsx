@@ -12,7 +12,7 @@ function WebhookEndpointsPage() {
     <PagePlaceholder
       icon={SendIcon}
       title="Webhook endpoints"
-      description="Where MessageHook sends webhooks: URL, template, secret and retry policy."
+      description="Where SendMock sends webhooks: URL, template, secret and retry policy."
       plannedPhase="Phase U2"
     />
   );

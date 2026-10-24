@@ -31,7 +31,7 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | `/docs/` | User docs: getting started, install (binary, Docker, Homebrew, ...), connect your app (per language), email, SMS, Verify, webhooks, templates, variables, HTTP catcher, CLI, MCP and AI, configuration and seed file, troubleshooting |
 | `/api/` | API reference generated from the OpenAPI spec, with the playground on every endpoint |
 | `/playground/` | Full-screen playground (request builder + response + event stream) |
-| `/demo/` | The real MessageHook web UI built in mock mode (Stage A mock layer), fully clickable in the browser |
+| `/demo/` | The real SendMock web UI built in mock mode (Stage A mock layer), fully clickable in the browser |
 | `/templates/` | Catalogue of built-in webhook payload templates, generated from the template TOML files |
 | `/changelog/` | Rendered `CHANGELOG.md`, with beta and stable releases marked |
 | `/download/` | OS-detected install instructions, stable and beta side by side |
@@ -44,13 +44,13 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | Section | Magic UI component (planned) | Idea |
 |---------|------------------------------|------|
 | Hero | Animated gradient text, shimmer/rainbow button, retro grid or dot pattern background | "Catch every email, SMS and webhook locally" with Download and Try the demo buttons |
-| How it works | **Animated Beam** | Your app -> MessageHook (SMTP, SMS API, HTTP) -> UI, and MessageHook -> webhooks back to your app, with beams animating along each path |
-| Quick start | **Terminal** (typing animation) | `brew install ...`, MessageHook, then a captured OTP appearing |
+| How it works | **Animated Beam** | Your app -> SendMock (SMTP, SMS API, HTTP) -> UI, and SendMock -> webhooks back to your app, with beams animating along each path |
+| Quick start | **Terminal** (typing animation) | `brew install ...`, SendMock, then a captured OTP appearing |
 | Works with | **Marquee** | Language logos (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) and provider names (Twilio, SendGrid, Mailgun, Postmark, Resend, Slack, ...) as text badges |
 | Features | **Bento Grid** with **Magic Card** / **Border Beam** | Email, SMS + Verify, Webhooks, Templates, HTTP catcher, AI/MCP, Docker |
 | Numbers | **Number Ticker** | binary size, startup time, providers emulated, languages |
 | Product shots | **Safari** / **iPhone** mockups, **Hero Video Dialog** | app screenshots and a short tour video |
-| AI section | Animated list | an agent session: `messagehook_status` -> `messagehook_sms_wait` -> OTP |
+| AI section | Animated list | an agent session: `sendmock_status` -> `sendmock_sms_wait` -> OTP |
 | Footer CTA | Confetti on copy of the install command, shiny text | |
 
 Exact component names are checked against the Magic UI registry when the site is built.
@@ -62,8 +62,8 @@ The playground is the main interactive feature. Because GitHub Pages is static, 
 | Target | How it works | When to use |
 |--------|--------------|-------------|
 | **Demo (default)** | Requests are answered **in the browser** by the same MSW mock layer built in Stage A (`web/src/mocks`, shared as a workspace package). State persists in the tab; realtime events stream from the mock generator | Anyone can try every endpoint without installing anything |
-| **Your local MessageHook** | Requests go to `http://localhost:8025` (editable). MessageHook allows the docs site origin via CORS by default (`--cors-origins`, removable), and only when the user clicks **Connect**. Browsers may show a local network access permission prompt; the page explains it | Real requests against your own running instance |
-| **Custom URL** | Any reachable MessageHook (team instance, Docker host) with an API token field | Shared or remote instances |
+| **Your local SendMock** | Requests go to `http://localhost:8025` (editable). SendMock allows the docs site origin via CORS by default (`--cors-origins`, removable), and only when the user clicks **Connect**. Browsers may show a local network access permission prompt; the page explains it | Real requests against your own running instance |
+| **Custom URL** | Any reachable SendMock (team instance, Docker host) with an API token field | Shared or remote instances |
 
 Features:
 
@@ -71,7 +71,7 @@ Features:
 - Request builder from the schema (path/query/body forms plus raw JSON editor), auth header, examples per endpoint.
 - **Code snippets** for every request in cURL, PHP, JavaScript, Python, Go, Java, Rust, Ruby and C#, kept in sync with the form.
 - Response viewer (status, headers, pretty JSON, timing) and a live **event stream** panel (WebSocket/SSE) showing events the request triggered.
-- **Scenario mode:** run multi-step flows (send SMS -> wait -> get OTP -> verify) as a guided walkthrough, using the same step format as `messagehook scenario run`.
+- **Scenario mode:** run multi-step flows (send SMS -> wait -> get OTP -> verify) as a guided walkthrough, using the same step format as `sendmock scenario run`.
 - **Provider endpoints too:** Twilio, Verify, SendGrid, ... wire APIs can be tried in Demo mode and against the provider port in Local mode.
 - "Open in demo UI" link: after a request, jump to `/demo/` to see the captured message.
 
@@ -81,7 +81,7 @@ Fumadocs' built-in OpenAPI pages may be used for the reference text; the interac
 
 - **Source of truth:** user docs live as Markdown in `docs/wiki/` (as in phpdebugger), synced into `website/` at build time, and optionally published to the GitHub wiki by `wiki.yml`. The planning docs live separately in `docs/plan/` and are not published on the website.
 - **Generated pages** (so docs never drift from code), checked in CI:
-  - CLI reference and MCP tool list from the `messagehook-ops` registry.
+  - CLI reference and MCP tool list from the `sendmock-ops` registry.
   - Built-in template catalogue from the template TOML files.
   - Template functions and filters from `/webhooks/template-reference`.
   - Magic numbers / magic addresses tables, provider compatibility tables.
@@ -160,8 +160,8 @@ flowchart LR
 |---------|------------------------|----------------------|
 | GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums | release `vX.Y.Z` marked latest |
 | Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` (plus `edge` on every `develop` push) | `latest`, `X`, `X.Y`, `X.Y.Z` |
-| Homebrew tap | `messagehook-beta` formula | `messagehook` formula |
-| Scoop bucket | `messagehook-beta` manifest | `messagehook` manifest |
+| Homebrew tap | `sendmock-beta` formula | `sendmock` formula |
+| Scoop bucket | `sendmock-beta` manifest | `sendmock` manifest |
 | npm wrapper | dist-tag `beta` | dist-tag `latest` |
 | Install scripts | `install.sh --channel beta` | default |
 | crates.io | not published | published |
@@ -172,7 +172,7 @@ flowchart LR
 
 - Settings > About shows the running version and channel (`stable`, `beta`, `edge`, `dev`).
 - Opt-in update check reads GitHub Releases; stable installs are only offered stables, beta installs are offered betas and stables.
-- The UI and `messagehook version` link to the matching changelog entry and docs version (`/` or `/next/`).
+- The UI and `sendmock version` link to the matching changelog entry and docs version (`/` or `/next/`).
 
 ### Commit and PR conventions
 
@@ -185,6 +185,6 @@ Conventional prefixes drive the version bump and changelog grouping (`feat:`, `f
 - **Phase U0:** `develop` and `main` branches, branch protection, `ci.yml` for `web/` and `website/`, website skeleton (Fumadocs + Magic UI landing draft), `website.yml` deploying to Pages with `/demo/` = mock-mode UI. This replaces the generic "static preview build" as the shareable preview URL.
 - **Phase U3:** API reference and **playground in Demo mode** generated from the frozen OpenAPI spec; landing page polished with Magic UI; docs IA drafted.
 - **Phase 0:** `scripts/version.ts`, `CHANGELOG.md`, all release workflows (`beta*`, `stable*`, `release.yml`, `docker-edge.yml`), versioned website builds (`/next/`).
-- **Phase 1:** first beta `0.1.0-beta.1` (email backend) published through the beta channel; playground **Local mode** with CORS support in MessageHook.
+- **Phase 1:** first beta `0.1.0-beta.1` (email backend) published through the beta channel; playground **Local mode** with CORS support in SendMock.
 - **Phases 2-4:** a beta per phase (or more often); docs pages and generated references grow with each feature.
 - **Phase 5:** first stable `1.0.0` promoted to `main`; all stable channels go live; `main` becomes the default branch.

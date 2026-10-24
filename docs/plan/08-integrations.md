@@ -1,6 +1,6 @@
 # 08. Language Integrations
 
-MessageHook needs no SDK. Email uses SMTP or a provider-compatible HTTP API, SMS uses HTTP. This page is the draft for the user-facing "Connect your app" guide. Each snippet will get a runnable sample app under `examples/<language>/` and a CI smoke test.
+SendMock needs no SDK. Email uses SMTP or a provider-compatible HTTP API, SMS uses HTTP. This page is the draft for the user-facing "Connect your app" guide. Each snippet will get a runnable sample app under `examples/<language>/` and a CI smoke test.
 
 Defaults assumed below: SMTP `127.0.0.1:1025`, HTTP `http://127.0.0.1:8025`, provider port (when enabled) `http://127.0.0.1:8026`.
 
@@ -12,7 +12,7 @@ Defaults assumed below: SMTP `127.0.0.1:1025`, HTTP `http://127.0.0.1:8025`, pro
 |-------|---------------|
 | PHP / Laravel | `.env`: `MAIL_MAILER=smtp`, `MAIL_HOST=127.0.0.1`, `MAIL_PORT=1025`, `MAIL_ENCRYPTION=null` |
 | PHP / Symfony | `MAILER_DSN=smtp://127.0.0.1:1025` |
-| PHP / plain `mail()` | `php.ini`: `sendmail_path = "/usr/local/bin/messagehook sendmail -t"` |
+| PHP / plain `mail()` | `php.ini`: `sendmail_path = "/usr/local/bin/sendmock sendmail -t"` |
 | Node / Nodemailer | `nodemailer.createTransport({ host: '127.0.0.1', port: 1025, secure: false });` |
 | Python / smtplib | `smtplib.SMTP('127.0.0.1', 1025)` |
 | Python / Django | `EMAIL_HOST = '127.0.0.1'`, `EMAIL_PORT = 1025` |
@@ -55,11 +55,11 @@ curl -X POST http://127.0.0.1:8025/api/v1/sms \
 
 Equivalent minimal snippets for each language (PHP `Http::post`, `fetch`, `requests.post`, `http.Post`, `HttpClient`, `reqwest`, `Net::HTTP`, `HttpClient` in .NET) will be in the guide.
 
-A recommended pattern for apps: define an `SmsSender` interface with a production implementation (real provider) and a local implementation (native MessageHook API), switched by env var.
+A recommended pattern for apps: define an `SmsSender` interface with a production implementation (real provider) and a local implementation (native SendMock API), switched by env var.
 
 ### Provider SDKs (Twilio, Vonage, ...)
 
-Point the SDK at MessageHook instead of the provider:
+Point the SDK at SendMock instead of the provider:
 
 - Use the SDK's base URL / host option where available, targeting the provider port (`--provider-addr 127.0.0.1:8026`) so provider paths resolve at the root. This covers Twilio Messaging, Messaging Services and Verify.
 - Otherwise inject a custom HTTP client that rewrites `api.twilio.com`, `verify.twilio.com`, `messaging.twilio.com` (or the vendor host) to `127.0.0.1:8026`.
@@ -93,7 +93,7 @@ Node (`standardwebhooks` on npm):
 ```js
 import { Webhook } from 'standardwebhooks';
 
-const webhook = new Webhook(process.env.MESSAGEHOOK_WEBHOOK_SECRET);
+const webhook = new Webhook(process.env.SENDMOCK_WEBHOOK_SECRET);
 const event = webhook.verify(rawBody, {
   'webhook-id': req.headers['webhook-id'],
   'webhook-timestamp': req.headers['webhook-timestamp'],
@@ -133,7 +133,7 @@ Provider-format deliveries (Twilio, Mailgun, SendGrid, ...) are verified with th
 ## Using it in tests
 
 ```python
-# pytest example: sign up, then read the OTP from messagehook
+# pytest example: sign up, then read the OTP from sendmock
 requests.post(f"{APP}/signup", json={"phone": "+8801700000000"})
 otp = requests.get(f"{MSS}/api/v1/otp", params={"to": "+8801700000000", "channel": "sms", "timeout": "10s"}).json()["code"]
 ```
@@ -144,10 +144,10 @@ const res = await request.get(`${MSS}/api/v1/wait/email`, { params: { to: 'user@
 const email = await res.json();
 ```
 
-### Starting MessageHook from a test suite
+### Starting SendMock from a test suite
 
-- **Testcontainers** modules (Java, Node, Go, Python, .NET; Phase 5): `new MssContainer().withSeed("messagehook.seed.toml")` exposes `getSmtpPort()`, `getHttpUrl()`, `getProviderUrl()`.
-- **Random ports:** `messagehook serve --smtp-addr 127.0.0.1:0 --http-addr 127.0.0.1:0 --ready-json` binds free ports and prints one JSON line with the chosen addresses once ready, so test harnesses can spawn the binary directly:
+- **Testcontainers** modules (Java, Node, Go, Python, .NET; Phase 5): `new MssContainer().withSeed("sendmock.seed.toml")` exposes `getSmtpPort()`, `getHttpUrl()`, `getProviderUrl()`.
+- **Random ports:** `sendmock serve --smtp-addr 127.0.0.1:0 --http-addr 127.0.0.1:0 --ready-json` binds free ports and prints one JSON line with the chosen addresses once ready, so test harnesses can spawn the binary directly:
 
 ```json
 {"ready":true,"smtp":"127.0.0.1:53121","http":"http://127.0.0.1:53122","provider":null,"pid":4242}
@@ -157,31 +157,31 @@ const email = await res.json();
 
 ```yaml
 services:
-  messagehook:
-    image: ghcr.io/<owner>/messagehook:1
+  sendmock:
+    image: ghcr.io/<owner>/sendmock:1
     ports:
       - "8025:8025"   # UI, API, MCP
       - "1025:1025"   # SMTP
       - "8026:8026"   # provider APIs (optional)
     environment:
-      MESSAGEHOOK_PROVIDER_ADDR: 0.0.0.0:8026
-      MESSAGEHOOK_UI_AUTH: admin:change-me      # recommended when ports are published
+      SENDMOCK_PROVIDER_ADDR: 0.0.0.0:8026
+      SENDMOCK_UI_AUTH: admin:change-me      # recommended when ports are published
     volumes:
-      - messagehook-data:/data
-      - ./messagehook.seed.toml:/config/messagehook.seed.toml:ro
+      - sendmock-data:/data
+      - ./sendmock.seed.toml:/config/sendmock.seed.toml:ro
   app:
     build: .
     environment:
-      MAIL_HOST: messagehook
+      MAIL_HOST: sendmock
       MAIL_PORT: 1025
-      SMS_BASE_URL: http://messagehook:8025
-      TWILIO_BASE_URL: http://messagehook:8026
+      SMS_BASE_URL: http://sendmock:8025
+      TWILIO_BASE_URL: http://sendmock:8026
     depends_on:
-      messagehook:
+      sendmock:
         condition: service_healthy
 
 volumes:
-  messagehook-data:
+  sendmock-data:
 ```
 
-Inside the image MessageHook already listens on `0.0.0.0` and stores data in `/data`; see [09-distribution.md](09-distribution.md#docker). When MessageHook calls webhooks on an app running on the host, use `host.docker.internal` (macOS/Windows) or `--add-host=host.docker.internal:host-gateway` (Linux); within Compose, use the service name (`http://app:8000/...`).
+Inside the image SendMock already listens on `0.0.0.0` and stores data in `/data`; see [09-distribution.md](09-distribution.md#docker). When SendMock calls webhooks on an app running on the host, use `host.docker.internal` (macOS/Windows) or `--add-host=host.docker.internal:host-gateway` (Linux); within Compose, use the service name (`http://app:8000/...`).

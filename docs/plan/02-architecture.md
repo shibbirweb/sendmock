@@ -10,7 +10,7 @@ flowchart LR
         A3[Webhook handlers]
     end
 
-    subgraph MSS["messagehook (single binary)"]
+    subgraph MSS["sendmock (single binary)"]
         SMTP[SMTP listener :1025]
         HTTP[HTTP server :8025]
         SMS[SMS gateway routes]
@@ -60,7 +60,7 @@ Inside the Docker image all listeners bind `0.0.0.0` ([09-distribution.md](09-di
 | `catcher` | HTTP catcher bins, mock response rules, presets ([15-http-catcher.md](15-http-catcher.md)). |
 | `payments` | Payment gateway emulation: native and provider APIs, hosted test checkout, test cards, IPN/webhook events, refunds, disputes ([17-payments.md](17-payments.md)). |
 | `logs` | SMTP session transcripts and API request log (including rejected requests). |
-| `seed` | Loads, applies and exports `messagehook.seed.toml`; `reset` restores the seed state. |
+| `seed` | Loads, applies and exports `sendmock.seed.toml`; `reset` restores the seed state. |
 | `events` | In-process broadcast bus (`tokio::sync::broadcast`). Every received or changed item becomes an `Event`. |
 | `store` | SQLite access, migrations, retention/pruning, full-text search. |
 | `webhooks` | Endpoint registry, rule matching, payload rendering, signing, persistent delivery queue, retries. |
@@ -107,7 +107,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | Fake data | `fake` | random names, emails, sentences for webhook variables |
 | Randomness | `rand`, `uuid` | random generators, UUID v4/v7 |
 | Embedding UI | `rust-embed` | compile `web/dist` into the binary |
-| CLI / config | `clap` (derive, env), `serde`, `toml` | flags, `MESSAGEHOOK_*` env vars, `messagehook.toml` |
+| CLI / config | `clap` (derive, env), `serde`, `toml` | flags, `SENDMOCK_*` env vars, `sendmock.toml` |
 | IDs | `ulid` | sortable IDs, good for pagination |
 | Logging | `tracing`, `tracing-subscriber` | |
 | OpenAPI | `utoipa` | spec served at `/api/openapi.json` |
@@ -140,25 +140,25 @@ In development, Vite proxies `/api` and `/ws` to the Rust server. In release bui
 ## Repository layout
 
 ```
-messagehook/
+sendmock/
 ├── Cargo.toml              # workspace root
 ├── crates/
-│   ├── messagehook/                # binary: CLI, wiring, config
-│   ├── messagehook-core/           # shared types: Event, Email, Sms, errors
-│   ├── messagehook-store/          # SQLite, migrations, search, retention
-│   ├── messagehook-smtp/           # SMTP server
-│   ├── messagehook-sms/            # SMS gateway + provider emulation
-│   ├── messagehook-webhooks/       # rules, rendering, delivery queue
-│   ├── messagehook-ops/            # operation registry shared by REST, CLI and MCP
-│   ├── messagehook-api/            # axum routes, websocket, openapi, static UI
-│   ├── messagehook-cli/            # client commands, scenarios, ai install
-│   └── messagehook-mcp/            # MCP server (rmcp), tools, resources, prompts
+│   ├── sendmock/                # binary: CLI, wiring, config
+│   ├── sendmock-core/           # shared types: Event, Email, Sms, errors
+│   ├── sendmock-store/          # SQLite, migrations, search, retention
+│   ├── sendmock-smtp/           # SMTP server
+│   ├── sendmock-sms/            # SMS gateway + provider emulation
+│   ├── sendmock-webhooks/       # rules, rendering, delivery queue
+│   ├── sendmock-ops/            # operation registry shared by REST, CLI and MCP
+│   ├── sendmock-api/            # axum routes, websocket, openapi, static UI
+│   ├── sendmock-cli/            # client commands, scenarios, ai install
+│   └── sendmock-mcp/            # MCP server (rmcp), tools, resources, prompts
 ├── ai/
 │   └── skill/              # agent skill source (SKILL.md + references), embedded in the binary
 ├── web/                    # Bun + Vite + React + shadcn/ui
 │   ├── package.json
 │   ├── src/
-│   └── dist/               # build output, embedded by messagehook-api (git-ignored)
+│   └── dist/               # build output, embedded by sendmock-api (git-ignored)
 ├── website/                # docs site + API playground (Fumadocs, shadcn, Magic UI), GitHub Pages
 ├── docs/
 │   ├── plan/               # this plan
@@ -262,8 +262,8 @@ Key/value table for runtime-editable settings (retention, SMS simulation profile
 
 Two files, both optional:
 
-- **`messagehook.toml`**: how the server runs (ports, DB path, auth, relay SMTP, retention). Precedence: flags > `MESSAGEHOOK_*` env > `messagehook.toml` > defaults.
-- **`messagehook.seed.toml`**: the **state** to start from, as code: webhook endpoints, rules, templates, variables (secrets via `${ENV_VAR}` references, never literal), virtual numbers, Messaging Services, Verify services (incl. fixed codes), HTTP catcher bins and responses, tag/forward rules, saved deliveries, settings (SMS profile, opened-event options, chaos), and optional local email templates for provider template IDs.
+- **`sendmock.toml`**: how the server runs (ports, DB path, auth, relay SMTP, retention). Precedence: flags > `SENDMOCK_*` env > `sendmock.toml` > defaults.
+- **`sendmock.seed.toml`**: the **state** to start from, as code: webhook endpoints, rules, templates, variables (secrets via `${ENV_VAR}` references, never literal), virtual numbers, Messaging Services, Verify services (incl. fixed codes), HTTP catcher bins and responses, tag/forward rules, saved deliveries, settings (SMS profile, opened-event options, chaos), and optional local email templates for provider template IDs.
 
 ```toml
 [[webhook.endpoints]]
@@ -291,10 +291,10 @@ inbound_template = "twilio.inbound_sms"
 
 Behaviour:
 
-- Loaded at startup from `--seed <file>` (or `./messagehook.seed.toml`, or `/config/messagehook.seed.toml` in Docker). Items are upserted by name/SID, so restarting is idempotent.
+- Loaded at startup from `--seed <file>` (or `./sendmock.seed.toml`, or `/config/sendmock.seed.toml` in Docker). Items are upserted by name/SID, so restarting is idempotent.
 - **`reset`** (UI, API, CLI, MCP) wipes traffic and restores exactly the seed state, so every test run starts identically.
-- **`messagehook seed export`** (and a Settings button) writes the current configuration back to a seed file, so a setup built in the UI (or by an AI agent) can be committed to the app's repo.
-- `messagehook seed apply <file>` applies a seed to a running instance; `messagehook seed validate <file>` checks it without applying.
+- **`sendmock seed export`** (and a Settings button) writes the current configuration back to a seed file, so a setup built in the UI (or by an AI agent) can be committed to the app's repo.
+- `sendmock seed apply <file>` applies a seed to a running instance; `sendmock seed validate <file>` checks it without applying.
 - Seed items show a "from seed" badge in the UI; editing them in the UI marks them as diverged until the next export.
 
 ## Code organisation

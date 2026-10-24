@@ -47,7 +47,7 @@ const endpointSpecs: EndpointSpec[] = [
   },
   {
     name: "Everything as native JSON",
-    url: "http://localhost:9000/messagehook-events",
+    url: "http://localhost:9000/sendmock-events",
     template_id: "native",
     successRate: null,
     isEnabled: false,

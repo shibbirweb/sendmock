@@ -1,6 +1,6 @@
 import type { ApiErrorBody } from "@/lib/api/types";
 
-/** Base URL of the MessageHook server; empty means the same origin as the UI. */
+/** Base URL of the SendMock server; empty means the same origin as the UI. */
 const apiBaseUrl = `${import.meta.env.VITE_API_BASE_URL ?? ""}/api/v1`;
 
 export class ApiError extends Error {
@@ -55,7 +55,7 @@ async function readErrorBody(response: Response): Promise<ApiErrorBody | null> {
   }
 }
 
-/** Calls the MessageHook REST API and returns the parsed JSON, or throws ApiError. */
+/** Calls the SendMock REST API and returns the parsed JSON, or throws ApiError. */
 export async function requestApi<ResponseType>(
   apiPath: string,
   requestOptions: ApiRequestOptions = {},

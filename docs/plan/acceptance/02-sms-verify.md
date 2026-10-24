@@ -134,7 +134,7 @@ Phase 2.
 - [ ] VF-02.1 Starting a verification returns `status: pending` in Twilio's shape.
 - [ ] VF-02.2 The `sms` and `whatsapp` channels create a captured SMS with the code; the `email` channel creates a captured email; `call` creates a Verify log entry.
 - [ ] VF-02.3 With a fixed code configured, that code is always used.
-- [ ] VF-02.4 `GET /api/v1/otp?to=...&channel=verify`, `messagehook otp` and `messagehook_otp_get` return the code.
+- [ ] VF-02.4 `GET /api/v1/otp?to=...&channel=verify`, `sendmock otp` and `sendmock_otp_get` return the code.
 - [ ] VF-02.5 Too many sends return error `60203`.
 
 ## VF-03 Check a verification
@@ -144,7 +144,7 @@ Phase 2.
 - [ ] VF-03.1 The correct code returns `approved`; a wrong code returns `pending`.
 - [ ] VF-03.2 After 5 wrong checks the verification fails with `60202`.
 - [ ] VF-03.3 Expired or unknown verifications return `20404`.
-- [ ] VF-03.4 An app using the official Twilio Verify SDK completes an OTP login against MessageHook.
+- [ ] VF-03.4 An app using the official Twilio Verify SDK completes an OTP login against SendMock.
 
 ## VF-04 Force state and events
 

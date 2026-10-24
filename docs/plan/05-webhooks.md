@@ -1,6 +1,6 @@
 # 05. Webhooks
 
-Webhooks are how MessageHook talks back to your app. Two trigger modes:
+Webhooks are how SendMock talks back to your app. Two trigger modes:
 
 - **Automatic:** rules fire when matching events happen.
 - **Manual:** you pick a message (or write a payload) and send it on demand from the UI, API or CLI.
@@ -16,7 +16,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `email.delivered`, `email.deferred`, `email.bounced`, `email.complained`, `email.unsubscribed` | simulated delivery outcomes (magic addresses, delivery profile, manual buttons; see [03-email.md](03-email.md#delivery-outcome-simulation)) |
 | `email.released` | an email was released or auto-forwarded to a real SMTP server |
 | `email.deleted` | message deleted (off by default for rules) |
-| `sms.sent` | your app sent an SMS (or WhatsApp message) to MessageHook |
+| `sms.sent` | your app sent an SMS (or WhatsApp message) to SendMock |
 | `sms.status` | simulated delivery status changed |
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated via API (see [Opened events](#opened-events)) |
 | `sms.inbound` | a simulated incoming SMS was created |
@@ -45,7 +45,7 @@ Rules:
 - **Auto-fire toggle:** Settings has "Fire opened events when I view messages" (default on). Turn it off to browse messages without triggering webhooks; manual and API opens still work.
 - **Only for the right direction:** `sms.opened` applies to outbound SMS (sent by your app to a user). Viewing a simulated inbound SMS does not fire it.
 - **Mark unread** does not reset `open_count` or `opened_at`; it only changes the read flag in the UI.
-- **Tracking pixels:** MessageHook blocks remote images by default. When you click "Load images", the browser requests your app's own tracking pixel directly, so your existing pixel-based tracking also works. `email.opened` is independent of that and fires either way.
+- **Tracking pixels:** SendMock blocks remote images by default. When you click "Load images", the browser requests your app's own tracking pixel directly, so your existing pixel-based tracking also works. `email.opened` is independent of that and fires either way.
 
 ### Native payload
 
@@ -126,7 +126,7 @@ A rule links events to an endpoint with an optional filter:
 - **From scratch:** a mini request composer (like a tiny Postman) with presets for each provider format, e.g. "Twilio inbound SMS" or "SendGrid inbound parse".
 - **Replay:** any past delivery can be resent as-is, or edited then resent.
 - **API:** `POST /api/v1/webhooks/{endpointId}/send` with `{ "email_id": "..." }`, `{ "sms_id": "..." }` or a raw payload, so CI scripts can trigger it.
-- **CLI:** `messagehook webhook send --endpoint <name> --email <id>` talking to a running instance.
+- **CLI:** `sendmock webhook send --endpoint <name> --email <id>` talking to a running instance.
 
 ## Payload formats
 
@@ -188,7 +188,7 @@ Native deliveries follow the [Standard Webhooks](https://www.standardwebhooks.co
 | `webhook-signature` | `v1,<base64(HMAC-SHA256(secret, "{webhook-id}.{webhook-timestamp}.{body}"))>`; several space-separated signatures during secret rotation |
 
 - Endpoint secrets use the spec's `whsec_<base64>` format; "Regenerate" keeps the old secret valid for a configurable overlap (default 24 h) and signs with both, so rotation can be tested.
-- Extra informational headers: `webhook-attempt` (attempt number) and `user-agent: messagehook/<version>`. The event type is in the payload `type` field, as the spec recommends.
+- Extra informational headers: `webhook-attempt` (attempt number) and `user-agent: sendmock/<version>`. The event type is in the payload `type` field, as the spec recommends.
 - Verification snippets in [08-integrations.md](08-integrations.md#receiving-webhooks-verifying-the-signature).
 
 ### Provider formats
@@ -211,7 +211,7 @@ Any delivery (or composer request) can be **saved with a name**, e.g. "Twilio ST
 - One-click re-send to the same or another endpoint, with optional re-render.
 - "Save as template" turns a saved delivery into a custom payload template.
 - Exported with the seed file, so a team shares the same fixtures.
-- API: `/api/v1/webhooks/saved`; CLI: `messagehook webhook saved list|send`; MCP: `messagehook_webhook_saved_{list,send}`.
+- API: `/api/v1/webhooks/saved`; CLI: `sendmock webhook saved list|send`; MCP: `sendmock_webhook_saved_{list,send}`.
 
 ## Metrics
 
@@ -220,7 +220,7 @@ A small dashboard (Webhooks > Overview, and the app home page) with: deliveries 
 ## Example use cases
 
 1. **Inbound email feature:** rule `email.received` where `to` matches `*@inbound.local` -> `POST http://localhost:8000/webhooks/mail` in Postmark format.
-2. **SMS delivery receipts:** app sends via Twilio-compatible API with `StatusCallback`; MessageHook calls it as status changes.
+2. **SMS delivery receipts:** app sends via Twilio-compatible API with `StatusCallback`; SendMock calls it as status changes.
 3. **Two-way SMS:** simulate a user texting "YES" to your number; app receives Twilio-format webhook and replies with TwiML.
 4. **Open tracking:** rule `email.opened` with `first_open = true` -> `POST http://localhost:8000/webhooks/sendgrid-events` in SendGrid Event Webhook format; open the email in the UI and watch your app record the open.
 5. **Mirror everything to another tool:** forward all events as native JSON to a log collector or a team chat bot.

@@ -8,8 +8,8 @@ import { basePath } from "@/lib/layout.shared";
 
 export const metadata: Metadata = {
   title: {
-    default: "MessageHook: local sandbox for email, SMS, payments and webhooks",
-    template: "%s | MessageHook",
+    default: "SendMock: local sandbox for email, SMS, payments and webhooks",
+    template: "%s | SendMock",
   },
   description:
     "A single binary that catches email, SMS and payments from any app, shows them in a web UI and calls your webhooks.",

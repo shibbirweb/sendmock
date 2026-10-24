@@ -2,27 +2,31 @@
 
 Decisions to make before or during implementation. Each has a recommendation so work can start without blocking.
 
-## 1. Product name (decided 2026-10-25: MessageHook)
+## 1. Product name (decided 2026-10-25: SendMock)
 
-**MessageHook**: messages (email, SMS) and webhooks in one name; payment IPNs and every other event are delivered as hooks too. Binary and packages `messagehook`, published from the `shibbirweb` GitHub account.
+**SendMock**: "send it to the mock". Your app sends email, SMS, payments, webhooks and other HTTP to SendMock instead of the real services, and SendMock catches, shows and answers them. Binary and packages `sendmock`, published from the `shibbirweb` GitHub account.
 
 | Channel | Name |
 |---------|------|
-| GitHub | `github.com/shibbirweb/messagehook`, Pages `shibbirweb.github.io/messagehook/` |
-| Binary, crates.io, Homebrew, Scoop, PyPI | `messagehook` |
-| npm | `messagehook` (free) or `@shibbirweb/messagehook` |
-| Docker | `ghcr.io/shibbirweb/messagehook` |
-| Domains | no live site on `messagehook.com`, `.io`, `.dev` or `.app`; register `messagehook.dev` (and `.com` if available) |
-| Env, files, MCP | `MESSAGEHOOK_*`, `messagehook.toml`, `messagehook.seed.toml`, `messagehook_*` tools |
+| GitHub | `github.com/shibbirweb/sendmock`, Pages `shibbirweb.github.io/sendmock/` |
+| Binary, crates.io, Homebrew (formula and cask), Scoop, PyPI, Packagist, RubyGems, NuGet | `sendmock` (all free on 2026-10-25) |
+| npm | `sendmock` (free) or `@shibbirweb/sendmock` |
+| Docker | `ghcr.io/shibbirweb/sendmock` (Docker Hub `sendmock` also free) |
+| Domains | `sendmock.com`, `.io`, `.dev`, `.app`, `.net`, `.org` all unregistered on 2026-10-25: register `sendmock.com` and `sendmock.dev` |
+| Env, files, MCP | `SENDMOCK_*`, `sendmock.toml`, `sendmock.seed.toml`, `sendmock_*` tools |
 
-How it was chosen (2026-10-25). Each candidate was checked on crates.io, npm, PyPI, Homebrew and Scoop, by loading its `.com`, `.io`, `.dev` and `.app` websites, and by a web search for existing products:
+Why SendMock:
 
-- **Rejected for existing brands in our space:** Gateway Lab (`gatewaylab.net` belongs to GatewayAPI, an SMS gateway), MailSMS and MailSMS Box (CM.com sells "Mail SMS"), Sendlab (several email marketing businesses), Outbox Lab (email outreach SaaS), SMSHook (Indian bulk SMS provider), PingPost (lead-generation company and industry term), Postnest (social media scheduler), Sendvault (New York State file-transfer tool), Sendpark (one letter from Sendspark).
-- **Clear alternatives kept on file:** Pingyard, Sendyard, Sendcatch, Letterbay, Sendward, Mocksend, Mock Outbox, PayPost.
-- Most single English words (Courier, Pigeon, Mailroom, Postmaster, Front Desk, ...) are taken on crates.io or npm.
-- "MessageHook" otherwise appears only as an old Windows API term (message hooks), not as a product.
+- **Unique:** an exact-name web search returns no product, company or project. Nearby results are generic test helpers (sgmock, the deprecated sendgrid-stub, MockMock), not brands.
+- **Developer friendly:** an 8-letter lowercase command, says what it does, easy to say and spell.
+- **Fully ownable:** every package registry name and every common domain is free.
 
-**Remaining check:** search "MessageHook" in the USPTO, EUIPO and WIPO trademark databases (and Bangladesh DPDT if registering locally) before investing in branding; web searches found no product or company using the name. A short CLI alias (for example `mhook`) can be added later if the full command feels long.
+How it was chosen (2026-10-25). Candidates were checked on package registries, by loading their `.com`, `.io`, `.dev` and `.app` sites, by domain registration (RDAP) and by exact-name web searches:
+
+- **Rejected for existing brands or conflicts:** Gateway Lab (`gatewaylab.net` belongs to GatewayAPI, an SMS gateway), MailSMS (CM.com's "Mail SMS" product), Sendlab (several email marketing businesses), Outbox Lab, SMSHook (Indian bulk SMS provider), PingPost (lead generation), Postnest (social scheduler), Sendvault, Sendpark (Sendspark), Pingmere and other "Ping" names (Ping Identity actively opposes "PING" marks), Courion, Mittio (Mitto SMS), Messio (Messagio), Envoyo (Envoy proxy), Dingbox, Beepost (bpost), MessageHook (descriptive; a Landbot feature name; the `.com` is parked for sale).
+- **Clear alternatives kept on file:** SendMockway (the "Mockway" part is an existing Scaleway mock server project), Telvara, Heraldyn, Msgvane, Missivio, Missivr, Hootpit, Hookwick, Gatepit, Mockway, Sandport, Pigeonix.
+
+**Remaining check:** search "SendMock" in the USPTO, EUIPO and WIPO trademark databases (and Bangladesh DPDT if registering locally) before investing in branding.
 
 ## 2. Default ports
 

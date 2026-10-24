@@ -10,7 +10,7 @@ type ThemeContextValue = {
   cycleThemePreference: () => void;
 };
 
-const themeStorageKey = "messagehook.theme";
+const themeStorageKey = "sendmock.theme";
 const darkColorSchemeQuery = "(prefers-color-scheme: dark)";
 const themePreferenceOrder: ThemePreference[] = ["system", "light", "dark"];
 

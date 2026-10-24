@@ -1,5 +1,5 @@
 /**
- * Shared shapes of the MessageHook REST API (docs/plan/06-api.md). Field names mirror
+ * Shared shapes of the SendMock REST API (docs/plan/06-api.md). Field names mirror
  * the JSON wire format (snake_case) so these types are the API contract until
  * it is frozen into docs/api/openapi.yaml.
  */
