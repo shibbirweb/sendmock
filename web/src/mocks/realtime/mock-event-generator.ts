@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker/locale/en";
 
 import { calculateSmsSegments } from "@/lib/sms/calculate-sms-segments";
 import {

@@ -1,0 +1,74 @@
+# Tests every push to develop (beta line) and main (stable), and every pull request.
+#
+# Passing CI on a push is also what will move releases along once the release workflows
+# exist (Phase 0): they start when this finishes and only act on a run that passed.
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Web UI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Format
+        run: bun run format:check
+
+      - name: Lint (includes file and function size limits)
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Unit tests with coverage gate
+        run: bun run test:coverage
+
+      - name: Install Playwright browser
+        run: bunx --bun playwright install --with-deps chromium
+
+      - name: End-to-end tests (production build, mock mode)
+        run: bun run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
+
+  acceptance:
+    name: Acceptance traceability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Script tests
+        run: bun test scripts/
+
+      - name: Criteria named by tests exist, accepted features are proven
+        run: bun scripts/acceptance.ts

@@ -18,6 +18,11 @@ export default mergeConfig(
           "src/**/*.test.{ts,tsx}",
           "src/test/**",
         ],
+        // AGENTS.md coverage gate. Logic in src/lib must stay at 80% lines;
+        // screens are covered by Playwright until component tests land in U1.
+        thresholds: {
+          "src/lib/**": { lines: 80 },
+        },
       },
     },
   }),
