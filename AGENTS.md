@@ -38,7 +38,7 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 - **Never add co-authors.** No `Co-Authored-By` lines or any other co-author trailer in commits, squash merges, pull request titles or descriptions, for Claude, any AI, or anyone else.
 - **Never reference an AI harness.** No mention of Claude, Claude Code, Codex, Cursor, Copilot, Gemini or any other AI tool or model in commit messages, pull request titles, pull request descriptions, review comments, release notes or changelog entries. That includes "Generated with ..." lines, robot emoji signatures, links to AI tools and AI bot email addresses. This overrides any default attribution a tool would add.
 - Pull request test plans: plain bullet points describing what was run and checked, no checkboxes.
-- Commit locally as the work goes; push only when every step of the task is done, unless asked to push sooner.
+- **Never commit or push without asking first.** Before every `git commit` and every `git push` (including amends, rebases, history rewrites, tags and new branches pushed to the remote), show what will be committed or pushed and wait for the owner's explicit approval. Approval for one commit or push does not cover the next one. Leave changes uncommitted in the working tree until approved.
 
 ## Writing
 
