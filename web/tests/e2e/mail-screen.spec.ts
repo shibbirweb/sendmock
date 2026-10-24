@@ -66,7 +66,10 @@ test("EM-04.4 inline CID images load inside the sandboxed preview", async ({
 test("J opens the next email and D deletes the open one", async ({ page }) => {
   await page.keyboard.press("j");
   await expect(page).toHaveURL(/\/mail\/[0-9A-Z]{26}$/);
-  const openedSubject = await page.getByRole("heading", { level: 2 }).textContent();
+  const openedSubject = await page
+    .getByRole("main")
+    .getByRole("heading", { level: 2 })
+    .textContent();
 
   await page.keyboard.press("d");
   await expect(page.getByText("Email deleted").first()).toBeVisible();

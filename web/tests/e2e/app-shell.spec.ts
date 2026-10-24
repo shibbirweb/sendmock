@@ -91,6 +91,17 @@ test("UI-01.3 keyboard shortcuts navigate and open the palette and help", async 
   await expect(page).toHaveURL(/\/logs$/);
 });
 
+test("the command palette title is only in the page while the palette is open", async ({
+  page,
+}) => {
+  const paletteTitle = page.getByRole("heading", { name: "Command palette" });
+
+  await page.keyboard.press("ControlOrMeta+k");
+  await expect(paletteTitle).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(paletteTitle).toHaveCount(0);
+});
+
 test("UI-01.4 sidebar shows the live connection status and version", async ({
   page,
 }) => {
