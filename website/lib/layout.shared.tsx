@@ -11,7 +11,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: (
         <>
-          <SendMockLogo className="size-6" />
+          <SendMockLogo className="size-8" />
           <span className="font-semibold">SendMock</span>
         </>
       ),

@@ -3,8 +3,9 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The SendMock mark: an envelope between code brackets, filled with the
- * brand gradient from the `--brand-from` and `--brand-to` theme tokens.
+ * The SendMock mark: an envelope between code brackets, with a small hook at
+ * the flap point for webhooks. Filled with the brand gradient from the
+ * `--brand-from` and `--brand-to` theme tokens.
  */
 export function SendMockLogo({ className }: { className?: string }) {
   const svgId = React.useId();
@@ -36,6 +37,15 @@ export function SendMockLogo({ className }: { className?: string }) {
             fill="none"
             stroke="#000"
             strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* A small hook at the flap point, where the envelope opens: webhooks. */}
+          <path
+            d="M32 32.5 V37.5 A3 3 0 0 0 38 37.5 V36.5"
+            fill="none"
+            stroke="#000"
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
