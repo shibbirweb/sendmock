@@ -11,14 +11,24 @@ test("EM-03.4 search filters narrow the list and chips toggle them", async ({
   page,
 }) => {
   const listPanel = page.locator(emailList);
+  // Exact match: the preview text of this email also contains "reset your password".
+  const passwordResetSubject = listPanel.getByText("Reset your password", {
+    exact: true,
+  });
+  await expect(passwordResetSubject).toBeVisible();
+
+  // The search is debounced, so wait for it to reach the URL before checking the list.
   await page.getByLabel("Search emails").fill("from:billing");
+  await expect(page).toHaveURL(/q=from%3Abilling/);
   await expect(listPanel.getByText("Invoice INV-2026-0042")).toBeVisible();
-  await expect(listPanel.getByText("Reset your password")).toBeHidden();
+  await expect(passwordResetSubject).toBeHidden();
 
   await page.getByLabel("Search emails").fill("");
+  await expect(page).not.toHaveURL(/q=/);
+  await expect(passwordResetSubject).toBeVisible();
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
   await expect(page).toHaveURL(/q=has%3Aattachment/);
-  await expect(listPanel.getByText("Reset your password")).toBeHidden();
+  await expect(passwordResetSubject).toBeHidden();
 });
 
 test("EM-05.4 an opened email shows its code with a copy button", async ({
