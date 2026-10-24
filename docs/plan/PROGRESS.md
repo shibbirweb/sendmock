@@ -2,23 +2,23 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-24
+**Last updated:** 2026-10-25
 
 ## Current position
 
 | | |
 |---|---|
-| **Stage** | Planning (before Stage A) |
-| **Current phase** | Planning wrap-up, next is **Phase U0: UI foundations** |
+| **Stage** | Stage A: UI with mock data |
+| **Current phase** | **Phase U0: UI foundations** (11 / 15 done; the rest needs the GitHub repository) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
-| **Blockers** | none; open decisions below can use placeholders |
-| **Feature acceptance** | 0 / 81 features accepted, 0 / 289 criteria proven ([acceptance/](acceptance/README.md)) |
+| **Blockers** | No GitHub remote yet: branch protection, required checks, the first CI run and the Pages deploy wait for it |
+| **Feature acceptance** | 0 / 81 accepted, 5 / 289 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Decide (or keep placeholders for) name, ports and licence.
-2. Push `develop` and `main` to GitHub and set up branch protection.
-3. Start Phase U0: scaffold `web/` and the mock layer.
+1. Create the GitHub repository, push `main`, `develop` and `feat/u0-ui-foundations`, open the U0 pull request.
+2. Turn on Pages (source: GitHub Actions), branch protection and required checks; confirm CI and the Pages deploy pass.
+3. Start Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens.
 
 ## How to update this file
 
@@ -35,7 +35,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
-| U0 | UI foundations | Not started | 0 / 15 |
+| U0 | UI foundations | In progress | 11 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Not started | 0 / 15 |
 | U2 | Webhook and HTTP catcher screens | Not started | 0 / 11 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
@@ -68,21 +68,21 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U0: UI foundations
 
-- [ ] `develop` and `main` branches, branch protection, PRs target `develop`
-- [ ] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui
-- [ ] TanStack Router and Query, lucide, sonner
-- [ ] App shell: sidebar, three-pane layout, responsive collapse
-- [ ] Theme: dark / light / system
-- [ ] Command palette and keyboard shortcut system with `?` help
-- [ ] MSW setup (HTTP + WebSocket) and in-memory mock DB
-- [ ] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables)
-- [ ] Dev toolbar (latency, errors, empty, large data, realtime on/off)
-- [ ] API types (`web/src/lib/api/types.ts`) and query hooks for all resources
-- [ ] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/`
-- [ ] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`)
-- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL)
-- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main`
-- [ ] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI
+- [ ] `develop` and `main` branches, branch protection, PRs target `develop` (branches exist locally; protection needs the GitHub repository)
+- [x] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui (48518c6)
+- [x] TanStack Router and Query, lucide, sonner (48518c6)
+- [x] App shell: sidebar, three-pane layout, responsive collapse (48518c6; the three-pane list/detail layout arrives with the U1 screens)
+- [x] Theme: dark / light / system (48518c6)
+- [x] Command palette and keyboard shortcut system with `?` help (48518c6)
+- [x] MSW setup (HTTP + WebSocket) and in-memory mock DB (698f0f1)
+- [x] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables) (698f0f1)
+- [x] Dev toolbar (latency, errors, empty, large data, realtime on/off) (698f0f1)
+- [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (698f0f1)
+- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (b30dd9f, a4bfb7d, 67ee273; passes locally, first GitHub run pending)
+- [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (67ee273)
+- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/mail-sms-server/`; first deploy needs the repository)
+- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing locally with an 80% gate on `src/lib`; required checks need the repository)
+- [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (a4bfb7d)
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
 
@@ -278,3 +278,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | Date | Update |
 |------|--------|
 | 2026-10-24 | Plan written (docs 01 to 16), competitor research folded in, plan moved to `docs/plan/`, progress tracker created, `AGENTS.md` / `CLAUDE.md` added, acceptance criteria written for all features. |
+| 2026-10-25 | Phase U0 started on `feat/u0-ui-foundations`: web app shell, mock API with realtime events and demo controls, tests (27 unit, 7 end-to-end), CI and Pages workflows, website skeleton with Magic UI. Waiting on the GitHub repository for the remaining four items. Note: the demo-only mock chunk is 308 KB gzipped (faker data); the app bundle is 172 KB, inside budget. |
