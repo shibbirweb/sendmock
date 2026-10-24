@@ -15,6 +15,7 @@ Phase progress lives in [PROGRESS.md](../PROGRESS.md); this folder tracks featur
 | [05-ai.md](05-ai.md) | CLI, MCP, scenarios, skill (AI) |
 | [06-ui.md](06-ui.md) | Web UI as a whole (UI) |
 | [07-distribution-website.md](07-distribution-website.md) | Distribution and releases (DS), Website and playground (WS) |
+| [08-payments.md](08-payments.md) | Payment gateway emulation (PY) |
 
 ## IDs
 
@@ -54,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 81 features, 0 / 289 criteria.**
+**Accepted: 0 / 92 features, 5 / 329 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -118,10 +119,10 @@ On top of its own criteria, a feature is done only when:
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Not started |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Not started |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Not started |
-| [AI-05](05-ai.md#ai-05-agent-skill-and-mss-ai-install) | Agent skill and `mss ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
+| [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Not started |
-| [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | Not started |
-| [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | Not started |
+| [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
+| [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
 | [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 2 | Not started |
 | [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 2 | Not started |
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Not started |
@@ -139,3 +140,14 @@ On top of its own criteria, a feature is done only when:
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | Phase 0 (`/next/`), Phase 5 (complete, versioned) | 3 | Not started |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 3 | Not started |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Not started |
+| [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Not started |
+| [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Not started |
+| [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | Not started |
+| [PY-04](08-payments.md#py-04-stripe-emulation) | Stripe emulation | Phase 3P | 4 | Not started |
+| [PY-05](08-payments.md#py-05-paypal-emulation) | PayPal emulation | Phase 3P | 3 | Not started |
+| [PY-06](08-payments.md#py-06-sslcommerz-emulation) | SSLCommerz emulation | Phase 3P | 5 | Not started |
+| [PY-07](08-payments.md#py-07-after-payment-operations) | After-payment operations | Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions) | 4 | Not started |
+| [PY-08](08-payments.md#py-08-events-templates-and-delivery) | Events, templates and delivery | Phase 3P | 3 | Not started |
+| [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 4 | Not started |
+| [PY-10](08-payments.md#py-10-more-gateways) | More gateways | Phase 4 (bKash, Razorpay, Paddle), later (others) | 3 | Not started |
+| [PY-11](08-payments.md#py-11-cli-mcp-and-test-helpers) | CLI, MCP and test helpers | Phase 3P | 3 | Not started |

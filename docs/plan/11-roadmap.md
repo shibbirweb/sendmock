@@ -70,6 +70,7 @@ Feature docs (03 to 14) mention "Phase N" for when a capability lands; those ref
 - **Variables:** global table, create/edit per kind, masked secrets with reveal confirm, regenerate fixed random values.
 - **Request editor:** CodeMirror with Jinja/JSON modes, `{{` autocomplete (variables, context fields, functions, filters), Fields / Raw / Template / None body modes, live preview panel (nunjucks), inline errors.
 - **HTTP catcher:** bins, request list and detail, Slack/Discord/push previews, response rule editor, forward.
+- **Payments:** list, detail with timeline, Simulate menu, hosted test checkout page with provider themes, Settings > Payments ([17-payments.md](17-payments.md)).
 - **Manual send dialog and composer:** pick endpoint/template, Prompt variable form, overrides, preview, send (creates a mock delivery).
 
 **Done when:** every webhook and catcher flow in [05-webhooks.md](05-webhooks.md), [12-webhook-variables.md](12-webhook-variables.md), [13-webhook-templates.md](13-webhook-templates.md) and [15-http-catcher.md](15-http-catcher.md) can be clicked through on mock data.
@@ -99,14 +100,14 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Config (clap + env + TOML), tracing, graceful shutdown.
 - SQLite setup, migrations, WAL mode.
 - Release machinery: `scripts/version.ts`, `CHANGELOG.md`, `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`; versioned website builds (`/next/` from `develop`).
-- `mss-ops` operation registry, CLI client skeleton (`mss status --json`, exit codes), parity CI check (every operation has REST + CLI + MCP).
-- Seed loader skeleton (`mss.seed.toml` parsing, `seed validate`), extended by each later phase.
-- Dockerfile (`scratch` + static musl binary, non-root, `/data` volume, `mss health` HEALTHCHECK) and an `edge` multi-arch image published from `develop`, so Docker users can follow along from the start.
+- `sendmock-ops` operation registry, CLI client skeleton (`sendmock status --json`, exit codes), parity CI check (every operation has REST + CLI + MCP).
+- Seed loader skeleton (`sendmock.seed.toml` parsing, `seed validate`), extended by each later phase.
+- Dockerfile (`scratch` + static musl binary, non-root, `/data` volume, `sendmock health` HEALTHCHECK) and an `edge` multi-arch image published from `develop`, so Docker users can follow along from the start.
 - Contract tests: the frozen OpenAPI spec is checked against the Rust handlers (e.g. schemathesis or generated tests).
 - CI: fmt, clippy, tests on Linux/macOS/Windows, plus existing `web/` checks.
 - `README.md`, licence, contributing notes (`AGENTS.md` / `CLAUDE.md` already exist).
 
-**Done when:** `mss` starts, serves the embedded UI at `:8025` (still in mock mode), `/api/v1/health` returns 200 on all three OSes.
+**Done when:** SendMock starts, serves the embedded UI at `:8025` (still in mock mode), `/api/v1/health` returns 200 on all three OSes.
 
 ## Phase 1: Email backend (about 2-3 weeks)
 
@@ -122,7 +123,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Switch Mail screens to live mode.
 - SMTP compatibility tests with real clients (Laravel, Nodemailer, Python smtplib, Go, Spring, lettre).
 - CORS for the docs origin and playground **Local mode**.
-- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release, Docker `beta`, Homebrew `mss-beta`).
+- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release, Docker `beta`, Homebrew `sendmock-beta`).
 
 **Done when:** a Laravel app and a Node app both send mail that appears live in the UI, and a pytest test reads an OTP via `/api/v1/otp`.
 
@@ -133,13 +134,13 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - **Twilio Verify** emulation: services, start/check/update verifications, fixed codes, expiry and attempt limits, force-state API, codes delivered as captured SMS/email, `verify.*` events.
 - Optional dedicated provider port serving root paths.
 - GSM-7/UCS-2 encoding and segment calculation.
-- Delivery simulation profiles (instant, realistic, manual), failure rate, magic numbers matching Twilio's official test numbers and error codes (plus `mss` after-send extensions, strict Twilio test mode), status history.
+- Delivery simulation profiles (instant, realistic, manual), failure rate, magic numbers matching Twilio's official test numbers and error codes (plus SendMock after-send extensions, strict Twilio test mode), status history.
 - Per-message status callbacks (Twilio and Vonage formats).
 - Inbound SMS simulation API.
 - CLI `sms` commands and MCP `sms` toolset.
 - Switch SMS screens to live mode.
 
-**Done when:** an app using the Twilio REST shape sends an SMS, sees it in the UI, and receives `queued` / `sent` / `delivered` status callbacks; and an app using Twilio Verify completes an OTP login against `mss`.
+**Done when:** an app using the Twilio REST shape sends an SMS, sees it in the UI, and receives `queued` / `sent` / `delivered` status callbacks; and an app using Twilio Verify completes an OTP login against SendMock.
 
 ## Phase 3: Webhooks backend (about 2-3 weeks)
 
@@ -158,6 +159,16 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 
 **Done when:** a rule forwards every `*@inbound.local` email to a local Express handler, the delivery log shows request/response, and a failed delivery retries then succeeds after the handler is fixed and replayed.
 
+## Phase 3P: Payment gateway (about 2 weeks)
+
+- Native payments API and hosted checkout flow with the test checkout page.
+- Test cards (Stripe table) and the real-card safety rule (reject, never store).
+- Stripe (Checkout Sessions, PaymentIntents, Refunds, `Stripe-Signature` webhooks), PayPal (Orders v2, webhooks, IPN with postback), SSLCommerz (init, IPN with `verify_sign`, validation API, refund, query).
+- Capture, void, full and partial refunds; `payment.*` and `checkout.*` events; payment templates; `wait/payment`.
+- CLI `payments` commands and MCP `payments` toolset; Payments screens switched to live mode.
+
+**Done when:** apps using the official Stripe SDK, PayPal Orders and SSLCommerz complete a payment, receive and verify the IPN/webhook, validate the order, and handle a decline and a refund, all offline.
+
 ## Phase 4: Integrations, fidelity and AI (about 2-3 weeks)
 
 - Email provider HTTP send APIs: SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo (on the provider port), with template ID/data capture.
@@ -166,17 +177,18 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Email inbound formats: SendGrid Inbound Parse, Mailgun routes, Postmark inbound.
 - Bounce/complaint/delivered provider formats: SendGrid events, Mailgun, Postmark, SES via SNS, Resend.
 - Open event formats: SendGrid Event Webhook `open`, Mailgun `opened`, Postmark Open, Twilio `MessageStatus=read`.
-- Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `MSS_VAR_*` env variables.
+- Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `SENDMOCK_VAR_*` env variables.
 - Remaining built-in templates (Mailgun, SendGrid, Postmark, SES, Resend, Brevo, Mandrill, SparkPost; Plivo, MessageBird, Telnyx, Sinch, Infobip, Africa's Talking; Teams, Google Chat, Telegram, n8n/Zapier/Make), template import/export, `--templates-dir`, revision history.
 - More SMS providers: Plivo, MessageBird, generic configurable GET/POST vendor.
 - TwiML reply parsing for two-way SMS.
 - WhatsApp via Twilio (`whatsapp:` addresses, channel badge, inbound, `read` status).
 - HTTP catcher: catch path, bins, mock response rules, Slack/Discord/Telegram/FCM presets, `wait/http`.
+- Payments: bKash, Razorpay and Paddle emulation; subscriptions; disputes.
 - Virtual numbers registry backend.
 - Chaos toggles (SMTP rejects/latency, SMS failures).
 - Verified SDK redirection recipes and `examples/` apps for PHP, Node, Python, Go, Java, Rust, Ruby, .NET, each with a CI smoke test.
 - OpenAPI spec published; API docs page in the UI.
-- AI: scenarios (`mss scenario run`), MCP resources, prompts and streamable HTTP transport, agent skill, `mss ai install` for Claude Code, Codex, Cursor, Gemini CLI and VS Code, `llms.txt`.
+- AI: scenarios (`sendmock scenario run`), MCP resources, prompts and streamable HTTP transport, agent skill, `sendmock ai install` for Claude Code, Codex, Cursor, Gemini CLI and VS Code, `llms.txt`.
 
 **Done when:** all eight example apps pass their smoke tests in CI, and an agent in Claude Code and Codex completes the example session in [14-ai-integration.md](14-ai-integration.md).
 
@@ -188,7 +200,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Testcontainers modules (Java, Node, Go, Python, .NET).
 - Remaining HTTP catcher presets (Teams, Google Chat, Expo, OneSignal) and dedicated catch-all port.
 - Performance and size budgets enforced in CI.
-- `mss --demo` flag that seeds the Stage A fixtures into a fresh instance (for screenshots, demos and first-run exploration).
+- `sendmock --demo` flag that seeds the Stage A fixtures into a fresh instance (for screenshots, demos and first-run exploration).
 - Claude Code plugin packaging, MCP registry listing, skill evals.
 - Documentation site content complete (from `docs/wiki/`, see [16-website-and-releases.md](16-website-and-releases.md)), with the mock-mode UI embedded as a live demo.
 - Final product name applied everywhere (including the website and Pages URL / custom domain).

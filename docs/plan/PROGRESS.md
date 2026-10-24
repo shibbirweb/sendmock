@@ -2,23 +2,23 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-24
+**Last updated:** 2026-10-25
 
 ## Current position
 
 | | |
 |---|---|
-| **Stage** | Planning (before Stage A) |
-| **Current phase** | Planning wrap-up, next is **Phase U0: UI foundations** |
+| **Stage** | Stage A: UI with mock data |
+| **Current phase** | **Phase U0: UI foundations** (11 / 15 done; the rest needs the GitHub repository) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
-| **Blockers** | none; open decisions below can use placeholders |
-| **Feature acceptance** | 0 / 81 features accepted, 0 / 289 criteria proven ([acceptance/](acceptance/README.md)) |
+| **Blockers** | No GitHub remote yet: branch protection, required checks, the first CI run and the Pages deploy wait for it |
+| **Feature acceptance** | 0 / 92 accepted, 5 / 329 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Decide (or keep placeholders for) name, ports and licence.
-2. Push `develop` and `main` to GitHub and set up branch protection.
-3. Start Phase U0: scaffold `web/` and the mock layer.
+1. Create the GitHub repository, push `main`, `develop` and `feat/u0-ui-foundations`, open the U0 pull request.
+2. Turn on Pages (source: GitHub Actions), branch protection and required checks; confirm CI and the Pages deploy pass.
+3. Start Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens.
 
 ## How to update this file
 
@@ -35,14 +35,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
-| U0 | UI foundations | Not started | 0 / 15 |
+| U0 | UI foundations | In progress | 11 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Not started | 0 / 15 |
-| U2 | Webhook and HTTP catcher screens | Not started | 0 / 11 |
+| U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 12 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 11 |
 | 3 | Webhooks backend | Not started | 0 / 14 |
+| 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
 | 5 | Distribution and 1.0 stable | Not started | 0 / 13 |
 
@@ -68,21 +69,21 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U0: UI foundations
 
-- [ ] `develop` and `main` branches, branch protection, PRs target `develop`
-- [ ] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui
-- [ ] TanStack Router and Query, lucide, sonner
-- [ ] App shell: sidebar, three-pane layout, responsive collapse
-- [ ] Theme: dark / light / system
-- [ ] Command palette and keyboard shortcut system with `?` help
-- [ ] MSW setup (HTTP + WebSocket) and in-memory mock DB
-- [ ] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables)
-- [ ] Dev toolbar (latency, errors, empty, large data, realtime on/off)
-- [ ] API types (`web/src/lib/api/types.ts`) and query hooks for all resources
-- [ ] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/`
-- [ ] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`)
-- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL)
-- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main`
-- [ ] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI
+- [ ] `develop` and `main` branches, branch protection, PRs target `develop` (branches exist locally; protection needs the GitHub repository)
+- [x] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui (044db8b)
+- [x] TanStack Router and Query, lucide, sonner (044db8b)
+- [x] App shell: sidebar, three-pane layout, responsive collapse (044db8b; the three-pane list/detail layout arrives with the U1 screens)
+- [x] Theme: dark / light / system (044db8b)
+- [x] Command palette and keyboard shortcut system with `?` help (044db8b)
+- [x] MSW setup (HTTP + WebSocket) and in-memory mock DB (f8209c5)
+- [x] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables) (f8209c5)
+- [x] Dev toolbar (latency, errors, empty, large data, realtime on/off) (f8209c5)
+- [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (f8209c5)
+- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (f7dca57, 4f8d212, 3ae88c2; passes locally, first GitHub run pending)
+- [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (3ae88c2)
+- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/sendmock/`; first deploy needs the repository)
+- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing locally with an 80% gate on `src/lib`; required checks need the repository)
+- [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (4f8d212)
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
 
@@ -102,7 +103,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
 - [ ] Empty states with "how to connect" and "send sample"
 
-### Phase U2: Webhook and HTTP catcher screens
+### Phase U2: Webhook, HTTP catcher and payment screens
 
 - [ ] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables)
 - [ ] Rules list and visual rule builder with match preview
@@ -115,6 +116,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Manual send dialog and composer (Prompt variables, overrides)
 - [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
 - [ ] Webhooks overview metrics
+- [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Settings > Payments
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
 
@@ -135,9 +137,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Cargo workspace and crate skeletons
 - [ ] `rust-embed` UI embedding, SPA fallback, dev proxy
-- [ ] Config (clap, env, `mss.toml`), tracing, graceful shutdown
+- [ ] Config (clap, env, `sendmock.toml`), tracing, graceful shutdown
 - [ ] SQLite, migrations, WAL mode
-- [ ] `mss-ops` registry, CLI skeleton (`mss status --json`, exit codes), parity CI check
+- [ ] `sendmock-ops` registry, CLI skeleton (`sendmock status --json`, exit codes), parity CI check
 - [ ] Seed loader skeleton (`seed validate`)
 - [ ] OpenAPI contract tests against handlers
 - [ ] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check)
@@ -164,7 +166,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] SMTP compatibility tests with real clients
 - [ ] CORS for the docs origin; playground Local mode
 - [ ] Done-when check: Laravel and Node mail appear live; pytest reads an OTP
-- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release, Docker `beta`, Homebrew `mss-beta`)
+- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release, Docker `beta`, Homebrew `sendmock-beta`)
 
 ### Phase 2: SMS and Verify backend
 
@@ -197,6 +199,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Done-when check: inbound email rule to Express handler, retry then replay succeeds
 - [ ] Beta released
 
+### Phase 3P: Payment gateway backend
+
+- [ ] Native payments API and hosted checkout flow
+- [ ] Test cards and the real-card safety rule
+- [ ] Stripe emulation with `Stripe-Signature` webhooks
+- [ ] PayPal emulation (Orders v2, webhooks, IPN postback)
+- [ ] SSLCommerz emulation (init, IPN, validation, refund, query)
+- [ ] Done-when check: Stripe, PayPal and SSLCommerz flows end to end offline; beta released
+
 ### Phase 4: Integrations, fidelity and AI
 
 - [ ] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo)
@@ -204,7 +215,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Release to real SMTP, auto-forward, tag rules
 - [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
 - [ ] Bounce/complaint/delivered and open provider formats
-- [ ] Fake data functions, Postman aliases, `MSS_VAR_*`
+- [ ] Fake data functions, Postman aliases, `SENDMOCK_VAR_*`
 - [ ] Remaining built-in templates, import/export, `--templates-dir`, revisions
 - [ ] More SMS providers (Plivo, MessageBird, generic GET/POST)
 - [ ] TwiML reply parsing
@@ -214,7 +225,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] SDK redirection recipes verified per SDK
 - [ ] `examples/` apps for 8 languages with CI smoke tests
 - [ ] OpenAPI published, API docs page in UI
-- [ ] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `mss ai install`, `llms.txt`
+- [ ] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `sendmock ai install`, `llms.txt`
 - [ ] Done-when check: example apps pass; agent session works in Claude Code and Codex
 - [ ] Beta released
 
@@ -222,11 +233,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Release builds for all 6 targets, checksums, install scripts with `--channel`
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
-- [ ] Homebrew tap (`mss`, `mss-beta`), Scoop bucket, npm wrapper
+- [ ] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper
 - [ ] Testcontainers modules
 - [ ] Remaining catcher presets and catch-all port
 - [ ] Performance and size budgets enforced in CI
-- [ ] `mss --demo`
+- [ ] `sendmock --demo`
 - [ ] Claude Code plugin, MCP registry listing, skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
 - [ ] Final product name applied everywhere
@@ -251,6 +262,10 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-24 | Docker is a first-class release channel | [09](09-distribution.md#docker) |
 | 2026-10-24 | `develop` = beta, `main` = stable, releases cut by workflows (phpdebugger model) | [16](16-website-and-releases.md) |
 | 2026-10-24 | Website on GitHub Pages with Fumadocs + Magic UI, API playground with in-browser demo mode | [16](16-website-and-releases.md) |
+| 2026-10-25 | Add a fake payment gateway (Stripe, PayPal, SSLCommerz first; bKash, Razorpay, Paddle next) with test checkout and IPN; only test cards accepted | [17](17-payments.md) |
+| 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
+| 2026-10-25 | Commits authored as `MD. Shibbir Ahmed <shibbirweb@gmail.com>` (rule in `AGENTS.md`); existing local commits rewritten before the first push | [AGENTS.md](../../AGENTS.md#commits-and-pull-requests) |
+| 2026-10-25 | Product name **SendMock** (binary and packages `sendmock`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock) |
 
 ### Open
 
@@ -258,7 +273,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 
 | Question | Recommendation | Status |
 |----------|----------------|--------|
-| Product name | pick from shortlist, check availability | Open (placeholder `mss`) |
+| Trademark check for "SendMock" | search USPTO, EUIPO, WIPO before branding | Open |
 | Default ports | 1025 / 8025 (Mailpit compatible) | Open (using recommendation) |
 | Licence | dual MIT / Apache-2.0 | Open |
 | Provider emulation priority | Twilio, Vonage, generic, then others | Open (using recommendation) |
@@ -278,3 +293,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | Date | Update |
 |------|--------|
 | 2026-10-24 | Plan written (docs 01 to 16), competitor research folded in, plan moved to `docs/plan/`, progress tracker created, `AGENTS.md` / `CLAUDE.md` added, acceptance criteria written for all features. |
+| 2026-10-25 | Phase U0 started on `feat/u0-ui-foundations`: web app shell, mock API with realtime events and demo controls, tests (27 unit, 7 end-to-end), CI and Pages workflows, website skeleton with Magic UI. Waiting on the GitHub repository for the remaining four items. Note: the demo-only mock chunk is 308 KB gzipped (faker data); the app bundle is 172 KB, inside budget. |

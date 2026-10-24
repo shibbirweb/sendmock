@@ -2,7 +2,7 @@
 
 Guidance for AI coding agents (Claude Code, Codex, Cursor, Copilot, Gemini CLI and others) working in this repository. `CLAUDE.md` imports this file, so every agent follows the same rules.
 
-The product name is not decided yet. `mss` (mail-sms-server), `MSS_*` and `mss.seed.toml` are placeholders used everywhere until it is.
+The product is **SendMock** (the binary, crates, packages and image are `sendmock`; env vars `SENDMOCK_*`; files `sendmock.toml` and `sendmock.seed.toml`). Write "SendMock" in prose and UI text, and `sendmock` for commands, packages and code.
 
 ## Start here
 
@@ -15,7 +15,7 @@ The product name is not decided yet. `mss` (mail-sms-server), `MSS_*` and `mss.s
 
 - **UI first.** Stage A builds the whole web UI against the mock API (MSW in `web/src/mocks/`). Do not start backend work before the Phase U3 sign-off is ticked in `PROGRESS.md`.
 - **Mocks stay behind the API.** UI components call the real API paths through the typed client and query hooks; they never import fixtures or the mock DB directly. `web/src/lib/api/types.ts` is the API contract until it is frozen into `docs/api/openapi.yaml`.
-- **Parity.** Every backend feature ships with UI, REST API, CLI command, MCP tool and skill docs, all from the `mss-ops` operation registry. CI enforces it.
+- **Parity.** Every backend feature ships with UI, REST API, CLI command, MCP tool and skill docs, all from the `sendmock-ops` operation registry. CI enforces it.
 - **Standards over custom.** Native webhooks follow Standard Webhooks. SMS magic numbers and error codes match Twilio's official test numbers exactly. Provider emulation returns the provider's real response and error shapes.
 - **Safe defaults.** Bind to `127.0.0.1` by default (Docker binds `0.0.0.0`). Secrets are masked in the UI, API responses, logs and MCP output, and are never written to seed exports in plain text. Release/forward to real SMTP stays off unless an allowlist is configured.
 - **Lightweight.** Keep the binary, memory and bundle budgets in [docs/plan/09-distribution.md](docs/plan/09-distribution.md). Justify every new dependency.
@@ -30,6 +30,8 @@ The product name is not decided yet. `mss` (mail-sms-server), `MSS_*` and `mss.s
 - Releases are cut by workflows, never by hand. See [docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md).
 
 ## Commits and pull requests
+
+- **Commit identity:** every commit in this repository is authored and committed as `MD. Shibbir Ahmed <shibbirweb@gmail.com>`. Set it per repository so other identities on the machine are untouched: `git config user.name "MD. Shibbir Ahmed"` and `git config user.email "shibbirweb@gmail.com"`. Check with `git log --format="%an <%ae>"` before pushing; never push a commit with any other name or email.
 
 - Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[MSS-12] add SMS thread list`.
 - Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
@@ -63,7 +65,7 @@ Each layer only calls the layer below it, never upwards or sideways:
 
 ```
 transport   SMTP listener, REST handlers, CLI, MCP tools, WebSocket      (thin: parse input, call an operation, format output)
-operations  mss-ops registry: one operation per use case                (orchestration, validation, permissions)
+operations  sendmock-ops registry: one operation per use case                (orchestration, validation, permissions)
 domain      email, sms, verify, webhooks, catcher: services and models  (business rules, no I/O details)
 storage     repositories over SQLite                                    (queries only, no business rules)
 ```
@@ -84,7 +86,7 @@ Use these names in code so the pattern is recognisable:
 | **Adapter** | each provider emulation (`TwilioMessagesAdapter`, `SendGridSendAdapter`) translates the provider's wire format to and from the internal model |
 | **Registry / factory** | provider registry, template registry, operation registry, catcher presets: look up an implementation by key |
 | **Observer (pub/sub)** | the event bus: producers publish `Event`s, webhooks, WebSocket and simulators subscribe |
-| **Command** | each `mss-ops` operation is a command object with typed input and output |
+| **Command** | each `sendmock-ops` operation is a command object with typed input and output |
 | **Builder** | building webhook requests, MIME messages and complex test fixtures |
 | **Value object** | `EmailAddress`, `PhoneNumber` (E.164), `WebhookSecret`, `Ulid`: validated on creation, never raw strings in domain code |
 
@@ -127,8 +129,8 @@ Frontend (`web/`, `website/`):
 | Unit | one function, struct, hook or component in isolation, with fakes for its dependencies | `cargo test` / `cargo nextest`, Vitest, React Testing Library | next to the code (`#[cfg(test)] mod tests`, `*.test.ts(x)`) |
 | Integration | a whole feature through real layers: SMTP session to stored email, SMS API to status callback, rule to webhook delivery, against a temporary SQLite DB | Rust integration tests (`crates/*/tests/`) | per crate |
 | Contract | every REST endpoint matches `docs/api/openapi.yaml`; every operation has REST, CLI and MCP adapters | schema-based API tests, registry parity test | `tests/contract/` |
-| CLI and MCP | each command's `--json` output and exit codes; each MCP tool's schema, annotations and result | snapshot tests (`insta`), MCP client tests | `crates/mss-cli/tests/`, `crates/mss-mcp/tests/` |
-| UI end to end | each screen and flow, in mock mode (Stage A) and against a real `mss` binary (Stage B) | Playwright | `web/tests/e2e/` |
+| CLI and MCP | each command's `--json` output and exit codes; each MCP tool's schema, annotations and result | snapshot tests (`insta`), MCP client tests | `crates/sendmock-cli/tests/`, `crates/sendmock-mcp/tests/` |
+| UI end to end | each screen and flow, in mock mode (Stage A) and against a real `sendmock` binary (Stage B) | Playwright | `web/tests/e2e/` |
 | Cross-language | real apps in PHP, Node, Python, Go, Java, Rust, Ruby and .NET send email and SMS and receive webhooks | Docker matrix in CI | `examples/` |
 | Website | build, links, playground in Demo mode | Playwright, link checker | `website/tests/` |
 

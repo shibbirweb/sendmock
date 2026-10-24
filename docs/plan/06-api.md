@@ -69,6 +69,10 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | GET | `/http/requests`, `/http/requests/{requestId}` | captured requests |
 | POST | `/http/requests/{requestId}/forward` | resend a captured request to a URL |
 
+## Payments
+
+Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
+
 ## Logs
 
 | Method | Path | Purpose |
@@ -101,7 +105,7 @@ Manual send and replay accept `"variables": { ... }` overrides and `"rerender": 
 
 ## Test-automation helpers
 
-These make `mss` useful from any test framework without polling loops:
+These make SendMock useful from any test framework without polling loops:
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -123,7 +127,7 @@ These make `mss` useful from any test framework without polling loops:
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, SMS simulation profile, chaos toggles, extractors |
 | GET | `/info` | version, uptime, listeners, counts, DB size |
-| GET | `/health` | liveness for Docker/CI (also `mss health` CLI for the Docker HEALTHCHECK) |
+| GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 
 ## Realtime
 

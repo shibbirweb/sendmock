@@ -2,9 +2,9 @@
 
 ## Behaviour
 
-`mss` pretends to be an SMS vendor. Your app "sends" SMS by making the same HTTP calls it makes to a real provider, but pointed at `mss`. Messages are stored, shown in a phone-style UI, and given simulated delivery statuses. Nothing is ever sent to a carrier.
+SendMock pretends to be an SMS vendor. Your app "sends" SMS by making the same HTTP calls it makes to a real provider, but pointed at SendMock. Messages are stored, shown in a phone-style UI, and given simulated delivery statuses. Nothing is ever sent to a carrier.
 
-It also works in the other direction: you can **simulate an incoming SMS** (a user replying "STOP" or texting a keyword) and `mss` calls your app's inbound webhook exactly like the provider would.
+It also works in the other direction: you can **simulate an incoming SMS** (a user replying "STOP" or texting a keyword) and SendMock calls your app's inbound webhook exactly like the provider would.
 
 ## API surfaces
 
@@ -67,7 +67,7 @@ The exact field coverage per provider is tracked in a compatibility table in use
 
 ### Messaging Services (Twilio)
 
-Many apps send with `MessagingServiceSid` instead of `From`. `mss`:
+Many apps send with `MessagingServiceSid` instead of `From`. SendMock:
 
 - Accepts `MessagingServiceSid` on Messages create; picks a sender from the service's number pool (virtual numbers assigned to it), or a generated number if the pool is empty.
 - Lets services be created via API (`/v1/Services`), UI (Numbers > Messaging services) or the seed file.
@@ -92,7 +92,7 @@ Behaviour:
   - `sms` / `whatsapp` channel: a real captured SMS ("Your <service> verification code is: 482913") in the SMS screen.
   - `email` channel: a real captured email in the Mail screen.
   - `call` channel: recorded as a "voice call" item in the Verify log (no audio), code shown.
-  - Always available via `/api/v1/otp?to=...`, the CLI (`mss otp`) and MCP (`mss_otp_get`).
+  - Always available via `/api/v1/otp?to=...`, the CLI (`sendmock otp`) and MCP (`sendmock_otp_get`).
 - **Realistic rules:** 10 minute expiry (configurable), max 5 check attempts then error `60202`, max send attempts then `60203`, unknown verification `20404`, expired returns `20404` like the real API.
 - **Force a state:** UI buttons and API (`POST /api/v1/verify/{verificationId}/force` with `approved`, `canceled`, `expired`, `max_attempts`) to test edge cases.
 - **Events:** `verify.started`, `verify.checked` (with `approved` true/false), `verify.expired`; available to webhook rules.
@@ -102,7 +102,7 @@ Later: Vonage Verify v2 and other providers' verify APIs using the same internal
 
 ## WhatsApp via Twilio
 
-Twilio sends WhatsApp through the same Messages API with `whatsapp:` prefixed addresses. `mss` accepts them, stores the channel (`sms` or `whatsapp`), shows a WhatsApp badge and chat styling, supports `read` status for the opened/read flow, and sends inbound WhatsApp messages to the app in Twilio format. Template (content SID) sends are stored with their variables. (Phase 4; full WhatsApp Business Cloud API emulation stays in the backlog.)
+Twilio sends WhatsApp through the same Messages API with `whatsapp:` prefixed addresses. SendMock accepts them, stores the channel (`sms` or `whatsapp`), shows a WhatsApp badge and chat styling, supports `read` status for the opened/read flow, and sends inbound WhatsApp messages to the app in Twilio format. Template (content SID) sends are stored with their variables. (Phase 4; full WhatsApp Business Cloud API emulation stays in the backlog.)
 
 ## API request log
 
@@ -114,10 +114,10 @@ Every request to the native and provider SMS APIs (and the email HTTP send APIs)
 
 ### 3. Provider SDK usage
 
-Two ways an app can use its normal provider SDK against `mss`:
+Two ways an app can use its normal provider SDK against SendMock:
 
 1. **Base URL / host override**, where the SDK supports it.
-2. **Custom HTTP client** that rewrites the provider host to `mss` (most official SDKs accept an injectable HTTP client).
+2. **Custom HTTP client** that rewrites the provider host to SendMock (most official SDKs accept an injectable HTTP client).
 
 Per-SDK instructions live in [08-integrations.md](08-integrations.md). Confirming the cleanest method for each official SDK is a Phase 4 task.
 
@@ -126,7 +126,7 @@ Per-SDK instructions live in [08-integrations.md](08-integrations.md). Confirmin
 1. Parse request, normalise numbers to E.164 when possible (keep the raw value too).
 2. Compute **encoding and segments**: GSM-7 (160 chars single, 153 per segment when concatenated, with extension-table characters counting as 2) vs UCS-2 (70 / 67). Shown in the UI because it affects real-world cost.
 3. Run extractors (OTP codes, links), same as email.
-4. Store, publish `sms.sent` event (meaning "your app sent an SMS to mss").
+4. Store, publish `sms.sent` event (meaning "your app sent an SMS to SendMock").
 5. Schedule simulated status transitions.
 
 ## Delivery simulation
@@ -139,7 +139,7 @@ Configurable globally (UI settings) and per request (via magic numbers):
 | Failure rate | 0% | random fraction marked `undelivered` / `failed` |
 | Magic numbers | on | numbers that always produce a specific outcome |
 
-Magic numbers follow **Twilio's official test numbers and error codes exactly** ([Twilio test credentials](https://www.twilio.com/docs/iam/test-credentials)), so tests written against `mss` also match Twilio's own test mode. The error is returned synchronously on send (HTTP 400 with Twilio's error JSON), as Twilio does.
+Magic numbers follow **Twilio's official test numbers and error codes exactly** ([Twilio test credentials](https://www.twilio.com/docs/iam/test-credentials)), so tests written against SendMock also match Twilio's own test mode. The error is returned synchronously on send (HTTP 400 with Twilio's error JSON), as Twilio does.
 
 `To` numbers (Twilio):
 
@@ -162,7 +162,7 @@ Magic numbers follow **Twilio's official test numbers and error codes exactly** 
 | `+15005550008` | message queue full | 21611 |
 | anything else | accepted (lenient default); with **strict Twilio test mode** on, rejected with 21606 like real test credentials | |
 
-`mss` extensions for **after-send** outcomes (Twilio's test mode has no equivalent because it never sends status callbacks):
+SendMock extensions for **after-send** outcomes (Twilio's test mode has no equivalent because it never sends status callbacks):
 
 | To number | Result | Error code in callback |
 |-----------|--------|------------------------|
@@ -190,9 +190,9 @@ POST /api/v1/sms/inbound
 { "from": "+8801700000000", "to": "+15550001111", "body": "STOP", "format": "twilio" }
 ```
 
-`mss` stores it with direction `inbound` and publishes `sms.inbound`. Webhook rules (or the number's configured inbound URL) deliver it to your app in the chosen provider format, for example a Twilio-style `application/x-www-form-urlencoded` POST with `From`, `To`, `Body`, `MessageSid`, plus an `X-Twilio-Signature` header computed with the configured auth token.
+SendMock stores it with direction `inbound` and publishes `sms.inbound`. Webhook rules (or the number's configured inbound URL) deliver it to your app in the chosen provider format, for example a Twilio-style `application/x-www-form-urlencoded` POST with `From`, `To`, `Body`, `MessageSid`, plus an `X-Twilio-Signature` header computed with the configured auth token.
 
-If your app responds with TwiML containing `<Message>`, `mss` can parse it and record the reply as an outbound SMS, so two-way conversations can be tested end to end (Phase 4).
+If your app responds with TwiML containing `<Message>`, SendMock can parse it and record the reply as an outbound SMS, so two-way conversations can be tested end to end (Phase 4).
 
 ## Virtual numbers
 

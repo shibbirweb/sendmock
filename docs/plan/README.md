@@ -1,6 +1,6 @@
 # Project Plan
 
-Working name: **mss** (mail-sms-server). The final product name is still undecided (see [10-open-questions.md](10-open-questions.md)). Every use of `mss`, `MSS_*` and `mss.toml` in these docs is a placeholder.
+Product name: **SendMock**: "send it to the mock". Your app sends email, SMS, payments and webhooks to SendMock instead of the real services. Binary and package name `sendmock`; published from the `shibbirweb` GitHub account. How the name was chosen: [10-open-questions.md](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock).
 
 ## One-line pitch
 
@@ -30,6 +30,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 14 | [AI integration](14-ai-integration.md) | Full CLI, MCP server and agent skill so Claude Code, Codex and others can drive every feature |
 | 15 | [HTTP catcher](15-http-catcher.md) | Request bin for any other outbound HTTP (Slack, Discord, push, Telegram) with mock responses |
 | 16 | [Website and releases](16-website-and-releases.md) | GitHub Pages docs site with Magic UI and an API playground; `develop` = beta, `main` = stable release workflows |
+| 17 | [Payment gateway emulation](17-payments.md) | Stripe, PayPal, SSLCommerz, bKash, Razorpay compatible APIs, test checkout page, IPN and payment webhooks |
 
 ## Headline decisions
 
@@ -37,7 +38,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 - **Backend:** Rust (tokio + axum), custom SMTP receiver, SQLite storage.
 - **Frontend:** React + TypeScript + Tailwind + shadcn/ui, built with Bun and Vite, embedded into the binary at compile time.
 - **Delivery:** one static binary per platform (macOS, Linux, Windows; x64 and arm64), plus a first-class multi-arch Docker image (Compose, CI service containers, Testcontainers).
-- **Broad capture:** SMTP and email provider HTTP APIs (SendGrid, Mailgun, Postmark, Resend, SES, Brevo); SMS provider APIs incl. Twilio Verify; an HTTP catcher for everything else.
+- **Broad capture:** SMTP and email provider HTTP APIs (SendGrid, Mailgun, Postmark, Resend, SES, Brevo); SMS provider APIs incl. Twilio Verify; a fake payment gateway (Stripe, PayPal, SSLCommerz, bKash, Razorpay) with test checkout and IPN; an HTTP catcher for everything else.
 - **Standards over custom:** webhooks signed with Standard Webhooks; SMS magic numbers match Twilio's official test numbers.
 - **Language agnostic by design:** apps talk to it over SMTP and HTTP only, so any language works without an SDK.
 - **Website and releases:** docs and API playground on GitHub Pages built with Fumadocs + Magic UI; `develop` ships betas, `main` ships stables, all cut by workflows (same model as the phpdebugger repo).

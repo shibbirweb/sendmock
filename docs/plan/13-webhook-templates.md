@@ -11,7 +11,7 @@ Users can:
 
 ### A. "Act like the provider" (inbound to your app)
 
-`mss` sends the webhook your app would receive from a real provider, so your production handler is tested unchanged.
+SendMock sends the webhook your app would receive from a real provider, so your production handler is tested unchanged.
 
 **Email providers (inbound mail and events)**
 
@@ -40,20 +40,31 @@ Users can:
 | Africa's Talking | Incoming message, delivery report | sms.inbound, sms.status |
 | AWS SNS (SMS) | Delivery status log shape | sms.status |
 
+**Payment gateways (IPN and webhooks)**, see [17-payments.md](17-payments.md)
+
+| Service | Templates | Events |
+|---------|-----------|--------|
+| Stripe | Webhook event with `Stripe-Signature` | payment.*, checkout.*, subscription.* |
+| PayPal | Webhook (transmission headers), classic IPN form post | payment.*, checkout.* |
+| SSLCommerz | IPN POST with `verify_sign`, success/fail/cancel POST | payment.*, checkout.* |
+| bKash | Callback redirect parameters | payment.* |
+| Razorpay | Webhook with `X-Razorpay-Signature` | payment.* |
+| Paddle | Webhook with `Paddle-Signature` | payment.*, subscription.* |
+
 ### B. "Notify a tool" (outbound to chat and automation)
 
 Forward captured messages to the tools a team already uses:
 
 | Service | Template |
 |---------|----------|
-| Slack | Incoming webhook with Block Kit message (subject, from, OTP, "Open in mss" button) |
+| Slack | Incoming webhook with Block Kit message (subject, from, OTP, "Open in SendMock" button) |
 | Discord | Webhook with embed |
 | Microsoft Teams | Workflows / Adaptive Card payload |
 | Google Chat | Card message |
 | Telegram | Bot `sendMessage` (URL includes `{{ vars.telegram_bot_token }}`) |
 | Mattermost / Rocket.Chat | Slack-compatible payload |
 | n8n / Zapier / Make / Pipedream | Flat JSON, easy to map in those tools |
-| Generic | Native `mss` JSON signed with Standard Webhooks (the default) |
+| Generic | Native SendMock JSON signed with Standard Webhooks (the default) |
 
 Each built-in template declares the **variables it needs** (e.g. Twilio needs `twilio_auth_token` for the signature, Telegram needs `telegram_bot_token` and `telegram_chat_id`). The UI asks for them when the template is chosen and stores them as endpoint variables (secrets masked).
 
@@ -61,7 +72,7 @@ Fidelity: provider templates are based on each provider's public docs and checke
 
 ## Template definition
 
-Built-in templates ship inside the binary as TOML files (`crates/mss-webhooks/templates/builtin/*.toml`). Custom templates use the same schema, so a built-in one can be cloned and edited.
+Built-in templates ship inside the binary as TOML files (`crates/sendmock-webhooks/templates/builtin/*.toml`). Custom templates use the same schema, so a built-in one can be cloned and edited.
 
 ```toml
 id = "twilio.inbound_sms"
@@ -122,7 +133,7 @@ Schema notes:
 - `events` restricts which events the template can be used with; the UI only offers matching templates.
 - `body_mode` is one of `fields`, `raw`, `none` (see [12-webhook-variables.md](12-webhook-variables.md)); `raw` uses `request.body`.
 - Provider signing helpers are exposed as template functions (`standard_webhooks_signature`, `twilio_signature`, `mailgun_signature`, `sendgrid_signature`, `slack_signature`, `stripe_style_signature`) so templates stay declarative.
-- `multipart` fields can attach files: `{ key = "attachment1", file = "{{ data.attachments[0].url }}" }`, and `mss` streams the bytes in.
+- `multipart` fields can attach files: `{ key = "attachment1", file = "{{ data.attachments[0].url }}" }`, and SendMock streams the bytes in.
 - Optional `[sample]` block gives a fixture event for previewing without real data.
 
 ## Custom templates
@@ -140,12 +151,12 @@ Schema notes:
 - Endpoint link modes:
   - **Linked (default for custom templates):** the endpoint follows template updates. Endpoint-level overrides (extra headers, extra fields, variables) are layered on top.
   - **Detached:** copy the template into the endpoint and edit freely; no future updates.
-- Built-in templates are always linked and read-only; upgrading `mss` can improve them. Clone to freeze a version.
+- Built-in templates are always linked and read-only; upgrading SendMock can improve them. Clone to freeze a version.
 
 ### Sharing across a team
 
-- **Export** a template as `<id>.mss-template.toml` (secrets never exported, only variable declarations).
-- **Templates directory:** `--templates-dir ./mss-templates` (or `MSS_TEMPLATES_DIR`) loads every `*.toml` at startup and watches for changes. Teams commit this folder to their app repo so everyone gets the same templates.
+- **Export** a template as `<id>.sendmock-template.toml` (secrets never exported, only variable declarations).
+- **Templates directory:** `--templates-dir ./sendmock-templates` (or `SENDMOCK_TEMPLATES_DIR`) loads every `*.toml` at startup and watches for changes. Teams commit this folder to their app repo so everyone gets the same templates.
 - Directory templates show a "from file" badge and are read-only in the UI (edit the file or clone).
 
 ### Versioning and safety

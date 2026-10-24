@@ -1,8 +1,8 @@
 # 15. HTTP Catcher (Request Bin)
 
-Apps send more than email and SMS: Slack/Discord/Teams notifications, push notifications (FCM, APNs, OneSignal, Expo), Telegram bot messages, analytics pings, third-party webhooks. The HTTP catcher captures **any HTTP request** your app makes to `mss`, shows it in the UI, and answers with a configurable mock response, so the app keeps working locally without hitting real services.
+Apps send more than email and SMS: Slack/Discord/Teams notifications, push notifications (FCM, APNs, OneSignal, Expo), Telegram bot messages, analytics pings, third-party webhooks. The HTTP catcher captures **any HTTP request** your app makes to SendMock, shows it in the UI, and answers with a configurable mock response, so the app keeps working locally without hitting real services.
 
-This turns `mss` into a sandbox for all outbound communication, not only email and SMS (MockPost and Webhook.site offer similar capture).
+This turns SendMock into a sandbox for all outbound communication, not only email and SMS (MockPost and Webhook.site offer similar capture).
 
 ## Behaviour
 
@@ -48,8 +48,8 @@ The UI renders recognised payloads nicely: Slack Block Kit and Discord embeds as
 ## API, CLI, MCP
 
 - API: `/api/v1/http/bins`, `/api/v1/http/requests`, `/api/v1/http/bins/{binId}/responses`, `/api/v1/wait/http?bin=slack&timeout=10s`.
-- CLI: `mss http bins|list|show|tail|forward`, `mss http response set ...`.
-- MCP: `mss_http_list`, `mss_http_get`, `mss_http_wait`, `mss_http_response_set` (toolset `http`).
+- CLI: `sendmock http bins|list|show|tail|forward`, `sendmock http response set ...`.
+- MCP: `sendmock_http_list`, `sendmock_http_get`, `sendmock_http_wait`, `sendmock_http_response_set` (toolset `http`).
 
 ## Storage
 
