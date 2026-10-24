@@ -4,12 +4,15 @@ import type {
   EmailDetail,
   EmailSummary,
   EmailUpdate,
+  NativeSendRequest,
   OpenSource,
   SimulatedEmailOutcome,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
+import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import {
   applyMockConditions,
+  createErrorResponse,
   createNotFoundResponse,
   includesText,
   paginateItems,
@@ -83,7 +86,53 @@ function findEmail(emailId: unknown): EmailDetail | undefined {
   return mockDatabase.emails.find((email) => email.id === emailId);
 }
 
+function parseAddress(addressText: string) {
+  const namedMatch = addressText.match(/^\s*"?([^"<]*)"?\s*<([^>]+)>\s*$/);
+
+  return namedMatch
+    ? { name: (namedMatch[1] ?? "").trim(), address: namedMatch[2] ?? "" }
+    : { name: "", address: addressText.trim() };
+}
+
 export const emailHandlers = [
+  http.post("*/api/v1/send", async ({ request }) => {
+    const conditionResponse = await applyMockConditions();
+    if (conditionResponse) {
+      return conditionResponse;
+    }
+
+    const nativeSendRequest = (await request.json()) as NativeSendRequest;
+    if (!nativeSendRequest.from || nativeSendRequest.to.length === 0) {
+      return createErrorResponse(
+        400,
+        "invalid_request",
+        "from and to are required",
+      );
+    }
+
+    const emailFixture = buildEmailFixture({
+      minutesAgo: 0,
+      from: parseAddress(nativeSendRequest.from),
+      to: nativeSendRequest.to.map(parseAddress),
+      subject: nativeSendRequest.subject,
+      textBody: nativeSendRequest.text ?? null,
+      htmlBody: nativeSendRequest.html ?? null,
+      tags: nativeSendRequest.tags ?? [],
+      source: "native_api",
+    });
+    mockDatabase.emails.unshift(emailFixture.email);
+    mockDatabase.emailTimelines.set(
+      emailFixture.email.id,
+      emailFixture.timeline,
+    );
+    publishMockEvent("email.received", {
+      id: emailFixture.email.id,
+      subject: emailFixture.email.subject,
+    });
+
+    return HttpResponse.json({ id: emailFixture.email.id }, { status: 201 });
+  }),
+
   http.get("*/api/v1/emails", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
     if (conditionResponse) {

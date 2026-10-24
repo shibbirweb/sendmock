@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Logo gradient, shared with the app (web/src/index.css). */
+:root {
+  --brand-from: #0d9488;
+  --brand-to: #10b981;
+}
+
+.dark {
+  --brand-from: #2dd4bf;
+  --brand-to: #34d399;
+}
+
 @theme inline {
     --animate-shiny-text: shiny-text 8s infinite;
     --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;

@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { InboxIcon } from "lucide-react";
 
+import { SendMockLogo } from "@/components/common/sendmock-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -68,10 +68,10 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
-                <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                  <InboxIcon className="size-4" />
-                </span>
-                <span className="grid leading-tight">
+                {/* size-8! overrides the menu button's size-4 rule for every svg inside it. */}
+                <SendMockLogo className="size-8! shrink-0" />
+                {/* Hidden in icon mode so the logo keeps its square shape. */}
+                <span className="grid leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="font-semibold">SendMock</span>
                   <span className="text-xs text-muted-foreground">
                     Mail · SMS · Payments

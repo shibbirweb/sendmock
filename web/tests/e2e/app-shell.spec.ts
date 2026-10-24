@@ -91,6 +91,17 @@ test("UI-01.3 keyboard shortcuts navigate and open the palette and help", async 
   await expect(page).toHaveURL(/\/logs$/);
 });
 
+test("the command palette title is only in the page while the palette is open", async ({
+  page,
+}) => {
+  const paletteTitle = page.getByRole("heading", { name: "Command palette" });
+
+  await page.keyboard.press("ControlOrMeta+k");
+  await expect(paletteTitle).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(paletteTitle).toHaveCount(0);
+});
+
 test("UI-01.4 sidebar shows the live connection status and version", async ({
   page,
 }) => {
@@ -134,6 +145,52 @@ test("UI-02.3 demo controls add traffic that appears live", async ({
     String(emailCountBefore + 1),
   );
   await expect(page.getByText("New email")).toBeVisible();
+});
+
+test("notification toasts can be dismissed with their close button", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Demo controls" }).click();
+  await page.getByRole("button", { name: "Sample email" }).click();
+  await page.keyboard.press("Escape");
+
+  const newEmailToast = page.locator("[data-sonner-toast]").filter({ hasText: "New email" });
+  await expect(newEmailToast).toBeVisible();
+  await newEmailToast.hover();
+  await newEmailToast.getByRole("button", { name: /close/i }).click();
+  await expect(newEmailToast).toBeHidden();
+});
+
+test("grouped notification toasts can all be cleared at once", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Demo controls" }).click();
+  const sampleEmailButton = page.getByRole("button", { name: "Sample email" });
+  await sampleEmailButton.click();
+  await expect(page.getByRole("button", { name: /Clear all/ })).toBeHidden();
+  await sampleEmailButton.click();
+  await sampleEmailButton.click();
+  await page.keyboard.press("Escape");
+
+  const clearAllButton = page.getByRole("button", { name: "Clear all (3)" });
+  await expect(clearAllButton).toBeVisible();
+  await clearAllButton.click();
+  await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+  await expect(clearAllButton).toBeHidden();
+});
+
+test("the sidebar and browser tab show the SendMock logo", async ({
+  page,
+  request,
+}) => {
+  const homeLink = page.getByRole("link", { name: /SendMock/ }).first();
+  await expect(homeLink.locator("svg")).toBeVisible();
+
+  const faviconPath = await page.locator("link[rel='icon']").getAttribute("href");
+  expect(faviconPath).toMatch(/favicon\.svg$/);
+  const faviconResponse = await request.get(faviconPath ?? "");
+  expect(faviconResponse.ok()).toBe(true);
+  expect(await faviconResponse.text()).toContain("<svg");
 });
 
 test("UI-02.3 simulated server errors show an error state", async ({

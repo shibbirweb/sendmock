@@ -84,6 +84,27 @@ export async function requestApi<ResponseType>(
   return (await response.json()) as ResponseType;
 }
 
+/** Calls an endpoint that answers with plain text, such as the raw email source. */
+export async function requestApiText(
+  apiPath: string,
+  abortSignal?: AbortSignal,
+): Promise<string> {
+  const response = await fetch(buildRequestUrl(apiPath), {
+    signal: abortSignal,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorBody(response));
+  }
+
+  return response.text();
+}
+
+/** Absolute URL for links the browser opens directly (downloads, images). */
+export function buildApiUrl(apiPath: string): string {
+  return buildRequestUrl(apiPath);
+}
+
 /** WebSocket URL of the realtime event stream. */
 export function buildRealtimeUrl(): string {
   const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL;

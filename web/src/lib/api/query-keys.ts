@@ -11,6 +11,14 @@ export const queryKeys = {
       ["emails", "list", emailFilters] as const,
     detail: (emailId: string) => ["emails", "detail", emailId] as const,
     timeline: (emailId: string) => ["emails", "timeline", emailId] as const,
+    infiniteList: (emailFilters: EmailListFilters) =>
+      ["emails", "infinite-list", emailFilters] as const,
+    raw: (emailId: string) => ["emails", "raw", emailId] as const,
+    mime: (emailId: string) => ["emails", "mime", emailId] as const,
+    htmlCheck: (emailId: string) => ["emails", "html-check", emailId] as const,
+    spamCheck: (emailId: string) => ["emails", "spam-check", emailId] as const,
+    listUnsubscribe: (emailId: string) =>
+      ["emails", "list-unsubscribe", emailId] as const,
   },
   sms: {
     all: ["sms"] as const,

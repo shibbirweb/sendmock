@@ -1,19 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MailIcon } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { MailLayout } from "@/features/mail/mail-layout";
+
+export type MailSearchParams = {
+  /** Search box text, e.g. `from:acme is:unread invoice`. */
+  q?: string;
+};
 
 export const Route = createFileRoute("/mail")({
-  component: MailPage,
+  validateSearch: (
+    searchParams: Record<string, unknown>,
+  ): MailSearchParams => ({
+    q: typeof searchParams.q === "string" ? searchParams.q : undefined,
+  }),
+  component: MailLayout,
 });
-
-function MailPage() {
-  return (
-    <PagePlaceholder
-      icon={MailIcon}
-      title="Mail"
-      description="Every email your app sends over SMTP or provider HTTP APIs, with HTML preview, source, checks and timeline."
-      plannedPhase="Phase U1"
-    />
-  );
-}

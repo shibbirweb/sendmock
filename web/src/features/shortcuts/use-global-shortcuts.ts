@@ -3,25 +3,11 @@ import * as React from "react";
 
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
+import { isTypingInEditableElement } from "@/features/shortcuts/is-typing-in-editable-element";
 import { useTheme } from "@/features/theme/theme-provider";
 
 /** How long after pressing "g" the second key of a navigation shortcut is accepted. */
 const navigationSequenceTimeoutMs = 1000;
-
-function isTypingInEditableElement(eventTarget: EventTarget | null): boolean {
-  if (!(eventTarget instanceof HTMLElement)) {
-    return false;
-  }
-
-  if (eventTarget.isContentEditable) {
-    return true;
-  }
-
-  return (
-    eventTarget.closest("input, textarea, select, [contenteditable='true']") !==
-    null
-  );
-}
 
 /**
  * Registers the app-wide keyboard shortcuts: command palette, shortcut help,

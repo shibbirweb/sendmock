@@ -23,9 +23,10 @@ export function AppShell() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="min-h-svh">
+      {/* A fixed-height inset lets screens like Mail scroll their own panes. */}
+      <SidebarInset className="h-svh overflow-hidden">
         <AppHeader />
-        <main className="flex min-h-0 flex-1 flex-col">
+        <main className="flex min-h-0 flex-1 flex-col overflow-auto">
           <Outlet />
         </main>
       </SidebarInset>

@@ -55,14 +55,14 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 92 features, 5 / 329 criteria ticked.**
+**Accepted: 0 / 92 features, 10 / 329 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
 | [EM-01](01-email.md#em-01-smtp-receive) | SMTP receive | Phase 1 | 6 | Not started |
 | [EM-02](01-email.md#em-02-smtp-tls-and-auth) | SMTP TLS and AUTH | Phase 1 | 5 | Not started |
 | [EM-03](01-email.md#em-03-storage-retention-and-search) | Storage, retention and search | Phase 1 | 5 | Not started |
-| [EM-04](01-email.md#em-04-email-viewer) | Email viewer | UI in U1, live in Phase 1 | 8 | Not started |
+| [EM-04](01-email.md#em-04-email-viewer) | Email viewer | UI in U1, live in Phase 1 | 8 | In progress |
 | [EM-05](01-email.md#em-05-otp-and-link-extraction) | OTP and link extraction | Phase 1 | 4 | Not started |
 | [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Not started |
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 | 3 | Not started |
@@ -74,7 +74,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-13](01-email.md#em-13-quality-checks) | Quality checks | Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam) | 4 | Not started |
 | [EM-14](01-email.md#em-14-release-and-auto-forward) | Release and auto-forward | Phase 4 | 4 | Not started |
 | [EM-15](01-email.md#em-15-smtp-chaos) | SMTP chaos | Phase 4 | 3 | Not started |
-| [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | Not started |
+| [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | In progress |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Not started |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Not started |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | Phase 2 | 3 | Not started |

@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
@@ -8,6 +13,7 @@ import type {
   EmailSummary,
   EmailTimelineEntry,
   EmailUpdate,
+  NativeSendRequest,
   OpenSource,
   PageOf,
   SimulatedEmailOutcome,
@@ -21,6 +27,20 @@ export function useEmailList(emailFilters: EmailListFilters = {}) {
         queryParameters: emailFilters,
         abortSignal: signal,
       }),
+  });
+}
+
+/** Email list that loads the next page as the user scrolls. */
+export function useInfiniteEmailList(emailFilters: EmailListFilters = {}) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.emails.infiniteList(emailFilters),
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam, signal }) =>
+      requestApi<PageOf<EmailSummary>>("/emails", {
+        queryParameters: { ...emailFilters, cursor: pageParam, limit: 50 },
+        abortSignal: signal,
+      }),
+    getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
   });
 }
 
@@ -102,5 +122,15 @@ export function useSimulateEmailOutcome() {
         method: "POST",
         requestBody: simulatedOutcome,
       }),
+  );
+}
+
+/** Native HTTP send API (POST /api/v1/send), used for sample emails. */
+export function useSendEmail() {
+  return useEmailMutation((nativeSendRequest: NativeSendRequest) =>
+    requestApi<{ id: string }>("/send", {
+      method: "POST",
+      requestBody: nativeSendRequest,
+    }),
   );
 }
