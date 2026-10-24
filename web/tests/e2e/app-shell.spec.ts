@@ -136,6 +136,38 @@ test("UI-02.3 demo controls add traffic that appears live", async ({
   await expect(page.getByText("New email")).toBeVisible();
 });
 
+test("notification toasts can be dismissed with their close button", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Demo controls" }).click();
+  await page.getByRole("button", { name: "Sample email" }).click();
+  await page.keyboard.press("Escape");
+
+  const newEmailToast = page.locator("[data-sonner-toast]").filter({ hasText: "New email" });
+  await expect(newEmailToast).toBeVisible();
+  await newEmailToast.hover();
+  await newEmailToast.getByRole("button", { name: /close/i }).click();
+  await expect(newEmailToast).toBeHidden();
+});
+
+test("grouped notification toasts can all be cleared at once", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Demo controls" }).click();
+  const sampleEmailButton = page.getByRole("button", { name: "Sample email" });
+  await sampleEmailButton.click();
+  await expect(page.getByRole("button", { name: /Clear all/ })).toBeHidden();
+  await sampleEmailButton.click();
+  await sampleEmailButton.click();
+  await page.keyboard.press("Escape");
+
+  const clearAllButton = page.getByRole("button", { name: "Clear all (3)" });
+  await expect(clearAllButton).toBeVisible();
+  await clearAllButton.click();
+  await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+  await expect(clearAllButton).toBeHidden();
+});
+
 test("UI-02.3 simulated server errors show an error state", async ({
   page,
 }, testInfo) => {
