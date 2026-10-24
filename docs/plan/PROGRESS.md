@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U0: UI foundations** (11 / 15 done; the rest needs the GitHub repository) |
+| **Current phase** | **Phase U0: UI foundations** (14 / 15 done; only the required CI checks in the rulesets remain) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
-| **Blockers** | No GitHub remote yet: branch protection, required checks, the first CI run and the Pages deploy wait for it |
+| **Blockers** | none |
+| **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
 | **Feature acceptance** | 0 / 92 accepted, 5 / 329 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Create the GitHub repository, push `main`, `develop` and `feat/u0-ui-foundations`, open the U0 pull request.
-2. Turn on Pages (source: GitHub Actions), branch protection and required checks; confirm CI and the Pages deploy pass.
-3. Start Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens.
+1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
+2. Start Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens.
 
 ## How to update this file
 
@@ -35,7 +35,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
-| U0 | UI foundations | In progress | 11 / 15 |
+| U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Not started | 0 / 15 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 12 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
@@ -69,7 +69,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U0: UI foundations
 
-- [ ] `develop` and `main` branches, branch protection, PRs target `develop` (branches exist locally; protection needs the GitHub repository)
+- [x] `develop` and `main` branches, branch protection, PRs target `develop` (rulesets on both: pull request required, no force push, no deletion; default branch `develop`) (#1)
 - [x] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui (044db8b)
 - [x] TanStack Router and Query, lucide, sonner (044db8b)
 - [x] App shell: sidebar, three-pane layout, responsive collapse (044db8b; the three-pane list/detail layout arrives with the U1 screens)
@@ -79,10 +79,10 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables) (f8209c5)
 - [x] Dev toolbar (latency, errors, empty, large data, realtime on/off) (f8209c5)
 - [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (f8209c5)
-- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (f7dca57, 4f8d212, 3ae88c2; passes locally, first GitHub run pending)
+- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (f7dca57, 4f8d212, 3ae88c2; first GitHub run passed on #1)
 - [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (3ae88c2)
-- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/sendmock/`; first deploy needs the repository)
-- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing locally with an 80% gate on `src/lib`; required checks need the repository)
+- [x] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL): https://shibbirweb.github.io/sendmock/ (#1)
+- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing in CI with an 80% gate on `src/lib`; still open: add Web UI, Acceptance traceability and Website as required checks in the rulesets)
 - [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (4f8d212)
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
@@ -294,3 +294,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 |------|--------|
 | 2026-10-24 | Plan written (docs 01 to 16), competitor research folded in, plan moved to `docs/plan/`, progress tracker created, `AGENTS.md` / `CLAUDE.md` added, acceptance criteria written for all features. |
 | 2026-10-25 | Phase U0 started on `feat/u0-ui-foundations`: web app shell, mock API with realtime events and demo controls, tests (27 unit, 7 end-to-end), CI and Pages workflows, website skeleton with Magic UI. Waiting on the GitHub repository for the remaining four items. Note: the demo-only mock chunk is 308 KB gzipped (faker data); the app bundle is 172 KB, inside budget. |
+| 2026-10-25 | PR #1 merged into `develop`: CI (Web UI, Acceptance traceability, Website) green on the PR and on `develop`; site live at https://shibbirweb.github.io/sendmock/ with the demo at `/demo/`. Rulesets protect `develop` and `main`; required status checks still to be added. |
