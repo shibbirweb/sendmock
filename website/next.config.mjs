@@ -10,6 +10,8 @@ const nextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,
+  // Our root AGENTS.md already covers AI agents; stop `next dev` writing website/AGENTS.md.
+  agentRules: false,
 };
 
 const withMDX = createMDX();
