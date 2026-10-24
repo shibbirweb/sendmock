@@ -31,6 +31,8 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 
 ## Commits and pull requests
 
+- **Commit identity:** every commit in this repository is authored and committed as `MD. Shibbir Ahmed <shibbirweb@gmail.com>`. Set it per repository so other identities on the machine are untouched: `git config user.name "MD. Shibbir Ahmed"` and `git config user.email "shibbirweb@gmail.com"`. Check with `git log --format="%an <%ae>"` before pushing; never push a commit with any other name or email.
+
 - Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[MSS-12] add SMS thread list`.
 - Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
 - **Never add co-authors.** No `Co-Authored-By` lines or any other co-author trailer in commits, squash merges, pull request titles or descriptions, for Claude, any AI, or anyone else.

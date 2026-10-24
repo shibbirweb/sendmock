@@ -70,20 +70,20 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 ### Phase U0: UI foundations
 
 - [ ] `develop` and `main` branches, branch protection, PRs target `develop` (branches exist locally; protection needs the GitHub repository)
-- [x] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui (48518c6)
-- [x] TanStack Router and Query, lucide, sonner (48518c6)
-- [x] App shell: sidebar, three-pane layout, responsive collapse (48518c6; the three-pane list/detail layout arrives with the U1 screens)
-- [x] Theme: dark / light / system (48518c6)
-- [x] Command palette and keyboard shortcut system with `?` help (48518c6)
-- [x] MSW setup (HTTP + WebSocket) and in-memory mock DB (698f0f1)
-- [x] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables) (698f0f1)
-- [x] Dev toolbar (latency, errors, empty, large data, realtime on/off) (698f0f1)
-- [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (698f0f1)
-- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (b30dd9f, a4bfb7d, 67ee273; passes locally, first GitHub run pending)
-- [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (67ee273)
+- [x] `web/` scaffold: Bun, Vite, React 19, TypeScript, Tailwind v4, shadcn/ui (044db8b)
+- [x] TanStack Router and Query, lucide, sonner (044db8b)
+- [x] App shell: sidebar, three-pane layout, responsive collapse (044db8b; the three-pane list/detail layout arrives with the U1 screens)
+- [x] Theme: dark / light / system (044db8b)
+- [x] Command palette and keyboard shortcut system with `?` help (044db8b)
+- [x] MSW setup (HTTP + WebSocket) and in-memory mock DB (f8209c5)
+- [x] Fixture generators (emails, SMS, Verify, catcher, logs, webhooks, templates, variables) (f8209c5)
+- [x] Dev toolbar (latency, errors, empty, large data, realtime on/off) (f8209c5)
+- [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (f8209c5)
+- [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (f7dca57, 4f8d212, 3ae88c2; passes locally, first GitHub run pending)
+- [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (3ae88c2)
 - [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/sendmock/`; first deploy needs the repository)
 - [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing locally with an 80% gate on `src/lib`; required checks need the repository)
-- [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (a4bfb7d)
+- [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (4f8d212)
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
 
@@ -264,6 +264,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-24 | Website on GitHub Pages with Fumadocs + Magic UI, API playground with in-browser demo mode | [16](16-website-and-releases.md) |
 | 2026-10-25 | Add a fake payment gateway (Stripe, PayPal, SSLCommerz first; bKash, Razorpay, Paddle next) with test checkout and IPN; only test cards accepted | [17](17-payments.md) |
 | 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
+| 2026-10-25 | Commits authored as `MD. Shibbir Ahmed <shibbirweb@gmail.com>` (rule in `AGENTS.md`); existing local commits rewritten before the first push | [AGENTS.md](../../AGENTS.md#commits-and-pull-requests) |
 | 2026-10-25 | Product name **SendMock** (binary and packages `sendmock`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock) |
 
 ### Open
