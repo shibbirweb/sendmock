@@ -1,6 +1,14 @@
-import { http, HttpResponse } from "msw";
+import { emailHandlers } from "@/mocks/handlers/email-handlers";
+import { smsHandlers } from "@/mocks/handlers/sms-handlers";
+import { systemHandlers } from "@/mocks/handlers/system-handlers";
+import { webhookHandlers } from "@/mocks/handlers/webhook-handlers";
+import { realtimeConnectionHandler } from "@/mocks/realtime/mock-event-bus";
 
-/** All mock API handlers. Resource handlers are added as each resource is built. */
+/** Every mock API handler, matching the paths in docs/plan/06-api.md. */
 export const mockHandlers = [
-  http.get("*/api/v1/health", () => HttpResponse.json({ status: "ok" })),
+  ...systemHandlers,
+  ...emailHandlers,
+  ...smsHandlers,
+  ...webhookHandlers,
+  realtimeConnectionHandler,
 ];

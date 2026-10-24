@@ -1,10 +1,11 @@
 import { setupWorker } from "msw/browser";
 
 import { mockHandlers } from "@/mocks/handlers";
+import { startMockEventGenerator } from "@/mocks/realtime/mock-event-generator";
 
 /**
- * Starts the in-browser mock API. Every request to /api/v1 is answered by the
- * mock handlers, so the UI runs without a backend.
+ * Starts the in-browser mock API. Every request to /api/v1 and the realtime
+ * WebSocket are answered by the mock handlers, so the UI runs without a backend.
  */
 export async function startMockApi() {
   const mockWorker = setupWorker(...mockHandlers);
@@ -16,4 +17,6 @@ export async function startMockApi() {
     onUnhandledFrame: "bypass",
     quiet: true,
   });
+
+  startMockEventGenerator();
 }

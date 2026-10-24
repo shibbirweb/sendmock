@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { KeyboardIcon, PaletteIcon } from "lucide-react";
 
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -33,56 +34,58 @@ export function CommandPalette() {
       title="Command palette"
       description="Search for a page or an action"
     >
-      <CommandInput placeholder="Type a page or an action..." />
-      <CommandList>
-        <CommandEmpty>Nothing matches.</CommandEmpty>
-        <CommandGroup heading="Go to">
-          {listAllNavigationItems().map((navigationItem) => (
+      <Command>
+        <CommandInput placeholder="Type a page or an action..." />
+        <CommandList>
+          <CommandEmpty>Nothing matches.</CommandEmpty>
+          <CommandGroup heading="Go to">
+            {listAllNavigationItems().map((navigationItem) => (
+              <CommandItem
+                key={navigationItem.path + navigationItem.title}
+                value={`Go to ${navigationItem.title}`}
+                onSelect={() => {
+                  runAndClose(() => {
+                    void navigate({ to: navigationItem.path });
+                  });
+                }}
+              >
+                <navigationItem.icon />
+                {navigationItem.title}
+                {navigationItem.shortcutKey !== undefined && (
+                  <CommandShortcut>
+                    G {navigationItem.shortcutKey.toUpperCase()}
+                  </CommandShortcut>
+                )}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Actions">
             <CommandItem
-              key={navigationItem.path + navigationItem.title}
-              value={`Go to ${navigationItem.title}`}
+              value="Switch theme"
+              onSelect={() => {
+                runAndClose(cycleThemePreference);
+              }}
+            >
+              <PaletteIcon />
+              Switch theme
+              <CommandShortcut>T</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              value="Show keyboard shortcuts"
               onSelect={() => {
                 runAndClose(() => {
-                  void navigate({ to: navigationItem.path });
+                  setShortcutHelpOpen(true);
                 });
               }}
             >
-              <navigationItem.icon />
-              {navigationItem.title}
-              {navigationItem.shortcutKey !== undefined && (
-                <CommandShortcut>
-                  G {navigationItem.shortcutKey.toUpperCase()}
-                </CommandShortcut>
-              )}
+              <KeyboardIcon />
+              Show keyboard shortcuts
+              <CommandShortcut>?</CommandShortcut>
             </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Actions">
-          <CommandItem
-            value="Switch theme"
-            onSelect={() => {
-              runAndClose(cycleThemePreference);
-            }}
-          >
-            <PaletteIcon />
-            Switch theme
-            <CommandShortcut>T</CommandShortcut>
-          </CommandItem>
-          <CommandItem
-            value="Show keyboard shortcuts"
-            onSelect={() => {
-              runAndClose(() => {
-                setShortcutHelpOpen(true);
-              });
-            }}
-          >
-            <KeyboardIcon />
-            Show keyboard shortcuts
-            <CommandShortcut>?</CommandShortcut>
-          </CommandItem>
-        </CommandGroup>
-      </CommandList>
+          </CommandGroup>
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 }

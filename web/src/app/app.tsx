@@ -5,6 +5,7 @@ import { queryClient } from "@/app/query-client";
 import { router } from "@/app/router";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { RealtimeProvider } from "@/features/realtime/realtime-provider";
 import { AppOverlaysProvider } from "@/features/shortcuts/app-overlays-provider";
 import { ThemeProvider } from "@/features/theme/theme-provider";
 
@@ -14,8 +15,10 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AppOverlaysProvider>
-            <RouterProvider router={router} />
-            <Toaster />
+            <RealtimeProvider>
+              <RouterProvider router={router} />
+              <Toaster position="top-right" />
+            </RealtimeProvider>
           </AppOverlaysProvider>
         </TooltipProvider>
       </QueryClientProvider>

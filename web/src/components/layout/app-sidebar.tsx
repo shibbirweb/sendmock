@@ -9,6 +9,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -17,6 +18,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { ConnectionStatus } from "@/features/connection/connection-status";
+import { useAppStats } from "@/lib/api/hooks/use-system-queries";
+import type { AppStats } from "@/lib/api/types";
 import {
   type NavigationItem,
   navigationItems,
@@ -36,7 +39,24 @@ function isSectionActive(currentPath: string, navigationItem: NavigationItem) {
   return isPathActive(currentPath, sectionPrefix || "/");
 }
 
+/** Unread counters shown next to sidebar sections. */
+function readSectionBadgeCount(
+  sectionPath: string,
+  appStats: AppStats | undefined,
+): number {
+  if (sectionPath === "/mail") {
+    return appStats?.unread_email_count ?? 0;
+  }
+
+  if (sectionPath === "/sms") {
+    return appStats?.unread_sms_count ?? 0;
+  }
+
+  return 0;
+}
+
 export function AppSidebar() {
+  const { data: appStats } = useAppStats();
   const currentPath = useRouterState({
     select: (routerState) => routerState.location.pathname,
   });
@@ -78,6 +98,11 @@ export function AppSidebar() {
                       <span>{navigationItem.title}</span>
                     </Link>
                   </SidebarMenuButton>
+                  {readSectionBadgeCount(navigationItem.path, appStats) > 0 && (
+                    <SidebarMenuBadge>
+                      {readSectionBadgeCount(navigationItem.path, appStats)}
+                    </SidebarMenuBadge>
+                  )}
                   {navigationItem.children !== undefined &&
                     isSectionActive(currentPath, navigationItem) && (
                       <SidebarMenuSub>
