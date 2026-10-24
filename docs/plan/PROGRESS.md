@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U0: UI foundations** (14 / 15 done; only the required CI checks in the rulesets remain) |
+| **Current phase** | **Phase U1: Mail screen done**; SMS, Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Start Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens.
+2. Continue Phase U1: SMS and Verify screens next, then Numbers, Logs and Settings.
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Not started | 0 / 15 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 6 / 15 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 12 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -88,11 +88,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
 
 - [ ] Overview dashboard
-- [ ] Mail list, search and filter chips, source and outcome badges
-- [ ] Mail detail: HTML (devices, images toggle, screenshot), Text, Source, Headers
-- [ ] Mail detail: Attachments with thumbnails, MIME tree, Checks, Timeline, Template data
-- [ ] Mail actions: read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, tag, download, send to webhook, release, delete, bulk delete
-- [ ] Extracted OTP/links panel, opened indicator and history, browser notifications
+- [x] Mail list, search and filter chips, source and outcome badges (virtual rows, infinite loading, J/K/D and / shortcuts)
+- [x] Mail detail: HTML (devices, images toggle, screenshot), Text, Source, Headers
+- [x] Mail detail: Attachments with thumbnails, MIME tree, Checks, Timeline, Template data
+- [x] Mail actions: read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, download, release, delete, bulk delete (tag editing and "send to webhook" follow with the webhook screens in U2)
+- [x] Extracted OTP/links panel, opened indicator, browser notifications (open history list follows with Logs)
 - [ ] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges)
 - [ ] SMS message drawer, inbound composer, manual status, simulate read
 - [ ] Verify tab: verifications, timeline, force-state buttons, Verify services editor
@@ -295,3 +295,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-24 | Plan written (docs 01 to 16), competitor research folded in, plan moved to `docs/plan/`, progress tracker created, `AGENTS.md` / `CLAUDE.md` added, acceptance criteria written for all features. |
 | 2026-10-25 | Phase U0 started on `feat/u0-ui-foundations`: web app shell, mock API with realtime events and demo controls, tests (27 unit, 7 end-to-end), CI and Pages workflows, website skeleton with Magic UI. Waiting on the GitHub repository for the remaining four items. Note: the demo-only mock chunk is 308 KB gzipped (faker data); the app bundle is 172 KB, inside budget. |
 | 2026-10-25 | PR #1 merged into `develop`: CI (Web UI, Acceptance traceability, Website) green on the PR and on `develop`; site live at https://shibbirweb.github.io/sendmock/ with the demo at `/demo/`. Rulesets protect `develop` and `main`; required status checks still to be added. |
+| 2026-10-25 | Mail screen built on mock data: virtual list with infinite loading, search with filter chips, keyboard shortcuts, sandboxed HTML preview with device widths and screenshot, Source/Headers/Attachments/MIME/Checks/Timeline/Template tabs, simulate open and delivery outcomes, release, bulk actions, browser notifications. Also: collapsed sidebar logo fixed, toasts dismissable. |

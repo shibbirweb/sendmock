@@ -37,10 +37,10 @@ Phase 1.
 
 UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-features-ui-and-api).
 
-- [ ] EM-04.1 HTML renders in a sandboxed iframe with a strict CSP; scripts in the email never run.
-- [ ] EM-04.2 Remote images are blocked by default and load after clicking "Load images".
-- [ ] EM-04.3 Desktop, tablet and mobile width toggles resize the preview.
-- [ ] EM-04.4 Text, Source (highlighted), Headers and Attachments tabs show the correct content; CID inline images display in the HTML view.
+- [x] EM-04.1 HTML renders in a sandboxed iframe with a strict CSP; scripts in the email never run. (UI on mock data; live in Phase 1)
+- [x] EM-04.2 Remote images are blocked by default and load after clicking "Load images". (UI on mock data; live in Phase 1)
+- [x] EM-04.3 Desktop, tablet and mobile width toggles resize the preview. (UI on mock data; live in Phase 1)
+- [x] EM-04.4 Text, Source (highlighted), Headers and Attachments tabs show the correct content; CID inline images display in the HTML view. (UI on mock data; live in Phase 1)
 - [ ] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails.
 - [ ] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded.
 - [ ] EM-04.7 "Screenshot" saves a PNG of the rendered HTML.
@@ -148,4 +148,4 @@ Phase 4.
 UI in U1, live in Phase 1.
 
 - [ ] EM-16.1 After the user grants permission, a notification appears for each new email (respecting the optional filter).
-- [ ] EM-16.2 Nothing is requested or shown until the user turns notifications on.
+- [x] EM-16.2 Nothing is requested or shown until the user turns notifications on. (UI on mock data; live in Phase 1)
