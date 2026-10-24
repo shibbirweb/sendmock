@@ -5,7 +5,7 @@
 | `sendmock-mark.svg` | The logo on its own: app sidebar, website nav, README headers. Transparent background. |
 | `sendmock-tile.svg` | The logo in white on a rounded tile: favicons, app icons, social images. |
 
-The mark is an envelope between code brackets: a developer tool for messages.
+The mark is an envelope between code brackets (a developer tool for messages), with a small hook at the flap point, where the envelope opens, for webhooks.
 
 ## Colours
 

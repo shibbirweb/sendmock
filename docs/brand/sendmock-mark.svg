@@ -7,6 +7,7 @@
     <mask id="flap">
       <rect width="64" height="64" fill="#fff"/>
       <path d="M22 25 L32 32.5 L42 25" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M32 32.5 V37.5 A3 3 0 0 0 38 37.5 V36.5" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     </mask>
   </defs>
   <g fill="none" stroke="url(#brand)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6">

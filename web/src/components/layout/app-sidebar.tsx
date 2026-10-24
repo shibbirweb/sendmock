@@ -68,8 +68,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
-                {/* size-8! overrides the menu button's size-4 rule for every svg inside it. */}
-                <SendMockLogo className="size-8! shrink-0" />
+                {/* The ! overrides the menu button's size-4 rule for every svg inside it;
+                    the collapsed icon rail only has room for size-8. */}
+                <SendMockLogo className="size-10! shrink-0 group-data-[collapsible=icon]:size-8!" />
                 {/* Hidden in icon mode so the logo keeps its square shape. */}
                 <span className="grid leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="font-semibold">SendMock</span>
