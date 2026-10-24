@@ -15,6 +15,7 @@ Almost every app sends email and SMS: sign-up verification, OTP codes, password 
 
 - **Acts as a mail server and email provider.** Accepts any email over SMTP or through SendGrid / Mailgun / Postmark / Resend / SES / Brevo compatible HTTP APIs, stores it, shows it in the browser, and simulates delivery outcomes (delivered, bounced, complained).
 - **Acts as an SMS vendor.** Exposes an HTTP API that looks like popular SMS providers, including Twilio Verify for OTP flows (plus a simple native API), stores every message, and simulates delivery status with Twilio's real test numbers.
+- **Acts as a payment gateway.** Stripe, PayPal, SSLCommerz, bKash and Razorpay compatible APIs, a test checkout page with success, decline, cancel and 3-D Secure, and signed IPN / webhook events, refunds and disputes. Only test cards are accepted; no real money ever moves.
 - **Catches any other outbound HTTP.** Slack, Discord, push notifications and other API calls land in an HTTP catcher with mock responses.
 - **Calls your webhooks.** Automatically (rules that fire on events) or manually (a button or API call), with payloads in a native JSON format or in the shape real providers use.
 - **Works with any language.** Integration is a config change (SMTP host/port, SMS API base URL), not a library.

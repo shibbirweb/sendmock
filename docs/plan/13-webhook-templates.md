@@ -40,6 +40,17 @@ Users can:
 | Africa's Talking | Incoming message, delivery report | sms.inbound, sms.status |
 | AWS SNS (SMS) | Delivery status log shape | sms.status |
 
+**Payment gateways (IPN and webhooks)**, see [17-payments.md](17-payments.md)
+
+| Service | Templates | Events |
+|---------|-----------|--------|
+| Stripe | Webhook event with `Stripe-Signature` | payment.*, checkout.*, subscription.* |
+| PayPal | Webhook (transmission headers), classic IPN form post | payment.*, checkout.* |
+| SSLCommerz | IPN POST with `verify_sign`, success/fail/cancel POST | payment.*, checkout.* |
+| bKash | Callback redirect parameters | payment.* |
+| Razorpay | Webhook with `X-Razorpay-Signature` | payment.* |
+| Paddle | Webhook with `Paddle-Signature` | payment.*, subscription.* |
+
 ### B. "Notify a tool" (outbound to chat and automation)
 
 Forward captured messages to the tools a team already uses:

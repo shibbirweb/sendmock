@@ -70,6 +70,7 @@ Feature docs (03 to 14) mention "Phase N" for when a capability lands; those ref
 - **Variables:** global table, create/edit per kind, masked secrets with reveal confirm, regenerate fixed random values.
 - **Request editor:** CodeMirror with Jinja/JSON modes, `{{` autocomplete (variables, context fields, functions, filters), Fields / Raw / Template / None body modes, live preview panel (nunjucks), inline errors.
 - **HTTP catcher:** bins, request list and detail, Slack/Discord/push previews, response rule editor, forward.
+- **Payments:** list, detail with timeline, Simulate menu, hosted test checkout page with provider themes, Settings > Payments ([17-payments.md](17-payments.md)).
 - **Manual send dialog and composer:** pick endpoint/template, Prompt variable form, overrides, preview, send (creates a mock delivery).
 
 **Done when:** every webhook and catcher flow in [05-webhooks.md](05-webhooks.md), [12-webhook-variables.md](12-webhook-variables.md), [13-webhook-templates.md](13-webhook-templates.md) and [15-http-catcher.md](15-http-catcher.md) can be clicked through on mock data.
@@ -158,6 +159,16 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 
 **Done when:** a rule forwards every `*@inbound.local` email to a local Express handler, the delivery log shows request/response, and a failed delivery retries then succeeds after the handler is fixed and replayed.
 
+## Phase 3P: Payment gateway (about 2 weeks)
+
+- Native payments API and hosted checkout flow with the test checkout page.
+- Test cards (Stripe table) and the real-card safety rule (reject, never store).
+- Stripe (Checkout Sessions, PaymentIntents, Refunds, `Stripe-Signature` webhooks), PayPal (Orders v2, webhooks, IPN with postback), SSLCommerz (init, IPN with `verify_sign`, validation API, refund, query).
+- Capture, void, full and partial refunds; `payment.*` and `checkout.*` events; payment templates; `wait/payment`.
+- CLI `payments` commands and MCP `payments` toolset; Payments screens switched to live mode.
+
+**Done when:** apps using the official Stripe SDK, PayPal Orders and SSLCommerz complete a payment, receive and verify the IPN/webhook, validate the order, and handle a decline and a refund, all offline.
+
 ## Phase 4: Integrations, fidelity and AI (about 2-3 weeks)
 
 - Email provider HTTP send APIs: SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo (on the provider port), with template ID/data capture.
@@ -172,6 +183,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - TwiML reply parsing for two-way SMS.
 - WhatsApp via Twilio (`whatsapp:` addresses, channel badge, inbound, `read` status).
 - HTTP catcher: catch path, bins, mock response rules, Slack/Discord/Telegram/FCM presets, `wait/http`.
+- Payments: bKash, Razorpay and Paddle emulation; subscriptions; disputes.
 - Virtual numbers registry backend.
 - Chaos toggles (SMTP rejects/latency, SMS failures).
 - Verified SDK redirection recipes and `examples/` apps for PHP, Node, Python, Go, Java, Rust, Ruby, .NET, each with a CI smoke test.

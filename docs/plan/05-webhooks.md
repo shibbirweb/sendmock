@@ -22,6 +22,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `sms.inbound` | a simulated incoming SMS was created |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify emulation (see [04-sms.md](04-sms.md#twilio-verify)) |
 | `http.captured` | the HTTP catcher captured a request from your app (see [15-http-catcher.md](15-http-catcher.md)) |
+| `payment.*`, `checkout.*`, `subscription.*` | payment gateway emulation: created, authorized, succeeded, failed, canceled, refunded, disputes, checkout completed/expired, subscriptions (see [17-payments.md](17-payments.md#events)) |
 | `webhook.failed` | a delivery exhausted retries (useful to chain alerts) |
 | `test.ping` | "Send test" button on an endpoint |
 

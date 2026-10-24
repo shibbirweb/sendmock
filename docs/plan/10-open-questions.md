@@ -4,7 +4,7 @@ Decisions to make before or during implementation. Each has a recommendation so 
 
 ## 1. Product name
 
-The folder is `mail-sms-server`; `mss` is a placeholder. Criteria: short CLI command (3-8 chars), free on crates.io, npm, Homebrew, Docker Hub and GitHub, and a `.dev` or `.sh` domain.
+The folder is `mail-sms-server`; `mss` is a placeholder. With payments and the HTTP catcher the product is broader than mail and SMS, so the name should cover "third-party services sandbox", not only mail and SMS. It will be published from the `shibbirweb` GitHub account (`github.com/shibbirweb/<name>`, `ghcr.io/shibbirweb/<name>`, npm `@shibbirweb/<name>`). Criteria: short CLI command (3-8 chars), free on crates.io, npm, Homebrew, Docker Hub and GitHub, and a `.dev` or `.sh` domain.
 
 Brainstorm candidates (availability not yet checked):
 

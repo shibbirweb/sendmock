@@ -69,6 +69,10 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | GET | `/http/requests`, `/http/requests/{requestId}` | captured requests |
 | POST | `/http/requests/{requestId}/forward` | resend a captured request to a URL |
 
+## Payments
+
+Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-mss-native).
+
 ## Logs
 
 | Method | Path | Purpose |

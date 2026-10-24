@@ -58,6 +58,7 @@ Inside the Docker image all listeners bind `0.0.0.0` ([09-distribution.md](09-di
 | `mail` | MIME parsing, header extraction, attachments, snippet, OTP/link extraction, email provider HTTP send APIs, delivery outcome simulation, HTML/link/spam checks, release and auto-forward. |
 | `sms` | Native and provider-compatible send endpoints (incl. Twilio Messaging Services and WhatsApp), Twilio Verify, segment/encoding calculation, delivery status simulation, inbound SMS simulation. |
 | `catcher` | HTTP catcher bins, mock response rules, presets ([15-http-catcher.md](15-http-catcher.md)). |
+| `payments` | Payment gateway emulation: native and provider APIs, hosted test checkout, test cards, IPN/webhook events, refunds, disputes ([17-payments.md](17-payments.md)). |
 | `logs` | SMTP session transcripts and API request log (including rejected requests). |
 | `seed` | Loads, applies and exports `mss.seed.toml`; `reset` restores the seed state. |
 | `events` | In-process broadcast bus (`tokio::sync::broadcast`). Every received or changed item becomes an `Event`. |
@@ -234,6 +235,7 @@ All IDs are ULIDs (string). Timestamps are UTC milliseconds.
 - `verify_services` (sid, friendly_name, code_length, fixed_code, ttl) and `verifications` (sid, service_sid, to, channel, code, status, attempts, sends, expires_at, linked sms/email id).
 - `numbers` (virtual numbers, channels, inbound URL/template, status callback) and `messaging_services` (sid, name, number pool).
 - `http_bins`, `http_requests` for the HTTP catcher ([15-http-catcher.md](15-http-catcher.md)).
+- `payments`, `payment_events`, `refunds`, `disputes`, `subscriptions` for payment emulation ([17-payments.md](17-payments.md#payment-data-model)).
 - `smtp_sessions` (id, remote_addr, helo, tls, auth_mech, auth_user, transcript, result, started_at, ended_at) and `api_requests` (id, api, method, path, headers, body, response_status, response_body, duration_ms, created_at).
 - `webhook_saved` (named saved deliveries / fixtures) and `tag_rules`, `forward_rules` (filter + action).
 

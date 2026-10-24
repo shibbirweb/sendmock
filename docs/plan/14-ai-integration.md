@@ -73,6 +73,8 @@ mss http response set --bin slack --status 200 --body '...'
 
 mss logs smtp|http [--failed] [--tail]
 
+mss payments list|show|simulate <paymentId> succeed|decline|refund|dispute|notify|test-cards
+
 mss otp --to <address|number> [--channel email|sms] [--wait 10s]
 mss links --to <address>
 
@@ -165,6 +167,7 @@ Tool names are prefixed `mss_` and generated from the registry. Each carries MCP
 | `verify` | `mss_verify_list`, `mss_verify_get`, `mss_verify_force`, `mss_verify_service_{list,create,update,delete}` |
 | `http` | `mss_http_bins`, `mss_http_list`, `mss_http_get`, `mss_http_wait`, `mss_http_forward`, `mss_http_response_set` |
 | `logs` | `mss_logs_smtp`, `mss_logs_http` |
+| `payments` | `mss_payment_create_checkout`, `mss_payment_list`, `mss_payment_get`, `mss_payment_simulate`, `mss_payment_notify`, `mss_payment_wait` |
 | `extract` | `mss_otp_get`, `mss_links_get` |
 | `numbers` | `mss_number_list`, `mss_number_upsert`, `mss_number_delete` |
 | `webhooks` | `mss_webhook_endpoint_{list,get,create,update,delete,test,rotate_secret}`, `mss_webhook_saved_{list,send,delete}`, `mss_webhook_rule_{list,create,update,delete,preview}`, `mss_webhook_send`, `mss_webhook_render`, `mss_webhook_delivery_{list,get,replay,cancel,wait}` |

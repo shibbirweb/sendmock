@@ -12,7 +12,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Current phase** | **Phase U0: UI foundations** (11 / 15 done; the rest needs the GitHub repository) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | No GitHub remote yet: branch protection, required checks, the first CI run and the Pages deploy wait for it |
-| **Feature acceptance** | 0 / 81 accepted, 5 / 289 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 92 accepted, 5 / 329 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
@@ -37,12 +37,13 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 11 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Not started | 0 / 15 |
-| U2 | Webhook and HTTP catcher screens | Not started | 0 / 11 |
+| U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 12 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 11 |
 | 3 | Webhooks backend | Not started | 0 / 14 |
+| 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
 | 5 | Distribution and 1.0 stable | Not started | 0 / 13 |
 
@@ -102,7 +103,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
 - [ ] Empty states with "how to connect" and "send sample"
 
-### Phase U2: Webhook and HTTP catcher screens
+### Phase U2: Webhook, HTTP catcher and payment screens
 
 - [ ] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables)
 - [ ] Rules list and visual rule builder with match preview
@@ -115,6 +116,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Manual send dialog and composer (Prompt variables, overrides)
 - [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
 - [ ] Webhooks overview metrics
+- [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Settings > Payments
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
 
@@ -197,6 +199,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Done-when check: inbound email rule to Express handler, retry then replay succeeds
 - [ ] Beta released
 
+### Phase 3P: Payment gateway backend
+
+- [ ] Native payments API and hosted checkout flow
+- [ ] Test cards and the real-card safety rule
+- [ ] Stripe emulation with `Stripe-Signature` webhooks
+- [ ] PayPal emulation (Orders v2, webhooks, IPN postback)
+- [ ] SSLCommerz emulation (init, IPN, validation, refund, query)
+- [ ] Done-when check: Stripe, PayPal and SSLCommerz flows end to end offline; beta released
+
 ### Phase 4: Integrations, fidelity and AI
 
 - [ ] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo)
@@ -251,6 +262,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-24 | Docker is a first-class release channel | [09](09-distribution.md#docker) |
 | 2026-10-24 | `develop` = beta, `main` = stable, releases cut by workflows (phpdebugger model) | [16](16-website-and-releases.md) |
 | 2026-10-24 | Website on GitHub Pages with Fumadocs + Magic UI, API playground with in-browser demo mode | [16](16-website-and-releases.md) |
+| 2026-10-25 | Add a fake payment gateway (Stripe, PayPal, SSLCommerz first; bKash, Razorpay, Paddle next) with test checkout and IPN; only test cards accepted | [17](17-payments.md) |
+| 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
 
 ### Open
 
@@ -258,7 +271,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 
 | Question | Recommendation | Status |
 |----------|----------------|--------|
-| Product name | pick from shortlist, check availability | Open (placeholder `mss`) |
+| Product name | decide after the payments scope; must cover more than mail and SMS | Open (placeholder `mss`) |
 | Default ports | 1025 / 8025 (Mailpit compatible) | Open (using recommendation) |
 | Licence | dual MIT / Apache-2.0 | Open |
 | Provider emulation priority | Twilio, Vonage, generic, then others | Open (using recommendation) |
