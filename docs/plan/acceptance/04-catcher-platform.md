@@ -1,0 +1,95 @@
+# Acceptance: HTTP catcher (HC) and Platform (PL)
+
+Plan: [15-http-catcher.md](../15-http-catcher.md), [02-architecture.md](../02-architecture.md), [06-api.md](../06-api.md). Rules for IDs, ticking and tests: [README.md](README.md).
+
+## HC-01 Capture requests
+
+UI in U2, backend Phase 4.
+
+- [ ] HC-01.1 Any method and path under `/catch/<bin>/...` is captured with method, URL, query, headers, body and timing; the bin is created on first use.
+- [ ] HC-01.2 JSON, form and multipart bodies are parsed and shown pretty; uploaded files are downloadable.
+- [ ] HC-01.3 `http.captured` fires and the request appears in the UI live.
+- [ ] HC-01.4 The optional catch-all port captures requests at any path.
+- [ ] HC-01.5 "Forward to URL" resends a captured request; "Copy as cURL" reproduces it.
+
+## HC-02 Mock responses
+
+Phase 4.
+
+- [ ] HC-02.1 Response rules match in order on method, path and filters; the default reply is `200 {"ok":true}`.
+- [ ] HC-02.2 Status, headers and templated bodies (including echoed request data) are returned as configured.
+- [ ] HC-02.3 Delay and failure rate behave as configured.
+
+## HC-03 Presets
+
+Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal).
+
+- [ ] HC-03.1 Each preset returns a reply the official client library accepts without error.
+- [ ] HC-03.2 Slack Block Kit, Discord embeds and push notifications are rendered as previews.
+
+---
+
+## PL-01 REST API and OpenAPI
+
+Phase 0 onwards.
+
+- [ ] PL-01.1 Every endpoint in [06-api.md](../06-api.md) exists and matches `docs/api/openapi.yaml` (contract tests).
+- [ ] PL-01.2 Errors use `{ "error": { "code", "message" } }` with the right HTTP status; times are RFC 3339 UTC; pagination uses `next_cursor`.
+- [ ] PL-01.3 `/api/openapi.json` is served and valid.
+
+## PL-02 Realtime
+
+Phase 1.
+
+- [ ] PL-02.1 Every event is pushed over WebSocket (`/api/v1/ws`) and SSE (`/api/v1/events`) within 500 ms.
+- [ ] PL-02.2 A client that reconnects resumes without duplicate or missing list entries.
+
+## PL-03 Test helpers
+
+Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
+
+- [ ] PL-03.1 `wait/email`, `wait/sms`, `wait/http` and `wait/webhook` return as soon as a match arrives and `408` after the timeout.
+- [ ] PL-03.2 `since` prevents matching messages older than the request window.
+- [ ] PL-03.3 `otp` and `links` return the latest values per recipient and channel.
+- [ ] PL-03.4 `--ready-json` with port `0` prints the bound addresses once ready.
+
+## PL-04 Seed file and reset
+
+Phase 0 (parse, validate), Phase 3 (full coverage).
+
+- [ ] PL-04.1 A seed file creates every supported item type; starting twice with the same seed changes nothing (idempotent).
+- [ ] PL-04.2 `${ENV_VAR}` references resolve; literal secrets are never written by export.
+- [ ] PL-04.3 `reset` wipes all traffic and restores exactly the seed state.
+- [ ] PL-04.4 `seed export` then `seed apply` on a fresh instance reproduces the same configuration.
+- [ ] PL-04.5 `seed validate` reports errors with file line numbers and changes nothing.
+
+## PL-05 Settings
+
+UI in U1, backend per feature phase.
+
+- [ ] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`.
+- [ ] PL-05.2 Invalid values are rejected with a field-level error.
+
+## PL-06 Security defaults
+
+Phase 0 onwards.
+
+- [ ] PL-06.1 The native binary binds only `127.0.0.1` by default; Docker binds `0.0.0.0` and prints a notice when no UI auth is set.
+- [ ] PL-06.2 With `--ui-auth`, UI, API, WebSocket and MCP over HTTP all require credentials or the API token.
+- [ ] PL-06.3 No secret (webhook secrets, provider tokens, SMTP AUTH passwords, relay passwords) appears in any API response, log line, MCP result or export.
+- [ ] PL-06.4 CORS only allows the configured origins; the docs playground origin can be removed with `--cors-origins`.
+
+## PL-07 Configuration
+
+Phase 0.
+
+- [ ] PL-07.1 Flags override `MSS_*` env vars, which override `mss.toml`, which overrides defaults.
+- [ ] PL-07.2 Unknown keys and invalid values fail at startup with a clear message.
+- [ ] PL-07.3 A port already in use fails with a message suggesting the flag to change it.
+
+## PL-08 Retention
+
+Phase 1.
+
+- [ ] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration.
+- [ ] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load.
