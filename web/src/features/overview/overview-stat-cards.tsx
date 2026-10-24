@@ -71,7 +71,7 @@ export function OverviewStatCards() {
   if (isError) {
     return (
       <p className="text-sm text-destructive">
-        Could not load the overview. Check that mss is running.
+        Could not load the overview. Check that MessageHook is running.
       </p>
     );
   }

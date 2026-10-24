@@ -83,7 +83,7 @@ Phase 0 onwards.
 
 Phase 0.
 
-- [ ] PL-07.1 Flags override `MSS_*` env vars, which override `mss.toml`, which overrides defaults.
+- [ ] PL-07.1 Flags override `MESSAGEHOOK_*` env vars, which override `messagehook.toml`, which overrides defaults.
 - [ ] PL-07.2 Unknown keys and invalid values fail at startup with a clear message.
 - [ ] PL-07.3 A port already in use fails with a message suggesting the flag to change it.
 

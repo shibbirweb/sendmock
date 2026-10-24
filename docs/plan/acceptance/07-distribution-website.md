@@ -8,15 +8,15 @@ Phase 0 (build), Phase 5 (all targets).
 
 - [ ] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64.
 - [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
-- [ ] DS-01.3 `mss version` prints version and channel; checksums are published with every release.
+- [ ] DS-01.3 `messagehook version` prints version and channel; checksums are published with every release.
 
 ## DS-02 Docker image
 
 Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 - [ ] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`.
-- [ ] DS-02.2 The HEALTHCHECK (`mss health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully.
-- [ ] DS-02.3 Mounted `/config/mss.toml`, `/config/mss.seed.toml` and `/templates` are loaded.
+- [ ] DS-02.2 The HEALTHCHECK (`messagehook health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully.
+- [ ] DS-02.3 Mounted `/config/messagehook.toml`, `/config/messagehook.seed.toml` and `/templates` are loaded.
 - [ ] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`.
 - [ ] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB.
 - [ ] DS-02.6 The Compose example and the GitHub Actions service-container example work as documented.
@@ -25,7 +25,7 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 Phase 1 (beta Homebrew), Phase 5 (all).
 
-- [ ] DS-03.1 Homebrew (`mss`, `mss-beta`), Scoop (`mss`, `mss-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
+- [ ] DS-03.1 Homebrew (`messagehook`, `messagehook-beta`), Scoop (`messagehook`, `messagehook-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
 - [ ] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums.
 
 ## DS-04 Release workflows
@@ -96,6 +96,6 @@ Phase U3.
 
 Phase 1.
 
-- [ ] WS-05.1 After clicking Connect, requests reach a local `mss` at the configured URL and responses display.
+- [ ] WS-05.1 After clicking Connect, requests reach a local MessageHook at the configured URL and responses display.
 - [ ] WS-05.2 Nothing is sent to a local instance until the user clicks Connect.
 - [ ] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation.

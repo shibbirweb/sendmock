@@ -8,7 +8,7 @@ Phase 3P.
 
 - [ ] PY-01.1 A card number that passes the Luhn check but is not a documented test card is rejected with a "use a test card" error and appears in no table, log, event or response.
 - [ ] PY-01.2 Stored payment methods contain only brand, last 4 and expiry; no full card number or CVC is stored anywhere.
-- [ ] PY-01.3 mss never opens a network connection to a real payment provider or card network (tested by running every flow with outbound traffic blocked).
+- [ ] PY-01.3 MessageHook never opens a network connection to a real payment provider or card network (tested by running every flow with outbound traffic blocked).
 - [ ] PY-01.4 Every hosted checkout page shows the TEST MODE banner.
 
 ## PY-02 Native payments API
@@ -42,7 +42,7 @@ Phase 3P.
 Phase 3P.
 
 - [ ] PY-05.1 Orders v2 create, approve (checkout page) and capture, and refunds, return PayPal-shaped responses and errors.
-- [ ] PY-05.2 Webhooks are sent with PayPal transmission headers, and `verify-webhook-signature` on mss returns `SUCCESS` for genuine deliveries and `FAILURE` for altered ones.
+- [ ] PY-05.2 Webhooks are sent with PayPal transmission headers, and `verify-webhook-signature` on MessageHook returns `SUCCESS` for genuine deliveries and `FAILURE` for altered ones.
 - [ ] PY-05.3 Classic IPN is posted as a form; the `_notify-validate` postback returns `VERIFIED` for genuine messages and `INVALID` for altered ones.
 
 ## PY-06 SSLCommerz emulation
@@ -93,6 +93,6 @@ Phase 4 (bKash, Razorpay, Paddle), later (others).
 
 Phase 3P.
 
-- [ ] PY-11.1 `mss payments list|show|simulate|notify|test-cards` work with `--json`.
+- [ ] PY-11.1 `messagehook payments list|show|simulate|notify|test-cards` work with `--json`.
 - [ ] PY-11.2 The MCP `payments` toolset exposes create checkout, simulate, notify, list, get and wait, with correct annotations.
 - [ ] PY-11.3 `GET /api/v1/wait/payment` returns when a matching payment reaches the requested status, or `408`.

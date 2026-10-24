@@ -100,14 +100,14 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Config (clap + env + TOML), tracing, graceful shutdown.
 - SQLite setup, migrations, WAL mode.
 - Release machinery: `scripts/version.ts`, `CHANGELOG.md`, `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`; versioned website builds (`/next/` from `develop`).
-- `mss-ops` operation registry, CLI client skeleton (`mss status --json`, exit codes), parity CI check (every operation has REST + CLI + MCP).
-- Seed loader skeleton (`mss.seed.toml` parsing, `seed validate`), extended by each later phase.
-- Dockerfile (`scratch` + static musl binary, non-root, `/data` volume, `mss health` HEALTHCHECK) and an `edge` multi-arch image published from `develop`, so Docker users can follow along from the start.
+- `messagehook-ops` operation registry, CLI client skeleton (`messagehook status --json`, exit codes), parity CI check (every operation has REST + CLI + MCP).
+- Seed loader skeleton (`messagehook.seed.toml` parsing, `seed validate`), extended by each later phase.
+- Dockerfile (`scratch` + static musl binary, non-root, `/data` volume, `messagehook health` HEALTHCHECK) and an `edge` multi-arch image published from `develop`, so Docker users can follow along from the start.
 - Contract tests: the frozen OpenAPI spec is checked against the Rust handlers (e.g. schemathesis or generated tests).
 - CI: fmt, clippy, tests on Linux/macOS/Windows, plus existing `web/` checks.
 - `README.md`, licence, contributing notes (`AGENTS.md` / `CLAUDE.md` already exist).
 
-**Done when:** `mss` starts, serves the embedded UI at `:8025` (still in mock mode), `/api/v1/health` returns 200 on all three OSes.
+**Done when:** MessageHook starts, serves the embedded UI at `:8025` (still in mock mode), `/api/v1/health` returns 200 on all three OSes.
 
 ## Phase 1: Email backend (about 2-3 weeks)
 
@@ -123,7 +123,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Switch Mail screens to live mode.
 - SMTP compatibility tests with real clients (Laravel, Nodemailer, Python smtplib, Go, Spring, lettre).
 - CORS for the docs origin and playground **Local mode**.
-- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release, Docker `beta`, Homebrew `mss-beta`).
+- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release, Docker `beta`, Homebrew `messagehook-beta`).
 
 **Done when:** a Laravel app and a Node app both send mail that appears live in the UI, and a pytest test reads an OTP via `/api/v1/otp`.
 
@@ -134,13 +134,13 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - **Twilio Verify** emulation: services, start/check/update verifications, fixed codes, expiry and attempt limits, force-state API, codes delivered as captured SMS/email, `verify.*` events.
 - Optional dedicated provider port serving root paths.
 - GSM-7/UCS-2 encoding and segment calculation.
-- Delivery simulation profiles (instant, realistic, manual), failure rate, magic numbers matching Twilio's official test numbers and error codes (plus `mss` after-send extensions, strict Twilio test mode), status history.
+- Delivery simulation profiles (instant, realistic, manual), failure rate, magic numbers matching Twilio's official test numbers and error codes (plus MessageHook after-send extensions, strict Twilio test mode), status history.
 - Per-message status callbacks (Twilio and Vonage formats).
 - Inbound SMS simulation API.
 - CLI `sms` commands and MCP `sms` toolset.
 - Switch SMS screens to live mode.
 
-**Done when:** an app using the Twilio REST shape sends an SMS, sees it in the UI, and receives `queued` / `sent` / `delivered` status callbacks; and an app using Twilio Verify completes an OTP login against `mss`.
+**Done when:** an app using the Twilio REST shape sends an SMS, sees it in the UI, and receives `queued` / `sent` / `delivered` status callbacks; and an app using Twilio Verify completes an OTP login against MessageHook.
 
 ## Phase 3: Webhooks backend (about 2-3 weeks)
 
@@ -177,7 +177,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Email inbound formats: SendGrid Inbound Parse, Mailgun routes, Postmark inbound.
 - Bounce/complaint/delivered provider formats: SendGrid events, Mailgun, Postmark, SES via SNS, Resend.
 - Open event formats: SendGrid Event Webhook `open`, Mailgun `opened`, Postmark Open, Twilio `MessageStatus=read`.
-- Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `MSS_VAR_*` env variables.
+- Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `MESSAGEHOOK_VAR_*` env variables.
 - Remaining built-in templates (Mailgun, SendGrid, Postmark, SES, Resend, Brevo, Mandrill, SparkPost; Plivo, MessageBird, Telnyx, Sinch, Infobip, Africa's Talking; Teams, Google Chat, Telegram, n8n/Zapier/Make), template import/export, `--templates-dir`, revision history.
 - More SMS providers: Plivo, MessageBird, generic configurable GET/POST vendor.
 - TwiML reply parsing for two-way SMS.
@@ -188,7 +188,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Chaos toggles (SMTP rejects/latency, SMS failures).
 - Verified SDK redirection recipes and `examples/` apps for PHP, Node, Python, Go, Java, Rust, Ruby, .NET, each with a CI smoke test.
 - OpenAPI spec published; API docs page in the UI.
-- AI: scenarios (`mss scenario run`), MCP resources, prompts and streamable HTTP transport, agent skill, `mss ai install` for Claude Code, Codex, Cursor, Gemini CLI and VS Code, `llms.txt`.
+- AI: scenarios (`messagehook scenario run`), MCP resources, prompts and streamable HTTP transport, agent skill, `messagehook ai install` for Claude Code, Codex, Cursor, Gemini CLI and VS Code, `llms.txt`.
 
 **Done when:** all eight example apps pass their smoke tests in CI, and an agent in Claude Code and Codex completes the example session in [14-ai-integration.md](14-ai-integration.md).
 
@@ -200,7 +200,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Testcontainers modules (Java, Node, Go, Python, .NET).
 - Remaining HTTP catcher presets (Teams, Google Chat, Expo, OneSignal) and dedicated catch-all port.
 - Performance and size budgets enforced in CI.
-- `mss --demo` flag that seeds the Stage A fixtures into a fresh instance (for screenshots, demos and first-run exploration).
+- `messagehook --demo` flag that seeds the Stage A fixtures into a fresh instance (for screenshots, demos and first-run exploration).
 - Claude Code plugin packaging, MCP registry listing, skill evals.
 - Documentation site content complete (from `docs/wiki/`, see [16-website-and-releases.md](16-website-and-releases.md)), with the mock-mode UI embedded as a live demo.
 - Final product name applied everywhere (including the website and Pages URL / custom domain).

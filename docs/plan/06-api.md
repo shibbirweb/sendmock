@@ -71,7 +71,7 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 
 ## Payments
 
-Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-mss-native).
+Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-messagehook-native).
 
 ## Logs
 
@@ -105,7 +105,7 @@ Manual send and replay accept `"variables": { ... }` overrides and `"rerender": 
 
 ## Test-automation helpers
 
-These make `mss` useful from any test framework without polling loops:
+These make MessageHook useful from any test framework without polling loops:
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -127,7 +127,7 @@ These make `mss` useful from any test framework without polling loops:
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, SMS simulation profile, chaos toggles, extractors |
 | GET | `/info` | version, uptime, listeners, counts, DB size |
-| GET | `/health` | liveness for Docker/CI (also `mss health` CLI for the Docker HEALTHCHECK) |
+| GET | `/health` | liveness for Docker/CI (also `messagehook health` CLI for the Docker HEALTHCHECK) |
 
 ## Realtime
 

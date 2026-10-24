@@ -8,11 +8,11 @@ import { basePath } from "@/lib/layout.shared";
 
 export const metadata: Metadata = {
   title: {
-    default: "mss: local email, SMS and webhook sandbox",
-    template: "%s | mss",
+    default: "MessageHook: local sandbox for email, SMS, payments and webhooks",
+    template: "%s | MessageHook",
   },
   description:
-    "A single binary that catches email and SMS from any app, shows them in a web UI and calls your webhooks.",
+    "A single binary that catches email, SMS and payments from any app, shows them in a web UI and calls your webhooks.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -119,7 +119,7 @@ On top of its own criteria, a feature is done only when:
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Not started |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Not started |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Not started |
-| [AI-05](05-ai.md#ai-05-agent-skill-and-mss-ai-install) | Agent skill and `mss ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
+| [AI-05](05-ai.md#ai-05-agent-skill-and-messagehook-ai-install) | Agent skill and `messagehook ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Not started |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |

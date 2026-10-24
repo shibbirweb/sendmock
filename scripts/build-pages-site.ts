@@ -3,7 +3,7 @@
  * Builds the GitHub Pages site: the website at the root and the mock-mode web
  * app at /demo/ (docs/plan/16-website-and-releases.md).
  *
- *     PAGES_BASE_PATH=/mail-sms-server bun scripts/build-pages-site.ts
+ *     PAGES_BASE_PATH=/messagehook bun scripts/build-pages-site.ts
  *
  * Output: website/out (upload it as the Pages artifact).
  */

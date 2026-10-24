@@ -6,7 +6,7 @@ import type {
   Ulid,
 } from "@/lib/api/types/common";
 
-/** How the message reached mss. */
+/** How the message reached MessageHook. */
 export type EmailSource =
   | "smtp"
   | "sendmail"

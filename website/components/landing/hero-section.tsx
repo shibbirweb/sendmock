@@ -19,11 +19,11 @@ export function HeroSection() {
         <AnimatedShinyText>In development: UI preview with demo data</AnimatedShinyText>
       </div>
       <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
-        Catch every email, SMS and webhook on your machine
+        Catch every email, SMS, payment and webhook on your machine
       </h1>
       <p className="max-w-2xl text-lg text-fd-muted-foreground">
-        One small binary that acts as a mail server and an SMS provider for
-        any app, shows everything in a clean web UI, and calls your webhooks
+        One small binary that acts as a mail server, an SMS provider and a
+        payment gateway for any app, shows everything in a clean web UI, and calls your webhooks
         automatically or on demand. PHP, Node, Python, Go, Java, Rust and more.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">

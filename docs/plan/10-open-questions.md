@@ -2,23 +2,27 @@
 
 Decisions to make before or during implementation. Each has a recommendation so work can start without blocking.
 
-## 1. Product name
+## 1. Product name (decided 2026-10-25: MessageHook)
 
-The folder is `mail-sms-server`; `mss` is a placeholder. With payments and the HTTP catcher the product is broader than mail and SMS, so the name should cover "third-party services sandbox", not only mail and SMS. It will be published from the `shibbirweb` GitHub account (`github.com/shibbirweb/<name>`, `ghcr.io/shibbirweb/<name>`, npm `@shibbirweb/<name>`). Criteria: short CLI command (3-8 chars), free on crates.io, npm, Homebrew, Docker Hub and GitHub, and a `.dev` or `.sh` domain.
+**MessageHook**: messages (email, SMS) and webhooks in one name; payment IPNs and every other event are delivered as hooks too. Binary and packages `messagehook`, published from the `shibbirweb` GitHub account.
 
-Brainstorm candidates (availability not yet checked):
+| Channel | Name |
+|---------|------|
+| GitHub | `github.com/shibbirweb/messagehook`, Pages `shibbirweb.github.io/messagehook/` |
+| Binary, crates.io, Homebrew, Scoop, PyPI | `messagehook` |
+| npm | `messagehook` (free) or `@shibbirweb/messagehook` |
+| Docker | `ghcr.io/shibbirweb/messagehook` |
+| Domains | no live site on `messagehook.com`, `.io`, `.dev` or `.app`; register `messagehook.dev` (and `.com` if available) |
+| Env, files, MCP | `MESSAGEHOOK_*`, `messagehook.toml`, `messagehook.seed.toml`, `messagehook_*` tools |
 
-| Name | Idea |
-|------|------|
-| `postbox` | catches every message |
-| `inkwell` | mail + text |
-| `catchall` | literal SMTP behaviour |
-| `pigeon` | carries both mail and messages |
-| `relaybox` | receive and forward via webhooks |
-| `hookpost` | webhook-first angle |
-| `msgpit` | nod to Mailpit, covers SMS |
+How it was chosen (2026-10-25). Each candidate was checked on crates.io, npm, PyPI, Homebrew and Scoop, by loading its `.com`, `.io`, `.dev` and `.app` websites, and by a web search for existing products:
 
-**Action:** pick 2-3 favourites, check availability, then rename crates, env prefix (`MSS_`), seed file name (`mss.seed.toml`) and Docker image. (Webhook signature headers follow Standard Webhooks, so they do not carry the product name.)
+- **Rejected for existing brands in our space:** Gateway Lab (`gatewaylab.net` belongs to GatewayAPI, an SMS gateway), MailSMS and MailSMS Box (CM.com sells "Mail SMS"), Sendlab (several email marketing businesses), Outbox Lab (email outreach SaaS), SMSHook (Indian bulk SMS provider), PingPost (lead-generation company and industry term), Postnest (social media scheduler), Sendvault (New York State file-transfer tool), Sendpark (one letter from Sendspark).
+- **Clear alternatives kept on file:** Pingyard, Sendyard, Sendcatch, Letterbay, Sendward, Mocksend, Mock Outbox, PayPost.
+- Most single English words (Courier, Pigeon, Mailroom, Postmaster, Front Desk, ...) are taken on crates.io or npm.
+- "MessageHook" otherwise appears only as an old Windows API term (message hooks), not as a product.
+
+**Remaining check:** search "MessageHook" in the USPTO, EUIPO and WIPO trademark databases (and Bangladesh DPDT if registering locally) before investing in branding; web searches found no product or company using the name. A short CLI alias (for example `mhook`) can be added later if the full command feels long.
 
 ## 2. Default ports
 

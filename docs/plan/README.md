@@ -1,6 +1,6 @@
 # Project Plan
 
-Working name: **mss** (mail-sms-server). The final product name is still undecided (see [10-open-questions.md](10-open-questions.md)). Every use of `mss`, `MSS_*` and `mss.toml` in these docs is a placeholder.
+Product name: **MessageHook**: messages (email, SMS) and webhooks, with payment IPNs delivered as hooks too. Binary and package name `messagehook`; published from the `shibbirweb` GitHub account. How the name was chosen: [10-open-questions.md](10-open-questions.md#1-product-name-decided-2026-10-25-messagehook).
 
 ## One-line pitch
 

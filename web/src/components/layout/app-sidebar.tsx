@@ -72,9 +72,9 @@ export function AppSidebar() {
                   <InboxIcon className="size-4" />
                 </span>
                 <span className="grid leading-tight">
-                  <span className="font-semibold">mss</span>
+                  <span className="font-semibold">MessageHook</span>
                   <span className="text-xs text-muted-foreground">
-                    Mail, SMS and webhooks
+                    Mail · SMS · Payments
                   </span>
                 </span>
               </Link>

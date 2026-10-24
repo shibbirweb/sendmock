@@ -28,8 +28,8 @@ const emailOutcomeEvents: AppEventType[] = [
 const builtinTemplateSpecs: TemplateSpec[] = [
   [
     "native",
-    "Native mss JSON",
-    "mss",
+    "Native MessageHook JSON",
+    "MessageHook",
     "generic",
     ["email.received", "sms.sent", "sms.inbound", "sms.status"],
     [],
@@ -206,7 +206,7 @@ export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
       category: "custom",
       source: "file",
       events: ["webhook.failed"],
-      description: "Loaded from ./mss-templates/ops-alert.toml.",
+      description: "Loaded from ./messagehook-templates/ops-alert.toml.",
       required_variables: [],
       revision: 1,
     },

@@ -81,7 +81,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] API types (`web/src/lib/api/types/`) and query hooks for all resources (698f0f1)
 - [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (b30dd9f, a4bfb7d, 67ee273; passes locally, first GitHub run pending)
 - [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (67ee273)
-- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/mail-sms-server/`; first deploy needs the repository)
+- [ ] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL) (workflow written and the build verified locally under `/messagehook/`; first deploy needs the repository)
 - [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing locally with an 80% gate on `src/lib`; required checks need the repository)
 - [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (a4bfb7d)
 
@@ -137,9 +137,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Cargo workspace and crate skeletons
 - [ ] `rust-embed` UI embedding, SPA fallback, dev proxy
-- [ ] Config (clap, env, `mss.toml`), tracing, graceful shutdown
+- [ ] Config (clap, env, `messagehook.toml`), tracing, graceful shutdown
 - [ ] SQLite, migrations, WAL mode
-- [ ] `mss-ops` registry, CLI skeleton (`mss status --json`, exit codes), parity CI check
+- [ ] `messagehook-ops` registry, CLI skeleton (`messagehook status --json`, exit codes), parity CI check
 - [ ] Seed loader skeleton (`seed validate`)
 - [ ] OpenAPI contract tests against handlers
 - [ ] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check)
@@ -166,7 +166,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] SMTP compatibility tests with real clients
 - [ ] CORS for the docs origin; playground Local mode
 - [ ] Done-when check: Laravel and Node mail appear live; pytest reads an OTP
-- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release, Docker `beta`, Homebrew `mss-beta`)
+- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release, Docker `beta`, Homebrew `messagehook-beta`)
 
 ### Phase 2: SMS and Verify backend
 
@@ -215,7 +215,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Release to real SMTP, auto-forward, tag rules
 - [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
 - [ ] Bounce/complaint/delivered and open provider formats
-- [ ] Fake data functions, Postman aliases, `MSS_VAR_*`
+- [ ] Fake data functions, Postman aliases, `MESSAGEHOOK_VAR_*`
 - [ ] Remaining built-in templates, import/export, `--templates-dir`, revisions
 - [ ] More SMS providers (Plivo, MessageBird, generic GET/POST)
 - [ ] TwiML reply parsing
@@ -225,7 +225,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] SDK redirection recipes verified per SDK
 - [ ] `examples/` apps for 8 languages with CI smoke tests
 - [ ] OpenAPI published, API docs page in UI
-- [ ] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `mss ai install`, `llms.txt`
+- [ ] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `messagehook ai install`, `llms.txt`
 - [ ] Done-when check: example apps pass; agent session works in Claude Code and Codex
 - [ ] Beta released
 
@@ -233,11 +233,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Release builds for all 6 targets, checksums, install scripts with `--channel`
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
-- [ ] Homebrew tap (`mss`, `mss-beta`), Scoop bucket, npm wrapper
+- [ ] Homebrew tap (`messagehook`, `messagehook-beta`), Scoop bucket, npm wrapper
 - [ ] Testcontainers modules
 - [ ] Remaining catcher presets and catch-all port
 - [ ] Performance and size budgets enforced in CI
-- [ ] `mss --demo`
+- [ ] `messagehook --demo`
 - [ ] Claude Code plugin, MCP registry listing, skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
 - [ ] Final product name applied everywhere
@@ -264,6 +264,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-24 | Website on GitHub Pages with Fumadocs + Magic UI, API playground with in-browser demo mode | [16](16-website-and-releases.md) |
 | 2026-10-25 | Add a fake payment gateway (Stripe, PayPal, SSLCommerz first; bKash, Razorpay, Paddle next) with test checkout and IPN; only test cards accepted | [17](17-payments.md) |
 | 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
+| 2026-10-25 | Product name **MessageHook** (binary and packages `messagehook`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-messagehook) |
 
 ### Open
 
@@ -271,7 +272,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 
 | Question | Recommendation | Status |
 |----------|----------------|--------|
-| Product name | decide after the payments scope; must cover more than mail and SMS | Open (placeholder `mss`) |
+| Trademark check for "MessageHook" | search USPTO, EUIPO, WIPO before branding | Open |
 | Default ports | 1025 / 8025 (Mailpit compatible) | Open (using recommendation) |
 | Licence | dual MIT / Apache-2.0 | Open |
 | Provider emulation priority | Twilio, Vonage, generic, then others | Open (using recommendation) |

@@ -5,30 +5,30 @@
 Release build steps (wrapped in `scripts/build.sh` and a `justfile` or `Makefile`):
 
 1. `cd web && bun install --frozen-lockfile && bun run build` -> `web/dist`
-2. `cargo build --release -p mss` -> `rust-embed` includes `web/dist`
-3. Result: `target/release/mss` (or `mss.exe`)
+2. `cargo build --release -p messagehook` -> `rust-embed` includes `web/dist`
+3. Result: `target/release/messagehook` (or `messagehook.exe`)
 
 In debug builds `rust-embed` reads files from disk, so UI changes do not require recompiling Rust. A `build.rs` guard fails release builds with a clear message if `web/dist` is missing.
 
 ## CLI shape
 
 ```
-mss                       # same as `mss serve`
-mss serve [flags]         # run servers
-mss sendmail [...]        # sendmail-compatible shim
-mss email|sms|otp|webhook|numbers|settings|chaos ...   # client commands for every feature
-mss http ...              # HTTP catcher
-mss seed export|apply     # config-as-code seed file
-mss health                # exit 0 when the running instance is healthy (Docker HEALTHCHECK)
-mss scenario run <file>   # scripted simulation
-mss mcp                   # MCP server over stdio
-mss ai install --target <harness>                      # register MCP + skill
-mss version
+messagehook                       # same as `messagehook serve`
+messagehook serve [flags]         # run servers
+messagehook sendmail [...]        # sendmail-compatible shim
+messagehook email|sms|otp|webhook|numbers|settings|chaos ...   # client commands for every feature
+messagehook http ...              # HTTP catcher
+messagehook seed export|apply     # config-as-code seed file
+messagehook health                # exit 0 when the running instance is healthy (Docker HEALTHCHECK)
+messagehook scenario run <file>   # scripted simulation
+messagehook mcp                   # MCP server over stdio
+messagehook ai install --target <harness>                      # register MCP + skill
+messagehook version
 ```
 
 The full command tree, `--json` conventions and exit codes are in [14-ai-integration.md](14-ai-integration.md).
 
-Config precedence: flags > `MSS_*` env vars > `mss.toml` (current dir, then OS config dir) > defaults. Seed data (endpoints, rules, templates, numbers, ...) lives in a separate `mss.seed.toml`; see [02-architecture.md](02-architecture.md#configuration-and-seed-file).
+Config precedence: flags > `MESSAGEHOOK_*` env vars > `messagehook.toml` (current dir, then OS config dir) > defaults. Seed data (endpoints, rules, templates, numbers, ...) lives in a separate `messagehook.seed.toml`; see [02-architecture.md](02-architecture.md#configuration-and-seed-file).
 
 ## Targets
 
@@ -51,11 +51,11 @@ Every channel has a **beta** track (from `develop`) and a **stable** track (from
 |---------|-----------|
 | GitHub Releases | archives + SHA256 checksums, built by a tag-triggered workflow (consider `cargo-dist`) |
 | Install scripts | `curl -fsSL .../install.sh \| sh`, `irm .../install.ps1 \| iex` |
-| Homebrew | tap first (`brew install <owner>/tap/mss`), core later |
+| Homebrew | tap first (`brew install <owner>/tap/messagehook`), core later |
 | Scoop / WinGet | manifest in a bucket repo, WinGet later |
-| Docker | `ghcr.io/<owner>/mss` and Docker Hub; multi-arch; see [Docker](#docker) |
-| Cargo | `cargo install mss` (requires prebuilt UI in the crate package) |
-| npm (optional) | `npx mss` wrapper that downloads the right binary, handy for JS projects and CI |
+| Docker | `ghcr.io/<owner>/messagehook` and Docker Hub; multi-arch; see [Docker](#docker) |
+| Cargo | `cargo install messagehook` (requires prebuilt UI in the crate package) |
+| npm (optional) | `npx messagehook` wrapper that downloads the right binary, handy for JS projects and CI |
 
 Optional later: a macOS menu-bar / system tray launcher.
 
@@ -67,18 +67,18 @@ Docker is a first-class release channel, not an afterthought: many teams run the
 
 | Item | Decision |
 |------|----------|
-| Registries | `ghcr.io/<owner>/mss` and Docker Hub `<owner>/mss` |
+| Registries | `ghcr.io/<owner>/messagehook` and Docker Hub `<owner>/messagehook` |
 | Platforms | `linux/amd64`, `linux/arm64` (Apple Silicon, Graviton, Raspberry Pi 4/5); `linux/arm/v7` if demand |
 | Base | `FROM scratch` with the static musl binary, CA certificates bundled (rustls + `webpki-roots`, so outbound HTTPS for webhooks, link check and relay works without OS packages) |
 | Size target | under 25 MB compressed |
 | User | runs as non-root (UID 10001) |
-| Data | `VOLUME /data` (SQLite DB, generated TLS certs); `MSS_DB=/data/mss.db` by default |
-| Config | everything via `MSS_*` env vars; optional `/config/mss.toml` and `/config/mss.seed.toml` auto-loaded if mounted; `/templates` auto-loaded as `--templates-dir` |
+| Data | `VOLUME /data` (SQLite DB, generated TLS certs); `MESSAGEHOOK_DB=/data/messagehook.db` by default |
+| Config | everything via `MESSAGEHOOK_*` env vars; optional `/config/messagehook.toml` and `/config/messagehook.seed.toml` auto-loaded if mounted; `/templates` auto-loaded as `--templates-dir` |
 | Listen | binds `0.0.0.0` inside the container by default (the localhost-only default applies to the native binary) |
-| Ports | `1025` SMTP, `8025` UI/API/MCP, `8026` provider APIs (when `MSS_PROVIDER_ADDR` set), `8030` HTTP catcher port (when enabled), `1465` implicit TLS SMTP (when enabled) |
-| Healthcheck | `HEALTHCHECK CMD ["/mss", "health"]` (a built-in subcommand, since `scratch` has no curl) |
+| Ports | `1025` SMTP, `8025` UI/API/MCP, `8026` provider APIs (when `MESSAGEHOOK_PROVIDER_ADDR` set), `8030` HTTP catcher port (when enabled), `1465` implicit TLS SMTP (when enabled) |
+| Healthcheck | `HEALTHCHECK CMD ["/messagehook", "health"]` (a built-in subcommand, since `scratch` has no curl) |
 | Signals | graceful shutdown on `SIGTERM` (finishes in-flight SMTP sessions and webhook attempts, up to 10 s) |
-| Logs | structured to stdout; `MSS_LOG_FORMAT=json` for log collectors |
+| Logs | structured to stdout; `MESSAGEHOOK_LOG_FORMAT=json` for log collectors |
 | Metadata | OCI labels (version, source, licence), SBOM and provenance attestations, images signed with cosign |
 
 ### Tags
@@ -88,10 +88,10 @@ Stable (from `main`): `latest`, `1`, `1.4`, `1.4.2`. Beta (from `develop`): `bet
 ### Usage
 
 ```bash
-docker run -d --name mss \
+docker run -d --name messagehook \
   -p 8025:8025 -p 1025:1025 \
-  -v mss-data:/data \
-  ghcr.io/<owner>/mss:1
+  -v messagehook-data:/data \
+  ghcr.io/<owner>/messagehook:1
 ```
 
 Compose example (with seed file, provider port and healthcheck dependency) is in [08-integrations.md](08-integrations.md#docker-compose).
@@ -100,20 +100,20 @@ CI service container (GitHub Actions):
 
 ```yaml
 services:
-  mss:
-    image: ghcr.io/<owner>/mss:1
+  messagehook:
+    image: ghcr.io/<owner>/messagehook:1
     ports:
       - 1025:1025
       - 8025:8025
     env:
-      MSS_DB: memory
+      MESSAGEHOOK_DB: memory
 ```
 
 ### Docker-specific UX
 
-- When running in a container, the UI's connection snippets show container-network hostnames (`mss:1025`) alongside host ones (`localhost:1025`).
+- When running in a container, the UI's connection snippets show container-network hostnames (`messagehook:1025`) alongside host ones (`localhost:1025`).
 - Webhook endpoint editor warns when a URL uses `localhost` inside a container and suggests `host.docker.internal` or the Compose service name.
-- Binding to `0.0.0.0` without `MSS_UI_AUTH` prints a startup notice (not an error, since published ports are usually only on the dev machine).
+- Binding to `0.0.0.0` without `MESSAGEHOOK_UI_AUTH` prints a startup notice (not an error, since published ports are usually only on the dev machine).
 
 ### Later
 
@@ -121,7 +121,7 @@ Helm chart for shared team instances in Kubernetes, and a Docker Desktop extensi
 
 ## Test suite integration
 
-- `mss serve --smtp-addr 127.0.0.1:0 --http-addr 127.0.0.1:0 --ready-json`: binds free ports and prints a single JSON line with the chosen addresses once ready (see [08-integrations.md](08-integrations.md#starting-mss-from-a-test-suite)).
+- `messagehook serve --smtp-addr 127.0.0.1:0 --http-addr 127.0.0.1:0 --ready-json`: binds free ports and prints a single JSON line with the chosen addresses once ready (see [08-integrations.md](08-integrations.md#starting-messagehook-from-a-test-suite)).
 - **Testcontainers modules** for Java, Node, Go, Python and .NET wrapping the Docker image, with helpers for ports, seed files and the wait/OTP API (Phase 5).
 
 ## CI pipeline

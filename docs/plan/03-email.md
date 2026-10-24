@@ -2,9 +2,9 @@
 
 ## Behaviour
 
-`mss` is a **catch-all, receive-only** mail sink. It accepts mail for any recipient and any domain, stores it, and never delivers it anywhere (unless release/forwarding is explicitly configured).
+MessageHook is a **catch-all, receive-only** mail sink. It accepts mail for any recipient and any domain, stores it, and never delivers it anywhere (unless release/forwarding is explicitly configured).
 
-Apps can hand mail to `mss` in two ways:
+Apps can hand mail to MessageHook in two ways:
 
 1. **SMTP** (classic mailers, frameworks, `sendmail`).
 2. **Email provider HTTP APIs** (SendGrid, Mailgun, Postmark, Resend, SES, Brevo, ...), because many modern apps never use SMTP. See [HTTP send APIs](#http-send-apis).
@@ -31,9 +31,9 @@ Custom async implementation on tokio. A full MTA library is unnecessary: we only
 
 | Flag | Env | Default | Meaning |
 |------|-----|---------|---------|
-| `--smtp-addr` | `MSS_SMTP_ADDR` | `127.0.0.1:1025` | listen address |
-| `--smtp-max-size` | `MSS_SMTP_MAX_SIZE` | `25MB` | reject larger messages with 552 |
-| `--smtp-auth` | `MSS_SMTP_AUTH` | `accept-any` | `accept-any`, `none` (advertise no AUTH), `file:<path>` |
+| `--smtp-addr` | `MESSAGEHOOK_SMTP_ADDR` | `127.0.0.1:1025` | listen address |
+| `--smtp-max-size` | `MESSAGEHOOK_SMTP_MAX_SIZE` | `25MB` | reject larger messages with 552 |
+| `--smtp-auth` | `MESSAGEHOOK_SMTP_AUTH` | `accept-any` | `accept-any`, `none` (advertise no AUTH), `file:<path>` |
 | `--smtp-tls-cert`, `--smtp-tls-key` | | auto | custom certificate |
 | `--smtp-require-tls` | | off | refuse `MAIL` before `STARTTLS` |
 | `--smtp-allow-rcpt` | | `*` | glob list; others get 550 (useful to test bounce handling) |
@@ -59,7 +59,7 @@ Toggled from the UI or API, so developers can test error handling:
 
 ## HTTP send APIs
 
-Apps using an email provider's HTTP API point the SDK (or base URL) at `mss` instead of the provider. `mss` validates the request like the provider, builds a standard MIME message from it (so every viewer, extractor and webhook works the same), stores the original JSON request alongside, and returns the provider's response shape.
+Apps using an email provider's HTTP API point the SDK (or base URL) at MessageHook instead of the provider. MessageHook validates the request like the provider, builds a standard MIME message from it (so every viewer, extractor and webhook works the same), stores the original JSON request alongside, and returns the provider's response shape.
 
 | API | Endpoint emulated | Notes | Phase |
 |-----|-------------------|-------|-------|
@@ -73,13 +73,13 @@ Apps using an email provider's HTTP API point the SDK (or base URL) at `mss` ins
 
 Provider routes are served on the dedicated provider port at the real provider paths (same mechanism as SMS, see [04-sms.md](04-sms.md#api-surfaces)) and under `/providers/<name>/...` on the main port. Each provider's API key/token is accepted by default and can be enforced to test auth errors.
 
-Template sends (SendGrid dynamic templates, Postmark templates, Resend templates) cannot be rendered without the provider's template content: `mss` stores the template ID and `dynamic_template_data`/`TemplateModel`, shows them in a "Template data" panel, and optionally renders a local template registered under the same ID (`mss.seed.toml`, see [02-architecture.md](02-architecture.md#configuration-and-seed-file)).
+Template sends (SendGrid dynamic templates, Postmark templates, Resend templates) cannot be rendered without the provider's template content: MessageHook stores the template ID and `dynamic_template_data`/`TemplateModel`, shows them in a "Template data" panel, and optionally renders a local template registered under the same ID (`messagehook.seed.toml`, see [02-architecture.md](02-architecture.md#configuration-and-seed-file)).
 
 Rejected requests (missing `from`, invalid address, auth failure) are recorded in the HTTP request log (**Logs > HTTP**) with the exact error response returned.
 
 ## Delivery outcome simulation
 
-Real providers report what happened after sending: delivered, bounced, complained (marked as spam). Apps need to handle those callbacks (suppress addresses, show "email bounced" in the UI). `mss` simulates them as events:
+Real providers report what happened after sending: delivered, bounced, complained (marked as spam). Apps need to handle those callbacks (suppress addresses, show "email bounced" in the UI). MessageHook simulates them as events:
 
 | Event | Meaning |
 |-------|---------|
@@ -91,7 +91,7 @@ Real providers report what happened after sending: delivered, bounced, complaine
 
 Triggered by:
 
-- **Magic recipient addresses** (compatible with the Amazon SES mailbox simulator, plus `mss` aliases on any domain):
+- **Magic recipient addresses** (compatible with the Amazon SES mailbox simulator, plus MessageHook aliases on any domain):
 
 | Recipient | Outcome |
 |-----------|---------|
@@ -151,16 +151,16 @@ Each check is a tab in the email detail and an API endpoint (`/emails/{emailId}/
 Some stacks (PHP `mail()`, cron, legacy apps) call a local `sendmail` binary instead of SMTP. The same binary provides:
 
 ```
-mss sendmail [-t] [-f from] [recipients...]
+messagehook sendmail [-t] [-f from] [recipients...]
 ```
 
-It reads the message from stdin and submits it to the running `mss` SMTP listener (configurable with `--smtp-addr`). Example `php.ini`:
+It reads the message from stdin and submits it to the running `messagehook` SMTP listener (configurable with `--smtp-addr`). Example `php.ini`:
 
 ```ini
-sendmail_path = "/usr/local/bin/mss sendmail -t"
+sendmail_path = "/usr/local/bin/messagehook sendmail -t"
 ```
 
-On Unix, a symlink named `sendmail` pointing to `mss` should also work (detect `argv[0]`).
+On Unix, a symlink named `sendmail` pointing to `messagehook` should also work (detect `argv[0]`).
 
 ## Release and forwarding to real SMTP
 

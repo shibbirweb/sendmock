@@ -1,6 +1,6 @@
 import type { IsoTimestamp } from "@/lib/api/types/common";
 
-/** Every event mss publishes; the same names are used by webhook rules. */
+/** Every event MessageHook publishes; the same names are used by webhook rules. */
 export const appEventTypes = [
   "email.received",
   "email.opened",

@@ -53,14 +53,14 @@ Phase 1.
 - [ ] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies.
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
 - [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
-- [ ] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `mss otp` return the latest code for that recipient.
+- [ ] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `messagehook otp` return the latest code for that recipient.
 
 ## EM-06 sendmail shim
 
 Phase 1.
 
-- [ ] EM-06.1 `mss sendmail -t` reads a message from stdin and it is stored like an SMTP message.
-- [ ] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to `mss`.
+- [ ] EM-06.1 `messagehook sendmail -t` reads a message from stdin and it is stored like an SMTP message.
+- [ ] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to MessageHook.
 - [ ] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender.
 
 ## EM-07 Native HTTP send API
@@ -79,7 +79,7 @@ Phase 4. Docs: [HTTP send APIs](../03-email.md#http-send-apis).
 - [ ] EM-08.2 Each returns the provider's success response shape and status code.
 - [ ] EM-08.3 Missing required fields and invalid addresses return the provider's error shape and status code.
 - [ ] EM-08.4 Template sends store the template ID and data and show them in the Template data tab; a local template registered under the same ID is rendered.
-- [ ] EM-08.5 The official SDK for each provider (where one exists) can send to `mss` using the documented redirection recipe.
+- [ ] EM-08.5 The official SDK for each provider (where one exists) can send to MessageHook using the documented redirection recipe.
 
 ## EM-09 SMTP session log
 
@@ -93,7 +93,7 @@ Phase 1.
 
 Native events Phase 3, provider formats Phase 4. Docs: [Delivery outcome simulation](../03-email.md#delivery-outcome-simulation).
 
-- [ ] EM-10.1 Sending to each SES mailbox simulator address and each `mss` alias (`delivered@`, `bounce@`, `bounce+soft@`, `complaint@`, ...) produces the documented events.
+- [ ] EM-10.1 Sending to each SES mailbox simulator address and each MessageHook alias (`delivered@`, `bounce@`, `bounce+soft@`, `complaint@`, ...) produces the documented events.
 - [ ] EM-10.2 Delivery profiles `off`, `auto-delivered` and `realistic` behave as documented.
 - [ ] EM-10.3 Manual "Simulate" actions fire the chosen event; the API and CLI do the same.
 - [ ] EM-10.4 Events appear on the email timeline and are delivered by matching webhook rules in native and provider formats.

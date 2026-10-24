@@ -53,7 +53,7 @@ export function buildCapturedHttpRequestFixtures(
       bin: slackBin,
       minutesAgo: 33,
       path: "/catch/slack",
-      body: '{"text":"mss test ping"}',
+      body: '{"text":"MessageHook test ping"}',
       responseBody: "ok",
     },
     {
@@ -93,9 +93,9 @@ export function buildCapturedHttpRequestFixtures(
 }
 
 const successfulTranscript = [
-  "S: 220 mss ESMTP ready",
+  "S: 220 messagehook ESMTP ready",
   "C: EHLO laravel.local",
-  "S: 250-mss Hello laravel.local",
+  "S: 250-messagehook Hello laravel.local",
   "S: 250-PIPELINING",
   "S: 250-SIZE 26214400",
   "S: 250-STARTTLS",
@@ -115,9 +115,9 @@ const successfulTranscript = [
 ].join("\n");
 
 const failedAuthTranscript = [
-  "S: 220 mss ESMTP ready",
+  "S: 220 messagehook ESMTP ready",
   "C: EHLO worker-3",
-  "S: 250-mss Hello worker-3",
+  "S: 250-messagehook Hello worker-3",
   "S: 250 AUTH PLAIN LOGIN",
   "C: AUTH LOGIN",
   "S: 334 VXNlcm5hbWU6",
