@@ -8,6 +8,8 @@ import {
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
+  CheckoutCompleteRequest,
+  CheckoutSession,
   PageOf,
   PaymentDetail,
   PaymentListFilters,
@@ -88,4 +90,35 @@ export function useResendPaymentNotification() {
       method: "POST",
     }),
   );
+}
+
+/** What the test checkout page shows (PY-03). */
+export function useCheckoutSession(sessionId: string) {
+  return useQuery({
+    queryKey: queryKeys.payments.checkout(sessionId),
+    queryFn: ({ signal }) =>
+      requestApi<CheckoutSession>(`/checkout-sessions/${sessionId}`, {
+        abortSignal: signal,
+      }),
+  });
+}
+
+/** One checkout page action; the updated session comes back (PY-03.1). */
+export function useCompleteCheckout(sessionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (checkoutRequest: CheckoutCompleteRequest) =>
+      requestApi<CheckoutSession>(`/checkout-sessions/${sessionId}/complete`, {
+        method: "POST",
+        requestBody: checkoutRequest,
+      }),
+    onSuccess: (updatedSession) => {
+      queryClient.setQueryData(
+        queryKeys.payments.checkout(sessionId),
+        updatedSession,
+      );
+      void queryClient.invalidateQueries({ queryKey: queryKeys.payments.all });
+    },
+  });
 }

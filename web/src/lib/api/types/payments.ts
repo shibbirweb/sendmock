@@ -21,7 +21,8 @@ export type DeclineReason =
   | "expired_card"
   | "incorrect_cvc"
   | "generic_decline"
-  | "fraudulent";
+  | "fraudulent"
+  | "authentication_failed";
 
 /** Never a full card number or CVC (PY-01.2). */
 export type PaymentMethod =
@@ -54,6 +55,7 @@ export type PaymentTimelineKind =
   | "dispute_opened"
   | "dispute_closed"
   | "redirected"
+  | "delayed"
   | "notification_sent";
 
 export type PaymentTimelineEvent = {
@@ -145,4 +147,60 @@ export type PaymentSimulateRequest = {
   decline_reason?: DeclineReason;
   refund_amount_minor?: number;
   dispute_outcome?: "won" | "lost";
+};
+
+/** Where a test checkout stands, from the customer's side (PY-03). */
+export type CheckoutState =
+  | "open"
+  | "requires_three_ds"
+  | "pending"
+  | "completed"
+  | "failed"
+  | "canceled"
+  | "expired";
+
+/** GET /api/v1/checkout-sessions/{sessionId}: what the test checkout page shows. */
+export type CheckoutSession = {
+  session_id: Ulid;
+  payment_id: Ulid;
+  provider: PaymentProvider;
+  merchant_name: string;
+  amount_minor: number;
+  currency: string;
+  line_items: PaymentLineItem[];
+  customer_email: string | null;
+  state: CheckoutState;
+  failure_code: PaymentSummary["failure_code"];
+  /** Where the browser goes once the checkout is finished. */
+  redirect: PaymentRedirect | null;
+};
+
+export type CheckoutAction =
+  | "pay"
+  | "decline"
+  | "cancel"
+  | "delay"
+  | "require_three_ds"
+  | "three_ds_approve"
+  | "three_ds_fail";
+
+/** A card typed on the checkout page; only test cards are accepted, and none is stored (PY-01.1). */
+export type CheckoutCard = {
+  number: string;
+  exp_month: number;
+  exp_year: number;
+  cvc: string;
+  holder_name: string;
+};
+
+export type CheckoutWallet = { number: string; otp: string; pin: string };
+
+/** Body of POST /api/v1/checkout-sessions/{sessionId}/complete. */
+export type CheckoutCompleteRequest = {
+  action: CheckoutAction;
+  card?: CheckoutCard;
+  wallet?: CheckoutWallet;
+  /** SSLCommerz: the method picked, e.g. "card", "bkash", "dbbl". */
+  payment_option?: string;
+  decline_reason?: DeclineReason;
 };

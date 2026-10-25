@@ -38,6 +38,32 @@ const visa4242: PaymentMethod = {
 
 const paymentSpecs: PaymentSpec[] = [
   {
+    provider: "paypal",
+    amountMinor: 4200,
+    currency: "EUR",
+    minutesAgo: 4,
+    customer: { email: "omar@example.com", name: "Omar Farouk" },
+    lineItems: [
+      { name: "Concert ticket", quantity: 1, unit_amount_minor: 4200 },
+    ],
+    hasCheckout: true,
+    steps: [],
+  },
+  {
+    provider: "bkash",
+    amountMinor: 120000,
+    currency: "BDT",
+    minutesAgo: 5,
+    customer: {
+      email: "ruma@example.com",
+      name: "Ruma Begum",
+      phone: "+8801770000001",
+    },
+    lineItems: [{ name: "Bus tickets", quantity: 2, unit_amount_minor: 60000 }],
+    hasCheckout: true,
+    steps: [],
+  },
+  {
     provider: "stripe",
     amountMinor: 4900,
     currency: "USD",

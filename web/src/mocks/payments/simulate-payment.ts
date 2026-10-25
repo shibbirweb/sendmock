@@ -23,12 +23,12 @@ export type SimulationResult =
   | { isApplied: true }
   | { isApplied: false; statusCode: 409 | 422; message: string };
 
-type PaymentDatabase = Pick<
+export type PaymentDatabase = Pick<
   MockDatabase,
   "webhookEndpoints" | "webhookDeliveries"
 >;
 
-function addTimeline(
+export function addTimeline(
   paymentDetail: PaymentDetail,
   kind: PaymentTimelineKind,
   description: string,
@@ -37,7 +37,7 @@ function addTimeline(
   paymentDetail.timeline.push({ kind, description, created_at: createdAt });
 }
 
-function finishCheckout(
+export function finishCheckout(
   paymentDetail: PaymentDetail,
   redirectOutcome: "success" | "fail" | "cancel",
   createdAt: string,
@@ -236,6 +236,18 @@ export function simulatePayment(
     simulateRequest,
     createdAt,
   );
+  firePaymentEvents(mockDatabase, paymentDetail, firedEvents, nowMs);
+
+  return { isApplied: true };
+}
+
+/** Sends each event the provider has as a notification, a millisecond apart. */
+export function firePaymentEvents(
+  mockDatabase: PaymentDatabase,
+  paymentDetail: PaymentDetail,
+  firedEvents: PaymentEventType[],
+  nowMs: number,
+) {
   firedEvents
     .filter((eventType) => hasProviderEvent(paymentDetail.provider, eventType))
     .forEach((eventType, eventIndex) => {
@@ -246,6 +258,4 @@ export function simulatePayment(
         nowMs + eventIndex,
       );
     });
-
-  return { isApplied: true };
 }

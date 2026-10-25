@@ -1,4 +1,4 @@
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
@@ -7,8 +7,12 @@ import { CommandPalette } from "@/features/command-palette/command-palette";
 import { ShortcutHelpDialog } from "@/features/shortcuts/shortcut-help-dialog";
 import { useGlobalShortcuts } from "@/features/shortcuts/use-global-shortcuts";
 
-/** Sidebar, header and the routed page, plus the app-wide overlays. */
-export function AppShell() {
+/** Pages a customer sees, like the test checkout, stand alone without the app around them. */
+function isStandalonePath(pathname: string): boolean {
+  return pathname.startsWith("/pay/");
+}
+
+function AppFrame() {
   useGlobalShortcuts();
 
   return (
@@ -25,4 +29,13 @@ export function AppShell() {
       <ShortcutHelpDialog />
     </SidebarProvider>
   );
+}
+
+/** Sidebar, header and the routed page, plus the app-wide overlays. */
+export function AppShell() {
+  const pathname = useRouterState({
+    select: (routerState) => routerState.location.pathname,
+  });
+
+  return isStandalonePath(pathname) ? <Outlet /> : <AppFrame />;
 }

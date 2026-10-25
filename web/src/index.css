@@ -6,6 +6,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-checkout-accent: var(--checkout-accent);
+  --color-checkout-accent-foreground: var(--checkout-accent-foreground);
   --font-heading: var(--font-sans);
   --font-sans: "Geist Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -159,6 +161,32 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/*
+ * Test checkout page accents, one per emulated provider (PY-03.2). The page
+ * sets data-checkout-theme; everything else comes from the shared tokens.
+ */
+[data-checkout-theme] {
+  --checkout-accent: var(--primary);
+  --checkout-accent-foreground: var(--primary-foreground);
+}
+[data-checkout-theme="stripe"],
+[data-checkout-theme="native"] {
+  --checkout-accent: #635bff;
+  --checkout-accent-foreground: #ffffff;
+}
+[data-checkout-theme="paypal"] {
+  --checkout-accent: #ffc439;
+  --checkout-accent-foreground: #111111;
+}
+[data-checkout-theme="sslcommerz"] {
+  --checkout-accent: #1e5bb8;
+  --checkout-accent-foreground: #ffffff;
+}
+[data-checkout-theme="bkash"] {
+  --checkout-accent: #e2136e;
+  --checkout-accent-foreground: #ffffff;
 }
 
 @layer base {
