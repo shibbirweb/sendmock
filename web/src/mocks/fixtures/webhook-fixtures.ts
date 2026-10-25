@@ -54,7 +54,16 @@ const endpointSpecs: EndpointSpec[] = [
     template_id: "native",
     isEnabled: false,
   },
+  {
+    // Payment IPNs and webhooks are deliveries to this endpoint (17-payments).
+    name: "Shop payments",
+    url: "http://localhost:8000/payments/notify",
+    template_id: "native",
+  },
 ];
+
+/** Where the payment fixtures send their notifications. */
+export const paymentEndpointName = "Shop payments";
 
 export function buildWebhookEndpointFixtures(): WebhookEndpointRecord[] {
   return endpointSpecs.map((endpointSpec, endpointIndex) => ({

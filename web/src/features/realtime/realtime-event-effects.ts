@@ -10,6 +10,8 @@ const queryKeysByEventArea: Record<string, QueryKey[]> = {
   verify: [queryKeys.verify.all, queryKeys.sms.all, queryKeys.system.stats],
   http: [queryKeys.httpCatcher.all, queryKeys.system.stats],
   webhook: [queryKeys.webhooks.all, queryKeys.system.stats],
+  payment: [queryKeys.payments.all, queryKeys.system.stats],
+  checkout: [queryKeys.payments.all, queryKeys.system.stats],
 };
 
 export function listQueryKeysToRefresh(eventType: AppEventType): QueryKey[] {

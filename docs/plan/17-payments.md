@@ -104,7 +104,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 - **Payments** screen: list (amount, currency, provider badge, status, customer, time), filters (status, provider, currency), detail with timeline, method, line items, redirects and IPN/webhook deliveries (linked to the webhook delivery log), and a **Simulate** menu (succeed, decline with reason, refund full/partial, open/resolve dispute, expire checkout, resend IPN).
 - **Test checkout page** (`/pay/{sessionId}`): a clean, provider-neutral checkout styled per provider theme (Stripe-like card form, PayPal-like approve, SSLCommerz-like method picker with cards / mobile banking / net banking, bKash-like wallet + OTP + PIN steps), always with the TEST MODE banner and the outcome controls.
-- **Settings > Payments**: merchant credentials per provider, default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), test card and wallet tables.
+- **Settings > Payments**: merchant credentials per provider, the **notification endpoint** per provider (a webhook endpoint; IPN and webhook notifications are deliveries to it, so they share the delivery log, retries and replay), default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), test card and wallet tables.
 - Overview: payments count, success rate, revenue (test) per currency.
 
 ## API (SendMock native)
@@ -113,8 +113,8 @@ Provider deliveries use the provider's own event names and payloads through buil
 |--------|------|---------|
 | POST | `/payments` | create a payment (native) |
 | POST | `/payments/checkout` | create a hosted checkout session (native) |
-| GET | `/payments`, `/payments/{paymentId}` | list, detail with timeline |
-| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void` |
+| GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
+| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |

@@ -4,6 +4,7 @@ import type {
   EmailListFilters,
   EndpointPreviewRequest,
   HttpRulePreviewRequest,
+  PaymentListFilters,
   RulePreviewRequest,
   TemplateRenderRequest,
   VariablePreviewRequest,
@@ -81,6 +82,12 @@ export const queryKeys = {
     saved: ["webhooks", "saved"] as const,
     metrics: (metricsQuery: WebhookMetricsQuery) =>
       ["webhooks", "metrics", metricsQuery] as const,
+  },
+  payments: {
+    all: ["payments"] as const,
+    list: (paymentFilters: PaymentListFilters) =>
+      ["payments", "list", paymentFilters] as const,
+    detail: (paymentId: string) => ["payments", "detail", paymentId] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

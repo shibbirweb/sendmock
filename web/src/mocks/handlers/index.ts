@@ -7,6 +7,7 @@ import { logsHandlers } from "@/mocks/handlers/logs-handlers";
 import { nativeSendHandlers } from "@/mocks/handlers/native-send-handlers";
 import { numbersHandlers } from "@/mocks/handlers/numbers-handlers";
 import { outcomeRulesHandlers } from "@/mocks/handlers/outcome-rules-handlers";
+import { paymentHandlers } from "@/mocks/handlers/payment-handlers";
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
@@ -40,6 +41,7 @@ export const mockHandlers = [
   ...httpBinHandlers,
   ...httpRequestHandlers,
   ...samplesHandlers,
+  ...paymentHandlers,
   ...webhookEndpointHandlers,
   ...webhookMetricsHandlers,
   ...webhookVariableHandlers,
