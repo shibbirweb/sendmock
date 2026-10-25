@@ -19,6 +19,7 @@ import {
   SquarePenIcon,
   VariableIcon,
   WalletCardsIcon,
+  WorkflowIcon,
   WebhookIcon,
 } from "lucide-react";
 
@@ -86,6 +87,7 @@ export const navigationItems: NavigationItem[] = [
     children: [
       { title: "All payments", path: "/payments", icon: ReceiptIcon },
       { title: "Methods", path: "/payments/methods", icon: WalletCardsIcon },
+      { title: "Flows", path: "/payments/flows", icon: WorkflowIcon },
     ],
   },
   { title: "Numbers", path: "/numbers", icon: PhoneIcon, shortcutKey: "n" },

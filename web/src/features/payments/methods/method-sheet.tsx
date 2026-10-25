@@ -15,25 +15,29 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { MethodFlowFields } from "@/features/payments/methods/method-flow-fields";
-import { methodFlowLabels } from "@/features/payments/methods/method-labels";
 import { usePaymentMethodForm } from "@/features/payments/methods/use-payment-method-form";
 import { ApiError } from "@/lib/api/api-client";
 import {
   useDeletePaymentMethod,
   useResetPaymentMethod,
 } from "@/lib/api/hooks/use-payment-method-queries";
-import type { PaymentMethodDefinition } from "@/lib/api/types";
+import type {
+  PaymentFlowDefinition,
+  PaymentMethodDefinition,
+} from "@/lib/api/types";
 
 /** Edit a method; built-ins reset to default, custom ones can be deleted (PY-12.1). Mount when opening. */
 export function MethodSheet({
   paymentMethod,
+  paymentFlow,
   onClose,
 }: {
   paymentMethod: PaymentMethodDefinition;
+  paymentFlow: PaymentFlowDefinition | undefined;
   onClose: () => void;
 }) {
   const fieldIdPrefix = React.useId();
-  const methodForm = usePaymentMethodForm(paymentMethod, onClose);
+  const methodForm = usePaymentMethodForm(paymentMethod, paymentFlow, onClose);
   const resetPaymentMethod = useResetPaymentMethod();
   const deletePaymentMethod = useDeletePaymentMethod();
   const [pendingAction, setPendingAction] = React.useState<
@@ -54,7 +58,7 @@ export function MethodSheet({
         <SheetHeader>
           <SheetTitle>{paymentMethod.name}</SheetTitle>
           <SheetDescription>
-            {methodFlowLabels[paymentMethod.flow].label} method, key{" "}
+            {paymentFlow?.name ?? paymentMethod.flow} flow, key{" "}
             <code className="font-mono">{paymentMethod.key}</code>
           </SheetDescription>
         </SheetHeader>
@@ -109,6 +113,7 @@ export function MethodSheet({
               </FormField>
             </div>
             <MethodFlowFields
+              paymentFlow={paymentFlow}
               methodInput={methodInput}
               fieldErrors={fieldErrors}
               onChange={updateInput}

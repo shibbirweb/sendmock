@@ -12,39 +12,47 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  buildNewMethodInput,
-  methodFlowLabels,
-  toMethodKey,
-} from "@/features/payments/methods/method-labels";
+import { buildNewMethodInput } from "@/features/payments/methods/method-labels";
 import { ApiError } from "@/lib/api/api-client";
 import { useSavePaymentMethod } from "@/lib/api/hooks/use-payment-method-queries";
 import type {
+  PaymentFlowDefinition,
   PaymentMethodDefinition,
-  PaymentMethodFlow,
 } from "@/lib/api/types";
+import { describeFlowSteps } from "@/lib/payments/payment-step-catalogue";
+import { toDefinitionKey } from "@/lib/payments/to-definition-key";
 import { validatePaymentMethod } from "@/lib/payments/validate-payment-method";
 
 /** A new method from a flow and a name, then edited in the sheet (PY-12.1). Mount when opening. */
 export function AddMethodDialog({
   paymentMethods,
+  paymentFlows,
   onCreated,
   onClose,
 }: {
   paymentMethods: PaymentMethodDefinition[];
+  paymentFlows: PaymentFlowDefinition[];
   onCreated: (createdMethod: PaymentMethodDefinition) => void;
   onClose: () => void;
 }) {
   const fieldIdPrefix = React.useId();
   const savePaymentMethod = useSavePaymentMethod();
-  const [flow, setFlow] = React.useState<PaymentMethodFlow>("wallet");
+  const [flowKey, setFlowKey] = React.useState(
+    () =>
+      paymentFlows.find((paymentFlow) => paymentFlow.key === "wallet")?.key ??
+      paymentFlows[0]?.key ??
+      "",
+  );
+  const pickedFlow = paymentFlows.find(
+    (paymentFlow) => paymentFlow.key === flowKey,
+  );
   const [methodName, setMethodName] = React.useState("");
   const [typedKey, setTypedKey] = React.useState<string | null>(null);
   const [errorMessages, setErrorMessages] = React.useState<{
     name?: string;
     key?: string;
   }>({});
-  const methodKey = typedKey ?? toMethodKey(methodName);
+  const methodKey = typedKey ?? toDefinitionKey(methodName);
 
   return (
     <Dialog
@@ -62,8 +70,11 @@ export function AddMethodDialog({
           onSubmit={(submitEvent) => {
             submitEvent.preventDefault();
             submitEvent.stopPropagation();
+            if (pickedFlow === undefined) {
+              return;
+            }
             const methodInput = buildNewMethodInput(
-              flow,
+              pickedFlow,
               methodName.trim(),
               methodKey,
             );
@@ -71,6 +82,7 @@ export function AddMethodDialog({
               methodInput,
               paymentMethods,
               true,
+              pickedFlow.steps,
             );
             setErrorMessages({
               name: validationErrors.name,
@@ -101,21 +113,20 @@ export function AddMethodDialog({
           <DialogHeader>
             <DialogTitle>Add a payment method</DialogTitle>
             <DialogDescription>
-              Pick how the customer pays; you set its test values next.
+              Pick the flow the customer goes through; you set its test values
+              next. Flows are edited in Payments &gt; Flows.
             </DialogDescription>
           </DialogHeader>
-          <RadioCardGroup<PaymentMethodFlow>
+          <RadioCardGroup<string>
             legend="Flow"
-            className="sm:grid-cols-2"
-            selectedValue={flow}
-            options={Object.entries(methodFlowLabels).map(
-              ([flowKey, flowLabel]) => ({
-                value: flowKey as PaymentMethodFlow,
-                label: flowLabel.label,
-                description: flowLabel.description,
-              }),
-            )}
-            onSelect={setFlow}
+            className="max-h-72 overflow-y-auto sm:grid-cols-2"
+            selectedValue={flowKey}
+            options={paymentFlows.map((paymentFlow) => ({
+              value: paymentFlow.key,
+              label: paymentFlow.name,
+              description: describeFlowSteps(paymentFlow.steps),
+            }))}
+            onSelect={setFlowKey}
           />
           <FormField
             label="Name"

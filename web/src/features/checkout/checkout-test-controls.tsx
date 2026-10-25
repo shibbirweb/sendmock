@@ -9,55 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { buildQuickPayRequest } from "@/features/checkout/flows/build-pay-request";
 import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
-import type {
-  CheckoutCompleteRequest,
-  CheckoutSession,
-  DeclineReason,
-  PaymentMethodDefinition,
-} from "@/lib/api/types";
+import type { CheckoutSession, DeclineReason } from "@/lib/api/types";
 import { declineReasons } from "@/lib/payments/payment-actions";
-
-/** A successful payment with the gateway's first method and its first succeeding test value. */
-function buildQuickPayRequest(
-  paymentMethod: PaymentMethodDefinition | undefined,
-): CheckoutCompleteRequest {
-  if (paymentMethod === undefined) {
-    return { action: "pay" };
-  }
-  if (paymentMethod.flow === "card") {
-    const succeedingCard = paymentMethod.test_cards.find(
-      (testCard) => testCard.outcome === "succeed",
-    );
-    return {
-      action: "pay",
-      method_key: paymentMethod.key,
-      card: {
-        number: succeedingCard?.number ?? "",
-        exp_month: 12,
-        exp_year: 2034,
-        cvc: "123",
-        holder_name: "Test Customer",
-      },
-    };
-  }
-  if (paymentMethod.flow === "wallet") {
-    const succeedingWallet = paymentMethod.test_wallets.find(
-      (testWallet) => testWallet.outcome === "succeed",
-    );
-    return {
-      action: "pay",
-      method_key: paymentMethod.key,
-      wallet: {
-        number: succeedingWallet?.number ?? "",
-        otp: paymentMethod.otp,
-        pin: paymentMethod.pin,
-      },
-    };
-  }
-
-  return { action: "pay", method_key: paymentMethod.key };
-}
 
 /** One click to each outcome, beside the provider's own form (PY-03.1). */
 export function CheckoutTestControls({
@@ -72,8 +27,8 @@ export function CheckoutTestControls({
     React.useState<DeclineReason>("insufficient_funds");
   const isBusy = checkoutActions.isSubmitting;
   // 3-D Secure belongs to cards; wallets confirm with their own PIN or login.
-  const isCardProvider = checkoutSession.methods.some(
-    (paymentMethod) => paymentMethod.flow === "card",
+  const isCardProvider = checkoutSession.flows.some((paymentFlow) =>
+    paymentFlow.steps.some((flowStep) => flowStep.type === "card_form"),
   );
 
   return (

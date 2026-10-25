@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/api-client";
 import { useSavePaymentMethod } from "@/lib/api/hooks/use-payment-method-queries";
 import type {
+  PaymentFlowDefinition,
   PaymentMethodDefinition,
   PaymentMethodInput,
 } from "@/lib/api/types";
@@ -22,17 +23,18 @@ export function toMethodInput(
     accent: paymentMethod.accent,
     is_enabled: paymentMethod.is_enabled,
     test_cards: paymentMethod.test_cards,
-    test_wallets: paymentMethod.test_wallets,
+    test_numbers: paymentMethod.test_numbers,
     otp: paymentMethod.otp,
     pin: paymentMethod.pin,
-    bank_outcome: paymentMethod.bank_outcome,
+    default_outcome: paymentMethod.default_outcome,
     test_account: paymentMethod.test_account,
   };
 }
 
-/** State, validation and saving for the method sheet (PY-12.1). */
+/** State, validation and saving for the method sheet; its flow decides which test values are checked (PY-12.1, PY-12.6). */
 export function usePaymentMethodForm(
   paymentMethod: PaymentMethodDefinition,
+  paymentFlow: PaymentFlowDefinition | undefined,
   onSaved: () => void,
 ) {
   const savePaymentMethod = useSavePaymentMethod();
@@ -53,7 +55,12 @@ export function usePaymentMethodForm(
       }));
     },
     save: () => {
-      const validationErrors = validatePaymentMethod(methodInput, [], false);
+      const validationErrors = validatePaymentMethod(
+        methodInput,
+        [],
+        false,
+        paymentFlow?.steps,
+      );
       setFieldErrors(validationErrors);
       if (Object.keys(validationErrors).length > 0) {
         return;

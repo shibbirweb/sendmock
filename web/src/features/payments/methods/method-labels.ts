@@ -1,101 +1,99 @@
 import type {
+  PaymentFlowDefinition,
   PaymentMethodDefinition,
-  PaymentMethodFlow,
   PaymentMethodInput,
+  PaymentStepType,
+  TestNumberValue,
 } from "@/lib/api/types";
+import { defaultTestCards } from "@/lib/payments/test-instruments";
 
-export const methodFlowLabels: Record<
-  PaymentMethodFlow,
-  { label: string; description: string }
-> = {
-  card: {
-    label: "Card",
-    description: "Card form; the outcome follows its test cards.",
-  },
-  wallet: {
-    label: "Wallet",
-    description: "Wallet number, then OTP, then PIN.",
-  },
-  bank: { label: "Bank", description: "Pick the bank, then confirm." },
-  account: {
-    label: "Account",
-    description: "Sign in as the test account, then approve.",
-  },
-};
+function hasStep(
+  paymentFlow: Pick<PaymentFlowDefinition, "steps"> | undefined,
+  stepType: PaymentStepType,
+): boolean {
+  return (paymentFlow?.steps ?? []).some(
+    (flowStep) => flowStep.type === stepType,
+  );
+}
 
-/** How many test values a method has, for the table. */
+/** What a method's test values come to, for the table: they follow its flow (PY-12.6). */
 export function countTestValues(
   paymentMethod: PaymentMethodDefinition,
+  paymentFlow: PaymentFlowDefinition | undefined,
 ): string {
-  if (paymentMethod.flow === "card") {
+  if (hasStep(paymentFlow, "card_form")) {
     return `${paymentMethod.test_cards.length} test cards`;
   }
-  if (paymentMethod.flow === "wallet") {
-    return `${paymentMethod.test_wallets.length} test wallets`;
+  if (hasStep(paymentFlow, "account_number")) {
+    return `${paymentMethod.test_numbers.length} test numbers`;
+  }
+  if (hasStep(paymentFlow, "voucher_code")) {
+    return `${paymentMethod.test_numbers.length} test codes`;
+  }
+  if (hasStep(paymentFlow, "signed_in_account")) {
+    return paymentMethod.test_account;
   }
 
-  return paymentMethod.flow === "bank"
-    ? `Always ${paymentMethod.bank_outcome === "decline" ? "declines" : "succeeds"}`
-    : paymentMethod.test_account;
+  return `Always ${paymentMethod.default_outcome === "decline" ? "declines" : "succeeds"}`;
 }
 
-/** "Upay Wallet" as a key: "upay_wallet". */
-export function toMethodKey(methodName: string): string {
-  return methodName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
-    .replace(/^(\d)/, "m_$1")
-    .slice(0, 32);
+function buildTestNumbers(
+  paymentFlow: PaymentFlowDefinition,
+): TestNumberValue[] {
+  if (hasStep(paymentFlow, "voucher_code")) {
+    return [
+      { number: "GIFT0001", outcome: "succeed", decline_reason: null },
+      {
+        number: "GIFT0002",
+        outcome: "decline",
+        decline_reason: "insufficient_funds",
+      },
+    ];
+  }
+  if (!hasStep(paymentFlow, "account_number")) {
+    return [];
+  }
+
+  return [
+    { number: "01600000001", outcome: "succeed", decline_reason: null },
+    {
+      number: "01600000002",
+      outcome: "decline",
+      decline_reason: "insufficient_funds",
+    },
+    ...(hasStep(paymentFlow, "pin")
+      ? [
+          {
+            number: "01600000003",
+            outcome: "wrong_pin" as const,
+            decline_reason: null,
+          },
+        ]
+      : []),
+  ];
 }
 
-/** A new method's starting values for its flow (PY-12.1). */
+/** A new method's starting values for its flow's steps (PY-12.1, PY-12.6). */
 export function buildNewMethodInput(
-  flow: PaymentMethodFlow,
+  paymentFlow: PaymentFlowDefinition,
   name: string,
   key: string,
 ): PaymentMethodInput {
   return {
     key,
     name,
-    flow,
+    flow: paymentFlow.key,
     accent: "#0d9488",
     is_enabled: true,
-    test_cards:
-      flow === "card"
-        ? [
-            {
-              number: "4242424242424242",
-              outcome: "succeed",
-              decline_reason: null,
-            },
-            {
-              number: "4000000000000002",
-              outcome: "decline",
-              decline_reason: "generic_decline",
-            },
-          ]
-        : [],
-    test_wallets:
-      flow === "wallet"
-        ? [
-            { number: "01600000001", outcome: "succeed", decline_reason: null },
-            {
-              number: "01600000002",
-              outcome: "decline",
-              decline_reason: "insufficient_funds",
-            },
-            {
-              number: "01600000003",
-              outcome: "wrong_pin",
-              decline_reason: null,
-            },
-          ]
-        : [],
+    test_cards: hasStep(paymentFlow, "card_form")
+      ? defaultTestCards.slice(0, 3)
+      : [],
+    test_numbers: buildTestNumbers(paymentFlow),
     otp: "123456",
     pin: "12121",
-    bank_outcome: "succeed",
-    test_account: flow === "account" ? "test-buyer@example.com" : "",
+    default_outcome: "succeed",
+    test_account: hasStep(paymentFlow, "signed_in_account")
+      ? "test-buyer@example.com"
+      : "",
   };
 }

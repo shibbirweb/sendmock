@@ -1,5 +1,6 @@
 import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
+import type { PaymentFlowDefinition } from "@/lib/api/types/payment-flows";
 import type { DeliveryStatus } from "@/lib/api/types/webhooks";
 
 export type PaymentProvider =
@@ -89,8 +90,6 @@ export type PaymentDispute = {
   reason: string;
 };
 
-export type PaymentMethodFlow = "card" | "wallet" | "bank" | "account";
-
 export type CardTestOutcome =
   "succeed" | "decline" | "three_ds" | "succeed_then_dispute";
 
@@ -101,11 +100,13 @@ export type TestCardValue = {
   decline_reason: DeclineReason | null;
 };
 
-export type WalletTestOutcome = "succeed" | "decline" | "wrong_pin";
+/** `wrong_pin` needs a PIN step in the flow. */
+export type NumberTestOutcome = "succeed" | "decline" | "wrong_pin";
 
-export type TestWalletValue = {
+/** A test account number or voucher code with its outcome. */
+export type TestNumberValue = {
   number: string;
-  outcome: WalletTestOutcome;
+  outcome: NumberTestOutcome;
   decline_reason: DeclineReason | null;
 };
 
@@ -113,22 +114,25 @@ export type TestWalletValue = {
 export type PaymentMethodDefinition = {
   key: string;
   name: string;
-  flow: PaymentMethodFlow;
+  /** The key of the flow its checkout runs (PY-12.6). */
+  flow: string;
   /** `#rrggbb`, used on checkout pages. */
   accent: string;
   is_enabled: boolean;
   is_builtin: boolean;
   /** A built-in that differs from its shipped default. */
   is_modified: boolean;
-  /** Card flow. */
+  /** Read by a card form step. */
   test_cards: TestCardValue[];
-  /** Wallet flow. */
-  test_wallets: TestWalletValue[];
+  /** Read by an account number or voucher code step. */
+  test_numbers: TestNumberValue[];
+  /** Read by an OTP step. */
   otp: string;
+  /** Read by a PIN step. */
   pin: string;
-  /** Bank flow. */
-  bank_outcome: "succeed" | "decline";
-  /** Account flow: the test account shown as signed in. */
+  /** The outcome when the flow has no deciding step. */
+  default_outcome: "succeed" | "decline";
+  /** Read by a signed-in account step. */
   test_account: string;
   /** Gateways whose checkout offers this method. */
   gateway_keys: string[];
@@ -145,10 +149,10 @@ export type PaymentMethodInput = Pick<
   | "accent"
   | "is_enabled"
   | "test_cards"
-  | "test_wallets"
+  | "test_numbers"
   | "otp"
   | "pin"
-  | "bank_outcome"
+  | "default_outcome"
   | "test_account"
 >;
 
@@ -238,6 +242,8 @@ export type CheckoutSession = {
   accent: string;
   /** The enabled methods the gateway offers, in order (PY-12.3). */
   methods: PaymentMethodDefinition[];
+  /** The flows those methods run (PY-12.6). */
+  flows: PaymentFlowDefinition[];
   state: CheckoutState;
   failure_code: PaymentSummary["failure_code"];
   /** Where the browser goes once the checkout is finished. */
@@ -262,7 +268,13 @@ export type CheckoutCard = {
   holder_name: string;
 };
 
-export type CheckoutWallet = { number: string; otp: string; pin: string };
+/** What the customer typed in a flow's steps; only the flow's own steps are read. */
+export type CheckoutStepEntries = {
+  /** An account number or voucher code. */
+  number?: string;
+  otp?: string;
+  pin?: string;
+};
 
 /** Body of POST /api/v1/checkout-sessions/{sessionId}/complete. */
 export type CheckoutCompleteRequest = {
@@ -270,6 +282,6 @@ export type CheckoutCompleteRequest = {
   /** The method the customer paid with. */
   method_key?: string;
   card?: CheckoutCard;
-  wallet?: CheckoutWallet;
+  entries?: CheckoutStepEntries;
   decline_reason?: DeclineReason;
 };

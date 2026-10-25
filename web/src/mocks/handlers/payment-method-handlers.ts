@@ -8,6 +8,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
+import { findFlowRecord } from "@/mocks/payments/payment-flow-record";
 import {
   applyMethodInput,
   findShippedMethod,
@@ -47,6 +48,7 @@ export const paymentMethodHandlers = [
       methodInput,
       mockDatabase.paymentMethods,
       true,
+      findFlowRecord(mockDatabase, methodInput.flow)?.steps,
     );
     const firstError = Object.values(fieldErrors)[0];
     if (firstError !== undefined) {
@@ -77,7 +79,12 @@ export const paymentMethodHandlers = [
         flow: methodRecord.flow,
       };
       const firstError = Object.values(
-        validatePaymentMethod(methodInput, mockDatabase.paymentMethods, false),
+        validatePaymentMethod(
+          methodInput,
+          mockDatabase.paymentMethods,
+          false,
+          findFlowRecord(mockDatabase, methodInput.flow)?.steps,
+        ),
       )[0];
       if (firstError !== undefined) {
         return createErrorResponse(400, "validation_failed", firstError);

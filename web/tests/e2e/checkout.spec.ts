@@ -183,7 +183,7 @@ test("PY-03.2 bKash asks for the wallet, OTP and PIN, and asks again after a wro
   await walletForm.getByRole("button", { name: "Confirm and pay" }).click();
   await expect(walletForm.getByText("Wrong PIN. Try again.")).toBeVisible();
 
-  await walletForm.getByRole("button", { name: "Change number" }).click();
+  await walletForm.getByRole("button", { name: "Start over" }).click();
   await walletForm.getByLabel("Your bKash account number").fill("01770000001");
   await walletForm.getByRole("button", { name: "Confirm" }).click();
   await walletForm.getByLabel("Verification code").fill("123456");

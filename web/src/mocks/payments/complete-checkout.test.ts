@@ -1,11 +1,10 @@
 import { describe, expect, test } from "vitest";
 
 import type { CheckoutCard, PaymentDetail } from "@/lib/api/types";
+import { buildDefaultStep } from "@/lib/payments/payment-step-catalogue";
 import { createMockDatabase } from "@/mocks/db/mock-database";
-import {
-  completeCheckout,
-  toCheckoutSession,
-} from "@/mocks/payments/complete-checkout";
+import { toCheckoutSession } from "@/mocks/payments/checkout-session";
+import { completeCheckout } from "@/mocks/payments/complete-checkout";
 
 function setUp(customerName: string) {
   const mockDatabase = createMockDatabase("standard");
@@ -126,17 +125,51 @@ describe("completeCheckout", () => {
     expect(
       completeCheckout(mockDatabase, paymentDetail, {
         action: "pay",
-        wallet: { number: "01770000003", otp: "123456", pin: "12121" },
+        entries: { number: "01770000003", otp: "123456", pin: "12121" },
       }),
     ).toMatchObject({ isApplied: false, message: "Wrong PIN. Try again." });
     completeCheckout(mockDatabase, paymentDetail, {
       action: "pay",
-      wallet: { number: "01770000001", otp: "123456", pin: "12121" },
+      entries: { number: "01770000001", otp: "123456", pin: "12121" },
     });
     expect(paymentDetail).toMatchObject({
       status: "succeeded",
       method: { kind: "wallet", masked_number: "01770****01" },
     });
+  });
+
+  test("PY-12.6 a method runs its flow's steps as edited: a QR step makes the bank flow a scan", () => {
+    const { mockDatabase, paymentDetail } = setUp("Nadia Islam");
+    const bankFlow = mockDatabase.paymentFlows.find(
+      (flowRecord) => flowRecord.key === "bank",
+    );
+    if (bankFlow === undefined) {
+      throw new Error("The fixtures need the Bank flow.");
+    }
+    bankFlow.steps = [buildDefaultStep("otp"), buildDefaultStep("qr_code")];
+
+    expect(
+      completeCheckout(mockDatabase, paymentDetail, {
+        action: "pay",
+        method_key: "city",
+        entries: { otp: "000000" },
+      }),
+    ).toMatchObject({ message: "The verification code is wrong" });
+    completeCheckout(mockDatabase, paymentDetail, {
+      action: "pay",
+      method_key: "city",
+      entries: { otp: "123456" },
+    });
+    expect(paymentDetail).toMatchObject({
+      status: "succeeded",
+      method_key: "city",
+      method: { kind: "bank", bank_name: "City Touch" },
+    });
+    expect(
+      toCheckoutSession(mockDatabase, paymentDetail).flows.map(
+        (paymentFlow) => paymentFlow.key,
+      ),
+    ).toEqual(["card", "wallet", "bank"]);
   });
 
   test("PY-03.3 a finished checkout cannot be paid again", () => {

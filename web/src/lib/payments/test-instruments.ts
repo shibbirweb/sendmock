@@ -1,8 +1,7 @@
 import type {
   DeclineReason,
-  PaymentMethodDefinition,
   TestCardValue,
-  TestWalletValue,
+  TestNumberValue,
 } from "@/lib/api/types";
 
 /** Stripe's documented test cards: the built-in Card method's values (17-payments). */
@@ -132,7 +131,7 @@ const declineReasonWords: Record<DeclineReason, string> = {
 export function describeTestOutcome(
   testValue:
     | Pick<TestCardValue, "outcome" | "decline_reason">
-    | Pick<TestWalletValue, "outcome" | "decline_reason">,
+    | Pick<TestNumberValue, "outcome" | "decline_reason">,
 ): string {
   const outcomeLabels: Record<string, string> = {
     succeed: "Succeeds",
@@ -147,37 +146,19 @@ export function describeTestOutcome(
   return outcomeLabels[testValue.outcome] ?? testValue.outcome;
 }
 
-export type WalletCheck =
-  | { kind: "succeed" }
-  | { kind: "decline"; reason: DeclineReason }
-  | { kind: "wrong_pin" }
-  | { kind: "error"; message: string };
+/** "0177-000 0001" and "gift 2024" as stored: no spaces or dashes, upper case. */
+export function toTestNumber(typedNumber: string): string {
+  return typedNumber.replace(/[\s-]/g, "").toUpperCase();
+}
 
-/** A wallet number, OTP and PIN against a wallet method's test values (17-payments). */
-export function checkWallet(
-  walletMethod: Pick<PaymentMethodDefinition, "test_wallets" | "otp" | "pin">,
-  walletNumber: string,
-  otp: string,
-  pin: string,
-): WalletCheck {
-  const testWallet = walletMethod.test_wallets.find(
-    (candidateWallet) =>
-      candidateWallet.number === walletNumber.replace(/\D/g, ""),
+/** The method's test number or voucher code the customer typed, if it is one. */
+export function findTestNumber(
+  testNumbers: TestNumberValue[],
+  typedNumber: string,
+): TestNumberValue | undefined {
+  const normalizedNumber = toTestNumber(typedNumber);
+
+  return testNumbers.find(
+    (testNumber) => toTestNumber(testNumber.number) === normalizedNumber,
   );
-  if (testWallet === undefined) {
-    return { kind: "error", message: "Use a test wallet" };
-  }
-  if (otp !== walletMethod.otp) {
-    return { kind: "error", message: "The verification code is wrong" };
-  }
-  if (testWallet.outcome === "wrong_pin" || pin !== walletMethod.pin) {
-    return { kind: "wrong_pin" };
-  }
-
-  return testWallet.outcome === "decline"
-    ? {
-        kind: "decline",
-        reason: testWallet.decline_reason ?? "insufficient_funds",
-      }
-    : { kind: "succeed" };
 }

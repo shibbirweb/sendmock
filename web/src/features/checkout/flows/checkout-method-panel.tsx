@@ -1,9 +1,12 @@
-import { checkoutFlows } from "@/features/checkout/flows/flow-registry";
-import { MethodPicker } from "@/features/checkout/flows/method-picker";
+import { FlowRunner } from "@/features/checkout/flows/flow-runner";
+import {
+  findMethodFlow,
+  MethodPicker,
+} from "@/features/checkout/flows/method-picker";
 import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
 import type { CheckoutSession } from "@/lib/api/types";
 
-/** One method shows its flow directly; several show the picker (PY-12.3). */
+/** One method runs its flow directly; several show the picker (PY-12.3, PY-12.6). */
 export function CheckoutMethodPanel({
   checkoutSession,
   checkoutActions,
@@ -14,6 +17,13 @@ export function CheckoutMethodPanel({
   const [onlyMethod] = checkoutSession.methods;
   const isSingleMethod =
     checkoutSession.methods.length === 1 && onlyMethod !== undefined;
+  const onlyFlow =
+    onlyMethod === undefined
+      ? undefined
+      : findMethodFlow(checkoutSession, onlyMethod);
+  const isCardFlow = (onlyFlow?.steps ?? []).some(
+    (flowStep) => flowStep.type === "card_form",
+  );
 
   return (
     <section
@@ -22,7 +32,7 @@ export function CheckoutMethodPanel({
     >
       <h2 className="text-base font-semibold">
         {isSingleMethod
-          ? onlyMethod.flow === "card"
+          ? isCardFlow
             ? "Pay with card"
             : `Pay with ${onlyMethod.name}`
           : "Choose a payment method"}
@@ -33,12 +43,14 @@ export function CheckoutMethodPanel({
           &gt; Methods.
         </p>
       )}
-      {isSingleMethod &&
-        checkoutFlows[onlyMethod.flow].render({
-          checkoutSession,
-          paymentMethod: onlyMethod,
-          checkoutActions,
-        })}
+      {isSingleMethod && onlyFlow !== undefined && (
+        <FlowRunner
+          checkoutSession={checkoutSession}
+          paymentMethod={onlyMethod}
+          paymentFlow={onlyFlow}
+          checkoutActions={checkoutActions}
+        />
+      )}
       {checkoutSession.methods.length > 1 && (
         <MethodPicker
           checkoutSession={checkoutSession}

@@ -1,7 +1,7 @@
 import type {
   DeclineReason,
   TestCardValue,
-  TestWalletValue,
+  TestNumberValue,
 } from "@/lib/api/types";
 import { declineReasons } from "@/lib/payments/payment-actions";
 
@@ -16,17 +16,22 @@ export const cardOutcomeOptions = [
   })),
 ];
 
-export const walletOutcomeOptions = [
-  { value: "succeed", label: "Succeeds" },
-  {
-    value: "decline:insufficient_funds",
-    label: "Declined: insufficient balance",
-  },
-  { value: "wrong_pin", label: "Wrong PIN (asked again)" },
-];
+/** Wrong PIN is offered only when the flow has a PIN step. */
+export function listNumberOutcomeOptions(hasPinStep: boolean) {
+  return [
+    { value: "succeed", label: "Succeeds" },
+    {
+      value: "decline:insufficient_funds",
+      label: "Declined: insufficient balance",
+    },
+    ...(hasPinStep
+      ? [{ value: "wrong_pin", label: "Wrong PIN (asked again)" }]
+      : []),
+  ];
+}
 
 export function toOutcomeValue(
-  testValue: TestCardValue | TestWalletValue,
+  testValue: TestCardValue | TestNumberValue,
 ): string {
   return testValue.outcome === "decline"
     ? `decline:${testValue.decline_reason ?? "generic_decline"}`

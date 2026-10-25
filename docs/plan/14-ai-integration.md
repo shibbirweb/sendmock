@@ -76,6 +76,9 @@ sendmock logs smtp|http [--failed] [--tail]
 sendmock payments list|show|simulate <paymentId> succeed|decline|refund|dispute|notify|test-cards
 sendmock payments gateways list|show|create|update|reset|delete|preview   # gateway definitions (JSON in / out)
 sendmock payments methods list|show|create|update|reset|delete
+sendmock payments flows list|show|create|update|reset|delete   # flows built step by step from the step catalogue
+sendmock payments flows steps add|move|remove|update            # edit one step of a flow (type, position, labels)
+sendmock payments flows step-types                             # the step catalogue with each step's fields
 
 sendmock otp --to <address|number> [--channel email|sms] [--wait 10s]
 sendmock links --to <address>
@@ -169,7 +172,7 @@ Tool names are prefixed `sendmock_` and generated from the registry. Each carrie
 | `verify` | `sendmock_verify_list`, `sendmock_verify_get`, `sendmock_verify_force`, `sendmock_verify_service_{list,create,update,delete}` |
 | `http` | `sendmock_http_bins`, `sendmock_http_list`, `sendmock_http_get`, `sendmock_http_wait`, `sendmock_http_forward`, `sendmock_http_response_set` |
 | `logs` | `sendmock_logs_smtp`, `sendmock_logs_http` |
-| `payments` | `sendmock_payment_create_checkout`, `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_wait`, `sendmock_payment_gateway_list`, `sendmock_payment_gateway_get`, `sendmock_payment_gateway_create`, `sendmock_payment_gateway_update`, `sendmock_payment_gateway_preview`, `sendmock_payment_gateway_reset`, `sendmock_payment_method_list`, `sendmock_payment_method_get`, `sendmock_payment_method_create`, `sendmock_payment_method_update`, `sendmock_payment_method_reset` (create and update take the same definition as the UI and are checked by the same validation; reset and delete are marked destructive and ask first) |
+| `payments` | `sendmock_payment_create_checkout`, `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_wait`, `sendmock_payment_gateway_list`, `sendmock_payment_gateway_get`, `sendmock_payment_gateway_create`, `sendmock_payment_gateway_update`, `sendmock_payment_gateway_preview`, `sendmock_payment_gateway_reset`, `sendmock_payment_method_list`, `sendmock_payment_method_get`, `sendmock_payment_method_create`, `sendmock_payment_method_update`, `sendmock_payment_method_reset`, `sendmock_payment_flow_list`, `sendmock_payment_flow_get`, `sendmock_payment_flow_create`, `sendmock_payment_flow_update`, `sendmock_payment_flow_reset`, `sendmock_payment_flow_delete`, `sendmock_payment_flow_step_add`, `sendmock_payment_flow_step_move`, `sendmock_payment_flow_step_remove`, `sendmock_payment_flow_step_update`, `sendmock_payment_step_type_list` (create and update take the same definition as the UI and are checked by the same validation; reset and delete are marked destructive and ask first) |
 | `extract` | `sendmock_otp_get`, `sendmock_links_get` |
 | `numbers` | `sendmock_number_list`, `sendmock_number_upsert`, `sendmock_number_delete` |
 | `webhooks` | `sendmock_webhook_endpoint_{list,get,create,update,delete,test,rotate_secret}`, `sendmock_webhook_saved_{list,send,delete}`, `sendmock_webhook_rule_{list,create,update,delete,preview}`, `sendmock_webhook_send`, `sendmock_webhook_render`, `sendmock_webhook_delivery_{list,get,replay,cancel,wait}` |
@@ -208,7 +211,8 @@ Ready-made prompts the user can pick in the harness:
 | `test-otp-flow` | trigger the app's OTP flow, wait for the SMS/email, return the code |
 | `simulate-sms-conversation` | run a scripted two-way SMS exchange against the app's inbound handler |
 | `debug-failed-webhook` | inspect the latest failed delivery, explain the error, suggest a fix, replay |
-| `add-payment-gateway` | add a gateway SendMock does not ship (or a new method such as a wallet): read the provider's docs the user points to, map them to a gateway and method definition (methods offered, redirect fields, notification event names, body and signature templates), create them, check the preview, run a test checkout and confirm the app receives the redirect and notification |
+| `add-payment-flow` | compose a checkout flow step by step from the provider's docs (for example "Upay: wallet number, OTP, then PIN" or "a QR wallet"): list the step catalogue, add each step in order with its labels, check the flow is valid, attach it to a method and run a test checkout |
+| `add-payment-gateway` | add a gateway SendMock does not ship (or a new method such as a wallet): read the provider's docs the user points to, map them to a gateway, method and (when the provider's checkout steps differ from the built-in flows) flow definition (methods offered, redirect fields, notification event names, body and signature templates), create them, check the preview, run a test checkout and confirm the app receives the redirect and notification |
 
 ## Agent skill
 
@@ -225,7 +229,7 @@ sendmock-skill/
 │   ├── mcp-tools.md            # generated
 │   ├── integrations.md         # per-stack config (Laravel, Django, Express, Spring, Go, Rails, .NET, Rust)
 │   ├── templates.md            # built-in template catalogue
-│   ├── payment-gateways.md     # gateway and method definition reference, template values, worked example (adding Nagad)
+│   ├── payment-gateways.md     # gateway, method and flow definition reference, step catalogue, template values, worked examples (adding Nagad; composing a QR wallet flow)
 │   ├── variables-and-filters.md
 │   └── scenarios.md
 └── examples/
@@ -239,7 +243,7 @@ sendmock-skill/
 1. **When to use:** testing or debugging anything that sends email/SMS or receives provider webhooks locally.
 2. **First step:** `sendmock status --json` (or `sendmock_status`). If not running, start it (`sendmock serve` in the background) or ask the user.
 3. **Prefer MCP tools when available, otherwise the CLI with `--json`.**
-4. **Workflows:** connect an app, read an OTP, set up inbound email/SMS webhooks with the right template, simulate opens and status callbacks, debug failed deliveries (check Logs > SMTP/HTTP first), complete Twilio Verify flows, simulate bounces and complaints, add a payment gateway or method from the provider's docs (definition, preview, test checkout, then export), capture Slack/push calls with the HTTP catcher, write a scenario for repeatable tests, and export the final setup with `sendmock seed export` so it can be committed.
+4. **Workflows:** connect an app, read an OTP, set up inbound email/SMS webhooks with the right template, simulate opens and status callbacks, debug failed deliveries (check Logs > SMTP/HTTP first), complete Twilio Verify flows, simulate bounces and complaints, add a payment gateway or method from the provider's docs (definition, preview, test checkout, then export), compose a payment flow step by step, capture Slack/push calls with the HTTP catcher, write a scenario for repeatable tests, and export the final setup with `sendmock seed export` so it can be committed.
 5. **Safety rules:** never run `reset` or delete-all without the user's confirmation; never print secret values; do not point webhooks at non-local URLs unless the user asks; prefer creating new endpoints over modifying ones the user made.
 
 ## One-command setup per harness

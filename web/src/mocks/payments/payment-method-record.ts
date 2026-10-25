@@ -16,10 +16,10 @@ const editableFields = [
   "accent",
   "is_enabled",
   "test_cards",
-  "test_wallets",
+  "test_numbers",
   "otp",
   "pin",
-  "bank_outcome",
+  "default_outcome",
   "test_account",
 ] as const;
 

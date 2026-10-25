@@ -2,35 +2,23 @@ import { describe, expect, test } from "vitest";
 
 import {
   checkCardNumber,
-  checkWallet,
   defaultTestCards,
   describeTestOutcome,
+  findTestNumber,
   isTestCardRange,
   passesLuhnCheck,
   readCardBrand,
+  toTestNumber,
 } from "@/lib/payments/test-instruments";
 
-const bkashMethod = {
-  test_wallets: [
-    {
-      number: "01770000001",
-      outcome: "succeed" as const,
-      decline_reason: null,
-    },
-    {
-      number: "01770000002",
-      outcome: "decline" as const,
-      decline_reason: "insufficient_funds" as const,
-    },
-    {
-      number: "01770000003",
-      outcome: "wrong_pin" as const,
-      decline_reason: null,
-    },
-  ],
-  otp: "123456",
-  pin: "12121",
-};
+const bkashNumbers = [
+  { number: "01770000001", outcome: "succeed" as const, decline_reason: null },
+  {
+    number: "01770000002",
+    outcome: "decline" as const,
+    decline_reason: "insufficient_funds" as const,
+  },
+];
 
 describe("test cards", () => {
   test("every default test card passes the Luhn check and sits in a test range", () => {
@@ -79,25 +67,12 @@ describe("test cards", () => {
   });
 });
 
-describe("test wallets", () => {
-  test("a wallet needs the method's OTP and PIN; each wallet gives its outcome", () => {
-    expect(checkWallet(bkashMethod, "01770000001", "123456", "12121")).toEqual({
-      kind: "succeed",
-    });
-    expect(checkWallet(bkashMethod, "01770000002", "123456", "12121")).toEqual({
-      kind: "decline",
-      reason: "insufficient_funds",
-    });
-    expect(checkWallet(bkashMethod, "01770000003", "123456", "12121")).toEqual({
-      kind: "wrong_pin",
-    });
-    expect(checkWallet(bkashMethod, "01770000001", "000000", "12121")).toEqual({
-      kind: "error",
-      message: "The verification code is wrong",
-    });
-    expect(checkWallet(bkashMethod, "01999999999", "123456", "12121")).toEqual({
-      kind: "error",
-      message: "Use a test wallet",
-    });
+describe("test numbers", () => {
+  test("a typed number matches its test value with spaces, dashes or lower case", () => {
+    expect(findTestNumber(bkashNumbers, "01770-000 001")).toEqual(
+      bkashNumbers[0],
+    );
+    expect(findTestNumber(bkashNumbers, "01999999999")).toBeUndefined();
+    expect(toTestNumber("gift 00-01")).toBe("GIFT0001");
   });
 });

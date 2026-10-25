@@ -14,9 +14,9 @@ import {
   fromOutcomeValue,
   toOutcomeValue,
 } from "@/features/payments/methods/test-outcome-options";
-import type { TestCardValue, TestWalletValue } from "@/lib/api/types";
+import type { TestCardValue, TestNumberValue } from "@/lib/api/types";
 
-type TestValue = TestCardValue | TestWalletValue;
+type TestValue = TestCardValue | TestNumberValue;
 
 /** Rows of a test number and its outcome: a card method's cards or a wallet's numbers (PY-12.1). */
 export function TestValuesEditor<Value extends TestValue>({

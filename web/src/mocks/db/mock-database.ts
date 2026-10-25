@@ -28,6 +28,10 @@ import {
 } from "@/mocks/fixtures/http-catcher-fixtures";
 import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
 import {
+  buildBuiltinPaymentFlows,
+  type PaymentFlowRecord,
+} from "@/mocks/fixtures/payment-flow-fixtures";
+import {
   buildBuiltinPaymentMethods,
   type PaymentMethodRecord,
 } from "@/mocks/fixtures/payment-method-fixtures";
@@ -104,6 +108,7 @@ export type MockDatabase = {
   savedDeliveries: SavedDelivery[];
   payments: PaymentDetail[];
   paymentMethods: PaymentMethodRecord[];
+  paymentFlows: PaymentFlowRecord[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -148,6 +153,7 @@ function buildConfiguration() {
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
     paymentMethods: buildBuiltinPaymentMethods(),
+    paymentFlows: buildBuiltinPaymentFlows(),
     httpResponseRules: new Map(
       httpBins.map((httpBin) => [
         httpBin.id,

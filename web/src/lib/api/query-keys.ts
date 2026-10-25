@@ -91,6 +91,7 @@ export const queryKeys = {
     checkout: (sessionId: string) =>
       ["payments", "checkout", sessionId] as const,
     methods: ["payments", "methods"] as const,
+    flows: ["payments", "flows"] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

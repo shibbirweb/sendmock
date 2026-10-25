@@ -1,7 +1,7 @@
 import type {
   PaymentMethodDefinition,
   PaymentProvider,
-  TestWalletValue,
+  TestNumberValue,
 } from "@/lib/api/types";
 import { defaultTestCards } from "@/lib/payments/test-instruments";
 
@@ -11,7 +11,7 @@ export type PaymentMethodRecord = Omit<
   "gateway_keys" | "payment_count" | "is_modified"
 >;
 
-function buildWallets(numberPrefix: string): TestWalletValue[] {
+function buildWallets(numberPrefix: string): TestNumberValue[] {
   return [
     { number: `${numberPrefix}1`, outcome: "succeed", decline_reason: null },
     {
@@ -25,10 +25,10 @@ function buildWallets(numberPrefix: string): TestWalletValue[] {
 
 const emptyFlowValues = {
   test_cards: [],
-  test_wallets: [],
+  test_numbers: [],
   otp: "123456",
   pin: "12121",
-  bank_outcome: "succeed" as const,
+  default_outcome: "succeed" as const,
   test_account: "",
 };
 
@@ -66,21 +66,21 @@ export function buildBuiltinPaymentMethods(): PaymentMethodRecord[] {
       name: "bKash",
       flow: "wallet",
       accent: "#e2136e",
-      test_wallets: buildWallets("0177000000"),
+      test_numbers: buildWallets("0177000000"),
     }),
     buildMethod({
       key: "nagad",
       name: "Nagad",
       flow: "wallet",
       accent: "#f6921e",
-      test_wallets: buildWallets("0188000000"),
+      test_numbers: buildWallets("0188000000"),
     }),
     buildMethod({
       key: "rocket",
       name: "Rocket",
       flow: "wallet",
       accent: "#8c3494",
-      test_wallets: buildWallets("0199000000"),
+      test_numbers: buildWallets("0199000000"),
     }),
     buildMethod({
       key: "dbbl",

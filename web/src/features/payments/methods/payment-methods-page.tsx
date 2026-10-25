@@ -8,6 +8,7 @@ import { AddMethodDialog } from "@/features/payments/methods/add-method-dialog";
 import { MethodSheet } from "@/features/payments/methods/method-sheet";
 import { PaymentMethodsTable } from "@/features/payments/methods/payment-methods-table";
 import { toMethodInput } from "@/features/payments/methods/use-payment-method-form";
+import { usePaymentFlows } from "@/lib/api/hooks/use-payment-flow-queries";
 import {
   usePaymentMethods,
   useSavePaymentMethod,
@@ -16,6 +17,8 @@ import {
 /** Payments > Methods: what checkout pages offer, and their test values (PY-12.1). */
 export function PaymentMethodsPage() {
   const methodsQuery = usePaymentMethods();
+  const flowsQuery = usePaymentFlows();
+  const paymentFlows = flowsQuery.data ?? [];
   const savePaymentMethod = useSavePaymentMethod();
   const [isAddOpen, setAddOpen] = React.useState(false);
   const [editedKey, setEditedKey] = React.useState<string | null>(null);
@@ -41,11 +44,12 @@ export function PaymentMethodsPage() {
           </Button>
         </header>
         <div className="min-w-0 rounded-lg border">
-          {methodsQuery.isPending ? (
+          {methodsQuery.isPending || flowsQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
           ) : (
             <PaymentMethodsTable
               paymentMethods={paymentMethods}
+              paymentFlows={paymentFlows}
               onEdit={(paymentMethod) => setEditedKey(paymentMethod.key)}
               onToggle={(paymentMethod, isEnabled) => {
                 savePaymentMethod.mutate(
@@ -72,6 +76,7 @@ export function PaymentMethodsPage() {
       {isAddOpen && (
         <AddMethodDialog
           paymentMethods={paymentMethods}
+          paymentFlows={paymentFlows}
           onCreated={(createdMethod) => {
             setAddOpen(false);
             setEditedKey(createdMethod.key);
@@ -83,6 +88,9 @@ export function PaymentMethodsPage() {
         <MethodSheet
           key={editedMethod.key}
           paymentMethod={editedMethod}
+          paymentFlow={paymentFlows.find(
+            (paymentFlow) => paymentFlow.key === editedMethod.flow,
+          )}
           onClose={() => setEditedKey(null)}
         />
       )}

@@ -7,10 +7,8 @@ import {
   createErrorResponse,
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
-import {
-  completeCheckout,
-  toCheckoutSession,
-} from "@/mocks/payments/complete-checkout";
+import { toCheckoutSession } from "@/mocks/payments/checkout-session";
+import { completeCheckout } from "@/mocks/payments/complete-checkout";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function findSessionPayment(sessionId: unknown) {

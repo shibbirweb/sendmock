@@ -86,12 +86,40 @@ The test OTP is `123456` and the test PIN is `12121`. A number that is not a tes
 
 Gateways and payment methods are data, not code, so a developer can emulate a gateway SendMock does not ship, change how a built-in one behaves, and go back to the shipped behaviour at any time.
 
-- **Payment method:** what the customer pays with on a checkout page, and the steps to do it.
-  - Flows: **Card** (card form; the outcome follows the method's test cards, one of which can ask for 3-D Secure), **Wallet** (wallet number, then OTP, then PIN; test wallet numbers with outcomes, the test OTP and PIN), **Bank** (pick, then confirm; a fixed outcome) and **Account** (sign in as the test account, then approve or cancel).
-  - Each has a name, a key, an accent colour, its flow and its test values. Built-ins: Card, PayPal account, bKash, Nagad, Rocket, DBBL Nexus, City Touch, BRAC iBanking.
+- **Payment flow:** the steps a customer goes through on the checkout page, in order, built from a fixed catalogue of step types that SendMock knows how to show and check:
+
+  | Step | Shows | Checked against the method's |
+  |------|-------|------------------------------|
+  | Card form | number, expiry, CVC, name (and a 3-D Secure challenge when the test card asks for one) | test cards and their outcomes |
+  | Account number | a number field (wallet, phone or account) | test numbers and their outcomes |
+  | Voucher code | a code field | test numbers and their outcomes |
+  | OTP | a verification code field | test OTP |
+  | PIN | a PIN field (asked again when wrong) | test PIN |
+  | Signed-in account | the test account with Approve and Cancel | test account |
+  | QR code | a QR code to scan with "I have paid" | default outcome |
+  | Reference code | a reference to pay with elsewhere and "I have paid" | default outcome |
+  | Confirm | a confirm button | default outcome |
+
+  - A flow is composed step by step: add a step from the catalogue, move it up or down, remove it, and edit its labels, one change at a time, by hand in Payments > Flows or by an AI agent through the CLI, the MCP `payments` toolset and the skill (same operations, same validation).
+  - Each step has its own title, field label, hint and button text. A flow has a name, a key, the picker tab it belongs to (e.g. "Mobile banking") and 1 to 6 steps, with at most one deciding step (card form, account number or voucher code); without one, the method's default outcome decides.
+  - Built-in flows ship ready to use:
+
+    | Flow | Steps | Picker tab |
+    |------|-------|------------|
+    | Card | card form | Cards |
+    | Wallet | account number, OTP, PIN | Mobile banking |
+    | Bank | confirm | Net banking |
+    | Account | signed-in account | Accounts |
+    | QR | QR code | Scan to pay |
+    | Bank transfer | reference code | Bank transfer |
+    | Voucher | voucher code | Vouchers |
+
+  - Built-ins are editable (labels, order, steps added or removed), show **Modified** once changed and **Reset to default** restores the shipped steps and labels (asks first). They cannot be deleted. Custom flows are composed from the same step catalogue and can be deleted while no method uses them.
+  - A new step type (one SendMock cannot show yet) still needs code: a checkout component and a server check, one entry in each registry.
+- **Payment method:** what the customer pays with on a checkout page: a name, a key, an accent colour, its flow, and the test values the flow's steps need (test cards, test numbers with outcomes, OTP, PIN, test account, default outcome). Built-ins: Card, PayPal account, bKash, Nagad, Rocket, DBBL Nexus, City Touch, BRAC iBanking.
 - **Gateway:** an emulated provider.
   - Name, key (the `provider` value in the API and in `/providers/<key>/...` paths), accent colour, enabled.
-  - **Methods offered**, in order: the checkout page shows one method directly, or a picker grouped by flow (Cards, Mobile banking, Net banking, Accounts) when there are several.
+  - **Methods offered**, in order: the checkout page shows one method directly, or a picker grouped by each flow's picker tab (Cards, Mobile banking, Net banking, ...) when there are several.
   - **Merchant credentials** as name / value rows (store id, secret key, ...), secrets masked everywhere and written to seed exports as `${ENV}` references.
   - **Notification endpoint** (a webhook endpoint) for its IPN or webhook deliveries.
   - **Redirect:** GET or POST, and the fields sent back to the app as name / template rows.
@@ -99,7 +127,7 @@ Gateways and payment methods are data, not code, so a developer can emulate a ga
   - Templates read `payment` (id, reference, amount and amount_major, currency, status, failure code, customer, method, provider ids), `event` (native type and the gateway's name for it), `merchant` (the credentials) and the usual functions and filters; a live preview renders them against a payment.
 - **Built-ins** (Stripe, PayPal, SSLCommerz, bKash, Native, and the built-in methods) are editable. An edited built-in shows **Modified** and **Reset to default** restores the shipped version. Built-ins cannot be deleted; they can be disabled.
 - **Custom gateways** start from a built-in (its methods, redirect and notification shapes are copied, then edited) or from blank. Custom methods start from a flow. Both can be deleted when no payment uses them (otherwise disabled).
-- **AI-assisted:** gateways and methods are operations in the registry like everything else, so the CLI (`sendmock payments gateways|methods ...`) and the MCP `payments` toolset can list, create, update, preview and reset them with the same validation as the UI. The agent skill's `add-payment-gateway` workflow (and the MCP prompt of the same name) lets a developer say "add the Nagad gateway" or "add Upay as a wallet": the agent reads the provider's docs, writes the definition, checks the preview, runs a test checkout and exports the result to the seed file. See [14-ai-integration.md](14-ai-integration.md#prompts).
+- **AI-assisted:** gateways and methods are operations in the registry like everything else, so the CLI (`sendmock payments gateways|methods ...`) and the MCP `payments` toolset can list, create, update, preview and reset them, and compose flows step by step (`sendmock payments flows steps add|move|remove|update`), with the same validation as the UI. The agent skill's `add-payment-gateway` workflow (and the MCP prompt of the same name) lets a developer say "add the Nagad gateway" or "add Upay as a wallet", and `add-payment-flow` handles "make a QR wallet flow": the agent reads the provider's docs, writes the definition, checks the preview, runs a test checkout and exports the result to the seed file. See [14-ai-integration.md](14-ai-integration.md#prompts).
 - Changes apply to new checkouts, redirects and notifications at once. The provider wire APIs (session init, validation) of custom gateways are emulated in Phase 3P from the same definition: init returns the checkout URL, and validation answers from the payment.
 
 ## Events
@@ -123,7 +151,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 ## Payment data model
 
-- `payment_gateways` and `payment_methods`: the definitions above, with `is_builtin`, `is_modified` and the shipped default kept for reset.
+- `payment_gateways`, `payment_methods` and `payment_flows`: the definitions above, with `is_builtin`, `is_modified` and the shipped default kept for reset.
 - `payments`: id, provider, provider_ids (session/intent/order/charge IDs), amount_minor, currency (incl. BDT, INR, USD, EUR, ...), status (`requires_payment`, `requires_action`, `authorized`, `succeeded`, `failed`, `canceled`, `refunded`, `partially_refunded`, `disputed`), failure_code, customer (email/name/phone), method (card brand + last4 + expiry, or wallet number masked), line_items JSON, metadata JSON, success/fail/cancel URLs, notification URL, request_raw, created_at, updated_at.
 - `payment_events`: timeline (created, 3DS, authorized, captured, refunded, disputed, notifications sent).
 - `refunds`, `disputes`, `subscriptions` (Phase 4+).
@@ -133,7 +161,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 - **Payments** screen: list (amount, currency, provider badge, status, customer, time), filters (status, provider, currency), detail with timeline, method, line items, redirects and IPN/webhook deliveries (linked to the webhook delivery log), and a **Simulate** menu (succeed, decline with reason, refund full/partial, open/resolve dispute, expire checkout, resend IPN).
 - **Test checkout page** (`/pay/{sessionId}`): a clean, provider-neutral checkout styled per provider theme (Stripe-like card form, PayPal-like approve, SSLCommerz-like method picker with cards / mobile banking / net banking, bKash-like wallet + OTP + PIN steps), always with the TEST MODE banner and the outcome controls.
-- **Gateways** screen (Payments > Gateways) and **Methods** screen (Payments > Methods): see [Gateways and payment methods](#gateways-and-payment-methods-configurable). The notification endpoint and merchant credentials are set per gateway; IPN and webhook notifications are deliveries to that endpoint, so they share the delivery log, retries and replay.
+- **Gateways** (Payments > Gateways), **Methods** (Payments > Methods) and **Flows** (Payments > Flows) screens: see [Gateways and payment methods](#gateways-and-payment-methods-configurable). The notification endpoint and merchant credentials are set per gateway; IPN and webhook notifications are deliveries to that endpoint, so they share the delivery log, retries and replay.
 - **Settings > Payments**: merchant name shown on checkout pages, default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), and the test card and wallet tables of the enabled methods, linking to Gateways and Methods.
 - Overview: payments count, success rate, revenue (test) per currency.
 
@@ -152,6 +180,10 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/payments/gateways/{gatewayKey}/preview` | render an unsaved gateway's redirect fields and notification for an event against a payment, with template problems |
 | GET/POST/PATCH/DELETE | `/payments/methods` | payment methods; built-ins cannot be deleted |
 | POST | `/payments/methods/{methodKey}/reset` | restore a built-in method |
+| GET/POST/PATCH/DELETE | `/payments/flows` | payment flows (steps in order with their labels); built-ins cannot be deleted, custom ones only while no method uses them |
+| POST | `/payments/flows/{flowKey}/reset` | restore a built-in flow |
+| POST/PATCH/DELETE | `/payments/flows/{flowKey}/steps[/{stepIndex}]` | add a step, update its labels or position, remove it (one step at a time) |
+| GET | `/payments/step-types` | the step catalogue with each step's fields and which method test values it reads |
 | GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |

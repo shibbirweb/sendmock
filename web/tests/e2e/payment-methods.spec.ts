@@ -38,7 +38,7 @@ test("PY-12.1 the table lists every method with its flow, gateways and test valu
   await expect(methodRow(page, "Card")).toContainText(
     "Stripe, Native, SSLCommerz",
   );
-  await expect(methodRow(page, "bKash")).toContainText("3 test wallets");
+  await expect(methodRow(page, "bKash")).toContainText("3 test numbers");
   await expect(methodRow(page, "DBBL Nexus")).toContainText("Always succeeds");
   await expect(
     page.getByRole("link", { name: "All payments" }),

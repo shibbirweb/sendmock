@@ -19,6 +19,7 @@ import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
 import { Route as PaySessionIdRouteImport } from './routes/pay/$sessionId'
 import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
+import { Route as PaymentsFlowsRouteImport } from './routes/payments/flows'
 import { Route as PaymentsMethodsRouteImport } from './routes/payments/methods'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
@@ -81,6 +82,11 @@ const PaySessionIdRoute = PaySessionIdRouteImport.update({
 const PaymentsIndexRoute = PaymentsIndexRouteImport.update({
   id: '/payments/',
   path: '/payments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsFlowsRoute = PaymentsFlowsRouteImport.update({
+  id: '/payments/flows',
+  path: '/payments/flows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentsMethodsRoute = PaymentsMethodsRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/methods': typeof PaymentsMethodsRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/methods': typeof PaymentsMethodsRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/methods': typeof PaymentsMethodsRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/flows'
     | '/payments/methods'
     | '/sms'
     | '/sms/verify'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/flows'
     | '/payments/methods'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/flows'
     | '/payments/methods'
     | '/sms/_conversations'
     | '/sms/verify'
@@ -308,6 +320,7 @@ export interface RootRouteChildren {
   NumbersRoute: typeof NumbersRoute
   SettingsRoute: typeof SettingsRoute
   PaySessionIdRoute: typeof PaySessionIdRoute
+  PaymentsFlowsRoute: typeof PaymentsFlowsRoute
   PaymentsMethodsRoute: typeof PaymentsMethodsRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsVerifyRoute: typeof SmsVerifyRoute
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments/'
       preLoaderRoute: typeof PaymentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/flows': {
+      id: '/payments/flows'
+      path: '/payments/flows'
+      fullPath: '/payments/flows'
+      preLoaderRoute: typeof PaymentsFlowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payments/methods': {
@@ -521,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   NumbersRoute: NumbersRoute,
   SettingsRoute: SettingsRoute,
   PaySessionIdRoute: PaySessionIdRoute,
+  PaymentsFlowsRoute: PaymentsFlowsRoute,
   PaymentsMethodsRoute: PaymentsMethodsRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsVerifyRoute: SmsVerifyRoute,

@@ -1,14 +1,25 @@
 import * as React from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  checkoutFlows,
-  flowOrder,
-} from "@/features/checkout/flows/flow-registry";
+import { FlowRunner } from "@/features/checkout/flows/flow-runner";
 import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
-import type { CheckoutSession, PaymentMethodDefinition } from "@/lib/api/types";
+import type {
+  CheckoutSession,
+  PaymentFlowDefinition,
+  PaymentMethodDefinition,
+} from "@/lib/api/types";
 
-/** Several methods of one flow as tiles; the picked one's flow shows below. */
+/** The flow a method runs, from the session. */
+export function findMethodFlow(
+  checkoutSession: CheckoutSession,
+  paymentMethod: PaymentMethodDefinition,
+): PaymentFlowDefinition | undefined {
+  return checkoutSession.flows.find(
+    (paymentFlow) => paymentFlow.key === paymentMethod.flow,
+  );
+}
+
+/** Several methods of one picker tab as tiles; the picked one's flow shows below. */
 function MethodGroup({
   checkoutSession,
   groupMethods,
@@ -23,6 +34,10 @@ function MethodGroup({
     (paymentMethod) => paymentMethod.key === pickedKey,
   );
   const groupName = React.useId();
+  const pickedFlow =
+    pickedMethod === undefined
+      ? undefined
+      : findMethodFlow(checkoutSession, pickedMethod);
 
   return (
     <div className="grid gap-4">
@@ -58,20 +73,20 @@ function MethodGroup({
           ))}
         </div>
       )}
-      {pickedMethod !== undefined && (
-        <React.Fragment key={pickedMethod.key}>
-          {checkoutFlows[pickedMethod.flow].render({
-            checkoutSession,
-            paymentMethod: pickedMethod,
-            checkoutActions,
-          })}
-        </React.Fragment>
+      {pickedMethod !== undefined && pickedFlow !== undefined && (
+        <FlowRunner
+          key={pickedMethod.key}
+          checkoutSession={checkoutSession}
+          paymentMethod={pickedMethod}
+          paymentFlow={pickedFlow}
+          checkoutActions={checkoutActions}
+        />
       )}
     </div>
   );
 }
 
-/** A gateway with several methods: one tab per flow, e.g. Cards, Mobile banking (PY-12.3). */
+/** A gateway with several methods: one tab per flow picker tab, e.g. Cards, Mobile banking (PY-12.3, PY-12.6). */
 export function MethodPicker({
   checkoutSession,
   checkoutActions,
@@ -79,34 +94,41 @@ export function MethodPicker({
   checkoutSession: CheckoutSession;
   checkoutActions: CheckoutActions;
 }) {
-  const presentFlows = flowOrder.filter((methodFlow) =>
-    checkoutSession.methods.some(
-      (paymentMethod) => paymentMethod.flow === methodFlow,
-    ),
-  );
+  const methodsByTab = new Map<string, PaymentMethodDefinition[]>();
+  checkoutSession.methods.forEach((paymentMethod) => {
+    const pickerTab = findMethodFlow(
+      checkoutSession,
+      paymentMethod,
+    )?.picker_tab;
+    if (pickerTab !== undefined) {
+      methodsByTab.set(pickerTab, [
+        ...(methodsByTab.get(pickerTab) ?? []),
+        paymentMethod,
+      ]);
+    }
+  });
+  const pickerTabs = [...methodsByTab.keys()];
 
   return (
     <Tabs
-      defaultValue={presentFlows[0]}
+      defaultValue={pickerTabs[0]}
       className="gap-4"
       onValueChange={() => {
         checkoutActions.showError(null);
       }}
     >
       <TabsList className="w-full">
-        {presentFlows.map((methodFlow) => (
-          <TabsTrigger key={methodFlow} value={methodFlow}>
-            {checkoutFlows[methodFlow].groupLabel}
+        {pickerTabs.map((pickerTab) => (
+          <TabsTrigger key={pickerTab} value={pickerTab}>
+            {pickerTab}
           </TabsTrigger>
         ))}
       </TabsList>
-      {presentFlows.map((methodFlow) => (
-        <TabsContent key={methodFlow} value={methodFlow}>
+      {pickerTabs.map((pickerTab) => (
+        <TabsContent key={pickerTab} value={pickerTab}>
           <MethodGroup
             checkoutSession={checkoutSession}
-            groupMethods={checkoutSession.methods.filter(
-              (paymentMethod) => paymentMethod.flow === methodFlow,
-            )}
+            groupMethods={methodsByTab.get(pickerTab) ?? []}
             checkoutActions={checkoutActions}
           />
         </TabsContent>
