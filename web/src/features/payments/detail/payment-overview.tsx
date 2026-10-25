@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
@@ -93,14 +94,14 @@ export function PaymentOverview({
         )}
         {paymentDetail.checkout_url !== null && (
           <FactRow label="Checkout">
-            <a
-              href={paymentDetail.checkout_url}
-              target="_blank"
-              rel="noreferrer"
+            {/* Same tab: in mock mode a new tab would start with fresh demo data. */}
+            <Link
+              to="/pay/$sessionId"
+              params={{ sessionId: paymentDetail.id }}
               className="font-mono text-xs break-all underline underline-offset-4"
             >
               {paymentDetail.checkout_url}
-            </a>
+            </Link>
           </FactRow>
         )}
         <FactRow label="Created">

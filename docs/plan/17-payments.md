@@ -72,7 +72,15 @@ Card outcomes follow **Stripe's documented test cards** for every card-based pro
 | `4000 0025 0000 3155` | requires 3-D Secure (challenge on the checkout page) |
 | `4000 0000 0000 0259` | succeeds, then a dispute is opened (fraudulent) |
 
-Wallet providers (bKash, Nagad) use test wallet numbers with fixed outcomes (e.g. a "success" wallet, an "insufficient balance" wallet, a "wrong PIN" wallet) and a fixed test OTP/PIN shown on the checkout page. The full tables live in Settings > Payments and the docs.
+Wallet providers (bKash, Nagad) use test wallet numbers with fixed outcomes and a fixed test OTP and PIN shown on the checkout page:
+
+| Wallet number | Outcome |
+|---------------|---------|
+| `01770000001` | succeeds |
+| `01770000002` | declined: insufficient balance |
+| `01770000003` | wrong PIN (asked again) |
+
+The test OTP is `123456` and the test PIN is `12121`. A number that is not a test wallet is refused with "Use a test wallet". The full tables live in Settings > Payments and the docs.
 
 ## Events
 
@@ -117,6 +125,8 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
+| GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
+| POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
 
 CLI: `sendmock payments list|show|simulate|notify|test-cards`. MCP toolset `payments`: `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_create_checkout`, `sendmock_payment_wait`.

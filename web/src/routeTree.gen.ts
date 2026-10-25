@@ -18,6 +18,7 @@ import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
+import { Route as PaySessionIdRouteImport } from './routes/pay/$sessionId'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
 import { Route as WebhooksComposerRouteImport } from './routes/webhooks/composer'
@@ -75,6 +76,11 @@ const MailEmailIdRoute = MailEmailIdRouteImport.update({
   id: '/$emailId',
   path: '/$emailId',
   getParentRoute: () => MailRoute,
+} as any)
+const PaySessionIdRoute = PaySessionIdRouteImport.update({
+  id: '/pay/$sessionId',
+  path: '/pay/$sessionId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SmsConversationsRoute = SmsConversationsRouteImport.update({
   id: '/sms/_conversations',
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
+  '/pay/$sessionId': typeof PaySessionIdRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
+  '/pay/$sessionId': typeof PaySessionIdRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
+  '/pay/$sessionId': typeof PaySessionIdRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/settings'
     | '/mail/$emailId'
+    | '/pay/$sessionId'
     | '/sms'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/settings'
     | '/mail/$emailId'
+    | '/pay/$sessionId'
     | '/sms/verify'
     | '/webhooks/composer'
     | '/webhooks/deliveries'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/settings'
     | '/mail/$emailId'
+    | '/pay/$sessionId'
     | '/sms/_conversations'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   NumbersRoute: typeof NumbersRoute
   PaymentsRoute: typeof PaymentsRoute
   SettingsRoute: typeof SettingsRoute
+  PaySessionIdRoute: typeof PaySessionIdRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsVerifyRoute: typeof SmsVerifyRoute
   WebhooksComposerRoute: typeof WebhooksComposerRoute
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/mail/$emailId'
       preLoaderRoute: typeof MailEmailIdRouteImport
       parentRoute: typeof MailRoute
+    }
+    '/pay/$sessionId': {
+      id: '/pay/$sessionId'
+      path: '/pay/$sessionId'
+      fullPath: '/pay/$sessionId'
+      preLoaderRoute: typeof PaySessionIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/sms/_conversations': {
       id: '/sms/_conversations'
@@ -481,6 +501,7 @@ const rootRouteChildren: RootRouteChildren = {
   NumbersRoute: NumbersRoute,
   PaymentsRoute: PaymentsRoute,
   SettingsRoute: SettingsRoute,
+  PaySessionIdRoute: PaySessionIdRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsVerifyRoute: SmsVerifyRoute,
   WebhooksComposerRoute: WebhooksComposerRoute,
