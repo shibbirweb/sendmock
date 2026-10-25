@@ -12,6 +12,9 @@ async function findSeriousViolations(
 ): Promise<string[]> {
   let axeBuilder = new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    // Frames hold the email's own HTML, not app UI; it is sandboxed without
+    // scripts, so axe would wait on it forever.
+    .exclude("iframe")
     // Toasts come and go with live traffic; they are scanned on their own.
     .exclude("[data-sonner-toaster]");
   if (includeSelector !== undefined) {
@@ -112,6 +115,19 @@ const overlaySteps: [string, string, (page: Page) => Promise<void>][] = [
     "Notifications",
     (page) => page.getByRole("button", { name: /^Notifications/ }).click(),
   ],
+  [
+    "/",
+    "Help",
+    (page) => page.getByRole("button", { name: "Help", exact: true }).click(),
+  ],
+  [
+    "/mail",
+    "Email actions menu",
+    async (page) => {
+      await page.getByText("Welcome to Acme").first().click();
+      await page.getByRole("button", { name: "More actions" }).click();
+    },
+  ],
 ];
 
 test("UI-05.2 the main sheets, dialogs and popovers have no serious or critical axe issues", async ({
@@ -123,7 +139,7 @@ test("UI-05.2 the main sheets, dialogs and popovers have no serious or critical 
     await navigateInApp(page, screenPath);
     await openOverlay(page);
     const overlay = page
-      .locator('[role="dialog"], [data-slot="popover-content"]')
+      .locator('[role="dialog"], [data-slot="popover-content"], [role="menu"]')
       .last();
     await expect(overlay).toBeVisible();
     await page.waitForTimeout(300);

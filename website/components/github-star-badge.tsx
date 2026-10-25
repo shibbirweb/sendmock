@@ -1,10 +1,8 @@
 import { StarIcon } from "lucide-react";
 
-import { repositoryUrl } from "@/lib/community-links";
-
 /**
  * The star count, read once when the site is built. GitHub may be offline or
- * the repository private; then the link shows without a count.
+ * the repository private; then only "GitHub" shows.
  */
 async function fetchStarCount(): Promise<number | null> {
   try {
@@ -24,21 +22,12 @@ async function fetchStarCount(): Promise<number | null> {
   }
 }
 
-export async function GithubStarLink() {
+/** The header's GitHub link content: a star, "GitHub" and the star count. */
+export async function GithubStarBadge() {
   const starCount = await fetchStarCount();
 
   return (
-    <a
-      href={repositoryUrl}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={
-        starCount === null
-          ? "SendMock on GitHub"
-          : `SendMock on GitHub, ${starCount} stars`
-      }
-      className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm text-fd-muted-foreground hover:text-fd-foreground"
-    >
+    <span className="inline-flex items-center gap-1.5 text-sm">
       <StarIcon aria-hidden="true" className="size-3.5" />
       GitHub
       {starCount !== null && (
@@ -46,6 +35,6 @@ export async function GithubStarLink() {
           {Intl.NumberFormat("en", { notation: "compact" }).format(starCount)}
         </span>
       )}
-    </a>
+    </span>
   );
 }

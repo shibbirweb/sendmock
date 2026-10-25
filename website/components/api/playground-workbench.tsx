@@ -30,10 +30,10 @@ export function PlaygroundWorkbench({
     ) ?? operations[0];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <section
         aria-label="Request"
-        className="grid content-start gap-4 rounded-xl border p-4"
+        className="grid min-w-0 content-start gap-4 rounded-xl border p-4"
       >
         <div className="grid gap-1">
           <label htmlFor="operation-select" className="text-sm font-medium">
@@ -45,7 +45,7 @@ export function PlaygroundWorkbench({
             onChange={(changeEvent) =>
               setSelectedOperationId(changeEvent.target.value)
             }
-            className="rounded-md border bg-fd-background px-2 py-1.5 font-mono text-xs"
+            className="w-full min-w-0 rounded-md border bg-fd-background px-2 py-1.5 font-mono text-xs"
           >
             {tagNames.map((tagName) => (
               <optgroup key={tagName} label={tagName}>

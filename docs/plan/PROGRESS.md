@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), starting with W1 design review guards (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10 and W12 done and re-audited; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -169,7 +169,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Release workflows: `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
 - [ ] Versioned website builds (`/next/` from `develop`)
-- [ ] Repo `README.md`, licence, `CONTRIBUTING.md`
+- [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
 
 ### Phase 1: Email backend and first beta
 
@@ -409,3 +409,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-26 | Docs structure drafted (U3 W9): `docs/wiki/` is the source of the user docs (24 Markdown pages: introduction, getting started, install, connect your app with a page per language, email, SMS, Verify, webhooks, templates, variables, HTTP catcher, payments, CLI, MCP and AI, configuration and seed file, troubleshooting), each saying which phase its backend lands in, with screenshots from the mock app. The website syncs them in at build time. A docs test checks every page is published and crawls for broken links and anchors (part of WS-03.3, which also needs search). |
 | 2026-10-26 | API reference and playground built (U3 W10): `/api/` and a page per tag generated from the frozen spec, each operation with Try it in Demo mode, and `/playground/` with all 169 operations, a live event stream and scenario mode. Requests are answered in the browser by the demo's own mock API through a bridge page in a hidden iframe (the workspace-package idea was dropped: the two apps' `@/` aliases collide). Path parameters are filled from demo data; snippets in cURL, PHP, JavaScript, Python, Go, Java, Rust, Ruby and C# follow the form. The capture URL no longer declares a body for GET and DELETE. WS-04.1 and WS-04.3 have tests; WS-04.2 has its snippet tests, and running the snippets against a real instance waits for the backend. |
 | 2026-10-26 | Community links done (U3 W12): a Help menu in the header and a Help and feedback card on Settings > About link to the docs, keyboard shortcuts, what's new, Report an issue and Request a feature (GitHub issue forms pre-filled with version, channel, OS and browser only), private security reporting and the repository. `.github/` has issue forms for bugs, features, providers and docs, a `config.yml` with blank issues off, a pull request template, `SECURITY.md`, `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, validated in CI. The website header shows the GitHub star count and a footer carries the same links. Below laptop width the header search is an icon so the header fits at 768 px. UI-10.1 and UI-10.2 have tests. |
+| 2026-10-26 | U3 re-audit ([18](18-phase-u3.md#re-audit-before-sign-off-2026-10-26)): every gate criterion is tested except the owner's review sign-off (UI-07.3); WS-02.3 now has a test over the Lighthouse CI reports. Fixed what the audit found: modal dropdown menus hid the page from screen readers (now non-modal, the Insert menu inserts on select), the notification popover had no name, axe scans hung on the sandboxed email preview, and on the website light muted text failed AA contrast, header items broke list semantics and the playground overflowed at 360 px. The website now has an axe and phone-width test for every kind of page. Left for the owner: W11 feedback, the review table sign-off and the sign-off tick. |

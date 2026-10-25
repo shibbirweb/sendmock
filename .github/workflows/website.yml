@@ -68,6 +68,10 @@ jobs:
         working-directory: website
         run: bunx --bun @lhci/cli@0.15.1 autorun
 
+      - name: Lighthouse scores test (names WS-02.3)
+        working-directory: website
+        run: bun run test:lighthouse
+
       - name: Build website with the demo at /demo/
         env:
           PAGES_BASE_PATH: /${{ github.event.repository.name }}

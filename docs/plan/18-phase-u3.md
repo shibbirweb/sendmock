@@ -195,6 +195,18 @@ So people can find the project, give feedback and report problems from wherever 
 - Tests: an end-to-end test checks the Help menu links (targets and pre-filled version); the YAML templates are validated in CI.
 - **As built:** the link builders are `web/src/lib/community/community-links.ts` (unit tested); the issue forms' `version`, `channel`, `os` and `browser` are inputs, since GitHub pre-fills inputs from the query string but not dropdowns. "What's new" opens the GitHub releases until `CHANGELOG.md` and the `/changelog/` page land in Phase 0. The community files live in `.github/` (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, the pull request template), and `bun run test:repository` (`web/tests/repository/`) validates the forms in CI. The website's star count is read once at build time and left out when GitHub does not answer. Adding the Help icon made the header too wide at 768 px next to the sidebar; below laptop width the search button is now an icon.
 
+## Re-audit before sign-off (2026-10-26)
+
+After W1 to W10 and W12, U3 was audited again across the whole app and site.
+
+- **Acceptance:** every criterion of the gate features has a test except UI-07.3, the owner's sign-off of the review table (W11). WS-02.3 is now named by a test that reads the Lighthouse CI reports (`website/lighthouse/`).
+- **Found and fixed:**
+  - All ten dropdown menus were modal, which hides the rest of the page from screen readers while it stays focusable (axe `aria-hidden-focus`, serious). Menus are now non-modal by default; the template Insert menu inserts on select instead of relying on modal focus timing.
+  - The notification popover (a dialog) had no name; it is named by its heading.
+  - The axe scans hung on the email preview, a sandboxed iframe without scripts; scans now exclude iframes, which hold the email's own HTML. The Help and email actions menus joined the overlay scans.
+  - Website: light-theme muted text was 4.3:1 on Fumadocs' background (a darker token fixes it on every page); the header's custom nav items broke list semantics (they are link items now); the playground scrolled sideways at 360 px. A new website test scans the landing page, docs, API reference and playground with axe in both themes and checks them at 360 px.
+- **Left for the owner:** the W11 feedback round, signing off the review table (UI-07.3), the sign-off tick, and, from U0, the required status checks in the `develop` and `main` rulesets.
+
 ## W11: Feedback round and sign-off (D3)
 
 - The preview URL (`/demo/` and the site) is shared; feedback is collected as GitHub issues with the `u3-feedback` label; each is fixed or recorded as a decision.

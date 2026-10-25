@@ -15,6 +15,13 @@
   --brand-to: #34d399;
 }
 
+/* Fumadocs' neutral muted text (#737373) is 4.3:1 on its light background;
+   this darker grey passes WCAG AA (4.5:1) there and on the card and secondary
+   surfaces. Dark mode keeps Fumadocs' value. */
+:root:not(.dark) {
+  --color-fd-muted-foreground: #5f5f5f;
+}
+
 @theme inline {
   --animate-shiny-text: shiny-text 8s infinite;
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
