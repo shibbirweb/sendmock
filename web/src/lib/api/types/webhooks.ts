@@ -89,6 +89,39 @@ export type WebhookRule = {
   created_by: CreatedBy;
 };
 
+/** Body of POST and PATCH /api/v1/webhooks/rules. */
+export type WebhookRuleInput = Pick<
+  WebhookRule,
+  "name" | "endpoint_id" | "events" | "filter" | "is_enabled"
+>;
+
+/** Body of POST /api/v1/webhooks/rules/{ruleId}/move. */
+export type WebhookRuleMove = { direction: "up" | "down" };
+
+/** Body of POST /api/v1/webhooks/rules/preview (WH-02.3). */
+export type RulePreviewRequest = {
+  events: AppEventType[];
+  filter: RuleFilter | null;
+};
+
+export type RulePreviewItem = {
+  message_kind: "email" | "sms";
+  message_id: Ulid;
+  /** Subject, or the SMS body. */
+  title: string;
+  /** Sender address, or "+1555... to +1415...". */
+  detail: string;
+  created_at: IsoTimestamp;
+  is_match: boolean;
+};
+
+export type RulePreviewResult = {
+  checked_count: number;
+  match_count: number;
+  /** Newest first. */
+  items: RulePreviewItem[];
+};
+
 export type DeliveryTrigger = "auto" | "manual" | "replay";
 export type DeliveryStatus =
   | "pending"

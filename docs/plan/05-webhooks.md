@@ -108,8 +108,8 @@ A rule links events to an endpoint with an optional filter:
   "events": ["email.received"],
   "filter": {
     "all": [
-      { "field": "to", "op": "matches", "value": "*@support.local" },
-      { "field": "subject", "op": "contains", "value": "Ticket" }
+      { "field": "to", "operator": "matches", "value": "*@support.local" },
+      { "field": "subject", "operator": "contains", "value": "Ticket" }
     ]
   }
 }
@@ -119,6 +119,8 @@ A rule links events to an endpoint with an optional filter:
 - Operators: `equals`, `contains`, `starts_with`, `matches` (glob), `regex`, `exists`.
 - Combinators: `all`, `any`, `not`.
 - The UI provides a visual rule builder plus a "test against recent messages" preview that shows which existing messages would match.
+- Matching: `equals`, `contains`, `starts_with` and `matches` ignore case; `regex` uses JavaScript-compatible syntax and is case-sensitive. A field with several values (`to`, `cc`, `tag`) matches when any value matches. `exists` is true when the field has a non-empty value. A field the event does not have never matches (and `exists` is false).
+- Rules fire in their list order; each matching enabled rule creates one delivery. `not` wraps one condition or one group; the builder offers one nested group level, and the API accepts deeper nesting.
 
 ## Manual mode
 
