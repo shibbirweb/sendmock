@@ -61,6 +61,8 @@ export const queryKeys = {
     templates: ["webhooks", "templates"] as const,
     template: (templateId: string) =>
       ["webhooks", "template", templateId] as const,
+    templateRevisions: (templateId: string) =>
+      ["webhooks", "template-revisions", templateId] as const,
     templatePreview: (
       templateId: string,
       renderRequest: TemplateRenderRequest,

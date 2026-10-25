@@ -6,7 +6,6 @@ import type {
   SavedDeliveryInput,
   SavedDeliveryRename,
   SavedDeliverySendRequest,
-  WebhookTemplateSummary,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
@@ -16,7 +15,7 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
-import { buildCustomTemplateId } from "@/mocks/webhooks/custom-template-id";
+import { createCustomTemplate } from "@/mocks/webhooks/template-store";
 import {
   buildSavedSendDelivery,
   signatureHeaderPrefix,
@@ -153,35 +152,30 @@ export const webhookSavedHandlers = [
         return createErrorResponse(400, "validation_failed", "Enter a name");
       }
 
-      const customTemplate: WebhookTemplateSummary = {
-        id: buildCustomTemplateId(mockDatabase, name.trim()),
-        name: name.trim(),
-        service: "Custom",
-        category: "custom",
-        source: "custom",
-        events:
-          savedDelivery.event_type === null ? [] : [savedDelivery.event_type],
-        description: `Made from the saved delivery "${savedDelivery.name}".`,
-        required_variables: [],
-        revision: 1,
-        is_modified: false,
-      };
-      mockDatabase.webhookTemplates.push(customTemplate);
-      mockDatabase.customTemplateDefinitions.set(customTemplate.id, {
-        method: savedDelivery.request.method,
-        content_type:
-          savedDelivery.request.headers["content-type"] ?? "application/json",
-        header_templates: Object.fromEntries(
-          Object.entries(savedDelivery.request.headers).filter(
-            ([headerName]) =>
-              headerName !== "content-type" &&
-              !headerName.startsWith(signatureHeaderPrefix),
+      const customTemplate = createCustomTemplate(
+        {
+          name: name.trim(),
+          description: `Made from the saved delivery "${savedDelivery.name}".`,
+          events:
+            savedDelivery.event_type === null ? [] : [savedDelivery.event_type],
+          required_variables: [],
+        },
+        {
+          method: savedDelivery.request.method,
+          content_type:
+            savedDelivery.request.headers["content-type"] ?? "application/json",
+          header_templates: Object.fromEntries(
+            Object.entries(savedDelivery.request.headers).filter(
+              ([headerName]) =>
+                headerName !== "content-type" &&
+                !headerName.startsWith(signatureHeaderPrefix),
+            ),
           ),
-        ),
-        body_template: savedDelivery.request.body,
-        doc_url: null,
-        verified_on: null,
-      });
+          body_template: savedDelivery.request.body,
+          doc_url: null,
+          verified_on: null,
+        },
+      );
 
       return HttpResponse.json(customTemplate, { status: 201 });
     },

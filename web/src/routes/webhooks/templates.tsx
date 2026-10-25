@@ -10,6 +10,8 @@ export type TemplatesSearchParams = {
   event?: string;
   /** ID of the template whose detail is open. */
   template?: string;
+  /** Open that template straight in the editor (after New template). */
+  edit?: boolean;
 };
 
 const templateCategories: TemplateCategory[] = [
@@ -39,6 +41,10 @@ export const Route = createFileRoute("/webhooks/templates")({
     query: readOptionalText(searchParams.query),
     event: readOptionalText(searchParams.event),
     template: readOptionalText(searchParams.template),
+    edit:
+      searchParams.edit === true || searchParams.edit === "true"
+        ? true
+        : undefined,
   }),
   component: TemplatesPage,
 });

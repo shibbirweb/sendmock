@@ -16,6 +16,7 @@ import type {
   VirtualNumber,
   WebhookDelivery,
   WebhookRule,
+  TemplateRevision,
   WebhookTemplateSummary,
   WebhookVariable,
 } from "@/lib/api/types";
@@ -59,6 +60,7 @@ import {
   buildWebhookRuleFixtures,
   linkDeliverySubjects,
 } from "@/mocks/fixtures/webhook-fixtures";
+import { buildTemplateRevisionFixtures } from "@/mocks/fixtures/template-revision-fixtures";
 import {
   readTemplateDefinition,
   type TemplateDefinition,
@@ -88,6 +90,8 @@ export type MockDatabase = {
   webhookTemplates: WebhookTemplateSummary[];
   /** Request shapes of custom templates; built-in ones come from the fixtures. */
   customTemplateDefinitions: Map<string, TemplateDefinition>;
+  /** Saved versions of custom and edited built-in templates, newest first. */
+  templateRevisions: Map<string, TemplateRevision[]>;
   webhookVariables: WebhookVariable[];
   savedDeliveries: SavedDelivery[];
   httpBins: HttpBin[];
@@ -124,6 +128,7 @@ function buildConfiguration() {
     webhookRules: buildWebhookRuleFixtures(webhookEndpoints),
     webhookTemplates: buildWebhookTemplateFixtures(),
     customTemplateDefinitions: new Map(),
+    templateRevisions: buildTemplateRevisionFixtures(),
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,

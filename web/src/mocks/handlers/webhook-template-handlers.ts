@@ -2,13 +2,9 @@ import { http, HttpResponse } from "msw";
 
 import type {
   TemplateCloneRequest,
-  TemplateDraft,
   TemplateRenderRequest,
   TemplateRenderResult,
-  WebhookTemplateDetail,
-  WebhookTemplateSummary,
 } from "@/lib/api/types";
-import { validateTemplateDraft } from "@/lib/webhooks/validate-template-draft";
 import { findTemplateDefinition, mockDatabase } from "@/mocks/db/mock-database";
 import {
   applyMockConditions,
@@ -16,31 +12,14 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
-import { buildCustomTemplateId } from "@/mocks/webhooks/custom-template-id";
 import { exportTemplateToml } from "@/mocks/webhooks/export-template-toml";
 import { renderTemplateDefinition } from "@/mocks/webhooks/render-template-definition";
-
-function findTemplate(templateId: unknown) {
-  return mockDatabase.webhookTemplates.find(
-    (webhookTemplate) => webhookTemplate.id === templateId,
-  );
-}
-
-function countUsingEndpoints(templateId: string): number {
-  return mockDatabase.webhookEndpoints.filter(
-    (endpointRecord) => endpointRecord.template_id === templateId,
-  ).length;
-}
-
-function buildTemplateDetail(
-  webhookTemplate: WebhookTemplateSummary,
-): WebhookTemplateDetail {
-  return {
-    ...webhookTemplate,
-    ...findTemplateDefinition(mockDatabase, webhookTemplate.id),
-    used_by_endpoint_count: countUsingEndpoints(webhookTemplate.id),
-  };
-}
+import {
+  buildTemplateDetail,
+  countUsingEndpoints,
+  createCustomTemplate,
+  findTemplate,
+} from "@/mocks/webhooks/template-store";
 
 /** Templates: list, detail, preview render, clone, export and delete (WH-08, WH-09). */
 export const webhookTemplateHandlers = [
@@ -84,89 +63,16 @@ export const webhookTemplateHandlers = [
         return createNotFoundResponse("Message");
       }
 
-      const renderedTemplate = renderTemplateDefinition(
-        renderRequest.draft ??
-          findTemplateDefinition(mockDatabase, webhookTemplate.id),
-        builtContext.templateContext,
-      );
       const renderResult: TemplateRenderResult = {
         rendered_against: builtContext.renderedAgainst,
-        ...renderedTemplate,
+        ...renderTemplateDefinition(
+          renderRequest.draft ??
+            findTemplateDefinition(mockDatabase, webhookTemplate.id),
+          builtContext.templateContext,
+        ),
       };
 
       return HttpResponse.json(renderResult);
-    },
-  ),
-
-  http.patch(
-    "*/api/v1/webhooks/templates/:templateId",
-    async ({ params, request }) => {
-      await applyMockConditions();
-      const webhookTemplate = findTemplate(params.templateId);
-      if (!webhookTemplate) {
-        return createNotFoundResponse("Template");
-      }
-      if (webhookTemplate.source === "file") {
-        return createErrorResponse(
-          409,
-          "read_only_template",
-          "File templates are read-only: edit the file, or clone the template.",
-        );
-      }
-
-      const templateDraft = (await request.json()) as TemplateDraft;
-      const shapeError = Object.values(
-        validateTemplateDraft(templateDraft),
-      ).find(Boolean);
-      const sampleContext = buildTemplateContext(
-        mockDatabase,
-        webhookTemplate,
-        {},
-      );
-      const renderErrors = renderTemplateDefinition(
-        templateDraft,
-        sampleContext?.templateContext ?? {},
-      ).errors;
-      const firstProblem = shapeError ?? renderErrors[0];
-      if (firstProblem !== undefined) {
-        return createErrorResponse(422, "template_invalid", firstProblem);
-      }
-
-      mockDatabase.customTemplateDefinitions.set(webhookTemplate.id, {
-        ...findTemplateDefinition(mockDatabase, webhookTemplate.id),
-        ...templateDraft,
-      });
-      webhookTemplate.revision += 1;
-      webhookTemplate.is_modified = webhookTemplate.source === "builtin";
-
-      return HttpResponse.json(buildTemplateDetail(webhookTemplate));
-    },
-  ),
-
-  http.post(
-    "*/api/v1/webhooks/templates/:templateId/reset",
-    async ({ params }) => {
-      await applyMockConditions();
-      const webhookTemplate = findTemplate(params.templateId);
-      if (!webhookTemplate) {
-        return createNotFoundResponse("Template");
-      }
-      if (
-        webhookTemplate.source !== "builtin" ||
-        !webhookTemplate.is_modified
-      ) {
-        return createErrorResponse(
-          409,
-          "not_modified",
-          "Only an edited built-in template can be reset.",
-        );
-      }
-
-      mockDatabase.customTemplateDefinitions.delete(webhookTemplate.id);
-      webhookTemplate.is_modified = false;
-      webhookTemplate.revision = 1;
-
-      return HttpResponse.json(buildTemplateDetail(webhookTemplate));
     },
   ),
 
@@ -184,18 +90,14 @@ export const webhookTemplateHandlers = [
         return createErrorResponse(400, "validation_failed", "Enter a name");
       }
 
-      const clonedTemplate: WebhookTemplateSummary = {
-        ...sourceTemplate,
-        id: buildCustomTemplateId(mockDatabase, name.trim()),
-        name: name.trim(),
-        category: "custom",
-        source: "custom",
-        description: `Copy of ${sourceTemplate.name}.`,
-        revision: 1,
-      };
-      mockDatabase.webhookTemplates.push(clonedTemplate);
-      mockDatabase.customTemplateDefinitions.set(
-        clonedTemplate.id,
+      const clonedTemplate = createCustomTemplate(
+        {
+          name: name.trim(),
+          service: sourceTemplate.service,
+          description: `Copy of ${sourceTemplate.name}.`,
+          events: sourceTemplate.events,
+          required_variables: sourceTemplate.required_variables,
+        },
         findTemplateDefinition(mockDatabase, sourceTemplate.id),
       );
 
@@ -257,6 +159,7 @@ export const webhookTemplateHandlers = [
       if (usingEndpointCount === 0) {
         mockDatabase.customTemplateDefinitions.delete(webhookTemplate.id);
       }
+      mockDatabase.templateRevisions.delete(webhookTemplate.id);
       mockDatabase.webhookTemplates = mockDatabase.webhookTemplates.filter(
         (existingTemplate) => existingTemplate.id !== webhookTemplate.id,
       );

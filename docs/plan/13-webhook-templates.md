@@ -143,7 +143,9 @@ Schema notes:
 - **New blank template** with the same editor as the endpoint request editor (URL, params, headers, body Fields/Raw, signing).
 - **Clone a built-in** and edit (e.g. "SendGrid Inbound Parse, but with our extra `X-Tenant` header").
 - **Save as template** from any endpoint or from the manual composer.
-- **Import** a template file (TOML or JSON) or paste JSON.
+- **Import** a template file (TOML or JSON, the export format) or paste its text. The import is checked like a save; when a template with the same id exists, choose **Replace** (custom templates; a revision is kept) or **Import as copy** (a new id). A file that `edits_builtin` applies as an edit of that built-in.
+- **New template** (Templates screen): a name, then the editor opens on a native JSON body. Custom templates also edit their name, description, events and required variables; built-in templates keep their own.
+- **Save as template** (endpoint sheet, Template tab): the endpoint's template with its extra headers and body fields folded in, as a new custom template.
 
 ### Using
 
@@ -161,7 +163,7 @@ Schema notes:
 
 ### Versioning and safety
 
-- Custom templates keep a simple revision history (last 20 versions) with diff and restore.
+- Custom templates and edited built-ins keep a simple revision history (last 20 versions) with diff and restore. The detail's **History** lists each revision (number, when saved), shows a line diff of its headers and body against the current version, and **Restore** saves it again as a new revision. Reset to default removes an edited built-in together with its history.
 - Saving validates the template by rendering it against its sample (or a built-in fixture for each declared event). Invalid templates cannot be saved, with errors shown inline.
 - Deleting a template used by endpoints requires choosing: detach those endpoints (copy) or cancel.
 

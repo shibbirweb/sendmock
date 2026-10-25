@@ -77,6 +77,8 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.6 Fields mode always produces valid JSON, form or multipart bodies.
 - [ ] WH-07.7 Templates cannot read files, network or environment, and a runaway template is stopped by the fuel/time limit.
 - [ ] WH-07.8 The live preview matches what is actually sent for the same message.
+- [ ] WH-07.9 The reference panel lists every context field for the chosen events, the variables, functions and filters with type, description and example, and clicking one inserts it at the cursor.
+- [ ] WH-07.10 Typing inside `{{ }}` suggests matching keys, the children after a dot, filters after `|` and functions with their signature; the keyboard picks and inserts one.
 
 ## WH-08 Built-in payload templates
 
@@ -100,6 +102,7 @@ UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/expo
 - [ ] WH-09.6 Deleting a template in use requires choosing detach or cancel.
 - [ ] WH-09.7 Built-in and custom templates can be edited (method, content type, header and body templates) with the preview following the draft; errors block saving, undefined variables are warnings, and file templates stay read-only.
 - [ ] WH-09.8 An edited built-in shows a Modified badge and is used by every endpoint that links it; Reset to default asks first and restores the shipped template.
+- [ ] WH-09.9 A new blank template can be created, and a custom template's name, description, events and required variables can be edited; built-in templates keep their own.
 
 ## WH-10 Saved deliveries
 

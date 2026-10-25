@@ -13,6 +13,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { templateSourceLabels } from "@/features/webhooks/templates/template-card";
 import { TemplateActions } from "@/features/webhooks/templates/detail/template-actions";
+import { TemplateHistory } from "@/features/webhooks/templates/detail/template-history";
 import { TemplateFacts } from "@/features/webhooks/templates/detail/template-facts";
 import { TemplatePreview } from "@/features/webhooks/templates/detail/template-preview";
 import { useTemplatePreview } from "@/features/webhooks/templates/detail/use-template-preview";
@@ -20,7 +21,13 @@ import { TemplateEditForm } from "@/features/webhooks/templates/edit/template-ed
 import { useWebhookTemplate } from "@/lib/api/hooks/use-webhook-template-queries";
 import type { WebhookTemplateDetail } from "@/lib/api/types";
 
-function TemplateDrawerContent({ templateId }: { templateId: string }) {
+function TemplateDrawerContent({
+  templateId,
+  shouldStartEditing,
+}: {
+  templateId: string;
+  shouldStartEditing: boolean;
+}) {
   const templateQuery = useWebhookTemplate(templateId);
 
   if (templateQuery.isPending) {
@@ -43,15 +50,22 @@ function TemplateDrawerContent({ templateId }: { templateId: string }) {
     );
   }
 
-  return <TemplateDetailBody templateDetail={templateQuery.data} />;
+  return (
+    <TemplateDetailBody
+      templateDetail={templateQuery.data}
+      shouldStartEditing={shouldStartEditing}
+    />
+  );
 }
 
 function TemplateDetailBody({
   templateDetail,
+  shouldStartEditing,
 }: {
   templateDetail: WebhookTemplateDetail;
+  shouldStartEditing: boolean;
 }) {
-  const [isEditing, setEditing] = React.useState(false);
+  const [isEditing, setEditing] = React.useState(shouldStartEditing);
   const templatePreview = useTemplatePreview(templateDetail);
 
   return (
@@ -85,6 +99,7 @@ function TemplateDetailBody({
             }}
           />
           <TemplateFacts templateDetail={templateDetail} />
+          <TemplateHistory templateDetail={templateDetail} />
           <Separator />
           <TemplatePreview
             templatePreview={templatePreview}
@@ -98,9 +113,8 @@ function TemplateDetailBody({
 
 /** One template's detail and preview, open while `?template=` is set (WH-08.4). */
 export function TemplateDrawer() {
-  const { template: openTemplateId } = useSearch({
-    from: "/webhooks/templates",
-  });
+  const { template: openTemplateId, edit: shouldStartEditing = false } =
+    useSearch({ from: "/webhooks/templates" });
   const navigate = useNavigate({ from: "/webhooks/templates" });
 
   return (
@@ -112,6 +126,7 @@ export function TemplateDrawer() {
             search: (previousSearch) => ({
               ...previousSearch,
               template: undefined,
+              edit: undefined,
             }),
           });
         }
@@ -119,7 +134,11 @@ export function TemplateDrawer() {
     >
       <SheetContent className="w-full gap-0 overflow-y-auto pt-4 data-[side=right]:sm:max-w-2xl">
         {openTemplateId !== undefined && (
-          <TemplateDrawerContent templateId={openTemplateId} />
+          <TemplateDrawerContent
+            key={openTemplateId}
+            templateId={openTemplateId}
+            shouldStartEditing={shouldStartEditing}
+          />
         )}
       </SheetContent>
     </Sheet>

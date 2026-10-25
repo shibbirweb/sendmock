@@ -132,6 +132,16 @@ X-Signature: {{ (timestamp() ~ "." ~ body) | hmac_sha256(vars.signing_secret) }}
 
 `body` is available in header and query templates and holds the already rendered body, so the signature covers exactly what is sent.
 
+## Template reference and suggestions
+
+So nobody has to guess what `event.created_at` or `data.to[0].address` hold, every template field (template editor body and headers, endpoint request editor, manual composer) offers two aids, built from one source:
+
+- **Reference panel** beside the field, like a GraphQL explorer: a searchable tree of everything a template can read, grouped as `event`, `data` (its shape follows the chosen events: email fields for `email.*`, SMS fields for `sms.*`), `vars` (global and endpoint variables with their kind; secrets masked), `endpoint`, `delivery`, `rule`, `sendmock`, `request_id`, then **functions** and **filters**. Each entry shows its path, type, a one-line description and an example value taken from the preview message. Clicking an entry inserts `{{ path }}` at the cursor (or `| filter`, or `function()`).
+- **Suggestions while typing**, like n8n or GraphQL tools: inside `{{ }}` a popup lists the keys that match what is typed; after a dot it lists the children (`data.` shows `from`, `to`, `subject`, ...); after `|` it lists filters; function names show their signature. Each suggestion carries its type, description and example. Arrow keys move, Enter or Tab inserts, Esc closes.
+- **Source:** `GET /api/v1/webhooks/template-reference?events=...` returns the context fields (path, type, description, example, children), functions (name, signature, description, example) and filters. The same data feeds the template docs page, so the panel and the docs never disagree.
+
+The template editor gets both in Phase U2; the request editor (CodeMirror) reuses them.
+
 ## Body modes
 
 The endpoint editor and manual composer offer:

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { TemplateMetadataFields } from "@/features/webhooks/templates/edit/template-metadata-fields";
 import { TemplatePreview } from "@/features/webhooks/templates/detail/template-preview";
 import { useTemplatePreview } from "@/features/webhooks/templates/detail/use-template-preview";
 import {
@@ -57,6 +58,13 @@ export function TemplateEditForm({
           Your edit replaces this built-in template for every endpoint that uses
           it. Reset to default brings back the shipped version at any time.
         </p>
+      )}
+      {templateDetail.source === "custom" && (
+        <TemplateMetadataFields
+          formValues={formValues}
+          fieldErrors={fieldErrors}
+          onChange={updateFormValues}
+        />
       )}
       <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3">
         <FormField
