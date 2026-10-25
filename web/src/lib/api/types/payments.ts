@@ -3,8 +3,8 @@ import type { AppEventType } from "@/lib/api/types/events";
 import type { PaymentFlowDefinition } from "@/lib/api/types/payment-flows";
 import type { DeliveryStatus } from "@/lib/api/types/webhooks";
 
-export type PaymentProvider =
-  "stripe" | "paypal" | "sslcommerz" | "bkash" | "native";
+/** A gateway key: a built-in one (stripe, paypal, sslcommerz, bkash, native) or a custom one. */
+export type PaymentProvider = string;
 
 export type PaymentStatus =
   | "requires_payment"
@@ -159,6 +159,8 @@ export type PaymentMethodInput = Pick<
 export type PaymentSummary = {
   id: Ulid;
   provider: PaymentProvider;
+  /** The gateway's name, e.g. "SSLCommerz". */
+  provider_name: string;
   /** The provider's main id: session, intent, order or transaction. */
   provider_reference: string;
   amount_minor: number;
@@ -233,6 +235,7 @@ export type CheckoutSession = {
   session_id: Ulid;
   payment_id: Ulid;
   provider: PaymentProvider;
+  provider_name: string;
   merchant_name: string;
   amount_minor: number;
   currency: string;

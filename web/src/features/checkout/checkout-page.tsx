@@ -10,7 +10,6 @@ import { CheckoutMethodPanel } from "@/features/checkout/flows/checkout-method-p
 import { useCheckoutActions } from "@/features/checkout/use-checkout-actions";
 import { useCheckoutSession } from "@/lib/api/hooks/use-payment-queries";
 import type { CheckoutSession } from "@/lib/api/types";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 import { readReadableForeground } from "@/lib/payments/readable-foreground";
 
 function CheckoutSteps({
@@ -90,7 +89,7 @@ export function CheckoutPage({ sessionId }: { sessionId: string }) {
                   aria-hidden="true"
                   className="size-2.5 rounded-full bg-checkout-accent"
                 />
-                {paymentProviderLabels[checkoutSession.provider]} test checkout
+                {checkoutSession.provider_name} test checkout
               </p>
               <CheckoutOrderSummary checkoutSession={checkoutSession} />
             </div>

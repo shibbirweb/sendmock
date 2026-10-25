@@ -5,11 +5,14 @@ import type {
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import {
   buildBuiltinPaymentMethods,
-  builtinGatewayMethodKeys,
   type PaymentMethodRecord,
 } from "@/mocks/fixtures/payment-method-fixtures";
+import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
 
-type MethodDatabase = Pick<MockDatabase, "paymentMethods" | "payments">;
+type MethodDatabase = Pick<
+  MockDatabase,
+  "paymentMethods" | "payments" | "paymentGateways"
+>;
 
 const editableFields = [
   "name",
@@ -53,9 +56,11 @@ export function presentPaymentMethod(
   return {
     ...methodRecord,
     is_modified: isModified(methodRecord),
-    gateway_keys: Object.entries(builtinGatewayMethodKeys)
-      .filter(([, methodKeys]) => methodKeys.includes(methodRecord.key))
-      .map(([gatewayKey]) => gatewayKey),
+    gateway_keys: mockDatabase.paymentGateways
+      .filter((gatewayRecord) =>
+        gatewayRecord.method_keys.includes(methodRecord.key),
+      )
+      .map((gatewayRecord) => gatewayRecord.key),
     payment_count: mockDatabase.payments.filter(
       (payment) => payment.method_key === methodRecord.key,
     ).length,
@@ -81,9 +86,7 @@ export function listGatewayMethods(
   gatewayKey: string,
 ): PaymentMethodDefinition[] {
   const methodKeys =
-    builtinGatewayMethodKeys[
-      gatewayKey as keyof typeof builtinGatewayMethodKeys
-    ] ?? [];
+    findGatewayRecord(mockDatabase, gatewayKey)?.method_keys ?? [];
 
   return methodKeys
     .map((methodKey) =>

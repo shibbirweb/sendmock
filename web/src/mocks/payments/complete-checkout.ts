@@ -24,7 +24,10 @@ import {
 } from "@/mocks/payments/simulate-payment";
 
 type CheckoutDatabase = PaymentDatabase &
-  Pick<MockDatabase, "paymentMethods" | "paymentFlows" | "payments">;
+  Pick<
+    MockDatabase,
+    "paymentMethods" | "paymentFlows" | "payments" | "paymentGateways"
+  >;
 
 const actionsByState: Partial<Record<CheckoutState, CheckoutAction[]>> = {
   open: ["pay", "decline", "cancel", "delay", "require_three_ds"],
@@ -184,7 +187,7 @@ const cancelStep: CheckoutStep = (
   const createdAt = new Date(nowMs).toISOString();
   paymentDetail.status = "canceled";
   addTimeline(paymentDetail, "canceled", "Canceled by the customer", createdAt);
-  finishCheckout(paymentDetail, "cancel", createdAt);
+  finishCheckout(mockDatabase, paymentDetail, "cancel", createdAt);
   firePaymentEvents(mockDatabase, paymentDetail, ["payment.canceled"], nowMs);
 
   return { isApplied: true };

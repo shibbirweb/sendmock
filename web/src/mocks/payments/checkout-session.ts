@@ -4,7 +4,7 @@ import type {
   PaymentDetail,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
-import { builtinGatewayAccents } from "@/mocks/fixtures/payment-method-fixtures";
+import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
 import { presentPaymentFlow } from "@/mocks/payments/payment-flow-record";
 import { listGatewayMethods } from "@/mocks/payments/payment-method-record";
 
@@ -12,7 +12,7 @@ const merchantName = "Acme Shop";
 
 type SessionDatabase = Pick<
   MockDatabase,
-  "paymentMethods" | "paymentFlows" | "payments"
+  "paymentMethods" | "paymentFlows" | "payments" | "paymentGateways"
 >;
 
 /** Where the checkout stands for the customer, from the payment (PY-03.3). */
@@ -38,6 +38,10 @@ export function toCheckoutSession(
   mockDatabase: SessionDatabase,
   paymentDetail: PaymentDetail,
 ): CheckoutSession {
+  const paymentGateway = findGatewayRecord(
+    mockDatabase,
+    paymentDetail.provider,
+  );
   const gatewayMethods = listGatewayMethods(
     mockDatabase,
     paymentDetail.provider,
@@ -47,12 +51,13 @@ export function toCheckoutSession(
     session_id: paymentDetail.id,
     payment_id: paymentDetail.id,
     provider: paymentDetail.provider,
+    provider_name: paymentGateway?.name ?? paymentDetail.provider,
     merchant_name: merchantName,
     amount_minor: paymentDetail.amount_minor,
     currency: paymentDetail.currency,
     line_items: paymentDetail.line_items,
     customer_email: paymentDetail.customer_email,
-    accent: builtinGatewayAccents[paymentDetail.provider],
+    accent: paymentGateway?.accent ?? "#0d9488",
     methods: gatewayMethods,
     flows: mockDatabase.paymentFlows
       .filter((flowRecord) =>

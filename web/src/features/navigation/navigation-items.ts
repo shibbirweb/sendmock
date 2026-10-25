@@ -18,6 +18,7 @@ import {
   ShieldCheckIcon,
   SquarePenIcon,
   VariableIcon,
+  LandmarkIcon,
   WalletCardsIcon,
   WorkflowIcon,
   WebhookIcon,
@@ -86,6 +87,7 @@ export const navigationItems: NavigationItem[] = [
     shortcutKey: "p",
     children: [
       { title: "All payments", path: "/payments", icon: ReceiptIcon },
+      { title: "Gateways", path: "/payments/gateways", icon: LandmarkIcon },
       { title: "Methods", path: "/payments/methods", icon: WalletCardsIcon },
       { title: "Flows", path: "/payments/flows", icon: WorkflowIcon },
     ],

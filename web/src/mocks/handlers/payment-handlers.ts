@@ -12,7 +12,8 @@ import {
   createNotFoundResponse,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
-import { isPaymentEventType } from "@/mocks/payments/provider-notifications";
+import { isPaymentEventType } from "@/mocks/payments/payment-event-types";
+import { readGatewayName } from "@/mocks/payments/payment-gateway-record";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
 import { simulatePayment } from "@/mocks/payments/simulate-payment";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
@@ -21,10 +22,19 @@ function findPayment(paymentId: unknown): PaymentDetail | undefined {
   return mockDatabase.payments.find((payment) => payment.id === paymentId);
 }
 
+/** A stored payment with its gateway's current name. */
+function presentPayment(paymentDetail: PaymentDetail): PaymentDetail {
+  return {
+    ...paymentDetail,
+    provider_name: readGatewayName(mockDatabase, paymentDetail.provider),
+  };
+}
+
 function toPaymentSummary(paymentDetail: PaymentDetail): PaymentSummary {
   return {
     id: paymentDetail.id,
     provider: paymentDetail.provider,
+    provider_name: readGatewayName(mockDatabase, paymentDetail.provider),
     provider_reference: paymentDetail.provider_reference,
     amount_minor: paymentDetail.amount_minor,
     currency: paymentDetail.currency,
@@ -73,7 +83,7 @@ export const paymentHandlers = [
 
     return paymentDetail === undefined
       ? createNotFoundResponse("Payment")
-      : HttpResponse.json(paymentDetail);
+      : HttpResponse.json(presentPayment(paymentDetail));
   }),
 
   http.post(
@@ -102,7 +112,7 @@ export const paymentHandlers = [
       }
       publishPaymentChange(paymentDetail);
 
-      return HttpResponse.json(paymentDetail);
+      return HttpResponse.json(presentPayment(paymentDetail));
     },
   ),
 
@@ -124,6 +134,6 @@ export const paymentHandlers = [
     recordPaymentNotification(mockDatabase, paymentDetail, lastEventType);
     publishPaymentChange(paymentDetail);
 
-    return HttpResponse.json(paymentDetail);
+    return HttpResponse.json(presentPayment(paymentDetail));
   }),
 ];

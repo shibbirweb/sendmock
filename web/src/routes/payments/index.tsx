@@ -19,7 +19,6 @@ const statusFilterValues = [
   "refunded",
   "disputed",
 ];
-const providerValues = ["stripe", "paypal", "sslcommerz", "bkash", "native"];
 
 function readString(searchValue: unknown): string | undefined {
   return typeof searchValue === "string" ? searchValue : undefined;
@@ -37,10 +36,9 @@ export const Route = createFileRoute("/payments/")({
         status !== undefined && statusFilterValues.includes(status)
           ? (status as PaymentsSearchParams["status"])
           : undefined,
-      provider:
-        provider !== undefined && providerValues.includes(provider)
-          ? (provider as PaymentProvider)
-          : undefined,
+      provider: /^[a-z][a-z0-9_]{1,31}$/.test(provider ?? "")
+        ? provider
+        : undefined,
       currency: readString(searchParams.currency),
       payment: readString(searchParams.payment),
     };

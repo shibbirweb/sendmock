@@ -6,7 +6,6 @@ import { PaymentStatusBadge } from "@/features/payments/payment-status-badge";
 import type { PaymentDetail, PaymentMethod } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format/format-values";
 import { formatMinorAmount } from "@/lib/payments/format-money";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 
 function describeMethod(paymentMethod: PaymentMethod | null): string {
   if (paymentMethod === null) {
@@ -56,9 +55,7 @@ export function PaymentOverview({
         <PaymentStatusBadge paymentSummary={paymentDetail} />
       </div>
       <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
-        <FactRow label="Provider">
-          {paymentProviderLabels[paymentDetail.provider]}
-        </FactRow>
+        <FactRow label="Provider">{paymentDetail.provider_name}</FactRow>
         {Object.entries(paymentDetail.provider_ids).map(([idName, idValue]) => (
           <FactRow key={idName} label={idName.replaceAll("_", " ")}>
             <span className="inline-flex items-center gap-1 font-mono text-xs">

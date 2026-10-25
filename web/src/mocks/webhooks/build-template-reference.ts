@@ -63,26 +63,48 @@ function buildField(
   fieldPath: string,
   fieldName: string,
   sampleValue: unknown,
+  fieldDescriptions: Record<string, string> = templateFieldDescriptions,
 ): TemplateReferenceField {
   const valueType = readValueType(sampleValue);
   let children: TemplateReferenceField[] = [];
   if (valueType === "object") {
     children = Object.entries(sampleValue as Record<string, unknown>).map(
       ([childName, childValue]) =>
-        buildField(`${fieldPath}.${childName}`, childName, childValue),
+        buildField(
+          `${fieldPath}.${childName}`,
+          childName,
+          childValue,
+          fieldDescriptions,
+        ),
     );
   } else if (valueType === "list" && (sampleValue as unknown[]).length > 0) {
     const firstItem = (sampleValue as unknown[])[0];
-    children = [buildField(`${fieldPath}[0]`, "[0]", firstItem)];
+    children = [
+      buildField(`${fieldPath}[0]`, "[0]", firstItem, fieldDescriptions),
+    ];
   }
 
   return {
     path: fieldPath,
     name: fieldName,
     value_type: valueType,
-    description: templateFieldDescriptions[toDescriptionKey(fieldPath)] ?? "",
+    description: fieldDescriptions[toDescriptionKey(fieldPath)] ?? "",
     example: toExample(sampleValue),
     children,
+  };
+}
+
+/** Reference fields for any template context, e.g. a payment gateway's (PY-12.4). */
+export function buildContextReference(
+  contextSample: Record<string, unknown>,
+  fieldDescriptions: Record<string, string>,
+): TemplateReference {
+  return {
+    fields: Object.entries(contextSample).map(([fieldName, sampleValue]) =>
+      buildField(fieldName, fieldName, sampleValue, fieldDescriptions),
+    ),
+    functions: templateFunctionCatalog,
+    filters: templateFilterCatalog,
   };
 }
 

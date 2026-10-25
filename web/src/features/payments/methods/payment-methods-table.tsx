@@ -14,19 +14,21 @@ import {
 import { countTestValues } from "@/features/payments/methods/method-labels";
 import type {
   PaymentFlowDefinition,
+  PaymentGatewayDefinition,
   PaymentMethodDefinition,
 } from "@/lib/api/types";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 
 /** Every payment method with its flow, gateways, test values and state (PY-12.1). */
 export function PaymentMethodsTable({
   paymentMethods,
   paymentFlows,
+  paymentGateways,
   onEdit,
   onToggle,
 }: {
   paymentMethods: PaymentMethodDefinition[];
   paymentFlows: PaymentFlowDefinition[];
+  paymentGateways: PaymentGatewayDefinition[];
   onEdit: (paymentMethod: PaymentMethodDefinition) => void;
   onToggle: (
     paymentMethod: PaymentMethodDefinition,
@@ -78,9 +80,10 @@ export function PaymentMethodsTable({
                   : paymentMethod.gateway_keys
                       .map(
                         (gatewayKey) =>
-                          paymentProviderLabels[
-                            gatewayKey as keyof typeof paymentProviderLabels
-                          ] ?? gatewayKey,
+                          paymentGateways.find(
+                            (paymentGateway) =>
+                              paymentGateway.key === gatewayKey,
+                          )?.name ?? gatewayKey,
                       )
                       .join(", ")}
               </TableCell>

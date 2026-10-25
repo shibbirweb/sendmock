@@ -2,6 +2,7 @@ import type {
   PaymentFlowStep,
   PaymentFlowStepUpdateRequest,
 } from "@/lib/api/types";
+import { moveListItem } from "@/lib/move-list-item";
 
 /**
  * One change to a flow's steps at a time (PY-12.6), the same for the Flows
@@ -32,15 +33,7 @@ export function moveFlowStep(
   stepIndex: number,
   position: number,
 ): PaymentFlowStep[] {
-  const movedStep = flowSteps[stepIndex];
-  if (movedStep === undefined) {
-    return flowSteps;
-  }
-  const remainingSteps = flowSteps.filter(
-    (_flowStep, candidateIndex) => candidateIndex !== stepIndex,
-  );
-
-  return addFlowStep(remainingSteps, movedStep, position);
+  return moveListItem(flowSteps, stepIndex, Math.trunc(position));
 }
 
 export function removeFlowStep(

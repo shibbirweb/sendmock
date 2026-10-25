@@ -1,39 +1,59 @@
 import { faker } from "@faker-js/faker/locale/en";
 
-import type { PaymentDetail, WebhookDelivery } from "@/lib/api/types";
+import type {
+  PaymentDetail,
+  PaymentEventType,
+  WebhookDelivery,
+} from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
-import { paymentEndpointName } from "@/mocks/fixtures/webhook-fixtures";
-import {
-  buildProviderNotification,
-  type PaymentEventType,
-} from "@/mocks/payments/provider-notifications";
+import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
+import { renderGatewayNotification } from "@/mocks/payments/render-gateway-templates";
 import { buildSignatureHeaders } from "@/mocks/webhooks/build-signature-headers";
 
 /**
- * Sends a payment's notification to its provider's notification endpoint
- * as a delivery in the webhook log, and notes it on the payment (PY-08.3).
+ * Sends a payment's notification, rendered from its gateway's templates, to
+ * the gateway's notification endpoint as a delivery in the webhook log, and
+ * notes it on the payment (PY-08.3, PY-12.3). Nothing is sent when the
+ * gateway names no event for it or has no endpoint.
  */
 export function recordPaymentNotification(
-  mockDatabase: Pick<MockDatabase, "webhookEndpoints" | "webhookDeliveries">,
+  mockDatabase: Pick<
+    MockDatabase,
+    "webhookEndpoints" | "webhookDeliveries" | "paymentGateways"
+  >,
   paymentDetail: PaymentDetail,
   eventType: PaymentEventType,
   createdAtMs: number = Date.now(),
 ): WebhookDelivery | null {
-  const endpointRecord = mockDatabase.webhookEndpoints.find(
-    (webhookEndpoint) => webhookEndpoint.name === paymentEndpointName,
+  const paymentGateway = findGatewayRecord(
+    mockDatabase,
+    paymentDetail.provider,
   );
-  if (endpointRecord === undefined) {
+  const endpointRecord = mockDatabase.webhookEndpoints.find(
+    (webhookEndpoint) =>
+      webhookEndpoint.id === paymentGateway?.notification_endpoint_id,
+  );
+  if (paymentGateway === undefined || endpointRecord === undefined) {
     return null;
   }
 
   const timestampSeconds = Math.floor(createdAtMs / 1000);
   const eventId = `evt_${createMockUlid(createdAtMs)}`;
-  const providerNotification = buildProviderNotification(
+  const providerNotification = renderGatewayNotification(
+    paymentGateway,
     paymentDetail,
-    eventType,
-    timestampSeconds,
+    {
+      eventType,
+      redirectOutcome: "success",
+      eventId,
+      timestampSeconds,
+      shouldMaskSecrets: false,
+    },
   );
+  if (providerNotification === null) {
+    return null;
+  }
   const createdAt = new Date(createdAtMs).toISOString();
   const notificationDelivery: WebhookDelivery = {
     id: createMockUlid(createdAtMs),
@@ -51,7 +71,8 @@ export function recordPaymentNotification(
       url: endpointRecord.url,
       headers: {
         ...providerNotification.headers,
-        ...(paymentDetail.provider === "native"
+        // Native signs with the endpoint's own secret (Standard Webhooks).
+        ...(paymentGateway.key === "native"
           ? buildSignatureHeaders(endpointRecord, eventId, timestampSeconds)
           : { "user-agent": "sendmock/0.0.0-dev" }),
       },
@@ -72,14 +93,14 @@ export function recordPaymentNotification(
   paymentDetail.notifications.push({
     delivery_id: notificationDelivery.id,
     event_type: eventType,
-    provider_event_name: providerNotification.providerEventName,
+    provider_event_name: providerNotification.eventName,
     status: notificationDelivery.status,
     status_code: 200,
     created_at: createdAt,
   });
   paymentDetail.timeline.push({
     kind: "notification_sent",
-    description: `Sent ${providerNotification.providerEventName} to ${endpointRecord.name}`,
+    description: `Sent ${providerNotification.eventName} to ${endpointRecord.name}`,
     created_at: createdAt,
   });
 

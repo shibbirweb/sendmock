@@ -33,6 +33,31 @@ export const templateFunctionCatalog: TemplateReferenceHelper[] = [
     description: "A Svix signature header, as Resend sends it.",
     example: "v1,K5oZfzN95Z9UVu1EsfQmfVNQ=",
   },
+  {
+    name: "uuid",
+    signature: "uuid()",
+    description: "A random UUID, e.g. for a transmission id.",
+    example: "3b241101-e2bb-4255-8caf-4136c566a962",
+  },
+  {
+    name: "random_hex",
+    signature: "random_hex(length)",
+    description: "Random lowercase hex digits, e.g. for a signature.",
+    example: "9f86d081884c7d65",
+  },
+  {
+    name: "now_iso",
+    signature: "now_iso()",
+    description: "The current time as an ISO 8601 timestamp.",
+    example: "2026-10-25T09:15:27.000Z",
+  },
+  {
+    name: "stripe_signature",
+    signature: "stripe_signature(secret)",
+    description:
+      "A Stripe-Signature header (t=...,v1=...), as Stripe sends it.",
+    example: "t=1792914927,v1=5257a869e7ecebeda32a...",
+  },
 ];
 
 /** Filters, applied with `| name`, documented for the reference panel (WH-07.9). */

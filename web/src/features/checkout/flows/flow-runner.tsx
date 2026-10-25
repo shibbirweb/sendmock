@@ -20,7 +20,6 @@ import {
   fillStepLabels,
   readPaymentReference,
 } from "@/lib/payments/flow-label-variables";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 
 /**
  * Runs a method's flow on the checkout page, one step at a time and in the
@@ -57,10 +56,7 @@ export function FlowRunner({
     ),
     currency: checkoutSession.currency,
     merchant: checkoutSession.merchant_name,
-    gateway:
-      paymentProviderLabels[
-        checkoutSession.provider as keyof typeof paymentProviderLabels
-      ] ?? checkoutSession.provider,
+    gateway: checkoutSession.provider_name,
     reference: readPaymentReference(checkoutSession.session_id),
     customer_email: checkoutSession.customer_email ?? "",
   });

@@ -9,6 +9,7 @@ import { MethodSheet } from "@/features/payments/methods/method-sheet";
 import { PaymentMethodsTable } from "@/features/payments/methods/payment-methods-table";
 import { toMethodInput } from "@/features/payments/methods/use-payment-method-form";
 import { usePaymentFlows } from "@/lib/api/hooks/use-payment-flow-queries";
+import { usePaymentGateways } from "@/lib/api/hooks/use-payment-gateway-queries";
 import {
   usePaymentMethods,
   useSavePaymentMethod,
@@ -18,6 +19,7 @@ import {
 export function PaymentMethodsPage() {
   const methodsQuery = usePaymentMethods();
   const flowsQuery = usePaymentFlows();
+  const gatewaysQuery = usePaymentGateways();
   const paymentFlows = flowsQuery.data ?? [];
   const savePaymentMethod = useSavePaymentMethod();
   const [isAddOpen, setAddOpen] = React.useState(false);
@@ -50,6 +52,7 @@ export function PaymentMethodsPage() {
             <PaymentMethodsTable
               paymentMethods={paymentMethods}
               paymentFlows={paymentFlows}
+              paymentGateways={gatewaysQuery.data ?? []}
               onEdit={(paymentMethod) => setEditedKey(paymentMethod.key)}
               onToggle={(paymentMethod, isEnabled) => {
                 savePaymentMethod.mutate(

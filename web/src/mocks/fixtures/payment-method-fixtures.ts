@@ -1,8 +1,4 @@
-import type {
-  PaymentMethodDefinition,
-  PaymentProvider,
-  TestNumberValue,
-} from "@/lib/api/types";
+import type { PaymentMethodDefinition, TestNumberValue } from "@/lib/api/types";
 import { defaultTestCards } from "@/lib/payments/test-instruments";
 
 /** What the mock stores; usage, gateways and Modified are worked out when presented. */
@@ -102,20 +98,3 @@ export function buildBuiltinPaymentMethods(): PaymentMethodRecord[] {
     }),
   ];
 }
-
-/** Which methods each built-in gateway's checkout offers, in order (until Gateways are editable). */
-export const builtinGatewayMethodKeys: Record<PaymentProvider, string[]> = {
-  stripe: ["card"],
-  native: ["card"],
-  paypal: ["paypal_account"],
-  sslcommerz: ["card", "bkash", "nagad", "rocket", "dbbl", "city", "brac"],
-  bkash: ["bkash"],
-};
-
-export const builtinGatewayAccents: Record<PaymentProvider, string> = {
-  stripe: "#635bff",
-  native: "#0d9488",
-  paypal: "#ffc439",
-  sslcommerz: "#1e5bb8",
-  bkash: "#e2136e",
-};

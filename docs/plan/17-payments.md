@@ -133,11 +133,13 @@ Gateways and payment methods are data, not code, so a developer can emulate a ga
 - **Gateway:** an emulated provider.
   - Name, key (the `provider` value in the API and in `/providers/<key>/...` paths), accent colour, enabled.
   - **Methods offered**, in order: the checkout page shows one method directly, or a picker grouped by each flow's picker tab (Cards, Mobile banking, Net banking, ...) when there are several.
-  - **Merchant credentials** as name / value rows (store id, secret key, ...), secrets masked everywhere and written to seed exports as `${ENV}` references.
+  - **Merchant credentials** as name / value rows (store id, secret key, ...), each marked secret or not; secrets are masked everywhere (the API returns `••••` and the last 4, a masked value sent back keeps the stored one, the plain value is fetched only by an explicit reveal) and written to seed exports as `${ENV}` references.
   - **Notification endpoint** (a webhook endpoint) for its IPN or webhook deliveries.
-  - **Redirect:** GET or POST, and the fields sent back to the app as name / template rows.
+  - **Redirect:** GET or POST, and the fields sent back to the app as name / template rows; each row is sent always or only on success (PayPal's `PayerID`).
   - **Notification:** content type (JSON or form), the gateway's event name for each native event (none means it sends nothing for that event), a body template and header templates (for signatures).
-  - Templates read `payment` (id, reference, amount and amount_major, currency, status, failure code, customer, method, provider ids), `event` (native type and the gateway's name for it), `merchant` (the credentials) and the usual functions and filters; a live preview renders them against a payment.
+  - Templates read `payment` (id, reference, amount_minor and amount_major, currency, status, failure code, customer, method, provider ids, metadata), `event` (id, native `type`, the gateway's `name` for it, `created` as Unix seconds), `redirect` (`outcome` success / fail / cancel and `status`, the gateway's event name for the outcome), `merchant` (the credentials by name) and the usual functions and filters, plus `uuid()`, `random_hex(length)`, `now_iso()` and `stripe_signature(secret)` for signature-shaped headers. A form notification's body template is the encoded form (`tran_id={{ payment.reference | urlencode }}&...`).
+  - A live preview renders them against a chosen payment, event and redirect outcome, with secrets masked and problems under each part; a save with template errors is refused.
+  - The built-in gateways are these definitions too: their redirect fields, event names, bodies and signature headers reproduce the shapes in [Provider emulation](#provider-emulation).
 - **Built-ins** (Stripe, PayPal, SSLCommerz, bKash, Native, and the built-in methods) are editable. An edited built-in shows **Modified** and **Reset to default** restores the shipped version. Built-ins cannot be deleted; they can be disabled.
 - **Custom gateways** start from a built-in (its methods, redirect and notification shapes are copied, then edited) or from blank. Custom methods start from a flow. Both can be deleted when no payment uses them (otherwise disabled).
 - **AI-assisted:** gateways and methods are operations in the registry like everything else, so the CLI (`sendmock payments gateways|methods ...`) and the MCP `payments` toolset can list, create, update, preview and reset them, and compose flows step by step (`sendmock payments flows steps add|move|remove|update`), with the same validation as the UI. The agent skill's `add-payment-gateway` workflow (and the MCP prompt of the same name) lets a developer say "add the Nagad gateway" or "add Upay as a wallet", and `add-payment-flow` handles "make a QR wallet flow": the agent reads the provider's docs, writes the definition, checks the preview, runs a test checkout and exports the result to the seed file. See [14-ai-integration.md](14-ai-integration.md#prompts).
@@ -183,14 +185,15 @@ Provider deliveries use the provider's own event names and payloads through buil
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/payments` | create a payment (native) |
-| POST | `/payments/checkout` | create a hosted checkout session (native) |
+| POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included |
 | GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
 | POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
 | GET/POST/PATCH/DELETE | `/payments/gateways` | gateways; `POST` takes `{ "name", "key", "start_from" }`; built-ins cannot be deleted |
 | POST | `/payments/gateways/{gatewayKey}/reset` | restore a built-in gateway |
-| POST | `/payments/gateways/{gatewayKey}/preview` | render an unsaved gateway's redirect fields and notification for an event against a payment, with template problems |
+| POST | `/payments/gateways/{gatewayKey}/preview` | render an unsaved gateway's redirect fields and notification for an event against a payment, with template problems and the template reference for `{{` suggestions |
+| GET | `/payments/gateways/{gatewayKey}/credentials/{credentialName}` | reveal one secret credential (the UI asks first) |
 | GET/POST/PATCH/DELETE | `/payments/methods` | payment methods; built-ins cannot be deleted |
 | POST | `/payments/methods/{methodKey}/reset` | restore a built-in method |
 | GET/POST/PATCH/DELETE | `/payments/flows` | payment flows (steps in order with their labels); built-ins cannot be deleted, custom ones only while no method uses them |
