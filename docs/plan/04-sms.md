@@ -257,6 +257,31 @@ When the primary URL fails and a fallback URL is set, SendMock calls the fallbac
 
 Other providers' reply mechanisms (Plivo XML, for example) can be added later as new adapters; providers without one (Vonage) only get the inbound webhook.
 
+## MMS and media
+
+MMS (and WhatsApp images and documents) carry files next to the text. Providers do not take files inline: Twilio takes public `MediaUrl` links and downloads them. SendMock supports that, and also accepts inline files on the native API, because local files have no public URL.
+
+### Sending
+
+| API | How media is passed | What SendMock does |
+|-----|---------------------|--------------------|
+| Twilio Messages (Phase 2) | `MediaUrl` form field, repeatable, up to 10 | downloads each URL and keeps a copy, so the conversation still shows it if the app's URL goes away; a URL that cannot be fetched fails the message with `11200`, as Twilio does (the other media error codes come from Twilio's error reference when the Messages API is built) |
+| Native `POST /api/v1/sms` | `media_urls: ["https://..."]` and / or `media: [{ "filename", "content" (base64), "content_type" }]`, same shape as email attachments | URL media is downloaded like Twilio's; inline media is decoded and stored |
+| Simulated inbound (`POST /api/v1/sms/inbound`, "Reply as recipient") | `media: [...]` inline | stored like inline media |
+
+- Each message has at most 10 media items and 5 MB of media in total (Twilio's MMS limit). `content_type` is guessed from the file extension when missing.
+- Errors return `400` naming the item, for example `media[2].content is not valid base64`, `media[0].filename is required` or `media goes over the 5 MB limit`.
+- Every stored file is served at `GET /api/v1/sms/{smsId}/media/{mediaIndex}` with its content type. The reply webhook sends `NumMedia`, `MediaUrl{N}` and `MediaContentType{N}` pointing at these copies, and TwiML `<Media>` replies are stored the same way.
+- A message with media is an MMS on the `sms` channel; WhatsApp uses the same fields. Segment counting covers the text only.
+- In the browser demo, media sent as URLs cannot be downloaded, so they show a placeholder image with the URL.
+
+### UI
+
+- Bubbles show images as thumbnails (a click opens the full image) and other files as chips with name, size and a download link; messages with media get an "MMS" badge (a "Media" badge on WhatsApp). A media-only message shows "Photo" or "Attachment" in the thread list preview.
+- The message drawer lists the media with type, size, source URL and download.
+- "Reply as recipient" has an attach button for one or more files, shown as removable chips before sending, with the same limits.
+- Settings > Connection adds `media` and `media_urls` chips to the SMS body; `{{file:...}}` values are read and encoded by each snippet.
+
 ## Virtual numbers
 
 A small registry (UI: "Numbers") of fake owned numbers, each with:

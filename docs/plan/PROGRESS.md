@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 94 accepted, 10 / 362 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 368 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
@@ -36,12 +36,12 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 14 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 15 / 17 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
-| 2 | SMS and Verify backend | Not started | 0 / 11 |
+| 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
 | 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
@@ -96,6 +96,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Mail reply, reply all and forward as recipient: inline composer with the original in the body (Gmail style), Inbound badge, links between originals and replies, `is:inbound` search, R / Shift+R / F ([07](07-ui.md#mail), EM-17)
 - [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
 - [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
+- [x] SMS and WhatsApp media (MMS): thumbnails and file chips, drawer media list, attach in "Reply as recipient", Connection chips ([04](04-sms.md#mms-and-media), SM-15)
 - [x] Verify tab: verifications, timeline, force-state buttons, Verify services editor (live expiry countdown, status chips, link to the SMS with the code)
 - [x] Numbers registry and Messaging Services tab (inbound URL, method, fallback, format and status callback per number; sender pools with inbound handling)
 - [x] Logs: SMTP sessions and transcript viewer (failed sessions highlighted, colour-coded transcript, email to session links, 50 rows per page)
@@ -174,6 +175,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Native SMS API (JSON, form, GET)
 - [ ] Twilio Messages API and Messaging Services
+- [ ] MMS media: Twilio `MediaUrl`, native `media_urls` and inline `media`, `/sms/{smsId}/media/{mediaIndex}`
 - [ ] Vonage `/sms/json`
 - [ ] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state)
 - [ ] Provider port serving real provider paths
@@ -320,4 +322,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: native send `attachments` defined ([03](03-email.md#native-send-attachments): `filename`, base64 `content`, optional `content_type` and `content_id`, 400 errors naming the attachment), criteria EM-07.4, EM-07.5 and PL-05.8; Connection gets an `attachments` chip and `{{file:<name>}}` values that each snippet reads and encodes. |
 | 2026-10-25 | Plan: SQLite recorded as the database decision ([02](02-architecture.md#database-sqlite): why, location and modes, connection setup, migrations with `user_version`, search, retention, tests); persistence default decided. |
 | 2026-10-25 | Native send attachments in the mock (`/send` stores them with real bytes, inline `cid:` images display, 400 errors name the attachment) and an `attachments` chip in Connection, where `{{file:...}}` values make each snippet read and encode the file. |
+| 2026-10-25 | Plan: MMS and media ([04](04-sms.md#mms-and-media): Twilio `MediaUrl` with stored copies, native `media_urls` and inline base64 `media`, 10 items and 5 MB, `/sms/{smsId}/media/{mediaIndex}`, reply webhook `MediaUrl{N}`, UI thumbnails, drawer list and attach in the composer), feature SM-15 and criterion PL-05.9. |
+| 2026-10-25 | MMS and media built on mock data: native `/sms` accepts `media_urls` and inline base64 `media` (10 items, 5 MB, 400 errors naming the item), `/sms/{smsId}/media/{mediaIndex}` serves the files, bubbles show image thumbnails and file chips with an MMS / Media badge, the drawer lists media, "Reply as recipient" attaches files, Connection has `media` and `media_urls` chips. The demo includes an MMS booking with a QR code and PDF, and a WhatsApp photo. Email attachments and SMS media share one base64 file parser. |
 | 2026-10-25 | Settings > Connection: "Customize the request" gets a Reset button that restores the sample bodies and removes added headers; the email and SMS body columns now line up. |

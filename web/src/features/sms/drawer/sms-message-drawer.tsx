@@ -15,6 +15,7 @@ import { SmsManualStatus } from "@/features/sms/drawer/sms-manual-status";
 import { SmsMessageFacts } from "@/features/sms/drawer/sms-message-facts";
 import { SmsRequestPanel } from "@/features/sms/drawer/sms-request-panel";
 import { SmsStatusHistory } from "@/features/sms/drawer/sms-status-history";
+import { SmsMediaList } from "@/features/sms/media/sms-media-list";
 import { useSmsMessage } from "@/lib/api/hooks/use-sms-queries";
 
 function SmsMessageDrawerBody({ smsId }: { smsId: string }) {
@@ -44,6 +45,9 @@ function SmsMessageDrawerBody({ smsId }: { smsId: string }) {
         {smsMessage.body}
       </p>
       <SmsMessageFacts smsMessage={smsMessage} />
+      {smsMessage.media.length > 0 && (
+        <SmsMediaList mediaItems={smsMessage.media} />
+      )}
       {smsMessage.direction === "outbound" && (
         <>
           <Separator />

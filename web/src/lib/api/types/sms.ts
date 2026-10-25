@@ -17,6 +17,27 @@ export type SmsEncoding = "GSM-7" | "UCS-2";
 export type SmsStatus =
   "queued" | "sent" | "delivered" | "undelivered" | "failed" | "received";
 
+/** One MMS or WhatsApp media file stored with a message. */
+export type SmsMedia = {
+  media_index: number;
+  content_type: string;
+  size_bytes: number | null;
+  filename: string | null;
+  /** Where the app said to fetch it (`MediaUrl`), null for inline files. */
+  source_url: string | null;
+  /** SendMock's copy: `/api/v1/sms/{smsId}/media/{mediaIndex}`. */
+  url: string;
+};
+
+/** An inline file in `media` of a native or simulated inbound send. */
+export type InlineSmsMedia = {
+  filename: string;
+  /** The file bytes, base64 encoded. */
+  content: string;
+  /** Guessed from the file extension when missing. */
+  content_type?: string;
+};
+
 export type SmsStatusChange = {
   status: SmsStatus;
   at: IsoTimestamp;
@@ -34,7 +55,7 @@ export type SmsMessage = {
   body: string;
   encoding: SmsEncoding;
   segments: number;
-  media_urls: string[];
+  media: SmsMedia[];
   status: SmsStatus;
   error_code: string | null;
   status_callback_url: string | null;
@@ -93,6 +114,9 @@ export type NativeSmsRequest = {
   body: string;
   status_callback?: string;
   metadata?: Record<string, unknown>;
+  /** Public links SendMock downloads, like Twilio's `MediaUrl`. */
+  media_urls?: string[];
+  media?: InlineSmsMedia[];
 };
 
 /** Body of POST /api/v1/sms/inbound (simulate an incoming message). */
@@ -102,4 +126,5 @@ export type InboundSmsRequest = {
   body: string;
   channel?: SmsChannel;
   template_id?: string;
+  media?: InlineSmsMedia[];
 };

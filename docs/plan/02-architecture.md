@@ -267,7 +267,7 @@ All IDs are ULIDs (string). Timestamps are UTC milliseconds.
 | body | TEXT | |
 | encoding | TEXT | `GSM-7` or `UCS-2` |
 | segments | INTEGER | |
-| media | TEXT (JSON) | MMS media URLs |
+| media | TEXT (JSON) | MMS / WhatsApp media: content type, size, file name, source URL; the bytes live in `sms_media` |
 | status | TEXT | `queued`, `sent`, `delivered`, `undelivered`, `failed`, `received` |
 | error_code | TEXT | simulated provider error |
 | status_callback | TEXT | per-message callback URL from the request |

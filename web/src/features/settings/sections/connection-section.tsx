@@ -61,6 +61,20 @@ const optionalSmsFields: OptionalBodyField[] = [
     exampleValue: "http://localhost:8000/sms/status",
   },
   { fieldName: "metadata", exampleValue: { order_id: 42 } },
+  {
+    fieldName: "media",
+    exampleValue: [
+      {
+        filename: "photo.jpg",
+        content: "{{file:photo.jpg}}",
+        content_type: "image/jpeg",
+      },
+    ],
+  },
+  {
+    fieldName: "media_urls",
+    exampleValue: ["https://example.com/photos/parcel.jpg"],
+  },
 ];
 
 const defaultSmtpPort = 1025;
@@ -184,6 +198,7 @@ export function ConnectionSection() {
               label="SMS body (POST /api/v1/sms)"
               bodyState={requestEditor.smsBody}
               optionalFields={optionalSmsFields}
+              hint="Media makes it an MMS (or WhatsApp media): up to 10 files, 5 MB in total."
               onBodyTextChange={requestEditor.setSmsBodyText}
               onAddField={requestEditor.addSmsBodyField}
             />

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { SmsContactAvatar } from "@/features/sms/sms-contact-avatar";
+import { describeMediaOnlyMessage } from "@/features/sms/media/sms-media-urls";
 import { SmsStatusTicks } from "@/features/sms/sms-status-ticks";
 import type { SmsThread } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -48,7 +49,9 @@ export function SmsThreadListItem({
             )}
             <span className="min-w-0 truncate">
               {isLastMessageOutbound && "You: "}
-              {lastMessage.body}
+              {lastMessage.body === "" && lastMessage.media.length > 0
+                ? describeMediaOnlyMessage(lastMessage.media)
+                : lastMessage.body}
             </span>
           </span>
           <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">

@@ -37,9 +37,10 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/sms` | native send (see [04-sms.md](04-sms.md)) |
+| POST | `/sms` | native send, with optional `media_urls` and inline base64 `media` (see [04-sms.md](04-sms.md#mms-and-media)) |
 | GET | `/sms` | list, filters (`to`, `from`, `status`, `direction`, `q`) |
 | GET | `/sms/{smsId}` | one message with status history |
+| GET | `/sms/{smsId}/media/{mediaIndex}` | one stored media file (MMS or WhatsApp), with its content type |
 | GET | `/sms/threads` | conversations grouped by number pair |
 | POST | `/sms/{smsId}/status` | manually set status (manual profile) |
 | POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 for inbound) |

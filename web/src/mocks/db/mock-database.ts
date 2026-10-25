@@ -62,6 +62,8 @@ export type MockDatabase = {
   emailTimelines: Map<string, EmailTimelineEntry[]>;
   /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
   attachmentContents: Map<string, Uint8Array>;
+  /** Bytes of SMS media sent inline, keyed `smsId/index`. */
+  smsMediaContents: Map<string, Uint8Array>;
   smsMessages: SmsMessageDetail[];
   verifyServices: VerifyService[];
   verifications: VerificationDetail[];
@@ -125,6 +127,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       emails: [],
       emailTimelines: new Map(),
       attachmentContents: new Map(),
+      smsMediaContents: new Map(),
       smsMessages: [],
       verifications: [],
       webhookDeliveries: [],
@@ -157,6 +160,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     ...configuration,
     emails,
     attachmentContents: new Map(),
+    smsMediaContents: new Map(),
     emailTimelines: new Map(
       emailFixtures.map((emailFixture) => [
         emailFixture.email.id,

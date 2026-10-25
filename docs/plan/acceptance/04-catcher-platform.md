@@ -75,6 +75,7 @@ UI in U1, backend per feature phase.
 - [ ] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`.
 - [ ] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged.
 - [ ] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body.
+- [ ] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips.
 - [ ] PL-05.6 About shows the version, channel, listeners and database, and the update check never runs until it is turned on.
 
 ## PL-06 Security defaults

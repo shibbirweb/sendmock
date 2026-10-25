@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 
 import type { SmsMessageDetail, SmsStatus, SmsThread } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
+import { buildPlaceholderSvg } from "@/mocks/fixtures/fixture-helpers";
 import {
   applyMockConditions,
   createErrorResponse,
@@ -87,6 +88,32 @@ export const smsHandlers = [
     return smsMessage
       ? HttpResponse.json(smsMessage)
       : createNotFoundResponse("SMS");
+  }),
+
+  http.get("*/api/v1/sms/:smsId/media/:mediaIndex", async ({ params }) => {
+    await applyMockConditions();
+    const smsMessage = findSms(params.smsId);
+    const mediaItem = smsMessage?.media[Number(params.mediaIndex)];
+    if (smsMessage === undefined || mediaItem === undefined) {
+      return createNotFoundResponse("Media");
+    }
+
+    const storedBytes = mockDatabase.smsMediaContents.get(
+      `${smsMessage.id}/${mediaItem.media_index}`,
+    );
+    if (storedBytes !== undefined) {
+      return new HttpResponse(storedBytes.slice().buffer, {
+        headers: { "Content-Type": mediaItem.content_type },
+      });
+    }
+
+    // Demo media and URL media have no stored bytes: show a labelled placeholder.
+    return new HttpResponse(
+      buildPlaceholderSvg(
+        mediaItem.filename ?? mediaItem.source_url ?? "media",
+      ),
+      { headers: { "Content-Type": "image/svg+xml" } },
+    );
   }),
 
   http.post("*/api/v1/sms/:smsId/status", async ({ params, request }) => {

@@ -126,6 +126,16 @@ Phase 2.
 - [ ] SM-14.2 The same routes answer under `/providers/<name>/` on the main port.
 - [ ] SM-14.3 `--provider-port <provider>=<port>` gives a provider its own port.
 
+## SM-15 MMS and media
+
+UI in U1, backend Phase 2 (Twilio and native), Phase 4 (WhatsApp). Docs: [MMS and media](../04-sms.md#mms-and-media).
+
+- [ ] SM-15.1 A Twilio send with `MediaUrl` stores a copy of each file; a URL that cannot be fetched fails the message with `11200`.
+- [ ] SM-15.2 A native send with `media_urls` and / or inline base64 `media` stores the media, and `GET /sms/{smsId}/media/{mediaIndex}` returns each file with its content type.
+- [ ] SM-15.3 More than 10 items, more than 5 MB, a missing filename or invalid base64 returns `400` naming the item.
+- [ ] SM-15.4 Bubbles show image thumbnails and file chips with an "MMS" or "Media" badge, and the message drawer lists the media.
+- [ ] SM-15.5 "Reply as recipient" can attach files, and the reply webhook sends `NumMedia` and `MediaUrl{N}` pointing at SendMock's copies.
+
 ---
 
 ## VF-01 Verify services
