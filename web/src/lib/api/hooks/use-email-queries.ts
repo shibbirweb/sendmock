@@ -13,7 +13,6 @@ import type {
   EmailSummary,
   EmailTimelineEntry,
   EmailUpdate,
-  NativeSendRequest,
   OpenSource,
   PageOf,
   SimulatedEmailOutcome,
@@ -122,15 +121,5 @@ export function useSimulateEmailOutcome() {
         method: "POST",
         requestBody: simulatedOutcome,
       }),
-  );
-}
-
-/** Native HTTP send API (POST /api/v1/send), used for sample emails. */
-export function useSendEmail() {
-  return useEmailMutation((nativeSendRequest: NativeSendRequest) =>
-    requestApi<{ id: string }>("/send", {
-      method: "POST",
-      requestBody: nativeSendRequest,
-    }),
   );
 }

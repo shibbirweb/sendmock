@@ -28,6 +28,10 @@ import {
   readApiLabel,
   statusClassFilters,
 } from "@/features/logs/logs-labels";
+import { ConnectHint } from "@/features/onboarding/connect-hint";
+import { NoDataState } from "@/features/onboarding/no-data-state";
+import { NoMatchState } from "@/features/onboarding/no-match-state";
+import { SampleButton } from "@/features/onboarding/sample-button";
 import { useApiRequestLog } from "@/lib/api/hooks/use-logs-queries";
 import type { ApiRequestLogEntry, ApiStatusClass } from "@/lib/api/types";
 import {
@@ -153,16 +157,29 @@ export function ApiRequestsPanel() {
             <Skeleton className="h-8 w-full" />
           </div>
         )}
-        {requestsQuery.isSuccess && apiRequests.length === 0 && (
-          <div className="flex flex-col items-center gap-2 px-6 py-16 text-center">
-            <GlobeIcon className="size-8 text-muted-foreground" />
-            <p className="text-sm font-medium">No requests match</p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              Calls to the native API and to emulated provider APIs (Twilio,
-              SendGrid, ...) appear here, including rejected ones.
-            </p>
-          </div>
-        )}
+        {requestsQuery.isSuccess &&
+          apiRequests.length === 0 &&
+          (statusClass !== null ||
+          apiFilter !== allApis ||
+          pathSearch !== "" ? (
+            <NoMatchState
+              message="No requests match this filter or search."
+              onClearFilter={() => {
+                setStatusClass(null);
+                setApiFilter(allApis);
+                setPathSearch("");
+              }}
+            />
+          ) : (
+            <NoDataState
+              icon={GlobeIcon}
+              title="No API requests yet"
+              description="Calls to the native API and to emulated provider APIs (Twilio, SendGrid, ...) appear here, including rejected ones."
+            >
+              <ConnectHint connectArea="api" />
+              <SampleButton sampleKind="sms" />
+            </NoDataState>
+          ))}
         {apiRequests.length > 0 && (
           <Table>
             <TableHeader>

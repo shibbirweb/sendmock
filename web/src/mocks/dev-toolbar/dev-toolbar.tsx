@@ -118,6 +118,17 @@ export function DevToolbar() {
             }}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="running-in-container">Running in Docker</Label>
+          <Switch
+            id="running-in-container"
+            checked={mockConditions.isRunningInContainer}
+            onCheckedChange={(isRunningInContainer) => {
+              updateMockConditions({ isRunningInContainer });
+              refreshAllData();
+            }}
+          />
+        </div>
         <Separator />
         <div className="grid grid-cols-2 gap-2">
           <Button variant="outline" size="sm" onClick={generateSampleEmail}>
