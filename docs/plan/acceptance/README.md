@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 95 features, 10 / 368 criteria ticked.**
+**Accepted: 0 / 95 features, 10 / 373 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -68,7 +68,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | In progress |
 | [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Not started |
 | [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | In progress |
-| [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | Native events Phase 3, provider formats Phase 4 | 4 | Not started |
+| [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | UI in U1, native events Phase 3, provider formats Phase 4 | 6 | In progress |
 | [EM-11](01-email.md#em-11-email-opened-events) | Email opened events | Phase 3 | 5 | Not started |
 | [EM-12](01-email.md#em-12-tags) | Tags | Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules) | 4 | Not started |
 | [EM-13](01-email.md#em-13-quality-checks) | Quality checks | Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam) | 4 | Not started |
@@ -82,7 +82,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Not started |
 | [SM-05](02-sms-verify.md#sm-05-other-sms-providers-and-generic-vendor) | Other SMS providers and generic vendor | Phase 4 | 2 | Not started |
 | [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Not started |
-| [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | Phase 2 | 6 | Not started |
+| [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | In progress |
 | [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | Not started |
 | [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Not started |
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Not started |

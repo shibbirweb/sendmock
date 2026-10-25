@@ -14,6 +14,7 @@ import {
   includesText,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
+import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function toEmailSummary(email: EmailDetail): EmailSummary {
@@ -168,13 +169,11 @@ export const emailHandlers = [
       }
 
       const simulatedOutcome = (await request.json()) as SimulatedEmailOutcome;
-      email.delivery_status = simulatedOutcome.event;
-      mockDatabase.emailTimelines.get(email.id)?.push({
-        kind: simulatedOutcome.event,
-        at: new Date().toISOString(),
-        detail: `Simulated ${simulatedOutcome.event}`,
-      });
-      publishMockEvent(`email.${simulatedOutcome.event}`, { id: email.id });
+      applyEmailOutcome(
+        email,
+        simulatedOutcome.event,
+        `Simulated ${simulatedOutcome.event}`,
+      );
 
       return new HttpResponse(null, { status: 204 });
     },

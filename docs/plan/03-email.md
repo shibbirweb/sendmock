@@ -124,6 +124,7 @@ Triggered by:
 | `ooto@simulator.amazonses.com` | delivered, then out-of-office auto-reply stored as a new email |
 | `suppressionlist@simulator.amazonses.com` | bounce with suppression-list reason |
 
+- **Custom outcome addresses** (Settings > Email, the API at `/api/v1/outcome-rules/email`, CLI, MCP and the seed file as `[[email.outcome_rules]]`): your own rules, checked in order before the magic addresses. Each has a pattern (an exact address or `*` wildcards, for example `*@bounce.qa.test`), an outcome (`delivered`, `hard_bounce`, `soft_bounce`, `complaint`, `unsubscribe`, or `reject`, which refuses the recipient during SMTP `RCPT` and the HTTP send with the given code), an optional SMTP code and diagnostic text, a note and an enabled switch. A "Test an address" box shows which rule would apply. The built-in magic addresses stay read-only and can be switched off with **Magic addresses** in Settings.
 - **Delivery profile** (Settings): `off` (default, no delivery events), `auto-delivered` (every message gets `email.delivered` after a short delay), or `realistic` (delay plus a configurable bounce/complaint rate).
 - **Manual buttons** on any email: Simulate delivered / bounce (hard, soft) / complaint / unsubscribe.
 - **API**: `POST /api/v1/emails/{emailId}/simulate` with `{ "event": "bounced", "bounce_type": "hard" }`.

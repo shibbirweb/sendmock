@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { MagicReferenceRow } from "@/features/settings/reference/magic-reference-data";
+import type { MagicReferenceRow } from "@/lib/outcomes/magic-reference-data";
 
 /** Addresses or numbers that always produce an outcome, with copy buttons. */
 export function MagicReferenceTable({

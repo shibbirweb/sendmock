@@ -175,6 +175,25 @@ SendMock extensions for **after-send** outcomes (Twilio's test mode has no equiv
 
 Other providers (Vonage, Plivo, ...) map the same outcomes to their own error codes and status names. The full table is shown in Settings > SMS simulation.
 
+The built-in numbers above are read-only, so they always match Twilio. The **Magic numbers** switch (Settings > SMS) turns them off; they then behave like any other number.
+
+### Custom outcome numbers
+
+Your own rules for your own test numbers, for example "my QA number always fails with 30007" or "every number starting `+1555777` is delivered after 10 s". Managed in Settings > SMS, the API (`/api/v1/outcome-rules/sms`), the CLI (`sendmock outcome-rule ...`), MCP and the seed file (`[[sms.outcome_rules]]`).
+
+| Field | Meaning |
+|-------|---------|
+| Match | `to` or `from` number |
+| Pattern | an exact E.164 number, or a pattern with `*` for any digits (`+1555777*`) |
+| Outcome | `reject` (refused on send, HTTP 400 with Twilio's error JSON and the given code), `undelivered` or `failed` (accepted, then that status with the given code), `delayed_delivery` (delivered after the given delay), `read` (delivered, then read) |
+| Error code | required for `reject`, `undelivered` and `failed`, for example `30007` |
+| Delay | seconds for `delayed_delivery`, 1 to 3,600 |
+| Note | optional, shown in the list |
+| Enabled | rules can be switched off without deleting them |
+
+- Order matters: the first enabled rule that matches wins. Custom rules are checked before the built-in magic numbers, then the simulation profile and failure rate apply.
+- A "Test a number" box in Settings shows which rule, magic number or profile a number would get.
+
 Each status change:
 
 - Appends to `sms_status_history`.

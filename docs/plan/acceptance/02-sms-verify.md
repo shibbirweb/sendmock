@@ -63,6 +63,9 @@ Phase 2. Docs: [Delivery simulation](../04-sms.md#delivery-simulation).
 - [ ] SM-07.4 Strict Twilio test mode rejects non-magic `From` numbers with `21606`.
 - [ ] SM-07.5 A failure rate of N% marks about N% of messages `undelivered`/`failed` over 1,000 sends (within 5 points).
 - [ ] SM-07.6 Every transition is stored in the status history and shown in the message drawer.
+- [ ] SM-07.7 Custom outcome numbers can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file, with the code and delay rules enforced.
+- [ ] SM-07.8 The first enabled matching custom rule wins over magic numbers and the profile, `*` patterns match any digits, and each outcome (`reject`, `undelivered`, `failed`, `delayed_delivery`, `read`) behaves as documented.
+- [ ] SM-07.9 With the Magic numbers switch off, `+15005550xxx` numbers behave like any other number; "Test a number" shows which rule, magic number or profile applies.
 
 ## SM-08 Status callbacks
 

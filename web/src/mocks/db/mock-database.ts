@@ -10,6 +10,8 @@ import type {
   SmsMessageDetail,
   SmtpSession,
   VerificationDetail,
+  SmsOutcomeRule,
+  EmailOutcomeRule,
   VerifyService,
   VirtualNumber,
   WebhookDelivery,
@@ -49,6 +51,10 @@ import {
   buildVirtualNumberFixtures,
 } from "@/mocks/fixtures/number-fixtures";
 import {
+  buildEmailOutcomeRuleFixtures,
+  buildSmsOutcomeRuleFixtures,
+} from "@/mocks/fixtures/outcome-rule-fixtures";
+import {
   buildWebhookDeliveryFixtures,
   buildWebhookEndpointFixtures,
   buildWebhookRuleFixtures,
@@ -69,6 +75,8 @@ export type MockDatabase = {
   verifications: VerificationDetail[];
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
+  smsOutcomeRules: SmsOutcomeRule[];
+  emailOutcomeRules: EmailOutcomeRule[];
   webhookEndpoints: WebhookEndpoint[];
   webhookRules: WebhookRule[];
   webhookDeliveries: WebhookDelivery[];
@@ -111,6 +119,8 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    smsOutcomeRules: buildSmsOutcomeRuleFixtures(),
+    emailOutcomeRules: buildEmailOutcomeRuleFixtures(),
     settings: buildDefaultSettings(),
     seedAppliedAt: new Date().toISOString(),
   };

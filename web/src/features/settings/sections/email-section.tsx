@@ -7,8 +7,9 @@ import { FormField } from "@/components/common/form-field";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { emailMagicAddresses } from "@/features/settings/reference/magic-reference-data";
+import { emailMagicAddresses } from "@/lib/outcomes/magic-reference-data";
 import { MagicReferenceTable } from "@/features/settings/reference/magic-reference-table";
+import { EmailOutcomeRulesCard } from "@/features/settings/outcome-rules/email-outcome-rules-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import {
   SettingsNumberField,
@@ -24,6 +25,7 @@ const receivingKeys = [
   "email_outcome_complaint_rate_percent",
   "inbound_email_domains",
   "spamassassin_address",
+  "is_magic_addresses_enabled",
 ] as const;
 const relayKeys = ["relay_smtp_url", "relay_recipient_allowlist"] as const;
 
@@ -73,6 +75,14 @@ function ReceivingCard({ appSettings }: { appSettings: AppSettings }) {
         isChecked={draftValues.is_plus_address_tagging_enabled}
         onCheckedChange={(isEnabled) => {
           updateDraft({ is_plus_address_tagging_enabled: isEnabled });
+        }}
+      />
+      <SettingsSwitchRow
+        label="Magic addresses"
+        description="Off: the SES simulator and SendMock addresses below behave like any other address."
+        isChecked={draftValues.is_magic_addresses_enabled}
+        onCheckedChange={(isEnabled) => {
+          updateDraft({ is_magic_addresses_enabled: isEnabled });
         }}
       />
       <RadioCardGroup
@@ -220,9 +230,14 @@ export function EmailSection({ appSettings }: { appSettings: AppSettings }) {
           </Button>
         </div>
       </SettingsSectionCard>
+      <EmailOutcomeRulesCard appSettings={appSettings} />
       <SettingsSectionCard
         title="Magic addresses"
-        description="Send to these to get a delivery outcome without touching any setting."
+        description={
+          appSettings.is_magic_addresses_enabled
+            ? "Send to these to get a delivery outcome without touching any setting. Built in and read-only."
+            : "Switched off: these addresses currently behave like any other address."
+        }
       >
         <MagicReferenceTable
           caption="Recipients"

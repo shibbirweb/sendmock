@@ -9,6 +9,7 @@ import {
   createErrorResponse,
 } from "@/mocks/handlers/handler-utils";
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
+import { planSmsOutcome } from "@/mocks/realtime/outcome-plans";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 
@@ -89,6 +90,21 @@ export const smsSendHandlers = [
     }
 
     const toNumber = nativeSmsRequest.to ?? "";
+    const outcomePlan = planSmsOutcome(toNumber, nativeSmsRequest.from ?? "");
+    if (outcomePlan?.outcome === "reject") {
+      const rejectMessage = `Rejected with error ${outcomePlan.errorCode ?? "unknown"} (${outcomePlan.sourceLabel})`;
+      recordNativeApiRequest({
+        path: "/api/v1/sms",
+        requestBody: summarizeMediaForLog(nativeSmsRequest),
+        responseStatus: 400,
+        responseBody: {
+          error: { code: "sms_rejected", message: rejectMessage },
+        },
+      });
+
+      return createErrorResponse(400, "sms_rejected", rejectMessage);
+    }
+
     const outboundMessage = buildNewSmsMessage({
       direction: "outbound",
       channel: toNumber.startsWith(whatsappPrefix) ? "whatsapp" : "sms",
@@ -118,7 +134,7 @@ export const smsSendHandlers = [
       to_number: outboundMessage.to_number,
       body: outboundMessage.body,
     });
-    simulateSmsDelivery(outboundMessage);
+    simulateSmsDelivery(outboundMessage, outcomePlan);
 
     return HttpResponse.json(outboundMessage, { status: 201 });
   }),

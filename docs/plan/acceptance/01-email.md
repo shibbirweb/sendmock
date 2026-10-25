@@ -102,6 +102,8 @@ Native events Phase 3, provider formats Phase 4. Docs: [Delivery outcome simulat
 - [ ] EM-10.2 Delivery profiles `off`, `auto-delivered` and `realistic` behave as documented.
 - [ ] EM-10.3 Manual "Simulate" actions fire the chosen event; the API and CLI do the same.
 - [ ] EM-10.4 Events appear on the email timeline and are delivered by matching webhook rules in native and provider formats.
+- [ ] EM-10.5 Custom outcome addresses can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file; the first enabled match wins over the magic addresses.
+- [ ] EM-10.6 With the Magic addresses switch off, magic addresses behave like any other address; "Test an address" shows which rule, magic address or profile applies.
 
 ## EM-11 Email opened events
 

@@ -32,6 +32,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/emails/{emailId}/list-unsubscribe` | List-Unsubscribe header validation |
 | POST | `/emails/{emailId}/release` | send to a real SMTP relay (`{ "to": [...] }` optional) |
 | GET/POST/PATCH/DELETE | `/tag-rules`, `/forward-rules` | automatic tagging and auto-forward rules |
+| GET/POST/PATCH/DELETE | `/outcome-rules/email` | custom outcome addresses; `POST /outcome-rules/email/{ruleId}/move` with `up` or `down` reorders |
 
 ## SMS
 
@@ -48,6 +49,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/sms/inbound` | simulate incoming SMS |
 | DELETE | `/sms/{smsId}`, `/sms` | delete one / all |
 | GET/POST/PATCH/DELETE | `/numbers` | virtual number registry |
+| GET/POST/PATCH/DELETE | `/outcome-rules/sms` | custom outcome numbers; `POST /outcome-rules/sms/{ruleId}/move` with `up` or `down` reorders |
 | GET/POST/PATCH/DELETE | `/messaging-services` | Twilio-style Messaging Services (sender pools) |
 
 ## Verify

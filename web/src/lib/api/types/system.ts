@@ -128,6 +128,10 @@ export type AppSettings = {
   sms_simulation_profile: SmsSimulationProfile;
   sms_failure_rate_percent: number;
   is_strict_twilio_test_mode: boolean;
+  /** Off: the built-in Twilio and SendMock numbers behave like any number. */
+  is_magic_numbers_enabled: boolean;
+  /** Off: the built-in magic addresses behave like any address. */
+  is_magic_addresses_enabled: boolean;
   fire_opened_events_on_view: boolean;
   opened_event_mode: "first_open" | "every_open";
   chaos_smtp_reject_next_count: number;

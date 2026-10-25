@@ -48,7 +48,7 @@ export function ChaosSection({ appSettings }: { appSettings: AppSettings }) {
       onSave={sectionForm.saveChanges}
       onDiscard={sectionForm.discardChanges}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <SettingsNumberField
           label="Reject the next"
           unitLabel="messages"

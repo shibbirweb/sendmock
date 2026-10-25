@@ -4,8 +4,9 @@ import {
   sendmockAfterSendNumbers,
   twilioFromNumbers,
   twilioToNumbers,
-} from "@/features/settings/reference/magic-reference-data";
+} from "@/lib/outcomes/magic-reference-data";
 import { MagicReferenceTable } from "@/features/settings/reference/magic-reference-table";
+import { SmsOutcomeRulesCard } from "@/features/settings/outcome-rules/sms-outcome-rules-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { SettingsSwitchRow } from "@/features/settings/settings-fields";
 import { useSettingsSectionForm } from "@/features/settings/use-settings-section-form";
@@ -17,6 +18,7 @@ const simulationKeys = [
   "sms_simulation_profile",
   "sms_failure_rate_percent",
   "is_strict_twilio_test_mode",
+  "is_magic_numbers_enabled",
 ] as const;
 
 const simulationProfileOptions: {
@@ -93,10 +95,23 @@ export function SmsSection({ appSettings }: { appSettings: AppSettings }) {
             updateDraft({ is_strict_twilio_test_mode: isStrict });
           }}
         />
+        <SettingsSwitchRow
+          label="Magic numbers"
+          description="Off: the Twilio test numbers and SendMock outcome numbers below behave like any other number."
+          isChecked={draftValues.is_magic_numbers_enabled}
+          onCheckedChange={(isEnabled) => {
+            updateDraft({ is_magic_numbers_enabled: isEnabled });
+          }}
+        />
       </SettingsSectionCard>
+      <SmsOutcomeRulesCard appSettings={appSettings} />
       <SettingsSectionCard
         title="Magic numbers"
-        description="Twilio's official test numbers, plus SendMock numbers for outcomes after sending."
+        description={
+          appSettings.is_magic_numbers_enabled
+            ? "Twilio's official test numbers, plus SendMock numbers for outcomes after sending. Built in and read-only."
+            : "Switched off: these numbers currently behave like any other number."
+        }
       >
         <MagicReferenceTable
           caption="To numbers (Twilio)"

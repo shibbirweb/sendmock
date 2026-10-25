@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 368 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 373 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 15 / 17 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 16 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -103,6 +103,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Logs: HTTP API request log with rejected requests (filters by status class, API and path, formatted bodies, message links, 50 rows per page)
 - [x] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns (per-section save with field errors; tag and forward rules follow with the U2 rule builder)
 - [x] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
+- [x] Custom outcome numbers and addresses with the Magic numbers and Magic addresses switches and "Test a number / address" boxes ([04](04-sms.md#custom-outcome-numbers), [03](03-email.md#delivery-outcome-simulation), SM-07.7 to SM-07.9, EM-10.5, EM-10.6)
 - [ ] Empty states with "how to connect" and "send sample"
 
 ### Phase U2: Webhook, HTTP catcher and payment screens
@@ -180,7 +181,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state)
 - [ ] Provider port serving real provider paths
 - [ ] GSM-7/UCS-2 encoding and segments
-- [ ] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode)
+- [ ] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode, custom outcome numbers)
 - [ ] Status callbacks (Twilio, Vonage) and inbound SMS simulation
 - [ ] CLI `sms` / `verify`; MCP `sms`, `verify` toolsets
 - [ ] SMS and Verify screens switched to live mode
@@ -190,7 +191,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Endpoints, rules, persistent queue, retries, cancel
 - [ ] Standard Webhooks signing and secret rotation
-- [ ] Email delivery outcome simulation and events
+- [ ] Email delivery outcome simulation and events (including custom outcome addresses)
 - [ ] Opened events and `/open` endpoints
 - [ ] Twilio and Vonage inbound/status formats with signatures
 - [ ] SMS reply webhook (Twilio style): number and Messaging Service inbound URLs, TwiML replies, fallback URL, Twilio error codes (moved from Phase 4)
@@ -325,3 +326,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: MMS and media ([04](04-sms.md#mms-and-media): Twilio `MediaUrl` with stored copies, native `media_urls` and inline base64 `media`, 10 items and 5 MB, `/sms/{smsId}/media/{mediaIndex}`, reply webhook `MediaUrl{N}`, UI thumbnails, drawer list and attach in the composer), feature SM-15 and criterion PL-05.9. |
 | 2026-10-25 | MMS and media built on mock data: native `/sms` accepts `media_urls` and inline base64 `media` (10 items, 5 MB, 400 errors naming the item), `/sms/{smsId}/media/{mediaIndex}` serves the files, bubbles show image thumbnails and file chips with an MMS / Media badge, the drawer lists media, "Reply as recipient" attaches files, Connection has `media` and `media_urls` chips. The demo includes an MMS booking with a QR code and PDF, and a WhatsApp photo. Email attachments and SMS media share one base64 file parser. |
 | 2026-10-25 | Settings > Connection: "Customize the request" gets a Reset button that restores the sample bodies and removes added headers; the email and SMS body columns now line up. |
+| 2026-10-25 | Plan: custom outcome numbers ([04](04-sms.md#custom-outcome-numbers)) and custom outcome addresses ([03](03-email.md#delivery-outcome-simulation)) as ordered, switchable rules checked before the read-only magic numbers and addresses, with Magic numbers / Magic addresses switches, "Test a number / address" boxes and `/outcome-rules/sms` and `/outcome-rules/email`; criteria SM-07.7 to SM-07.9, EM-10.5, EM-10.6. |
+| 2026-10-25 | Custom outcome numbers and addresses built on mock data: ordered rule tables with on / off, move, edit and delete, dialogs that ask only for what an outcome needs, "Test a number / address" boxes, Magic numbers and Magic addresses switches, rules exported to the seed file. Mock sends now follow custom rules and the magic numbers and addresses (reject on send, failure codes, delayed delivery, read, bounces). |

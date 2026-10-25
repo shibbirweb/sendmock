@@ -1,6 +1,10 @@
 import { http, HttpResponse } from "msw";
 
-import type { NativeSendRequest } from "@/lib/api/types";
+import type {
+  EmailDeliveryStatus,
+  EmailDetail,
+  NativeSendRequest,
+} from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import { parseNativeAttachments } from "@/mocks/fixtures/native-attachments";
@@ -10,9 +14,43 @@ import {
   parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
+import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import {
+  type EmailOutcomePlan,
+  planEmailOutcome,
+} from "@/mocks/realtime/outcome-plans";
 
 const sendPath = "/api/v1/send";
+
+/** Outcome kinds as the delivery events they fire. */
+const plannedEmailEvents: Record<
+  Exclude<EmailOutcomePlan["outcome"], "reject">,
+  EmailDeliveryStatus
+> = {
+  delivered: "delivered",
+  hard_bounce: "bounced",
+  soft_bounce: "deferred",
+  complaint: "complained",
+  unsubscribe: "unsubscribed",
+};
+
+function applyPlannedEmailOutcome(
+  email: EmailDetail,
+  outcomePlan: EmailOutcomePlan,
+) {
+  if (outcomePlan.outcome === "reject") {
+    return;
+  }
+
+  const codeText =
+    outcomePlan.smtpCode === null ? "" : `, ${outcomePlan.smtpCode}`;
+  applyEmailOutcome(
+    email,
+    plannedEmailEvents[outcomePlan.outcome],
+    `${outcomePlan.recipientAddress}: ${outcomePlan.outcome.replace("_", " ")}${codeText} (${outcomePlan.sourceLabel})`,
+  );
+}
 
 /** The logged request keeps attachment names and sizes, not their base64. */
 function summarizeForLog(nativeSendRequest: NativeSendRequest) {
@@ -61,6 +99,14 @@ export const nativeSendHandlers = [
       return rejectSend(nativeSendRequest, attachmentsResult.errorMessage);
     }
 
+    const outcomePlan = planEmailOutcome(nativeSendRequest.to);
+    if (outcomePlan?.outcome === "reject") {
+      return rejectSend(
+        nativeSendRequest,
+        `${outcomePlan.recipientAddress} rejected with ${outcomePlan.smtpCode ?? "550"} (${outcomePlan.sourceLabel})`,
+      );
+    }
+
     const emailFixture = buildEmailFixture({
       minutesAgo: 0,
       from: parseEmailAddress(nativeSendRequest.from),
@@ -98,6 +144,9 @@ export const nativeSendHandlers = [
     });
     mockDatabase.emails.unshift(storedEmail);
     mockDatabase.emailTimelines.set(storedEmail.id, emailFixture.timeline);
+    if (outcomePlan !== null) {
+      applyPlannedEmailOutcome(storedEmail, outcomePlan);
+    }
     publishMockEvent("email.received", {
       id: storedEmail.id,
       subject: storedEmail.subject,

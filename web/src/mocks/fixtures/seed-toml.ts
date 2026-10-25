@@ -82,6 +82,27 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         inbound_url: messagingService.inbound_url,
       }),
     ),
+    ...mockDatabase.smsOutcomeRules.map((outcomeRule) =>
+      formatTomlTable("[[sms.outcome_rules]]", {
+        match: outcomeRule.match_field,
+        pattern: outcomeRule.pattern,
+        outcome: outcomeRule.outcome,
+        error_code: outcomeRule.error_code,
+        delay_seconds: outcomeRule.delay_seconds,
+        note: outcomeRule.note === "" ? null : outcomeRule.note,
+        enabled: outcomeRule.is_enabled,
+      }),
+    ),
+    ...mockDatabase.emailOutcomeRules.map((outcomeRule) =>
+      formatTomlTable("[[email.outcome_rules]]", {
+        pattern: outcomeRule.pattern,
+        outcome: outcomeRule.outcome,
+        smtp_code: outcomeRule.smtp_code,
+        diagnostic: outcomeRule.diagnostic,
+        note: outcomeRule.note === "" ? null : outcomeRule.note,
+        enabled: outcomeRule.is_enabled,
+      }),
+    ),
     ...mockDatabase.httpBins.map((httpBin) =>
       formatTomlTable("[[http.bins]]", {
         name: httpBin.name,
@@ -112,6 +133,8 @@ const knownSeedSections: Record<string, string> = {
   "[[http.bins]]": "HTTP bin",
   "[[email.tag_rules]]": "Tag rule",
   "[[email.forward_rules]]": "Forward rule",
+  "[[sms.outcome_rules]]": "Custom outcome number",
+  "[[email.outcome_rules]]": "Custom outcome address",
 };
 
 const keyValuePattern = /^[A-Za-z0-9_.-]+\s*=\s*(.+)$/;

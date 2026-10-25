@@ -107,6 +107,8 @@ export function buildDefaultSettings(): AppSettings {
     sms_failure_rate_percent: 0,
     inbound_email_domains: ["inbound.app.test", "reply.app.test"],
     is_strict_twilio_test_mode: false,
+    is_magic_numbers_enabled: true,
+    is_magic_addresses_enabled: true,
     fire_opened_events_on_view: true,
     opened_event_mode: "first_open",
     chaos_smtp_reject_next_count: 0,
