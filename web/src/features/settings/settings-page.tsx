@@ -10,6 +10,7 @@ import { GeneralSection } from "@/features/settings/sections/general-section";
 import { OpenedEventsSection } from "@/features/settings/sections/opened-events-section";
 import { OtpPatternsSection } from "@/features/settings/sections/otp-patterns-section";
 import { SeedSection } from "@/features/settings/sections/seed-section";
+import { PaymentsSection } from "@/features/settings/sections/payments-section";
 import { SmsSection } from "@/features/settings/sections/sms-section";
 import { SettingsNav } from "@/features/settings/settings-nav";
 import {
@@ -35,6 +36,8 @@ function SelectedSection({
       return <EmailSection appSettings={appSettings} />;
     case "sms":
       return <SmsSection appSettings={appSettings} />;
+    case "payments":
+      return <PaymentsSection appSettings={appSettings} />;
     case "opened-events":
       return <OpenedEventsSection appSettings={appSettings} />;
     case "chaos":

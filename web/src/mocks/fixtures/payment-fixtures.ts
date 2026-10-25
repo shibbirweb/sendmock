@@ -2,7 +2,7 @@ import type {
   PaymentDetail,
   PaymentLineItem,
   PaymentMethod,
-  PaymentProvider,
+  BuiltinPaymentProvider,
   PaymentSimulateRequest,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
@@ -13,7 +13,7 @@ import {
 import { simulatePayment } from "@/mocks/payments/simulate-payment";
 
 type PaymentSpec = {
-  provider: PaymentProvider;
+  provider: BuiltinPaymentProvider;
   amountMinor: number;
   currency: string;
   minutesAgo: number;
@@ -28,6 +28,14 @@ type PaymentSpec = {
 };
 
 const shopUrl = "http://localhost:8000/checkout";
+
+const providerNames: Record<BuiltinPaymentProvider, string> = {
+  stripe: "Stripe",
+  paypal: "PayPal",
+  sslcommerz: "SSLCommerz",
+  bkash: "bKash",
+  native: "Native",
+};
 const visa4242: PaymentMethod = {
   kind: "card",
   brand: "visa",
@@ -315,13 +323,14 @@ const paymentSpecs: PaymentSpec[] = [
   },
 ];
 
-function buildProviderIds(
-  provider: PaymentProvider,
+/** Each provider's own ids for a payment; a custom gateway gets one reference. */
+export function buildProviderIds(
+  provider: string,
   createdAtMs: number,
 ): Record<string, string> {
   const suffix = createMockUlid(createdAtMs).slice(-12);
   const providerIdsByProvider: Record<
-    PaymentProvider,
+    BuiltinPaymentProvider,
     Record<string, string>
   > = {
     stripe: {
@@ -334,7 +343,28 @@ function buildProviderIds(
     native: { payment: `pay_${suffix}` },
   };
 
-  return providerIdsByProvider[provider];
+  return (
+    providerIdsByProvider[provider as BuiltinPaymentProvider] ?? {
+      reference: `${provider.toUpperCase()}-${suffix}`,
+    }
+  );
+}
+
+/** Which built-in method a fixture's chosen method stands for. */
+function readFixtureMethodKey(
+  paymentMethod: PaymentMethod | undefined,
+): string | null {
+  if (paymentMethod === undefined) {
+    return null;
+  }
+  if (paymentMethod.kind === "card") {
+    return "card";
+  }
+
+  return paymentMethod.kind === "wallet" &&
+    paymentMethod.wallet_name === "PayPal"
+    ? "paypal_account"
+    : "bkash";
 }
 
 function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
@@ -347,6 +377,7 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
   return {
     id: paymentId,
     provider: paymentSpec.provider,
+    provider_name: providerNames[paymentSpec.provider],
     provider_reference: Object.values(providerIds)[0] ?? paymentId,
     provider_ids: providerIds,
     amount_minor: paymentSpec.amountMinor,
@@ -359,6 +390,7 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
     refunded_minor: 0,
     captured_minor: 0,
     method: paymentSpec.method ?? null,
+    method_key: readFixtureMethodKey(paymentSpec.method),
     line_items: paymentSpec.lineItems,
     metadata: { order_id: `ord_${paymentId.slice(-6)}` },
     success_url: paymentSpec.hasCheckout ? `${shopUrl}/success` : null,
@@ -407,7 +439,10 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
  * uses, so timelines and notification deliveries are consistent (PY-09).
  */
 export function buildPaymentFixtures(
-  mockDatabase: Pick<MockDatabase, "webhookEndpoints" | "webhookDeliveries">,
+  mockDatabase: Pick<
+    MockDatabase,
+    "webhookEndpoints" | "webhookDeliveries" | "paymentGateways"
+  >,
 ): PaymentDetail[] {
   return paymentSpecs.map((paymentSpec) => {
     const paymentDetail = buildPayment(paymentSpec);

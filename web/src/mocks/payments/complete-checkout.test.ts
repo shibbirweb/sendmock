@@ -1,11 +1,10 @@
 import { describe, expect, test } from "vitest";
 
 import type { CheckoutCard, PaymentDetail } from "@/lib/api/types";
+import { buildDefaultStep } from "@/lib/payments/payment-step-catalogue";
 import { createMockDatabase } from "@/mocks/db/mock-database";
-import {
-  completeCheckout,
-  toCheckoutSession,
-} from "@/mocks/payments/complete-checkout";
+import { toCheckoutSession } from "@/mocks/payments/checkout-session";
+import { completeCheckout } from "@/mocks/payments/complete-checkout";
 
 function setUp(customerName: string) {
   const mockDatabase = createMockDatabase("standard");
@@ -39,7 +38,7 @@ describe("completeCheckout", () => {
         card: card("4242 4242 4242 4242"),
       }),
     ).toEqual({ isApplied: true });
-    expect(toCheckoutSession(paymentDetail)).toMatchObject({
+    expect(toCheckoutSession(mockDatabase, paymentDetail)).toMatchObject({
       state: "completed",
       redirect: { outcome: "success" },
     });
@@ -51,7 +50,12 @@ describe("completeCheckout", () => {
       exp_month: 12,
       exp_year: 2034,
     });
-    expect(JSON.stringify(mockDatabase)).not.toContain("4242424242424242");
+    // The typed number is in neither the payment nor its notifications; only
+    // the Card method's own test card list holds test numbers.
+    expect(JSON.stringify(paymentDetail)).not.toContain("4242424242424242");
+    expect(JSON.stringify(mockDatabase.webhookDeliveries)).not.toContain(
+      "4242424242424242",
+    );
   });
 
   test("PY-01.1 a real card number is refused and leaves no trace", () => {
@@ -80,10 +84,12 @@ describe("completeCheckout", () => {
       action: "pay",
       card: card("4000002500003155"),
     });
-    expect(toCheckoutSession(paymentDetail).state).toBe("requires_three_ds");
+    expect(toCheckoutSession(mockDatabase, paymentDetail).state).toBe(
+      "requires_three_ds",
+    );
 
     completeCheckout(mockDatabase, paymentDetail, { action: "three_ds_fail" });
-    expect(toCheckoutSession(paymentDetail)).toMatchObject({
+    expect(toCheckoutSession(mockDatabase, paymentDetail)).toMatchObject({
       state: "failed",
       failure_code: "authentication_failed",
     });
@@ -94,7 +100,9 @@ describe("completeCheckout", () => {
     completeCheckout(canceled.mockDatabase, canceled.paymentDetail, {
       action: "cancel",
     });
-    expect(toCheckoutSession(canceled.paymentDetail)).toMatchObject({
+    expect(
+      toCheckoutSession(canceled.mockDatabase, canceled.paymentDetail),
+    ).toMatchObject({
       state: "canceled",
       redirect: { outcome: "cancel" },
     });
@@ -106,7 +114,9 @@ describe("completeCheckout", () => {
     completeCheckout(delayed.mockDatabase, delayed.paymentDetail, {
       action: "delay",
     });
-    expect(toCheckoutSession(delayed.paymentDetail).state).toBe("pending");
+    expect(
+      toCheckoutSession(delayed.mockDatabase, delayed.paymentDetail).state,
+    ).toBe("pending");
   });
 
   test("PY-03.1 bKash pays with a test wallet; a wrong PIN is asked again", () => {
@@ -115,12 +125,12 @@ describe("completeCheckout", () => {
     expect(
       completeCheckout(mockDatabase, paymentDetail, {
         action: "pay",
-        wallet: { number: "01770000003", otp: "123456", pin: "12121" },
+        entries: { number: "01770000003", otp: "123456", pin: "12121" },
       }),
     ).toMatchObject({ isApplied: false, message: "Wrong PIN. Try again." });
     completeCheckout(mockDatabase, paymentDetail, {
       action: "pay",
-      wallet: { number: "01770000001", otp: "123456", pin: "12121" },
+      entries: { number: "01770000001", otp: "123456", pin: "12121" },
     });
     expect(paymentDetail).toMatchObject({
       status: "succeeded",
@@ -128,10 +138,46 @@ describe("completeCheckout", () => {
     });
   });
 
+  test("PY-12.6 a method runs its flow's steps as edited: a QR step makes the bank flow a scan", () => {
+    const { mockDatabase, paymentDetail } = setUp("Nadia Islam");
+    const bankFlow = mockDatabase.paymentFlows.find(
+      (flowRecord) => flowRecord.key === "bank",
+    );
+    if (bankFlow === undefined) {
+      throw new Error("The fixtures need the Bank flow.");
+    }
+    bankFlow.steps = [buildDefaultStep("otp"), buildDefaultStep("qr_code")];
+
+    expect(
+      completeCheckout(mockDatabase, paymentDetail, {
+        action: "pay",
+        method_key: "city",
+        entries: { otp: "000000" },
+      }),
+    ).toMatchObject({ message: "The verification code is wrong" });
+    completeCheckout(mockDatabase, paymentDetail, {
+      action: "pay",
+      method_key: "city",
+      entries: { otp: "123456" },
+    });
+    expect(paymentDetail).toMatchObject({
+      status: "succeeded",
+      method_key: "city",
+      method: { kind: "bank", bank_name: "City Touch" },
+    });
+    expect(
+      toCheckoutSession(mockDatabase, paymentDetail).flows.map(
+        (paymentFlow) => paymentFlow.key,
+      ),
+    ).toEqual(["card", "wallet", "bank"]);
+  });
+
   test("PY-03.3 a finished checkout cannot be paid again", () => {
     const { mockDatabase, paymentDetail } = setUp("Ayesha Khan");
 
-    expect(toCheckoutSession(paymentDetail).state).toBe("completed");
+    expect(toCheckoutSession(mockDatabase, paymentDetail).state).toBe(
+      "completed",
+    );
     expect(
       completeCheckout(mockDatabase, paymentDetail, {
         action: "pay",

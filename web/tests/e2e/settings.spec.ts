@@ -196,7 +196,8 @@ test("PL-05.6 the update check stays off until it is turned on", async ({
   page,
 }) => {
   await page.goto("/settings?section=about");
-  await expect(page.getByText("0.0.0-dev")).toBeVisible();
+  // Exact: the sidebar footer shows "v0.0.0-dev" too once /info loads.
+  await expect(page.getByText("0.0.0-dev", { exact: true })).toBeVisible();
   const checkButton = page.getByRole("button", { name: "Check for updates" });
   await expect(checkButton).toBeDisabled();
 

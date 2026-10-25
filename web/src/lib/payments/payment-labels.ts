@@ -1,16 +1,4 @@
-import type {
-  PaymentProvider,
-  PaymentStatus,
-  PaymentSummary,
-} from "@/lib/api/types";
-
-export const paymentProviderLabels: Record<PaymentProvider, string> = {
-  stripe: "Stripe",
-  paypal: "PayPal",
-  sslcommerz: "SSLCommerz",
-  bkash: "bKash",
-  native: "Native",
-};
+import type { PaymentStatus, PaymentSummary } from "@/lib/api/types";
 
 export const paymentStatusLabels: Record<PaymentStatus, string> = {
   requires_payment: "Awaiting payment",

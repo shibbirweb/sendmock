@@ -1,5 +1,6 @@
 import type {
   PaymentDetail,
+  PaymentEventType,
   PaymentMethod,
   PaymentSimulateAction,
   PaymentSimulateRequest,
@@ -13,10 +14,7 @@ import {
 } from "@/lib/payments/payment-actions";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { buildPaymentRedirect } from "@/mocks/payments/build-payment-redirect";
-import {
-  hasProviderEvent,
-  type PaymentEventType,
-} from "@/mocks/payments/provider-notifications";
+import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
 
 export type SimulationResult =
@@ -25,7 +23,7 @@ export type SimulationResult =
 
 export type PaymentDatabase = Pick<
   MockDatabase,
-  "webhookEndpoints" | "webhookDeliveries"
+  "webhookEndpoints" | "webhookDeliveries" | "paymentGateways"
 >;
 
 export function addTimeline(
@@ -38,11 +36,13 @@ export function addTimeline(
 }
 
 export function finishCheckout(
+  mockDatabase: PaymentDatabase,
   paymentDetail: PaymentDetail,
   redirectOutcome: "success" | "fail" | "cancel",
   createdAt: string,
 ) {
   const paymentRedirect = buildPaymentRedirect(
+    findGatewayRecord(mockDatabase, paymentDetail.provider),
     paymentDetail,
     redirectOutcome,
     createdAt,
@@ -64,6 +64,7 @@ function money(paymentDetail: PaymentDetail, amountMinor: number): string {
 }
 
 type SimulationStep = (
+  mockDatabase: PaymentDatabase,
   paymentDetail: PaymentDetail,
   simulateRequest: PaymentSimulateRequest,
   createdAt: string,
@@ -83,12 +84,17 @@ function readDefaultTestMethod(paymentDetail: PaymentDetail): PaymentMethod {
 }
 
 const succeedStep: SimulationStep = (
+  mockDatabase,
   paymentDetail,
   simulateRequest,
   createdAt,
 ) => {
   const hadCheckout = paymentDetail.checkout_url !== null;
-  paymentDetail.method ??= readDefaultTestMethod(paymentDetail);
+  if (paymentDetail.method === null) {
+    paymentDetail.method = readDefaultTestMethod(paymentDetail);
+    paymentDetail.method_key =
+      paymentDetail.provider === "bkash" ? "bkash" : "card";
+  }
   const isCapture = simulateRequest.action === "capture";
   paymentDetail.status = "succeeded";
   paymentDetail.captured_minor = paymentDetail.amount_minor;
@@ -98,7 +104,7 @@ const succeedStep: SimulationStep = (
     `${isCapture ? "Captured" : "Paid"} ${money(paymentDetail, paymentDetail.amount_minor)}`,
     createdAt,
   );
-  finishCheckout(paymentDetail, "success", createdAt);
+  finishCheckout(mockDatabase, paymentDetail, "success", createdAt);
 
   return hadCheckout
     ? ["checkout.completed", "payment.succeeded"]
@@ -106,6 +112,7 @@ const succeedStep: SimulationStep = (
 };
 
 const refundStep: SimulationStep = (
+  _mockDatabase,
   paymentDetail,
   simulateRequest,
   createdAt,
@@ -126,6 +133,7 @@ const refundStep: SimulationStep = (
 };
 
 const resolveDisputeStep: SimulationStep = (
+  _mockDatabase,
   paymentDetail,
   simulateRequest,
   createdAt,
@@ -157,7 +165,7 @@ const resolveDisputeStep: SimulationStep = (
 const simulationSteps: Record<PaymentSimulateAction, SimulationStep> = {
   succeed: succeedStep,
   capture: succeedStep,
-  decline: (paymentDetail, simulateRequest, createdAt) => {
+  decline: (mockDatabase, paymentDetail, simulateRequest, createdAt) => {
     const declineReason = simulateRequest.decline_reason ?? "generic_decline";
     paymentDetail.status = "failed";
     paymentDetail.failure_code = declineReason;
@@ -167,10 +175,10 @@ const simulationSteps: Record<PaymentSimulateAction, SimulationStep> = {
       `Declined: ${declineReason.replaceAll("_", " ")}`,
       createdAt,
     );
-    finishCheckout(paymentDetail, "fail", createdAt);
+    finishCheckout(mockDatabase, paymentDetail, "fail", createdAt);
     return ["payment.failed"];
   },
-  expire: (paymentDetail, _simulateRequest, createdAt) => {
+  expire: (_mockDatabase, paymentDetail, _simulateRequest, createdAt) => {
     paymentDetail.status = "canceled";
     paymentDetail.failure_code = "expired";
     paymentDetail.checkout_url = null;
@@ -182,13 +190,13 @@ const simulationSteps: Record<PaymentSimulateAction, SimulationStep> = {
     );
     return ["checkout.expired"];
   },
-  void: (paymentDetail, _simulateRequest, createdAt) => {
+  void: (_mockDatabase, paymentDetail, _simulateRequest, createdAt) => {
     paymentDetail.status = "canceled";
     addTimeline(paymentDetail, "canceled", "Authorization voided", createdAt);
     return ["payment.canceled"];
   },
   refund: refundStep,
-  dispute: (paymentDetail, _simulateRequest, createdAt) => {
+  dispute: (_mockDatabase, paymentDetail, _simulateRequest, createdAt) => {
     paymentDetail.status = "disputed";
     paymentDetail.dispute = { status: "needs_response", reason: "fraudulent" };
     addTimeline(
@@ -232,6 +240,7 @@ export function simulatePayment(
 
   const createdAt = new Date(nowMs).toISOString();
   const firedEvents = simulationSteps[simulateRequest.action](
+    mockDatabase,
     paymentDetail,
     simulateRequest,
     createdAt,
@@ -241,7 +250,7 @@ export function simulatePayment(
   return { isApplied: true };
 }
 
-/** Sends each event the provider has as a notification, a millisecond apart. */
+/** Sends each event the gateway names as a notification, a millisecond apart (PY-12.3). */
 export function firePaymentEvents(
   mockDatabase: PaymentDatabase,
   paymentDetail: PaymentDetail,
@@ -249,7 +258,14 @@ export function firePaymentEvents(
   nowMs: number,
 ) {
   firedEvents
-    .filter((eventType) => hasProviderEvent(paymentDetail.provider, eventType))
+    .filter(
+      (eventType) =>
+        (
+          findGatewayRecord(mockDatabase, paymentDetail.provider)?.event_names[
+            eventType
+          ] ?? ""
+        ).trim() !== "",
+    )
     .forEach((eventType, eventIndex) => {
       recordPaymentNotification(
         mockDatabase,

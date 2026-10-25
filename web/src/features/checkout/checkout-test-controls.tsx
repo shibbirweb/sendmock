@@ -9,47 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { buildQuickPayRequest } from "@/features/checkout/flows/build-pay-request";
 import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
-import type {
-  CheckoutCompleteRequest,
-  DeclineReason,
-  PaymentProvider,
-} from "@/lib/api/types";
+import type { CheckoutSession, DeclineReason } from "@/lib/api/types";
 import { declineReasons } from "@/lib/payments/payment-actions";
-import { testWalletOtp, testWalletPin } from "@/lib/payments/test-instruments";
-
-/** A successful payment in the provider's own way: a test card, test wallet or approval. */
-function buildQuickPayRequest(
-  provider: PaymentProvider,
-): CheckoutCompleteRequest {
-  if (provider === "bkash") {
-    return {
-      action: "pay",
-      wallet: { number: "01770000001", otp: testWalletOtp, pin: testWalletPin },
-    };
-  }
-  if (provider === "paypal") {
-    return { action: "pay" };
-  }
-
-  return {
-    action: "pay",
-    card: {
-      number: "4242424242424242",
-      exp_month: 12,
-      exp_year: 2034,
-      cvc: "123",
-      holder_name: "Test Customer",
-    },
-  };
-}
 
 /** One click to each outcome, beside the provider's own form (PY-03.1). */
 export function CheckoutTestControls({
-  provider,
+  checkoutSession,
   checkoutActions,
 }: {
-  provider: PaymentProvider;
+  checkoutSession: CheckoutSession;
   checkoutActions: CheckoutActions;
 }) {
   const reasonPickerId = React.useId();
@@ -57,7 +27,9 @@ export function CheckoutTestControls({
     React.useState<DeclineReason>("insufficient_funds");
   const isBusy = checkoutActions.isSubmitting;
   // 3-D Secure belongs to cards; wallets confirm with their own PIN or login.
-  const isCardProvider = provider !== "paypal" && provider !== "bkash";
+  const isCardProvider = checkoutSession.flows.some((paymentFlow) =>
+    paymentFlow.steps.some((flowStep) => flowStep.type === "card_form"),
+  );
 
   return (
     <aside
@@ -73,7 +45,9 @@ export function CheckoutTestControls({
       <Button
         disabled={isBusy}
         onClick={() => {
-          checkoutActions.submit(buildQuickPayRequest(provider));
+          checkoutActions.submit(
+            buildQuickPayRequest(checkoutSession.methods[0]),
+          );
         }}
       >
         Pay successfully

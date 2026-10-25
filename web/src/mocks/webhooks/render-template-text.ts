@@ -120,6 +120,14 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   mailgun_signature: () =>
     faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase(),
   svix_signature: () => `v1,${faker.string.alphanumeric(43)}=`,
+  uuid: () => faker.string.uuid(),
+  random_hex: ([lengthText]) =>
+    faker.string
+      .hexadecimal({ length: Number(lengthText) || 32, prefix: "" })
+      .toLowerCase(),
+  now_iso: () => new Date().toISOString(),
+  stripe_signature: () =>
+    `t=${Math.floor(Date.now() / 1000)},v1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
 };
 
 function stripEmailPrefix(eventType: string): string {

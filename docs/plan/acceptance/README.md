@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 96 features, 10 / 410 criteria ticked.**
+**Accepted: 0 / 97 features, 10 / 418 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -152,6 +152,7 @@ On top of its own criteria, a feature is done only when:
 | [PY-06](08-payments.md#py-06-sslcommerz-emulation) | SSLCommerz emulation | Phase 3P | 5 | Not started |
 | [PY-07](08-payments.md#py-07-after-payment-operations) | After-payment operations | Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions) | 4 | In progress |
 | [PY-08](08-payments.md#py-08-events-templates-and-delivery) | Events, templates and delivery | Phase 3P | 3 | Not started |
-| [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 4 | In progress |
+| [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 5 | In progress |
 | [PY-10](08-payments.md#py-10-more-gateways) | More gateways | Phase 4 (bKash, Razorpay, Paddle), later (others) | 3 | Not started |
 | [PY-11](08-payments.md#py-11-cli-mcp-and-test-helpers) | CLI, MCP and test helpers | Phase 3P | 3 | Not started |
+| [PY-12](08-payments.md#py-12-gateway-method-and-flow-configuration) | Gateway, method and flow configuration | UI in U2, backend, CLI, MCP and skill in Phase 3P | 7 | In progress |

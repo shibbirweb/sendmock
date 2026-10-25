@@ -9,6 +9,9 @@ import { numbersHandlers } from "@/mocks/handlers/numbers-handlers";
 import { outcomeRulesHandlers } from "@/mocks/handlers/outcome-rules-handlers";
 import { checkoutHandlers } from "@/mocks/handlers/checkout-handlers";
 import { paymentHandlers } from "@/mocks/handlers/payment-handlers";
+import { paymentFlowHandlers } from "@/mocks/handlers/payment-flow-handlers";
+import { paymentGatewayHandlers } from "@/mocks/handlers/payment-gateway-handlers";
+import { paymentMethodHandlers } from "@/mocks/handlers/payment-method-handlers";
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
@@ -42,6 +45,9 @@ export const mockHandlers = [
   ...httpBinHandlers,
   ...httpRequestHandlers,
   ...samplesHandlers,
+  ...paymentFlowHandlers,
+  ...paymentGatewayHandlers,
+  ...paymentMethodHandlers,
   ...paymentHandlers,
   ...checkoutHandlers,
   ...webhookEndpointHandlers,

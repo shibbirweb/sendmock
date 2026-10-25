@@ -7,10 +7,8 @@ import {
   createErrorResponse,
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
-import {
-  completeCheckout,
-  toCheckoutSession,
-} from "@/mocks/payments/complete-checkout";
+import { toCheckoutSession } from "@/mocks/payments/checkout-session";
+import { completeCheckout } from "@/mocks/payments/complete-checkout";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function findSessionPayment(sessionId: unknown) {
@@ -28,7 +26,7 @@ export const checkoutHandlers = [
 
     return paymentDetail === undefined
       ? createNotFoundResponse("Checkout session")
-      : HttpResponse.json(toCheckoutSession(paymentDetail));
+      : HttpResponse.json(toCheckoutSession(mockDatabase, paymentDetail));
   }),
 
   http.post(
@@ -60,7 +58,7 @@ export const checkoutHandlers = [
         { id: paymentDetail.id },
       );
 
-      return HttpResponse.json(toCheckoutSession(paymentDetail));
+      return HttpResponse.json(toCheckoutSession(mockDatabase, paymentDetail));
     },
   ),
 ];

@@ -12,7 +12,6 @@ import { PaymentStatusBadge } from "@/features/payments/payment-status-badge";
 import type { PaymentSummary } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
 import { formatMinorAmount } from "@/lib/payments/format-money";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 
 function PaymentRow({ paymentSummary }: { paymentSummary: PaymentSummary }) {
   return (
@@ -34,7 +33,7 @@ function PaymentRow({ paymentSummary }: { paymentSummary: PaymentSummary }) {
       </TableCell>
       <TableCell>
         <span className="rounded border px-1.5 text-[11px]">
-          {paymentProviderLabels[paymentSummary.provider]}
+          {paymentSummary.provider_name}
         </span>
       </TableCell>
       <TableCell>

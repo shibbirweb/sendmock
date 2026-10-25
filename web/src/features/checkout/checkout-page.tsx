@@ -1,14 +1,16 @@
+import type * as React from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckoutOrderSummary } from "@/features/checkout/checkout-order-summary";
 import { CheckoutResult } from "@/features/checkout/checkout-result";
 import { CheckoutTestControls } from "@/features/checkout/checkout-test-controls";
 import { TestModeBanner } from "@/features/checkout/test-mode-banner";
 import { ThreeDsChallenge } from "@/features/checkout/three-ds-challenge";
-import { CheckoutThemePanel } from "@/features/checkout/themes/checkout-theme-panel";
+import { CheckoutMethodPanel } from "@/features/checkout/flows/checkout-method-panel";
 import { useCheckoutActions } from "@/features/checkout/use-checkout-actions";
 import { useCheckoutSession } from "@/lib/api/hooks/use-payment-queries";
 import type { CheckoutSession } from "@/lib/api/types";
-import { paymentProviderLabels } from "@/lib/payments/payment-labels";
+import { readReadableForeground } from "@/lib/payments/readable-foreground";
 
 function CheckoutSteps({
   checkoutSession,
@@ -27,12 +29,12 @@ function CheckoutSteps({
 
   return (
     <div className="grid gap-4">
-      <CheckoutThemePanel
+      <CheckoutMethodPanel
         checkoutSession={checkoutSession}
         checkoutActions={checkoutActions}
       />
       <CheckoutTestControls
-        provider={checkoutSession.provider}
+        checkoutSession={checkoutSession}
         checkoutActions={checkoutActions}
       />
     </div>
@@ -51,6 +53,17 @@ export function CheckoutPage({ sessionId }: { sessionId: string }) {
     <div
       data-checkout-theme={checkoutSession?.provider ?? "native"}
       className="min-h-svh bg-muted/30"
+      // The gateway's configured colour, with readable text on it (PY-12.3).
+      style={
+        checkoutSession === undefined
+          ? undefined
+          : ({
+              "--checkout-accent": checkoutSession.accent,
+              "--checkout-accent-foreground": readReadableForeground(
+                checkoutSession.accent,
+              ),
+            } as React.CSSProperties)
+      }
     >
       <TestModeBanner />
       <main className="mx-auto grid w-full max-w-4xl gap-6 px-4 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:gap-10">
@@ -76,7 +89,7 @@ export function CheckoutPage({ sessionId }: { sessionId: string }) {
                   aria-hidden="true"
                   className="size-2.5 rounded-full bg-checkout-accent"
                 />
-                {paymentProviderLabels[checkoutSession.provider]} test checkout
+                {checkoutSession.provider_name} test checkout
               </p>
               <CheckoutOrderSummary checkoutSession={checkoutSession} />
             </div>

@@ -33,6 +33,20 @@ function isPathActive(currentPath: string, itemPath: string): boolean {
   return currentPath === itemPath || currentPath.startsWith(`${itemPath}/`);
 }
 
+/**
+ * The child to highlight: the longest path that matches, so "All payments"
+ * (/payments) is not lit while Methods (/payments/methods) is open.
+ */
+function findActiveChildPath(
+  currentPath: string,
+  childItems: NavigationItem[],
+): string | undefined {
+  return childItems
+    .map((childItem) => childItem.path)
+    .filter((childPath) => isPathActive(currentPath, childPath))
+    .sort((firstPath, secondPath) => secondPath.length - firstPath.length)[0];
+}
+
 function isSectionActive(currentPath: string, navigationItem: NavigationItem) {
   const sectionPrefix = navigationItem.path.split("/").slice(0, 2).join("/");
 
@@ -112,10 +126,12 @@ export function AppSidebar() {
                           <SidebarMenuSubItem key={childItem.title}>
                             <SidebarMenuSubButton
                               asChild
-                              isActive={isPathActive(
-                                currentPath,
-                                childItem.path,
-                              )}
+                              isActive={
+                                findActiveChildPath(
+                                  currentPath,
+                                  navigationItem.children ?? [],
+                                ) === childItem.path
+                              }
                             >
                               <Link to={childItem.path}>
                                 <childItem.icon />

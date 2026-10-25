@@ -7,11 +7,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { usePaymentsSearch } from "@/features/payments/use-payments-search";
-import type { PaymentProvider } from "@/lib/api/types";
-import {
-  paymentProviderLabels,
-  paymentStatusFilters,
-} from "@/lib/payments/payment-labels";
+import { usePaymentGateways } from "@/lib/api/hooks/use-payment-gateway-queries";
+import { paymentStatusFilters } from "@/lib/payments/payment-labels";
 
 const anyValue = "any";
 /** Currencies the emulated providers settle in (PY-02.3). */
@@ -24,6 +21,7 @@ export function PaymentFilters({
   paymentsSearch: ReturnType<typeof usePaymentsSearch>;
 }) {
   const { status, provider, currency } = paymentsSearch.paymentsSearch;
+  const paymentGateways = usePaymentGateways().data ?? [];
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -51,9 +49,7 @@ export function PaymentFilters({
           onValueChange={(selectedProvider) => {
             paymentsSearch.updateSearch({
               provider:
-                selectedProvider === anyValue
-                  ? undefined
-                  : (selectedProvider as PaymentProvider),
+                selectedProvider === anyValue ? undefined : selectedProvider,
             });
           }}
         >
@@ -62,13 +58,11 @@ export function PaymentFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={anyValue}>All providers</SelectItem>
-            {Object.entries(paymentProviderLabels).map(
-              ([providerKey, label]) => (
-                <SelectItem key={providerKey} value={providerKey}>
-                  {label}
-                </SelectItem>
-              ),
-            )}
+            {paymentGateways.map((paymentGateway) => (
+              <SelectItem key={paymentGateway.key} value={paymentGateway.key}>
+                {paymentGateway.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select

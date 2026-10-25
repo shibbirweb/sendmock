@@ -27,6 +27,18 @@ import {
   buildHttpResponseRuleFixtures,
 } from "@/mocks/fixtures/http-catcher-fixtures";
 import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
+import {
+  buildBuiltinPaymentGateways,
+  type PaymentGatewayRecord,
+} from "@/mocks/fixtures/payment-gateway-fixtures";
+import {
+  buildBuiltinPaymentFlows,
+  type PaymentFlowRecord,
+} from "@/mocks/fixtures/payment-flow-fixtures";
+import {
+  buildBuiltinPaymentMethods,
+  type PaymentMethodRecord,
+} from "@/mocks/fixtures/payment-method-fixtures";
 import { buildDefaultSettings } from "@/mocks/fixtures/settings-fixtures";
 import { buildHttpCatcherTraffic } from "@/mocks/http/build-http-catcher-traffic";
 import {
@@ -63,6 +75,7 @@ import {
   buildWebhookEndpointFixtures,
   buildWebhookRuleFixtures,
   linkDeliverySubjects,
+  paymentEndpointName,
 } from "@/mocks/fixtures/webhook-fixtures";
 import { buildTemplateRevisionFixtures } from "@/mocks/fixtures/template-revision-fixtures";
 import {
@@ -99,6 +112,9 @@ export type MockDatabase = {
   webhookVariables: WebhookVariable[];
   savedDeliveries: SavedDelivery[];
   payments: PaymentDetail[];
+  paymentMethods: PaymentMethodRecord[];
+  paymentFlows: PaymentFlowRecord[];
+  paymentGateways: PaymentGatewayRecord[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -142,6 +158,13 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    paymentMethods: buildBuiltinPaymentMethods(),
+    paymentFlows: buildBuiltinPaymentFlows(),
+    paymentGateways: buildBuiltinPaymentGateways(
+      webhookEndpoints.find(
+        (webhookEndpoint) => webhookEndpoint.name === paymentEndpointName,
+      )?.id ?? null,
+    ),
     httpResponseRules: new Map(
       httpBins.map((httpBin) => [
         httpBin.id,
@@ -200,6 +223,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
   const payments = buildPaymentFixtures({
     webhookEndpoints: configuration.webhookEndpoints,
     webhookDeliveries,
+    paymentGateways: configuration.paymentGateways,
   });
   const httpCatcherTraffic = buildHttpCatcherTraffic(
     configuration.httpBins,
