@@ -6,18 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SeedApplyCard } from "@/features/settings/sections/seed-apply-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useExportSeed, useSeedStatus } from "@/lib/api/hooks/use-seed-queries";
+import { downloadTextFile } from "@/lib/files/download-text-file";
 import { formatDateTime } from "@/lib/format/format-values";
-
-function downloadTextFile(fileText: string, fileName: string) {
-  const fileUrl = URL.createObjectURL(
-    new Blob([fileText], { type: "application/toml" }),
-  );
-  const downloadLink = document.createElement("a");
-  downloadLink.href = fileUrl;
-  downloadLink.download = fileName;
-  downloadLink.click();
-  URL.revokeObjectURL(fileUrl);
-}
 
 function SeedStatusCard() {
   const seedStatusQuery = useSeedStatus();

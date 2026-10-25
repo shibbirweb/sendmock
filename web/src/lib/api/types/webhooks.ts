@@ -283,7 +283,76 @@ export type WebhookTemplateSummary = {
   description: string;
   required_variables: string[];
   revision: number;
+  /** A built-in template the user edited; Reset to default restores it (WH-09.8). */
+  is_modified: boolean;
 };
+
+/** GET /api/v1/webhooks/templates/{templateId} (WH-08.4). */
+export type WebhookTemplateDetail = WebhookTemplateSummary & {
+  method: HttpMethod;
+  content_type: string;
+  /** Header name to a template, e.g. "X-Twilio-Signature": "{{ twilio_signature(...) }}". */
+  header_templates: Record<string, string>;
+  body_template: string;
+  doc_url: string | null;
+  /** "2026-09-30": when a provider template was last checked against the docs. */
+  verified_on: string | null;
+  used_by_endpoint_count: number;
+};
+
+/** The editable part of a template; body of PATCH /api/v1/webhooks/templates/{templateId}. */
+export type TemplateDraft = Pick<
+  WebhookTemplateDetail,
+  "method" | "content_type" | "header_templates" | "body_template"
+>;
+
+/** Template details only custom templates can change (WH-09.9). */
+export type TemplateMetadata = Pick<
+  WebhookTemplateSummary,
+  "name" | "description" | "events" | "required_variables"
+>;
+
+/** Body of PATCH /api/v1/webhooks/templates/{templateId}; metadata is ignored for built-ins. */
+export type TemplateUpdate = TemplateDraft & Partial<TemplateMetadata>;
+
+/** One saved version of a template (WH-09.5). */
+export type TemplateRevision = {
+  revision: number;
+  saved_at: IsoTimestamp;
+  template: TemplateDraft & TemplateMetadata;
+};
+
+/** Body of POST /api/v1/webhooks/templates (a new blank custom template). */
+export type TemplateCreateRequest = { name: string };
+
+/** Body of POST /api/v1/webhooks/templates/import (WH-09.3). */
+export type TemplateImportRequest = {
+  file_text: string;
+  /** What to do when the id is taken; left out, the API answers 409. */
+  on_conflict?: "replace" | "copy";
+};
+
+/** Body of POST /api/v1/webhooks/templates/{templateId}/render; empty for the sample. */
+export type TemplateRenderRequest = {
+  email_id?: Ulid;
+  sms_id?: Ulid;
+  /** Unsaved edits to preview instead of the stored template (WH-09.7). */
+  draft?: TemplateDraft;
+};
+
+export type TemplateRenderResult = {
+  /** What it was rendered against, e.g. "Built-in sample" or an email subject. */
+  rendered_against: string;
+  headers: Record<string, string>;
+  body: string;
+  /** Undefined variables; they render empty. */
+  warnings: string[];
+  /** Problems that stop the template from being saved: unknown functions or filters, unbalanced braces. */
+  errors: string[];
+};
+
+/** Body of POST /api/v1/webhooks/templates/{templateId}/clone. */
+export type TemplateCloneRequest = { name: string };
 
 export type SavedDelivery = {
   id: Ulid;

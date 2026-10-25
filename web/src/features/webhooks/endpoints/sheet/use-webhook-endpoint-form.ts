@@ -39,6 +39,7 @@ const defaultBackoffSeconds = [1, 5, 30, 120, 600];
 
 function toFormValues(
   webhookEndpoint: WebhookEndpoint | null,
+  initialTemplateId: string,
 ): WebhookEndpointFormValues {
   return {
     name: webhookEndpoint?.name ?? "",
@@ -46,7 +47,7 @@ function toFormValues(
     method: webhookEndpoint?.method ?? "POST",
     timeoutSeconds: String((webhookEndpoint?.timeout_ms ?? 10_000) / 1000),
     isEnabled: webhookEndpoint?.is_enabled ?? true,
-    templateId: webhookEndpoint?.template_id ?? "native",
+    templateId: webhookEndpoint?.template_id ?? initialTemplateId,
     templateMode: webhookEndpoint?.template_mode ?? "linked",
     headerRows: toNameValueRows(webhookEndpoint?.headers ?? {}),
     fieldRows: toNameValueRows(webhookEndpoint?.extra_fields ?? {}),
@@ -82,14 +83,17 @@ export function toEndpointInput(
 /** State, validation (WH-01.5) and saving for the endpoint sheet. */
 export function useWebhookEndpointForm({
   editedEndpoint,
+  initialTemplateId,
   onSaved,
 }: {
   editedEndpoint: WebhookEndpoint | null;
+  /** The template a new endpoint starts with. */
+  initialTemplateId: string;
   onSaved: (savedEndpoint: WebhookEndpoint) => void;
 }) {
   const saveWebhookEndpoint = useSaveWebhookEndpoint();
   const [formValues, setFormValues] = React.useState(() =>
-    toFormValues(editedEndpoint),
+    toFormValues(editedEndpoint, initialTemplateId),
   );
   const [fieldErrors, setFieldErrors] =
     React.useState<WebhookEndpointFieldErrors>({});

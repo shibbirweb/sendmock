@@ -1,4 +1,6 @@
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { PlusIcon, SendIcon } from "lucide-react";
+import * as React from "react";
 
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { Button } from "@/components/ui/button";
@@ -44,6 +46,20 @@ export function WebhookEndpointsPage() {
   const templatesQuery = useWebhookTemplates();
   const appInfoQuery = useAppInfo();
   const endpointActions = useWebhookEndpointActions();
+  const { template: templateToUse } = useSearch({
+    from: "/webhooks/endpoints",
+  });
+  const navigate = useNavigate({ from: "/webhooks/endpoints" });
+  const { openNewEndpointWithTemplate } = endpointActions;
+
+  React.useEffect(() => {
+    if (templateToUse === undefined) {
+      return;
+    }
+
+    openNewEndpointWithTemplate(templateToUse);
+    void navigate({ search: {}, replace: true });
+  }, [templateToUse, openNewEndpointWithTemplate, navigate]);
   const webhookEndpoints = endpointsQuery.data ?? [];
   const templateNamesById = new Map(
     (templatesQuery.data ?? []).map((webhookTemplate) => [
@@ -137,6 +153,7 @@ export function WebhookEndpointsPage() {
       <WebhookEndpointSheet
         isOpen={endpointActions.isSheetOpen}
         editedEndpoint={editedEndpoint}
+        initialTemplateId={endpointActions.newEndpointTemplateId}
         onOpenChange={endpointActions.setSheetOpen}
         onCreated={(createdEndpoint) => {
           endpointActions.setEditedEndpointId(createdEndpoint.id);

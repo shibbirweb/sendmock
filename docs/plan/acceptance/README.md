@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 95 features, 10 / 389 criteria ticked.**
+**Accepted: 0 / 96 features, 10 / 399 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -101,9 +101,9 @@ On top of its own criteria, a feature is done only when:
 | [WH-04](03-webhooks.md#wh-04-standard-webhooks-signing) | Standard Webhooks signing | Phase 3 | 3 | Not started |
 | [WH-05](03-webhooks.md#wh-05-manual-send-and-replay) | Manual send and replay | UI in U2, backend Phase 3 | 4 | In progress |
 | [WH-06](03-webhooks.md#wh-06-provider-formats-and-signatures) | Provider formats and signatures | Phase 3 (Twilio, Vonage), Phase 4 (email providers) | 3 | Not started |
-| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env) | 8 | Not started |
-| [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 3 | Not started |
-| [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 6 | Not started |
+| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env) | 10 | Not started |
+| [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 5 | In progress |
+| [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 9 | In progress |
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | In progress |
 | [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 2 | Not started |
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 6 | Not started |
@@ -131,6 +131,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Not started |
 | [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Not started |
 | [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 3 | Not started |
+| [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 3 | Not started |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 3 | Not started |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew), Phase 5 (all) | 2 | Not started |

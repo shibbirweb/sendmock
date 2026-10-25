@@ -53,6 +53,8 @@ export function NamePromptDialog({
           className="grid gap-4"
           onSubmit={(submitEvent) => {
             submitEvent.preventDefault();
+            // React passes submit up through the portal; keep it from saving an outer form.
+            submitEvent.stopPropagation();
             if (enteredName.trim() === "") {
               setNameError("Enter a name");
               return;
