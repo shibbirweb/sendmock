@@ -117,3 +117,8 @@ export type MessagingServiceInput = Omit<
   MessagingService,
   "sid" | "created_by"
 >;
+
+/** Body of `POST /verify/{verificationSid}/force`. */
+export type VerificationForceRequest = {
+  state: ForcedVerificationState;
+};

@@ -2,6 +2,12 @@
 
 Base path: `/api/v1`. JSON in and out. The OpenAPI 3.1 document is served at `/api/openapi.json` and drives both the UI's TypeScript types and the user-facing API docs page.
 
+## Contract
+
+The contract is [docs/api/openapi.yaml](../api/openapi.yaml), frozen in Phase U3 ([18](18-phase-u3.md#w7-contract-freeze-ui-09)). It is generated, never edited by hand: `web/src/lib/api/endpoint-registry` lists every endpoint (method, path, summary, parameters, body, answer, errors) and the schemas come from the TypeScript types in `web/src/lib/api/types` (`bun run openapi` in `web/`). Tests keep it honest: the registry must equal the mock handlers, and the committed file must equal a fresh build and validate as OpenAPI 3.1. From the freeze on, an API change starts here in the plan, then the registry or types, then the spec. In Stage B the backend generates its document with `utoipa` and the contract tests (PL-01.1) compare it with this file.
+
+The spec covers the 164 endpoints the UI uses plus the `/catch/{binPath}` capture URL. The tables below also list planned endpoints that no screen calls yet; each joins the spec through the registry when its backend lands: `GET /emails/{emailId}/html`, `GET /emails/{emailId}/opens`, `GET /emails/latest`, `POST /emails/inbound`, `/tag-rules`, `/forward-rules`, `GET /sms/{smsId}/opens`, `POST /webhooks/render`, the test-automation helpers (`/wait/*`, `/otp`, `/links`), the payments test cards and `wait/payment` ([17](17-payments.md#api-sendmock-native)), and the realtime stream (`/ws`, `/events`), which OpenAPI does not describe.
+
 Auth: none by default; when `--ui-auth` is set, the same basic auth (or an API token from settings) protects the API.
 
 CORS: `--cors-origins` (default: the official docs site origin, so the website's API playground can reach a local instance after the user clicks Connect; set to empty to disable). See [16-website-and-releases.md](16-website-and-releases.md#api-playground).
@@ -10,11 +16,11 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET | `/emails` | list, cursor pagination (`?cursor=&limit=`), filters (`q`, `from`, `to`, `unread`, `tag`) |
+| GET | `/emails` | list, cursor pagination (`?cursor=&limit=`), filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
 | GET | `/emails/{emailId}` | parsed message (headers, text, html, attachments meta, extracted data) |
 | GET | `/emails/{emailId}/raw` | original `.eml` |
 | GET | `/emails/{emailId}/html` | sanitised HTML for preview iframe |
-| GET | `/emails/{emailId}/attachments/{index}` | download attachment |
+| GET | `/emails/{emailId}/attachments/{attachmentIndex}` | download attachment |
 | PATCH | `/emails/{emailId}` | mark read/unread, set tags |
 | POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api" }` (default `api`) |
 | GET | `/emails/{emailId}/opens` | open history |
@@ -25,12 +31,14 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/emails/{emailId}/simulate` | simulate `delivered`, `deferred`, `bounced` (hard/soft), `complained`, `unsubscribed` |
 | GET | `/emails/{emailId}/timeline` | received, opened, delivery outcomes, releases, webhooks |
 | GET | `/emails/{emailId}/mime` | MIME tree |
-| GET | `/emails/{emailId}/parts/{partId}/thumbnail` | image thumbnail |
+| GET | `/emails/{emailId}/parts/{attachmentIndex}/thumbnail` | image thumbnail |
 | GET | `/emails/{emailId}/html-check` | HTML/CSS client compatibility report |
 | POST | `/emails/{emailId}/link-check` | check links and images (outbound requests) |
 | POST | `/emails/{emailId}/spam-check` | SpamAssassin score (when configured) |
 | GET | `/emails/{emailId}/list-unsubscribe` | List-Unsubscribe header validation |
 | POST | `/emails/{emailId}/release` | send to a real SMTP relay (`{ "to": [...] }` optional) |
+| POST | `/emails/{emailId}/reply`, `/emails/{emailId}/forward` | reply to or forward an email as its recipient; the result is stored as an inbound email and fires `email.inbound` ([03](03-email.md)) |
+| GET/POST/PATCH/DELETE | `/inbound-routes` | Mailgun-style routes for incoming email, in priority order; `POST /inbound-routes/test` shows which routes match and what runs ([05](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style)) |
 | GET/POST/PATCH/DELETE | `/tag-rules`, `/forward-rules` | automatic tagging and auto-forward rules |
 | GET/POST/PATCH/DELETE | `/outcome-rules/email` | custom outcome addresses; `POST /outcome-rules/email/{ruleId}/move` with `up` or `down` reorders |
 
@@ -39,7 +47,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/sms` | native send, with optional `media_urls` and inline base64 `media` (see [04-sms.md](04-sms.md#mms-and-media)) |
-| GET | `/sms` | list, filters (`to`, `from`, `status`, `direction`, `q`) |
+| GET | `/sms` | list, filters (`query`, `to`, `from`, `status`, `direction`, `thread_id`) |
 | GET | `/sms/{smsId}` | one message with status history |
 | GET | `/sms/{smsId}/media/{mediaIndex}` | one stored media file (MMS or WhatsApp), with its content type |
 | GET | `/sms/threads` | conversations grouped by number pair |
@@ -47,6 +55,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 for inbound) |
 | GET | `/sms/{smsId}/opens` | open history |
 | POST | `/sms/inbound` | simulate incoming SMS |
+| POST | `/sms/{smsId}/reply-webhook/resend` | send an inbound message's reply webhook again (Twilio-style request URL, fallback and TwiML replies) |
 | DELETE | `/sms/{smsId}`, `/sms` | delete one / all |
 | GET/POST/PATCH/DELETE | `/numbers` | virtual number registry |
 | GET/POST/PATCH/DELETE | `/outcome-rules/sms` | custom outcome numbers; `POST /outcome-rules/sms/{ruleId}/move` with `up` or `down` reorders |
@@ -58,8 +67,8 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 |--------|------|---------|
 | GET/POST/PATCH/DELETE | `/verify/services` | Verify services (code length, fixed code, TTL) |
 | GET | `/verify` | verifications list (filters `to`, `status`, `channel`) |
-| GET | `/verify/{verificationId}` | one verification with code, attempts, timeline |
-| POST | `/verify/{verificationId}/force` | force `approved`, `canceled`, `expired`, `max_attempts` |
+| GET | `/verify/{verificationSid}` | one verification with code, attempts, timeline |
+| POST | `/verify/{verificationSid}/force` | force `approved`, `canceled`, `expired`, `max_attempts` |
 
 The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider port ([04-sms.md](04-sms.md#twilio-verify)).
 

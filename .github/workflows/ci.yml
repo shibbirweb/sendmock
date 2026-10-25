@@ -48,6 +48,9 @@ jobs:
       - name: Bundle budget (live build, initial JS and embedded size)
         run: bun run test:budget
 
+      - name: OpenAPI contract (fresh build equals docs/api/openapi.yaml, valid 3.1)
+        run: bun run test:contract
+
       - name: Install Playwright browser
         run: bunx --bun playwright install --with-deps chromium
 

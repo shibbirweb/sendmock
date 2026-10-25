@@ -4,6 +4,7 @@ import type {
   EmailDeliveryStatus,
   EmailDetail,
   NativeSendRequest,
+  NativeSendResult,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
@@ -152,6 +153,9 @@ export const nativeSendHandlers = [
       subject: storedEmail.subject,
     });
 
-    return HttpResponse.json({ id: storedEmail.id }, { status: 201 });
+    return HttpResponse.json(
+      { id: storedEmail.id } satisfies NativeSendResult,
+      { status: 201 },
+    );
   }),
 ];

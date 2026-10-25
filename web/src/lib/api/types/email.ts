@@ -193,3 +193,13 @@ export type EmailForwardRequest = {
   include_original?: boolean;
   include_attachments?: boolean;
 };
+
+/** Answer of `POST /send`: the stored email's id. */
+export type NativeSendResult = {
+  id: Ulid;
+};
+
+/** Body of `POST /emails/{emailId}/release`; empty sends to the original recipients. */
+export type EmailReleaseRequest = {
+  to?: string[];
+};

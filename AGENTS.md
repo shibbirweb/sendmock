@@ -14,7 +14,7 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 ## Project rules
 
 - **UI first.** Stage A builds the whole web UI against the mock API (MSW in `web/src/mocks/`). Do not start backend work before the Phase U3 sign-off is ticked in `PROGRESS.md`.
-- **Mocks stay behind the API.** UI components call the real API paths through the typed client and query hooks; they never import fixtures or the mock DB directly. `web/src/lib/api/types.ts` is the API contract until it is frozen into `docs/api/openapi.yaml`.
+- **Mocks stay behind the API.** UI components call the real API paths through the typed client and query hooks; they never import fixtures or the mock DB directly. The API contract is `docs/api/openapi.yaml`, generated from `web/src/lib/api/endpoint-registry` and the types in `web/src/lib/api/types` (`bun run openapi`); an API change starts in `docs/plan/06-api.md`, then the registry or types, then the regenerated spec.
 - **Parity.** Every backend feature ships with UI, REST API, CLI command, MCP tool and skill docs, all from the `sendmock-ops` operation registry. CI enforces it.
 - **Standards over custom.** Native webhooks follow Standard Webhooks. SMS magic numbers and error codes match Twilio's official test numbers exactly. Provider emulation returns the provider's real response and error shapes.
 - **Safe defaults.** Bind to `127.0.0.1` by default (Docker binds `0.0.0.0`). Secrets are masked in the UI, API responses, logs and MCP output, and are never written to seed exports in plain text. Release/forward to real SMTP stays off unless an allowlist is configured.

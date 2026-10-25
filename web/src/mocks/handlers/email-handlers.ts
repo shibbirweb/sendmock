@@ -4,7 +4,7 @@ import type {
   EmailDetail,
   EmailSummary,
   EmailUpdate,
-  OpenSource,
+  OpenEventRequest,
   SimulatedEmailOutcome,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
@@ -147,7 +147,7 @@ export const emailHandlers = [
       return createNotFoundResponse("Email");
     }
 
-    const { source } = (await request.json()) as { source?: OpenSource };
+    const { source } = (await request.json()) as OpenEventRequest;
     email.open_count += 1;
     email.opened_at = email.opened_at ?? new Date().toISOString();
     publishMockEvent("email.opened", {

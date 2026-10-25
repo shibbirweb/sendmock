@@ -1,0 +1,143 @@
+import {
+  type ApiEndpoint,
+  listOf,
+  partialOf,
+  tagEndpoints,
+  typeRef,
+} from "./endpoint-definition";
+
+const endpointEndpoints = tagEndpoints("Webhook endpoints", [
+  {
+    method: "GET",
+    path: "/api/v1/webhooks/endpoints",
+    summary: "Where webhooks go: URL, template, secret and retry policy.",
+    response: listOf("WebhookEndpoint"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints",
+    summary: "Add an endpoint; its signing secret is generated.",
+    requestBody: typeRef("WebhookEndpointInput"),
+    response: typeRef("WebhookEndpoint"),
+    successStatus: 201,
+    errorStatuses: [400],
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/webhooks/endpoints/{endpointId}",
+    summary: "Change an endpoint; send only the changed keys.",
+    requestBody: partialOf("WebhookEndpointInput"),
+    response: typeRef("WebhookEndpoint"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/webhooks/endpoints/{endpointId}",
+    summary: "Delete an endpoint and its rules.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints/preview",
+    summary: "Render an unsaved endpoint's request against a message.",
+    requestBody: typeRef("EndpointPreviewRequest"),
+    response: typeRef("EndpointPreviewResult"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/webhooks/endpoints/{endpointId}/secret",
+    summary: "Reveal the signing secret (asked for after a confirmation).",
+    response: typeRef("RevealedEndpointSecret"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints/{endpointId}/rotate-secret",
+    summary: "New signing secret; the old one keeps working for the overlap.",
+    requestBody: typeRef("RotateSecretRequest"),
+    response: typeRef("WebhookEndpoint"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints/{endpointId}/save-as-template",
+    summary: "Save the endpoint's request as a custom template.",
+    requestBody: typeRef("SaveAsTemplateRequest"),
+    response: typeRef("WebhookTemplateSummary"),
+    successStatus: 201,
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints/{endpointId}/send",
+    summary: "Send a webhook for a chosen message or the sample, by hand.",
+    requestBody: typeRef("ManualSendRequest"),
+    response: typeRef("WebhookDelivery"),
+    successStatus: 201,
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/endpoints/{endpointId}/test",
+    summary: "Send a test.ping delivery.",
+    response: typeRef("WebhookDelivery"),
+    errorStatuses: [404],
+  },
+]);
+
+const ruleEndpoints = tagEndpoints("Webhook rules", [
+  {
+    method: "GET",
+    path: "/api/v1/webhooks/rules",
+    summary: "Which events go to which endpoint, checked from top to bottom.",
+    response: listOf("WebhookRule"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/rules",
+    summary: "Add a rule.",
+    requestBody: typeRef("WebhookRuleInput"),
+    response: typeRef("WebhookRule"),
+    successStatus: 201,
+    errorStatuses: [400],
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/webhooks/rules/{ruleId}",
+    summary: "Change a rule; send only the changed keys.",
+    requestBody: partialOf("WebhookRuleInput"),
+    response: typeRef("WebhookRule"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/webhooks/rules/{ruleId}",
+    summary: "Delete a rule.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/rules/{ruleId}/move",
+    summary: "Move a rule up or down; answers the reordered list.",
+    requestBody: typeRef("WebhookRuleMove"),
+    response: listOf("WebhookRule"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/rules/preview",
+    summary: "Which recent messages an unsaved rule would match.",
+    requestBody: typeRef("RulePreviewRequest"),
+    response: typeRef("RulePreviewResult"),
+  },
+]);
+
+export const webhooksApi: ApiEndpoint[] = [
+  ...endpointEndpoints,
+  ...ruleEndpoints,
+];

@@ -1,7 +1,7 @@
 /**
  * Shared shapes of the SendMock REST API (docs/plan/06-api.md). Field names mirror
- * the JSON wire format (snake_case) so these types are the API contract until
- * it is frozen into docs/api/openapi.yaml.
+ * the JSON wire format (snake_case); the schemas in docs/api/openapi.yaml are
+ * generated from these types (`bun run openapi`).
  */
 
 /** Sortable unique ID (ULID), e.g. "01JB6Z3K8Q2W5X7Y9A1B3C5D7E". */
@@ -43,6 +43,11 @@ export type ExtractedData = {
 };
 
 export type OpenSource = "ui" | "manual" | "api";
+
+/** Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`. */
+export type OpenEventRequest = {
+  source?: OpenSource;
+};
 
 export type OpenRecord = {
   opened_at: IsoTimestamp;

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import type { AppInfo } from "@/lib/api/types";
+import type { AppInfo, HealthStatus } from "@/lib/api/types";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { applyMockConditions } from "@/mocks/handlers/handler-utils";
@@ -25,7 +25,9 @@ function buildMockAppInfo(): AppInfo {
 }
 
 export const systemHandlers = [
-  http.get("*/api/v1/health", () => HttpResponse.json({ status: "ok" })),
+  http.get("*/api/v1/health", () =>
+    HttpResponse.json({ status: "ok" } satisfies HealthStatus),
+  ),
 
   http.get("*/api/v1/stats", async () => {
     const conditionResponse = await applyMockConditions();

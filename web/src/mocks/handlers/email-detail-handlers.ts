@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { EmailDetail } from "@/lib/api/types";
+import type { EmailDetail, EmailReleaseRequest } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import {
   buildHtmlCheckReport,
@@ -151,7 +151,7 @@ export const emailDetailHandlers = [
   http.post(
     "*/api/v1/emails/:emailId/release",
     withEmail(async (email, request) => {
-      const { to } = (await request.json()) as { to?: string[] };
+      const { to } = (await request.json()) as EmailReleaseRequest;
       const recipientAddresses = to?.length ? to : email.envelope_to;
       if (recipientAddresses.length === 0) {
         return createErrorResponse(
