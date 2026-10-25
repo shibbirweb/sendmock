@@ -300,6 +300,7 @@ export function buildSavedDeliveryFixtures(): SavedDelivery[] {
       id: createMockUlid(),
       name: "Twilio STOP reply",
       endpoint_id: null,
+      event_type: "sms.inbound",
       template_id: "twilio.inbound_sms",
       request: {
         method: "POST",

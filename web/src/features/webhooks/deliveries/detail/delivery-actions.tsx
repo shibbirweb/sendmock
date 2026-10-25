@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
+import { NamePromptDialog } from "@/components/common/name-prompt-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { isDeliveryRetrying } from "@/features/webhooks/deliveries/delivery-status";
 import { EditReplayDialog } from "@/features/webhooks/deliveries/detail/edit-replay-dialog";
-import { SaveDeliveryDialog } from "@/features/webhooks/deliveries/detail/save-delivery-dialog";
 import { useDeliveryActions } from "@/features/webhooks/deliveries/detail/use-delivery-actions";
 import type { WebhookDeliveryDetail } from "@/lib/api/types";
 
@@ -131,11 +131,13 @@ export function DeliveryActions({
         onClose={closeDialog}
       />
       {deliveryActions.pendingDialog === "save" && (
-        <SaveDeliveryDialog
-          isOpen
-          suggestedName={`${deliveryDetail.event_type} to ${deliveryDetail.endpoint_name}`}
-          isSaving={deliveryActions.isSaving}
-          onSave={deliveryActions.save}
+        <NamePromptDialog
+          title="Save this delivery"
+          description="Saved deliveries are kept through pruning and reset, and can be sent again later."
+          confirmLabel="Save"
+          initialName={`${deliveryDetail.event_type} to ${deliveryDetail.endpoint_name}`}
+          isSubmitting={deliveryActions.isSaving}
+          onSubmit={deliveryActions.save}
           onClose={closeDialog}
         />
       )}

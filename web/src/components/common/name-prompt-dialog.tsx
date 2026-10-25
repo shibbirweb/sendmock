@@ -12,27 +12,31 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-/** Names a delivery to keep as a bookmark on the Saved screen. */
-export function SaveDeliveryDialog({
-  isOpen,
-  suggestedName,
-  isSaving,
-  onSave,
+/** Asks for one name: saving, renaming or naming a copy. Mount it when opening. */
+export function NamePromptDialog({
+  title,
+  description,
+  confirmLabel,
+  initialName,
+  isSubmitting,
+  onSubmit,
   onClose,
 }: {
-  isOpen: boolean;
-  suggestedName: string;
-  isSaving: boolean;
-  onSave: (savedName: string) => void;
+  title: string;
+  description: string;
+  confirmLabel: string;
+  initialName: string;
+  isSubmitting: boolean;
+  onSubmit: (enteredName: string) => void;
   onClose: () => void;
 }) {
   const nameFieldId = React.useId();
-  const [savedName, setSavedName] = React.useState(suggestedName);
+  const [enteredName, setEnteredName] = React.useState(initialName);
   const [nameError, setNameError] = React.useState<string | undefined>();
 
   return (
     <Dialog
-      open={isOpen}
+      open
       onOpenChange={(isDialogOpen) => {
         if (!isDialogOpen) {
           onClose();
@@ -41,22 +45,19 @@ export function SaveDeliveryDialog({
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Save this delivery</DialogTitle>
-          <DialogDescription>
-            Saved deliveries are kept through pruning and reset, and can be sent
-            again later.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <form
           noValidate
           className="grid gap-4"
           onSubmit={(submitEvent) => {
             submitEvent.preventDefault();
-            if (savedName.trim() === "") {
+            if (enteredName.trim() === "") {
               setNameError("Enter a name");
               return;
             }
-            onSave(savedName.trim());
+            onSubmit(enteredName.trim());
           }}
         >
           <FormField
@@ -66,10 +67,10 @@ export function SaveDeliveryDialog({
           >
             <Input
               id={nameFieldId}
-              value={savedName}
+              value={enteredName}
               aria-invalid={nameError !== undefined}
               onChange={(changeEvent) => {
-                setSavedName(changeEvent.target.value);
+                setEnteredName(changeEvent.target.value);
               }}
             />
           </FormField>
@@ -77,8 +78,8 @@ export function SaveDeliveryDialog({
             <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSaving}>
-              Save
+            <Button type="submit" disabled={isSubmitting}>
+              {confirmLabel}
             </Button>
           </DialogFooter>
         </form>

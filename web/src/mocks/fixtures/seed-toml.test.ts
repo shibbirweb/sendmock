@@ -46,3 +46,30 @@ describe("validateSeedToml", () => {
     ]);
   });
 });
+
+describe("saved deliveries in the seed export", () => {
+  test("WH-10.3 exports saved deliveries without signature headers", () => {
+    const mockDatabase = createMockDatabase("standard");
+    const firstSaved = mockDatabase.savedDeliveries[0];
+    if (firstSaved === undefined) {
+      throw new Error("The fixtures need a saved delivery.");
+    }
+    mockDatabase.savedDeliveries[0] = {
+      ...firstSaved,
+      request: {
+        ...firstSaved.request,
+        headers: {
+          ...firstSaved.request.headers,
+          "webhook-signature": "v1,abc=",
+        },
+      },
+    };
+
+    const seedToml = buildSeedToml(mockDatabase);
+
+    expect(seedToml).toContain("[[webhook.saved]]");
+    expect(seedToml).toContain('name = "Twilio STOP reply"');
+    expect(seedToml).not.toContain("webhook-signature");
+    expect(validateSeedToml(seedToml).errors).toEqual([]);
+  });
+});

@@ -6,7 +6,6 @@ import { applyMockConditions } from "@/mocks/handlers/handler-utils";
 /** Read-only list endpoints that return a whole collection. */
 const collectionRoutes = {
   "*/api/v1/webhooks/templates": () => mockDatabase.webhookTemplates,
-  "*/api/v1/webhooks/saved": () => mockDatabase.savedDeliveries,
 };
 
 const collectionHandlers = Object.entries(collectionRoutes).map(

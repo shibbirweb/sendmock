@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 95 features, 10 / 388 criteria ticked.**
+**Accepted: 0 / 95 features, 10 / 389 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -104,7 +104,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env) | 8 | Not started |
 | [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 3 | Not started |
 | [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 6 | Not started |
-| [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | Phase 3 | 3 | Not started |
+| [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | In progress |
 | [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 2 | Not started |
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 6 | Not started |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 5 | Not started |

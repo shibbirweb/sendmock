@@ -102,7 +102,9 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/render` | render templates against a sample without sending |
 | GET | `/webhooks/template-reference` | functions, filters and context fields for autocomplete |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
-| GET/POST/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST` takes `{ "name": ..., "delivery_id": ... }`; `POST /webhooks/saved/{savedId}/send` |
+| GET/POST/PATCH/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST` takes `{ "name": ..., "delivery_id": ... }`, `PATCH` renames |
+| POST | `/webhooks/saved/{savedId}/send` | send again: `{ "endpoint_id": ..., "rerender": true }`; returns the new delivery |
+| POST | `/webhooks/saved/{savedId}/template` | save as a custom template: `{ "name": ... }`; returns the template |
 | POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window (`{ "overlap_hours": 24 }`); the response carries the new masked secret and `previous_secret_expires_at` |
 | GET | `/webhooks/endpoints/{endpointId}/secret` | reveal the plain secret (the reveal is written to the API request log); everywhere else secrets are masked |
 

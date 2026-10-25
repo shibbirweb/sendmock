@@ -28,6 +28,24 @@ function formatTomlTable(
   return [tableHeader, ...valueLines].join("\n");
 }
 
+function readEndpointName(
+  mockDatabase: MockDatabase,
+  endpointId: string | null,
+): string | null {
+  return (
+    mockDatabase.webhookEndpoints.find(
+      (endpointRecord) => endpointRecord.id === endpointId,
+    )?.name ?? null
+  );
+}
+
+/** "name: value" lines without signature headers, which are made per send (WH-10.3). */
+function listExportableHeaders(headers: Record<string, string>): string[] {
+  return Object.entries(headers)
+    .filter(([headerName]) => !headerName.toLowerCase().startsWith("webhook-"))
+    .map(([headerName, headerValue]) => `${headerName}: ${headerValue}`);
+}
+
 function toSecretReference(itemName: string): string {
   return `\${${itemName.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}_SECRET}`;
 }
@@ -109,6 +127,18 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         preset: httpBin.preset,
       }),
     ),
+    ...mockDatabase.savedDeliveries.map((savedDelivery) =>
+      formatTomlTable("[[webhook.saved]]", {
+        name: savedDelivery.name,
+        endpoint: readEndpointName(mockDatabase, savedDelivery.endpoint_id),
+        event: savedDelivery.event_type,
+        template: savedDelivery.template_id,
+        method: savedDelivery.request.method,
+        url: savedDelivery.request.url,
+        headers: listExportableHeaders(savedDelivery.request.headers),
+        body: savedDelivery.request.body,
+      }),
+    ),
   ];
 
   return [
@@ -127,6 +157,7 @@ const knownSeedSections: Record<string, string> = {
   "[[webhook.rules]]": "Webhook rule",
   "[[webhook.templates]]": "Webhook template",
   "[[webhook.variables]]": "Webhook variable",
+  "[[webhook.saved]]": "Saved delivery",
   "[[verify.services]]": "Verify service",
   "[[numbers]]": "Virtual number",
   "[[messaging_services]]": "Messaging Service",

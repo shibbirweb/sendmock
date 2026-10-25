@@ -217,6 +217,18 @@ export type SavedDeliveryInput = {
   delivery_id: Ulid;
 };
 
+/** Body of POST /api/v1/webhooks/saved/{savedId}/send (WH-10.2). */
+export type SavedDeliverySendRequest = {
+  endpoint_id: Ulid;
+  rerender: boolean;
+};
+
+/** Body of PATCH /api/v1/webhooks/saved/{savedId}. */
+export type SavedDeliveryRename = { name: string };
+
+/** Body of POST /api/v1/webhooks/saved/{savedId}/template (WH-10.2). */
+export type SaveAsTemplateRequest = { name: string };
+
 export type VariableKind =
   | "text"
   | "number"
@@ -277,6 +289,8 @@ export type SavedDelivery = {
   id: Ulid;
   name: string;
   endpoint_id: Ulid | null;
+  /** The event of the delivery it was saved from; null for a composer request. */
+  event_type: AppEventType | null;
   template_id: string;
   request: RecordedHttpRequest;
   saved_at: IsoTimestamp;
