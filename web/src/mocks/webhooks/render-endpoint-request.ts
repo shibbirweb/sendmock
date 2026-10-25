@@ -263,6 +263,7 @@ export function renderEndpointRequest(
     vars: {
       ...(builtContext.templateContext.vars as Record<string, unknown>),
       ...endpointVariables,
+      ...previewRequest.variables,
     },
     endpoint: { name: endpointInput.name, url: endpointInput.url },
   };
@@ -301,6 +302,7 @@ export function renderEndpointRequest(
 
   return {
     rendered_against: builtContext.renderedAgainst,
+    event_type: builtContext.eventType,
     method: endpointInput.method,
     url:
       queryPairs.length === 0

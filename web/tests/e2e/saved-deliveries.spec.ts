@@ -71,7 +71,7 @@ test("WH-10.2 a saved delivery can be sent to any endpoint and saved as a templa
   await sendDialog.getByRole("combobox").click();
   await page.getByRole("option", { name: "Team Slack alerts" }).click();
   await sendDialog.getByRole("button", { name: "Send", exact: true }).click();
-  const sendResult = sendDialog.getByTestId("saved-send-result");
+  const sendResult = sendDialog.getByTestId("sent-delivery-result");
   await expect(sendResult).toContainText("200");
   await expect(sendResult).toContainText("Sent to Team Slack alerts");
   await sendResult.getByRole("link", { name: "Open delivery" }).click();

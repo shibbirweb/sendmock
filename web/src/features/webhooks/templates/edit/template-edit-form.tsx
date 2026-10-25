@@ -14,10 +14,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { TemplateMetadataFields } from "@/features/webhooks/templates/edit/template-metadata-fields";
 import { CodeEditor } from "@/features/webhooks/templates/reference/code-editor/code-editor";
-import type {
-  CodeEditorHandle,
-  CodeEditorProblem,
-} from "@/features/webhooks/templates/reference/code-editor/code-editor-types";
+import type { CodeEditorHandle } from "@/features/webhooks/templates/reference/code-editor/code-editor-types";
 import { TemplateInsertMenu } from "@/features/webhooks/templates/reference/template-insert-menu";
 import { TemplateReferencePanel } from "@/features/webhooks/templates/reference/template-reference-panel";
 import { TemplateRowsEditor } from "@/features/webhooks/templates/reference/template-rows-editor";
@@ -29,6 +26,7 @@ import {
 } from "@/features/webhooks/templates/edit/use-template-draft-form";
 import { useTemplateReference } from "@/lib/api/hooks/use-webhook-template-queries";
 import type { HttpMethod, WebhookTemplateDetail } from "@/lib/api/types";
+import { selectBodyEditorProblems } from "@/lib/webhooks/describe-problem-source";
 
 const templateMethods: HttpMethod[] = ["POST", "PUT", "PATCH", "GET"];
 
@@ -50,21 +48,8 @@ export function TemplateEditForm({
   const renderErrors = templatePreview.previewQuery.data?.errors ?? [];
   const bodyEditorRef = React.useRef<CodeEditorHandle | null>(null);
   const renderProblems = templatePreview.previewQuery.data?.problems;
-  const bodyProblems = React.useMemo<CodeEditorProblem[]>(
-    () =>
-      (renderProblems ?? []).flatMap((renderProblem) =>
-        renderProblem.source === "body" &&
-        renderProblem.line !== null &&
-        renderProblem.column !== null
-          ? [
-              {
-                ...renderProblem,
-                line: renderProblem.line,
-                column: renderProblem.column,
-              },
-            ]
-          : [],
-      ),
+  const bodyProblems = React.useMemo(
+    () => selectBodyEditorProblems(renderProblems ?? []),
     [renderProblems],
   );
   const templateReference = useTemplateReference(

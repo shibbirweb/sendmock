@@ -56,7 +56,7 @@ export type WebhookEndpointFormValues = {
 
 const defaultBackoffSeconds = [1, 5, 30, 120, 600];
 
-function toFormValues(
+export function toFormValues(
   webhookEndpoint: WebhookEndpoint | null,
   initialTemplateId: string,
 ): WebhookEndpointFormValues {

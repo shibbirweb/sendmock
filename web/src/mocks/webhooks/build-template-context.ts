@@ -126,7 +126,11 @@ export function buildTemplateContext(
   mockDatabase: MockDatabase,
   webhookTemplate: WebhookTemplateSummary,
   renderRequest: TemplateRenderRequest,
-): { templateContext: TemplateContext; renderedAgainst: string } | null {
+): {
+  templateContext: TemplateContext;
+  renderedAgainst: string;
+  eventType: AppEventType;
+} | null {
   const contextSubject = findContextSubject(
     mockDatabase,
     webhookTemplate,
@@ -144,6 +148,7 @@ export function buildTemplateContext(
 
   return {
     renderedAgainst: contextSubject.label,
+    eventType: contextSubject.eventType,
     templateContext: {
       event: {
         id: "evt_preview",

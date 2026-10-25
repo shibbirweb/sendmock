@@ -104,15 +104,32 @@ export type EndpointPreviewRequest = {
   endpoint_id?: Ulid;
   email_id?: Ulid;
   sms_id?: Ulid;
+  /** Send-time values by variable name (no `vars.`); they win for this render (WH-05.5). */
+  variables?: Record<string, string>;
 };
 
 export type EndpointPreviewResult = {
   rendered_against: string;
+  event_type: AppEventType;
   method: HttpMethod;
   url: string;
   headers: Record<string, string>;
   body: string;
   problems: RenderProblem[];
+};
+
+/** Body of POST /api/v1/webhooks/endpoints/{endpointId}/send (WH-05.1, WH-05.3); neither id means the sample. */
+export type ManualSendRequest = {
+  email_id?: Ulid;
+  sms_id?: Ulid;
+  /** A template used for this send instead of the endpoint's request. */
+  template_id?: string;
+  /** A hand-written request replacing the endpoint's, from the composer. */
+  request?: WebhookEndpointInput;
+  /** Send-time values by variable name (no `vars.`), for this send only (WH-05.5). */
+  variables?: Record<string, string>;
+  /** An edited body, sent as written (WH-05.6). */
+  body?: string;
 };
 
 /** GET /api/v1/webhooks/endpoints/{endpointId}/secret (WH-01.3). */

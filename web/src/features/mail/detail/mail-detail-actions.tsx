@@ -28,6 +28,7 @@ import {
   type EmailComposerMode,
 } from "@/features/mail/detail/response/email-composer-mode";
 import { EmailResponseButtons } from "@/features/mail/detail/response/email-response-buttons";
+import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
 import { buildApiUrl } from "@/lib/api/api-client";
 import {
   useDeleteEmail,
@@ -58,6 +59,7 @@ export function MailDetailActions({
   const simulateOutcome = useSimulateEmailOutcome();
   const deleteEmail = useDeleteEmail();
   const [isReleaseDialogOpen, setReleaseDialogOpen] = React.useState(false);
+  const [isSendDialogOpen, setSendDialogOpen] = React.useState(false);
   // Replies, forwards and outcome simulations only apply to mail your app sent.
   const isSentByApp = canRespondToEmail(email);
 
@@ -155,12 +157,25 @@ export function MailDetailActions({
             <SendIcon />
             Release to real SMTP
           </DropdownMenuItem>
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem
+            onSelect={() => {
+              setSendDialogOpen(true);
+            }}
+          >
             <WebhookIcon />
-            Send to webhook (with the webhook screens)
+            Send to webhook
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      {isSendDialogOpen && (
+        <SendToWebhookDialog
+          renderRequest={{ email_id: email.id }}
+          messageLabel={email.subject || "(no subject)"}
+          onClose={() => {
+            setSendDialogOpen(false);
+          }}
+        />
+      )}
       <ReleaseEmailDialog
         email={email}
         isOpen={isReleaseDialogOpen}

@@ -84,8 +84,11 @@ function PartProblems({
 /** The message picker and the rendered method, URL, headers and body. */
 export function EndpointRequestPreview({
   requestPreview,
+  bodyEditor,
 }: {
   requestPreview: ReturnType<typeof useEndpointRequestPreview>;
+  /** Shown instead of the rendered body, e.g. while editing it before a send. */
+  bodyEditor?: React.ReactNode;
 }) {
   const pickerId = React.useId();
   const {
@@ -100,25 +103,27 @@ export function EndpointRequestPreview({
 
   return (
     <section aria-label="Request preview" className="grid min-w-0 gap-3">
-      <div className="grid gap-1.5">
-        <Label htmlFor={pickerId}>Preview with</Label>
-        <Select value={pickedOption} onValueChange={setPickedOption}>
-          <SelectTrigger id={pickerId} className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={sampleOption}>Built-in sample</SelectItem>
-            {messageOptions.map((messageOption) => (
-              <SelectItem
-                key={messageOption.optionValue}
-                value={messageOption.optionValue}
-              >
-                {messageOption.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {!requestPreview.isMessageFixed && (
+        <div className="grid gap-1.5">
+          <Label htmlFor={pickerId}>Preview with</Label>
+          <Select value={pickedOption} onValueChange={setPickedOption}>
+            <SelectTrigger id={pickerId} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={sampleOption}>Built-in sample</SelectItem>
+              {messageOptions.map((messageOption) => (
+                <SelectItem
+                  key={messageOption.optionValue}
+                  value={messageOption.optionValue}
+                >
+                  {messageOption.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       {previewQuery.isPending && <Skeleton className="h-40 w-full" />}
       {previewQuery.isError && (
         <p className="text-sm text-destructive">
@@ -166,11 +171,13 @@ export function EndpointRequestPreview({
             />
           </div>
           <div className="grid gap-1.5">
-            <HttpBodyView
-              title="Rendered body"
-              bodyText={previewResult.body}
-              contentType={previewResult.headers["content-type"] ?? null}
-            />
+            {bodyEditor ?? (
+              <HttpBodyView
+                title="Rendered body"
+                bodyText={previewResult.body}
+                contentType={previewResult.headers["content-type"] ?? null}
+              />
+            )}
             <PartProblems
               requestPart="body"
               problems={problems}

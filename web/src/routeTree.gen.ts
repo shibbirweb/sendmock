@@ -19,6 +19,7 @@ import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
+import { Route as WebhooksComposerRouteImport } from './routes/webhooks/composer'
 import { Route as WebhooksDeliveriesRouteImport } from './routes/webhooks/deliveries'
 import { Route as WebhooksEndpointsRouteImport } from './routes/webhooks/endpoints'
 import { Route as WebhooksRulesRouteImport } from './routes/webhooks/rules'
@@ -78,6 +79,11 @@ const SmsVerifyRoute = SmsVerifyRouteImport.update({
   path: '/sms/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WebhooksComposerRoute = WebhooksComposerRouteImport.update({
+  id: '/webhooks/composer',
+  path: '/webhooks/composer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WebhooksDeliveriesRoute = WebhooksDeliveriesRouteImport.update({
   id: '/webhooks/deliveries',
   path: '/webhooks/deliveries',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/mail/$emailId': typeof MailEmailIdRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
+  '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/sms/verify': typeof SmsVerifyRoute
+  '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/mail/$emailId': typeof MailEmailIdRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
+  '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/mail/$emailId'
     | '/sms'
     | '/sms/verify'
+    | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
     | '/webhooks/rules'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/sms/verify'
+    | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
     | '/webhooks/rules'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/mail/$emailId'
     | '/sms/_conversations'
     | '/sms/verify'
+    | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
     | '/webhooks/rules'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsVerifyRoute: typeof SmsVerifyRoute
+  WebhooksComposerRoute: typeof WebhooksComposerRoute
   WebhooksDeliveriesRoute: typeof WebhooksDeliveriesRoute
   WebhooksEndpointsRoute: typeof WebhooksEndpointsRoute
   WebhooksRulesRoute: typeof WebhooksRulesRoute
@@ -327,6 +340,13 @@ declare module '@tanstack/react-router' {
       path: '/sms/verify'
       fullPath: '/sms/verify'
       preLoaderRoute: typeof SmsVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webhooks/composer': {
+      id: '/webhooks/composer'
+      path: '/webhooks/composer'
+      fullPath: '/webhooks/composer'
+      preLoaderRoute: typeof WebhooksComposerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/webhooks/deliveries': {
@@ -422,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsVerifyRoute: SmsVerifyRoute,
+  WebhooksComposerRoute: WebhooksComposerRoute,
   WebhooksDeliveriesRoute: WebhooksDeliveriesRoute,
   WebhooksEndpointsRoute: WebhooksEndpointsRoute,
   WebhooksRulesRoute: WebhooksRulesRoute,
