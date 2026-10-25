@@ -75,5 +75,6 @@ export const queryKeys = {
     stats: ["system", "stats"] as const,
     info: ["system", "info"] as const,
     settings: ["system", "settings"] as const,
+    seedStatus: ["system", "seed-status"] as const,
   },
 };

@@ -56,8 +56,12 @@ import {
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
+  /** When the seed state was last applied (creation, reset or seed apply). */
+  seedAppliedAt: string;
   emails: EmailDetail[];
   emailTimelines: Map<string, EmailTimelineEntry[]>;
+  /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
+  attachmentContents: Map<string, Uint8Array>;
   smsMessages: SmsMessageDetail[];
   verifyServices: VerifyService[];
   verifications: VerificationDetail[];
@@ -106,6 +110,7 @@ function buildConfiguration() {
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
     settings: buildDefaultSettings(),
+    seedAppliedAt: new Date().toISOString(),
   };
 }
 
@@ -119,6 +124,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ...configuration,
       emails: [],
       emailTimelines: new Map(),
+      attachmentContents: new Map(),
       smsMessages: [],
       verifications: [],
       webhookDeliveries: [],
@@ -150,6 +156,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
   return {
     ...configuration,
     emails,
+    attachmentContents: new Map(),
     emailTimelines: new Map(
       emailFixtures.map((emailFixture) => [
         emailFixture.email.id,

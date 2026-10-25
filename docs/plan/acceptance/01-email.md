@@ -48,11 +48,12 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 
 ## EM-05 OTP and link extraction
 
-Phase 1.
+UI in U1, backend Phase 1.
 
 - [ ] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies.
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
 - [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
+- [ ] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code.
 - [ ] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient.
 
 ## EM-06 sendmail shim
@@ -70,6 +71,8 @@ Phase 1.
 - [ ] EM-07.1 `POST /api/v1/send` with from, to, cc, bcc, subject, text, html, attachments and headers stores a message equal to the equivalent SMTP message.
 - [ ] EM-07.2 Invalid input returns `400` with a field-level error and is recorded in the HTTP request log.
 - [ ] EM-07.3 The stored email shows source `native_api`.
+- [ ] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message.
+- [ ] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment.
 
 ## EM-08 Email provider HTTP send APIs
 

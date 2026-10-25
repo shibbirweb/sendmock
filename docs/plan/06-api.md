@@ -21,7 +21,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | DELETE | `/emails/{emailId}` | delete one |
 | DELETE | `/emails` | delete all (or by filter) |
 | GET | `/emails/latest` | newest message, optionally filtered by `to` |
-| POST | `/send` | native HTTP send (JSON); provider-compatible send APIs live under `/providers/*` and the provider port ([03-email.md](03-email.md#http-send-apis)) |
+| POST | `/send` | native HTTP send (JSON, with base64 `attachments`, see [03-email.md](03-email.md#native-send-attachments)); provider-compatible send APIs live under `/providers/*` and the provider port ([03-email.md](03-email.md#http-send-apis)) |
 | POST | `/emails/{emailId}/simulate` | simulate `delivered`, `deferred`, `bounced` (hard/soft), `complained`, `unsubscribed` |
 | GET | `/emails/{emailId}/timeline` | received, opened, delivery outcomes, releases, webhooks |
 | GET | `/emails/{emailId}/mime` | MIME tree |
@@ -117,6 +117,8 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/links?to=...` | latest extracted links for a recipient |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
+| POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
+| GET | `/seed/status` | seed file path, when it was applied, and items added or changed since |
 | GET | `/stats` | counts and webhook metrics for the dashboard |
 
 `wait` endpoints only match messages received after an optional `since` timestamp (defaults to "now minus 30 s") to avoid matching stale messages.
@@ -125,8 +127,9 @@ These make SendMock useful from any test framework without polling loops:
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET/PATCH | `/settings` | retention, SMS simulation profile, chaos toggles, extractors |
+| GET/PATCH | `/settings` | retention, email and SMS options, opened events, chaos toggles, OTP patterns; `PATCH` takes only the changed keys and returns field-level errors for invalid values |
 | GET | `/info` | version, uptime, listeners, counts, DB size |
+| GET | `/updates` | opt-in update check against GitHub Releases for the running channel; `409` while the update check is off |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 
 ## Realtime

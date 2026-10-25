@@ -1,8 +1,7 @@
 import { http, HttpResponse } from "msw";
 
-import type { AppInfo, AppSettings, AppStats } from "@/lib/api/types";
-import { readMockConditions } from "@/mocks/conditions/mock-conditions";
-import { mockDatabase, replaceMockDatabase } from "@/mocks/db/mock-database";
+import type { AppInfo, AppStats } from "@/lib/api/types";
+import { mockDatabase } from "@/mocks/db/mock-database";
 import {
   applyMockConditions,
   paginateItems,
@@ -90,27 +89,6 @@ export const systemHandlers = [
     await applyMockConditions();
 
     return HttpResponse.json(mockAppInfo);
-  }),
-
-  http.get("*/api/v1/settings", async () => {
-    await applyMockConditions();
-
-    return HttpResponse.json(mockDatabase.settings);
-  }),
-
-  http.patch("*/api/v1/settings", async ({ request }) => {
-    await applyMockConditions();
-    const settingsUpdate = (await request.json()) as Partial<AppSettings>;
-    mockDatabase.settings = { ...mockDatabase.settings, ...settingsUpdate };
-
-    return HttpResponse.json(mockDatabase.settings);
-  }),
-
-  http.post("*/api/v1/reset", async () => {
-    await applyMockConditions();
-    replaceMockDatabase(readMockConditions().dataSize);
-
-    return new HttpResponse(null, { status: 204 });
   }),
 
   http.get("*/api/v1/http/bins", async () => {

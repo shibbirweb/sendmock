@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers and Logs screens done**; Settings, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens done**; Overview dashboard and empty states, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 92 accepted, 5 / 329 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 94 accepted, 10 / 362 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: Settings next, then the Overview dashboard and empty states.
+2. Finish Phase U1: the Overview dashboard and the empty states with "how to connect" and "send sample".
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 12 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 14 / 16 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -100,8 +100,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Numbers registry and Messaging Services tab (inbound URL, method, fallback, format and status callback per number; sender pools with inbound handling)
 - [x] Logs: SMTP sessions and transcript viewer (failed sessions highlighted, colour-coded transcript, email to session links, 50 rows per page)
 - [x] Logs: HTTP API request log with rejected requests (filters by status class, API and path, formatted bodies, message links, 50 rows per page)
-- [ ] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns
-- [ ] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
+- [x] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns (per-section save with field errors; tag and forward rules follow with the U2 rule builder)
+- [x] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
 - [ ] Empty states with "how to connect" and "send sample"
 
 ### Phase U2: Webhook, HTTP catcher and payment screens
@@ -313,4 +313,11 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Logs screen design ([07](07-ui.md#logs): SMTP sessions with a colour-coded transcript viewer and a link from each email to its session, HTTP API request log with formatted bodies, filters and message links) and criteria EM-09.4 and SM-13.4. |
 | 2026-10-25 | Logs screen built on mock data: SMTP sessions (failed ones highlighted with their reason, transcript viewer with C / S lines and reply codes coloured by class, each SMTP email linked to its session and back) and the API request log (status class, API and path filters, JSON and form bodies formatted, links to the SMS or email created and back). Both tables page 50 rows at a time and load more on scroll; the large data set now has about 5,000 sessions and 2,000 requests. Native sends are logged live. |
 | 2026-10-25 | Fix: `web/.gitignore` ignored every folder named `logs`, which hid `src/features/logs` from git, Tailwind, Prettier and ESLint; the rule is now anchored to the root (`/logs/`). Demo control labels are now tied to their selects. |
+| 2026-10-25 | Plan: Settings screen design ([07](07-ui.md#settings): section nav, per-section save with field errors, General, Seed, Email, SMS, Opened events, Chaos, OTP patterns, Connection, About), `/seed/validate` and `/seed/status` in the API plan, criteria PL-04.6, PL-05.3, PL-05.4 and EM-05.5. Tag and auto-forward rules are edited with the U2 rule builder. |
+| 2026-10-25 | Settings screen built on mock data: section nav (picker on phones) with a "Chaos on" badge, per-section Save / Discard with validation shared with the API, General (retention, delete all, reset to seed), Seed (status, export, validate with line numbers, apply), Email (plus addressing, outcome profile and rates, inbound domains, masked relay URL and allowlist, SpamAssassin, magic addresses), SMS (profile, failure rate, strict mode, magic numbers), Opened events, Chaos, OTP patterns with a live tester, Connection snippets for 8 languages and 3 app locations, About with the opt-in update check. Shared `RadioCardGroup`, `ChipListInput` and `ConfirmActionDialog`. |
+| 2026-10-25 | Plan: Settings > Connection gets "Customize the request" (request headers and the optional `/send` and `/sms` payload fields, reflected in every language's snippet), criterion PL-05.7. |
+| 2026-10-25 | Settings > Connection: "Customize the request" adds request headers (with a quick Authorization header) and editable JSON bodies with chips for the optional `/send` (`cc`, `bcc`, `text`, `tags`, `headers`) and `/sms` (`status_callback`, `metadata`) fields; every language's snippet follows in its own syntax. |
+| 2026-10-25 | Plan: native send `attachments` defined ([03](03-email.md#native-send-attachments): `filename`, base64 `content`, optional `content_type` and `content_id`, 400 errors naming the attachment), criteria EM-07.4, EM-07.5 and PL-05.8; Connection gets an `attachments` chip and `{{file:<name>}}` values that each snippet reads and encodes. |
 | 2026-10-25 | Plan: SQLite recorded as the database decision ([02](02-architecture.md#database-sqlite): why, location and modes, connection setup, migrations with `user_version`, search, retention, tests); persistence default decided. |
+| 2026-10-25 | Native send attachments in the mock (`/send` stores them with real bytes, inline `cid:` images display, 400 errors name the attachment) and an `attachments` chip in Connection, where `{{file:...}}` values make each snippet read and encode the file. |
+| 2026-10-25 | Settings > Connection: "Customize the request" gets a Reset button that restores the sample bodies and removes added headers; the email and SMS body columns now line up. |

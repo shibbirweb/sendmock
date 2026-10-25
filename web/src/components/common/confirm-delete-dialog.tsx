@@ -1,13 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 
 /** "Delete X?" confirmation; open while `itemName` is set. */
 export function ConfirmDeleteDialog({
@@ -23,24 +14,14 @@ export function ConfirmDeleteDialog({
   onClose: () => void;
 }) {
   return (
-    <AlertDialog
-      open={itemName !== null}
-      onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          onClose();
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete {itemName}?</AlertDialogTitle>
-          <AlertDialogDescription>{consequence}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Keep it</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Delete</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmActionDialog
+      isOpen={itemName !== null}
+      title={`Delete ${itemName ?? ""}?`}
+      consequence={consequence}
+      confirmLabel="Delete"
+      cancelLabel="Keep it"
+      onConfirm={onConfirm}
+      onClose={onClose}
+    />
   );
 }

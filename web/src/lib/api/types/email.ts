@@ -150,6 +150,17 @@ export type SimulatedEmailOutcome = {
   bounce_type?: "hard" | "soft";
 };
 
+/** One file in `attachments` of POST /api/v1/send. */
+export type NativeSendAttachment = {
+  filename: string;
+  /** The file bytes, base64 encoded. */
+  content: string;
+  /** Guessed from the file extension when missing. */
+  content_type?: string;
+  /** Makes the attachment inline, shown in the HTML with `cid:<content_id>`. */
+  content_id?: string;
+};
+
 /** Body of POST /api/v1/send (native HTTP send API). */
 export type NativeSendRequest = {
   from: string;
@@ -161,6 +172,7 @@ export type NativeSendRequest = {
   html?: string;
   headers?: Record<string, string>;
   tags?: string[];
+  attachments?: NativeSendAttachment[];
 };
 
 /** Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying). */
