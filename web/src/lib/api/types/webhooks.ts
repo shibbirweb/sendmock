@@ -322,6 +322,36 @@ export type TemplateRevision = {
   template: TemplateDraft & TemplateMetadata;
 };
 
+export type TemplateValueType =
+  "string" | "number" | "boolean" | "timestamp" | "object" | "list";
+
+/** One value a template can read, e.g. `data.to[0].address` (WH-07.9). */
+export type TemplateReferenceField = {
+  path: string;
+  /** The last part of the path, shown in the tree. */
+  name: string;
+  value_type: TemplateValueType;
+  description: string;
+  /** From the preview sample; secrets come masked. */
+  example: string | null;
+  children: TemplateReferenceField[];
+};
+
+/** A function or filter, with how to call it. */
+export type TemplateReferenceHelper = {
+  name: string;
+  signature: string;
+  description: string;
+  example: string;
+};
+
+/** GET /api/v1/webhooks/template-reference?events=... */
+export type TemplateReference = {
+  fields: TemplateReferenceField[];
+  functions: TemplateReferenceHelper[];
+  filters: TemplateReferenceHelper[];
+};
+
 /** Body of POST /api/v1/webhooks/templates (a new blank custom template). */
 export type TemplateCreateRequest = { name: string };
 

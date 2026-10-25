@@ -41,7 +41,7 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
 }
 
 /** A fixed example for each kind of event, used when no message is picked. */
-function buildSampleSubject(eventType: AppEventType): ContextSubject {
+export function buildSampleSubject(eventType: AppEventType): ContextSubject {
   if (eventType.startsWith("sms.")) {
     return {
       eventType,
@@ -152,6 +152,14 @@ export function buildTemplateContext(
         name: "Preview",
         url: "http://localhost:8000/webhooks/preview",
       },
+      delivery: {
+        id: "01PREVIEWDELIVERY000000000",
+        attempt: 1,
+        trigger: "manual",
+      },
+      rule: { id: null, name: null },
+      sendmock: { version: "0.0.0-dev", http_url: "http://127.0.0.1:8025" },
+      request_id: "01PREVIEWREQUEST0000000000",
       body_fields: {},
     },
   };

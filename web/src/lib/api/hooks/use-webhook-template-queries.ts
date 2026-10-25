@@ -9,6 +9,7 @@ import { requestApi, requestApiText } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   TemplateImportRequest,
+  TemplateReference,
   TemplateRenderRequest,
   TemplateRevision,
   TemplateUpdate,
@@ -187,4 +188,19 @@ export function useSaveEndpointAsTemplate() {
         },
       ),
   );
+}
+
+/** Fields, functions and filters a template can use for these events (WH-07.9). */
+export function useTemplateReference(events: string[]) {
+  const eventsText = [...events].sort().join(",");
+
+  return useQuery({
+    queryKey: queryKeys.webhooks.templateReference(eventsText),
+    queryFn: ({ signal }) =>
+      requestApi<TemplateReference>("/webhooks/template-reference", {
+        queryParameters: { events: eventsText },
+        abortSignal: signal,
+      }),
+    staleTime: 60_000,
+  });
 }
