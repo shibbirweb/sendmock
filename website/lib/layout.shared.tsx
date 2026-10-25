@@ -3,7 +3,7 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { DemoLink } from "@/components/demo-link";
 import { SendMockLogo } from "@/components/sendmock-logo";
 
-export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+export { basePath } from "@/lib/base-path";
 
 /** Navigation shared by the landing page and the docs. */
 export function baseOptions(): BaseLayoutProps {
@@ -18,6 +18,8 @@ export function baseOptions(): BaseLayoutProps {
     },
     links: [
       { text: "Docs", url: "/docs" },
+      { text: "API", url: "/api" },
+      { text: "Playground", url: "/playground" },
       {
         type: "custom",
         children: (

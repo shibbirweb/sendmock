@@ -2203,13 +2203,6 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          "*/*":
-            schema:
-              type: string
-              format: binary
       responses:
         "200":
           description: OK.
@@ -2315,13 +2308,6 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          "*/*":
-            schema:
-              type: string
-              format: binary
       responses:
         "200":
           description: OK.

@@ -55,11 +55,15 @@ jobs:
         working-directory: website
         run: bunx --bun playwright install --with-deps chromium
 
-      - name: Landing page tests (WS-02.1, WS-02.2)
+      - name: Unit tests (snippets)
+        working-directory: website
+        run: bun run test:unit
+
+      - name: Landing, docs and API playground tests (WS-02, WS-03.3, WS-04)
         working-directory: website
         run: bun run test:e2e
 
-      # Uses the root build the tests just made; the Pages build below replaces it.
+      # Uses the root build (with the demo) the tests just made; the Pages build below replaces it.
       - name: Lighthouse at least 90 in every category (WS-02.3)
         working-directory: website
         run: bunx --bun @lhci/cli@0.15.1 autorun

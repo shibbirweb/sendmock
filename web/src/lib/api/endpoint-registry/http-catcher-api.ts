@@ -30,7 +30,10 @@ const captureEndpoints: AreaEndpoint[] = captureMethods.map((method) => ({
   path: "/catch/{binPath}",
   summary:
     "Capture a request in a bin and answer with its matching response rule or default response.",
-  requestBody: fileOf("*/*"),
+  // GET and DELETE carry no body.
+  ...(method === "GET" || method === "DELETE"
+    ? {}
+    : { requestBody: fileOf("*/*") }),
   response: fileOf("*/*"),
 }));
 

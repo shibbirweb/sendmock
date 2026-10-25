@@ -11,7 +11,7 @@ SendMock speaks the protocols your app already uses, so connecting is a settings
 | --- | --- |
 | Email over SMTP | host `127.0.0.1`, port `1025`, no TLS, any username and password |
 | Email or SMS provider SDKs | the provider port `http://127.0.0.1:8026` as the SDK's base URL ([email](../email.md), [SMS](../sms.md)) |
-| SendMock's own API | `http://127.0.0.1:8025/api/v1` |
+| SendMock's own API | `http://127.0.0.1:8025/api/v1` ([API reference](/api/)) |
 | Your webhooks | an endpoint in **Webhooks** pointing at your app ([webhooks](../webhooks.md)) |
 
 From inside Docker, use `host.docker.internal` (or the Compose service name) instead of `127.0.0.1`.

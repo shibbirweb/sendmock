@@ -6,6 +6,8 @@ export default defineConfig({
   testDir: "./tests",
   expect: { timeout: 10_000 },
   fullyParallel: true,
+  // The playground sweep is heavy; more workers starve the landing animations.
+  workers: 2,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
@@ -15,10 +17,11 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // The static export, as GitHub Pages serves it.
-    command: `bun run build && bunx --bun serve out -l ${websitePort} --no-clipboard`,
+    // The static export with the demo at /demo/, as GitHub Pages serves it;
+    // the API playground needs the demo's bridge page.
+    command: `bun ../scripts/build-pages-site.ts && bunx --bun serve out -l ${websitePort} --no-clipboard`,
     url: `http://127.0.0.1:${websitePort}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: 300_000,
   },
 });
