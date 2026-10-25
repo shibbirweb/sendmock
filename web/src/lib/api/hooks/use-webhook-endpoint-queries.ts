@@ -10,6 +10,7 @@ import { queryKeys } from "@/lib/api/query-keys";
 import type {
   EndpointPreviewRequest,
   EndpointPreviewResult,
+  ManualSendRequest,
   RevealedEndpointSecret,
   WebhookDelivery,
   WebhookEndpoint,
@@ -66,6 +67,23 @@ export function useEndpointPreview(previewRequest: EndpointPreviewRequest) {
       }),
     placeholderData: keepPreviousData,
   });
+}
+
+/** Sends a message or a hand-written request on demand; returns the `manual` delivery (WH-05.1). */
+export function useSendToEndpoint() {
+  return useWebhookMutation(
+    ({
+      endpointId,
+      sendRequest,
+    }: {
+      endpointId: string;
+      sendRequest: ManualSendRequest;
+    }) =>
+      requestApi<WebhookDelivery>(`/webhooks/endpoints/${endpointId}/send`, {
+        method: "POST",
+        requestBody: sendRequest,
+      }),
+  );
 }
 
 export function useDeleteWebhookEndpoint() {

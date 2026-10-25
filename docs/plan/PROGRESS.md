@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables and the request editor built on mock data**; the manual send dialog and composer next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook and the composer built on mock data**; the HTTP catcher next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 96 accepted, 10 / 404 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 96 accepted, 10 / 406 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: manual send dialog and composer (Prompt variables, overrides).
+2. Continue Phase U2: HTTP catcher (bins, requests, Slack/Discord/push previews, response rules, forward).
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 9 / 14 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 10 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -117,7 +117,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Template reference panel and `{{` suggestions in the template editor ([12](12-webhook-variables.md#template-reference-and-suggestions), WH-07.9, WH-07.10)
 - [x] Variables (all kinds, masked secrets, regenerate; scope, kind and name filters, Resolves to preview, suggestions for expressions)
 - [x] Request editor: CodeMirror, `{{` autocomplete, body modes, live nunjucks preview, inline errors (endpoint sheet Request tab: query params, headers, Template / Fields / Raw / None, Strict or Lenient, Insert menu, hover values; live preview with problems under each part and underlined at line and column; the template body uses the same editor; WH-07.14, WH-07.15)
-- [ ] Manual send dialog and composer (Prompt variables, overrides)
+- [x] Manual send dialog and composer (Prompt variables, overrides; Send to webhook from Mail and SMS with format, live preview, Edit body, Open delivery and Save; Composer at `/webhooks/composer` with template presets and the request editor; WH-05.1, WH-05.3, WH-05.5, WH-05.6)
 - [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
 - [ ] Webhooks overview metrics
 - [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Settings > Payments
@@ -354,3 +354,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Variables screen built on mock data: table of global and endpoint variables with scope (in the URL), kind and name filters; add / edit sheet with fields per kind (number, boolean switch, checked JSON, write-only secret that an empty edit keeps, Dynamic and Random expressions with suggestions, Computed templates, Prompt default), a Resolves to preview against the sample email whose errors block saving, and Fixed random values with Regenerate. The endpoint sheet's Variables tab links here for the other kinds. |
 | 2026-10-25 | Plan: request editor placement and contract ([07](07-ui.md#webhooks)): the endpoint sheet's Request tab (query params, headers, body mode Template / Fields / Raw / None, Strict or Lenient, live preview with problems under each part and at line and column), CodeMirror 6 lazy loaded and justified in [12](12-webhook-variables.md#editor-experience-ui), also used for the template body. API: endpoint request fields and `POST /webhooks/endpoints/preview`; criteria WH-07.14 and WH-07.15. |
 | 2026-10-25 | Request editor built on mock data: the endpoint sheet's Template tab became a Request tab with query params, headers, body mode (Template with picker and extra fields, typed Fields encoded as JSON or a form, Raw in a lazy-loaded CodeMirror editor, None) and Strict or Lenient rendering; `{{` completion, hover values (secrets masked), an Insert menu and a live preview against the sample or a recent email or SMS, with each problem under its part and underlined at its line and column. The template editor body uses the same editor. Template data gains `data.extracted` (OTP codes and links). |
+| 2026-10-25 | Plan: Send to webhook dialog and Composer in detail ([07](07-ui.md#webhooks)): endpoint and format, Prompt variables prefilled with defaults, per-send overrides, live preview, Edit body, result with Open delivery and Save; the composer at `/webhooks/composer` with a target endpoint, template presets and the request editor. API: `POST /webhooks/endpoints/{endpointId}/send` fields and preview `variables`; criteria WH-05.5 and WH-05.6. |
+| 2026-10-25 | Send to webhook and Composer built on mock data: Mail and SMS menus open a dialog with endpoint (starting on one whose template fits the message), format, Prompt variables prefilled with defaults, per-send overrides, a live preview, Edit body (sent as written), and a result with Open delivery and Save; render errors block sending. The Composer (`/webhooks/composer`, in the Webhooks nav) sends a hand-written request to an endpoint, starting blank or from any template preset, with the request editor, variables and preview. Mock: `POST /webhooks/endpoints/{endpointId}/send` records a signed `manual` delivery or `render_failed`. |

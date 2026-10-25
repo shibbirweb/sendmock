@@ -56,6 +56,8 @@ UI in U2, backend Phase 3.
 - [ ] WH-05.2 Replay as-is resends the stored request; Re-render uses fresh variables; Edit and replay sends the edited body.
 - [ ] WH-05.3 The composer sends a hand-written request using any template preset.
 - [ ] WH-05.4 API (`/send`, `/replay`) and CLI (`sendmock webhook send`) trigger the same behaviour, including variable overrides.
+- [ ] WH-05.5 Send to webhook and the composer ask for every Prompt variable in scope, prefilled with its default, and take per-send overrides that win over endpoint and global values for that send only; the preview shows the result before sending.
+- [ ] WH-05.6 The rendered body can be edited before a manual send and is then sent as written; a render error blocks sending; the result links to the new `manual` delivery and can be saved with a name.
 
 ## WH-06 Provider formats and signatures
 

@@ -1,10 +1,8 @@
-import { Link } from "@tanstack/react-router";
-import { ExternalLinkIcon, SendIcon } from "lucide-react";
+import { SendIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { FormField } from "@/components/common/form-field";
-import { HttpStatusBadge } from "@/components/common/http-status-badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,42 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SentDeliveryResult } from "@/features/webhooks/deliveries/sent-delivery-result";
 import { useSendSavedDelivery } from "@/lib/api/hooks/use-saved-delivery-queries";
 import type {
   SavedDelivery,
   WebhookDelivery,
   WebhookEndpoint,
 } from "@/lib/api/types";
-import { formatDurationMs } from "@/lib/format/format-values";
-
-function SentDeliveryResult({
-  sentDelivery,
-}: {
-  sentDelivery: WebhookDelivery;
-}) {
-  return (
-    <div
-      data-testid="saved-send-result"
-      className="flex flex-wrap items-center gap-2 rounded-md border p-3 text-sm"
-    >
-      {sentDelivery.response !== null && (
-        <HttpStatusBadge statusCode={sentDelivery.response.status_code} />
-      )}
-      <span>Sent to {sentDelivery.endpoint_name}</span>
-      {sentDelivery.duration_ms !== null && (
-        <span className="text-muted-foreground">
-          in {formatDurationMs(sentDelivery.duration_ms)}
-        </span>
-      )}
-      <Button variant="outline" size="sm" className="ml-auto" asChild>
-        <Link to="/webhooks/deliveries" search={{ delivery: sentDelivery.id }}>
-          <ExternalLinkIcon />
-          Open delivery
-        </Link>
-      </Button>
-    </div>
-  );
-}
 
 /** Sends a saved request to any endpoint, optionally re-rendered (WH-10.2). Mount when opening. */
 export function SendSavedDialog({

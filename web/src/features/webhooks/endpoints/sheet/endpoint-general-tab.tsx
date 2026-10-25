@@ -16,7 +16,7 @@ import type { WebhookEndpointFormValues } from "@/features/webhooks/endpoints/sh
 import type { HttpMethod } from "@/lib/api/types";
 import type { WebhookEndpointFieldErrors } from "@/lib/webhooks/validate-webhook-endpoint";
 
-const endpointMethods: HttpMethod[] = ["POST", "PUT", "PATCH", "GET"];
+export const endpointMethods: HttpMethod[] = ["POST", "PUT", "PATCH", "GET"];
 
 /** Name, method, URL, timeout and the enabled switch. */
 export function EndpointGeneralTab({

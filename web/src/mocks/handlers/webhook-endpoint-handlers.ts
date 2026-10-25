@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 
 import type {
   EndpointPreviewRequest,
+  ManualSendRequest,
   RevealedEndpointSecret,
   RotateSecretRequest,
   WebhookEndpointInput,
@@ -16,6 +17,7 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { buildManualDelivery } from "@/mocks/webhooks/build-manual-delivery";
 import { buildTestDelivery } from "@/mocks/webhooks/build-test-delivery";
 import { renderEndpointRequest } from "@/mocks/webhooks/render-endpoint-request";
 import {
@@ -154,6 +156,36 @@ export const webhookEndpointHandlers = [
       publishMockEvent("webhook.delivered", { id: testDelivery.id });
 
       return HttpResponse.json(testDelivery);
+    },
+  ),
+
+  http.post(
+    "*/api/v1/webhooks/endpoints/:endpointId/send",
+    async ({ params, request }) => {
+      await applyMockConditions();
+      const endpointRecord = findEndpointRecord(params.endpointId);
+      if (!endpointRecord) {
+        return createNotFoundResponse("Endpoint");
+      }
+
+      const sendRequest = (await request.json()) as ManualSendRequest;
+      const manualDelivery = buildManualDelivery(
+        mockDatabase,
+        endpointRecord,
+        sendRequest,
+      );
+      if (manualDelivery === null) {
+        return createNotFoundResponse("Message");
+      }
+      mockDatabase.webhookDeliveries.unshift(manualDelivery);
+      publishMockEvent(
+        manualDelivery.status === "render_failed"
+          ? "webhook.failed"
+          : "webhook.delivered",
+        { id: manualDelivery.id },
+      );
+
+      return HttpResponse.json(manualDelivery, { status: 201 });
     },
   ),
 

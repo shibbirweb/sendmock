@@ -46,3 +46,20 @@ export function describeProblemSource(
     ? sourceName
     : `${sourceName}, line ${renderProblem.line} column ${renderProblem.column}`;
 }
+
+export type LocatedRenderProblem = RenderProblem & {
+  line: number;
+  column: number;
+};
+
+/** Body problems that have a position, for underlining in the code editor. */
+export function selectBodyEditorProblems(
+  problems: RenderProblem[],
+): LocatedRenderProblem[] {
+  return problems.filter(
+    (renderProblem): renderProblem is LocatedRenderProblem =>
+      renderProblem.source === "body" &&
+      renderProblem.line !== null &&
+      renderProblem.column !== null,
+  );
+}
