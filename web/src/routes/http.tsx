@@ -1,19 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GlobeIcon } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { HttpCatcherLayout } from "@/features/http/http-catcher-layout";
+
+export type HttpCatcherSearchParams = {
+  /** The selected bin; none shows every request. */
+  bin?: string;
+  tab?: "responses";
+  request?: string;
+};
 
 export const Route = createFileRoute("/http")({
-  component: HttpCatcherPage,
+  validateSearch: (
+    searchParams: Record<string, unknown>,
+  ): HttpCatcherSearchParams => ({
+    bin: typeof searchParams.bin === "string" ? searchParams.bin : undefined,
+    tab: searchParams.tab === "responses" ? "responses" : undefined,
+    request:
+      typeof searchParams.request === "string"
+        ? searchParams.request
+        : undefined,
+  }),
+  component: HttpCatcherLayout,
 });
-
-function HttpCatcherPage() {
-  return (
-    <PagePlaceholder
-      icon={GlobeIcon}
-      title="HTTP catcher"
-      description="Requests your app sends to Slack, Discord, push services and other APIs, with mock responses."
-      plannedPhase="Phase U2"
-    />
-  );
-}

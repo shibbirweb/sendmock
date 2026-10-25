@@ -58,7 +58,8 @@ test("WH-01.2 Send test delivers test.ping and shows the response", async ({
 
   await expect(testDialog).toContainText("200");
   await expect(testDialog).toContainText("webhook-signature");
-  await expect(testDialog).toContainText('{"received":true}');
+  // The endpoint points at the HTTP catcher's slack bin, which answers like Slack.
+  await expect(testDialog).toContainText("Response bodyok");
   await testDialog.getByRole("link", { name: "Open delivery" }).click();
   await expect(page).toHaveURL(/\/webhooks\/deliveries\?delivery=[0-9A-Z]+/);
 });

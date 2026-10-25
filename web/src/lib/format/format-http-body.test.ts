@@ -37,4 +37,29 @@ describe("formatHttpBody", () => {
     expect(formatHttpBody("  ")).toEqual({ kind: "empty" });
     expect(formatHttpBody("{not json").kind).toBe("text");
   });
+
+  test("HC-01.2 shows multipart fields as rows, with file parts by name", () => {
+    const multipartBody = [
+      "--b1",
+      'Content-Disposition: form-data; name="user_id"',
+      "",
+      "42",
+      "--b1",
+      'Content-Disposition: form-data; name="report"; filename="report.csv"',
+      "Content-Type: text/csv",
+      "",
+      "a,b",
+      "--b1--",
+    ].join("\r\n");
+
+    expect(
+      formatHttpBody(multipartBody, "multipart/form-data; boundary=b1"),
+    ).toEqual({
+      kind: "form",
+      fields: [
+        ["user_id", "42"],
+        ["report", "report.csv (file)"],
+      ],
+    });
+  });
 });

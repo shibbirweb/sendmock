@@ -1,30 +1,6 @@
 import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
 
-export type HttpBin = {
-  id: Ulid;
-  name: string;
-  preset: string | null;
-  request_count: number;
-  last_request_at: IsoTimestamp | null;
-};
-
-export type CapturedHttpRequest = {
-  id: Ulid;
-  bin_id: Ulid;
-  bin_name: string;
-  method: string;
-  path: string;
-  query: Record<string, string>;
-  headers: Record<string, string>;
-  body: string;
-  content_type: string | null;
-  response_status: number;
-  response_body: string;
-  duration_ms: number;
-  created_at: IsoTimestamp;
-};
-
 export type SmtpSessionResult = "delivered" | "rejected" | "aborted";
 
 /** Query of GET /api/v1/logs/smtp; `result` takes a comma-separated list. */
@@ -117,6 +93,43 @@ export type RecentFailedDelivery = {
   created_at: IsoTimestamp;
 };
 
+export type WebhookMetricsRange = "24h" | "7d";
+
+/** One hour (24h) or day (7d) of deliveries by outcome (WH-11.3). */
+export type DeliveryOutcomeBucket = {
+  bucket_start: IsoTimestamp;
+  succeeded_count: number;
+  /** Pending, in flight, or failed with a retry still to come. */
+  retrying_count: number;
+  /** Exhausted, render failed, cancelled, or failed with no retry left. */
+  failed_count: number;
+  p50_latency_ms: number | null;
+  p95_latency_ms: number | null;
+};
+
+/** Query of GET /api/v1/webhooks/metrics. */
+export type WebhookMetricsQuery = {
+  range: WebhookMetricsRange;
+  endpoint_id?: Ulid;
+};
+
+/** GET /api/v1/webhooks/metrics: delivery health for a range (WH-11.1, WH-11.3). */
+export type WebhookMetrics = {
+  range: WebhookMetricsRange;
+  endpoint_id: Ulid | null;
+  delivery_count: number;
+  success_rate: number | null;
+  p50_latency_ms: number | null;
+  p95_latency_ms: number | null;
+  retry_count: number;
+  render_failed_count: number;
+  /** Oldest first, ending with the current hour or day. */
+  buckets: DeliveryOutcomeBucket[];
+  endpoint_metrics: EndpointMetrics[];
+  top_failure_codes: FailureCodeCount[];
+  recent_failures: RecentFailedDelivery[];
+};
+
 /** GET /api/v1/stats: everything the Overview shows (UI-03). */
 export type AppStats = {
   email_count: number;
@@ -152,7 +165,7 @@ export type AppInfo = {
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */
-export type SampleKind = "email" | "sms" | "verification";
+export type SampleKind = "email" | "sms" | "verification" | "http";
 
 export type CreatedSample = {
   kind: SampleKind;

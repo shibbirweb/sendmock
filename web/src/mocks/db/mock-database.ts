@@ -5,6 +5,7 @@ import type {
   EmailDetail,
   EmailTimelineEntry,
   HttpBin,
+  HttpResponseRule,
   MessagingService,
   SavedDelivery,
   SmsMessageDetail,
@@ -21,10 +22,11 @@ import type {
   WebhookVariable,
 } from "@/lib/api/types";
 import {
-  buildCapturedHttpRequestFixtures,
-  buildDefaultSettings,
   buildHttpBinFixtures,
-} from "@/mocks/fixtures/catcher-and-log-fixtures";
+  buildHttpResponseRuleFixtures,
+} from "@/mocks/fixtures/http-catcher-fixtures";
+import { buildDefaultSettings } from "@/mocks/fixtures/settings-fixtures";
+import { buildHttpCatcherTraffic } from "@/mocks/http/build-http-catcher-traffic";
 import {
   buildApiRequestLogFixtures,
   linkApiRequestFixtures,
@@ -95,7 +97,11 @@ export type MockDatabase = {
   webhookVariables: WebhookVariable[];
   savedDeliveries: SavedDelivery[];
   httpBins: HttpBin[];
+  /** Each bin's response rules in order, by bin id. */
+  httpResponseRules: Map<string, HttpResponseRule[]>;
   capturedHttpRequests: CapturedHttpRequest[];
+  /** Uploaded file contents by `<requestId>:<fileIndex>`. */
+  httpFileContents: Map<string, string>;
   smtpSessions: SmtpSession[];
   apiRequestLog: ApiRequestLogEntry[];
   settings: AppSettings;
@@ -119,6 +125,7 @@ function buildConfiguration() {
   const verifyServices = buildVerifyServiceFixtures();
   const webhookEndpoints = buildWebhookEndpointFixtures();
   const httpBins = buildHttpBinFixtures();
+  const responseRulesByBinName = buildHttpResponseRuleFixtures();
 
   return {
     virtualNumbers,
@@ -132,6 +139,12 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    httpResponseRules: new Map(
+      httpBins.map((httpBin) => [
+        httpBin.id,
+        responseRulesByBinName[httpBin.name] ?? [],
+      ]),
+    ),
     smsOutcomeRules: buildSmsOutcomeRuleFixtures(),
     emailOutcomeRules: buildEmailOutcomeRuleFixtures(),
     settings: buildDefaultSettings(),
@@ -155,13 +168,9 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       verifications: [],
       webhookDeliveries: [],
       capturedHttpRequests: [],
+      httpFileContents: new Map(),
       smtpSessions: [],
       apiRequestLog: [],
-      httpBins: configuration.httpBins.map((httpBin) => ({
-        ...httpBin,
-        request_count: 0,
-        last_request_at: null,
-      })),
     };
   }
 
@@ -178,6 +187,11 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     mockDataSize === "large" ? largeDataSetApiRequestCount : 0,
   );
   linkApiRequestFixtures(apiRequestLog, emails, smsMessages);
+  const httpCatcherTraffic = buildHttpCatcherTraffic(
+    configuration.httpBins,
+    configuration.httpResponseRules,
+    configuration.webhookVariables,
+  );
 
   return {
     ...configuration,
@@ -202,9 +216,9 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
         smsMessages.map((smsMessage) => smsMessage.id),
       ),
     ),
-    capturedHttpRequests: sortNewestFirst(
-      buildCapturedHttpRequestFixtures(configuration.httpBins),
-    ),
+    httpBins: httpCatcherTraffic.httpBins,
+    capturedHttpRequests: sortNewestFirst(httpCatcherTraffic.capturedRequests),
+    httpFileContents: httpCatcherTraffic.fileContents,
     smtpSessions,
     apiRequestLog,
   };

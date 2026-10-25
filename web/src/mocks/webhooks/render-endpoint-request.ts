@@ -243,7 +243,11 @@ export function renderEndpointRequest(
       revision: 1,
       is_modified: false,
     },
-    { email_id: previewRequest.email_id, sms_id: previewRequest.sms_id },
+    {
+      email_id: previewRequest.email_id,
+      sms_id: previewRequest.sms_id,
+      http_request_id: previewRequest.http_request_id,
+    },
   );
   if (builtContext === null) {
     return null;

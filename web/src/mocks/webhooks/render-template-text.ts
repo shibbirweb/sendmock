@@ -61,7 +61,10 @@ function toLineAndColumn(
   };
 }
 
-/** Where a `{{` or `}}` outside every complete expression is, or -1. */
+/**
+ * Where a `{{` without a matching `}}` is, or -1. A lone `}}` is plain text,
+ * as in Jinja, so JSON ending in `}}` is fine.
+ */
 function findUnbalancedBraceIndex(templateText: string): number {
   const coveredRanges = [...templateText.matchAll(expressionPattern)].map(
     (expressionMatch) => [
@@ -69,7 +72,7 @@ function findUnbalancedBraceIndex(templateText: string): number {
       expressionMatch.index + expressionMatch[0].length,
     ],
   );
-  const bracePattern = /\{\{|\}\}/g;
+  const bracePattern = /\{\{/g;
   for (const braceMatch of templateText.matchAll(bracePattern)) {
     const isCovered = coveredRanges.some(
       ([rangeStart = 0, rangeEnd = 0]) =>

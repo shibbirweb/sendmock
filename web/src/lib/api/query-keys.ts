@@ -3,12 +3,14 @@ import type {
   DeliveryListFilters,
   EmailListFilters,
   EndpointPreviewRequest,
+  HttpRulePreviewRequest,
   RulePreviewRequest,
   TemplateRenderRequest,
   VariablePreviewRequest,
   SmsListFilters,
   SmtpSessionListFilters,
   VerificationListFilters,
+  WebhookMetricsQuery,
 } from "@/lib/api/types";
 
 /**
@@ -77,12 +79,20 @@ export const queryKeys = {
     variablePreview: (previewRequest: VariablePreviewRequest) =>
       ["webhooks", "variable-preview", previewRequest] as const,
     saved: ["webhooks", "saved"] as const,
+    metrics: (metricsQuery: WebhookMetricsQuery) =>
+      ["webhooks", "metrics", metricsQuery] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,
     bins: ["http-catcher", "bins"] as const,
     requests: (binId: string | null) =>
       ["http-catcher", "requests", binId] as const,
+    request: (requestId: string) =>
+      ["http-catcher", "request", requestId] as const,
+    responseRules: (binId: string) =>
+      ["http-catcher", "response-rules", binId] as const,
+    rulePreview: (binId: string, previewRequest: HttpRulePreviewRequest) =>
+      ["http-catcher", "rule-preview", binId, previewRequest] as const,
   },
   logs: {
     all: ["logs"] as const,

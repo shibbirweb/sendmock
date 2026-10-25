@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook and the composer built on mock data**; the HTTP catcher next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook, the composer, the HTTP catcher and the webhooks overview built on mock data**; payments next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 96 accepted, 10 / 406 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 96 accepted, 10 / 410 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: HTTP catcher (bins, requests, Slack/Discord/push previews, response rules, forward).
+2. Continue Phase U2: payments list, detail and Simulate menu, hosted test checkout, Settings > Payments.
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 10 / 14 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 12 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -118,8 +118,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Variables (all kinds, masked secrets, regenerate; scope, kind and name filters, Resolves to preview, suggestions for expressions)
 - [x] Request editor: CodeMirror, `{{` autocomplete, body modes, live nunjucks preview, inline errors (endpoint sheet Request tab: query params, headers, Template / Fields / Raw / None, Strict or Lenient, Insert menu, hover values; live preview with problems under each part and underlined at line and column; the template body uses the same editor; WH-07.14, WH-07.15)
 - [x] Manual send dialog and composer (Prompt variables, overrides; Send to webhook from Mail and SMS with format, live preview, Edit body, Open delivery and Save; Composer at `/webhooks/composer` with template presets and the request editor; WH-05.1, WH-05.3, WH-05.5, WH-05.6)
-- [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
-- [ ] Webhooks overview metrics
+- [x] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward (bins from presets with catch URL, clear and delete; live request list; detail with previews, pretty or raw body, files, headers, query and the response with its rule; Copy as cURL, Forward to URL, Send to webhook; Responses tab with ordered rules, live rule preview and default reply; HC-01.6, HC-01.7, HC-02.4)
+- [x] Webhooks overview metrics (`/webhooks/overview`: 24 hours or 7 days and an endpoint, kept in the URL; stat tiles; deliveries over time stacked by succeeded / retrying / failed with tooltip, p50 / p95 and table; per-endpoint metrics; top failure codes linking to failed deliveries; recent failures; live; WH-11.1, WH-11.3)
 - [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Settings > Payments
 - [ ] Replies: Inbound routes list and editor, SMS reply webhook result and drawer tab, inbound URL and fallback on Numbers
 
@@ -357,3 +357,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Send to webhook dialog and Composer in detail ([07](07-ui.md#webhooks)): endpoint and format, Prompt variables prefilled with defaults, per-send overrides, live preview, Edit body, result with Open delivery and Save; the composer at `/webhooks/composer` with a target endpoint, template presets and the request editor. API: `POST /webhooks/endpoints/{endpointId}/send` fields and preview `variables`; criteria WH-05.5 and WH-05.6. |
 | 2026-10-25 | Send to webhook and Composer built on mock data: Mail and SMS menus open a dialog with endpoint (starting on one whose template fits the message), format, Prompt variables prefilled with defaults, per-send overrides, a live preview, Edit body (sent as written), and a result with Open delivery and Save; render errors block sending. The Composer (`/webhooks/composer`, in the Webhooks nav) sends a hand-written request to an endpoint, starting blank or from any template preset, with the request editor, variables and preview. Mock: `POST /webhooks/endpoints/{endpointId}/send` records a signed `manual` delivery or `render_failed`. |
 | 2026-10-25 | Fix: the Mail empty state's Clear search no longer comes back after a moment (the search box now follows `?q=` when it changes elsewhere). The code editor accepts a suggestion on Enter at once, like the text fields. Flaky e2e tests fixed in empty states, template suggestions, deliveries paging and logs paging (they raced URL updates, the suggestion selection and automatic page loads on slower CI runners). |
+| 2026-10-25 | Plan: HTTP catcher screen in detail ([07](07-ui.md#http-catcher)): three columns with bin, tab and request in the URL; bins from presets with catch URL, clear and delete; live request list; detail with Slack, Discord and push previews, pretty or raw body, files, headers, query and the response sent with its rule; Copy as cURL, Forward to URL, Send to webhook; Responses tab with ordered rules (method, path glob, header and body conditions, templated response, delay, failure rate), default reply and a live rule preview. API rows in [06](06-api.md#http-catcher); criteria HC-01.6, HC-01.7 and HC-02.4. |
+| 2026-10-25 | HTTP catcher built on mock data (`/http`): bins with presets (Slack, Discord, Teams, Google Chat, Telegram, FCM, Expo, OneSignal, Generic JSON) setting the default reply; requests live, 50 at a time; detail with Slack Block Kit, Discord embed and push notification previews, pretty or raw body (multipart fields parsed, files to download), headers, query and the response sent with the rule that produced it; Copy as cURL, Forward to URL and Send to webhook (as an `http.captured` event). Responses tab: ordered rules matching method, path glob and header / body conditions (the webhook filter builder), templated status, headers and body, delay range and failure rate, with a live preview against a captured request; editable default reply. Webhook sends to a `/catch/...` URL now land in the catcher and get its reply. The mock template renderer treats a lone `}}` as text, as Jinja does, so JSON bodies ending in `}}` no longer report unbalanced braces. |
+| 2026-10-25 | Plan: Webhooks overview in detail ([07](07-ui.md#webhooks)): `/webhooks/overview` as the first Webhooks screen with range (24 hours or 7 days) and endpoint filters, stat tiles, deliveries over time stacked by succeeded / retrying / failed with tooltip (p50 / p95) and table, per-endpoint metrics, top failure codes and recent failures. API: `GET /webhooks/metrics`; criterion WH-11.3. |
+| 2026-10-25 | Webhooks overview built on mock data (`/webhooks/overview`, now the first Webhooks screen): range (24 hours hourly or 7 days daily) and endpoint filters in the URL, stat tiles, deliveries over time stacked by succeeded, retrying and failed (the validated chart tokens; the status colours failed the CVD check when stacked) with the hover and keyboard tooltip, p50 / p95 latency and a table view, per-endpoint metrics (a row narrows to that endpoint), top failure codes linking to the deliveries log on the Failed chip (`?status=failed&endpoint=`), and recent failures, updated live. Mock: `GET /webhooks/metrics`; delivery history now spans 7 days and only recent failures still have a retry scheduled. The Overview activity chart and this one share a generic stacked column chart. |

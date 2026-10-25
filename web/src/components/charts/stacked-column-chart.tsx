@@ -1,17 +1,13 @@
 import * as React from "react";
 
-import { ActivityColumn } from "@/features/overview/activity/activity-column";
+import { ChartTooltip } from "@/components/charts/chart-tooltip";
 import {
-  activitySeries,
-  formatBucketHour,
-  formatBucketRange,
+  type ChartBucketFormat,
+  type ChartSeries,
   readAxisMaximum,
-  sumActivityBucket,
-} from "@/features/overview/activity/activity-series";
-import { ActivityTooltip } from "@/features/overview/activity/activity-tooltip";
-import type { ActivityBucket } from "@/lib/api/types";
-
-const hourLabelInterval = 6;
+  sumBucket,
+} from "@/components/charts/chart-series";
+import { StackedColumn } from "@/components/charts/stacked-column";
 
 function readNextBucketIndex(
   pressedKey: string,
@@ -35,35 +31,45 @@ function readNextBucketIndex(
   }
 }
 
-function describeBucket(activityBucket: ActivityBucket): string {
-  const seriesCounts = activitySeries
-    .map((series) => `${activityBucket[series.countKey]} ${series.label}`)
-    .join(", ");
-
-  return `${formatBucketRange(activityBucket.bucket_start)}: ${seriesCounts}, ${sumActivityBucket(activityBucket)} in total`;
-}
-
 /**
- * Stacked columns per hour. Hover or arrow keys pick an hour and show every
- * series for it (UI-03.3).
+ * Stacked columns with one y-axis. Hover or the arrow keys pick a bucket and
+ * show every series for it; screen readers hear the same summary.
  */
-export function ActivityChart({
-  activityBuckets,
+export function StackedColumnChart<Bucket>({
+  buckets,
+  chartSeries,
+  bucketFormat,
+  plotLabel,
+  columnTestId,
 }: {
-  activityBuckets: ActivityBucket[];
+  buckets: Bucket[];
+  chartSeries: ChartSeries<Bucket>[];
+  bucketFormat: ChartBucketFormat<Bucket>;
+  /** Names the plot and says how to read it with the keyboard. */
+  plotLabel: string;
+  columnTestId: string;
 }) {
   const [activeBucketIndex, setActiveBucketIndex] = React.useState<
     number | null
   >(null);
-  const axisMaximum = readAxisMaximum(activityBuckets);
+  const axisMaximum = readAxisMaximum(
+    buckets.map((bucket) => sumBucket(chartSeries, bucket)),
+  );
   const activeBucket =
-    activeBucketIndex === null ? undefined : activityBuckets[activeBucketIndex];
+    activeBucketIndex === null ? undefined : buckets[activeBucketIndex];
+
+  const describeBucket = (bucket: Bucket) => {
+    const seriesValues = chartSeries
+      .map((series) => `${series.readValue(bucket)} ${series.label}`)
+      .join(", ");
+    return `${bucketFormat.formatRange(bucket)}: ${seriesValues}, ${sumBucket(chartSeries, bucket)} in total`;
+  };
 
   function handlePlotKeyDown(keyboardEvent: React.KeyboardEvent) {
     const nextIndex = readNextBucketIndex(
       keyboardEvent.key,
       activeBucketIndex,
-      activityBuckets.length,
+      buckets.length,
     );
     if (nextIndex !== null) {
       keyboardEvent.preventDefault();
@@ -84,7 +90,7 @@ export function ActivityChart({
       <div
         role="group"
         tabIndex={0}
-        aria-label="Activity per hour for the last 24 hours. Use the left and right arrow keys to read each hour."
+        aria-label={plotLabel}
         className="relative h-48 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onKeyDown={handlePlotKeyDown}
         onMouseLeave={() => setActiveBucketIndex(null)}
@@ -99,21 +105,25 @@ export function ActivityChart({
           <span className="border-t border-border" />
         </div>
         <div aria-hidden="true" className="relative flex h-full items-end">
-          {activityBuckets.map((activityBucket, bucketIndex) => (
-            <ActivityColumn
-              key={activityBucket.bucket_start}
-              activityBucket={activityBucket}
+          {buckets.map((bucket, bucketIndex) => (
+            <StackedColumn
+              key={bucketFormat.readBucketKey(bucket)}
+              bucket={bucket}
+              chartSeries={chartSeries}
               axisMaximum={axisMaximum}
               isActive={bucketIndex === activeBucketIndex}
+              columnTestId={columnTestId}
               onActivate={() => setActiveBucketIndex(bucketIndex)}
             />
           ))}
         </div>
         {activeBucket !== undefined && activeBucketIndex !== null && (
-          <ActivityTooltip
-            activityBucket={activeBucket}
+          <ChartTooltip
+            bucket={activeBucket}
+            chartSeries={chartSeries}
+            bucketFormat={bucketFormat}
             bucketIndex={activeBucketIndex}
-            bucketCount={activityBuckets.length}
+            bucketCount={buckets.length}
           />
         )}
         <span aria-live="polite" className="sr-only">
@@ -125,13 +135,13 @@ export function ActivityChart({
         aria-hidden="true"
         className="flex text-[11px] text-muted-foreground"
       >
-        {activityBuckets.map((activityBucket, bucketIndex) => (
+        {buckets.map((bucket, bucketIndex) => (
           <span
-            key={activityBucket.bucket_start}
+            key={bucketFormat.readBucketKey(bucket)}
             className="flex-1 whitespace-nowrap"
           >
-            {bucketIndex % hourLabelInterval === 0
-              ? formatBucketHour(activityBucket.bucket_start)
+            {bucketIndex % bucketFormat.tickInterval === 0
+              ? bucketFormat.formatTick(bucket)
               : ""}
           </span>
         ))}

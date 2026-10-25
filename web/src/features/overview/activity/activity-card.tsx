@@ -10,27 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ActivityChart } from "@/features/overview/activity/activity-chart";
-import { activitySeries } from "@/features/overview/activity/activity-series";
-import { ActivityTable } from "@/features/overview/activity/activity-table";
+import { ChartLegend } from "@/components/charts/chart-legend";
+import { StackedColumnChart } from "@/components/charts/stacked-column-chart";
+import { StackedColumnTable } from "@/components/charts/stacked-column-table";
+import {
+  activitySeries,
+  hourlyBucketFormat,
+} from "@/features/overview/activity/activity-series";
 import type { ActivityBucket } from "@/lib/api/types";
-import { cn } from "@/lib/utils";
-
-function ActivityLegend() {
-  return (
-    <ul aria-label="Legend" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-      {activitySeries.map((series) => (
-        <li key={series.countKey} className="flex items-center gap-1.5">
-          <span
-            aria-hidden="true"
-            className={cn("size-2.5 rounded-[2px]", series.swatchClassName)}
-          />
-          {series.label}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 /** Activity over the last 24 hours, as a chart or as a table (UI-03.3). */
 export function ActivityCard({
@@ -61,11 +48,23 @@ export function ActivityCard({
       </CardHeader>
       <CardContent className="grid gap-4">
         {isTableShown ? (
-          <ActivityTable activityBuckets={activityBuckets} />
+          <StackedColumnTable
+            buckets={activityBuckets}
+            chartSeries={activitySeries}
+            bucketFormat={hourlyBucketFormat}
+            tableLabel="Activity per hour"
+            bucketHeading="Hour"
+          />
         ) : (
           <>
-            <ActivityLegend />
-            <ActivityChart activityBuckets={activityBuckets} />
+            <ChartLegend chartSeries={activitySeries} />
+            <StackedColumnChart
+              buckets={activityBuckets}
+              chartSeries={activitySeries}
+              bucketFormat={hourlyBucketFormat}
+              plotLabel="Activity per hour for the last 24 hours. Use the left and right arrow keys to read each hour."
+              columnTestId="activity-column"
+            />
           </>
         )}
       </CardContent>

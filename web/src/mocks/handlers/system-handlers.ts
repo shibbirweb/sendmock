@@ -3,10 +3,7 @@ import { http, HttpResponse } from "msw";
 import type { AppInfo } from "@/lib/api/types";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
 import { mockDatabase } from "@/mocks/db/mock-database";
-import {
-  applyMockConditions,
-  paginateItems,
-} from "@/mocks/handlers/handler-utils";
+import { applyMockConditions } from "@/mocks/handlers/handler-utils";
 import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
 
 /** What `/info` reports; Docker binds every interface instead of loopback. */
@@ -43,22 +40,5 @@ export const systemHandlers = [
     await applyMockConditions();
 
     return HttpResponse.json(buildMockAppInfo());
-  }),
-
-  http.get("*/api/v1/http/bins", async () => {
-    await applyMockConditions();
-
-    return HttpResponse.json(mockDatabase.httpBins);
-  }),
-
-  http.get("*/api/v1/http/requests", async ({ request }) => {
-    await applyMockConditions();
-    const requestUrl = new URL(request.url);
-    const binFilter = requestUrl.searchParams.get("bin_id");
-    const matchingRequests = mockDatabase.capturedHttpRequests.filter(
-      (capturedRequest) => !binFilter || capturedRequest.bin_id === binFilter,
-    );
-
-    return HttpResponse.json(paginateItems(matchingRequests, requestUrl));
   }),
 ];

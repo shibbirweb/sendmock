@@ -1,3 +1,4 @@
+import { useSearch } from "@tanstack/react-router";
 import { ActivityIcon } from "lucide-react";
 import * as React from "react";
 
@@ -41,7 +42,14 @@ function toDeliveryListFilters(
 
 /** Webhook deliveries: live log, filters, paging and the detail drawer (WH-03.7). */
 export function WebhookDeliveriesPage() {
-  const [filterValues, setFilterValues] = React.useState(noDeliveryFilters);
+  const initialSearch = useSearch({ from: "/webhooks/deliveries" });
+  const [filterValues, setFilterValues] = React.useState(
+    (): DeliveryFilterValues => ({
+      ...noDeliveryFilters,
+      statusFilter: initialSearch.status ?? noDeliveryFilters.statusFilter,
+      endpointId: initialSearch.endpoint ?? noDeliveryFilters.endpointId,
+    }),
+  );
   const deliveriesQuery = useWebhookDeliveries(
     toDeliveryListFilters(filterValues),
   );

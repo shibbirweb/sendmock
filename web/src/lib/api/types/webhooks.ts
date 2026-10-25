@@ -104,6 +104,7 @@ export type EndpointPreviewRequest = {
   endpoint_id?: Ulid;
   email_id?: Ulid;
   sms_id?: Ulid;
+  http_request_id?: Ulid;
   /** Send-time values by variable name (no `vars.`); they win for this render (WH-05.5). */
   variables?: Record<string, string>;
 };
@@ -122,6 +123,8 @@ export type EndpointPreviewResult = {
 export type ManualSendRequest = {
   email_id?: Ulid;
   sms_id?: Ulid;
+  /** A captured HTTP request, sent as an `http.captured` event (HC-01.7). */
+  http_request_id?: Ulid;
   /** A template used for this send instead of the endpoint's request. */
   template_id?: string;
   /** A hand-written request replacing the endpoint's, from the composer. */
@@ -454,6 +457,8 @@ export type TemplateImportRequest = {
 export type TemplateRenderRequest = {
   email_id?: Ulid;
   sms_id?: Ulid;
+  /** A captured HTTP request, as the data of an `http.captured` event. */
+  http_request_id?: Ulid;
   /** Unsaved edits to preview instead of the stored template (WH-09.7). */
   draft?: TemplateDraft;
 };

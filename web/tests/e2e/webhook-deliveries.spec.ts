@@ -175,13 +175,15 @@ test("WH-05.2 replay as-is, re-render, and edit and replay create new deliveries
     deliveryDrawer.getByText("replay", { exact: true }),
   ).toBeVisible();
 
+  const replayUrl = page.url();
   await deliveryDrawer
     .getByRole("button", { name: "Replay", exact: true })
     .click();
   await page
     .getByRole("menuitem", { name: "Re-render with fresh values" })
     .click();
-  await expect(page.getByText("Replayed").first()).toBeVisible();
+  // The first replay's toast may still show, so wait for the new delivery.
+  await expect(page).not.toHaveURL(replayUrl);
 
   await deliveryDrawer.getByRole("button", { name: "Edit and replay" }).click();
   const editDialog = page.getByRole("dialog", { name: "Edit and replay" });

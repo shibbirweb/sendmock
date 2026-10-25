@@ -1,10 +1,15 @@
-import type { EmailDetail, SmsMessage } from "@/lib/api/types";
+import type {
+  CapturedHttpRequest,
+  EmailDetail,
+  SmsMessage,
+} from "@/lib/api/types";
 import { headerFieldPrefix } from "@/lib/webhooks/rule-filter/rule-fields";
 
-/** What a filter is checked against: an email or an SMS. */
+/** What a filter is checked against: an email, an SMS or a captured HTTP request. */
 export type RuleMessage =
   | { messageKind: "email"; email: EmailDetail }
-  | { messageKind: "sms"; smsMessage: SmsMessage };
+  | { messageKind: "sms"; smsMessage: SmsMessage }
+  | { messageKind: "http"; capturedRequest: CapturedHttpRequest };
 
 function stripHtmlTags(htmlBody: string): string {
   return htmlBody
@@ -55,12 +60,34 @@ function readSmsField(
   return smsFieldReaders[fieldKey]?.() ?? null;
 }
 
+/** HTTP catcher response rules match on headers and the raw body (HC-02.1). */
+function readHttpField(
+  capturedRequest: CapturedHttpRequest,
+  fieldKey: string,
+): string[] | null {
+  if (fieldKey.startsWith(headerFieldPrefix)) {
+    const headerName = fieldKey.slice(headerFieldPrefix.length).toLowerCase();
+    const headerEntry = Object.entries(capturedRequest.headers).find(
+      ([existingName]) => existingName.toLowerCase() === headerName,
+    );
+
+    return headerEntry === undefined ? [] : [headerEntry[1]];
+  }
+
+  return fieldKey === "body" ? [capturedRequest.body] : null;
+}
+
 /** The field's values, or null when this kind of message has no such field. */
 export function readMessageField(
   ruleMessage: RuleMessage,
   fieldKey: string,
 ): string[] | null {
-  return ruleMessage.messageKind === "email"
-    ? readEmailField(ruleMessage.email, fieldKey)
-    : readSmsField(ruleMessage.smsMessage, fieldKey);
+  if (ruleMessage.messageKind === "email") {
+    return readEmailField(ruleMessage.email, fieldKey);
+  }
+  if (ruleMessage.messageKind === "sms") {
+    return readSmsField(ruleMessage.smsMessage, fieldKey);
+  }
+
+  return readHttpField(ruleMessage.capturedRequest, fieldKey);
 }

@@ -10,14 +10,17 @@ import type { MockDatabase } from "@/mocks/db/mock-database";
 
 const previewMessageLimit = 50;
 
-function readMessageTime(ruleMessage: RuleMessage): string {
+/** The rule preview lists emails and SMS only. */
+type PreviewMessage = Extract<RuleMessage, { messageKind: "email" | "sms" }>;
+
+function readMessageTime(ruleMessage: PreviewMessage): string {
   return ruleMessage.messageKind === "email"
     ? ruleMessage.email.received_at
     : ruleMessage.smsMessage.created_at;
 }
 
 function toPreviewItem(
-  ruleMessage: RuleMessage,
+  ruleMessage: PreviewMessage,
   isMatch: boolean,
 ): RulePreviewItem {
   if (ruleMessage.messageKind === "email") {
@@ -54,15 +57,15 @@ export function previewRuleFilter(
   previewRequest: RulePreviewRequest,
 ): RulePreviewResult {
   const eventSubjects = readEventSubjects(previewRequest.events);
-  const candidateMessages: RuleMessage[] = [
+  const candidateMessages: PreviewMessage[] = [
     ...(eventSubjects.includes("email")
-      ? mockDatabase.emails.map((email): RuleMessage => ({
+      ? mockDatabase.emails.map((email): PreviewMessage => ({
           messageKind: "email",
           email,
         }))
       : []),
     ...(eventSubjects.includes("sms")
-      ? mockDatabase.smsMessages.map((smsMessage): RuleMessage => ({
+      ? mockDatabase.smsMessages.map((smsMessage): PreviewMessage => ({
           messageKind: "sms",
           smsMessage,
         }))

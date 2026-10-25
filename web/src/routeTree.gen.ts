@@ -22,6 +22,7 @@ import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
 import { Route as WebhooksComposerRouteImport } from './routes/webhooks/composer'
 import { Route as WebhooksDeliveriesRouteImport } from './routes/webhooks/deliveries'
 import { Route as WebhooksEndpointsRouteImport } from './routes/webhooks/endpoints'
+import { Route as WebhooksOverviewRouteImport } from './routes/webhooks/overview'
 import { Route as WebhooksRulesRouteImport } from './routes/webhooks/rules'
 import { Route as WebhooksSavedRouteImport } from './routes/webhooks/saved'
 import { Route as WebhooksTemplatesRouteImport } from './routes/webhooks/templates'
@@ -94,6 +95,11 @@ const WebhooksEndpointsRoute = WebhooksEndpointsRouteImport.update({
   path: '/webhooks/endpoints',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WebhooksOverviewRoute = WebhooksOverviewRouteImport.update({
+  id: '/webhooks/overview',
+  path: '/webhooks/overview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WebhooksRulesRoute = WebhooksRulesRouteImport.update({
   id: '/webhooks/rules',
   path: '/webhooks/rules',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
+  '/webhooks/overview': typeof WebhooksOverviewRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
+  '/webhooks/overview': typeof WebhooksOverviewRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
+  '/webhooks/overview': typeof WebhooksOverviewRoute
   '/webhooks/rules': typeof WebhooksRulesRoute
   '/webhooks/saved': typeof WebhooksSavedRoute
   '/webhooks/templates': typeof WebhooksTemplatesRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
+    | '/webhooks/overview'
     | '/webhooks/rules'
     | '/webhooks/saved'
     | '/webhooks/templates'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
+    | '/webhooks/overview'
     | '/webhooks/rules'
     | '/webhooks/saved'
     | '/webhooks/templates'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/webhooks/composer'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
+    | '/webhooks/overview'
     | '/webhooks/rules'
     | '/webhooks/saved'
     | '/webhooks/templates'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   WebhooksComposerRoute: typeof WebhooksComposerRoute
   WebhooksDeliveriesRoute: typeof WebhooksDeliveriesRoute
   WebhooksEndpointsRoute: typeof WebhooksEndpointsRoute
+  WebhooksOverviewRoute: typeof WebhooksOverviewRoute
   WebhooksRulesRoute: typeof WebhooksRulesRoute
   WebhooksSavedRoute: typeof WebhooksSavedRoute
   WebhooksTemplatesRoute: typeof WebhooksTemplatesRoute
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebhooksEndpointsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/webhooks/overview': {
+      id: '/webhooks/overview'
+      path: '/webhooks/overview'
+      fullPath: '/webhooks/overview'
+      preLoaderRoute: typeof WebhooksOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/webhooks/rules': {
       id: '/webhooks/rules'
       path: '/webhooks/rules'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebhooksComposerRoute: WebhooksComposerRoute,
   WebhooksDeliveriesRoute: WebhooksDeliveriesRoute,
   WebhooksEndpointsRoute: WebhooksEndpointsRoute,
+  WebhooksOverviewRoute: WebhooksOverviewRoute,
   WebhooksRulesRoute: WebhooksRulesRoute,
   WebhooksSavedRoute: WebhooksSavedRoute,
   WebhooksTemplatesRoute: WebhooksTemplatesRoute,

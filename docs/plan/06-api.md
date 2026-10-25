@@ -68,9 +68,13 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | Method | Path | Purpose |
 |--------|------|---------|
 | ANY | `/catch/{bin}/*` | capture any request (outside `/api/v1`, see [15-http-catcher.md](15-http-catcher.md)) |
-| GET/POST/PATCH/DELETE | `/http/bins` | bins, presets and mock response rules |
-| GET | `/http/requests`, `/http/requests/{requestId}` | captured requests |
-| POST | `/http/requests/{requestId}/forward` | resend a captured request to a URL |
+| GET/POST/PATCH/DELETE | `/http/bins` | bins: `POST` takes `{ "name": ..., "preset": ... }` (`409` when the name is taken), `PATCH` the `default_response`; `DELETE` removes the bin and its requests |
+| GET/PUT | `/http/bins/{binId}/responses` | the bin's response rules, in order; `PUT` replaces the list (order, enabled, edits) |
+| POST | `/http/bins/{binId}/responses/preview` | `{ "rule": ..., "request_id": ... }`: whether the rule matches that captured request, and the rendered response with template problems |
+| GET | `/http/requests`, `/http/requests/{requestId}` | captured requests (`?bin_id=`), newest first, paged; each with the response sent and the rule that produced it |
+| DELETE | `/http/requests?bin_id=` | clear a bin's requests |
+| GET | `/http/requests/{requestId}/files/{fileIndex}` | download a file uploaded in a multipart request |
+| POST | `/http/requests/{requestId}/forward` | resend a captured request to `{ "url": ... }`; returns the status, duration and body it got |
 
 ## Payments
 
@@ -91,6 +95,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/endpoints/preview` | render an unsaved endpoint request (URL, query params, headers, body in any mode, render mode) against the sample or `email_id` / `sms_id`, with optional send-time `variables`; returns the rendered request and problems, each with where it comes from and, for templates, its line and column |
 | POST | `/webhooks/endpoints/{endpointId}/test` | send `test.ping` |
 | POST | `/webhooks/endpoints/{endpointId}/send` | manual send: `email_id` or `sms_id` (or neither for the sample), optional `template_id` (format for this send), `request` (a hand-written request: method, URL, query params, headers, body mode and render mode, replacing the endpoint's), `variables` (send-time overrides) and `body` (an edited body, sent as written); returns the `manual` delivery, `render_failed` when rendering stops it |
+| GET | `/webhooks/metrics?range=24h\|7d&endpoint_id=` | delivery health for the range: totals (deliveries, success rate, p50 / p95 latency, retries, render failures), hourly or daily buckets (succeeded, retrying, failed, p50 / p95), per-endpoint metrics, top failure codes and recent failures |
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
 | POST | `/webhooks/rules/preview` | which of the last 50 messages a filter would match: body `{ "events": [...], "filter": {...} }`, returns `checked_count`, `match_count` and the messages with `is_match` |
 | POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
@@ -136,7 +141,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/wait/webhook?endpoint=...&status=succeeded&timeout=10s` | wait for a webhook delivery outcome |
 | GET | `/otp?to=...&channel=sms\|email\|verify` | latest OTP for a recipient (extracted from messages or from Twilio Verify) |
 | GET | `/links?to=...` | latest extracted links for a recipient |
-| POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `create_sample` |
+| POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `create_sample` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |

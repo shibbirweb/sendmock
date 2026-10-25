@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -14,6 +15,8 @@ import type {
   SavedDelivery,
   WebhookDelivery,
   WebhookDeliveryDetail,
+  WebhookMetrics,
+  WebhookMetricsQuery,
 } from "@/lib/api/types";
 
 /** Rows per page; the delivery log grows with every event (WH-03.7). */
@@ -35,6 +38,19 @@ export function useWebhookDeliveries(
         abortSignal: signal,
       }),
     getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
+  });
+}
+
+/** Delivery health for a range and an optional endpoint (WH-11.3). */
+export function useWebhookMetrics(metricsQuery: WebhookMetricsQuery) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.metrics(metricsQuery),
+    queryFn: ({ signal }) =>
+      requestApi<WebhookMetrics>("/webhooks/metrics", {
+        queryParameters: metricsQuery,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
   });
 }
 

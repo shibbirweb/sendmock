@@ -31,6 +31,7 @@ export function buildManualDelivery(
     endpoint_id: endpointRecord.id,
     email_id: sendRequest.email_id,
     sms_id: sendRequest.sms_id,
+    http_request_id: sendRequest.http_request_id,
     variables: sendRequest.variables,
   });
   if (previewResult === null) {
@@ -50,7 +51,11 @@ export function buildManualDelivery(
     rule_id: null,
     event_id: eventId,
     event_type: previewResult.event_type,
-    subject_id: sendRequest.email_id ?? sendRequest.sms_id ?? null,
+    subject_id:
+      sendRequest.email_id ??
+      sendRequest.sms_id ??
+      sendRequest.http_request_id ??
+      null,
     trigger: "manual" as const,
     attempt: 1,
     next_attempt_at: null,

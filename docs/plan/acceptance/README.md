@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 96 features, 10 / 406 criteria ticked.**
+**Accepted: 0 / 96 features, 10 / 410 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -105,11 +105,11 @@ On top of its own criteria, a feature is done only when:
 | [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 5 | In progress |
 | [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 9 | In progress |
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | In progress |
-| [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 2 | Not started |
+| [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 3 | In progress |
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 6 | Not started |
-| [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 5 | Not started |
-| [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | Phase 4 | 3 | Not started |
-| [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Not started |
+| [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | In progress |
+| [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | In progress |
+| [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | In progress |
 | [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 3 | Not started |
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Not started |
 | [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
