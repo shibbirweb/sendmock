@@ -6,6 +6,7 @@ import type {
   ForcedVerificationState,
   InboundSmsRequest,
   MessagingService,
+  NativeSmsRequest,
   OpenSource,
   PageOf,
   SmsListFilters,
@@ -69,12 +70,29 @@ export function useSendInboundSms() {
   );
 }
 
+export function useSendSms() {
+  return useSmsMutation((nativeSmsRequest: NativeSmsRequest) =>
+    requestApi<SmsMessage>("/sms", {
+      method: "POST",
+      requestBody: nativeSmsRequest,
+    }),
+  );
+}
+
 export function useSetSmsStatus() {
   return useSmsMutation(
-    ({ smsId, smsStatus }: { smsId: string; smsStatus: SmsStatus }) =>
+    ({
+      smsId,
+      smsStatus,
+      errorCode = null,
+    }: {
+      smsId: string;
+      smsStatus: SmsStatus;
+      errorCode?: string | null;
+    }) =>
       requestApi<SmsMessage>(`/sms/${smsId}/status`, {
         method: "POST",
-        requestBody: { status: smsStatus },
+        requestBody: { status: smsStatus, error_code: errorCode },
       }),
   );
 }

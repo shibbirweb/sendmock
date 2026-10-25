@@ -34,6 +34,14 @@ describe("parseMailSearch", () => {
     });
   });
 
+  test("EM-17.3 is:inbound and is:outbound filter by direction", () => {
+    expect(parseMailSearch("is:inbound password")).toEqual({
+      direction: "inbound",
+      query: "password",
+    });
+    expect(parseMailSearch("is:outbound")).toEqual({ direction: "outbound" });
+  });
+
   test("an empty search means no filters", () => {
     expect(parseMailSearch("   ")).toEqual({});
   });

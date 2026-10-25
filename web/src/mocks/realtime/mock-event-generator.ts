@@ -1,18 +1,14 @@
 import { faker } from "@faker-js/faker/locale/en";
 
-import { calculateSmsSegments } from "@/lib/sms/calculate-sms-segments";
 import {
   readMockConditions,
   subscribeToMockConditions,
 } from "@/mocks/conditions/mock-conditions";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
-import {
-  createMockUlid,
-  createProviderId,
-  extractFixtureData,
-} from "@/mocks/fixtures/fixture-helpers";
+import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 
 /** Adds one new email and announces it, like an app sending over SMTP. */
 export function generateSampleEmail() {
@@ -45,40 +41,24 @@ export function generateSampleEmail() {
   });
 }
 
-/** Adds one new outbound SMS and announces it. */
+/** Adds one new outbound SMS, announces it and moves it towards delivered. */
 export function generateSampleSms() {
-  const messageBody = `Your Acme code is ${faker.string.numeric(6)}`;
-  const segmentInfo = calculateSmsSegments(messageBody);
-  const createdAt = new Date().toISOString();
-  const toNumber = `+88017${faker.string.numeric(8)}`;
-
-  mockDatabase.smsMessages.unshift({
-    id: createMockUlid(),
-    provider_id: createProviderId("SM"),
+  const outboundMessage = buildNewSmsMessage({
     direction: "outbound",
     channel: "sms",
     api: "twilio",
-    from_number: "+15550001111",
-    to_number: toNumber,
-    body: messageBody,
-    encoding: segmentInfo.encoding,
-    segments: segmentInfo.segmentCount,
-    media_urls: [],
-    status: "delivered",
-    error_code: null,
-    status_callback_url: null,
-    messaging_service_sid: null,
-    account: "AC00000000000000000000000000000000",
-    extracted: extractFixtureData(messageBody),
-    opened_at: null,
-    open_count: 0,
-    created_at: createdAt,
-    updated_at: createdAt,
-    status_history: [{ status: "delivered", at: createdAt, error_code: null }],
-    request_body: { To: toNumber, Body: messageBody },
-    api_request_id: null,
+    fromNumber: "+15550001111",
+    toNumber: `+88017${faker.string.numeric(8)}`,
+    body: `Your Acme code is ${faker.string.numeric(6)}`,
   });
-  publishMockEvent("sms.sent", { to_number: toNumber, body: messageBody });
+
+  mockDatabase.smsMessages.unshift(outboundMessage);
+  publishMockEvent("sms.sent", {
+    id: outboundMessage.id,
+    to_number: outboundMessage.to_number,
+    body: outboundMessage.body,
+  });
+  simulateSmsDelivery(outboundMessage);
 }
 
 const trafficGenerators = [generateSampleEmail, generateSampleSms];

@@ -3,6 +3,7 @@ import type { IsoTimestamp } from "@/lib/api/types/common";
 /** Every event SendMock publishes; the same names are used by webhook rules. */
 export const appEventTypes = [
   "email.received",
+  "email.inbound",
   "email.opened",
   "email.delivered",
   "email.deferred",

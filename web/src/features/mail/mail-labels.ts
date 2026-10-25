@@ -12,6 +12,7 @@ export const emailSourceLabels: Record<EmailSource, string> = {
   ses: "SES",
   brevo: "Brevo",
   verify: "Verify",
+  simulated: "Simulated",
 };
 
 export const deliveryStatusLabels: Record<EmailDeliveryStatus, string> = {

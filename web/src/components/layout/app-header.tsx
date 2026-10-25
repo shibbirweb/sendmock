@@ -1,13 +1,22 @@
 import { useRouterState } from "@tanstack/react-router";
 import { KeyboardIcon, SearchIcon } from "lucide-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { apiMode } from "@/config/api-mode";
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
+
+/** Demo controls are loaded only in mock mode, so live builds never ship them. */
+const LazyDevToolbar = React.lazy(async () => {
+  const { DevToolbar } = await import("@/mocks/dev-toolbar/dev-toolbar");
+
+  return { default: DevToolbar };
+});
 
 function findPageTitle(currentPath: string): string {
   const matchingItem = listAllNavigationItems()
@@ -48,6 +57,11 @@ export function AppHeader() {
           Search or jump to...
           <Kbd>⌘K</Kbd>
         </Button>
+        {apiMode === "mock" && (
+          <React.Suspense fallback={null}>
+            <LazyDevToolbar />
+          </React.Suspense>
+        )}
         <Button
           variant="ghost"
           size="icon"

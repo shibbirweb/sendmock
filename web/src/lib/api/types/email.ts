@@ -17,7 +17,23 @@ export type EmailSource =
   | "resend"
   | "ses"
   | "brevo"
-  | "verify";
+  | "verify"
+  | "simulated";
+
+/** `outbound`: mail your app sent; `inbound`: mail coming in to your app. */
+export type EmailDirection = "outbound" | "inbound";
+
+/** How the recipient answered an email your app sent. */
+export type EmailResponseKind = "reply" | "forward";
+
+/** Points from an original email to a reply or forward, or back. */
+export type EmailResponseLink = {
+  kind: EmailResponseKind;
+  email_id: Ulid;
+  subject: string;
+  from: EmailAddress;
+  received_at: IsoTimestamp;
+};
 
 /** Simulated delivery outcome, null when no outcome was simulated. */
 export type EmailDeliveryStatus =
@@ -50,6 +66,9 @@ export type EmailSummary = {
   delivery_status: EmailDeliveryStatus | null;
   open_count: number;
   has_otp: boolean;
+  direction: EmailDirection;
+  /** Set on inbound emails made by Reply or Forward, for the list icon. */
+  response_kind: EmailResponseKind | null;
 };
 
 export type EmailTemplateData = {
@@ -73,6 +92,10 @@ export type EmailDetail = EmailSummary & {
   smtp_session_id: Ulid | null;
   smtp_auth_user: string | null;
   template: EmailTemplateData | null;
+  /** On a reply or forward: the original email it answers. */
+  response_to: EmailResponseLink | null;
+  /** On an original: the replies and forwards made from it, oldest first. */
+  responses: EmailResponseLink[];
 };
 
 export type EmailTimelineKind =
@@ -85,6 +108,8 @@ export type EmailTimelineKind =
   | "unsubscribed"
   | "released"
   | "forwarded"
+  | "replied"
+  | "forwarded_by_recipient"
   | "webhook_sent";
 
 export type EmailTimelineEntry = {
@@ -112,6 +137,7 @@ export type EmailListFilters = PageRequest & {
   is_unread?: boolean;
   has_attachment?: boolean;
   source?: EmailSource;
+  direction?: EmailDirection;
 };
 
 export type EmailUpdate = {
@@ -135,4 +161,23 @@ export type NativeSendRequest = {
   html?: string;
   headers?: Record<string, string>;
   tags?: string[];
+};
+
+/** Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying). */
+export type EmailReplyRequest = {
+  body: string;
+  from?: string;
+  subject?: string;
+  reply_all?: boolean;
+  include_original?: boolean;
+};
+
+/** Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding). */
+export type EmailForwardRequest = {
+  to: string;
+  body?: string;
+  from?: string;
+  subject?: string;
+  include_original?: boolean;
+  include_attachments?: boolean;
 };

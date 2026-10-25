@@ -1,8 +1,13 @@
+import * as React from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExtractedDataPanel } from "@/features/mail/detail/extracted-data-panel";
 import { MailDetailHeader } from "@/features/mail/detail/mail-detail-header";
 import { EmailHtmlPreview } from "@/features/mail/detail/preview/email-html-preview";
+import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
+import { EmailResponseComposer } from "@/features/mail/detail/response/email-response-composer";
+import { useEmailResponseShortcuts } from "@/features/mail/detail/response/use-email-response-shortcuts";
 import { EmailChecksTab } from "@/features/mail/detail/tabs/email-checks-tab";
 import {
   EmailAttachmentsTab,
@@ -22,7 +27,11 @@ export function MailDetail({ emailId }: { emailId: string }) {
   const emailQuery = useEmail(emailId);
   const timelineQuery = useEmailTimeline(emailId);
   const email = emailQuery.data;
+  // The route keys this component by email, so a composer never outlives it.
+  const [composerMode, setComposerMode] =
+    React.useState<EmailComposerMode | null>(null);
   useEmailOpenTracking(email);
+  useEmailResponseShortcuts(email, setComposerMode);
 
   if (emailQuery.isPending) {
     return (
@@ -63,7 +72,17 @@ export function MailDetail({ emailId }: { emailId: string }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <MailDetailHeader email={email} />
+      <MailDetailHeader email={email} onStartResponse={setComposerMode} />
+      {composerMode !== null && (
+        <EmailResponseComposer
+          key={composerMode}
+          email={email}
+          composerMode={composerMode}
+          onClose={() => {
+            setComposerMode(null);
+          }}
+        />
+      )}
       <ExtractedDataPanel extracted={email.extracted} />
       <Tabs
         defaultValue={tabDefinitions[0]?.value}

@@ -4,6 +4,10 @@ import {
   type EmailFixtureSpec,
   generateRandomEmailSpecs,
 } from "@/mocks/fixtures/email-fixture-builder";
+import {
+  buildEmailResponse,
+  buildResponseTimelineEntry,
+} from "@/mocks/fixtures/email-response-builder";
 
 const appSender = { name: "Acme App", address: "no-reply@acme.test" };
 const customer = { name: "Rahim Uddin", address: "rahim@example.com" };
@@ -137,17 +141,46 @@ const handcraftedEmailSpecs: EmailFixtureSpec[] = [
   },
 ];
 
+const demoReplyOriginalSubject = "Reset your password";
+
+/** The customer answers the password reset email, so the demo shows a reply. */
+function addDemoReply(emailFixtures: EmailFixture[]): EmailFixture[] {
+  const originalFixture = emailFixtures.find(
+    (emailFixture) => emailFixture.email.subject === demoReplyOriginalSubject,
+  );
+  if (originalFixture === undefined) {
+    return emailFixtures;
+  }
+
+  const replyFixture = buildEmailResponse(originalFixture.email, {
+    kind: "reply",
+    from: customer,
+    to: [originalFixture.email.from],
+    cc: [],
+    body: "I did not ask for a password reset. Is my account safe?\n\nRahim",
+    includeOriginalText: true,
+    includeAttachments: false,
+    minutesAgo: 4,
+  });
+  originalFixture.timeline.push(buildResponseTimelineEntry(replyFixture.email));
+
+  return [...emailFixtures, replyFixture];
+}
+
 /** The standard demo mailbox: hand-written cases first, then random filler. */
 export function buildStandardEmailFixtures(): EmailFixture[] {
-  return [...handcraftedEmailSpecs, ...generateRandomEmailSpecs(18)].map(
-    buildEmailFixture,
+  return addDemoReply(
+    [...handcraftedEmailSpecs, ...generateRandomEmailSpecs(18)].map(
+      buildEmailFixture,
+    ),
   );
 }
 
 /** A large mailbox for performance and pagination testing. */
 export function buildLargeEmailFixtures(emailCount: number): EmailFixture[] {
-  return [
-    ...handcraftedEmailSpecs,
-    ...generateRandomEmailSpecs(emailCount),
-  ].map(buildEmailFixture);
+  return addDemoReply(
+    [...handcraftedEmailSpecs, ...generateRandomEmailSpecs(emailCount)].map(
+      buildEmailFixture,
+    ),
+  );
 }

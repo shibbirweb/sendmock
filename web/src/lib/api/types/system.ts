@@ -94,4 +94,6 @@ export type AppSettings = {
   fire_opened_events_on_view: boolean;
   opened_event_mode: "first_open" | "every_open";
   otp_patterns: string[];
+  /** Mail for these domains is incoming; offered as Forward suggestions. */
+  inbound_email_domains: string[];
 };

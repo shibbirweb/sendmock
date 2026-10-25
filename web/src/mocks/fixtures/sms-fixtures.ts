@@ -1,5 +1,6 @@
 import type {
   SmsApi,
+  SmsCallbackAttempt,
   SmsChannel,
   SmsDirection,
   SmsMessageDetail,
@@ -14,6 +15,7 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import { buildSmsCallbackAttempt } from "@/mocks/fixtures/sms-callback-builder";
 
 type SmsFixtureSpec = {
   minutesAgo: number;
@@ -27,7 +29,11 @@ type SmsFixtureSpec = {
   channel?: SmsChannel;
   openCount?: number;
   messagingServiceSid?: string | null;
+  /** The callback for the final status fails once, then the retry succeeds. */
+  isCallbackFailingOnce?: boolean;
 };
+
+const callbackRetryDelayMs = 30_000;
 
 const outboundStatusSequence: SmsStatus[] = ["queued", "sent", "delivered"];
 
@@ -56,6 +62,46 @@ function buildStatusHistory(smsSpec: SmsFixtureSpec): SmsStatusChange[] {
   }));
 }
 
+/** One callback per status change after the first, as the server sends them. */
+function buildCallbackAttempts(
+  smsMessage: SmsMessageDetail,
+  smsSpec: SmsFixtureSpec,
+): SmsCallbackAttempt[] {
+  const callbackUrl = smsMessage.status_callback_url;
+  if (callbackUrl === null) {
+    return [];
+  }
+
+  const reportedChanges = smsMessage.status_history.slice(1);
+
+  return reportedChanges.flatMap((statusChange, changeIndex) => {
+    const isFinalChange = changeIndex === reportedChanges.length - 1;
+    if (!isFinalChange || smsSpec.isCallbackFailingOnce !== true) {
+      return [buildSmsCallbackAttempt(smsMessage, callbackUrl, statusChange)];
+    }
+
+    const retriedAt = new Date(
+      new Date(statusChange.at).getTime() + callbackRetryDelayMs,
+    ).toISOString();
+
+    return [
+      buildSmsCallbackAttempt(smsMessage, callbackUrl, statusChange, {
+        attempt: 1,
+        responseStatusCode: 500,
+      }),
+      buildSmsCallbackAttempt(
+        smsMessage,
+        callbackUrl,
+        { ...statusChange, at: retriedAt },
+        {
+          attempt: 2,
+          responseStatusCode: 204,
+        },
+      ),
+    ];
+  });
+}
+
 function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
   const segmentInfo = calculateSmsSegments(smsSpec.body);
   const isOutbound = smsSpec.direction === "outbound";
@@ -64,7 +110,7 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
   const api = smsSpec.api ?? "twilio";
   const openCount = smsSpec.openCount ?? 0;
 
-  return {
+  const smsMessage: SmsMessageDetail = {
     id: createMockUlid(minutesAgoInMs(smsSpec.minutesAgo)),
     provider_id:
       api === "twilio" ? createProviderId("SM") : createProviderId(""),
@@ -94,7 +140,11 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
     api_request_id: isOutbound
       ? createMockUlid(minutesAgoInMs(smsSpec.minutesAgo))
       : null,
+    callback_attempts: [],
   };
+  smsMessage.callback_attempts = buildCallbackAttempts(smsMessage, smsSpec);
+
+  return smsMessage;
 }
 
 const supportLine = "+15550001111";
@@ -143,6 +193,7 @@ const smsFixtureSpecs: SmsFixtureSpec[] = [
     status: "failed",
     errorCode: "30008",
     messagingServiceSid: "MG00000000000000000000000000000001",
+    isCallbackFailingOnce: true,
   },
   {
     minutesAgo: 20,

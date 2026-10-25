@@ -192,7 +192,70 @@ POST /api/v1/sms/inbound
 
 SendMock stores it with direction `inbound` and publishes `sms.inbound`. Webhook rules (or the number's configured inbound URL) deliver it to your app in the chosen provider format, for example a Twilio-style `application/x-www-form-urlencoded` POST with `From`, `To`, `Body`, `MessageSid`, plus an `X-Twilio-Signature` header computed with the configured auth token.
 
-If your app responds with TwiML containing `<Message>`, SendMock can parse it and record the reply as an outbound SMS, so two-way conversations can be tested end to end (Phase 4).
+If your app answers with TwiML, SendMock records the reply in the same conversation. See [Reply webhook (Twilio style)](#reply-webhook-twilio-style).
+
+## Reply webhook (Twilio style)
+
+Phase 3 (moved from Phase 4 on 2026-10-25: two-way SMS is a core flow, so the reply webhook ships with the Twilio inbound format). This works like a Twilio phone number's "A message comes in" webhook: when someone texts your number, Twilio POSTs the message to your app, and your app can answer with TwiML to reply.
+
+### Where the inbound message goes
+
+The first match wins:
+
+1. The number belongs to a Messaging Service whose inbound setting is "Send a webhook": the service's request URL.
+2. The number has its own inbound URL in the Numbers registry (`SmsUrl`, `SmsMethod`, `SmsFallbackUrl`), or the service setting is "Defer to sender's webhook".
+3. Neither: no reply webhook. Webhook rules on `sms.inbound` still fire either way, so a rule and a number URL can both receive the message (the UI warns about this).
+
+### The request
+
+Exactly what Twilio sends, so the handler you run in production works unchanged:
+
+- `POST` (or `GET` when `SmsMethod` is `GET`) as `application/x-www-form-urlencoded`.
+- Fields: `MessageSid`, `SmsSid`, `SmsMessageSid`, `AccountSid`, `MessagingServiceSid`, `From`, `To`, `Body`, `NumMedia`, `NumSegments`, `MediaUrl{N}` and `MediaContentType{N}`, `ApiVersion`, and the geographic fields (`FromCountry`, `ToCountry`, ...) when known. WhatsApp adds `ProfileName` and `WaId`.
+- Headers: `X-Twilio-Signature` (HMAC-SHA1 of the full URL plus sorted parameters with the configured auth token, see [05-webhooks.md](05-webhooks.md#provider-formats)), `I-Twilio-Idempotency-Token`, `User-Agent: TwilioProxy/1.1`.
+
+### The reply (TwiML)
+
+SendMock reads the response body as TwiML when it is `text/xml` or `application/xml`:
+
+```xml
+<Response>
+  <Message statusCallback="http://localhost:8000/sms/status">Thanks, your booking is confirmed.</Message>
+</Response>
+```
+
+| TwiML | Behaviour |
+|-------|-----------|
+| `<Message>` text, or `<Body>` and `<Media>` children | stored as an outbound reply in the same thread, linked to the inbound message (`in_reply_to_sms_id`), sent through the normal delivery simulation |
+| `to` and `from` attributes | override the reply's recipient and sender (default: back to the sender, from the number that was texted) |
+| `statusCallback` | status callbacks for the reply, as for any sent message |
+| `action` and `method` | called once the reply is sent, with `MessageStatus`; its TwiML response is processed the same way |
+| `<Redirect>` | fetches TwiML from another URL and processes it |
+| empty `<Response/>` or `204` | no reply, success |
+
+Several `<Message>` verbs create several replies, in order. To stop loops, one inbound message can trigger at most 10 TwiML fetches (redirects and actions included).
+
+### Errors
+
+Failures use Twilio's error codes and are shown on the inbound message (drawer and conversation), in the API request log, and on the `sms.inbound` event:
+
+| Problem | Twilio error |
+|---------|--------------|
+| non-2xx response, or no answer within 15 seconds | 11200 HTTP retrieval failure |
+| connection refused or reset | 11205 HTTP connection failure |
+| body is not valid TwiML | 12100 Document parse failure |
+| unsupported `Content-Type` | 12300 Invalid Content-Type |
+
+When the primary URL fails and a fallback URL is set, SendMock calls the fallback with the same request plus `ErrorCode` and `ErrorUrl`, as Twilio does. Reply webhooks are not retried (Twilio does not retry them either); use **Resend reply webhook** in the message drawer after fixing the handler.
+
+### UI, API and CLI
+
+- Conversation view: inbound bubbles show the webhook result (status code, or the Twilio error code); replies created from TwiML carry a "TwiML reply" badge.
+- Message drawer: a **Reply webhook** tab with the request, the response and the parsed TwiML, plus **Resend reply webhook**.
+- Numbers: inbound URL, method and fallback URL per number; Messaging Services: the inbound setting (send a webhook, defer to sender, drop).
+- API: `POST /api/v1/sms/{smsId}/reply-webhook/resend`; CLI: `sendmock sms reply-webhook resend <smsId>`; MCP: `sendmock_sms_reply_webhook_resend`.
+
+Other providers' reply mechanisms (Plivo XML, for example) can be added later as new adapters; providers without one (Vonage) only get the inbound webhook.
 
 ## Virtual numbers
 
@@ -200,7 +263,7 @@ A small registry (UI: "Numbers") of fake owned numbers, each with:
 
 - Label (e.g. "Support line").
 - Channel capabilities (SMS, WhatsApp).
-- Inbound webhook URL and format (mirrors how you configure a number in a provider console).
+- Inbound webhook URL, method, fallback URL and format (mirrors how you configure a number in a provider console; see [Reply webhook](#reply-webhook-twilio-style)).
 - Status callback default.
 - Optional Messaging Service membership (sender pool).
 

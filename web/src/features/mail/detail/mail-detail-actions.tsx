@@ -23,6 +23,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ReleaseEmailDialog } from "@/features/mail/detail/release-email-dialog";
+import {
+  canRespondToEmail,
+  type EmailComposerMode,
+} from "@/features/mail/detail/response/email-composer-mode";
+import { EmailResponseButtons } from "@/features/mail/detail/response/email-response-buttons";
 import { buildApiUrl } from "@/lib/api/api-client";
 import {
   useDeleteEmail,
@@ -40,16 +45,27 @@ const simulatedOutcomes: { label: string; outcome: SimulatedEmailOutcome }[] = [
   { label: "Unsubscribe", outcome: { event: "unsubscribed" } },
 ];
 
-export function MailDetailActions({ email }: { email: EmailDetail }) {
+export function MailDetailActions({
+  email,
+  onStartResponse,
+}: {
+  email: EmailDetail;
+  onStartResponse: (composerMode: EmailComposerMode) => void;
+}) {
   const navigate = useNavigate();
   const updateEmail = useUpdateEmail();
   const openEmail = useOpenEmail();
   const simulateOutcome = useSimulateEmailOutcome();
   const deleteEmail = useDeleteEmail();
   const [isReleaseDialogOpen, setReleaseDialogOpen] = React.useState(false);
+  // Replies, forwards and outcome simulations only apply to mail your app sent.
+  const isSentByApp = canRespondToEmail(email);
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex flex-wrap items-center justify-end gap-1">
+      {isSentByApp && (
+        <EmailResponseButtons email={email} onStartResponse={onStartResponse} />
+      )}
       <Button
         variant="ghost"
         size="icon"
@@ -78,41 +94,43 @@ export function MailDetailActions({ email }: { email: EmailDetail }) {
       >
         <Trash2Icon />
       </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" aria-label="Simulate an event">
-            <FlaskConicalIcon />
-            Simulate
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onSelect={() => {
-              openEmail.mutate({ emailId: email.id, openSource: "manual" });
-              toast("email.opened fired");
-            }}
-          >
-            <EyeIcon />
-            Open (email.opened)
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Delivery outcome</DropdownMenuLabel>
-          {simulatedOutcomes.map(({ label, outcome }) => (
+      {isSentByApp && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" aria-label="Simulate an event">
+              <FlaskConicalIcon />
+              Simulate
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
             <DropdownMenuItem
-              key={label}
               onSelect={() => {
-                simulateOutcome.mutate({
-                  emailId: email.id,
-                  simulatedOutcome: outcome,
-                });
-                toast(`Simulated: ${label.toLowerCase()}`);
+                openEmail.mutate({ emailId: email.id, openSource: "manual" });
+                toast("email.opened fired");
               }}
             >
-              {label}
+              <EyeIcon />
+              Open (email.opened)
             </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Delivery outcome</DropdownMenuLabel>
+            {simulatedOutcomes.map(({ label, outcome }) => (
+              <DropdownMenuItem
+                key={label}
+                onSelect={() => {
+                  simulateOutcome.mutate({
+                    emailId: email.id,
+                    simulatedOutcome: outcome,
+                  });
+                  toast(`Simulated: ${label.toLowerCase()}`);
+                }}
+              >
+                {label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label="More actions">

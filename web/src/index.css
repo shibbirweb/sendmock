@@ -35,6 +35,11 @@
   --color-primary: var(--primary);
   --color-brand-from: var(--brand-from);
   --color-brand-to: var(--brand-to);
+  --color-sms-outbound: var(--sms-outbound);
+  --color-sms-outbound-foreground: var(--sms-outbound-foreground);
+  --color-whatsapp-outbound: var(--whatsapp-outbound);
+  --color-whatsapp-outbound-foreground: var(--whatsapp-outbound-foreground);
+  --color-read-receipt: var(--read-receipt);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -62,6 +67,12 @@
   /* Logo gradient: teal-600 to emerald-500. */
   --brand-from: #0d9488;
   --brand-to: #10b981;
+  /* SMS and WhatsApp bubbles sent by the app, and the blue "read" ticks. */
+  --sms-outbound: #0f766e;
+  --sms-outbound-foreground: #ffffff;
+  --whatsapp-outbound: #d9fdd3;
+  --whatsapp-outbound-foreground: #111b21;
+  --read-receipt: #0284c7;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -100,6 +111,11 @@
   /* Logo gradient: teal-400 to emerald-400. */
   --brand-from: #2dd4bf;
   --brand-to: #34d399;
+  --sms-outbound: #115e59;
+  --sms-outbound-foreground: #f0fdfa;
+  --whatsapp-outbound: #005c4b;
+  --whatsapp-outbound-foreground: #e9edef;
+  --read-receipt: #38bdf8;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

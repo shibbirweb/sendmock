@@ -152,6 +152,10 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
         : null,
     smtp_auth_user: null,
     template: emailSpec.template ?? null,
+    direction: "outbound",
+    response_kind: null,
+    response_to: null,
+    responses: [],
   };
 
   return { email, timeline: buildTimeline(emailSpec, receivedAt) };
