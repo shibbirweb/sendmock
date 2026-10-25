@@ -15,12 +15,14 @@ on:
     paths:
       - "web/**"
       - "website/**"
+      - "docs/api/**"
       - "scripts/build-pages-site.ts"
       - ".github/workflows/website.yml"
   pull_request:
     paths:
       - "web/**"
       - "website/**"
+      - "docs/api/**"
       - "scripts/build-pages-site.ts"
       - ".github/workflows/website.yml"
   workflow_dispatch:
@@ -48,6 +50,19 @@ jobs:
       - name: Install website
         working-directory: website
         run: bun install --frozen-lockfile
+
+      - name: Install Playwright browser
+        working-directory: website
+        run: bunx --bun playwright install --with-deps chromium
+
+      - name: Landing page tests (WS-02.1, WS-02.2)
+        working-directory: website
+        run: bun run test:e2e
+
+      # Uses the root build the tests just made; the Pages build below replaces it.
+      - name: Lighthouse at least 90 in every category (WS-02.3)
+        working-directory: website
+        run: bunx --bun @lhci/cli@0.15.1 autorun
 
       - name: Build website with the demo at /demo/
         env:

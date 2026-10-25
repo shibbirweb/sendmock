@@ -90,9 +90,14 @@ export function MailDetail({ emailId }: { emailId: string }) {
         defaultValue={tabDefinitions[0]?.value}
         className="gap-4 px-4 py-4 sm:px-6"
       >
-        <TabsList className="h-auto flex-wrap justify-start">
+        {/* Up to ten tabs: they wrap inside the pill rather than scroll out of sight. */}
+        <TabsList className="flex-wrap justify-start group-data-horizontal/tabs:h-auto">
           {tabDefinitions.map((tabDefinition) => (
-            <TabsTrigger key={tabDefinition.value} value={tabDefinition.value}>
+            <TabsTrigger
+              key={tabDefinition.value}
+              value={tabDefinition.value}
+              className="h-7 flex-none"
+            >
               {tabDefinition.label}
             </TabsTrigger>
           ))}
