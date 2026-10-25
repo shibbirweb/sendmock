@@ -110,11 +110,13 @@ UI in U1, backend Phase 4.
 
 ## SM-13 API request log
 
-Phase 1 (email APIs), Phase 2 (SMS APIs).
+UI in U1, backend Phase 1 (email APIs) and Phase 2 (SMS APIs).
 
 - [ ] SM-13.1 Every request to native and provider APIs is logged, including `4xx` rejections, with the exact response returned.
 - [ ] SM-13.2 Credentials are masked in the log.
 - [ ] SM-13.3 The log can be filtered by provider, status class and path, and each accepted message links to its request.
+- [ ] SM-13.4 Rejected requests are highlighted, and request and response bodies are shown formatted (JSON pretty-printed, form fields as a table).
+- [ ] SM-13.5 The request log loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of requests.
 
 ## SM-14 Provider port
 

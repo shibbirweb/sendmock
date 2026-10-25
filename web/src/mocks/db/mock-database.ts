@@ -19,18 +19,21 @@ import type {
   WebhookVariable,
 } from "@/lib/api/types";
 import {
-  buildApiRequestLogFixtures,
   buildCapturedHttpRequestFixtures,
   buildDefaultSettings,
   buildHttpBinFixtures,
-  buildSmtpSessionFixtures,
 } from "@/mocks/fixtures/catcher-and-log-fixtures";
+import {
+  buildApiRequestLogFixtures,
+  linkApiRequestFixtures,
+} from "@/mocks/fixtures/api-request-fixtures";
 import {
   buildLargeEmailFixtures,
   buildStandardEmailFixtures,
 } from "@/mocks/fixtures/email-fixtures";
 import { seedFixtureRandomness } from "@/mocks/fixtures/fixture-helpers";
 import { buildStandardSmsFixtures } from "@/mocks/fixtures/sms-fixtures";
+import { buildSmtpSessionFixtures } from "@/mocks/fixtures/smtp-session-fixtures";
 import {
   buildSavedDeliveryFixtures,
   buildWebhookTemplateFixtures,
@@ -76,6 +79,7 @@ export type MockDatabase = {
 export type MockDataSize = "standard" | "large" | "empty";
 
 const largeDataSetEmailCount = 5000;
+const largeDataSetApiRequestCount = 2000;
 
 function sortNewestFirst<ItemType extends { id: string }>(
   items: ItemType[],
@@ -134,12 +138,18 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ? buildLargeEmailFixtures(largeDataSetEmailCount)
       : buildStandardEmailFixtures();
   const smsMessages = sortNewestFirst(buildStandardSmsFixtures());
+  const emails = sortNewestFirst(
+    emailFixtures.map((emailFixture) => emailFixture.email),
+  );
+  const smtpSessions = buildSmtpSessionFixtures(emails);
+  const apiRequestLog = buildApiRequestLogFixtures(
+    mockDataSize === "large" ? largeDataSetApiRequestCount : 0,
+  );
+  linkApiRequestFixtures(apiRequestLog, emails, smsMessages);
 
   return {
     ...configuration,
-    emails: sortNewestFirst(
-      emailFixtures.map((emailFixture) => emailFixture.email),
-    ),
+    emails,
     emailTimelines: new Map(
       emailFixtures.map((emailFixture) => [
         emailFixture.email.id,
@@ -157,8 +167,8 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     capturedHttpRequests: sortNewestFirst(
       buildCapturedHttpRequestFixtures(configuration.httpBins),
     ),
-    smtpSessions: buildSmtpSessionFixtures(),
-    apiRequestLog: buildApiRequestLogFixtures(),
+    smtpSessions,
+    apiRequestLog,
   };
 }
 

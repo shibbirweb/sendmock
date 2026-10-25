@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 94 features, 10 / 348 criteria ticked.**
+**Accepted: 0 / 94 features, 10 / 352 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -67,7 +67,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Not started |
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 | 3 | Not started |
 | [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Not started |
-| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | Phase 1 | 3 | Not started |
+| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | In progress |
 | [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | Native events Phase 3, provider formats Phase 4 | 4 | Not started |
 | [EM-11](01-email.md#em-11-email-opened-events) | Email opened events | Phase 3 | 5 | Not started |
 | [EM-12](01-email.md#em-12-tags) | Tags | Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules) | 4 | Not started |
@@ -88,7 +88,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Not started |
 | [SM-11](02-sms-verify.md#sm-11-whatsapp-via-twilio) | WhatsApp via Twilio | Phase 4 | 3 | Not started |
 | [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 4 | 3 | In progress |
-| [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | Phase 1 (email APIs), Phase 2 (SMS APIs) | 3 | Not started |
+| [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | In progress |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Not started |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Not started |

@@ -1,5 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftIcon, EyeIcon, ForwardIcon, ReplyIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  EyeIcon,
+  ForwardIcon,
+  ReplyIcon,
+  ScrollTextIcon,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,7 +83,20 @@ export function MailDetailHeader({
             Inbound
           </Badge>
         )}
-        <Badge variant="outline">{emailSourceLabels[email.source]}</Badge>
+        {email.smtp_session_id === null ? (
+          <Badge variant="outline">{emailSourceLabels[email.source]}</Badge>
+        ) : (
+          <Badge variant="outline" asChild>
+            <Link
+              to="/logs"
+              search={{ session: email.smtp_session_id }}
+              title="Open the SMTP session that delivered this email"
+            >
+              {emailSourceLabels[email.source]}
+              <ScrollTextIcon />
+            </Link>
+          </Badge>
+        )}
         {email.tags.map((tagName) => (
           <Badge key={tagName} variant="secondary">
             {tagName}

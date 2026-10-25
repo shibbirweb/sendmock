@@ -1,4 +1,4 @@
-import type { IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 
 export type HttpBin = {
   id: Ulid;
@@ -26,6 +26,12 @@ export type CapturedHttpRequest = {
 
 export type SmtpSessionResult = "delivered" | "rejected" | "aborted";
 
+/** Query of GET /api/v1/logs/smtp; `result` takes a comma-separated list. */
+export type SmtpSessionListFilters = PageRequest & {
+  result?: string;
+  query?: string;
+};
+
 export type SmtpSession = {
   id: Ulid;
   remote_address: string;
@@ -36,6 +42,7 @@ export type SmtpSession = {
   result: SmtpSessionResult;
   failure_reason: string | null;
   email_ids: Ulid[];
+  /** One line per command or reply, prefixed `C: ` (client) or `S: ` (server). */
   transcript: string;
   started_at: IsoTimestamp;
   ended_at: IsoTimestamp;
@@ -51,8 +58,25 @@ export type ApiRequestLogEntry = {
   response_status: number;
   response_body: string;
   duration_ms: number;
-  message_id: Ulid | null;
+  /** The SMS or email this request created; null for rejected requests. */
+  linked_message: ApiRequestLinkedMessage | null;
   created_at: IsoTimestamp;
+};
+
+export type ApiRequestLinkedMessage = {
+  kind: "email" | "sms";
+  id: Ulid;
+  /** Conversation of a linked SMS, for the "Open message" link. */
+  sms_thread_id: string | null;
+};
+
+export type ApiStatusClass = "2xx" | "4xx" | "5xx";
+
+/** Query of GET /api/v1/logs/http. */
+export type ApiRequestLogFilters = PageRequest & {
+  api?: string;
+  status_class?: ApiStatusClass;
+  path?: string;
 };
 
 export type AppStats = {

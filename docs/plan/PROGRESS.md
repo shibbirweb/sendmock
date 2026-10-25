@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail, SMS, Verify and Numbers screens done**; Logs, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers and Logs screens done**; Settings, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: Logs (SMTP sessions and the API request log) next, then Settings.
+2. Continue Phase U1: Settings next, then the Overview dashboard and empty states.
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 10 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 12 / 16 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -98,8 +98,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
 - [x] Verify tab: verifications, timeline, force-state buttons, Verify services editor (live expiry countdown, status chips, link to the SMS with the code)
 - [x] Numbers registry and Messaging Services tab (inbound URL, method, fallback, format and status callback per number; sender pools with inbound handling)
-- [ ] Logs: SMTP sessions and transcript viewer
-- [ ] Logs: HTTP API request log with rejected requests
+- [x] Logs: SMTP sessions and transcript viewer (failed sessions highlighted, colour-coded transcript, email to session links, 50 rows per page)
+- [x] Logs: HTTP API request log with rejected requests (filters by status class, API and path, formatted bodies, message links, 50 rows per page)
 - [ ] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns
 - [ ] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
 - [ ] Empty states with "how to connect" and "send sample"
@@ -309,4 +309,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Fix: buttons, tabs, checkboxes, select triggers, menu items and `<summary>` show the pointer cursor again (Tailwind v4 dropped it); disabled buttons keep the default cursor. |
 | 2026-10-25 | Plan: Numbers screen design ([07](07-ui.md#numbers): numbers table and side sheet with inbound URL, method, fallback, format and status callback; Messaging Services with sender pool and inbound handling) and criteria SM-03.4 and SM-12.3. |
 | 2026-10-25 | Numbers screen built on mock data: numbers table and side sheet (E.164, channels, inbound webhook URL, method, fallback and format, default status callback, Messaging Service, note when an `sms.inbound` rule also exists), Messaging Services with sender pool (moving a number between pools updates both) and inbound handling. Shared `FormField`, `FormFieldError` and `ConfirmDeleteDialog` now also used by Verify. |
+| 2026-10-25 | Plan: Logs screen design ([07](07-ui.md#logs): SMTP sessions with a colour-coded transcript viewer and a link from each email to its session, HTTP API request log with formatted bodies, filters and message links) and criteria EM-09.4 and SM-13.4. |
+| 2026-10-25 | Logs screen built on mock data: SMTP sessions (failed ones highlighted with their reason, transcript viewer with C / S lines and reply codes coloured by class, each SMTP email linked to its session and back) and the API request log (status class, API and path filters, JSON and form bodies formatted, links to the SMS or email created and back). Both tables page 50 rows at a time and load more on scroll; the large data set now has about 5,000 sessions and 2,000 requests. Native sends are logged live. |
 | 2026-10-25 | Fix: `web/.gitignore` ignored every folder named `logs`, which hid `src/features/logs` from git, Tailwind, Prettier and ESLint; the rule is now anchored to the root (`/logs/`). Demo control labels are now tied to their selects. |
