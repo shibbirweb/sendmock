@@ -22,7 +22,10 @@ export function FlowVariablesReference() {
             <th scope="col" className="px-3 py-1.5 font-medium">
               Becomes
             </th>
-            <th scope="col" className="px-3 py-1.5 font-medium">
+            <th
+              scope="col"
+              className="hidden px-3 py-1.5 font-medium sm:table-cell"
+            >
               Example
             </th>
           </tr>
@@ -34,7 +37,7 @@ export function FlowVariablesReference() {
                 <code className="font-mono">{flowVariable.token}</code>
               </td>
               <td className="px-3 py-1.5">{flowVariable.description}</td>
-              <td className="px-3 py-1.5 text-muted-foreground">
+              <td className="hidden px-3 py-1.5 text-muted-foreground sm:table-cell">
                 {flowVariable.example}
               </td>
             </tr>

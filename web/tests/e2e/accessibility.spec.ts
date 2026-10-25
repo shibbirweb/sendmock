@@ -1,36 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
-const screenPaths = [
-  "/",
-  "/mail",
-  "/sms",
-  "/sms/verify",
-  "/http",
-  "/webhooks/overview",
-  "/webhooks/endpoints",
-  "/webhooks/rules",
-  "/webhooks/inbound-routes",
-  "/webhooks/deliveries",
-  "/webhooks/composer",
-  "/webhooks/templates",
-  "/webhooks/variables",
-  "/webhooks/saved",
-  "/payments",
-  "/payments/gateways",
-  "/payments/methods",
-  "/payments/flows",
-  "/numbers",
-  "/logs",
-  "/settings",
-];
+import { appScreens, navigateInApp } from "./support/app-screens";
 
-async function navigateInApp(page: Page, targetPath: string) {
-  await page.evaluate((path) => {
-    window.history.pushState({}, "", path);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }, targetPath);
-}
+const screenPaths = appScreens.map((appScreen) => appScreen.path);
 
 /** Serious or critical WCAG A / AA violations, as "rule: element" lines. */
 async function findSeriousViolations(

@@ -154,7 +154,9 @@ test("notification toasts can be dismissed with their close button", async ({
   await page.getByRole("button", { name: "Sample email" }).click();
   await page.keyboard.press("Escape");
 
-  const newEmailToast = page.locator("[data-sonner-toast]").filter({ hasText: "New email" });
+  const newEmailToast = page
+    .locator("[data-sonner-toast]")
+    .filter({ hasText: "New email" });
   await expect(newEmailToast).toBeVisible();
   await newEmailToast.hover();
   await newEmailToast.getByRole("button", { name: /close/i }).click();
@@ -186,7 +188,9 @@ test("the sidebar and browser tab show the SendMock logo", async ({
   const homeLink = page.getByRole("link", { name: /SendMock/ }).first();
   await expect(homeLink.locator("svg")).toBeVisible();
 
-  const faviconPath = await page.locator("link[rel='icon']").getAttribute("href");
+  const faviconPath = await page
+    .locator("link[rel='icon']")
+    .getAttribute("href");
   expect(faviconPath).toMatch(/favicon\.svg$/);
   const faviconResponse = await request.get(faviconPath ?? "");
   expect(faviconResponse.ok()).toBe(true);

@@ -34,10 +34,18 @@ test("EM-03.4 search filters narrow the list and chips toggle them", async ({
 test("EM-05.4 an opened email shows its code with a copy button", async ({
   page,
 }) => {
-  await page.locator(emailList).getByText("Your verification code").first().click();
+  await page
+    .locator(emailList)
+    .getByText("Your verification code")
+    .first()
+    .click();
 
-  await expect(page.getByRole("heading", { name: "Your verification code", level: 2 })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Copy code 482913" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Your verification code", level: 2 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy code 482913" }),
+  ).toBeVisible();
 });
 
 test("EM-04.3 device toggles resize the HTML preview", async ({ page }) => {
@@ -49,17 +57,25 @@ test("EM-04.3 device toggles resize the HTML preview", async ({ page }) => {
   await expect
     .poll(async () => (await previewFrame.boundingBox())?.width ?? 0)
     .toBeLessThan(desktopWidth);
-  await expect.poll(async () => (await previewFrame.boundingBox())?.width ?? 0).toBeLessThanOrEqual(375);
+  await expect
+    .poll(async () => (await previewFrame.boundingBox())?.width ?? 0)
+    .toBeLessThanOrEqual(375);
 });
 
 test("EM-04.4 inline CID images load inside the sandboxed preview", async ({
   page,
 }) => {
   await page.locator(emailList).getByText("Welcome to Acme").click();
-  const heroImage = page.frameLocator("iframe[title^='Preview']").locator("img[alt='Hero']");
+  const heroImage = page
+    .frameLocator("iframe[title^='Preview']")
+    .locator("img[alt='Hero']");
 
   await expect
-    .poll(() => heroImage.evaluate((imageElement: HTMLImageElement) => imageElement.naturalWidth))
+    .poll(() =>
+      heroImage.evaluate(
+        (imageElement: HTMLImageElement) => imageElement.naturalWidth,
+      ),
+    )
     .toBeGreaterThan(0);
 });
 
@@ -94,10 +110,14 @@ test("EM-16.2 notification permission is requested only when turned on", async (
 
   const readRequestCount = () =>
     page.evaluate(
-      () => (window as unknown as { permissionRequests: { count: number } }).permissionRequests.count,
+      () =>
+        (window as unknown as { permissionRequests: { count: number } })
+          .permissionRequests.count,
     );
   expect(await readRequestCount()).toBe(0);
 
-  await page.getByRole("button", { name: "Notify me about new emails" }).click();
+  await page
+    .getByRole("button", { name: "Notify me about new emails" })
+    .click();
   await expect.poll(readRequestCount).toBe(1);
 });

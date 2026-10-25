@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import * as React from "react";
 
 import { SendMockLogo } from "@/components/common/sendmock-logo";
 import {
@@ -16,6 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { ConnectionStatus } from "@/features/connection/connection-status";
 import { useAppStats } from "@/lib/api/hooks/use-system-queries";
@@ -74,6 +76,12 @@ export function AppSidebar() {
   const currentPath = useRouterState({
     select: (routerState) => routerState.location.pathname,
   });
+  const { setOpenMobile } = useSidebar();
+
+  // On phones the sidebar is a drawer; close it once the user has navigated.
+  React.useEffect(() => {
+    setOpenMobile(false);
+  }, [currentPath, setOpenMobile]);
 
   return (
     <Sidebar collapsible="icon">

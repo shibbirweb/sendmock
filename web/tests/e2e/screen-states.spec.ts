@@ -1,39 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-/** Every screen of the app with its browser tab title (UI-07.4). */
-const screens = [
-  { path: "/", title: "Overview · SendMock" },
-  { path: "/mail", title: "Mail · SendMock" },
-  { path: "/sms", title: "SMS · SendMock" },
-  { path: "/sms/verify", title: "Verify · SendMock" },
-  { path: "/http", title: "HTTP catcher · SendMock" },
-  { path: "/webhooks/overview", title: "Overview · Webhooks · SendMock" },
-  { path: "/webhooks/endpoints", title: "Endpoints · Webhooks · SendMock" },
-  { path: "/webhooks/rules", title: "Rules · Webhooks · SendMock" },
-  {
-    path: "/webhooks/inbound-routes",
-    title: "Inbound routes · Webhooks · SendMock",
-  },
-  { path: "/webhooks/deliveries", title: "Deliveries · Webhooks · SendMock" },
-  { path: "/webhooks/composer", title: "Composer · Webhooks · SendMock" },
-  { path: "/webhooks/templates", title: "Templates · Webhooks · SendMock" },
-  { path: "/webhooks/variables", title: "Variables · Webhooks · SendMock" },
-  { path: "/webhooks/saved", title: "Saved deliveries · Webhooks · SendMock" },
-  { path: "/payments", title: "Payments · SendMock" },
-  { path: "/payments/gateways", title: "Gateways · Payments · SendMock" },
-  { path: "/payments/methods", title: "Methods · Payments · SendMock" },
-  { path: "/payments/flows", title: "Flows · Payments · SendMock" },
-  { path: "/numbers", title: "Numbers · SendMock" },
-  { path: "/logs", title: "Logs · SendMock" },
-  { path: "/settings", title: "General · Settings · SendMock" },
-];
-
-async function navigateInApp(page: Page, targetPath: string) {
-  await page.evaluate((path) => {
-    window.history.pushState({}, "", path);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }, targetPath);
-}
+import { appScreens, navigateInApp } from "./support/app-screens";
 
 async function chooseApiResponses(page: Page, optionName: string) {
   await page.getByRole("button", { name: "Demo controls" }).click();
@@ -53,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 test("UI-07.4 every screen sets its own tab title, the open item first", async ({
   page,
 }) => {
-  for (const screen of screens) {
+  for (const screen of appScreens) {
     await navigateInApp(page, screen.path);
     await expect(page).toHaveTitle(screen.title);
   }
@@ -75,7 +42,7 @@ test("UI-07.2 every screen shows an error with Try again when the API fails, and
   page,
 }) => {
   await chooseApiResponses(page, "Always 500 server error");
-  for (const screen of screens) {
+  for (const screen of appScreens) {
     await navigateInApp(page, screen.path);
     await expect(
       screenContent(page).getByRole("alert").first(),
@@ -104,7 +71,7 @@ test("UI-07.2 every screen shows a skeleton while its data loads", async ({
   await page.keyboard.press("End");
   await page.keyboard.press("Escape");
   // The overview and the SMS threads (the sidebar badge) are already loaded.
-  const unloadedScreens = screens.filter(
+  const unloadedScreens = appScreens.filter(
     (screen) => screen.path !== "/" && screen.path !== "/sms",
   );
   for (const screen of unloadedScreens) {

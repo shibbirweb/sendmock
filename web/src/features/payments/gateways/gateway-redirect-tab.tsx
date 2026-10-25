@@ -70,7 +70,7 @@ export function GatewayRedirectTab({
         {redirectFields.map((redirectField, fieldIndex) => (
           <div
             key={fieldIndex}
-            className="grid grid-cols-[0.8fr_1.6fr_9rem_auto] items-start gap-2"
+            className="grid grid-cols-[1fr_8rem_auto] items-start gap-2 sm:grid-cols-[0.8fr_1.6fr_9rem_auto]"
           >
             <Input
               aria-label={`Redirect field ${fieldIndex + 1} name`}
@@ -81,14 +81,17 @@ export function GatewayRedirectTab({
                 changeField(fieldIndex, { name: changeEvent.target.value })
               }
             />
-            <TemplateTextField
-              ariaLabel={`Redirect field ${fieldIndex + 1} template`}
-              className="font-mono text-xs"
-              placeholder="{{ payment.reference }}"
-              value={redirectField.template}
-              templateReference={templateReference}
-              onChange={(template) => changeField(fieldIndex, { template })}
-            />
+            {/* Its own row on phones, under the name, send rule and remove. */}
+            <div className="col-span-3 row-start-2 sm:col-span-1 sm:row-start-auto">
+              <TemplateTextField
+                ariaLabel={`Redirect field ${fieldIndex + 1} template`}
+                className="font-mono text-xs"
+                placeholder="{{ payment.reference }}"
+                value={redirectField.template}
+                templateReference={templateReference}
+                onChange={(template) => changeField(fieldIndex, { template })}
+              />
+            </div>
             <Select
               value={redirectField.send_on}
               onValueChange={(sendOn) =>

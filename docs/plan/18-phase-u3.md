@@ -125,7 +125,8 @@ As specified in [07-ui.md](07-ui.md#notifications):
 
 - **Widths checked:** 360 and 390 (phone), 768 (tablet), 1024 and 1280 (laptop split screen and laptop), 1440 and 2560 (desktop).
 - **Rules:** no horizontal page scroll at any width; the sidebar becomes a sheet below 768; three-pane screens (Mail, SMS, HTTP) show one pane at a time on phones with a back button; tables hide secondary columns and keep the row action reachable; sheets are full width on phones; dialogs fit 360 wide; the checkout page stacks the order summary above the payment panel.
-- **Test:** an end-to-end test visits every screen at 360, 768 and 1280 and checks that the document does not scroll horizontally and the page title and primary action are visible; screenshots at each width are reviewed and fixed.
+- **Test:** an end-to-end test visits every screen at every width above and fails on any element past the right edge that is not inside an intended horizontal scroller (`overflow-x-auto`, a table container, `pre`) and on a page-level horizontal scroll; it also opens the editing sheets at 360 wide tab by tab, checks the sidebar drawer closes after navigating on a phone, and checks the checkout stacking; screenshots at each width are reviewed and fixed.
+- **Tab strips** that can be wider than a phone sit in an `overflow-x-auto` wrapper outside the scrolling form, so they scroll sideways without clipping and stay in view while the form scrolls.
 
 ## W5: Performance (UI-06)
 

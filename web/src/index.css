@@ -202,6 +202,11 @@
   html {
     @apply font-sans;
   }
+  /* Browsers give fieldsets min-width: min-content, so one wide row pushes the
+     whole form past a phone screen. Let them shrink like any other block. */
+  fieldset {
+    min-width: 0;
+  }
   /* Tailwind v4 no longer gives buttons a pointer cursor; restore it for
      everything clickable (buttons, tabs, checkboxes, select triggers). */
   button:not(:disabled),
