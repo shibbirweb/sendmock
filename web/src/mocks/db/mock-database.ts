@@ -15,7 +15,6 @@ import type {
   VerifyService,
   VirtualNumber,
   WebhookDelivery,
-  WebhookEndpoint,
   WebhookRule,
   WebhookTemplateSummary,
   WebhookVariable,
@@ -59,6 +58,7 @@ import {
   buildWebhookEndpointFixtures,
   buildWebhookRuleFixtures,
 } from "@/mocks/fixtures/webhook-fixtures";
+import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
@@ -77,7 +77,7 @@ export type MockDatabase = {
   messagingServices: MessagingService[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
-  webhookEndpoints: WebhookEndpoint[];
+  webhookEndpoints: WebhookEndpointRecord[];
   webhookRules: WebhookRule[];
   webhookDeliveries: WebhookDelivery[];
   webhookTemplates: WebhookTemplateSummary[];

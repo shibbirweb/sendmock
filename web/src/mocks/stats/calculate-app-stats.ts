@@ -7,38 +7,18 @@ import type {
   WebhookDelivery,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
+import {
+  calculateSuccessRate,
+  isFailedDelivery,
+  percentile,
+  readFailureCode,
+  sortDurations,
+} from "@/mocks/stats/delivery-metrics";
 
 const hourInMs = 60 * 60 * 1000;
 const activityBucketCount = 24;
 const topFailureCodeLimit = 3;
 const recentFailureLimit = 5;
-
-const finishedDeliveryStatuses: WebhookDelivery["status"][] = [
-  "succeeded",
-  "failed",
-  "exhausted",
-];
-const failedDeliveryStatuses: WebhookDelivery["status"][] = [
-  "failed",
-  "exhausted",
-  "render_failed",
-];
-
-export function percentile(
-  sortedValues: number[],
-  percentileRank: number,
-): number | null {
-  if (sortedValues.length === 0) {
-    return null;
-  }
-
-  const valueIndex = Math.min(
-    sortedValues.length - 1,
-    Math.ceil((percentileRank / 100) * sortedValues.length) - 1,
-  );
-
-  return sortedValues[valueIndex] ?? null;
-}
 
 function readStartOfTodayMs(nowMs: number): number {
   const startOfToday = new Date(nowMs);
@@ -50,43 +30,6 @@ function readStartOfTodayMs(nowMs: number): number {
 function countSince(timestamps: string[], sinceMs: number): number {
   return timestamps.filter((timestamp) => Date.parse(timestamp) >= sinceMs)
     .length;
-}
-
-function calculateSuccessRate(deliveries: WebhookDelivery[]): number | null {
-  const finishedDeliveries = deliveries.filter((webhookDelivery) =>
-    finishedDeliveryStatuses.includes(webhookDelivery.status),
-  );
-  if (finishedDeliveries.length === 0) {
-    return null;
-  }
-
-  const succeededCount = finishedDeliveries.filter(
-    (webhookDelivery) => webhookDelivery.status === "succeeded",
-  ).length;
-
-  return succeededCount / finishedDeliveries.length;
-}
-
-function sortDurations(deliveries: WebhookDelivery[]): number[] {
-  return deliveries
-    .map((webhookDelivery) => webhookDelivery.duration_ms)
-    .filter((durationMs): durationMs is number => durationMs !== null)
-    .sort((firstDuration, secondDuration) => firstDuration - secondDuration);
-}
-
-function isFailedDelivery(webhookDelivery: WebhookDelivery): boolean {
-  return failedDeliveryStatuses.includes(webhookDelivery.status);
-}
-
-/** "500", "render_failed" or "no_response" for a delivery that failed. */
-function readFailureCode(webhookDelivery: WebhookDelivery): string {
-  if (webhookDelivery.status === "render_failed") {
-    return "render_failed";
-  }
-
-  return webhookDelivery.response === null
-    ? "no_response"
-    : String(webhookDelivery.response.status_code);
 }
 
 function countTopFailureCodes(

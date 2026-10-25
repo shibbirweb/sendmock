@@ -7,14 +7,16 @@ import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
  * request (SM-13.1), so demo sends and rejections show up in Logs > HTTP.
  */
 export function recordNativeApiRequest({
+  method = "POST",
   path,
   requestBody,
   responseStatus,
   responseBody,
   linkedMessage = null,
 }: {
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
   path: string;
-  requestBody: unknown;
+  requestBody?: unknown;
   responseStatus: number;
   responseBody: unknown;
   linkedMessage?: ApiRequestLinkedMessage | null;
@@ -23,10 +25,10 @@ export function recordNativeApiRequest({
   mockDatabase.apiRequestLog.unshift({
     id: apiRequestId,
     api: "native",
-    method: "POST",
+    method,
     path,
     request_headers: { "content-type": "application/json" },
-    request_body: JSON.stringify(requestBody),
+    request_body: requestBody === undefined ? "" : JSON.stringify(requestBody),
     response_status: responseStatus,
     response_body: JSON.stringify(responseBody),
     duration_ms: 1,

@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { HttpStatusBadge } from "@/features/logs/http/http-status-badge";
+import { HttpStatusBadge } from "@/components/common/http-status-badge";
 import {
   apiFilterOptions,
   isRejectedStatus,

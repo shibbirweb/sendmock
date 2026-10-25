@@ -87,7 +87,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET/POST/PATCH/DELETE | `/webhooks/endpoints` | manage endpoints |
+| GET/POST/PATCH/DELETE | `/webhooks/endpoints` | manage endpoints; the list adds `delivery_count_24h` and `success_history` (24 hourly success rates, `null` for hours without deliveries) |
 | POST | `/webhooks/endpoints/{endpointId}/test` | send `test.ping` |
 | POST | `/webhooks/endpoints/{endpointId}/send` | manual send (email_id, sms_id, or raw payload) |
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
@@ -102,7 +102,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | GET | `/webhooks/template-reference` | functions, filters and context fields for autocomplete |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
 | GET/POST/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST /webhooks/saved/{savedId}/send` |
-| POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window |
+| POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window (`{ "overlap_hours": 24 }`); the response carries the new masked secret and `previous_secret_expires_at` |
+| GET | `/webhooks/endpoints/{endpointId}/secret` | reveal the plain secret (the reveal is written to the API request log); everywhere else secrets are masked |
 
 Manual send and replay accept `"variables": { ... }` overrides and `"rerender": true|false`. Details in [12-webhook-variables.md](12-webhook-variables.md).
 

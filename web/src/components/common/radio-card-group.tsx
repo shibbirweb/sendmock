@@ -6,6 +6,7 @@ export type RadioCardOption<OptionValue extends string> = {
   value: OptionValue;
   label: string;
   description: string;
+  isDisabled?: boolean;
 };
 
 /** Radio buttons as bordered cards with a description under each label. */
@@ -34,7 +35,7 @@ export function RadioCardGroup<OptionValue extends string>({
           <label
             key={option.value}
             htmlFor={optionId}
-            className="flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-sm has-checked:border-primary"
+            className="flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-sm has-checked:border-primary has-disabled:cursor-not-allowed has-disabled:opacity-60"
           >
             <input
               id={optionId}
@@ -42,6 +43,7 @@ export function RadioCardGroup<OptionValue extends string>({
               name={groupName}
               className="mt-0.5 accent-primary"
               checked={selectedValue === option.value}
+              disabled={option.isDisabled}
               onChange={() => {
                 onSelect(option.value);
               }}
