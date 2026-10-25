@@ -56,6 +56,28 @@ test("UI-01.1 sidebar lists every section and highlights the current one", async
   await expect(sidebar.getByRole("link", { name: "Verify" })).toBeVisible();
 });
 
+test("UI-01.1 sections with sub-items show a chevron that turns when the group opens", async ({
+  page,
+}) => {
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  const chevronOf = (sectionTitle: string) =>
+    sidebar
+      .getByRole("link", { name: sectionTitle, exact: true })
+      .getByTestId("sidebar-group-chevron");
+
+  for (const groupTitle of ["SMS", "Webhooks", "Payments"]) {
+    await expect(chevronOf(groupTitle)).toBeVisible();
+    await expect(chevronOf(groupTitle)).not.toHaveClass(/rotate-90/);
+  }
+  for (const plainTitle of ["Overview", "Mail", "HTTP", "Numbers", "Logs"]) {
+    await expect(chevronOf(plainTitle)).toHaveCount(0);
+  }
+
+  await sidebar.getByRole("link", { name: "Webhooks", exact: true }).click();
+  await expect(chevronOf("Webhooks")).toHaveClass(/rotate-90/);
+  await expect(chevronOf("SMS")).not.toHaveClass(/rotate-90/);
+});
+
 test("UI-01.2 theme can be switched and the choice persists", async ({
   page,
 }) => {

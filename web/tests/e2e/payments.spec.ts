@@ -66,7 +66,7 @@ test("PY-09.2 the detail shows ids, method, line items, timeline, redirect and n
     name: "Payment overview",
   });
   await expect(overview).toContainText("SSLCommerz");
-  await expect(overview).toContainText("tran id");
+  await expect(overview).toContainText("tran_id");
   await expect(overview).toContainText("visa ending 4242, expires 12/34");
   await expect(
     paymentDrawer.getByRole("region", { name: "Line items" }),

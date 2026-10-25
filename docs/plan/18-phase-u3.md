@@ -70,28 +70,28 @@ The review table: each row is filled during the pass (`OK`, or the fix made), an
 
 | Screen | Path | Hierarchy | Spacing | Copy | Loading | Empty | Error | Dark | Notes | Signed off |
 |--------|------|-----------|---------|------|---------|-------|-------|------|-------|------------|
-| Overview | `/` | | | | | | | | | |
-| Mail | `/mail`, `/mail/{id}` | | | | | | | | | |
-| SMS | `/sms`, `/sms/{thread}` | | | | | | | | | |
-| Verify | `/sms/verify` | | | | | | | | | |
-| HTTP catcher | `/http` | | | | | | | | | |
-| Webhooks overview | `/webhooks/overview` | | | | | | | | | |
-| Endpoints | `/webhooks/endpoints` | | | | | | | | | |
-| Rules | `/webhooks/rules` | | | | | | | | | |
-| Inbound routes | `/webhooks/inbound-routes` | | | | | | | | | |
-| Deliveries | `/webhooks/deliveries` | | | | | | | | | |
-| Composer | `/webhooks/composer` | | | | | | | | | |
-| Templates | `/webhooks/templates` | | | | | | | | | |
-| Variables | `/webhooks/variables` | | | | | | | | | |
-| Saved deliveries | `/webhooks/saved` | | | | | | | | | |
-| Payments | `/payments` | | | | | | | | | |
-| Gateways | `/payments/gateways` | | | | | | | | | |
-| Methods | `/payments/methods` | | | | | | | | | |
-| Flows | `/payments/flows` | | | | | | | | | |
-| Test checkout | `/pay/{session}` | | | | | | | | | |
-| Numbers | `/numbers` | | | | | | | | | |
-| Logs | `/logs` | | | | | | | | | |
-| Settings | `/settings` (every section) | | | | | | | | | |
+| Overview | `/` | OK | Capped at `max-w-6xl` like the other pages (was `max-w-7xl`, so it stretched on wide screens) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Mail | `/mail`, `/mail/{id}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The subject wraps beside its actions on narrow screens (W4) | |
+| SMS | `/sms`, `/sms/{thread}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Verify | `/sms/verify` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| HTTP catcher | `/http` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The request detail tabs scroll sideways without clipping (W4) | |
+| Webhooks overview | `/webhooks/overview` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Endpoints | `/webhooks/endpoints` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The sheet footer says Close, not Cancel, on purpose: the Security and Variables tabs save on their own | |
+| Rules | `/webhooks/rules` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Inbound routes | `/webhooks/inbound-routes` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Deliveries | `/webhooks/deliveries` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Composer | `/webhooks/composer` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Templates | `/webhooks/templates` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Variables | `/webhooks/variables` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Saved deliveries | `/webhooks/saved` | OK | Capped at `max-w-6xl` like the other webhook pages (was `max-w-5xl`) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Payments | `/payments` | OK | OK | The payment drawer shows provider id names as the provider writes them, in monospace (`tran_id`, not "tran id") | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Gateways | `/payments/gateways` | OK | The preview pickers fill their columns instead of a long payment name running into the next one | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The tabs stay in view while the form scrolls (W4) | |
+| Methods | `/payments/methods` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Flows | `/payments/flows` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The variables table drops its Example column on phones (W4) | |
+| Test checkout | `/pay/{session}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | Pay successfully is the only filled button in Test controls | |
+| Numbers | `/numbers` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Logs | `/logs` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Settings | `/settings` (every section) | Delete all emails and Delete all SMS are red like Reset to seed (they were outline) | OK | Keep forever reads "Turn off to delete traffic after a number of days." (it pointed at an age field that is hidden while on) | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
 
 #### Pass (W6)
 
@@ -99,7 +99,7 @@ Light and dark screenshots of every screen at 1440 wide (and the sheets and dial
 
 Known fixes already listed for the pass:
 
-- Sidebar groups (SMS, Webhooks, Payments) show a chevron on the parent item, rotating when the group opens.
+- Sidebar groups (SMS, Webhooks, Payments) show a chevron on the parent item, rotating when the group opens. Done in W6; the SMS unread badge moves left of the chevron, and an end-to-end test checks which items have one and that it turns.
 
 ## W2: Notifications (UI-08)
 

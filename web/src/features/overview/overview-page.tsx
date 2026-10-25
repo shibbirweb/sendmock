@@ -26,7 +26,7 @@ export function OverviewPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto grid w-full max-w-7xl min-w-0 grid-cols-1 gap-4 px-4 py-6 sm:px-6">
+      <div className="mx-auto grid w-full max-w-6xl min-w-0 grid-cols-1 gap-4 px-4 py-6 sm:px-6">
         <header className="grid gap-1">
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="text-sm text-muted-foreground">

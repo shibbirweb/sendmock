@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ChevronRightIcon } from "lucide-react";
 import * as React from "react";
 
 import { SendMockLogo } from "@/components/common/sendmock-logo";
@@ -20,6 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ConnectionStatus } from "@/features/connection/connection-status";
+import { cn } from "@/lib/utils";
 import { useAppStats } from "@/lib/api/hooks/use-system-queries";
 import type { AppStats } from "@/lib/api/types";
 import {
@@ -120,10 +122,25 @@ export function AppSidebar() {
                     <Link to={navigationItem.path}>
                       <navigationItem.icon />
                       <span>{navigationItem.title}</span>
+                      {navigationItem.children !== undefined && (
+                        <ChevronRightIcon
+                          aria-hidden="true"
+                          data-testid="sidebar-group-chevron"
+                          className={cn(
+                            "ml-auto transition-transform",
+                            isSectionActive(currentPath, navigationItem) &&
+                              "rotate-90",
+                          )}
+                        />
+                      )}
                     </Link>
                   </SidebarMenuButton>
                   {readSectionBadgeCount(navigationItem.path, appStats) > 0 && (
-                    <SidebarMenuBadge>
+                    <SidebarMenuBadge
+                      className={cn(
+                        navigationItem.children !== undefined && "right-7",
+                      )}
+                    >
                       {readSectionBadgeCount(navigationItem.path, appStats)}
                     </SidebarMenuBadge>
                   )}

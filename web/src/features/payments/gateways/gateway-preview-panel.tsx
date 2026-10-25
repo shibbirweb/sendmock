@@ -36,7 +36,10 @@ function PreviewPickers({ gatewayForm }: { gatewayForm: PaymentGatewayForm }) {
         value={previewPaymentId}
         onValueChange={(paymentId) => choosePreview({ paymentId })}
       >
-        <SelectTrigger aria-label="Preview payment" className="h-8 text-xs">
+        <SelectTrigger
+          aria-label="Preview payment"
+          className="h-8 w-full min-w-0 text-xs"
+        >
           <SelectValue placeholder="Payment" />
         </SelectTrigger>
         <SelectContent>
@@ -57,7 +60,10 @@ function PreviewPickers({ gatewayForm }: { gatewayForm: PaymentGatewayForm }) {
           choosePreview({ eventType: eventType as PaymentEventType })
         }
       >
-        <SelectTrigger aria-label="Preview event" className="h-8 text-xs">
+        <SelectTrigger
+          aria-label="Preview event"
+          className="h-8 w-full min-w-0 text-xs"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -78,7 +84,7 @@ function PreviewPickers({ gatewayForm }: { gatewayForm: PaymentGatewayForm }) {
       >
         <SelectTrigger
           aria-label="Preview redirect outcome"
-          className="h-8 text-xs"
+          className="h-8 w-full min-w-0 text-xs"
         >
           <SelectValue />
         </SelectTrigger>
