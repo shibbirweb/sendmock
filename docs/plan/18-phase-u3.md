@@ -16,7 +16,7 @@ Left over from U0 and done by the owner in GitHub settings: add the required sta
 
 ## Workstreams and order
 
-Each workstream is one or more pull requests into `develop` (stacked while the previous one is open). The order puts UI changes first, so the design review looks at the final screens, and the contract freeze before the API reference and playground, which are generated from it.
+All U3 workstreams are built on one branch, `feat/u3-design-review`, with a commit per workstream (decided 2026-10-26); the Branch column names the part only. The order puts UI changes first, so the design review looks at the final screens, and the contract freeze before the API reference and playground, which are generated from it.
 
 | # | Workstream | Branch | Criteria | Depends on |
 |---|------------|--------|----------|------------|
@@ -109,7 +109,7 @@ As specified in [07-ui.md](07-ui.md#notifications):
   - **Show pop-up toasts** on (default) or off; off is the bell-only mode.
   - **Toast position:** top right (default), top center, top left, bottom right, bottom center or bottom left, with a preview toast shown at the chosen place when it changes.
 - **Header bell** at the top right of the header (both modes): an unread count badge (hidden at zero, "99+" above 99); opens a popover list, newest first, each item with an icon, title, short description, relative time and a link to the email, SMS, verification or delivery; opening the list marks all read; **Clear all** empties it; an empty list says what will appear.
-- Toast mode keeps the history of toasts already shown in the bell; bell-only mode shows no toasts at all.
+- Toast mode keeps the history of toasts already shown in the bell; bell-only mode shows no toasts at all. Opening the bell dismisses the visible toasts, since the list shows them.
 - The list holds the last 50 notifications in memory for the session.
 - Tests: unit tests for the notification store, end-to-end tests UI-08.1 to UI-08.3.
 

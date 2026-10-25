@@ -1,4 +1,5 @@
 import {
+  BellIcon,
   BellRingIcon,
   DatabaseIcon,
   FlameIcon,
@@ -20,6 +21,7 @@ export const settingsSectionIds = [
   "email",
   "sms",
   "payments",
+  "notifications",
   "opened-events",
   "chaos",
   "otp",
@@ -39,6 +41,7 @@ export const settingsSections: {
   { sectionId: "email", label: "Email", icon: MailIcon },
   { sectionId: "sms", label: "SMS", icon: MessageSquareIcon },
   { sectionId: "payments", label: "Payments", icon: ReceiptIcon },
+  { sectionId: "notifications", label: "Notifications", icon: BellIcon },
   { sectionId: "opened-events", label: "Opened events", icon: BellRingIcon },
   { sectionId: "chaos", label: "Chaos", icon: FlameIcon },
   { sectionId: "otp", label: "OTP patterns", icon: KeyRoundIcon },

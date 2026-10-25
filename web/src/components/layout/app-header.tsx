@@ -9,6 +9,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiMode } from "@/config/api-mode";
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
+import { NotificationBell } from "@/features/notifications/notification-bell";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
 /** Demo controls are loaded only in mock mode, so live builds never ship them. */
@@ -73,6 +74,7 @@ export function AppHeader() {
           <KeyboardIcon />
         </Button>
         <ThemeToggle />
+        <NotificationBell />
       </div>
     </header>
   );

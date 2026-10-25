@@ -5,6 +5,8 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+import { rawColourPatternSources } from "./src/lib/design/raw-colour-patterns.ts";
+
 export default defineConfig([
   // Generated code: shadcn components and the TanStack route tree.
   globalIgnores([
@@ -59,6 +61,33 @@ export default defineConfig([
             },
           ],
         },
+      ],
+    },
+  },
+  {
+    // UI-07.1: colours come from the design tokens. The email preview renders
+    // mail on white, as a mail client does; the mock layer holds data colours.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/mocks/**",
+      "src/**/*.test.{ts,tsx}",
+      "src/features/mail/detail/preview/email-html-preview.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        ...rawColourPatternSources.flatMap((patternSource) => [
+          {
+            selector: `Literal[value=/${patternSource}/]`,
+            message:
+              "Use a design token (text-destructive, bg-success, ...) instead of a raw colour class.",
+          },
+          {
+            selector: `TemplateElement[value.raw=/${patternSource}/]`,
+            message:
+              "Use a design token (text-destructive, bg-success, ...) instead of a raw colour class.",
+          },
+        ]),
       ],
     },
   },

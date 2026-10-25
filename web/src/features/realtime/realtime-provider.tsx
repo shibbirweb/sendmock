@@ -3,8 +3,10 @@ import * as React from "react";
 
 import { buildRealtimeUrl } from "@/lib/api/api-client";
 import type { AppEvent } from "@/lib/api/types";
+import { readNotificationPreferences } from "@/features/notifications/notification-preferences";
+import { addNotification } from "@/features/notifications/notification-store";
 import {
-  describeEventForToast,
+  describeEventForNotification,
   listQueryKeysToRefresh,
 } from "@/features/realtime/realtime-event-effects";
 import { toast } from "sonner";
@@ -45,9 +47,19 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         appEventListener(appEvent);
       }
 
-      const toastMessage = describeEventForToast(appEvent);
-      if (toastMessage !== null) {
-        toast(toastMessage.title, { description: toastMessage.description });
+      // Every notable event goes to the bell; a toast only when toasts are on (UI-08).
+      const eventNotification = describeEventForNotification(appEvent);
+      if (eventNotification !== null) {
+        addNotification({
+          ...eventNotification,
+          id: appEvent.id,
+          createdAt: appEvent.created_at,
+        });
+        if (readNotificationPreferences().areToastsShown) {
+          toast(eventNotification.title, {
+            description: eventNotification.description,
+          });
+        }
       }
     };
 

@@ -75,6 +75,18 @@ export function fireMatchingRules(appEvent: AppEvent) {
       id: autoDelivery.id,
       endpoint_name: autoDelivery.endpoint_name,
     });
+    // A failure is announced too, except for deliveries a webhook event
+    // caused, so rules on webhook.failed cannot loop.
+    if (
+      autoDelivery.status === "failed" &&
+      !appEvent.type.startsWith("webhook.")
+    ) {
+      publishMockEvent("webhook.failed", {
+        id: autoDelivery.id,
+        endpoint_name: autoDelivery.endpoint_name,
+        event_type: autoDelivery.event_type,
+      });
+    }
   }
 }
 
