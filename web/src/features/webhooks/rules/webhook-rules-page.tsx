@@ -1,7 +1,9 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ListFilterIcon, PlusIcon } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -26,6 +28,7 @@ const allEndpoints = "all";
 
 /** Webhook rules: ordered list, endpoint filter and the rule editor (WH-02). */
 export function WebhookRulesPage() {
+  usePageTitle("Rules", "Webhooks");
   const { endpoint: endpointFilter } = useSearch({ from: "/webhooks/rules" });
   const navigate = useNavigate({ from: "/webhooks/rules" });
   const rulesQuery = useWebhookRules();
@@ -99,18 +102,10 @@ export function WebhookRulesPage() {
         <div className="min-w-0 rounded-lg border">
           {rulesQuery.isPending && <Skeleton className="m-4 h-24" />}
           {rulesQuery.isError && (
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <p className="text-sm text-destructive">
-                Could not load the rules.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void rulesQuery.refetch()}
-              >
-                Try again
-              </Button>
-            </div>
+            <QueryErrorState
+              message="Could not load the rules."
+              onRetry={() => void rulesQuery.refetch()}
+            />
           )}
           {rulesQuery.isSuccess && allRules.length === 0 && (
             <NoDataState

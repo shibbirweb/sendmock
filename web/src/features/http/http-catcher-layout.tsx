@@ -1,5 +1,7 @@
 import { GlobeIcon } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HttpBinHeader } from "@/features/http/bins/http-bin-header";
 import { HttpBinList } from "@/features/http/bins/http-bin-list";
@@ -16,6 +18,7 @@ import { cn } from "@/lib/utils";
  * Responses tab replaces the requests and detail with the bin's rules.
  */
 export function HttpCatcherLayout() {
+  usePageTitle("HTTP catcher");
   const binsQuery = useHttpBins();
   const catcherSearch = useHttpCatcherSearch();
   const httpBins = binsQuery.data ?? [];
@@ -26,6 +29,15 @@ export function HttpCatcherLayout() {
 
   if (binsQuery.isPending) {
     return <Skeleton className="m-4 h-96 flex-1" />;
+  }
+  if (binsQuery.isError) {
+    return (
+      <QueryErrorState
+        message="Could not load the HTTP bins."
+        onRetry={() => void binsQuery.refetch()}
+        className="flex-1"
+      />
+    );
   }
   if (httpBins.length === 0) {
     return <HttpCatcherEmptyState icon={GlobeIcon} />;

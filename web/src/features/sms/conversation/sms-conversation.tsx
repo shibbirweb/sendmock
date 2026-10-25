@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SmsConversationHeader } from "@/features/sms/conversation/sms-conversation-header";
@@ -21,6 +23,7 @@ export function SmsConversation({ threadId }: { threadId: string }) {
   const smsThread = threadsQuery.data?.find(
     (candidateThread) => candidateThread.thread_id === threadId,
   );
+  usePageTitle(smsThread?.contact_number.replace(/^whatsapp:/, ""), "SMS");
   const smsMessagesOldestFirst = React.useMemo(
     () => [...(messagesQuery.data?.items ?? [])].reverse(),
     [messagesQuery.data],
@@ -37,23 +40,16 @@ export function SmsConversation({ threadId }: { threadId: string }) {
   }
   if (messagesQuery.isError) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-sm text-destructive">
-          Could not load this conversation.
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => void messagesQuery.refetch()}
-        >
-          Try again
-        </Button>
-      </div>
+      <QueryErrorState
+        message="Could not load this conversation."
+        onRetry={() => void messagesQuery.refetch()}
+        className="flex-1 p-6"
+      />
     );
   }
   if (smsThread === undefined) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+      <div className="flex-1 p-6">
         <p className="text-sm text-muted-foreground">
           This conversation no longer exists. Its messages may have been deleted
           or pruned.

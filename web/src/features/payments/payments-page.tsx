@@ -1,7 +1,8 @@
 import { CreditCardIcon } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
@@ -13,6 +14,7 @@ import { usePayments } from "@/lib/api/hooks/use-payment-queries";
 
 /** Test payments: list, filters, paging and the detail drawer (PY-09.1). */
 export function PaymentsPage() {
+  usePageTitle("Payments");
   const paymentsSearch = usePaymentsSearch();
   const paymentsQuery = usePayments(paymentsSearch.listFilters);
   const loadedPages = paymentsQuery.data?.pages ?? [];
@@ -34,18 +36,10 @@ export function PaymentsPage() {
         <div className="min-w-0 rounded-lg border">
           {paymentsQuery.isPending && <Skeleton className="m-4 h-32" />}
           {paymentsQuery.isError && (
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <p className="text-sm text-destructive">
-                Could not load the payments.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void paymentsQuery.refetch()}
-              >
-                Try again
-              </Button>
-            </div>
+            <QueryErrorState
+              message="Could not load the payments."
+              onRetry={() => void paymentsQuery.refetch()}
+            />
           )}
           {paymentsQuery.isSuccess &&
             paymentSummaries.length === 0 &&

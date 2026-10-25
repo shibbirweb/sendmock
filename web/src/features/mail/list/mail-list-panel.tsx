@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MailListEmptyState } from "@/features/mail/list/mail-list-empty-state";
 import { MailListToolbar } from "@/features/mail/list/mail-list-toolbar";
@@ -111,16 +111,11 @@ export function MailListPanel({
           ))}
         </div>
       ) : emailListQuery.isError ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-          <p className="text-sm text-destructive">Could not load emails.</p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void emailListQuery.refetch()}
-          >
-            Try again
-          </Button>
-        </div>
+        <QueryErrorState
+          message="Could not load emails."
+          onRetry={() => void emailListQuery.refetch()}
+          className="flex-1 p-6"
+        />
       ) : emails.length === 0 ? (
         <MailListEmptyState
           hasActiveSearch={searchText.trim() !== ""}

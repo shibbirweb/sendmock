@@ -76,9 +76,9 @@ export function EmailHeadersTab({ email }: { email: EmailDetail }) {
         <div className="grid gap-1 rounded-md border p-3 text-sm">
           <span className="flex items-center gap-2 font-medium">
             {listUnsubscribeReport.warnings.length === 0 ? (
-              <CheckCircle2Icon className="size-4 text-emerald-600" />
+              <CheckCircle2Icon className="size-4 text-success" />
             ) : (
-              <AlertTriangleIcon className="size-4 text-amber-600" />
+              <AlertTriangleIcon className="size-4 text-warning" />
             )}
             List-Unsubscribe
             {listUnsubscribeReport.supports_one_click &&

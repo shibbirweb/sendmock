@@ -2,6 +2,8 @@ import { PlusIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddMethodDialog } from "@/features/payments/methods/add-method-dialog";
@@ -17,6 +19,7 @@ import {
 
 /** Payments > Methods: what checkout pages offer, and their test values (PY-12.1). */
 export function PaymentMethodsPage() {
+  usePageTitle("Methods", "Payments");
   const methodsQuery = usePaymentMethods();
   const flowsQuery = usePaymentFlows();
   const gatewaysQuery = usePaymentGateways();
@@ -48,6 +51,14 @@ export function PaymentMethodsPage() {
         <div className="min-w-0 rounded-lg border">
           {methodsQuery.isPending || flowsQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
+          ) : methodsQuery.isError || flowsQuery.isError ? (
+            <QueryErrorState
+              message="Could not load the payment methods."
+              onRetry={() => {
+                void methodsQuery.refetch();
+                void flowsQuery.refetch();
+              }}
+            />
           ) : (
             <PaymentMethodsTable
               paymentMethods={paymentMethods}

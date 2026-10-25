@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExtractedDataPanel } from "@/features/mail/detail/extracted-data-panel";
@@ -27,6 +28,7 @@ export function MailDetail({ emailId }: { emailId: string }) {
   const emailQuery = useEmail(emailId);
   const timelineQuery = useEmailTimeline(emailId);
   const email = emailQuery.data;
+  usePageTitle(email?.subject || "(no subject)", "Mail");
   // The route keys this component by email, so a composer never outlives it.
   const [composerMode, setComposerMode] =
     React.useState<EmailComposerMode | null>(null);

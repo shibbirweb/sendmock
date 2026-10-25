@@ -2,7 +2,9 @@ import { MailPlusIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InboundRouteSheet } from "@/features/webhooks/inbound-routes/inbound-route-sheet";
@@ -16,6 +18,7 @@ import type { InboundRoute } from "@/lib/api/types";
 
 /** Webhooks > Inbound routes: Mailgun-style routes for incoming emails (WH-12.7). */
 export function InboundRoutesPage() {
+  usePageTitle("Inbound routes", "Webhooks");
   const routesQuery = useInboundRoutes();
   const moveRoute = useMoveInboundRoute();
   const deleteRoute = useDeleteInboundRoute();
@@ -47,6 +50,11 @@ export function InboundRoutesPage() {
         <div className="min-w-0 rounded-lg border">
           {routesQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
+          ) : routesQuery.isError ? (
+            <QueryErrorState
+              message="Could not load the inbound routes."
+              onRetry={() => void routesQuery.refetch()}
+            />
           ) : inboundRoutes.length === 0 ? (
             <div className="grid justify-items-center gap-2 p-10 text-center">
               <MailPlusIcon className="size-8 text-muted-foreground" />

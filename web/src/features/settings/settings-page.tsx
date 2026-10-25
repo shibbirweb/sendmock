@@ -1,6 +1,8 @@
 import { useSearch } from "@tanstack/react-router";
 
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
+import { usePageTitle } from "@/hooks/use-page-title";
+import { settingsSections } from "@/features/settings/settings-sections";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AboutSection } from "@/features/settings/sections/about-section";
 import { ChaosSection } from "@/features/settings/sections/chaos-section";
@@ -58,6 +60,12 @@ export function SettingsPage() {
   });
   const settingsQuery = useAppSettings();
   const appSettings = settingsQuery.data;
+  usePageTitle(
+    settingsSections.find(
+      (settingsSection) => settingsSection.sectionId === selectedSectionId,
+    )?.label,
+    "Settings",
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -77,18 +85,11 @@ export function SettingsPage() {
           <div className="min-w-0">
             {settingsQuery.isPending && <Skeleton className="h-72 w-full" />}
             {settingsQuery.isError && (
-              <div className="flex flex-col items-start gap-3 rounded-lg border p-6">
-                <p className="text-sm text-destructive">
-                  Could not load the settings.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void settingsQuery.refetch()}
-                >
-                  Try again
-                </Button>
-              </div>
+              <QueryErrorState
+                message="Could not load the settings."
+                onRetry={() => void settingsQuery.refetch()}
+                className="items-start rounded-lg border p-6 text-left"
+              />
             )}
             {appSettings !== undefined && (
               <SelectedSection

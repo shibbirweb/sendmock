@@ -72,6 +72,7 @@ export function DevToolbar() {
         <div className="grid gap-2">
           <Label>Latency: {mockConditions.latencyMs} ms</Label>
           <Slider
+            aria-label="Latency"
             min={0}
             max={3000}
             step={50}

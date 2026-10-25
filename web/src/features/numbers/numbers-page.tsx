@@ -1,11 +1,13 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessagingServicesPanel } from "@/features/numbers/messaging-services/messaging-services-panel";
 import { VirtualNumbersPanel } from "@/features/numbers/virtual-numbers/virtual-numbers-panel";
 
 /** Virtual numbers and Messaging Services, like a provider console. */
 export function NumbersPage() {
+  usePageTitle("Numbers");
   const { tab: selectedTab = "numbers" } = useSearch({ from: "/numbers" });
   const navigate = useNavigate({ from: "/numbers" });
 

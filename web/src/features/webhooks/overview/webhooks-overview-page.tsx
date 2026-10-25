@@ -1,7 +1,9 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ActivityIcon } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { EndpointMetricsCard } from "@/features/overview/endpoint-metrics-card";
@@ -21,6 +23,7 @@ const rangeDescriptions: Record<WebhookMetricsRange, string> = {
 
 /** Delivery health by range and endpoint, updated live (WH-11.1, WH-11.3). */
 export function WebhooksOverviewPage() {
+  usePageTitle("Overview", "Webhooks");
   const overviewSearch = useSearch({ from: "/webhooks/overview" });
   const navigate = useNavigate({ from: "/webhooks/overview" });
   const range: WebhookMetricsRange = overviewSearch.range ?? "24h";
@@ -64,7 +67,13 @@ export function WebhooksOverviewPage() {
           }}
           onEndpointChange={narrowToEndpoint}
         />
-        {webhookMetrics === undefined ? (
+        {metricsQuery.isError && webhookMetrics === undefined ? (
+          <QueryErrorState
+            message="Could not load the webhook metrics."
+            onRetry={() => void metricsQuery.refetch()}
+            className="rounded-lg border"
+          />
+        ) : webhookMetrics === undefined ? (
           <Skeleton className="h-96 w-full" />
         ) : webhookMetrics.delivery_count === 0 && endpointId === null ? (
           <NoDataState

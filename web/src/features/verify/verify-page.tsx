@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VerifyServicesPanel } from "@/features/verify/services/verify-services-panel";
 import { VerificationDrawer } from "@/features/verify/verifications/verification-drawer";
@@ -7,6 +8,7 @@ import { VerificationsPanel } from "@/features/verify/verifications/verification
 
 /** Twilio Verify: verifications and the services apps verify against. */
 export function VerifyPage() {
+  usePageTitle("Verify");
   const { tab: selectedTab = "verifications" } = useSearch({
     from: "/sms/verify",
   });

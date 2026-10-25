@@ -15,6 +15,7 @@ import { paymentGatewayHandlers } from "@/mocks/handlers/payment-gateway-handler
 import { paymentMethodHandlers } from "@/mocks/handlers/payment-method-handlers";
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
+import { simulatedErrorHandler } from "@/mocks/handlers/simulated-error-handler";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
@@ -31,6 +32,7 @@ import { realtimeConnectionHandler } from "@/mocks/realtime/mock-event-bus";
 
 /** Every mock API handler, matching the paths in docs/plan/06-api.md. */
 export const mockHandlers = [
+  simulatedErrorHandler,
   ...systemHandlers,
   ...settingsHandlers,
   ...emailDetailHandlers,

@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageSquareIcon } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Route = createFileRoute("/sms/_conversations/")({
   component: NoThreadSelected,
 });
 
 function NoThreadSelected() {
+  usePageTitle("SMS");
+
   return (
     <div className="flex h-full flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
       <MessageSquareIcon className="size-8 text-muted-foreground" />

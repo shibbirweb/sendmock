@@ -1,9 +1,10 @@
 import { BookmarkIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { NamePromptDialog } from "@/components/common/name-prompt-dialog";
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
@@ -19,6 +20,7 @@ import {
 
 /** Saved deliveries: search, stored requests, send again, rename, template, delete (WH-10). */
 export function SavedDeliveriesPage() {
+  usePageTitle("Saved deliveries", "Webhooks");
   const savedQuery = useSavedDeliveries();
   const endpointsQuery = useWebhookEndpoints();
   const templatesQuery = useWebhookTemplates();
@@ -67,18 +69,11 @@ export function SavedDeliveriesPage() {
         </div>
         {savedQuery.isPending && <Skeleton className="h-32 w-full" />}
         {savedQuery.isError && (
-          <div className="flex flex-col items-center gap-3 rounded-lg border p-8 text-center">
-            <p className="text-sm text-destructive">
-              Could not load the saved deliveries.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void savedQuery.refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <QueryErrorState
+            message="Could not load the saved deliveries."
+            onRetry={() => void savedQuery.refetch()}
+            className="rounded-lg border"
+          />
         )}
         {savedQuery.isSuccess && allSaved.length === 0 && (
           <NoDataState

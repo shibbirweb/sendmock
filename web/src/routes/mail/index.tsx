@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MailIcon } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Route = createFileRoute("/mail/")({
   component: NoEmailSelected,
 });
 
 function NoEmailSelected() {
+  usePageTitle("Mail");
+
   return (
     <div className="flex h-full flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
       <MailIcon className="size-8 text-muted-foreground" />

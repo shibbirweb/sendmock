@@ -3,7 +3,7 @@ import { SearchIcon, ShieldCheckIcon } from "lucide-react";
 import * as React from "react";
 
 import { FilterChip } from "@/components/common/filter-chip";
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConnectHint } from "@/features/onboarding/connect-hint";
@@ -108,18 +108,10 @@ export function VerificationsPanel() {
           </div>
         )}
         {verificationsQuery.isError && (
-          <div className="flex flex-col items-center gap-3 p-8 text-center">
-            <p className="text-sm text-destructive">
-              Could not load verifications.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void verificationsQuery.refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <QueryErrorState
+            message="Could not load verifications."
+            onRetry={() => void verificationsQuery.refetch()}
+          />
         )}
         {verificationsQuery.isSuccess &&
           (verifications.length === 0 ? (

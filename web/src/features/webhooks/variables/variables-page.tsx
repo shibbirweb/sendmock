@@ -3,7 +3,9 @@ import { PlusIcon, VariableIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
@@ -40,6 +42,7 @@ function matchesScope(
 
 /** Webhook variables of every kind: table, filters and the edit sheet (WH-07.11 to WH-07.13). */
 export function VariablesPage() {
+  usePageTitle("Variables", "Webhooks");
   const { endpoint: scopeFromUrl } = useSearch({ from: "/webhooks/variables" });
   const navigate = useNavigate({ from: "/webhooks/variables" });
   const variablesQuery = useWebhookVariables();
@@ -107,18 +110,10 @@ export function VariablesPage() {
         <div className="min-w-0 rounded-lg border">
           {variablesQuery.isPending && <Skeleton className="m-4 h-24" />}
           {variablesQuery.isError && (
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <p className="text-sm text-destructive">
-                Could not load the variables.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void variablesQuery.refetch()}
-              >
-                Try again
-              </Button>
-            </div>
+            <QueryErrorState
+              message="Could not load the variables."
+              onRetry={() => void variablesQuery.refetch()}
+            />
           )}
           {variablesQuery.isSuccess && allVariables.length === 0 && (
             <NoDataState
