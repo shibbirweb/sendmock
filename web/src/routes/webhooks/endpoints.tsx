@@ -8,8 +8,13 @@ export type WebhookEndpointsSearchParams = {
 };
 
 export const Route = createFileRoute("/webhooks/endpoints")({
-  validateSearch: (searchParams: Record<string, unknown>): WebhookEndpointsSearchParams => ({
-    template: typeof searchParams.template === "string" ? searchParams.template : undefined,
+  validateSearch: (
+    searchParams: Record<string, unknown>,
+  ): WebhookEndpointsSearchParams => ({
+    template:
+      typeof searchParams.template === "string"
+        ? searchParams.template
+        : undefined,
   }),
   component: WebhookEndpointsPage,
 });

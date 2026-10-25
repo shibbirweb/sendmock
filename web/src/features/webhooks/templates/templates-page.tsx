@@ -1,35 +1,40 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { FileCodeIcon, SearchIcon } from "lucide-react";
+import { FileCodeIcon, PlusIcon, UploadIcon } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
 
+import { NamePromptDialog } from "@/components/common/name-prompt-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
+import { ImportTemplateDialog } from "@/features/webhooks/templates/import-template-dialog";
+import {
+  TemplatesFilterBar,
+  type TemplateFilterChange,
+} from "@/features/webhooks/templates/templates-filter-bar";
 import { TemplateCard } from "@/features/webhooks/templates/template-card";
 import { TemplateDrawer } from "@/features/webhooks/templates/detail/template-drawer";
-import {
-  templateCategoryLabels,
-  templateCategoryOrder,
-} from "@/features/webhooks/webhook-labels";
 import { useWebhookTemplates } from "@/lib/api/hooks/use-webhook-queries";
-import { appEventTypes, type TemplateCategory } from "@/lib/api/types";
-
-const allCategories = "all";
-const anyEvent = "any";
+import { useCreateTemplate } from "@/lib/api/hooks/use-webhook-template-queries";
 
 /** Templates gallery: category tabs, search and event filter in the URL (WH-08.3). */
 export function TemplatesPage() {
   const { category, query, event } = useSearch({ from: "/webhooks/templates" });
   const navigate = useNavigate({ from: "/webhooks/templates" });
   const templatesQuery = useWebhookTemplates();
+  const createTemplate = useCreateTemplate();
+  const [openDialog, setOpenDialog] = React.useState<"new" | "import" | null>(
+    null,
+  );
+  const openTemplate = (templateId: string, shouldEdit: boolean) => {
+    void navigate({
+      search: (previousSearch) => ({
+        ...previousSearch,
+        template: templateId,
+        edit: shouldEdit ? true : undefined,
+      }),
+    });
+  };
   const searchText = (query ?? "").trim().toLowerCase();
   const visibleTemplates = (templatesQuery.data ?? []).filter(
     (webhookTemplate) =>
@@ -43,11 +48,7 @@ export function TemplatesPage() {
   );
   const hasFilters =
     category !== undefined || event !== undefined || searchText !== "";
-  const updateSearch = (changedSearch: {
-    category?: TemplateCategory;
-    query?: string;
-    event?: string;
-  }) => {
+  const updateSearch = (changedSearch: TemplateFilterChange) => {
     void navigate({
       search: (previousSearch) => ({ ...previousSearch, ...changedSearch }),
     });
@@ -56,73 +57,42 @@ export function TemplatesPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <div className="mx-auto grid w-full max-w-6xl min-w-0 grid-cols-1 gap-4 px-4 py-6 sm:px-6">
-        <header className="grid gap-1">
-          <h2 className="text-xl font-semibold">Webhook templates</h2>
-          <p className="text-sm text-muted-foreground">
-            Payload formats your endpoints can send: SendMock's own JSON,
-            providers your app already parses, chat tools, and your own.
-          </p>
-        </header>
-        <div className="overflow-x-auto">
-          <Tabs
-            value={category ?? allCategories}
-            onValueChange={(selectedCategory) => {
-              updateSearch({
-                category:
-                  selectedCategory === allCategories
-                    ? undefined
-                    : (selectedCategory as TemplateCategory),
-              });
-            }}
-          >
-            <TabsList>
-              <TabsTrigger value={allCategories}>All</TabsTrigger>
-              {templateCategoryOrder.map((templateCategory) => (
-                <TabsTrigger key={templateCategory} value={templateCategory}>
-                  {templateCategoryLabels[templateCategory]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <div className="relative w-full sm:w-72">
-            <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query ?? ""}
-              placeholder="Search name or service"
-              aria-label="Search templates"
-              className="pl-8"
-              onChange={(changeEvent) => {
-                updateSearch({ query: changeEvent.target.value || undefined });
-              }}
-            />
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="grid gap-1">
+            <h2 className="text-xl font-semibold">Webhook templates</h2>
+            <p className="text-sm text-muted-foreground">
+              Payload formats your endpoints can send: SendMock's own JSON,
+              providers your app already parses, chat tools, and your own.
+            </p>
           </div>
-          <Select
-            value={event ?? anyEvent}
-            onValueChange={(selectedEvent) => {
-              updateSearch({
-                event: selectedEvent === anyEvent ? undefined : selectedEvent,
-              });
-            }}
-          >
-            <SelectTrigger aria-label="Event filter" className="w-full sm:w-52">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={anyEvent}>Every event</SelectItem>
-              {appEventTypes.map((eventType) => (
-                <SelectItem
-                  key={eventType}
-                  value={eventType}
-                  className="font-mono text-xs"
-                >
-                  {eventType}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenDialog("import");
+              }}
+            >
+              <UploadIcon />
+              Import
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setOpenDialog("new");
+              }}
+            >
+              <PlusIcon />
+              New template
+            </Button>
+          </div>
+        </header>
+        <TemplatesFilterBar
+          category={category}
+          query={query}
+          event={event}
+          onChange={updateSearch}
+        />
         {templatesQuery.isPending && <Skeleton className="h-48 w-full" />}
         {templatesQuery.isError && (
           <div className="flex flex-col items-center gap-3 rounded-lg border p-8 text-center">
@@ -170,6 +140,40 @@ export function TemplatesPage() {
         </ul>
       </div>
       <TemplateDrawer />
+      {openDialog === "new" && (
+        <NamePromptDialog
+          title="New template"
+          description="It starts as SendMock's native JSON; change it in the editor that opens next."
+          confirmLabel="Create"
+          initialName=""
+          isSubmitting={createTemplate.isPending}
+          onSubmit={(templateName) => {
+            createTemplate.mutate(templateName, {
+              onSuccess: (createdTemplate) => {
+                setOpenDialog(null);
+                openTemplate(createdTemplate.id, true);
+              },
+              onError: () => {
+                toast.error("Could not create the template");
+              },
+            });
+          }}
+          onClose={() => {
+            setOpenDialog(null);
+          }}
+        />
+      )}
+      {openDialog === "import" && (
+        <ImportTemplateDialog
+          onImported={(importedTemplate) => {
+            setOpenDialog(null);
+            openTemplate(importedTemplate.id, false);
+          }}
+          onClose={() => {
+            setOpenDialog(null);
+          }}
+        />
+      )}
     </div>
   );
 }

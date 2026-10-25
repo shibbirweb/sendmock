@@ -8,8 +8,10 @@ import {
 import { requestApi, requestApiText } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
-  TemplateDraft,
+  TemplateImportRequest,
   TemplateRenderRequest,
+  TemplateRevision,
+  TemplateUpdate,
   TemplateRenderResult,
   WebhookTemplateDetail,
   WebhookTemplateSummary,
@@ -100,14 +102,14 @@ export function useUpdateTemplate() {
   return useTemplateMutation(
     ({
       templateId,
-      templateDraft,
+      templateUpdate,
     }: {
       templateId: string;
-      templateDraft: TemplateDraft;
+      templateUpdate: TemplateUpdate;
     }) =>
       requestApi<WebhookTemplateDetail>(`/webhooks/templates/${templateId}`, {
         method: "PATCH",
-        requestBody: templateDraft,
+        requestBody: templateUpdate,
       }),
   );
 }
@@ -121,5 +123,68 @@ export function useResetTemplate() {
         method: "POST",
       },
     ),
+  );
+}
+
+export function useCreateTemplate() {
+  return useTemplateMutation((templateName: string) =>
+    requestApi<WebhookTemplateSummary>("/webhooks/templates", {
+      method: "POST",
+      requestBody: { name: templateName },
+    }),
+  );
+}
+
+/** Imports a TOML or JSON template file (WH-09.3); a 409 means the id is taken. */
+export function useImportTemplate() {
+  return useTemplateMutation((importRequest: TemplateImportRequest) =>
+    requestApi<WebhookTemplateSummary>("/webhooks/templates/import", {
+      method: "POST",
+      requestBody: importRequest,
+    }),
+  );
+}
+
+/** The last 20 saved versions of a template (WH-09.5). */
+export function useTemplateRevisions(templateId: string) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.templateRevisions(templateId),
+    queryFn: ({ signal }) =>
+      requestApi<TemplateRevision[]>(
+        `/webhooks/templates/${templateId}/revisions`,
+        {
+          abortSignal: signal,
+        },
+      ),
+  });
+}
+
+export function useRestoreTemplateRevision() {
+  return useTemplateMutation(
+    ({ templateId, revision }: { templateId: string; revision: number }) =>
+      requestApi<WebhookTemplateDetail>(
+        `/webhooks/templates/${templateId}/revisions/${revision}/restore`,
+        { method: "POST" },
+      ),
+  );
+}
+
+/** Saves an endpoint's template and overrides as a new custom template (WH-09.1). */
+export function useSaveEndpointAsTemplate() {
+  return useTemplateMutation(
+    ({
+      endpointId,
+      templateName,
+    }: {
+      endpointId: string;
+      templateName: string;
+    }) =>
+      requestApi<WebhookTemplateSummary>(
+        `/webhooks/endpoints/${endpointId}/save-as-template`,
+        {
+          method: "POST",
+          requestBody: { name: templateName },
+        },
+      ),
   );
 }

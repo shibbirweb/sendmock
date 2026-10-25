@@ -306,6 +306,32 @@ export type TemplateDraft = Pick<
   "method" | "content_type" | "header_templates" | "body_template"
 >;
 
+/** Template details only custom templates can change (WH-09.9). */
+export type TemplateMetadata = Pick<
+  WebhookTemplateSummary,
+  "name" | "description" | "events" | "required_variables"
+>;
+
+/** Body of PATCH /api/v1/webhooks/templates/{templateId}; metadata is ignored for built-ins. */
+export type TemplateUpdate = TemplateDraft & Partial<TemplateMetadata>;
+
+/** One saved version of a template (WH-09.5). */
+export type TemplateRevision = {
+  revision: number;
+  saved_at: IsoTimestamp;
+  template: TemplateDraft & TemplateMetadata;
+};
+
+/** Body of POST /api/v1/webhooks/templates (a new blank custom template). */
+export type TemplateCreateRequest = { name: string };
+
+/** Body of POST /api/v1/webhooks/templates/import (WH-09.3). */
+export type TemplateImportRequest = {
+  file_text: string;
+  /** What to do when the id is taken; left out, the API answers 409. */
+  on_conflict?: "replace" | "copy";
+};
+
 /** Body of POST /api/v1/webhooks/templates/{templateId}/render; empty for the sample. */
 export type TemplateRenderRequest = {
   email_id?: Ulid;

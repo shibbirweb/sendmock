@@ -9,8 +9,10 @@ import {
 import { ApiError } from "@/lib/api/api-client";
 import { useUpdateTemplate } from "@/lib/api/hooks/use-webhook-template-queries";
 import type {
+  AppEventType,
   HttpMethod,
   TemplateDraft,
+  TemplateUpdate,
   WebhookTemplateDetail,
 } from "@/lib/api/types";
 import {
@@ -23,6 +25,15 @@ export type TemplateDraftFormValues = {
   contentType: string;
   headerRows: NameValueRow[];
   bodyTemplate: string;
+  /** Only sent for custom templates (WH-09.9). */
+  name: string;
+  description: string;
+  events: AppEventType[];
+  requiredVariables: string[];
+};
+
+export type TemplateFormFieldErrors = TemplateDraftFieldErrors & {
+  name?: string;
 };
 
 export function toTemplateDraft(
@@ -33,6 +44,24 @@ export function toTemplateDraft(
     content_type: formValues.contentType.trim(),
     header_templates: fromNameValueRows(formValues.headerRows),
     body_template: formValues.bodyTemplate,
+  };
+}
+
+function toTemplateUpdate(
+  formValues: TemplateDraftFormValues,
+  isCustomTemplate: boolean,
+): TemplateUpdate {
+  const templateDraft = toTemplateDraft(formValues);
+  if (!isCustomTemplate) {
+    return templateDraft;
+  }
+
+  return {
+    ...templateDraft,
+    name: formValues.name,
+    description: formValues.description,
+    events: formValues.events,
+    required_variables: formValues.requiredVariables,
   };
 }
 
@@ -51,10 +80,15 @@ export function useTemplateDraftForm({
       contentType: templateDetail.content_type,
       headerRows: toNameValueRows(templateDetail.header_templates),
       bodyTemplate: templateDetail.body_template,
+      name: templateDetail.name,
+      description: templateDetail.description,
+      events: templateDetail.events,
+      requiredVariables: templateDetail.required_variables,
     }),
   );
-  const [fieldErrors, setFieldErrors] =
-    React.useState<TemplateDraftFieldErrors>({});
+  const [fieldErrors, setFieldErrors] = React.useState<TemplateFormFieldErrors>(
+    {},
+  );
 
   const updateFormValues = (
     changedValues: Partial<TemplateDraftFormValues>,
@@ -66,15 +100,23 @@ export function useTemplateDraftForm({
   };
 
   const saveTemplate = () => {
+    const isCustomTemplate = templateDetail.source === "custom";
     const templateDraft = toTemplateDraft(formValues);
-    const validationErrors = validateTemplateDraft(templateDraft);
+    const validationErrors: TemplateFormFieldErrors =
+      validateTemplateDraft(templateDraft);
+    if (isCustomTemplate && formValues.name.trim() === "") {
+      validationErrors.name = "Enter a name";
+    }
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
     updateTemplate.mutate(
-      { templateId: templateDetail.id, templateDraft },
+      {
+        templateId: templateDetail.id,
+        templateUpdate: toTemplateUpdate(formValues, isCustomTemplate),
+      },
       {
         onSuccess: () => {
           toast("Template saved");

@@ -126,6 +126,7 @@ function WebhookEndpointForm({
           <TabsContent value="template">
             <EndpointTemplateTab
               formValues={formValues}
+              savedEndpointId={editedEndpoint?.id ?? null}
               onChange={updateFormValues}
             />
           </TabsContent>

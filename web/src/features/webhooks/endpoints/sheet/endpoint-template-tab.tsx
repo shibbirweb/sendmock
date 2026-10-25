@@ -3,6 +3,7 @@ import * as React from "react";
 import { FormField } from "@/components/common/form-field";
 import { NameValueRowsEditor } from "@/components/common/name-value-rows-editor";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
+import { SaveEndpointAsTemplate } from "@/features/webhooks/endpoints/sheet/save-endpoint-as-template";
 import { TemplatePicker } from "@/features/webhooks/endpoints/sheet/template-picker";
 import type { WebhookEndpointFormValues } from "@/features/webhooks/endpoints/sheet/use-webhook-endpoint-form";
 import { useWebhookTemplates } from "@/lib/api/hooks/use-webhook-queries";
@@ -11,9 +12,12 @@ import type { TemplateMode } from "@/lib/api/types";
 /** Template picker, link mode and the overrides layered on top. */
 export function EndpointTemplateTab({
   formValues,
+  savedEndpointId,
   onChange,
 }: {
   formValues: WebhookEndpointFormValues;
+  /** Null until the endpoint is added; only a saved endpoint can be saved as a template. */
+  savedEndpointId: string | null;
   onChange: (changedValues: Partial<WebhookEndpointFormValues>) => void;
 }) {
   const fieldIdPrefix = React.useId();
@@ -102,6 +106,9 @@ export function EndpointTemplateTab({
           }}
         />
       </div>
+      {savedEndpointId !== null && (
+        <SaveEndpointAsTemplate endpointId={savedEndpointId} />
+      )}
     </div>
   );
 }

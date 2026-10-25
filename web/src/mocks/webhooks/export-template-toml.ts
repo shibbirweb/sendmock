@@ -28,6 +28,7 @@ export function exportTemplateToml(
     `service = ${quoteToml(webhookTemplate.service)}`,
     `events = [${webhookTemplate.events.map(quoteToml).join(", ")}]`,
     `variables = [${webhookTemplate.required_variables.map(quoteToml).join(", ")}]`,
+    `edits_builtin = ${webhookTemplate.source === "builtin"}`,
     "",
     "[request]",
     `method = ${quoteToml(webhookTemplate.method)}`,
