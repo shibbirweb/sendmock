@@ -45,6 +45,9 @@ jobs:
       - name: Unit tests with coverage gate
         run: bun run test:coverage
 
+      - name: Bundle budget (live build, initial JS and embedded size)
+        run: bun run test:budget
+
       - name: Install Playwright browser
         run: bunx --bun playwright install --with-deps chromium
 

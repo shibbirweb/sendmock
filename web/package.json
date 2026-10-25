@@ -14,7 +14,8 @@
     "test": "bun --bun vitest run",
     "test:watch": "bun --bun vitest",
     "test:coverage": "bun --bun vitest run --coverage",
-    "test:e2e": "bun --bun playwright test"
+    "test:e2e": "bun --bun playwright test",
+    "test:budget": "bun test tests/budget"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.4",

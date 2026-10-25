@@ -6,18 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { apiMode } from "@/config/api-mode";
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
-/** Demo controls are loaded only in mock mode, so live builds never ship them. */
-const LazyDevToolbar = React.lazy(async () => {
-  const { DevToolbar } = await import("@/mocks/dev-toolbar/dev-toolbar");
+/**
+ * Demo controls, loaded only in mock mode. The import sits behind the
+ * build-time flag so a live build drops it and the whole mock layer.
+ */
+const LazyDevToolbar =
+  import.meta.env.VITE_API_MODE !== "live"
+    ? React.lazy(async () => {
+        const { DevToolbar } = await import("@/mocks/dev-toolbar/dev-toolbar");
 
-  return { default: DevToolbar };
-});
+        return { default: DevToolbar };
+      })
+    : null;
 
 function findPageTitle(currentPath: string): string {
   const matchingItem = listAllNavigationItems()
@@ -58,7 +63,7 @@ export function AppHeader() {
           Search or jump to...
           <Kbd>⌘K</Kbd>
         </Button>
-        {apiMode === "mock" && (
+        {LazyDevToolbar !== null && (
           <React.Suspense fallback={null}>
             <LazyDevToolbar />
           </React.Suspense>

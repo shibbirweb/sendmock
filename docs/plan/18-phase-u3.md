@@ -133,6 +133,7 @@ As specified in [07-ui.md](07-ui.md#notifications):
 - **Bundle budget (UI-06.1):** a script measures the gzipped size of the initial JS (the entry chunk and what it imports eagerly) after `vite build` and fails CI above 250 KB; CodeMirror, the chart code and other heavy screens load lazily (route-level code splitting with TanStack Router's lazy routes).
 - **Large data (UI-06.2):** with the large data set (5,000 emails, 2,000 log rows), the mail list, logs and deliveries stay virtualised or paged; an end-to-end test measures opening an email (click to rendered detail) under 200 ms and checks the list renders only visible rows.
 - **Embedded size (UI-06.3):** `web/dist` without source maps stays under 2 MB, checked in the same script.
+- **What is measured:** the live build (`VITE_API_MODE=live`), the one the binary embeds. The mock layer, faker data and the demo toolbar are imported behind a literal `import.meta.env.VITE_API_MODE !== "live"` check at the import site, so the bundler drops them from a live build instead of emitting unused chunks (a shared constant is not folded early enough). The `/demo/` site keeps the mock build. The check is `bun run test:budget` (`web/tests/budget/`), which builds into a temporary folder and runs in CI.
 - Findings (large chunks, eager imports) are fixed in the same PR.
 
 ## W7: Contract freeze (UI-09)
