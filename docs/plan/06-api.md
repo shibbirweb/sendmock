@@ -91,7 +91,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/endpoints/{endpointId}/test` | send `test.ping` |
 | POST | `/webhooks/endpoints/{endpointId}/send` | manual send (email_id, sms_id, or raw payload) |
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
-| POST | `/webhooks/rules/preview` | which recent messages a filter would match |
+| POST | `/webhooks/rules/preview` | which of the last 50 messages a filter would match: body `{ "events": [...], "filter": {...} }`, returns `checked_count`, `match_count` and the messages with `is_match` |
+| POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
 | GET | `/webhooks/deliveries` | delivery log with filters |
 | GET | `/webhooks/deliveries/{deliveryId}` | full request/response |
 | POST | `/webhooks/deliveries/{deliveryId}/replay` | resend (optionally with edited body) |

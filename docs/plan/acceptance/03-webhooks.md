@@ -23,6 +23,8 @@ UI in U2, backend Phase 3.
 - [ ] WH-02.2 Every documented field, operator (`equals`, `contains`, `starts_with`, `matches`, `regex`, `exists`) and combinator (`all`, `any`, `not`) evaluates correctly.
 - [ ] WH-02.3 The preview shows exactly which of the last 50 messages would match.
 - [ ] WH-02.4 Disabled rules never fire; rule order is respected.
+- [ ] WH-02.5 The builder checks every condition the same way as the API (field, value unless `exists`, valid regex, header name) and round-trips every filter the API accepts (`all`, `any`, `not`, one nested group).
+- [ ] WH-02.6 The rules list shows firing order, endpoint, events and a plain-language filter summary; rules can be reordered, switched on and off at once and filtered by endpoint.
 
 ## WH-03 Delivery engine and retries
 
