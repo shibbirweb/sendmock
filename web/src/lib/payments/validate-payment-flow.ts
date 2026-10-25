@@ -1,4 +1,8 @@
 import type { PaymentFlowDefinition, PaymentFlowInput } from "@/lib/api/types";
+import {
+  findUnknownVariables,
+  flowLabelVariables,
+} from "@/lib/payments/flow-label-variables";
 import { paymentStepCatalogue } from "@/lib/payments/payment-step-catalogue";
 
 export const maxFlowSteps = 6;
@@ -64,7 +68,16 @@ export function validatePaymentFlow(
     if (!(flowStep.type in paymentStepCatalogue)) {
       return;
     }
-    if (flowStep.button_label.trim() === "") {
+    const unknownVariables = [
+      flowStep.title,
+      flowStep.field_label,
+      flowStep.hint,
+      flowStep.button_label,
+    ].flatMap(findUnknownVariables);
+    if (unknownVariables.length > 0) {
+      fieldErrors[`steps.${stepIndex}`] =
+        `${[...new Set(unknownVariables)].join(", ")} is not a variable; use ${flowLabelVariables.map((flowVariable) => flowVariable.token).join(", ")}`;
+    } else if (flowStep.button_label.trim() === "") {
       fieldErrors[`steps.${stepIndex}`] = "Enter the button text";
     } else if (
       paymentStepCatalogue[flowStep.type].has_field &&

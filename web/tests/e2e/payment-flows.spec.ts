@@ -69,7 +69,9 @@ test("PY-12.6 a built-in flow is edited step by step, run at checkout, and reset
 }) => {
   const flowSheet = await openFlow(page, "Wallet");
   const otpStep = flowSheet.getByRole("listitem", { name: "Step 2: OTP" });
-  await otpStep.getByLabel("Field label").fill("SMS code for {method}");
+  await otpStep
+    .getByLabel("Field label", { exact: true })
+    .fill("SMS code for {method}");
   await flowSheet.getByRole("button", { name: "Move Step 3: PIN up" }).click();
   await expect(
     flowSheet.getByRole("listitem", { name: "Step 2: PIN" }),
@@ -105,6 +107,58 @@ test("PY-12.6 a built-in flow is edited step by step, run at checkout, and reset
     "Account number, OTP, PIN",
   );
   await expect(flowRow(page, "Wallet")).not.toContainText("Modified");
+});
+
+test("PY-12.7 labels list their variables, insert one, preview it and refuse unknown ones", async ({
+  page,
+}) => {
+  const flowSheet = await openFlow(page, "Wallet");
+  const variablesTable = flowSheet.getByRole("table", {
+    name: "Label variables",
+  });
+  await expect(
+    variablesTable.getByRole("row").filter({ hasText: "{merchant}" }),
+  ).toContainText("The merchant name shown on checkout pages");
+
+  const otpStep = flowSheet.getByRole("listitem", { name: "Step 2: OTP" });
+  await otpStep.getByLabel("Field label", { exact: true }).fill("Code for ");
+  await otpStep
+    .getByRole("button", {
+      name: "Insert variable into Step 2: OTP field label",
+    })
+    .click();
+  await page.getByRole("menuitem", { name: /^\{merchant\}/ }).click();
+  await expect(otpStep.getByLabel("Field label", { exact: true })).toHaveValue(
+    "Code for {merchant}",
+  );
+  await expect(otpStep.getByTestId("step-preview")).toContainText(
+    "Code for Acme Shop",
+  );
+  await expect(
+    flowSheet
+      .getByRole("listitem", { name: "Step 1: Account number" })
+      .getByTestId("step-preview"),
+  ).toContainText("Your bKash account number");
+
+  await otpStep
+    .getByLabel("Button text", { exact: true })
+    .fill("Pay {ammount}");
+  await flowSheet.getByRole("button", { name: "Save flow" }).click();
+  await expect(
+    otpStep.getByText(/\{ammount\} is not a variable; use \{method\}/),
+  ).toBeVisible();
+  await otpStep.getByLabel("Button text", { exact: true }).fill("Pay {amount}");
+  await flowSheet.getByRole("button", { name: "Save flow" }).click();
+  await expect(flowSheet).toBeHidden();
+
+  await openCheckoutFor(page, "Ruma Begum");
+  const walletForm = page.getByRole("form", { name: "bKash payment" });
+  await walletForm.getByLabel("Your bKash account number").fill("01770000001");
+  await walletForm.getByRole("button", { name: "Confirm" }).click();
+  await expect(walletForm.getByLabel("Code for Acme Shop")).toBeVisible();
+  await expect(
+    walletForm.getByRole("button", { name: "Pay BDT 1,200.00" }),
+  ).toBeVisible();
 });
 
 test("PY-12.6 problems show before saving: no step, and one deciding step at most", async ({
@@ -145,7 +199,7 @@ test("PY-12.6 a custom flow is composed, used by a new method, and deleted once 
     .click();
   await flowSheet
     .getByRole("listitem", { name: "Step 1: QR code" })
-    .getByLabel("Button text")
+    .getByLabel("Button text", { exact: true })
     .fill("Paid in the app");
   await flowSheet.getByRole("button", { name: "Save flow" }).click();
   await expect(flowRow(page, "Upay QR")).toContainText("Custom");

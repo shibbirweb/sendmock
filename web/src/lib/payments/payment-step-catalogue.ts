@@ -169,13 +169,3 @@ export function describeFlowSteps(flowSteps: PaymentFlowStep[]): string {
     .map((flowStep) => paymentStepCatalogue[flowStep.type].name)
     .join(", ");
 }
-
-/** Fills `{method}` and `{amount}` in a step label. */
-export function fillStepLabel(
-  stepLabel: string,
-  labelValues: { methodName: string; amountText: string },
-): string {
-  return stepLabel
-    .replaceAll("{method}", labelValues.methodName)
-    .replaceAll("{amount}", labelValues.amountText);
-}

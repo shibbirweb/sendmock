@@ -61,6 +61,19 @@ describe("payment flow API", () => {
     expect(stepTypes).toHaveLength(9);
   });
 
+  test("PY-12.7 the label variables are served for the CLI and MCP tools", async () => {
+    const flowVariables = (await (
+      await callFlowApi("GET", "/payments/flow-variables")
+    ).json()) as { token: string; description: string; example: string }[];
+
+    expect(flowVariables).toHaveLength(7);
+    expect(flowVariables[0]).toEqual({
+      token: "{method}",
+      description: "The payment method's name",
+      example: "bKash",
+    });
+  });
+
   test("PY-12.6 a flow is composed one step at a time, then reset to default", async () => {
     const withQr = await readFlow(
       await callFlowApi("POST", "/payments/flows/bank/steps", {

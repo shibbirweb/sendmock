@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FlowStepCard } from "@/features/payments/flows/flow-step-card";
+import { FlowVariablesReference } from "@/features/payments/flows/flow-variables-reference";
 import type { PaymentFlowForm } from "@/features/payments/flows/use-payment-flow-form";
 import type { PaymentStepType } from "@/lib/api/types";
 import {
@@ -41,18 +42,23 @@ function findAddBlocker(
  * The flow's steps in order, composed one change at a time: add a step from
  * the catalogue, move it, remove it, and edit its labels (PY-12.6).
  */
-export function FlowStepsEditor({ flowForm }: { flowForm: PaymentFlowForm }) {
+export function FlowStepsEditor({
+  flowForm,
+  previewMethodName,
+}: {
+  flowForm: PaymentFlowForm;
+  previewMethodName: string | undefined;
+}) {
   const flowSteps = flowForm.flowInput.steps;
 
   return (
     <section aria-label="Steps" className="grid gap-3">
+      <FlowVariablesReference />
       <div className="flex items-center justify-between gap-2">
         <div className="grid gap-0.5">
           <h3 className="text-sm font-medium">Steps</h3>
           <p className="text-xs text-muted-foreground">
-            The checkout page runs them in this order. Labels can use{" "}
-            <code className="font-mono">{"{method}"}</code> and{" "}
-            <code className="font-mono">{"{amount}"}</code>.
+            The checkout page runs them in this order.
           </p>
         </div>
         <DropdownMenu>
@@ -97,6 +103,7 @@ export function FlowStepsEditor({ flowForm }: { flowForm: PaymentFlowForm }) {
             stepIndex={stepIndex}
             stepCount={flowSteps.length}
             errorMessage={flowForm.fieldErrors[`steps.${stepIndex}`]}
+            previewMethodName={previewMethodName}
             onMove={(position) => flowForm.moveStep(stepIndex, position)}
             onRemove={() => flowForm.removeStep(stepIndex)}
             onRelabel={(labelChanges) =>

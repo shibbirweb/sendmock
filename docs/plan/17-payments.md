@@ -101,7 +101,20 @@ Gateways and payment methods are data, not code, so a developer can emulate a ga
   | Confirm | a confirm button | default outcome |
 
   - A flow is composed step by step: add a step from the catalogue, move it up or down, remove it, and edit its labels, one change at a time, by hand in Payments > Flows or by an AI agent through the CLI, the MCP `payments` toolset and the skill (same operations, same validation).
-  - Each step has its own title, field label, hint and button text. A flow has a name, a key, the picker tab it belongs to (e.g. "Mobile banking") and 1 to 6 steps, with at most one deciding step (card form, account number or voucher code); without one, the method's default outcome decides.
+  - Each step has its own title, field label, hint and button text. Labels can use these variables, filled in on the checkout page:
+
+    | Variable | Becomes | Example |
+    |----------|---------|---------|
+    | `{method}` | the payment method's name | bKash |
+    | `{amount}` | the amount to pay, in the currency's format | BDT 1,200.00 |
+    | `{currency}` | the currency code | BDT |
+    | `{merchant}` | the merchant name shown on checkout pages | Acme Shop |
+    | `{gateway}` | the gateway's name | SSLCommerz |
+    | `{reference}` | the payment reference the customer quotes (as the reference code step shows it) | SM-8F2KD9XL |
+    | `{customer_email}` | the customer's email, or empty | ruma@example.com |
+
+    An unknown variable (`{methd}`) is refused when the flow is saved, naming the ones that exist. The list is served by `GET /payments/flow-variables`, so the CLI, MCP tools and skill use the same names.
+  - A flow has a name, a key, the picker tab it belongs to (e.g. "Mobile banking") and 1 to 6 steps, with at most one deciding step (card form, account number or voucher code); without one, the method's default outcome decides.
   - Built-in flows ship ready to use:
 
     | Flow | Steps | Picker tab |
@@ -184,6 +197,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/payments/flows/{flowKey}/reset` | restore a built-in flow |
 | POST/PATCH/DELETE | `/payments/flows/{flowKey}/steps[/{stepIndex}]` | add a step, update its labels or position, remove it (one step at a time) |
 | GET | `/payments/step-types` | the step catalogue with each step's fields and which method test values it reads |
+| GET | `/payments/flow-variables` | the variables step labels can use, with what each becomes and an example |
 | GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |

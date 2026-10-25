@@ -1,5 +1,6 @@
 import { CopyButton } from "@/components/common/copy-button";
 import { TestQrCode } from "@/features/checkout/steps/test-qr-code";
+import { readPaymentReference } from "@/lib/payments/flow-label-variables";
 import type {
   CheckoutStepView,
   StepViewProps,
@@ -20,11 +21,6 @@ function TestOutcomeNote({ paymentMethod }: StepViewProps) {
       .
     </p>
   );
-}
-
-/** "SM-01HZX4F2" from the session, so each checkout has its own reference. */
-export function readPaymentReference(sessionId: string): string {
-  return `SM-${sessionId.slice(-8).toUpperCase()}`;
 }
 
 /** Signed in as the method's test account, approve or cancel (PY-12.6). */

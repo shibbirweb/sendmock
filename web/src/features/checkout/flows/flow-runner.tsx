@@ -13,24 +13,14 @@ import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
 import type {
   CheckoutSession,
   PaymentFlowDefinition,
-  PaymentFlowStep,
   PaymentMethodDefinition,
 } from "@/lib/api/types";
 import { formatMinorAmount } from "@/lib/payments/format-money";
-import { fillStepLabel } from "@/lib/payments/payment-step-catalogue";
-
-function fillStepLabels(
-  flowStep: PaymentFlowStep,
-  labelValues: Parameters<typeof fillStepLabel>[1],
-): PaymentFlowStep {
-  return {
-    type: flowStep.type,
-    title: fillStepLabel(flowStep.title, labelValues),
-    field_label: fillStepLabel(flowStep.field_label, labelValues),
-    hint: fillStepLabel(flowStep.hint, labelValues),
-    button_label: fillStepLabel(flowStep.button_label, labelValues),
-  };
-}
+import {
+  fillStepLabels,
+  readPaymentReference,
+} from "@/lib/payments/flow-label-variables";
+import { paymentProviderLabels } from "@/lib/payments/payment-labels";
 
 /**
  * Runs a method's flow on the checkout page, one step at a time and in the
@@ -60,11 +50,19 @@ export function FlowRunner({
     );
   }
   const flowStep = fillStepLabels(currentStep, {
-    methodName: paymentMethod.name,
-    amountText: formatMinorAmount(
+    method: paymentMethod.name,
+    amount: formatMinorAmount(
       checkoutSession.amount_minor,
       checkoutSession.currency,
     ),
+    currency: checkoutSession.currency,
+    merchant: checkoutSession.merchant_name,
+    gateway:
+      paymentProviderLabels[
+        checkoutSession.provider as keyof typeof paymentProviderLabels
+      ] ?? checkoutSession.provider,
+    reference: readPaymentReference(checkoutSession.session_id),
+    customer_email: checkoutSession.customer_email ?? "",
   });
   const stepView = checkoutStepViews[flowStep.type];
   const stepCount = paymentFlow.steps.length;

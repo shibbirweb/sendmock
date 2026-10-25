@@ -93,6 +93,23 @@ describe("validatePaymentFlow", () => {
     });
   });
 
+  test("PY-12.7 an unknown label variable is refused, naming the known ones", () => {
+    expect(
+      validatePaymentFlow(
+        {
+          ...qrInput,
+          steps: [
+            { ...buildDefaultStep("qr_code"), hint: "Pay {ammount} now" },
+          ],
+        },
+        [],
+        false,
+      )["steps.0"],
+    ).toBe(
+      "{ammount} is not a variable; use {method}, {amount}, {currency}, {merchant}, {gateway}, {reference}, {customer_email}",
+    );
+  });
+
   test("PY-12.6 a step type SendMock does not know is refused", () => {
     expect(
       validatePaymentFlow(

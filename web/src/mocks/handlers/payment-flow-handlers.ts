@@ -11,6 +11,7 @@ import {
   removeFlowStep,
   updateFlowStep,
 } from "@/lib/payments/edit-flow-steps";
+import { flowLabelVariables } from "@/lib/payments/flow-label-variables";
 import {
   buildDefaultStep,
   paymentStepCatalogue,
@@ -77,6 +78,18 @@ export const paymentFlowHandlers = [
     await applyMockConditions();
 
     return HttpResponse.json(Object.values(paymentStepCatalogue));
+  }),
+
+  http.get("*/api/v1/payments/flow-variables", async () => {
+    await applyMockConditions();
+
+    return HttpResponse.json(
+      flowLabelVariables.map(({ token, description, example }) => ({
+        token,
+        description,
+        example,
+      })),
+    );
   }),
 
   http.get("*/api/v1/payments/flows", async () => {

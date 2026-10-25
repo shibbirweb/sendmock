@@ -80,3 +80,12 @@ export type PaymentStepTypeInfo = {
   method_values: PaymentMethodValueKind[];
   default_labels: Omit<PaymentFlowStep, "type">;
 };
+
+/** GET /api/v1/payments/flow-variables: a variable step labels can use (PY-12.7). */
+export type PaymentFlowVariable = {
+  /** As written in a label, e.g. `{method}`. */
+  token: string;
+  /** What it becomes on the checkout page. */
+  description: string;
+  example: string;
+};

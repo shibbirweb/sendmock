@@ -102,7 +102,10 @@ export function FlowSheet({
                 />
               </FormField>
             </div>
-            <FlowStepsEditor flowForm={flowForm} />
+            <FlowStepsEditor
+              flowForm={flowForm}
+              previewMethodName={usedByMethodNames[0]}
+            />
           </div>
           <SheetFooter className="flex-row flex-wrap items-center justify-end border-t">
             {paymentFlow.is_builtin ? (
