@@ -147,6 +147,17 @@ export type AppInfo = {
   provider_address: string | null;
   database_path: string;
   database_size_bytes: number;
+  /** True when SendMock runs in Docker, so the UI defaults to container hostnames. */
+  is_container: boolean;
+};
+
+/** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */
+export type SampleKind = "email" | "sms" | "verification";
+
+export type CreatedSample = {
+  kind: SampleKind;
+  /** Email or SMS ID, or the verification SID. */
+  id: string;
 };
 
 export type SmsSimulationProfile = "instant" | "realistic" | "manual";

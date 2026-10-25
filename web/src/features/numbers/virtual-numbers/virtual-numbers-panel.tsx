@@ -1,4 +1,4 @@
-import { PencilIcon, PhoneIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { numberChannelLabels } from "@/features/numbers/numbers-labels";
+import { NumbersEmptyState } from "@/features/numbers/virtual-numbers/numbers-empty-state";
 import { VirtualNumberSheet } from "@/features/numbers/virtual-numbers/virtual-number-sheet";
 import {
   useDeleteVirtualNumber,
@@ -49,19 +50,6 @@ function WebhookSummary({ virtualNumber }: { virtualNumber: VirtualNumber }) {
         </span>
       )}
     </span>
-  );
-}
-
-function NumbersEmptyState() {
-  return (
-    <div className="flex flex-col items-center gap-2 px-6 py-16 text-center">
-      <PhoneIcon className="size-8 text-muted-foreground" />
-      <p className="text-sm font-medium">No numbers yet</p>
-      <p className="max-w-md text-sm text-muted-foreground">
-        Numbers are optional: any From is accepted. Add one to give it an
-        inbound webhook, a default status callback or a Messaging Service.
-      </p>
-    </div>
   );
 }
 

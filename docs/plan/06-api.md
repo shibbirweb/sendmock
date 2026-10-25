@@ -118,6 +118,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/wait/webhook?endpoint=...&status=succeeded&timeout=10s` | wait for a webhook delivery outcome |
 | GET | `/otp?to=...&channel=sms\|email\|verify` | latest OTP for a recipient (extracted from messages or from Twilio Verify) |
 | GET | `/links?to=...` | latest extracted links for a recipient |
+| POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `create_sample` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
@@ -131,7 +132,7 @@ These make SendMock useful from any test framework without polling loops:
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, email and SMS options, opened events, chaos toggles, OTP patterns; `PATCH` takes only the changed keys and returns field-level errors for invalid values |
-| GET | `/info` | version, uptime, listeners, counts, DB size |
+| GET | `/info` | version, uptime, listeners, counts, DB size, and `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel; `409` while the update check is off |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 

@@ -131,6 +131,6 @@ test("UI-03.5 stat tiles show totals with today's counts and the connect card co
     "http://127.0.0.1:8025/api/v1",
   );
 
-  await page.getByRole("link", { name: /Snippets for your language/ }).click();
+  await page.getByRole("link", { name: /More snippets/ }).click();
   await expect(page).toHaveURL(/\/settings\?section=connection/);
 });

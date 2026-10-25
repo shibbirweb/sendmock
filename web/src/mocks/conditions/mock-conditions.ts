@@ -9,6 +9,8 @@ export type MockConditions = {
   dataSize: MockDataSize;
   isRealtimeEnabled: boolean;
   realtimeIntervalMs: number;
+  /** Makes `/info` report a Docker install, to try container hostnames. */
+  isRunningInContainer: boolean;
 };
 
 type MockConditionsListener = (mockConditions: MockConditions) => void;
@@ -19,6 +21,7 @@ const defaultMockConditions: MockConditions = {
   dataSize: "standard",
   isRealtimeEnabled: true,
   realtimeIntervalMs: 12_000,
+  isRunningInContainer: false,
 };
 
 let currentMockConditions: MockConditions = defaultMockConditions;

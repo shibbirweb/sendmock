@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 95 features, 10 / 376 criteria ticked.**
+**Accepted: 0 / 95 features, 10 / 379 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -112,7 +112,7 @@ On top of its own criteria, a feature is done only when:
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Not started |
 | [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 3 | Not started |
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Not started |
-| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 4 | Not started |
+| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 9 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | Not started |
@@ -127,7 +127,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
 | [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | In progress |
-| [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 2 | Not started |
+| [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 4 | In progress |
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Not started |
 | [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Not started |
 | [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 3 | Not started |

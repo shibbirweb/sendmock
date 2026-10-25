@@ -52,7 +52,7 @@ const deliveringClients = [
 ];
 
 /** The session that delivered an SMTP email, linked both ways (EM-09.3). */
-function buildDeliveredSession(
+export function buildDeliveredSmtpSession(
   email: EmailDetail,
   emailIndex: number,
 ): SmtpSession {
@@ -190,7 +190,7 @@ const smtpSessionSpecs: SmtpSessionSpec[] = [
 export function buildSmtpSessionFixtures(emails: EmailDetail[]): SmtpSession[] {
   const deliveredSessions = emails
     .filter((email) => email.source === "smtp")
-    .map(buildDeliveredSession);
+    .map(buildDeliveredSmtpSession);
   const failedSessions = smtpSessionSpecs.map(
     ({ minutesAgo: sessionMinutesAgo, durationMs, ...sessionFields }) => {
       const startedAtMs = minutesAgoInMs(sessionMinutesAgo);

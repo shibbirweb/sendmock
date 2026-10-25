@@ -18,6 +18,10 @@ import {
   type SmtpResultFilter,
   smtpResultFilters,
 } from "@/features/logs/logs-labels";
+import { ConnectHint } from "@/features/onboarding/connect-hint";
+import { NoDataState } from "@/features/onboarding/no-data-state";
+import { NoMatchState } from "@/features/onboarding/no-match-state";
+import { SampleButton } from "@/features/onboarding/sample-button";
 import { SmtpResultBadge } from "@/features/logs/smtp/smtp-result-badge";
 import { useSmtpSessions } from "@/lib/api/hooks/use-logs-queries";
 import type { SmtpSession } from "@/lib/api/types";
@@ -147,16 +151,26 @@ export function SmtpSessionsPanel() {
             <Skeleton className="h-8 w-full" />
           </div>
         )}
-        {sessionsQuery.isSuccess && smtpSessions.length === 0 && (
-          <div className="flex flex-col items-center gap-2 px-6 py-16 text-center">
-            <ServerIcon className="size-8 text-muted-foreground" />
-            <p className="text-sm font-medium">No SMTP sessions</p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              Point your app's SMTP settings at SendMock; every connection shows
-              up here, even the ones that fail.
-            </p>
-          </div>
-        )}
+        {sessionsQuery.isSuccess &&
+          smtpSessions.length === 0 &&
+          (resultFilter !== "all" || searchText !== "" ? (
+            <NoMatchState
+              message="No SMTP sessions match this filter or search."
+              onClearFilter={() => {
+                setResultFilter("all");
+                setSearchText("");
+              }}
+            />
+          ) : (
+            <NoDataState
+              icon={ServerIcon}
+              title="No SMTP sessions yet"
+              description="Point your app's SMTP settings at SendMock; every connection shows up here, even the ones that fail."
+            >
+              <ConnectHint connectArea="smtp" />
+              <SampleButton sampleKind="email" />
+            </NoDataState>
+          ))}
         {smtpSessions.length > 0 && (
           <Table>
             <TableHeader>
