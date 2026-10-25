@@ -134,16 +134,4 @@ export const smsHandlers = [
 
     return new HttpResponse(null, { status: 204 });
   }),
-
-  http.get("*/api/v1/numbers", async () => {
-    await applyMockConditions();
-
-    return HttpResponse.json(mockDatabase.virtualNumbers);
-  }),
-
-  http.get("*/api/v1/messaging-services", async () => {
-    await applyMockConditions();
-
-    return HttpResponse.json(mockDatabase.messagingServices);
-  }),
 ];

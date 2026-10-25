@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail, SMS and Verify screens done**; Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail, SMS, Verify and Numbers screens done**; Logs, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: Numbers registry and Messaging Services next, then Logs and Settings.
+2. Continue Phase U1: Logs (SMTP sessions and the API request log) next, then Settings.
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 9 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 10 / 16 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -97,7 +97,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
 - [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
 - [x] Verify tab: verifications, timeline, force-state buttons, Verify services editor (live expiry countdown, status chips, link to the SMS with the code)
-- [ ] Numbers registry and Messaging Services tab
+- [x] Numbers registry and Messaging Services tab (inbound URL, method, fallback, format and status callback per number; sender pools with inbound handling)
 - [ ] Logs: SMTP sessions and transcript viewer
 - [ ] Logs: HTTP API request log with rejected requests
 - [ ] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns
@@ -307,3 +307,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Verify tab design ([07](07-ui.md#sms): verifications table with live expiry countdown, status chips, detail drawer with timeline, linked message and force buttons, Services tab with create / edit / delete dialog) and criteria VF-01.3 and VF-04.4. |
 | 2026-10-25 | Verify tab built on mock data: verifications table with a live expiry countdown, status chips and search, detail drawer with timeline, force buttons and a link to the SMS that carried the code, Services tab with create / edit / delete and the shared validation rules. Pending codes past their expiry turn expired on the next fetch. Shared `FilterChip` now used by Mail, SMS and Verify. |
 | 2026-10-25 | Fix: buttons, tabs, checkboxes, select triggers, menu items and `<summary>` show the pointer cursor again (Tailwind v4 dropped it); disabled buttons keep the default cursor. |
+| 2026-10-25 | Plan: Numbers screen design ([07](07-ui.md#numbers): numbers table and side sheet with inbound URL, method, fallback, format and status callback; Messaging Services with sender pool and inbound handling) and criteria SM-03.4 and SM-12.3. |
+| 2026-10-25 | Numbers screen built on mock data: numbers table and side sheet (E.164, channels, inbound webhook URL, method, fallback and format, default status callback, Messaging Service, note when an `sms.inbound` rule also exists), Messaging Services with sender pool (moving a number between pools updates both) and inbound handling. Shared `FormField`, `FormFieldError` and `ConfirmDeleteDialog` now also used by Verify. |

@@ -37,12 +37,14 @@ import {
   buildWebhookVariableFixtures,
 } from "@/mocks/fixtures/template-and-variable-fixtures";
 import {
-  buildMessagingServiceFixtures,
   buildVerificationFixtures,
   linkVerificationMessages,
   buildVerifyServiceFixtures,
+} from "@/mocks/fixtures/verify-fixtures";
+import {
+  buildMessagingServiceFixtures,
   buildVirtualNumberFixtures,
-} from "@/mocks/fixtures/verify-and-number-fixtures";
+} from "@/mocks/fixtures/number-fixtures";
 import {
   buildWebhookDeliveryFixtures,
   buildWebhookEndpointFixtures,

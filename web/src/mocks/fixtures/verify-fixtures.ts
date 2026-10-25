@@ -1,18 +1,12 @@
 import type {
-  MessagingService,
   SmsMessageDetail,
   Verification,
   VerificationDetail,
   VerificationTimelineEntry,
   VerifyChannel,
   VerifyService,
-  VirtualNumber,
 } from "@/lib/api/types";
-import {
-  createMockUlid,
-  createProviderId,
-  minutesAgo,
-} from "@/mocks/fixtures/fixture-helpers";
+import { createProviderId, minutesAgo } from "@/mocks/fixtures/fixture-helpers";
 
 export function buildVerifyServiceFixtures(): VerifyService[] {
   return [
@@ -221,57 +215,4 @@ export function linkVerificationMessages(
       linked_thread_id: `${codeMessage.from_number}|${codeMessage.to_number}`,
     };
   });
-}
-
-export function buildVirtualNumberFixtures(): VirtualNumber[] {
-  return [
-    {
-      id: createMockUlid(),
-      number: "+15550001111",
-      label: "Support line",
-      channels: ["sms"],
-      inbound_url: "http://localhost:8000/sms/inbound",
-      inbound_template_id: "twilio.inbound_sms",
-      status_callback_url: "http://localhost:8000/sms/status",
-      messaging_service_sid: "MG00000000000000000000000000000001",
-      created_by: "seed",
-    },
-    {
-      id: createMockUlid(),
-      number: "+15550002222",
-      label: "Alerts",
-      channels: ["sms"],
-      inbound_url: null,
-      inbound_template_id: null,
-      status_callback_url: null,
-      messaging_service_sid: "MG00000000000000000000000000000001",
-      created_by: "ui",
-    },
-    {
-      id: createMockUlid(),
-      number: "+15550003333",
-      label: "WhatsApp support",
-      channels: ["whatsapp"],
-      inbound_url: "http://localhost:8000/whatsapp/inbound",
-      inbound_template_id: "twilio.inbound_sms",
-      status_callback_url: null,
-      messaging_service_sid: null,
-      created_by: "mcp",
-    },
-  ];
-}
-
-export function buildMessagingServiceFixtures(
-  virtualNumbers: VirtualNumber[],
-): MessagingService[] {
-  return [
-    {
-      sid: "MG00000000000000000000000000000001",
-      friendly_name: "Acme notifications",
-      number_ids: virtualNumbers
-        .filter((virtualNumber) => virtualNumber.messaging_service_sid !== null)
-        .map((virtualNumber) => virtualNumber.id),
-      created_by: "seed",
-    },
-  ];
 }

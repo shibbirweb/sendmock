@@ -2,17 +2,8 @@ import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { CopyButton } from "@/components/common/copy-button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -38,60 +29,10 @@ function formatTtl(ttlSeconds: number): string {
     : `${ttlMinutes} min`;
 }
 
-function DeleteServiceDialog({
-  deletedService,
-  onClose,
-}: {
-  deletedService: VerifyService | null;
-  onClose: () => void;
-}) {
-  const deleteVerifyService = useDeleteVerifyService();
-
-  return (
-    <AlertDialog
-      open={deletedService !== null}
-      onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          onClose();
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            Delete {deletedService?.friendly_name}?
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            Apps using this service SID get Twilio&apos;s 20404 error until they
-            switch to another service.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Keep it</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              if (deletedService === null) {
-                return;
-              }
-
-              deleteVerifyService.mutate(deletedService.sid, {
-                onSuccess: () => {
-                  toast("Service deleted");
-                },
-              });
-            }}
-          >
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
-
 /** Verify services with create, edit and delete (VF-01.3). */
 export function VerifyServicesPanel() {
   const servicesQuery = useVerifyServices();
+  const deleteVerifyService = useDeleteVerifyService();
   const [isDialogOpen, setDialogOpen] = React.useState(false);
   const [editedService, setEditedService] =
     React.useState<VerifyService | null>(null);
@@ -204,8 +145,20 @@ export function VerifyServicesPanel() {
         editedService={editedService}
         onOpenChange={setDialogOpen}
       />
-      <DeleteServiceDialog
-        deletedService={deletedService}
+      <ConfirmDeleteDialog
+        itemName={deletedService?.friendly_name ?? null}
+        consequence="Apps using this service SID get Twilio's 20404 error until they switch to another service."
+        onConfirm={() => {
+          if (deletedService === null) {
+            return;
+          }
+
+          deleteVerifyService.mutate(deletedService.sid, {
+            onSuccess: () => {
+              toast("Service deleted");
+            },
+          });
+        }}
         onClose={() => {
           setDeletedService(null);
         }}
