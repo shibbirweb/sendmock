@@ -2,6 +2,7 @@ import type {
   ApiRequestLogFilters,
   DeliveryListFilters,
   EmailListFilters,
+  EndpointPreviewRequest,
   RulePreviewRequest,
   TemplateRenderRequest,
   VariablePreviewRequest,
@@ -70,6 +71,8 @@ export const queryKeys = {
       templateId: string,
       renderRequest: TemplateRenderRequest,
     ) => ["webhooks", "template-preview", templateId, renderRequest] as const,
+    endpointPreview: (previewRequest: EndpointPreviewRequest) =>
+      ["webhooks", "endpoint-preview", previewRequest] as const,
     variables: ["webhooks", "variables"] as const,
     variablePreview: (previewRequest: VariablePreviewRequest) =>
       ["webhooks", "variable-preview", previewRequest] as const,

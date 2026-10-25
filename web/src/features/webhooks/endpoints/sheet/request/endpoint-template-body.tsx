@@ -9,8 +9,8 @@ import type { WebhookEndpointFormValues } from "@/features/webhooks/endpoints/sh
 import { useWebhookTemplates } from "@/lib/api/hooks/use-webhook-queries";
 import type { TemplateMode } from "@/lib/api/types";
 
-/** Template picker, link mode and the overrides layered on top. */
-export function EndpointTemplateTab({
+/** Template body mode: picker, link mode and extra body fields on top. */
+export function EndpointTemplateBody({
   formValues,
   savedEndpointId,
   onChange,
@@ -77,35 +77,16 @@ export function EndpointTemplateTab({
           onChange({ templateMode });
         }}
       />
-      <div className="grid gap-4 rounded-md border p-3">
-        <div className="grid gap-0.5">
-          <h3 className="text-sm font-medium">Overrides</h3>
-          <p className="text-xs text-muted-foreground">
-            Added to what the template sends. Values accept {"{{ }}"} templates,
-            such as {"{{ vars.tenant_id }}"}.
-          </p>
-        </div>
-        <NameValueRowsEditor
-          legend="Extra headers"
-          rowLabel="Header"
-          namePlaceholder="X-Tenant"
-          emptyText="None."
-          rows={formValues.headerRows}
-          onChange={(headerRows) => {
-            onChange({ headerRows });
-          }}
-        />
-        <NameValueRowsEditor
-          legend="Extra body fields"
-          rowLabel="Field"
-          namePlaceholder="environment"
-          emptyText="None."
-          rows={formValues.fieldRows}
-          onChange={(fieldRows) => {
-            onChange({ fieldRows });
-          }}
-        />
-      </div>
+      <NameValueRowsEditor
+        legend="Extra body fields"
+        rowLabel="Field"
+        namePlaceholder="environment"
+        emptyText="None. Added to what the template sends; values accept {{ }} templates."
+        rows={formValues.fieldRows}
+        onChange={(fieldRows) => {
+          onChange({ fieldRows });
+        }}
+      />
       {savedEndpointId !== null && (
         <SaveEndpointAsTemplate endpointId={savedEndpointId} />
       )}

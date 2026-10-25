@@ -25,6 +25,7 @@ function toEmailData(email: EmailDetail): Record<string, unknown> {
     text_body: email.text_body,
     html_body: email.html_body,
     tags: email.tags,
+    extracted: email.extracted,
   };
 }
 
@@ -37,6 +38,7 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
     body: smsMessage.body,
     status: smsMessage.status,
     error_code: smsMessage.error_code,
+    extracted: smsMessage.extracted,
   };
 }
 
@@ -53,6 +55,7 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
         body: "Your Acme code is 482913",
         status: "delivered",
         error_code: null,
+        extracted: { otp: ["482913"], links: [] },
       },
     };
   }
@@ -79,6 +82,7 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       text_body: "Your verification code is 739104.",
       html_body: null,
       tags: [],
+      extracted: { otp: ["739104"], links: [] },
     },
   };
 }
@@ -122,7 +126,11 @@ export function buildTemplateContext(
   mockDatabase: MockDatabase,
   webhookTemplate: WebhookTemplateSummary,
   renderRequest: TemplateRenderRequest,
-): { templateContext: TemplateContext; renderedAgainst: string } | null {
+): {
+  templateContext: TemplateContext;
+  renderedAgainst: string;
+  eventType: AppEventType;
+} | null {
   const contextSubject = findContextSubject(
     mockDatabase,
     webhookTemplate,
@@ -140,6 +148,7 @@ export function buildTemplateContext(
 
   return {
     renderedAgainst: contextSubject.label,
+    eventType: contextSubject.eventType,
     templateContext: {
       event: {
         id: "evt_preview",

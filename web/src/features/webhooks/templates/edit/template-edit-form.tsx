@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { FormField } from "@/components/common/form-field";
 import { FormFieldError } from "@/components/common/form-field-error";
-import { NameValueRowsEditor } from "@/components/common/name-value-rows-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,9 +13,11 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { TemplateMetadataFields } from "@/features/webhooks/templates/edit/template-metadata-fields";
-import { insertAtCursor } from "@/features/webhooks/templates/reference/insert-at-cursor";
+import { CodeEditor } from "@/features/webhooks/templates/reference/code-editor/code-editor";
+import type { CodeEditorHandle } from "@/features/webhooks/templates/reference/code-editor/code-editor-types";
+import { TemplateInsertMenu } from "@/features/webhooks/templates/reference/template-insert-menu";
 import { TemplateReferencePanel } from "@/features/webhooks/templates/reference/template-reference-panel";
-import { TemplateTextField } from "@/features/webhooks/templates/reference/template-text-field";
+import { TemplateRowsEditor } from "@/features/webhooks/templates/reference/template-rows-editor";
 import { TemplatePreview } from "@/features/webhooks/templates/detail/template-preview";
 import { useTemplatePreview } from "@/features/webhooks/templates/detail/use-template-preview";
 import {
@@ -25,6 +26,7 @@ import {
 } from "@/features/webhooks/templates/edit/use-template-draft-form";
 import { useTemplateReference } from "@/lib/api/hooks/use-webhook-template-queries";
 import type { HttpMethod, WebhookTemplateDetail } from "@/lib/api/types";
+import { selectBodyEditorProblems } from "@/lib/webhooks/describe-problem-source";
 
 const templateMethods: HttpMethod[] = ["POST", "PUT", "PATCH", "GET"];
 
@@ -44,9 +46,12 @@ export function TemplateEditForm({
     toTemplateDraft(formValues),
   );
   const renderErrors = templatePreview.previewQuery.data?.errors ?? [];
-  const bodyFieldRef = React.useRef<
-    HTMLTextAreaElement | HTMLInputElement | null
-  >(null);
+  const bodyEditorRef = React.useRef<CodeEditorHandle | null>(null);
+  const renderProblems = templatePreview.previewQuery.data?.problems;
+  const bodyProblems = React.useMemo(
+    () => selectBodyEditorProblems(renderProblems ?? []),
+    [renderProblems],
+  );
   const templateReference = useTemplateReference(
     templateDetail.source === "custom"
       ? formValues.events
@@ -118,62 +123,51 @@ export function TemplateEditForm({
         </FormField>
       </div>
       <div className="grid gap-1">
-        <NameValueRowsEditor
+        <TemplateRowsEditor
           legend="Header templates"
           rowLabel="Header"
           namePlaceholder="X-Signature"
           emptyText="None besides Content-Type."
           rows={formValues.headerRows}
+          templateReference={templateReference}
           onChange={(headerRows) => {
             updateFormValues({ headerRows });
           }}
-          renderValueInput={({ ariaLabel, rowValue, onValueChange }) => (
-            <TemplateTextField
-              ariaLabel={ariaLabel}
-              placeholder="value or {{ template }}"
-              value={rowValue}
-              templateReference={templateReference}
-              onChange={onValueChange}
-            />
-          )}
         />
         <FormFieldError errorMessage={fieldErrors.header_templates} />
       </div>
       <div className="grid min-w-0 items-start gap-3 md:grid-cols-[minmax(0,1fr)_15rem]">
-        <FormField
-          label="Body template"
-          fieldId={`${fieldIdPrefix}-body`}
-          hint="Type {{ to see what you can use, or pick from the reference."
-          errorMessage={fieldErrors.body_template}
-        >
-          <TemplateTextField
-            fieldId={`${fieldIdPrefix}-body`}
-            fieldRef={bodyFieldRef}
-            isMultiline
-            rows={14}
-            className="min-h-80"
+        <div className="grid min-w-0 gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-medium">Body template</span>
+            <TemplateInsertMenu
+              onInsert={(insertText) => {
+                bodyEditorRef.current?.insertText(insertText);
+              }}
+            />
+          </div>
+          <CodeEditor
+            ariaLabel="Body template"
+            language={formValues.contentType.includes("json") ? "json" : "text"}
+            minHeightClassName="min-h-80"
             value={formValues.bodyTemplate}
             isInvalid={fieldErrors.body_template !== undefined}
             templateReference={templateReference}
+            problems={bodyProblems}
+            handleRef={bodyEditorRef}
             onChange={(bodyTemplate) => {
               updateFormValues({ bodyTemplate });
             }}
           />
-        </FormField>
+          <p className="text-xs text-muted-foreground">
+            Type {"{{"} to see what you can use, or pick from the reference.
+          </p>
+          <FormFieldError errorMessage={fieldErrors.body_template} />
+        </div>
         <TemplateReferencePanel
           templateReference={templateReference}
           onInsert={(insertText) => {
-            const bodyField = bodyFieldRef.current;
-            const { nextText, nextCursorIndex } = insertAtCursor(
-              bodyField,
-              formValues.bodyTemplate,
-              insertText,
-            );
-            updateFormValues({ bodyTemplate: nextText });
-            requestAnimationFrame(() => {
-              bodyField?.focus();
-              bodyField?.setSelectionRange(nextCursorIndex, nextCursorIndex);
-            });
+            bodyEditorRef.current?.insertText(insertText);
           }}
         />
       </div>

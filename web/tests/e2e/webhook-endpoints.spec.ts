@@ -170,8 +170,8 @@ test("WH-01.6 a global variable satisfies a template's need", async ({
   page,
 }) => {
   const endpointSheet = await openEndpointSheet(page, "Laravel inbound mail");
-  await endpointSheet.getByRole("tab", { name: "Template" }).click();
-  await endpointSheet.getByRole("combobox").click();
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
+  await endpointSheet.getByRole("combobox", { name: "Template" }).click();
   await page
     .getByRole("option", { name: "Postmark inbound with tenant header" })
     .click();

@@ -257,8 +257,14 @@ export function TemplateTextField({
 export function isSuggestionPopupOpen(): boolean {
   const focusedElement = document.activeElement;
 
+  if (focusedElement?.getAttribute("aria-autocomplete") !== "list") {
+    return false;
+  }
+
+  // The code editor marks an open list with aria-controls instead.
   return (
-    focusedElement?.getAttribute("aria-autocomplete") === "list" &&
-    focusedElement.getAttribute("aria-expanded") === "true"
+    focusedElement.getAttribute("aria-expanded") === "true" ||
+    (focusedElement.getAttribute("aria-haspopup") === "listbox" &&
+      focusedElement.hasAttribute("aria-controls"))
   );
 }

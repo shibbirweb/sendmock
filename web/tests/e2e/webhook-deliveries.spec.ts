@@ -84,7 +84,9 @@ test("WH-03.7 the log loads 50 rows at a time and shows new deliveries live", as
   const totalBefore = await readTotalCount(page);
   expect(totalBefore).toBeGreaterThan(50);
 
-  await page.getByRole("button", { name: "Load more" }).click();
+  // Scrolling the footer into view loads the next page by itself; clicking
+  // Load more as well would race that load, which disables the button.
+  await page.getByText(/^Showing 50 of/).scrollIntoViewIfNeeded();
   await expect.poll(() => page.locator("tbody tr").count()).toBeGreaterThan(50);
 
   await page.getByRole("button", { name: "Demo controls" }).click();

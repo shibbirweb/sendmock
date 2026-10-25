@@ -13,6 +13,7 @@ import {
   SendIcon,
   SettingsIcon,
   ShieldCheckIcon,
+  SquarePenIcon,
   VariableIcon,
   WebhookIcon,
 } from "lucide-react";
@@ -62,6 +63,7 @@ export const navigationItems: NavigationItem[] = [
         icon: ActivityIcon,
         shortcutKey: "d",
       },
+      { title: "Composer", path: "/webhooks/composer", icon: SquarePenIcon },
       { title: "Templates", path: "/webhooks/templates", icon: FileCode2Icon },
       { title: "Variables", path: "/webhooks/variables", icon: VariableIcon },
       { title: "Saved", path: "/webhooks/saved", icon: BookmarkIcon },

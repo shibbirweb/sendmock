@@ -17,7 +17,7 @@ const draftDebounceMs = 300;
 export type PreviewMessageOption = { optionValue: string; label: string };
 
 /** "email:<id>" or "sms:<id>" from the picker, as a render request. */
-function toRenderRequest(pickedOption: string): TemplateRenderRequest {
+export function toRenderRequest(pickedOption: string): TemplateRenderRequest {
   const [messageKind, messageId] = pickedOption.split(":");
   if (messageKind === "email" && messageId !== undefined) {
     return { email_id: messageId };

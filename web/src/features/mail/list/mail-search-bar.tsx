@@ -24,9 +24,20 @@ export function MailSearchBar({
 }: MailSearchBarProps) {
   const navigate = useNavigate({ from: "/mail" });
   const [draftSearchText, setDraftSearchText] = React.useState(searchText);
+  // The URL text last seen and the text this bar last wrote there, so a
+  // change made elsewhere (the empty state's Clear search) replaces the draft.
+  const [seenSearchText, setSeenSearchText] = React.useState(searchText);
+  const [appliedSearchText, setAppliedSearchText] = React.useState(searchText);
+  if (searchText !== seenSearchText) {
+    setSeenSearchText(searchText);
+    if (searchText !== appliedSearchText) {
+      setDraftSearchText(searchText);
+    }
+  }
 
   const applySearchText = React.useCallback(
     (nextSearchText: string) => {
+      setAppliedSearchText(nextSearchText.trim() === "" ? "" : nextSearchText);
       void navigate({
         search: (previousSearch) => ({
           ...previousSearch,

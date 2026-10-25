@@ -183,7 +183,7 @@ Fields mode is the recommended default for most users; Raw is for full control.
 
 ## Editor experience (UI)
 
-- CodeMirror 6 editor (lazy loaded) with Jinja + JSON highlighting.
+- CodeMirror 6 editor (lazy loaded) with Jinja + JSON highlighting. Dependency: the `@codemirror/*` packages only (state, view, commands, autocomplete, language, lang-json) plus `@lezer/highlight` (already pulled in by them; imported directly so highlighting uses the design tokens), loaded in their own chunk when an editor opens, so the initial bundle is unchanged. A textarea would lack highlighting, completion at the caret, hover and positioned errors, which the plan asks for.
 - Autocomplete on `{{`: variables (with kind badge), event fields for the selected event type, functions and filters with signatures.
 - Hover a variable to see its current value (secrets masked).
 - **Live preview panel:** pick a sample (latest email, latest SMS, a specific message, or a built-in fixture) and see the fully rendered URL, headers and body update as you type.

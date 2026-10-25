@@ -11,6 +11,7 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import { defaultEndpointRequest } from "@/lib/webhooks/endpoint-request-defaults";
 import {
   generateEndpointSecret,
   type WebhookEndpointRecord,
@@ -71,6 +72,7 @@ export function buildWebhookEndpointFixtures(): WebhookEndpointRecord[] {
     timeout_ms: 10_000,
     retry_policy: defaultRetryPolicy,
     is_enabled: endpointSpec.isEnabled ?? true,
+    ...defaultEndpointRequest,
     created_by: endpointSpec.createdBy ?? "ui",
     created_at: minutesAgo(600 - endpointIndex),
   }));

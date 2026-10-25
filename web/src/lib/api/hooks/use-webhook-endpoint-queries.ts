@@ -1,8 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
+  EndpointPreviewRequest,
+  EndpointPreviewResult,
+  ManualSendRequest,
   RevealedEndpointSecret,
   WebhookDelivery,
   WebhookEndpoint,
@@ -44,6 +52,37 @@ export function useSaveWebhookEndpoint() {
             method: "PATCH",
             requestBody: endpointInput,
           }),
+  );
+}
+
+/** An unsaved endpoint's request, rendered as it would be sent (WH-07.15). */
+export function useEndpointPreview(previewRequest: EndpointPreviewRequest) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.endpointPreview(previewRequest),
+    queryFn: ({ signal }) =>
+      requestApi<EndpointPreviewResult>("/webhooks/endpoints/preview", {
+        method: "POST",
+        requestBody: previewRequest,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Sends a message or a hand-written request on demand; returns the `manual` delivery (WH-05.1). */
+export function useSendToEndpoint() {
+  return useWebhookMutation(
+    ({
+      endpointId,
+      sendRequest,
+    }: {
+      endpointId: string;
+      sendRequest: ManualSendRequest;
+    }) =>
+      requestApi<WebhookDelivery>(`/webhooks/endpoints/${endpointId}/send`, {
+        method: "POST",
+        requestBody: sendRequest,
+      }),
   );
 }
 

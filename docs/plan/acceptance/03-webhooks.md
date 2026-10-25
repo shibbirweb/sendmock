@@ -56,6 +56,8 @@ UI in U2, backend Phase 3.
 - [ ] WH-05.2 Replay as-is resends the stored request; Re-render uses fresh variables; Edit and replay sends the edited body.
 - [ ] WH-05.3 The composer sends a hand-written request using any template preset.
 - [ ] WH-05.4 API (`/send`, `/replay`) and CLI (`sendmock webhook send`) trigger the same behaviour, including variable overrides.
+- [ ] WH-05.5 Send to webhook and the composer ask for every Prompt variable in scope, prefilled with its default, and take per-send overrides that win over endpoint and global values for that send only; the preview shows the result before sending.
+- [ ] WH-05.6 The rendered body can be edited before a manual send and is then sent as written; a render error blocks sending; the result links to the new `manual` delivery and can be saved with a name.
 
 ## WH-06 Provider formats and signatures
 
@@ -82,6 +84,8 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.11 The Variables screen lists global and endpoint variables with kind, value (secrets masked) and scope, and narrows them by scope, kind and name.
 - [ ] WH-07.12 Each kind has its own editor fields, checked the same way by the UI and the API (number, boolean, valid JSON, expressions that render), with a "Resolves to" preview against the sample; a secret is never shown again after saving.
 - [ ] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
+- [ ] WH-07.14 The request editor sets query params, headers and a body as Template, Fields, Raw or None, plus Strict or Lenient rendering; Fields always encode a valid JSON or form body, and Raw uses the code editor with highlighting, `{{` completion, hover values and an Insert menu.
+- [ ] WH-07.15 The live preview renders the method, URL, headers and body against the sample or a chosen message as you type, and each error or warning shows under the part it comes from and, in the code editor, at its line and column.
 
 ## WH-08 Built-in payload templates
 

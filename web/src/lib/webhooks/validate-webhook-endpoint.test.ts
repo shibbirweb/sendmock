@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import type { WebhookEndpointInput } from "@/lib/api/types";
+import { defaultEndpointRequest } from "@/lib/webhooks/endpoint-request-defaults";
 import { validateWebhookEndpointInput } from "@/lib/webhooks/validate-webhook-endpoint";
 
 const validEndpointInput: WebhookEndpointInput = {
@@ -18,6 +19,7 @@ const validEndpointInput: WebhookEndpointInput = {
     retry_on_client_errors: false,
   },
   is_enabled: true,
+  ...defaultEndpointRequest,
 };
 
 describe("validateWebhookEndpointInput", () => {
@@ -95,5 +97,78 @@ describe("validateWebhookEndpointInput", () => {
         },
       }),
     ).toEqual({});
+  });
+
+  test("WH-07.14 Fields mode needs named, unique fields", () => {
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        body_fields: [
+          {
+            name: "",
+            value_type: "text",
+            value: "x",
+          },
+        ],
+      }),
+    ).toEqual({ body_fields: "Every field needs a name" });
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        body_fields: [
+          {
+            name: "to",
+            value_type: "text",
+            value: "a",
+          },
+          {
+            name: "to",
+            value_type: "text",
+            value: "b",
+          },
+        ],
+      }),
+    ).toEqual({ body_fields: "to is used twice" });
+  });
+
+  test("WH-07.14 a fixed field value must fit its type; templated values are left to the preview", () => {
+    const withField = (
+      valueType: "number" | "boolean" | "json",
+      value: string,
+    ) =>
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        body_fields: [
+          {
+            name: "count",
+            value_type: valueType,
+            value,
+          },
+        ],
+      });
+
+    expect(withField("number", "lots")).toEqual({
+      body_fields: "count must be a number",
+    });
+    expect(withField("boolean", "yes")).toEqual({
+      body_fields: "count must be true or false",
+    });
+    expect(withField("json", "{ nope")).toEqual({
+      body_fields: "count must be valid JSON",
+    });
+    expect(withField("number", "{{ delivery.attempt }}")).toEqual({});
+  });
+
+  test("WH-07.14 Raw mode needs a content type", () => {
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "raw",
+        raw_content_type: " ",
+      }),
+    ).toEqual({ raw_content_type: "Enter a content type" });
   });
 });

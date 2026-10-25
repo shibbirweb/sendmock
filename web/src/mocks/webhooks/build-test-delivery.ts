@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker/locale/en";
 
 import type { WebhookDelivery } from "@/lib/api/types";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
+import { buildSignatureHeaders } from "@/mocks/webhooks/build-signature-headers";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
 /**
@@ -18,10 +19,6 @@ export function buildTestDelivery(
     timestamp: new Date(timestampSeconds * 1000).toISOString(),
     data: { endpoint: endpointRecord.name, message: "Hello from SendMock" },
   });
-  const signatures = [endpointRecord.secret, endpointRecord.previous_secret]
-    .filter((secret): secret is string => secret !== null)
-    .map(() => `v1,${faker.string.alphanumeric(43)}=`);
-
   return {
     id: createMockUlid(),
     endpoint_id: endpointRecord.id,
@@ -38,11 +35,7 @@ export function buildTestDelivery(
       url: endpointRecord.url,
       headers: {
         "content-type": "application/json",
-        "user-agent": "sendmock/0.0.0-dev",
-        "webhook-id": eventId,
-        "webhook-timestamp": String(timestampSeconds),
-        "webhook-signature": signatures.join(" "),
-        "webhook-attempt": "1",
+        ...buildSignatureHeaders(endpointRecord, eventId, timestampSeconds),
         ...endpointRecord.headers,
       },
       body: requestBody,

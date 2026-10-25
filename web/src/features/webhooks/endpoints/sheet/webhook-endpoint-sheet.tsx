@@ -12,16 +12,17 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EndpointGeneralTab } from "@/features/webhooks/endpoints/sheet/endpoint-general-tab";
+import { EndpointRequestTab } from "@/features/webhooks/endpoints/sheet/request/endpoint-request-tab";
 import { EndpointRetriesTab } from "@/features/webhooks/endpoints/sheet/endpoint-retries-tab";
 import { EndpointSecurityTab } from "@/features/webhooks/endpoints/sheet/endpoint-security-tab";
-import { EndpointTemplateTab } from "@/features/webhooks/endpoints/sheet/endpoint-template-tab";
 import { EndpointVariablesTab } from "@/features/webhooks/endpoints/sheet/endpoint-variables-tab";
+import { isSuggestionPopupOpen } from "@/features/webhooks/templates/reference/template-text-field";
 import { useWebhookEndpointForm } from "@/features/webhooks/endpoints/sheet/use-webhook-endpoint-form";
 import type { WebhookEndpoint } from "@/lib/api/types";
 import type { WebhookEndpointFieldErrors } from "@/lib/webhooks/validate-webhook-endpoint";
 
 type EndpointSheetTab =
-  "general" | "template" | "security" | "retries" | "variables";
+  "general" | "request" | "security" | "retries" | "variables";
 
 /** The tab holding each field, so a failed save opens the right one. */
 const tabByField: Record<keyof WebhookEndpointFieldErrors, EndpointSheetTab> = {
@@ -30,10 +31,17 @@ const tabByField: Record<keyof WebhookEndpointFieldErrors, EndpointSheetTab> = {
   method: "general",
   timeout_ms: "general",
   is_enabled: "general",
-  template_id: "template",
-  template_mode: "template",
-  headers: "template",
-  extra_fields: "template",
+  template_id: "request",
+  template_mode: "request",
+  query_params: "request",
+  headers: "request",
+  extra_fields: "request",
+  body_mode: "request",
+  body_fields: "request",
+  fields_encoding: "request",
+  raw_content_type: "request",
+  raw_body: "request",
+  render_mode: "request",
   retry_policy: "retries",
   backoff_seconds: "retries",
 };
@@ -99,7 +107,7 @@ function WebhookEndpointForm({
         <div className="overflow-x-auto px-4">
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="template">Template</TabsTrigger>
+            <TabsTrigger value="request">Request</TabsTrigger>
             <TabsTrigger value="security" disabled={editedEndpoint === null}>
               Security
             </TabsTrigger>
@@ -123,9 +131,10 @@ function WebhookEndpointForm({
               onChange={updateFormValues}
             />
           </TabsContent>
-          <TabsContent value="template">
-            <EndpointTemplateTab
+          <TabsContent value="request">
+            <EndpointRequestTab
               formValues={formValues}
+              fieldErrors={fieldErrors}
               savedEndpointId={editedEndpoint?.id ?? null}
               onChange={updateFormValues}
             />
@@ -198,7 +207,14 @@ export function WebhookEndpointSheet({
 }) {
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full gap-0 data-[side=right]:sm:max-w-xl">
+      <SheetContent
+        className="w-full gap-0 data-[side=right]:sm:max-w-2xl"
+        onEscapeKeyDown={(escapeEvent) => {
+          if (isSuggestionPopupOpen()) {
+            escapeEvent.preventDefault();
+          }
+        }}
+      >
         <SheetHeader>
           <SheetTitle>
             {editedEndpoint === null ? "Add an endpoint" : editedEndpoint.name}
