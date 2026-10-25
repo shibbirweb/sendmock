@@ -162,6 +162,7 @@ As planned in [16-website-and-releases.md](16-website-and-releases.md#landing-pa
 - `docs/wiki/` holds the user docs as Markdown, synced into `website/content/docs` at build time; the structure from the site map: getting started, install, connect your app (per language), email, SMS, Verify, webhooks, templates, variables, HTTP catcher, payments, CLI, MCP and AI, configuration and seed file, troubleshooting.
 - Each page gets its outline and the parts already true in Stage A (UI tours with screenshots); backend-dependent pages say "available in Phase N" until then.
 - Internal links are checked in CI (part of WS-03.3).
+- **As built:** 24 pages in plain Markdown with Fumadocs `meta.json` ordering (Docs, Features, Tools), relative `.md` links that work on GitHub and on the site, and `/demo/...` links rendered as plain anchors with the base path (the demo is a separate app). `website/scripts/sync-docs.ts` copies `docs/wiki` into `website/content/docs` before `dev` and `build` (that folder is generated and ignored). `bun run screenshots` also writes the light shots to `docs/wiki/images`. `website/tests/docs.spec.ts` checks every wiki file is published and crawls the docs for broken links, missing `.md` targets and missing anchors; it runs in the Website workflow.
 
 ## W10: API reference and playground in Demo mode (WS-04)
 

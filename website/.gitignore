@@ -7,3 +7,5 @@ test-results
 playwright-report
 .lighthouseci
 tsconfig.tsbuildinfo
+# Generated from docs/wiki by scripts/sync-docs.ts
+content/docs

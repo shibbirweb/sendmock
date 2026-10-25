@@ -8,7 +8,7 @@ import {
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { getMDXComponents } from "@/components/mdx";
+import { createDocsLink, getMDXComponents } from "@/components/mdx";
 import { source } from "@/lib/source";
 
 type DocsPageProps = {
@@ -31,7 +31,7 @@ export default async function Page({ params }: DocsPageProps) {
       <DocsBody>
         <MdxContent
           components={getMDXComponents({
-            a: createRelativeLink(source, docsPage),
+            a: createDocsLink(createRelativeLink(source, docsPage)),
           })}
         />
       </DocsBody>

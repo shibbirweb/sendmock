@@ -3,12 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --bun next dev --port 5190",
-    "build": "bun --bun next build",
+    "dev": "bun scripts/sync-docs.ts && bun --bun next dev --port 5190",
+    "build": "bun scripts/sync-docs.ts && bun --bun next build",
     "preview": "bunx --bun serve out -l 5191",
     "typecheck": "bun --bun tsc --noEmit",
     "lint": "bun --bun eslint .",
     "screenshots": "bun scripts/capture-screenshots.ts",
+    "sync-docs": "bun scripts/sync-docs.ts",
     "test:e2e": "bun --bun playwright test"
   },
   "dependencies": {

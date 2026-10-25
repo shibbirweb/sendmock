@@ -3,7 +3,7 @@
  * always show the current UI. Start the app first (`bun run dev` in web/),
  * then run `bun run screenshots` here; pass another base URL as the argument.
  */
-import { mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,6 +12,10 @@ import { chromium, type Page } from "@playwright/test";
 const appBaseUrl = process.argv[2] ?? "http://localhost:5173";
 const outputDirectory = fileURLToPath(
   new URL("../public/screenshots", import.meta.url),
+);
+/** The docs show the light shots next to their Markdown (docs/wiki/images). */
+const docsImageDirectory = fileURLToPath(
+  new URL("../../docs/wiki/images", import.meta.url),
 );
 
 type Scene = { name: string; open: (page: Page) => Promise<void> };
@@ -66,6 +70,7 @@ const scenes: Scene[] = [
 ];
 
 mkdirSync(outputDirectory, { recursive: true });
+mkdirSync(docsImageDirectory, { recursive: true });
 const browser = await chromium.launch();
 for (const colorScheme of ["light", "dark"] as const) {
   const page = await browser.newPage({
@@ -84,11 +89,17 @@ for (const colorScheme of ["light", "dark"] as const) {
         .forEach((toaster) => toaster.remove());
     });
     await page.waitForTimeout(500);
-    await page.screenshot({
-      path: join(outputDirectory, `${scene.name}-${colorScheme}.jpg`),
-      type: "jpeg",
-      quality: 80,
-    });
+    const screenshotPath = join(
+      outputDirectory,
+      `${scene.name}-${colorScheme}.jpg`,
+    );
+    await page.screenshot({ path: screenshotPath, type: "jpeg", quality: 80 });
+    if (colorScheme === "light") {
+      copyFileSync(
+        screenshotPath,
+        join(docsImageDirectory, `${scene.name}.jpg`),
+      );
+    }
   }
   await page.close();
 }

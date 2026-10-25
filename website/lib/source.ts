@@ -1,7 +1,7 @@
 import { loader } from "fumadocs-core/source";
 import { defineDocs } from "fumadocs-mdx/macro";
 
-/** User docs. In Phase 0 they move to docs/wiki/ and are synced in at build time. */
+/** User docs, synced from docs/wiki/ by scripts/sync-docs.ts before every build. */
 const docs = defineDocs({
   dir: "content/docs",
 });
