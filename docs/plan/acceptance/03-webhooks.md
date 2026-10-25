@@ -28,7 +28,7 @@ UI in U2, backend Phase 3.
 
 ## WH-03 Delivery engine and retries
 
-Phase 3.
+UI in U2 (WH-03.7 to WH-03.9), backend Phase 3.
 
 - [ ] WH-03.1 Ingest (SMTP, SMS API) never waits for webhook delivery.
 - [ ] WH-03.2 `5xx`, timeouts and connection errors are retried with the configured backoff up to max attempts; `4xx` are not (unless configured).
@@ -36,6 +36,9 @@ Phase 3.
 - [ ] WH-03.4 Exhausted deliveries fire `webhook.failed`; cancelled deliveries stop retrying.
 - [ ] WH-03.5 Each attempt stores the full request and the response (body truncated at 64 KB with a flag), duration and error.
 - [ ] WH-03.6 Concurrency never exceeds the configured limit.
+- [ ] WH-03.7 The deliveries log shows time, event, endpoint, trigger, status, duration and attempt, narrows by status, endpoint and event, loads 50 rows at a time and shows new deliveries as they happen.
+- [ ] WH-03.8 A delivery's detail shows request and response side by side with formatted bodies and the truncation note, lists every attempt of the event, links to the message that caused it and copies the request as cURL.
+- [ ] WH-03.9 "Cancel retries" marks a retrying delivery cancelled so it never runs again; a `render_failed` delivery shows the template error instead of a request.
 
 ## WH-04 Standard Webhooks signing
 

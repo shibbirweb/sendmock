@@ -2,6 +2,7 @@ import { setupWorker } from "msw/browser";
 
 import { mockHandlers } from "@/mocks/handlers";
 import { startMockEventGenerator } from "@/mocks/realtime/mock-event-generator";
+import { startRuleFiring } from "@/mocks/webhooks/fire-matching-rules";
 
 /**
  * Starts the in-browser mock API. Every request to /api/v1 and the realtime
@@ -18,5 +19,6 @@ export async function startMockApi() {
     quiet: true,
   });
 
+  startRuleFiring();
   startMockEventGenerator();
 }

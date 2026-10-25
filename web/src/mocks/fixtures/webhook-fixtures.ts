@@ -144,6 +144,8 @@ type DeliverySpec = {
   attempt?: number;
   trigger?: DeliveryTrigger;
   errorMessage?: string;
+  /** Specs with the same key are attempts of one event and share its id. */
+  eventKey?: string;
 };
 
 const deliverySpecs: DeliverySpec[] = [
@@ -169,6 +171,17 @@ const deliverySpecs: DeliverySpec[] = [
     statusCode: 500,
     attempt: 2,
     errorMessage: "Internal Server Error",
+    eventKey: "retried-status",
+  },
+  {
+    minutesAgo: 5.02,
+    endpointIndex: 1,
+    eventType: "sms.status",
+    status: "failed",
+    statusCode: 500,
+    attempt: 1,
+    errorMessage: "Internal Server Error",
+    eventKey: "retried-status",
   },
   {
     minutesAgo: 12,
@@ -262,61 +275,108 @@ function buildHistoryDeliverySpecs(): DeliverySpec[] {
 export function buildWebhookDeliveryFixtures(
   webhookEndpoints: WebhookEndpointRecord[],
 ): WebhookDelivery[] {
-  return [...deliverySpecs, ...buildHistoryDeliverySpecs()].map(
-    (deliverySpec) => {
-      const webhookEndpoint = webhookEndpoints[deliverySpec.endpointIndex];
-      const requestBody = JSON.stringify(
-        { type: deliverySpec.eventType, data: {} },
-        null,
-        2,
-      );
-      const wasSent = deliverySpec.status !== "render_failed";
+  const eventIdsByKey = new Map<string, string>();
+  const readEventId = (deliverySpec: DeliverySpec) => {
+    const generatedEventId = `evt_${createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo))}`;
+    if (deliverySpec.eventKey === undefined) {
+      return generatedEventId;
+    }
+    if (!eventIdsByKey.has(deliverySpec.eventKey)) {
+      eventIdsByKey.set(deliverySpec.eventKey, generatedEventId);
+    }
 
-      return {
-        id: createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo)),
-        endpoint_id: webhookEndpoint?.id ?? "",
-        endpoint_name: webhookEndpoint?.name ?? "",
-        rule_id: null,
-        event_id: `evt_${createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo))}`,
-        event_type: deliverySpec.eventType,
-        subject_id: null,
-        trigger: deliverySpec.trigger ?? "auto",
-        attempt: deliverySpec.attempt ?? 1,
-        status: deliverySpec.status,
-        request: wasSent
-          ? {
-              method: "POST",
-              url: webhookEndpoint?.url ?? "",
-              headers: {
-                "content-type": "application/json",
-                "webhook-id": "evt_01JB...",
-                "webhook-timestamp": "1761321600",
-                "webhook-signature":
-                  "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-              },
-              body: requestBody,
-            }
+    return eventIdsByKey.get(deliverySpec.eventKey) ?? generatedEventId;
+  };
+
+  const allDeliverySpecs = [...deliverySpecs, ...buildHistoryDeliverySpecs()];
+  const hasLaterAttempt = (deliverySpec: DeliverySpec) =>
+    deliverySpec.eventKey !== undefined &&
+    allDeliverySpecs.some(
+      (otherSpec) =>
+        otherSpec.eventKey === deliverySpec.eventKey &&
+        (otherSpec.attempt ?? 1) > (deliverySpec.attempt ?? 1),
+    );
+
+  return allDeliverySpecs.map((deliverySpec) => {
+    const webhookEndpoint = webhookEndpoints[deliverySpec.endpointIndex];
+    const requestBody = JSON.stringify(
+      { type: deliverySpec.eventType, data: {} },
+      null,
+      2,
+    );
+    const wasSent = deliverySpec.status !== "render_failed";
+
+    return {
+      id: createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo)),
+      endpoint_id: webhookEndpoint?.id ?? "",
+      endpoint_name: webhookEndpoint?.name ?? "",
+      rule_id: null,
+      event_id: readEventId(deliverySpec),
+      event_type: deliverySpec.eventType,
+      subject_id: null,
+      trigger: deliverySpec.trigger ?? "auto",
+      attempt: deliverySpec.attempt ?? 1,
+      status: deliverySpec.status,
+      request: wasSent
+        ? {
+            method: "POST",
+            url: webhookEndpoint?.url ?? "",
+            headers: {
+              "content-type": "application/json",
+              "webhook-id": "evt_01JB...",
+              "webhook-timestamp": "1761321600",
+              "webhook-signature":
+                "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            },
+            body: requestBody,
+          }
+        : null,
+      response:
+        deliverySpec.statusCode === null
+          ? null
+          : {
+              status_code: deliverySpec.statusCode,
+              headers: { "content-type": "application/json" },
+              body:
+                deliverySpec.statusCode < 300
+                  ? '{"ok":true}'
+                  : '{"error":"boom"}',
+              is_body_truncated: false,
+            },
+      duration_ms: wasSent
+        ? 40 + Math.round((deliverySpec.minutesAgo * 13) % 400)
+        : null,
+      error_message: deliverySpec.errorMessage ?? null,
+      // Only the latest attempt of an event can still have one scheduled.
+      next_attempt_at:
+        deliverySpec.status === "failed" && !hasLaterAttempt(deliverySpec)
+          ? minutesAgo(-1)
           : null,
-        response:
-          deliverySpec.statusCode === null
-            ? null
-            : {
-                status_code: deliverySpec.statusCode,
-                headers: { "content-type": "application/json" },
-                body:
-                  deliverySpec.statusCode < 300
-                    ? '{"ok":true}'
-                    : '{"error":"boom"}',
-                is_body_truncated: false,
-              },
-        duration_ms: wasSent
-          ? 40 + Math.round((deliverySpec.minutesAgo * 13) % 400)
-          : null,
-        error_message: deliverySpec.errorMessage ?? null,
-        next_attempt_at:
-          deliverySpec.status === "failed" ? minutesAgo(-1) : null,
-        created_at: minutesAgo(deliverySpec.minutesAgo),
-      };
-    },
-  );
+      created_at: minutesAgo(deliverySpec.minutesAgo),
+    };
+  });
+}
+
+/**
+ * Points each email and SMS delivery at a stored message, so the detail can
+ * link to what caused it. Other events keep no subject.
+ */
+export function linkDeliverySubjects(
+  webhookDeliveries: WebhookDelivery[],
+  emailIds: string[],
+  smsIds: string[],
+): WebhookDelivery[] {
+  return webhookDeliveries.map((webhookDelivery, deliveryIndex) => {
+    const subjectIds = webhookDelivery.event_type.startsWith("email.")
+      ? emailIds
+      : webhookDelivery.event_type.startsWith("sms.")
+        ? smsIds
+        : [];
+
+    return {
+      ...webhookDelivery,
+      subject_id:
+        subjectIds[deliveryIndex % Math.max(1, subjectIds.length)] ?? null,
+    };
+  });
 }

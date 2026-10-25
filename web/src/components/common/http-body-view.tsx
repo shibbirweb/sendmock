@@ -1,5 +1,5 @@
 import { CopyButton } from "@/components/common/copy-button";
-import { formatHttpBody } from "@/features/logs/http/format-http-body";
+import { formatHttpBody } from "@/lib/format/format-http-body";
 
 /** A logged request or response body, formatted for reading (SM-13.4). */
 export function HttpBodyView({

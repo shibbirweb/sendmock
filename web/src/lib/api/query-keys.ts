@@ -1,5 +1,6 @@
 import type {
   ApiRequestLogFilters,
+  DeliveryListFilters,
   EmailListFilters,
   RulePreviewRequest,
   SmsListFilters,
@@ -52,7 +53,10 @@ export const queryKeys = {
     rules: ["webhooks", "rules"] as const,
     rulePreview: (previewRequest: RulePreviewRequest) =>
       ["webhooks", "rule-preview", previewRequest] as const,
-    deliveries: ["webhooks", "deliveries"] as const,
+    deliveries: (deliveryFilters: DeliveryListFilters) =>
+      ["webhooks", "deliveries", deliveryFilters] as const,
+    delivery: (deliveryId: string) =>
+      ["webhooks", "delivery", deliveryId] as const,
     templates: ["webhooks", "templates"] as const,
     variables: ["webhooks", "variables"] as const,
     saved: ["webhooks", "saved"] as const,

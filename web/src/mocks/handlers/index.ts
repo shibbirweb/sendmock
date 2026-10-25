@@ -11,6 +11,7 @@ import { smsHandlers } from "@/mocks/handlers/sms-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
+import { webhookDeliveryHandlers } from "@/mocks/handlers/webhook-delivery-handlers";
 import { webhookEndpointHandlers } from "@/mocks/handlers/webhook-endpoint-handlers";
 import { webhookHandlers } from "@/mocks/handlers/webhook-handlers";
 import { webhookRuleHandlers } from "@/mocks/handlers/webhook-rule-handlers";
@@ -35,6 +36,7 @@ export const mockHandlers = [
   ...webhookEndpointHandlers,
   ...webhookVariableHandlers,
   ...webhookRuleHandlers,
+  ...webhookDeliveryHandlers,
   ...webhookHandlers,
   realtimeConnectionHandler,
 ];

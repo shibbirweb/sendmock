@@ -21,7 +21,22 @@ export const realtimeConnectionHandler = realtimeLink.addEventListener(
   },
 );
 
-/** Sends an event to every connected UI tab, like the server's event bus. */
+type MockEventListener = (appEvent: AppEvent) => void;
+
+const mockEventListeners = new Set<MockEventListener>();
+
+/** Server-side subscribers (webhook rules), like the backend's event bus. */
+export function subscribeToMockEvents(
+  mockEventListener: MockEventListener,
+): () => void {
+  mockEventListeners.add(mockEventListener);
+
+  return () => {
+    mockEventListeners.delete(mockEventListener);
+  };
+}
+
+/** Sends an event to every connected UI tab and every server-side subscriber. */
 export function publishMockEvent(
   eventType: AppEventType | string,
   eventData: Record<string, unknown>,
@@ -34,4 +49,7 @@ export function publishMockEvent(
   };
 
   realtimeLink.broadcast(JSON.stringify(appEvent));
+  for (const mockEventListener of mockEventListeners) {
+    mockEventListener(appEvent);
+  }
 }

@@ -11,10 +11,16 @@ const eventAreaLabels: Record<string, string> = {
   test: "Test",
 };
 
+/** `webhook.delivered` only drives the live log; a rule on it could loop. */
+const unselectableEvents: AppEventType[] = ["webhook.delivered"];
+
 /** Events grouped by the part before the dot: email, sms, verify, ... */
 function groupEventsByArea(): [areaKey: string, events: AppEventType[]][] {
   const eventsByArea = new Map<string, AppEventType[]>();
-  for (const eventType of appEventTypes) {
+  const selectableEvents = appEventTypes.filter(
+    (eventType) => !unselectableEvents.includes(eventType),
+  );
+  for (const eventType of selectableEvents) {
     const areaKey = eventType.split(".")[0] ?? eventType;
     eventsByArea.set(areaKey, [
       ...(eventsByArea.get(areaKey) ?? []),
