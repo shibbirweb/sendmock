@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2 done: webhooks (endpoints, rules, deliveries, saved deliveries, templates, variables, the request editor, Send to webhook, the composer, the overview), the HTTP catcher, payments (list, checkout, gateways, methods, flows, settings) and replies (SMS reply webhook, inbound routes) built on mock data**; Phase U3 next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), starting with W1 design review guards (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 97 accepted, 10 / 419 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 99 accepted, 10 / 426 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Start Phase U3: the design review pass on every screen, then accessibility, performance with large data and the responsive check.
+2. Phase U3 in the order of [18-phase-u3.md](18-phase-u3.md): W1 design review guards first.
 
 ## How to update this file
 
@@ -38,7 +38,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 0 / 12 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -135,16 +135,21 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
 
+Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
+
 - [ ] Design review pass on every screen (hierarchy, spacing, microcopy, empty/loading/error states)
-- [ ] Accessibility pass (keyboard-only, focus, contrast, labels, reduced motion)
-- [ ] Performance with large data (virtualised lists, bundle under 250 KB gzipped, lazy editors)
-- [ ] Responsive check (split screen, tablet, phone)
-- [ ] Notification settings: pop-up toasts or bell only, header bell with unread count and a notification list ([07](07-ui.md#notifications), UI-08)
-- [ ] Feedback round on the preview URL, iterations done
-- [ ] Website landing page with Magic UI (animated beam, terminal, marquee, bento grid, number ticker)
-- [ ] Website docs structure drafted (`docs/wiki/`)
-- [ ] API reference and playground in Demo mode
-- [ ] OpenAPI contract frozen at `docs/api/openapi.yaml`
+  - [x] W1 Guards: design token check (UI-07.1), page titles on every screen (UI-07.4), simulated API errors for every endpoint, a shared error state, and a states test that opens every screen with errors, empty data and slow responses (UI-07.2), fixing what it catches
+  - [ ] W6 Pass: light and dark screenshots of every screen reviewed against the checklist (including the sidebar chevron on groups with sub-items); fixes made and the review table filled in
+- [ ] Notification settings: show or hide pop-up toasts, toast position, header bell with unread count and a notification list ([07](07-ui.md#notifications), UI-08) (W2)
+- [ ] Accessibility pass: axe on every screen in both themes, keyboard-only flows, focus, labels, reduced motion (UI-05) (W3)
+- [ ] Responsive check: every screen from 360 to 2560 wide, no horizontal scroll, panes and tables adapt (UI-01.1) (W4)
+- [ ] Performance with large data: initial JS under 250 KB gzipped, lazy routes and editors, virtualised lists, opening an email under 200 ms, `dist/` under 2 MB (UI-06) (W5)
+- [ ] OpenAPI contract frozen at `docs/api/openapi.yaml`, generated from an endpoint registry and the API types, with drift checks (UI-09) (W7)
+- [ ] Website landing page with Magic UI (animated beam, terminal, marquee, bento grid, number ticker), reduced motion, Lighthouse 90+ (WS-02) (W8)
+- [ ] Website docs structure drafted (`docs/wiki/`), synced into the site, links checked (W9)
+- [ ] API reference and playground in Demo mode: reference from the spec, request builder, snippets in nine languages, event stream, scenario mode (WS-04) (W10)
+- [ ] Community links and GitHub templates: Help menu (docs, shortcuts, changelog, report an issue, request a feature, security, star), website links, issue forms, PR template, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT (UI-10) (W12)
+- [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
 ## Stage B: Backend
@@ -388,3 +393,9 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Replies UI in detail ([07](07-ui.md)): the reply webhook result line under inbound SMS bubbles, the TwiML reply badge and the drawer's Reply webhook tab; Webhooks > Inbound routes with list, editor in Mailgun syntax and a live match preview with captured groups. New criterion WH-12.7. The Numbers part (inbound URL and fallback) was already built in U1. |
 | 2026-10-25 | SMS reply webhook built on mock data (Replies R1): inbound messages go to the Messaging Service or number URL with Twilio's form fields and headers, the fallback URL gets `ErrorCode` and `ErrorUrl` when the primary fails, and failures carry Twilio's codes (11200, 11205, 12100, 12300); the result line under inbound bubbles ("Reply webhook 200, 1 TwiML reply", "Fallback 200 after 11205", "Rules only"); `<Message>` TwiML becomes a reply in the thread with a TwiML reply badge that jumps to the message it answers, `<Redirect>` is followed up to 10 fetches; the drawer's Reply webhook tab shows each attempt's request, response and parsed TwiML with Resend reply webhook (`POST /sms/{smsId}/reply-webhook/resend`). In the demo the fixtures' app at localhost:8000 answers and other hosts refuse the connection, so the WhatsApp service shows its fallback. SM-09.7 has tests. |
 | 2026-10-25 | Inbound routes built on mock data (Replies R2, U2 complete): Webhooks > Inbound routes lists Mailgun-style routes by priority with their expression and action chips, reorders them (priority swap) and deletes them; the editor sheet builds the filter (match recipient, match header, catch all) and the actions (forward to URL, forward to email, store and notify, stop) in Mailgun syntax with `(?P<name>...)` groups usable as `\g<name>`, and previews "Matches N of the last 50 incoming emails" with captured groups and regex errors as you type. New incoming emails (replies and forwards as recipient) run the matching routes until `stop()`: forwards post Mailgun's multipart fields and appear in the email timeline and the delivery log, forwarding to an email follows the release allowlist. Mock API: `/api/v1/inbound-routes` with `POST /inbound-routes/test`. WH-12.7 has tests. |
+| 2026-10-26 | Plan: Phase U3 in full ([18](18-phase-u3.md)): the sign-off gate, eleven workstreams in order with branches, criteria and dependencies (W1 design review guards, W2 notifications, W3 accessibility, W4 responsive, W5 performance, W6 design review pass, W7 OpenAPI contract freeze, W8 landing page, W9 docs structure, W10 API reference and playground, W11 feedback and sign-off), each with its deliverables and tests. New feature UI-09 Contract freeze (3 criteria): the spec is generated from an endpoint registry and the API types, with drift checks in CI. |
+| 2026-10-26 | Plan: page titles and sidebar group chevrons ([18](18-phase-u3.md#w1-and-w6-design-review)): every screen sets its browser tab title `<Screen> · SendMock` (open item first), checked by the states test (new criterion UI-07.4, part of W1); sidebar items with sub-items show a rotating chevron (W6 fix list). |
+| 2026-10-26 | Plan: community links and GitHub templates ([18](18-phase-u3.md#w12-community-links-and-github-templates-ui-10), W12): a header Help menu and Settings > About links (docs, shortcuts, changelog, Report an issue and Request a feature as pre-filled GitHub issue forms, private security reporting, Star on GitHub), website header and footer links, issue forms (bug, feature, provider request, docs) with `config.yml`, a PR template, `SECURITY.md`, `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`. New feature UI-10 (2 criteria). |
+| 2026-10-26 | Plan: notification settings add the toast position ([18](18-phase-u3.md#w2-notifications-ui-08), [07](07-ui.md#notifications)): Settings > Notifications shows or hides pop-up toasts and picks where they appear (top or bottom, left, center or right) with a preview; the header bell at the top right shows the unread count and opens the notification list. New criterion UI-08.4. |
+| 2026-10-26 | Design review guards built (U3 W1): a unit test fails on Tailwind palette colours, `bg-white` / `text-black` and hex colours in class names (UI-07.1; the four found moved to the success and warning tokens); the demo's simulated 500 / 404 now apply to every endpoint through one mock handler; one shared `QueryErrorState` replaces thirteen copies and is added to the ten screens that had none (webhooks overview, inbound routes, composer, gateways, methods, flows, numbers, Messaging Services, both logs, HTTP catcher, which showed its onboarding on errors); every screen sets its tab title (`Gateways · Payments · SendMock`, the open email or number first; UI-07.4); a states test opens every screen with errors (message, navigation still works, recovery), slow responses (skeleton) and the empty data set (UI-07.2). The shared slider now names its focusable thumb (the demo latency and SMS failure rate sliders had no accessible name). |
+| 2026-10-26 | Plan: Settings > Payments test values follow each method's flow ([17](17-payments.md#ui)): test cards only for card form flows, OTP and PIN only when the flow has those steps, a row for methods without a deciding step (test account or fixed outcome), and an Offered by column naming the gateways, so custom methods and gateways show correctly. PY-09.4 reworded to match (reason: the table read stored values without the flow, so it showed OTP / PIN for voucher methods and hid account and fixed-outcome methods). |

@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 97 features, 10 / 419 criteria ticked.**
+**Accepted: 0 / 99 features, 10 / 426 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -130,8 +130,10 @@ On top of its own criteria, a feature is done only when:
 | [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 4 | In progress |
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Not started |
 | [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Not started |
-| [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 3 | Not started |
-| [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 3 | Not started |
+| [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 4 | In progress |
+| [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 4 | Not started |
+| [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | Not started |
+| [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | Not started |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 3 | Not started |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew), Phase 5 (all) | 2 | Not started |
