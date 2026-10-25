@@ -79,8 +79,9 @@
   --whatsapp-outbound-foreground: #111b21;
   --read-receipt: #0284c7;
   /* Positive outcomes such as an approved verification. */
-  --success: #059669;
-  --warning: #b45309;
+  /* Darker than emerald-600 so text on the success tint meets AA (UI-05.3). */
+  --success: #047857;
+  --warning: #92400e;
   /* Code editor highlighting (JSON and {{ }} template expressions). */
   --code-key: #2a78d6;
   --code-string: #047857;
@@ -91,10 +92,11 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* 5.5:1 on muted and 6:1 on the background (UI-05.3). */
+  --muted-foreground: oklch(0.5 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.505 0.213 27.518);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -173,6 +175,21 @@
 [data-checkout-theme] {
   --checkout-accent: var(--primary);
   --checkout-accent-foreground: var(--primary-foreground);
+}
+
+/*
+ * Reduced motion (UI-05.4): animations and transitions finish at once, so
+ * sheets, dialogs, toasts and skeletons appear without moving or pulsing.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer base {

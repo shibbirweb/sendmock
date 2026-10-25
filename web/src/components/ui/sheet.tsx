@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { cn } from "cn";
+
+import { useRestoreFocusOnClose } from "@/hooks/use-restore-focus-on-close";
 import { Dialog as SheetPrimitive } from "radix-ui";
 
 import { Button } from "@/components/ui/button";
@@ -50,15 +52,19 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
 }) {
+  const restoreFocusOnClose = useRestoreFocusOnClose(onCloseAutoFocus);
+
   return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
+        onCloseAutoFocus={restoreFocusOnClose}
         data-slot="sheet-content"
         data-side={side}
         className={cn(

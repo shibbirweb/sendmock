@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
 import { ImportTemplateDialog } from "@/features/webhooks/templates/import-template-dialog";
 import {
+  templateGalleryId,
   TemplatesFilterBar,
   type TemplateFilterChange,
 } from "@/features/webhooks/templates/templates-filter-bar";
@@ -124,6 +125,7 @@ export function TemplatesPage() {
             </p>
           )}
         <ul
+          id={templateGalleryId}
           aria-label="Templates"
           className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
         >

@@ -17,13 +17,25 @@ function AppFrame() {
 
   return (
     <SidebarProvider>
+      {/* The first tab stop: jumps past the sidebar and header (UI-05.1). */}
+      <a
+        href="#main-content"
+        className="sr-only z-50 rounded-md bg-background px-3 py-2 text-sm font-medium shadow focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-2 focus:ring-ring"
+      >
+        Skip to content
+      </a>
       <AppSidebar />
       {/* A fixed-height inset lets screens like Mail scroll their own panes. */}
       <SidebarInset className="h-svh overflow-hidden">
         <AppHeader />
-        <main className="flex min-h-0 flex-1 flex-col overflow-auto">
+        {/* SidebarInset is the page's <main>; this is where the skip link lands. */}
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-h-0 flex-1 flex-col overflow-auto outline-none"
+        >
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
       <CommandPalette />
       <ShortcutHelpDialog />

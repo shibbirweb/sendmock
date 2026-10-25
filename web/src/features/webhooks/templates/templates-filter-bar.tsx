@@ -25,6 +25,9 @@ export type TemplateFilterChange = {
 };
 
 /** Category tabs, name search and event picker above the gallery (WH-08.3). */
+/** The gallery the category tabs filter. */
+export const templateGalleryId = "template-gallery";
+
 export function TemplatesFilterBar({
   category,
   query,
@@ -51,9 +54,19 @@ export function TemplatesFilterBar({
           }}
         >
           <TabsList>
-            <TabsTrigger value={allCategories}>All</TabsTrigger>
+            {/* The tabs filter the gallery, so they control it rather than panels. */}
+            <TabsTrigger
+              value={allCategories}
+              aria-controls={templateGalleryId}
+            >
+              All
+            </TabsTrigger>
             {templateCategoryOrder.map((templateCategory) => (
-              <TabsTrigger key={templateCategory} value={templateCategory}>
+              <TabsTrigger
+                key={templateCategory}
+                value={templateCategory}
+                aria-controls={templateGalleryId}
+              >
                 {templateCategoryLabels[templateCategory]}
               </TabsTrigger>
             ))}

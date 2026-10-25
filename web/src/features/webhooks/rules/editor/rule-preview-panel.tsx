@@ -119,9 +119,11 @@ export function RulePreviewPanel({
           No recent message matches.
         </p>
       )}
+      {/* Focusable so keyboard users can scroll the matches (UI-05.1). */}
       <ul
         aria-label="Preview"
-        className="grid max-h-72 gap-0.5 overflow-y-auto"
+        tabIndex={0}
+        className="grid max-h-72 gap-0.5 overflow-y-auto rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         {visibleItems.map((previewItem) => (
           <PreviewItemRow
