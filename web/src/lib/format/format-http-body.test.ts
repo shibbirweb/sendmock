@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { formatHttpBody } from "@/features/logs/http/format-http-body";
+import { formatHttpBody } from "@/lib/format/format-http-body";
 
 describe("formatHttpBody", () => {
   test("SM-13.4 pretty-prints JSON", () => {

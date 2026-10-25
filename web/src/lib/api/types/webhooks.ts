@@ -1,4 +1,9 @@
-import type { CreatedBy, IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type {
+  CreatedBy,
+  IsoTimestamp,
+  PageRequest,
+  Ulid,
+} from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -163,6 +168,53 @@ export type WebhookDelivery = {
   error_message: string | null;
   next_attempt_at: IsoTimestamp | null;
   created_at: IsoTimestamp;
+};
+
+/** Query of GET /api/v1/webhooks/deliveries; `status` takes a comma-separated list. */
+export type DeliveryListFilters = PageRequest & {
+  status?: string;
+  endpoint_id?: string;
+  event_type?: AppEventType;
+};
+
+/** One attempt of the same event, for the detail's attempt list. */
+export type DeliveryAttemptSummary = {
+  delivery_id: Ulid;
+  attempt: number;
+  status: DeliveryStatus;
+  status_code: number | null;
+  created_at: IsoTimestamp;
+};
+
+/** The email or SMS that caused a delivery. */
+export type DeliverySubject = {
+  kind: "email" | "sms";
+  id: Ulid;
+  /** Subject, or the SMS body. */
+  title: string;
+  sms_thread_id: string | null;
+};
+
+/** GET /api/v1/webhooks/deliveries/{deliveryId} (WH-03.8). */
+export type WebhookDeliveryDetail = WebhookDelivery & {
+  max_attempts: number;
+  /** Every attempt of this event to this endpoint, oldest first. */
+  attempts: DeliveryAttemptSummary[];
+  subject: DeliverySubject | null;
+};
+
+/** Body of POST /api/v1/webhooks/deliveries/{deliveryId}/replay (WH-05.2). */
+export type DeliveryReplayRequest = {
+  rerender: boolean;
+  /** An edited body and headers; left out to resend the stored request. */
+  body?: string;
+  headers?: Record<string, string>;
+};
+
+/** Body of POST /api/v1/webhooks/saved. */
+export type SavedDeliveryInput = {
+  name: string;
+  delivery_id: Ulid;
 };
 
 export type VariableKind =

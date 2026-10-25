@@ -10,7 +10,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HttpBodyView } from "@/features/logs/http/http-body-view";
+import { HttpBodyView } from "@/components/common/http-body-view";
+import { HttpHeadersList } from "@/components/common/http-headers-list";
 import { HttpStatusBadge } from "@/components/common/http-status-badge";
 import { readApiLabel } from "@/features/logs/logs-labels";
 import { useApiRequest } from "@/lib/api/hooks/use-logs-queries";
@@ -68,8 +69,6 @@ function LinkedMessageButton({
 }
 
 function ApiRequestDetails({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
-  const headerEntries = Object.entries(apiRequest.request_headers);
-
   return (
     <div className="grid gap-4 px-4 pb-6">
       <div className="grid gap-2">
@@ -91,23 +90,10 @@ function ApiRequestDetails({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
           </div>
         )}
       </div>
-      <section aria-label="Request headers" className="grid gap-1.5">
-        <h4 className="text-xs font-medium text-muted-foreground">
-          Request headers
-        </h4>
-        {headerEntries.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No headers recorded</p>
-        ) : (
-          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border bg-muted/30 p-3 font-mono text-xs">
-            {headerEntries.map(([headerName, headerValue]) => (
-              <div key={headerName} className="contents">
-                <dt className="text-muted-foreground">{headerName}</dt>
-                <dd className="break-all">{headerValue}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </section>
+      <HttpHeadersList
+        title="Request headers"
+        headers={apiRequest.request_headers}
+      />
       <HttpBodyView
         title="Request body"
         bodyText={apiRequest.request_body}

@@ -25,6 +25,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `http.captured` | the HTTP catcher captured a request from your app (see [15-http-catcher.md](15-http-catcher.md)) |
 | `payment.*`, `checkout.*`, `subscription.*` | payment gateway emulation: created, authorized, succeeded, failed, canceled, refunded, disputes, checkout completed/expired, subscriptions (see [17-payments.md](17-payments.md#events)) |
 | `webhook.failed` | a delivery exhausted retries (useful to chain alerts) |
+| `webhook.delivered` | a delivery attempt finished, whatever the outcome; drives the live deliveries log and cannot be picked in rules, so a delivery never triggers another |
 | `test.ping` | "Send test" button on an endpoint |
 
 ## Opened events

@@ -93,16 +93,16 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
 | POST | `/webhooks/rules/preview` | which of the last 50 messages a filter would match: body `{ "events": [...], "filter": {...} }`, returns `checked_count`, `match_count` and the messages with `is_match` |
 | POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
-| GET | `/webhooks/deliveries` | delivery log with filters |
-| GET | `/webhooks/deliveries/{deliveryId}` | full request/response |
-| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend (optionally with edited body) |
+| GET | `/webhooks/deliveries` | delivery log, newest first and paged: `status` (comma-separated), `endpoint_id`, `event_type` |
+| GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
+| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables, or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |
 | GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables |
 | POST | `/webhooks/variables/{variableId}/regenerate` | refresh a Fixed random variable |
 | POST | `/webhooks/render` | render templates against a sample without sending |
 | GET | `/webhooks/template-reference` | functions, filters and context fields for autocomplete |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
-| GET/POST/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST /webhooks/saved/{savedId}/send` |
+| GET/POST/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST` takes `{ "name": ..., "delivery_id": ... }`; `POST /webhooks/saved/{savedId}/send` |
 | POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window (`{ "overlap_hours": 24 }`); the response carries the new masked secret and `previous_secret_expires_at` |
 | GET | `/webhooks/endpoints/{endpointId}/secret` | reveal the plain secret (the reveal is written to the API request log); everywhere else secrets are masked |
 

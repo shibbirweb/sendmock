@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints and rules built on mock data**; the deliveries log next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules and deliveries built on mock data**; saved deliveries next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 385 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 388 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: deliveries live log and detail.
+2. Continue Phase U2: saved deliveries (bookmarks).
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 2 / 13 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 3 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -110,7 +110,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [x] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables; Send test dialog, 24-hour success sparkline, Docker hint)
 - [x] Rules list and visual rule builder with match preview (firing order, endpoint filter, all / any groups with not, field-aware values, live preview of the last 50 messages)
-- [ ] Deliveries live log and detail (cURL, replay, re-render, edit and replay, cancel, `render_failed`)
+- [x] Deliveries live log and detail (cURL, replay, re-render, edit and replay, cancel, `render_failed`; paged with status, endpoint and event filters, every attempt of an event, Save)
 - [ ] Saved deliveries (bookmarks)
 - [ ] Templates gallery and detail
 - [ ] Template editor (clone, save from endpoint, import/export, revisions with diff)
@@ -336,3 +336,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Webhook endpoints built on mock data: table with enabled switch, 24-hour success sparkline and Docker hint; edit sheet with General, Template (searchable picker, link mode, header and field overrides), Security (confirmed reveal, rotation with overlap), Retries (validated delays, schedule preview) and Variables (template's required variables, text and secret endpoint variables); Send test result dialog. Mock fixtures gain a day of delivery history, so sparklines and the Overview chart show trends. |
 | 2026-10-25 | Plan: webhook rules screen in detail ([07](07-ui.md#webhooks)): ordered list with filter summaries and endpoint filter; editor sheet with grouped events and a filter builder (all / any groups, not toggle, one nested group, field-aware value inputs, inline checks); live preview against the last 50 messages. Matching semantics written down in [05](05-webhooks.md#rules-automatic-mode); `preview` request and response and `move` in the API plan; criteria WH-02.5 and WH-02.6. |
 | 2026-10-25 | Webhook rules built on mock data: ordered list with move up / down, event chips, plain-language filter summaries, enabled switch and an endpoint filter in the URL; editor sheet with grouped event checkboxes, a visual filter builder (all / any, not on rows and groups, one nested group, field-aware value pickers, inline checks) and a live preview of the last 50 messages. The filter engine (fields, operators, evaluation, validation, builder conversion, summaries) is shared by the UI and the mock API. |
+| 2026-10-25 | Plan: webhook deliveries in detail ([07](07-ui.md#webhooks)): paged live log with status, endpoint and event filters; detail drawer with request and response side by side, every attempt of the event, the causing message, and Copy as cURL, Replay (as-is or re-rendered), Edit and replay, Cancel retries and Save. API: log filters, detail extras, replay body and saved delivery body; criteria WH-03.7 to WH-03.9. |
+| 2026-10-25 | Webhook deliveries built on mock data: paged live log with status, endpoint and event filters; detail drawer with request and response side by side, every attempt of the event, the causing email or SMS, Copy as cURL, Replay as-is or re-rendered, Edit and replay (JSON checked), Cancel retries and Save. The mock now fires enabled matching rules in order when emails and SMS arrive, so deliveries appear live. `webhook.delivered` documented as the live-log event that rules cannot pick. |

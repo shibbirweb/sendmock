@@ -57,6 +57,7 @@ import {
   buildWebhookDeliveryFixtures,
   buildWebhookEndpointFixtures,
   buildWebhookRuleFixtures,
+  linkDeliverySubjects,
 } from "@/mocks/fixtures/webhook-fixtures";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
@@ -183,7 +184,11 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       smsMessages,
     ),
     webhookDeliveries: sortNewestFirst(
-      buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
+      linkDeliverySubjects(
+        buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
+        emails.map((email) => email.id),
+        smsMessages.map((smsMessage) => smsMessage.id),
+      ),
     ),
     capturedHttpRequests: sortNewestFirst(
       buildCapturedHttpRequestFixtures(configuration.httpBins),
