@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftIcon, EyeIcon } from "lucide-react";
+import { ArrowLeftIcon, EyeIcon, ForwardIcon, ReplyIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MailDetailActions } from "@/features/mail/detail/mail-detail-actions";
+import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
+import { EmailResponseLinks } from "@/features/mail/detail/response/email-response-links";
 import { EmailOutcomeBadge } from "@/features/mail/email-outcome-badge";
 import { emailSourceLabels } from "@/features/mail/mail-labels";
 import type { EmailAddress, EmailDetail } from "@/lib/api/types";
@@ -19,7 +21,13 @@ function formatAddressList(emailAddresses: EmailAddress[]): string {
     .join(", ");
 }
 
-export function MailDetailHeader({ email }: { email: EmailDetail }) {
+export function MailDetailHeader({
+  email,
+  onStartResponse,
+}: {
+  email: EmailDetail;
+  onStartResponse: (composerMode: EmailComposerMode) => void;
+}) {
   const addressRows = [
     { label: "From", value: formatAddressList([email.from]) },
     { label: "To", value: formatAddressList(email.to) },
@@ -42,7 +50,7 @@ export function MailDetailHeader({ email }: { email: EmailDetail }) {
         <h2 className="min-w-0 flex-1 text-lg leading-snug font-semibold break-words">
           {email.subject || "(no subject)"}
         </h2>
-        <MailDetailActions email={email} />
+        <MailDetailActions email={email} onStartResponse={onStartResponse} />
       </div>
       <dl className="grid grid-cols-[3rem_1fr] gap-x-2 gap-y-0.5 text-sm">
         {addressRows.map((addressRow) => (
@@ -59,6 +67,16 @@ export function MailDetailHeader({ email }: { email: EmailDetail }) {
         </dd>
       </dl>
       <div className="flex flex-wrap items-center gap-1.5">
+        {email.direction === "inbound" && (
+          <Badge variant="secondary">
+            {email.response_kind === "forward" ? (
+              <ForwardIcon />
+            ) : (
+              <ReplyIcon />
+            )}
+            Inbound
+          </Badge>
+        )}
         <Badge variant="outline">{emailSourceLabels[email.source]}</Badge>
         {email.tags.map((tagName) => (
           <Badge key={tagName} variant="secondary">
@@ -74,6 +92,7 @@ export function MailDetailHeader({ email }: { email: EmailDetail }) {
           </span>
         )}
       </div>
+      <EmailResponseLinks email={email} />
     </header>
   );
 }

@@ -16,6 +16,7 @@ import {
   createNotFoundResponse,
   includesText,
   paginateItems,
+  parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
@@ -35,6 +36,8 @@ function toEmailSummary(email: EmailDetail): EmailSummary {
     delivery_status: email.delivery_status,
     open_count: email.open_count,
     has_otp: email.has_otp,
+    direction: email.direction,
+    response_kind: email.response_kind,
   };
 }
 
@@ -45,6 +48,7 @@ function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
   const toFilter = searchParameters.get("to");
   const tagFilter = searchParameters.get("tag");
   const sourceFilter = searchParameters.get("source");
+  const directionFilter = searchParameters.get("direction");
 
   if (
     searchQuery &&
@@ -69,6 +73,9 @@ function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
   if (sourceFilter && email.source !== sourceFilter) {
     return false;
   }
+  if (directionFilter && email.direction !== directionFilter) {
+    return false;
+  }
   if (searchParameters.get("is_unread") === "true" && email.is_read) {
     return false;
   }
@@ -84,14 +91,6 @@ function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
 
 function findEmail(emailId: unknown): EmailDetail | undefined {
   return mockDatabase.emails.find((email) => email.id === emailId);
-}
-
-function parseAddress(addressText: string) {
-  const namedMatch = addressText.match(/^\s*"?([^"<]*)"?\s*<([^>]+)>\s*$/);
-
-  return namedMatch
-    ? { name: (namedMatch[1] ?? "").trim(), address: namedMatch[2] ?? "" }
-    : { name: "", address: addressText.trim() };
 }
 
 export const emailHandlers = [
@@ -112,8 +111,8 @@ export const emailHandlers = [
 
     const emailFixture = buildEmailFixture({
       minutesAgo: 0,
-      from: parseAddress(nativeSendRequest.from),
-      to: nativeSendRequest.to.map(parseAddress),
+      from: parseEmailAddress(nativeSendRequest.from),
+      to: nativeSendRequest.to.map(parseEmailAddress),
       subject: nativeSendRequest.subject,
       textBody: nativeSendRequest.text ?? null,
       htmlBody: nativeSendRequest.html ?? null,

@@ -204,6 +204,7 @@ export function buildDefaultSettings(): AppSettings {
     email_outcome_profile: "off",
     sms_simulation_profile: "realistic",
     sms_failure_rate_percent: 0,
+    inbound_email_domains: ["inbound.app.test", "reply.app.test"],
     is_strict_twilio_test_mode: false,
     fire_opened_events_on_view: true,
     opened_event_mode: "first_open",

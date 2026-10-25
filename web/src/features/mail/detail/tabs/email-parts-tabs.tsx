@@ -144,7 +144,7 @@ export function EmailTimelineTab({
         >
           <span className="absolute top-1.5 -left-[1.3rem] size-2 rounded-full bg-primary" />
           <span className="font-medium capitalize">
-            {timelineEntry.kind.replace("_", " ")}
+            {timelineEntry.kind.replaceAll("_", " ")}
           </span>
           <span className="text-muted-foreground">{timelineEntry.detail}</span>
           <time

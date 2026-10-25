@@ -1,5 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { KeyRoundIcon, PaperclipIcon } from "lucide-react";
+import {
+  ForwardIcon,
+  KeyRoundIcon,
+  PaperclipIcon,
+  ReplyIcon,
+} from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { emailSourceLabels } from "@/features/mail/mail-labels";
@@ -93,10 +98,21 @@ export function MailListItem({
             />
           )}
           <span className="min-w-0 truncate">{email.snippet}</span>
-          {email.source !== "smtp" && (
-            <span className="shrink-0 rounded border px-1 text-[10px] uppercase">
-              {emailSourceLabels[email.source]}
+          {email.direction === "inbound" ? (
+            <span className="flex shrink-0 items-center gap-0.5 rounded border px-1 text-[10px] uppercase">
+              {email.response_kind === "forward" ? (
+                <ForwardIcon className="size-3" aria-hidden="true" />
+              ) : (
+                <ReplyIcon className="size-3" aria-hidden="true" />
+              )}
+              Inbound
             </span>
+          ) : (
+            email.source !== "smtp" && (
+              <span className="shrink-0 rounded border px-1 text-[10px] uppercase">
+                {emailSourceLabels[email.source]}
+              </span>
+            )
           )}
           <EmailOutcomeBadge deliveryStatus={email.delivery_status} />
         </span>

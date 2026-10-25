@@ -11,6 +11,7 @@ const knownEmailSources: EmailSource[] = [
   "ses",
   "brevo",
   "verify",
+  "simulated",
 ];
 
 export type MailSearchChip = {
@@ -41,6 +42,11 @@ export function parseMailSearch(searchText: string): EmailListFilters {
       emailFilters.tag = tokenValue;
     } else if (normalizedKey === "is" && tokenValue === "unread") {
       emailFilters.is_unread = true;
+    } else if (
+      normalizedKey === "is" &&
+      (tokenValue === "inbound" || tokenValue === "outbound")
+    ) {
+      emailFilters.direction = tokenValue;
     } else if (normalizedKey === "has" && tokenValue === "attachment") {
       emailFilters.has_attachment = true;
     } else if (
@@ -64,6 +70,7 @@ export function parseMailSearch(searchText: string): EmailListFilters {
 export const mailSearchChips: MailSearchChip[] = [
   { label: "Unread", token: "is:unread" },
   { label: "Attachments", token: "has:attachment" },
+  { label: "Inbound", token: "is:inbound" },
   { label: "SendGrid", token: "source:sendgrid" },
   { label: "SMTP", token: "source:smtp" },
 ];
