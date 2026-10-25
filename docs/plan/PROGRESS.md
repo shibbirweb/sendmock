@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates and template suggestions built on mock data**; the variables screen next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions and variables built on mock data**; the request editor next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 96 accepted, 10 / 399 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 96 accepted, 10 / 402 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: variables screen (all kinds, masked secrets, regenerate).
+2. Continue Phase U2: request editor (CodeMirror, body modes, live preview, inline errors).
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 7 / 14 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 8 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -115,7 +115,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Templates gallery and detail (category tabs, search and event filter in the URL; request shape, doc link and live preview; Edit for built-in and custom templates with Reset to default; Use in new endpoint, Clone, Export, Delete with detach)
 - [x] Template editor (clone, save from endpoint, import/export, revisions with diff; New template, custom template details, Import with Replace or copy, History with Compare and Restore)
 - [x] Template reference panel and `{{` suggestions in the template editor ([12](12-webhook-variables.md#template-reference-and-suggestions), WH-07.9, WH-07.10)
-- [ ] Variables (all kinds, masked secrets, regenerate)
+- [x] Variables (all kinds, masked secrets, regenerate; scope, kind and name filters, Resolves to preview, suggestions for expressions)
 - [ ] Request editor: CodeMirror, `{{` autocomplete, body modes, live nunjucks preview, inline errors
 - [ ] Manual send dialog and composer (Prompt variables, overrides)
 - [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
@@ -350,3 +350,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Template editor built on mock data: New template opening in the editor, custom template name, description, events and required variables, Save as template from an endpoint (extra headers and fields folded in), Import from TOML or JSON with Replace or Import as copy on an id clash, and History (last 20 revisions) with Compare and Restore. Fixed: a name dialog inside the endpoint sheet also saved the endpoint. |
 | 2026-10-25 | Plan: template reference panel and `{{` suggestions ([12](12-webhook-variables.md#template-reference-and-suggestions)), WH-07.9 and WH-07.10, added as a U2 item before the request editor; notification settings with a bell-only mode, header bell and notification list ([07](07-ui.md#notifications)), new feature UI-08, scheduled in U3. |
 | 2026-10-25 | Template reference and suggestions built on mock data: the template editor has a searchable reference panel (event, data shaped by the template's events, vars, endpoint, delivery, rule, sendmock, request_id, functions and filters, each with type, description and an example; click to insert) and suggestions at the caret while typing inside `{{ }}` in the body and header values (keys, children after a dot, filters after `|`, functions; arrows, Enter or Tab, Esc). The reference lists exactly the functions and filters the preview renderer supports. |
+| 2026-10-25 | Plan: Variables screen in detail ([07](07-ui.md#webhooks)): table with scope, kind and name filters; add / edit sheet with fields per kind (JSON checked, secrets write-only, suggestions for Dynamic, Random and Computed, Random Per send or Fixed with Regenerate) and a Resolves to preview. API: per-kind checks, masked secrets, `fixed_value`, `POST /webhooks/variables/preview`; criteria WH-07.11 to WH-07.13. |
+| 2026-10-25 | Variables screen built on mock data: table of global and endpoint variables with scope (in the URL), kind and name filters; add / edit sheet with fields per kind (number, boolean switch, checked JSON, write-only secret that an empty edit keeps, Dynamic and Random expressions with suggestions, Computed templates, Prompt default), a Resolves to preview against the sample email whose errors block saving, and Fixed random values with Regenerate. The endpoint sheet's Variables tab links here for the other kinds. |

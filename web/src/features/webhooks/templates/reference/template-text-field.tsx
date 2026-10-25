@@ -16,6 +16,32 @@ import { cn } from "@/lib/utils";
 
 type TemplateField = HTMLTextAreaElement | HTMLInputElement;
 
+/** An expression field reads as if it sat inside `{{ ` so the same rules apply. */
+const expressionPrefix = "{{ ";
+
+function findFieldSuggestionQuery(
+  fieldText: string,
+  cursorIndex: number,
+  isExpression: boolean,
+): SuggestionQuery | null {
+  if (!isExpression) {
+    return findSuggestionQuery(fieldText, cursorIndex);
+  }
+
+  const prefixedQuery = findSuggestionQuery(
+    expressionPrefix + fieldText,
+    cursorIndex + expressionPrefix.length,
+  );
+
+  return prefixedQuery === null
+    ? null
+    : {
+        ...prefixedQuery,
+        replaceFromIndex:
+          prefixedQuery.replaceFromIndex - expressionPrefix.length,
+      };
+}
+
 type OpenSuggestions = {
   suggestionQuery: SuggestionQuery;
   suggestions: TemplateSuggestion[];
@@ -40,6 +66,7 @@ export function TemplateTextField({
   placeholder,
   className,
   fieldRef,
+  isExpression = false,
 }: {
   fieldId?: string;
   value: string;
@@ -53,6 +80,8 @@ export function TemplateTextField({
   className?: string;
   /** Lets a parent insert text at the caret, e.g. from the reference panel. */
   fieldRef?: React.RefObject<TemplateField | null>;
+  /** The whole field is one expression (no `{{ }}`), e.g. a Dynamic variable. */
+  isExpression?: boolean;
 }) {
   const listId = React.useId();
   const ownFieldRef = React.useRef<TemplateField | null>(null);
@@ -77,7 +106,7 @@ export function TemplateTextField({
     const suggestionQuery =
       templateReference === undefined
         ? null
-        : findSuggestionQuery(textField.value, cursorIndex);
+        : findFieldSuggestionQuery(textField.value, cursorIndex, isExpression);
     const suggestions =
       suggestionQuery === null || templateReference === undefined
         ? []

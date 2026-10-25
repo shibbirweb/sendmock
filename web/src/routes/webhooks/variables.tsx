@@ -1,19 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { VariableIcon } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { VariablesPage } from "@/features/webhooks/variables/variables-page";
+
+export type VariablesSearchParams = {
+  /** Show only this endpoint's variables; "global" for global ones. */
+  endpoint?: string;
+};
 
 export const Route = createFileRoute("/webhooks/variables")({
-  component: WebhookVariablesPage,
+  validateSearch: (
+    searchParams: Record<string, unknown>,
+  ): VariablesSearchParams => ({
+    endpoint:
+      typeof searchParams.endpoint === "string"
+        ? searchParams.endpoint
+        : undefined,
+  }),
+  component: VariablesPage,
 });
-
-function WebhookVariablesPage() {
-  return (
-    <PagePlaceholder
-      icon={VariableIcon}
-      title="Webhook variables"
-      description="Static, secret, dynamic, random, computed and prompt variables for templates."
-      plannedPhase="Phase U2"
-    />
-  );
-}

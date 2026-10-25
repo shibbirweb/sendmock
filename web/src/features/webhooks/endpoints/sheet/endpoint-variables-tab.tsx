@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
@@ -131,8 +132,16 @@ export function EndpointVariablesTab({
         </div>
         <p className="text-xs text-muted-foreground">
           Used as {"{{ vars.name }}"} by this endpoint only; they win over
-          global variables of the same name. Every variable kind comes with the
-          Variables screen.
+          global variables of the same name. Number, JSON, Dynamic, Random and
+          the other kinds are on the{" "}
+          <Link
+            to="/webhooks/variables"
+            search={{ endpoint: endpointId }}
+            className="underline underline-offset-4"
+          >
+            Variables screen
+          </Link>
+          .
         </p>
         {editState.mode === "new" && (
           <EndpointVariableForm
