@@ -2,19 +2,12 @@ import { http, HttpResponse } from "msw";
 
 import type {
   ForcedVerificationState,
-  InboundSmsRequest,
   SmsMessageDetail,
   SmsStatus,
   SmsThread,
   VerificationStatus,
 } from "@/lib/api/types";
-import { calculateSmsSegments } from "@/lib/sms/calculate-sms-segments";
 import { mockDatabase } from "@/mocks/db/mock-database";
-import {
-  createMockUlid,
-  createProviderId,
-  extractFixtureData,
-} from "@/mocks/fixtures/fixture-helpers";
 import {
   applyMockConditions,
   createErrorResponse,
@@ -23,6 +16,7 @@ import {
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { applySmsStatus } from "@/mocks/realtime/simulate-sms-delivery";
 
 function findSms(smsId: unknown): SmsMessageDetail | undefined {
   return mockDatabase.smsMessages.find((smsMessage) => smsMessage.id === smsId);
@@ -116,14 +110,11 @@ export const smsHandlers = [
       return createNotFoundResponse("SMS");
     }
 
-    const { status } = (await request.json()) as { status: SmsStatus };
-    smsMessage.status = status;
-    smsMessage.status_history.push({
-      status,
-      at: new Date().toISOString(),
-      error_code: null,
-    });
-    publishMockEvent("sms.status", { id: smsMessage.id, status });
+    const { status, error_code: errorCode } = (await request.json()) as {
+      status: SmsStatus;
+      error_code?: string | null;
+    };
+    applySmsStatus(smsMessage, status, errorCode ?? null);
 
     return HttpResponse.json(smsMessage);
   }),
@@ -147,44 +138,6 @@ export const smsHandlers = [
     publishMockEvent("sms.opened", { id: smsMessage.id });
 
     return new HttpResponse(null, { status: 204 });
-  }),
-
-  http.post("*/api/v1/sms/inbound", async ({ request }) => {
-    await applyMockConditions();
-    const inboundSmsRequest = (await request.json()) as InboundSmsRequest;
-    const segmentInfo = calculateSmsSegments(inboundSmsRequest.body);
-    const createdAt = new Date().toISOString();
-    const inboundMessage: SmsMessageDetail = {
-      id: createMockUlid(),
-      provider_id: createProviderId("SM"),
-      direction: "inbound",
-      channel: inboundSmsRequest.channel ?? "sms",
-      api: "twilio",
-      from_number: inboundSmsRequest.from,
-      to_number: inboundSmsRequest.to,
-      body: inboundSmsRequest.body,
-      encoding: segmentInfo.encoding,
-      segments: segmentInfo.segmentCount,
-      media_urls: [],
-      status: "received",
-      error_code: null,
-      status_callback_url: null,
-      messaging_service_sid: null,
-      account: null,
-      extracted: extractFixtureData(inboundSmsRequest.body),
-      opened_at: null,
-      open_count: 0,
-      created_at: createdAt,
-      updated_at: createdAt,
-      status_history: [{ status: "received", at: createdAt, error_code: null }],
-      request_body: null,
-      api_request_id: null,
-    };
-
-    mockDatabase.smsMessages.unshift(inboundMessage);
-    publishMockEvent("sms.inbound", { id: inboundMessage.id });
-
-    return HttpResponse.json(inboundMessage, { status: 201 });
   }),
 
   http.delete("*/api/v1/sms/:smsId", async ({ params }) => {

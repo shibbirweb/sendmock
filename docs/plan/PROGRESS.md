@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail screen done**; SMS, Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail screen done, SMS conversations done**; SMS drawer, Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: SMS and Verify screens next, then Numbers, Logs and Settings.
+2. Continue Phase U1: SMS message drawer and manual status, then Verify, Numbers, Logs and Settings.
 
 ## How to update this file
 
@@ -93,8 +93,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Mail detail: Attachments with thumbnails, MIME tree, Checks, Timeline, Template data
 - [x] Mail actions: read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, download, release, delete, bulk delete (tag editing and "send to webhook" follow with the webhook screens in U2)
 - [x] Extracted OTP/links panel, opened indicator, browser notifications (open history list follows with Logs)
-- [ ] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges)
-- [ ] SMS message drawer, inbound composer, manual status, simulate read
+- [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
+- [ ] SMS message drawer, inbound composer, manual status, simulate read (composer and simulate read done with the conversation view; drawer and manual status next)
 - [ ] Verify tab: verifications, timeline, force-state buttons, Verify services editor
 - [ ] Numbers registry and Messaging Services tab
 - [ ] Logs: SMTP sessions and transcript viewer
@@ -296,3 +296,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Phase U0 started on `feat/u0-ui-foundations`: web app shell, mock API with realtime events and demo controls, tests (27 unit, 7 end-to-end), CI and Pages workflows, website skeleton with Magic UI. Waiting on the GitHub repository for the remaining four items. Note: the demo-only mock chunk is 308 KB gzipped (faker data); the app bundle is 172 KB, inside budget. |
 | 2026-10-25 | PR #1 merged into `develop`: CI (Web UI, Acceptance traceability, Website) green on the PR and on `develop`; site live at https://shibbirweb.github.io/sendmock/ with the demo at `/demo/`. Rulesets protect `develop` and `main`; required status checks still to be added. |
 | 2026-10-25 | Mail screen built on mock data: virtual list with infinite loading, search with filter chips, keyboard shortcuts, sandboxed HTML preview with device widths and screenshot, Source/Headers/Attachments/MIME/Checks/Timeline/Template tabs, simulate open and delivery outcomes, release, bulk actions, browser notifications. Also: collapsed sidebar logo fixed, toasts dismissable. |
+| 2026-10-25 | SMS conversations built on mock data: thread list with search and SMS / WhatsApp chips, chat bubbles with WhatsApp styling, status ticks (queued, sent, delivered, read, failed with Twilio error code), segment, encoding, API and Messaging Service badges, OTP copy, read on view, "Simulate read", "Reply as recipient" composer. Mock sends now move through queued, sent and delivered live. Demo controls moved into the header so they never cover page content. |

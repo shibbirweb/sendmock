@@ -54,11 +54,12 @@ export function DevToolbar() {
       <PopoverTrigger asChild>
         <Button
           size="sm"
-          variant="secondary"
-          className="fixed right-4 bottom-4 z-50 gap-2 shadow-md"
+          variant="ghost"
+          aria-label="Demo controls"
+          className="gap-2"
         >
           <FlaskConicalIcon />
-          Demo controls
+          <span className="hidden lg:inline">Demo</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="grid w-80 gap-4">

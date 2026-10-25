@@ -17,7 +17,7 @@ import { Route as NumbersRouteImport } from './routes/numbers'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
-import { Route as SmsIndexRouteImport } from './routes/sms/index'
+import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
 import { Route as WebhooksDeliveriesRouteImport } from './routes/webhooks/deliveries'
 import { Route as WebhooksEndpointsRouteImport } from './routes/webhooks/endpoints'
@@ -25,6 +25,8 @@ import { Route as WebhooksRulesRouteImport } from './routes/webhooks/rules'
 import { Route as WebhooksSavedRouteImport } from './routes/webhooks/saved'
 import { Route as WebhooksTemplatesRouteImport } from './routes/webhooks/templates'
 import { Route as WebhooksVariablesRouteImport } from './routes/webhooks/variables'
+import { Route as SmsConversationsIndexRouteImport } from './routes/sms/_conversations/index'
+import { Route as SmsConversationsThreadIdRouteImport } from './routes/sms/_conversations/$threadId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -66,9 +68,9 @@ const MailEmailIdRoute = MailEmailIdRouteImport.update({
   path: '/$emailId',
   getParentRoute: () => MailRoute,
 } as any)
-const SmsIndexRoute = SmsIndexRouteImport.update({
-  id: '/sms/',
-  path: '/sms/',
+const SmsConversationsRoute = SmsConversationsRouteImport.update({
+  id: '/sms/_conversations',
+  path: '/sms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SmsVerifyRoute = SmsVerifyRouteImport.update({
@@ -106,6 +108,17 @@ const WebhooksVariablesRoute = WebhooksVariablesRouteImport.update({
   path: '/webhooks/variables',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SmsConversationsIndexRoute = SmsConversationsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SmsConversationsRoute,
+} as any)
+const SmsConversationsThreadIdRoute =
+  SmsConversationsThreadIdRouteImport.update({
+    id: '/$threadId',
+    path: '/$threadId',
+    getParentRoute: () => SmsConversationsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/numbers': typeof NumbersRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
+  '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
@@ -123,7 +137,8 @@ export interface FileRoutesByFullPath {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail/': typeof MailIndexRoute
-  '/sms/': typeof SmsIndexRoute
+  '/sms/$threadId': typeof SmsConversationsThreadIdRoute
+  '/sms/': typeof SmsConversationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,7 +155,8 @@ export interface FileRoutesByTo {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail': typeof MailIndexRoute
-  '/sms': typeof SmsIndexRoute
+  '/sms/$threadId': typeof SmsConversationsThreadIdRoute
+  '/sms': typeof SmsConversationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,6 +167,7 @@ export interface FileRoutesById {
   '/numbers': typeof NumbersRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
+  '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
   '/webhooks/endpoints': typeof WebhooksEndpointsRoute
@@ -159,7 +176,8 @@ export interface FileRoutesById {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail/': typeof MailIndexRoute
-  '/sms/': typeof SmsIndexRoute
+  '/sms/_conversations/$threadId': typeof SmsConversationsThreadIdRoute
+  '/sms/_conversations/': typeof SmsConversationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +189,7 @@ export interface FileRouteTypes {
     | '/numbers'
     | '/settings'
     | '/mail/$emailId'
+    | '/sms'
     | '/sms/verify'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
@@ -179,6 +198,7 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail/'
+    | '/sms/$threadId'
     | '/sms/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -196,6 +216,7 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail'
+    | '/sms/$threadId'
     | '/sms'
   id:
     | '__root__'
@@ -206,6 +227,7 @@ export interface FileRouteTypes {
     | '/numbers'
     | '/settings'
     | '/mail/$emailId'
+    | '/sms/_conversations'
     | '/sms/verify'
     | '/webhooks/deliveries'
     | '/webhooks/endpoints'
@@ -214,7 +236,8 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail/'
-    | '/sms/'
+    | '/sms/_conversations/$threadId'
+    | '/sms/_conversations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +247,7 @@ export interface RootRouteChildren {
   MailRoute: typeof MailRouteWithChildren
   NumbersRoute: typeof NumbersRoute
   SettingsRoute: typeof SettingsRoute
+  SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsVerifyRoute: typeof SmsVerifyRoute
   WebhooksDeliveriesRoute: typeof WebhooksDeliveriesRoute
   WebhooksEndpointsRoute: typeof WebhooksEndpointsRoute
@@ -231,7 +255,6 @@ export interface RootRouteChildren {
   WebhooksSavedRoute: typeof WebhooksSavedRoute
   WebhooksTemplatesRoute: typeof WebhooksTemplatesRoute
   WebhooksVariablesRoute: typeof WebhooksVariablesRoute
-  SmsIndexRoute: typeof SmsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,11 +315,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailEmailIdRouteImport
       parentRoute: typeof MailRoute
     }
-    '/sms/': {
-      id: '/sms/'
+    '/sms/_conversations': {
+      id: '/sms/_conversations'
       path: '/sms'
-      fullPath: '/sms/'
-      preLoaderRoute: typeof SmsIndexRouteImport
+      fullPath: '/sms'
+      preLoaderRoute: typeof SmsConversationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sms/verify': {
@@ -348,6 +371,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebhooksVariablesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sms/_conversations/': {
+      id: '/sms/_conversations/'
+      path: '/'
+      fullPath: '/sms/'
+      preLoaderRoute: typeof SmsConversationsIndexRouteImport
+      parentRoute: typeof SmsConversationsRoute
+    }
+    '/sms/_conversations/$threadId': {
+      id: '/sms/_conversations/$threadId'
+      path: '/$threadId'
+      fullPath: '/sms/$threadId'
+      preLoaderRoute: typeof SmsConversationsThreadIdRouteImport
+      parentRoute: typeof SmsConversationsRoute
+    }
   }
 }
 
@@ -363,6 +400,19 @@ const MailRouteChildren: MailRouteChildren = {
 
 const MailRouteWithChildren = MailRoute._addFileChildren(MailRouteChildren)
 
+interface SmsConversationsRouteChildren {
+  SmsConversationsThreadIdRoute: typeof SmsConversationsThreadIdRoute
+  SmsConversationsIndexRoute: typeof SmsConversationsIndexRoute
+}
+
+const SmsConversationsRouteChildren: SmsConversationsRouteChildren = {
+  SmsConversationsThreadIdRoute: SmsConversationsThreadIdRoute,
+  SmsConversationsIndexRoute: SmsConversationsIndexRoute,
+}
+
+const SmsConversationsRouteWithChildren =
+  SmsConversationsRoute._addFileChildren(SmsConversationsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HttpRoute: HttpRoute,
@@ -370,6 +420,7 @@ const rootRouteChildren: RootRouteChildren = {
   MailRoute: MailRouteWithChildren,
   NumbersRoute: NumbersRoute,
   SettingsRoute: SettingsRoute,
+  SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsVerifyRoute: SmsVerifyRoute,
   WebhooksDeliveriesRoute: WebhooksDeliveriesRoute,
   WebhooksEndpointsRoute: WebhooksEndpointsRoute,
@@ -377,7 +428,6 @@ const rootRouteChildren: RootRouteChildren = {
   WebhooksSavedRoute: WebhooksSavedRoute,
   WebhooksTemplatesRoute: WebhooksTemplatesRoute,
   WebhooksVariablesRoute: WebhooksVariablesRoute,
-  SmsIndexRoute: SmsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

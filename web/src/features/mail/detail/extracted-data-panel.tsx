@@ -1,36 +1,7 @@
-import {
-  CheckIcon,
-  CopyIcon,
-  ExternalLinkIcon,
-  KeyRoundIcon,
-} from "lucide-react";
-import * as React from "react";
+import { ExternalLinkIcon, KeyRoundIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/common/copy-button";
 import type { ExtractedData } from "@/lib/api/types";
-
-function CopyButton({ copyText, label }: { copyText: string; label: string }) {
-  const [isCopied, setIsCopied] = React.useState(false);
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="size-7"
-      aria-label={label}
-      onClick={() => {
-        void navigator.clipboard.writeText(copyText).then(() => {
-          setIsCopied(true);
-          setTimeout(() => {
-            setIsCopied(false);
-          }, 1500);
-        });
-      }}
-    >
-      {isCopied ? <CheckIcon /> : <CopyIcon />}
-    </Button>
-  );
-}
 
 /** OTP codes and links found in the email, one click to copy (EM-05.4). */
 export function ExtractedDataPanel({
