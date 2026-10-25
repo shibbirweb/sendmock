@@ -70,7 +70,7 @@ test("WH-09.1 an endpoint can be saved as a template with its overrides", async 
   await navigateInApp(page, "/webhooks/endpoints");
   await page.getByRole("button", { name: "Edit Team Slack alerts" }).click();
   const endpointSheet = page.getByRole("dialog", { name: "Team Slack alerts" });
-  await endpointSheet.getByRole("tab", { name: "Template" }).click();
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
   await endpointSheet.getByRole("button", { name: "Add header" }).click();
   await endpointSheet.getByLabel("Header 1 name").fill("X-Team");
   await endpointSheet.getByLabel("Header 1 value").fill("ops");
@@ -78,7 +78,7 @@ test("WH-09.1 an endpoint can be saved as a template with its overrides", async 
   await expect(endpointSheet).toBeHidden();
 
   await page.getByRole("button", { name: "Edit Team Slack alerts" }).click();
-  await endpointSheet.getByRole("tab", { name: "Template" }).click();
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
   await endpointSheet.getByRole("button", { name: "Save as template" }).click();
   const nameDialog = page.getByRole("dialog", { name: "Save as template" });
   await nameDialog.getByLabel("Name").fill("Slack with team header");

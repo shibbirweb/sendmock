@@ -17,6 +17,7 @@ import {
   useWebhookTemplates,
 } from "@/lib/api/hooks/use-webhook-queries";
 import type { WebhookEndpointInput } from "@/lib/api/types";
+import { defaultEndpointRequest } from "@/lib/webhooks/endpoint-request-defaults";
 import { readPort } from "@/lib/settings/build-connection-snippets";
 
 /** Native JSON to SendMock's own catcher, so a test lands in HTTP. */
@@ -36,6 +37,7 @@ function buildCatcherEndpointInput(httpPort: number): WebhookEndpointInput {
       retry_on_client_errors: false,
     },
     is_enabled: true,
+    ...defaultEndpointRequest,
   };
 }
 

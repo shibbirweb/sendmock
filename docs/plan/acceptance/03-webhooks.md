@@ -82,6 +82,8 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.11 The Variables screen lists global and endpoint variables with kind, value (secrets masked) and scope, and narrows them by scope, kind and name.
 - [ ] WH-07.12 Each kind has its own editor fields, checked the same way by the UI and the API (number, boolean, valid JSON, expressions that render), with a "Resolves to" preview against the sample; a secret is never shown again after saving.
 - [ ] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
+- [ ] WH-07.14 The request editor sets query params, headers and a body as Template, Fields, Raw or None, plus Strict or Lenient rendering; Fields always encode a valid JSON or form body, and Raw uses the code editor with highlighting, `{{` completion, hover values and an Insert menu.
+- [ ] WH-07.15 The live preview renders the method, URL, headers and body against the sample or a chosen message as you type, and each error or warning shows under the part it comes from and, in the code editor, at its line and column.
 
 ## WH-08 Built-in payload templates
 

@@ -78,6 +78,13 @@
   /* Positive outcomes such as an approved verification. */
   --success: #059669;
   --warning: #b45309;
+  /* Code editor highlighting (JSON and {{ }} template expressions). */
+  --code-key: #2a78d6;
+  --code-string: #047857;
+  --code-number: #b45309;
+  --code-literal: #7c3aed;
+  --code-expression: #0f766e;
+  --code-expression-background: rgb(13 148 136 / 10%);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -123,6 +130,12 @@
   --read-receipt: #38bdf8;
   --success: #34d399;
   --warning: #fbbf24;
+  --code-key: #60a5fa;
+  --code-string: #34d399;
+  --code-number: #fbbf24;
+  --code-literal: #c4b5fd;
+  --code-expression: #5eead4;
+  --code-expression-background: rgb(45 212 191 / 15%);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

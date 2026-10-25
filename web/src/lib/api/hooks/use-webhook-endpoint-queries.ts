@@ -1,8 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
+  EndpointPreviewRequest,
+  EndpointPreviewResult,
   RevealedEndpointSecret,
   WebhookDelivery,
   WebhookEndpoint,
@@ -45,6 +52,20 @@ export function useSaveWebhookEndpoint() {
             requestBody: endpointInput,
           }),
   );
+}
+
+/** An unsaved endpoint's request, rendered as it would be sent (WH-07.15). */
+export function useEndpointPreview(previewRequest: EndpointPreviewRequest) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.endpointPreview(previewRequest),
+    queryFn: ({ signal }) =>
+      requestApi<EndpointPreviewResult>("/webhooks/endpoints/preview", {
+        method: "POST",
+        requestBody: previewRequest,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
+  });
 }
 
 export function useDeleteWebhookEndpoint() {

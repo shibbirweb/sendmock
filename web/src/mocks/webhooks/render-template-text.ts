@@ -3,15 +3,85 @@ import { faker } from "@faker-js/faker/locale/en";
 /** Values a template can read: `event`, `data`, `vars`, `endpoint`, ... */
 export type TemplateContext = Record<string, unknown>;
 
+export type LocatedProblem = {
+  message: string;
+  severity: "error" | "warning";
+  /** 1-based, where the expression starts. */
+  line: number;
+  column: number;
+};
+
 type RenderOutcome = {
   renderedText: string;
   /** Undefined variables: they render empty. */
   warnings: string[];
   /** Unknown functions or filters and unbalanced braces: saving is refused. */
   errors: string[];
+  /** Every problem with its line and column, for editor markers (WH-07.15). */
+  locatedProblems: LocatedProblem[];
 };
 
-type RenderProblems = { warnings: string[]; errors: string[] };
+type RenderProblems = {
+  warnings: string[];
+  errors: string[];
+  located: {
+    message: string;
+    severity: "error" | "warning";
+    textIndex: number;
+  }[];
+  /** Where the expression being evaluated starts. */
+  currentIndex: number;
+};
+
+function reportProblem(
+  renderProblems: RenderProblems,
+  severity: "error" | "warning",
+  message: string,
+) {
+  (severity === "error" ? renderProblems.errors : renderProblems.warnings).push(
+    message,
+  );
+  renderProblems.located.push({
+    message,
+    severity,
+    textIndex: renderProblems.currentIndex,
+  });
+}
+
+function toLineAndColumn(
+  text: string,
+  textIndex: number,
+): { line: number; column: number } {
+  const textBefore = text.slice(0, textIndex);
+  const lineBreakCount = textBefore.split("\n").length - 1;
+
+  return {
+    line: lineBreakCount + 1,
+    column: textIndex - (textBefore.lastIndexOf("\n") + 1) + 1,
+  };
+}
+
+/** Where a `{{` or `}}` outside every complete expression is, or -1. */
+function findUnbalancedBraceIndex(templateText: string): number {
+  const coveredRanges = [...templateText.matchAll(expressionPattern)].map(
+    (expressionMatch) => [
+      expressionMatch.index,
+      expressionMatch.index + expressionMatch[0].length,
+    ],
+  );
+  const bracePattern = /\{\{|\}\}/g;
+  for (const braceMatch of templateText.matchAll(bracePattern)) {
+    const isCovered = coveredRanges.some(
+      ([rangeStart = 0, rangeEnd = 0]) =>
+        braceMatch.index >= rangeStart && braceMatch.index < rangeEnd,
+    );
+    if (!isCovered) {
+      return braceMatch.index;
+    }
+  }
+
+  return -1;
+}
 
 const expressionPattern = /\{\{\s*([\s\S]+?)\s*\}\}/g;
 const missingValue = Symbol("missing");
@@ -117,7 +187,11 @@ function evaluateOperand(
     const functionName = callMatch[1] ?? "";
     const templateFunction = templateFunctions[functionName];
     if (templateFunction === undefined) {
-      renderProblems.errors.push(`Unknown function: ${functionName}`);
+      reportProblem(
+        renderProblems,
+        "error",
+        `Unknown function: ${functionName}`,
+      );
       return reportedMissingValue;
     }
 
@@ -160,7 +234,7 @@ function evaluateExpression(
 
     const templateFilter = templateFilters[filterText];
     if (templateFilter === undefined) {
-      renderProblems.errors.push(`Unknown filter: ${filterText}`);
+      reportProblem(renderProblems, "error", `Unknown filter: ${filterText}`);
       continue;
     }
     if (
@@ -176,7 +250,11 @@ function evaluateExpression(
   }
   if (currentValue === missingValue) {
     if (!isDefaulted) {
-      renderProblems.warnings.push(`Undefined variable: ${operandText}`);
+      reportProblem(
+        renderProblems,
+        "warning",
+        `Undefined variable: ${operandText}`,
+      );
     }
     return "";
   }
@@ -194,22 +272,52 @@ export function renderTemplateText(
   templateText: string,
   templateContext: TemplateContext,
 ): RenderOutcome {
-  const renderProblems: RenderProblems = { warnings: [], errors: [] };
+  const renderProblems: RenderProblems = {
+    warnings: [],
+    errors: [],
+    located: [],
+    currentIndex: 0,
+  };
   const renderedText = templateText.replace(
     expressionPattern,
-    (_, expressionText: string) =>
-      evaluateExpression(expressionText, templateContext, renderProblems),
+    (_, expressionText: string, expressionIndex: number) => {
+      renderProblems.currentIndex = expressionIndex;
+      return evaluateExpression(
+        expressionText,
+        templateContext,
+        renderProblems,
+      );
+    },
   );
-  // Braces left over after rendering were never closed or never opened.
-  if (renderedText.includes("{{") || renderedText.includes("}}")) {
-    renderProblems.errors.push(
+  const unbalancedBraceIndex = findUnbalancedBraceIndex(templateText);
+  if (unbalancedBraceIndex !== -1) {
+    renderProblems.currentIndex = unbalancedBraceIndex;
+    reportProblem(
+      renderProblems,
+      "error",
       "Unbalanced {{ }}: every {{ needs a matching }}",
     );
   }
+  const locatedProblems = renderProblems.located.map(
+    ({ message, severity, textIndex }) => ({
+      message,
+      severity,
+      ...toLineAndColumn(templateText, textIndex),
+    }),
+  );
 
   return {
     renderedText,
     warnings: [...new Set(renderProblems.warnings)],
     errors: [...new Set(renderProblems.errors)],
+    locatedProblems: locatedProblems.filter(
+      (locatedProblem, problemIndex) =>
+        locatedProblems.findIndex(
+          (otherProblem) =>
+            otherProblem.message === locatedProblem.message &&
+            otherProblem.line === locatedProblem.line &&
+            otherProblem.column === locatedProblem.column,
+        ) === problemIndex,
+    ),
   };
 }

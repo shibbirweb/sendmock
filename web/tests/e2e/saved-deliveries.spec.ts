@@ -94,10 +94,10 @@ test("WH-10.2 a saved delivery can be sent to any endpoint and saved as a templa
 
   await navigateInApp(page, "/webhooks/endpoints");
   await page.getByRole("button", { name: "Edit Team Slack alerts" }).click();
-  await page.getByRole("tab", { name: "Template" }).click();
+  await page.getByRole("tab", { name: "Request" }).click();
   await page
     .getByRole("dialog", { name: "Team Slack alerts" })
-    .getByRole("combobox")
+    .getByRole("combobox", { name: "Template" })
     .click();
   await expect(
     page.getByRole("option", { name: "STOP reply template" }),

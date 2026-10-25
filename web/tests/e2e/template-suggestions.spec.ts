@@ -10,7 +10,9 @@ async function openSlackEditor(page: Page) {
     name: /Slack: incoming webhook/,
   });
   await templateSheet.getByRole("button", { name: "Edit" }).click();
-  const bodyField = templateSheet.getByLabel("Body template");
+  const bodyField = templateSheet.getByRole("textbox", {
+    name: "Body template",
+  });
   await bodyField.fill("");
   // Suggestions need the reference, which loads with the editor.
   await expect(
@@ -42,9 +44,9 @@ test("WH-07.9 the reference panel explains every value and inserts it", async ({
   ).toContainText("urlencode");
 
   await subjectEntry.click();
-  await expect(bodyField).toHaveValue("{{ data.subject }}");
+  await expect(bodyField).toHaveText("{{ data.subject }}");
   await referencePanel.getByRole("button", { name: /^lower/ }).click();
-  await expect(bodyField).toHaveValue("{{ data.subject }} | lower");
+  await expect(bodyField).toHaveText("{{ data.subject }} | lower");
 
   await referencePanel.getByLabel("Search the reference").fill("tenant");
   await expect(
@@ -72,19 +74,19 @@ test("WH-07.10 typing inside {{ }} suggests keys, children, filters and function
   ]);
   await bodyField.press("ArrowDown");
   await bodyField.press("Enter");
-  await expect(bodyField).toHaveValue("{{ event.type");
+  await expect(bodyField).toHaveText("{{ event.type");
 
   await bodyField.pressSequentially(" | lo");
   await expect(suggestions.getByRole("option")).toHaveText([/^lower/]);
   await bodyField.press("Tab");
-  await expect(bodyField).toHaveValue("{{ event.type | lower");
+  await expect(bodyField).toHaveText("{{ event.type | lower");
 
   await bodyField.pressSequentially(" }} {{ now");
   await expect(suggestions.getByRole("option").first()).toContainText(
     "now_unix",
   );
   await bodyField.press("Enter");
-  await expect(bodyField).toHaveValue("{{ event.type | lower }} {{ now_unix()");
+  await expect(bodyField).toHaveText("{{ event.type | lower }} {{ now_unix()");
 
   await bodyField.pressSequentially(" }} {{ da");
   await expect(suggestions).toBeVisible();

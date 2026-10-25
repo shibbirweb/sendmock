@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 
 import type {
+  EndpointPreviewRequest,
   RevealedEndpointSecret,
   RotateSecretRequest,
   WebhookEndpointInput,
@@ -16,6 +17,7 @@ import {
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { buildTestDelivery } from "@/mocks/webhooks/build-test-delivery";
+import { renderEndpointRequest } from "@/mocks/webhooks/render-endpoint-request";
 import {
   generateEndpointSecret,
   maskEndpointSecret,
@@ -55,6 +57,20 @@ export const webhookEndpointHandlers = [
       conditionResponse ??
       HttpResponse.json(mockDatabase.webhookEndpoints.map(presentEndpoint))
     );
+  }),
+
+  http.post("*/api/v1/webhooks/endpoints/preview", async ({ request }) => {
+    const conditionResponse = await applyMockConditions();
+    if (conditionResponse) {
+      return conditionResponse;
+    }
+
+    const previewRequest = (await request.json()) as EndpointPreviewRequest;
+    const previewResult = renderEndpointRequest(mockDatabase, previewRequest);
+
+    return previewResult === null
+      ? createNotFoundResponse("Message")
+      : HttpResponse.json(previewResult);
   }),
 
   http.post("*/api/v1/webhooks/endpoints", async ({ request }) => {

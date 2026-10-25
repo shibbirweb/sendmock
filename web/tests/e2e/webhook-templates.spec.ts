@@ -105,8 +105,8 @@ test("WH-08.5 Use in new endpoint opens the endpoint sheet with the template", a
 
   const addSheet = page.getByRole("dialog", { name: "Add an endpoint" });
   await expect(addSheet).toBeVisible();
-  await addSheet.getByRole("tab", { name: "Template" }).click();
-  await expect(addSheet.getByRole("combobox")).toHaveText(
+  await addSheet.getByRole("tab", { name: "Request" }).click();
+  await expect(addSheet.getByRole("combobox", { name: "Template" })).toHaveText(
     "Slack: incoming webhook",
   );
   await expect(page).toHaveURL(/\/webhooks\/endpoints$/);
@@ -139,8 +139,8 @@ test("WH-09.6 deleting a template in use detaches its endpoints first", async ({
   await page.goto("/webhooks/endpoints");
   await page.getByRole("button", { name: "Edit Team Slack alerts" }).click();
   const endpointSheet = page.getByRole("dialog", { name: "Team Slack alerts" });
-  await endpointSheet.getByRole("tab", { name: "Template" }).click();
-  await endpointSheet.getByRole("combobox").click();
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
+  await endpointSheet.getByRole("combobox", { name: "Template" }).click();
   await page
     .getByRole("option", { name: "Postmark inbound with tenant header" })
     .click();
@@ -196,7 +196,9 @@ test("WH-09.7 templates can be edited with a live preview; errors block saving",
 }) => {
   const templateSheet = await openTemplate(page, "Slack: incoming webhook");
   await templateSheet.getByRole("button", { name: "Edit" }).click();
-  const bodyField = templateSheet.getByLabel("Body template");
+  const bodyField = templateSheet.getByRole("textbox", {
+    name: "Body template",
+  });
   await bodyField.fill(
     '{ "text": "{{ data.subject | shout }} by {{ vars.team }}" }',
   );
@@ -239,7 +241,7 @@ test("WH-09.8 an edited built-in is Modified, used by endpoints, and resets to d
   const templateSheet = await openTemplate(page, "Slack: incoming webhook");
   await templateSheet.getByRole("button", { name: "Edit" }).click();
   await templateSheet
-    .getByLabel("Body template")
+    .getByRole("textbox", { name: "Body template" })
     .fill('{ "text": "{{ data.subject }}" }');
   await expect(
     templateSheet.getByRole("button", { name: "Save template" }),
@@ -259,7 +261,7 @@ test("WH-09.8 an edited built-in is Modified, used by endpoints, and resets to d
   });
   await page.getByRole("button", { name: "Edit Team Slack alerts" }).click();
   const endpointSheet = page.getByRole("dialog", { name: "Team Slack alerts" });
-  await endpointSheet.getByRole("tab", { name: "Template" }).click();
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
   await expect(endpointSheet).toContainText(
     "Based on Slack: incoming webhook rev 2",
   );

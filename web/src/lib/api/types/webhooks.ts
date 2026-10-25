@@ -16,6 +16,31 @@ export type RetryPolicy = {
 
 export type TemplateMode = "linked" | "detached";
 
+/** How an endpoint builds its body (WH-07.14). */
+export type EndpointBodyMode = "template" | "fields" | "raw" | "none";
+export type BodyFieldType = "text" | "number" | "boolean" | "json";
+export type RenderMode = "strict" | "lenient";
+
+/** A query param or header: a name and a template value. */
+export type NameValueTemplate = { name: string; value: string };
+
+/** One Fields-mode row; the value is a template, encoded as its type. */
+export type EndpointBodyField = {
+  name: string;
+  value_type: BodyFieldType;
+  value: string;
+};
+
+/** A render problem and where it comes from, e.g. "body" at line 3 (WH-07.15). */
+export type RenderProblem = {
+  message: string;
+  severity: "error" | "warning";
+  /** "url", "query.0", "header.0", "field.0" or "body". */
+  source: string;
+  line: number | null;
+  column: number | null;
+};
+
 export type WebhookEndpoint = {
   id: Ulid;
   name: string;
@@ -34,6 +59,13 @@ export type WebhookEndpoint = {
   timeout_ms: number;
   retry_policy: RetryPolicy;
   is_enabled: boolean;
+  query_params: NameValueTemplate[];
+  body_mode: EndpointBodyMode;
+  body_fields: EndpointBodyField[];
+  fields_encoding: "json" | "form";
+  raw_content_type: string;
+  raw_body: string;
+  render_mode: RenderMode;
   /** Success rate over the last 24 hours; null without finished deliveries. */
   success_rate: number | null;
   delivery_count_24h: number;
@@ -56,7 +88,32 @@ export type WebhookEndpointInput = Pick<
   | "timeout_ms"
   | "retry_policy"
   | "is_enabled"
+  | "query_params"
+  | "body_mode"
+  | "body_fields"
+  | "fields_encoding"
+  | "raw_content_type"
+  | "raw_body"
+  | "render_mode"
 >;
+
+/** Body of POST /api/v1/webhooks/endpoints/preview (WH-07.15). */
+export type EndpointPreviewRequest = {
+  endpoint: WebhookEndpointInput;
+  /** A saved endpoint's own variables are used too. */
+  endpoint_id?: Ulid;
+  email_id?: Ulid;
+  sms_id?: Ulid;
+};
+
+export type EndpointPreviewResult = {
+  rendered_against: string;
+  method: HttpMethod;
+  url: string;
+  headers: Record<string, string>;
+  body: string;
+  problems: RenderProblem[];
+};
 
 /** GET /api/v1/webhooks/endpoints/{endpointId}/secret (WH-01.3). */
 export type RevealedEndpointSecret = {
@@ -393,6 +450,8 @@ export type TemplateRenderResult = {
   warnings: string[];
   /** Problems that stop the template from being saved: unknown functions or filters, unbalanced braces. */
   errors: string[];
+  /** The same problems with where they are, for markers in the code editor. */
+  problems: RenderProblem[];
 };
 
 /** Body of POST /api/v1/webhooks/templates/{templateId}/clone. */

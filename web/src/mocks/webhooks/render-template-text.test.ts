@@ -15,7 +15,7 @@ describe("renderTemplateText", () => {
         "{{ data.subject | lower }} to {{ data.to[0].address | urlencode }} for {{ vars.tenant_id | upper }}",
         templateContext,
       ),
-    ).toEqual({
+    ).toMatchObject({
       renderedText: "hello world to a%40b.test for ACME",
       warnings: [],
       errors: [],
@@ -23,13 +23,13 @@ describe("renderTemplateText", () => {
   });
 
   test("WH-08.4 renders undefined values empty and lists them as warnings", () => {
-    expect(renderTemplateText("[{{ vars.missing }}]", templateContext)).toEqual(
-      {
-        renderedText: "[]",
-        warnings: ["Undefined variable: vars.missing"],
-        errors: [],
-      },
-    );
+    expect(
+      renderTemplateText("[{{ vars.missing }}]", templateContext),
+    ).toMatchObject({
+      renderedText: "[]",
+      warnings: ["Undefined variable: vars.missing"],
+      errors: [],
+    });
   });
 
   test("default fills missing values without a warning", () => {
@@ -38,7 +38,11 @@ describe("renderTemplateText", () => {
         '{{ data.body | default(data.subject) }} {{ vars.x | default("none") }}',
         templateContext,
       ),
-    ).toEqual({ renderedText: "Hello World none", warnings: [], errors: [] });
+    ).toMatchObject({
+      renderedText: "Hello World none",
+      warnings: [],
+      errors: [],
+    });
   });
 
   test("json, functions and unknown names", () => {
@@ -58,5 +62,38 @@ describe("renderTemplateText", () => {
     expect(
       renderTemplateText('{"a": "{{ data.subject }"}', templateContext).errors,
     ).toEqual(["Unbalanced {{ }}: every {{ needs a matching }}"]);
+  });
+
+  test("WH-07.15 problems carry the line and column of their expression", () => {
+    const renderOutcome = renderTemplateText(
+      '{\n  "a": "{{ vars.missing }}",\n  "b": "{{ data.subject | shout }}"\n}',
+      templateContext,
+    );
+
+    expect(renderOutcome.locatedProblems).toEqual([
+      {
+        message: "Undefined variable: vars.missing",
+        severity: "warning",
+        line: 2,
+        column: 9,
+      },
+      {
+        message: "Unknown filter: shout",
+        severity: "error",
+        line: 3,
+        column: 9,
+      },
+    ]);
+    expect(
+      renderTemplateText("x\n  {{ data.subject", templateContext)
+        .locatedProblems,
+    ).toEqual([
+      {
+        message: "Unbalanced {{ }}: every {{ needs a matching }}",
+        severity: "error",
+        line: 2,
+        column: 3,
+      },
+    ]);
   });
 });

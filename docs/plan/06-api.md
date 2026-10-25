@@ -87,7 +87,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET/POST/PATCH/DELETE | `/webhooks/endpoints` | manage endpoints; the list adds `delivery_count_24h` and `success_history` (24 hourly success rates, `null` for hours without deliveries) |
+| GET/POST/PATCH/DELETE | `/webhooks/endpoints` | manage endpoints (URL, `query_params`, headers, `body_mode` with its fields, raw body or template, `render_mode`); the list adds `delivery_count_24h` and `success_history` (24 hourly success rates, `null` for hours without deliveries) |
+| POST | `/webhooks/endpoints/preview` | render an unsaved endpoint request (URL, query params, headers, body in any mode, render mode) against the sample or `email_id` / `sms_id`; returns the rendered request and problems, each with where it comes from and, for templates, its line and column |
 | POST | `/webhooks/endpoints/{endpointId}/test` | send `test.ping` |
 | POST | `/webhooks/endpoints/{endpointId}/send` | manual send (email_id, sms_id, or raw payload) |
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
