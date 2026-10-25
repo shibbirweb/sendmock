@@ -17,15 +17,11 @@ import {
   createErrorResponse,
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
+import { buildPlaceholderSvg } from "@/mocks/fixtures/fixture-helpers";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function findEmail(emailId: unknown): EmailDetail | undefined {
   return mockDatabase.emails.find((email) => email.id === emailId);
-}
-
-/** A labelled placeholder image, used for image attachments and thumbnails. */
-function buildPlaceholderImage(label: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200"><rect width="320" height="200" fill="#e4e4e7"/><text x="160" y="105" font-family="sans-serif" font-size="16" fill="#52525b" text-anchor="middle">${label}</text></svg>`;
 }
 
 /** Wraps a handler that needs the email, answering 404 when it is missing. */
@@ -80,8 +76,21 @@ export const emailDetailHandlers = [
       if (!attachment) {
         return createNotFoundResponse("Attachment");
       }
+
+      // Files sent through the native API keep their real bytes.
+      const storedBytes = mockDatabase.attachmentContents.get(
+        `${email.id}/${attachmentIndex}`,
+      );
+      if (storedBytes !== undefined) {
+        return new HttpResponse(storedBytes.slice().buffer, {
+          headers: {
+            "Content-Type": attachment.content_type,
+            "Content-Disposition": `${attachment.is_inline ? "inline" : "attachment"}; filename="${attachment.filename}"`,
+          },
+        });
+      }
       if (attachment.content_type.startsWith("image/")) {
-        return new HttpResponse(buildPlaceholderImage(attachment.filename), {
+        return new HttpResponse(buildPlaceholderSvg(attachment.filename), {
           headers: { "Content-Type": "image/svg+xml" },
         });
       }
@@ -97,15 +106,22 @@ export const emailDetailHandlers = [
 
   http.get(
     "*/api/v1/emails/:emailId/parts/:attachmentIndex/thumbnail",
-    withEmail(
-      (email, _request, attachmentIndex) =>
-        new HttpResponse(
-          buildPlaceholderImage(
-            email.attachments[attachmentIndex]?.filename ?? "image",
-          ),
-          { headers: { "Content-Type": "image/svg+xml" } },
-        ),
-    ),
+    withEmail((email, _request, attachmentIndex) => {
+      const attachment = email.attachments[attachmentIndex];
+      const storedBytes = mockDatabase.attachmentContents.get(
+        `${email.id}/${attachmentIndex}`,
+      );
+      if (storedBytes !== undefined && attachment !== undefined) {
+        return new HttpResponse(storedBytes.slice().buffer, {
+          headers: { "Content-Type": attachment.content_type },
+        });
+      }
+
+      return new HttpResponse(
+        buildPlaceholderSvg(attachment?.filename ?? "image"),
+        { headers: { "Content-Type": "image/svg+xml" } },
+      );
+    }),
   ),
 
   http.get(

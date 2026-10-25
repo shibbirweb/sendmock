@@ -10,6 +10,8 @@ import type {
   SmsMessageDetail,
   SmtpSession,
   VerificationDetail,
+  SmsOutcomeRule,
+  EmailOutcomeRule,
   VerifyService,
   VirtualNumber,
   WebhookDelivery,
@@ -49,6 +51,10 @@ import {
   buildVirtualNumberFixtures,
 } from "@/mocks/fixtures/number-fixtures";
 import {
+  buildEmailOutcomeRuleFixtures,
+  buildSmsOutcomeRuleFixtures,
+} from "@/mocks/fixtures/outcome-rule-fixtures";
+import {
   buildWebhookDeliveryFixtures,
   buildWebhookEndpointFixtures,
   buildWebhookRuleFixtures,
@@ -56,13 +62,21 @@ import {
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
+  /** When the seed state was last applied (creation, reset or seed apply). */
+  seedAppliedAt: string;
   emails: EmailDetail[];
   emailTimelines: Map<string, EmailTimelineEntry[]>;
+  /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
+  attachmentContents: Map<string, Uint8Array>;
+  /** Bytes of SMS media sent inline, keyed `smsId/index`. */
+  smsMediaContents: Map<string, Uint8Array>;
   smsMessages: SmsMessageDetail[];
   verifyServices: VerifyService[];
   verifications: VerificationDetail[];
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
+  smsOutcomeRules: SmsOutcomeRule[];
+  emailOutcomeRules: EmailOutcomeRule[];
   webhookEndpoints: WebhookEndpoint[];
   webhookRules: WebhookRule[];
   webhookDeliveries: WebhookDelivery[];
@@ -105,7 +119,10 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    smsOutcomeRules: buildSmsOutcomeRuleFixtures(),
+    emailOutcomeRules: buildEmailOutcomeRuleFixtures(),
     settings: buildDefaultSettings(),
+    seedAppliedAt: new Date().toISOString(),
   };
 }
 
@@ -119,6 +136,8 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ...configuration,
       emails: [],
       emailTimelines: new Map(),
+      attachmentContents: new Map(),
+      smsMediaContents: new Map(),
       smsMessages: [],
       verifications: [],
       webhookDeliveries: [],
@@ -150,6 +169,8 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
   return {
     ...configuration,
     emails,
+    attachmentContents: new Map(),
+    smsMediaContents: new Map(),
     emailTimelines: new Map(
       emailFixtures.map((emailFixture) => [
         emailFixture.email.id,

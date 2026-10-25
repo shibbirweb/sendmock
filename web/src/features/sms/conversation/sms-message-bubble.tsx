@@ -3,6 +3,7 @@ import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { SmsMessageActions } from "@/features/sms/conversation/sms-message-actions";
+import { SmsMediaGallery } from "@/features/sms/media/sms-media-gallery";
 import { useSmsOpenOnView } from "@/features/sms/conversation/use-sms-open-on-view";
 import { smsApiLabels } from "@/features/sms/sms-labels";
 import { SmsStatusTicks } from "@/features/sms/sms-status-ticks";
@@ -58,6 +59,11 @@ function SmsMessageMeta({ smsMessage }: { smsMessage: SmsMessage }) {
         {smsMessage.segments} segment{smsMessage.segments === 1 ? "" : "s"},{" "}
         {smsMessage.encoding}
       </span>
+      {smsMessage.media.length > 0 && (
+        <span className="rounded border px-1 text-[10px] uppercase">
+          {smsMessage.channel === "whatsapp" ? "Media" : "MMS"}
+        </span>
+      )}
       {isOutbound && (
         <span className="rounded border px-1 text-[10px] uppercase">
           {smsApiLabels[smsMessage.api]}
@@ -90,21 +96,29 @@ export function SmsMessageBubble({ smsMessage }: { smsMessage: SmsMessage }) {
       )}
     >
       <div
+        ref={bubbleElementRef}
         className={cn(
           "flex max-w-[min(32rem,85%)] flex-col gap-1",
           isOutbound ? "items-end" : "items-start",
         )}
       >
-        <div
-          ref={bubbleElementRef}
-          data-sms-direction={smsMessage.direction}
-          className={cn(
-            "rounded-2xl px-3 py-2 text-sm break-words whitespace-pre-wrap",
-            bubbleColoursByKind[readBubbleKind(smsMessage)],
-          )}
-        >
-          {smsMessage.body}
-        </div>
+        {smsMessage.media.length > 0 && (
+          <SmsMediaGallery
+            mediaItems={smsMessage.media}
+            isOutbound={isOutbound}
+          />
+        )}
+        {smsMessage.body !== "" && (
+          <div
+            data-sms-direction={smsMessage.direction}
+            className={cn(
+              "rounded-2xl px-3 py-2 text-sm break-words whitespace-pre-wrap",
+              bubbleColoursByKind[readBubbleKind(smsMessage)],
+            )}
+          >
+            {smsMessage.body}
+          </div>
+        )}
         {smsMessage.extracted.otp.map((otpCode) => (
           <div
             key={otpCode}

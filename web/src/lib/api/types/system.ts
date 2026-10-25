@@ -106,18 +106,88 @@ export type AppInfo = {
 export type SmsSimulationProfile = "instant" | "realistic" | "manual";
 export type EmailOutcomeProfile = "off" | "auto-delivered" | "realistic";
 
+/** SMTP reply codes the chaos options can answer with. */
+export type ChaosSmtpRejectCode = 421 | 450 | 550 | 552;
+
 export type AppSettings = {
   max_emails: number;
   max_sms: number;
+  /** Null keeps traffic until the count limits prune it. */
   max_age_days: number | null;
   is_plus_address_tagging_enabled: boolean;
   email_outcome_profile: EmailOutcomeProfile;
+  /** Used by the `realistic` outcome profile. */
+  email_outcome_bounce_rate_percent: number;
+  email_outcome_complaint_rate_percent: number;
+  /** Relay for release and auto-forward; the password is always masked. */
+  relay_smtp_url: string | null;
+  /** Glob patterns; release stays off while this is empty. */
+  relay_recipient_allowlist: string[];
+  /** `host:port` of a SpamAssassin `spamd`; null turns the spam check off. */
+  spamassassin_address: string | null;
   sms_simulation_profile: SmsSimulationProfile;
   sms_failure_rate_percent: number;
   is_strict_twilio_test_mode: boolean;
+  /** Off: the built-in Twilio and SendMock numbers behave like any number. */
+  is_magic_numbers_enabled: boolean;
+  /** Off: the built-in magic addresses behave like any address. */
+  is_magic_addresses_enabled: boolean;
   fire_opened_events_on_view: boolean;
   opened_event_mode: "first_open" | "every_open";
+  chaos_smtp_reject_next_count: number;
+  chaos_smtp_reject_code: ChaosSmtpRejectCode;
+  /** Glob; matching recipients get `550 No such user`. */
+  chaos_smtp_reject_recipient_pattern: string | null;
+  chaos_smtp_command_latency_ms: number;
+  is_chaos_smtp_drop_during_data_enabled: boolean;
+  /** Ordered; the first capture group of the first match is the code. */
   otp_patterns: string[];
+  is_update_check_enabled: boolean;
   /** Mail for these domains is incoming; offered as Forward suggestions. */
   inbound_email_domains: string[];
+};
+
+/** Body of PATCH /api/v1/settings: only the changed keys. */
+export type AppSettingsUpdate = Partial<AppSettings>;
+
+export type SeedChangedItem = {
+  /** What kind of item, e.g. "Virtual number" or "Webhook endpoint". */
+  item_kind: string;
+  item_name: string;
+  change: "added" | "edited";
+};
+
+/** GET /api/v1/seed/status. */
+export type SeedStatus = {
+  source_path: string | null;
+  applied_at: IsoTimestamp | null;
+  /** Configuration added or edited since the seed was applied. */
+  changed_items: SeedChangedItem[];
+};
+
+export type SeedValidationError = {
+  line: number;
+  message: string;
+};
+
+/** Result of POST /api/v1/seed/validate (and of apply when invalid). */
+export type SeedValidation = {
+  is_valid: boolean;
+  errors: SeedValidationError[];
+  /** How many items of each kind the file would create or update. */
+  summary: { item_kind: string; item_count: number }[];
+};
+
+/** Body of POST /api/v1/seed/validate and /seed/apply. */
+export type SeedFileRequest = {
+  seed_toml: string;
+};
+
+/** GET /api/v1/updates (opt-in). */
+export type UpdateCheckResult = {
+  current_version: string;
+  latest_version: string;
+  is_update_available: boolean;
+  release_url: string;
+  checked_at: IsoTimestamp;
 };

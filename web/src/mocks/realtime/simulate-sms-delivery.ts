@@ -2,6 +2,7 @@ import type { SmsMessageDetail, SmsStatus } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildSmsCallbackAttempt } from "@/mocks/fixtures/sms-callback-builder";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import type { SmsOutcomePlan } from "@/mocks/realtime/outcome-plans";
 
 /** Delay before each step of the `realistic` profile, from the moment of sending. */
 const realisticStepDelaysMs: { status: SmsStatus; delayMs: number }[] = [
@@ -42,39 +43,105 @@ export function applySmsStatus(
   });
 }
 
+function isStillStored(smsMessage: SmsMessageDetail): boolean {
+  // The message may be deleted, or the database reset, before a step fires.
+  return mockDatabase.smsMessages.includes(smsMessage);
+}
+
 function applyStatusIfStillStored(
   smsMessage: SmsMessageDetail,
   smsStatus: SmsStatus,
+  errorCode: string | null = null,
 ) {
-  // The message may be deleted, or the database reset, before the step fires.
-  if (!mockDatabase.smsMessages.includes(smsMessage)) {
+  if (isStillStored(smsMessage)) {
+    applySmsStatus(smsMessage, smsStatus, errorCode);
+  }
+}
+
+function markReadIfStillStored(smsMessage: SmsMessageDetail) {
+  if (!isStillStored(smsMessage)) {
     return;
   }
 
-  applySmsStatus(smsMessage, smsStatus);
+  smsMessage.open_count += 1;
+  smsMessage.opened_at = smsMessage.opened_at ?? new Date().toISOString();
+  publishMockEvent("sms.opened", { id: smsMessage.id });
+}
+
+/** Runs `step` now for the instant profile, after `delayMs` otherwise. */
+function scheduleStep(isInstant: boolean, delayMs: number, step: () => void) {
+  if (isInstant) {
+    step();
+    return;
+  }
+
+  setTimeout(step, delayMs);
+}
+
+/**
+ * Plays a custom rule or magic number outcome (SM-07.8) after the message is
+ * sent: a failure status with its code, a late delivery, or delivered then read.
+ */
+function playOutcomePlan(
+  smsMessage: SmsMessageDetail,
+  outcomePlan: SmsOutcomePlan,
+) {
+  const isInstant = mockDatabase.settings.sms_simulation_profile === "instant";
+  const sentDelayMs = realisticStepDelaysMs[0]?.delayMs ?? 0;
+  const finalDelayMs = realisticStepDelaysMs[1]?.delayMs ?? 0;
+
+  scheduleStep(isInstant, sentDelayMs, () =>
+    applyStatusIfStillStored(smsMessage, "sent"),
+  );
+  if (
+    outcomePlan.outcome === "undelivered" ||
+    outcomePlan.outcome === "failed"
+  ) {
+    scheduleStep(isInstant, finalDelayMs, () =>
+      applyStatusIfStillStored(
+        smsMessage,
+        outcomePlan.outcome as SmsStatus,
+        outcomePlan.errorCode,
+      ),
+    );
+  } else if (outcomePlan.outcome === "delayed_delivery") {
+    // The delay is the point of this outcome, so it applies in every profile.
+    setTimeout(
+      () => applyStatusIfStillStored(smsMessage, "delivered"),
+      (outcomePlan.delaySeconds ?? 0) * 1000,
+    );
+  } else if (outcomePlan.outcome === "read") {
+    scheduleStep(isInstant, finalDelayMs, () => {
+      applyStatusIfStillStored(smsMessage, "delivered");
+      markReadIfStillStored(smsMessage);
+    });
+  }
 }
 
 /**
  * Moves a new outbound message through queued, sent and delivered following
  * the SMS simulation profile in Settings (SM-07.1): `manual` stops at sent
- * until a status is set from the message drawer.
+ * until a status is set from the message drawer. An outcome plan from a
+ * custom rule or magic number replaces the profile.
  */
-export function simulateSmsDelivery(smsMessage: SmsMessageDetail) {
-  const simulationProfile = mockDatabase.settings.sms_simulation_profile;
+export function simulateSmsDelivery(
+  smsMessage: SmsMessageDetail,
+  outcomePlan: SmsOutcomePlan | null = null,
+) {
+  if (outcomePlan !== null) {
+    playOutcomePlan(smsMessage, outcomePlan);
+    return;
+  }
 
+  const simulationProfile = mockDatabase.settings.sms_simulation_profile;
   if (simulationProfile === "manual") {
     applyStatusIfStillStored(smsMessage, "sent");
     return;
   }
 
   for (const deliveryStep of realisticStepDelaysMs) {
-    if (simulationProfile === "instant") {
-      applyStatusIfStillStored(smsMessage, deliveryStep.status);
-      continue;
-    }
-
-    setTimeout(() => {
-      applyStatusIfStillStored(smsMessage, deliveryStep.status);
-    }, deliveryStep.delayMs);
+    scheduleStep(simulationProfile === "instant", deliveryStep.delayMs, () =>
+      applyStatusIfStillStored(smsMessage, deliveryStep.status),
+    );
   }
 }

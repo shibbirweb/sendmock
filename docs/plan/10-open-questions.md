@@ -66,9 +66,9 @@ Recommendation: none. Opt-in update check only.
 
 Worth offering compatibility aliases so existing Mailpit-based test suites can switch with no code change? Recommendation: yes, as a stretch goal after 1.0 if there is demand.
 
-## 10. Persistence default
+## 10. Persistence default (decided 2026-10-25)
 
-In-memory by default (like MailHog) or on-disk SQLite by default (like Mailpit with `--database`)? Recommendation: on-disk at the OS data dir, with `--db memory` for CI, because webhook rules and endpoints should survive restarts.
+In-memory by default (like MailHog) or on-disk SQLite by default (like Mailpit with `--database`)? **Decided:** on-disk SQLite at the OS data directory, with `--db memory` for CI, because webhook rules and endpoints should survive restarts. See [Database: SQLite](02-architecture.md#database-sqlite).
 
 ## 11. caniemail data licence
 

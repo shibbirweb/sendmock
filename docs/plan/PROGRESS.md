@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers and Logs screens done**; Settings, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens done**; Overview dashboard and empty states, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 92 accepted, 5 / 329 criteria ticked; UI-01 and UI-02 in progress ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 373 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: Settings next, then the Overview dashboard and empty states.
+2. Finish Phase U1: the Overview dashboard and the empty states with "how to connect" and "send sample".
 
 ## How to update this file
 
@@ -36,12 +36,12 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 12 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 16 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
-| 2 | SMS and Verify backend | Not started | 0 / 11 |
+| 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
 | 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
@@ -96,12 +96,14 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Mail reply, reply all and forward as recipient: inline composer with the original in the body (Gmail style), Inbound badge, links between originals and replies, `is:inbound` search, R / Shift+R / F ([07](07-ui.md#mail), EM-17)
 - [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
 - [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
+- [x] SMS and WhatsApp media (MMS): thumbnails and file chips, drawer media list, attach in "Reply as recipient", Connection chips ([04](04-sms.md#mms-and-media), SM-15)
 - [x] Verify tab: verifications, timeline, force-state buttons, Verify services editor (live expiry countdown, status chips, link to the SMS with the code)
 - [x] Numbers registry and Messaging Services tab (inbound URL, method, fallback, format and status callback per number; sender pools with inbound handling)
 - [x] Logs: SMTP sessions and transcript viewer (failed sessions highlighted, colour-coded transcript, email to session links, 50 rows per page)
 - [x] Logs: HTTP API request log with rejected requests (filters by status class, API and path, formatted bodies, message links, 50 rows per page)
-- [ ] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns
-- [ ] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
+- [x] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns (per-section save with field errors; tag and forward rules follow with the U2 rule builder)
+- [x] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
+- [x] Custom outcome numbers and addresses with the Magic numbers and Magic addresses switches and "Test a number / address" boxes ([04](04-sms.md#custom-outcome-numbers), [03](03-email.md#delivery-outcome-simulation), SM-07.7 to SM-07.9, EM-10.5, EM-10.6)
 - [ ] Empty states with "how to connect" and "send sample"
 
 ### Phase U2: Webhook, HTTP catcher and payment screens
@@ -174,11 +176,12 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Native SMS API (JSON, form, GET)
 - [ ] Twilio Messages API and Messaging Services
+- [ ] MMS media: Twilio `MediaUrl`, native `media_urls` and inline `media`, `/sms/{smsId}/media/{mediaIndex}`
 - [ ] Vonage `/sms/json`
 - [ ] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state)
 - [ ] Provider port serving real provider paths
 - [ ] GSM-7/UCS-2 encoding and segments
-- [ ] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode)
+- [ ] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode, custom outcome numbers)
 - [ ] Status callbacks (Twilio, Vonage) and inbound SMS simulation
 - [ ] CLI `sms` / `verify`; MCP `sms`, `verify` toolsets
 - [ ] SMS and Verify screens switched to live mode
@@ -188,7 +191,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 - [ ] Endpoints, rules, persistent queue, retries, cancel
 - [ ] Standard Webhooks signing and secret rotation
-- [ ] Email delivery outcome simulation and events
+- [ ] Email delivery outcome simulation and events (including custom outcome addresses)
 - [ ] Opened events and `/open` endpoints
 - [ ] Twilio and Vonage inbound/status formats with signatures
 - [ ] SMS reply webhook (Twilio style): number and Messaging Service inbound URLs, TwiML replies, fallback URL, Twilio error codes (moved from Phase 4)
@@ -269,6 +272,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
 | 2026-10-25 | Commits authored as `MD. Shibbir Ahmed <shibbirweb@gmail.com>` (rule in `AGENTS.md`); existing local commits rewritten before the first push | [AGENTS.md](../../AGENTS.md#commits-and-pull-requests) |
 | 2026-10-25 | Product name **SendMock** (binary and packages `sendmock`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock) |
+| 2026-10-25 | SQLite is the only database: embedded (`rusqlite`, bundled, FTS5), one file, WAL mode, on disk at the OS data directory by default and `--db memory` for CI, hand-rolled `user_version` migrations | [02](02-architecture.md#database-sqlite) |
 
 ### Open
 
@@ -284,7 +288,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | Attachment storage | inside SQLite | Open (using recommendation) |
 | Telemetry | none, opt-in update check | Open (using recommendation) |
 | Mailpit API aliases | after 1.0 if demanded | Open |
-| Persistence default | on-disk, `--db memory` for CI | Open (using recommendation) |
+| Persistence default | on-disk SQLite, `--db memory` for CI | Decided 2026-10-25 |
 | caniemail data licence | confirm before shipping | Open |
 | Lenient vs strict provider emulation | lenient default, strict mode per provider | Open (using recommendation) |
 | Docs-site CORS default for local playground | allow docs origin, connect on click | Open |
@@ -312,3 +316,15 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Logs screen design ([07](07-ui.md#logs): SMTP sessions with a colour-coded transcript viewer and a link from each email to its session, HTTP API request log with formatted bodies, filters and message links) and criteria EM-09.4 and SM-13.4. |
 | 2026-10-25 | Logs screen built on mock data: SMTP sessions (failed ones highlighted with their reason, transcript viewer with C / S lines and reply codes coloured by class, each SMTP email linked to its session and back) and the API request log (status class, API and path filters, JSON and form bodies formatted, links to the SMS or email created and back). Both tables page 50 rows at a time and load more on scroll; the large data set now has about 5,000 sessions and 2,000 requests. Native sends are logged live. |
 | 2026-10-25 | Fix: `web/.gitignore` ignored every folder named `logs`, which hid `src/features/logs` from git, Tailwind, Prettier and ESLint; the rule is now anchored to the root (`/logs/`). Demo control labels are now tied to their selects. |
+| 2026-10-25 | Plan: Settings screen design ([07](07-ui.md#settings): section nav, per-section save with field errors, General, Seed, Email, SMS, Opened events, Chaos, OTP patterns, Connection, About), `/seed/validate` and `/seed/status` in the API plan, criteria PL-04.6, PL-05.3, PL-05.4 and EM-05.5. Tag and auto-forward rules are edited with the U2 rule builder. |
+| 2026-10-25 | Settings screen built on mock data: section nav (picker on phones) with a "Chaos on" badge, per-section Save / Discard with validation shared with the API, General (retention, delete all, reset to seed), Seed (status, export, validate with line numbers, apply), Email (plus addressing, outcome profile and rates, inbound domains, masked relay URL and allowlist, SpamAssassin, magic addresses), SMS (profile, failure rate, strict mode, magic numbers), Opened events, Chaos, OTP patterns with a live tester, Connection snippets for 8 languages and 3 app locations, About with the opt-in update check. Shared `RadioCardGroup`, `ChipListInput` and `ConfirmActionDialog`. |
+| 2026-10-25 | Plan: Settings > Connection gets "Customize the request" (request headers and the optional `/send` and `/sms` payload fields, reflected in every language's snippet), criterion PL-05.7. |
+| 2026-10-25 | Settings > Connection: "Customize the request" adds request headers (with a quick Authorization header) and editable JSON bodies with chips for the optional `/send` (`cc`, `bcc`, `text`, `tags`, `headers`) and `/sms` (`status_callback`, `metadata`) fields; every language's snippet follows in its own syntax. |
+| 2026-10-25 | Plan: native send `attachments` defined ([03](03-email.md#native-send-attachments): `filename`, base64 `content`, optional `content_type` and `content_id`, 400 errors naming the attachment), criteria EM-07.4, EM-07.5 and PL-05.8; Connection gets an `attachments` chip and `{{file:<name>}}` values that each snippet reads and encodes. |
+| 2026-10-25 | Plan: SQLite recorded as the database decision ([02](02-architecture.md#database-sqlite): why, location and modes, connection setup, migrations with `user_version`, search, retention, tests); persistence default decided. |
+| 2026-10-25 | Native send attachments in the mock (`/send` stores them with real bytes, inline `cid:` images display, 400 errors name the attachment) and an `attachments` chip in Connection, where `{{file:...}}` values make each snippet read and encode the file. |
+| 2026-10-25 | Plan: MMS and media ([04](04-sms.md#mms-and-media): Twilio `MediaUrl` with stored copies, native `media_urls` and inline base64 `media`, 10 items and 5 MB, `/sms/{smsId}/media/{mediaIndex}`, reply webhook `MediaUrl{N}`, UI thumbnails, drawer list and attach in the composer), feature SM-15 and criterion PL-05.9. |
+| 2026-10-25 | MMS and media built on mock data: native `/sms` accepts `media_urls` and inline base64 `media` (10 items, 5 MB, 400 errors naming the item), `/sms/{smsId}/media/{mediaIndex}` serves the files, bubbles show image thumbnails and file chips with an MMS / Media badge, the drawer lists media, "Reply as recipient" attaches files, Connection has `media` and `media_urls` chips. The demo includes an MMS booking with a QR code and PDF, and a WhatsApp photo. Email attachments and SMS media share one base64 file parser. |
+| 2026-10-25 | Settings > Connection: "Customize the request" gets a Reset button that restores the sample bodies and removes added headers; the email and SMS body columns now line up. |
+| 2026-10-25 | Plan: custom outcome numbers ([04](04-sms.md#custom-outcome-numbers)) and custom outcome addresses ([03](03-email.md#delivery-outcome-simulation)) as ordered, switchable rules checked before the read-only magic numbers and addresses, with Magic numbers / Magic addresses switches, "Test a number / address" boxes and `/outcome-rules/sms` and `/outcome-rules/email`; criteria SM-07.7 to SM-07.9, EM-10.5, EM-10.6. |
+| 2026-10-25 | Custom outcome numbers and addresses built on mock data: ordered rule tables with on / off, move, edit and delete, dialogs that ask only for what an outcome needs, "Test a number / address" boxes, Magic numbers and Magic addresses switches, rules exported to the seed file. Mock sends now follow custom rules and the magic numbers and addresses (reject on send, failure codes, delayed delivery, read, bounces). |

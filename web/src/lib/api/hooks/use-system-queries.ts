@@ -5,6 +5,8 @@ import { queryKeys } from "@/lib/api/query-keys";
 import type {
   AppInfo,
   AppSettings,
+  AppSettingsUpdate,
+  UpdateCheckResult,
   AppStats,
   CapturedHttpRequest,
   HttpBin,
@@ -39,7 +41,7 @@ export function useUpdateAppSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (settingsUpdate: Partial<AppSettings>) =>
+    mutationFn: (settingsUpdate: AppSettingsUpdate) =>
       requestApi<AppSettings>("/settings", {
         method: "PATCH",
         requestBody: settingsUpdate,
@@ -78,5 +80,12 @@ export function useCapturedHttpRequests(binId: string | null) {
         queryParameters: { bin_id: binId },
         abortSignal: signal,
       }),
+  });
+}
+
+/** Asks GitHub Releases for a newer version; only works once opted in. */
+export function useCheckForUpdates() {
+  return useMutation({
+    mutationFn: () => requestApi<UpdateCheckResult>("/updates"),
   });
 }

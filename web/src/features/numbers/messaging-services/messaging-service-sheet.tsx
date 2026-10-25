@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { FormField } from "@/components/common/form-field";
+import { RadioCardGroup } from "@/components/common/radio-card-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -71,39 +72,18 @@ function MessagingServiceForm({
           messagingServices={messagingServices}
           onToggle={togglePoolNumber}
         />
-        <fieldset className="grid gap-2">
-          <legend className="mb-1 text-sm font-medium">Inbound messages</legend>
-          {inboundModes.map((inboundMode) => {
-            const optionId = `${fieldIdPrefix}-mode-${inboundMode}`;
-
-            return (
-              <label
-                key={inboundMode}
-                htmlFor={optionId}
-                className="flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-sm has-checked:border-primary"
-              >
-                <input
-                  id={optionId}
-                  type="radio"
-                  name={`${fieldIdPrefix}-inbound-mode`}
-                  className="mt-0.5 accent-primary"
-                  checked={formValues.inboundMode === inboundMode}
-                  onChange={() => {
-                    updateFormValues({ inboundMode });
-                  }}
-                />
-                <span className="grid gap-0.5">
-                  <span className="font-medium">
-                    {inboundModeLabels[inboundMode]}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {inboundModeDescriptions[inboundMode]}
-                  </span>
-                </span>
-              </label>
-            );
-          })}
-        </fieldset>
+        <RadioCardGroup
+          legend="Inbound messages"
+          options={inboundModes.map((inboundMode) => ({
+            value: inboundMode,
+            label: inboundModeLabels[inboundMode],
+            description: inboundModeDescriptions[inboundMode],
+          }))}
+          selectedValue={formValues.inboundMode}
+          onSelect={(inboundMode) => {
+            updateFormValues({ inboundMode });
+          }}
+        />
         {formValues.inboundMode === "webhook" && (
           <div className="grid gap-3">
             <FormField

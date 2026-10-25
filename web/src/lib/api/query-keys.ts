@@ -71,9 +71,15 @@ export const queryKeys = {
     apiRequest: (requestId: string) =>
       ["logs", "http-request", requestId] as const,
   },
+  outcomeRules: {
+    all: ["outcome-rules"] as const,
+    sms: ["outcome-rules", "sms"] as const,
+    email: ["outcome-rules", "email"] as const,
+  },
   system: {
     stats: ["system", "stats"] as const,
     info: ["system", "info"] as const,
     settings: ["system", "settings"] as const,
+    seedStatus: ["system", "seed-status"] as const,
   },
 };

@@ -55,13 +55,14 @@ Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
 
 ## PL-04 Seed file and reset
 
-Phase 0 (parse, validate), Phase 3 (full coverage).
+UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage).
 
 - [ ] PL-04.1 A seed file creates every supported item type; starting twice with the same seed changes nothing (idempotent).
 - [ ] PL-04.2 `${ENV_VAR}` references resolve; literal secrets are never written by export.
 - [ ] PL-04.3 `reset` wipes all traffic and restores exactly the seed state.
 - [ ] PL-04.4 `seed export` then `seed apply` on a fresh instance reproduces the same configuration.
 - [ ] PL-04.5 `seed validate` reports errors with file line numbers and changes nothing.
+- [ ] PL-04.6 Settings > Seed shows the seed status, exports the file, and validates then applies an uploaded or pasted file after a confirmation.
 
 ## PL-05 Settings
 
@@ -69,6 +70,13 @@ UI in U1, backend per feature phase.
 
 - [ ] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`.
 - [ ] PL-05.2 Invalid values are rejected with a field-level error.
+- [ ] PL-05.3 Each section saves only its own changes, Save is disabled until something changed, and Discard restores the saved values.
+- [ ] PL-05.4 Reset to seed and the delete-all buttons ask for confirmation before acting.
+- [ ] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`.
+- [ ] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged.
+- [ ] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body.
+- [ ] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips.
+- [ ] PL-05.6 About shows the version, channel, listeners and database, and the update check never runs until it is turned on.
 
 ## PL-06 Security defaults
 

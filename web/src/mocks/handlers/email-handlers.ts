@@ -4,21 +4,17 @@ import type {
   EmailDetail,
   EmailSummary,
   EmailUpdate,
-  NativeSendRequest,
   OpenSource,
   SimulatedEmailOutcome,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
-import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import {
   applyMockConditions,
-  createErrorResponse,
   createNotFoundResponse,
   includesText,
   paginateItems,
-  parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
-import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
+import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function toEmailSummary(email: EmailDetail): EmailSummary {
@@ -95,67 +91,6 @@ function findEmail(emailId: unknown): EmailDetail | undefined {
 }
 
 export const emailHandlers = [
-  http.post("*/api/v1/send", async ({ request }) => {
-    const conditionResponse = await applyMockConditions();
-    if (conditionResponse) {
-      return conditionResponse;
-    }
-
-    const nativeSendRequest = (await request.json()) as NativeSendRequest;
-    if (!nativeSendRequest.from || (nativeSendRequest.to ?? []).length === 0) {
-      recordNativeApiRequest({
-        path: "/api/v1/send",
-        requestBody: nativeSendRequest,
-        responseStatus: 400,
-        responseBody: {
-          error: {
-            code: "invalid_request",
-            message: "from and to are required",
-          },
-        },
-      });
-
-      return createErrorResponse(
-        400,
-        "invalid_request",
-        "from and to are required",
-      );
-    }
-
-    const emailFixture = buildEmailFixture({
-      minutesAgo: 0,
-      from: parseEmailAddress(nativeSendRequest.from),
-      to: nativeSendRequest.to.map(parseEmailAddress),
-      subject: nativeSendRequest.subject,
-      textBody: nativeSendRequest.text ?? null,
-      htmlBody: nativeSendRequest.html ?? null,
-      tags: nativeSendRequest.tags ?? [],
-      source: "native_api",
-    });
-    recordNativeApiRequest({
-      path: "/api/v1/send",
-      requestBody: nativeSendRequest,
-      responseStatus: 201,
-      responseBody: { id: emailFixture.email.id },
-      linkedMessage: {
-        kind: "email",
-        id: emailFixture.email.id,
-        sms_thread_id: null,
-      },
-    });
-    mockDatabase.emails.unshift(emailFixture.email);
-    mockDatabase.emailTimelines.set(
-      emailFixture.email.id,
-      emailFixture.timeline,
-    );
-    publishMockEvent("email.received", {
-      id: emailFixture.email.id,
-      subject: emailFixture.email.subject,
-    });
-
-    return HttpResponse.json({ id: emailFixture.email.id }, { status: 201 });
-  }),
-
   http.get("*/api/v1/emails", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
     if (conditionResponse) {
@@ -234,13 +169,11 @@ export const emailHandlers = [
       }
 
       const simulatedOutcome = (await request.json()) as SimulatedEmailOutcome;
-      email.delivery_status = simulatedOutcome.event;
-      mockDatabase.emailTimelines.get(email.id)?.push({
-        kind: simulatedOutcome.event,
-        at: new Date().toISOString(),
-        detail: `Simulated ${simulatedOutcome.event}`,
-      });
-      publishMockEvent(`email.${simulatedOutcome.event}`, { id: email.id });
+      applyEmailOutcome(
+        email,
+        simulatedOutcome.event,
+        `Simulated ${simulatedOutcome.event}`,
+      );
 
       return new HttpResponse(null, { status: 204 });
     },

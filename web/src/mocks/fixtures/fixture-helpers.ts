@@ -59,3 +59,10 @@ export function extractFixtureData(messageText: string): ExtractedData {
 export function seedFixtureRandomness() {
   faker.seed(2026);
 }
+
+/** A labelled placeholder image for demo attachments and media. */
+export function buildPlaceholderSvg(label: string): string {
+  const safeLabel = label.replace(/[<>&"]/g, "");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200"><rect width="320" height="200" fill="#e4e4e7"/><text x="160" y="105" font-family="sans-serif" font-size="14" fill="#52525b" text-anchor="middle">${safeLabel}</text></svg>`;
+}

@@ -102,6 +102,10 @@ export function useOpenSms() {
   );
 }
 
+export function useDeleteAllSms() {
+  return useSmsMutation(() => requestApi<void>("/sms", { method: "DELETE" }));
+}
+
 export function useDeleteSms() {
   return useSmsMutation((smsId: string) =>
     requestApi<void>(`/sms/${smsId}`, { method: "DELETE" }),

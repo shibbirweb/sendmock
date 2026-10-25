@@ -10,6 +10,7 @@ import {
   createProviderId,
   extractFixtureData,
 } from "@/mocks/fixtures/fixture-helpers";
+import { type ParsedSmsMedia, toSmsMedia } from "@/mocks/fixtures/sms-media";
 
 type NewSmsMessageSpec = {
   direction: SmsDirection;
@@ -19,6 +20,7 @@ type NewSmsMessageSpec = {
   toNumber: string;
   body: string;
   statusCallbackUrl?: string | null;
+  parsedMedia?: ParsedSmsMedia[];
 };
 
 /**
@@ -32,9 +34,10 @@ export function buildNewSmsMessage(
   const createdAt = new Date().toISOString();
   const isOutbound = smsSpec.direction === "outbound";
   const initialStatus = isOutbound ? "queued" : "received";
+  const smsId = createMockUlid();
 
   return {
-    id: createMockUlid(),
+    id: smsId,
     provider_id: createProviderId("SM"),
     direction: smsSpec.direction,
     channel: smsSpec.channel,
@@ -44,7 +47,7 @@ export function buildNewSmsMessage(
     body: smsSpec.body,
     encoding: segmentInfo.encoding,
     segments: segmentInfo.segmentCount,
-    media_urls: [],
+    media: toSmsMedia(smsId, smsSpec.parsedMedia ?? []),
     status: initialStatus,
     error_code: null,
     status_callback_url: smsSpec.statusCallbackUrl ?? null,

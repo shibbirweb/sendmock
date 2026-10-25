@@ -63,6 +63,9 @@ Phase 2. Docs: [Delivery simulation](../04-sms.md#delivery-simulation).
 - [ ] SM-07.4 Strict Twilio test mode rejects non-magic `From` numbers with `21606`.
 - [ ] SM-07.5 A failure rate of N% marks about N% of messages `undelivered`/`failed` over 1,000 sends (within 5 points).
 - [ ] SM-07.6 Every transition is stored in the status history and shown in the message drawer.
+- [ ] SM-07.7 Custom outcome numbers can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file, with the code and delay rules enforced.
+- [ ] SM-07.8 The first enabled matching custom rule wins over magic numbers and the profile, `*` patterns match any digits, and each outcome (`reject`, `undelivered`, `failed`, `delayed_delivery`, `read`) behaves as documented.
+- [ ] SM-07.9 With the Magic numbers switch off, `+15005550xxx` numbers behave like any other number; "Test a number" shows which rule, magic number or profile applies.
 
 ## SM-08 Status callbacks
 
@@ -125,6 +128,16 @@ Phase 2.
 - [ ] SM-14.1 With `--provider-addr`, provider routes answer at their real root paths (Twilio, Verify, Messaging Services, email providers).
 - [ ] SM-14.2 The same routes answer under `/providers/<name>/` on the main port.
 - [ ] SM-14.3 `--provider-port <provider>=<port>` gives a provider its own port.
+
+## SM-15 MMS and media
+
+UI in U1, backend Phase 2 (Twilio and native), Phase 4 (WhatsApp). Docs: [MMS and media](../04-sms.md#mms-and-media).
+
+- [ ] SM-15.1 A Twilio send with `MediaUrl` stores a copy of each file; a URL that cannot be fetched fails the message with `11200`.
+- [ ] SM-15.2 A native send with `media_urls` and / or inline base64 `media` stores the media, and `GET /sms/{smsId}/media/{mediaIndex}` returns each file with its content type.
+- [ ] SM-15.3 More than 10 items, more than 5 MB, a missing filename or invalid base64 returns `400` naming the item.
+- [ ] SM-15.4 Bubbles show image thumbnails and file chips with an "MMS" or "Media" badge, and the message drawer lists the media.
+- [ ] SM-15.5 "Reply as recipient" can attach files, and the reply webhook sends `NumMedia` and `MediaUrl{N}` pointing at SendMock's copies.
 
 ---
 

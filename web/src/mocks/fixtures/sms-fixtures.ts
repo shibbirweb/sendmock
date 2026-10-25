@@ -29,6 +29,8 @@ type SmsFixtureSpec = {
   channel?: SmsChannel;
   openCount?: number;
   messagingServiceSid?: string | null;
+  /** MMS / WhatsApp media; the demo serves a placeholder for each file. */
+  media?: { filename: string; contentType: string; sizeBytes: number }[];
   /** The callback for the final status fails once, then the retry succeeds. */
   isCallbackFailingOnce?: boolean;
 };
@@ -122,7 +124,7 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
     body: smsSpec.body,
     encoding: segmentInfo.encoding,
     segments: segmentInfo.segmentCount,
-    media_urls: [],
+    media: [],
     status: isOutbound ? (smsSpec.status ?? "delivered") : "received",
     error_code: smsSpec.errorCode ?? null,
     status_callback_url: isOutbound ? "http://localhost:8000/sms/status" : null,
@@ -142,6 +144,14 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
       : null,
     callback_attempts: [],
   };
+  smsMessage.media = (smsSpec.media ?? []).map((mediaSpec, mediaIndex) => ({
+    media_index: mediaIndex,
+    content_type: mediaSpec.contentType,
+    size_bytes: mediaSpec.sizeBytes,
+    filename: mediaSpec.filename,
+    source_url: null,
+    url: `/api/v1/sms/${smsMessage.id}/media/${mediaIndex}`,
+  }));
   smsMessage.callback_attempts = buildCallbackAttempts(smsMessage, smsSpec);
 
   return smsMessage;
@@ -210,6 +220,25 @@ const smsFixtureSpecs: SmsFixtureSpec[] = [
     body: "YES",
   },
   {
+    minutesAgo: 17,
+    direction: "outbound",
+    appNumber: alertsLine,
+    contactNumber: "+447700900123",
+    body: "Booked for Thursday. Show this code at the door.",
+    media: [
+      {
+        filename: "booking-qr.png",
+        contentType: "image/png",
+        sizeBytes: 24_118,
+      },
+      {
+        filename: "booking.pdf",
+        contentType: "application/pdf",
+        sizeBytes: 96_512,
+      },
+    ],
+  },
+  {
     minutesAgo: 30,
     direction: "outbound",
     appNumber: alertsLine,
@@ -239,6 +268,17 @@ const smsFixtureSpecs: SmsFixtureSpec[] = [
     contactNumber: "whatsapp:+8801722222222",
     body: "Thanks! Can you deliver after 5pm?",
     channel: "whatsapp",
+  },
+  {
+    minutesAgo: 38,
+    direction: "inbound",
+    appNumber: whatsappLine,
+    contactNumber: "whatsapp:+8801722222222",
+    body: "This is the gate, please leave it with the guard.",
+    channel: "whatsapp",
+    media: [
+      { filename: "gate.jpg", contentType: "image/jpeg", sizeBytes: 182_430 },
+    ],
   },
 ];
 

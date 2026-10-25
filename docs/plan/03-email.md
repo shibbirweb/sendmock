@@ -71,6 +71,28 @@ Apps using an email provider's HTTP API point the SDK (or base URL) at SendMock 
 | Amazon SES v2 | `POST /v2/email/outbound-emails` | simple and raw content; SigV4 accepted without verification | 4 |
 | Brevo | `POST /v3/smtp/email` | `api-key` header | 4 |
 
+### Native send attachments
+
+`attachments` on `POST /api/v1/send` uses the shape SendGrid and Resend use, so it feels familiar:
+
+```json
+"attachments": [
+  { "filename": "invoice.pdf", "content": "JVBERi0xLjQK...", "content_type": "application/pdf" },
+  { "filename": "logo.png", "content": "iVBORw0KGgo...", "content_type": "image/png", "content_id": "logo" }
+]
+```
+
+| Field | Required | Meaning |
+|-------|----------|---------|
+| `filename` | yes | name shown and used for downloads |
+| `content` | yes | the file bytes, base64 encoded (standard alphabet, padding optional, line breaks ignored) |
+| `content_type` | no | MIME type; guessed from the file extension when missing (`application/octet-stream` as the last resort) |
+| `content_id` | no | makes the attachment inline, so the HTML can show it with `cid:<content_id>` |
+
+- The stored message is built as real MIME (`multipart/mixed`, with `multipart/related` for inline parts), so it equals the same message sent over SMTP.
+- Limits: the decoded attachments count towards the 25 MB message size limit.
+- Errors return `400` naming the attachment, for example `attachments[1].content is not valid base64` or `attachments[0].filename is required`, and are recorded in the request log.
+
 Provider routes are served on the dedicated provider port at the real provider paths (same mechanism as SMS, see [04-sms.md](04-sms.md#api-surfaces)) and under `/providers/<name>/...` on the main port. Each provider's API key/token is accepted by default and can be enforced to test auth errors.
 
 Template sends (SendGrid dynamic templates, Postmark templates, Resend templates) cannot be rendered without the provider's template content: SendMock stores the template ID and `dynamic_template_data`/`TemplateModel`, shows them in a "Template data" panel, and optionally renders a local template registered under the same ID (`sendmock.seed.toml`, see [02-architecture.md](02-architecture.md#configuration-and-seed-file)).
@@ -102,6 +124,7 @@ Triggered by:
 | `ooto@simulator.amazonses.com` | delivered, then out-of-office auto-reply stored as a new email |
 | `suppressionlist@simulator.amazonses.com` | bounce with suppression-list reason |
 
+- **Custom outcome addresses** (Settings > Email, the API at `/api/v1/outcome-rules/email`, CLI, MCP and the seed file as `[[email.outcome_rules]]`): your own rules, checked in order before the magic addresses. Each has a pattern (an exact address or `*` wildcards, for example `*@bounce.qa.test`), an outcome (`delivered`, `hard_bounce`, `soft_bounce`, `complaint`, `unsubscribe`, or `reject`, which refuses the recipient during SMTP `RCPT` and the HTTP send with the given code), an optional SMTP code and diagnostic text, a note and an enabled switch. A "Test an address" box shows which rule would apply. The built-in magic addresses stay read-only and can be switched off with **Magic addresses** in Settings.
 - **Delivery profile** (Settings): `off` (default, no delivery events), `auto-delivered` (every message gets `email.delivered` after a short delay), or `realistic` (delay plus a configurable bounce/complaint rate).
 - **Manual buttons** on any email: Simulate delivered / bounce (hard, soft) / complaint / unsubscribe.
 - **API**: `POST /api/v1/emails/{emailId}/simulate` with `{ "event": "bounced", "bounce_type": "hard" }`.
