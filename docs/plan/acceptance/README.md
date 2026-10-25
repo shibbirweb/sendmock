@@ -150,8 +150,8 @@ On top of its own criteria, a feature is done only when:
 | [PY-04](08-payments.md#py-04-stripe-emulation) | Stripe emulation | Phase 3P | 4 | Not started |
 | [PY-05](08-payments.md#py-05-paypal-emulation) | PayPal emulation | Phase 3P | 3 | Not started |
 | [PY-06](08-payments.md#py-06-sslcommerz-emulation) | SSLCommerz emulation | Phase 3P | 5 | Not started |
-| [PY-07](08-payments.md#py-07-after-payment-operations) | After-payment operations | Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions) | 4 | Not started |
+| [PY-07](08-payments.md#py-07-after-payment-operations) | After-payment operations | Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions) | 4 | In progress |
 | [PY-08](08-payments.md#py-08-events-templates-and-delivery) | Events, templates and delivery | Phase 3P | 3 | Not started |
-| [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 4 | Not started |
+| [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 4 | In progress |
 | [PY-10](08-payments.md#py-10-more-gateways) | More gateways | Phase 4 (bKash, Razorpay, Paddle), later (others) | 3 | Not started |
 | [PY-11](08-payments.md#py-11-cli-mcp-and-test-helpers) | CLI, MCP and test helpers | Phase 3P | 3 | Not started |

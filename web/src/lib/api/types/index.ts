@@ -7,6 +7,7 @@ export type * from "@/lib/api/types/webhooks";
 export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/system";
 export type * from "@/lib/api/types/http-catcher";
+export type * from "@/lib/api/types/payments";
 export type * from "@/lib/api/types/outcome-rules";
 export { appEventTypes } from "@/lib/api/types/events";
 export { maxVerificationCheckAttempts } from "@/lib/api/types/verify-and-numbers";

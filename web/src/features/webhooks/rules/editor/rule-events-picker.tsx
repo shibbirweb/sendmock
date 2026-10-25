@@ -7,6 +7,8 @@ const eventAreaLabels: Record<string, string> = {
   sms: "SMS",
   verify: "Verify",
   http: "HTTP",
+  payment: "Payments",
+  checkout: "Checkout",
   webhook: "Webhooks",
   test: "Test",
 };

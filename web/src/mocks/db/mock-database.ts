@@ -6,6 +6,7 @@ import type {
   EmailTimelineEntry,
   HttpBin,
   HttpResponseRule,
+  PaymentDetail,
   MessagingService,
   SavedDelivery,
   SmsMessageDetail,
@@ -25,6 +26,7 @@ import {
   buildHttpBinFixtures,
   buildHttpResponseRuleFixtures,
 } from "@/mocks/fixtures/http-catcher-fixtures";
+import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
 import { buildDefaultSettings } from "@/mocks/fixtures/settings-fixtures";
 import { buildHttpCatcherTraffic } from "@/mocks/http/build-http-catcher-traffic";
 import {
@@ -96,6 +98,7 @@ export type MockDatabase = {
   templateRevisions: Map<string, TemplateRevision[]>;
   webhookVariables: WebhookVariable[];
   savedDeliveries: SavedDelivery[];
+  payments: PaymentDetail[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -169,6 +172,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       webhookDeliveries: [],
       capturedHttpRequests: [],
       httpFileContents: new Map(),
+      payments: [],
       smtpSessions: [],
       apiRequestLog: [],
     };
@@ -187,6 +191,16 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     mockDataSize === "large" ? largeDataSetApiRequestCount : 0,
   );
   linkApiRequestFixtures(apiRequestLog, emails, smsMessages);
+  const webhookDeliveries = linkDeliverySubjects(
+    buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
+    emails.map((email) => email.id),
+    smsMessages.map((smsMessage) => smsMessage.id),
+  );
+  // Payment notifications are deliveries too, added to the same log.
+  const payments = buildPaymentFixtures({
+    webhookEndpoints: configuration.webhookEndpoints,
+    webhookDeliveries,
+  });
   const httpCatcherTraffic = buildHttpCatcherTraffic(
     configuration.httpBins,
     configuration.httpResponseRules,
@@ -209,13 +223,8 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,
     ),
-    webhookDeliveries: sortNewestFirst(
-      linkDeliverySubjects(
-        buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
-        emails.map((email) => email.id),
-        smsMessages.map((smsMessage) => smsMessage.id),
-      ),
-    ),
+    webhookDeliveries: sortNewestFirst(webhookDeliveries),
+    payments: sortNewestFirst(payments),
     httpBins: httpCatcherTraffic.httpBins,
     capturedHttpRequests: sortNewestFirst(httpCatcherTraffic.capturedRequests),
     httpFileContents: httpCatcherTraffic.fileContents,
