@@ -10,6 +10,10 @@ UI in U2, backend Phase 3.
 - [ ] WH-01.2 "Send test" delivers `test.ping` and shows the response.
 - [ ] WH-01.3 Secrets are write-only: masked in UI, API, logs and MCP; "reveal" requires confirmation.
 - [ ] WH-01.4 A `localhost` URL while running in Docker shows the `host.docker.internal` hint.
+- [ ] WH-01.5 Timeout (1 to 60 s), max attempts (1 to 10) and retry delays (1 s to 24 h) are validated the same way in the UI and API, and the sheet previews the attempt schedule.
+- [ ] WH-01.6 A template's required variables show as missing until they are set as endpoint or global variables (endpoint ones win); names with token, secret, key or password are stored as masked secrets.
+- [ ] WH-01.7 The endpoints table shows each endpoint's 24-hour success sparkline with the rate as text, and the enabled switch applies at once.
+- [ ] WH-01.8 Rotating the secret shows the new masked secret and until when the old one stays valid.
 
 ## WH-02 Rules and filters
 

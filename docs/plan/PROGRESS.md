@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: every screen and the empty states built on mock data** (18 / 18); Phase U2 next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints built on mock data**; rules and the visual rule builder next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 379 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 383 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Start Phase U2: the webhook, HTTP catcher and payment screens.
+2. Continue Phase U2: rules list and visual rule builder with match preview.
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 1 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -108,7 +108,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U2: Webhook, HTTP catcher and payment screens
 
-- [ ] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables)
+- [x] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables; Send test dialog, 24-hour success sparkline, Docker hint)
 - [ ] Rules list and visual rule builder with match preview
 - [ ] Deliveries live log and detail (cURL, replay, re-render, edit and replay, cancel, `render_failed`)
 - [ ] Saved deliveries (bookmarks)
@@ -332,3 +332,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Overview dashboard built on mock data: stat tiles with totals and today's counts, a 24-hour stacked activity chart (legend, tooltip on hover and arrow keys, "Show as table"), webhook health per endpoint with a success meter, p50 / p95, retries and top failure codes, recent failures linking to the delivery, latest messages and a connect card with copy buttons. `/stats` mock computes the new fields. |
 | 2026-10-25 | Plan: empty states ([07](07-ui.md#empty-states--onboarding)): "no data yet" (how to connect card with copyable values and a sample button per screen) told apart from "nothing matches" (Clear filter); the host follows a shared, remembered "Where does your app run?" choice that defaults to the Compose host in Docker. New `POST /samples/{kind}` (email over SMTP, SMS, verification) with CLI and MCP, `is_container` on `/info`; criteria UI-04.3, UI-04.4, PL-03.5. |
 | 2026-10-25 | Empty states built on mock data: Mail, SMS, Verify, Numbers, both Logs tabs and the Overview show a how to connect card (copyable host and ports from `/info`, a shared and remembered "Where does your app run?" switch that defaults to the Compose host in Docker) and a sample button; filters that match nothing offer Clear filter instead. Mock `POST /samples/{kind}` creates the email with its SMTP session, the SMS with its API log entry and a pending verification. Demo controls gain a "Running in Docker" switch. |
+| 2026-10-25 | Plan: webhook endpoints screen in detail ([07](07-ui.md#webhooks)): table with enabled switch, 24-hour success sparkline and Docker hint; edit sheet tabs General, Template (picker, link mode, overrides), Security (reveal with confirmation, rotate with overlap), Retries (validated schedule with preview), Variables (template's required variables); Send test result dialog. API: `delivery_count_24h` and `success_history` on endpoints, `GET .../secret` reveal; criteria WH-01.5 to WH-01.8. |
+| 2026-10-25 | Webhook endpoints built on mock data: table with enabled switch, 24-hour success sparkline and Docker hint; edit sheet with General, Template (searchable picker, link mode, header and field overrides), Security (confirmed reveal, rotation with overlap), Retries (validated delays, schedule preview) and Variables (template's required variables, text and secret endpoint variables); Send test result dialog. Mock fixtures gain a day of delivery history, so sparklines and the Overview chart show trends. |

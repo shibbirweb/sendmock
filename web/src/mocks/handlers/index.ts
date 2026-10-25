@@ -11,7 +11,9 @@ import { smsHandlers } from "@/mocks/handlers/sms-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
+import { webhookEndpointHandlers } from "@/mocks/handlers/webhook-endpoint-handlers";
 import { webhookHandlers } from "@/mocks/handlers/webhook-handlers";
+import { webhookVariableHandlers } from "@/mocks/handlers/webhook-variable-handlers";
 import { realtimeConnectionHandler } from "@/mocks/realtime/mock-event-bus";
 
 /** Every mock API handler, matching the paths in docs/plan/06-api.md. */
@@ -29,6 +31,8 @@ export const mockHandlers = [
   ...outcomeRulesHandlers,
   ...logsHandlers,
   ...samplesHandlers,
+  ...webhookEndpointHandlers,
+  ...webhookVariableHandlers,
   ...webhookHandlers,
   realtimeConnectionHandler,
 ];

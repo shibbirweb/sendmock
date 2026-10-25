@@ -4,7 +4,6 @@ import type {
   DeliveryTrigger,
   RetryPolicy,
   WebhookDelivery,
-  WebhookEndpoint,
   WebhookRule,
 } from "@/lib/api/types";
 import {
@@ -12,6 +11,10 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import {
+  generateEndpointSecret,
+  type WebhookEndpointRecord,
+} from "@/mocks/webhooks/webhook-endpoint-record";
 
 const defaultRetryPolicy: RetryPolicy = {
   max_attempts: 5,
@@ -19,10 +22,12 @@ const defaultRetryPolicy: RetryPolicy = {
   retry_on_client_errors: false,
 };
 
-type EndpointSpec = Pick<WebhookEndpoint, "name" | "url" | "template_id"> & {
-  successRate: number | null;
+type EndpointSpec = Pick<
+  WebhookEndpointRecord,
+  "name" | "url" | "template_id"
+> & {
   isEnabled?: boolean;
-  createdBy?: WebhookEndpoint["created_by"];
+  createdBy?: WebhookEndpointRecord["created_by"];
 };
 
 const endpointSpecs: EndpointSpec[] = [
@@ -30,51 +35,49 @@ const endpointSpecs: EndpointSpec[] = [
     name: "Laravel inbound mail",
     url: "http://localhost:8000/webhooks/inbound-mail",
     template_id: "postmark.inbound",
-    successRate: 0.96,
   },
   {
     name: "SMS status callbacks",
     url: "http://localhost:3000/sms/status",
     template_id: "twilio.status_callback",
-    successRate: 0.81,
   },
   {
     name: "Team Slack alerts",
     url: "http://127.0.0.1:8025/catch/slack",
     template_id: "slack.incoming_webhook",
-    successRate: 1,
     createdBy: "mcp",
   },
   {
     name: "Everything as native JSON",
     url: "http://localhost:9000/sendmock-events",
     template_id: "native",
-    successRate: null,
     isEnabled: false,
   },
 ];
 
-export function buildWebhookEndpointFixtures(): WebhookEndpoint[] {
+export function buildWebhookEndpointFixtures(): WebhookEndpointRecord[] {
   return endpointSpecs.map((endpointSpec, endpointIndex) => ({
     id: createMockUlid(minutesAgoInMs(600 - endpointIndex)),
     name: endpointSpec.name,
     url: endpointSpec.url,
     method: "POST",
     headers: {},
+    extra_fields: {},
     template_id: endpointSpec.template_id,
     template_mode: "linked",
-    masked_secret: `whsec_••••${(4096 + endpointIndex * 977).toString(16)}`,
+    secret: generateEndpointSecret(),
+    previous_secret: null,
+    previous_secret_expires_at: null,
     timeout_ms: 10_000,
     retry_policy: defaultRetryPolicy,
     is_enabled: endpointSpec.isEnabled ?? true,
-    success_rate: endpointSpec.successRate,
     created_by: endpointSpec.createdBy ?? "ui",
     created_at: minutesAgo(600 - endpointIndex),
   }));
 }
 
 export function buildWebhookRuleFixtures(
-  webhookEndpoints: WebhookEndpoint[],
+  webhookEndpoints: WebhookEndpointRecord[],
 ): WebhookRule[] {
   const [
     inboundMailEndpoint,
@@ -218,61 +221,102 @@ const deliverySpecs: DeliverySpec[] = [
   },
 ];
 
-export function buildWebhookDeliveryFixtures(
-  webhookEndpoints: WebhookEndpoint[],
-): WebhookDelivery[] {
-  return deliverySpecs.map((deliverySpec) => {
-    const webhookEndpoint = webhookEndpoints[deliverySpec.endpointIndex];
-    const requestBody = JSON.stringify(
-      { type: deliverySpec.eventType, data: {} },
-      null,
-      2,
-    );
-    const wasSent = deliverySpec.status !== "render_failed";
+/**
+ * Older traffic, two to 23 hours ago, so success sparklines and the
+ * activity chart show a day of history. Deterministic: the same hours
+ * fail on every load.
+ */
+function buildHistoryDeliverySpecs(): DeliverySpec[] {
+  const historySpecs: DeliverySpec[] = [];
+  for (let hoursAgo = 2; hoursAgo <= 23; hoursAgo += 1) {
+    const hasInboundMailFailure = hoursAgo === 13;
+    historySpecs.push({
+      minutesAgo: hoursAgo * 60,
+      endpointIndex: 0,
+      eventType: "email.received",
+      status: hasInboundMailFailure ? "failed" : "succeeded",
+      statusCode: hasInboundMailFailure ? 502 : 200,
+    });
+    const hasStatusCallbackFailure = hoursAgo % 5 === 0;
+    historySpecs.push({
+      minutesAgo: hoursAgo * 60 + 7,
+      endpointIndex: 1,
+      eventType: "sms.status",
+      status: hasStatusCallbackFailure ? "failed" : "succeeded",
+      statusCode: hasStatusCallbackFailure ? 503 : 200,
+    });
+    if (hoursAgo % 3 === 0) {
+      historySpecs.push({
+        minutesAgo: hoursAgo * 60 + 19,
+        endpointIndex: 2,
+        eventType: "email.received",
+        status: "succeeded",
+        statusCode: 200,
+      });
+    }
+  }
 
-    return {
-      id: createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo)),
-      endpoint_id: webhookEndpoint?.id ?? "",
-      endpoint_name: webhookEndpoint?.name ?? "",
-      rule_id: null,
-      event_id: `evt_${createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo))}`,
-      event_type: deliverySpec.eventType,
-      subject_id: null,
-      trigger: deliverySpec.trigger ?? "auto",
-      attempt: deliverySpec.attempt ?? 1,
-      status: deliverySpec.status,
-      request: wasSent
-        ? {
-            method: "POST",
-            url: webhookEndpoint?.url ?? "",
-            headers: {
-              "content-type": "application/json",
-              "webhook-id": "evt_01JB...",
-              "webhook-timestamp": "1761321600",
-              "webhook-signature":
-                "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            },
-            body: requestBody,
-          }
-        : null,
-      response:
-        deliverySpec.statusCode === null
-          ? null
-          : {
-              status_code: deliverySpec.statusCode,
-              headers: { "content-type": "application/json" },
-              body:
-                deliverySpec.statusCode < 300
-                  ? '{"ok":true}'
-                  : '{"error":"boom"}',
-              is_body_truncated: false,
-            },
-      duration_ms: wasSent
-        ? 40 + Math.round(deliverySpec.minutesAgo * 13)
-        : null,
-      error_message: deliverySpec.errorMessage ?? null,
-      next_attempt_at: deliverySpec.status === "failed" ? minutesAgo(-1) : null,
-      created_at: minutesAgo(deliverySpec.minutesAgo),
-    };
-  });
+  return historySpecs;
+}
+
+export function buildWebhookDeliveryFixtures(
+  webhookEndpoints: WebhookEndpointRecord[],
+): WebhookDelivery[] {
+  return [...deliverySpecs, ...buildHistoryDeliverySpecs()].map(
+    (deliverySpec) => {
+      const webhookEndpoint = webhookEndpoints[deliverySpec.endpointIndex];
+      const requestBody = JSON.stringify(
+        { type: deliverySpec.eventType, data: {} },
+        null,
+        2,
+      );
+      const wasSent = deliverySpec.status !== "render_failed";
+
+      return {
+        id: createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo)),
+        endpoint_id: webhookEndpoint?.id ?? "",
+        endpoint_name: webhookEndpoint?.name ?? "",
+        rule_id: null,
+        event_id: `evt_${createMockUlid(minutesAgoInMs(deliverySpec.minutesAgo))}`,
+        event_type: deliverySpec.eventType,
+        subject_id: null,
+        trigger: deliverySpec.trigger ?? "auto",
+        attempt: deliverySpec.attempt ?? 1,
+        status: deliverySpec.status,
+        request: wasSent
+          ? {
+              method: "POST",
+              url: webhookEndpoint?.url ?? "",
+              headers: {
+                "content-type": "application/json",
+                "webhook-id": "evt_01JB...",
+                "webhook-timestamp": "1761321600",
+                "webhook-signature":
+                  "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+              },
+              body: requestBody,
+            }
+          : null,
+        response:
+          deliverySpec.statusCode === null
+            ? null
+            : {
+                status_code: deliverySpec.statusCode,
+                headers: { "content-type": "application/json" },
+                body:
+                  deliverySpec.statusCode < 300
+                    ? '{"ok":true}'
+                    : '{"error":"boom"}',
+                is_body_truncated: false,
+              },
+        duration_ms: wasSent
+          ? 40 + Math.round((deliverySpec.minutesAgo * 13) % 400)
+          : null,
+        error_message: deliverySpec.errorMessage ?? null,
+        next_attempt_at:
+          deliverySpec.status === "failed" ? minutesAgo(-1) : null,
+        created_at: minutesAgo(deliverySpec.minutesAgo),
+      };
+    },
+  );
 }

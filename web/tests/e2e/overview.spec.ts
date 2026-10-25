@@ -19,7 +19,7 @@ test("UI-03.1 counts, success rate, latency and recent failures update live", as
   await expect(webhookTile).toContainText(/p95 \d+ ms/);
   await expect(
     page.getByRole("list", { name: "Recent failures" }).getByRole("listitem"),
-  ).toHaveCount(4);
+  ).toHaveCount(5);
 
   const emailTile = findStatTile(page, "Emails");
   const todayCountBefore = Number(

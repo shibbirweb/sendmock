@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HttpBodyView } from "@/features/logs/http/http-body-view";
-import { HttpStatusBadge } from "@/features/logs/http/http-status-badge";
+import { HttpStatusBadge } from "@/components/common/http-status-badge";
 import { readApiLabel } from "@/features/logs/logs-labels";
 import { useApiRequest } from "@/lib/api/hooks/use-logs-queries";
 import type {

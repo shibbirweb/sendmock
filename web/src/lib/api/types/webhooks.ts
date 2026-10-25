@@ -9,22 +9,58 @@ export type RetryPolicy = {
   retry_on_client_errors: boolean;
 };
 
+export type TemplateMode = "linked" | "detached";
+
 export type WebhookEndpoint = {
   id: Ulid;
   name: string;
   url: string;
   method: HttpMethod;
+  /** Extra headers layered on top of the template's. */
   headers: Record<string, string>;
+  /** Extra body fields layered on top of the template's. */
+  extra_fields: Record<string, string>;
   template_id: string;
-  template_mode: "linked" | "detached";
+  template_mode: TemplateMode;
   /** Always masked by the API, e.g. "whsec_••••3f9a". */
   masked_secret: string;
+  /** Until when the secret before the last rotation still signs; null when none. */
+  previous_secret_expires_at: IsoTimestamp | null;
   timeout_ms: number;
   retry_policy: RetryPolicy;
   is_enabled: boolean;
+  /** Success rate over the last 24 hours; null without finished deliveries. */
   success_rate: number | null;
+  delivery_count_24h: number;
+  /** 24 hourly success rates, oldest first; null for hours without deliveries. */
+  success_history: (number | null)[];
   created_by: CreatedBy;
   created_at: IsoTimestamp;
+};
+
+/** Body of POST and PATCH /api/v1/webhooks/endpoints. */
+export type WebhookEndpointInput = Pick<
+  WebhookEndpoint,
+  | "name"
+  | "url"
+  | "method"
+  | "headers"
+  | "extra_fields"
+  | "template_id"
+  | "template_mode"
+  | "timeout_ms"
+  | "retry_policy"
+  | "is_enabled"
+>;
+
+/** GET /api/v1/webhooks/endpoints/{endpointId}/secret (WH-01.3). */
+export type RevealedEndpointSecret = {
+  secret: string;
+};
+
+/** Body of POST /api/v1/webhooks/endpoints/{endpointId}/rotate-secret. */
+export type RotateSecretRequest = {
+  overlap_hours: number;
 };
 
 export type RuleFilterOperator =
@@ -119,6 +155,18 @@ export type WebhookVariable = {
   description: string;
   created_by: CreatedBy;
 };
+
+/** Body of POST and PATCH /api/v1/webhooks/variables. */
+export type WebhookVariableInput = Pick<
+  WebhookVariable,
+  | "name"
+  | "kind"
+  | "scope"
+  | "endpoint_id"
+  | "value"
+  | "random_mode"
+  | "description"
+>;
 
 export type TemplateCategory =
   | "email-provider"
