@@ -1,88 +1,61 @@
-import type { DeclineReason } from "@/lib/api/types";
+import type {
+  DeclineReason,
+  PaymentMethodDefinition,
+  TestCardValue,
+  TestWalletValue,
+} from "@/lib/api/types";
 
-export type TestCardOutcome =
-  | { kind: "succeed" }
-  | { kind: "decline"; reason: DeclineReason }
-  | { kind: "three_ds" }
-  | { kind: "succeed_then_dispute" };
-
-/** Stripe's documented test cards, used by every card provider (17-payments). */
-export const testCards: {
-  number: string;
-  label: string;
-  outcome: TestCardOutcome;
-}[] = [
-  {
-    number: "4242424242424242",
-    label: "Succeeds (Visa)",
-    outcome: { kind: "succeed" },
-  },
-  {
-    number: "5555555555554444",
-    label: "Succeeds (Mastercard)",
-    outcome: { kind: "succeed" },
-  },
+/** Stripe's documented test cards: the built-in Card method's values (17-payments). */
+export const defaultTestCards: TestCardValue[] = [
+  { number: "4242424242424242", outcome: "succeed", decline_reason: null },
+  { number: "5555555555554444", outcome: "succeed", decline_reason: null },
   {
     number: "4000000000000002",
-    label: "Declined: generic decline",
-    outcome: { kind: "decline", reason: "generic_decline" },
+    outcome: "decline",
+    decline_reason: "generic_decline",
   },
   {
     number: "4000000000009995",
-    label: "Declined: insufficient funds",
-    outcome: { kind: "decline", reason: "insufficient_funds" },
+    outcome: "decline",
+    decline_reason: "insufficient_funds",
   },
   {
     number: "4000000000000069",
-    label: "Declined: expired card",
-    outcome: { kind: "decline", reason: "expired_card" },
+    outcome: "decline",
+    decline_reason: "expired_card",
   },
   {
     number: "4000000000000127",
-    label: "Declined: incorrect CVC",
-    outcome: { kind: "decline", reason: "incorrect_cvc" },
+    outcome: "decline",
+    decline_reason: "incorrect_cvc",
   },
-  {
-    number: "4000002500003155",
-    label: "Requires 3-D Secure",
-    outcome: { kind: "three_ds" },
-  },
+  { number: "4000002500003155", outcome: "three_ds", decline_reason: null },
   {
     number: "4000000000000259",
-    label: "Succeeds, then a dispute opens",
-    outcome: { kind: "succeed_then_dispute" },
+    outcome: "succeed_then_dispute",
+    decline_reason: null,
   },
 ];
 
-export const testWalletOtp = "123456";
-export const testWalletPin = "12121";
-
-export type TestWalletOutcome =
-  | { kind: "succeed" }
-  | { kind: "decline"; reason: DeclineReason }
-  | { kind: "wrong_pin" };
-
-export const testWallets: {
-  number: string;
-  label: string;
-  outcome: TestWalletOutcome;
-}[] = [
-  { number: "01770000001", label: "Succeeds", outcome: { kind: "succeed" } },
-  {
-    number: "01770000002",
-    label: "Declined: insufficient balance",
-    outcome: { kind: "decline", reason: "insufficient_funds" },
-  },
-  {
-    number: "01770000003",
-    label: "Wrong PIN (asked again)",
-    outcome: { kind: "wrong_pin" },
-  },
+/**
+ * Card ranges reserved for testing; a test card must start with one, so a
+ * real card can never be saved as a "test card" (PY-01.1).
+ */
+export const testCardPrefixes = [
+  "424242424242",
+  "400000",
+  "400002",
+  "555555555555",
 ];
 
 /** Digits only, so "4242 4242 ..." and "4242-4242-..." match the table. */
 export function toCardDigits(cardNumber: string): string {
   return cardNumber.replace(/[\s-]/g, "");
+}
+
+/** "4242 4242 4242 4242" for display. */
+export function formatCardNumber(cardDigits: string): string {
+  return cardDigits.replace(/(\d{4})(?=\d)/g, "$1 ");
 }
 
 /** The Luhn checksum every real card number passes. */
@@ -103,22 +76,31 @@ export function passesLuhnCheck(cardDigits: string): boolean {
   return digitSum % 10 === 0;
 }
 
+export function isTestCardRange(cardDigits: string): boolean {
+  return testCardPrefixes.some((testPrefix) =>
+    cardDigits.startsWith(testPrefix),
+  );
+}
+
 export type CardCheck =
   | { kind: "invalid" }
   | { kind: "not_test_card" }
-  | { kind: "test_card"; outcome: TestCardOutcome };
+  | { kind: "test_card"; testCard: TestCardValue };
 
 /**
- * A typed card number against the test card table (PY-01.1): a number that
- * passes the Luhn check but is not a test card is refused, never used.
+ * A typed card number against a method's test cards (PY-01.1): a number
+ * that passes the Luhn check but is not one of them is refused, never used.
  */
-export function checkCardNumber(cardNumber: string): CardCheck {
+export function checkCardNumber(
+  cardNumber: string,
+  testCards: TestCardValue[],
+): CardCheck {
   const cardDigits = toCardDigits(cardNumber);
   const testCard = testCards.find(
     (candidateCard) => candidateCard.number === cardDigits,
   );
   if (testCard !== undefined) {
-    return { kind: "test_card", outcome: testCard.outcome };
+    return { kind: "test_card", testCard };
   }
 
   return passesLuhnCheck(cardDigits)
@@ -137,25 +119,65 @@ export function readCardBrand(cardDigits: string): string {
   return /^3[47]/.test(cardDigits) ? "amex" : "card";
 }
 
-/** A wallet number, OTP and PIN against the test wallets (17-payments). */
+const declineReasonWords: Record<DeclineReason, string> = {
+  insufficient_funds: "insufficient funds",
+  expired_card: "expired card",
+  incorrect_cvc: "incorrect CVC",
+  generic_decline: "generic decline",
+  fraudulent: "fraud",
+  authentication_failed: "authentication failed",
+};
+
+/** "Declined: insufficient funds", "Requires 3-D Secure" for tables and hints. */
+export function describeTestOutcome(
+  testValue:
+    | Pick<TestCardValue, "outcome" | "decline_reason">
+    | Pick<TestWalletValue, "outcome" | "decline_reason">,
+): string {
+  const outcomeLabels: Record<string, string> = {
+    succeed: "Succeeds",
+    three_ds: "Requires 3-D Secure",
+    succeed_then_dispute: "Succeeds, then a dispute opens",
+    wrong_pin: "Wrong PIN (asked again)",
+  };
+  if (testValue.outcome === "decline") {
+    return `Declined: ${declineReasonWords[testValue.decline_reason ?? "generic_decline"]}`;
+  }
+
+  return outcomeLabels[testValue.outcome] ?? testValue.outcome;
+}
+
+export type WalletCheck =
+  | { kind: "succeed" }
+  | { kind: "decline"; reason: DeclineReason }
+  | { kind: "wrong_pin" }
+  | { kind: "error"; message: string };
+
+/** A wallet number, OTP and PIN against a wallet method's test values (17-payments). */
 export function checkWallet(
+  walletMethod: Pick<PaymentMethodDefinition, "test_wallets" | "otp" | "pin">,
   walletNumber: string,
   otp: string,
   pin: string,
-): TestWalletOutcome | { kind: "error"; message: string } {
-  const testWallet = testWallets.find(
+): WalletCheck {
+  const testWallet = walletMethod.test_wallets.find(
     (candidateWallet) =>
       candidateWallet.number === walletNumber.replace(/\D/g, ""),
   );
   if (testWallet === undefined) {
     return { kind: "error", message: "Use a test wallet" };
   }
-  if (otp !== testWalletOtp) {
+  if (otp !== walletMethod.otp) {
     return { kind: "error", message: "The verification code is wrong" };
   }
-  if (testWallet.outcome.kind === "wrong_pin" || pin !== testWalletPin) {
+  if (testWallet.outcome === "wrong_pin" || pin !== walletMethod.pin) {
     return { kind: "wrong_pin" };
   }
 
-  return testWallet.outcome;
+  return testWallet.outcome === "decline"
+    ? {
+        kind: "decline",
+        reason: testWallet.decline_reason ?? "insufficient_funds",
+      }
+    : { kind: "succeed" };
 }

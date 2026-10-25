@@ -25,7 +25,7 @@ function readString(searchValue: unknown): string | undefined {
   return typeof searchValue === "string" ? searchValue : undefined;
 }
 
-export const Route = createFileRoute("/payments")({
+export const Route = createFileRoute("/payments/")({
   validateSearch: (
     searchParams: Record<string, unknown>,
   ): PaymentsSearchParams => {

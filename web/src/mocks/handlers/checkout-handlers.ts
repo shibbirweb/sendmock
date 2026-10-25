@@ -28,7 +28,7 @@ export const checkoutHandlers = [
 
     return paymentDetail === undefined
       ? createNotFoundResponse("Checkout session")
-      : HttpResponse.json(toCheckoutSession(paymentDetail));
+      : HttpResponse.json(toCheckoutSession(mockDatabase, paymentDetail));
   }),
 
   http.post(
@@ -60,7 +60,7 @@ export const checkoutHandlers = [
         { id: paymentDetail.id },
       );
 
-      return HttpResponse.json(toCheckoutSession(paymentDetail));
+      return HttpResponse.json(toCheckoutSession(mockDatabase, paymentDetail));
     },
   ),
 ];

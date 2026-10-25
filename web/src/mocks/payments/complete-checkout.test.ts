@@ -39,7 +39,7 @@ describe("completeCheckout", () => {
         card: card("4242 4242 4242 4242"),
       }),
     ).toEqual({ isApplied: true });
-    expect(toCheckoutSession(paymentDetail)).toMatchObject({
+    expect(toCheckoutSession(mockDatabase, paymentDetail)).toMatchObject({
       state: "completed",
       redirect: { outcome: "success" },
     });
@@ -51,7 +51,12 @@ describe("completeCheckout", () => {
       exp_month: 12,
       exp_year: 2034,
     });
-    expect(JSON.stringify(mockDatabase)).not.toContain("4242424242424242");
+    // The typed number is in neither the payment nor its notifications; only
+    // the Card method's own test card list holds test numbers.
+    expect(JSON.stringify(paymentDetail)).not.toContain("4242424242424242");
+    expect(JSON.stringify(mockDatabase.webhookDeliveries)).not.toContain(
+      "4242424242424242",
+    );
   });
 
   test("PY-01.1 a real card number is refused and leaves no trace", () => {
@@ -80,10 +85,12 @@ describe("completeCheckout", () => {
       action: "pay",
       card: card("4000002500003155"),
     });
-    expect(toCheckoutSession(paymentDetail).state).toBe("requires_three_ds");
+    expect(toCheckoutSession(mockDatabase, paymentDetail).state).toBe(
+      "requires_three_ds",
+    );
 
     completeCheckout(mockDatabase, paymentDetail, { action: "three_ds_fail" });
-    expect(toCheckoutSession(paymentDetail)).toMatchObject({
+    expect(toCheckoutSession(mockDatabase, paymentDetail)).toMatchObject({
       state: "failed",
       failure_code: "authentication_failed",
     });
@@ -94,7 +101,9 @@ describe("completeCheckout", () => {
     completeCheckout(canceled.mockDatabase, canceled.paymentDetail, {
       action: "cancel",
     });
-    expect(toCheckoutSession(canceled.paymentDetail)).toMatchObject({
+    expect(
+      toCheckoutSession(canceled.mockDatabase, canceled.paymentDetail),
+    ).toMatchObject({
       state: "canceled",
       redirect: { outcome: "cancel" },
     });
@@ -106,7 +115,9 @@ describe("completeCheckout", () => {
     completeCheckout(delayed.mockDatabase, delayed.paymentDetail, {
       action: "delay",
     });
-    expect(toCheckoutSession(delayed.paymentDetail).state).toBe("pending");
+    expect(
+      toCheckoutSession(delayed.mockDatabase, delayed.paymentDetail).state,
+    ).toBe("pending");
   });
 
   test("PY-03.1 bKash pays with a test wallet; a wrong PIN is asked again", () => {
@@ -131,7 +142,9 @@ describe("completeCheckout", () => {
   test("PY-03.3 a finished checkout cannot be paid again", () => {
     const { mockDatabase, paymentDetail } = setUp("Ayesha Khan");
 
-    expect(toCheckoutSession(paymentDetail).state).toBe("completed");
+    expect(toCheckoutSession(mockDatabase, paymentDetail).state).toBe(
+      "completed",
+    );
     expect(
       completeCheckout(mockDatabase, paymentDetail, {
         action: "pay",

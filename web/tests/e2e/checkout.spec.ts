@@ -139,16 +139,32 @@ test("PY-03.1 test controls decline with a reason, delay and cancel", async ({
   await expect(checkoutResult(page)).toContainText("Payment canceled");
 });
 
-test("PY-03.2 SSLCommerz mobile banking pays and returns by POST", async ({
+test("PY-12.3 SSLCommerz groups its methods; a wallet runs its own flow and returns by POST", async ({
   page,
 }) => {
   await openCheckout(page, "Nadia Islam");
+  await page.getByRole("tab", { name: "Net banking" }).click();
+  await page.locator("label", { hasText: "City Touch" }).click();
+  await expect(
+    page.getByRole("button", { name: "Pay with City Touch" }),
+  ).toBeVisible();
+
   await page.getByRole("tab", { name: "Mobile banking" }).click();
-  await page.getByRole("button", { name: "Pay with bKash" }).click();
+  await page.locator("label", { hasText: "Nagad" }).click();
+  await expect(page.getByLabel("Your Nagad account number")).toBeVisible();
+  await page.locator("label", { hasText: "bKash" }).click();
+  const walletForm = page.getByRole("form", { name: "bKash payment" });
+  await walletForm.getByLabel("Your bKash account number").fill("01770000001");
+  await walletForm.getByRole("button", { name: "Confirm" }).click();
+  await walletForm.getByLabel("Verification code").fill("123456");
+  await walletForm.getByRole("button", { name: "Confirm" }).click();
+  await walletForm.getByLabel("PIN").fill("12121");
+  await walletForm.getByRole("button", { name: "Confirm and pay" }).click();
 
   await expect(checkoutResult(page)).toContainText("by POST");
-  const fieldsSent = page.getByRole("definition").filter({ hasText: "VALID" });
-  await expect(fieldsSent).toBeVisible();
+  await expect(
+    page.getByRole("definition").filter({ hasText: "VALID" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Return to Acme Shop" }),
   ).toBeVisible();

@@ -88,7 +88,11 @@ const succeedStep: SimulationStep = (
   createdAt,
 ) => {
   const hadCheckout = paymentDetail.checkout_url !== null;
-  paymentDetail.method ??= readDefaultTestMethod(paymentDetail);
+  if (paymentDetail.method === null) {
+    paymentDetail.method = readDefaultTestMethod(paymentDetail);
+    paymentDetail.method_key =
+      paymentDetail.provider === "bkash" ? "bkash" : "card";
+  }
   const isCapture = simulateRequest.action === "capture";
   paymentDetail.status = "succeeded";
   paymentDetail.captured_minor = paymentDetail.amount_minor;

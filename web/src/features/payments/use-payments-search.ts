@@ -2,12 +2,12 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 
 import type { PaymentListFilters } from "@/lib/api/types";
 import { paymentStatusFilters } from "@/lib/payments/payment-labels";
-import type { PaymentsSearchParams } from "@/routes/payments";
+import type { PaymentsSearchParams } from "@/routes/payments/index";
 
 /** The payments filters and open payment, kept in the URL (PY-09.1). */
 export function usePaymentsSearch() {
-  const paymentsSearch = useSearch({ from: "/payments" });
-  const navigate = useNavigate({ from: "/payments" });
+  const paymentsSearch = useSearch({ from: "/payments/" });
+  const navigate = useNavigate({ from: "/payments/" });
 
   const updateSearch = (changedParams: Partial<PaymentsSearchParams>) => {
     void navigate({

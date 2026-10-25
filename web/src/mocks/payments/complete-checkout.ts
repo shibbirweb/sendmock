@@ -4,7 +4,8 @@ import type {
   CheckoutSession,
   CheckoutState,
   PaymentDetail,
-  PaymentMethod,
+  PaymentMethodDefinition,
+  PaymentMethodFlow,
 } from "@/lib/api/types";
 import {
   checkCardNumber,
@@ -12,6 +13,9 @@ import {
   readCardBrand,
   toCardDigits,
 } from "@/lib/payments/test-instruments";
+import type { MockDatabase } from "@/mocks/db/mock-database";
+import { builtinGatewayAccents } from "@/mocks/fixtures/payment-method-fixtures";
+import { listGatewayMethods } from "@/mocks/payments/payment-method-record";
 import {
   addTimeline,
   finishCheckout,
@@ -22,6 +26,9 @@ import {
 } from "@/mocks/payments/simulate-payment";
 
 const merchantName = "Acme Shop";
+
+type CheckoutDatabase = PaymentDatabase &
+  Pick<MockDatabase, "paymentMethods" | "payments">;
 
 /** Where the checkout stands for the customer, from the payment (PY-03.3). */
 export function readCheckoutState(paymentDetail: PaymentDetail): CheckoutState {
@@ -42,6 +49,7 @@ export function readCheckoutState(paymentDetail: PaymentDetail): CheckoutState {
 }
 
 export function toCheckoutSession(
+  mockDatabase: CheckoutDatabase,
   paymentDetail: PaymentDetail,
 ): CheckoutSession {
   return {
@@ -53,6 +61,8 @@ export function toCheckoutSession(
     currency: paymentDetail.currency,
     line_items: paymentDetail.line_items,
     customer_email: paymentDetail.customer_email,
+    accent: builtinGatewayAccents[paymentDetail.provider],
+    methods: listGatewayMethods(mockDatabase, paymentDetail.provider),
     state: readCheckoutState(paymentDetail),
     failure_code: paymentDetail.failure_code,
     redirect: paymentDetail.redirect,
@@ -70,41 +80,59 @@ const refused = (statusCode: 409 | 422, message: string): SimulationResult => ({
   message,
 });
 
-/** The method a non-card option pays with: PayPal account, a wallet or a bank. */
-function readOptionMethod(
-  paymentDetail: PaymentDetail,
-  paymentOption: string | undefined,
-): PaymentMethod {
-  if (paymentDetail.provider === "paypal") {
-    return {
-      kind: "wallet",
-      wallet_name: "PayPal",
-      masked_number: "sb-buyer@personal.example.com",
-    };
-  }
-  const walletNames: Record<string, string> = {
-    bkash: "bKash",
-    nagad: "Nagad",
-    rocket: "Rocket",
-  };
-  const walletName = walletNames[paymentOption ?? ""];
-
-  return walletName === undefined
-    ? { kind: "bank", bank_name: (paymentOption ?? "bank").toUpperCase() }
-    : { kind: "wallet", wallet_name: walletName, masked_number: "01770****01" };
-}
-
-function payWithCard(
-  mockDatabase: PaymentDatabase,
+type CheckoutStep = (
+  mockDatabase: CheckoutDatabase,
   paymentDetail: PaymentDetail,
   checkoutRequest: CheckoutCompleteRequest,
   nowMs: number,
-): SimulationResult {
+) => SimulationResult;
+
+const showThreeDsStep: CheckoutStep = (
+  _mockDatabase,
+  paymentDetail,
+  _checkoutRequest,
+  nowMs,
+) => {
+  paymentDetail.status = "requires_action";
+  addTimeline(
+    paymentDetail,
+    "three_ds",
+    "3-D Secure challenge shown",
+    new Date(nowMs).toISOString(),
+  );
+
+  return { isApplied: true };
+};
+
+type FlowPayment = (
+  mockDatabase: CheckoutDatabase,
+  paymentDetail: PaymentDetail,
+  paymentMethod: PaymentMethodDefinition,
+  checkoutRequest: CheckoutCompleteRequest,
+  nowMs: number,
+) => SimulationResult;
+
+const succeed = (
+  mockDatabase: CheckoutDatabase,
+  paymentDetail: PaymentDetail,
+  nowMs: number,
+) => simulatePayment(mockDatabase, paymentDetail, { action: "succeed" }, nowMs);
+
+const payWithCard: FlowPayment = (
+  mockDatabase,
+  paymentDetail,
+  paymentMethod,
+  checkoutRequest,
+  nowMs,
+) => {
   const checkoutCard = checkoutRequest.card;
   if (checkoutCard === undefined) {
     return refused(422, "Enter a card");
   }
-  const cardCheck = checkCardNumber(checkoutCard.number);
+  const cardCheck = checkCardNumber(
+    checkoutCard.number,
+    paymentMethod.test_cards,
+  );
   if (cardCheck.kind === "invalid") {
     return refused(422, "Enter a valid card number");
   }
@@ -123,26 +151,24 @@ function payWithCard(
     exp_month: checkoutCard.exp_month,
     exp_year: checkoutCard.exp_year,
   };
-  const { outcome } = cardCheck;
-  if (outcome.kind === "three_ds") {
+  const { testCard } = cardCheck;
+  if (testCard.outcome === "three_ds") {
     return showThreeDsStep(mockDatabase, paymentDetail, checkoutRequest, nowMs);
   }
-  if (outcome.kind === "decline") {
+  if (testCard.outcome === "decline") {
     return simulatePayment(
       mockDatabase,
       paymentDetail,
-      { action: "decline", decline_reason: outcome.reason },
+      {
+        action: "decline",
+        decline_reason: testCard.decline_reason ?? "generic_decline",
+      },
       nowMs,
     );
   }
-  const paidResult = simulatePayment(
-    mockDatabase,
-    paymentDetail,
-    { action: "succeed" },
-    nowMs,
-  );
+  const paidResult = succeed(mockDatabase, paymentDetail, nowMs);
 
-  return outcome.kind === "succeed_then_dispute"
+  return testCard.outcome === "succeed_then_dispute"
     ? simulatePayment(
         mockDatabase,
         paymentDetail,
@@ -150,57 +176,106 @@ function payWithCard(
         nowMs + 10,
       )
     : paidResult;
-}
+};
 
-function payWithWallet(
-  mockDatabase: PaymentDatabase,
-  paymentDetail: PaymentDetail,
-  checkoutRequest: CheckoutCompleteRequest,
-  nowMs: number,
-): SimulationResult {
+const payWithWallet: FlowPayment = (
+  mockDatabase,
+  paymentDetail,
+  paymentMethod,
+  checkoutRequest,
+  nowMs,
+) => {
   const checkoutWallet = checkoutRequest.wallet;
   if (checkoutWallet === undefined) {
     return refused(422, "Enter a wallet number");
   }
-  const walletOutcome = checkWallet(
+  const walletCheck = checkWallet(
+    paymentMethod,
     checkoutWallet.number,
     checkoutWallet.otp,
     checkoutWallet.pin,
   );
-  if (walletOutcome.kind === "error") {
-    return refused(422, walletOutcome.message);
+  if (walletCheck.kind === "error") {
+    return refused(422, walletCheck.message);
   }
-  if (walletOutcome.kind === "wrong_pin") {
+  if (walletCheck.kind === "wrong_pin") {
     return refused(422, "Wrong PIN. Try again.");
   }
   const walletDigits = checkoutWallet.number.replace(/\D/g, "");
   paymentDetail.method = {
     kind: "wallet",
-    wallet_name: "bKash",
+    wallet_name: paymentMethod.name,
     masked_number: `${walletDigits.slice(0, 5)}****${walletDigits.slice(-2)}`,
   };
 
-  return walletOutcome.kind === "decline"
+  return walletCheck.kind === "decline"
     ? simulatePayment(
         mockDatabase,
         paymentDetail,
-        { action: "decline", decline_reason: walletOutcome.reason },
+        { action: "decline", decline_reason: walletCheck.reason },
         nowMs,
       )
-    : simulatePayment(
-        mockDatabase,
-        paymentDetail,
-        { action: "succeed" },
-        nowMs,
-      );
-}
+    : succeed(mockDatabase, paymentDetail, nowMs);
+};
 
-type CheckoutStep = (
-  mockDatabase: PaymentDatabase,
-  paymentDetail: PaymentDetail,
+/** One way to pay per flow; a new flow adds an entry (PY-12.3). */
+const flowPayments: Record<PaymentMethodFlow, FlowPayment> = {
+  card: payWithCard,
+  wallet: payWithWallet,
+  bank: (
+    mockDatabase,
+    paymentDetail,
+    paymentMethod,
+    _checkoutRequest,
+    nowMs,
+  ) => {
+    paymentDetail.method = { kind: "bank", bank_name: paymentMethod.name };
+    return paymentMethod.bank_outcome === "decline"
+      ? simulatePayment(
+          mockDatabase,
+          paymentDetail,
+          { action: "decline", decline_reason: "generic_decline" },
+          nowMs,
+        )
+      : succeed(mockDatabase, paymentDetail, nowMs);
+  },
+  account: (
+    mockDatabase,
+    paymentDetail,
+    paymentMethod,
+    _checkoutRequest,
+    nowMs,
+  ) => {
+    paymentDetail.method = {
+      kind: "wallet",
+      wallet_name: paymentMethod.name,
+      masked_number: paymentMethod.test_account,
+    };
+    return succeed(mockDatabase, paymentDetail, nowMs);
+  },
+};
+
+/** The method named in the request, else the first one that fits what was sent. */
+function findCheckoutMethod(
+  gatewayMethods: PaymentMethodDefinition[],
   checkoutRequest: CheckoutCompleteRequest,
-  nowMs: number,
-) => SimulationResult;
+): PaymentMethodDefinition | undefined {
+  if (checkoutRequest.method_key !== undefined) {
+    return gatewayMethods.find(
+      (paymentMethod) => paymentMethod.key === checkoutRequest.method_key,
+    );
+  }
+  const wantedFlow: PaymentMethodFlow | undefined =
+    checkoutRequest.card !== undefined
+      ? "card"
+      : checkoutRequest.wallet !== undefined
+        ? "wallet"
+        : undefined;
+
+  return wantedFlow === undefined
+    ? gatewayMethods[0]
+    : gatewayMethods.find((paymentMethod) => paymentMethod.flow === wantedFlow);
+}
 
 const payStep: CheckoutStep = (
   mockDatabase,
@@ -208,23 +283,25 @@ const payStep: CheckoutStep = (
   checkoutRequest,
   nowMs,
 ) => {
-  if (checkoutRequest.card !== undefined) {
-    return payWithCard(mockDatabase, paymentDetail, checkoutRequest, nowMs);
-  }
-  if (checkoutRequest.wallet !== undefined) {
-    return payWithWallet(mockDatabase, paymentDetail, checkoutRequest, nowMs);
-  }
-  paymentDetail.method = readOptionMethod(
-    paymentDetail,
-    checkoutRequest.payment_option,
+  const paymentMethod = findCheckoutMethod(
+    listGatewayMethods(mockDatabase, paymentDetail.provider),
+    checkoutRequest,
   );
-
-  return simulatePayment(
+  if (paymentMethod === undefined) {
+    return refused(422, "This checkout does not offer that payment method");
+  }
+  const payResult = flowPayments[paymentMethod.flow](
     mockDatabase,
     paymentDetail,
-    { action: "succeed" },
+    paymentMethod,
+    checkoutRequest,
     nowMs,
   );
+  if (payResult.isApplied) {
+    paymentDetail.method_key = paymentMethod.key;
+  }
+
+  return payResult;
 };
 
 const cancelStep: CheckoutStep = (
@@ -238,23 +315,6 @@ const cancelStep: CheckoutStep = (
   addTimeline(paymentDetail, "canceled", "Canceled by the customer", createdAt);
   finishCheckout(paymentDetail, "cancel", createdAt);
   firePaymentEvents(mockDatabase, paymentDetail, ["payment.canceled"], nowMs);
-
-  return { isApplied: true };
-};
-
-const showThreeDsStep: CheckoutStep = (
-  _mockDatabase,
-  paymentDetail,
-  _checkoutRequest,
-  nowMs,
-) => {
-  paymentDetail.status = "requires_action";
-  addTimeline(
-    paymentDetail,
-    "three_ds",
-    "3-D Secure challenge shown",
-    new Date(nowMs).toISOString(),
-  );
 
   return { isApplied: true };
 };
@@ -291,12 +351,7 @@ const checkoutSteps: Record<CheckoutAction, CheckoutStep> = {
       "3-D Secure approved",
       new Date(nowMs).toISOString(),
     );
-    return simulatePayment(
-      mockDatabase,
-      paymentDetail,
-      { action: "succeed" },
-      nowMs,
-    );
+    return succeed(mockDatabase, paymentDetail, nowMs);
   },
   three_ds_fail: (mockDatabase, paymentDetail, _checkoutRequest, nowMs) => {
     addTimeline(
@@ -315,12 +370,12 @@ const checkoutSteps: Record<CheckoutAction, CheckoutStep> = {
 };
 
 /**
- * The test checkout page's actions (PY-03.1): pay with a test card or
- * wallet, decline, cancel, delay and 3-D Secure, each with its redirect and
- * notification; a closed session cannot be paid again (PY-03.3).
+ * The test checkout page's actions (PY-03.1, PY-12.3): pay with one of the
+ * gateway's methods using its own test values, decline, cancel, delay and
+ * 3-D Secure; a closed session cannot be paid again (PY-03.3).
  */
 export function completeCheckout(
-  mockDatabase: PaymentDatabase,
+  mockDatabase: CheckoutDatabase,
   paymentDetail: PaymentDetail,
   checkoutRequest: CheckoutCompleteRequest,
   nowMs: number = Date.now(),

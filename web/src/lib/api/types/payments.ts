@@ -89,6 +89,69 @@ export type PaymentDispute = {
   reason: string;
 };
 
+export type PaymentMethodFlow = "card" | "wallet" | "bank" | "account";
+
+export type CardTestOutcome =
+  "succeed" | "decline" | "three_ds" | "succeed_then_dispute";
+
+export type TestCardValue = {
+  number: string;
+  outcome: CardTestOutcome;
+  /** Set when the outcome is a decline. */
+  decline_reason: DeclineReason | null;
+};
+
+export type WalletTestOutcome = "succeed" | "decline" | "wrong_pin";
+
+export type TestWalletValue = {
+  number: string;
+  outcome: WalletTestOutcome;
+  decline_reason: DeclineReason | null;
+};
+
+/** What a customer pays with on a checkout page, and its test values (PY-12.1). */
+export type PaymentMethodDefinition = {
+  key: string;
+  name: string;
+  flow: PaymentMethodFlow;
+  /** `#rrggbb`, used on checkout pages. */
+  accent: string;
+  is_enabled: boolean;
+  is_builtin: boolean;
+  /** A built-in that differs from its shipped default. */
+  is_modified: boolean;
+  /** Card flow. */
+  test_cards: TestCardValue[];
+  /** Wallet flow. */
+  test_wallets: TestWalletValue[];
+  otp: string;
+  pin: string;
+  /** Bank flow. */
+  bank_outcome: "succeed" | "decline";
+  /** Account flow: the test account shown as signed in. */
+  test_account: string;
+  /** Gateways whose checkout offers this method. */
+  gateway_keys: string[];
+  /** Payments made with it; a custom method in use cannot be deleted. */
+  payment_count: number;
+};
+
+/** Body of POST and PATCH /api/v1/payments/methods; key and flow are fixed after creation. */
+export type PaymentMethodInput = Pick<
+  PaymentMethodDefinition,
+  | "key"
+  | "name"
+  | "flow"
+  | "accent"
+  | "is_enabled"
+  | "test_cards"
+  | "test_wallets"
+  | "otp"
+  | "pin"
+  | "bank_outcome"
+  | "test_account"
+>;
+
 export type PaymentSummary = {
   id: Ulid;
   provider: PaymentProvider;
@@ -119,6 +182,8 @@ export type PaymentDetail = PaymentSummary & {
   checkout_url: string | null;
   redirect: PaymentRedirect | null;
   captured_minor: number;
+  /** The payment method used, once paid. */
+  method_key: string | null;
   dispute: PaymentDispute | null;
   timeline: PaymentTimelineEvent[];
   notifications: PaymentNotification[];
@@ -169,6 +234,10 @@ export type CheckoutSession = {
   currency: string;
   line_items: PaymentLineItem[];
   customer_email: string | null;
+  /** The gateway's accent, `#rrggbb`. */
+  accent: string;
+  /** The enabled methods the gateway offers, in order (PY-12.3). */
+  methods: PaymentMethodDefinition[];
   state: CheckoutState;
   failure_code: PaymentSummary["failure_code"];
   /** Where the browser goes once the checkout is finished. */
@@ -198,9 +267,9 @@ export type CheckoutWallet = { number: string; otp: string; pin: string };
 /** Body of POST /api/v1/checkout-sessions/{sessionId}/complete. */
 export type CheckoutCompleteRequest = {
   action: CheckoutAction;
+  /** The method the customer paid with. */
+  method_key?: string;
   card?: CheckoutCard;
   wallet?: CheckoutWallet;
-  /** SSLCommerz: the method picked, e.g. "card", "bkash", "dbbl". */
-  payment_option?: string;
   decline_reason?: DeclineReason;
 };

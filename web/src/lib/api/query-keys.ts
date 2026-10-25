@@ -90,6 +90,7 @@ export const queryKeys = {
     detail: (paymentId: string) => ["payments", "detail", paymentId] as const,
     checkout: (sessionId: string) =>
       ["payments", "checkout", sessionId] as const,
+    methods: ["payments", "methods"] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

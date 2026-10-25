@@ -14,11 +14,12 @@ import { Route as HttpRouteImport } from './routes/http'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as MailRouteImport } from './routes/mail'
 import { Route as NumbersRouteImport } from './routes/numbers'
-import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
 import { Route as PaySessionIdRouteImport } from './routes/pay/$sessionId'
+import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
+import { Route as PaymentsMethodsRouteImport } from './routes/payments/methods'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
 import { Route as WebhooksComposerRouteImport } from './routes/webhooks/composer'
@@ -57,11 +58,6 @@ const NumbersRoute = NumbersRouteImport.update({
   path: '/numbers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PaymentsRoute = PaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -80,6 +76,16 @@ const MailEmailIdRoute = MailEmailIdRouteImport.update({
 const PaySessionIdRoute = PaySessionIdRouteImport.update({
   id: '/pay/$sessionId',
   path: '/pay/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsIndexRoute = PaymentsIndexRouteImport.update({
+  id: '/payments/',
+  path: '/payments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsMethodsRoute = PaymentsMethodsRouteImport.update({
+  id: '/payments/methods',
+  path: '/payments/methods',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SmsConversationsRoute = SmsConversationsRouteImport.update({
@@ -150,10 +156,10 @@ export interface FileRoutesByFullPath {
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
-  '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/methods': typeof PaymentsMethodsRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail/': typeof MailIndexRoute
+  '/payments/': typeof PaymentsIndexRoute
   '/sms/$threadId': typeof SmsConversationsThreadIdRoute
   '/sms/': typeof SmsConversationsIndexRoute
 }
@@ -173,10 +180,10 @@ export interface FileRoutesByTo {
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/numbers': typeof NumbersRoute
-  '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/methods': typeof PaymentsMethodsRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
   '/webhooks/deliveries': typeof WebhooksDeliveriesRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail': typeof MailIndexRoute
+  '/payments': typeof PaymentsIndexRoute
   '/sms/$threadId': typeof SmsConversationsThreadIdRoute
   '/sms': typeof SmsConversationsIndexRoute
 }
@@ -197,10 +205,10 @@ export interface FileRoutesById {
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
-  '/payments': typeof PaymentsRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
+  '/payments/methods': typeof PaymentsMethodsRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/webhooks/templates': typeof WebhooksTemplatesRoute
   '/webhooks/variables': typeof WebhooksVariablesRoute
   '/mail/': typeof MailIndexRoute
+  '/payments/': typeof PaymentsIndexRoute
   '/sms/_conversations/$threadId': typeof SmsConversationsThreadIdRoute
   '/sms/_conversations/': typeof SmsConversationsIndexRoute
 }
@@ -223,10 +232,10 @@ export interface FileRouteTypes {
     | '/logs'
     | '/mail'
     | '/numbers'
-    | '/payments'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/methods'
     | '/sms'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail/'
+    | '/payments/'
     | '/sms/$threadId'
     | '/sms/'
   fileRoutesByTo: FileRoutesByTo
@@ -246,10 +256,10 @@ export interface FileRouteTypes {
     | '/http'
     | '/logs'
     | '/numbers'
-    | '/payments'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/methods'
     | '/sms/verify'
     | '/webhooks/composer'
     | '/webhooks/deliveries'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail'
+    | '/payments'
     | '/sms/$threadId'
     | '/sms'
   id:
@@ -269,10 +280,10 @@ export interface FileRouteTypes {
     | '/logs'
     | '/mail'
     | '/numbers'
-    | '/payments'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
+    | '/payments/methods'
     | '/sms/_conversations'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/webhooks/templates'
     | '/webhooks/variables'
     | '/mail/'
+    | '/payments/'
     | '/sms/_conversations/$threadId'
     | '/sms/_conversations/'
   fileRoutesById: FileRoutesById
@@ -294,9 +306,9 @@ export interface RootRouteChildren {
   LogsRoute: typeof LogsRoute
   MailRoute: typeof MailRouteWithChildren
   NumbersRoute: typeof NumbersRoute
-  PaymentsRoute: typeof PaymentsRoute
   SettingsRoute: typeof SettingsRoute
   PaySessionIdRoute: typeof PaySessionIdRoute
+  PaymentsMethodsRoute: typeof PaymentsMethodsRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsVerifyRoute: typeof SmsVerifyRoute
   WebhooksComposerRoute: typeof WebhooksComposerRoute
@@ -307,6 +319,7 @@ export interface RootRouteChildren {
   WebhooksSavedRoute: typeof WebhooksSavedRoute
   WebhooksTemplatesRoute: typeof WebhooksTemplatesRoute
   WebhooksVariablesRoute: typeof WebhooksVariablesRoute
+  PaymentsIndexRoute: typeof PaymentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -346,13 +359,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NumbersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/payments': {
-      id: '/payments'
-      path: '/payments'
-      fullPath: '/payments'
-      preLoaderRoute: typeof PaymentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -379,6 +385,20 @@ declare module '@tanstack/react-router' {
       path: '/pay/$sessionId'
       fullPath: '/pay/$sessionId'
       preLoaderRoute: typeof PaySessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/': {
+      id: '/payments/'
+      path: '/payments'
+      fullPath: '/payments/'
+      preLoaderRoute: typeof PaymentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/methods': {
+      id: '/payments/methods'
+      path: '/payments/methods'
+      fullPath: '/payments/methods'
+      preLoaderRoute: typeof PaymentsMethodsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sms/_conversations': {
@@ -499,9 +519,9 @@ const rootRouteChildren: RootRouteChildren = {
   LogsRoute: LogsRoute,
   MailRoute: MailRouteWithChildren,
   NumbersRoute: NumbersRoute,
-  PaymentsRoute: PaymentsRoute,
   SettingsRoute: SettingsRoute,
   PaySessionIdRoute: PaySessionIdRoute,
+  PaymentsMethodsRoute: PaymentsMethodsRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsVerifyRoute: SmsVerifyRoute,
   WebhooksComposerRoute: WebhooksComposerRoute,
@@ -512,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebhooksSavedRoute: WebhooksSavedRoute,
   WebhooksTemplatesRoute: WebhooksTemplatesRoute,
   WebhooksVariablesRoute: WebhooksVariablesRoute,
+  PaymentsIndexRoute: PaymentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

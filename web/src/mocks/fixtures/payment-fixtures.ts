@@ -337,6 +337,23 @@ function buildProviderIds(
   return providerIdsByProvider[provider];
 }
 
+/** Which built-in method a fixture's chosen method stands for. */
+function readFixtureMethodKey(
+  paymentMethod: PaymentMethod | undefined,
+): string | null {
+  if (paymentMethod === undefined) {
+    return null;
+  }
+  if (paymentMethod.kind === "card") {
+    return "card";
+  }
+
+  return paymentMethod.kind === "wallet" &&
+    paymentMethod.wallet_name === "PayPal"
+    ? "paypal_account"
+    : "bkash";
+}
+
 function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
   const createdAtMs = minutesAgoInMs(paymentSpec.minutesAgo);
   const providerIds = buildProviderIds(paymentSpec.provider, createdAtMs);
@@ -359,6 +376,7 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
     refunded_minor: 0,
     captured_minor: 0,
     method: paymentSpec.method ?? null,
+    method_key: readFixtureMethodKey(paymentSpec.method),
     line_items: paymentSpec.lineItems,
     metadata: { order_id: `ord_${paymentId.slice(-6)}` },
     success_url: paymentSpec.hasCheckout ? `${shopUrl}/success` : null,

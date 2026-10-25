@@ -82,6 +82,26 @@ Wallet providers (bKash, Nagad) use test wallet numbers with fixed outcomes and 
 
 The test OTP is `123456` and the test PIN is `12121`. A number that is not a test wallet is refused with "Use a test wallet". The full tables live in Settings > Payments and the docs.
 
+## Gateways and payment methods (configurable)
+
+Gateways and payment methods are data, not code, so a developer can emulate a gateway SendMock does not ship, change how a built-in one behaves, and go back to the shipped behaviour at any time.
+
+- **Payment method:** what the customer pays with on a checkout page, and the steps to do it.
+  - Flows: **Card** (card form; the outcome follows the method's test cards, one of which can ask for 3-D Secure), **Wallet** (wallet number, then OTP, then PIN; test wallet numbers with outcomes, the test OTP and PIN), **Bank** (pick, then confirm; a fixed outcome) and **Account** (sign in as the test account, then approve or cancel).
+  - Each has a name, a key, an accent colour, its flow and its test values. Built-ins: Card, PayPal account, bKash, Nagad, Rocket, DBBL Nexus, City Touch, BRAC iBanking.
+- **Gateway:** an emulated provider.
+  - Name, key (the `provider` value in the API and in `/providers/<key>/...` paths), accent colour, enabled.
+  - **Methods offered**, in order: the checkout page shows one method directly, or a picker grouped by flow (Cards, Mobile banking, Net banking, Accounts) when there are several.
+  - **Merchant credentials** as name / value rows (store id, secret key, ...), secrets masked everywhere and written to seed exports as `${ENV}` references.
+  - **Notification endpoint** (a webhook endpoint) for its IPN or webhook deliveries.
+  - **Redirect:** GET or POST, and the fields sent back to the app as name / template rows.
+  - **Notification:** content type (JSON or form), the gateway's event name for each native event (none means it sends nothing for that event), a body template and header templates (for signatures).
+  - Templates read `payment` (id, reference, amount and amount_major, currency, status, failure code, customer, method, provider ids), `event` (native type and the gateway's name for it), `merchant` (the credentials) and the usual functions and filters; a live preview renders them against a payment.
+- **Built-ins** (Stripe, PayPal, SSLCommerz, bKash, Native, and the built-in methods) are editable. An edited built-in shows **Modified** and **Reset to default** restores the shipped version. Built-ins cannot be deleted; they can be disabled.
+- **Custom gateways** start from a built-in (its methods, redirect and notification shapes are copied, then edited) or from blank. Custom methods start from a flow. Both can be deleted when no payment uses them (otherwise disabled).
+- **AI-assisted:** gateways and methods are operations in the registry like everything else, so the CLI (`sendmock payments gateways|methods ...`) and the MCP `payments` toolset can list, create, update, preview and reset them with the same validation as the UI. The agent skill's `add-payment-gateway` workflow (and the MCP prompt of the same name) lets a developer say "add the Nagad gateway" or "add Upay as a wallet": the agent reads the provider's docs, writes the definition, checks the preview, runs a test checkout and exports the result to the seed file. See [14-ai-integration.md](14-ai-integration.md#prompts).
+- Changes apply to new checkouts, redirects and notifications at once. The provider wire APIs (session init, validation) of custom gateways are emulated in Phase 3P from the same definition: init returns the checkout URL, and validation answers from the payment.
+
 ## Events
 
 Native events (also usable in webhook rules and the realtime stream):
@@ -103,6 +123,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 ## Payment data model
 
+- `payment_gateways` and `payment_methods`: the definitions above, with `is_builtin`, `is_modified` and the shipped default kept for reset.
 - `payments`: id, provider, provider_ids (session/intent/order/charge IDs), amount_minor, currency (incl. BDT, INR, USD, EUR, ...), status (`requires_payment`, `requires_action`, `authorized`, `succeeded`, `failed`, `canceled`, `refunded`, `partially_refunded`, `disputed`), failure_code, customer (email/name/phone), method (card brand + last4 + expiry, or wallet number masked), line_items JSON, metadata JSON, success/fail/cancel URLs, notification URL, request_raw, created_at, updated_at.
 - `payment_events`: timeline (created, 3DS, authorized, captured, refunded, disputed, notifications sent).
 - `refunds`, `disputes`, `subscriptions` (Phase 4+).
@@ -112,7 +133,8 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 - **Payments** screen: list (amount, currency, provider badge, status, customer, time), filters (status, provider, currency), detail with timeline, method, line items, redirects and IPN/webhook deliveries (linked to the webhook delivery log), and a **Simulate** menu (succeed, decline with reason, refund full/partial, open/resolve dispute, expire checkout, resend IPN).
 - **Test checkout page** (`/pay/{sessionId}`): a clean, provider-neutral checkout styled per provider theme (Stripe-like card form, PayPal-like approve, SSLCommerz-like method picker with cards / mobile banking / net banking, bKash-like wallet + OTP + PIN steps), always with the TEST MODE banner and the outcome controls.
-- **Settings > Payments**: merchant credentials per provider, the **notification endpoint** per provider (a webhook endpoint; IPN and webhook notifications are deliveries to it, so they share the delivery log, retries and replay), default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), test card and wallet tables.
+- **Gateways** screen (Payments > Gateways) and **Methods** screen (Payments > Methods): see [Gateways and payment methods](#gateways-and-payment-methods-configurable). The notification endpoint and merchant credentials are set per gateway; IPN and webhook notifications are deliveries to that endpoint, so they share the delivery log, retries and replay.
+- **Settings > Payments**: merchant name shown on checkout pages, default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), and the test card and wallet tables of the enabled methods, linking to Gateways and Methods.
 - Overview: payments count, success rate, revenue (test) per currency.
 
 ## API (SendMock native)
@@ -125,6 +147,11 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
+| GET/POST/PATCH/DELETE | `/payments/gateways` | gateways; `POST` takes `{ "name", "key", "start_from" }`; built-ins cannot be deleted |
+| POST | `/payments/gateways/{gatewayKey}/reset` | restore a built-in gateway |
+| POST | `/payments/gateways/{gatewayKey}/preview` | render an unsaved gateway's redirect fields and notification for an event against a payment, with template problems |
+| GET/POST/PATCH/DELETE | `/payments/methods` | payment methods; built-ins cannot be deleted |
+| POST | `/payments/methods/{methodKey}/reset` | restore a built-in method |
 | GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
@@ -133,7 +160,7 @@ CLI: `sendmock payments list|show|simulate|notify|test-cards`. MCP toolset `paym
 
 ## Roadmap placement
 
-- **Phase U2:** Payments screen, payment detail, Simulate menu, test checkout page (all provider themes) and Settings > Payments on mock data.
+- **Phase U2:** Payments screen, payment detail, Simulate menu, test checkout page (all provider themes), Gateways and Methods screens (add, edit, reset) and Settings > Payments on mock data.
 - **Phase 3P (new, after Phase 3):** native payments API, hosted checkout flow, Stripe, PayPal and SSLCommerz emulation, test cards, events, signing, validation APIs, payment templates, CLI and MCP `payments` toolset.
 - **Phase 4:** bKash, Razorpay, Paddle; subscriptions; disputes polish.
 - **Later:** Nagad, ShurjoPay, aamarPay, Paystack, Flutterwave, Mollie, Square, Lemon Squeezy.

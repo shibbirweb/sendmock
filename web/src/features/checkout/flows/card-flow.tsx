@@ -4,11 +4,14 @@ import { FormField } from "@/components/common/form-field";
 import { FormFieldError } from "@/components/common/form-field-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { accentButtonClassName } from "@/features/checkout/themes/accent-button-classes";
-import type { CheckoutActions } from "@/features/checkout/use-checkout-actions";
-import type { CheckoutSession } from "@/lib/api/types";
+import { accentButtonClassName } from "@/features/checkout/flows/accent-button-classes";
+import type { FlowProps } from "@/features/checkout/flows/flow-props";
 import { formatMinorAmount } from "@/lib/payments/format-money";
-import { checkCardNumber, testCards } from "@/lib/payments/test-instruments";
+import {
+  checkCardNumber,
+  describeTestOutcome,
+  formatCardNumber,
+} from "@/lib/payments/test-instruments";
 
 /** "12/34" as month and four-digit year, or null. */
 function parseExpiry(
@@ -23,17 +26,45 @@ function parseExpiry(
   return { month, year: 2000 + Number(expiryMatch[2]) };
 }
 
-/**
- * A card form whose outcome follows the test card table (PY-03.1). A real
- * card number is refused here and never leaves the page (PY-01.1).
- */
-export function CardPaymentForm({
-  checkoutSession,
-  checkoutActions,
+function CardField({
+  label,
+  fieldId,
+  value,
+  placeholder,
+  onChange,
 }: {
-  checkoutSession: CheckoutSession;
-  checkoutActions: CheckoutActions;
+  label: string;
+  fieldId: string;
+  value: string;
+  placeholder?: string;
+  onChange: (nextValue: string) => void;
 }) {
+  return (
+    <FormField label={label} fieldId={fieldId}>
+      <Input
+        id={fieldId}
+        inputMode={label === "Name on card" ? undefined : "numeric"}
+        autoComplete="off"
+        placeholder={placeholder}
+        className={label === "Name on card" ? undefined : "font-mono"}
+        value={value}
+        onChange={(changeEvent) => {
+          onChange(changeEvent.target.value);
+        }}
+      />
+    </FormField>
+  );
+}
+
+/**
+ * The card flow: the outcome follows the method's own test cards (PY-12.3).
+ * A real card number is refused here and never leaves the page (PY-01.1).
+ */
+export function CardFlow({
+  checkoutSession,
+  paymentMethod,
+  checkoutActions,
+}: FlowProps) {
   const fieldIdPrefix = React.useId();
   const [cardNumber, setCardNumber] = React.useState("");
   const [expiryText, setExpiryText] = React.useState("");
@@ -47,7 +78,7 @@ export function CardPaymentForm({
       className="grid gap-3"
       onSubmit={(submitEvent) => {
         submitEvent.preventDefault();
-        const cardCheck = checkCardNumber(cardNumber);
+        const cardCheck = checkCardNumber(cardNumber, paymentMethod.test_cards);
         const expiry = parseExpiry(expiryText);
         if (cardCheck.kind === "invalid") {
           checkoutActions.showError("Enter a valid card number");
@@ -67,6 +98,7 @@ export function CardPaymentForm({
         }
         checkoutActions.submit({
           action: "pay",
+          method_key: paymentMethod.key,
           card: {
             number: cardNumber,
             exp_month: expiry.month,
@@ -77,57 +109,35 @@ export function CardPaymentForm({
         });
       }}
     >
-      <FormField label="Card number" fieldId={`${fieldIdPrefix}-number`}>
-        <Input
-          id={`${fieldIdPrefix}-number`}
-          inputMode="numeric"
-          autoComplete="off"
-          placeholder="4242 4242 4242 4242"
-          className="font-mono"
-          value={cardNumber}
-          onChange={(changeEvent) => {
-            setCardNumber(changeEvent.target.value);
-          }}
-        />
-      </FormField>
+      <CardField
+        label="Card number"
+        fieldId={`${fieldIdPrefix}-number`}
+        placeholder="4242 4242 4242 4242"
+        value={cardNumber}
+        onChange={setCardNumber}
+      />
       <div className="grid grid-cols-2 gap-3">
-        <FormField label="Expiry (MM/YY)" fieldId={`${fieldIdPrefix}-expiry`}>
-          <Input
-            id={`${fieldIdPrefix}-expiry`}
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="12/34"
-            className="font-mono"
-            value={expiryText}
-            onChange={(changeEvent) => {
-              setExpiryText(changeEvent.target.value);
-            }}
-          />
-        </FormField>
-        <FormField label="CVC" fieldId={`${fieldIdPrefix}-cvc`}>
-          <Input
-            id={`${fieldIdPrefix}-cvc`}
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="123"
-            className="font-mono"
-            value={cvc}
-            onChange={(changeEvent) => {
-              setCvc(changeEvent.target.value);
-            }}
-          />
-        </FormField>
-      </div>
-      <FormField label="Name on card" fieldId={`${fieldIdPrefix}-name`}>
-        <Input
-          id={`${fieldIdPrefix}-name`}
-          autoComplete="off"
-          value={holderName}
-          onChange={(changeEvent) => {
-            setHolderName(changeEvent.target.value);
-          }}
+        <CardField
+          label="Expiry (MM/YY)"
+          fieldId={`${fieldIdPrefix}-expiry`}
+          placeholder="12/34"
+          value={expiryText}
+          onChange={setExpiryText}
         />
-      </FormField>
+        <CardField
+          label="CVC"
+          fieldId={`${fieldIdPrefix}-cvc`}
+          placeholder="123"
+          value={cvc}
+          onChange={setCvc}
+        />
+      </div>
+      <CardField
+        label="Name on card"
+        fieldId={`${fieldIdPrefix}-name`}
+        value={holderName}
+        onChange={setHolderName}
+      />
       <FormFieldError
         errorMessage={checkoutActions.errorMessage ?? undefined}
       />
@@ -145,20 +155,18 @@ export function CardPaymentForm({
       <details className="text-xs text-muted-foreground">
         <summary className="cursor-pointer">Test cards</summary>
         <ul className="mt-2 grid gap-1">
-          {testCards.map((testCard) => (
+          {paymentMethod.test_cards.map((testCard) => (
             <li key={testCard.number} className="flex justify-between gap-2">
               <button
                 type="button"
                 className="font-mono underline-offset-2 hover:underline"
                 onClick={() => {
-                  setCardNumber(
-                    testCard.number.replace(/(\d{4})(?=\d)/g, "$1 "),
-                  );
+                  setCardNumber(formatCardNumber(testCard.number));
                 }}
               >
-                {testCard.number.replace(/(\d{4})(?=\d)/g, "$1 ")}
+                {formatCardNumber(testCard.number)}
               </button>
-              <span>{testCard.label}</span>
+              <span>{describeTestOutcome(testCard)}</span>
             </li>
           ))}
         </ul>

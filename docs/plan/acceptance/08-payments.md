@@ -96,3 +96,14 @@ Phase 3P.
 - [ ] PY-11.1 `sendmock payments list|show|simulate|notify|test-cards` work with `--json`.
 - [ ] PY-11.2 The MCP `payments` toolset exposes create checkout, simulate, notify, list, get and wait, with correct annotations.
 - [ ] PY-11.3 `GET /api/v1/wait/payment` returns when a matching payment reaches the requested status, or `408`.
+
+## PY-12 Gateway and method configuration
+
+UI in U2, backend, CLI, MCP and skill in Phase 3P.
+
+- [ ] PY-12.1 Payments > Methods lists every payment method; a method can be added from a flow (card, wallet, bank, account) and edited (name, accent, test values with outcomes, OTP and PIN); a built-in shows Modified once edited and Reset to default restores it; a custom one can be deleted while no payment uses it.
+- [ ] PY-12.2 Payments > Gateways lists every gateway; a gateway can be added from a built-in or blank and edited (name, accent, methods offered in order, merchant credentials with secrets masked, notification endpoint, redirect method and fields, notification content type, event names, body and header templates); built-ins show Modified and reset to default; a custom one can be deleted while no payment uses it.
+- [ ] PY-12.3 The checkout page offers the gateway's methods (one directly, several in a picker grouped by flow), each running its flow with its own test values; a custom gateway's payments, redirects and notifications follow its definition.
+- [ ] PY-12.4 Redirect fields and notification templates render against a chosen payment and event in a live preview with problems shown; a save with template errors is refused.
+- [ ] PY-12.5 The CLI and the MCP `payments` toolset list, create, update, preview and reset gateways and methods with the same validation as the UI, and the skill's `add-payment-gateway` workflow takes an agent from the provider's docs to a working gateway (definition, preview, test checkout, seed export).
+
