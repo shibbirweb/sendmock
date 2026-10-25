@@ -6,6 +6,10 @@ import { FilterChip } from "@/components/common/filter-chip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConnectHint } from "@/features/onboarding/connect-hint";
+import { NoDataState } from "@/features/onboarding/no-data-state";
+import { NoMatchState } from "@/features/onboarding/no-match-state";
+import { SampleButton } from "@/features/onboarding/sample-button";
 import { useCurrentTimeMs } from "@/features/verify/verifications/use-current-time";
 import { VerificationTable } from "@/features/verify/verifications/verification-table";
 import {
@@ -15,19 +19,31 @@ import {
 import { useVerifications } from "@/lib/api/hooks/use-verify-queries";
 import { queryKeys } from "@/lib/api/query-keys";
 
-function VerificationsEmptyState({ isFiltered }: { isFiltered: boolean }) {
+function VerificationsEmptyState({
+  isFiltered,
+  onClearFilter,
+}: {
+  isFiltered: boolean;
+  onClearFilter: () => void;
+}) {
+  if (isFiltered) {
+    return (
+      <NoMatchState
+        message="No verifications match this status or search."
+        onClearFilter={onClearFilter}
+      />
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center gap-2 px-6 py-16 text-center">
-      <ShieldCheckIcon className="size-8 text-muted-foreground" />
-      <p className="text-sm font-medium">
-        {isFiltered ? "No verifications match" : "No verifications yet"}
-      </p>
-      <p className="max-w-md text-sm text-muted-foreground">
-        {isFiltered
-          ? "Try another status or clear the search."
-          : "Start one from your app with the Twilio Verify API (POST /v2/Services/{ServiceSid}/Verifications). The code shows up here and in the SMS or Mail screen."}
-      </p>
-    </div>
+    <NoDataState
+      icon={ShieldCheckIcon}
+      title="No verifications yet"
+      description="Start one from your app with the Twilio Verify API. The code shows up here and in the SMS screen."
+    >
+      <ConnectHint connectArea="verify" />
+      <SampleButton sampleKind="verification" />
+    </NoDataState>
   );
 }
 
@@ -109,6 +125,10 @@ export function VerificationsPanel() {
           (verifications.length === 0 ? (
             <VerificationsEmptyState
               isFiltered={statusFilter !== "all" || recipientSearch !== ""}
+              onClearFilter={() => {
+                setStatusFilter("all");
+                setRecipientSearch("");
+              }}
             />
           ) : (
             <VerificationTable

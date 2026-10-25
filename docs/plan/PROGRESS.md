@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Overview, Mail, SMS, Verify, Numbers, Logs and Settings screens done**; empty states next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: every screen and the empty states built on mock data** (18 / 18); Phase U2 next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 376 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 379 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Finish Phase U1: the empty states with "how to connect" and "send sample".
+2. Start Phase U2: the webhook, HTTP catcher and payment screens.
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 17 / 18 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -104,7 +104,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Settings: retention, reset to seed, seed export/apply, email and SMS options, opened events, chaos, OTP patterns (per-section save with field errors; tag and forward rules follow with the U2 rule builder)
 - [x] Settings: connection snippets per language (incl. Docker hostnames), about and update channel
 - [x] Custom outcome numbers and addresses with the Magic numbers and Magic addresses switches and "Test a number / address" boxes ([04](04-sms.md#custom-outcome-numbers), [03](03-email.md#delivery-outcome-simulation), SM-07.7 to SM-07.9, EM-10.5, EM-10.6)
-- [ ] Empty states with "how to connect" and "send sample"
+- [x] Empty states with "how to connect" and "send sample" (no data told apart from no match, shared "Where does your app run?" choice, `POST /samples/{kind}`)
 
 ### Phase U2: Webhook, HTTP catcher and payment screens
 
@@ -330,3 +330,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Custom outcome numbers and addresses built on mock data: ordered rule tables with on / off, move, edit and delete, dialogs that ask only for what an outcome needs, "Test a number / address" boxes, Magic numbers and Magic addresses switches, rules exported to the seed file. Mock sends now follow custom rules and the magic numbers and addresses (reject on send, failure codes, delayed delivery, read, bounces). |
 | 2026-10-25 | Plan: Overview dashboard design ([07](07-ui.md#overview): KPI row with today's counts, 24-hour activity chart with tooltip and table view, webhook metrics per endpoint, recent failures, latest messages, connect shortcuts), richer `/stats` in the API plan, criteria UI-03.3 to UI-03.5. Chart colours checked for colour-blind separation and contrast in both themes. |
 | 2026-10-25 | Overview dashboard built on mock data: stat tiles with totals and today's counts, a 24-hour stacked activity chart (legend, tooltip on hover and arrow keys, "Show as table"), webhook health per endpoint with a success meter, p50 / p95, retries and top failure codes, recent failures linking to the delivery, latest messages and a connect card with copy buttons. `/stats` mock computes the new fields. |
+| 2026-10-25 | Plan: empty states ([07](07-ui.md#empty-states--onboarding)): "no data yet" (how to connect card with copyable values and a sample button per screen) told apart from "nothing matches" (Clear filter); the host follows a shared, remembered "Where does your app run?" choice that defaults to the Compose host in Docker. New `POST /samples/{kind}` (email over SMTP, SMS, verification) with CLI and MCP, `is_container` on `/info`; criteria UI-04.3, UI-04.4, PL-03.5. |
+| 2026-10-25 | Empty states built on mock data: Mail, SMS, Verify, Numbers, both Logs tabs and the Overview show a how to connect card (copyable host and ports from `/info`, a shared and remembered "Where does your app run?" switch that defaults to the Compose host in Docker) and a sample button; filters that match nothing offer Clear filter instead. Mock `POST /samples/{kind}` creates the email with its SMTP session, the SMS with its API log entry and a pending verification. Demo controls gain a "Running in Docker" switch. |

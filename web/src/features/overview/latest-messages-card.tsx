@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SampleButton } from "@/features/onboarding/sample-button";
 import { useEmailList } from "@/lib/api/hooks/use-email-queries";
 import { useSmsThreads } from "@/lib/api/hooks/use-sms-queries";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -76,9 +77,15 @@ export function LatestMessagesCard() {
       <CardContent>
         {isPending && <Skeleton className="h-40 w-full" />}
         {!isPending && latestRows.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Nothing yet. Send an email or SMS from your app to see it here.
-          </p>
+          <div className="grid justify-items-start gap-3">
+            <p className="text-sm text-muted-foreground">
+              Nothing yet. Send an email or SMS from your app, or try a sample.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <SampleButton sampleKind="email" variant="outline" />
+              <SampleButton sampleKind="sms" variant="outline" />
+            </div>
+          </div>
         )}
         {!isPending && latestRows.length > 0 && (
           <ul aria-label="Latest messages" className="grid gap-1">

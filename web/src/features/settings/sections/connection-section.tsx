@@ -17,6 +17,7 @@ import {
 } from "@/features/settings/connection/request-body-editor";
 import { RequestHeadersEditor } from "@/features/settings/connection/request-headers-editor";
 import { useRequestCustomization } from "@/features/settings/connection/use-request-customization";
+import { useAppLocation } from "@/features/onboarding/use-app-location";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
 import {
@@ -85,8 +86,7 @@ export function ConnectionSection() {
   const fieldIdPrefix = React.useId();
   const appInfoQuery = useAppInfo();
   const [language, setLanguage] = React.useState<SnippetLanguage>("laravel");
-  const [appLocation, setAppLocation] =
-    React.useState<AppLocation>("this-machine");
+  const [appLocation, setAppLocation] = useAppLocation();
   const requestEditor = useRequestCustomization();
   const connectionSnippets = buildConnectionSnippets(
     language,

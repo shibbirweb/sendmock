@@ -4,7 +4,6 @@ import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   InboundSmsRequest,
-  NativeSmsRequest,
   OpenSource,
   PageOf,
   SmsListFilters,
@@ -61,15 +60,6 @@ export function useSendInboundSms() {
     requestApi<SmsMessage>("/sms/inbound", {
       method: "POST",
       requestBody: inboundSmsRequest,
-    }),
-  );
-}
-
-export function useSendSms() {
-  return useSmsMutation((nativeSmsRequest: NativeSmsRequest) =>
-    requestApi<SmsMessage>("/sms", {
-      method: "POST",
-      requestBody: nativeSmsRequest,
     }),
   );
 }
