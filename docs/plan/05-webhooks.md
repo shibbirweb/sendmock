@@ -266,7 +266,7 @@ Any delivery (or composer request) can be **saved with a name**, e.g. "Twilio ST
 
 ## Metrics
 
-A small dashboard (Webhooks > Overview, and the app home page) with: deliveries per endpoint over time, success rate, p50/p95 latency, retries, most common failure codes, plus captured email/SMS/HTTP counts. Computed from the existing tables, no extra infrastructure. API: `/api/v1/stats`.
+A small dashboard (Webhooks > Overview, and the app home page) with: deliveries per endpoint over time, success rate, p50/p95 latency, retries, most common failure codes, plus captured email/SMS/HTTP counts. Computed from the existing tables, no extra infrastructure. API: `/api/v1/stats` (home page) and `/api/v1/webhooks/metrics` (Webhooks > Overview, by range and endpoint).
 
 ## Example use cases
 

@@ -2,22 +2,19 @@ import type {
   ActivityBucket,
   AppStats,
   EndpointMetrics,
-  FailureCodeCount,
   RecentFailedDelivery,
-  WebhookDelivery,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import {
   calculateSuccessRate,
   isFailedDelivery,
   percentile,
-  readFailureCode,
   sortDurations,
+  summarizeEndpointMetrics,
 } from "@/mocks/stats/delivery-metrics";
 
 const hourInMs = 60 * 60 * 1000;
 const activityBucketCount = 24;
-const topFailureCodeLimit = 3;
 const recentFailureLimit = 5;
 
 function readStartOfTodayMs(nowMs: number): number {
@@ -30,25 +27,6 @@ function readStartOfTodayMs(nowMs: number): number {
 function countSince(timestamps: string[], sinceMs: number): number {
   return timestamps.filter((timestamp) => Date.parse(timestamp) >= sinceMs)
     .length;
-}
-
-function countTopFailureCodes(
-  deliveries: WebhookDelivery[],
-): FailureCodeCount[] {
-  const failureCounts = new Map<string, number>();
-  for (const webhookDelivery of deliveries.filter(isFailedDelivery)) {
-    const failureCode = readFailureCode(webhookDelivery);
-    failureCounts.set(failureCode, (failureCounts.get(failureCode) ?? 0) + 1);
-  }
-
-  return [...failureCounts.entries()]
-    .map(([failureCode, failureCount]) => ({ failureCode, failureCount }))
-    .sort((first, second) => second.failureCount - first.failureCount)
-    .slice(0, topFailureCodeLimit)
-    .map(({ failureCode, failureCount }) => ({
-      failure_code: failureCode,
-      failure_count: failureCount,
-    }));
 }
 
 /** 24 hourly buckets ending with the current hour (UI-03.3). */
@@ -107,25 +85,10 @@ export function buildEndpointMetrics(
       Date.parse(webhookDelivery.created_at) >= windowStartMs,
   );
 
-  return mockDatabase.webhookEndpoints.map((webhookEndpoint) => {
-    const endpointDeliveries = recentDeliveries.filter(
-      (webhookDelivery) => webhookDelivery.endpoint_id === webhookEndpoint.id,
-    );
-    const sortedDurations = sortDurations(endpointDeliveries);
-
-    return {
-      endpoint_id: webhookEndpoint.id,
-      endpoint_name: webhookEndpoint.name,
-      delivery_count: endpointDeliveries.length,
-      success_rate: calculateSuccessRate(endpointDeliveries),
-      p50_latency_ms: percentile(sortedDurations, 50),
-      p95_latency_ms: percentile(sortedDurations, 95),
-      retry_count: endpointDeliveries.filter(
-        (webhookDelivery) => webhookDelivery.attempt > 1,
-      ).length,
-      top_failure_codes: countTopFailureCodes(endpointDeliveries),
-    };
-  });
+  return summarizeEndpointMetrics(
+    mockDatabase.webhookEndpoints,
+    recentDeliveries,
+  );
 }
 
 /** The newest failed deliveries, linking to the delivery (UI-03.5). */
