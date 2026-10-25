@@ -19,6 +19,7 @@ function buildVariable(
     endpoint_id: endpointId,
     value: "value",
     random_mode: null,
+    fixed_value: null,
     description: "",
     created_by: "ui",
   };

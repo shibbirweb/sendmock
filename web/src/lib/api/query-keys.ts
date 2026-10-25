@@ -4,6 +4,7 @@ import type {
   EmailListFilters,
   RulePreviewRequest,
   TemplateRenderRequest,
+  VariablePreviewRequest,
   SmsListFilters,
   SmtpSessionListFilters,
   VerificationListFilters,
@@ -70,6 +71,8 @@ export const queryKeys = {
       renderRequest: TemplateRenderRequest,
     ) => ["webhooks", "template-preview", templateId, renderRequest] as const,
     variables: ["webhooks", "variables"] as const,
+    variablePreview: (previewRequest: VariablePreviewRequest) =>
+      ["webhooks", "variable-preview", previewRequest] as const,
     saved: ["webhooks", "saved"] as const,
   },
   httpCatcher: {

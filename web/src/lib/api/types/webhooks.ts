@@ -249,8 +249,22 @@ export type WebhookVariable = {
   /** Static value, expression, generator or default; secrets are masked. */
   value: string;
   random_mode: "per_send" | "fixed" | null;
+  /** The generated value of a Fixed random variable; Regenerate replaces it (WH-07.13). */
+  fixed_value: string | null;
   description: string;
   created_by: CreatedBy;
+};
+
+/** Body of POST /api/v1/webhooks/variables/preview (WH-07.12). */
+export type VariablePreviewRequest = {
+  kind: VariableKind;
+  value: string;
+};
+
+export type VariablePreviewResult = {
+  resolved_value: string;
+  warnings: string[];
+  errors: string[];
 };
 
 /** Body of POST and PATCH /api/v1/webhooks/variables. */

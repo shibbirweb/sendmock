@@ -62,6 +62,7 @@ export function EndpointVariableForm({
     const validationErrors = validateWebhookVariableInput(
       variableInput,
       existingVariables,
+      editedVariable !== null,
     );
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
@@ -135,7 +136,13 @@ export function EndpointVariableForm({
           id={`${fieldIdPrefix}-value`}
           aria-label="Variable value"
           type={variableKind === "secret" ? "password" : "text"}
-          placeholder={variableKind === "secret" ? "New secret value" : "Value"}
+          placeholder={
+            variableKind === "secret"
+              ? editedVariable === null
+                ? "Secret value"
+                : "Leave empty to keep the current secret"
+              : "Value"
+          }
           className="font-mono text-xs"
           value={variableValue}
           aria-invalid={fieldErrors.value !== undefined}

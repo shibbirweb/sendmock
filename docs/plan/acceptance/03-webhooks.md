@@ -79,6 +79,9 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.8 The live preview matches what is actually sent for the same message.
 - [ ] WH-07.9 The reference panel lists every context field for the chosen events, the variables, functions and filters with type, description and example, and clicking one inserts it at the cursor.
 - [ ] WH-07.10 Typing inside `{{ }}` suggests matching keys, the children after a dot, filters after `|` and functions with their signature; the keyboard picks and inserts one.
+- [ ] WH-07.11 The Variables screen lists global and endpoint variables with kind, value (secrets masked) and scope, and narrows them by scope, kind and name.
+- [ ] WH-07.12 Each kind has its own editor fields, checked the same way by the UI and the API (number, boolean, valid JSON, expressions that render), with a "Resolves to" preview against the sample; a secret is never shown again after saving.
+- [ ] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
 
 ## WH-08 Built-in payload templates
 

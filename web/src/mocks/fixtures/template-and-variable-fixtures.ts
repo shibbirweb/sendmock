@@ -223,6 +223,7 @@ type VariableSpec = Pick<
   "name" | "kind" | "value" | "description"
 > & {
   randomMode?: WebhookVariable["random_mode"];
+  fixedValue?: string;
 };
 
 const variableSpecs: VariableSpec[] = [
@@ -270,6 +271,14 @@ const variableSpecs: VariableSpec[] = [
     randomMode: "per_send",
   },
   {
+    name: "idempotency_seed",
+    kind: "random",
+    value: "random_string(12)",
+    description: "Generated once; Regenerate to change it.",
+    randomMode: "fixed",
+    fixedValue: "k3Vq8LzP0aXm",
+  },
+  {
     name: "full_ref",
     kind: "computed",
     value: "{{ vars.tenant_id }}-{{ vars.nonce }}",
@@ -292,6 +301,7 @@ export function buildWebhookVariableFixtures(): WebhookVariable[] {
     endpoint_id: null,
     value: variableSpec.value,
     random_mode: variableSpec.randomMode ?? null,
+    fixed_value: variableSpec.fixedValue ?? null,
     description: variableSpec.description,
     created_by: "ui",
   }));

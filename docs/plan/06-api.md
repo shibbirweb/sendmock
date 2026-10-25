@@ -97,7 +97,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
 | POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables, or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |
-| GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables |
+| GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables; values are checked per kind and secrets are always returned masked (an empty value on `PATCH` keeps the stored secret); a Fixed random variable carries its `fixed_value` |
+| POST | `/webhooks/variables/preview` | what a variable resolves to against the sample message: `{ "kind": ..., "value": ... }`, returns the value, warnings and errors |
 | POST | `/webhooks/variables/{variableId}/regenerate` | refresh a Fixed random variable |
 | POST | `/webhooks/render` | render templates against a sample without sending |
 | GET | `/webhooks/template-reference` | context fields (path, type, description, example, children) for `?events=`, plus functions and filters, for the reference panel and `{{` suggestions |
