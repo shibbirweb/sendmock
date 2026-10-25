@@ -15,55 +15,68 @@
   --brand-to: #34d399;
 }
 
+/* Fumadocs' neutral muted text (#737373) is 4.3:1 on its light background;
+   this darker grey passes WCAG AA (4.5:1) there and on the card and secondary
+   surfaces. Dark mode keeps Fumadocs' value. */
+:root:not(.dark) {
+  --color-fd-muted-foreground: #5f5f5f;
+}
+
 @theme inline {
-    --animate-shiny-text: shiny-text 8s infinite;
-    --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
-    --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
-    --animate-marquee: marquee var(--duration) infinite linear;
-    --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --animate-shiny-text: shiny-text 8s infinite;
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
+    alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   @keyframes shiny-text {
-  0%, 90%, 100% {
-    background-position: calc(-100% - var(--shiny-width)) 0;
-        }
-  30%, 60% {
-    background-position: calc(100% + var(--shiny-width)) 0;
-        }
+    0%,
+    90%,
+    100% {
+      background-position: calc(-100% - var(--shiny-width)) 0;
     }
+    30%,
+    60% {
+      background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
   @keyframes shimmer-slide {
-  to {
-    transform: translate(calc(100cqw - 100%), 0);
-        }
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
     }
+  }
   @keyframes spin-around {
-  0% {
-    transform: translateZ(0) rotate(0);
-        }
-  15%, 35% {
-    transform: translateZ(0) rotate(90deg);
-        }
-  65%, 85% {
-    transform: translateZ(0) rotate(270deg);
-        }
-  100% {
-    transform: translateZ(0) rotate(360deg);
-        }
+    0% {
+      transform: translateZ(0) rotate(0);
     }
+    15%,
+    35% {
+      transform: translateZ(0) rotate(90deg);
+    }
+    65%,
+    85% {
+      transform: translateZ(0) rotate(270deg);
+    }
+    100% {
+      transform: translateZ(0) rotate(360deg);
+    }
+  }
   @keyframes marquee {
-  from {
-    transform: translateX(0);
-        }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-        }
+    from {
+      transform: translateX(0);
     }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-        }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
-        }
+    from {
+      transform: translateY(0);
     }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 /* WS-02.2: with reduced motion on, animations stop and the page stays readable. */
 @media (prefers-reduced-motion: reduce) {

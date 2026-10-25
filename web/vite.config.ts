@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 
 // The website publishes this app under /demo/, so the base path is configurable.
 const basePath = process.env.VITE_BASE_PATH ?? "/";
+const isMockBuild = process.env.VITE_API_MODE !== "live";
 
 export default defineConfig({
   base: basePath,
@@ -20,6 +21,23 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(import.meta.dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        app: resolve(import.meta.dirname, "index.html"),
+        // Answers the website's API playground with this app's mock API (W10);
+        // a live build has no mock layer, so it has no bridge either.
+        ...(isMockBuild
+          ? {
+              playgroundBridge: resolve(
+                import.meta.dirname,
+                "playground-bridge.html",
+              ),
+            }
+          : {}),
+      },
     },
   },
 });

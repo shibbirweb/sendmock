@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -156,6 +157,12 @@ export function ApiRequestsPanel() {
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
           </div>
+        )}
+        {requestsQuery.isError && (
+          <QueryErrorState
+            message="Could not load the request log."
+            onRetry={() => void requestsQuery.refetch()}
+          />
         )}
         {requestsQuery.isSuccess &&
           apiRequests.length === 0 &&

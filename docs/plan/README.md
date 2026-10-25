@@ -31,6 +31,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 15 | [HTTP catcher](15-http-catcher.md) | Request bin for any other outbound HTTP (Slack, Discord, push, Telegram) with mock responses |
 | 16 | [Website and releases](16-website-and-releases.md) | GitHub Pages docs site with Magic UI and an API playground; `develop` = beta, `main` = stable release workflows |
 | 17 | [Payment gateway emulation](17-payments.md) | Stripe, PayPal, SSLCommerz, bKash, Razorpay compatible APIs, test checkout page, IPN and payment webhooks |
+| 18 | [Phase U3](18-phase-u3.md) | Polish, website, contract freeze and sign-off: workstreams in order, design review checklist and table, notifications, accessibility, responsive, performance, OpenAPI freeze, landing page, docs, playground |
 
 ## Headline decisions
 

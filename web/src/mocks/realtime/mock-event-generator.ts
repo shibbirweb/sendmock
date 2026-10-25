@@ -56,6 +56,7 @@ export function generateSampleSms() {
   publishMockEvent("sms.sent", {
     id: outboundMessage.id,
     to_number: outboundMessage.to_number,
+    thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
     body: outboundMessage.body,
   });
   simulateSmsDelivery(outboundMessage);

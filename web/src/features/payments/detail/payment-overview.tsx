@@ -26,7 +26,7 @@ function FactRow({
   label,
   children,
 }: {
-  label: string;
+  label: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -57,7 +57,11 @@ export function PaymentOverview({
       <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
         <FactRow label="Provider">{paymentDetail.provider_name}</FactRow>
         {Object.entries(paymentDetail.provider_ids).map(([idName, idValue]) => (
-          <FactRow key={idName} label={idName.replaceAll("_", " ")}>
+          // The provider's own field name, as it appears in its API and docs.
+          <FactRow
+            key={idName}
+            label={<code className="font-mono text-xs">{idName}</code>}
+          >
             <span className="inline-flex items-center gap-1 font-mono text-xs">
               {idValue}
               <CopyButton

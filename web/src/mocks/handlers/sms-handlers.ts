@@ -1,6 +1,10 @@
 import { http, HttpResponse } from "msw";
 
-import type { SmsMessageDetail, SmsStatus, SmsThread } from "@/lib/api/types";
+import type {
+  SmsMessageDetail,
+  SmsStatusUpdate,
+  SmsThread,
+} from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildPlaceholderSvg } from "@/mocks/fixtures/fixture-helpers";
 import {
@@ -125,10 +129,8 @@ export const smsHandlers = [
       return createNotFoundResponse("SMS");
     }
 
-    const { status, error_code: errorCode } = (await request.json()) as {
-      status: SmsStatus;
-      error_code?: string | null;
-    };
+    const { status, error_code: errorCode } =
+      (await request.json()) as SmsStatusUpdate;
     applySmsStatus(smsMessage, status, errorCode ?? null);
 
     return HttpResponse.json(smsMessage);

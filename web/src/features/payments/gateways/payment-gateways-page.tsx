@@ -2,6 +2,8 @@ import { PlusIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddGatewayDialog } from "@/features/payments/gateways/add-gateway-dialog";
@@ -17,6 +19,7 @@ import { useWebhookEndpoints } from "@/lib/api/hooks/use-webhook-queries";
 
 /** Payments > Gateways: the emulated providers and how each behaves (PY-12.2). */
 export function PaymentGatewaysPage() {
+  usePageTitle("Gateways", "Payments");
   const gatewaysQuery = usePaymentGateways();
   const paymentMethods = usePaymentMethods().data ?? [];
   const webhookEndpoints = useWebhookEndpoints().data ?? [];
@@ -47,6 +50,11 @@ export function PaymentGatewaysPage() {
         <div className="min-w-0 rounded-lg border">
           {gatewaysQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
+          ) : gatewaysQuery.isError ? (
+            <QueryErrorState
+              message="Could not load the gateways."
+              onRetry={() => void gatewaysQuery.refetch()}
+            />
           ) : (
             <PaymentGatewaysTable
               paymentGateways={paymentGateways}

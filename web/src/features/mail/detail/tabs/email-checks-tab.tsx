@@ -17,9 +17,9 @@ function SupportBar({ supportPercent }: { supportPercent: number }) {
         className={cn(
           "h-full rounded-full",
           supportPercent >= 90
-            ? "bg-emerald-500"
+            ? "bg-success"
             : supportPercent >= 60
-              ? "bg-amber-500"
+              ? "bg-warning"
               : "bg-destructive",
         )}
         style={{ width: `${supportPercent}%` }}
@@ -105,7 +105,7 @@ function LinkCheckSection({ emailId }: { emailId: string }) {
             className={cn(
               "w-10 shrink-0 rounded px-1 text-center font-mono text-xs",
               linkResult.status_code !== null && linkResult.status_code < 400
-                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                ? "bg-success/10 text-success"
                 : "bg-destructive/10 text-destructive",
             )}
           >

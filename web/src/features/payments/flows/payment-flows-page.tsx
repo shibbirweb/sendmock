@@ -1,6 +1,8 @@
 import { PlusIcon } from "lucide-react";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddFlowDialog } from "@/features/payments/flows/add-flow-dialog";
@@ -11,6 +13,7 @@ import { usePaymentMethods } from "@/lib/api/hooks/use-payment-method-queries";
 
 /** Payments > Flows: the steps customers go through, composed step by step (PY-12.6). */
 export function PaymentFlowsPage() {
+  usePageTitle("Flows", "Payments");
   const flowsQuery = usePaymentFlows();
   const methodsQuery = usePaymentMethods();
   const [isAddOpen, setAddOpen] = React.useState(false);
@@ -39,6 +42,11 @@ export function PaymentFlowsPage() {
         <div className="min-w-0 rounded-lg border">
           {flowsQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
+          ) : flowsQuery.isError ? (
+            <QueryErrorState
+              message="Could not load the payment flows."
+              onRetry={() => void flowsQuery.refetch()}
+            />
           ) : (
             <PaymentFlowsTable
               paymentFlows={paymentFlows}

@@ -1,0 +1,22 @@
+name: Docs problem
+description: A docs page that is wrong, unclear or missing.
+labels:
+  - docs
+body:
+  - type: input
+    id: page_url
+    attributes:
+      label: Page
+      description: The link to the page, or the topic when it is missing.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What it should say

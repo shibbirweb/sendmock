@@ -6,6 +6,7 @@ import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { CopyButton } from "@/components/common/copy-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -68,6 +69,11 @@ export function MessagingServicesPanel() {
           <div className="grid gap-2 p-4">
             <Skeleton className="h-8 w-full" />
           </div>
+        ) : servicesQuery.isError ? (
+          <QueryErrorState
+            message="Could not load the Messaging Services."
+            onRetry={() => void servicesQuery.refetch()}
+          />
         ) : (
           <Table>
             <TableHeader>

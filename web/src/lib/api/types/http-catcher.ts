@@ -112,3 +112,8 @@ export type HttpForwardResult = {
   duration_ms: number;
   body: string;
 };
+
+/** Body of `PATCH /http/bins/{binId}`. */
+export type HttpBinUpdate = {
+  default_response: HttpMockResponse;
+};

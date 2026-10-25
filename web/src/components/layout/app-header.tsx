@@ -6,17 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { apiMode } from "@/config/api-mode";
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
+import { HelpMenu } from "@/features/help/help-menu";
+import { NotificationBell } from "@/features/notifications/notification-bell";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
-/** Demo controls are loaded only in mock mode, so live builds never ship them. */
-const LazyDevToolbar = React.lazy(async () => {
-  const { DevToolbar } = await import("@/mocks/dev-toolbar/dev-toolbar");
+/**
+ * Demo controls, loaded only in mock mode. The import sits behind the
+ * build-time flag so a live build drops it and the whole mock layer.
+ */
+const LazyDevToolbar =
+  import.meta.env.VITE_API_MODE !== "live"
+    ? React.lazy(async () => {
+        const { DevToolbar } = await import("@/mocks/dev-toolbar/dev-toolbar");
 
-  return { default: DevToolbar };
-});
+        return { default: DevToolbar };
+      })
+    : null;
 
 function findPageTitle(currentPath: string): string {
   const matchingItem = listAllNavigationItems()
@@ -43,12 +50,15 @@ export function AppHeader() {
     <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
       <SidebarTrigger />
       <Separator orientation="vertical" className="mx-1 h-4" />
-      <h1 className="text-sm font-medium">{findPageTitle(currentPath)}</h1>
-      <div className="ml-auto flex items-center gap-1">
+      <h1 className="min-w-0 truncate text-sm font-medium">
+        {findPageTitle(currentPath)}
+      </h1>
+      <div className="ml-auto flex shrink-0 items-center gap-1">
+        {/* The wide search button needs a laptop width next to the sidebar. */}
         <Button
           variant="outline"
           size="sm"
-          className="hidden gap-2 text-muted-foreground sm:flex"
+          className="hidden gap-2 text-muted-foreground lg:flex"
           onClick={() => {
             setCommandPaletteOpen(true);
           }}
@@ -57,7 +67,18 @@ export function AppHeader() {
           Search or jump to...
           <Kbd>⌘K</Kbd>
         </Button>
-        {apiMode === "mock" && (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Search or jump to"
+          className="lg:hidden"
+          onClick={() => {
+            setCommandPaletteOpen(true);
+          }}
+        >
+          <SearchIcon />
+        </Button>
+        {LazyDevToolbar !== null && (
           <React.Suspense fallback={null}>
             <LazyDevToolbar />
           </React.Suspense>
@@ -72,7 +93,9 @@ export function AppHeader() {
         >
           <KeyboardIcon />
         </Button>
+        <HelpMenu />
         <ThemeToggle />
+        <NotificationBell />
       </div>
     </header>
   );

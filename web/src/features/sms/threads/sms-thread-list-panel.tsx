@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useListKeyboardShortcuts } from "@/features/shortcuts/use-list-keyboard-shortcuts";
 import {
@@ -74,18 +74,11 @@ export function SmsThreadListPanel({
           ))}
         </div>
       ) : threadsQuery.isError ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-          <p className="text-sm text-destructive">
-            Could not load conversations.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void threadsQuery.refetch()}
-          >
-            Try again
-          </Button>
-        </div>
+        <QueryErrorState
+          message="Could not load conversations."
+          onRetry={() => void threadsQuery.refetch()}
+          className="flex-1 p-6"
+        />
       ) : visibleThreads.length === 0 ? (
         <SmsThreadEmptyState
           hasActiveFilter={hasActiveFilter}

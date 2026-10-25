@@ -10,31 +10,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
+import { usePaymentFlows } from "@/lib/api/hooks/use-payment-flow-queries";
+import { usePaymentGateways } from "@/lib/api/hooks/use-payment-gateway-queries";
 import { usePaymentMethods } from "@/lib/api/hooks/use-payment-method-queries";
 import {
-  describeTestOutcome,
-  formatCardNumber,
-} from "@/lib/payments/test-instruments";
-
-type TestValueRow = {
-  methodName: string;
-  testValue: string;
-  copyValue: string;
-  outcome: string;
-  codes: string;
-};
+  buildTestValueTables,
+  type TestValueRow,
+} from "@/lib/payments/build-test-value-rows";
 
 function TestValuesTable({
   caption,
   valueHeading,
   testValueRows,
-  hasCodes,
 }: {
   caption: string;
-  valueHeading: string;
+  /** Null for methods where nothing is typed. */
+  valueHeading: string | null;
   testValueRows: TestValueRow[];
-  hasCodes: boolean;
 }) {
+  const hasCodes = testValueRows.some(
+    (testValueRow) => testValueRow.codes !== "",
+  );
+  if (testValueRows.length === 0) {
+    return null;
+  }
+
   return (
     <div className="grid gap-1.5">
       <h4 className="text-sm font-medium">{caption}</h4>
@@ -43,30 +43,40 @@ function TestValuesTable({
           <TableHeader>
             <TableRow>
               <TableHead>Method</TableHead>
-              <TableHead>{valueHeading}</TableHead>
-              <TableHead>Outcome</TableHead>
+              <TableHead className="hidden md:table-cell">Offered by</TableHead>
+              {valueHeading !== null && <TableHead>{valueHeading}</TableHead>}
+              <TableHead>
+                {valueHeading === null ? "What happens" : "Outcome"}
+              </TableHead>
               {hasCodes && (
                 <TableHead className="hidden sm:table-cell">
-                  OTP / PIN
+                  OTP and PIN
                 </TableHead>
               )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {testValueRows.map((testValueRow) => (
+            {testValueRows.map((testValueRow, rowIndex) => (
               <TableRow
-                key={`${testValueRow.methodName}-${testValueRow.copyValue}`}
+                key={`${testValueRow.methodName}-${testValueRow.copyValue ?? rowIndex}`}
               >
                 <TableCell>{testValueRow.methodName}</TableCell>
-                <TableCell>
-                  <span className="flex items-center gap-1 font-mono text-xs">
-                    {testValueRow.testValue}
-                    <CopyButton
-                      copyText={testValueRow.copyValue}
-                      label={`Copy ${testValueRow.testValue}`}
-                    />
-                  </span>
+                <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
+                  {testValueRow.offeredBy}
                 </TableCell>
+                {valueHeading !== null && (
+                  <TableCell>
+                    <span className="flex items-center gap-1 font-mono text-xs">
+                      {testValueRow.testValue}
+                      {testValueRow.copyValue !== null && (
+                        <CopyButton
+                          copyText={testValueRow.copyValue}
+                          label={`Copy ${testValueRow.testValue ?? ""}`}
+                        />
+                      )}
+                    </span>
+                  </TableCell>
+                )}
                 <TableCell className="text-xs">
                   {testValueRow.outcome}
                 </TableCell>
@@ -84,46 +94,36 @@ function TestValuesTable({
   );
 }
 
-/** The test cards and test numbers of the enabled methods (PY-09.4), read-only. */
+/**
+ * The test values of the enabled methods as their flows ask for them, each
+ * with the gateways offering it (PY-09.4), read-only.
+ */
 export function PaymentTestValuesCard() {
-  const enabledMethods = (usePaymentMethods().data ?? []).filter(
-    (paymentMethod) => paymentMethod.is_enabled,
-  );
-  const cardRows = enabledMethods.flatMap((paymentMethod) =>
-    paymentMethod.test_cards.map((testCard) => ({
-      methodName: paymentMethod.name,
-      testValue: formatCardNumber(testCard.number),
-      copyValue: testCard.number,
-      outcome: describeTestOutcome(testCard),
-      codes: "",
-    })),
-  );
-  const numberRows = enabledMethods.flatMap((paymentMethod) =>
-    paymentMethod.test_numbers.map((testNumber) => ({
-      methodName: paymentMethod.name,
-      testValue: testNumber.number,
-      copyValue: testNumber.number,
-      outcome: describeTestOutcome(testNumber),
-      codes: `${paymentMethod.otp} / ${paymentMethod.pin}`,
-    })),
+  const testValueTables = buildTestValueTables(
+    usePaymentMethods().data ?? [],
+    usePaymentFlows().data ?? [],
+    usePaymentGateways().data ?? [],
   );
 
   return (
     <SettingsSectionCard
       title="Test values"
-      description="What the enabled methods accept on checkout pages. Any future expiry and any CVC work with the test cards."
+      description="What the enabled methods accept on checkout pages, as each method's flow asks for it. Any future expiry and any CVC work with the test cards."
     >
       <TestValuesTable
         caption="Test cards"
         valueHeading="Card number"
-        testValueRows={cardRows}
-        hasCodes={false}
+        testValueRows={testValueTables.cardRows}
       />
       <TestValuesTable
-        caption="Test numbers"
+        caption="Test numbers and codes"
         valueHeading="Number or code"
-        testValueRows={numberRows}
-        hasCodes
+        testValueRows={testValueTables.numberRows}
+      />
+      <TestValuesTable
+        caption="Other methods"
+        valueHeading={null}
+        testValueRows={testValueTables.otherRows}
       />
       <p className="text-sm text-muted-foreground">
         Merchant credentials are set per gateway in{" "}

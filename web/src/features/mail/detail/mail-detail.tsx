@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExtractedDataPanel } from "@/features/mail/detail/extracted-data-panel";
@@ -27,6 +28,7 @@ export function MailDetail({ emailId }: { emailId: string }) {
   const emailQuery = useEmail(emailId);
   const timelineQuery = useEmailTimeline(emailId);
   const email = emailQuery.data;
+  usePageTitle(email?.subject || "(no subject)", "Mail");
   // The route keys this component by email, so a composer never outlives it.
   const [composerMode, setComposerMode] =
     React.useState<EmailComposerMode | null>(null);
@@ -88,9 +90,14 @@ export function MailDetail({ emailId }: { emailId: string }) {
         defaultValue={tabDefinitions[0]?.value}
         className="gap-4 px-4 py-4 sm:px-6"
       >
-        <TabsList className="h-auto flex-wrap justify-start">
+        {/* Up to ten tabs: they wrap inside the pill rather than scroll out of sight. */}
+        <TabsList className="flex-wrap justify-start group-data-horizontal/tabs:h-auto">
           {tabDefinitions.map((tabDefinition) => (
-            <TabsTrigger key={tabDefinition.value} value={tabDefinition.value}>
+            <TabsTrigger
+              key={tabDefinition.value}
+              value={tabDefinition.value}
+              className="h-7 flex-none"
+            >
               {tabDefinition.label}
             </TabsTrigger>
           ))}

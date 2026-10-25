@@ -3,6 +3,7 @@ import { http, HttpResponse } from "msw";
 import type {
   ForcedVerificationState,
   VerificationDetail,
+  VerificationForceRequest,
   VerificationStatus,
   VerificationTimelineKind,
   VerifyServiceInput,
@@ -191,9 +192,7 @@ export const verifyHandlers = [
         return createNotFoundResponse("Verification");
       }
 
-      const { state } = (await request.json()) as {
-        state: ForcedVerificationState;
-      };
+      const { state } = (await request.json()) as VerificationForceRequest;
       const forcedStatus = forcedStateToStatus[state];
       verification.status = forcedStatus;
       verification.timeline.push({

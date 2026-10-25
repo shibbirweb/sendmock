@@ -3,12 +3,15 @@ import { FileCodeIcon, PlusIcon, UploadIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { NamePromptDialog } from "@/components/common/name-prompt-dialog";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
 import { ImportTemplateDialog } from "@/features/webhooks/templates/import-template-dialog";
 import {
+  templateGalleryId,
   TemplatesFilterBar,
   type TemplateFilterChange,
 } from "@/features/webhooks/templates/templates-filter-bar";
@@ -19,6 +22,7 @@ import { useCreateTemplate } from "@/lib/api/hooks/use-webhook-template-queries"
 
 /** Templates gallery: category tabs, search and event filter in the URL (WH-08.3). */
 export function TemplatesPage() {
+  usePageTitle("Templates", "Webhooks");
   const { category, query, event } = useSearch({ from: "/webhooks/templates" });
   const navigate = useNavigate({ from: "/webhooks/templates" });
   const templatesQuery = useWebhookTemplates();
@@ -95,18 +99,11 @@ export function TemplatesPage() {
         />
         {templatesQuery.isPending && <Skeleton className="h-48 w-full" />}
         {templatesQuery.isError && (
-          <div className="flex flex-col items-center gap-3 rounded-lg border p-8 text-center">
-            <p className="text-sm text-destructive">
-              Could not load the templates.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void templatesQuery.refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <QueryErrorState
+            message="Could not load the templates."
+            onRetry={() => void templatesQuery.refetch()}
+            className="rounded-lg border"
+          />
         )}
         {templatesQuery.isSuccess &&
           visibleTemplates.length === 0 &&
@@ -128,6 +125,7 @@ export function TemplatesPage() {
             </p>
           )}
         <ul
+          id={templateGalleryId}
           aria-label="Templates"
           className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
         >

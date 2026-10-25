@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiRequestDrawer } from "@/features/logs/http/api-request-drawer";
 import { ApiRequestsPanel } from "@/features/logs/http/api-requests-panel";
@@ -8,6 +9,7 @@ import { SmtpSessionsPanel } from "@/features/logs/smtp/smtp-sessions-panel";
 
 /** SMTP sessions and the API request log, failures included. */
 export function LogsPage() {
+  usePageTitle("Logs");
   const search = useSearch({ from: "/logs" });
   const navigate = useNavigate({ from: "/logs" });
   const selectedTab =

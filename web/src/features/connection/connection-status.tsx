@@ -15,8 +15,8 @@ const connectionLabels: Record<RealtimeConnectionState, string> = {
 };
 
 const connectionDotClasses: Record<RealtimeConnectionState, string> = {
-  connecting: "bg-amber-500",
-  connected: "bg-emerald-500",
+  connecting: "bg-warning",
+  connected: "bg-success",
   disconnected: "bg-destructive",
 };
 

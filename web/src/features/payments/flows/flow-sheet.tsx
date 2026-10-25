@@ -70,7 +70,7 @@ export function FlowSheet({
             flowForm.save();
           }}
         >
-          <div className="grid min-h-0 flex-1 content-start gap-5 overflow-y-auto px-4 pb-4">
+          <div className="grid min-h-0 min-w-0 flex-1 grid-cols-1 content-start gap-5 overflow-y-auto px-4 pb-4">
             <div className="grid items-start gap-3 sm:grid-cols-2">
               <FormField
                 label="Name"

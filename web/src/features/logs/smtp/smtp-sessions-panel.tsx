@@ -5,6 +5,7 @@ import * as React from "react";
 import { FilterChip } from "@/components/common/filter-chip";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { Input } from "@/components/ui/input";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -150,6 +151,12 @@ export function SmtpSessionsPanel() {
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
           </div>
+        )}
+        {sessionsQuery.isError && (
+          <QueryErrorState
+            message="Could not load the SMTP log."
+            onRetry={() => void sessionsQuery.refetch()}
+          />
         )}
         {sessionsQuery.isSuccess &&
           smtpSessions.length === 0 &&

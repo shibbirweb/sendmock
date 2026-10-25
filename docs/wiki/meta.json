@@ -1,0 +1,23 @@
+{
+  "title": "Docs",
+  "pages": [
+    "index",
+    "getting-started",
+    "install",
+    "connect",
+    "---Features---",
+    "email",
+    "sms",
+    "verify",
+    "webhooks",
+    "templates",
+    "variables",
+    "http-catcher",
+    "payments",
+    "---Tools---",
+    "cli",
+    "mcp-and-ai",
+    "configuration",
+    "troubleshooting"
+  ]
+}

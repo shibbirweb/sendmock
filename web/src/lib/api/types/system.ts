@@ -278,3 +278,8 @@ export type UpdateCheckResult = {
   release_url: string;
   checked_at: IsoTimestamp;
 };
+
+/** Answer of `GET /health`. */
+export type HealthStatus = {
+  status: "ok";
+};

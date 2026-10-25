@@ -43,8 +43,9 @@ export function TemplateInsertMenu({
 }: {
   onInsert: (insertText: string) => void;
 }) {
-  // The menu holds focus while open, so the text goes in once it has closed.
-  const pendingInsertRef = React.useRef<string | null>(null);
+  // Set when an item inserted text: the editor then keeps focus (its caret
+  // after the text) instead of focus going back to the Insert button.
+  const hasInsertedRef = React.useRef(false);
 
   return (
     <DropdownMenu>
@@ -58,12 +59,9 @@ export function TemplateInsertMenu({
       <DropdownMenuContent
         align="end"
         onCloseAutoFocus={(closeEvent) => {
-          const pendingInsert = pendingInsertRef.current;
-          pendingInsertRef.current = null;
-          if (pendingInsert !== null) {
-            // The editor takes focus itself, after the inserted text.
+          if (hasInsertedRef.current) {
+            hasInsertedRef.current = false;
             closeEvent.preventDefault();
-            onInsert(pendingInsert);
           }
         }}
       >
@@ -71,7 +69,8 @@ export function TemplateInsertMenu({
           <DropdownMenuItem
             key={templateInsert.label}
             onSelect={() => {
-              pendingInsertRef.current = templateInsert.insertText;
+              hasInsertedRef.current = true;
+              onInsert(templateInsert.insertText);
             }}
           >
             <span>{templateInsert.label}</span>

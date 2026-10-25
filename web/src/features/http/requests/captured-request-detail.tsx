@@ -80,15 +80,17 @@ export function CapturedRequestDetail({
         defaultValue={messagePreview === null ? "body" : "preview"}
         className="gap-3 p-4"
       >
-        <TabsList className="max-w-full overflow-x-auto">
-          {messagePreview !== null && (
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          )}
-          <TabsTrigger value="body">Body</TabsTrigger>
-          <TabsTrigger value="headers">Headers</TabsTrigger>
-          <TabsTrigger value="query">Query</TabsTrigger>
-          <TabsTrigger value="response">Response</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList>
+            {messagePreview !== null && (
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            )}
+            <TabsTrigger value="body">Body</TabsTrigger>
+            <TabsTrigger value="headers">Headers</TabsTrigger>
+            <TabsTrigger value="query">Query</TabsTrigger>
+            <TabsTrigger value="response">Response</TabsTrigger>
+          </TabsList>
+        </div>
         {messagePreview !== null && (
           <TabsContent value="preview">
             <MessagePreviewView messagePreview={messagePreview} />

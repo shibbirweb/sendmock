@@ -1,0 +1,45 @@
+name: Request a provider
+description: A provider SendMock should emulate (email, SMS, payment gateway or webhook format).
+labels:
+  - provider
+  - enhancement
+body:
+  - type: input
+    id: provider_name
+    attributes:
+      label: Provider
+      placeholder: Razorpay, MessageBird, SparkPost
+    validations:
+      required: true
+  - type: dropdown
+    id: provider_kind
+    attributes:
+      label: Kind
+      options:
+        - Email sending API
+        - SMS or messaging API
+        - Payment gateway
+        - Webhook payload format
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: api_docs
+    attributes:
+      label: API docs
+      description: The provider's official API reference.
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: needed_endpoints
+    attributes:
+      label: What your app uses
+      description: The endpoints, webhooks or SDK calls you need, and any test values the provider documents.
+    validations:
+      required: true
+  - type: input
+    id: official_sdk
+    attributes:
+      label: Official SDK you use
+      placeholder: twilio-node 5.x

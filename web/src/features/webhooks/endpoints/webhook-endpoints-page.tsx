@@ -2,7 +2,9 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { PlusIcon, SendIcon } from "lucide-react";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
@@ -43,6 +45,7 @@ function buildCatcherEndpointInput(httpPort: number): WebhookEndpointInput {
 
 /** Webhook endpoints: table, edit sheet, Send test and delete (WH-01). */
 export function WebhookEndpointsPage() {
+  usePageTitle("Endpoints", "Webhooks");
   const endpointsQuery = useWebhookEndpoints();
   const rulesQuery = useWebhookRules();
   const templatesQuery = useWebhookTemplates();
@@ -103,18 +106,10 @@ export function WebhookEndpointsPage() {
         <div className="min-w-0 rounded-lg border">
           {endpointsQuery.isPending && <Skeleton className="m-4 h-24" />}
           {endpointsQuery.isError && (
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <p className="text-sm text-destructive">
-                Could not load the endpoints.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void endpointsQuery.refetch()}
-              >
-                Try again
-              </Button>
-            </div>
+            <QueryErrorState
+              message="Could not load the endpoints."
+              onRetry={() => void endpointsQuery.refetch()}
+            />
           )}
           {endpointsQuery.isSuccess && webhookEndpoints.length === 0 && (
             <NoDataState

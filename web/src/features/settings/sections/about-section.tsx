@@ -1,8 +1,9 @@
-import { ExternalLinkIcon, RefreshCwIcon } from "lucide-react";
+import { RefreshCwIcon } from "lucide-react";
 import type * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CommunityLinksCard } from "@/features/help/community-links-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { SettingsSwitchRow } from "@/features/settings/settings-fields";
 import { useSettingsSectionForm } from "@/features/settings/use-settings-section-form";
@@ -14,7 +15,6 @@ import type { AppSettings } from "@/lib/api/types";
 import { formatBytes } from "@/lib/format/format-values";
 
 const updateCheckKeys = ["is_update_check_enabled"] as const;
-const releasesUrl = "https://github.com/shibbirweb/sendmock/releases";
 
 function formatUptime(uptimeSeconds: number): string {
   const uptimeMinutes = Math.floor(uptimeSeconds / 60);
@@ -139,15 +139,8 @@ export function AboutSection({ appSettings }: { appSettings: AppSettings }) {
             </AboutFact>
           </dl>
         )}
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href={releasesUrl} target="_blank" rel="noreferrer">
-              <ExternalLinkIcon />
-              Changelog
-            </a>
-          </Button>
-        </div>
       </SettingsSectionCard>
+      <CommunityLinksCard />
       <UpdatesCard appSettings={appSettings} />
     </div>
   );

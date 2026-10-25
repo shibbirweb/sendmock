@@ -2,8 +2,9 @@ import { useSearch } from "@tanstack/react-router";
 import { ActivityIcon } from "lucide-react";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
-import { Button } from "@/components/ui/button";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
@@ -42,6 +43,7 @@ function toDeliveryListFilters(
 
 /** Webhook deliveries: live log, filters, paging and the detail drawer (WH-03.7). */
 export function WebhookDeliveriesPage() {
+  usePageTitle("Deliveries", "Webhooks");
   const initialSearch = useSearch({ from: "/webhooks/deliveries" });
   const [filterValues, setFilterValues] = React.useState(
     (): DeliveryFilterValues => ({
@@ -89,18 +91,10 @@ export function WebhookDeliveriesPage() {
         <div className="min-w-0 rounded-lg border">
           {deliveriesQuery.isPending && <Skeleton className="m-4 h-32" />}
           {deliveriesQuery.isError && (
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <p className="text-sm text-destructive">
-                Could not load the deliveries.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void deliveriesQuery.refetch()}
-              >
-                Try again
-              </Button>
-            </div>
+            <QueryErrorState
+              message="Could not load the deliveries."
+              onRetry={() => void deliveriesQuery.refetch()}
+            />
           )}
           {deliveriesQuery.isSuccess &&
             webhookDeliveries.length === 0 &&

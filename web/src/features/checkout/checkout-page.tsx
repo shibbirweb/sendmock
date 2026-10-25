@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { useDocumentTitle } from "@/hooks/use-page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckoutOrderSummary } from "@/features/checkout/checkout-order-summary";
 import { CheckoutResult } from "@/features/checkout/checkout-result";
@@ -48,6 +49,11 @@ function CheckoutSteps({
 export function CheckoutPage({ sessionId }: { sessionId: string }) {
   const sessionQuery = useCheckoutSession(sessionId);
   const checkoutSession = sessionQuery.data;
+  useDocumentTitle(
+    checkoutSession === undefined
+      ? "Test checkout"
+      : `Pay ${checkoutSession.merchant_name} · ${checkoutSession.provider_name} test checkout`,
+  );
 
   return (
     <div

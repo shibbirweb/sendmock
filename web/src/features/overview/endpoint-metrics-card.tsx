@@ -31,14 +31,17 @@ function SuccessRateMeter({
   return (
     <div className="flex items-center gap-2">
       <div
-        role="meter"
-        aria-label={`${endpointName} success rate`}
-        aria-valuemin={0}
-        aria-valuemax={100}
+        // A meter needs a value; without deliveries it is a plain label.
+        role={successRate === null ? "img" : "meter"}
+        aria-label={`${endpointName} success rate${successRate === null ? ": no deliveries" : ""}`}
+        aria-valuemin={successRate === null ? undefined : 0}
+        aria-valuemax={successRate === null ? undefined : 100}
         aria-valuenow={
           successRate === null ? undefined : Math.round(successRate * 100)
         }
-        aria-valuetext={formatPercent(successRate)}
+        aria-valuetext={
+          successRate === null ? undefined : formatPercent(successRate)
+        }
         className="h-1.5 w-16 overflow-hidden rounded-full bg-muted"
       >
         <div

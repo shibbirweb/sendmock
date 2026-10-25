@@ -134,6 +134,7 @@ export const smsSendHandlers = [
     publishMockEvent("sms.sent", {
       id: outboundMessage.id,
       to_number: outboundMessage.to_number,
+      thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
       body: outboundMessage.body,
     });
     simulateSmsDelivery(outboundMessage, outcomePlan);
@@ -169,7 +170,12 @@ export const smsSendHandlers = [
     storeSmsMediaBytes(inboundMessage.id, inboundMediaResult.media);
 
     mockDatabase.smsMessages.unshift(inboundMessage);
-    publishMockEvent("sms.inbound", { id: inboundMessage.id });
+    publishMockEvent("sms.inbound", {
+      id: inboundMessage.id,
+      from_number: inboundMessage.from_number,
+      body: inboundMessage.body,
+      thread_id: `${inboundMessage.to_number}|${inboundMessage.from_number}`,
+    });
     sendRepliesFromTwiml(runReplyWebhook(mockDatabase, inboundMessage));
 
     return HttpResponse.json(inboundMessage, { status: 201 });

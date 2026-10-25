@@ -56,6 +56,28 @@ test("UI-01.1 sidebar lists every section and highlights the current one", async
   await expect(sidebar.getByRole("link", { name: "Verify" })).toBeVisible();
 });
 
+test("UI-01.1 sections with sub-items show a chevron that turns when the group opens", async ({
+  page,
+}) => {
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  const chevronOf = (sectionTitle: string) =>
+    sidebar
+      .getByRole("link", { name: sectionTitle, exact: true })
+      .getByTestId("sidebar-group-chevron");
+
+  for (const groupTitle of ["SMS", "Webhooks", "Payments"]) {
+    await expect(chevronOf(groupTitle)).toBeVisible();
+    await expect(chevronOf(groupTitle)).not.toHaveClass(/rotate-90/);
+  }
+  for (const plainTitle of ["Overview", "Mail", "HTTP", "Numbers", "Logs"]) {
+    await expect(chevronOf(plainTitle)).toHaveCount(0);
+  }
+
+  await sidebar.getByRole("link", { name: "Webhooks", exact: true }).click();
+  await expect(chevronOf("Webhooks")).toHaveClass(/rotate-90/);
+  await expect(chevronOf("SMS")).not.toHaveClass(/rotate-90/);
+});
+
 test("UI-01.2 theme can be switched and the choice persists", async ({
   page,
 }) => {
@@ -154,7 +176,9 @@ test("notification toasts can be dismissed with their close button", async ({
   await page.getByRole("button", { name: "Sample email" }).click();
   await page.keyboard.press("Escape");
 
-  const newEmailToast = page.locator("[data-sonner-toast]").filter({ hasText: "New email" });
+  const newEmailToast = page
+    .locator("[data-sonner-toast]")
+    .filter({ hasText: "New email" });
   await expect(newEmailToast).toBeVisible();
   await newEmailToast.hover();
   await newEmailToast.getByRole("button", { name: /close/i }).click();
@@ -186,7 +210,9 @@ test("the sidebar and browser tab show the SendMock logo", async ({
   const homeLink = page.getByRole("link", { name: /SendMock/ }).first();
   await expect(homeLink.locator("svg")).toBeVisible();
 
-  const faviconPath = await page.locator("link[rel='icon']").getAttribute("href");
+  const faviconPath = await page
+    .locator("link[rel='icon']")
+    .getAttribute("href");
   expect(faviconPath).toMatch(/favicon\.svg$/);
   const faviconResponse = await request.get(faviconPath ?? "");
   expect(faviconResponse.ok()).toBe(true);

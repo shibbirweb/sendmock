@@ -1,31 +1,10 @@
 import { Marquee } from "@/components/ui/marquee";
-
-const languageNames = [
-  "PHP",
-  "Laravel",
-  "Node.js",
-  "Python",
-  "Django",
-  "Go",
-  "Java",
-  "Spring",
-  "Rust",
-  "Ruby",
-  ".NET",
-];
-
-const providerNames = [
-  "Twilio",
-  "Twilio Verify",
-  "Vonage",
-  "SendGrid",
-  "Mailgun",
-  "Postmark",
-  "Resend",
-  "Amazon SES",
-  "Slack",
-  "Discord",
-];
+import {
+  allEmulatedProviderNames,
+  frameworkNames,
+  testedLanguageNames,
+  webhookTargetNames,
+} from "@/lib/landing-data";
 
 function NameBadge({ name }: { name: string }) {
   return (
@@ -37,21 +16,31 @@ function NameBadge({ name }: { name: string }) {
 
 export function WorksWithSection() {
   return (
-    <section className="flex flex-col items-center gap-4 py-12">
-      <h2 className="text-2xl font-semibold">Works with your stack</h2>
-      <p className="text-fd-muted-foreground">
-        Plain SMTP and HTTP, plus provider-compatible APIs. No SDK needed.
+    <section
+      aria-labelledby="works-with-heading"
+      className="flex flex-col items-center gap-4 py-12"
+    >
+      <h2 id="works-with-heading" className="text-2xl font-semibold">
+        Works with your stack
+      </h2>
+      <p className="px-4 text-center text-fd-muted-foreground">
+        Plain SMTP and HTTP, plus provider-compatible APIs. No SDK changes.
       </p>
-      <div className="relative w-full max-w-4xl overflow-hidden">
+      <div
+        data-testid="works-with-marquee"
+        className="relative w-full max-w-4xl overflow-hidden"
+      >
         <Marquee pauseOnHover className="[--duration:30s]">
-          {languageNames.map((languageName) => (
-            <NameBadge key={languageName} name={languageName} />
+          {[...testedLanguageNames, ...frameworkNames].map((stackName) => (
+            <NameBadge key={stackName} name={stackName} />
           ))}
         </Marquee>
         <Marquee reverse pauseOnHover className="[--duration:30s]">
-          {providerNames.map((providerName) => (
-            <NameBadge key={providerName} name={providerName} />
-          ))}
+          {[...allEmulatedProviderNames, ...webhookTargetNames].map(
+            (providerName) => (
+              <NameBadge key={providerName} name={providerName} />
+            ),
+          )}
         </Marquee>
       </div>
     </section>

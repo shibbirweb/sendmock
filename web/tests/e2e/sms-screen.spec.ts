@@ -5,7 +5,9 @@ const conversation = "section[aria-label='Conversation']";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/sms");
-  await expect(page.locator(threadList).getByRole("link").first()).toBeVisible();
+  await expect(
+    page.locator(threadList).getByRole("link").first(),
+  ).toBeVisible();
 });
 
 test("SM-06.3 each bubble shows its segment count and encoding", async ({
@@ -27,7 +29,10 @@ test("SM-11.1 WhatsApp conversations get the WhatsApp badge and bubbles", async 
 
   await whatsappThreads.first().click();
   await expect(
-    page.locator(conversation).locator("[data-sms-direction='outbound']").first(),
+    page
+      .locator(conversation)
+      .locator("[data-sms-direction='outbound']")
+      .first(),
   ).toHaveClass(/bg-whatsapp-outbound/);
 });
 

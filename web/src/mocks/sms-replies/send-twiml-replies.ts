@@ -8,6 +8,7 @@ export function sendRepliesFromTwiml(replies: SmsMessageDetail[]) {
     publishMockEvent("sms.sent", {
       id: reply.id,
       to_number: reply.to_number,
+      thread_id: `${reply.from_number}|${reply.to_number}`,
       body: reply.body,
     });
     simulateSmsDelivery(reply);

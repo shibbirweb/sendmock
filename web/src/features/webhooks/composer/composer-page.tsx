@@ -1,8 +1,10 @@
 import { SendIcon, SquarePenIcon } from "lucide-react";
 import * as React from "react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { ComposerTargetFields } from "@/features/webhooks/composer/composer-target-fields";
@@ -78,6 +80,7 @@ function ComposerWorkspace({
 
 /** A request written by hand and sent to an endpoint, like a small Postman (WH-05.3). */
 export function ComposerPage() {
+  usePageTitle("Composer", "Webhooks");
   const endpointsQuery = useWebhookEndpoints();
   const webhookEndpoints = endpointsQuery.data ?? [];
 
@@ -92,6 +95,13 @@ export function ComposerPage() {
           </p>
         </header>
         {endpointsQuery.isPending && <Skeleton className="h-96 w-full" />}
+        {endpointsQuery.isError && (
+          <QueryErrorState
+            message="Could not load the endpoints to send to."
+            onRetry={() => void endpointsQuery.refetch()}
+            className="rounded-lg border"
+          />
+        )}
         {endpointsQuery.isSuccess && webhookEndpoints.length === 0 && (
           <NoDataState
             icon={SquarePenIcon}

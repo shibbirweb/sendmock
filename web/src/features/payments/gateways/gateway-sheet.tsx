@@ -94,20 +94,22 @@ export function GatewaySheet({
           <Tabs
             value={openTab}
             onValueChange={(nextTab) => setOpenTab(nextTab as GatewayTab)}
-            className="min-h-0 flex-1 gap-3 overflow-y-auto px-4 pb-4"
+            className="flex min-h-0 flex-1 flex-col gap-3"
           >
-            <TabsList className="flex-wrap">
-              {gatewayTabs.map(({ tab, label }) => (
-                <TabsTrigger key={tab} value={tab}>
-                  {label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="overflow-x-auto px-4">
+              <TabsList>
+                {gatewayTabs.map(({ tab, label }) => (
+                  <TabsTrigger key={tab} value={tab}>
+                    {label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
             <div
               className={
                 hasSidePanel
-                  ? "grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
-                  : "grid max-w-2xl"
+                  ? "grid min-h-0 flex-1 items-start gap-6 overflow-y-auto px-4 pb-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+                  : "grid min-h-0 max-w-2xl flex-1 content-start overflow-y-auto px-4 pb-4"
               }
             >
               <div className="min-w-0">

@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { usePageTitle } from "@/hooks/use-page-title";
+import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActivityCard } from "@/features/overview/activity/activity-card";
 import { ConnectCard } from "@/features/overview/connect-card";
@@ -19,12 +20,13 @@ function OverviewLoading() {
 
 /** Home dashboard, refreshed on every realtime event (UI-03). */
 export function OverviewPage() {
+  usePageTitle("Overview");
   const statsQuery = useAppStats();
   const appStats = statsQuery.data;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto grid w-full max-w-7xl min-w-0 grid-cols-1 gap-4 px-4 py-6 sm:px-6">
+      <div className="mx-auto grid w-full max-w-6xl min-w-0 grid-cols-1 gap-4 px-4 py-6 sm:px-6">
         <header className="grid gap-1">
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="text-sm text-muted-foreground">
@@ -33,18 +35,11 @@ export function OverviewPage() {
         </header>
         {statsQuery.isPending && <OverviewLoading />}
         {statsQuery.isError && (
-          <div className="flex flex-col items-start gap-3 rounded-lg border p-6">
-            <p className="text-sm text-destructive">
-              Could not load the overview. Check that SendMock is running.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void statsQuery.refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <QueryErrorState
+            message="Could not load the overview. Check that SendMock is running."
+            onRetry={() => void statsQuery.refetch()}
+            className="items-start rounded-lg border p-6 text-left"
+          />
         )}
         {appStats !== undefined && (
           <>

@@ -50,6 +50,7 @@ export function MailListItem({
         />
         {!email.is_read && (
           <span
+            role="img"
             aria-label="Unread"
             className="size-2 rounded-full bg-primary"
           />

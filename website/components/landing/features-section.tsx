@@ -1,6 +1,8 @@
 import {
   BotIcon,
   ContainerIcon,
+  CreditCardIcon,
+  GlobeIcon,
   MailIcon,
   MessageSquareIcon,
   WebhookIcon,
@@ -37,6 +39,24 @@ const featureCards = [
     className: "lg:col-span-1",
   },
   {
+    name: "Payments",
+    description:
+      "Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects, IPNs and signatures. Test cards, wallets and your own flows.",
+    Icon: CreditCardIcon,
+    href: "/docs",
+    cta: "Payment docs",
+    className: "lg:col-span-2",
+  },
+  {
+    name: "HTTP catcher",
+    description:
+      "A bin for any HTTP call your app makes, with response rules, delays and failures you set.",
+    Icon: GlobeIcon,
+    href: "/docs",
+    cta: "HTTP catcher docs",
+    className: "lg:col-span-1",
+  },
+  {
     name: "Built for AI agents",
     description:
       "A full CLI, an MCP server and an agent skill, so Claude Code, Codex and others can set up and test everything.",
@@ -58,14 +78,24 @@ const featureCards = [
 
 export function FeaturesSection() {
   return (
-    <section className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-16">
-      <h2 className="text-center text-2xl font-semibold">Everything in one place</h2>
-      <BentoGrid className="lg:grid-cols-3">
+    <section
+      aria-labelledby="features-heading"
+      className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-16"
+    >
+      <h2 id="features-heading" className="text-center text-2xl font-semibold">
+        Everything in one place
+      </h2>
+      <BentoGrid
+        data-testid="features-bento"
+        className="auto-rows-[15rem] lg:grid-cols-3"
+      >
         {featureCards.map((featureCard) => (
           <BentoCard
             key={featureCard.name}
             {...featureCard}
-            background={<div className="absolute inset-0 bg-gradient-to-br from-fd-primary/5 to-transparent" />}
+            background={
+              <div className="absolute inset-0 bg-gradient-to-br from-fd-primary/5 to-transparent" />
+            }
           />
         ))}
       </BentoGrid>

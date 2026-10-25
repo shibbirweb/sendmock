@@ -72,7 +72,7 @@ export function GatewayMerchantTab({
           return (
             <div
               key={credentialIndex}
-              className="grid grid-cols-[1fr_1.4fr_auto_auto_auto] items-center gap-2"
+              className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 sm:grid-cols-[1fr_1.4fr_auto_auto_auto]"
             >
               <Input
                 aria-label={`Credential ${credentialIndex + 1} name`}
@@ -87,7 +87,8 @@ export function GatewayMerchantTab({
               />
               <Input
                 aria-label={`Credential ${credentialIndex + 1} value`}
-                className="font-mono text-xs"
+                // Its own row on phones, under the name and the controls.
+                className="col-span-4 row-start-2 font-mono text-xs sm:col-span-1 sm:row-start-auto"
                 value={credential.value}
                 onChange={(changeEvent) =>
                   changeCredential(credentialIndex, {

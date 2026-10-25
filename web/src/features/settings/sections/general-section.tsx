@@ -87,7 +87,7 @@ function RetentionCard({ appSettings }: { appSettings: AppSettings }) {
       </div>
       <SettingsSwitchRow
         label="Keep forever"
-        description="Off: delete traffic older than the age below."
+        description="Turn off to delete traffic after a number of days."
         isChecked={draftValues.max_age_days === null}
         onCheckedChange={(isKeptForever) => {
           updateDraft({
@@ -142,14 +142,14 @@ function DangerZoneCard() {
     >
       <div className="flex flex-wrap gap-2">
         <Button
-          variant="outline"
+          variant="destructive"
           onClick={() => setPendingAction("delete-emails")}
         >
           <Trash2Icon />
           Delete all emails
         </Button>
         <Button
-          variant="outline"
+          variant="destructive"
           onClick={() => setPendingAction("delete-sms")}
         >
           <Trash2Icon />

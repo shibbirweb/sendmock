@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import type {
   HttpBin,
   HttpBinInput,
-  HttpMockResponse,
+  HttpBinUpdate,
   HttpResponseRule,
   HttpRulePreviewRequest,
   HttpRulePreviewResult,
@@ -71,9 +71,8 @@ export const httpBinHandlers = [
       return createNotFoundResponse("Bin");
     }
 
-    const { default_response: defaultResponse } = (await request.json()) as {
-      default_response: HttpMockResponse;
-    };
+    const { default_response: defaultResponse } =
+      (await request.json()) as HttpBinUpdate;
     httpBin.default_response = defaultResponse;
 
     return HttpResponse.json(httpBin);

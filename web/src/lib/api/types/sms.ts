@@ -174,3 +174,9 @@ export type InboundSmsRequest = {
   template_id?: string;
   media?: InlineSmsMedia[];
 };
+
+/** Body of `POST /sms/{smsId}/status`: a manual status change. */
+export type SmsStatusUpdate = {
+  status: SmsStatus;
+  error_code?: string | null;
+};
