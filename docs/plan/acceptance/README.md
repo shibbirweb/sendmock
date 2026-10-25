@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 94 features, 10 / 344 criteria ticked.**
+**Accepted: 0 / 94 features, 10 / 346 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -90,10 +90,10 @@ On top of its own criteria, a feature is done only when:
 | [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 4 | 2 | Not started |
 | [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | Phase 1 (email APIs), Phase 2 (SMS APIs) | 3 | Not started |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Not started |
-| [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | Phase 2 | 2 | Not started |
+| [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Not started |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Not started |
-| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | Phase 2 | 3 | Not started |
+| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | In progress |
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 4 | Not started |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 4 | Not started |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | Phase 3 | 6 | Not started |

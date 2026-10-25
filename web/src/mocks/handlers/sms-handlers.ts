@@ -1,12 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import type {
-  ForcedVerificationState,
-  SmsMessageDetail,
-  SmsStatus,
-  SmsThread,
-  VerificationStatus,
-} from "@/lib/api/types";
+import type { SmsMessageDetail, SmsStatus, SmsThread } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import {
   applyMockConditions,
@@ -57,14 +51,6 @@ function buildSmsThreads(): SmsThread[] {
 
   return [...threadsById.values()];
 }
-
-const forcedStateToStatus: Record<ForcedVerificationState, VerificationStatus> =
-  {
-    approved: "approved",
-    canceled: "canceled",
-    expired: "expired",
-    max_attempts: "max_attempts_reached",
-  };
 
 export const smsHandlers = [
   http.get("*/api/v1/sms", async ({ request }) => {
@@ -148,48 +134,6 @@ export const smsHandlers = [
 
     return new HttpResponse(null, { status: 204 });
   }),
-
-  http.get("*/api/v1/verify", async ({ request }) => {
-    const conditionResponse = await applyMockConditions();
-
-    return (
-      conditionResponse ??
-      HttpResponse.json(
-        paginateItems(mockDatabase.verifications, new URL(request.url)),
-      )
-    );
-  }),
-
-  http.get("*/api/v1/verify/services", async () => {
-    await applyMockConditions();
-
-    return HttpResponse.json(mockDatabase.verifyServices);
-  }),
-
-  http.post(
-    "*/api/v1/verify/:verificationSid/force",
-    async ({ params, request }) => {
-      await applyMockConditions();
-      const verification = mockDatabase.verifications.find(
-        (existingVerification) =>
-          existingVerification.sid === params.verificationSid,
-      );
-      if (!verification) {
-        return createNotFoundResponse("Verification");
-      }
-
-      const { state } = (await request.json()) as {
-        state: ForcedVerificationState;
-      };
-      verification.status = forcedStateToStatus[state];
-      publishMockEvent("verify.checked", {
-        sid: verification.sid,
-        status: verification.status,
-      });
-
-      return HttpResponse.json(verification);
-    },
-  ),
 
   http.get("*/api/v1/numbers", async () => {
     await applyMockConditions();

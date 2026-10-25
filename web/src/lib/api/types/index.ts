@@ -7,3 +7,4 @@ export type * from "@/lib/api/types/webhooks";
 export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/system";
 export { appEventTypes } from "@/lib/api/types/events";
+export { maxVerificationCheckAttempts } from "@/lib/api/types/verify-and-numbers";

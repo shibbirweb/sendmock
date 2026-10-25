@@ -9,7 +9,7 @@ import type {
   SavedDelivery,
   SmsMessageDetail,
   SmtpSession,
-  Verification,
+  VerificationDetail,
   VerifyService,
   VirtualNumber,
   WebhookDelivery,
@@ -39,6 +39,7 @@ import {
 import {
   buildMessagingServiceFixtures,
   buildVerificationFixtures,
+  linkVerificationMessages,
   buildVerifyServiceFixtures,
   buildVirtualNumberFixtures,
 } from "@/mocks/fixtures/verify-and-number-fixtures";
@@ -54,7 +55,7 @@ export type MockDatabase = {
   emailTimelines: Map<string, EmailTimelineEntry[]>;
   smsMessages: SmsMessageDetail[];
   verifyServices: VerifyService[];
-  verifications: Verification[];
+  verifications: VerificationDetail[];
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
   webhookEndpoints: WebhookEndpoint[];
@@ -130,6 +131,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     mockDataSize === "large"
       ? buildLargeEmailFixtures(largeDataSetEmailCount)
       : buildStandardEmailFixtures();
+  const smsMessages = sortNewestFirst(buildStandardSmsFixtures());
 
   return {
     ...configuration,
@@ -142,8 +144,11 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
         emailFixture.timeline,
       ]),
     ),
-    smsMessages: sortNewestFirst(buildStandardSmsFixtures()),
-    verifications: buildVerificationFixtures(configuration.verifyServices),
+    smsMessages,
+    verifications: linkVerificationMessages(
+      buildVerificationFixtures(configuration.verifyServices),
+      smsMessages,
+    ),
     webhookDeliveries: sortNewestFirst(
       buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
     ),

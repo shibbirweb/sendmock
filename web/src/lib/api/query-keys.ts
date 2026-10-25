@@ -1,4 +1,8 @@
-import type { EmailListFilters, SmsListFilters } from "@/lib/api/types";
+import type {
+  EmailListFilters,
+  SmsListFilters,
+  VerificationListFilters,
+} from "@/lib/api/types";
 
 /**
  * Query keys for every resource. Realtime events invalidate by the top-level
@@ -28,7 +32,10 @@ export const queryKeys = {
   },
   verify: {
     all: ["verify"] as const,
-    verifications: ["verify", "verifications"] as const,
+    verifications: (verificationFilters: VerificationListFilters) =>
+      ["verify", "verifications", verificationFilters] as const,
+    detail: (verificationSid: string) =>
+      ["verify", "detail", verificationSid] as const,
     services: ["verify", "services"] as const,
   },
   numbers: {

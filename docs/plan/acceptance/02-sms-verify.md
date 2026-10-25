@@ -126,10 +126,11 @@ Phase 2.
 
 ## VF-01 Verify services
 
-Phase 2. Docs: [Twilio Verify](../04-sms.md#twilio-verify).
+UI in U1, backend Phase 2. Docs: [Twilio Verify](../04-sms.md#twilio-verify).
 
 - [ ] VF-01.1 `POST /v2/Services` creates a service and `GET` returns it in Twilio's shape.
 - [ ] VF-01.2 Code length (4 to 10), fixed code and TTL can be set per service and globally.
+- [ ] VF-01.3 Services can be created, edited and deleted from the Services tab, with the code length, fixed code and TTL rules enforced in the form and the API.
 
 ## VF-02 Start a verification and deliver the code
 
@@ -152,8 +153,9 @@ Phase 2.
 
 ## VF-04 Force state and events
 
-Phase 2.
+UI in U1, backend Phase 2.
 
 - [ ] VF-04.1 Forcing `approved`, `canceled`, `expired` or `max_attempts` from UI, API, CLI or MCP changes the state immediately.
 - [ ] VF-04.2 `verify.started`, `verify.checked` and `verify.expired` fire and can trigger webhook rules.
 - [ ] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown.
+- [ ] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code.

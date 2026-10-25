@@ -1,6 +1,10 @@
 import type {
   MessagingService,
+  SmsMessageDetail,
   Verification,
+  VerificationDetail,
+  VerificationTimelineEntry,
+  VerifyChannel,
   VerifyService,
   VirtualNumber,
 } from "@/lib/api/types";
@@ -93,13 +97,87 @@ const verificationSpecs: VerificationSpec[] = [
   },
 ];
 
+const codeDeliveryDescriptions: Record<VerifyChannel, string> = {
+  sms: "Code sent as an SMS",
+  whatsapp: "Code sent as a WhatsApp message",
+  email: "Code sent as an email",
+  call: "Code read out in a voice call (no audio is stored)",
+};
+
+function minutesAfter(isoTimestamp: string, minutes: number): string {
+  return new Date(Date.parse(isoTimestamp) + minutes * 60_000).toISOString();
+}
+
+function buildFailedChecks(
+  createdAt: string,
+  failedCheckCount: number,
+): VerificationTimelineEntry[] {
+  return Array.from({ length: failedCheckCount }, (_, checkIndex) => ({
+    kind: "check_failed" as const,
+    at: minutesAfter(createdAt, 0.5 + checkIndex * 0.25),
+    detail: `Wrong code entered (attempt ${checkIndex + 1})`,
+  }));
+}
+
+/** What happened to a verification, derived from its final status. */
+function buildVerificationTimeline(
+  verification: Verification,
+): VerificationTimelineEntry[] {
+  const createdAt = verification.created_at;
+  const timeline: VerificationTimelineEntry[] = [
+    {
+      kind: "started",
+      at: createdAt,
+      detail: `Started for ${verification.to} by ${verification.service_name}`,
+    },
+    {
+      kind: "code_sent",
+      at: minutesAfter(createdAt, 0.02),
+      detail: codeDeliveryDescriptions[verification.channel],
+    },
+  ];
+
+  if (verification.status === "approved") {
+    timeline.push(
+      ...buildFailedChecks(createdAt, verification.check_attempts - 1),
+      {
+        kind: "approved",
+        at: minutesAfter(createdAt, 0.5 + verification.check_attempts * 0.25),
+        detail: "Correct code entered",
+      },
+    );
+  } else if (verification.status === "max_attempts_reached") {
+    timeline.push(
+      ...buildFailedChecks(createdAt, verification.check_attempts),
+      {
+        kind: "max_attempts_reached",
+        at: minutesAfter(createdAt, 2),
+        detail: "Too many wrong codes (Twilio error 60202)",
+      },
+    );
+  } else if (verification.status === "expired") {
+    timeline.push({
+      kind: "expired",
+      at: verification.expires_at,
+      detail: "Not checked before the code expired",
+    });
+  } else if (verification.status === "canceled") {
+    timeline.push({
+      kind: "canceled",
+      at: minutesAfter(createdAt, 1),
+      detail: "Canceled by the app",
+    });
+  }
+
+  return timeline;
+}
+
 export function buildVerificationFixtures(
   verifyServices: VerifyService[],
-): Verification[] {
+): VerificationDetail[] {
   return verificationSpecs.map((verificationSpec) => {
     const verifyService = verifyServices[verificationSpec.serviceIndex];
-
-    return {
+    const verification: Verification = {
       sid: createProviderId("VE"),
       service_sid: verifyService?.sid ?? "",
       service_name: verifyService?.friendly_name ?? "",
@@ -112,6 +190,35 @@ export function buildVerificationFixtures(
       expires_at: minutesAgo(verificationSpec.minutesAgo - 10),
       created_at: minutesAgo(verificationSpec.minutesAgo),
       linked_message_id: null,
+      linked_thread_id: null,
+    };
+
+    return {
+      ...verification,
+      timeline: buildVerificationTimeline(verification),
+    };
+  });
+}
+
+/** Links each verification to the captured SMS that carried its code. */
+export function linkVerificationMessages(
+  verifications: VerificationDetail[],
+  smsMessages: SmsMessageDetail[],
+): VerificationDetail[] {
+  return verifications.map((verification) => {
+    const codeMessage = smsMessages.find(
+      (smsMessage) =>
+        smsMessage.to_number === verification.to &&
+        smsMessage.body.includes(verification.code),
+    );
+    if (codeMessage === undefined) {
+      return verification;
+    }
+
+    return {
+      ...verification,
+      linked_message_id: codeMessage.id,
+      linked_thread_id: `${codeMessage.from_number}|${codeMessage.to_number}`,
     };
   });
 }
