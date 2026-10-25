@@ -161,6 +161,8 @@ test("EM-09.5 SM-13.5 both logs load 50 rows at a time and more on scroll", asyn
 
   await page.getByRole("tab", { name: "API requests" }).click();
   await expect(page.getByText(/^Showing 50 of 2,006$/)).toBeVisible();
-  await page.getByRole("button", { name: "Load more" }).click();
+  // The fallback button, clicked without scrolling: scrolling the footer into
+  // view would start the automatic load and race the click.
+  await page.getByRole("button", { name: "Load more" }).dispatchEvent("click");
   await expect(page.getByText(/^Showing 100 of 2,006$/)).toBeVisible();
 });

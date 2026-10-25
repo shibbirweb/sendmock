@@ -148,8 +148,12 @@ test("UI-04.4 a filter that matches nothing offers Clear filter instead of onboa
     .filter({ hasText: "Clear search" })
     .click();
   await expect(page.getByText("No emails match this search.")).toBeHidden();
+  // The search box follows the cleared URL, so its debounce cannot bring the search back.
+  await expect(page.getByLabel("Search emails")).toHaveValue("");
+  await expect(page).not.toHaveURL(/[?&]q=/);
 
   await navigateInApp(page, "/sms/verify");
+  await expect(page).toHaveURL(/\/sms\/verify/);
   await page.getByLabel("Search verifications").fill("+10000000000");
   await expect(
     page.getByText("No verifications match this status or search."),

@@ -73,6 +73,9 @@ test("WH-07.10 typing inside {{ }} suggests keys, children, filters and function
     /^event\.created_at/,
   ]);
   await bodyField.press("ArrowDown");
+  await expect(suggestions.getByRole("option", { selected: true })).toHaveText(
+    /^event\.type/,
+  );
   await bodyField.press("Enter");
   await expect(bodyField).toHaveText("{{ event.type");
 

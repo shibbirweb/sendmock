@@ -78,6 +78,8 @@ export default function CodeEditorView({
           autocompletion({
             override: [createTemplateCompletionSource(readReference)],
             icons: false,
+            // Enter and Tab accept at once, like the template text fields.
+            interactionDelay: 0,
           }),
           createValueHover(readReference),
           keymap.of([
