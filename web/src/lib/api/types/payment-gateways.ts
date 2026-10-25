@@ -111,7 +111,8 @@ export type GatewayCredentialReveal = { name: string; value: string };
 export type PaymentCheckoutCreateRequest = {
   provider: string;
   amount_minor: number;
-  currency: string;
+  /** Settings > Payments' default currency when left out. */
+  currency?: string;
   customer_email?: string;
   line_items?: { name: string; quantity: number; unit_amount_minor: number }[];
 };

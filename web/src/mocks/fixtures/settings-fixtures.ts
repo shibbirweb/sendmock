@@ -28,5 +28,9 @@ export function buildDefaultSettings(): AppSettings {
     is_chaos_smtp_drop_during_data_enabled: false,
     otp_patterns: [...defaultOtpPatterns],
     is_update_check_enabled: false,
+    payment_merchant_name: "Acme Shop",
+    payment_default_currency: "USD",
+    payment_outcome_profile: "interactive",
+    payment_random_success_rate_percent: 80,
   };
 }

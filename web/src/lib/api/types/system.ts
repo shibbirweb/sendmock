@@ -145,6 +145,12 @@ export type AppStats = {
   webhook_delivery_count: number;
   webhook_success_rate: number | null;
   webhook_p95_latency_ms: number | null;
+  payment_count: number;
+  payments_today: number;
+  /** Succeeded among finished payments; null before any finished. */
+  payment_success_rate: number | null;
+  /** Captured minus refunded, per currency, largest first (test money). */
+  payment_revenue: { currency: string; amount_minor: number }[];
   /** 24 hourly buckets, oldest first, ending with the current hour. */
   activity: ActivityBucket[];
   endpoint_metrics: EndpointMetrics[];
@@ -215,7 +221,18 @@ export type AppSettings = {
   is_update_check_enabled: boolean;
   /** Mail for these domains is incoming; offered as Forward suggestions. */
   inbound_email_domains: string[];
+  /** Shown on checkout pages and as `{merchant}` in step labels. */
+  payment_merchant_name: string;
+  /** For hosted checkouts created without a currency. */
+  payment_default_currency: string;
+  payment_outcome_profile: PaymentOutcomeProfile;
+  /** Used by the `random` outcome profile. */
+  payment_random_success_rate_percent: number;
 };
+
+/** What happens to a new hosted checkout (PY-09.4): wait for the page, or settle at once. */
+export type PaymentOutcomeProfile =
+  "interactive" | "auto_success" | "auto_decline" | "random";
 
 /** Body of PATCH /api/v1/settings: only the changed keys. */
 export type AppSettingsUpdate = Partial<AppSettings>;

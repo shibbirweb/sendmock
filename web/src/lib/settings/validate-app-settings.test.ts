@@ -5,6 +5,28 @@ import { findOtpMatch } from "@/lib/settings/find-otp-match";
 import { validateAppSettingsUpdate } from "@/lib/settings/validate-app-settings";
 
 describe("validateAppSettingsUpdate", () => {
+  test("PY-09.4 checks the merchant name, currency code and success rate", () => {
+    expect(
+      validateAppSettingsUpdate({
+        payment_merchant_name: " ",
+        payment_default_currency: "usd",
+        payment_random_success_rate_percent: 101,
+      }),
+    ).toEqual({
+      payment_merchant_name: "Use 1 to 60 characters",
+      payment_default_currency: "Use a 3-letter currency code, e.g. USD",
+      payment_random_success_rate_percent: "Choose 0 to 100",
+    });
+    expect(
+      validateAppSettingsUpdate({
+        payment_merchant_name: "Acme Shop",
+        payment_default_currency: "BDT",
+        payment_outcome_profile: "random",
+        payment_random_success_rate_percent: 80,
+      }),
+    ).toEqual({});
+  });
+
   test("PL-05.2 accepts valid values and checks only the keys sent", () => {
     expect(
       validateAppSettingsUpdate({

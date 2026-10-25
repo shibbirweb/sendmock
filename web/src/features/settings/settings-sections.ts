@@ -8,6 +8,7 @@ import {
   MailIcon,
   MessageSquareIcon,
   PlugIcon,
+  ReceiptIcon,
   SlidersHorizontalIcon,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ export const settingsSectionIds = [
   "seed",
   "email",
   "sms",
+  "payments",
   "opened-events",
   "chaos",
   "otp",
@@ -36,6 +38,7 @@ export const settingsSections: {
   { sectionId: "seed", label: "Seed", icon: DatabaseIcon },
   { sectionId: "email", label: "Email", icon: MailIcon },
   { sectionId: "sms", label: "SMS", icon: MessageSquareIcon },
+  { sectionId: "payments", label: "Payments", icon: ReceiptIcon },
   { sectionId: "opened-events", label: "Opened events", icon: BellRingIcon },
   { sectionId: "chaos", label: "Chaos", icon: FlameIcon },
   { sectionId: "otp", label: "OTP patterns", icon: KeyRoundIcon },

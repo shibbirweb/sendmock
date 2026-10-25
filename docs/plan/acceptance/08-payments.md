@@ -79,7 +79,8 @@ UI in U2, live in Phase 3P.
 - [ ] PY-09.1 The Payments list filters by status, provider and currency and updates live.
 - [ ] PY-09.2 Payment detail shows the timeline, method, line items, redirects and linked notification deliveries.
 - [ ] PY-09.3 The Simulate menu performs every documented action, and the result shows immediately.
-- [ ] PY-09.4 Settings > Payments edits merchant credentials (secrets masked), outcome profile and shows the test card and wallet tables.
+- [ ] PY-09.4 Settings > Payments edits the merchant name, default currency and automatic outcome profile (each used by the next checkout), shows the test card and test number tables of the enabled methods with the OTP and PIN, and links to Gateways (merchant credentials, per gateway since PY-12.2) and Methods.
+- [ ] PY-09.5 The Overview shows a Payments tile with the payment count, today's count, the success rate and test revenue per currency, linking to Payments.
 
 ## PY-10 More gateways
 

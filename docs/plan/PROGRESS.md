@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook, the composer, the HTTP catcher and the webhooks overview built on mock data**; payments next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook, the composer, the HTTP catcher, the webhooks overview and payments (list, checkout, gateways, methods, flows, settings) built on mock data**; Replies next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 97 accepted, 10 / 417 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 97 accepted, 10 / 418 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: payments list, detail and Simulate menu, hosted test checkout, Settings > Payments.
+2. Continue Phase U2: Replies (inbound routes, SMS reply webhook result, inbound URL and fallback on Numbers).
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 12 / 14 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 13 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -120,14 +120,14 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Manual send dialog and composer (Prompt variables, overrides; Send to webhook from Mail and SMS with format, live preview, Edit body, Open delivery and Save; Composer at `/webhooks/composer` with template presets and the request editor; WH-05.1, WH-05.3, WH-05.5, WH-05.6)
 - [x] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward (bins from presets with catch URL, clear and delete; live request list; detail with previews, pretty or raw body, files, headers, query and the response with its rule; Copy as cURL, Forward to URL, Send to webhook; Responses tab with ordered rules, live rule preview and default reply; HC-01.6, HC-01.7, HC-02.4)
 - [x] Webhooks overview metrics (`/webhooks/overview`: 24 hours or 7 days and an endpoint, kept in the URL; stat tiles; deliveries over time stacked by succeeded / retrying / failed with tooltip, p50 / p95 and table; per-endpoint metrics; top failure codes linking to failed deliveries; recent failures; live; WH-11.1, WH-11.3)
-- [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Gateways, Methods and Flows (add, edit, reset to default; flows composed step by step); Settings > Payments
+- [x] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Gateways, Methods and Flows (add, edit, reset to default; flows composed step by step); Settings > Payments
   - [x] Part 1: payments list, detail and Simulate menu
   - [x] Part 2: hosted test checkout page with provider themes
   - [x] Part 3: payment methods (add, edit, reset, delete) and a method-driven checkout
   - [x] Part 4: payment flows (PY-12.6): flow and step types in the API contract; step catalogue and flow validation shared by the UI and the mock API; seven built-in flows in the mock DB with reset; `/payments/flows`, single-step and `/payments/step-types` handlers; methods point at a flow key and their test value fields follow its steps; the checkout page runs a flow's steps in order through a step registry (one component per step type) and the mock checks each step; Payments > Flows table, Add flow and the step-by-step edit sheet; unit and e2e tests
   - [x] Part 4b: step label variables (PY-12.7): a Variables reference in the flow sheet, an Insert variable menu on every label, a filled preview per step, unknown variables refused on save, all seven filled in on the checkout page, and `GET /payments/flow-variables`
   - [x] Part 5a: Gateways screen (PY-12.2, PY-12.3 custom gateways, PY-12.4): gateway definitions in the API contract and mock DB (the five built-ins as data, reproducing today's redirect and notification shapes); redirects and notifications rendered from the gateway's templates; `/payments/gateways` with reset, preview, secret reveal and `POST /payments/checkout` for a test checkout; payments show the gateway's name; Payments > Gateways table, Add gateway (from a built-in or blank) and the tabbed edit sheet with a live preview; unit and e2e tests
-  - [ ] Part 5b: Settings > Payments (merchant name, default currency, automatic outcome profile, test value tables) and the Overview payments tile
+  - [x] Part 5b: Settings > Payments (merchant name, default currency, automatic outcome profile, test value tables) and the Overview payments tile
 - [ ] Replies: Inbound routes list and editor, SMS reply webhook result and drawer tab, inbound URL and fallback on Numbers
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
@@ -380,3 +380,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: step label variables are documented and checked ([17](17-payments.md#gateways-and-payment-methods-configurable), [07](07-ui.md#payments), [14](14-ai-integration.md)): `{method}`, `{amount}`, `{currency}`, `{merchant}`, `{gateway}`, `{reference}` and `{customer_email}`, each with what it becomes and an example; the Flows sheet gets a Variables reference, an Insert variable menu per label and a filled preview per step; unknown variables are refused on save; `GET /payments/flow-variables`, CLI `sendmock payments flows variables` and MCP `sendmock_payment_flow_variable_list` share the list. Criterion PY-12.7. |
 | 2026-10-25 | Step label variables built on mock data (part 4b): the flow sheet lists `{method}`, `{amount}`, `{currency}`, `{merchant}`, `{gateway}`, `{reference}` and `{customer_email}` with what each becomes and an example; every label field has an Insert variable menu that inserts at the caret; each step shows a preview with example values (the method's name when a method uses the flow); an unknown variable is refused on save naming the known ones; the checkout page fills all seven; the mock API serves `GET /payments/flow-variables`. PY-12.7 has tests. |
 | 2026-10-25 | Payment gateways built on mock data (part 5a of 5): the five built-in gateways are now data (methods offered, credentials, notification endpoint, redirect method and fields, content type, event names, body and header templates) that reproduce the previous redirect and notification shapes, and every redirect and notification renders from them. Payments > Gateways (new nav child) lists them with methods, endpoint, Built-in / Custom, Modified and an enabled switch; Add gateway starts from a built-in or blank; the edit sheet has General, Checkout (methods in order, Open a test checkout), Merchant (credentials masked, reveal asks first, notification endpoint), Redirect (fields sent always or only on success) and Notification (event names, body in the code editor, header templates) with a live preview against a chosen payment, event and outcome and the template reference beside them; template errors block saving. New template functions `uuid()`, `random_hex()`, `now_iso()` and `stripe_signature()`. Payments show the gateway's name. Mock API: `/payments/gateways` with reset, preview, secret reveal, and `POST /payments/checkout` for any gateway. PY-12.2, PY-12.3 (custom gateways) and PY-12.4 have tests. |
+| 2026-10-25 | Plan: Settings > Payments and the Overview payments tile in detail ([17](17-payments.md#ui), [07](07-ui.md)): merchant name, default currency and the automatic outcome profile (interactive, auto_success, auto_decline, random with a success rate) apply to new hosted checkouts; the test value tables of the enabled methods; a Payments tile with count, success rate and revenue per currency. PY-09.4 reworded (reason: merchant credentials moved to each gateway in PY-12.2, so Settings links to Gateways instead of editing them); new criterion PY-09.5 for the tile. |
+| 2026-10-25 | Settings > Payments and the Overview payments tile built on mock data (part 5b of 5, the payments item is done): a Payments settings section with the merchant name (checkout pages and `{merchant}`), default currency and automatic outcome profile (interactive, always succeed, always decline, random with a success rate) applied to new hosted checkouts, and the test card and test number tables of the enabled methods with OTP / PIN and links to Gateways and Methods; the Overview gets a Payments tile (count, today, success rate, test revenue per currency). PY-09.4 and PY-09.5 have tests. |

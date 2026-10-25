@@ -153,7 +153,6 @@ export function GatewayCheckoutTab({
               {
                 provider: gatewayInput.key,
                 amount_minor: 2500,
-                currency: "USD",
               },
               {
                 onSuccess: (paymentDetail) => {

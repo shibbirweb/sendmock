@@ -26,7 +26,11 @@ import {
 type CheckoutDatabase = PaymentDatabase &
   Pick<
     MockDatabase,
-    "paymentMethods" | "paymentFlows" | "payments" | "paymentGateways"
+    | "paymentMethods"
+    | "paymentFlows"
+    | "payments"
+    | "paymentGateways"
+    | "settings"
   >;
 
 const actionsByState: Partial<Record<CheckoutState, CheckoutAction[]>> = {

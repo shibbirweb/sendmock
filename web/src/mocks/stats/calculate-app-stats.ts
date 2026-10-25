@@ -12,6 +12,7 @@ import {
   sortDurations,
   summarizeEndpointMetrics,
 } from "@/mocks/stats/delivery-metrics";
+import { calculatePaymentStats } from "@/mocks/stats/payment-stats";
 
 const hourInMs = 60 * 60 * 1000;
 const activityBucketCount = 24;
@@ -117,6 +118,7 @@ export function calculateAppStats(
   const startOfTodayMs = readStartOfTodayMs(nowMs);
 
   return {
+    ...calculatePaymentStats(mockDatabase.payments, startOfTodayMs),
     email_count: mockDatabase.emails.length,
     emails_today: countSince(
       mockDatabase.emails.map((email) => email.received_at),

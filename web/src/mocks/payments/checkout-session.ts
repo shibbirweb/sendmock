@@ -8,11 +8,13 @@ import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
 import { presentPaymentFlow } from "@/mocks/payments/payment-flow-record";
 import { listGatewayMethods } from "@/mocks/payments/payment-method-record";
 
-const merchantName = "Acme Shop";
-
 type SessionDatabase = Pick<
   MockDatabase,
-  "paymentMethods" | "paymentFlows" | "payments" | "paymentGateways"
+  | "paymentMethods"
+  | "paymentFlows"
+  | "payments"
+  | "paymentGateways"
+  | "settings"
 >;
 
 /** Where the checkout stands for the customer, from the payment (PY-03.3). */
@@ -52,7 +54,7 @@ export function toCheckoutSession(
     payment_id: paymentDetail.id,
     provider: paymentDetail.provider,
     provider_name: paymentGateway?.name ?? paymentDetail.provider,
-    merchant_name: merchantName,
+    merchant_name: mockDatabase.settings.payment_merchant_name,
     amount_minor: paymentDetail.amount_minor,
     currency: paymentDetail.currency,
     line_items: paymentDetail.line_items,

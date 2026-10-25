@@ -156,6 +156,35 @@ export function validateAppSettingsUpdate(
       fieldErrors.otp_patterns = otpPatternError;
     }
   }
+  checkPaymentSettings(fieldErrors, settingsUpdate);
 
   return fieldErrors;
+}
+
+/** Settings > Payments (PY-09.4): a merchant name, an ISO 4217 code and a rate. */
+function checkPaymentSettings(
+  fieldErrors: AppSettingsFieldErrors,
+  settingsUpdate: AppSettingsUpdate,
+) {
+  const merchantName = settingsUpdate.payment_merchant_name;
+  if (
+    merchantName !== undefined &&
+    (merchantName.trim() === "" || merchantName.length > 60)
+  ) {
+    fieldErrors.payment_merchant_name = "Use 1 to 60 characters";
+  }
+  if (
+    settingsUpdate.payment_default_currency !== undefined &&
+    !/^[A-Z]{3}$/.test(settingsUpdate.payment_default_currency)
+  ) {
+    fieldErrors.payment_default_currency =
+      "Use a 3-letter currency code, e.g. USD";
+  }
+  checkRange(
+    fieldErrors,
+    settingsUpdate,
+    "payment_random_success_rate_percent",
+    [0, 100],
+    "Choose 0 to 100",
+  );
 }

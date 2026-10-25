@@ -177,8 +177,13 @@ Provider deliveries use the provider's own event names and payloads through buil
 - **Payments** screen: list (amount, currency, provider badge, status, customer, time), filters (status, provider, currency), detail with timeline, method, line items, redirects and IPN/webhook deliveries (linked to the webhook delivery log), and a **Simulate** menu (succeed, decline with reason, refund full/partial, open/resolve dispute, expire checkout, resend IPN).
 - **Test checkout page** (`/pay/{sessionId}`): a clean, provider-neutral checkout styled per provider theme (Stripe-like card form, PayPal-like approve, SSLCommerz-like method picker with cards / mobile banking / net banking, bKash-like wallet + OTP + PIN steps), always with the TEST MODE banner and the outcome controls.
 - **Gateways** (Payments > Gateways), **Methods** (Payments > Methods) and **Flows** (Payments > Flows) screens: see [Gateways and payment methods](#gateways-and-payment-methods-configurable). The notification endpoint and merchant credentials are set per gateway; IPN and webhook notifications are deliveries to that endpoint, so they share the delivery log, retries and replay.
-- **Settings > Payments**: merchant name shown on checkout pages, default currency, automatic outcome profile (`interactive` = wait for the checkout page, `auto-success`, `auto-decline`, `random` with rate), and the test card and wallet tables of the enabled methods, linking to Gateways and Methods.
-- Overview: payments count, success rate, revenue (test) per currency.
+- **Settings > Payments**:
+  - Merchant name: shown on checkout pages and in the `{merchant}` label variable.
+  - Default currency: used by `POST /payments/checkout` when the request sets none (and by Open a test checkout).
+  - Automatic outcome profile for new hosted checkouts: `interactive` (wait for the checkout page), `auto_success` and `auto_decline` (settle at once, a decline with `generic_decline`), `random` (succeeds at the chosen rate, else declines). The checkout page of a settled checkout shows its result.
+  - The test value tables of the enabled methods (test cards and test numbers or codes, each with its method and outcome, plus the OTP and PIN), linking to Payments > Gateways (where merchant credentials now live, per gateway) and Payments > Methods.
+  - Settings keys: `payment_merchant_name`, `payment_default_currency`, `payment_outcome_profile`, `payment_random_success_rate_percent`.
+- **Overview:** a Payments stat tile with the payment count and today's count, the success rate (succeeded among finished payments) and test revenue per currency (captured minus refunded), linking to Payments.
 
 ## API (SendMock native)
 
