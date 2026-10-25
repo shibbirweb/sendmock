@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 95 features, 10 / 373 criteria ticked.**
+**Accepted: 0 / 95 features, 10 / 376 criteria ticked.**
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -126,7 +126,7 @@ On top of its own criteria, a feature is done only when:
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Not started |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
-| [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 2 | Not started |
+| [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | In progress |
 | [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 2 | Not started |
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Not started |
 | [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Not started |

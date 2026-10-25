@@ -1,69 +1,12 @@
 import { http, HttpResponse } from "msw";
 
-import type { AppInfo, AppStats } from "@/lib/api/types";
+import type { AppInfo } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import {
   applyMockConditions,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
-
-function percentile(
-  sortedValues: number[],
-  percentileRank: number,
-): number | null {
-  if (sortedValues.length === 0) {
-    return null;
-  }
-
-  const valueIndex = Math.min(
-    sortedValues.length - 1,
-    Math.ceil((percentileRank / 100) * sortedValues.length) - 1,
-  );
-
-  return sortedValues[valueIndex] ?? null;
-}
-
-function calculateStats(): AppStats {
-  const finishedDeliveries = mockDatabase.webhookDeliveries.filter(
-    (webhookDelivery) =>
-      webhookDelivery.status === "succeeded" ||
-      webhookDelivery.status === "failed" ||
-      webhookDelivery.status === "exhausted",
-  );
-  const succeededDeliveryCount = finishedDeliveries.filter(
-    (webhookDelivery) => webhookDelivery.status === "succeeded",
-  ).length;
-  const sortedDurations = mockDatabase.webhookDeliveries
-    .map((webhookDelivery) => webhookDelivery.duration_ms)
-    .filter((durationMs): durationMs is number => durationMs !== null)
-    .sort((firstDuration, secondDuration) => firstDuration - secondDuration);
-
-  return {
-    email_count: mockDatabase.emails.length,
-    unread_email_count: mockDatabase.emails.filter((email) => !email.is_read)
-      .length,
-    sms_count: mockDatabase.smsMessages.length,
-    unread_sms_count: mockDatabase.smsMessages.filter(
-      (smsMessage) => smsMessage.direction === "inbound",
-    ).length,
-    verification_count: mockDatabase.verifications.length,
-    http_request_count: mockDatabase.capturedHttpRequests.length,
-    webhook_delivery_count: mockDatabase.webhookDeliveries.length,
-    webhook_success_rate:
-      finishedDeliveries.length === 0
-        ? null
-        : succeededDeliveryCount / finishedDeliveries.length,
-    webhook_p95_latency_ms: percentile(sortedDurations, 95),
-    recent_failed_delivery_ids: mockDatabase.webhookDeliveries
-      .filter((webhookDelivery) =>
-        ["failed", "exhausted", "render_failed"].includes(
-          webhookDelivery.status,
-        ),
-      )
-      .slice(0, 5)
-      .map((webhookDelivery) => webhookDelivery.id),
-  };
-}
+import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
 
 const mockAppInfo: AppInfo = {
   version: "0.0.0-dev",
@@ -82,7 +25,7 @@ export const systemHandlers = [
   http.get("*/api/v1/stats", async () => {
     const conditionResponse = await applyMockConditions();
 
-    return conditionResponse ?? HttpResponse.json(calculateStats());
+    return conditionResponse ?? HttpResponse.json(calculateAppStats(mockDatabase, Date.now()));
   }),
 
   http.get("*/api/v1/info", async () => {

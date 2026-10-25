@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail, SMS, Verify, Numbers, Logs and Settings screens done**; Overview dashboard and empty states, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Overview, Mail, SMS, Verify, Numbers, Logs and Settings screens done**; empty states next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 373 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 376 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Finish Phase U1: the Overview dashboard and the empty states with "how to connect" and "send sample".
+2. Finish Phase U1: the empty states with "how to connect" and "send sample".
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 16 / 18 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 17 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -87,7 +87,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
 
-- [ ] Overview dashboard
+- [x] Overview dashboard
 - [x] Mail list, search and filter chips, source and outcome badges (virtual rows, infinite loading, J/K/D and / shortcuts)
 - [x] Mail detail: HTML (devices, images toggle, screenshot), Text, Source, Headers
 - [x] Mail detail: Attachments with thumbnails, MIME tree, Checks, Timeline, Template data
@@ -328,3 +328,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Settings > Connection: "Customize the request" gets a Reset button that restores the sample bodies and removes added headers; the email and SMS body columns now line up. |
 | 2026-10-25 | Plan: custom outcome numbers ([04](04-sms.md#custom-outcome-numbers)) and custom outcome addresses ([03](03-email.md#delivery-outcome-simulation)) as ordered, switchable rules checked before the read-only magic numbers and addresses, with Magic numbers / Magic addresses switches, "Test a number / address" boxes and `/outcome-rules/sms` and `/outcome-rules/email`; criteria SM-07.7 to SM-07.9, EM-10.5, EM-10.6. |
 | 2026-10-25 | Custom outcome numbers and addresses built on mock data: ordered rule tables with on / off, move, edit and delete, dialogs that ask only for what an outcome needs, "Test a number / address" boxes, Magic numbers and Magic addresses switches, rules exported to the seed file. Mock sends now follow custom rules and the magic numbers and addresses (reject on send, failure codes, delayed delivery, read, bounces). |
+| 2026-10-25 | Plan: Overview dashboard design ([07](07-ui.md#overview): KPI row with today's counts, 24-hour activity chart with tooltip and table view, webhook metrics per endpoint, recent failures, latest messages, connect shortcuts), richer `/stats` in the API plan, criteria UI-03.3 to UI-03.5. Chart colours checked for colour-blind separation and contrast in both themes. |
+| 2026-10-25 | Overview dashboard built on mock data: stat tiles with totals and today's counts, a 24-hour stacked activity chart (legend, tooltip on hover and arrow keys, "Show as table"), webhook health per endpoint with a success meter, p50 / p95, retries and top failure codes, recent failures linking to the delivery, latest messages and a connect card with copy buttons. `/stats` mock computes the new fields. |

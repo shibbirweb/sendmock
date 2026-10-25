@@ -122,7 +122,7 @@ These make SendMock useful from any test framework without polling loops:
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
 | GET | `/seed/status` | seed file path, when it was applied, and items added or changed since |
-| GET | `/stats` | counts and webhook metrics for the dashboard |
+| GET | `/stats` | totals and today's counts, 24 hourly activity buckets (emails, SMS, HTTP requests, deliveries), per-endpoint webhook metrics (deliveries, success rate, p50 / p95 latency, retries, top failure codes) and recent failed deliveries |
 
 `wait` endpoints only match messages received after an optional `since` timestamp (defaults to "now minus 30 s") to avoid matching stale messages.
 

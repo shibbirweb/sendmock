@@ -1,4 +1,5 @@
 import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
+import type { AppEventType } from "@/lib/api/types/events";
 
 export type HttpBin = {
   id: Ulid;
@@ -79,17 +80,62 @@ export type ApiRequestLogFilters = PageRequest & {
   path?: string;
 };
 
+/** One hour of traffic in the Overview activity chart. */
+export type ActivityBucket = {
+  bucket_start: IsoTimestamp;
+  email_count: number;
+  sms_count: number;
+  http_request_count: number;
+  webhook_delivery_count: number;
+};
+
+export type FailureCodeCount = {
+  /** HTTP status as text (`"500"`), or `"timeout"` / `"connection"`. */
+  failure_code: string;
+  failure_count: number;
+};
+
+/** Webhook health of one endpoint over the last 24 hours (WH-11.1). */
+export type EndpointMetrics = {
+  endpoint_id: Ulid;
+  endpoint_name: string;
+  delivery_count: number;
+  /** 0 to 1; null when nothing finished yet. */
+  success_rate: number | null;
+  p50_latency_ms: number | null;
+  p95_latency_ms: number | null;
+  retry_count: number;
+  top_failure_codes: FailureCodeCount[];
+};
+
+export type RecentFailedDelivery = {
+  delivery_id: Ulid;
+  endpoint_name: string;
+  event_type: AppEventType;
+  status_code: number | null;
+  error_message: string | null;
+  created_at: IsoTimestamp;
+};
+
+/** GET /api/v1/stats: everything the Overview shows (UI-03). */
 export type AppStats = {
   email_count: number;
+  emails_today: number;
   unread_email_count: number;
   sms_count: number;
+  sms_today: number;
   unread_sms_count: number;
   verification_count: number;
+  pending_verification_count: number;
   http_request_count: number;
+  http_requests_today: number;
   webhook_delivery_count: number;
   webhook_success_rate: number | null;
   webhook_p95_latency_ms: number | null;
-  recent_failed_delivery_ids: Ulid[];
+  /** 24 hourly buckets, oldest first, ending with the current hour. */
+  activity: ActivityBucket[];
+  endpoint_metrics: EndpointMetrics[];
+  recent_failures: RecentFailedDelivery[];
 };
 
 export type AppInfo = {
