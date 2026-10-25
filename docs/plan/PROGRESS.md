@@ -269,6 +269,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 2026-10-25 | Publish from the `shibbirweb` GitHub account | [10](10-open-questions.md) |
 | 2026-10-25 | Commits authored as `MD. Shibbir Ahmed <shibbirweb@gmail.com>` (rule in `AGENTS.md`); existing local commits rewritten before the first push | [AGENTS.md](../../AGENTS.md#commits-and-pull-requests) |
 | 2026-10-25 | Product name **SendMock** (binary and packages `sendmock`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock) |
+| 2026-10-25 | SQLite is the only database: embedded (`rusqlite`, bundled, FTS5), one file, WAL mode, on disk at the OS data directory by default and `--db memory` for CI, hand-rolled `user_version` migrations | [02](02-architecture.md#database-sqlite) |
 
 ### Open
 
@@ -284,7 +285,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | Attachment storage | inside SQLite | Open (using recommendation) |
 | Telemetry | none, opt-in update check | Open (using recommendation) |
 | Mailpit API aliases | after 1.0 if demanded | Open |
-| Persistence default | on-disk, `--db memory` for CI | Open (using recommendation) |
+| Persistence default | on-disk SQLite, `--db memory` for CI | Decided 2026-10-25 |
 | caniemail data licence | confirm before shipping | Open |
 | Lenient vs strict provider emulation | lenient default, strict mode per provider | Open (using recommendation) |
 | Docs-site CORS default for local playground | allow docs origin, connect on click | Open |
@@ -312,3 +313,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: Logs screen design ([07](07-ui.md#logs): SMTP sessions with a colour-coded transcript viewer and a link from each email to its session, HTTP API request log with formatted bodies, filters and message links) and criteria EM-09.4 and SM-13.4. |
 | 2026-10-25 | Logs screen built on mock data: SMTP sessions (failed ones highlighted with their reason, transcript viewer with C / S lines and reply codes coloured by class, each SMTP email linked to its session and back) and the API request log (status class, API and path filters, JSON and form bodies formatted, links to the SMS or email created and back). Both tables page 50 rows at a time and load more on scroll; the large data set now has about 5,000 sessions and 2,000 requests. Native sends are logged live. |
 | 2026-10-25 | Fix: `web/.gitignore` ignored every folder named `logs`, which hid `src/features/logs` from git, Tailwind, Prettier and ESLint; the rule is now anchored to the root (`/logs/`). Demo control labels are now tied to their selects. |
+| 2026-10-25 | Plan: SQLite recorded as the database decision ([02](02-architecture.md#database-sqlite): why, location and modes, connection setup, migrations with `user_version`, search, retention, tests); persistence default decided. |

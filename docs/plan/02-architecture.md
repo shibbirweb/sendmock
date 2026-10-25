@@ -97,7 +97,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | TLS | `rustls`, `tokio-rustls`, `rcgen` | STARTTLS / HTTPS with auto-generated self-signed cert |
 | MIME parsing | `mail-parser` | robust, zero-copy, handles broken real-world mail |
 | Storage | `rusqlite` (bundled, FTS5) | no system SQLite dependency; `spawn_blocking` or a small pool |
-| Migrations | `refinery` or hand-rolled `user_version` | embedded SQL migrations |
+| Migrations | hand-rolled, `PRAGMA user_version` | embedded SQL migrations, no extra dependency (see [Database](#database-sqlite)) |
 | Compression | `zstd` | raw `.eml` bodies compressed at rest |
 | HTTP client | `reqwest` (rustls) | webhook delivery |
 | Signing | `hmac`, `sha2`, `sha1`, `base64` | Standard Webhooks HMAC-SHA256 native signatures, Twilio-style HMAC-SHA1 |
@@ -171,6 +171,55 @@ sendmock/
 ```
 
 A workspace keeps compile units small and boundaries clear. If it feels heavy early on, start as one crate with the same module names and split later.
+
+## Database: SQLite
+
+**Decision (2026-10-25):** SendMock stores everything (traffic, configuration, logs) in one embedded SQLite database. There is no external database to install or run.
+
+### Why SQLite
+
+- **Zero setup:** SQLite is compiled into the binary (`rusqlite` with the `bundled` feature), so there is no server, no system library and nothing to configure. This keeps the "one binary, start and go" promise and the Docker image small.
+- **One file:** the whole state is a single file that is easy to copy, delete, back up or attach to a bug report. `reset` and `--db memory` make test runs start clean.
+- **Fast enough by a wide margin:** a local test tool sees hundreds of messages a minute, not thousands a second. SQLite in WAL mode handles that with room to spare, and the 10,000-email search budget (EM-03.4) is met with FTS5.
+- **Portable:** the same code and file format on Linux, macOS and Windows, with no per-platform setup.
+
+### What it is not
+
+- Not a shared or multi-instance database: one SendMock process owns its file. Running several instances means several files (for example one per CI job).
+- No other database engines are planned. The storage layer sits behind repository traits (`EmailRepository`, `SmsRepository`, ...), so another engine could be added later without touching domain code, but there is no need for it today.
+
+### Location and modes
+
+| Mode | How | Use |
+|------|-----|-----|
+| On disk (default) | the OS data directory (`~/.local/share/sendmock/sendmock.db` on Linux, `~/Library/Application Support/sendmock/` on macOS, `%APPDATA%\sendmock\` on Windows) | local development: endpoints, rules and numbers survive restarts |
+| Custom path | `--db ./sendmock.db` or `SENDMOCK_DB` | per-project data next to the app |
+| Docker | `/data/sendmock.db` on the `/data` volume ([09-distribution.md](09-distribution.md#docker)) | containers |
+| In memory | `--db memory` | CI and throwaway runs; everything is gone when the process exits |
+
+The path, size and mode are shown in Settings > About and `GET /api/v1/info`.
+
+### Connection setup
+
+- `journal_mode = WAL`, `synchronous = NORMAL`, `foreign_keys = ON`, `busy_timeout = 5000`, `auto_vacuum = INCREMENTAL`.
+- One writer task owns the only write connection and applies writes in order; reads use a small pool of read-only connections. Blocking SQLite calls run on `spawn_blocking`, never on the async workers.
+- Raw `.eml` bodies are stored `zstd`-compressed.
+
+### Migrations
+
+- Plain SQL files embedded in the binary (`crates/sendmock-store/migrations/0001_init.sql`, ...), applied in order at startup inside one transaction each, with the schema version kept in `PRAGMA user_version`.
+- Migrations only move forward. A database from a newer SendMock version is refused with a clear message instead of being modified.
+- Before migrating an on-disk database, SendMock copies it to `sendmock.db.bak-<version>`.
+
+### Search, retention and maintenance
+
+- Full-text search uses FTS5 tables kept in sync by triggers.
+- Retention prunes in small batches so ingest never waits (PL-08), then runs `PRAGMA incremental_vacuum` so the file shrinks again.
+- `PRAGMA optimize` runs on shutdown and every few hours.
+
+### Tests
+
+Every integration test opens its own temporary database (on disk in a temp dir, or `:memory:`), so tests run in parallel and never share state ([AGENTS.md](../../AGENTS.md#testing)).
 
 ## Data model (SQLite)
 
