@@ -40,6 +40,7 @@
   --color-whatsapp-outbound: var(--whatsapp-outbound);
   --color-whatsapp-outbound-foreground: var(--whatsapp-outbound-foreground);
   --color-read-receipt: var(--read-receipt);
+  --color-success: var(--success);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -73,6 +74,8 @@
   --whatsapp-outbound: #d9fdd3;
   --whatsapp-outbound-foreground: #111b21;
   --read-receipt: #0284c7;
+  /* Positive outcomes such as an approved verification. */
+  --success: #059669;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -116,6 +119,7 @@
   --whatsapp-outbound: #005c4b;
   --whatsapp-outbound-foreground: #e9edef;
   --read-receipt: #38bdf8;
+  --success: #34d399;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -150,5 +154,12 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Tailwind v4 no longer gives buttons a pointer cursor; restore it for
+     everything clickable (buttons, tabs, checkboxes, select triggers). */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary {
+    cursor: pointer;
   }
 }

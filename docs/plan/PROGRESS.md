@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail and SMS screens done**; Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail, SMS and Verify screens done**; Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: Verify tab next, then Numbers, Logs and Settings.
+2. Continue Phase U1: Numbers registry and Messaging Services next, then Logs and Settings.
 
 ## How to update this file
 
@@ -36,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 8 / 16 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 9 / 16 |
 | U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
@@ -96,7 +96,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Mail reply, reply all and forward as recipient: inline composer with the original in the body (Gmail style), Inbound badge, links between originals and replies, `is:inbound` search, R / Shift+R / F ([07](07-ui.md#mail), EM-17)
 - [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
 - [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
-- [ ] Verify tab: verifications, timeline, force-state buttons, Verify services editor
+- [x] Verify tab: verifications, timeline, force-state buttons, Verify services editor (live expiry countdown, status chips, link to the SMS with the code)
 - [ ] Numbers registry and Messaging Services tab
 - [ ] Logs: SMTP sessions and transcript viewer
 - [ ] Logs: HTTP API request log with rejected requests
@@ -304,3 +304,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Plan: email replies and inbound routes that work like Mailgun Routes ([05](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style), EM-17, WH-12, Phase 4) and an SMS reply webhook that works like Twilio's ([04](04-sms.md#reply-webhook-twilio-style), SM-09.4 to SM-09.7). TwiML replies moved from Phase 4 to Phase 3; reply UI added to U2. |
 | 2026-10-25 | Plan: reply, reply all and forward as recipient for email (inline composer design in [07](07-ui.md#mail), `/emails/{emailId}/forward`, EM-17.4 and EM-17.5). The email reply UI moves from U2 into U1, next to the rest of the Mail screen. |
 | 2026-10-25 | Mail reply, reply all and forward as recipient built on mock data: inline composer that puts the quote or forwarded-message block in the message box like Gmail, editable subject and From, forward suggestions from the inbound domains, Inbound badge, "Reply to" / "Forward of" links and a "Replies and forwards" row, timeline entries, `is:inbound`, R / Shift+R / F, discard prompt. The demo mailbox now includes a customer reply. |
+| 2026-10-25 | Plan: Verify tab design ([07](07-ui.md#sms): verifications table with live expiry countdown, status chips, detail drawer with timeline, linked message and force buttons, Services tab with create / edit / delete dialog) and criteria VF-01.3 and VF-04.4. |
+| 2026-10-25 | Verify tab built on mock data: verifications table with a live expiry countdown, status chips and search, detail drawer with timeline, force buttons and a link to the SMS that carried the code, Services tab with create / edit / delete and the shared validation rules. Pending codes past their expiry turn expired on the next fetch. Shared `FilterChip` now used by Mail, SMS and Verify. |
+| 2026-10-25 | Fix: buttons, tabs, checkboxes, select triggers, menu items and `<summary>` show the pointer cursor again (Tailwind v4 dropped it); disabled buttons keep the default cursor. |

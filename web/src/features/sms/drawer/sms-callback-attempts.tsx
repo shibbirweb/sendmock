@@ -80,7 +80,7 @@ function SmsCallbackAttemptRow({
   return (
     <li>
       <details className="group/callback rounded-md border">
-        <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 px-3 py-2 text-sm [&::-webkit-details-marker]:hidden">
+        <summary className="flex list-none flex-wrap items-center gap-2 px-3 py-2 text-sm [&::-webkit-details-marker]:hidden">
           <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground transition-transform group-open/callback:rotate-90 motion-reduce:transition-none" />
           <span className="font-medium">
             {smsStatusLabels[callbackAttempt.reported_status]}

@@ -1,10 +1,10 @@
 import { SearchIcon, XIcon } from "lucide-react";
 import type * as React from "react";
 
+import { FilterChip } from "@/components/common/filter-chip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SmsThreadFilters } from "@/features/sms/threads/filter-sms-threads";
-import { cn } from "@/lib/utils";
 
 const channelChips: {
   label: string;
@@ -68,24 +68,18 @@ export function SmsThreadFilterBar({
           const isChipActive = threadFilters.channel === channelChip.channel;
 
           return (
-            <button
+            <FilterChip
               key={channelChip.label}
-              type="button"
-              aria-pressed={isChipActive}
-              onClick={() => {
+              isActive={isChipActive}
+              onToggle={() => {
                 onThreadFiltersChange({
                   ...threadFilters,
                   channel: channelChip.channel,
                 });
               }}
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 text-xs transition-colors hover:bg-muted",
-                isChipActive &&
-                  "border-primary bg-primary text-primary-foreground hover:bg-primary/90",
-              )}
             >
               {channelChip.label}
-            </button>
+            </FilterChip>
           );
         })}
       </div>

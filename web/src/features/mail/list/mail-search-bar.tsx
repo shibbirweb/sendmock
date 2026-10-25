@@ -2,13 +2,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { SearchIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
+import { FilterChip } from "@/components/common/filter-chip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   mailSearchChips,
   toggleSearchToken,
 } from "@/features/mail/parse-mail-search";
-import { cn } from "@/lib/utils";
 
 const searchDebounceMs = 250;
 
@@ -97,23 +97,17 @@ export function MailSearchBar({
             .includes(searchChip.token);
 
           return (
-            <button
+            <FilterChip
               key={searchChip.token}
-              type="button"
-              aria-pressed={isChipActive}
-              onClick={() => {
+              isActive={isChipActive}
+              onToggle={() => {
                 updateSearchText(
                   toggleSearchToken(draftSearchText, searchChip.token),
                 );
               }}
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 text-xs transition-colors hover:bg-muted",
-                isChipActive &&
-                  "border-primary bg-primary text-primary-foreground hover:bg-primary/90",
-              )}
             >
               {searchChip.label}
-            </button>
+            </FilterChip>
           );
         })}
       </div>

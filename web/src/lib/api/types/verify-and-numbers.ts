@@ -1,8 +1,16 @@
-import type { CreatedBy, IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type {
+  CreatedBy,
+  IsoTimestamp,
+  PageRequest,
+  Ulid,
+} from "@/lib/api/types/common";
 
 export type VerifyChannel = "sms" | "whatsapp" | "email" | "call";
 export type VerificationStatus =
   "pending" | "approved" | "canceled" | "expired" | "max_attempts_reached";
+
+/** Twilio Verify allows this many wrong checks before failing with 60202. */
+export const maxVerificationCheckAttempts = 5;
 
 export type VerifyService = {
   sid: string;
@@ -25,8 +33,43 @@ export type Verification = {
   send_attempts: number;
   expires_at: IsoTimestamp;
   created_at: IsoTimestamp;
+  /** The captured SMS or email that carried the code; null for `call`. */
   linked_message_id: Ulid | null;
+  /** Conversation of the linked SMS, for the "Open message" link. */
+  linked_thread_id: string | null;
 };
+
+export type VerificationTimelineKind =
+  | "started"
+  | "code_sent"
+  | "check_failed"
+  | "approved"
+  | "canceled"
+  | "expired"
+  | "max_attempts_reached";
+
+export type VerificationTimelineEntry = {
+  kind: VerificationTimelineKind;
+  at: IsoTimestamp;
+  detail: string;
+};
+
+export type VerificationDetail = Verification & {
+  timeline: VerificationTimelineEntry[];
+};
+
+/** Query of GET /api/v1/verify; `status` takes a comma-separated list. */
+export type VerificationListFilters = PageRequest & {
+  status?: string;
+  to?: string;
+  channel?: VerifyChannel;
+};
+
+/** Body of POST and PATCH /api/v1/verify/services. */
+export type VerifyServiceInput = Pick<
+  VerifyService,
+  "friendly_name" | "code_length" | "fixed_code" | "ttl_seconds"
+>;
 
 export type ForcedVerificationState =
   "approved" | "canceled" | "expired" | "max_attempts";

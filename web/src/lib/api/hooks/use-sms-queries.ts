@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
-  ForcedVerificationState,
   InboundSmsRequest,
   MessagingService,
   NativeSmsRequest,
@@ -14,8 +13,6 @@ import type {
   SmsMessageDetail,
   SmsStatus,
   SmsThread,
-  Verification,
-  VerifyService,
   VirtualNumber,
 } from "@/lib/api/types";
 
@@ -110,38 +107,6 @@ export function useOpenSms() {
 export function useDeleteSms() {
   return useSmsMutation((smsId: string) =>
     requestApi<void>(`/sms/${smsId}`, { method: "DELETE" }),
-  );
-}
-
-export function useVerifications() {
-  return useQuery({
-    queryKey: queryKeys.verify.verifications,
-    queryFn: ({ signal }) =>
-      requestApi<PageOf<Verification>>("/verify", { abortSignal: signal }),
-  });
-}
-
-export function useVerifyServices() {
-  return useQuery({
-    queryKey: queryKeys.verify.services,
-    queryFn: ({ signal }) =>
-      requestApi<VerifyService[]>("/verify/services", { abortSignal: signal }),
-  });
-}
-
-export function useForceVerificationState() {
-  return useSmsMutation(
-    ({
-      verificationSid,
-      forcedState,
-    }: {
-      verificationSid: string;
-      forcedState: ForcedVerificationState;
-    }) =>
-      requestApi<Verification>(`/verify/${verificationSid}/force`, {
-        method: "POST",
-        requestBody: { state: forcedState },
-      }),
   );
 }
 
