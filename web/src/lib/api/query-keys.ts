@@ -1,6 +1,8 @@
 import type {
+  ApiRequestLogFilters,
   EmailListFilters,
   SmsListFilters,
+  SmtpSessionListFilters,
   VerificationListFilters,
 } from "@/lib/api/types";
 
@@ -60,8 +62,14 @@ export const queryKeys = {
   },
   logs: {
     all: ["logs"] as const,
-    smtpSessions: ["logs", "smtp"] as const,
-    apiRequests: ["logs", "http"] as const,
+    smtpSessions: (sessionFilters: SmtpSessionListFilters) =>
+      ["logs", "smtp", sessionFilters] as const,
+    smtpSession: (sessionId: string) =>
+      ["logs", "smtp-session", sessionId] as const,
+    apiRequests: (requestFilters: ApiRequestLogFilters) =>
+      ["logs", "http", requestFilters] as const,
+    apiRequest: (requestId: string) =>
+      ["logs", "http-request", requestId] as const,
   },
   system: {
     stats: ["system", "stats"] as const,

@@ -129,20 +129,4 @@ export const systemHandlers = [
 
     return HttpResponse.json(paginateItems(matchingRequests, requestUrl));
   }),
-
-  http.get("*/api/v1/logs/smtp", async ({ request }) => {
-    await applyMockConditions();
-
-    return HttpResponse.json(
-      paginateItems(mockDatabase.smtpSessions, new URL(request.url)),
-    );
-  }),
-
-  http.get("*/api/v1/logs/http", async ({ request }) => {
-    await applyMockConditions();
-
-    return HttpResponse.json(
-      paginateItems(mockDatabase.apiRequestLog, new URL(request.url)),
-    );
-  }),
 ];

@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   formatBytes,
   formatDateTime,
+  formatDurationMs,
   formatRelativeTime,
 } from "@/lib/format/format-values";
 
@@ -39,5 +40,12 @@ describe("formatDateTime", () => {
 
     expect(formattedDateTime).toMatch(/2026/);
     expect(formattedDateTime).toMatch(/\d{1,2}:\d{2}/);
+  });
+});
+
+describe("formatDurationMs", () => {
+  test("uses milliseconds below a second and seconds above", () => {
+    expect(formatDurationMs(184)).toBe("184 ms");
+    expect(formatDurationMs(5004)).toBe("5.0 s");
   });
 });

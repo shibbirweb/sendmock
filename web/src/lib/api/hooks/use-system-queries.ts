@@ -3,14 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
-  ApiRequestLogEntry,
   AppInfo,
   AppSettings,
   AppStats,
   CapturedHttpRequest,
   HttpBin,
   PageOf,
-  SmtpSession,
 } from "@/lib/api/types";
 
 export function useAppStats() {
@@ -78,24 +76,6 @@ export function useCapturedHttpRequests(binId: string | null) {
     queryFn: ({ signal }) =>
       requestApi<PageOf<CapturedHttpRequest>>("/http/requests", {
         queryParameters: { bin_id: binId },
-        abortSignal: signal,
-      }),
-  });
-}
-
-export function useSmtpSessions() {
-  return useQuery({
-    queryKey: queryKeys.logs.smtpSessions,
-    queryFn: ({ signal }) =>
-      requestApi<PageOf<SmtpSession>>("/logs/smtp", { abortSignal: signal }),
-  });
-}
-
-export function useApiRequestLog() {
-  return useQuery({
-    queryKey: queryKeys.logs.apiRequests,
-    queryFn: ({ signal }) =>
-      requestApi<PageOf<ApiRequestLogEntry>>("/logs/http", {
         abortSignal: signal,
       }),
   });

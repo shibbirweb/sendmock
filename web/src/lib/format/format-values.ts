@@ -67,3 +67,12 @@ export function formatBytes(sizeBytes: number): string {
 
   return `${roundedSize} ${byteUnits[unitIndex] ?? "B"}`;
 }
+
+/** 184 -> "184 ms", 5004 -> "5.0 s". */
+export function formatDurationMs(durationMs: number): string {
+  if (durationMs < 1000) {
+    return `${Math.round(durationMs)} ms`;
+  }
+
+  return `${(durationMs / 1000).toFixed(1)} s`;
+}

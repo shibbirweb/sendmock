@@ -7,6 +7,7 @@ import {
   applyMockConditions,
   createErrorResponse,
 } from "@/mocks/handlers/handler-utils";
+import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 
@@ -32,11 +33,17 @@ export const smsSendHandlers = [
       (await request.json()) as Partial<NativeSmsRequest>;
     const missingField = findMissingSendField(nativeSmsRequest);
     if (missingField !== undefined) {
-      return createErrorResponse(
-        400,
-        "validation_failed",
-        `The ${missingField} field is required`,
-      );
+      const errorMessage = `The ${missingField} field is required`;
+      recordNativeApiRequest({
+        path: "/api/v1/sms",
+        requestBody: nativeSmsRequest,
+        responseStatus: 400,
+        responseBody: {
+          error: { code: "validation_failed", message: errorMessage },
+        },
+      });
+
+      return createErrorResponse(400, "validation_failed", errorMessage);
     }
 
     const toNumber = nativeSmsRequest.to ?? "";
@@ -50,6 +57,17 @@ export const smsSendHandlers = [
       statusCallbackUrl: nativeSmsRequest.status_callback ?? null,
     });
 
+    outboundMessage.api_request_id = recordNativeApiRequest({
+      path: "/api/v1/sms",
+      requestBody: nativeSmsRequest,
+      responseStatus: 201,
+      responseBody: { id: outboundMessage.id, status: outboundMessage.status },
+      linkedMessage: {
+        kind: "sms",
+        id: outboundMessage.id,
+        sms_thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
+      },
+    });
     mockDatabase.smsMessages.unshift(outboundMessage);
     publishMockEvent("sms.sent", {
       id: outboundMessage.id,

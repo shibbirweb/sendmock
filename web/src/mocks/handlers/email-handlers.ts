@@ -18,6 +18,7 @@ import {
   paginateItems,
   parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
+import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 function toEmailSummary(email: EmailDetail): EmailSummary {
@@ -101,7 +102,19 @@ export const emailHandlers = [
     }
 
     const nativeSendRequest = (await request.json()) as NativeSendRequest;
-    if (!nativeSendRequest.from || nativeSendRequest.to.length === 0) {
+    if (!nativeSendRequest.from || (nativeSendRequest.to ?? []).length === 0) {
+      recordNativeApiRequest({
+        path: "/api/v1/send",
+        requestBody: nativeSendRequest,
+        responseStatus: 400,
+        responseBody: {
+          error: {
+            code: "invalid_request",
+            message: "from and to are required",
+          },
+        },
+      });
+
       return createErrorResponse(
         400,
         "invalid_request",
@@ -118,6 +131,17 @@ export const emailHandlers = [
       htmlBody: nativeSendRequest.html ?? null,
       tags: nativeSendRequest.tags ?? [],
       source: "native_api",
+    });
+    recordNativeApiRequest({
+      path: "/api/v1/send",
+      requestBody: nativeSendRequest,
+      responseStatus: 201,
+      responseBody: { id: emailFixture.email.id },
+      linkedMessage: {
+        kind: "email",
+        id: emailFixture.email.id,
+        sms_thread_id: null,
+      },
     });
     mockDatabase.emails.unshift(emailFixture.email);
     mockDatabase.emailTimelines.set(
