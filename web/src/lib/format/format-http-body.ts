@@ -14,9 +14,41 @@ function tryFormatJson(bodyText: string): string | null {
   }
 }
 
+/** Multipart parts as name / value rows; a file part shows its file name (HC-01.2). */
+function parseMultipartFields(
+  bodyText: string,
+  contentType: string,
+): [fieldName: string, fieldValue: string][] | null {
+  const boundary = /boundary=("?)([^";]+)\1/.exec(contentType)?.[2];
+  if (boundary === undefined) {
+    return null;
+  }
+
+  return bodyText
+    .split(`--${boundary}`)
+    .slice(1)
+    .flatMap((partText): [string, string][] => {
+      const headerEndIndex = partText.indexOf("\r\n\r\n");
+      if (headerEndIndex === -1) {
+        return [];
+      }
+      const partHeaders = partText.slice(0, headerEndIndex);
+      const fieldName = /name="([^"]*)"/.exec(partHeaders)?.[1];
+      const fileName = /filename="([^"]*)"/.exec(partHeaders)?.[1];
+      if (fieldName === undefined) {
+        return [];
+      }
+      const partValue = partText.slice(headerEndIndex + 4).replace(/\r\n$/, "");
+
+      return [
+        [fieldName, fileName === undefined ? partValue : `${fileName} (file)`],
+      ];
+    });
+}
+
 /**
  * Picks how to show a logged body (SM-13.4): JSON pretty-printed, form
- * bodies as name / value rows, anything else as plain text.
+ * and multipart bodies as name / value rows, anything else as plain text.
  */
 export function formatHttpBody(
   bodyText: string,
@@ -33,6 +65,13 @@ export function formatHttpBody(
     const prettyJson = tryFormatJson(trimmedBody);
     if (prettyJson !== null) {
       return { kind: "json", text: prettyJson };
+    }
+  }
+
+  if (contentType?.includes("multipart/form-data") === true) {
+    const multipartFields = parseMultipartFields(bodyText, contentType);
+    if (multipartFields !== null) {
+      return { kind: "form", fields: multipartFields };
     }
   }
 

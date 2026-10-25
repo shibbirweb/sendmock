@@ -1,5 +1,6 @@
 import type {
   AppEventType,
+  CapturedHttpRequest,
   EmailDetail,
   SmsMessage,
   TemplateRenderRequest,
@@ -42,6 +43,30 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
   };
 }
 
+function parseJsonBody(bodyText: string): unknown {
+  try {
+    return JSON.parse(bodyText) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function toHttpRequestData(
+  capturedRequest: CapturedHttpRequest,
+): Record<string, unknown> {
+  return {
+    id: capturedRequest.id,
+    bin: capturedRequest.bin_name,
+    method: capturedRequest.method,
+    url: capturedRequest.url,
+    path: capturedRequest.path,
+    query: capturedRequest.query,
+    headers: capturedRequest.headers,
+    body: capturedRequest.body,
+    json: parseJsonBody(capturedRequest.body),
+  };
+}
+
 /** A fixed example for each kind of event, used when no message is picked. */
 export function buildSampleSubject(eventType: AppEventType): ContextSubject {
   if (eventType.startsWith("sms.")) {
@@ -56,6 +81,22 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
         status: "delivered",
         error_code: null,
         extracted: { otp: ["482913"], links: [] },
+      },
+    };
+  }
+  if (eventType.startsWith("http.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: {
+        bin: "slack",
+        method: "POST",
+        url: "http://127.0.0.1:8025/catch/slack",
+        path: "/catch/slack",
+        query: {},
+        headers: { "content-type": "application/json" },
+        body: '{"text":"Deploy finished"}',
+        json: { text: "Deploy finished" },
       },
     };
   }
@@ -115,6 +156,19 @@ function findContextSubject(
             smsMessage.direction === "inbound" ? "sms.inbound" : "sms.status",
           data: toSmsData(smsMessage),
           label: smsMessage.body,
+        };
+  }
+
+  if (renderRequest.http_request_id !== undefined) {
+    const capturedRequest = mockDatabase.capturedHttpRequests.find(
+      (existingRequest) => existingRequest.id === renderRequest.http_request_id,
+    );
+    return capturedRequest === undefined
+      ? null
+      : {
+          eventType: "http.captured",
+          data: toHttpRequestData(capturedRequest),
+          label: `${capturedRequest.method} ${capturedRequest.path}`,
         };
   }
 

@@ -1,30 +1,6 @@
 import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
 
-export type HttpBin = {
-  id: Ulid;
-  name: string;
-  preset: string | null;
-  request_count: number;
-  last_request_at: IsoTimestamp | null;
-};
-
-export type CapturedHttpRequest = {
-  id: Ulid;
-  bin_id: Ulid;
-  bin_name: string;
-  method: string;
-  path: string;
-  query: Record<string, string>;
-  headers: Record<string, string>;
-  body: string;
-  content_type: string | null;
-  response_status: number;
-  response_body: string;
-  duration_ms: number;
-  created_at: IsoTimestamp;
-};
-
 export type SmtpSessionResult = "delivered" | "rejected" | "aborted";
 
 /** Query of GET /api/v1/logs/smtp; `result` takes a comma-separated list. */
@@ -152,7 +128,7 @@ export type AppInfo = {
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */
-export type SampleKind = "email" | "sms" | "verification";
+export type SampleKind = "email" | "sms" | "verification" | "http";
 
 export type CreatedSample = {
   kind: SampleKind;

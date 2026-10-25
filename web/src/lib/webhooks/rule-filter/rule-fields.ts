@@ -1,7 +1,7 @@
 import type { AppEventType } from "@/lib/api/types";
 
 /** What a rule's events are about; a field only exists on some subjects. */
-export type RuleSubject = "email" | "sms" | "opened";
+export type RuleSubject = "email" | "sms" | "opened" | "http";
 
 /** How the builder asks for a value. */
 export type RuleValueKind =
@@ -41,13 +41,13 @@ export const ruleFieldDefinitions: RuleFieldDefinition[] = [
   {
     fieldKey: "body",
     label: "Body",
-    subjects: ["email", "sms"],
+    subjects: ["email", "sms", "http"],
     valueKind: "text",
   },
   {
     fieldKey: headerFieldPrefix,
     label: "Header",
-    subjects: ["email"],
+    subjects: ["email", "http"],
     valueKind: "text",
   },
   {

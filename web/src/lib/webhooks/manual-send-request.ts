@@ -93,15 +93,20 @@ export function findBlockingProblems(
 
 /**
  * The endpoint Send to webhook starts with: the first one whose template
- * handles this kind of message (an SMS goes to an SMS template), else the
- * first one.
+ * handles this kind of message (an SMS goes to an SMS template, a captured
+ * request to an `http.*` one), else the first one.
  */
 export function suggestSendEndpoint<Endpoint extends WebhookEndpoint>(
   webhookEndpoints: [Endpoint, ...Endpoint[]],
   webhookTemplates: WebhookTemplateSummary[],
   renderRequest: TemplateRenderRequest,
 ): Endpoint {
-  const eventPrefix = renderRequest.sms_id === undefined ? "email." : "sms.";
+  let eventPrefix = "email.";
+  if (renderRequest.sms_id !== undefined) {
+    eventPrefix = "sms.";
+  } else if (renderRequest.http_request_id !== undefined) {
+    eventPrefix = "http.";
+  }
   const fittingEndpoint = webhookEndpoints.find((webhookEndpoint) =>
     webhookTemplates
       .find(

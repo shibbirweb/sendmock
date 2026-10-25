@@ -64,6 +64,16 @@ describe("renderTemplateText", () => {
     ).toEqual(["Unbalanced {{ }}: every {{ needs a matching }}"]);
   });
 
+  test("a lone }} is text, so JSON bodies ending in }} render", () => {
+    const renderOutcome = renderTemplateText(
+      '{"error":{"details":[{"code":"{{ data.subject }}"}]}}',
+      templateContext,
+    );
+
+    expect(renderOutcome.errors).toEqual([]);
+    expect(renderOutcome.renderedText).toContain('"code":"');
+  });
+
   test("WH-07.15 problems carry the line and column of their expression", () => {
     const renderOutcome = renderTemplateText(
       '{\n  "a": "{{ vars.missing }}",\n  "b": "{{ data.subject | shout }}"\n}',

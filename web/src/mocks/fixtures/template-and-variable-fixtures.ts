@@ -31,7 +31,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     "Native SendMock JSON",
     "SendMock",
     "generic",
-    ["email.received", "sms.sent", "sms.inbound", "sms.status"],
+    ["email.received", "sms.sent", "sms.inbound", "sms.status", "http.captured"],
     [],
   ],
   [

@@ -11,14 +11,17 @@ UI in U2, backend Phase 4.
 - [ ] HC-01.3 `http.captured` fires and the request appears in the UI live.
 - [ ] HC-01.4 The optional catch-all port captures requests at any path.
 - [ ] HC-01.5 "Forward to URL" resends a captured request; "Copy as cURL" reproduces it.
+- [ ] HC-01.6 The HTTP screen lists bins with preset, request count and last request, and a bin's requests newest first (method, path, status returned, time); a bin can be added from a preset, its catch URL copied, its requests cleared and the bin deleted.
+- [ ] HC-01.7 The request detail shows the full URL, headers, query, the body pretty or raw, uploaded files to download, and the response sent with the rule that produced it; "Send to webhook" sends the captured request to an endpoint.
 
 ## HC-02 Mock responses
 
-Phase 4.
+UI in U2, backend Phase 4.
 
 - [ ] HC-02.1 Response rules match in order on method, path and filters; the default reply is `200 {"ok":true}`.
 - [ ] HC-02.2 Status, headers and templated bodies (including echoed request data) are returned as configured.
 - [ ] HC-02.3 Delay and failure rate behave as configured.
+- [ ] HC-02.4 The Responses tab orders, toggles, edits and deletes a bin's rules and edits its default reply; the rule editor sets method, path glob, header and body conditions, status, headers, templated body, delay and failure rate, and previews against a captured request whether the rule matches and what it returns.
 
 ## HC-03 Presets
 

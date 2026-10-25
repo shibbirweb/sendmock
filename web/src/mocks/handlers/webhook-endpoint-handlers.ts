@@ -16,6 +16,7 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
+import { routeDeliveryToCatcher } from "@/mocks/http/route-delivery-to-catcher";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { buildManualDelivery } from "@/mocks/webhooks/build-manual-delivery";
 import { buildTestDelivery } from "@/mocks/webhooks/build-test-delivery";
@@ -151,7 +152,10 @@ export const webhookEndpointHandlers = [
         return createNotFoundResponse("Endpoint");
       }
 
-      const testDelivery = buildTestDelivery(endpointRecord);
+      const testDelivery = routeDeliveryToCatcher(
+        mockDatabase,
+        buildTestDelivery(endpointRecord),
+      );
       mockDatabase.webhookDeliveries.unshift(testDelivery);
       publishMockEvent("webhook.delivered", { id: testDelivery.id });
 
@@ -169,14 +173,18 @@ export const webhookEndpointHandlers = [
       }
 
       const sendRequest = (await request.json()) as ManualSendRequest;
-      const manualDelivery = buildManualDelivery(
+      const builtDelivery = buildManualDelivery(
         mockDatabase,
         endpointRecord,
         sendRequest,
       );
-      if (manualDelivery === null) {
+      if (builtDelivery === null) {
         return createNotFoundResponse("Message");
       }
+      const manualDelivery = routeDeliveryToCatcher(
+        mockDatabase,
+        builtDelivery,
+      );
       mockDatabase.webhookDeliveries.unshift(manualDelivery);
       publishMockEvent(
         manualDelivery.status === "render_failed"

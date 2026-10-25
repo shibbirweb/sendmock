@@ -8,9 +8,6 @@ import type {
   AppSettingsUpdate,
   UpdateCheckResult,
   AppStats,
-  CapturedHttpRequest,
-  HttpBin,
-  PageOf,
 } from "@/lib/api/types";
 
 export function useAppStats() {
@@ -61,25 +58,6 @@ export function useResetToSeed() {
     onSuccess: () => {
       void queryClient.invalidateQueries();
     },
-  });
-}
-
-export function useHttpBins() {
-  return useQuery({
-    queryKey: queryKeys.httpCatcher.bins,
-    queryFn: ({ signal }) =>
-      requestApi<HttpBin[]>("/http/bins", { abortSignal: signal }),
-  });
-}
-
-export function useCapturedHttpRequests(binId: string | null) {
-  return useQuery({
-    queryKey: queryKeys.httpCatcher.requests(binId),
-    queryFn: ({ signal }) =>
-      requestApi<PageOf<CapturedHttpRequest>>("/http/requests", {
-        queryParameters: { bin_id: binId },
-        abortSignal: signal,
-      }),
   });
 }
 

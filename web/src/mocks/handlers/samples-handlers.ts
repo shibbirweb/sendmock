@@ -6,6 +6,7 @@ import {
   createErrorResponse,
 } from "@/mocks/handlers/handler-utils";
 import { createSampleEmail } from "@/mocks/samples/create-sample-email";
+import { createSampleHttpRequest } from "@/mocks/samples/create-sample-http-request";
 import { createSampleSms } from "@/mocks/samples/create-sample-sms";
 import { createSampleVerification } from "@/mocks/samples/create-sample-verification";
 
@@ -14,6 +15,7 @@ const sampleCreators: Record<SampleKind, () => string> = {
   email: createSampleEmail,
   sms: createSampleSms,
   verification: createSampleVerification,
+  http: createSampleHttpRequest,
 };
 
 function isSampleKind(kindText: unknown): kindText is SampleKind {
@@ -30,7 +32,7 @@ export const samplesHandlers = [
       return createErrorResponse(
         404,
         "unknown_sample_kind",
-        "Sample kind must be email, sms or verification.",
+        "Sample kind must be email, sms, verification or http.",
       );
     }
 
