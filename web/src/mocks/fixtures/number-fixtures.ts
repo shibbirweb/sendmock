@@ -73,8 +73,9 @@ export function buildMessagingServiceFixtures(
       friendly_name: "Acme WhatsApp",
       number_ids: listPoolNumberIds(whatsappServiceSid),
       inbound_mode: "webhook",
-      inbound_url: "http://localhost:8000/whatsapp/service-inbound",
-      inbound_fallback_url: null,
+      // Unreachable on purpose: the demo shows the fallback answering (SM-09.7).
+      inbound_url: "http://app.internal:8000/whatsapp/inbound",
+      inbound_fallback_url: "http://localhost:8000/whatsapp/fallback",
       created_by: "ui",
     },
   ];

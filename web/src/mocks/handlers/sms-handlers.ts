@@ -12,6 +12,8 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { applySmsStatus } from "@/mocks/realtime/simulate-sms-delivery";
+import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
+import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
 
 function findSms(smsId: unknown): SmsMessageDetail | undefined {
   return mockDatabase.smsMessages.find((smsMessage) => smsMessage.id === smsId);
@@ -128,6 +130,32 @@ export const smsHandlers = [
       error_code?: string | null;
     };
     applySmsStatus(smsMessage, status, errorCode ?? null);
+
+    return HttpResponse.json(smsMessage);
+  }),
+
+  http.post("*/api/v1/sms/:smsId/reply-webhook/resend", async ({ params }) => {
+    await applyMockConditions();
+    const smsMessage = findSms(params.smsId);
+    if (!smsMessage) {
+      return createNotFoundResponse("SMS");
+    }
+    if (smsMessage.direction !== "inbound") {
+      return createErrorResponse(
+        409,
+        "conflict",
+        "Only inbound messages have a reply webhook",
+      );
+    }
+    sendRepliesFromTwiml(runReplyWebhook(mockDatabase, smsMessage));
+    if (smsMessage.reply_webhook === null) {
+      return createErrorResponse(
+        409,
+        "no_reply_webhook",
+        "This number has no reply webhook; set an inbound URL in Numbers",
+      );
+    }
+    publishMockEvent("sms.inbound", { id: smsMessage.id });
 
     return HttpResponse.json(smsMessage);
   }),

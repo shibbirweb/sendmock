@@ -3,6 +3,10 @@ import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { SmsMessageActions } from "@/features/sms/conversation/sms-message-actions";
+import {
+  SmsReplyWebhookLine,
+  TwimlReplyBadge,
+} from "@/features/sms/conversation/sms-reply-webhook-line";
 import { SmsMediaGallery } from "@/features/sms/media/sms-media-gallery";
 import { useSmsOpenOnView } from "@/features/sms/conversation/use-sms-open-on-view";
 import { smsApiLabels } from "@/features/sms/sms-labels";
@@ -77,6 +81,9 @@ function SmsMessageMeta({ smsMessage }: { smsMessage: SmsMessage }) {
           {smsMessage.messaging_service_sid}
         </span>
       )}
+      {smsMessage.in_reply_to_sms_id !== null && (
+        <TwimlReplyBadge inReplyToSmsId={smsMessage.in_reply_to_sms_id} />
+      )}
       {isOutbound && <SmsStatusTicks smsMessage={smsMessage} />}
     </div>
   );
@@ -90,8 +97,10 @@ export function SmsMessageBubble({ smsMessage }: { smsMessage: SmsMessage }) {
 
   return (
     <li
+      id={`sms-${smsMessage.id}`}
+      tabIndex={-1}
       className={cn(
-        "group/sms-bubble flex items-center gap-1",
+        "group/sms-bubble flex items-center gap-1 rounded-md outline-none focus-visible:bg-muted/50",
         isOutbound ? "flex-row-reverse pl-8" : "pr-8",
       )}
     >
@@ -136,6 +145,7 @@ export function SmsMessageBubble({ smsMessage }: { smsMessage: SmsMessage }) {
           </div>
         ))}
         <SmsMessageMeta smsMessage={smsMessage} />
+        {!isOutbound && <SmsReplyWebhookLine smsMessage={smsMessage} />}
       </div>
       <SmsMessageActions smsMessage={smsMessage} />
     </li>

@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SmsCallbackAttempts } from "@/features/sms/drawer/sms-callback-attempts";
 import { SmsManualStatus } from "@/features/sms/drawer/sms-manual-status";
 import { SmsMessageFacts } from "@/features/sms/drawer/sms-message-facts";
+import { SmsReplyWebhookPanel } from "@/features/sms/drawer/sms-reply-webhook-panel";
 import { SmsRequestPanel } from "@/features/sms/drawer/sms-request-panel";
 import { SmsStatusHistory } from "@/features/sms/drawer/sms-status-history";
 import { SmsMediaList } from "@/features/sms/media/sms-media-list";
@@ -38,6 +39,7 @@ function SmsMessageDrawerBody({ smsId }: { smsId: string }) {
   }
 
   const smsMessage = messageQuery.data;
+  const isInbound = smsMessage.direction === "inbound";
 
   return (
     <div className="grid gap-4 px-4 pb-6">
@@ -55,13 +57,17 @@ function SmsMessageDrawerBody({ smsId }: { smsId: string }) {
         </>
       )}
       <Separator />
-      <Tabs defaultValue="timeline">
+      <Tabs defaultValue={isInbound ? "reply-webhook" : "timeline"}>
         <TabsList>
           <TabsTrigger value="timeline">Status</TabsTrigger>
           <TabsTrigger value="request">Request</TabsTrigger>
-          <TabsTrigger value="callbacks">
-            Callbacks ({smsMessage.callback_attempts.length})
-          </TabsTrigger>
+          {isInbound ? (
+            <TabsTrigger value="reply-webhook">Reply webhook</TabsTrigger>
+          ) : (
+            <TabsTrigger value="callbacks">
+              Callbacks ({smsMessage.callback_attempts.length})
+            </TabsTrigger>
+          )}
         </TabsList>
         <TabsContent value="timeline" className="pt-3">
           <SmsStatusHistory smsMessage={smsMessage} />
@@ -71,6 +77,9 @@ function SmsMessageDrawerBody({ smsId }: { smsId: string }) {
         </TabsContent>
         <TabsContent value="callbacks" className="pt-3">
           <SmsCallbackAttempts smsMessage={smsMessage} />
+        </TabsContent>
+        <TabsContent value="reply-webhook" className="pt-3">
+          <SmsReplyWebhookPanel smsMessage={smsMessage} />
         </TabsContent>
       </Tabs>
     </div>

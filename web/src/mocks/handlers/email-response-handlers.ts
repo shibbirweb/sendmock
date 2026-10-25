@@ -18,6 +18,7 @@ import {
   createNotFoundResponse,
   parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
+import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
 const fallbackRecipient: EmailAddress = {
@@ -80,6 +81,10 @@ function storeEmailResponse(
     id: responseEmail.id,
     subject: responseEmail.subject,
   });
+  // Incoming emails run the inbound routes (WH-12.7).
+  if (runInboundRoutes(mockDatabase, responseEmail).length > 0) {
+    publishMockEvent("webhook.delivered", { id: responseEmail.id });
+  }
 
   return HttpResponse.json(responseEmail, { status: 201 });
 }

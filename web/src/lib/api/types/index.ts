@@ -10,6 +10,7 @@ export type * from "@/lib/api/types/http-catcher";
 export type * from "@/lib/api/types/payments";
 export type * from "@/lib/api/types/payment-flows";
 export type * from "@/lib/api/types/payment-gateways";
+export type * from "@/lib/api/types/inbound-routes";
 export type * from "@/lib/api/types/outcome-rules";
 export { appEventTypes } from "@/lib/api/types/events";
 export { maxVerificationCheckAttempts } from "@/lib/api/types/verify-and-numbers";

@@ -64,8 +64,52 @@ export type SmsMessage = {
   extracted: ExtractedData;
   opened_at: IsoTimestamp | null;
   open_count: number;
+  /** Inbound only: what the number's reply webhook answered; null when it has none. */
+  reply_webhook: SmsReplyWebhookResult | null;
+  /** A TwiML reply: the inbound message it answers. */
+  in_reply_to_sms_id: Ulid | null;
   created_at: IsoTimestamp;
   updated_at: IsoTimestamp;
+};
+
+/** A verb of the TwiML an app answered with (SM-09.7). */
+export type TwimlVerb =
+  | {
+      verb: "Message";
+      body: string;
+      to: string | null;
+      from: string | null;
+      status_callback: string | null;
+      media_urls: string[];
+    }
+  | { verb: "Redirect"; url: string };
+
+/** The outcome of an inbound message's reply webhook, for the bubble (SM-09.7). */
+export type SmsReplyWebhookResult = {
+  /** A Messaging Service set to "Send a webhook", or the number's own URL. */
+  target: "messaging_service" | "number";
+  outcome: "succeeded" | "failed";
+  /** Of the last attempt. */
+  status_code: number | null;
+  /** Twilio's code for the primary URL's failure, e.g. "11205". */
+  error_code: string | null;
+  /** The primary failed and the fallback URL answered. */
+  used_fallback: boolean;
+  /** Messages created from the TwiML. */
+  reply_count: number;
+};
+
+/** One call to a reply webhook URL, primary or fallback. */
+export type SmsReplyWebhookAttempt = {
+  id: Ulid;
+  is_fallback: boolean;
+  request: RecordedHttpRequest;
+  response: RecordedHttpResponse | null;
+  duration_ms: number | null;
+  error_code: string | null;
+  error_message: string | null;
+  twiml: TwimlVerb[];
+  created_at: IsoTimestamp;
 };
 
 /** One call to the message's status callback URL, in the provider's format. */
@@ -85,6 +129,8 @@ export type SmsMessageDetail = SmsMessage & {
   request_body: Record<string, unknown> | null;
   api_request_id: Ulid | null;
   callback_attempts: SmsCallbackAttempt[];
+  /** Inbound only, oldest first; every Resend adds attempts. */
+  reply_webhook_attempts: SmsReplyWebhookAttempt[];
 };
 
 /** A conversation between two numbers. */
