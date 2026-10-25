@@ -1,0 +1,60 @@
+name: Request a feature
+description: An idea that would make SendMock more useful.
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to test or do, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like SendMock to do
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      multiple: true
+      options:
+        - Email
+        - SMS
+        - Verify
+        - Webhooks
+        - HTTP catcher
+        - Payments
+        - CLI
+        - MCP and AI
+        - Web UI
+        - Docs or website
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you tried
+  - type: input
+    id: provider_docs
+    attributes:
+      label: Provider docs
+      description: If a provider documents the behaviour, link it.
+      placeholder: https://
+  - type: input
+    id: version
+    attributes:
+      label: SendMock version
+  - type: input
+    id: channel
+    attributes:
+      label: Channel
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+  - type: input
+    id: browser
+    attributes:
+      label: Browser

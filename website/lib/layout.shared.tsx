@@ -1,6 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
 import { DemoLink } from "@/components/demo-link";
+import { GithubStarLink } from "@/components/github-star-link";
 import { SendMockLogo } from "@/components/sendmock-logo";
 
 export { basePath } from "@/lib/base-path";
@@ -28,6 +29,7 @@ export function baseOptions(): BaseLayoutProps {
           </DemoLink>
         ),
       },
+      { type: "custom", secondary: true, children: <GithubStarLink /> },
     ],
   };
 }

@@ -51,6 +51,9 @@ jobs:
       - name: OpenAPI contract (fresh build equals docs/api/openapi.yaml, valid 3.1)
         run: bun run test:contract
 
+      - name: GitHub issue forms and community files (UI-10.2)
+        run: bun run test:repository
+
       - name: Install Playwright browser
         run: bunx --bun playwright install --with-deps chromium
 

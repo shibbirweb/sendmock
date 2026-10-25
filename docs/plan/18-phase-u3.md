@@ -193,6 +193,7 @@ So people can find the project, give feedback and report problems from wherever 
   - `SECURITY.md`: supported versions, how to report privately (GitHub advisories), what to expect and when; `CONTRIBUTING.md`: setup with Bun, branches into `develop`, commit format, tests; `CODE_OF_CONDUCT.md` (Contributor Covenant).
   - Labels used by the templates (`bug`, `enhancement`, `provider`, `docs`, `u3-feedback`) are listed in `CONTRIBUTING.md`.
 - Tests: an end-to-end test checks the Help menu links (targets and pre-filled version); the YAML templates are validated in CI.
+- **As built:** the link builders are `web/src/lib/community/community-links.ts` (unit tested); the issue forms' `version`, `channel`, `os` and `browser` are inputs, since GitHub pre-fills inputs from the query string but not dropdowns. "What's new" opens the GitHub releases until `CHANGELOG.md` and the `/changelog/` page land in Phase 0. The community files live in `.github/` (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, the pull request template), and `bun run test:repository` (`web/tests/repository/`) validates the forms in CI. The website's star count is read once at build time and left out when GitHub does not answer. Adding the Help icon made the header too wide at 768 px next to the sidebar; below laptop width the search button is now an icon.
 
 ## W11: Feedback round and sign-off (D3)
 

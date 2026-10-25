@@ -17,6 +17,7 @@
     "test:e2e": "bun --bun playwright test",
     "test:budget": "bun test tests/budget",
     "test:contract": "bun test tests/contract",
+    "test:repository": "bun test tests/repository",
     "openapi": "bun scripts/build-openapi.ts",
     "openapi:check": "bun scripts/build-openapi.ts --check"
   },

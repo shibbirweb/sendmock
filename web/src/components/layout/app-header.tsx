@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { listAllNavigationItems } from "@/features/navigation/navigation-items";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
+import { HelpMenu } from "@/features/help/help-menu";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
@@ -49,12 +50,15 @@ export function AppHeader() {
     <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
       <SidebarTrigger />
       <Separator orientation="vertical" className="mx-1 h-4" />
-      <h1 className="text-sm font-medium">{findPageTitle(currentPath)}</h1>
-      <div className="ml-auto flex items-center gap-1">
+      <h1 className="min-w-0 truncate text-sm font-medium">
+        {findPageTitle(currentPath)}
+      </h1>
+      <div className="ml-auto flex shrink-0 items-center gap-1">
+        {/* The wide search button needs a laptop width next to the sidebar. */}
         <Button
           variant="outline"
           size="sm"
-          className="hidden gap-2 text-muted-foreground sm:flex"
+          className="hidden gap-2 text-muted-foreground lg:flex"
           onClick={() => {
             setCommandPaletteOpen(true);
           }}
@@ -62,6 +66,17 @@ export function AppHeader() {
           <SearchIcon />
           Search or jump to...
           <Kbd>⌘K</Kbd>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Search or jump to"
+          className="lg:hidden"
+          onClick={() => {
+            setCommandPaletteOpen(true);
+          }}
+        >
+          <SearchIcon />
         </Button>
         {LazyDevToolbar !== null && (
           <React.Suspense fallback={null}>
@@ -78,6 +93,7 @@ export function AppHeader() {
         >
           <KeyboardIcon />
         </Button>
+        <HelpMenu />
         <ThemeToggle />
         <NotificationBell />
       </div>

@@ -100,3 +100,29 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   );
   expect(runningAnimationCount).toBe(0);
 });
+
+test("the footer and header link to docs, feedback forms, security and the repository", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const footerNav = page.getByRole("navigation", { name: "Footer" });
+
+  await expect(
+    footerNav.getByRole("link", { name: "Report an issue" }),
+  ).toHaveAttribute(
+    "href",
+    "https://github.com/shibbirweb/sendmock/issues/new?template=bug_report.yml",
+  );
+  await expect(
+    footerNav.getByRole("link", { name: "Report a security issue" }),
+  ).toHaveAttribute(
+    "href",
+    "https://github.com/shibbirweb/sendmock/security/advisories/new",
+  );
+  await expect(
+    footerNav.getByRole("link", { name: "Star on GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/shibbirweb/sendmock");
+  await expect(
+    page.getByRole("link", { name: /SendMock on GitHub/ }).first(),
+  ).toBeVisible();
+});
