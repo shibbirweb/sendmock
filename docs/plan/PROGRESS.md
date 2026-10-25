@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U1: Mail screen done, SMS conversations done**; SMS drawer, Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U1: Mail and SMS screens done**; Verify, Numbers, Logs and Settings next (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -18,7 +18,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U1: SMS message drawer and manual status, then Verify, Numbers, Logs and Settings.
+2. Continue Phase U1: Verify tab next, then Numbers, Logs and Settings.
 
 ## How to update this file
 
@@ -36,13 +36,13 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 6 / 15 |
-| U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 12 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 8 / 16 |
+| U2 | Webhook, HTTP catcher and payment screens | Not started | 0 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 11 |
-| 3 | Webhooks backend | Not started | 0 / 14 |
+| 3 | Webhooks backend | Not started | 0 / 15 |
 | 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
 | 5 | Distribution and 1.0 stable | Not started | 0 / 13 |
@@ -93,8 +93,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Mail detail: Attachments with thumbnails, MIME tree, Checks, Timeline, Template data
 - [x] Mail actions: read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, download, release, delete, bulk delete (tag editing and "send to webhook" follow with the webhook screens in U2)
 - [x] Extracted OTP/links panel, opened indicator, browser notifications (open history list follows with Logs)
+- [x] Mail reply, reply all and forward as recipient: inline composer with the original in the body (Gmail style), Inbound badge, links between originals and replies, `is:inbound` search, R / Shift+R / F ([07](07-ui.md#mail), EM-17)
 - [x] SMS threads and conversation view (SMS and WhatsApp styling, status ticks, badges; search and channel chips, J/K and / shortcuts)
-- [ ] SMS message drawer, inbound composer, manual status, simulate read (composer and simulate read done with the conversation view; drawer and manual status next)
+- [x] SMS message drawer, inbound composer, manual status, simulate read (drawer: status timeline, request JSON with request log link, callback attempts; manual Delivered / Undelivered / Failed with error code picker)
 - [ ] Verify tab: verifications, timeline, force-state buttons, Verify services editor
 - [ ] Numbers registry and Messaging Services tab
 - [ ] Logs: SMTP sessions and transcript viewer
@@ -117,6 +118,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] HTTP catcher: bins, requests, Slack/Discord/push previews, response rules, forward
 - [ ] Webhooks overview metrics
 - [ ] Payments list, detail and Simulate menu; hosted test checkout page with provider themes; Settings > Payments
+- [ ] Replies: Inbound routes list and editor, SMS reply webhook result and drawer tab, inbound URL and fallback on Numbers
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
 
@@ -189,6 +191,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Email delivery outcome simulation and events
 - [ ] Opened events and `/open` endpoints
 - [ ] Twilio and Vonage inbound/status formats with signatures
+- [ ] SMS reply webhook (Twilio style): number and Messaging Service inbound URLs, TwiML replies, fallback URL, Twilio error codes (moved from Phase 4)
 - [ ] Variables and `minijinja` templating, `/webhooks/render`
 - [ ] Payload templates (native, Twilio, Vonage, Slack, Discord) and custom templates
 - [ ] Manual send, replay, edit-and-replay
@@ -218,7 +221,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [ ] Fake data functions, Postman aliases, `SENDMOCK_VAR_*`
 - [ ] Remaining built-in templates, import/export, `--templates-dir`, revisions
 - [ ] More SMS providers (Plivo, MessageBird, generic GET/POST)
-- [ ] TwiML reply parsing
+- [ ] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API
 - [ ] WhatsApp via Twilio
 - [ ] HTTP catcher backend (bins, mock responses, core presets, `wait/http`)
 - [ ] Virtual numbers backend and chaos toggles
@@ -297,3 +300,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | PR #1 merged into `develop`: CI (Web UI, Acceptance traceability, Website) green on the PR and on `develop`; site live at https://shibbirweb.github.io/sendmock/ with the demo at `/demo/`. Rulesets protect `develop` and `main`; required status checks still to be added. |
 | 2026-10-25 | Mail screen built on mock data: virtual list with infinite loading, search with filter chips, keyboard shortcuts, sandboxed HTML preview with device widths and screenshot, Source/Headers/Attachments/MIME/Checks/Timeline/Template tabs, simulate open and delivery outcomes, release, bulk actions, browser notifications. Also: collapsed sidebar logo fixed, toasts dismissable. |
 | 2026-10-25 | SMS conversations built on mock data: thread list with search and SMS / WhatsApp chips, chat bubbles with WhatsApp styling, status ticks (queued, sent, delivered, read, failed with Twilio error code), segment, encoding, API and Messaging Service badges, OTP copy, read on view, "Simulate read", "Reply as recipient" composer. Mock sends now move through queued, sent and delivered live. Demo controls moved into the header so they never cover page content. |
+| 2026-10-25 | SMS message drawer built on mock data: status timeline with time between steps, request JSON with a request log link, status callback attempts with request and response (Twilio form or JSON), manual Delivered / Undelivered / Failed with an error code picker. The mock `manual` profile now stops at `sent`, as the plan says. |
+| 2026-10-25 | Plan: email replies and inbound routes that work like Mailgun Routes ([05](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style), EM-17, WH-12, Phase 4) and an SMS reply webhook that works like Twilio's ([04](04-sms.md#reply-webhook-twilio-style), SM-09.4 to SM-09.7). TwiML replies moved from Phase 4 to Phase 3; reply UI added to U2. |
+| 2026-10-25 | Plan: reply, reply all and forward as recipient for email (inline composer design in [07](07-ui.md#mail), `/emails/{emailId}/forward`, EM-17.4 and EM-17.5). The email reply UI moves from U2 into U1, next to the rest of the Mail screen. |
+| 2026-10-25 | Mail reply, reply all and forward as recipient built on mock data: inline composer that puts the quote or forwarded-message block in the message box like Gmail, editable subject and From, forward suggestions from the inbound domains, Inbound badge, "Reply to" / "Forward of" links and a "Replies and forwards" row, timeline entries, `is:inbound`, R / Shift+R / F, discard prompt. The demo mailbox now includes a customer reply. |

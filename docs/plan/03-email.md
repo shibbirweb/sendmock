@@ -171,6 +171,10 @@ For final checks in real mail clients (Gmail, Outlook, Apple Mail):
 - **Relay config:** `--relay-smtp smtp://user:pass@smtp.example.com:587` or Settings; STARTTLS/implicit TLS; optional `Return-Path` override.
 - **Safety:** off by default; a recipient allowlist (glob patterns) is required before anything can be sent out; every release/forward is logged with result and visible in the email timeline.
 
+## Replies and inbound email
+
+Phase 4. SendMock can also simulate mail coming **in** to your app: a recipient replying to or forwarding an email your app sent (**Reply**, **Reply all** and **Forward** in the email detail, or `POST /api/v1/emails/{emailId}/reply` and `/forward`), any incoming email through `POST /api/v1/emails/inbound`, or SMTP mail for a configured inbound domain. Incoming emails are stored with `direction: inbound`, fire `email.inbound`, and are delivered to your app by inbound routes that work like Mailgun Routes (`match_recipient`, `forward`, `store`, `stop`, the Mailgun form fields and signature, and the `/v3/routes` API). Details in [05-webhooks.md](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style).
+
 ## Optional: POP3 (later)
 
 Read-only POP3 listener so desktop mail clients can view captured mail. Low priority.

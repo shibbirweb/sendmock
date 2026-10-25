@@ -102,3 +102,14 @@ UI in U1/U2, backend Phase 3.
 
 - [ ] WH-11.1 Overview and Webhooks show deliveries over time, success rate, p50/p95 latency and top failure codes per endpoint.
 - [ ] WH-11.2 `/api/v1/stats` numbers match the delivery log.
+
+## WH-12 Inbound routes (Mailgun style)
+
+UI in U2, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhooks.md#email-replies-and-inbound-routes-mailgun-style).
+
+- [ ] WH-12.1 Routes support `match_recipient` (named groups usable as `\g<name>` in actions), `match_header` and `catch_all`, run in priority order, and stop after `stop()`.
+- [ ] WH-12.2 `forward(url)` posts Mailgun's multipart fields, attachments included, with a `signature` that verifies with Mailgun's documented algorithm; a URL ending in `mime` gets `body-mime`.
+- [ ] WH-12.3 `stripped-text` and `stripped-signature` leave out the quoted original and the signature block.
+- [ ] WH-12.4 A `406` response is not retried, other non-2xx responses follow the endpoint's retry policy, and every forward appears in the delivery log and the email timeline.
+- [ ] WH-12.5 `forward(email)` only sends to addresses on the release allowlist; `store(notify)` posts a `message-url`, and `GET` on it returns the message.
+- [ ] WH-12.6 Routes created through the Mailgun Routes API (`/v3/routes`) on the provider port behave like routes created in the UI.

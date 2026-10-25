@@ -50,7 +50,7 @@ Feature docs (03 to 14) mention "Phase N" for when a capability lands; those ref
 ## Phase U1: Mail, SMS, Numbers, Settings screens (about 1-2 weeks)
 
 - **Overview** dashboard (counts, webhook success rate and latency, recent failures).
-- **Mail:** list (infinite scroll, unread, tags, attachment icon, source and outcome badges), search with filter chips, detail tabs (HTML sandboxed iframe with device widths, load-images toggle and screenshot, Text, Source, Headers with List-Unsubscribe check, Attachments with thumbnails, MIME tree, Checks, Timeline, Template data), extracted OTP/links panel, opened indicator and open history, actions (read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, tag, download, send to webhook, release, delete, bulk delete), browser notifications.
+- **Mail:** list (infinite scroll, unread, tags, attachment icon, source and outcome badges), search with filter chips, detail tabs (HTML sandboxed iframe with device widths, load-images toggle and screenshot, Text, Source, Headers with List-Unsubscribe check, Attachments with thumbnails, MIME tree, Checks, Timeline, Template data), extracted OTP/links panel, opened indicator and open history, actions (read/unread, simulate open, simulate delivered/bounce/complaint/unsubscribe, tag, download, send to webhook, release, delete, bulk delete), reply / reply all / forward as recipient with an inline composer and links between originals and their replies, browser notifications.
 - **SMS:** thread list, conversation bubbles (SMS and WhatsApp styling), status ticks including Read with error codes, segment/encoding/API/Messaging Service badges, per-message drawer (status timeline, request JSON, callback attempts), inbound composer, manual status buttons, simulate read.
 - **Verify:** verifications table, detail timeline, force-state buttons, Verify services editor.
 - **Numbers:** registry table and edit sheet, Messaging Services tab.
@@ -72,6 +72,7 @@ Feature docs (03 to 14) mention "Phase N" for when a capability lands; those ref
 - **HTTP catcher:** bins, request list and detail, Slack/Discord/push previews, response rule editor, forward.
 - **Payments:** list, detail with timeline, Simulate menu, hosted test checkout page with provider themes, Settings > Payments ([17-payments.md](17-payments.md)).
 - **Manual send dialog and composer:** pick endpoint/template, Prompt variable form, overrides, preview, send (creates a mock delivery).
+- **Replies:** Inbound routes list and editor with match preview; reply webhook result on inbound SMS bubbles, "TwiML reply" badge, and a Reply webhook tab with resend in the SMS drawer; inbound URL, method and fallback on Numbers.
 
 **Done when:** every webhook and catcher flow in [05-webhooks.md](05-webhooks.md), [12-webhook-variables.md](12-webhook-variables.md), [13-webhook-templates.md](13-webhook-templates.md) and [15-http-catcher.md](15-http-catcher.md) can be clicked through on mock data.
 
@@ -151,6 +152,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Seed file covers endpoints, rules, templates, variables, numbers, Messaging Services, Verify services; `reset` restores seed; `seed export/apply`.
 - `email.opened` and `sms.opened` events: `/open` API endpoints, open history, auto-fire and first-open settings.
 - Twilio inbound + status formats with `X-Twilio-Signature`; Vonage inbound/DLR.
+- SMS reply webhook (Twilio style): number and Messaging Service inbound URLs with fallback, TwiML replies recorded in the thread, Twilio error codes, resend ([04-sms.md](04-sms.md#reply-webhook-twilio-style)). Moved from Phase 4.
 - Variables and templating with `minijinja`: all variable kinds, scopes, built-in context, text filters, random functions, Fields and Raw body modes, strict/lenient rendering, `/webhooks/render` (replaces the nunjucks mock preview).
 - Payload templates: schema, native/generic, Twilio, Vonage, Slack, Discord; custom templates (create, clone, save from endpoint, linked/detached).
 - Manual send, replay and edit-and-replay.
@@ -175,12 +177,12 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Email quality checks: HTML compatibility (caniemail data), link check, optional SpamAssassin spam check.
 - Release to real SMTP relay and auto-forward rules (with recipient allowlist); tag rules.
 - Email inbound formats: SendGrid Inbound Parse, Mailgun routes, Postmark inbound.
+- Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `/emails/inbound`, inbound domains, `email.inbound`, routes with `match_recipient` / `forward` / `store` / `stop` and the `/v3/routes` API ([05-webhooks.md](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style)).
 - Bounce/complaint/delivered provider formats: SendGrid events, Mailgun, Postmark, SES via SNS, Resend.
 - Open event formats: SendGrid Event Webhook `open`, Mailgun `opened`, Postmark Open, Twilio `MessageStatus=read`.
 - Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `SENDMOCK_VAR_*` env variables.
 - Remaining built-in templates (Mailgun, SendGrid, Postmark, SES, Resend, Brevo, Mandrill, SparkPost; Plivo, MessageBird, Telnyx, Sinch, Infobip, Africa's Talking; Teams, Google Chat, Telegram, n8n/Zapier/Make), template import/export, `--templates-dir`, revision history.
 - More SMS providers: Plivo, MessageBird, generic configurable GET/POST vendor.
-- TwiML reply parsing for two-way SMS.
 - WhatsApp via Twilio (`whatsapp:` addresses, channel badge, inbound, `read` status).
 - HTTP catcher: catch path, bins, mock response rules, Slack/Discord/Telegram/FCM presets, `wait/http`.
 - Payments: bKash, Razorpay and Paddle emulation; subscriptions; disputes.

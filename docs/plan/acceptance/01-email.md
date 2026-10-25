@@ -149,3 +149,13 @@ UI in U1, live in Phase 1.
 
 - [ ] EM-16.1 After the user grants permission, a notification appears for each new email (respecting the optional filter).
 - [x] EM-16.2 Nothing is requested or shown until the user turns notifications on. (UI on mock data; live in Phase 1)
+
+## EM-17 Simulated replies and inbound email
+
+UI in U1, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhooks.md#email-replies-and-inbound-routes-mailgun-style).
+
+- [ ] EM-17.1 "Reply as recipient" and `POST /api/v1/emails/{emailId}/reply` create an inbound email to the original `Reply-To` (or `From`), from the original recipient, with a `Re:` subject, `In-Reply-To` and `References` from the original `Message-ID`, and the original text quoted.
+- [ ] EM-17.2 `POST /api/v1/emails/inbound` (fields or raw MIME) and SMTP mail for a configured inbound domain create inbound emails.
+- [ ] EM-17.3 Inbound emails fire `email.inbound`, never `email.received`, and show an Inbound badge and a "Reply to" or "Forward of" link to the original.
+- [ ] EM-17.4 "Forward" and `POST /api/v1/emails/{emailId}/forward` create an inbound email to the given address with a `Fwd:` subject, the original below a forwarded-message block, and the original attachments unless turned off; "Reply all" adds the other original recipients in `Cc`.
+- [ ] EM-17.5 The original email lists its replies and forwards as links and its timeline shows them; replying to or forwarding an incoming email is not offered in the UI and returns `409` from the API.
