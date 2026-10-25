@@ -1,0 +1,52 @@
+/**
+ * What each value means, by path; list items use `[]`, e.g. `data.to[].address`.
+ * Fields without an entry still show, with their type and example.
+ */
+export const templateFieldDescriptions: Record<string, string> = {
+  event: "The event that triggered this delivery.",
+  "event.id": "Event id, the same on every retry (also the webhook-id header).",
+  "event.type": "Event name, e.g. email.received or sms.status.",
+  "event.created_at": "When the event happened, ISO 8601.",
+  data: "The email, SMS or delivery the event is about; its shape follows the event.",
+  "data.id": "SendMock id of the message.",
+  "data.message_id": "The email's Message-ID header.",
+  "data.from": "Sender of the email.",
+  "data.from.name": "Sender display name, may be empty.",
+  "data.from.address": "Sender email address.",
+  "data.to": "Recipients of the email, a list.",
+  "data.to[]": "One recipient.",
+  "data.to[].name": "Recipient display name, may be empty.",
+  "data.to[].address": "Recipient email address.",
+  "data.cc": "Cc recipients, a list.",
+  "data.subject": "Email subject.",
+  "data.text_body": "Plain text body of the email.",
+  "data.html_body": "HTML body of the email, or empty.",
+  "data.tags": "Tags on the email, a list of text.",
+  "data.provider_id": "Provider-style message id, e.g. Twilio's SM... SID.",
+  "data.from_number": "Sender number in E.164.",
+  "data.to_number": "Recipient number in E.164.",
+  "data.body": "SMS text.",
+  "data.status":
+    "SMS delivery status: queued, sent, delivered, undelivered, failed or received.",
+  "data.error_code": "Provider error code of a failed SMS, or empty.",
+  "data.endpoint_name": "Endpoint whose delivery failed (webhook.failed).",
+  "data.error_message": "Why the delivery failed (webhook.failed).",
+  vars: "Variables: this endpoint's, then global ones, then SENDMOCK_VAR_*.",
+  endpoint: "The endpoint receiving this request.",
+  "endpoint.name": "Endpoint name.",
+  "endpoint.url": "Endpoint URL after rendering.",
+  delivery: "This delivery attempt.",
+  "delivery.id": "Delivery id.",
+  "delivery.attempt": "Attempt number, 1 for the first try.",
+  "delivery.trigger": "auto, manual or replay.",
+  rule: "The rule that fired; empty for manual sends.",
+  "rule.id": "Rule id.",
+  "rule.name": "Rule name.",
+  sendmock: "This SendMock instance.",
+  "sendmock.version": "SendMock version.",
+  "sendmock.http_url":
+    "Base URL of the web UI and API, e.g. to link to the message.",
+  request_id: "A unique id for this delivery, stable across retries.",
+  body_fields:
+    "In header templates: the rendered body fields, e.g. for signatures.",
+};

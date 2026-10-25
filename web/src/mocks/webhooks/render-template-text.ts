@@ -67,6 +67,13 @@ const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
     `email.${stripEmailPrefix(String(filterInput))}`,
 };
 
+/** Names the renderer understands; the reference lists exactly these. */
+export const supportedFunctionNames = Object.keys(templateFunctions);
+export const supportedFilterNames = [
+  ...Object.keys(templateFilters),
+  "default",
+];
+
 function splitTopLevel(text: string, separator: string): string[] {
   const parts: string[] = [];
   let depth = 0;

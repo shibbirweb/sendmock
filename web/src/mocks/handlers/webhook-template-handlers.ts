@@ -1,9 +1,11 @@
 import { http, HttpResponse } from "msw";
 
-import type {
-  TemplateCloneRequest,
-  TemplateRenderRequest,
-  TemplateRenderResult,
+import {
+  type AppEventType,
+  appEventTypes,
+  type TemplateCloneRequest,
+  type TemplateRenderRequest,
+  type TemplateRenderResult,
 } from "@/lib/api/types";
 import { findTemplateDefinition, mockDatabase } from "@/mocks/db/mock-database";
 import {
@@ -12,6 +14,7 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
+import { buildTemplateReference } from "@/mocks/webhooks/build-template-reference";
 import { exportTemplateToml } from "@/mocks/webhooks/export-template-toml";
 import { renderTemplateDefinition } from "@/mocks/webhooks/render-template-definition";
 import {
@@ -28,6 +31,21 @@ export const webhookTemplateHandlers = [
 
     return (
       conditionResponse ?? HttpResponse.json(mockDatabase.webhookTemplates)
+    );
+  }),
+
+  http.get("*/api/v1/webhooks/template-reference", async ({ request }) => {
+    const conditionResponse = await applyMockConditions();
+    const eventsText = new URL(request.url).searchParams.get("events") ?? "";
+    const events = eventsText
+      .split(",")
+      .filter((eventType): eventType is AppEventType =>
+        (appEventTypes as readonly string[]).includes(eventType),
+      );
+
+    return (
+      conditionResponse ??
+      HttpResponse.json(buildTemplateReference(mockDatabase, events))
     );
   }),
 

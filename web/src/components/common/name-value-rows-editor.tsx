@@ -1,4 +1,5 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
+import type * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ export function NameValueRowsEditor({
   emptyText,
   rows,
   onChange,
+  renderValueInput,
 }: {
   legend: string;
   /** "Header" gives "Header 1 name", "Remove header 1". */
@@ -25,6 +27,12 @@ export function NameValueRowsEditor({
   emptyText: string;
   rows: NameValueRow[];
   onChange: (nextRows: NameValueRow[]) => void;
+  /** A custom value control, e.g. a template field with suggestions. */
+  renderValueInput?: (valueInput: {
+    ariaLabel: string;
+    rowValue: string;
+    onValueChange: (nextValue: string) => void;
+  }) => React.ReactNode;
 }) {
   const updateRow = (rowId: number, changedFields: Partial<NameValueRow>) => {
     onChange(
@@ -51,15 +59,25 @@ export function NameValueRowsEditor({
               updateRow(row.rowId, { rowName: changeEvent.target.value });
             }}
           />
-          <Input
-            aria-label={`${rowLabel} ${rowIndex + 1} value`}
-            placeholder="value or {{ template }}"
-            className="font-mono text-xs"
-            value={row.rowValue}
-            onChange={(changeEvent) => {
-              updateRow(row.rowId, { rowValue: changeEvent.target.value });
-            }}
-          />
+          {renderValueInput === undefined ? (
+            <Input
+              aria-label={`${rowLabel} ${rowIndex + 1} value`}
+              placeholder="value or {{ template }}"
+              className="font-mono text-xs"
+              value={row.rowValue}
+              onChange={(changeEvent) => {
+                updateRow(row.rowId, { rowValue: changeEvent.target.value });
+              }}
+            />
+          ) : (
+            renderValueInput({
+              ariaLabel: `${rowLabel} ${rowIndex + 1} value`,
+              rowValue: row.rowValue,
+              onValueChange: (nextValue) => {
+                updateRow(row.rowId, { rowValue: nextValue });
+              },
+            })
+          )}
           <Button
             type="button"
             variant="ghost"

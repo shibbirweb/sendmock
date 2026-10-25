@@ -17,6 +17,7 @@ import { TemplateHistory } from "@/features/webhooks/templates/detail/template-h
 import { TemplateFacts } from "@/features/webhooks/templates/detail/template-facts";
 import { TemplatePreview } from "@/features/webhooks/templates/detail/template-preview";
 import { useTemplatePreview } from "@/features/webhooks/templates/detail/use-template-preview";
+import { isSuggestionPopupOpen } from "@/features/webhooks/templates/reference/template-text-field";
 import { TemplateEditForm } from "@/features/webhooks/templates/edit/template-edit-form";
 import { useWebhookTemplate } from "@/lib/api/hooks/use-webhook-template-queries";
 import type { WebhookTemplateDetail } from "@/lib/api/types";
@@ -132,7 +133,14 @@ export function TemplateDrawer() {
         }
       }}
     >
-      <SheetContent className="w-full gap-0 overflow-y-auto pt-4 data-[side=right]:sm:max-w-2xl">
+      <SheetContent
+        className="w-full gap-0 overflow-y-auto pt-4 data-[side=right]:sm:max-w-3xl"
+        onEscapeKeyDown={(escapeEvent) => {
+          if (isSuggestionPopupOpen()) {
+            escapeEvent.preventDefault();
+          }
+        }}
+      >
         {openTemplateId !== undefined && (
           <TemplateDrawerContent
             key={openTemplateId}
