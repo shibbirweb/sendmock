@@ -1,54 +1,30 @@
+import type {
+  ChartBucketFormat,
+  ChartSeries,
+} from "@/components/charts/chart-series";
 import type { ActivityBucket } from "@/lib/api/types";
 
-export type ActivitySeriesKey =
-  "email_count" | "sms_count" | "http_request_count";
-
-export type ActivitySeries = {
-  countKey: ActivitySeriesKey;
-  label: string;
-  swatchClassName: string;
-};
-
 /** Stacked bottom to top, in the fixed categorical order of the chart tokens. */
-export const activitySeries: ActivitySeries[] = [
+export const activitySeries: ChartSeries<ActivityBucket>[] = [
   {
-    countKey: "email_count",
+    seriesKey: "email_count",
     label: "Emails",
     swatchClassName: "bg-chart-1",
+    readValue: (activityBucket) => activityBucket.email_count,
   },
   {
-    countKey: "sms_count",
+    seriesKey: "sms_count",
     label: "SMS",
     swatchClassName: "bg-chart-2",
+    readValue: (activityBucket) => activityBucket.sms_count,
   },
   {
-    countKey: "http_request_count",
+    seriesKey: "http_request_count",
     label: "HTTP requests",
     swatchClassName: "bg-chart-3",
+    readValue: (activityBucket) => activityBucket.http_request_count,
   },
 ];
-
-export function sumActivityBucket(activityBucket: ActivityBucket): number {
-  return activitySeries.reduce(
-    (totalCount, series) => totalCount + activityBucket[series.countKey],
-    0,
-  );
-}
-
-/** A round axis maximum (1, 2, 5, 10, 20, 50 ...) at or above the tallest column. */
-export function readAxisMaximum(activityBuckets: ActivityBucket[]): number {
-  const tallestTotal = Math.max(0, ...activityBuckets.map(sumActivityBucket));
-  if (tallestTotal <= 4) {
-    return 4;
-  }
-
-  const magnitude = 10 ** Math.floor(Math.log10(tallestTotal));
-  const niceStep = [1, 2, 5, 10].find(
-    (stepMultiplier) => stepMultiplier * magnitude >= tallestTotal,
-  );
-
-  return (niceStep ?? 10) * magnitude;
-}
 
 /** "14:00" for the bucket that starts at 14:00 local time. */
 export function formatBucketHour(bucketStart: string): string {
@@ -64,3 +40,11 @@ export function formatBucketRange(bucketStart: string): string {
 
   return `${formatBucketHour(bucketStart)} to ${formatBucketHour(bucketEnd.toISOString())}`;
 }
+
+/** Hourly buckets labelled every six hours (UI-03.3). */
+export const hourlyBucketFormat: ChartBucketFormat<{ bucket_start: string }> = {
+  readBucketKey: (bucket) => bucket.bucket_start,
+  formatTick: (bucket) => formatBucketHour(bucket.bucket_start),
+  formatRange: (bucket) => formatBucketRange(bucket.bucket_start),
+  tickInterval: 6,
+};

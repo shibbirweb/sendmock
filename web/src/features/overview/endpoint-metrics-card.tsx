@@ -53,13 +53,27 @@ function SuccessRateMeter({
 
 function EndpointMetricsRow({
   endpointMetrics,
+  onSelectEndpoint,
 }: {
   endpointMetrics: EndpointMetrics;
+  onSelectEndpoint?: (endpointId: string) => void;
 }) {
   return (
     <TableRow>
       <TableCell className="max-w-48 truncate font-medium">
-        {endpointMetrics.endpoint_name}
+        {onSelectEndpoint === undefined ? (
+          endpointMetrics.endpoint_name
+        ) : (
+          <button
+            type="button"
+            className="truncate underline-offset-4 hover:underline"
+            onClick={() => {
+              onSelectEndpoint(endpointMetrics.endpoint_id);
+            }}
+          >
+            {endpointMetrics.endpoint_name}
+          </button>
+        )}
       </TableCell>
       <TableCell className="text-right tabular-nums">
         {endpointMetrics.delivery_count}
@@ -98,17 +112,24 @@ function EndpointMetricsRow({
   );
 }
 
-/** Health of each webhook endpoint over the last 24 hours (UI-03.4). */
+/** Health of each webhook endpoint over a range, 24 hours by default (UI-03.4, WH-11.1). */
 export function EndpointMetricsCard({
   endpointMetrics,
+  title = "Webhooks by endpoint",
+  description = "Deliveries in the last 24 hours.",
+  onSelectEndpoint,
 }: {
   endpointMetrics: EndpointMetrics[];
+  title?: string;
+  description?: string;
+  /** Makes each endpoint name a button, e.g. to narrow a screen to it. */
+  onSelectEndpoint?: (endpointId: string) => void;
 }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Webhooks by endpoint</CardTitle>
-        <CardDescription>Deliveries in the last 24 hours.</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         {endpointMetrics.length === 0 ? (
@@ -138,6 +159,7 @@ export function EndpointMetricsCard({
               <TableBody>
                 {endpointMetrics.map((metrics) => (
                   <EndpointMetricsRow
+                    onSelectEndpoint={onSelectEndpoint}
                     key={metrics.endpoint_id}
                     endpointMetrics={metrics}
                   />

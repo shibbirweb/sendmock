@@ -1,18 +1,21 @@
 import {
-  activitySeries,
-  formatBucketRange,
-  sumActivityBucket,
-} from "@/features/overview/activity/activity-series";
-import type { ActivityBucket } from "@/lib/api/types";
+  type ChartBucketFormat,
+  type ChartSeries,
+  sumBucket,
+} from "@/components/charts/chart-series";
 import { cn } from "@/lib/utils";
 
-/** Every series for one hour; values stay in text colours, swatches carry identity. */
-export function ActivityTooltip({
-  activityBucket,
+/** Every series for one bucket; values stay in text colours, swatches carry identity. */
+export function ChartTooltip<Bucket>({
+  bucket,
+  chartSeries,
+  bucketFormat,
   bucketIndex,
   bucketCount,
 }: {
-  activityBucket: ActivityBucket;
+  bucket: Bucket;
+  chartSeries: ChartSeries<Bucket>[];
+  bucketFormat: ChartBucketFormat<Bucket>;
   bucketIndex: number;
   bucketCount: number;
 }) {
@@ -29,27 +32,33 @@ export function ActivityTooltip({
           : { left: `${centerPercent}%`, marginLeft: "0.75rem" }
       }
     >
-      <span className="font-medium">
-        {formatBucketRange(activityBucket.bucket_start)}
-      </span>
-      {[...activitySeries].reverse().map((series) => (
-        <span key={series.countKey} className="flex items-center gap-2">
+      <span className="font-medium">{bucketFormat.formatRange(bucket)}</span>
+      {[...chartSeries].reverse().map((series) => (
+        <span key={series.seriesKey} className="flex items-center gap-2">
           <span
             aria-hidden="true"
             className={cn("size-2 rounded-[2px]", series.swatchClassName)}
           />
           <span className="text-muted-foreground">{series.label}</span>
           <span className="ml-auto font-medium tabular-nums">
-            {activityBucket[series.countKey]}
+            {series.readValue(bucket)}
           </span>
         </span>
       ))}
       <span className="flex items-center gap-2 border-t pt-1">
         <span className="text-muted-foreground">Total</span>
         <span className="ml-auto font-medium tabular-nums">
-          {sumActivityBucket(activityBucket)}
+          {sumBucket(chartSeries, bucket)}
         </span>
       </span>
+      {(bucketFormat.readExtraRows?.(bucket) ?? []).map((extraRow) => (
+        <span key={extraRow.label} className="flex items-center gap-2">
+          <span className="text-muted-foreground">{extraRow.label}</span>
+          <span className="ml-auto font-medium tabular-nums">
+            {extraRow.value}
+          </span>
+        </span>
+      ))}
     </div>
   );
 }

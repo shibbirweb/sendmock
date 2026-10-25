@@ -271,6 +271,26 @@ function buildHistoryDeliverySpecs(): DeliverySpec[] {
     }
   }
 
+  // Six more days, every six hours, for the overview's 7-day range (WH-11.3).
+  for (let hoursAgo = 24; hoursAgo < 168; hoursAgo += 6) {
+    const isMailFailure = hoursAgo % 30 === 0;
+    historySpecs.push({
+      minutesAgo: hoursAgo * 60 + 11,
+      endpointIndex: 0,
+      eventType: "email.received",
+      status: isMailFailure ? "failed" : "succeeded",
+      statusCode: isMailFailure ? 500 : 200,
+    });
+    const isCallbackFailure = hoursAgo % 42 === 0;
+    historySpecs.push({
+      minutesAgo: hoursAgo * 60 + 23,
+      endpointIndex: 1,
+      eventType: "sms.status",
+      status: isCallbackFailure ? "failed" : "succeeded",
+      statusCode: isCallbackFailure ? 503 : 200,
+    });
+  }
+
   return historySpecs;
 }
 
@@ -349,9 +369,11 @@ export function buildWebhookDeliveryFixtures(
         ? 40 + Math.round((deliverySpec.minutesAgo * 13) % 400)
         : null,
       error_message: deliverySpec.errorMessage ?? null,
-      // Only the latest attempt of an event can still have one scheduled.
+      // Only the latest attempt of a recent event still has one scheduled.
       next_attempt_at:
-        deliverySpec.status === "failed" && !hasLaterAttempt(deliverySpec)
+        deliverySpec.status === "failed" &&
+        !hasLaterAttempt(deliverySpec) &&
+        deliverySpec.minutesAgo < 60
           ? minutesAgo(-1)
           : null,
       created_at: minutesAgo(deliverySpec.minutesAgo),

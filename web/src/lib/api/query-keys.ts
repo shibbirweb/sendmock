@@ -10,6 +10,7 @@ import type {
   SmsListFilters,
   SmtpSessionListFilters,
   VerificationListFilters,
+  WebhookMetricsQuery,
 } from "@/lib/api/types";
 
 /**
@@ -78,6 +79,8 @@ export const queryKeys = {
     variablePreview: (previewRequest: VariablePreviewRequest) =>
       ["webhooks", "variable-preview", previewRequest] as const,
     saved: ["webhooks", "saved"] as const,
+    metrics: (metricsQuery: WebhookMetricsQuery) =>
+      ["webhooks", "metrics", metricsQuery] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

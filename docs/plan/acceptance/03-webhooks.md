@@ -126,6 +126,7 @@ UI in U1/U2, backend Phase 3.
 
 - [ ] WH-11.1 Overview and Webhooks show deliveries over time, success rate, p50/p95 latency and top failure codes per endpoint.
 - [ ] WH-11.2 `/api/v1/stats` numbers match the delivery log.
+- [ ] WH-11.3 The Webhooks overview narrows to 24 hours or 7 days and to one endpoint; its chart stacks succeeded, retrying and failed deliveries per hour or day with a legend, a tooltip with p50 / p95 latency and a table view, beside the totals, per-endpoint metrics, top failure codes and recent failures.
 
 ## WH-12 Inbound routes (Mailgun style)
 

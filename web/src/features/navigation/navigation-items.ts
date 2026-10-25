@@ -1,6 +1,7 @@
 import {
   ActivityIcon,
   BookmarkIcon,
+  ChartColumnIcon,
   FileCode2Icon,
   GaugeIcon,
   GlobeIcon,
@@ -51,10 +52,15 @@ export const navigationItems: NavigationItem[] = [
   { title: "HTTP", path: "/http", icon: GlobeIcon, shortcutKey: "h" },
   {
     title: "Webhooks",
-    path: "/webhooks/endpoints",
+    path: "/webhooks/overview",
     icon: WebhookIcon,
     shortcutKey: "w",
     children: [
+      {
+        title: "Overview",
+        path: "/webhooks/overview",
+        icon: ChartColumnIcon,
+      },
       { title: "Endpoints", path: "/webhooks/endpoints", icon: SendIcon },
       { title: "Rules", path: "/webhooks/rules", icon: ListChecksIcon },
       {
