@@ -99,11 +99,12 @@ UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/expo
 
 ## WH-10 Saved deliveries
 
-Phase 3.
+UI in U2, backend Phase 3.
 
 - [ ] WH-10.1 Any delivery or composer request can be saved with a name, and survives pruning and `reset`.
 - [ ] WH-10.2 A saved delivery can be resent to any endpoint and turned into a template.
 - [ ] WH-10.3 Saved deliveries are included in seed export.
+- [ ] WH-10.4 The Saved screen lists saved deliveries newest first with their stored request, searches them by name, and renames and deletes them.
 
 ## WH-11 Webhook metrics
 

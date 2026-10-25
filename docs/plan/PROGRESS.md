@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules and deliveries built on mock data**; saved deliveries next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries and saved deliveries built on mock data**; the templates gallery next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 388 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 389 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: saved deliveries (bookmarks).
+2. Continue Phase U2: templates gallery and detail.
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 3 / 13 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 4 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -111,7 +111,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Endpoints table and edit sheet (`whsec_` secret and rotation, retry policy, template picker, overrides, endpoint variables; Send test dialog, 24-hour success sparkline, Docker hint)
 - [x] Rules list and visual rule builder with match preview (firing order, endpoint filter, all / any groups with not, field-aware values, live preview of the last 50 messages)
 - [x] Deliveries live log and detail (cURL, replay, re-render, edit and replay, cancel, `render_failed`; paged with status, endpoint and event filters, every attempt of an event, Save)
-- [ ] Saved deliveries (bookmarks)
+- [x] Saved deliveries (bookmarks): searchable list with the stored request, send to any endpoint with optional re-render, rename, delete, save as template; kept through reset and written to the seed export
 - [ ] Templates gallery and detail
 - [ ] Template editor (clone, save from endpoint, import/export, revisions with diff)
 - [ ] Variables (all kinds, masked secrets, regenerate)
@@ -338,3 +338,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Webhook rules built on mock data: ordered list with move up / down, event chips, plain-language filter summaries, enabled switch and an endpoint filter in the URL; editor sheet with grouped event checkboxes, a visual filter builder (all / any, not on rows and groups, one nested group, field-aware value pickers, inline checks) and a live preview of the last 50 messages. The filter engine (fields, operators, evaluation, validation, builder conversion, summaries) is shared by the UI and the mock API. |
 | 2026-10-25 | Plan: webhook deliveries in detail ([07](07-ui.md#webhooks)): paged live log with status, endpoint and event filters; detail drawer with request and response side by side, every attempt of the event, the causing message, and Copy as cURL, Replay (as-is or re-rendered), Edit and replay, Cancel retries and Save. API: log filters, detail extras, replay body and saved delivery body; criteria WH-03.7 to WH-03.9. |
 | 2026-10-25 | Webhook deliveries built on mock data: paged live log with status, endpoint and event filters; detail drawer with request and response side by side, every attempt of the event, the causing email or SMS, Copy as cURL, Replay as-is or re-rendered, Edit and replay (JSON checked), Cancel retries and Save. The mock now fires enabled matching rules in order when emails and SMS arrive, so deliveries appear live. `webhook.delivered` documented as the live-log event that rules cannot pick. |
+| 2026-10-25 | Plan: Saved screen in detail ([07](07-ui.md#webhooks)): searchable list with the stored request, Send to any endpoint with optional re-render and a result, Rename, Delete, Save as template; saved deliveries survive reset and go into the seed export without signature headers. API: `PATCH /webhooks/saved`, `send` and `template` bodies; criterion WH-10.4. |
+| 2026-10-25 | Saved deliveries built on mock data: searchable list that opens to the stored headers and body, Send to any endpoint with optional re-render and a result linking to the new delivery, Rename, Delete and Save as template. Saved deliveries now survive reset in the mock and are written to the seed export without signature headers. The save dialog became a shared name prompt. |

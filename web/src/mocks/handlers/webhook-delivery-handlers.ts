@@ -1,13 +1,7 @@
 import { http, HttpResponse } from "msw";
 
-import type {
-  DeliveryReplayRequest,
-  SavedDelivery,
-  SavedDeliveryInput,
-  WebhookDelivery,
-} from "@/lib/api/types";
+import type { DeliveryReplayRequest, WebhookDelivery } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
-import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
 import {
   applyMockConditions,
   createErrorResponse,
@@ -56,7 +50,7 @@ function isRetrying(webhookDelivery: WebhookDelivery): boolean {
   );
 }
 
-/** Delivery log, detail, replay, cancel and save (WH-03, WH-05). */
+/** Delivery log, detail, replay and cancel (WH-03, WH-05). */
 export const webhookDeliveryHandlers = [
   http.get("*/api/v1/webhooks/deliveries", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
@@ -138,38 +132,4 @@ export const webhookDeliveryHandlers = [
       );
     },
   ),
-
-  http.post("*/api/v1/webhooks/saved", async ({ request }) => {
-    await applyMockConditions();
-    const savedInput = (await request.json()) as SavedDeliveryInput;
-    const webhookDelivery = findDelivery(savedInput.delivery_id);
-    if (!webhookDelivery) {
-      return createNotFoundResponse("Delivery");
-    }
-    if (savedInput.name.trim() === "") {
-      return createErrorResponse(400, "validation_failed", "Enter a name");
-    }
-    if (webhookDelivery.request === null) {
-      return createErrorResponse(
-        409,
-        "nothing_to_save",
-        "This delivery was never sent, so there is no request to save.",
-      );
-    }
-
-    const endpointRecord = mockDatabase.webhookEndpoints.find(
-      (existingEndpoint) => existingEndpoint.id === webhookDelivery.endpoint_id,
-    );
-    const savedDelivery: SavedDelivery = {
-      id: createMockUlid(),
-      name: savedInput.name.trim(),
-      endpoint_id: webhookDelivery.endpoint_id,
-      template_id: endpointRecord?.template_id ?? "native",
-      request: webhookDelivery.request,
-      saved_at: new Date().toISOString(),
-    };
-    mockDatabase.savedDeliveries.unshift(savedDelivery);
-
-    return HttpResponse.json(savedDelivery, { status: 201 });
-  }),
 ];

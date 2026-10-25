@@ -126,7 +126,25 @@ export const settingsHandlers = [
 
   http.post("*/api/v1/reset", async () => {
     await applyMockConditions();
+    // Saved deliveries are configuration, not traffic: they survive reset (WH-10.1).
+    const keptSavedDeliveries = mockDatabase.savedDeliveries;
+    const endpointNamesById = new Map(
+      mockDatabase.webhookEndpoints.map((endpointRecord) => [
+        endpointRecord.id,
+        endpointRecord.name,
+      ]),
+    );
     replaceMockDatabase(readMockConditions().dataSize);
+    // The mock makes new ids on reset; a real server keeps them.
+    mockDatabase.savedDeliveries = keptSavedDeliveries.map((savedDelivery) => ({
+      ...savedDelivery,
+      endpoint_id:
+        mockDatabase.webhookEndpoints.find(
+          (endpointRecord) =>
+            endpointRecord.name ===
+            endpointNamesById.get(savedDelivery.endpoint_id ?? ""),
+        )?.id ?? savedDelivery.endpoint_id,
+    }));
 
     return new HttpResponse(null, { status: 204 });
   }),
