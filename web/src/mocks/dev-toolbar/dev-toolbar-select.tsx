@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -20,16 +22,18 @@ export function DevToolbarSelect<OptionValue extends string>({
   options,
   onValueChange,
 }: DevToolbarSelectProps<OptionValue>) {
+  const selectId = React.useId();
+
   return (
     <div className="grid gap-2">
-      <Label>{label}</Label>
+      <Label htmlFor={selectId}>{label}</Label>
       <Select
         value={value}
         onValueChange={(selectedValue) => {
           onValueChange(selectedValue as OptionValue);
         }}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger id={selectId} className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
