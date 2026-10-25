@@ -18,7 +18,7 @@ import {
 import type { SmsMessage, SmsStatus } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
-type DisplayedSmsStatus = SmsStatus | "read";
+export type DisplayedSmsStatus = SmsStatus | "read";
 
 const failedStatuses: SmsStatus[] = ["undelivered", "failed"];
 

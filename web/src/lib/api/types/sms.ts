@@ -4,6 +4,10 @@ import type {
   PageRequest,
   Ulid,
 } from "@/lib/api/types/common";
+import type {
+  RecordedHttpRequest,
+  RecordedHttpResponse,
+} from "@/lib/api/types/webhooks";
 
 export type SmsDirection = "outbound" | "inbound";
 export type SmsChannel = "sms" | "whatsapp";
@@ -43,10 +47,23 @@ export type SmsMessage = {
   updated_at: IsoTimestamp;
 };
 
+/** One call to the message's status callback URL, in the provider's format. */
+export type SmsCallbackAttempt = {
+  id: Ulid;
+  reported_status: SmsStatus;
+  attempt: number;
+  request: RecordedHttpRequest;
+  response: RecordedHttpResponse | null;
+  duration_ms: number | null;
+  error_message: string | null;
+  created_at: IsoTimestamp;
+};
+
 export type SmsMessageDetail = SmsMessage & {
   status_history: SmsStatusChange[];
   request_body: Record<string, unknown> | null;
   api_request_id: Ulid | null;
+  callback_attempts: SmsCallbackAttempt[];
 };
 
 /** A conversation between two numbers. */

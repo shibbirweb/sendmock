@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SmsConversationHeader } from "@/features/sms/conversation/sms-conversation-header";
 import { SmsInboundComposer } from "@/features/sms/conversation/sms-inbound-composer";
 import { SmsMessageTimeline } from "@/features/sms/conversation/sms-message-timeline";
+import { SmsMessageDrawer } from "@/features/sms/drawer/sms-message-drawer";
 import { useSmsList, useSmsThreads } from "@/lib/api/hooks/use-sms-queries";
 
 /** Enough for any test conversation; older messages are pruned by retention. */
@@ -69,6 +70,7 @@ export function SmsConversation({ threadId }: { threadId: string }) {
       <SmsConversationHeader smsThread={smsThread} />
       <SmsMessageTimeline smsMessagesOldestFirst={smsMessagesOldestFirst} />
       <SmsInboundComposer smsThread={smsThread} />
+      <SmsMessageDrawer />
     </div>
   );
 }

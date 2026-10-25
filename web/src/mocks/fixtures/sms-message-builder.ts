@@ -71,5 +71,6 @@ export function buildNewSmsMessage(
         }
       : null,
     api_request_id: isOutbound ? createMockUlid() : null,
+    callback_attempts: [],
   };
 }

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
@@ -41,12 +42,17 @@ function SmsMessageMeta({ smsMessage }: { smsMessage: SmsMessage }) {
         isOutbound && "justify-end",
       )}
     >
-      <time
-        dateTime={smsMessage.created_at}
-        title={formatDateTime(smsMessage.created_at)}
+      <Link
+        from="/sms/$threadId"
+        to="."
+        search={{ message: smsMessage.id }}
+        title={`${formatDateTime(smsMessage.created_at)}, open message details`}
+        className="rounded-sm hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
-        {formatTimeOfDay(smsMessage.created_at)}
-      </time>
+        <time dateTime={smsMessage.created_at}>
+          {formatTimeOfDay(smsMessage.created_at)}
+        </time>
+      </Link>
       <span aria-hidden="true">·</span>
       <span title="Segments and encoding">
         {smsMessage.segments} segment{smsMessage.segments === 1 ? "" : "s"},{" "}

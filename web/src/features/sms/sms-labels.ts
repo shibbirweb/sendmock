@@ -46,3 +46,15 @@ export function describeSmsErrorCode(errorCode: string): string {
     ? `Error ${errorCode}`
     : `${errorCode} ${errorDescription}`;
 }
+
+/** Twilio's 300xx delivery errors, offered when a status is set by hand. */
+export const manualSmsErrorCodes = [
+  "30001",
+  "30002",
+  "30003",
+  "30004",
+  "30005",
+  "30006",
+  "30007",
+  "30008",
+];

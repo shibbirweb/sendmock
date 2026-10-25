@@ -1,7 +1,9 @@
+import { Link } from "@tanstack/react-router";
 import {
   CheckCheckIcon,
   CopyIcon,
   HashIcon,
+  InfoIcon,
   MoreHorizontalIcon,
   Trash2Icon,
 } from "lucide-react";
@@ -25,7 +27,7 @@ function copyToClipboard(copiedText: string, confirmation: string) {
   });
 }
 
-/** Per-message menu: simulate read, copy, delete. Shown on hover or focus. */
+/** Per-message menu: details, simulate read, copy, delete. Shown on hover or focus. */
 export function SmsMessageActions({
   smsMessage,
   className,
@@ -53,6 +55,17 @@ export function SmsMessageActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={isOutbound ? "end" : "start"}>
+        <DropdownMenuItem asChild>
+          <Link
+            from="/sms/$threadId"
+            to="."
+            search={{ message: smsMessage.id }}
+          >
+            <InfoIcon />
+            Message details
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {isOutbound && (
           <>
             <DropdownMenuItem
