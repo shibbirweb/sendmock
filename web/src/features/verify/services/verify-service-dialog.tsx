@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { FormFieldError } from "@/components/common/form-field-error";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,14 +27,6 @@ const codeLengthOptions = Array.from(
   { length: verifyCodeLengthRange.max - verifyCodeLengthRange.min + 1 },
   (_, optionIndex) => verifyCodeLengthRange.min + optionIndex,
 );
-
-function FieldError({ errorMessage }: { errorMessage: string | undefined }) {
-  if (errorMessage === undefined) {
-    return null;
-  }
-
-  return <p className="text-xs text-destructive">{errorMessage}</p>;
-}
 
 function VerifyServiceForm({
   editedService,
@@ -66,7 +59,7 @@ function VerifyServiceForm({
             updateFormValues({ friendlyName: changeEvent.target.value });
           }}
         />
-        <FieldError errorMessage={fieldErrors.friendly_name} />
+        <FormFieldError errorMessage={fieldErrors.friendly_name} />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="grid gap-1.5">
@@ -88,7 +81,7 @@ function VerifyServiceForm({
               ))}
             </SelectContent>
           </Select>
-          <FieldError errorMessage={fieldErrors.code_length} />
+          <FormFieldError errorMessage={fieldErrors.code_length} />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor={`${fieldIdPrefix}-ttl`}>
@@ -105,7 +98,7 @@ function VerifyServiceForm({
               updateFormValues({ ttlMinutes: changeEvent.target.value });
             }}
           />
-          <FieldError errorMessage={fieldErrors.ttl_seconds} />
+          <FormFieldError errorMessage={fieldErrors.ttl_seconds} />
         </div>
       </div>
       <div className="grid gap-1.5">
@@ -128,7 +121,7 @@ function VerifyServiceForm({
         >
           Leave empty for a random code. A fixed code makes tests deterministic.
         </p>
-        <FieldError errorMessage={fieldErrors.fixed_code} />
+        <FormFieldError errorMessage={fieldErrors.fixed_code} />
       </div>
       <DialogFooter>
         <Button type="button" variant="ghost" onClick={onDone}>

@@ -4,7 +4,6 @@ import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   InboundSmsRequest,
-  MessagingService,
   NativeSmsRequest,
   OpenSource,
   PageOf,
@@ -13,7 +12,6 @@ import type {
   SmsMessageDetail,
   SmsStatus,
   SmsThread,
-  VirtualNumber,
 } from "@/lib/api/types";
 
 export function useSmsList(smsFilters: SmsListFilters = {}) {
@@ -108,22 +106,4 @@ export function useDeleteSms() {
   return useSmsMutation((smsId: string) =>
     requestApi<void>(`/sms/${smsId}`, { method: "DELETE" }),
   );
-}
-
-export function useVirtualNumbers() {
-  return useQuery({
-    queryKey: queryKeys.numbers.virtualNumbers,
-    queryFn: ({ signal }) =>
-      requestApi<VirtualNumber[]>("/numbers", { abortSignal: signal }),
-  });
-}
-
-export function useMessagingServices() {
-  return useQuery({
-    queryKey: queryKeys.numbers.messagingServices,
-    queryFn: ({ signal }) =>
-      requestApi<MessagingService[]>("/messaging-services", {
-        abortSignal: signal,
-      }),
-  });
 }

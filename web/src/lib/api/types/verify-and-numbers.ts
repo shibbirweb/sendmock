@@ -74,21 +74,46 @@ export type VerifyServiceInput = Pick<
 export type ForcedVerificationState =
   "approved" | "canceled" | "expired" | "max_attempts";
 
+export type NumberChannel = "sms" | "whatsapp";
+export type InboundWebhookMethod = "POST" | "GET";
+
 export type VirtualNumber = {
   id: Ulid;
+  /** E.164, without a channel prefix; `channels` says whether WhatsApp works. */
   number: string;
   label: string;
-  channels: ("sms" | "whatsapp")[];
+  channels: NumberChannel[];
+  /** Reply webhook (Twilio "A message comes in"); null means rules only. */
   inbound_url: string | null;
+  inbound_method: InboundWebhookMethod;
+  inbound_fallback_url: string | null;
+  /** Payload template for the inbound webhook, e.g. `twilio.inbound_sms`. */
   inbound_template_id: string | null;
   status_callback_url: string | null;
   messaging_service_sid: string | null;
   created_by: CreatedBy;
 };
 
+/** Body of POST and PATCH /api/v1/numbers. */
+export type VirtualNumberInput = Omit<VirtualNumber, "id" | "created_by">;
+
+/** What a Messaging Service does with inbound messages to its numbers. */
+export type MessagingServiceInboundMode =
+  "webhook" | "defer_to_sender" | "drop";
+
 export type MessagingService = {
   sid: string;
   friendly_name: string;
   number_ids: Ulid[];
+  inbound_mode: MessagingServiceInboundMode;
+  /** Used when `inbound_mode` is `webhook`. */
+  inbound_url: string | null;
+  inbound_fallback_url: string | null;
   created_by: CreatedBy;
 };
+
+/** Body of POST and PATCH /api/v1/messaging-services. */
+export type MessagingServiceInput = Omit<
+  MessagingService,
+  "sid" | "created_by"
+>;

@@ -1,19 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PhoneIcon } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { NumbersPage } from "@/features/numbers/numbers-page";
+
+export type NumbersSearchParams = {
+  /** Open tab; Numbers when left out. */
+  tab?: "services";
+};
 
 export const Route = createFileRoute("/numbers")({
+  validateSearch: (
+    searchParams: Record<string, unknown>,
+  ): NumbersSearchParams => ({
+    tab: searchParams.tab === "services" ? "services" : undefined,
+  }),
   component: NumbersPage,
 });
-
-function NumbersPage() {
-  return (
-    <PagePlaceholder
-      icon={PhoneIcon}
-      title="Numbers"
-      description="Virtual phone numbers and Messaging Services with inbound webhook settings."
-      plannedPhase="Phase U1"
-    />
-  );
-}
