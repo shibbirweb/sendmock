@@ -16,30 +16,16 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
-import { buildSavedSendDelivery } from "@/mocks/webhooks/send-saved-delivery";
+import { buildCustomTemplateId } from "@/mocks/webhooks/custom-template-id";
+import {
+  buildSavedSendDelivery,
+  signatureHeaderPrefix,
+} from "@/mocks/webhooks/send-saved-delivery";
 
 function findSavedDelivery(savedId: unknown) {
   return mockDatabase.savedDeliveries.find(
     (savedDelivery) => savedDelivery.id === savedId,
   );
-}
-
-/** "Twilio STOP reply" to `custom.twilio_stop_reply`, unique among templates. */
-function buildCustomTemplateId(templateName: string): string {
-  const slug = templateName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-  const baseId = `custom.${slug || "template"}`;
-  const existingIds = new Set(
-    mockDatabase.webhookTemplates.map((template) => template.id),
-  );
-  let candidateId = baseId;
-  for (let suffix = 2; existingIds.has(candidateId); suffix += 1) {
-    candidateId = `${baseId}_${suffix}`;
-  }
-
-  return candidateId;
 }
 
 /** Saved deliveries: save, list, rename, delete, send again and save as template (WH-10). */
@@ -168,7 +154,7 @@ export const webhookSavedHandlers = [
       }
 
       const customTemplate: WebhookTemplateSummary = {
-        id: buildCustomTemplateId(name.trim()),
+        id: buildCustomTemplateId(mockDatabase, name.trim()),
         name: name.trim(),
         service: "Custom",
         category: "custom",
@@ -178,8 +164,24 @@ export const webhookSavedHandlers = [
         description: `Made from the saved delivery "${savedDelivery.name}".`,
         required_variables: [],
         revision: 1,
+        is_modified: false,
       };
       mockDatabase.webhookTemplates.push(customTemplate);
+      mockDatabase.customTemplateDefinitions.set(customTemplate.id, {
+        method: savedDelivery.request.method,
+        content_type:
+          savedDelivery.request.headers["content-type"] ?? "application/json",
+        header_templates: Object.fromEntries(
+          Object.entries(savedDelivery.request.headers).filter(
+            ([headerName]) =>
+              headerName !== "content-type" &&
+              !headerName.startsWith(signatureHeaderPrefix),
+          ),
+        ),
+        body_template: savedDelivery.request.body,
+        doc_url: null,
+        verified_on: null,
+      });
 
       return HttpResponse.json(customTemplate, { status: 201 });
     },

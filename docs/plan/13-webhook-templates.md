@@ -151,13 +151,13 @@ Schema notes:
 - Endpoint link modes:
   - **Linked (default for custom templates):** the endpoint follows template updates. Endpoint-level overrides (extra headers, extra fields, variables) are layered on top.
   - **Detached:** copy the template into the endpoint and edit freely; no future updates.
-- Built-in templates are always linked and read-only; upgrading SendMock can improve them. Clone to freeze a version.
+- Built-in templates are always linked. They can be **edited in place**: the edit is stored as your version of that template, every endpoint using it sends the edited request, and the template shows a **Modified** badge. **Reset to default** (asks first) drops your version and brings back the shipped one. Upgrading SendMock improves the shipped default but never overwrites a modified template; the detail says when a newer default is available. Clone to keep a separate copy instead.
 
 ### Sharing across a team
 
 - **Export** a template as `<id>.sendmock-template.toml` (secrets never exported, only variable declarations).
 - **Templates directory:** `--templates-dir ./sendmock-templates` (or `SENDMOCK_TEMPLATES_DIR`) loads every `*.toml` at startup and watches for changes. Teams commit this folder to their app repo so everyone gets the same templates.
-- Directory templates show a "from file" badge and are read-only in the UI (edit the file or clone).
+- Directory templates show a "from file" badge and stay read-only in the UI (edit the file or clone).
 
 ### Versioning and safety
 
@@ -179,7 +179,7 @@ Schema notes:
 | revision | integer, bumps on save |
 | created_at, updated_at | |
 
-Built-in and file templates are loaded into memory at startup and not stored as rows (only custom ones are), so upgrades replace them cleanly. `webhook_template_revisions` keeps custom history. `webhook_endpoints` gains `template_id`, `template_mode` (`linked`/`detached`) and `overrides` (JSON).
+Built-in and file templates are loaded into memory at startup and not stored as rows (only custom ones and edited built-ins are), so upgrades replace the shipped defaults cleanly. An edited built-in is a row with `source = builtin` and `default_revision` (the shipped revision it was edited from); resetting deletes the row. Edited built-ins and custom templates are written to the seed export. `webhook_template_revisions` keeps custom history. `webhook_endpoints` gains `template_id`, `template_mode` (`linked`/`detached`) and `overrides` (JSON).
 
 ## API
 
@@ -196,9 +196,15 @@ Built-in and file templates are loaded into memory at startup and not stored as 
 
 ## UI
 
-- **Templates gallery** (Webhooks > Templates): cards with service logo (simple monochrome icon, no third-party branding beyond the name), category tabs (Email providers, SMS providers, Chat, Automation, Custom), search, event filter chips.
-- **Template detail:** description, supported events, required variables, provider doc link, live preview (choose a message), "Use in new endpoint", "Clone", "Export".
-- **Template editor:** same request editor as endpoints, plus a "Variables this template needs" panel and a Sample tab.
+- **Templates gallery** (Webhooks > Templates): cards with a category icon (simple monochrome icon, no third-party branding beyond the name), the name and service, a Built-in / Custom / From file badge (plus **Modified** for an edited built-in), the first events and the number of required variables. Category tabs (All, Generic, Email providers, SMS providers, Chat, Automation, Custom), a search on name and service, and an event picker narrow the cards; the filters live in the URL.
+- **Template detail** (a side sheet opened from a card or `?template=`): description, supported events, required variables (marked secret when the name holds a credential), the request shape (method, content type, header templates), the provider doc link with the "verified against docs as of" date for provider templates, and a **live preview**: pick one of the recent messages that fit the template's events, or the built-in sample, and see the rendered headers and body with any warnings (an undefined variable renders empty and is listed). Actions:
+  - **Use in new endpoint:** opens the endpoint sheet with this template chosen.
+  - **Edit** (built-in and custom templates; file templates are read-only): method, content type, header templates as name / value rows and the body template, with the live preview following the draft. Errors (unbalanced `{{ }}`, unknown functions or filters) block saving; undefined variables are warnings. Saving a built-in replaces it for every endpoint that uses it.
+  - **Reset to default** (modified built-ins only): asks first, then restores the shipped template.
+  - **Clone:** a custom copy with a new name, opened in the detail.
+  - **Export:** downloads `<id>.sendmock-template.toml` (variable declarations only, never values).
+  - **Delete** (custom templates only): when endpoints use it, asks to detach them (they keep a copy) or cancel.
+- **Template editor:** the full editor replaces the basic Edit form: same request editor as endpoints (CodeMirror, `{{` autocomplete), plus a "Variables this template needs" panel, a Sample tab, revisions with diff and import.
 - **Endpoint editor:** template picker at the top; when linked, shows "Based on <template> rev N" with an "Overrides" section beneath.
 
 ## Roadmap placement

@@ -80,11 +80,13 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 
 ## WH-08 Built-in payload templates
 
-Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest).
+UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest).
 
 - [ ] WH-08.1 Every built-in template in the catalogue renders against its sample and against a real event of each declared type.
 - [ ] WH-08.2 Choosing a template asks for its required variables.
 - [ ] WH-08.3 The gallery filters by category, service and event.
+- [ ] WH-08.4 A template's detail shows its description, events, required variables, request shape and provider doc link with the verified date, and previews the rendered request against a chosen recent message or the built-in sample, listing undefined variables as warnings.
+- [ ] WH-08.5 "Use in new endpoint" opens the endpoint sheet with the template chosen.
 
 ## WH-09 Custom templates
 
@@ -96,6 +98,8 @@ UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/expo
 - [ ] WH-09.4 `--templates-dir` loads templates at startup and reloads them on change.
 - [ ] WH-09.5 Revisions keep the last 20 versions with diff and restore; invalid templates cannot be saved.
 - [ ] WH-09.6 Deleting a template in use requires choosing detach or cancel.
+- [ ] WH-09.7 Built-in and custom templates can be edited (method, content type, header and body templates) with the preview following the draft; errors block saving, undefined variables are warnings, and file templates stay read-only.
+- [ ] WH-09.8 An edited built-in shows a Modified badge and is used by every endpoint that links it; Reset to default asks first and restores the shipped template.
 
 ## WH-10 Saved deliveries
 

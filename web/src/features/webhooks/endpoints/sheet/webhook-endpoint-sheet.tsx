@@ -51,11 +51,13 @@ function findFirstErrorTab(
 
 function WebhookEndpointForm({
   editedEndpoint,
+  initialTemplateId,
   onCreated,
   onDone,
   onSendTest,
 }: {
   editedEndpoint: WebhookEndpoint | null;
+  initialTemplateId: string;
   onCreated: (createdEndpoint: WebhookEndpoint) => void;
   onDone: () => void;
   onSendTest: (webhookEndpoint: WebhookEndpoint) => void;
@@ -65,6 +67,7 @@ function WebhookEndpointForm({
   const { formValues, updateFormValues, fieldErrors, isSaving, saveEndpoint } =
     useWebhookEndpointForm({
       editedEndpoint,
+      initialTemplateId,
       onSaved: (savedEndpoint) => {
         if (editedEndpoint === null) {
           onCreated(savedEndpoint);
@@ -180,12 +183,14 @@ function WebhookEndpointForm({
 export function WebhookEndpointSheet({
   isOpen,
   editedEndpoint,
+  initialTemplateId = "native",
   onOpenChange,
   onCreated,
   onSendTest,
 }: {
   isOpen: boolean;
   editedEndpoint: WebhookEndpoint | null;
+  initialTemplateId?: string;
   onOpenChange: (isOpen: boolean) => void;
   onCreated: (createdEndpoint: WebhookEndpoint) => void;
   onSendTest: (webhookEndpoint: WebhookEndpoint) => void;
@@ -205,6 +210,7 @@ export function WebhookEndpointSheet({
           <WebhookEndpointForm
             key={editedEndpoint?.id ?? "new"}
             editedEndpoint={editedEndpoint}
+            initialTemplateId={initialTemplateId}
             onCreated={onCreated}
             onDone={() => {
               onOpenChange(false);

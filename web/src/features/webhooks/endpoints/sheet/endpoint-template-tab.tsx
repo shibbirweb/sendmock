@@ -50,7 +50,7 @@ export function EndpointTemplateTab({
         <p className="text-xs text-muted-foreground">
           Based on {selectedTemplate.name} rev {selectedTemplate.revision}
           {isBuiltinTemplate &&
-            ". Built-in and file templates are always linked: clone one to freeze it."}
+            ". Built-in templates are always linked: edit them on the Templates screen, or clone one for a separate copy."}
         </p>
       )}
       <RadioCardGroup<TemplateMode>

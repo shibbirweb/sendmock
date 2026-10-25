@@ -102,6 +102,13 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/render` | render templates against a sample without sending |
 | GET | `/webhooks/template-reference` | functions, filters and context fields for autocomplete |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
+| GET | `/webhooks/templates/{templateId}` | one template: request shape (method, content type, header and body templates), required variables, doc link and verified date |
+| POST | `/webhooks/templates/{templateId}/render` | render against `{ "email_id": ... }`, `{ "sms_id": ... }` or `{}` for the built-in sample, optionally with an unsaved `draft`; returns headers, body, warnings and errors |
+| PATCH | `/webhooks/templates/{templateId}` | edit `method`, `content_type`, `header_templates`, `body_template` (built-in and custom; file templates are read-only); `422` with the errors when it does not render; an edited built-in gets `is_modified` |
+| POST | `/webhooks/templates/{templateId}/reset` | restore a modified built-in to the shipped default |
+| POST | `/webhooks/templates/{templateId}/clone` | custom copy: `{ "name": ... }` |
+| GET | `/webhooks/templates/{templateId}/export` | the template as TOML (variable declarations, never values) |
+| DELETE | `/webhooks/templates/{templateId}` | custom templates only; `409` with the endpoint count while in use, unless `?endpoints=detach` (those endpoints keep a copy) |
 | GET/POST/PATCH/DELETE | `/webhooks/saved` | saved deliveries (bookmarks); `POST` takes `{ "name": ..., "delivery_id": ... }`, `PATCH` renames |
 | POST | `/webhooks/saved/{savedId}/send` | send again: `{ "endpoint_id": ..., "rerender": true }`; returns the new delivery |
 | POST | `/webhooks/saved/{savedId}/template` | save as a custom template: `{ "name": ... }`; returns the template |

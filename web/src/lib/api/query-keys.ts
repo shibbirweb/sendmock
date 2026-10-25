@@ -3,6 +3,7 @@ import type {
   DeliveryListFilters,
   EmailListFilters,
   RulePreviewRequest,
+  TemplateRenderRequest,
   SmsListFilters,
   SmtpSessionListFilters,
   VerificationListFilters,
@@ -58,6 +59,12 @@ export const queryKeys = {
     delivery: (deliveryId: string) =>
       ["webhooks", "delivery", deliveryId] as const,
     templates: ["webhooks", "templates"] as const,
+    template: (templateId: string) =>
+      ["webhooks", "template", templateId] as const,
+    templatePreview: (
+      templateId: string,
+      renderRequest: TemplateRenderRequest,
+    ) => ["webhooks", "template-preview", templateId, renderRequest] as const,
     variables: ["webhooks", "variables"] as const,
     saved: ["webhooks", "saved"] as const,
   },

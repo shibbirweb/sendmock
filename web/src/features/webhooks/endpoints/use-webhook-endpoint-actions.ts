@@ -17,6 +17,8 @@ export function useWebhookEndpointActions() {
   const [editedEndpointId, setEditedEndpointId] = React.useState<string | null>(
     null,
   );
+  const [newEndpointTemplateId, setNewEndpointTemplateId] =
+    React.useState("native");
   const [deletedEndpoint, setDeletedEndpoint] =
     React.useState<WebhookEndpoint | null>(null);
   const [testedEndpointName, setTestedEndpointName] = React.useState<
@@ -27,6 +29,14 @@ export function useWebhookEndpointActions() {
 
   const openSheet = (webhookEndpoint: WebhookEndpoint | null) => {
     setEditedEndpointId(webhookEndpoint?.id ?? null);
+    setNewEndpointTemplateId("native");
+    setSheetOpen(true);
+  };
+
+  /** "Use in new endpoint" from a template's detail (WH-08.5). */
+  const openNewEndpointWithTemplate = (templateId: string) => {
+    setEditedEndpointId(null);
+    setNewEndpointTemplateId(templateId);
     setSheetOpen(true);
   };
 
@@ -82,6 +92,8 @@ export function useWebhookEndpointActions() {
     editedEndpointId,
     setEditedEndpointId,
     openSheet,
+    openNewEndpointWithTemplate,
+    newEndpointTemplateId,
     deletedEndpoint,
     setDeletedEndpoint,
     confirmDelete,

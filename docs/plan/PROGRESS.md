@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries and saved deliveries built on mock data**; the templates gallery next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries and templates gallery built on mock data**; the template editor next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 95 accepted, 10 / 389 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 95 accepted, 10 / 393 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: templates gallery and detail.
+2. Continue Phase U2: template editor (clone, save from endpoint, import/export, revisions with diff).
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 4 / 13 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 5 / 13 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 10 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -112,7 +112,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Rules list and visual rule builder with match preview (firing order, endpoint filter, all / any groups with not, field-aware values, live preview of the last 50 messages)
 - [x] Deliveries live log and detail (cURL, replay, re-render, edit and replay, cancel, `render_failed`; paged with status, endpoint and event filters, every attempt of an event, Save)
 - [x] Saved deliveries (bookmarks): searchable list with the stored request, send to any endpoint with optional re-render, rename, delete, save as template; kept through reset and written to the seed export
-- [ ] Templates gallery and detail
+- [x] Templates gallery and detail (category tabs, search and event filter in the URL; request shape, doc link and live preview; Edit for built-in and custom templates with Reset to default; Use in new endpoint, Clone, Export, Delete with detach)
 - [ ] Template editor (clone, save from endpoint, import/export, revisions with diff)
 - [ ] Variables (all kinds, masked secrets, regenerate)
 - [ ] Request editor: CodeMirror, `{{` autocomplete, body modes, live nunjucks preview, inline errors
@@ -340,3 +340,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Webhook deliveries built on mock data: paged live log with status, endpoint and event filters; detail drawer with request and response side by side, every attempt of the event, the causing email or SMS, Copy as cURL, Replay as-is or re-rendered, Edit and replay (JSON checked), Cancel retries and Save. The mock now fires enabled matching rules in order when emails and SMS arrive, so deliveries appear live. `webhook.delivered` documented as the live-log event that rules cannot pick. |
 | 2026-10-25 | Plan: Saved screen in detail ([07](07-ui.md#webhooks)): searchable list with the stored request, Send to any endpoint with optional re-render and a result, Rename, Delete, Save as template; saved deliveries survive reset and go into the seed export without signature headers. API: `PATCH /webhooks/saved`, `send` and `template` bodies; criterion WH-10.4. |
 | 2026-10-25 | Saved deliveries built on mock data: searchable list that opens to the stored headers and body, Send to any endpoint with optional re-render and a result linking to the new delivery, Rename, Delete and Save as template. Saved deliveries now survive reset in the mock and are written to the seed export without signature headers. The save dialog became a shared name prompt. |
+| 2026-10-25 | Plan: templates gallery and detail ([13](13-webhook-templates.md#ui)): cards with category tabs, search and event filter in the URL; detail sheet with request shape, doc link and verified date, live preview against a recent message or the sample with undefined-variable warnings, Use in new endpoint, Clone, Export and Delete with detach-or-cancel. API: template detail, render, clone, export and delete rules; criteria WH-08.4 and WH-08.5. |
+| 2026-10-25 | Templates gallery and detail built on mock data: cards with category tabs, search and an event filter in the URL; a detail sheet with events, required variables, request shape, provider doc link and verified date, and a live preview against the sample or a recent email or SMS listing undefined variables; Use in new endpoint, Clone, Export (TOML) and Delete with detach-or-cancel. Every built-in template has a request shape in the mock, rendered by a small stand-in for the template engine. Design tokens gain a warning colour. |
+| 2026-10-25 | Plan change: built-in templates are editable in place ([13](13-webhook-templates.md#using)) with a Modified badge and Reset to default (asks first), instead of read-only with clone-to-freeze; upgrades never overwrite a modified template. A basic Edit form in the template detail (method, content type, headers, body, live preview of the draft, errors block saving) comes now; the full editor stays a separate item. API: template `PATCH`, `reset`, `draft` in render; criteria WH-09.7 and WH-09.8. |
+| 2026-10-25 | Built-in templates are editable: a basic Edit form in the template detail (method, content type, header templates, body) previews the draft live, blocks saving on errors (unknown functions or filters, unbalanced braces) and lists undefined variables as warnings. An edited built-in shows Modified in the gallery and detail, endpoints linked to it see the new revision, and Reset to default restores the shipped template. File templates stay read-only. Edited built-ins and custom templates go into the seed export. |

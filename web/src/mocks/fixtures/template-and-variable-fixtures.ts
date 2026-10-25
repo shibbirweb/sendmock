@@ -184,6 +184,7 @@ export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
       description: `${name} payload, matching the provider's documented format.`,
       required_variables: requiredVariables,
       revision: 1,
+      is_modified: false,
     }),
   );
 
@@ -198,6 +199,7 @@ export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
       description: "Clone of Postmark inbound that adds an X-Tenant header.",
       required_variables: ["tenant_id"],
       revision: 3,
+      is_modified: false,
     },
     {
       id: "custom.ops_alert",
@@ -209,6 +211,7 @@ export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
       description: "Loaded from ./sendmock-templates/ops-alert.toml.",
       required_variables: [],
       revision: 1,
+      is_modified: false,
     },
   ];
 

@@ -41,6 +41,7 @@
   --color-whatsapp-outbound-foreground: var(--whatsapp-outbound-foreground);
   --color-read-receipt: var(--read-receipt);
   --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -76,6 +77,7 @@
   --read-receipt: #0284c7;
   /* Positive outcomes such as an approved verification. */
   --success: #059669;
+  --warning: #b45309;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -120,6 +122,7 @@
   --whatsapp-outbound-foreground: #e9edef;
   --read-receipt: #38bdf8;
   --success: #34d399;
+  --warning: #fbbf24;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

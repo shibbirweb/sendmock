@@ -13,9 +13,9 @@ import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
 import { webhookDeliveryHandlers } from "@/mocks/handlers/webhook-delivery-handlers";
 import { webhookEndpointHandlers } from "@/mocks/handlers/webhook-endpoint-handlers";
-import { webhookHandlers } from "@/mocks/handlers/webhook-handlers";
 import { webhookRuleHandlers } from "@/mocks/handlers/webhook-rule-handlers";
 import { webhookSavedHandlers } from "@/mocks/handlers/webhook-saved-handlers";
+import { webhookTemplateHandlers } from "@/mocks/handlers/webhook-template-handlers";
 import { webhookVariableHandlers } from "@/mocks/handlers/webhook-variable-handlers";
 import { realtimeConnectionHandler } from "@/mocks/realtime/mock-event-bus";
 
@@ -39,6 +39,6 @@ export const mockHandlers = [
   ...webhookRuleHandlers,
   ...webhookDeliveryHandlers,
   ...webhookSavedHandlers,
-  ...webhookHandlers,
+  ...webhookTemplateHandlers,
   realtimeConnectionHandler,
 ];

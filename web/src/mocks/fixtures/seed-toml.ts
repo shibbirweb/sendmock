@@ -1,5 +1,8 @@
 import type { SeedValidation, SeedValidationError } from "@/lib/api/types";
-import type { MockDatabase } from "@/mocks/db/mock-database";
+import {
+  findTemplateDefinition,
+  type MockDatabase,
+} from "@/mocks/db/mock-database";
 
 type TomlValue = string | number | boolean | string[] | null;
 
@@ -127,6 +130,27 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         preset: httpBin.preset,
       }),
     ),
+    ...mockDatabase.webhookTemplates
+      .filter(
+        (webhookTemplate) =>
+          webhookTemplate.source === "custom" || webhookTemplate.is_modified,
+      )
+      .map((webhookTemplate) => {
+        const templateDefinition = findTemplateDefinition(
+          mockDatabase,
+          webhookTemplate.id,
+        );
+
+        return formatTomlTable("[[webhook.templates]]", {
+          id: webhookTemplate.id,
+          name: webhookTemplate.name,
+          // An edited built-in keeps its id, so importing it edits that template.
+          edits_builtin: webhookTemplate.source === "builtin",
+          method: templateDefinition.method,
+          content_type: templateDefinition.content_type,
+          body: templateDefinition.body_template,
+        });
+      }),
     ...mockDatabase.savedDeliveries.map((savedDelivery) =>
       formatTomlTable("[[webhook.saved]]", {
         name: savedDelivery.name,

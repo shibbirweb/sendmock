@@ -59,6 +59,10 @@ import {
   buildWebhookRuleFixtures,
   linkDeliverySubjects,
 } from "@/mocks/fixtures/webhook-fixtures";
+import {
+  readTemplateDefinition,
+  type TemplateDefinition,
+} from "@/mocks/fixtures/template-definitions";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
@@ -82,6 +86,8 @@ export type MockDatabase = {
   webhookRules: WebhookRule[];
   webhookDeliveries: WebhookDelivery[];
   webhookTemplates: WebhookTemplateSummary[];
+  /** Request shapes of custom templates; built-in ones come from the fixtures. */
+  customTemplateDefinitions: Map<string, TemplateDefinition>;
   webhookVariables: WebhookVariable[];
   savedDeliveries: SavedDelivery[];
   httpBins: HttpBin[];
@@ -117,6 +123,7 @@ function buildConfiguration() {
     webhookEndpoints,
     webhookRules: buildWebhookRuleFixtures(webhookEndpoints),
     webhookTemplates: buildWebhookTemplateFixtures(),
+    customTemplateDefinitions: new Map(),
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
@@ -203,4 +210,15 @@ export let mockDatabase: MockDatabase = createMockDatabase("standard");
 
 export function replaceMockDatabase(mockDataSize: MockDataSize) {
   mockDatabase = createMockDatabase(mockDataSize);
+}
+
+/** A template's request shape: a custom one from the database, else the fixtures. */
+export function findTemplateDefinition(
+  database: MockDatabase,
+  templateId: string,
+): TemplateDefinition {
+  return (
+    database.customTemplateDefinitions.get(templateId) ??
+    readTemplateDefinition(templateId)
+  );
 }
