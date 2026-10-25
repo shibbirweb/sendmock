@@ -4,6 +4,7 @@ import type {
   EmailListFilters,
   EndpointPreviewRequest,
   HttpRulePreviewRequest,
+  InboundRouteTestRequest,
   PaymentGatewayPreviewRequest,
   PaymentListFilters,
   RulePreviewRequest,
@@ -96,6 +97,11 @@ export const queryKeys = {
     gateways: ["payments", "gateways"] as const,
     gatewayPreview: (previewRequest: PaymentGatewayPreviewRequest) =>
       ["payments", "gateway-preview", previewRequest] as const,
+  },
+  inboundRoutes: {
+    all: ["inbound-routes"] as const,
+    test: (testRequest: InboundRouteTestRequest) =>
+      ["inbound-routes", "test", testRequest] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

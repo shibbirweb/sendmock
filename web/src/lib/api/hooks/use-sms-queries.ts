@@ -82,6 +82,15 @@ export function useSetSmsStatus() {
   );
 }
 
+/** Sends an inbound message to its reply webhook again (SM-09.7). */
+export function useResendReplyWebhook() {
+  return useSmsMutation((smsId: string) =>
+    requestApi<SmsMessage>(`/sms/${smsId}/reply-webhook/resend`, {
+      method: "POST",
+    }),
+  );
+}
+
 export function useOpenSms() {
   return useSmsMutation(
     ({ smsId, openSource }: { smsId: string; openSource: OpenSource }) =>

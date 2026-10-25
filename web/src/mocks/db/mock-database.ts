@@ -28,6 +28,11 @@ import {
 } from "@/mocks/fixtures/http-catcher-fixtures";
 import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
 import {
+  buildInboundRouteFixtures,
+  type InboundRouteRecord,
+} from "@/mocks/fixtures/inbound-route-fixtures";
+import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
+import {
   buildBuiltinPaymentGateways,
   type PaymentGatewayRecord,
 } from "@/mocks/fixtures/payment-gateway-fixtures";
@@ -115,6 +120,7 @@ export type MockDatabase = {
   paymentMethods: PaymentMethodRecord[];
   paymentFlows: PaymentFlowRecord[];
   paymentGateways: PaymentGatewayRecord[];
+  inboundRoutes: InboundRouteRecord[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -160,6 +166,7 @@ function buildConfiguration() {
     httpBins,
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
+    inboundRoutes: buildInboundRouteFixtures(),
     paymentGateways: buildBuiltinPaymentGateways(
       webhookEndpoints.find(
         (webhookEndpoint) => webhookEndpoint.name === paymentEndpointName,
@@ -230,6 +237,18 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     configuration.httpResponseRules,
     configuration.webhookVariables,
   );
+
+  // Inbound fixtures went to their reply webhooks as they arrived (SM-09.7);
+  // run last, so the seeded randomness of the other fixtures stays the same.
+  smsMessages
+    .filter((smsMessage) => smsMessage.direction === "inbound")
+    .forEach((inboundMessage) => {
+      runReplyWebhook(
+        { ...configuration, smsMessages },
+        inboundMessage,
+        Date.parse(inboundMessage.created_at),
+      );
+    });
 
   return {
     ...configuration,

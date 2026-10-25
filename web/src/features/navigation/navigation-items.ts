@@ -7,6 +7,7 @@ import {
   GaugeIcon,
   GlobeIcon,
   ListChecksIcon,
+  MailPlusIcon,
   type LucideIcon,
   MailIcon,
   MessageSquareIcon,
@@ -68,6 +69,11 @@ export const navigationItems: NavigationItem[] = [
       },
       { title: "Endpoints", path: "/webhooks/endpoints", icon: SendIcon },
       { title: "Rules", path: "/webhooks/rules", icon: ListChecksIcon },
+      {
+        title: "Inbound routes",
+        path: "/webhooks/inbound-routes",
+        icon: MailPlusIcon,
+      },
       {
         title: "Deliveries",
         path: "/webhooks/deliveries",

@@ -57,6 +57,8 @@ export function buildNewSmsMessage(
     extracted: extractFixtureData(smsSpec.body),
     opened_at: null,
     open_count: 0,
+    reply_webhook: null,
+    in_reply_to_sms_id: null,
     created_at: createdAt,
     updated_at: createdAt,
     status_history: [
@@ -75,5 +77,6 @@ export function buildNewSmsMessage(
       : null,
     api_request_id: isOutbound ? createMockUlid() : null,
     callback_attempts: [],
+    reply_webhook_attempts: [],
   };
 }

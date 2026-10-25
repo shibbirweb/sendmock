@@ -9,16 +9,16 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U2: webhook endpoints, rules, deliveries, saved deliveries, templates, suggestions, variables, the request editor, Send to webhook, the composer, the HTTP catcher, the webhooks overview and payments (list, checkout, gateways, methods, flows, settings) built on mock data**; Replies next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U2 done: webhooks (endpoints, rules, deliveries, saved deliveries, templates, variables, the request editor, Send to webhook, the composer, the overview), the HTTP catcher, payments (list, checkout, gateways, methods, flows, settings) and replies (SMS reply webhook, inbound routes) built on mock data**; Phase U3 next (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 97 accepted, 10 / 418 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 97 accepted, 10 / 419 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Continue Phase U2: Replies (inbound routes, SMS reply webhook result, inbound URL and fallback on Numbers).
+2. Start Phase U3: the design review pass on every screen, then accessibility, performance with large data and the responsive check.
 
 ## How to update this file
 
@@ -37,7 +37,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 13 / 14 |
+| U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Not started | 0 / 11 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
@@ -128,7 +128,10 @@ Where the project stands, what is done, and what is left. The plan itself is in 
   - [x] Part 4b: step label variables (PY-12.7): a Variables reference in the flow sheet, an Insert variable menu on every label, a filled preview per step, unknown variables refused on save, all seven filled in on the checkout page, and `GET /payments/flow-variables`
   - [x] Part 5a: Gateways screen (PY-12.2, PY-12.3 custom gateways, PY-12.4): gateway definitions in the API contract and mock DB (the five built-ins as data, reproducing today's redirect and notification shapes); redirects and notifications rendered from the gateway's templates; `/payments/gateways` with reset, preview, secret reveal and `POST /payments/checkout` for a test checkout; payments show the gateway's name; Payments > Gateways table, Add gateway (from a built-in or blank) and the tabbed edit sheet with a live preview; unit and e2e tests
   - [x] Part 5b: Settings > Payments (merchant name, default currency, automatic outcome profile, test value tables) and the Overview payments tile
-- [ ] Replies: Inbound routes list and editor, SMS reply webhook result and drawer tab, inbound URL and fallback on Numbers
+- [x] Replies: Inbound routes list and editor, SMS reply webhook result and drawer tab, inbound URL and fallback on Numbers
+  - [x] Numbers: inbound URL, method, fallback URL and format per number, and the Messaging Service inbound setting (built in U1)
+  - [x] R1: SMS reply webhook result (SM-09.7): inbound messages go to the service or number URL (fallback with `ErrorCode` and `ErrorUrl` when the primary fails); the result line under inbound bubbles; TwiML replies stored in the thread with a "TwiML reply" badge; the drawer's Reply webhook tab with attempts, request, response, parsed TwiML and Resend reply webhook; `POST /sms/{smsId}/reply-webhook/resend`
+  - [x] R2: Inbound routes (WH-12.7): `/webhooks/inbound-routes` list by priority, editor sheet for the filter and actions in Mailgun syntax with the "matches N of the last 50" preview; incoming emails run matching routes, forwards in the email timeline and the delivery log; `/api/v1/inbound-routes` with a test endpoint
 
 ### Phase U3: Polish, website, contract freeze, sign-off gate
 
@@ -382,3 +385,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-25 | Payment gateways built on mock data (part 5a of 5): the five built-in gateways are now data (methods offered, credentials, notification endpoint, redirect method and fields, content type, event names, body and header templates) that reproduce the previous redirect and notification shapes, and every redirect and notification renders from them. Payments > Gateways (new nav child) lists them with methods, endpoint, Built-in / Custom, Modified and an enabled switch; Add gateway starts from a built-in or blank; the edit sheet has General, Checkout (methods in order, Open a test checkout), Merchant (credentials masked, reveal asks first, notification endpoint), Redirect (fields sent always or only on success) and Notification (event names, body in the code editor, header templates) with a live preview against a chosen payment, event and outcome and the template reference beside them; template errors block saving. New template functions `uuid()`, `random_hex()`, `now_iso()` and `stripe_signature()`. Payments show the gateway's name. Mock API: `/payments/gateways` with reset, preview, secret reveal, and `POST /payments/checkout` for any gateway. PY-12.2, PY-12.3 (custom gateways) and PY-12.4 have tests. |
 | 2026-10-25 | Plan: Settings > Payments and the Overview payments tile in detail ([17](17-payments.md#ui), [07](07-ui.md)): merchant name, default currency and the automatic outcome profile (interactive, auto_success, auto_decline, random with a success rate) apply to new hosted checkouts; the test value tables of the enabled methods; a Payments tile with count, success rate and revenue per currency. PY-09.4 reworded (reason: merchant credentials moved to each gateway in PY-12.2, so Settings links to Gateways instead of editing them); new criterion PY-09.5 for the tile. |
 | 2026-10-25 | Settings > Payments and the Overview payments tile built on mock data (part 5b of 5, the payments item is done): a Payments settings section with the merchant name (checkout pages and `{merchant}`), default currency and automatic outcome profile (interactive, always succeed, always decline, random with a success rate) applied to new hosted checkouts, and the test card and test number tables of the enabled methods with OTP / PIN and links to Gateways and Methods; the Overview gets a Payments tile (count, today, success rate, test revenue per currency). PY-09.4 and PY-09.5 have tests. |
+| 2026-10-25 | Plan: Replies UI in detail ([07](07-ui.md)): the reply webhook result line under inbound SMS bubbles, the TwiML reply badge and the drawer's Reply webhook tab; Webhooks > Inbound routes with list, editor in Mailgun syntax and a live match preview with captured groups. New criterion WH-12.7. The Numbers part (inbound URL and fallback) was already built in U1. |
+| 2026-10-25 | SMS reply webhook built on mock data (Replies R1): inbound messages go to the Messaging Service or number URL with Twilio's form fields and headers, the fallback URL gets `ErrorCode` and `ErrorUrl` when the primary fails, and failures carry Twilio's codes (11200, 11205, 12100, 12300); the result line under inbound bubbles ("Reply webhook 200, 1 TwiML reply", "Fallback 200 after 11205", "Rules only"); `<Message>` TwiML becomes a reply in the thread with a TwiML reply badge that jumps to the message it answers, `<Redirect>` is followed up to 10 fetches; the drawer's Reply webhook tab shows each attempt's request, response and parsed TwiML with Resend reply webhook (`POST /sms/{smsId}/reply-webhook/resend`). In the demo the fixtures' app at localhost:8000 answers and other hosts refuse the connection, so the WhatsApp service shows its fallback. SM-09.7 has tests. |
+| 2026-10-25 | Inbound routes built on mock data (Replies R2, U2 complete): Webhooks > Inbound routes lists Mailgun-style routes by priority with their expression and action chips, reorders them (priority swap) and deletes them; the editor sheet builds the filter (match recipient, match header, catch all) and the actions (forward to URL, forward to email, store and notify, stop) in Mailgun syntax with `(?P<name>...)` groups usable as `\g<name>`, and previews "Matches N of the last 50 incoming emails" with captured groups and regex errors as you type. New incoming emails (replies and forwards as recipient) run the matching routes until `stop()`: forwards post Mailgun's multipart fields and appear in the email timeline and the delivery log, forwarding to an email follows the release allowlist. Mock API: `/api/v1/inbound-routes` with `POST /inbound-routes/test`. WH-12.7 has tests. |

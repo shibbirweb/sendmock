@@ -133,6 +133,8 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
     extracted: extractFixtureData(smsSpec.body),
     opened_at: openCount > 0 ? minutesAgo(smsSpec.minutesAgo - 1) : null,
     open_count: openCount,
+    reply_webhook: null,
+    in_reply_to_sms_id: null,
     created_at: minutesAgo(smsSpec.minutesAgo),
     updated_at: minutesAgo(smsSpec.minutesAgo),
     status_history: buildStatusHistory(smsSpec),
@@ -143,6 +145,7 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
       ? createMockUlid(minutesAgoInMs(smsSpec.minutesAgo))
       : null,
     callback_attempts: [],
+    reply_webhook_attempts: [],
   };
   smsMessage.media = (smsSpec.media ?? []).map((mediaSpec, mediaIndex) => ({
     media_index: mediaIndex,

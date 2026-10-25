@@ -12,6 +12,8 @@ import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { planSmsOutcome } from "@/mocks/realtime/outcome-plans";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
+import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
+import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
 
 const whatsappPrefix = "whatsapp:";
 
@@ -168,6 +170,7 @@ export const smsSendHandlers = [
 
     mockDatabase.smsMessages.unshift(inboundMessage);
     publishMockEvent("sms.inbound", { id: inboundMessage.id });
+    sendRepliesFromTwiml(runReplyWebhook(mockDatabase, inboundMessage));
 
     return HttpResponse.json(inboundMessage, { status: 201 });
   }),
