@@ -91,6 +91,9 @@ Phase U3.
 - [ ] WS-04.1 Every endpoint in the OpenAPI spec can be called from the playground and is answered by the in-browser mock.
 - [ ] WS-04.2 Code snippets in cURL, PHP, JavaScript, Python, Go, Java, Rust, Ruby and C# stay in sync with the form and run successfully against a real instance (CI).
 - [ ] WS-04.3 The event stream panel shows events triggered by requests; scenario mode runs multi-step flows.
+- [ ] WS-04.4 When an operation is picked, the playground shows every input it accepts in an Inputs panel: path and query parameters and every body field (nested fields included) with type, required, allowed values, default, description and example; an operation without a body says so (added 2026-10-26, [21](../21-reference-and-examples.md#4-playground-show-every-input)).
+- [ ] WS-04.5 The body starts as a full example (required and optional fields with their example values); each field can be added to or removed from the body from the Inputs panel, Reset to example restores it, query parameters with allowed values are dropdowns, booleans are switches, and an unknown field, a missing required field or a value outside the allowed ones is pointed out before sending.
+- [ ] WS-04.6 The snippet tabs include CLI and MCP, built from the same form values as the other languages, each linking to its entry in the CLI or MCP reference.
 
 ## WS-05 API playground: Local mode
 
@@ -109,3 +112,24 @@ Phase U3 (W13). Plan: [19-user-guide.md](../19-user-guide.md).
 - [ ] WS-06.3 The connection map and the problem index link to every menu page, and every recipe and Advanced page is linked from at least one menu page.
 - [ ] WS-06.4 The UI steps of the recipes and the Advanced walkthroughs (gateway, method, flow, template, catcher response, inbound route, outcome rules) are followed by Playwright tests in the demo, so a renamed button fails CI.
 - [ ] WS-06.5 Every CLI command and MCP tool named in the user guide runs an operation in the surface catalogue (changed 2026-10-26: the catalogue from [20](../20-surface-parity.md) names every command and tool already in Stage A, so the check no longer waits for the Phase 0 reference).
+
+## WS-07 CLI and MCP reference
+
+Phase U3 (W15). Plan: [21-reference-and-examples.md](../21-reference-and-examples.md).
+
+- [ ] WS-07.1 Every input in the spec (path, query and body fields of every operation, nested fields included) has a description, and every body field has an example value; a test fails on an undocumented input.
+- [ ] WS-07.2 `/cli/` has an entry for every command in the surface catalogue, grouped by area, showing its usage line, positional arguments, flags (name, type, required, allowed values, default, description), the global flags, an example command line, the output type and exit codes, and links to its API operation, MCP tool and app place.
+- [ ] WS-07.3 `/mcp/` has an entry for every MCP tool and resource, showing its toolset, annotations (read only, destructive, idempotent), input table (name, type, required, allowed values, description), an example call, the result type, which operation each selector value runs for shared tools, and links to its API operation, CLI command and app place; the exempt operations are listed with their reason.
+- [ ] WS-07.4 The API reference links every operation's CLI command and MCP tool to their entries, the CLI and AI guide pages link to the references, and every CLI and MCP cell in the user guide tables is a link to an entry that exists; a test fails on a missing or broken link.
+- [ ] WS-07.5 `docs/api/cli-reference.json` and `docs/api/mcp-tools.json` are generated from the spec and the catalogue by the rules in [14](../14-ai-integration.md#flags-and-tool-inputs), and `openapi:check` fails on drift; a test fails when two inputs of one command or tool map to the same flag or property, or when a catalogue override names an input that does not exist.
+
+## WS-08 Code examples
+
+Phase U3 (W15) for WS-08.1 to WS-08.4; WS-08.5 in Phase 2, when email and SMS run for real. Plan: [21-reference-and-examples.md](../21-reference-and-examples.md#5-code-examples-in-every-supported-language).
+
+- [ ] WS-08.1 Every recipe has an In your code section with the whole flow as a tab per language: CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#; a test fails when a recipe misses a language.
+- [ ] WS-08.2 Every menu page has a From your code section with the screen's most common task in the same languages.
+- [ ] WS-08.3 Every example is checked against the contract: each `/api/v1/...` method and path is in the spec, each JSON key and query name sent is an input of that operation, and each `sendmock` command and flag is in `cli-reference.json`; a test reads every example block.
+- [ ] WS-08.4 The site shows the examples as tabs that work with the keyboard and remember the chosen language across pages and visits; on GitHub each language is a labelled code block.
+- [ ] WS-08.5 The cross-language matrix runs every recipe example against a real `sendmock` binary in CI.
+

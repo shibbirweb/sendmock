@@ -111,9 +111,14 @@ tabs, buttons, menus, drawers, keyboard keys. This is the A to Z.
 ## Customize
 What can be changed here, one line each, linking to the Advanced page.
 
+## From your code
+The screen's most common task in your app or test, as tabs: CLI, PHP
+(Laravel), JavaScript, Python, Go, Java, Rust, Ruby, C# (added in W15, plan 21).
+
 ## From the CLI, API and AI
 | Do this | CLI | API | MCP tool |
-The same actions without the UI, with their phase.
+The same actions without the UI, with their phase; every cell links to its
+entry in the CLI, API or MCP reference.
 
 ## Related
 Links to the connected menus and recipes.
@@ -316,7 +321,7 @@ One page, one section per Settings section in app order, each with what it solve
 
 ## Recipes (basic use)
 
-Short task pages using **built-ins only**, each: the situation, what you need, numbered steps (UI first, then the same with the CLI), what you should see, and next steps. Planned list:
+Short task pages using **built-ins only**, each: the situation, what you need, numbered steps (UI first, then the same with the CLI), **In your code** (the whole flow as a test in every supported language, added in W15, see [21](21-reference-and-examples.md#5-code-examples-in-every-supported-language)), what you should see, and next steps. Planned list:
 
 1. Catch your app's password reset email and click the link.
 2. Read a one-time code from an email or SMS (UI copy button, `sendmock otp`).

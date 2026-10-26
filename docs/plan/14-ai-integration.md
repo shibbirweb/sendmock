@@ -42,6 +42,14 @@ The single binary is also the client. Commands talk to a running instance over H
 - `sendmock <command> --help` includes examples; `sendmock help --all --json` dumps the whole command tree for agents.
 - Inputs accept flags, `--data '<json>'`, or `--file payload.json|toml` (stdin with `-`).
 
+### Flags and tool inputs
+
+A command's flags and a tool's inputs are derived from the operation's inputs by fixed rules, so the docs, the playground and the binary agree. The full rules and examples are in [21-reference-and-examples.md](21-reference-and-examples.md#2-one-rule-set-for-cli-flags-and-mcp-inputs); in short:
+
+- **CLI:** path parameters are positional arguments in path order; query parameters and top-level body fields are `--kebab-case` flags; booleans are `--name` / `--no-name` without an `is_` or `has_` prefix; lists of scalars repeat the flag in the singular (`--tag a --tag b`); objects take JSON or come from `--data` / `--file`; allowed values are validated (exit 2). Global flags: `--json`, `--url`, `--token`, `--data`, `--file`, `--help`, and `--yes` on destructive commands.
+- **MCP:** one `inputSchema` with the path, query and top-level body inputs as snake_case properties, the success response as `outputSchema`, annotations from the method (GET read only, DELETE destructive, PUT, PATCH and DELETE idempotent), and a selector property (`kind`, ...) when several operations share one tool.
+- Exceptions to a rule are overrides in the surface catalogue (`cliFlags`, `mcpSelector`, annotations), never hand-written lists. `bun run openapi` writes the result to `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`, which the website's [CLI and MCP reference](21-reference-and-examples.md#3-the-cli-and-mcp-reference-pages) is built from and the Stage B binary is checked against.
+
 ### Command tree
 
 Generated from the surface catalogue (`web/src/lib/api/surface-catalogue`, see [20-surface-parity.md](20-surface-parity.md)) with `bun scripts/surfaces/print-surface-lists.ts`: every command runs one REST operation, and every REST operation has a command. Arguments in `<>` are positional; the operation's body and query fields are flags (`--to`, `--subject`, ...), or `--data '<json>'` / `--file`.

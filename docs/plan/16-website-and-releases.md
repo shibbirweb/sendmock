@@ -31,6 +31,8 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | `/docs/` | User docs: getting started, install (binary, Docker, Homebrew, ...), connect your app (per language), email, SMS, Verify, webhooks, templates, variables, HTTP catcher, CLI, MCP and AI, configuration and seed file, troubleshooting |
 | `/api/` | API reference generated from the OpenAPI spec, with the playground on every endpoint |
 | `/playground/` | Full-screen playground (request builder + response + event stream) |
+| `/cli/` | CLI reference generated from `docs/api/cli-reference.json`: every command with its arguments, flags, example and links ([21](21-reference-and-examples.md#3-the-cli-and-mcp-reference-pages)) |
+| `/mcp/` | MCP reference generated from `docs/api/mcp-tools.json`: every tool and resource with its inputs, annotations, example call and links |
 | `/demo/` | The real SendMock web UI built in mock mode (Stage A mock layer), fully clickable in the browser |
 | `/templates/` | Catalogue of built-in webhook payload templates, generated from the template TOML files |
 | `/changelog/` | Rendered `CHANGELOG.md`, with beta and stable releases marked |

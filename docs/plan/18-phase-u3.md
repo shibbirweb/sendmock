@@ -34,6 +34,7 @@ All U3 workstreams are built on one branch, `feat/u3-design-review`, with a comm
 | W12 | Community links and GitHub templates | `chore/u3-community` | UI-10 | |
 | W13 | User guide (not part of the sign-off gate) | `docs/user-guide-plan` | WS-06 | W9 |
 | W14 | Every feature in every way (inside the sign-off gate, it changes the contract) | `docs/user-guide-plan` | UI-11 | W7, W13 |
+| W15 | CLI and MCP reference, field docs, playground inputs and code examples (field docs and the flag and input rules are inside the gate) | `docs/user-guide-plan` | WS-07, WS-08, WS-04.4 to WS-04.6 | W14 |
 
 ## W1 and W6: Design review
 
@@ -206,6 +207,10 @@ The user docs become a guide that walks the sidebar menu by menu, says which rea
 ## W14: Every feature in every way (UI-11)
 
 Every operation is reachable from the UI, the REST API, the CLI and the MCP server, with one recorded exemption (agents never read secrets back). Plan and as-built notes: [20-surface-parity.md](20-surface-parity.md). Part of the sign-off gate, because it changes the contract.
+
+## W15: CLI and MCP reference, field docs and code examples (WS-07, WS-08)
+
+Every input field gets a description and an example in the API types; the CLI flags and MCP tool inputs are derived from them by one rule set into `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` references linked from the API reference and every guide table; the playground shows every accepted input and starts with a full example body; recipes and menu pages get code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#. Plan: [21-reference-and-examples.md](21-reference-and-examples.md). The field docs and the flag and input rules are inside the sign-off gate, because Stage B builds the CLI and MCP server from them.
 
 ## Re-audit before sign-off (2026-10-26)
 

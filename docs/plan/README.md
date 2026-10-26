@@ -34,6 +34,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 18 | [Phase U3](18-phase-u3.md) | Polish, website, contract freeze and sign-off: workstreams in order, design review checklist and table, notifications, accessibility, responsive, performance, OpenAPI freeze, landing page, docs, playground |
 | 19 | [User guide](19-user-guide.md) | The user docs as a guide: every sidebar menu explained with the problems it solves and how it connects, recipes with the built-ins, Advanced pages for customizing and creating (gateways, methods, flows, templates, rules), and building them with AI |
 | 20 | [Surface parity](20-surface-parity.md) | Every feature in every way: each REST operation names its CLI command, MCP tool and UI place in one catalogue, the missing names and REST helpers are added, the API reference shows all of them, and the user guide links every API cell to its parameters |
+| 21 | [Reference and examples](21-reference-and-examples.md) | CLI and MCP reference generated from the contract (every command's flags, every tool's inputs), a description and example for every input field, a playground that shows every accepted input, and code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# for every recipe and menu page |
 
 ## Headline decisions
 
