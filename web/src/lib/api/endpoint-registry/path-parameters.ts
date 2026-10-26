@@ -28,7 +28,8 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     example: "slack",
   },
   credentialName: {
-    description: "The credential's name in the gateway, e.g. `secret_key`.",
+    description:
+      "The credential's name in the gateway or provider, e.g. `secret_key` or `api_key`.",
     example: "secret_key",
   },
   deliveryId: {
@@ -78,6 +79,11 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
   paymentId: {
     description: "The payment's ID, from `GET /api/v1/payments`.",
     example: exampleUlid,
+  },
+  providerKey: {
+    description:
+      "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+    example: "twilio",
   },
   requestId: {
     description:

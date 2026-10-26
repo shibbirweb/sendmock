@@ -138,7 +138,7 @@ Nine per area, 18 in all. Email:
 | `POST /api/v1/emails/providers/{providerKey}/preview` | `sendmock email providers preview <providerKey>` | `sendmock_email_provider_preview` | Mail > Providers > provider > Preview |
 | `GET /api/v1/emails/providers/{providerKey}/credentials/{credentialName}` | `sendmock email providers credential <providerKey> <credentialName> --reveal` | none: agents never read secrets back | Mail > Providers > provider > General > Reveal |
 
-SMS has the same nine under `/api/v1/sms/providers`, `sendmock sms providers` and `sendmock_sms_provider_*`, in SMS > Providers. `DELETE` removes a built-in (restorable, `200` with the definition) and deletes a custom provider (`204`); `404` for an unknown key, `400` for a refused save, `409` for a key that exists.
+SMS has the same nine under `/api/v1/sms/providers`, `sendmock sms providers` and `sendmock_sms_provider_*`, in SMS > Providers. `DELETE` removes a built-in (restorable) or deletes a custom provider, both `204`; `404` for an unknown key, `400` for a refused save, `409` for a key that exists or a restore or reset that does not apply.
 
 - The surface catalogue gets the 18 entries; the MCP tools fall into the existing `email` and `sms` toolsets by their prefix.
 - `bun run openapi` regenerates `docs/api/openapi.yaml`, `cli-reference.json` and `mcp-tools.json`, and the website's API, CLI and MCP references pick them up.

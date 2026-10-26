@@ -45,6 +45,9 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/send/raw` | store a raw message (`message/rfc822`) as sent by your app, as the `sendmail` shim does |
 | POST | `/outcome-rules/email/test`, `/outcome-rules/sms/test` | which custom rule, magic address or number, or profile applies to an address or number |
 | GET/POST/PATCH/DELETE | `/outcome-rules/email` | custom outcome addresses; `POST /outcome-rules/email/{ruleId}/move` with `up` or `down` reorders |
+| GET/POST/PATCH/DELETE | `/emails/providers`, `/emails/providers/{providerKey}` | email provider definitions: list, add (blank or from a built-in), change, remove a built-in or delete a custom one ([22](22-configurable-providers.md)) |
+| POST | `/emails/providers/{providerKey}/restore`, `/reset`, `/preview` | bring a removed built-in back, put a built-in back as shipped, run a sample request through a definition |
+| GET | `/emails/providers/{providerKey}/credentials/{credentialName}` | reveal one secret credential (UI and CLI, after a confirmation; never over MCP) |
 
 ## SMS
 
@@ -64,6 +67,9 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET/POST/PATCH/DELETE | `/numbers` | virtual number registry |
 | GET/POST/PATCH/DELETE | `/outcome-rules/sms` | custom outcome numbers; `POST /outcome-rules/sms/{ruleId}/move` with `up` or `down` reorders |
 | GET/POST/PATCH/DELETE | `/messaging-services` | Twilio-style Messaging Services (sender pools) |
+| GET/POST/PATCH/DELETE | `/sms/providers`, `/sms/providers/{providerKey}` | SMS provider definitions, as for email providers ([22](22-configurable-providers.md)) |
+| POST | `/sms/providers/{providerKey}/restore`, `/reset`, `/preview` | as for email providers |
+| GET | `/sms/providers/{providerKey}/credentials/{credentialName}` | reveal one secret credential (UI and CLI only) |
 
 ## Verify
 

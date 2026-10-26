@@ -31,6 +31,8 @@ tags:
   - name: Outcome rules
   - name: Verify
   - name: Numbers
+  - name: Email providers
+  - name: SMS providers
   - name: HTTP Catcher
   - name: Payments
   - name: Checkout
@@ -3174,6 +3176,532 @@ paths:
       x-sendmock-cli: sendmock sms services delete <serviceSid>
       x-sendmock-mcp: sendmock_messaging_service_delete
       x-sendmock-ui: Numbers > Messaging Services > Delete
+  /api/v1/emails/providers:
+    get:
+      operationId: getEmailsProviders
+      summary: Email providers, built in and custom, removed ones included.
+      tags:
+        - Email providers
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageProviderDefinition"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers list
+      x-sendmock-mcp: sendmock_email_provider_list
+      x-sendmock-ui: Mail > Providers
+    post:
+      operationId: postEmailsProviders
+      summary: Add a email provider, blank or copied from another.
+      tags:
+        - Email providers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers create
+      x-sendmock-mcp: sendmock_email_provider_create
+      x-sendmock-ui: Mail > Providers > Add provider
+  /api/v1/emails/providers/{providerKey}:
+    get:
+      operationId: getEmailsProvidersByProviderKey
+      summary: One provider definition; secret credentials masked.
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers show <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_get
+      x-sendmock-ui: Mail > Providers > provider
+    patch:
+      operationId: patchEmailsProvidersByProviderKey
+      summary: Change a provider; 400 with the problems for template errors, bad paths or a path clash.
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderInput"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers update <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_update
+      x-sendmock-ui: Mail > Providers > provider > Save provider
+    delete:
+      operationId: deleteEmailsProvidersByProviderKey
+      summary: Remove a built-in (restorable) or delete a custom provider; its messages stay.
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers delete <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_delete
+      x-sendmock-ui: Mail > Providers > provider > Remove or Delete
+  /api/v1/emails/providers/{providerKey}/restore:
+    post:
+      operationId: postEmailsProvidersByProviderKeyRestore
+      summary: Bring a removed built-in back as it was.
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers restore <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_restore
+      x-sendmock-ui: Mail > Providers > Removed > Restore
+  /api/v1/emails/providers/{providerKey}/reset:
+    post:
+      operationId: postEmailsProvidersByProviderKeyReset
+      summary: Put a built-in provider back as shipped.
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers reset <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_reset
+      x-sendmock-ui: Mail > Providers > provider > Reset to default
+  /api/v1/emails/providers/{providerKey}/preview:
+    post:
+      operationId: postEmailsProvidersByProviderKeyPreview
+      summary: "Run a sample request through a definition: the message it would store and the answer it would give."
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderPreviewRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderPreview"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers preview <providerKey>
+      x-sendmock-mcp: sendmock_email_provider_preview
+      x-sendmock-ui: Mail > Providers > provider > Preview
+  /api/v1/emails/providers/{providerKey}/credentials/{credentialName}:
+    get:
+      operationId: getEmailsProvidersByProviderKeyCredentialsByCredentialName
+      summary: Reveal one secret credential (asked for after a confirmation).
+      tags:
+        - Email providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+        - name: credentialName
+          in: path
+          required: true
+          description: The credential's name in the gateway or provider, e.g. `secret_key` or `api_key`.
+          schema:
+            type: string
+          example: secret_key
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderCredentialReveal"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email providers credential <providerKey> <credentialName> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: Mail > Providers > provider > General > Reveal
+  /api/v1/sms/providers:
+    get:
+      operationId: getSmsProviders
+      summary: SMS providers, built in and custom, removed ones included.
+      tags:
+        - SMS providers
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageProviderDefinition"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers list
+      x-sendmock-mcp: sendmock_sms_provider_list
+      x-sendmock-ui: SMS > Providers
+    post:
+      operationId: postSmsProviders
+      summary: Add a sms provider, blank or copied from another.
+      tags:
+        - SMS providers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers create
+      x-sendmock-mcp: sendmock_sms_provider_create
+      x-sendmock-ui: SMS > Providers > Add provider
+  /api/v1/sms/providers/{providerKey}:
+    get:
+      operationId: getSmsProvidersByProviderKey
+      summary: One provider definition; secret credentials masked.
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers show <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_get
+      x-sendmock-ui: SMS > Providers > provider
+    patch:
+      operationId: patchSmsProvidersByProviderKey
+      summary: Change a provider; 400 with the problems for template errors, bad paths or a path clash.
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderInput"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers update <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_update
+      x-sendmock-ui: SMS > Providers > provider > Save provider
+    delete:
+      operationId: deleteSmsProvidersByProviderKey
+      summary: Remove a built-in (restorable) or delete a custom provider; its messages stay.
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers delete <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_delete
+      x-sendmock-ui: SMS > Providers > provider > Remove or Delete
+  /api/v1/sms/providers/{providerKey}/restore:
+    post:
+      operationId: postSmsProvidersByProviderKeyRestore
+      summary: Bring a removed built-in back as it was.
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers restore <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_restore
+      x-sendmock-ui: SMS > Providers > Removed > Restore
+  /api/v1/sms/providers/{providerKey}/reset:
+    post:
+      operationId: postSmsProvidersByProviderKeyReset
+      summary: Put a built-in provider back as shipped.
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers reset <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_reset
+      x-sendmock-ui: SMS > Providers > provider > Reset to default
+  /api/v1/sms/providers/{providerKey}/preview:
+    post:
+      operationId: postSmsProvidersByProviderKeyPreview
+      summary: "Run a sample request through a definition: the message it would store and the answer it would give."
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageProviderPreviewRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageProviderPreview"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers preview <providerKey>
+      x-sendmock-mcp: sendmock_sms_provider_preview
+      x-sendmock-ui: SMS > Providers > provider > Preview
+  /api/v1/sms/providers/{providerKey}/credentials/{credentialName}:
+    get:
+      operationId: getSmsProvidersByProviderKeyCredentialsByCredentialName
+      summary: Reveal one secret credential (asked for after a confirmation).
+      tags:
+        - SMS providers
+      parameters:
+        - name: providerKey
+          in: path
+          required: true
+          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+        - name: credentialName
+          in: path
+          required: true
+          description: The credential's name in the gateway or provider, e.g. `secret_key` or `api_key`.
+          schema:
+            type: string
+          example: secret_key
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderCredentialReveal"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms providers credential <providerKey> <credentialName> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: SMS > Providers > provider > General > Reveal
   /api/v1/http/bins:
     get:
       operationId: getHttpBins
@@ -4484,7 +5012,7 @@ paths:
         - name: credentialName
           in: path
           required: true
-          description: The credential's name in the gateway, e.g. `secret_key`.
+          description: The credential's name in the gateway or provider, e.g. `secret_key` or `api_key`.
           schema:
             type: string
           example: secret_key
@@ -7659,6 +8187,14 @@ components:
       required:
         - address
       description: Body of POST /api/v1/outcome-rules/email/test.
+    EmailProviderOperationKind:
+      type: string
+      enum:
+        - send
+        - send_batch
+        - send_with_template
+        - fetch
+      description: The email requests SendMock knows how to run (a new kind needs code).
     EmailReleaseRequest:
       type: object
       properties:
@@ -7729,19 +8265,9 @@ components:
       description: Points from an original email to a reply or forward, or back.
     EmailSource:
       type: string
-      enum:
-        - smtp
-        - sendmail
-        - native_api
+      description: "How an email reached SendMock: a transport (`smtp`, `sendmail`, `native_api`, `verify`, `simulated`) or the key of the email provider whose API it was sent through (`sendgrid`, or a custom provider's key; docs/plan/22)."
+      examples:
         - sendgrid
-        - mailgun
-        - postmark
-        - resend
-        - ses
-        - brevo
-        - verify
-        - simulated
-      description: How the message reached SendMock.
     EmailSummary:
       type: object
       properties:
@@ -8919,6 +9445,356 @@ components:
           examples:
             - '{"text": "hello"}'
       description: Body of POST /api/v1/webhooks/endpoints/{endpointId}/send; neither id means the sample.
+    MessageProviderArea:
+      type: string
+      enum:
+        - email
+        - sms
+      description: Whether a provider sends email or SMS.
+    MessageProviderCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new provider's name.
+          examples:
+            - SSL Wireless
+        key:
+          type: string
+          description: Its key in `/providers/<key>/...` paths and on messages; lowercase, fixed after creation.
+          examples:
+            - sslwireless
+        start_from:
+          type:
+            - string
+            - "null"
+          description: A provider of the same area to copy, or null to start blank.
+          examples:
+            - twilio
+      required:
+        - name
+        - key
+        - start_from
+      description: Body of POST /api/v1/emails/providers and /api/v1/sms/providers.
+    MessageProviderDefinition:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.
+          examples:
+            - sendgrid
+        name:
+          type: string
+          description: The provider's name, shown on messages and in pickers.
+          examples:
+            - SendGrid
+        area:
+          $ref: "#/components/schemas/MessageProviderArea"
+          description: Whether it sends email or SMS.
+          examples:
+            - email
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its badge."
+          examples:
+            - "#1a82e2"
+        is_enabled:
+          type: boolean
+          description: Off providers answer nothing; their paths get SendMock's native 404.
+          examples:
+            - true
+        host:
+          type:
+            - string
+            - "null"
+          description: The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.
+          examples:
+            - api.sendgrid.com
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderCredential"
+          description: The credentials your app is configured with.
+        check_credentials:
+          type: boolean
+          description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderOperation"
+          description: The requests it answers.
+        field_mapping:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderFieldMapping"
+          description: Where each part of a sent message is read from; anything else is kept as metadata.
+        validation_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderValidationRule"
+          description: The checks run on each send, in order.
+        success_response:
+          $ref: "#/components/schemas/ProviderResponseTemplate"
+          description: The answer to a request that passes every check.
+        error_responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderErrorResponse"
+          description: The answer for each kind of error.
+        message_id_template:
+          type: string
+          description: The provider's id for each message, a template.
+          examples:
+            - <{{ uuid() }}@sendmock.local>
+        callback_template_key:
+          type:
+            - string
+            - "null"
+          description: The webhook template its status callbacks and inbound messages are sent with; null sends none.
+          examples:
+            - sendgrid-event
+        status_names:
+          type: object
+          additionalProperties:
+            type: string
+          description: The provider's name for each SendMock status.
+          examples:
+            - delivered: delivered
+              bounced: bounce
+              complained: spamreport
+        outcome_error_codes:
+          type: object
+          additionalProperties:
+            type: string
+          description: "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes."
+          examples:
+            - invalid_number: "21211"
+              unreachable: "30003"
+        is_builtin:
+          type: boolean
+          description: Shipped with SendMock; it can be reset, removed and restored, not deleted.
+        is_modified:
+          type: boolean
+          description: A built-in that differs from its shipped default.
+        is_removed:
+          type: boolean
+          description: A built-in taken out of routing, pickers and snippets; Restore brings it back.
+        message_count_24h:
+          type: number
+          description: Messages it caught in the last 24 hours.
+      required:
+        - key
+        - name
+        - area
+        - accent
+        - is_enabled
+        - host
+        - credentials
+        - check_credentials
+        - operations
+        - field_mapping
+        - validation_rules
+        - success_response
+        - error_responses
+        - message_id_template
+        - callback_template_key
+        - status_names
+        - outcome_error_codes
+        - is_builtin
+        - is_modified
+        - is_removed
+        - message_count_24h
+      description: "An email or SMS provider SendMock answers like the real one: a built-in or one you added, editable like a payment gateway."
+    MessageProviderInput:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.
+          examples:
+            - sendgrid
+        name:
+          type: string
+          description: The provider's name, shown on messages and in pickers.
+          examples:
+            - SendGrid
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its badge."
+          examples:
+            - "#1a82e2"
+        is_enabled:
+          type: boolean
+          description: Off providers answer nothing; their paths get SendMock's native 404.
+          examples:
+            - true
+        host:
+          type:
+            - string
+            - "null"
+          description: The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.
+          examples:
+            - api.sendgrid.com
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderCredential"
+          description: The credentials your app is configured with.
+        check_credentials:
+          type: boolean
+          description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderOperation"
+          description: The requests it answers.
+        field_mapping:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderFieldMapping"
+          description: Where each part of a sent message is read from; anything else is kept as metadata.
+        validation_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderValidationRule"
+          description: The checks run on each send, in order.
+        success_response:
+          $ref: "#/components/schemas/ProviderResponseTemplate"
+          description: The answer to a request that passes every check.
+        error_responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderErrorResponse"
+          description: The answer for each kind of error.
+        message_id_template:
+          type: string
+          description: The provider's id for each message, a template.
+          examples:
+            - <{{ uuid() }}@sendmock.local>
+        callback_template_key:
+          type:
+            - string
+            - "null"
+          description: The webhook template its status callbacks and inbound messages are sent with; null sends none.
+          examples:
+            - sendgrid-event
+        status_names:
+          type: object
+          additionalProperties:
+            type: string
+          description: The provider's name for each SendMock status.
+          examples:
+            - delivered: delivered
+              bounced: bounce
+              complained: spamreport
+        outcome_error_codes:
+          type: object
+          additionalProperties:
+            type: string
+          description: "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes."
+          examples:
+            - invalid_number: "21211"
+              unreachable: "30003"
+      required:
+        - key
+        - name
+        - accent
+        - is_enabled
+        - host
+        - credentials
+        - check_credentials
+        - operations
+        - field_mapping
+        - validation_rules
+        - success_response
+        - error_responses
+        - message_id_template
+        - callback_template_key
+        - status_names
+        - outcome_error_codes
+      description: Body of PATCH .../providers/{providerKey}; the key and area are fixed.
+    MessageProviderPreview:
+      type: object
+      properties:
+        operation_kind:
+          anyOf:
+            - $ref: "#/components/schemas/ProviderOperationKind"
+            - type: "null"
+          description: The operation the request matched, or null when none matched.
+        stored_message:
+          anyOf:
+            - type: object
+              properties:
+                from:
+                  type: string
+                to:
+                  type: array
+                  items:
+                    type: string
+                subject:
+                  type:
+                    - string
+                    - "null"
+                body:
+                  type: string
+                metadata:
+                  type: object
+                  additionalProperties:
+                    type: string
+              required:
+                - from
+                - to
+                - subject
+                - body
+                - metadata
+            - type: "null"
+          description: The message SendMock would store; null when the request is refused.
+        response:
+          type: object
+          properties:
+            status:
+              type: number
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+            body:
+              type: string
+          required:
+            - status
+            - headers
+            - body
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderDefinitionProblem"
+        reference:
+          $ref: "#/components/schemas/TemplateReference"
+          description: What templates can read, for `{{` suggestions.
+      required:
+        - operation_kind
+        - stored_message
+        - response
+        - problems
+        - reference
+      description: "What a sample request becomes: the message SendMock would store and the answer it would give."
+    MessageProviderPreviewRequest:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/MessageProviderInput"
+          description: The provider settings to run, saved or not.
+        sample_request:
+          $ref: "#/components/schemas/ProviderSampleRequest"
+          description: The request to run; the provider's example send when left out.
+      required:
+        - provider
+      description: Body of POST .../providers/{providerKey}/preview.
     MessageRuleMove:
       type: object
       properties:
@@ -10832,6 +11708,291 @@ components:
         - redirected
         - delayed
         - notification_sent
+    ProviderCredential:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The credential's name, readable in templates as `credentials.<name>`.
+          examples:
+            - api_key
+        value:
+          type: string
+          description: The value; a secret comes back masked, and sending the masked value back keeps the stored one.
+          examples:
+            - SG.test_key_123
+        is_secret:
+          type: boolean
+          description: Masks the value in the UI, API answers, logs and MCP output.
+          examples:
+            - true
+      required:
+        - name
+        - value
+        - is_secret
+      description: A credential your app is configured with; a secret's value comes back masked (`••••` and the last 4).
+    ProviderCredentialReveal:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      required:
+        - name
+        - value
+      description: GET .../providers/{providerKey}/credentials/{credentialName}.
+    ProviderDefinitionProblem:
+      type: object
+      properties:
+        part:
+          type: string
+        message:
+          type: string
+        severity:
+          type: string
+          enum:
+            - error
+            - warning
+      required:
+        - part
+        - message
+        - severity
+      description: One template or definition problem, named by the part it is in, e.g. `Success response body`.
+    ProviderErrorKind:
+      type: string
+      enum:
+        - missing_field
+        - invalid_value
+        - unauthorized
+        - not_found
+        - rate_limited
+      description: The kinds of error a provider answers with its own shape.
+    ProviderErrorResponse:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/ProviderErrorKind"
+          description: The kind of error this response answers.
+          examples:
+            - missing_field
+        status:
+          type: number
+          description: The HTTP status code.
+          examples:
+            - 202
+        headers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderHeaderTemplate"
+          description: Headers sent with the response.
+        body:
+          type: string
+          description: The body, a template over the message, the request and the error.
+          examples:
+            - '{"id": "{{ message.provider_id }}"}'
+      required:
+        - body
+        - headers
+        - kind
+        - status
+      description: The answer for one kind of error.
+    ProviderFieldMapping:
+      type: object
+      properties:
+        part:
+          $ref: "#/components/schemas/ProviderMessagePart"
+          description: The part of the message.
+          examples:
+            - to
+        source:
+          type: string
+          description: "The request path it is read from: a JSON path, a form field or a query parameter."
+          examples:
+            - personalizations[0].to[*].email
+      required:
+        - part
+        - source
+      description: Where one part of a sent message is read from in the request.
+    ProviderHeaderTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The header name.
+          examples:
+            - X-Message-Id
+        template:
+          type: string
+          description: The value, a template over the message and the request.
+          examples:
+            - "{{ message.provider_id }}"
+      required:
+        - name
+        - template
+      description: A response header, from a template.
+    ProviderMessagePart:
+      type: string
+      enum:
+        - from
+        - to
+        - cc
+        - bcc
+        - reply_to
+        - subject
+        - text
+        - html
+        - attachments
+        - headers
+        - tags
+        - template_id
+        - template_data
+        - body
+        - media_urls
+        - messaging_service
+        - status_callback_url
+      description: A part of a message a request can carry; email and SMS use their own parts.
+    ProviderOperation:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/ProviderOperationKind"
+          description: What the request does, from the kinds SendMock can run.
+          examples:
+            - send
+        method:
+          type: string
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          description: The HTTP method.
+          examples:
+            - POST
+        path:
+          type: string
+          description: The path at the provider's API, with `{name}` for variable parts.
+          examples:
+            - /v3/{domain}/messages
+        request_format:
+          type: string
+          enum:
+            - json
+            - form
+            - multipart
+            - query
+          description: "How the request body is sent: `json`, `form`, `multipart`, or `query` for none."
+          examples:
+            - multipart
+      required:
+        - kind
+        - method
+        - path
+        - request_format
+      description: One request the provider answers.
+    ProviderOperationKind:
+      anyOf:
+        - $ref: "#/components/schemas/EmailProviderOperationKind"
+        - $ref: "#/components/schemas/SmsProviderOperationKind"
+    ProviderResponseTemplate:
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status code.
+          examples:
+            - 202
+        headers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderHeaderTemplate"
+          description: Headers sent with the response.
+        body:
+          type: string
+          description: The body, a template over the message, the request and the error.
+          examples:
+            - '{"id": "{{ message.provider_id }}"}'
+      required:
+        - status
+        - headers
+        - body
+      description: "What the provider answers: a status, headers and a body template."
+    ProviderSampleRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          description: The HTTP method.
+          examples:
+            - POST
+        path:
+          type: string
+          description: The path as your app would call it.
+          examples:
+            - /v3/mail/send
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: The request headers.
+          examples:
+            - content-type: application/json
+              authorization: Bearer SG.test_key_123
+        body:
+          type: string
+          description: The raw request body.
+          examples:
+            - '{"personalizations": [{"to": [{"email": "ana@example.test"}]}], "from": {"email": "app@example.test"}, "subject": "Welcome", "content": [{"type": "text/plain", "value": "Hi"}]}'
+      required:
+        - method
+        - path
+        - headers
+        - body
+      description: A request to run through a provider in the preview.
+    ProviderValidationRule:
+      type: object
+      properties:
+        part:
+          $ref: "#/components/schemas/ProviderMessagePart"
+          description: The part of the message checked.
+          examples:
+            - to
+        check:
+          type: string
+          enum:
+            - required
+            - email_address
+            - e164_number
+            - max_length
+          description: "The check: present, an email address, an E.164 number, or at most `max_length` characters."
+          examples:
+            - required
+        max_length:
+          type:
+            - number
+            - "null"
+          description: The longest value allowed, for `max_length`; null otherwise.
+          examples:
+            - null
+        error_kind:
+          $ref: "#/components/schemas/ProviderErrorKind"
+          description: The error answered when the check fails.
+          examples:
+            - missing_field
+      required:
+        - part
+        - check
+        - max_length
+        - error_kind
+      description: A check on a request, and the error it answers when the check fails.
     RecentFailedDelivery:
       type: object
       properties:
@@ -11429,13 +12590,9 @@ components:
         - event
     SmsApi:
       type: string
-      enum:
-        - native
+      description: "The API a message was sent through: `native`, or the key of the SMS provider (`twilio`, or a custom provider's key; docs/plan/22)."
+      examples:
         - twilio
-        - vonage
-        - plivo
-        - messagebird
-        - generic
     SmsCallbackAttempt:
       type: object
       properties:
@@ -11918,6 +13075,16 @@ components:
         - number
         - match_field
       description: Body of POST /api/v1/outcome-rules/sms/test.
+    SmsProviderOperationKind:
+      type: string
+      enum:
+        - send
+        - fetch
+        - list
+        - cancel
+        - start_verification
+        - check_verification
+      description: The SMS requests SendMock knows how to run (a new kind needs code).
     SmsReplyWebhookAttempt:
       type: object
       properties:

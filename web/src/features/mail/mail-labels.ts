@@ -1,6 +1,6 @@
 import type { EmailDeliveryStatus, EmailSource } from "@/lib/api/types";
 
-/** Short names for how an email reached SendMock. */
+/** Short names for how an email reached SendMock; a custom provider shows its key. */
 export const emailSourceLabels: Record<EmailSource, string> = {
   smtp: "SMTP",
   sendmail: "sendmail",
@@ -14,6 +14,10 @@ export const emailSourceLabels: Record<EmailSource, string> = {
   verify: "Verify",
   simulated: "Simulated",
 };
+
+export function labelEmailSource(emailSource: EmailSource): string {
+  return emailSourceLabels[emailSource] ?? emailSource;
+}
 
 export const deliveryStatusLabels: Record<EmailDeliveryStatus, string> = {
   delivered: "Delivered",

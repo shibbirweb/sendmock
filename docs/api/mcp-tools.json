@@ -1281,19 +1281,7 @@
           },
           "type": "string",
           "is_required": false,
-          "allowed_values": [
-            "smtp",
-            "sendmail",
-            "native_api",
-            "sendgrid",
-            "mailgun",
-            "postmark",
-            "resend",
-            "ses",
-            "brevo",
-            "verify",
-            "simulated"
-          ],
+          "allowed_values": null,
           "description": "How it arrived.",
           "example": "smtp"
         },
@@ -1398,20 +1386,10 @@
           },
           "EmailSource": {
             "type": "string",
-            "enum": [
-              "smtp",
-              "sendmail",
-              "native_api",
-              "sendgrid",
-              "mailgun",
-              "postmark",
-              "resend",
-              "ses",
-              "brevo",
-              "verify",
-              "simulated"
-            ],
-            "description": "How the message reached SendMock."
+            "description": "How an email reached SendMock: a transport (`smtp`, `sendmail`, `native_api`, `verify`, `simulated`) or the key of the email provider whose API it was sent through (`sendgrid`, or a custom provider's key; docs/plan/22).",
+            "examples": [
+              "sendgrid"
+            ]
           }
         }
       },
@@ -1583,6 +1561,2155 @@
       ],
       "ui": [
         "Mail > open email (opening it fires the open)"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_create",
+      "toolset": "email",
+      "summary": "Add a email provider, blank or copied from another.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/providers",
+          "operation_id": "postEmailsProviders",
+          "summary": "Add a email provider, blank or copied from another.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The new provider's name.",
+          "example": "SSL Wireless"
+        },
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Its key in `/providers/<key>/...` paths and on messages; lowercase, fixed after creation.",
+          "example": "sslwireless"
+        },
+        {
+          "name": "start_from",
+          "input": {
+            "name": "start_from",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A provider of the same area to copy, or null to start blank.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The new provider's name.",
+            "examples": [
+              "SSL Wireless"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "Its key in `/providers/<key>/...` paths and on messages; lowercase, fixed after creation.",
+            "examples": [
+              "sslwireless"
+            ]
+          },
+          "start_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "A provider of the same area to copy, or null to start blank.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "key"
+        ]
+      },
+      "example_arguments": {
+        "name": "SSL Wireless",
+        "key": "sslwireless",
+        "start_from": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock email providers create"
+      ],
+      "ui": [
+        "Mail > Providers > Add provider"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_delete",
+      "toolset": "email",
+      "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/emails/providers/{providerKey}",
+          "operation_id": "deleteEmailsProvidersByProviderKey",
+          "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": null,
+      "cli": [
+        "sendmock email providers delete <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > provider > Remove or Delete"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_get",
+      "toolset": "email",
+      "summary": "One provider definition; secret credentials masked.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/providers/{providerKey}",
+          "operation_id": "getEmailsProvidersByProviderKey",
+          "summary": "One provider definition; secret credentials masked.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock email providers show <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > provider"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_list",
+      "toolset": "email",
+      "summary": "Email providers, built in and custom, removed ones included.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/providers",
+          "operation_id": "getEmailsProviders",
+          "summary": "Email providers, built in and custom, removed ones included.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "MessageProviderDefinition[]",
+      "cli": [
+        "sendmock email providers list"
+      ],
+      "ui": [
+        "Mail > Providers"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_preview",
+      "toolset": "email",
+      "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/providers/{providerKey}/preview",
+          "operation_id": "postEmailsProvidersByProviderKeyPreview",
+          "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "MessageProviderInput",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider settings to run, saved or not.",
+          "example": {
+            "key": "sendgrid",
+            "name": "SendGrid",
+            "accent": "#1a82e2",
+            "is_enabled": true,
+            "host": "api.sendgrid.com",
+            "credentials": [
+              {
+                "name": "api_key",
+                "value": "SG.test_key_123",
+                "is_secret": true
+              }
+            ],
+            "check_credentials": false,
+            "operations": [
+              {
+                "kind": "send",
+                "method": "POST",
+                "path": "/v3/{domain}/messages",
+                "request_format": "multipart"
+              }
+            ],
+            "field_mapping": [
+              {
+                "part": "to",
+                "source": "personalizations[0].to[*].email"
+              }
+            ],
+            "validation_rules": [
+              {
+                "part": "to",
+                "check": "required",
+                "max_length": null,
+                "error_kind": "missing_field"
+              }
+            ],
+            "success_response": {
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            },
+            "error_responses": [
+              {
+                "kind": "missing_field",
+                "status": 202,
+                "headers": [
+                  {
+                    "name": "X-Message-Id",
+                    "template": "{{ message.provider_id }}"
+                  }
+                ],
+                "body": "{\"id\": \"{{ message.provider_id }}\"}"
+              }
+            ],
+            "message_id_template": "<{{ uuid() }}@sendmock.local>",
+            "callback_template_key": "sendgrid-event",
+            "status_names": {
+              "delivered": "delivered",
+              "bounced": "bounce",
+              "complained": "spamreport"
+            },
+            "outcome_error_codes": {
+              "invalid_number": "21211",
+              "unreachable": "30003"
+            }
+          }
+        },
+        {
+          "name": "sample_request",
+          "input": {
+            "name": "sample_request",
+            "location": "body"
+          },
+          "type": "ProviderSampleRequest",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The request to run; the provider's example send when left out.",
+          "example": {
+            "method": "POST",
+            "path": "/v3/mail/send",
+            "headers": {
+              "content-type": "application/json",
+              "authorization": "Bearer SG.test_key_123"
+            },
+            "body": "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/MessageProviderInput",
+            "description": "The provider settings to run, saved or not.",
+            "examples": [
+              {
+                "key": "sendgrid",
+                "name": "SendGrid",
+                "accent": "#1a82e2",
+                "is_enabled": true,
+                "host": "api.sendgrid.com",
+                "credentials": [
+                  {
+                    "name": "api_key",
+                    "value": "SG.test_key_123",
+                    "is_secret": true
+                  }
+                ],
+                "check_credentials": false,
+                "operations": [
+                  {
+                    "kind": "send",
+                    "method": "POST",
+                    "path": "/v3/{domain}/messages",
+                    "request_format": "multipart"
+                  }
+                ],
+                "field_mapping": [
+                  {
+                    "part": "to",
+                    "source": "personalizations[0].to[*].email"
+                  }
+                ],
+                "validation_rules": [
+                  {
+                    "part": "to",
+                    "check": "required",
+                    "max_length": null,
+                    "error_kind": "missing_field"
+                  }
+                ],
+                "success_response": {
+                  "status": 202,
+                  "headers": [
+                    {
+                      "name": "X-Message-Id",
+                      "template": "{{ message.provider_id }}"
+                    }
+                  ],
+                  "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                },
+                "error_responses": [
+                  {
+                    "kind": "missing_field",
+                    "status": 202,
+                    "headers": [
+                      {
+                        "name": "X-Message-Id",
+                        "template": "{{ message.provider_id }}"
+                      }
+                    ],
+                    "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                  }
+                ],
+                "message_id_template": "<{{ uuid() }}@sendmock.local>",
+                "callback_template_key": "sendgrid-event",
+                "status_names": {
+                  "delivered": "delivered",
+                  "bounced": "bounce",
+                  "complained": "spamreport"
+                },
+                "outcome_error_codes": {
+                  "invalid_number": "21211",
+                  "unreachable": "30003"
+                }
+              }
+            ]
+          },
+          "sample_request": {
+            "$ref": "#/$defs/ProviderSampleRequest",
+            "description": "The request to run; the provider's example send when left out.",
+            "examples": [
+              {
+                "method": "POST",
+                "path": "/v3/mail/send",
+                "headers": {
+                  "content-type": "application/json",
+                  "authorization": "Bearer SG.test_key_123"
+                },
+                "body": "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider_key",
+          "provider"
+        ],
+        "$defs": {
+          "EmailProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "send_batch",
+              "send_with_template",
+              "fetch"
+            ],
+            "description": "The email requests SendMock knows how to run (a new kind needs code)."
+          },
+          "MessageProviderInput": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+                "examples": [
+                  "sendgrid"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "description": "The provider's name, shown on messages and in pickers.",
+                "examples": [
+                  "SendGrid"
+                ]
+              },
+              "accent": {
+                "type": "string",
+                "description": "`#rrggbb`, used on its badge.",
+                "examples": [
+                  "#1a82e2"
+                ]
+              },
+              "is_enabled": {
+                "type": "boolean",
+                "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+                "examples": [
+                  true
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+                "examples": [
+                  "api.sendgrid.com"
+                ]
+              },
+              "credentials": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderCredential"
+                },
+                "description": "The credentials your app is configured with."
+              },
+              "check_credentials": {
+                "type": "boolean",
+                "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+                "examples": [
+                  false
+                ]
+              },
+              "operations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderOperation"
+                },
+                "description": "The requests it answers."
+              },
+              "field_mapping": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderFieldMapping"
+                },
+                "description": "Where each part of a sent message is read from; anything else is kept as metadata."
+              },
+              "validation_rules": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderValidationRule"
+                },
+                "description": "The checks run on each send, in order."
+              },
+              "success_response": {
+                "$ref": "#/$defs/ProviderResponseTemplate",
+                "description": "The answer to a request that passes every check."
+              },
+              "error_responses": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderErrorResponse"
+                },
+                "description": "The answer for each kind of error."
+              },
+              "message_id_template": {
+                "type": "string",
+                "description": "The provider's id for each message, a template.",
+                "examples": [
+                  "<{{ uuid() }}@sendmock.local>"
+                ]
+              },
+              "callback_template_key": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+                "examples": [
+                  "sendgrid-event"
+                ]
+              },
+              "status_names": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "The provider's name for each SendMock status.",
+                "examples": [
+                  {
+                    "delivered": "delivered",
+                    "bounced": "bounce",
+                    "complained": "spamreport"
+                  }
+                ]
+              },
+              "outcome_error_codes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+                "examples": [
+                  {
+                    "invalid_number": "21211",
+                    "unreachable": "30003"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "accent",
+              "is_enabled",
+              "host",
+              "credentials",
+              "check_credentials",
+              "operations",
+              "field_mapping",
+              "validation_rules",
+              "success_response",
+              "error_responses",
+              "message_id_template",
+              "callback_template_key",
+              "status_names",
+              "outcome_error_codes"
+            ],
+            "description": "Body of PATCH .../providers/{providerKey}; the key and area are fixed."
+          },
+          "ProviderCredential": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The credential's name, readable in templates as `credentials.<name>`.",
+                "examples": [
+                  "api_key"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "description": "The value; a secret comes back masked, and sending the masked value back keeps the stored one.",
+                "examples": [
+                  "SG.test_key_123"
+                ]
+              },
+              "is_secret": {
+                "type": "boolean",
+                "description": "Masks the value in the UI, API answers, logs and MCP output.",
+                "examples": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value",
+              "is_secret"
+            ],
+            "description": "A credential your app is configured with; a secret's value comes back masked (`••••` and the last 4)."
+          },
+          "ProviderErrorKind": {
+            "type": "string",
+            "enum": [
+              "missing_field",
+              "invalid_value",
+              "unauthorized",
+              "not_found",
+              "rate_limited"
+            ],
+            "description": "The kinds of error a provider answers with its own shape."
+          },
+          "ProviderErrorResponse": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The kind of error this response answers.",
+                "examples": [
+                  "missing_field"
+                ]
+              },
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "body",
+              "headers",
+              "kind",
+              "status"
+            ],
+            "description": "The answer for one kind of error."
+          },
+          "ProviderFieldMapping": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "description": "The request path it is read from: a JSON path, a form field or a query parameter.",
+                "examples": [
+                  "personalizations[0].to[*].email"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "source"
+            ],
+            "description": "Where one part of a sent message is read from in the request."
+          },
+          "ProviderHeaderTemplate": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The header name.",
+                "examples": [
+                  "X-Message-Id"
+                ]
+              },
+              "template": {
+                "type": "string",
+                "description": "The value, a template over the message and the request.",
+                "examples": [
+                  "{{ message.provider_id }}"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "template"
+            ],
+            "description": "A response header, from a template."
+          },
+          "ProviderMessagePart": {
+            "type": "string",
+            "enum": [
+              "from",
+              "to",
+              "cc",
+              "bcc",
+              "reply_to",
+              "subject",
+              "text",
+              "html",
+              "attachments",
+              "headers",
+              "tags",
+              "template_id",
+              "template_data",
+              "body",
+              "media_urls",
+              "messaging_service",
+              "status_callback_url"
+            ],
+            "description": "A part of a message a request can carry; email and SMS use their own parts."
+          },
+          "ProviderOperation": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderOperationKind",
+                "description": "What the request does, from the kinds SendMock can run.",
+                "examples": [
+                  "send"
+                ]
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path at the provider's API, with `{name}` for variable parts.",
+                "examples": [
+                  "/v3/{domain}/messages"
+                ]
+              },
+              "request_format": {
+                "type": "string",
+                "enum": [
+                  "json",
+                  "form",
+                  "multipart",
+                  "query"
+                ],
+                "description": "How the request body is sent: `json`, `form`, `multipart`, or `query` for none.",
+                "examples": [
+                  "multipart"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "method",
+              "path",
+              "request_format"
+            ],
+            "description": "One request the provider answers."
+          },
+          "ProviderOperationKind": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EmailProviderOperationKind"
+              },
+              {
+                "$ref": "#/$defs/SmsProviderOperationKind"
+              }
+            ]
+          },
+          "ProviderResponseTemplate": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "headers",
+              "body"
+            ],
+            "description": "What the provider answers: a status, headers and a body template."
+          },
+          "ProviderSampleRequest": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path as your app would call it.",
+                "examples": [
+                  "/v3/mail/send"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "The request headers.",
+                "examples": [
+                  {
+                    "content-type": "application/json",
+                    "authorization": "Bearer SG.test_key_123"
+                  }
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The raw request body.",
+                "examples": [
+                  "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+                ]
+              }
+            },
+            "required": [
+              "method",
+              "path",
+              "headers",
+              "body"
+            ],
+            "description": "A request to run through a provider in the preview."
+          },
+          "ProviderValidationRule": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message checked.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "check": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "email_address",
+                  "e164_number",
+                  "max_length"
+                ],
+                "description": "The check: present, an email address, an E.164 number, or at most `max_length` characters.",
+                "examples": [
+                  "required"
+                ]
+              },
+              "max_length": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The longest value allowed, for `max_length`; null otherwise.",
+                "examples": [
+                  null
+                ]
+              },
+              "error_kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The error answered when the check fails.",
+                "examples": [
+                  "missing_field"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "check",
+              "max_length",
+              "error_kind"
+            ],
+            "description": "A check on a request, and the error it answers when the check fails."
+          },
+          "SmsProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "fetch",
+              "list",
+              "cancel",
+              "start_verification",
+              "check_verification"
+            ],
+            "description": "The SMS requests SendMock knows how to run (a new kind needs code)."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider_key": "twilio",
+        "provider": {
+          "key": "sendgrid",
+          "name": "SendGrid",
+          "accent": "#1a82e2",
+          "is_enabled": true,
+          "host": "api.sendgrid.com",
+          "credentials": [
+            {
+              "name": "api_key",
+              "value": "SG.test_key_123",
+              "is_secret": true
+            }
+          ],
+          "check_credentials": false,
+          "operations": [
+            {
+              "kind": "send",
+              "method": "POST",
+              "path": "/v3/{domain}/messages",
+              "request_format": "multipart"
+            }
+          ],
+          "field_mapping": [
+            {
+              "part": "to",
+              "source": "personalizations[0].to[*].email"
+            }
+          ],
+          "validation_rules": [
+            {
+              "part": "to",
+              "check": "required",
+              "max_length": null,
+              "error_kind": "missing_field"
+            }
+          ],
+          "success_response": {
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          },
+          "error_responses": [
+            {
+              "kind": "missing_field",
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            }
+          ],
+          "message_id_template": "<{{ uuid() }}@sendmock.local>",
+          "callback_template_key": "sendgrid-event",
+          "status_names": {
+            "delivered": "delivered",
+            "bounced": "bounce",
+            "complained": "spamreport"
+          },
+          "outcome_error_codes": {
+            "invalid_number": "21211",
+            "unreachable": "30003"
+          }
+        }
+      },
+      "output": "MessageProviderPreview",
+      "cli": [
+        "sendmock email providers preview <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > provider > Preview"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_reset",
+      "toolset": "email",
+      "summary": "Put a built-in provider back as shipped.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/providers/{providerKey}/reset",
+          "operation_id": "postEmailsProvidersByProviderKeyReset",
+          "summary": "Put a built-in provider back as shipped.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock email providers reset <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > provider > Reset to default"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_restore",
+      "toolset": "email",
+      "summary": "Bring a removed built-in back as it was.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/providers/{providerKey}/restore",
+          "operation_id": "postEmailsProvidersByProviderKeyRestore",
+          "summary": "Bring a removed built-in back as it was.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock email providers restore <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > Removed > Restore"
+      ]
+    },
+    {
+      "name": "sendmock_email_provider_update",
+      "toolset": "email",
+      "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+      "area": "Email providers",
+      "area_slug": "email-providers",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/emails/providers/{providerKey}",
+          "operation_id": "patchEmailsProvidersByProviderKey",
+          "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+          "area_slug": "email-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        },
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+          "example": "sendgrid"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's name, shown on messages and in pickers.",
+          "example": "SendGrid"
+        },
+        {
+          "name": "accent",
+          "input": {
+            "name": "accent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "`#rrggbb`, used on its badge.",
+          "example": "#1a82e2"
+        },
+        {
+          "name": "is_enabled",
+          "input": {
+            "name": "is_enabled",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+          "example": true
+        },
+        {
+          "name": "host",
+          "input": {
+            "name": "host",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+          "example": "api.sendgrid.com"
+        },
+        {
+          "name": "credentials",
+          "input": {
+            "name": "credentials",
+            "location": "body"
+          },
+          "type": "ProviderCredential[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The credentials your app is configured with.",
+          "example": [
+            {
+              "name": "api_key",
+              "value": "SG.test_key_123",
+              "is_secret": true
+            }
+          ]
+        },
+        {
+          "name": "check_credentials",
+          "input": {
+            "name": "check_credentials",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "name": "operations",
+          "input": {
+            "name": "operations",
+            "location": "body"
+          },
+          "type": "ProviderOperation[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The requests it answers.",
+          "example": [
+            {
+              "kind": "send",
+              "method": "POST",
+              "path": "/v3/{domain}/messages",
+              "request_format": "multipart"
+            }
+          ]
+        },
+        {
+          "name": "field_mapping",
+          "input": {
+            "name": "field_mapping",
+            "location": "body"
+          },
+          "type": "ProviderFieldMapping[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
+          "example": [
+            {
+              "part": "to",
+              "source": "personalizations[0].to[*].email"
+            }
+          ]
+        },
+        {
+          "name": "validation_rules",
+          "input": {
+            "name": "validation_rules",
+            "location": "body"
+          },
+          "type": "ProviderValidationRule[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The checks run on each send, in order.",
+          "example": [
+            {
+              "part": "to",
+              "check": "required",
+              "max_length": null,
+              "error_kind": "missing_field"
+            }
+          ]
+        },
+        {
+          "name": "success_response",
+          "input": {
+            "name": "success_response",
+            "location": "body"
+          },
+          "type": "ProviderResponseTemplate",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The answer to a request that passes every check.",
+          "example": {
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          }
+        },
+        {
+          "name": "error_responses",
+          "input": {
+            "name": "error_responses",
+            "location": "body"
+          },
+          "type": "ProviderErrorResponse[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The answer for each kind of error.",
+          "example": [
+            {
+              "kind": "missing_field",
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            }
+          ]
+        },
+        {
+          "name": "message_id_template",
+          "input": {
+            "name": "message_id_template",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's id for each message, a template.",
+          "example": "<{{ uuid() }}@sendmock.local>"
+        },
+        {
+          "name": "callback_template_key",
+          "input": {
+            "name": "callback_template_key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+          "example": "sendgrid-event"
+        },
+        {
+          "name": "status_names",
+          "input": {
+            "name": "status_names",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's name for each SendMock status.",
+          "example": {
+            "delivered": "delivered",
+            "bounced": "bounce",
+            "complained": "spamreport"
+          }
+        },
+        {
+          "name": "outcome_error_codes",
+          "input": {
+            "name": "outcome_error_codes",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+          "example": {
+            "invalid_number": "21211",
+            "unreachable": "30003"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+            "examples": [
+              "sendgrid"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The provider's name, shown on messages and in pickers.",
+            "examples": [
+              "SendGrid"
+            ]
+          },
+          "accent": {
+            "type": "string",
+            "description": "`#rrggbb`, used on its badge.",
+            "examples": [
+              "#1a82e2"
+            ]
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+            "examples": [
+              true
+            ]
+          },
+          "host": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+            "examples": [
+              "api.sendgrid.com"
+            ]
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderCredential"
+            },
+            "description": "The credentials your app is configured with.",
+            "examples": [
+              [
+                {
+                  "name": "api_key",
+                  "value": "SG.test_key_123",
+                  "is_secret": true
+                }
+              ]
+            ]
+          },
+          "check_credentials": {
+            "type": "boolean",
+            "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderOperation"
+            },
+            "description": "The requests it answers.",
+            "examples": [
+              [
+                {
+                  "kind": "send",
+                  "method": "POST",
+                  "path": "/v3/{domain}/messages",
+                  "request_format": "multipart"
+                }
+              ]
+            ]
+          },
+          "field_mapping": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderFieldMapping"
+            },
+            "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
+            "examples": [
+              [
+                {
+                  "part": "to",
+                  "source": "personalizations[0].to[*].email"
+                }
+              ]
+            ]
+          },
+          "validation_rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderValidationRule"
+            },
+            "description": "The checks run on each send, in order.",
+            "examples": [
+              [
+                {
+                  "part": "to",
+                  "check": "required",
+                  "max_length": null,
+                  "error_kind": "missing_field"
+                }
+              ]
+            ]
+          },
+          "success_response": {
+            "$ref": "#/$defs/ProviderResponseTemplate",
+            "description": "The answer to a request that passes every check.",
+            "examples": [
+              {
+                "status": 202,
+                "headers": [
+                  {
+                    "name": "X-Message-Id",
+                    "template": "{{ message.provider_id }}"
+                  }
+                ],
+                "body": "{\"id\": \"{{ message.provider_id }}\"}"
+              }
+            ]
+          },
+          "error_responses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderErrorResponse"
+            },
+            "description": "The answer for each kind of error.",
+            "examples": [
+              [
+                {
+                  "kind": "missing_field",
+                  "status": 202,
+                  "headers": [
+                    {
+                      "name": "X-Message-Id",
+                      "template": "{{ message.provider_id }}"
+                    }
+                  ],
+                  "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                }
+              ]
+            ]
+          },
+          "message_id_template": {
+            "type": "string",
+            "description": "The provider's id for each message, a template.",
+            "examples": [
+              "<{{ uuid() }}@sendmock.local>"
+            ]
+          },
+          "callback_template_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+            "examples": [
+              "sendgrid-event"
+            ]
+          },
+          "status_names": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The provider's name for each SendMock status.",
+            "examples": [
+              {
+                "delivered": "delivered",
+                "bounced": "bounce",
+                "complained": "spamreport"
+              }
+            ]
+          },
+          "outcome_error_codes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+            "examples": [
+              {
+                "invalid_number": "21211",
+                "unreachable": "30003"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider_key",
+          "key",
+          "name",
+          "accent",
+          "is_enabled",
+          "credentials",
+          "check_credentials",
+          "operations",
+          "field_mapping",
+          "validation_rules",
+          "success_response",
+          "error_responses",
+          "message_id_template",
+          "status_names",
+          "outcome_error_codes"
+        ],
+        "$defs": {
+          "EmailProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "send_batch",
+              "send_with_template",
+              "fetch"
+            ],
+            "description": "The email requests SendMock knows how to run (a new kind needs code)."
+          },
+          "ProviderCredential": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The credential's name, readable in templates as `credentials.<name>`.",
+                "examples": [
+                  "api_key"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "description": "The value; a secret comes back masked, and sending the masked value back keeps the stored one.",
+                "examples": [
+                  "SG.test_key_123"
+                ]
+              },
+              "is_secret": {
+                "type": "boolean",
+                "description": "Masks the value in the UI, API answers, logs and MCP output.",
+                "examples": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value",
+              "is_secret"
+            ],
+            "description": "A credential your app is configured with; a secret's value comes back masked (`••••` and the last 4)."
+          },
+          "ProviderErrorKind": {
+            "type": "string",
+            "enum": [
+              "missing_field",
+              "invalid_value",
+              "unauthorized",
+              "not_found",
+              "rate_limited"
+            ],
+            "description": "The kinds of error a provider answers with its own shape."
+          },
+          "ProviderErrorResponse": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The kind of error this response answers.",
+                "examples": [
+                  "missing_field"
+                ]
+              },
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "body",
+              "headers",
+              "kind",
+              "status"
+            ],
+            "description": "The answer for one kind of error."
+          },
+          "ProviderFieldMapping": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "description": "The request path it is read from: a JSON path, a form field or a query parameter.",
+                "examples": [
+                  "personalizations[0].to[*].email"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "source"
+            ],
+            "description": "Where one part of a sent message is read from in the request."
+          },
+          "ProviderHeaderTemplate": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The header name.",
+                "examples": [
+                  "X-Message-Id"
+                ]
+              },
+              "template": {
+                "type": "string",
+                "description": "The value, a template over the message and the request.",
+                "examples": [
+                  "{{ message.provider_id }}"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "template"
+            ],
+            "description": "A response header, from a template."
+          },
+          "ProviderMessagePart": {
+            "type": "string",
+            "enum": [
+              "from",
+              "to",
+              "cc",
+              "bcc",
+              "reply_to",
+              "subject",
+              "text",
+              "html",
+              "attachments",
+              "headers",
+              "tags",
+              "template_id",
+              "template_data",
+              "body",
+              "media_urls",
+              "messaging_service",
+              "status_callback_url"
+            ],
+            "description": "A part of a message a request can carry; email and SMS use their own parts."
+          },
+          "ProviderOperation": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderOperationKind",
+                "description": "What the request does, from the kinds SendMock can run.",
+                "examples": [
+                  "send"
+                ]
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path at the provider's API, with `{name}` for variable parts.",
+                "examples": [
+                  "/v3/{domain}/messages"
+                ]
+              },
+              "request_format": {
+                "type": "string",
+                "enum": [
+                  "json",
+                  "form",
+                  "multipart",
+                  "query"
+                ],
+                "description": "How the request body is sent: `json`, `form`, `multipart`, or `query` for none.",
+                "examples": [
+                  "multipart"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "method",
+              "path",
+              "request_format"
+            ],
+            "description": "One request the provider answers."
+          },
+          "ProviderOperationKind": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EmailProviderOperationKind"
+              },
+              {
+                "$ref": "#/$defs/SmsProviderOperationKind"
+              }
+            ]
+          },
+          "ProviderResponseTemplate": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "headers",
+              "body"
+            ],
+            "description": "What the provider answers: a status, headers and a body template."
+          },
+          "ProviderValidationRule": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message checked.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "check": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "email_address",
+                  "e164_number",
+                  "max_length"
+                ],
+                "description": "The check: present, an email address, an E.164 number, or at most `max_length` characters.",
+                "examples": [
+                  "required"
+                ]
+              },
+              "max_length": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The longest value allowed, for `max_length`; null otherwise.",
+                "examples": [
+                  null
+                ]
+              },
+              "error_kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The error answered when the check fails.",
+                "examples": [
+                  "missing_field"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "check",
+              "max_length",
+              "error_kind"
+            ],
+            "description": "A check on a request, and the error it answers when the check fails."
+          },
+          "SmsProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "fetch",
+              "list",
+              "cancel",
+              "start_verification",
+              "check_verification"
+            ],
+            "description": "The SMS requests SendMock knows how to run (a new kind needs code)."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider_key": "twilio",
+        "key": "sendgrid",
+        "name": "SendGrid",
+        "accent": "#1a82e2",
+        "is_enabled": true,
+        "credentials": [
+          {
+            "name": "api_key",
+            "value": "SG.test_key_123",
+            "is_secret": true
+          }
+        ],
+        "check_credentials": false,
+        "operations": [
+          {
+            "kind": "send",
+            "method": "POST",
+            "path": "/v3/{domain}/messages",
+            "request_format": "multipart"
+          }
+        ],
+        "field_mapping": [
+          {
+            "part": "to",
+            "source": "personalizations[0].to[*].email"
+          }
+        ],
+        "validation_rules": [
+          {
+            "part": "to",
+            "check": "required",
+            "max_length": null,
+            "error_kind": "missing_field"
+          }
+        ],
+        "success_response": {
+          "status": 202,
+          "headers": [
+            {
+              "name": "X-Message-Id",
+              "template": "{{ message.provider_id }}"
+            }
+          ],
+          "body": "{\"id\": \"{{ message.provider_id }}\"}"
+        },
+        "error_responses": [
+          {
+            "kind": "missing_field",
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          }
+        ],
+        "message_id_template": "<{{ uuid() }}@sendmock.local>",
+        "status_names": {
+          "delivered": "delivered",
+          "bounced": "bounce",
+          "complained": "spamreport"
+        },
+        "outcome_error_codes": {
+          "invalid_number": "21211",
+          "unreachable": "30003"
+        },
+        "host": "api.sendgrid.com",
+        "callback_template_key": "sendgrid-event"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock email providers update <providerKey>"
+      ],
+      "ui": [
+        "Mail > Providers > provider > Save provider"
       ]
     },
     {
@@ -14911,6 +17038,2155 @@
       ]
     },
     {
+      "name": "sendmock_sms_provider_create",
+      "toolset": "sms",
+      "summary": "Add a sms provider, blank or copied from another.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/providers",
+          "operation_id": "postSmsProviders",
+          "summary": "Add a sms provider, blank or copied from another.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The new provider's name.",
+          "example": "SSL Wireless"
+        },
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Its key in `/providers/<key>/...` paths and on messages; lowercase, fixed after creation.",
+          "example": "sslwireless"
+        },
+        {
+          "name": "start_from",
+          "input": {
+            "name": "start_from",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A provider of the same area to copy, or null to start blank.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The new provider's name.",
+            "examples": [
+              "SSL Wireless"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "Its key in `/providers/<key>/...` paths and on messages; lowercase, fixed after creation.",
+            "examples": [
+              "sslwireless"
+            ]
+          },
+          "start_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "A provider of the same area to copy, or null to start blank.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "key"
+        ]
+      },
+      "example_arguments": {
+        "name": "SSL Wireless",
+        "key": "sslwireless",
+        "start_from": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock sms providers create"
+      ],
+      "ui": [
+        "SMS > Providers > Add provider"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_delete",
+      "toolset": "sms",
+      "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/providers/{providerKey}",
+          "operation_id": "deleteSmsProvidersByProviderKey",
+          "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms providers delete <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > provider > Remove or Delete"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_get",
+      "toolset": "sms",
+      "summary": "One provider definition; secret credentials masked.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/providers/{providerKey}",
+          "operation_id": "getSmsProvidersByProviderKey",
+          "summary": "One provider definition; secret credentials masked.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock sms providers show <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > provider"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_list",
+      "toolset": "sms",
+      "summary": "SMS providers, built in and custom, removed ones included.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/providers",
+          "operation_id": "getSmsProviders",
+          "summary": "SMS providers, built in and custom, removed ones included.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "MessageProviderDefinition[]",
+      "cli": [
+        "sendmock sms providers list"
+      ],
+      "ui": [
+        "SMS > Providers"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_preview",
+      "toolset": "sms",
+      "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/providers/{providerKey}/preview",
+          "operation_id": "postSmsProvidersByProviderKeyPreview",
+          "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "MessageProviderInput",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider settings to run, saved or not.",
+          "example": {
+            "key": "sendgrid",
+            "name": "SendGrid",
+            "accent": "#1a82e2",
+            "is_enabled": true,
+            "host": "api.sendgrid.com",
+            "credentials": [
+              {
+                "name": "api_key",
+                "value": "SG.test_key_123",
+                "is_secret": true
+              }
+            ],
+            "check_credentials": false,
+            "operations": [
+              {
+                "kind": "send",
+                "method": "POST",
+                "path": "/v3/{domain}/messages",
+                "request_format": "multipart"
+              }
+            ],
+            "field_mapping": [
+              {
+                "part": "to",
+                "source": "personalizations[0].to[*].email"
+              }
+            ],
+            "validation_rules": [
+              {
+                "part": "to",
+                "check": "required",
+                "max_length": null,
+                "error_kind": "missing_field"
+              }
+            ],
+            "success_response": {
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            },
+            "error_responses": [
+              {
+                "kind": "missing_field",
+                "status": 202,
+                "headers": [
+                  {
+                    "name": "X-Message-Id",
+                    "template": "{{ message.provider_id }}"
+                  }
+                ],
+                "body": "{\"id\": \"{{ message.provider_id }}\"}"
+              }
+            ],
+            "message_id_template": "<{{ uuid() }}@sendmock.local>",
+            "callback_template_key": "sendgrid-event",
+            "status_names": {
+              "delivered": "delivered",
+              "bounced": "bounce",
+              "complained": "spamreport"
+            },
+            "outcome_error_codes": {
+              "invalid_number": "21211",
+              "unreachable": "30003"
+            }
+          }
+        },
+        {
+          "name": "sample_request",
+          "input": {
+            "name": "sample_request",
+            "location": "body"
+          },
+          "type": "ProviderSampleRequest",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The request to run; the provider's example send when left out.",
+          "example": {
+            "method": "POST",
+            "path": "/v3/mail/send",
+            "headers": {
+              "content-type": "application/json",
+              "authorization": "Bearer SG.test_key_123"
+            },
+            "body": "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/MessageProviderInput",
+            "description": "The provider settings to run, saved or not.",
+            "examples": [
+              {
+                "key": "sendgrid",
+                "name": "SendGrid",
+                "accent": "#1a82e2",
+                "is_enabled": true,
+                "host": "api.sendgrid.com",
+                "credentials": [
+                  {
+                    "name": "api_key",
+                    "value": "SG.test_key_123",
+                    "is_secret": true
+                  }
+                ],
+                "check_credentials": false,
+                "operations": [
+                  {
+                    "kind": "send",
+                    "method": "POST",
+                    "path": "/v3/{domain}/messages",
+                    "request_format": "multipart"
+                  }
+                ],
+                "field_mapping": [
+                  {
+                    "part": "to",
+                    "source": "personalizations[0].to[*].email"
+                  }
+                ],
+                "validation_rules": [
+                  {
+                    "part": "to",
+                    "check": "required",
+                    "max_length": null,
+                    "error_kind": "missing_field"
+                  }
+                ],
+                "success_response": {
+                  "status": 202,
+                  "headers": [
+                    {
+                      "name": "X-Message-Id",
+                      "template": "{{ message.provider_id }}"
+                    }
+                  ],
+                  "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                },
+                "error_responses": [
+                  {
+                    "kind": "missing_field",
+                    "status": 202,
+                    "headers": [
+                      {
+                        "name": "X-Message-Id",
+                        "template": "{{ message.provider_id }}"
+                      }
+                    ],
+                    "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                  }
+                ],
+                "message_id_template": "<{{ uuid() }}@sendmock.local>",
+                "callback_template_key": "sendgrid-event",
+                "status_names": {
+                  "delivered": "delivered",
+                  "bounced": "bounce",
+                  "complained": "spamreport"
+                },
+                "outcome_error_codes": {
+                  "invalid_number": "21211",
+                  "unreachable": "30003"
+                }
+              }
+            ]
+          },
+          "sample_request": {
+            "$ref": "#/$defs/ProviderSampleRequest",
+            "description": "The request to run; the provider's example send when left out.",
+            "examples": [
+              {
+                "method": "POST",
+                "path": "/v3/mail/send",
+                "headers": {
+                  "content-type": "application/json",
+                  "authorization": "Bearer SG.test_key_123"
+                },
+                "body": "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider_key",
+          "provider"
+        ],
+        "$defs": {
+          "EmailProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "send_batch",
+              "send_with_template",
+              "fetch"
+            ],
+            "description": "The email requests SendMock knows how to run (a new kind needs code)."
+          },
+          "MessageProviderInput": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+                "examples": [
+                  "sendgrid"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "description": "The provider's name, shown on messages and in pickers.",
+                "examples": [
+                  "SendGrid"
+                ]
+              },
+              "accent": {
+                "type": "string",
+                "description": "`#rrggbb`, used on its badge.",
+                "examples": [
+                  "#1a82e2"
+                ]
+              },
+              "is_enabled": {
+                "type": "boolean",
+                "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+                "examples": [
+                  true
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+                "examples": [
+                  "api.sendgrid.com"
+                ]
+              },
+              "credentials": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderCredential"
+                },
+                "description": "The credentials your app is configured with."
+              },
+              "check_credentials": {
+                "type": "boolean",
+                "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+                "examples": [
+                  false
+                ]
+              },
+              "operations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderOperation"
+                },
+                "description": "The requests it answers."
+              },
+              "field_mapping": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderFieldMapping"
+                },
+                "description": "Where each part of a sent message is read from; anything else is kept as metadata."
+              },
+              "validation_rules": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderValidationRule"
+                },
+                "description": "The checks run on each send, in order."
+              },
+              "success_response": {
+                "$ref": "#/$defs/ProviderResponseTemplate",
+                "description": "The answer to a request that passes every check."
+              },
+              "error_responses": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderErrorResponse"
+                },
+                "description": "The answer for each kind of error."
+              },
+              "message_id_template": {
+                "type": "string",
+                "description": "The provider's id for each message, a template.",
+                "examples": [
+                  "<{{ uuid() }}@sendmock.local>"
+                ]
+              },
+              "callback_template_key": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+                "examples": [
+                  "sendgrid-event"
+                ]
+              },
+              "status_names": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "The provider's name for each SendMock status.",
+                "examples": [
+                  {
+                    "delivered": "delivered",
+                    "bounced": "bounce",
+                    "complained": "spamreport"
+                  }
+                ]
+              },
+              "outcome_error_codes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+                "examples": [
+                  {
+                    "invalid_number": "21211",
+                    "unreachable": "30003"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "accent",
+              "is_enabled",
+              "host",
+              "credentials",
+              "check_credentials",
+              "operations",
+              "field_mapping",
+              "validation_rules",
+              "success_response",
+              "error_responses",
+              "message_id_template",
+              "callback_template_key",
+              "status_names",
+              "outcome_error_codes"
+            ],
+            "description": "Body of PATCH .../providers/{providerKey}; the key and area are fixed."
+          },
+          "ProviderCredential": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The credential's name, readable in templates as `credentials.<name>`.",
+                "examples": [
+                  "api_key"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "description": "The value; a secret comes back masked, and sending the masked value back keeps the stored one.",
+                "examples": [
+                  "SG.test_key_123"
+                ]
+              },
+              "is_secret": {
+                "type": "boolean",
+                "description": "Masks the value in the UI, API answers, logs and MCP output.",
+                "examples": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value",
+              "is_secret"
+            ],
+            "description": "A credential your app is configured with; a secret's value comes back masked (`••••` and the last 4)."
+          },
+          "ProviderErrorKind": {
+            "type": "string",
+            "enum": [
+              "missing_field",
+              "invalid_value",
+              "unauthorized",
+              "not_found",
+              "rate_limited"
+            ],
+            "description": "The kinds of error a provider answers with its own shape."
+          },
+          "ProviderErrorResponse": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The kind of error this response answers.",
+                "examples": [
+                  "missing_field"
+                ]
+              },
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "body",
+              "headers",
+              "kind",
+              "status"
+            ],
+            "description": "The answer for one kind of error."
+          },
+          "ProviderFieldMapping": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "description": "The request path it is read from: a JSON path, a form field or a query parameter.",
+                "examples": [
+                  "personalizations[0].to[*].email"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "source"
+            ],
+            "description": "Where one part of a sent message is read from in the request."
+          },
+          "ProviderHeaderTemplate": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The header name.",
+                "examples": [
+                  "X-Message-Id"
+                ]
+              },
+              "template": {
+                "type": "string",
+                "description": "The value, a template over the message and the request.",
+                "examples": [
+                  "{{ message.provider_id }}"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "template"
+            ],
+            "description": "A response header, from a template."
+          },
+          "ProviderMessagePart": {
+            "type": "string",
+            "enum": [
+              "from",
+              "to",
+              "cc",
+              "bcc",
+              "reply_to",
+              "subject",
+              "text",
+              "html",
+              "attachments",
+              "headers",
+              "tags",
+              "template_id",
+              "template_data",
+              "body",
+              "media_urls",
+              "messaging_service",
+              "status_callback_url"
+            ],
+            "description": "A part of a message a request can carry; email and SMS use their own parts."
+          },
+          "ProviderOperation": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderOperationKind",
+                "description": "What the request does, from the kinds SendMock can run.",
+                "examples": [
+                  "send"
+                ]
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path at the provider's API, with `{name}` for variable parts.",
+                "examples": [
+                  "/v3/{domain}/messages"
+                ]
+              },
+              "request_format": {
+                "type": "string",
+                "enum": [
+                  "json",
+                  "form",
+                  "multipart",
+                  "query"
+                ],
+                "description": "How the request body is sent: `json`, `form`, `multipart`, or `query` for none.",
+                "examples": [
+                  "multipart"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "method",
+              "path",
+              "request_format"
+            ],
+            "description": "One request the provider answers."
+          },
+          "ProviderOperationKind": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EmailProviderOperationKind"
+              },
+              {
+                "$ref": "#/$defs/SmsProviderOperationKind"
+              }
+            ]
+          },
+          "ProviderResponseTemplate": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "headers",
+              "body"
+            ],
+            "description": "What the provider answers: a status, headers and a body template."
+          },
+          "ProviderSampleRequest": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path as your app would call it.",
+                "examples": [
+                  "/v3/mail/send"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "The request headers.",
+                "examples": [
+                  {
+                    "content-type": "application/json",
+                    "authorization": "Bearer SG.test_key_123"
+                  }
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The raw request body.",
+                "examples": [
+                  "{\"personalizations\": [{\"to\": [{\"email\": \"ana@example.test\"}]}], \"from\": {\"email\": \"app@example.test\"}, \"subject\": \"Welcome\", \"content\": [{\"type\": \"text/plain\", \"value\": \"Hi\"}]}"
+                ]
+              }
+            },
+            "required": [
+              "method",
+              "path",
+              "headers",
+              "body"
+            ],
+            "description": "A request to run through a provider in the preview."
+          },
+          "ProviderValidationRule": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message checked.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "check": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "email_address",
+                  "e164_number",
+                  "max_length"
+                ],
+                "description": "The check: present, an email address, an E.164 number, or at most `max_length` characters.",
+                "examples": [
+                  "required"
+                ]
+              },
+              "max_length": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The longest value allowed, for `max_length`; null otherwise.",
+                "examples": [
+                  null
+                ]
+              },
+              "error_kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The error answered when the check fails.",
+                "examples": [
+                  "missing_field"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "check",
+              "max_length",
+              "error_kind"
+            ],
+            "description": "A check on a request, and the error it answers when the check fails."
+          },
+          "SmsProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "fetch",
+              "list",
+              "cancel",
+              "start_verification",
+              "check_verification"
+            ],
+            "description": "The SMS requests SendMock knows how to run (a new kind needs code)."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider_key": "twilio",
+        "provider": {
+          "key": "sendgrid",
+          "name": "SendGrid",
+          "accent": "#1a82e2",
+          "is_enabled": true,
+          "host": "api.sendgrid.com",
+          "credentials": [
+            {
+              "name": "api_key",
+              "value": "SG.test_key_123",
+              "is_secret": true
+            }
+          ],
+          "check_credentials": false,
+          "operations": [
+            {
+              "kind": "send",
+              "method": "POST",
+              "path": "/v3/{domain}/messages",
+              "request_format": "multipart"
+            }
+          ],
+          "field_mapping": [
+            {
+              "part": "to",
+              "source": "personalizations[0].to[*].email"
+            }
+          ],
+          "validation_rules": [
+            {
+              "part": "to",
+              "check": "required",
+              "max_length": null,
+              "error_kind": "missing_field"
+            }
+          ],
+          "success_response": {
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          },
+          "error_responses": [
+            {
+              "kind": "missing_field",
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            }
+          ],
+          "message_id_template": "<{{ uuid() }}@sendmock.local>",
+          "callback_template_key": "sendgrid-event",
+          "status_names": {
+            "delivered": "delivered",
+            "bounced": "bounce",
+            "complained": "spamreport"
+          },
+          "outcome_error_codes": {
+            "invalid_number": "21211",
+            "unreachable": "30003"
+          }
+        }
+      },
+      "output": "MessageProviderPreview",
+      "cli": [
+        "sendmock sms providers preview <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > provider > Preview"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_reset",
+      "toolset": "sms",
+      "summary": "Put a built-in provider back as shipped.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/providers/{providerKey}/reset",
+          "operation_id": "postSmsProvidersByProviderKeyReset",
+          "summary": "Put a built-in provider back as shipped.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock sms providers reset <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > provider > Reset to default"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_restore",
+      "toolset": "sms",
+      "summary": "Bring a removed built-in back as it was.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/providers/{providerKey}/restore",
+          "operation_id": "postSmsProvidersByProviderKeyRestore",
+          "summary": "Bring a removed built-in back as it was.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "provider_key": "twilio"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock sms providers restore <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > Removed > Restore"
+      ]
+    },
+    {
+      "name": "sendmock_sms_provider_update",
+      "toolset": "sms",
+      "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/sms/providers/{providerKey}",
+          "operation_id": "patchSmsProvidersByProviderKey",
+          "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "example": "twilio"
+        },
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+          "example": "sendgrid"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's name, shown on messages and in pickers.",
+          "example": "SendGrid"
+        },
+        {
+          "name": "accent",
+          "input": {
+            "name": "accent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "`#rrggbb`, used on its badge.",
+          "example": "#1a82e2"
+        },
+        {
+          "name": "is_enabled",
+          "input": {
+            "name": "is_enabled",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+          "example": true
+        },
+        {
+          "name": "host",
+          "input": {
+            "name": "host",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+          "example": "api.sendgrid.com"
+        },
+        {
+          "name": "credentials",
+          "input": {
+            "name": "credentials",
+            "location": "body"
+          },
+          "type": "ProviderCredential[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The credentials your app is configured with.",
+          "example": [
+            {
+              "name": "api_key",
+              "value": "SG.test_key_123",
+              "is_secret": true
+            }
+          ]
+        },
+        {
+          "name": "check_credentials",
+          "input": {
+            "name": "check_credentials",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "name": "operations",
+          "input": {
+            "name": "operations",
+            "location": "body"
+          },
+          "type": "ProviderOperation[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The requests it answers.",
+          "example": [
+            {
+              "kind": "send",
+              "method": "POST",
+              "path": "/v3/{domain}/messages",
+              "request_format": "multipart"
+            }
+          ]
+        },
+        {
+          "name": "field_mapping",
+          "input": {
+            "name": "field_mapping",
+            "location": "body"
+          },
+          "type": "ProviderFieldMapping[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
+          "example": [
+            {
+              "part": "to",
+              "source": "personalizations[0].to[*].email"
+            }
+          ]
+        },
+        {
+          "name": "validation_rules",
+          "input": {
+            "name": "validation_rules",
+            "location": "body"
+          },
+          "type": "ProviderValidationRule[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The checks run on each send, in order.",
+          "example": [
+            {
+              "part": "to",
+              "check": "required",
+              "max_length": null,
+              "error_kind": "missing_field"
+            }
+          ]
+        },
+        {
+          "name": "success_response",
+          "input": {
+            "name": "success_response",
+            "location": "body"
+          },
+          "type": "ProviderResponseTemplate",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The answer to a request that passes every check.",
+          "example": {
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          }
+        },
+        {
+          "name": "error_responses",
+          "input": {
+            "name": "error_responses",
+            "location": "body"
+          },
+          "type": "ProviderErrorResponse[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The answer for each kind of error.",
+          "example": [
+            {
+              "kind": "missing_field",
+              "status": 202,
+              "headers": [
+                {
+                  "name": "X-Message-Id",
+                  "template": "{{ message.provider_id }}"
+                }
+              ],
+              "body": "{\"id\": \"{{ message.provider_id }}\"}"
+            }
+          ]
+        },
+        {
+          "name": "message_id_template",
+          "input": {
+            "name": "message_id_template",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's id for each message, a template.",
+          "example": "<{{ uuid() }}@sendmock.local>"
+        },
+        {
+          "name": "callback_template_key",
+          "input": {
+            "name": "callback_template_key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+          "example": "sendgrid-event"
+        },
+        {
+          "name": "status_names",
+          "input": {
+            "name": "status_names",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's name for each SendMock status.",
+          "example": {
+            "delivered": "delivered",
+            "bounced": "bounce",
+            "complained": "spamreport"
+          }
+        },
+        {
+          "name": "outcome_error_codes",
+          "input": {
+            "name": "outcome_error_codes",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+          "example": {
+            "invalid_number": "21211",
+            "unreachable": "30003"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
+            "examples": [
+              "sendgrid"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The provider's name, shown on messages and in pickers.",
+            "examples": [
+              "SendGrid"
+            ]
+          },
+          "accent": {
+            "type": "string",
+            "description": "`#rrggbb`, used on its badge.",
+            "examples": [
+              "#1a82e2"
+            ]
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "description": "Off providers answer nothing; their paths get SendMock's native 404.",
+            "examples": [
+              true
+            ]
+          },
+          "host": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.",
+            "examples": [
+              "api.sendgrid.com"
+            ]
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderCredential"
+            },
+            "description": "The credentials your app is configured with.",
+            "examples": [
+              [
+                {
+                  "name": "api_key",
+                  "value": "SG.test_key_123",
+                  "is_secret": true
+                }
+              ]
+            ]
+          },
+          "check_credentials": {
+            "type": "boolean",
+            "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderOperation"
+            },
+            "description": "The requests it answers.",
+            "examples": [
+              [
+                {
+                  "kind": "send",
+                  "method": "POST",
+                  "path": "/v3/{domain}/messages",
+                  "request_format": "multipart"
+                }
+              ]
+            ]
+          },
+          "field_mapping": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderFieldMapping"
+            },
+            "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
+            "examples": [
+              [
+                {
+                  "part": "to",
+                  "source": "personalizations[0].to[*].email"
+                }
+              ]
+            ]
+          },
+          "validation_rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderValidationRule"
+            },
+            "description": "The checks run on each send, in order.",
+            "examples": [
+              [
+                {
+                  "part": "to",
+                  "check": "required",
+                  "max_length": null,
+                  "error_kind": "missing_field"
+                }
+              ]
+            ]
+          },
+          "success_response": {
+            "$ref": "#/$defs/ProviderResponseTemplate",
+            "description": "The answer to a request that passes every check.",
+            "examples": [
+              {
+                "status": 202,
+                "headers": [
+                  {
+                    "name": "X-Message-Id",
+                    "template": "{{ message.provider_id }}"
+                  }
+                ],
+                "body": "{\"id\": \"{{ message.provider_id }}\"}"
+              }
+            ]
+          },
+          "error_responses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ProviderErrorResponse"
+            },
+            "description": "The answer for each kind of error.",
+            "examples": [
+              [
+                {
+                  "kind": "missing_field",
+                  "status": 202,
+                  "headers": [
+                    {
+                      "name": "X-Message-Id",
+                      "template": "{{ message.provider_id }}"
+                    }
+                  ],
+                  "body": "{\"id\": \"{{ message.provider_id }}\"}"
+                }
+              ]
+            ]
+          },
+          "message_id_template": {
+            "type": "string",
+            "description": "The provider's id for each message, a template.",
+            "examples": [
+              "<{{ uuid() }}@sendmock.local>"
+            ]
+          },
+          "callback_template_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The webhook template its status callbacks and inbound messages are sent with; null sends none.",
+            "examples": [
+              "sendgrid-event"
+            ]
+          },
+          "status_names": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The provider's name for each SendMock status.",
+            "examples": [
+              {
+                "delivered": "delivered",
+                "bounced": "bounce",
+                "complained": "spamreport"
+              }
+            ]
+          },
+          "outcome_error_codes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
+            "examples": [
+              {
+                "invalid_number": "21211",
+                "unreachable": "30003"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider_key",
+          "key",
+          "name",
+          "accent",
+          "is_enabled",
+          "credentials",
+          "check_credentials",
+          "operations",
+          "field_mapping",
+          "validation_rules",
+          "success_response",
+          "error_responses",
+          "message_id_template",
+          "status_names",
+          "outcome_error_codes"
+        ],
+        "$defs": {
+          "EmailProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "send_batch",
+              "send_with_template",
+              "fetch"
+            ],
+            "description": "The email requests SendMock knows how to run (a new kind needs code)."
+          },
+          "ProviderCredential": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The credential's name, readable in templates as `credentials.<name>`.",
+                "examples": [
+                  "api_key"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "description": "The value; a secret comes back masked, and sending the masked value back keeps the stored one.",
+                "examples": [
+                  "SG.test_key_123"
+                ]
+              },
+              "is_secret": {
+                "type": "boolean",
+                "description": "Masks the value in the UI, API answers, logs and MCP output.",
+                "examples": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value",
+              "is_secret"
+            ],
+            "description": "A credential your app is configured with; a secret's value comes back masked (`••••` and the last 4)."
+          },
+          "ProviderErrorKind": {
+            "type": "string",
+            "enum": [
+              "missing_field",
+              "invalid_value",
+              "unauthorized",
+              "not_found",
+              "rate_limited"
+            ],
+            "description": "The kinds of error a provider answers with its own shape."
+          },
+          "ProviderErrorResponse": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The kind of error this response answers.",
+                "examples": [
+                  "missing_field"
+                ]
+              },
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "body",
+              "headers",
+              "kind",
+              "status"
+            ],
+            "description": "The answer for one kind of error."
+          },
+          "ProviderFieldMapping": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "description": "The request path it is read from: a JSON path, a form field or a query parameter.",
+                "examples": [
+                  "personalizations[0].to[*].email"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "source"
+            ],
+            "description": "Where one part of a sent message is read from in the request."
+          },
+          "ProviderHeaderTemplate": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The header name.",
+                "examples": [
+                  "X-Message-Id"
+                ]
+              },
+              "template": {
+                "type": "string",
+                "description": "The value, a template over the message and the request.",
+                "examples": [
+                  "{{ message.provider_id }}"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "template"
+            ],
+            "description": "A response header, from a template."
+          },
+          "ProviderMessagePart": {
+            "type": "string",
+            "enum": [
+              "from",
+              "to",
+              "cc",
+              "bcc",
+              "reply_to",
+              "subject",
+              "text",
+              "html",
+              "attachments",
+              "headers",
+              "tags",
+              "template_id",
+              "template_data",
+              "body",
+              "media_urls",
+              "messaging_service",
+              "status_callback_url"
+            ],
+            "description": "A part of a message a request can carry; email and SMS use their own parts."
+          },
+          "ProviderOperation": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "$ref": "#/$defs/ProviderOperationKind",
+                "description": "What the request does, from the kinds SendMock can run.",
+                "examples": [
+                  "send"
+                ]
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ],
+                "description": "The HTTP method.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The path at the provider's API, with `{name}` for variable parts.",
+                "examples": [
+                  "/v3/{domain}/messages"
+                ]
+              },
+              "request_format": {
+                "type": "string",
+                "enum": [
+                  "json",
+                  "form",
+                  "multipart",
+                  "query"
+                ],
+                "description": "How the request body is sent: `json`, `form`, `multipart`, or `query` for none.",
+                "examples": [
+                  "multipart"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "method",
+              "path",
+              "request_format"
+            ],
+            "description": "One request the provider answers."
+          },
+          "ProviderOperationKind": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EmailProviderOperationKind"
+              },
+              {
+                "$ref": "#/$defs/SmsProviderOperationKind"
+              }
+            ]
+          },
+          "ProviderResponseTemplate": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "number",
+                "description": "The HTTP status code.",
+                "examples": [
+                  202
+                ]
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/ProviderHeaderTemplate"
+                },
+                "description": "Headers sent with the response."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, a template over the message, the request and the error.",
+                "examples": [
+                  "{\"id\": \"{{ message.provider_id }}\"}"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "headers",
+              "body"
+            ],
+            "description": "What the provider answers: a status, headers and a body template."
+          },
+          "ProviderValidationRule": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "$ref": "#/$defs/ProviderMessagePart",
+                "description": "The part of the message checked.",
+                "examples": [
+                  "to"
+                ]
+              },
+              "check": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "email_address",
+                  "e164_number",
+                  "max_length"
+                ],
+                "description": "The check: present, an email address, an E.164 number, or at most `max_length` characters.",
+                "examples": [
+                  "required"
+                ]
+              },
+              "max_length": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The longest value allowed, for `max_length`; null otherwise.",
+                "examples": [
+                  null
+                ]
+              },
+              "error_kind": {
+                "$ref": "#/$defs/ProviderErrorKind",
+                "description": "The error answered when the check fails.",
+                "examples": [
+                  "missing_field"
+                ]
+              }
+            },
+            "required": [
+              "part",
+              "check",
+              "max_length",
+              "error_kind"
+            ],
+            "description": "A check on a request, and the error it answers when the check fails."
+          },
+          "SmsProviderOperationKind": {
+            "type": "string",
+            "enum": [
+              "send",
+              "fetch",
+              "list",
+              "cancel",
+              "start_verification",
+              "check_verification"
+            ],
+            "description": "The SMS requests SendMock knows how to run (a new kind needs code)."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider_key": "twilio",
+        "key": "sendgrid",
+        "name": "SendGrid",
+        "accent": "#1a82e2",
+        "is_enabled": true,
+        "credentials": [
+          {
+            "name": "api_key",
+            "value": "SG.test_key_123",
+            "is_secret": true
+          }
+        ],
+        "check_credentials": false,
+        "operations": [
+          {
+            "kind": "send",
+            "method": "POST",
+            "path": "/v3/{domain}/messages",
+            "request_format": "multipart"
+          }
+        ],
+        "field_mapping": [
+          {
+            "part": "to",
+            "source": "personalizations[0].to[*].email"
+          }
+        ],
+        "validation_rules": [
+          {
+            "part": "to",
+            "check": "required",
+            "max_length": null,
+            "error_kind": "missing_field"
+          }
+        ],
+        "success_response": {
+          "status": 202,
+          "headers": [
+            {
+              "name": "X-Message-Id",
+              "template": "{{ message.provider_id }}"
+            }
+          ],
+          "body": "{\"id\": \"{{ message.provider_id }}\"}"
+        },
+        "error_responses": [
+          {
+            "kind": "missing_field",
+            "status": 202,
+            "headers": [
+              {
+                "name": "X-Message-Id",
+                "template": "{{ message.provider_id }}"
+              }
+            ],
+            "body": "{\"id\": \"{{ message.provider_id }}\"}"
+          }
+        ],
+        "message_id_template": "<{{ uuid() }}@sendmock.local>",
+        "status_names": {
+          "delivered": "delivered",
+          "bounced": "bounce",
+          "complained": "spamreport"
+        },
+        "outcome_error_codes": {
+          "invalid_number": "21211",
+          "unreachable": "30003"
+        },
+        "host": "api.sendgrid.com",
+        "callback_template_key": "sendgrid-event"
+      },
+      "output": "MessageProviderDefinition",
+      "cli": [
+        "sendmock sms providers update <providerKey>"
+      ],
+      "ui": [
+        "SMS > Providers > provider > Save provider"
+      ]
+    },
+    {
       "name": "sendmock_sms_reply_webhook_resend",
       "toolset": "sms",
       "summary": "Send an inbound message's reply webhook again.",
@@ -24750,6 +29026,30 @@
     }
   ],
   "exemptions": [
+    {
+      "operation": {
+        "method": "GET",
+        "path": "/api/v1/emails/providers/{providerKey}/credentials/{credentialName}",
+        "operation_id": "getEmailsProvidersByProviderKeyCredentialsByCredentialName",
+        "summary": "Reveal one secret credential (asked for after a confirmation).",
+        "area_slug": "email-providers",
+        "selector": null
+      },
+      "reason": "Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.",
+      "cli": "sendmock email providers credential <providerKey> <credentialName> --reveal"
+    },
+    {
+      "operation": {
+        "method": "GET",
+        "path": "/api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
+        "operation_id": "getSmsProvidersByProviderKeyCredentialsByCredentialName",
+        "summary": "Reveal one secret credential (asked for after a confirmation).",
+        "area_slug": "sms-providers",
+        "selector": null
+      },
+      "reason": "Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.",
+      "cli": "sendmock sms providers credential <providerKey> <credentialName> --reveal"
+    },
     {
       "operation": {
         "method": "GET",

@@ -23,7 +23,6 @@ const smsApiOptions: SmsApi[] = [
   "vonage",
   "plivo",
   "messagebird",
-  "generic",
 ];
 
 const pickerOptionsByKind: Partial<Record<RuleValueKind, string[]>> = {

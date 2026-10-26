@@ -1,14 +1,17 @@
 import type { SmsApi, SmsStatus } from "@/lib/api/types";
 
-/** Short names for the API a message was sent through. */
+/** Short names for the APIs SendMock ships; a custom provider shows its key. */
 export const smsApiLabels: Record<SmsApi, string> = {
   native: "Native",
   twilio: "Twilio",
   vonage: "Vonage",
   plivo: "Plivo",
   messagebird: "MessageBird",
-  generic: "Generic",
 };
+
+export function labelSmsApi(smsApi: SmsApi): string {
+  return smsApiLabels[smsApi] ?? smsApi;
+}
 
 /** Status names, plus "read" for delivered messages that fired `sms.opened`. */
 export const smsStatusLabels: Record<SmsStatus | "read", string> = {

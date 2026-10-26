@@ -9,7 +9,7 @@ import {
 } from "@/features/sms/conversation/sms-reply-webhook-line";
 import { SmsMediaGallery } from "@/features/sms/media/sms-media-gallery";
 import { useSmsOpenOnView } from "@/features/sms/conversation/use-sms-open-on-view";
-import { smsApiLabels } from "@/features/sms/sms-labels";
+import { labelSmsApi } from "@/features/sms/sms-labels";
 import { SmsStatusTicks } from "@/features/sms/sms-status-ticks";
 import type { SmsMessage } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format/format-values";
@@ -70,7 +70,7 @@ function SmsMessageMeta({ smsMessage }: { smsMessage: SmsMessage }) {
       )}
       {isOutbound && (
         <span className="rounded border px-1 text-[10px] uppercase">
-          {smsApiLabels[smsMessage.api]}
+          {labelSmsApi(smsMessage.api)}
         </span>
       )}
       {smsMessage.messaging_service_sid !== null && (
