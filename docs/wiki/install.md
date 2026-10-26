@@ -14,6 +14,19 @@ brew install shibbirweb/tap/sendmock        # stable
 brew install shibbirweb/tap/sendmock-beta   # beta from develop
 ```
 
+## Install script (Linux, macOS and Windows)
+
+Downloads the right binary from the latest GitHub release, checks its checksum and puts `sendmock` on your `PATH`.
+
+```bash
+curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh                      # Linux and macOS
+curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta # beta from develop
+```
+
+```powershell
+irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex   # Windows PowerShell
+```
+
 ## Docker
 
 ```bash

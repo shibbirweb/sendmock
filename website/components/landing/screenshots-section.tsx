@@ -1,10 +1,10 @@
 "use client";
 
-import { useId, useState, type KeyboardEvent } from "react";
-
 import { Safari } from "@/components/ui/safari";
 import { basePath } from "@/lib/layout.shared";
 import { cn } from "@/lib/utils";
+
+import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
 /** Captured from the demo app by `bun run screenshots`. */
 const productShots = [
@@ -35,26 +35,9 @@ const productShots = [
 ];
 
 export function ScreenshotsSection() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const tabsId = useId();
+  const { selectedIndex, setSelectedIndex, moveSelection, tabId, panelId } =
+    useArrowKeyTabs(productShots.length);
   const selectedShot = productShots[selectedIndex] ?? productShots[0];
-
-  const moveSelection = (keyboardEvent: KeyboardEvent<HTMLDivElement>) => {
-    const step =
-      keyboardEvent.key === "ArrowRight"
-        ? 1
-        : keyboardEvent.key === "ArrowLeft"
-          ? -1
-          : 0;
-    if (step === 0) {
-      return;
-    }
-    keyboardEvent.preventDefault();
-    const nextIndex =
-      (selectedIndex + step + productShots.length) % productShots.length;
-    setSelectedIndex(nextIndex);
-    document.getElementById(`${tabsId}-tab-${nextIndex}`)?.focus();
-  };
 
   return (
     <section
@@ -78,11 +61,11 @@ export function ScreenshotsSection() {
         {productShots.map((productShot, shotIndex) => (
           <button
             key={productShot.key}
-            id={`${tabsId}-tab-${shotIndex}`}
+            id={tabId(shotIndex)}
             type="button"
             role="tab"
             aria-selected={shotIndex === selectedIndex}
-            aria-controls={`${tabsId}-panel`}
+            aria-controls={panelId}
             tabIndex={shotIndex === selectedIndex ? 0 : -1}
             onClick={() => setSelectedIndex(shotIndex)}
             className={cn(
@@ -97,9 +80,9 @@ export function ScreenshotsSection() {
         ))}
       </div>
       <div
-        id={`${tabsId}-panel`}
+        id={panelId}
         role="tabpanel"
-        aria-labelledby={`${tabsId}-tab-${selectedIndex}`}
+        aria-labelledby={tabId(selectedIndex)}
         className="w-full"
       >
         <Safari

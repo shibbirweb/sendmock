@@ -34,6 +34,100 @@ test("WS-02.1 the landing page has the hero, flow, quick start, marquee, bento g
   ).toHaveCount(4);
 });
 
+const releaseUrl =
+  "https://github.com/shibbirweb/sendmock/releases/latest/download";
+const visitorUserAgents = {
+  macOS:
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Safari/605.1.15",
+  Windows:
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+};
+
+test.describe("the quick start on a Mac", () => {
+  test.use({ userAgent: visitorUserAgents.macOS });
+
+  test("WS-02.1 the quick start shows the install command for each operating system", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const platformTabs = page.getByRole("tablist", {
+      name: "Your operating system",
+    });
+    const terminal = page.getByTestId("quick-start-terminal");
+
+    await expect(platformTabs.getByRole("tab")).toHaveText([
+      "macOS",
+      "Windows",
+      "Linux",
+    ]);
+    await expect(
+      platformTabs.getByRole("tab", { name: "macOS" }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(terminal).toContainText(
+      "$ brew install shibbirweb/tap/sendmock",
+    );
+
+    await platformTabs.getByRole("tab", { name: "Windows" }).click();
+    await expect(terminal).toContainText(
+      `PS> irm ${releaseUrl}/install.ps1 | iex`,
+    );
+    await expect(terminal).toContainText("PS> sendmock");
+
+    await page.keyboard.press("ArrowRight");
+    await expect(
+      platformTabs.getByRole("tab", { name: "Linux" }),
+    ).toBeFocused();
+    await expect(terminal).toContainText(
+      `$ curl -fsSL ${releaseUrl}/install.sh | sh`,
+    );
+    await expect(terminal).not.toContainText("otp");
+  });
+});
+
+test.describe("the quick start on Windows", () => {
+  test.use({ userAgent: visitorUserAgents.Windows });
+
+  test("WS-02.1 the quick start opens on the visitor's operating system", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+
+    await expect(
+      page
+        .getByRole("tablist", { name: "Your operating system" })
+        .getByRole("tab", { name: "Windows" }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByTestId("quick-start-terminal")).toContainText(
+      `PS> irm ${releaseUrl}/install.ps1 | iex`,
+    );
+  });
+
+  test("WS-02.1 the copy button copies the install command without its prompt", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+
+    await page
+      .getByTestId("quick-start-terminal")
+      .getByRole("button", { name: "Copy the install command" })
+      .click();
+
+    await expect(
+      page.getByTestId("quick-start-terminal").getByRole("button", {
+        name: "Copied",
+      }),
+    ).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+      `irm ${releaseUrl}/install.ps1 | iex`,
+    );
+  });
+});
+
 test("WS-02.1 the number ticker counts the providers, languages and API operations it shows", async ({
   page,
 }) => {
@@ -74,10 +168,10 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
 
   // The quick start shows every line at once instead of typing it.
   const terminal = page.getByTestId("quick-start-terminal");
+  await expect(terminal).toContainText("$ sendmock");
   await expect(terminal).toContainText(
-    "$ sendmock otp --to +8801700000000 --wait 10s",
+    "Web UI and API on http://127.0.0.1:8025",
   );
-  await expect(terminal).toContainText("482913");
   // The tickers show their final values without counting.
   await expect(page.getByTestId("number-ticker")).toHaveText([
     "15",

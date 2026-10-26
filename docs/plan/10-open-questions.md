@@ -78,15 +78,16 @@ The HTML compatibility check embeds the caniemail.com support dataset (as Mailpi
 
 Lenient by default (unknown Messaging Service SIDs auto-created, any `From` accepted, any credentials accepted) with per-provider "strict mode" to reproduce real provider errors. Confirm this default with early users; strict-by-default catches more bugs but makes first setup harder.
 
-## 13. Install script URL
+## 13. Install script URL (decided 2026-10-27: GitHub release assets)
 
-`install.sh` and `install.ps1` ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) need a public URL, which the install page and the landing page's quick start print and people copy, so it is hard to change later. Options:
+`install.sh` and `install.ps1` are attached to every GitHub release and fetched through GitHub's "latest release" link, so the commands never change and always install the newest stable:
 
-| Option | Example | For | Against |
-|--------|---------|-----|---------|
-| The website | `https://shibbirweb.github.io/sendmock/install.sh` | shortest; can move to `sendmock.dev` behind the same path | served from the site's branch |
-| A GitHub release asset | `https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh` | always the latest release, no website | long; stable only |
-| A raw file in the repository | `https://raw.githubusercontent.com/shibbirweb/sendmock/main/scripts/install.sh` | versioned with the code | long; tied to the branch layout |
+```bash
+curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh
+```
 
-Recommendation: the website now, moving to the custom domain (`sendmock.dev`) when it is registered. To decide with the owner before the first beta.
+```powershell
+irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex
+```
 
+The beta comes from the same scripts with `--channel beta`. Considered and not chosen: the website (`https://shibbirweb.github.io/sendmock/install.sh`, shorter but served from the site's branch) and a raw file in the repository (tied to the branch layout). The install page and the landing page's quick start use these URLs.

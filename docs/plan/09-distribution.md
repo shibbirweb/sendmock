@@ -69,7 +69,7 @@ Channels we run ourselves ship early; a distribution's official repository is ru
 | Stage | Channel | Users run | Notes |
 |-------|---------|-----------|-------|
 | First beta (Phase 1) | GitHub Releases archives | download and unpack | macOS, Linux, Windows; checksums |
-| | Install scripts | `curl -fsSL <url>/install.sh \| sh`, `irm <url>/install.ps1 \| iex` | where `<url>` lives is [open question 13](10-open-questions.md#13-install-script-url) |
+| | Install scripts | `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh \| sh`, `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 \| iex` | attached to every release ([open question 13](10-open-questions.md#13-install-script-url-decided-2026-10-27-github-release-assets), decided) |
 | | `.deb` and `.rpm` on each release | `sudo apt install ./sendmock_<version>_amd64.deb`, `sudo dnf install ./sendmock-<version>.x86_64.rpm` | built by `cargo-deb` and `cargo-generate-rpm` |
 | | Homebrew tap | `brew install shibbirweb/tap/sendmock` | repository `shibbirweb/homebrew-tap`; macOS and Linux |
 | | Scoop bucket | `scoop bucket add shibbirweb <bucket url>`, `scoop install sendmock` | repository `shibbirweb/scoop-bucket` |
@@ -88,7 +88,7 @@ Channels we run ourselves ship early; a distribution's official repository is ru
 
 Before any official repository will take SendMock it needs an OSI licence (the Phase 0 README and licence item), a history of stable releases, and users. Windows code signing is optional: it removes SmartScreen's "unknown publisher" warning, and neither WinGet nor Chocolatey requires it.
 
-The landing page's quick start shows the first-beta channels per platform: Homebrew (macOS), the install script or `.deb` (Linux), `install.ps1` or Scoop (Windows) and Docker; when our APT repository and WinGet exist, the Linux and Windows tabs switch to `apt install` and `winget install`.
+The landing page's quick start has a tab per platform: Homebrew (macOS), `install.ps1` (Windows) and `install.sh` (Linux), the scripts served from the latest GitHub release; each tab then starts `sendmock`. When our APT repository and WinGet exist, the Linux and Windows tabs can switch to `apt install` and `winget install`.
 
 ## Docker
 
