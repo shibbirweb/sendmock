@@ -75,6 +75,12 @@ jobs:
         working-directory: website
         run: |
           chrome_path=$(find /ms-playwright -path "*/chromium-*/*" -type f -name chrome | head -1)
+          if [ -z "$chrome_path" ]; then
+            echo "Playwright's Chromium was not found under /ms-playwright." >&2
+            exit 1
+          fi
+          # Lighthouse CI's health check finds Chrome only through CHROME_PATH.
+          export CHROME_PATH="$chrome_path"
           bunx --bun @lhci/cli@0.15.1 autorun --collect.chromePath="$chrome_path" --collect.settings.chromeFlags="--headless=new --no-sandbox"
 
       - name: Lighthouse scores test (names WS-02.3)
