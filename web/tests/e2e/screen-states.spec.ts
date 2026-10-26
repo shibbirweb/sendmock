@@ -12,6 +12,11 @@ async function chooseApiResponses(page: Page, optionName: string) {
 
 const screenContent = (page: Page) => page.locator("main").first();
 
+/** Screens that load data when they open, so they have loading and error states. */
+const screensWithData = appScreens.filter(
+  (screen) => screen.loadsDataOnOpen !== false,
+);
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Activity, last 24 hours")).toBeVisible();
@@ -42,8 +47,10 @@ test("UI-07.2 every screen shows an error with Try again when the API fails, and
   page,
 }) => {
   await chooseApiResponses(page, "Always 500 server error");
-  for (const screen of appScreens) {
+  for (const screen of screensWithData) {
     await navigateInApp(page, screen.path);
+    // The title changes once the new screen is up, so the last screen's alert cannot pass for it.
+    await expect(page).toHaveTitle(screen.title);
     await expect(
       screenContent(page).getByRole("alert").first(),
       `${screen.path} shows an error`,
@@ -71,11 +78,12 @@ test("UI-07.2 every screen shows a skeleton while its data loads", async ({
   await page.keyboard.press("End");
   await page.keyboard.press("Escape");
   // The overview and the SMS threads (the sidebar badge) are already loaded.
-  const unloadedScreens = appScreens.filter(
+  const unloadedScreens = screensWithData.filter(
     (screen) => screen.path !== "/" && screen.path !== "/sms",
   );
   for (const screen of unloadedScreens) {
     await navigateInApp(page, screen.path);
+    await expect(page).toHaveTitle(screen.title);
     await expect(
       screenContent(page).locator('[data-slot="skeleton"]').first(),
       `${screen.path} shows a skeleton`,
