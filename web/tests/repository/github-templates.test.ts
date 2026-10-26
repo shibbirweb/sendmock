@@ -159,3 +159,24 @@ describe("GitHub templates", () => {
     }
   });
 });
+
+describe("surface parity workflow", () => {
+  type Workflow = {
+    on: { push?: { branches?: string[] }; pull_request?: unknown };
+    jobs: Record<string, { steps: { run?: string }[] }>;
+  };
+  const workflowPath = join(githubDirectory, "workflows/parity.yml");
+
+  test("UI-11.7 runs the parity check and tests on pull requests and pushes to develop and main", () => {
+    expect(existsSync(workflowPath)).toBe(true);
+    const workflow = parse(readFileSync(workflowPath, "utf8")) as Workflow;
+    const commands = Object.values(workflow.jobs).flatMap((workflowJob) =>
+      workflowJob.steps.map((workflowStep) => workflowStep.run ?? ""),
+    );
+
+    expect(workflow.on.pull_request).not.toBeUndefined();
+    expect(workflow.on.push?.branches).toEqual(["develop", "main"]);
+    expect(commands).toContain("bun run parity");
+    expect(commands).toContain("bun run test:parity");
+  });
+});

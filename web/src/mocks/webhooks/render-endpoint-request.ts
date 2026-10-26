@@ -5,10 +5,8 @@ import type {
   RenderProblem,
   WebhookEndpointInput,
 } from "@/lib/api/types";
-import {
-  findTemplateDefinition,
-  type MockDatabase,
-} from "@/mocks/db/mock-database";
+import { type MockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
 import { foldEndpointOverrides } from "@/mocks/webhooks/fold-endpoint-overrides";
 import { toRenderProblems } from "@/mocks/webhooks/render-template-definition";

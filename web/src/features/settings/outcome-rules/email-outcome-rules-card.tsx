@@ -4,30 +4,23 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { describeResolution } from "@/features/settings/outcome-rules/describe-resolution";
 import { EmailOutcomeRuleDialog } from "@/features/settings/outcome-rules/email-outcome-rule-dialog";
-import { describeEmailRuleOutcome } from "@/features/settings/outcome-rules/outcome-rule-labels";
+import { describeEmailRuleOutcome } from "@/lib/outcomes/outcome-rule-labels";
 import { OutcomeRulesTable } from "@/features/settings/outcome-rules/outcome-rules-table";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
+import { useOutcomeTest } from "@/lib/api/hooks/use-automation-queries";
 import { useOutcomeRules } from "@/lib/api/hooks/use-outcome-rule-queries";
 import type { AppSettings, EmailOutcomeRule } from "@/lib/api/types";
-import { resolveEmailOutcome } from "@/lib/outcomes/resolve-outcome";
 
 /** Which rule, magic address or profile an address gets (EM-10.6). */
-function EmailOutcomeTester({
-  outcomeRules,
-  appSettings,
-}: {
-  outcomeRules: EmailOutcomeRule[];
-  appSettings: AppSettings;
-}) {
+function EmailOutcomeTester({ appSettings }: { appSettings: AppSettings }) {
   const testerId = React.useId();
   const [testedAddress, setTestedAddress] = React.useState("bounce@shop.test");
-  const resolution = resolveEmailOutcome(
-    testedAddress.trim(),
-    outcomeRules,
-    appSettings.is_magic_addresses_enabled,
-  );
+  const outcomeTest = useOutcomeTest({
+    ruleKind: "email",
+    testedValue: testedAddress.trim(),
+    settingsKey: `${appSettings.is_magic_addresses_enabled}/${appSettings.email_outcome_profile}`,
+  });
 
   return (
     <div className="grid gap-2 rounded-md border bg-muted/30 p-3">
@@ -43,20 +36,7 @@ function EmailOutcomeTester({
         data-testid="email-outcome-result"
         className="text-sm"
       >
-        {describeResolution(
-          resolution,
-          (ruleId) => {
-            const outcomeRule = outcomeRules.find(
-              (existingRule) => existingRule.id === ruleId,
-            );
-
-            return outcomeRule === undefined
-              ? ""
-              : describeEmailRuleOutcome(outcomeRule);
-          },
-          "Magic address",
-          `No rule or magic address matches: the ${appSettings.email_outcome_profile} outcome profile applies.`,
-        )}
+        {outcomeTest.data?.summary ?? ""}
       </p>
     </div>
   );
@@ -120,10 +100,7 @@ export function EmailOutcomeRulesCard({
           Add address
         </Button>
       </div>
-      <EmailOutcomeTester
-        outcomeRules={outcomeRules}
-        appSettings={appSettings}
-      />
+      <EmailOutcomeTester appSettings={appSettings} />
       <EmailOutcomeRuleDialog
         isOpen={isDialogOpen}
         editedRule={editedRule}

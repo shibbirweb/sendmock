@@ -177,7 +177,7 @@ Routes follow Mailgun's model, so a route copied from the Mailgun dashboard or c
 - Routes can also send in another provider's inbound format (SendGrid Inbound Parse, Postmark inbound) by picking that template; the filter and action model stays the same.
 - Every forward is a normal webhook delivery: logged, replayable and visible in the email's timeline.
 
-UI: **Webhooks > Inbound routes** (list with priority, expression and actions, editor with a "matches N of the last 50 incoming emails" preview). API: `/api/v1/inbound-routes`; CLI: `sendmock route list|create|test`; MCP: `sendmock_inbound_routes_{list,create,update,delete,test}`.
+UI: **Webhooks > Inbound routes** (list with priority, expression and actions, editor with a "matches N of the last 50 incoming emails" preview). API: `/api/v1/inbound-routes`; CLI: `sendmock route list|create|update|delete|test`; MCP: `sendmock_inbound_route_{list,create,update,delete,test}` (names from the [surface catalogue](20-surface-parity.md)).
 
 ## Payload formats
 

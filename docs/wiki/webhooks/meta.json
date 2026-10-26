@@ -1,0 +1,13 @@
+{
+  "title": "Webhooks",
+  "pages": [
+    "index",
+    "endpoints",
+    "rules",
+    "inbound-routes",
+    "deliveries",
+    "composer-and-saved",
+    "templates",
+    "variables"
+  ]
+}

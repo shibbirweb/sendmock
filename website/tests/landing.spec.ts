@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { countSpecOperations } from "./support/count-spec-operations";
+
 /** Scrolls the whole page so every in-view animation gets its chance to run. */
 async function scrollThroughPage(page: Page) {
   const pageHeight = await page.evaluate(() => document.body.scrollHeight);
@@ -41,7 +43,7 @@ test("WS-02.1 the number ticker counts the providers, languages and API operatio
   await expect(page.getByTestId("number-ticker")).toHaveText([
     "15",
     "8",
-    "169",
+    String(countSpecOperations()),
   ]);
 });
 
@@ -80,7 +82,7 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   await expect(page.getByTestId("number-ticker")).toHaveText([
     "15",
     "8",
-    "169",
+    String(countSpecOperations()),
   ]);
   // The beams are drawn as plain paths, with no moving gradient.
   await expect(

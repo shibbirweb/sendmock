@@ -7,6 +7,7 @@ import {
   GaugeIcon,
   GlobeIcon,
   ListChecksIcon,
+  ListTodoIcon,
   MailPlusIcon,
   type LucideIcon,
   MailIcon,
@@ -99,6 +100,12 @@ export const navigationItems: NavigationItem[] = [
     ],
   },
   { title: "Numbers", path: "/numbers", icon: PhoneIcon, shortcutKey: "n" },
+  {
+    title: "Scenarios",
+    path: "/scenarios",
+    icon: ListTodoIcon,
+    shortcutKey: "c",
+  },
   { title: "Logs", path: "/logs", icon: ScrollTextIcon, shortcutKey: "l" },
   {
     title: "Settings",

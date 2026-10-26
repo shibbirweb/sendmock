@@ -203,3 +203,14 @@ export type NativeSendResult = {
 export type EmailReleaseRequest = {
   to?: string[];
 };
+
+/** Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`. */
+export type EmailInboundRequest = {
+  from?: string;
+  to?: string[];
+  subject?: string;
+  text?: string;
+  html?: string;
+  /** A whole message (RFC 5322); when set, the other fields are ignored. */
+  raw?: string;
+};

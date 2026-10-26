@@ -130,7 +130,14 @@ export const queryKeys = {
     all: ["outcome-rules"] as const,
     sms: ["outcome-rules", "sms"] as const,
     email: ["outcome-rules", "email"] as const,
+    test: (ruleKind: string, testedValue: string, matchField: string) =>
+      ["outcome-rules", ruleKind, "test", testedValue, matchField] as const,
   },
+  messageRules: {
+    tag: ["message-rules", "tag-rules"] as const,
+    forward: ["message-rules", "forward-rules"] as const,
+  },
+  aiAgents: ["ai", "agents"] as const,
   system: {
     stats: ["system", "stats"] as const,
     info: ["system", "info"] as const,

@@ -1,5 +1,8 @@
+import { HttpHandler } from "msw";
 import { setupWorker } from "msw/browser";
 
+import { startMessageRules } from "@/mocks/automation/apply-message-rules";
+import { registerMockRequestHandlers } from "@/mocks/automation/mock-request-dispatcher";
 import { mockHandlers } from "@/mocks/handlers";
 import { startMockEventGenerator } from "@/mocks/realtime/mock-event-generator";
 import { startRuleFiring } from "@/mocks/webhooks/fire-matching-rules";
@@ -26,7 +29,14 @@ export async function startMockApi({
     quiet: true,
   });
 
+  registerMockRequestHandlers(
+    mockHandlers.filter(
+      (mockHandler): mockHandler is HttpHandler =>
+        mockHandler instanceof HttpHandler,
+    ),
+  );
   startRuleFiring();
+  startMessageRules();
   if (hasLiveTraffic) {
     startMockEventGenerator();
   }

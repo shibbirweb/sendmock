@@ -25,6 +25,10 @@ type RawOperation = {
     schema: JsonSchema;
   }[];
   requestBody?: { content: RawContent };
+  "x-sendmock-cli": string;
+  "x-sendmock-mcp": string | null;
+  "x-sendmock-mcp-exempt"?: string;
+  "x-sendmock-ui": string;
   responses: Record<
     string,
     { $ref?: string; description?: string; content?: RawContent }
@@ -97,6 +101,12 @@ export function loadApiReference() {
           parameters,
           requestBody: readBody(rawOperation.requestBody?.content),
           responses,
+          surfaces: {
+            cli: rawOperation["x-sendmock-cli"],
+            mcp: rawOperation["x-sendmock-mcp"],
+            mcpExemptReason: rawOperation["x-sendmock-mcp-exempt"] ?? null,
+            ui: rawOperation["x-sendmock-ui"],
+          },
         };
       }),
   );

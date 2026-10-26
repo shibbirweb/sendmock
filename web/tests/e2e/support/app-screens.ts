@@ -24,6 +24,7 @@ export const appScreens = [
   { path: "/payments/methods", title: "Methods · Payments · SendMock" },
   { path: "/payments/flows", title: "Flows · Payments · SendMock" },
   { path: "/numbers", title: "Numbers · SendMock" },
+  { path: "/scenarios", title: "Scenarios · SendMock" },
   { path: "/logs", title: "Logs · SendMock" },
   { path: "/settings", title: "General · Settings · SendMock" },
 ];

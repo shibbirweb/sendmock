@@ -11,32 +11,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { describeResolution } from "@/features/settings/outcome-rules/describe-resolution";
-import { describeSmsRuleOutcome } from "@/features/settings/outcome-rules/outcome-rule-labels";
+import { describeSmsRuleOutcome } from "@/lib/outcomes/outcome-rule-labels";
 import { OutcomeRulesTable } from "@/features/settings/outcome-rules/outcome-rules-table";
 import { SmsOutcomeRuleDialog } from "@/features/settings/outcome-rules/sms-outcome-rule-dialog";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
+import { useOutcomeTest } from "@/lib/api/hooks/use-automation-queries";
 import { useOutcomeRules } from "@/lib/api/hooks/use-outcome-rule-queries";
 import type { AppSettings, SmsOutcomeRule } from "@/lib/api/types";
-import { resolveSmsOutcome } from "@/lib/outcomes/resolve-outcome";
 
 /** Which rule, magic number or profile a number gets (SM-07.9). */
-function SmsOutcomeTester({
-  outcomeRules,
-  appSettings,
-}: {
-  outcomeRules: SmsOutcomeRule[];
-  appSettings: AppSettings;
-}) {
+function SmsOutcomeTester({ appSettings }: { appSettings: AppSettings }) {
   const testerId = React.useId();
   const [testedNumber, setTestedNumber] = React.useState("+15005550001");
   const [matchField, setMatchField] = React.useState<"to" | "from">("to");
-  const resolution = resolveSmsOutcome(
-    testedNumber.trim(),
+  const outcomeTest = useOutcomeTest({
+    ruleKind: "sms",
+    testedValue: testedNumber.trim(),
     matchField,
-    outcomeRules,
-    appSettings.is_magic_numbers_enabled,
-  );
+    settingsKey: `${appSettings.is_magic_numbers_enabled}/${appSettings.sms_simulation_profile}`,
+  });
 
   return (
     <div className="grid gap-2 rounded-md border bg-muted/30 p-3">
@@ -68,20 +61,7 @@ function SmsOutcomeTester({
         data-testid="sms-outcome-result"
         className="text-sm"
       >
-        {describeResolution(
-          resolution,
-          (ruleId) => {
-            const outcomeRule = outcomeRules.find(
-              (existingRule) => existingRule.id === ruleId,
-            );
-
-            return outcomeRule === undefined
-              ? ""
-              : describeSmsRuleOutcome(outcomeRule);
-          },
-          "Magic number",
-          `No rule or magic number matches: the ${appSettings.sms_simulation_profile} profile applies.`,
-        )}
+        {outcomeTest.data?.summary ?? ""}
       </p>
     </div>
   );
@@ -143,7 +123,7 @@ export function SmsOutcomeRulesCard({
           Add number
         </Button>
       </div>
-      <SmsOutcomeTester outcomeRules={outcomeRules} appSettings={appSettings} />
+      <SmsOutcomeTester appSettings={appSettings} />
       <SmsOutcomeRuleDialog
         isOpen={isDialogOpen}
         editedRule={editedRule}

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { emailOutcomeLabels } from "@/features/settings/outcome-rules/outcome-rule-labels";
+import { emailOutcomeLabels } from "@/lib/outcomes/outcome-rule-labels";
 import { ApiError } from "@/lib/api/api-client";
 import { useSaveOutcomeRule } from "@/lib/api/hooks/use-outcome-rule-queries";
 import type {

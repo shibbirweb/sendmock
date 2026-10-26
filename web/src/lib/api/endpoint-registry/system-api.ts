@@ -57,7 +57,9 @@ const systemEndpoints = tagEndpoints("System", [
   {
     method: "POST",
     path: "/api/v1/samples/{kind}",
-    summary: "Create a sample email, SMS or verification for the demo.",
+    summary:
+      "Create a sample email, SMS, verification or HTTP request through the normal path.",
+    requestBody: typeRef("SampleOptions"),
     response: typeRef("CreatedSample"),
     successStatus: 201,
     errorStatuses: [404],

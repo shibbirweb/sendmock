@@ -22,6 +22,13 @@ const flowEndpoints = tagEndpoints("Payment flows", [
     errorStatuses: [400],
   },
   {
+    method: "GET",
+    path: "/api/v1/payments/flows/{flowKey}",
+    summary: "One payment flow with its steps.",
+    response: typeRef("PaymentFlowDefinition"),
+    errorStatuses: [404],
+  },
+  {
     method: "PATCH",
     path: "/api/v1/payments/flows/{flowKey}",
     summary: "Change a flow.",
@@ -98,6 +105,13 @@ const gatewayEndpoints = tagEndpoints("Payment gateways", [
     errorStatuses: [400],
   },
   {
+    method: "GET",
+    path: "/api/v1/payments/gateways/{gatewayKey}",
+    summary: "One gateway definition; secret credentials masked.",
+    response: typeRef("PaymentGatewayDefinition"),
+    errorStatuses: [404],
+  },
+  {
     method: "PATCH",
     path: "/api/v1/payments/gateways/{gatewayKey}",
     summary: "Change a gateway; secret credentials stay masked.",
@@ -151,6 +165,13 @@ const methodEndpoints = tagEndpoints("Payment methods", [
     response: typeRef("PaymentMethodDefinition"),
     successStatus: 201,
     errorStatuses: [400],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payments/methods/{methodKey}",
+    summary: "One payment method with its test values.",
+    response: typeRef("PaymentMethodDefinition"),
+    errorStatuses: [404],
   },
   {
     method: "PATCH",

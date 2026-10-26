@@ -1,0 +1,10 @@
+{
+  "title": "Payments",
+  "pages": [
+    "index",
+    "checkout-page",
+    "gateways",
+    "methods",
+    "flows"
+  ]
+}

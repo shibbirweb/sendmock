@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { countSpecOperations } from "./support/count-spec-operations";
+
 const sendButton = (page: Page) =>
   page.getByRole("button", { name: "Send to the demo API" });
 
@@ -8,7 +10,7 @@ async function openPlayground(page: Page) {
   await expect(sendButton(page)).toBeEnabled({ timeout: 30_000 });
 }
 
-test("WS-04.1 every endpoint in the spec can be called and is answered by the in-browser mock", async ({
+test("WS-04.1 UI-11.5 every endpoint in the spec can be called and is answered by the in-browser mock", async ({
   page,
 }) => {
   test.setTimeout(300_000);
@@ -19,7 +21,7 @@ test("WS-04.1 every endpoint in the spec can be called and is answered by the in
     .evaluateAll((options) =>
       options.map((option) => (option as HTMLOptionElement).value),
     );
-  expect(operationValues.length).toBe(169);
+  expect(operationValues.length).toBe(countSpecOperations());
 
   const unansweredOperations: string[] = [];
   for (const operationValue of operationValues) {

@@ -25,6 +25,14 @@ type MockEventListener = (appEvent: AppEvent) => void;
 
 const mockEventListeners = new Set<MockEventListener>();
 
+const recentEventLimit = 200;
+const recentEvents: AppEvent[] = [];
+
+/** The latest published events, newest first, for `GET /events/recent`. */
+export function listRecentMockEvents(): AppEvent[] {
+  return [...recentEvents];
+}
+
 /** Server-side subscribers (webhook rules), like the backend's event bus. */
 export function subscribeToMockEvents(
   mockEventListener: MockEventListener,
@@ -48,6 +56,8 @@ export function publishMockEvent(
     data: eventData,
   };
 
+  recentEvents.unshift(appEvent);
+  recentEvents.length = Math.min(recentEvents.length, recentEventLimit);
   realtimeLink.broadcast(JSON.stringify(appEvent));
   for (const mockEventListener of mockEventListeners) {
     mockEventListener(appEvent);

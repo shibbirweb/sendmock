@@ -27,4 +27,4 @@ var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:8025/api/v1/sm
 HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 ```
 
-To use a provider SDK (Twilio, SendGrid, ...) instead, set its base URL to the provider port `http://127.0.0.1:8026`; the [SMS](../sms.md) and [Email](../email.md) pages list the providers.
+To use a provider SDK (Twilio, SendGrid, ...) instead, set its base URL to the provider port `http://127.0.0.1:8026`; the [SMS](../sms/index.md) and [Email](../mail/index.md) pages list the providers.

@@ -60,3 +60,22 @@ export type EmailOutcomeRuleInput = Omit<
 
 /** Body of POST /api/v1/outcome-rules/{kind}/{ruleId}/move. */
 export type OutcomeRuleMove = { direction: "up" | "down" };
+
+/** Body of POST /api/v1/outcome-rules/email/test. */
+export type EmailOutcomeTestRequest = { address: string };
+
+/** Body of POST /api/v1/outcome-rules/sms/test. */
+export type SmsOutcomeTestRequest = {
+  number: string;
+  match_field: "to" | "from";
+};
+
+/** Which source decides an outcome: a custom rule, a magic address or number, or the profile. */
+export type OutcomeTestResult = {
+  source: "custom" | "magic" | "profile";
+  rule_id: string | null;
+  /** One-based position of the matching custom rule. */
+  rule_position: number | null;
+  /** What the testers show, e.g. "Custom rule 2: Hard bounce, 550 5.1.1". */
+  summary: string;
+};

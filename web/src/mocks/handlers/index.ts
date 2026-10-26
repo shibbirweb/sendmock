@@ -1,4 +1,11 @@
+import { automationHandlers } from "@/mocks/handlers/automation-handlers";
+import { definitionLookupHandlers } from "@/mocks/handlers/definition-lookup-handlers";
 import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
+import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
+import { messageRuleHandlers } from "@/mocks/handlers/message-rule-handlers";
+import { outcomeTestHandlers } from "@/mocks/handlers/outcome-test-handlers";
+import { paymentTestValueHandlers } from "@/mocks/handlers/payment-test-value-handlers";
+import { waitHandlers } from "@/mocks/handlers/wait-handlers";
 import { emailHandlers } from "@/mocks/handlers/email-handlers";
 import { emailResponseHandlers } from "@/mocks/handlers/email-response-handlers";
 import { httpBinHandlers } from "@/mocks/handlers/http-bin-handlers";
@@ -35,6 +42,14 @@ export const mockHandlers = [
   simulatedErrorHandler,
   ...systemHandlers,
   ...settingsHandlers,
+  ...waitHandlers,
+  ...automationHandlers,
+  // Before the `:emailId`, `:paymentId` and `:ruleId` routes they would collide with.
+  ...emailImportHandlers,
+  ...paymentTestValueHandlers,
+  ...outcomeTestHandlers,
+  ...definitionLookupHandlers,
+  ...messageRuleHandlers,
   ...emailDetailHandlers,
   ...nativeSendHandlers,
   ...emailHandlers,

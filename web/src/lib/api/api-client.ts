@@ -25,8 +25,31 @@ type ApiRequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   queryParameters?: Record<string, QueryParameterValue>;
   requestBody?: unknown;
+  /** A body sent as it is, such as a raw message, instead of JSON. */
+  rawRequestBody?: { content: string; contentType: string };
+  /** Extra headers, such as the ones Settings > Connection adds. */
+  headers?: Record<string, string>;
   abortSignal?: AbortSignal;
 };
+
+function buildRequestInit(requestOptions: ApiRequestOptions): RequestInit {
+  const { rawRequestBody, requestBody } = requestOptions;
+  const contentType =
+    rawRequestBody?.contentType ??
+    (requestBody === undefined ? undefined : "application/json");
+
+  return {
+    method: requestOptions.method ?? "GET",
+    headers: {
+      ...(contentType === undefined ? {} : { "Content-Type": contentType }),
+      ...requestOptions.headers,
+    },
+    body:
+      rawRequestBody?.content ??
+      (requestBody === undefined ? undefined : JSON.stringify(requestBody)),
+    signal: requestOptions.abortSignal,
+  };
+}
 
 function buildRequestUrl(
   apiPath: string,
@@ -60,17 +83,9 @@ export async function requestApi<ResponseType>(
   apiPath: string,
   requestOptions: ApiRequestOptions = {},
 ): Promise<ResponseType> {
-  const hasRequestBody = requestOptions.requestBody !== undefined;
   const response = await fetch(
     buildRequestUrl(apiPath, requestOptions.queryParameters),
-    {
-      method: requestOptions.method ?? "GET",
-      headers: hasRequestBody ? { "Content-Type": "application/json" } : {},
-      body: hasRequestBody
-        ? JSON.stringify(requestOptions.requestBody)
-        : undefined,
-      signal: requestOptions.abortSignal,
-    },
+    buildRequestInit(requestOptions),
   );
 
   if (!response.ok) {

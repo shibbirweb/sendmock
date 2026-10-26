@@ -3,12 +3,17 @@ import type {
   QueryParameter,
   SchemaReference,
 } from "../../src/lib/api/endpoint-registry";
+import { surfaceCatalogue } from "../../src/lib/api/surface-catalogue";
 import { type JsonSchema, toComponentName } from "./generate-schemas";
 import { readSchemaTypeName } from "./schema-roots";
 
 const errorResponses: Record<number, { name: string; description: string }> = {
   400: { name: "BadRequest", description: "The request is invalid." },
   404: { name: "NotFound", description: "The item does not exist." },
+  408: {
+    name: "Timeout",
+    description: "Nothing matched before the timeout.",
+  },
   409: { name: "Conflict", description: "The item's state does not allow it." },
   422: {
     name: "Unprocessable",
@@ -116,6 +121,24 @@ function buildResponses(apiEndpoint: ApiEndpoint): JsonSchema {
   };
 }
 
+/** The CLI command, MCP tool and UI place of an operation (UI-11.3). */
+function buildSurfaceExtensions(apiEndpoint: ApiEndpoint): JsonSchema {
+  const operationKey = `${apiEndpoint.method} ${apiEndpoint.path}`;
+  const operationSurfaces = surfaceCatalogue[operationKey];
+  if (operationSurfaces === undefined) {
+    throw new Error(`${operationKey} has no entry in the surface catalogue`);
+  }
+
+  return {
+    "x-sendmock-cli": operationSurfaces.cli,
+    "x-sendmock-mcp": operationSurfaces.mcp,
+    ...(operationSurfaces.mcpExemptReason === undefined
+      ? {}
+      : { "x-sendmock-mcp-exempt": operationSurfaces.mcpExemptReason }),
+    "x-sendmock-ui": operationSurfaces.ui,
+  };
+}
+
 function buildOperation(apiEndpoint: ApiEndpoint): JsonSchema {
   const pathParameterNames = [...apiEndpoint.path.matchAll(/\{(\w+)\}/g)].map(
     (parameterMatch) => parameterMatch[1] ?? "",
@@ -139,6 +162,7 @@ function buildOperation(apiEndpoint: ApiEndpoint): JsonSchema {
           },
         }),
     responses: buildResponses(apiEndpoint),
+    ...buildSurfaceExtensions(apiEndpoint),
   };
 }
 

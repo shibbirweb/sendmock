@@ -174,6 +174,22 @@ const outcomeRuleEndpoints = tagEndpoints("Outcome rules", [
     "EmailOutcomeRuleInput",
   ),
   ...buildOutcomeRuleEndpoints("sms", "SmsOutcomeRule", "SmsOutcomeRuleInput"),
+  {
+    method: "POST",
+    path: "/api/v1/outcome-rules/email/test",
+    summary:
+      "Which custom rule, magic address or profile decides an address's outcome.",
+    requestBody: typeRef("EmailOutcomeTestRequest"),
+    response: typeRef("OutcomeTestResult"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/outcome-rules/sms/test",
+    summary:
+      "Which custom rule, magic number or profile decides a number's outcome.",
+    requestBody: typeRef("SmsOutcomeTestRequest"),
+    response: typeRef("OutcomeTestResult"),
+  },
 ]);
 
 export const smsApi: ApiEndpoint[] = [...smsEndpoints, ...outcomeRuleEndpoints];

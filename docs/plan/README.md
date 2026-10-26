@@ -32,6 +32,8 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 16 | [Website and releases](16-website-and-releases.md) | GitHub Pages docs site with Magic UI and an API playground; `develop` = beta, `main` = stable release workflows |
 | 17 | [Payment gateway emulation](17-payments.md) | Stripe, PayPal, SSLCommerz, bKash, Razorpay compatible APIs, test checkout page, IPN and payment webhooks |
 | 18 | [Phase U3](18-phase-u3.md) | Polish, website, contract freeze and sign-off: workstreams in order, design review checklist and table, notifications, accessibility, responsive, performance, OpenAPI freeze, landing page, docs, playground |
+| 19 | [User guide](19-user-guide.md) | The user docs as a guide: every sidebar menu explained with the problems it solves and how it connects, recipes with the built-ins, Advanced pages for customizing and creating (gateways, methods, flows, templates, rules), and building them with AI |
+| 20 | [Surface parity](20-surface-parity.md) | Every feature in every way: each REST operation names its CLI command, MCP tool and UI place in one catalogue, the missing names and REST helpers are added, the API reference shows all of them, and the user guide links every API cell to its parameters |
 
 ## Headline decisions
 
