@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) done; W15 (CLI and MCP reference, field docs, code examples) planned; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W11 feedback (F2, the HTTP Catcher rename, is next) and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -17,8 +17,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. Add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
-2. Phase U3 in the order of [18-phase-u3.md](18-phase-u3.md): W1 design review guards first.
+1. U3 feedback F2: rename the HTTP menu to HTTP Catcher and take the guide screenshots again ([18](18-phase-u3.md#feedback-items)).
+2. W11: the owner's feedback round on the preview, the review table sign-off (UI-07.3) and the sign-off tick.
+3. Add the required status checks (Web UI, Acceptance traceability, Website, Surface parity) to the `develop` and `main` rulesets.
 
 ## How to update this file
 
@@ -38,7 +39,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | In progress | 14 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 12 / 15 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 13 / 15 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -151,7 +152,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [x] Community links and GitHub templates: Help menu (docs, shortcuts, changelog, report an issue, request a feature, security, star), website links, issue forms, PR template, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT (UI-10) (W12)
 - [x] User guide: every sidebar menu with the problems it solves and how it connects, recipes, Advanced customize and create pages, AI pages, screenshots and tests ([19](19-user-guide.md), WS-06); not part of the sign-off gate (W13)
 - [x] Every feature in every way: CLI command, MCP tool and UI place named for every REST operation, missing REST helpers added, API reference and user guide show all of them ([20](20-surface-parity.md), UI-11) (W14)
-- [ ] CLI and MCP reference, field docs and code examples: a description and example for every input, CLI flags and MCP inputs derived by one rule set into `cli-reference.json` and `mcp-tools.json`, `/cli/` and `/mcp/` pages linked from the API reference and guide tables, a playground that shows every accepted input, and examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# ([21](21-reference-and-examples.md), WS-07, WS-08, WS-04.4 to WS-04.6) (W15)
+- [x] CLI and MCP reference, field docs and code examples: a description and example for every input, CLI flags and MCP inputs derived by one rule set into `cli-reference.json` and `mcp-tools.json`, `/cli/` and `/mcp/` pages linked from the API reference and guide tables, a playground that shows every accepted input, and examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# ([21](21-reference-and-examples.md), WS-07, WS-08, WS-04.4 to WS-04.6) (W15)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -420,3 +421,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-26 | Surface parity workflow (U3 W14, [20](20-surface-parity.md#ci-the-surface-parity-workflow), new criterion UI-11.7): `.github/workflows/parity.yml` runs on every pull request and push to `develop` and `main`. `bun run parity` checks every operation has REST, CLI, MCP (or the recorded exemption) and UI, prints a per-area table to the job summary and fails on any gap; `bun run test:parity` runs the catalogue, AI plan, user guide, mock handler and spec checks without a browser or build. The user guide table check (UI-11.4) moved from the website's Playwright tests into these contract tests. |
 | 2026-10-26 | Plan: CLI and MCP reference, field docs and code examples ([21](21-reference-and-examples.md), U3 W15, new features WS-07 and WS-08 with 5 criteria each, and WS-04.4 to WS-04.6). The guide named every command and tool but not their flags or inputs, none of the spec's 1,228 fields had a description and none of its 86 bodies an example, so the playground showed an empty or `{}` body with no list of what it accepts. Every input gets a description and example in the API types; CLI flags and MCP inputs are derived by one rule set ([14](14-ai-integration.md#flags-and-tool-inputs)) into generated `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` pages linked from the API reference and every guide table; the playground gets an Inputs panel, a full example body and CLI and MCP snippet tabs; recipes and menu pages get code examples in nine tabs. `/otp` and `/links` gain `timeout_ms` so `sendmock otp --wait` maps to one call. The field docs and the rules are inside the sign-off gate. |
 | 2026-10-26 | U3 feedback ([18](18-phase-u3.md#feedback-items)): toasts now appear at the bottom right by default (F1, done); the HTTP sidebar item becomes HTTP Catcher across the app, catalogue, guide and tests, with every guide screenshot taken again (F2, planned). |
+| 2026-10-26 | CLI and MCP reference, field docs and code examples built (U3 W15, [21](21-reference-and-examples.md#as-built-2026-10-26)): every request input in the spec has a description and an example; `bun run openapi` also writes `docs/api/cli-reference.json` (199 commands) and `docs/api/mcp-tools.json` (180 tools, 6 resources) by one rule set, which found and fixed contract gaps (`timeout` on `/otp` and `/links`, `target` on `/ai/agents`, a flag per setting, and the global `--server` flag instead of `--url`). The website has `/cli/` and `/mcp/` references linked from the API reference, every guide table and the search; the playground shows every input with a full example body, hints, and CLI and MCP snippets; every recipe and menu page has code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#, generated from checked steps. Also fixed: the playground bridge race (never ready in development), code comment contrast, and the website workflow now runs on guide changes. WS-04.4 to WS-04.6, WS-07.1 to WS-07.5 and WS-08.1 to WS-08.4 have tests. |

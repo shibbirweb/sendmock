@@ -212,6 +212,8 @@ Every operation is reachable from the UI, the REST API, the CLI and the MCP serv
 
 Every input field gets a description and an example in the API types; the CLI flags and MCP tool inputs are derived from them by one rule set into `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` references linked from the API reference and every guide table; the playground shows every accepted input and starts with a full example body; recipes and menu pages get code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#. Plan: [21-reference-and-examples.md](21-reference-and-examples.md). The field docs and the flag and input rules are inside the sign-off gate, because Stage B builds the CLI and MCP server from them.
 
+- **As built:** field docs on every input, `cli-reference.json` and `mcp-tools.json`, the `/cli/` and `/mcp/` references, the playground's Inputs panel and CLI and MCP snippets, and 23 code examples in nine languages; details in [21-reference-and-examples.md](21-reference-and-examples.md#as-built-2026-10-26).
+
 ## Re-audit before sign-off (2026-10-26)
 
 After W1 to W10 and W12, U3 was audited again across the whole app and site.
