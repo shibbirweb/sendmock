@@ -217,7 +217,7 @@ Every input field gets a description and an example in the API types; the CLI fl
 
 ## W16: Configurable email and SMS providers (EM-18, SM-16)
 
-Email and SMS providers become definitions like payment gateways: every built-in can be edited, reset to default, removed and restored, and a user can add a provider SendMock does not ship, from blank or from the closest built-in. Mail > Providers and SMS > Providers, sixteen new operations in every surface, `add-email-provider` and `add-sms-provider` skill workflows, and seed file support. Plan and build steps: [22-configurable-providers.md](22-configurable-providers.md).
+Email and SMS providers become definitions like payment gateways: every built-in can be edited, reset to default, removed and restored, and a user can add a provider SendMock does not ship, from blank or from the closest built-in. Mail > Providers and SMS > Providers, 18 new operations in every surface, `add-email-provider` and `add-sms-provider` skill workflows, and seed file support. Plan and build steps: [22-configurable-providers.md](22-configurable-providers.md).
 
 ## Re-audit before sign-off (2026-10-26)
 
