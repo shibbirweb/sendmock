@@ -46,6 +46,8 @@ test("UI-07.4 every screen sets its own tab title, the open item first", async (
 test("UI-07.2 every screen shows an error with Try again when the API fails, and recovers", async ({
   page,
 }) => {
+  // It visits every screen and waits for each, like the accessibility scans.
+  test.setTimeout(120_000);
   await chooseApiResponses(page, "Always 500 server error");
   for (const screen of screensWithData) {
     await navigateInApp(page, screen.path);
@@ -73,6 +75,7 @@ test("UI-07.2 every screen shows an error with Try again when the API fails, and
 test("UI-07.2 every screen shows a skeleton while its data loads", async ({
   page,
 }) => {
+  test.setTimeout(120_000);
   await page.getByRole("button", { name: "Demo controls" }).click();
   await page.getByRole("slider", { name: "Latency" }).focus();
   await page.keyboard.press("End");
