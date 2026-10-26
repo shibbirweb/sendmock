@@ -10,7 +10,7 @@ import type {
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { mergeCredentials } from "@/mocks/payments/payment-gateway-record";
 import { maskSecretValue } from "@/mocks/payments/render-gateway-templates";
-import { buildSampleRequest } from "@/mocks/providers/build-sample-request";
+import { buildSampleRequest } from "@/lib/providers/build-sample-request";
 import {
   findFailure,
   hasValidCredentials,

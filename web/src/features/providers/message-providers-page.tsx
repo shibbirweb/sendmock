@@ -7,6 +7,7 @@ import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddProviderDialog } from "@/features/providers/add-provider-dialog";
+import { MessageProviderSheet } from "@/features/providers/message-provider-sheet";
 import {
   MessageProvidersTable,
   type ProviderRowAction,
@@ -75,12 +76,16 @@ export function MessageProvidersPage({
   const [isAddOpen, setAddOpen] = React.useState(false);
   const [pendingAction, setPendingAction] =
     React.useState<PendingAction | null>(null);
+  const [editedKey, setEditedKey] = React.useState<string | null>(null);
   const messageProviders = providersQuery.data ?? [];
   const activeProviders = messageProviders.filter(
     (messageProvider) => !messageProvider.is_removed,
   );
   const removedProviders = messageProviders.filter(
     (messageProvider) => messageProvider.is_removed,
+  );
+  const editedProvider = messageProviders.find(
+    (messageProvider) => messageProvider.key === editedKey,
   );
 
   function runPendingAction(confirmedAction: PendingAction) {
@@ -129,6 +134,7 @@ export function MessageProvidersPage({
           ) : (
             <MessageProvidersTable
               messageProviders={activeProviders}
+              onEdit={(messageProvider) => setEditedKey(messageProvider.key)}
               onToggle={(messageProvider, isEnabled) => {
                 saveProvider.mutate(
                   {
@@ -167,8 +173,18 @@ export function MessageProvidersPage({
           onCreated={(createdProvider) => {
             setAddOpen(false);
             toast(`${createdProvider.name} added`);
+            setEditedKey(createdProvider.key);
           }}
           onClose={() => setAddOpen(false)}
+        />
+      )}
+      {editedProvider !== undefined && (
+        <MessageProviderSheet
+          key={editedProvider.key}
+          providerArea={providerArea}
+          messageProvider={editedProvider}
+          areaProviders={messageProviders}
+          onClose={() => setEditedKey(null)}
         />
       )}
       {pendingAction !== null && (

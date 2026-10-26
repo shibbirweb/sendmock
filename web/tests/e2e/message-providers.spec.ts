@@ -76,3 +76,61 @@ test("SM-16.3 a built-in is removed and restored, and a custom provider is delet
   await expect(providerRow(page, "SSL Wireless")).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Removed" })).toBeHidden();
 });
+
+async function openProvider(page: Page, providerName: string) {
+  await page
+    .getByRole("button", { name: `Edit ${providerName}`, exact: true })
+    .click();
+
+  return page.getByRole("dialog", { name: providerName });
+}
+
+test("EM-18.3 an edited built-in shows Modified, and Reset to default puts it back", async ({
+  page,
+}) => {
+  await page.goto("/mail/providers");
+  const providerSheet = await openProvider(page, "SendGrid");
+  await providerSheet.getByLabel("Host").fill("api.eu.sendgrid.com");
+  await providerSheet.getByRole("button", { name: "Save provider" }).click();
+  await expect(providerSheet).toBeHidden();
+  await expect(providerRow(page, "SendGrid")).toContainText("Modified");
+
+  await chooseRowAction(page, "SendGrid", "Reset to default");
+  await page.getByRole("button", { name: "Reset to default" }).click();
+  await expect(providerRow(page, "SendGrid")).not.toContainText("Modified");
+});
+
+test("EM-18.4 the preview shows the stored message and the answer, and a refused request stores nothing", async ({
+  page,
+}) => {
+  await page.goto("/mail/providers");
+  const providerSheet = await openProvider(page, "SendGrid");
+  await providerSheet.getByRole("tab", { name: "Preview" }).click();
+
+  await expect(
+    providerSheet.getByTestId("provider-stored-message"),
+  ).toContainText("ana@example.test");
+  await expect(
+    providerSheet.getByTestId("provider-preview-response"),
+  ).toContainText("202");
+
+  await providerSheet.getByLabel("Sample body").fill("{}");
+  await expect(
+    providerSheet.getByTestId("provider-stored-message"),
+  ).toContainText("Nothing is stored");
+  await expect(
+    providerSheet.getByTestId("provider-preview-response"),
+  ).toContainText("400");
+});
+
+test("SM-16.4 a template error is shown and blocks Save", async ({ page }) => {
+  await page.goto("/sms/providers");
+  const providerSheet = await openProvider(page, "Twilio");
+  await providerSheet.getByRole("tab", { name: "Responses" }).click();
+  await providerSheet.getByLabel("Message id").fill("SM{{ random_hex(32) ");
+
+  await expect(providerSheet.getByText(/template error/)).toBeVisible();
+  await expect(
+    providerSheet.getByRole("button", { name: "Save provider" }),
+  ).toBeDisabled();
+});
