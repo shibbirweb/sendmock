@@ -77,13 +77,22 @@ export function collectSchemaNames(
   return collectedNames;
 }
 
-/** A plausible request body for the editor: required fields filled in. */
+/** A full request body for the editor: every field, with its documented example. */
 export function buildExampleValue(
   schema: JsonSchema,
   schemas: SchemaComponents,
   depth = 0,
 ): unknown {
+  if (schema.examples !== undefined && schema.examples.length > 0) {
+    return schema.examples[0];
+  }
   const resolvedSchema = resolveSchema(schema, schemas);
+  if (
+    resolvedSchema.examples !== undefined &&
+    resolvedSchema.examples.length > 0
+  ) {
+    return resolvedSchema.examples[0];
+  }
   if (depth > 6) {
     return null;
   }
@@ -108,14 +117,13 @@ export function buildExampleValue(
       : [];
   }
   if (schemaType === "object" || resolvedSchema.properties) {
-    const requiredNames = new Set(resolvedSchema.required ?? []);
     return Object.fromEntries(
-      Object.entries(resolvedSchema.properties ?? {})
-        .filter(([propertyName]) => requiredNames.has(propertyName))
-        .map(([propertyName, propertySchema]) => [
+      Object.entries(resolvedSchema.properties ?? {}).map(
+        ([propertyName, propertySchema]) => [
           propertyName,
           buildExampleValue(propertySchema, schemas, depth + 1),
-        ]),
+        ],
+      ),
     );
   }
   const primitiveExamples: Record<string, unknown> = {

@@ -66,7 +66,7 @@ test("WS-04.2 snippets in nine languages follow the form", async ({ page }) => {
   const languageButtons = page
     .getByRole("group", { name: "Snippet language" })
     .getByRole("button");
-  await expect(languageButtons).toHaveCount(9);
+  await expect(languageButtons).toHaveCount(11);
   for (const languageName of [
     "cURL",
     "PHP",

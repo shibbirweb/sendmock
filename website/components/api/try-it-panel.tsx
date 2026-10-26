@@ -25,7 +25,11 @@ export function TryItBody({
 
   return (
     <div className="grid gap-4">
-      <RequestForm operation={operation} requestState={requestState} />
+      <RequestForm
+        operation={operation}
+        schemas={schemas}
+        requestState={requestState}
+      />
       <div>
         <button
           type="button"
@@ -44,7 +48,10 @@ export function TryItBody({
       {requestState.sentAtMs !== null && (
         <EventStreamPanel sinceMs={requestState.sentAtMs} />
       )}
-      <CodeSnippets snippetRequest={requestState.snippetRequest} />
+      <CodeSnippets
+        snippetRequest={requestState.snippetRequest}
+        surfaceSnippets={requestState.surfaceSnippets}
+      />
     </div>
   );
 }

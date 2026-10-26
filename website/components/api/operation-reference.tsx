@@ -13,16 +13,16 @@ import { MethodBadge } from "./method-badge";
 import { SchemaTable } from "./schema-table";
 import { TryItPanel } from "./try-it-panel";
 
-/** Only the schemas the operation's body needs, so each page stays small. */
-function pickBodySchemas(
+/** Only the schemas the operation's parameters and body need, so each page stays small. */
+function pickOperationSchemas(
   operation: ApiOperation,
   schemas: SchemaComponents,
 ): SchemaComponents {
-  if (operation.requestBody === null) {
-    return {};
-  }
   const schemaNames = collectSchemaNames(
-    [operation.requestBody.schema],
+    [
+      ...operation.parameters.map((parameter) => parameter.schema),
+      ...(operation.requestBody === null ? [] : [operation.requestBody.schema]),
+    ],
     schemas,
   );
   return Object.fromEntries(
@@ -141,7 +141,7 @@ export function OperationReference({
       </section>
       <TryItPanel
         operation={operation}
-        schemas={pickBodySchemas(operation, schemas)}
+        schemas={pickOperationSchemas(operation, schemas)}
       />
     </article>
   );

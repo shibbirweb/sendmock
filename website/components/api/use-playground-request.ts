@@ -6,9 +6,19 @@ import type {
   ApiOperation,
   SchemaComponents,
 } from "@/lib/openapi/openapi-types";
+import { listSchemaFields } from "@/lib/openapi/schema-fields";
 import { buildExampleValue } from "@/lib/openapi/schema-tools";
+import {
+  findBodyProblems,
+  parseBodyObject,
+} from "@/lib/playground/body-fields";
 import type { PlaygroundResponse } from "@/lib/playground/bridge-messages";
 import type { SnippetRequest } from "@/lib/playground/build-snippets";
+import {
+  buildCliSnippet,
+  buildMcpSnippet,
+  type SnippetFormValues,
+} from "@/lib/playground/build-surface-snippets";
 import { useDemoBridge } from "@/lib/playground/demo-bridge-provider";
 import { findDemoPathValues } from "@/lib/playground/demo-path-values";
 
@@ -102,6 +112,56 @@ export function usePlaygroundRequest(
     return headers;
   }, [operation.requestBody]);
   const requestBody = operation.requestBody === null ? null : bodyText;
+  const isJsonBody =
+    operation.requestBody?.contentType.includes("json") ?? false;
+  const bodyFields = useMemo(
+    () =>
+      operation.requestBody === null || !isJsonBody
+        ? []
+        : listSchemaFields(operation.requestBody.schema, schemas),
+    [operation.requestBody, isJsonBody, schemas],
+  );
+  const bodyProblems = useMemo(
+    () =>
+      isJsonBody
+        ? findBodyProblems(
+            bodyText,
+            bodyFields.filter((bodyField) => bodyField.depth === 0),
+          )
+        : [],
+    [isJsonBody, bodyText, bodyFields],
+  );
+  const snippetFormValues: SnippetFormValues = {
+    pathValues,
+    queryValues,
+    bodyObject: isJsonBody
+      ? (parseBodyObject(bodyText) ?? undefined)
+      : undefined,
+    rawBody: isJsonBody ? null : requestBody,
+  };
+  const surfaceSnippets = {
+    cli:
+      operation.surfaces.cliSnippetSource === null
+        ? null
+        : {
+            text: buildCliSnippet(
+              operation.surfaces.cliSnippetSource,
+              snippetFormValues,
+            ),
+            url: operation.surfaces.cliSnippetSource.url,
+          },
+    mcp:
+      operation.surfaces.mcpSnippetSource === null
+        ? null
+        : {
+            text: buildMcpSnippet(
+              operation.surfaces.mcpSnippetSource,
+              snippetFormValues,
+            ),
+            url: operation.surfaces.mcpSnippetSource.url,
+          },
+    mcpExemptReason: operation.surfaces.mcpExemptReason,
+  };
   const snippetRequest: SnippetRequest = {
     method: operation.method,
     url: `${localInstanceUrl}${requestPath}`,
@@ -130,7 +190,11 @@ export function usePlaygroundRequest(
     setQueryValues,
     bodyText,
     setBodyText,
+    resetBody: () => setBodyText(buildInitialBody(operation, schemas)),
+    bodyFields,
+    bodyProblems,
     snippetRequest,
+    surfaceSnippets,
     response,
     isSending,
     sentAtMs,

@@ -2,6 +2,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type {
+  CliSnippetSource,
+  McpSnippetSource,
+} from "@/lib/playground/build-surface-snippets";
+
+import type {
   CliCommand,
   CliReference,
   McpReference,
@@ -55,40 +60,107 @@ export function toApiOperationUrl(
   return `/api/${referencedOperation.area_slug}/#${referencedOperation.operation_id}`;
 }
 
-/** `GET /api/v1/emails` to the CLI command and MCP entry that run it. */
+export type OperationReferenceLinks = {
+  cliUrl: string | null;
+  mcpUrl: string | null;
+  cliSnippetSource: CliSnippetSource | null;
+  mcpSnippetSource: McpSnippetSource | null;
+};
+
+function readSelectorValue(
+  cliOrMcpEntry: { operations: ReferencedOperation[] },
+  operationKey: string,
+): string | null {
+  const operation = cliOrMcpEntry.operations.find(
+    (referencedOperation) =>
+      `${referencedOperation.method} ${referencedOperation.path}` ===
+      operationKey,
+  );
+
+  return operation?.selector?.value ?? null;
+}
+
+function toCliSnippetSource(
+  cliCommand: CliCommand,
+  operationKey: string,
+): CliSnippetSource {
+  return {
+    usage: cliCommand.usage,
+    url: toCliCommandUrl(cliCommand),
+    arguments: cliCommand.arguments,
+    flags: cliCommand.flags,
+    selectorValue: readSelectorValue(cliCommand, operationKey),
+  };
+}
+
+function toMcpToolSnippetSource(
+  mcpTool: McpTool,
+  operationKey: string,
+): McpSnippetSource {
+  return {
+    kind: "tool",
+    name: mcpTool.name,
+    url: toMcpToolUrl(mcpTool),
+    properties: mcpTool.properties.map((mcpProperty) => ({
+      name: mcpProperty.name,
+      input: mcpProperty.input,
+      type: mcpProperty.type,
+    })),
+    selectorValue: readSelectorValue(mcpTool, operationKey),
+  };
+}
+
+/** `GET /api/v1/emails` to the CLI command and MCP entry that run it, with their snippet sources. */
 export function indexReferencesByOperation(): Map<
   string,
-  { cliUrl: string; mcpUrl: string | null }
+  OperationReferenceLinks
 > {
-  const cliUrls = new Map<string, string>();
+  const referenceLinks = new Map<string, OperationReferenceLinks>();
+  const readLinks = (operationKey: string): OperationReferenceLinks =>
+    referenceLinks.get(operationKey) ?? {
+      cliUrl: null,
+      mcpUrl: null,
+      cliSnippetSource: null,
+      mcpSnippetSource: null,
+    };
   for (const cliCommand of loadCliReference().commands) {
     for (const operation of cliCommand.operations) {
-      cliUrls.set(
-        `${operation.method} ${operation.path}`,
-        toCliCommandUrl(cliCommand),
-      );
+      const operationKey = `${operation.method} ${operation.path}`;
+      const cliSnippetSource = toCliSnippetSource(cliCommand, operationKey);
+      referenceLinks.set(operationKey, {
+        ...readLinks(operationKey),
+        cliUrl: cliSnippetSource.url,
+        cliSnippetSource,
+      });
     }
   }
   const mcpReference = loadMcpReference();
-  const mcpUrls = new Map<string, string>([
-    ...mcpReference.tools.flatMap((mcpTool) =>
-      mcpTool.operations.map((operation): [string, string] => [
-        `${operation.method} ${operation.path}`,
-        toMcpToolUrl(mcpTool),
-      ]),
-    ),
-    ...mcpReference.resources.map((mcpResource): [string, string] => [
-      `${mcpResource.operation.method} ${mcpResource.operation.path}`,
-      toMcpResourceUrl(mcpResource),
-    ]),
-  ]);
+  for (const mcpTool of mcpReference.tools) {
+    for (const operation of mcpTool.operations) {
+      const operationKey = `${operation.method} ${operation.path}`;
+      const mcpSnippetSource = toMcpToolSnippetSource(mcpTool, operationKey);
+      referenceLinks.set(operationKey, {
+        ...readLinks(operationKey),
+        mcpUrl: mcpSnippetSource.url,
+        mcpSnippetSource,
+      });
+    }
+  }
+  for (const mcpResource of mcpReference.resources) {
+    const operationKey = `${mcpResource.operation.method} ${mcpResource.operation.path}`;
+    const resourceUrl = toMcpResourceUrl(mcpResource);
+    referenceLinks.set(operationKey, {
+      ...readLinks(operationKey),
+      mcpUrl: resourceUrl,
+      mcpSnippetSource: {
+        kind: "resource",
+        uri: mcpResource.uri,
+        url: resourceUrl,
+      },
+    });
+  }
 
-  return new Map(
-    [...cliUrls].map(([operationKey, cliUrl]) => [
-      operationKey,
-      { cliUrl, mcpUrl: mcpUrls.get(operationKey) ?? null },
-    ]),
-  );
+  return referenceLinks;
 }
 
 /** The catalogue's command text (`sendmock email update <emailId>`) to its entry. */
