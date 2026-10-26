@@ -4,8 +4,10 @@ import type { Page } from "@playwright/test";
 export const appScreens = [
   { path: "/", title: "Overview · SendMock" },
   { path: "/mail", title: "Mail · SendMock" },
+  { path: "/mail/providers", title: "Providers · Mail · SendMock" },
   { path: "/sms", title: "SMS · SendMock" },
   { path: "/sms/verify", title: "Verify · SendMock" },
+  { path: "/sms/providers", title: "Providers · SMS · SendMock" },
   { path: "/http", title: "HTTP Catcher · SendMock" },
   { path: "/webhooks/overview", title: "Overview · Webhooks · SendMock" },
   { path: "/webhooks/endpoints", title: "Endpoints · Webhooks · SendMock" },

@@ -3198,7 +3198,7 @@ paths:
       x-sendmock-ui: Mail > Providers
     post:
       operationId: postEmailsProviders
-      summary: Add a email provider, blank or copied from another.
+      summary: Add an email provider, blank or copied from another.
       tags:
         - Email providers
       requestBody:
@@ -3461,7 +3461,7 @@ paths:
       x-sendmock-ui: SMS > Providers
     post:
       operationId: postSmsProviders
-      summary: Add a sms provider, blank or copied from another.
+      summary: Add an SMS provider, blank or copied from another.
       tags:
         - SMS providers
       requestBody:

@@ -21,7 +21,7 @@ function buildProviderEndpoints(
     {
       method: "POST",
       path: basePath,
-      summary: `Add a ${areaName.toLowerCase()} provider, blank or copied from another.`,
+      summary: `Add ${areaName === "Email" ? "an email" : "an SMS"} provider, blank or copied from another.`,
       requestBody: typeRef("MessageProviderCreateRequest"),
       response: typeRef("MessageProviderDefinition"),
       successStatus: 201,

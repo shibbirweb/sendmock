@@ -158,7 +158,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Mock data and handlers for the 11 built-ins and custom providers (step 3)
   - [x] Screens: lists, Removed group, Add provider, row actions (step 4)
   - [x] Screens: provider sheet and preview (step 5)
-  - [ ] Wiring: message badge, provider filters, Settings > Connection (step 6)
+  - [x] Wiring: message badge, provider filters, Settings > Connection (step 6)
   - [ ] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
   - [ ] Tests per criterion, parity and walkthrough tests (step 8)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)

@@ -12,6 +12,8 @@ Everything here can also be done by an AI agent: see [Build it with AI](../ai/bu
 | Page | Create or change |
 | --- | --- |
 | [Create a payment gateway](./payment-gateway.md) | a complete gateway SendMock does not ship, from its docs to a working checkout, redirect and notification |
+| [Create an email provider](./email-provider.md) | an email API SendMock does not ship, from its docs to a working provider |
+| [Create an SMS provider](./sms-provider.md) | a regional or smaller SMS vendor, from its docs to a working provider with its own error codes |
 | [Create a payment method](./payment-method.md) | a wallet, bank or card method with its own test values |
 | [Create a payment flow](./payment-flow.md) | the steps a checkout asks for, with your own labels |
 

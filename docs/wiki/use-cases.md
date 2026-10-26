@@ -14,6 +14,7 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 | check my HTML on phones and in Outlook and Gmail | HTML preview widths, Checks | [Reading and checks](./mail/reading-and-checks.md) |
 | handle bounces, spam complaints and unsubscribes | magic addresses, Simulate | [Recipe: bounces and complaints](./recipes/bounces-and-complaints.md) |
 | make my own test addresses always bounce or be rejected | custom outcome addresses | [Advanced: email outcome addresses](./advanced/email-outcome-addresses.md) |
+| test an email API SendMock does not ship, or one that differs from my account | Mail > Providers | [Mail > Providers](./mail/providers.md), [Advanced: create an email provider](./advanced/email-provider.md) |
 | let users answer a notification by email | Reply as recipient, Inbound routes | [Recipe: reply by email](./recipes/reply-by-email.md) |
 | receive inbound email the way Postmark, SendGrid or Mailgun sends it | built-in templates, rules | [Recipe: inbound email](./recipes/inbound-email.md) |
 | send one real copy to a colleague, safely | Release with an allowlist | [Release](./mail/release.md) |
@@ -31,6 +32,7 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 | test a Twilio Verify login, including expired codes and too many attempts | Verify, force outcome | [Recipe: Twilio Verify login](./recipes/twilio-verify-login.md) |
 | test WhatsApp messages and media | WhatsApp channel, MMS | [Replies and WhatsApp](./sms/replies-and-whatsapp.md) |
 | have my app's code format found | OTP patterns | [Advanced: OTP patterns](./advanced/otp-patterns.md) |
+| test a regional SMS vendor SendMock does not ship, or change how a built-in answers | SMS > Providers | [SMS > Providers](./sms/providers.md), [Advanced: create an SMS provider](./advanced/sms-provider.md) |
 
 ## Payments
 
@@ -76,4 +78,4 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 
 ## Browse by menu
 
-[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP Catcher](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)
+[Overview](./overview.md) · [Mail](./mail/index.md): [Providers](./mail/providers.md) · [SMS](./sms/index.md): [Verify](./sms/verify.md), [Providers](./sms/providers.md) · [HTTP Catcher](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)

@@ -65,13 +65,12 @@ test("UI-01.1 sections with sub-items show a chevron that turns when the group o
       .getByRole("link", { name: sectionTitle, exact: true })
       .getByTestId("sidebar-group-chevron");
 
-  for (const groupTitle of ["SMS", "Webhooks", "Payments"]) {
+  for (const groupTitle of ["Mail", "SMS", "Webhooks", "Payments"]) {
     await expect(chevronOf(groupTitle)).toBeVisible();
     await expect(chevronOf(groupTitle)).not.toHaveClass(/rotate-90/);
   }
   for (const plainTitle of [
     "Overview",
-    "Mail",
     "HTTP Catcher",
     "Numbers",
     "Logs",

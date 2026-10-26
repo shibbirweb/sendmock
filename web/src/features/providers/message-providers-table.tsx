@@ -79,7 +79,8 @@ export function MessageProvidersTable({
               {messageProvider.key}
             </TableCell>
             <TableCell className="hidden text-xs text-muted-foreground tabular-nums md:table-cell">
-              {messageProvider.message_count_24h} messages
+              {messageProvider.message_count_24h}{" "}
+              {messageProvider.message_count_24h === 1 ? "message" : "messages"}
             </TableCell>
             <TableCell>
               <Switch

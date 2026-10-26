@@ -1566,7 +1566,7 @@
     {
       "name": "sendmock_email_provider_create",
       "toolset": "email",
-      "summary": "Add a email provider, blank or copied from another.",
+      "summary": "Add an email provider, blank or copied from another.",
       "area": "Email providers",
       "area_slug": "email-providers",
       "operations": [
@@ -1574,7 +1574,7 @@
           "method": "POST",
           "path": "/api/v1/emails/providers",
           "operation_id": "postEmailsProviders",
-          "summary": "Add a email provider, blank or copied from another.",
+          "summary": "Add an email provider, blank or copied from another.",
           "area_slug": "email-providers",
           "selector": null
         }
@@ -17040,7 +17040,7 @@
     {
       "name": "sendmock_sms_provider_create",
       "toolset": "sms",
-      "summary": "Add a sms provider, blank or copied from another.",
+      "summary": "Add an SMS provider, blank or copied from another.",
       "area": "SMS providers",
       "area_slug": "sms-providers",
       "operations": [
@@ -17048,7 +17048,7 @@
           "method": "POST",
           "path": "/api/v1/sms/providers",
           "operation_id": "postSmsProviders",
-          "summary": "Add a sms provider, blank or copied from another.",
+          "summary": "Add an SMS provider, blank or copied from another.",
           "area_slug": "sms-providers",
           "selector": null
         }

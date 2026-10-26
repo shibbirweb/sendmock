@@ -49,5 +49,6 @@ That is 15 built-in provider APIs; the landing page counts this list.
 ## Add or change a provider
 
 - **Payment gateways:** see [Advanced: create a gateway](./advanced/payment-gateway.md), or open a built-in on the [Gateways](./payments/gateways.md) screen to change it.
-- **Email and SMS providers:** they follow the same model as gateways, arriving with the provider phases.
+- **Email providers:** [Mail > Providers](./mail/providers.md), and the walkthrough [Advanced: create an email provider](./advanced/email-provider.md).
+- **SMS providers:** [SMS > Providers](./sms/providers.md), and the walkthrough [Advanced: create an SMS provider](./advanced/sms-provider.md).
 - **The shape of the webhooks SendMock sends** (Slack, Discord, Telnyx and more): see [Advanced: templates](./advanced/templates.md).
