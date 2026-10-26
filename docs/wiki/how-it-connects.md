@@ -58,6 +58,7 @@ Read it top to bottom:
 | [Webhooks](./webhooks/index.md) | events from every capture menu; gateway notifications from Payments | requests to your app, all logged in Deliveries |
 | [Payments](./payments/index.md) | your app over a gateway API; the test checkout page | redirects to your app; notifications through the gateway's endpoint into Deliveries; `payment.*` events to Rules |
 | [Numbers](./numbers.md) | your setup, as in a provider console | where incoming SMS go; which number a Messaging Service sends from |
+| [Scenarios](./scenarios.md) | a scenario file | its steps call the same operations as every other menu, in order |
 | [Logs](./logs.md) | the raw traffic behind Mail, SMS, Verify and Payments | links to the message each request created |
 | [Settings](./settings.md) | your choices | how every capture menu behaves; the seed file for teams and CI |
 
@@ -87,7 +88,7 @@ Read it top to bottom:
 
 ## Every menu page
 
-[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Logs](./logs.md) · [Settings](./settings.md)
+[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)
 
 ## Where to go next
 

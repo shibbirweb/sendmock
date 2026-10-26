@@ -68,8 +68,13 @@ Two-way SMS and sender pools in depth: [Advanced: numbers and Messaging Services
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| numbers | `sendmock numbers list`, `... add`, `... update`, `... remove` | `/api/v1/numbers` | `sendmock_number_list`, `sendmock_number_upsert`, `sendmock_number_delete` |
-| Messaging Services | `sendmock sms services list`, `... create` | `/api/v1/messaging-services` | `sendmock_messaging_service_list`, `_create` |
+| list numbers | `sendmock numbers list` | [`GET /api/v1/numbers`](/api/numbers/#getNumbers) | `sendmock_number_list` |
+| add a number | `sendmock numbers add` | [`POST /api/v1/numbers`](/api/numbers/#postNumbers) | `sendmock_number_upsert` |
+| change a number | `sendmock numbers update <numberId>` | [`PATCH /api/v1/numbers/{numberId}`](/api/numbers/#patchNumbersByNumberId) | `sendmock_number_upsert` |
+| remove a number | `sendmock numbers remove <numberId>` | [`DELETE /api/v1/numbers/{numberId}`](/api/numbers/#deleteNumbersByNumberId) | `sendmock_number_delete` |
+| list Messaging Services | `sendmock sms services list` | [`GET /api/v1/messaging-services`](/api/numbers/#getMessagingServices) | `sendmock_messaging_service_list` |
+| add a service | `sendmock sms services create` | [`POST /api/v1/messaging-services`](/api/numbers/#postMessagingServices) | `sendmock_messaging_service_create` |
+| change a service | `sendmock sms services update <serviceSid>` | [`PATCH /api/v1/messaging-services/{serviceSid}`](/api/numbers/#patchMessagingServicesByServiceSid) | `sendmock_messaging_service_update` |
 
 ## Related
 

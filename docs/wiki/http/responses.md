@@ -52,8 +52,10 @@ Step by step, with examples: [Advanced: catcher responses](../advanced/catcher-r
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| set a reply | `sendmock http response set --bin push --status 429` | `/api/v1/http/bins/{binId}/responses` | `sendmock_http_response_set` |
-| preview a rule | | `POST /api/v1/http/bins/{binId}/responses/preview` | |
+| list the rules | `sendmock http response list <binId>` | [`GET /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#getHttpBinsByBinIdResponses) | `sendmock_http_response_list` |
+| set the rules | `sendmock http response set <binId>` | [`PUT /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#putHttpBinsByBinIdResponses) | `sendmock_http_response_set` |
+| preview a rule | `sendmock http response preview <binId>` | [`POST /api/v1/http/bins/{binId}/responses/preview`](/api/http-catcher/#postHttpBinsByBinIdResponsesPreview) | `sendmock_http_response_preview` |
+| change the default reply | `sendmock http bin update <binId>` | [`PATCH /api/v1/http/bins/{binId}`](/api/http-catcher/#patchHttpBinsByBinId) | `sendmock_http_bin_update` |
 
 ## Related
 

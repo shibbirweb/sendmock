@@ -51,8 +51,10 @@ Step by step: [Recipe: bounces and complaints](../recipes/bounces-and-complaints
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| simulate | `sendmock email simulate <emailId> bounced --bounce-type hard` | `POST /api/v1/emails/{emailId}/simulate` with `{"event": "bounced", "bounce_type": "hard"}` | `sendmock_email_simulate` |
-| own outcome addresses | `sendmock outcome-rule ...` | `/api/v1/outcome-rules/email` | outcome rule tools |
+| simulate | `sendmock email simulate <emailId> <event>` | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | `sendmock_email_simulate` |
+| list own outcome addresses | `sendmock outcome-rule email list` | [`GET /api/v1/outcome-rules/email`](/api/outcome-rules/#getOutcomeRulesEmail) | `sendmock_outcome_rule_list` |
+| add one | `sendmock outcome-rule email create` | [`POST /api/v1/outcome-rules/email`](/api/outcome-rules/#postOutcomeRulesEmail) | `sendmock_outcome_rule_create` |
+| test an address | `sendmock outcome-rule email test <address>` | [`POST /api/v1/outcome-rules/email/test`](/api/outcome-rules/#postOutcomeRulesEmailTest) | `sendmock_outcome_rule_test` |
 
 ## Related
 

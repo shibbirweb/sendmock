@@ -50,6 +50,13 @@ Only test values are accepted. A card number that passes the Luhn check but is n
 
 Every control is reachable with `Tab` in order, and `Enter` submits the current step.
 
+## From the CLI, API and AI
+
+| Do this | CLI | API | MCP tool |
+| --- | --- | --- | --- |
+| what the page shows | `sendmock payments checkout show <sessionId>` | [`GET /api/v1/checkout-sessions/{sessionId}`](/api/checkout/#getCheckoutSessionsBySessionId) | `sendmock_checkout_get` |
+| pay, decline or cancel | `sendmock payments checkout complete <sessionId> <action>` | [`POST /api/v1/checkout-sessions/{sessionId}/complete`](/api/checkout/#postCheckoutSessionsBySessionIdComplete) | `sendmock_checkout_complete` |
+
 ## Related
 
 - [Payments](./index.md)

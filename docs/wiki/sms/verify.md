@@ -57,10 +57,13 @@ A table of Verify services: name, SID (copy), code length, fixed code (or Random
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock verify list` | `GET /api/v1/verify` | `sendmock_verify_list` |
-| read the latest code | `sendmock otp --to +8801700000000` | | `sendmock_otp_get` |
-| force an outcome | `sendmock verify force <verificationId> expired` | `POST /api/v1/verify/{verificationSid}/force` | `sendmock_verify_force` |
-| services | `sendmock verify services list` | `/api/v1/verify/services` | `sendmock_verify_service_list` |
+| list | `sendmock verify list` | [`GET /api/v1/verify`](/api/verify/#getVerify) | `sendmock_verify_list` |
+| one verification | `sendmock verify show <verificationSid>` | [`GET /api/v1/verify/{verificationSid}`](/api/verify/#getVerifyByVerificationSid) | `sendmock_verify_get` |
+| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
+| force an outcome | `sendmock verify force <verificationSid> <status>` | [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce) | `sendmock_verify_force` |
+| list services | `sendmock verify services list` | [`GET /api/v1/verify/services`](/api/verify/#getVerifyServices) | `sendmock_verify_service_list` |
+| add a service | `sendmock verify services create` | [`POST /api/v1/verify/services`](/api/verify/#postVerifyServices) | `sendmock_verify_service_create` |
+| change a service | `sendmock verify services update <serviceSid>` | [`PATCH /api/v1/verify/services/{serviceSid}`](/api/verify/#patchVerifyServicesByServiceSid) | `sendmock_verify_service_update` |
 
 ## Related
 

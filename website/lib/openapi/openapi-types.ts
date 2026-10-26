@@ -45,4 +45,14 @@ export type ApiOperation = {
   parameters: ApiParameter[];
   requestBody: ApiBody | null;
   responses: ApiResponse[];
+  surfaces: OperationSurfaces;
+};
+
+/** The same operation from the CLI, an AI agent and the UI (`x-sendmock-*`, UI-11.3). */
+export type OperationSurfaces = {
+  cli: string;
+  /** Null only where agents may not act, with the reason. */
+  mcp: string | null;
+  mcpExemptReason: string | null;
+  ui: string;
 };

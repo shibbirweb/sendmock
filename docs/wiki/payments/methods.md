@@ -61,9 +61,12 @@ Add a new wallet end to end: [Advanced: payment method](../advanced/payment-meth
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, show | `sendmock payments methods list` | `GET /api/v1/payments/methods` | `sendmock_payment_method_list`, `_get` |
-| create, update | `sendmock payments methods create`, `... update` | `POST`, `PATCH /api/v1/payments/methods` | `sendmock_payment_method_create`, `_update` |
-| reset a built-in | `sendmock payments methods reset <key>` | `POST /api/v1/payments/methods/{methodKey}/reset` | `sendmock_payment_method_reset` |
+| list | `sendmock payments methods list` | [`GET /api/v1/payments/methods`](/api/payment-methods/#getPaymentsMethods) | `sendmock_payment_method_list` |
+| one method | `sendmock payments methods show <methodKey>` | [`GET /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#getPaymentsMethodsByMethodKey) | `sendmock_payment_method_get` |
+| create | `sendmock payments methods create` | [`POST /api/v1/payments/methods`](/api/payment-methods/#postPaymentsMethods) | `sendmock_payment_method_create` |
+| update | `sendmock payments methods update <methodKey>` | [`PATCH /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#patchPaymentsMethodsByMethodKey) | `sendmock_payment_method_update` |
+| reset a built-in | `sendmock payments methods reset <methodKey>` | [`POST /api/v1/payments/methods/{methodKey}/reset`](/api/payment-methods/#postPaymentsMethodsByMethodKeyReset) | `sendmock_payment_method_reset` |
+| delete a custom one | `sendmock payments methods delete <methodKey>` | [`DELETE /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#deletePaymentsMethodsByMethodKey) | `sendmock_payment_method_delete` |
 
 ## Related
 

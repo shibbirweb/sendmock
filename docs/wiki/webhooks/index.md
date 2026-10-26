@@ -98,9 +98,9 @@ SendMock's own JSON follows [Standard Webhooks](https://www.standardwebhooks.com
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| health | `sendmock stats` | `GET /api/v1/webhooks/metrics` | `sendmock_stats` |
-| watch deliveries live | `sendmock webhook tail` | WebSocket | |
-| watch events live | `sendmock events tail` | WebSocket | `sendmock_events_recent` |
+| health | `sendmock webhook metrics` | [`GET /api/v1/webhooks/metrics`](/api/webhook-deliveries/#getWebhooksMetrics) | `sendmock_webhook_metrics` |
+| recent events | `sendmock events tail` | [`GET /api/v1/events/recent`](/api/automation/#getEventsRecent) | `sendmock_events_recent` |
+| wait for a delivery | `sendmock webhook deliveries wait` | [`GET /api/v1/wait/webhook`](/api/test-helpers/#getWaitWebhook) | `sendmock_webhook_delivery_wait` |
 
 ## Related
 

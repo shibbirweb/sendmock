@@ -81,9 +81,15 @@ Compose a QR wallet flow from scratch: [Advanced: payment flow](../advanced/paym
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, show | `sendmock payments flows list` | `GET /api/v1/payments/flows` | `sendmock_payment_flow_list`, `_get` |
-| add, move, remove, update a step | `sendmock payments flows steps add` (`move`, `remove`, `update`) | `/api/v1/payments/flows/{flowKey}/steps` | `sendmock_payment_flow_step_add` (`_move`, `_remove`, `_update`) |
-| the catalogue, the variables | `sendmock payments flows step-types`, `... variables` | `GET /api/v1/payments/step-types`, `/flow-variables` | `sendmock_payment_step_type_list`, `sendmock_payment_flow_variable_list` |
+| list | `sendmock payments flows list` | [`GET /api/v1/payments/flows`](/api/payment-flows/#getPaymentsFlows) | `sendmock_payment_flow_list` |
+| one flow | `sendmock payments flows show <flowKey>` | [`GET /api/v1/payments/flows/{flowKey}`](/api/payment-flows/#getPaymentsFlowsByFlowKey) | `sendmock_payment_flow_get` |
+| create | `sendmock payments flows create` | [`POST /api/v1/payments/flows`](/api/payment-flows/#postPaymentsFlows) | `sendmock_payment_flow_create` |
+| add a step | `sendmock payments flows steps add <flowKey>` | [`POST /api/v1/payments/flows/{flowKey}/steps`](/api/payment-flows/#postPaymentsFlowsByFlowKeySteps) | `sendmock_payment_flow_step_add` |
+| change or move a step | `sendmock payments flows steps update <flowKey> <stepIndex>` | [`PATCH /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#patchPaymentsFlowsByFlowKeyStepsByStepIndex) | `sendmock_payment_flow_step_update` |
+| remove a step | `sendmock payments flows steps remove <flowKey> <stepIndex>` | [`DELETE /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#deletePaymentsFlowsByFlowKeyStepsByStepIndex) | `sendmock_payment_flow_step_remove` |
+| the step catalogue | `sendmock payments flows step-types` | [`GET /api/v1/payments/step-types`](/api/payment-flows/#getPaymentsStepTypes) | `sendmock_payment_step_type_list` |
+| the label variables | `sendmock payments flows variables` | [`GET /api/v1/payments/flow-variables`](/api/payment-flows/#getPaymentsFlowVariables) | `sendmock_payment_flow_variable_list` |
+| reset a built-in | `sendmock payments flows reset <flowKey>` | [`POST /api/v1/payments/flows/{flowKey}/reset`](/api/payment-flows/#postPaymentsFlowsByFlowKeyReset) | `sendmock_payment_flow_reset` |
 
 ## Related
 

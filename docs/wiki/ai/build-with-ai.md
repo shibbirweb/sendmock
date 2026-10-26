@@ -20,6 +20,8 @@ Everything on the [Advanced](../advanced/index.md) pages, an agent can do from o
 | "Route reply+ticket emails to /tickets/:id/replies" | creates an inbound route with a named group, previews it against recent emails | inbound route tools |
 | "Make the Slack bin answer 429 one time in ten" | adds a response rule with a failure rate | `sendmock_http_response_set` |
 | "Make qa+fail@ bounce and +1555777 numbers fail with 30007" | creates email and SMS outcome rules, checks them with the tester | outcome rule tools |
+| "Tag every email with Invoice in the subject as billing" | creates a tag rule with that filter and checks it against recent mail | `sendmock_tag_rule_create` |
+| "Write a scenario for the checkout and run it" | writes the TOML steps, validates and runs it, and saves the file | `sendmock_scenario_validate`, `sendmock_scenario_run` |
 | "Add a Login Verify service with the fixed code 123456" | creates the Verify service | `sendmock_verify_service_create` |
 | "Why did my webhook fail?" | reads the delivery, explains the error, suggests a fix, replays after you fix it | `debug-failed-webhook` prompt |
 | "Test my OTP login" | triggers your app, waits for the SMS, reads the code, finishes the login, writes a scenario | `test-otp-flow` prompt, `sendmock_otp_get` |

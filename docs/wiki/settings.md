@@ -56,7 +56,8 @@ The seed file (`sendmock.seed.toml`) is the configuration SendMock starts from a
 - **Magic addresses:** the switch, and the reference table of the SES simulator and SendMock addresses ([Outcomes](./mail/outcomes.md)).
 - **Custom outcome addresses:** your own rules, with **Test an address** ([Advanced: email outcome addresses](./advanced/email-outcome-addresses.md)).
 - **Release to real SMTP:** **Relay SMTP URL** (password masked) and **Allowed recipients**; release stays off until the list has an entry ([Release](./mail/release.md)).
-- **Tag and forward rules:** rules that tag or auto-forward arriving emails, edited with the webhook rule builder.
+- **Tag rules:** add a tag to arriving emails that match a filter (the webhook rule filter builder, with a preview of the last 50 emails), in order; each can be switched off, moved and deleted.
+- **Auto-forward rules:** release a real copy of matching arriving emails to fixed addresses, through the relay and only to allowed recipients; the email's **Timeline** says where it went, or why not.
 
 ### SMS
 
@@ -86,7 +87,9 @@ Make SMTP fail on purpose: **Reject the next** N messages **With code** 421, 450
 
 ### Connection
 
-**Connect your app:** copy-ready settings for SMTP, the email API, SMS and the HTTP catcher. Pick a **Language** (Laravel and PHP, Node.js, Python, Go, Java, Ruby, .NET, cURL) and **Where does your app run?** (this machine `127.0.0.1`, a container talking to the host `host.docker.internal`, or the same Docker Compose project `sendmock`). Edit the request headers and the email and SMS bodies; every snippet follows as you type, and a value `"{{file:invoice.pdf}}"` is read and base64-encoded the way each language does it. The same content is in [Connect your app](./connect/index.md).
+**Connect your app:** copy-ready settings for SMTP, the email API, SMS and the HTTP catcher. Pick a **Language** (Laravel and PHP, Node.js, Python, Go, Java, Ruby, .NET, cURL) and **Where does your app run?** (this machine `127.0.0.1`, a container talking to the host `host.docker.internal`, or the same Docker Compose project `sendmock`). Edit the request headers and the email and SMS bodies; every snippet follows as you type, and a value `"{{file:invoice.pdf}}"` is read and base64-encoded the way each language does it. **Send this request** under each body runs that email or SMS call against this SendMock, with your headers, so you see exactly what your app's call will do. The same content is in [Connect your app](./connect/index.md).
+
+**AI agents** (its own card): pick Claude Code, Codex, Cursor, Gemini CLI or VS Code to see the install command, the MCP configuration and where it goes, and **Download the skill**. See [AI](./ai/index.md).
 
 ### About
 
@@ -100,10 +103,22 @@ Settings are part of the seed file, so a team shares them: [Advanced: seed file]
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| read and change | `sendmock settings get`, `sendmock settings set <key> <value>` | `GET`, `PATCH /api/v1/settings` | `sendmock_settings_get`, `sendmock_settings_update` |
-| chaos | `sendmock chaos smtp-reject`, `... clear` | `PATCH /api/v1/settings` | `sendmock_chaos_set` |
-| reset to seed | `sendmock reset --yes` | `POST /api/v1/reset` | `sendmock_reset` |
-| seed file | `sendmock seed export`, `... validate`, `... apply` | `/api/v1/seed/export`, `/validate`, `/apply` | `sendmock_seed_export`, `sendmock_seed_apply` |
+| read | `sendmock settings get` | [`GET /api/v1/settings`](/api/system/#getSettings) | `sendmock_settings_get` |
+| change, chaos too | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
+| reset to seed | `sendmock reset --yes` | [`POST /api/v1/reset`](/api/system/#postReset) | `sendmock_reset` |
+| seed status | `sendmock seed status` | [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus) | `sendmock_seed_status` |
+| export the seed | `sendmock seed export` | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | `sendmock_seed_export` |
+| validate a seed file | `sendmock seed validate <file>` | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | `sendmock_seed_validate` |
+| apply a seed file | `sendmock seed apply <file>` | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | `sendmock_seed_apply` |
+| tag rules | `sendmock email tag-rules list` | [`GET /api/v1/tag-rules`](/api/tag-rules/#getTagRules) | `sendmock_tag_rule_list` |
+| add a tag rule | `sendmock email tag-rules create` | [`POST /api/v1/tag-rules`](/api/tag-rules/#postTagRules) | `sendmock_tag_rule_create` |
+| auto-forward rules | `sendmock email forward-rules list` | [`GET /api/v1/forward-rules`](/api/forward-rules/#getForwardRules) | `sendmock_forward_rule_list` |
+| add an auto-forward rule | `sendmock email forward-rules create` | [`POST /api/v1/forward-rules`](/api/forward-rules/#postForwardRules) | `sendmock_forward_rule_create` |
+| connection snippet for a stack | `sendmock integrate <stack>` | [`GET /api/v1/integrations/{stack}`](/api/automation/#getIntegrationsByStack) | `sendmock_integration_snippet` |
+| AI agent setup | `sendmock ai install --target <agent>` | [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents) | `sendmock_ai_agents` |
+| the agent skill | `sendmock ai skill` | [`GET /api/v1/ai/skill`](/api/automation/#getAiSkill) | `sendmock://docs/skill` |
+| send a sample | `sendmock sample <kind>` | [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind) | `sendmock_sample_send` |
+| check for updates | `sendmock update check` | [`GET /api/v1/updates`](/api/system/#getUpdates) | `sendmock_update_check` |
 
 ## Related
 

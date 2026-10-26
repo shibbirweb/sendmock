@@ -60,9 +60,15 @@ Edit a built-in (it shows **Modified**; **Reset to default** brings back the shi
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, show | `sendmock webhook template list` | `GET /api/v1/webhooks/templates` | `sendmock_webhook_template_list`, `_get` |
-| render a preview | `sendmock webhook template render <templateId>` | `POST /api/v1/webhooks/templates/{templateId}/render` | `sendmock_webhook_template_render` |
-| clone, export, import | `sendmock webhook template clone`, `... export`, `... import` | `.../clone`, `.../export`, `/api/v1/webhooks/templates/import` | `_clone`, `_export`, `_import` |
+| list | `sendmock webhook template list` | [`GET /api/v1/webhooks/templates`](/api/webhook-templates/#getWebhooksTemplates) | `sendmock_webhook_template_list` |
+| one template | `sendmock webhook template show <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}`](/api/webhook-templates/#getWebhooksTemplatesByTemplateId) | `sendmock_webhook_template_get` |
+| render a preview | `sendmock webhook template render <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/render`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdRender) | `sendmock_webhook_template_render` |
+| clone | `sendmock webhook template clone <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/clone`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdClone) | `sendmock_webhook_template_clone` |
+| export | `sendmock webhook template export <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}/export`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdExport) | `sendmock_webhook_template_export` |
+| import | `sendmock webhook template import <file>` | [`POST /api/v1/webhooks/templates/import`](/api/webhook-templates/#postWebhooksTemplatesImport) | `sendmock_webhook_template_import` |
+| history | `sendmock webhook template history <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}/revisions`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdRevisions) | `sendmock_webhook_template_revisions` |
+| reset a built-in | `sendmock webhook template reset <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/reset`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdReset) | `sendmock_webhook_template_reset` |
+| the reference of values and filters | `sendmock webhook template reference` | [`GET /api/v1/webhooks/template-reference`](/api/webhook-templates/#getWebhooksTemplateReference) | `sendmock_webhook_template_reference` |
 
 ## Related
 

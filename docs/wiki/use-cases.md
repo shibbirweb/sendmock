@@ -68,9 +68,12 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 | find out why my app's email or SMS never arrived | Logs | [Logs](./logs.md) |
 | see how my app copes when the mail server fails | Chaos | [Advanced: chaos](./advanced/chaos.md) |
 | give my team and CI the same setup | seed file | [Recipe: share your setup](./recipes/share-your-setup.md) |
-| run a whole flow again and again, in CI | scenarios | [Advanced: scenarios](./advanced/scenarios.md) |
+| run a whole flow again and again, in CI | scenarios | [Scenarios](./scenarios.md), [Advanced: scenarios](./advanced/scenarios.md) |
+| tag arriving mail, or forward it to a real inbox automatically | tag and auto-forward rules | [Settings > Email](./settings.md#email) |
+| import a saved `.eml` file | Import .eml | [Mail](./mail/index.md#the-list) |
+| connect an AI agent | AI agents card | [Settings > Connection](./settings.md#connection) |
 | let an AI agent set all of this up | MCP, CLI, skill | [AI](./ai/index.md) |
 
 ## Browse by menu
 
-[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Logs](./logs.md) · [Settings](./settings.md)
+[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)

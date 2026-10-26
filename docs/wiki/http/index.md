@@ -80,11 +80,15 @@ The bin's response rules and default reply. See [Responses](./responses.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| bins | `sendmock http bins` | `GET /api/v1/http/bins` | `sendmock_http_bins` |
-| requests | `sendmock http list --bin slack`, `sendmock http tail` | `GET /api/v1/http/requests` | `sendmock_http_list` |
-| wait in a test | | | `sendmock_http_wait` |
-| forward | `sendmock http forward <requestId> --url ...` | `POST /api/v1/http/requests/{requestId}/forward` | `sendmock_http_forward` |
-| set a reply | `sendmock http response set --bin slack --status 200 --body ok` | `/api/v1/http/bins/{binId}/responses` | `sendmock_http_response_set` |
+| bins | `sendmock http bin list` | [`GET /api/v1/http/bins`](/api/http-catcher/#getHttpBins) | `sendmock_http_bin_list` |
+| add a bin | `sendmock http bin create` | [`POST /api/v1/http/bins`](/api/http-catcher/#postHttpBins) | `sendmock_http_bin_create` |
+| delete a bin | `sendmock http bin delete <binId>` | [`DELETE /api/v1/http/bins/{binId}`](/api/http-catcher/#deleteHttpBinsByBinId) | `sendmock_http_bin_delete` |
+| requests | `sendmock http list` | [`GET /api/v1/http/requests`](/api/http-catcher/#getHttpRequests) | `sendmock_http_list` |
+| one request | `sendmock http show <requestId>` | [`GET /api/v1/http/requests/{requestId}`](/api/http-catcher/#getHttpRequestsByRequestId) | `sendmock_http_get` |
+| wait in a test | `sendmock http wait` | [`GET /api/v1/wait/http`](/api/test-helpers/#getWaitHttp) | `sendmock_http_wait` |
+| send a test request | `sendmock http send <bin>` | [`POST /catch/{binPath}`](/api/http-catcher/#postCatchByBinPath) | `sendmock_http_send` |
+| forward | `sendmock http forward <requestId>` | [`POST /api/v1/http/requests/{requestId}/forward`](/api/http-catcher/#postHttpRequestsByRequestIdForward) | `sendmock_http_forward` |
+| clear requests | `sendmock http clear` | [`DELETE /api/v1/http/requests`](/api/http-catcher/#deleteHttpRequests) | `sendmock_http_clear` |
 
 ## Related
 

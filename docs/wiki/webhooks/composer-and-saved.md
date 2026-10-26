@@ -73,9 +73,12 @@ Saved deliveries survive pruning and reset, and are written to the seed export (
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| send a message | `sendmock webhook send --endpoint <name> --email <emailId>` | `POST /api/v1/webhooks/endpoints/{endpointId}/send` | `sendmock_webhook_send` |
-| render without sending | `sendmock webhook render --endpoint <name> --email <emailId>` | `POST /api/v1/webhooks/endpoints/preview` | `sendmock_webhook_render` |
-| saved | `sendmock webhook saved list`, `... send` | `/api/v1/webhooks/saved` | `sendmock_webhook_saved_list`, `_send` |
+| send a message or a written request | `sendmock webhook send --endpoint <endpointId>` | [`POST /api/v1/webhooks/endpoints/{endpointId}/send`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSend) | `sendmock_webhook_send` |
+| render without sending | `sendmock webhook render --endpoint <endpointId>` | [`POST /api/v1/webhooks/endpoints/preview`](/api/webhook-endpoints/#postWebhooksEndpointsPreview) | `sendmock_webhook_render` |
+| saved list | `sendmock webhook saved list` | [`GET /api/v1/webhooks/saved`](/api/saved-deliveries/#getWebhooksSaved) | `sendmock_webhook_saved_list` |
+| send a saved one | `sendmock webhook saved send <savedId>` | [`POST /api/v1/webhooks/saved/{savedId}/send`](/api/saved-deliveries/#postWebhooksSavedBySavedIdSend) | `sendmock_webhook_saved_send` |
+| rename | `sendmock webhook saved rename <savedId>` | [`PATCH /api/v1/webhooks/saved/{savedId}`](/api/saved-deliveries/#patchWebhooksSavedBySavedId) | `sendmock_webhook_saved_update` |
+| save as template | `sendmock webhook saved save-as-template <savedId>` | [`POST /api/v1/webhooks/saved/{savedId}/template`](/api/saved-deliveries/#postWebhooksSavedBySavedIdTemplate) | `sendmock_webhook_saved_save_as_template` |
 
 ## Related
 

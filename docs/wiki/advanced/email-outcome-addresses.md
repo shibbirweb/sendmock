@@ -38,7 +38,7 @@ enabled = true
 
 ## With the CLI and API
 
-`sendmock outcome-rule ...`, or `POST /api/v1/outcome-rules/email` with the same fields; MCP outcome rule tools for agents.
+`sendmock outcome-rule email create` and `sendmock outcome-rule email test <address>`, or `POST /api/v1/outcome-rules/email` with the same fields; MCP `sendmock_outcome_rule_create` and `sendmock_outcome_rule_test`.
 
 ## Related
 

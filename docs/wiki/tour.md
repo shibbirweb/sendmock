@@ -32,6 +32,7 @@ Press `G` and then the key in the table to jump to a menu from anywhere.
 | Payments > Methods | | what a customer pays with (card, bKash, Nagad, ...) and its test values | [Methods](./payments/methods.md) |
 | Payments > Flows | | the steps a checkout page asks for (card form, number, OTP, PIN, ...) | [Flows](./payments/flows.md) |
 | Numbers | `G N` | your fake phone numbers and Messaging Services, set up like a provider console | [Numbers](./numbers.md) |
+| Scenarios | `G C` | multi-step tests you write once and run again, step by step | [Scenarios](./scenarios.md) |
 | Logs | `G L` | the raw SMTP sessions and API requests behind every message | [Logs](./logs.md) |
 | Settings | `G ,` | how SendMock behaves: outcomes, profiles, chaos, seed file, connection snippets | [Settings](./settings.md) |
 

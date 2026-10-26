@@ -42,9 +42,10 @@ Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| reply as the contact | `sendmock sms inbound --from +8801700000000 --to +15550001111 --body STOP` | `POST /api/v1/sms/inbound` | `sendmock_sms_simulate_inbound` |
-| resend the reply webhook | | `POST /api/v1/sms/{smsId}/reply-webhook/resend` | |
-| simulate a read | `sendmock sms open <smsId>` | `POST /api/v1/sms/{smsId}/open` | `sendmock_sms_open` |
+| reply as the contact | `sendmock sms inbound` | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | `sendmock_sms_simulate_inbound` |
+| resend the reply webhook | `sendmock sms resend-reply-webhook <smsId>` | [`POST /api/v1/sms/{smsId}/reply-webhook/resend`](/api/sms/#postSmsBySmsIdReplyWebhookResend) | `sendmock_sms_reply_webhook_resend` |
+| simulate a read | `sendmock sms open <smsId>` | [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen) | `sendmock_sms_open` |
+| a media file | `sendmock sms media <smsId> <mediaIndex>` | [`GET /api/v1/sms/{smsId}/media/{mediaIndex}`](/api/sms/#getSmsBySmsIdMediaByMediaIndex) | `sendmock://sms/{smsId}/media/{mediaIndex}` |
 
 ## Related
 

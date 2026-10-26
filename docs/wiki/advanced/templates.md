@@ -50,7 +50,7 @@ Endpoints using a custom template are **Linked** by default and follow its chang
 
 ## With the CLI and API
 
-`sendmock webhook template clone|create|update|render|export|import`, or `/api/v1/webhooks/templates`; MCP `sendmock_webhook_template_*`. Agents can write a template from a provider's docs: "Send Africa's Talking inbound SMS to my app."
+`sendmock webhook template clone <templateId>`, `sendmock webhook template create`, `sendmock webhook template export <templateId>` and `sendmock webhook template import <file>`, or `/api/v1/webhooks/templates`; MCP `sendmock_webhook_template_clone` and the other template tools. Agents can write a template from a provider's docs: "Send Africa's Talking inbound SMS to my app."
 
 ## Related
 

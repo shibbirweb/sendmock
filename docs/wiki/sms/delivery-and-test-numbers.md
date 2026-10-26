@@ -79,9 +79,11 @@ Step by step: [Recipe: failed SMS](../recipes/failed-sms.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| set a status by hand | `sendmock sms status <smsId> undelivered` | `POST /api/v1/sms/{smsId}/status` | `sendmock_sms_set_status` |
-| failure rate | `sendmock chaos sms-failure-rate 20` | `PATCH /api/v1/settings` | `sendmock_chaos_set` |
-| own outcome numbers | `sendmock outcome-rule ...` | `/api/v1/outcome-rules/sms` | outcome rule tools |
+| set a status by hand | `sendmock sms status <smsId> <status>` | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | `sendmock_sms_set_status` |
+| profile and failure rate | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
+| list own outcome numbers | `sendmock outcome-rule sms list` | [`GET /api/v1/outcome-rules/sms`](/api/outcome-rules/#getOutcomeRulesSms) | `sendmock_outcome_rule_list` |
+| add one | `sendmock outcome-rule sms create` | [`POST /api/v1/outcome-rules/sms`](/api/outcome-rules/#postOutcomeRulesSms) | `sendmock_outcome_rule_create` |
+| test a number | `sendmock outcome-rule sms test <number>` | [`POST /api/v1/outcome-rules/sms/test`](/api/outcome-rules/#postOutcomeRulesSmsTest) | `sendmock_outcome_rule_test` |
 
 ## Related
 

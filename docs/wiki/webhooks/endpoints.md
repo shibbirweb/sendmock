@@ -58,9 +58,14 @@ With no endpoints yet, the screen offers **Add endpoint** and **Add a catcher en
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, create, update | `sendmock webhook endpoint list`, `... create`, `... update` | `/api/v1/webhooks/endpoints` | `sendmock_webhook_endpoint_list`, `_create`, `_update` |
-| send a test | `sendmock webhook endpoint test <name>` | `POST /api/v1/webhooks/endpoints/{endpointId}/test` | `sendmock_webhook_endpoint_test` |
-| rotate the secret | `sendmock webhook endpoint rotate-secret <name>` | `POST /api/v1/webhooks/endpoints/{endpointId}/rotate-secret` | `sendmock_webhook_endpoint_rotate_secret` |
+| list | `sendmock webhook endpoint list` | [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints) | `sendmock_webhook_endpoint_list` |
+| one endpoint | `sendmock webhook endpoint show <endpointId>` | [`GET /api/v1/webhooks/endpoints/{endpointId}`](/api/webhook-endpoints/#getWebhooksEndpointsByEndpointId) | `sendmock_webhook_endpoint_get` |
+| create | `sendmock webhook endpoint create` | [`POST /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#postWebhooksEndpoints) | `sendmock_webhook_endpoint_create` |
+| update | `sendmock webhook endpoint update <endpointId>` | [`PATCH /api/v1/webhooks/endpoints/{endpointId}`](/api/webhook-endpoints/#patchWebhooksEndpointsByEndpointId) | `sendmock_webhook_endpoint_update` |
+| send a test | `sendmock webhook endpoint test <endpointId>` | [`POST /api/v1/webhooks/endpoints/{endpointId}/test`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdTest) | `sendmock_webhook_endpoint_test` |
+| rotate the secret | `sendmock webhook endpoint rotate-secret <endpointId>` | [`POST /api/v1/webhooks/endpoints/{endpointId}/rotate-secret`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdRotateSecret) | `sendmock_webhook_endpoint_rotate_secret` |
+| reveal the secret (agents cannot) | `sendmock webhook endpoint secret <endpointId> --reveal` | [`GET /api/v1/webhooks/endpoints/{endpointId}/secret`](/api/webhook-endpoints/#getWebhooksEndpointsByEndpointIdSecret) | none: agents never read secrets |
+| save as a template | `sendmock webhook endpoint save-as-template <endpointId>` | [`POST /api/v1/webhooks/endpoints/{endpointId}/save-as-template`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSaveAsTemplate) | `sendmock_webhook_endpoint_save_as_template` |
 
 Agents can set secrets but never read them back.
 

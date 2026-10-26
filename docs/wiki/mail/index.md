@@ -47,6 +47,7 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 
 - **Search** with plain words or prefixes: `from:`, `to:`, `tag:`, `source:`, `has:attachment`, `is:unread`, `is:inbound`.
 - **Chips** toggle unread, attachments, inbound and each source.
+- **Import .eml**: upload or paste a whole message and store it as **Sent by your app** (like the `sendmail` shim) or **Incoming to your app** (inbound routes deliver it).
 - **Bulk select** and **Delete all** (asks first).
 - The bell button in the list header turns on browser notifications for new email.
 - Keys: `J` and `K` move, `Enter` opens, `D` deletes, `/` searches.
@@ -69,11 +70,17 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list and search | `sendmock email list --to user@example.test` | `GET /api/v1/emails` | `sendmock_email_list`, `sendmock_email_search` |
-| wait for an email in a test | `sendmock email wait --to user@example.test` | | `sendmock_email_wait` |
-| read the latest code | `sendmock otp --to user@example.test` | | `sendmock_otp_get` |
-| simulate an outcome | `sendmock email simulate <emailId> bounced` | `POST /api/v1/emails/{emailId}/simulate` | `sendmock_email_simulate` |
-| delete everything | `sendmock email delete-all --yes` | `DELETE /api/v1/emails` | `sendmock_email_delete` |
+| list and search | `sendmock email list` | [`GET /api/v1/emails`](/api/email/#getEmails) | `sendmock_email_list` |
+| the newest email to a recipient | `sendmock email latest --to <address>` | [`GET /api/v1/emails/latest`](/api/email/#getEmailsLatest) | `sendmock_email_latest` |
+| wait for an email in a test | `sendmock email wait` | [`GET /api/v1/wait/email`](/api/test-helpers/#getWaitEmail) | `sendmock_email_wait` |
+| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
+| read the latest links | `sendmock links --to <recipient>` | [`GET /api/v1/links`](/api/test-helpers/#getLinks) | `sendmock_links_get` |
+| mark read, tag | `sendmock email update <emailId>` | [`PATCH /api/v1/emails/{emailId}`](/api/email/#patchEmailsByEmailId) | `sendmock_email_update` |
+| simulate an outcome | `sendmock email simulate <emailId> <event>` | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | `sendmock_email_simulate` |
+| import a raw message | `sendmock sendmail` | [`POST /api/v1/send/raw`](/api/email/#postSendRaw) | `sendmock_email_send_raw` |
+| create an incoming email | `sendmock email inbound` | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | `sendmock_email_inbound` |
+| delete one | `sendmock email delete <emailId>` | [`DELETE /api/v1/emails/{emailId}`](/api/email/#deleteEmailsByEmailId) | `sendmock_email_delete` |
+| delete everything | `sendmock email delete-all --yes` | [`DELETE /api/v1/emails`](/api/email/#deleteEmails) | `sendmock_email_delete_all` |
 
 The email commands and tools arrive in Phase 1.
 

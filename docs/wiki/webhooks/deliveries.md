@@ -62,10 +62,12 @@ The retry schedule is per endpoint ([Endpoints](./endpoints.md), Retries tab).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, show | `sendmock webhook deliveries list --failed` | `GET /api/v1/webhooks/deliveries` | `sendmock_webhook_delivery_list`, `_get` |
-| replay | `sendmock webhook deliveries replay <deliveryId> --rerender` | `POST /api/v1/webhooks/deliveries/{deliveryId}/replay` | `sendmock_webhook_delivery_replay` |
-| cancel retries | `sendmock webhook deliveries cancel <deliveryId>` | `POST /api/v1/webhooks/deliveries/{deliveryId}/cancel` | `sendmock_webhook_delivery_cancel` |
-| wait in a test | | | `sendmock_webhook_delivery_wait` |
+| list | `sendmock webhook deliveries list` | [`GET /api/v1/webhooks/deliveries`](/api/webhook-deliveries/#getWebhooksDeliveries) | `sendmock_webhook_delivery_list` |
+| one delivery | `sendmock webhook deliveries show <deliveryId>` | [`GET /api/v1/webhooks/deliveries/{deliveryId}`](/api/webhook-deliveries/#getWebhooksDeliveriesByDeliveryId) | `sendmock_webhook_delivery_get` |
+| replay | `sendmock webhook deliveries replay <deliveryId>` | [`POST /api/v1/webhooks/deliveries/{deliveryId}/replay`](/api/webhook-deliveries/#postWebhooksDeliveriesByDeliveryIdReplay) | `sendmock_webhook_delivery_replay` |
+| cancel retries | `sendmock webhook deliveries cancel <deliveryId>` | [`POST /api/v1/webhooks/deliveries/{deliveryId}/cancel`](/api/webhook-deliveries/#postWebhooksDeliveriesByDeliveryIdCancel) | `sendmock_webhook_delivery_cancel` |
+| save | `sendmock webhook saved create --delivery <deliveryId>` | [`POST /api/v1/webhooks/saved`](/api/saved-deliveries/#postWebhooksSaved) | `sendmock_webhook_saved_create` |
+| wait in a test | `sendmock webhook deliveries wait` | [`GET /api/v1/wait/webhook`](/api/test-helpers/#getWaitWebhook) | `sendmock_webhook_delivery_wait` |
 
 ## Related
 

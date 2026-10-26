@@ -53,8 +53,10 @@ How long logs are kept follows retention in [Settings > General](./settings.md#g
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| SMTP sessions | `sendmock logs smtp --failed` | `GET /api/v1/logs/smtp` | `sendmock_logs_smtp` |
-| API requests | `sendmock logs http --tail` | `GET /api/v1/logs/http` | `sendmock_logs_http` |
+| SMTP sessions | `sendmock logs smtp` | [`GET /api/v1/logs/smtp`](/api/logs/#getLogsSmtp) | `sendmock_logs_smtp` |
+| one session | `sendmock logs smtp show <sessionId>` | [`GET /api/v1/logs/smtp/{sessionId}`](/api/logs/#getLogsSmtpBySessionId) | `sendmock_logs_smtp_get` |
+| API requests | `sendmock logs http` | [`GET /api/v1/logs/http`](/api/logs/#getLogsHttp) | `sendmock_logs_http` |
+| one request | `sendmock logs http show <requestId>` | [`GET /api/v1/logs/http/{requestId}`](/api/logs/#getLogsHttpByRequestId) | `sendmock_logs_http_get` |
 
 ## Related
 

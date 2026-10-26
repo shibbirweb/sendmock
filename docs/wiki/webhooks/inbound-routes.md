@@ -55,9 +55,11 @@ Ticket routing with named groups, store and notify, and other providers' formats
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, create | `sendmock route list`, `sendmock route create` | `/api/v1/inbound-routes` | `sendmock_inbound_routes_list`, `_create` |
-| test a filter | `sendmock route test` | `POST /api/v1/inbound-routes/test` | `sendmock_inbound_routes_test` |
-| Mailgun's own API | | `GET` and `POST /v3/routes` on port `8026` | |
+| list | `sendmock route list` | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | `sendmock_inbound_route_list` |
+| create | `sendmock route create` | [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes) | `sendmock_inbound_route_create` |
+| update or reorder | `sendmock route update <routeId>` | [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId) | `sendmock_inbound_route_update` |
+| delete | `sendmock route delete <routeId>` | [`DELETE /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#deleteInboundRoutesByRouteId) | `sendmock_inbound_route_delete` |
+| test a filter | `sendmock route test` | [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest) | `sendmock_inbound_route_test` |
 
 ## Related
 

@@ -32,6 +32,35 @@ function pickBodySchemas(
 }
 
 /** One operation: method and path, parameters, body, answers and Try it. */
+/** The same operation from the terminal, an AI agent and the UI (UI-11.3). */
+function OperationSurfacesList({
+  surfaces,
+}: {
+  surfaces: ApiOperation["surfaces"];
+}) {
+  return (
+    <dl
+      aria-label="Other ways"
+      className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[auto_1fr]"
+    >
+      <dt className="text-fd-muted-foreground">CLI</dt>
+      <dd>
+        <code className="font-mono break-all">{surfaces.cli}</code>
+      </dd>
+      <dt className="text-fd-muted-foreground">MCP tool</dt>
+      <dd>
+        {surfaces.mcp === null ? (
+          <span>None: {surfaces.mcpExemptReason}</span>
+        ) : (
+          <code className="font-mono break-all">{surfaces.mcp}</code>
+        )}
+      </dd>
+      <dt className="text-fd-muted-foreground">In the app</dt>
+      <dd>{surfaces.ui}</dd>
+    </dl>
+  );
+}
+
 export function OperationReference({
   operation,
   schemas,
@@ -57,6 +86,7 @@ export function OperationReference({
         <code className="font-mono text-base break-all">{operation.path}</code>
       </h2>
       <p className="text-fd-muted-foreground">{operation.summary}</p>
+      <OperationSurfacesList surfaces={operation.surfaces} />
       {operation.requestBody && (
         <section className="grid gap-1.5">
           <h3 className="text-sm font-medium">

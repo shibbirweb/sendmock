@@ -163,6 +163,15 @@ const docsScenes: Scene[] = [
   listScene("payment-flows", "/payments/flows", "Flows · Payments · SendMock"),
   listScene("numbers", "/numbers", "Numbers · SendMock"),
   {
+    name: "scenarios",
+    isLandingShot: false,
+    open: async (page) => {
+      await navigateInApp(page, "/scenarios");
+      await page.getByRole("button", { name: "Run", exact: true }).click();
+      await page.getByRole("region", { name: "Run report" }).waitFor();
+    },
+  },
+  {
     name: "logs",
     isLandingShot: false,
     open: async (page) => {

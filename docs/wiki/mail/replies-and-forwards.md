@@ -41,9 +41,10 @@ Step by step: [Recipe: reply by email](../recipes/reply-by-email.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| reply | | `POST /api/v1/emails/{emailId}/reply` | |
-| forward | | `POST /api/v1/emails/{emailId}/forward` | |
-| routes | `sendmock route list` | `/api/v1/inbound-routes` | `sendmock_inbound_routes_list` |
+| reply | `sendmock email reply <emailId>` | [`POST /api/v1/emails/{emailId}/reply`](/api/email/#postEmailsByEmailIdReply) | `sendmock_email_reply` |
+| forward | `sendmock email forward <emailId>` | [`POST /api/v1/emails/{emailId}/forward`](/api/email/#postEmailsByEmailIdForward) | `sendmock_email_forward` |
+| create an incoming email | `sendmock email inbound` | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | `sendmock_email_inbound` |
+| list routes | `sendmock route list` | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | `sendmock_inbound_route_list` |
 
 ## Related
 

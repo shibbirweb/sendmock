@@ -66,8 +66,9 @@ Nothing to configure here. What the tiles count follows your retention in [Setti
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| the same counts | `sendmock stats` | `GET /api/v1/stats` | `sendmock_stats` |
-| is it running, which ports | `sendmock status` | `GET /api/v1/info` | `sendmock_status` |
+| the same counts | `sendmock stats` | [`GET /api/v1/stats`](/api/system/#getStats) | `sendmock_stats` |
+| is it running, which ports | `sendmock status` | [`GET /api/v1/info`](/api/system/#getInfo) | `sendmock_status` |
+| is it alive | `sendmock health` | [`GET /api/v1/health`](/api/system/#getHealth) | `sendmock_status` |
 
 ## Related
 

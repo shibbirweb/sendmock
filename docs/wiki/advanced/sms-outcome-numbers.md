@@ -39,7 +39,7 @@ enabled = true
 
 ## With the CLI and API
 
-`sendmock outcome-rule ...`, or `POST /api/v1/outcome-rules/sms`; MCP outcome rule tools for agents.
+`sendmock outcome-rule sms create` and `sendmock outcome-rule sms test <number>`, or `POST /api/v1/outcome-rules/sms`; MCP `sendmock_outcome_rule_create` and `sendmock_outcome_rule_test`.
 
 ## Related
 

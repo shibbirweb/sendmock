@@ -70,10 +70,14 @@ The full walkthrough, from the provider's docs to a working checkout and a seed 
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list, show | `sendmock payments gateways list` | `GET /api/v1/payments/gateways` | `sendmock_payment_gateway_list`, `_get` |
-| create, update | `sendmock payments gateways create`, `... update` | `POST`, `PATCH /api/v1/payments/gateways` | `sendmock_payment_gateway_create`, `_update` |
-| preview | `sendmock payments gateways preview <key>` | `POST /api/v1/payments/gateways/{gatewayKey}/preview` | `sendmock_payment_gateway_preview` |
-| reset a built-in | `sendmock payments gateways reset <key>` | `POST /api/v1/payments/gateways/{gatewayKey}/reset` | `sendmock_payment_gateway_reset` |
+| list | `sendmock payments gateways list` | [`GET /api/v1/payments/gateways`](/api/payment-gateways/#getPaymentsGateways) | `sendmock_payment_gateway_list` |
+| one gateway | `sendmock payments gateways show <gatewayKey>` | [`GET /api/v1/payments/gateways/{gatewayKey}`](/api/payment-gateways/#getPaymentsGatewaysByGatewayKey) | `sendmock_payment_gateway_get` |
+| create | `sendmock payments gateways create` | [`POST /api/v1/payments/gateways`](/api/payment-gateways/#postPaymentsGateways) | `sendmock_payment_gateway_create` |
+| update | `sendmock payments gateways update <gatewayKey>` | [`PATCH /api/v1/payments/gateways/{gatewayKey}`](/api/payment-gateways/#patchPaymentsGatewaysByGatewayKey) | `sendmock_payment_gateway_update` |
+| preview | `sendmock payments gateways preview <gatewayKey>` | [`POST /api/v1/payments/gateways/{gatewayKey}/preview`](/api/payment-gateways/#postPaymentsGatewaysByGatewayKeyPreview) | `sendmock_payment_gateway_preview` |
+| reset a built-in | `sendmock payments gateways reset <gatewayKey>` | [`POST /api/v1/payments/gateways/{gatewayKey}/reset`](/api/payment-gateways/#postPaymentsGatewaysByGatewayKeyReset) | `sendmock_payment_gateway_reset` |
+| delete a custom one | `sendmock payments gateways delete <gatewayKey>` | [`DELETE /api/v1/payments/gateways/{gatewayKey}`](/api/payment-gateways/#deletePaymentsGatewaysByGatewayKey) | `sendmock_payment_gateway_delete` |
+| reveal a credential (agents cannot) | `sendmock payments gateways credential <gatewayKey> <credentialName> --reveal` | [`GET /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}`](/api/payment-gateways/#getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName) | none: agents never read secrets |
 
 ## Related
 

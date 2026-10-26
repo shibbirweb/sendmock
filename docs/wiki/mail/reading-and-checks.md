@@ -40,11 +40,16 @@ Opening an email in the UI counts as the recipient opening it: SendMock fires `e
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| raw message | `sendmock email raw <emailId>` | `GET /api/v1/emails/{emailId}/raw` | `sendmock_email_get` |
-| MIME tree | `sendmock email mime <emailId>` | `GET /api/v1/emails/{emailId}/mime` | `sendmock_email_mime` |
-| checks | `sendmock email check <emailId> html` | `GET /api/v1/emails/{emailId}/html-check`, `/link-check`, `/spam-check` | `sendmock_email_check` |
-| timeline | `sendmock email timeline <emailId>` | `GET /api/v1/emails/{emailId}/timeline` | `sendmock_email_timeline` |
-| simulate an open | `sendmock email open <emailId>` | `POST /api/v1/emails/{emailId}/open` | `sendmock_email_open` |
+| one email with its bodies and headers | `sendmock email show <emailId>` | [`GET /api/v1/emails/{emailId}`](/api/email/#getEmailsByEmailId) | `sendmock_email_get` |
+| raw message | `sendmock email raw <emailId>` | [`GET /api/v1/emails/{emailId}/raw`](/api/email/#getEmailsByEmailIdRaw) | `sendmock://emails/{emailId}/raw` |
+| an attachment | `sendmock email attachments <emailId> <attachmentIndex>` | [`GET /api/v1/emails/{emailId}/attachments/{attachmentIndex}`](/api/email/#getEmailsByEmailIdAttachmentsByAttachmentIndex) | `sendmock://emails/{emailId}/attachments/{attachmentIndex}` |
+| MIME tree | `sendmock email mime <emailId>` | [`GET /api/v1/emails/{emailId}/mime`](/api/email/#getEmailsByEmailIdMime) | `sendmock_email_mime` |
+| HTML check | `sendmock email check <emailId> html` | [`GET /api/v1/emails/{emailId}/html-check`](/api/email/#getEmailsByEmailIdHtmlCheck) | `sendmock_email_check` |
+| link check | `sendmock email check <emailId> links` | [`POST /api/v1/emails/{emailId}/link-check`](/api/email/#postEmailsByEmailIdLinkCheck) | `sendmock_email_check` |
+| spam check | `sendmock email check <emailId> spam` | [`POST /api/v1/emails/{emailId}/spam-check`](/api/email/#postEmailsByEmailIdSpamCheck) | `sendmock_email_check` |
+| unsubscribe check | `sendmock email check <emailId> unsubscribe` | [`GET /api/v1/emails/{emailId}/list-unsubscribe`](/api/email/#getEmailsByEmailIdListUnsubscribe) | `sendmock_email_check` |
+| timeline | `sendmock email timeline <emailId>` | [`GET /api/v1/emails/{emailId}/timeline`](/api/email/#getEmailsByEmailIdTimeline) | `sendmock_email_timeline` |
+| simulate an open | `sendmock email open <emailId>` | [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen) | `sendmock_email_open` |
 
 ## Related
 
