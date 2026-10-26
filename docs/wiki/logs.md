@@ -53,10 +53,10 @@ How long logs are kept follows retention in [Settings > General](./settings.md#g
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| SMTP sessions | `sendmock logs smtp` | [`GET /api/v1/logs/smtp`](/api/logs/#getLogsSmtp) | `sendmock_logs_smtp` |
-| one session | `sendmock logs smtp show <sessionId>` | [`GET /api/v1/logs/smtp/{sessionId}`](/api/logs/#getLogsSmtpBySessionId) | `sendmock_logs_smtp_get` |
-| API requests | `sendmock logs http` | [`GET /api/v1/logs/http`](/api/logs/#getLogsHttp) | `sendmock_logs_http` |
-| one request | `sendmock logs http show <requestId>` | [`GET /api/v1/logs/http/{requestId}`](/api/logs/#getLogsHttpByRequestId) | `sendmock_logs_http_get` |
+| SMTP sessions | [`sendmock logs smtp`](/cli/logs/#logs-smtp) | [`GET /api/v1/logs/smtp`](/api/logs/#getLogsSmtp) | [`sendmock_logs_smtp`](/mcp/logs/#sendmock_logs_smtp) |
+| one session | [`sendmock logs smtp show <sessionId>`](/cli/logs/#logs-smtp-show) | [`GET /api/v1/logs/smtp/{sessionId}`](/api/logs/#getLogsSmtpBySessionId) | [`sendmock_logs_smtp_get`](/mcp/logs/#sendmock_logs_smtp_get) |
+| API requests | [`sendmock logs http`](/cli/logs/#logs-http) | [`GET /api/v1/logs/http`](/api/logs/#getLogsHttp) | [`sendmock_logs_http`](/mcp/logs/#sendmock_logs_http) |
+| one request | [`sendmock logs http show <requestId>`](/cli/logs/#logs-http-show) | [`GET /api/v1/logs/http/{requestId}`](/api/logs/#getLogsHttpByRequestId) | [`sendmock_logs_http_get`](/mcp/logs/#sendmock_logs_http_get) |
 
 ## Related
 

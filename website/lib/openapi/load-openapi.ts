@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { parse } from "yaml";
 
+import { indexReferencesByOperation } from "@/lib/reference/load-references";
+
 import type {
   ApiBody,
   ApiOperation,
@@ -64,6 +66,7 @@ function readOpenApiDocument(): RawDocument {
 
 export function loadApiReference() {
   const rawDocument = readOpenApiDocument();
+  const referenceUrls = indexReferencesByOperation();
   const sharedResponses = rawDocument.components.responses;
   const operations: ApiOperation[] = Object.entries(rawDocument.paths).flatMap(
     ([path, pathItem]) =>
@@ -103,6 +106,12 @@ export function loadApiReference() {
           responses,
           surfaces: {
             cli: rawOperation["x-sendmock-cli"],
+            cliUrl:
+              referenceUrls.get(`${method.toUpperCase()} ${path}`)?.cliUrl ??
+              null,
+            mcpUrl:
+              referenceUrls.get(`${method.toUpperCase()} ${path}`)?.mcpUrl ??
+              null,
             mcp: rawOperation["x-sendmock-mcp"],
             mcpExemptReason: rawOperation["x-sendmock-mcp-exempt"] ?? null,
             ui: rawOperation["x-sendmock-ui"],

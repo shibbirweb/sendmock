@@ -24,6 +24,8 @@ export function baseOptions(): BaseLayoutProps {
     links: [
       { text: "Docs", url: "/docs" },
       { text: "API", url: "/api" },
+      { text: "CLI", url: "/cli" },
+      { text: "MCP", url: "/mcp" },
       { text: "Playground", url: "/playground" },
       // The demo is a separate app: an external link is a plain anchor, so
       // Next does not try to prefetch it as a route.

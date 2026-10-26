@@ -70,17 +70,17 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list and search | `sendmock email list` | [`GET /api/v1/emails`](/api/email/#getEmails) | `sendmock_email_list` |
-| the newest email to a recipient | `sendmock email latest --to <address>` | [`GET /api/v1/emails/latest`](/api/email/#getEmailsLatest) | `sendmock_email_latest` |
-| wait for an email in a test | `sendmock email wait` | [`GET /api/v1/wait/email`](/api/test-helpers/#getWaitEmail) | `sendmock_email_wait` |
-| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
-| read the latest links | `sendmock links --to <recipient>` | [`GET /api/v1/links`](/api/test-helpers/#getLinks) | `sendmock_links_get` |
-| mark read, tag | `sendmock email update <emailId>` | [`PATCH /api/v1/emails/{emailId}`](/api/email/#patchEmailsByEmailId) | `sendmock_email_update` |
-| simulate an outcome | `sendmock email simulate <emailId> <event>` | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | `sendmock_email_simulate` |
-| import a raw message | `sendmock sendmail` | [`POST /api/v1/send/raw`](/api/email/#postSendRaw) | `sendmock_email_send_raw` |
-| create an incoming email | `sendmock email inbound` | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | `sendmock_email_inbound` |
-| delete one | `sendmock email delete <emailId>` | [`DELETE /api/v1/emails/{emailId}`](/api/email/#deleteEmailsByEmailId) | `sendmock_email_delete` |
-| delete everything | `sendmock email delete-all --yes` | [`DELETE /api/v1/emails`](/api/email/#deleteEmails) | `sendmock_email_delete_all` |
+| list and search | [`sendmock email list`](/cli/email/#email-list) | [`GET /api/v1/emails`](/api/email/#getEmails) | [`sendmock_email_list`](/mcp/email/#sendmock_email_list) |
+| the newest email to a recipient | [`sendmock email latest --to <address>`](/cli/email/#email-latest) | [`GET /api/v1/emails/latest`](/api/email/#getEmailsLatest) | [`sendmock_email_latest`](/mcp/email/#sendmock_email_latest) |
+| wait for an email in a test | [`sendmock email wait`](/cli/test-helpers/#email-wait) | [`GET /api/v1/wait/email`](/api/test-helpers/#getWaitEmail) | [`sendmock_email_wait`](/mcp/test-helpers/#sendmock_email_wait) |
+| read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |
+| read the latest links | [`sendmock links --to <recipient>`](/cli/test-helpers/#links) | [`GET /api/v1/links`](/api/test-helpers/#getLinks) | [`sendmock_links_get`](/mcp/test-helpers/#sendmock_links_get) |
+| mark read, tag | [`sendmock email update <emailId>`](/cli/email/#email-update) | [`PATCH /api/v1/emails/{emailId}`](/api/email/#patchEmailsByEmailId) | [`sendmock_email_update`](/mcp/email/#sendmock_email_update) |
+| simulate an outcome | [`sendmock email simulate <emailId> <event>`](/cli/email/#email-simulate) | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate) |
+| import a raw message | [`sendmock sendmail`](/cli/email/#sendmail) | [`POST /api/v1/send/raw`](/api/email/#postSendRaw) | [`sendmock_email_send_raw`](/mcp/email/#sendmock_email_send_raw) |
+| create an incoming email | [`sendmock email inbound`](/cli/email/#email-inbound) | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | [`sendmock_email_inbound`](/mcp/email/#sendmock_email_inbound) |
+| delete one | [`sendmock email delete <emailId>`](/cli/email/#email-delete) | [`DELETE /api/v1/emails/{emailId}`](/api/email/#deleteEmailsByEmailId) | [`sendmock_email_delete`](/mcp/email/#sendmock_email_delete) |
+| delete everything | [`sendmock email delete-all --yes`](/cli/email/#email-delete-all) | [`DELETE /api/v1/emails`](/api/email/#deleteEmails) | [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all) |
 
 The email commands and tools arrive in Phase 1.
 

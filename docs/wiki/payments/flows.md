@@ -81,15 +81,15 @@ Compose a QR wallet flow from scratch: [Advanced: payment flow](../advanced/paym
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock payments flows list` | [`GET /api/v1/payments/flows`](/api/payment-flows/#getPaymentsFlows) | `sendmock_payment_flow_list` |
-| one flow | `sendmock payments flows show <flowKey>` | [`GET /api/v1/payments/flows/{flowKey}`](/api/payment-flows/#getPaymentsFlowsByFlowKey) | `sendmock_payment_flow_get` |
-| create | `sendmock payments flows create` | [`POST /api/v1/payments/flows`](/api/payment-flows/#postPaymentsFlows) | `sendmock_payment_flow_create` |
-| add a step | `sendmock payments flows steps add <flowKey>` | [`POST /api/v1/payments/flows/{flowKey}/steps`](/api/payment-flows/#postPaymentsFlowsByFlowKeySteps) | `sendmock_payment_flow_step_add` |
-| change or move a step | `sendmock payments flows steps update <flowKey> <stepIndex>` | [`PATCH /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#patchPaymentsFlowsByFlowKeyStepsByStepIndex) | `sendmock_payment_flow_step_update` |
-| remove a step | `sendmock payments flows steps remove <flowKey> <stepIndex>` | [`DELETE /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#deletePaymentsFlowsByFlowKeyStepsByStepIndex) | `sendmock_payment_flow_step_remove` |
-| the step catalogue | `sendmock payments flows step-types` | [`GET /api/v1/payments/step-types`](/api/payment-flows/#getPaymentsStepTypes) | `sendmock_payment_step_type_list` |
-| the label variables | `sendmock payments flows variables` | [`GET /api/v1/payments/flow-variables`](/api/payment-flows/#getPaymentsFlowVariables) | `sendmock_payment_flow_variable_list` |
-| reset a built-in | `sendmock payments flows reset <flowKey>` | [`POST /api/v1/payments/flows/{flowKey}/reset`](/api/payment-flows/#postPaymentsFlowsByFlowKeyReset) | `sendmock_payment_flow_reset` |
+| list | [`sendmock payments flows list`](/cli/payment-flows/#payments-flows-list) | [`GET /api/v1/payments/flows`](/api/payment-flows/#getPaymentsFlows) | [`sendmock_payment_flow_list`](/mcp/payment-flows/#sendmock_payment_flow_list) |
+| one flow | [`sendmock payments flows show <flowKey>`](/cli/payment-flows/#payments-flows-show) | [`GET /api/v1/payments/flows/{flowKey}`](/api/payment-flows/#getPaymentsFlowsByFlowKey) | [`sendmock_payment_flow_get`](/mcp/payment-flows/#sendmock_payment_flow_get) |
+| create | [`sendmock payments flows create`](/cli/payment-flows/#payments-flows-create) | [`POST /api/v1/payments/flows`](/api/payment-flows/#postPaymentsFlows) | [`sendmock_payment_flow_create`](/mcp/payment-flows/#sendmock_payment_flow_create) |
+| add a step | [`sendmock payments flows steps add <flowKey>`](/cli/payment-flows/#payments-flows-steps-add) | [`POST /api/v1/payments/flows/{flowKey}/steps`](/api/payment-flows/#postPaymentsFlowsByFlowKeySteps) | [`sendmock_payment_flow_step_add`](/mcp/payment-flows/#sendmock_payment_flow_step_add) |
+| change or move a step | [`sendmock payments flows steps update <flowKey> <stepIndex>`](/cli/payment-flows/#payments-flows-steps-update) | [`PATCH /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#patchPaymentsFlowsByFlowKeyStepsByStepIndex) | [`sendmock_payment_flow_step_update`](/mcp/payment-flows/#sendmock_payment_flow_step_update) |
+| remove a step | [`sendmock payments flows steps remove <flowKey> <stepIndex>`](/cli/payment-flows/#payments-flows-steps-remove) | [`DELETE /api/v1/payments/flows/{flowKey}/steps/{stepIndex}`](/api/payment-flows/#deletePaymentsFlowsByFlowKeyStepsByStepIndex) | [`sendmock_payment_flow_step_remove`](/mcp/payment-flows/#sendmock_payment_flow_step_remove) |
+| the step catalogue | [`sendmock payments flows step-types`](/cli/payment-flows/#payments-flows-step-types) | [`GET /api/v1/payments/step-types`](/api/payment-flows/#getPaymentsStepTypes) | [`sendmock_payment_step_type_list`](/mcp/payment-flows/#sendmock_payment_step_type_list) |
+| the label variables | [`sendmock payments flows variables`](/cli/payment-flows/#payments-flows-variables) | [`GET /api/v1/payments/flow-variables`](/api/payment-flows/#getPaymentsFlowVariables) | [`sendmock_payment_flow_variable_list`](/mcp/payment-flows/#sendmock_payment_flow_variable_list) |
+| reset a built-in | [`sendmock payments flows reset <flowKey>`](/cli/payment-flows/#payments-flows-reset) | [`POST /api/v1/payments/flows/{flowKey}/reset`](/api/payment-flows/#postPaymentsFlowsByFlowKeyReset) | [`sendmock_payment_flow_reset`](/mcp/payment-flows/#sendmock_payment_flow_reset) |
 
 ## Related
 

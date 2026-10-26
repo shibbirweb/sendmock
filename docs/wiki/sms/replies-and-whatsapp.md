@@ -42,10 +42,10 @@ Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| reply as the contact | `sendmock sms inbound` | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | `sendmock_sms_simulate_inbound` |
-| resend the reply webhook | `sendmock sms resend-reply-webhook <smsId>` | [`POST /api/v1/sms/{smsId}/reply-webhook/resend`](/api/sms/#postSmsBySmsIdReplyWebhookResend) | `sendmock_sms_reply_webhook_resend` |
-| simulate a read | `sendmock sms open <smsId>` | [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen) | `sendmock_sms_open` |
-| a media file | `sendmock sms media <smsId> <mediaIndex>` | [`GET /api/v1/sms/{smsId}/media/{mediaIndex}`](/api/sms/#getSmsBySmsIdMediaByMediaIndex) | `sendmock://sms/{smsId}/media/{mediaIndex}` |
+| reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
+| resend the reply webhook | [`sendmock sms resend-reply-webhook <smsId>`](/cli/sms/#sms-resend-reply-webhook) | [`POST /api/v1/sms/{smsId}/reply-webhook/resend`](/api/sms/#postSmsBySmsIdReplyWebhookResend) | [`sendmock_sms_reply_webhook_resend`](/mcp/sms/#sendmock_sms_reply_webhook_resend) |
+| simulate a read | [`sendmock sms open <smsId>`](/cli/sms/#sms-open) | [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen) | [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open) |
+| a media file | [`sendmock sms media <smsId> <mediaIndex>`](/cli/sms/#sms-media) | [`GET /api/v1/sms/{smsId}/media/{mediaIndex}`](/api/sms/#getSmsBySmsIdMediaByMediaIndex) | [`sendmock://sms/{smsId}/media/{mediaIndex}`](/mcp/sms/#resource-sms-smsid-media-mediaindex) |
 
 ## Related
 

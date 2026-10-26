@@ -11,6 +11,8 @@ export type ReferencedOperation = {
   path: string;
   operation_id: string;
   summary: string;
+  /** The API reference page it is on, e.g. `email`. */
+  area_slug: string;
   selector: OperationSelector | null;
 };
 
@@ -104,6 +106,8 @@ export type McpTool = {
 
 export type McpResource = {
   uri: string;
+  /** The page anchor, e.g. `resource-emails-emailid-raw`. */
+  slug: string;
   summary: string;
   mime_type: string;
   area: string;

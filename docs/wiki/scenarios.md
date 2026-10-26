@@ -59,8 +59,8 @@ The full file format and a CI example: [Advanced: scenarios](./advanced/scenario
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| check a scenario file | `sendmock scenario validate <file>` | [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate) | `sendmock_scenario_validate` |
-| run it | `sendmock scenario run <file>` | [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun) | `sendmock_scenario_run` |
+| check a scenario file | [`sendmock scenario validate <file>`](/cli/automation/#scenario-validate) | [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate) | [`sendmock_scenario_validate`](/mcp/automation/#sendmock_scenario_validate) |
+| run it | [`sendmock scenario run <file>`](/cli/automation/#scenario-run) | [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) |
 
 ## Related
 

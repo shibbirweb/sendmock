@@ -178,6 +178,63 @@ function readSpecOperations(): Map<string, SpecOperation> {
   );
 }
 
+type ReferenceEntry = {
+  slug?: string;
+  name?: string;
+  area_slug: string;
+  operations?: { method: string; path: string }[];
+  operation?: { method: string; path: string };
+};
+
+/** `POST /api/v1/emails/{emailId}/simulate` to its CLI and MCP reference pages (WS-07.4). */
+function readReferenceUrls(): Map<string, { cliUrl: string; mcpUrl: string }> {
+  const readReference = (fileName: string) =>
+    JSON.parse(
+      readFileSync(resolve(process.cwd(), "../docs/api", fileName), "utf8"),
+    ) as Record<string, ReferenceEntry[]>;
+  const cliReference = readReference("cli-reference.json");
+  const mcpReference = readReference("mcp-tools.json");
+  const urlsByOperation = (
+    entries: ReferenceEntry[],
+    section: string,
+    readAnchor: (entry: ReferenceEntry) => string,
+  ) =>
+    new Map(
+      entries.flatMap((entry) =>
+        (entry.operations ?? (entry.operation ? [entry.operation] : [])).map(
+          (operation): [string, string] => [
+            `${operation.method} ${operation.path}`,
+            `/${section}/${entry.area_slug}/#${readAnchor(entry)}`,
+          ],
+        ),
+      ),
+    );
+  const cliUrls = urlsByOperation(
+    cliReference.commands ?? [],
+    "cli",
+    (entry) => entry.slug ?? "",
+  );
+  const mcpUrls = new Map([
+    ...urlsByOperation(
+      mcpReference.tools ?? [],
+      "mcp",
+      (entry) => entry.name ?? "",
+    ),
+    ...urlsByOperation(
+      mcpReference.resources ?? [],
+      "mcp",
+      (entry) => entry.slug ?? "",
+    ),
+  ]);
+
+  return new Map(
+    [...cliUrls].map(([operationKey, cliUrl]) => [
+      operationKey,
+      { cliUrl, mcpUrl: mcpUrls.get(operationKey) ?? "" },
+    ]),
+  );
+}
+
 /** `| label | cli | api | mcp |` to its four cells. */
 function readTableCells(tableRow: string): string[] {
   return tableRow
@@ -187,8 +244,9 @@ function readTableCells(tableRow: string): string[] {
     .map((tableCell) => tableCell.trim());
 }
 
-test("UI-11.4 every CLI, API and AI row is complete, links its operation and uses its names", () => {
+test("UI-11.4 WS-07.4 every CLI, API and AI row is complete, links each name to its reference entry and uses the catalogue's names", () => {
   const specOperations = readSpecOperations();
+  const referenceUrls = readReferenceUrls();
   const wikiDirectory = resolve(process.cwd(), "../docs/wiki");
   const problems: string[] = [];
   for (const guidePage of listGuidePages(wikiDirectory)) {
@@ -216,15 +274,15 @@ test("UI-11.4 every CLI, API and AI row is complete, links its operation and use
         problems.push(`${rowName}: the API cell does not link an operation`);
         continue;
       }
-      if (cliCell !== `\`${operation["x-sendmock-cli"]}\``) {
-        problems.push(
-          `${rowName}: CLI should be ${operation["x-sendmock-cli"]}`,
-        );
+      const operationUrls = referenceUrls.get(`${apiMatch[1]} ${apiMatch[2]}`);
+      const expectedCli = `[\`${operation["x-sendmock-cli"]}\`](${operationUrls?.cliUrl})`;
+      if (cliCell !== expectedCli) {
+        problems.push(`${rowName}: CLI should be ${expectedCli}`);
       }
       const expectedMcp =
         operation["x-sendmock-mcp"] === null
           ? "none: agents never read secrets"
-          : `\`${operation["x-sendmock-mcp"]}\``;
+          : `[\`${operation["x-sendmock-mcp"]}\`](${operationUrls?.mcpUrl})`;
       if (mcpCell !== expectedMcp) {
         problems.push(`${rowName}: MCP should be ${expectedMcp}`);
       }

@@ -80,15 +80,15 @@ The bin's response rules and default reply. See [Responses](./responses.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| bins | `sendmock http bin list` | [`GET /api/v1/http/bins`](/api/http-catcher/#getHttpBins) | `sendmock_http_bin_list` |
-| add a bin | `sendmock http bin create` | [`POST /api/v1/http/bins`](/api/http-catcher/#postHttpBins) | `sendmock_http_bin_create` |
-| delete a bin | `sendmock http bin delete <binId>` | [`DELETE /api/v1/http/bins/{binId}`](/api/http-catcher/#deleteHttpBinsByBinId) | `sendmock_http_bin_delete` |
-| requests | `sendmock http list` | [`GET /api/v1/http/requests`](/api/http-catcher/#getHttpRequests) | `sendmock_http_list` |
-| one request | `sendmock http show <requestId>` | [`GET /api/v1/http/requests/{requestId}`](/api/http-catcher/#getHttpRequestsByRequestId) | `sendmock_http_get` |
-| wait in a test | `sendmock http wait` | [`GET /api/v1/wait/http`](/api/test-helpers/#getWaitHttp) | `sendmock_http_wait` |
-| send a test request | `sendmock http send <bin>` | [`POST /catch/{binPath}`](/api/http-catcher/#postCatchByBinPath) | `sendmock_http_send` |
-| forward | `sendmock http forward <requestId>` | [`POST /api/v1/http/requests/{requestId}/forward`](/api/http-catcher/#postHttpRequestsByRequestIdForward) | `sendmock_http_forward` |
-| clear requests | `sendmock http clear` | [`DELETE /api/v1/http/requests`](/api/http-catcher/#deleteHttpRequests) | `sendmock_http_clear` |
+| bins | [`sendmock http bin list`](/cli/http-catcher/#http-bin-list) | [`GET /api/v1/http/bins`](/api/http-catcher/#getHttpBins) | [`sendmock_http_bin_list`](/mcp/http-catcher/#sendmock_http_bin_list) |
+| add a bin | [`sendmock http bin create`](/cli/http-catcher/#http-bin-create) | [`POST /api/v1/http/bins`](/api/http-catcher/#postHttpBins) | [`sendmock_http_bin_create`](/mcp/http-catcher/#sendmock_http_bin_create) |
+| delete a bin | [`sendmock http bin delete <binId>`](/cli/http-catcher/#http-bin-delete) | [`DELETE /api/v1/http/bins/{binId}`](/api/http-catcher/#deleteHttpBinsByBinId) | [`sendmock_http_bin_delete`](/mcp/http-catcher/#sendmock_http_bin_delete) |
+| requests | [`sendmock http list`](/cli/http-catcher/#http-list) | [`GET /api/v1/http/requests`](/api/http-catcher/#getHttpRequests) | [`sendmock_http_list`](/mcp/http-catcher/#sendmock_http_list) |
+| one request | [`sendmock http show <requestId>`](/cli/http-catcher/#http-show) | [`GET /api/v1/http/requests/{requestId}`](/api/http-catcher/#getHttpRequestsByRequestId) | [`sendmock_http_get`](/mcp/http-catcher/#sendmock_http_get) |
+| wait in a test | [`sendmock http wait`](/cli/test-helpers/#http-wait) | [`GET /api/v1/wait/http`](/api/test-helpers/#getWaitHttp) | [`sendmock_http_wait`](/mcp/test-helpers/#sendmock_http_wait) |
+| send a test request | [`sendmock http send <bin>`](/cli/http-catcher/#http-send) | [`POST /catch/{binPath}`](/api/http-catcher/#postCatchByBinPath) | [`sendmock_http_send`](/mcp/http-catcher/#sendmock_http_send) |
+| forward | [`sendmock http forward <requestId>`](/cli/http-catcher/#http-forward) | [`POST /api/v1/http/requests/{requestId}/forward`](/api/http-catcher/#postHttpRequestsByRequestIdForward) | [`sendmock_http_forward`](/mcp/http-catcher/#sendmock_http_forward) |
+| clear requests | [`sendmock http clear`](/cli/http-catcher/#http-clear) | [`DELETE /api/v1/http/requests`](/api/http-catcher/#deleteHttpRequests) | [`sendmock_http_clear`](/mcp/http-catcher/#sendmock_http_clear) |
 
 ## Related
 

@@ -65,7 +65,7 @@ export function buildInputFlag(
     value_label:
       inputShape.kind === "boolean"
         ? null
-        : (valueLabel ?? `<${toKebabCase(input.name)}>`),
+        : (valueLabel ?? `<${flag.replace(/^--/, "")}>`),
     is_required: input.isRequired,
     is_repeatable: inputShape.kind === "list",
     takes_json: inputShape.kind === "object",

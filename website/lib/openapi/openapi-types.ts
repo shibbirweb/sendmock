@@ -51,6 +51,10 @@ export type ApiOperation = {
 /** The same operation from the CLI, an AI agent and the UI (`x-sendmock-*`, UI-11.3). */
 export type OperationSurfaces = {
   cli: string;
+  /** The command's entry in the CLI reference. */
+  cliUrl: string | null;
+  /** The tool's or resource's entry in the MCP reference. */
+  mcpUrl: string | null;
   /** Null only where agents may not act, with the reason. */
   mcp: string | null;
   mcpExemptReason: string | null;

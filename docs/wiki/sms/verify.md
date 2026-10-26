@@ -57,13 +57,13 @@ A table of Verify services: name, SID (copy), code length, fixed code (or Random
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock verify list` | [`GET /api/v1/verify`](/api/verify/#getVerify) | `sendmock_verify_list` |
-| one verification | `sendmock verify show <verificationSid>` | [`GET /api/v1/verify/{verificationSid}`](/api/verify/#getVerifyByVerificationSid) | `sendmock_verify_get` |
-| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
-| force an outcome | `sendmock verify force <verificationSid> <status>` | [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce) | `sendmock_verify_force` |
-| list services | `sendmock verify services list` | [`GET /api/v1/verify/services`](/api/verify/#getVerifyServices) | `sendmock_verify_service_list` |
-| add a service | `sendmock verify services create` | [`POST /api/v1/verify/services`](/api/verify/#postVerifyServices) | `sendmock_verify_service_create` |
-| change a service | `sendmock verify services update <serviceSid>` | [`PATCH /api/v1/verify/services/{serviceSid}`](/api/verify/#patchVerifyServicesByServiceSid) | `sendmock_verify_service_update` |
+| list | [`sendmock verify list`](/cli/verify/#verify-list) | [`GET /api/v1/verify`](/api/verify/#getVerify) | [`sendmock_verify_list`](/mcp/verify/#sendmock_verify_list) |
+| one verification | [`sendmock verify show <verificationSid>`](/cli/verify/#verify-show) | [`GET /api/v1/verify/{verificationSid}`](/api/verify/#getVerifyByVerificationSid) | [`sendmock_verify_get`](/mcp/verify/#sendmock_verify_get) |
+| read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |
+| force an outcome | [`sendmock verify force <verificationSid> <status>`](/cli/verify/#verify-force) | [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce) | [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force) |
+| list services | [`sendmock verify services list`](/cli/verify/#verify-services-list) | [`GET /api/v1/verify/services`](/api/verify/#getVerifyServices) | [`sendmock_verify_service_list`](/mcp/verify/#sendmock_verify_service_list) |
+| add a service | [`sendmock verify services create`](/cli/verify/#verify-services-create) | [`POST /api/v1/verify/services`](/api/verify/#postVerifyServices) | [`sendmock_verify_service_create`](/mcp/verify/#sendmock_verify_service_create) |
+| change a service | [`sendmock verify services update <serviceSid>`](/cli/verify/#verify-services-update) | [`PATCH /api/v1/verify/services/{serviceSid}`](/api/verify/#patchVerifyServicesByServiceSid) | [`sendmock_verify_service_update`](/mcp/verify/#sendmock_verify_service_update) |
 
 ## Related
 

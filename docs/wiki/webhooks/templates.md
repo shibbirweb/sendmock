@@ -60,15 +60,15 @@ Edit a built-in (it shows **Modified**; **Reset to default** brings back the shi
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock webhook template list` | [`GET /api/v1/webhooks/templates`](/api/webhook-templates/#getWebhooksTemplates) | `sendmock_webhook_template_list` |
-| one template | `sendmock webhook template show <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}`](/api/webhook-templates/#getWebhooksTemplatesByTemplateId) | `sendmock_webhook_template_get` |
-| render a preview | `sendmock webhook template render <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/render`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdRender) | `sendmock_webhook_template_render` |
-| clone | `sendmock webhook template clone <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/clone`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdClone) | `sendmock_webhook_template_clone` |
-| export | `sendmock webhook template export <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}/export`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdExport) | `sendmock_webhook_template_export` |
-| import | `sendmock webhook template import <file>` | [`POST /api/v1/webhooks/templates/import`](/api/webhook-templates/#postWebhooksTemplatesImport) | `sendmock_webhook_template_import` |
-| history | `sendmock webhook template history <templateId>` | [`GET /api/v1/webhooks/templates/{templateId}/revisions`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdRevisions) | `sendmock_webhook_template_revisions` |
-| reset a built-in | `sendmock webhook template reset <templateId>` | [`POST /api/v1/webhooks/templates/{templateId}/reset`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdReset) | `sendmock_webhook_template_reset` |
-| the reference of values and filters | `sendmock webhook template reference` | [`GET /api/v1/webhooks/template-reference`](/api/webhook-templates/#getWebhooksTemplateReference) | `sendmock_webhook_template_reference` |
+| list | [`sendmock webhook template list`](/cli/webhook-templates/#webhook-template-list) | [`GET /api/v1/webhooks/templates`](/api/webhook-templates/#getWebhooksTemplates) | [`sendmock_webhook_template_list`](/mcp/webhook-templates/#sendmock_webhook_template_list) |
+| one template | [`sendmock webhook template show <templateId>`](/cli/webhook-templates/#webhook-template-show) | [`GET /api/v1/webhooks/templates/{templateId}`](/api/webhook-templates/#getWebhooksTemplatesByTemplateId) | [`sendmock_webhook_template_get`](/mcp/webhook-templates/#sendmock_webhook_template_get) |
+| render a preview | [`sendmock webhook template render <templateId>`](/cli/webhook-templates/#webhook-template-render) | [`POST /api/v1/webhooks/templates/{templateId}/render`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdRender) | [`sendmock_webhook_template_render`](/mcp/webhook-templates/#sendmock_webhook_template_render) |
+| clone | [`sendmock webhook template clone <templateId>`](/cli/webhook-templates/#webhook-template-clone) | [`POST /api/v1/webhooks/templates/{templateId}/clone`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdClone) | [`sendmock_webhook_template_clone`](/mcp/webhook-templates/#sendmock_webhook_template_clone) |
+| export | [`sendmock webhook template export <templateId>`](/cli/webhook-templates/#webhook-template-export) | [`GET /api/v1/webhooks/templates/{templateId}/export`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdExport) | [`sendmock_webhook_template_export`](/mcp/webhook-templates/#sendmock_webhook_template_export) |
+| import | [`sendmock webhook template import <file>`](/cli/webhook-templates/#webhook-template-import) | [`POST /api/v1/webhooks/templates/import`](/api/webhook-templates/#postWebhooksTemplatesImport) | [`sendmock_webhook_template_import`](/mcp/webhook-templates/#sendmock_webhook_template_import) |
+| history | [`sendmock webhook template history <templateId>`](/cli/webhook-templates/#webhook-template-history) | [`GET /api/v1/webhooks/templates/{templateId}/revisions`](/api/webhook-templates/#getWebhooksTemplatesByTemplateIdRevisions) | [`sendmock_webhook_template_revisions`](/mcp/webhook-templates/#sendmock_webhook_template_revisions) |
+| reset a built-in | [`sendmock webhook template reset <templateId>`](/cli/webhook-templates/#webhook-template-reset) | [`POST /api/v1/webhooks/templates/{templateId}/reset`](/api/webhook-templates/#postWebhooksTemplatesByTemplateIdReset) | [`sendmock_webhook_template_reset`](/mcp/webhook-templates/#sendmock_webhook_template_reset) |
+| the reference of values and filters | [`sendmock webhook template reference`](/cli/webhook-templates/#webhook-template-reference) | [`GET /api/v1/webhooks/template-reference`](/api/webhook-templates/#getWebhooksTemplateReference) | [`sendmock_webhook_template_reference`](/mcp/webhook-templates/#sendmock_webhook_template_reference) |
 
 ## Related
 

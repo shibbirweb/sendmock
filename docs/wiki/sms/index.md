@@ -72,16 +72,16 @@ Facts (id, from, to, API, channel, segments, Messaging Service), the **status hi
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| send | `sendmock sms send` | [`POST /api/v1/sms`](/api/sms/#postSms) | `sendmock_sms_send` |
-| list | `sendmock sms list` | [`GET /api/v1/sms`](/api/sms/#getSms) | `sendmock_sms_list` |
-| conversations | `sendmock sms threads` | [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads) | `sendmock_sms_threads` |
-| one message with its history | `sendmock sms show <smsId>` | [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId) | `sendmock_sms_get` |
-| wait in a test | `sendmock sms wait` | [`GET /api/v1/wait/sms`](/api/test-helpers/#getWaitSms) | `sendmock_sms_wait` |
-| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
-| set a status | `sendmock sms status <smsId> <status>` | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | `sendmock_sms_set_status` |
-| reply as the contact | `sendmock sms inbound` | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | `sendmock_sms_simulate_inbound` |
-| delete one | `sendmock sms delete <smsId>` | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | `sendmock_sms_delete` |
-| delete everything | `sendmock sms delete-all --yes` | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | `sendmock_sms_delete_all` |
+| send | [`sendmock sms send`](/cli/sms/#sms-send) | [`POST /api/v1/sms`](/api/sms/#postSms) | [`sendmock_sms_send`](/mcp/sms/#sendmock_sms_send) |
+| list | [`sendmock sms list`](/cli/sms/#sms-list) | [`GET /api/v1/sms`](/api/sms/#getSms) | [`sendmock_sms_list`](/mcp/sms/#sendmock_sms_list) |
+| conversations | [`sendmock sms threads`](/cli/sms/#sms-threads) | [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads) | [`sendmock_sms_threads`](/mcp/sms/#sendmock_sms_threads) |
+| one message with its history | [`sendmock sms show <smsId>`](/cli/sms/#sms-show) | [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId) | [`sendmock_sms_get`](/mcp/sms/#sendmock_sms_get) |
+| wait in a test | [`sendmock sms wait`](/cli/test-helpers/#sms-wait) | [`GET /api/v1/wait/sms`](/api/test-helpers/#getWaitSms) | [`sendmock_sms_wait`](/mcp/test-helpers/#sendmock_sms_wait) |
+| read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |
+| set a status | [`sendmock sms status <smsId> <status>`](/cli/sms/#sms-status) | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status) |
+| reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
+| delete one | [`sendmock sms delete <smsId>`](/cli/sms/#sms-delete) | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | [`sendmock_sms_delete`](/mcp/sms/#sendmock_sms_delete) |
+| delete everything | [`sendmock sms delete-all --yes`](/cli/sms/#sms-delete-all) | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all) |
 
 The SMS commands and tools arrive in Phase 2.
 

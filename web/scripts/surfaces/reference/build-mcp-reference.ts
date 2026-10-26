@@ -140,6 +140,17 @@ function buildTool(
   };
 }
 
+/** `sendmock://emails/{emailId}/raw` to `resource-emails-emailid-raw`. */
+function toResourceSlug(resourceUri: string): string {
+  const uriPath = resourceUri
+    .replace("sendmock://", "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `resource-${uriPath}`;
+}
+
 function buildResource(
   catalogueOperation: CatalogueOperation,
   schemas: Schemas,
@@ -151,6 +162,7 @@ function buildResource(
   const area = catalogueOperation.entry.operation.tags[0] ?? "Other";
   return {
     uri: catalogueOperation.surfaces.mcp ?? "",
+    slug: toResourceSlug(catalogueOperation.surfaces.mcp ?? ""),
     summary: catalogueOperation.entry.operation.summary,
     mime_type:
       Object.keys(

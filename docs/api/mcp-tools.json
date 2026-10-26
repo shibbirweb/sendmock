@@ -12,6 +12,7 @@
           "path": "/api/v1/ai/agents",
           "operation_id": "getAiAgents",
           "summary": "For each AI agent, the install command and its MCP configuration.",
+          "area_slug": "automation",
           "selector": null
         }
       ],
@@ -88,6 +89,7 @@
           "path": "/api/v1/checkout-sessions/{sessionId}/complete",
           "operation_id": "postCheckoutSessionsBySessionIdComplete",
           "summary": "Pay, decline or cancel from the checkout page.",
+          "area_slug": "checkout",
           "selector": null
         }
       ],
@@ -383,6 +385,7 @@
           "path": "/api/v1/checkout-sessions/{sessionId}",
           "operation_id": "getCheckoutSessionsBySessionId",
           "summary": "What a test checkout page shows: order, methods and flows.",
+          "area_slug": "checkout",
           "selector": null
         }
       ],
@@ -444,6 +447,7 @@
           "path": "/api/v1/emails/{emailId}/html-check",
           "operation_id": "getEmailsByEmailIdHtmlCheck",
           "summary": "HTML and CSS support across email clients.",
+          "area_slug": "email",
           "selector": {
             "input": "kind",
             "value": "html"
@@ -454,6 +458,7 @@
           "path": "/api/v1/emails/{emailId}/list-unsubscribe",
           "operation_id": "getEmailsByEmailIdListUnsubscribe",
           "summary": "List-Unsubscribe and one-click unsubscribe checks.",
+          "area_slug": "email",
           "selector": {
             "input": "kind",
             "value": "unsubscribe"
@@ -464,6 +469,7 @@
           "path": "/api/v1/emails/{emailId}/link-check",
           "operation_id": "postEmailsByEmailIdLinkCheck",
           "summary": "Check every link in the message.",
+          "area_slug": "email",
           "selector": {
             "input": "kind",
             "value": "links"
@@ -474,6 +480,7 @@
           "path": "/api/v1/emails/{emailId}/spam-check",
           "operation_id": "postEmailsByEmailIdSpamCheck",
           "summary": "Score the message with the spam rules.",
+          "area_slug": "email",
           "selector": {
             "input": "kind",
             "value": "spam"
@@ -571,6 +578,7 @@
           "path": "/api/v1/emails/{emailId}",
           "operation_id": "deleteEmailsByEmailId",
           "summary": "Delete one email.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -632,6 +640,7 @@
           "path": "/api/v1/emails",
           "operation_id": "deleteEmails",
           "summary": "Delete every email.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -667,6 +676,7 @@
           "path": "/api/v1/emails/{emailId}/forward",
           "operation_id": "postEmailsByEmailIdForward",
           "summary": "Forward as the recipient; the copy arrives as inbound email.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -846,6 +856,7 @@
           "path": "/api/v1/emails/{emailId}",
           "operation_id": "getEmailsByEmailId",
           "summary": "One email with bodies, headers, attachments and extracted codes.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -907,6 +918,7 @@
           "path": "/api/v1/emails/inbound",
           "operation_id": "postEmailsInbound",
           "summary": "Create an incoming email from fields or raw MIME; fires email.inbound.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1070,6 +1082,7 @@
           "path": "/api/v1/emails/latest",
           "operation_id": "getEmailsLatest",
           "summary": "The newest email to a recipient.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1151,6 +1164,7 @@
           "path": "/api/v1/emails",
           "operation_id": "getEmails",
           "summary": "Stored emails, newest first, with search and filters.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1425,6 +1439,7 @@
           "path": "/api/v1/emails/{emailId}/mime",
           "operation_id": "getEmailsByEmailIdMime",
           "summary": "The MIME tree of the message.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1486,6 +1501,7 @@
           "path": "/api/v1/emails/{emailId}/open",
           "operation_id": "postEmailsByEmailIdOpen",
           "summary": "Record an open and fire email.opened.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1581,6 +1597,7 @@
           "path": "/api/v1/emails/{emailId}/release",
           "operation_id": "postEmailsByEmailIdRelease",
           "summary": "Send the email on through the allowlisted relay.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1671,6 +1688,7 @@
           "path": "/api/v1/emails/{emailId}/reply",
           "operation_id": "postEmailsByEmailIdReply",
           "summary": "Reply as the recipient; the reply arrives as inbound email.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -1831,6 +1849,7 @@
           "path": "/api/v1/send",
           "operation_id": "postSend",
           "summary": "Native send: JSON with optional base64 attachments.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -2167,6 +2186,7 @@
           "path": "/api/v1/send/raw",
           "operation_id": "postSendRaw",
           "summary": "Store a raw message as sent by your app, as the sendmail shim does.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -2228,6 +2248,7 @@
           "path": "/api/v1/emails/{emailId}/simulate",
           "operation_id": "postEmailsByEmailIdSimulate",
           "summary": "Simulate a delivery outcome such as a bounce or complaint.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -2356,6 +2377,7 @@
           "path": "/api/v1/emails/{emailId}/timeline",
           "operation_id": "getEmailsByEmailIdTimeline",
           "summary": "Delivery events: received, delivered, opened, bounced.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -2417,6 +2439,7 @@
           "path": "/api/v1/emails/{emailId}",
           "operation_id": "patchEmailsByEmailId",
           "summary": "Mark read or unread, or change tags.",
+          "area_slug": "email",
           "selector": null
         }
       ],
@@ -2532,6 +2555,7 @@
           "path": "/api/v1/wait/email",
           "operation_id": "getWaitEmail",
           "summary": "Wait until a matching email arrives; 408 on timeout.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -2648,6 +2672,7 @@
           "path": "/api/v1/events/recent",
           "operation_id": "getEventsRecent",
           "summary": "The latest events, newest first: the polling twin of the live stream.",
+          "area_slug": "automation",
           "selector": null
         }
       ],
@@ -2745,6 +2770,7 @@
           "path": "/api/v1/forward-rules",
           "operation_id": "postForwardRules",
           "summary": "Add a forward rule at the end of the list.",
+          "area_slug": "forward-rules",
           "selector": null
         }
       ],
@@ -2988,6 +3014,7 @@
           "path": "/api/v1/forward-rules/{ruleId}",
           "operation_id": "deleteForwardRulesByRuleId",
           "summary": "Delete a forward rule.",
+          "area_slug": "forward-rules",
           "selector": null
         }
       ],
@@ -3049,6 +3076,7 @@
           "path": "/api/v1/forward-rules",
           "operation_id": "getForwardRules",
           "summary": "Every forward rule, in the order they run.",
+          "area_slug": "forward-rules",
           "selector": null
         }
       ],
@@ -3084,6 +3112,7 @@
           "path": "/api/v1/forward-rules/{ruleId}/move",
           "operation_id": "postForwardRulesByRuleIdMove",
           "summary": "Move a forward rule up or down.",
+          "area_slug": "forward-rules",
           "selector": null
         }
       ],
@@ -3173,6 +3202,7 @@
           "path": "/api/v1/forward-rules/{ruleId}",
           "operation_id": "patchForwardRulesByRuleId",
           "summary": "Change a forward rule, or switch it on or off.",
+          "area_slug": "forward-rules",
           "selector": null
         }
       ],
@@ -3433,6 +3463,7 @@
           "path": "/api/v1/http/bins",
           "operation_id": "postHttpBins",
           "summary": "Add a bin; 409 when the name is taken.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3548,6 +3579,7 @@
           "path": "/api/v1/http/bins/{binId}",
           "operation_id": "deleteHttpBinsByBinId",
           "summary": "Delete a bin and its requests.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3609,6 +3641,7 @@
           "path": "/api/v1/http/bins",
           "operation_id": "getHttpBins",
           "summary": "Bins, each a capture URL with its own responses.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3646,6 +3679,7 @@
           "path": "/api/v1/http/bins/{binId}",
           "operation_id": "patchHttpBinsByBinId",
           "summary": "Change a bin's default response.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3785,6 +3819,7 @@
           "path": "/api/v1/http/requests",
           "operation_id": "deleteHttpRequests",
           "summary": "Delete captured requests, all or one bin's.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3841,6 +3876,7 @@
           "path": "/api/v1/http/requests/{requestId}/forward",
           "operation_id": "postHttpRequestsByRequestIdForward",
           "summary": "Send a captured request on to another URL.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3923,6 +3959,7 @@
           "path": "/api/v1/http/requests/{requestId}",
           "operation_id": "getHttpRequestsByRequestId",
           "summary": "One captured request and what SendMock answered.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -3984,6 +4021,7 @@
           "path": "/api/v1/http/requests",
           "operation_id": "getHttpRequests",
           "summary": "Captured requests, newest first.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -4081,6 +4119,7 @@
           "path": "/api/v1/http/bins/{binId}/responses",
           "operation_id": "getHttpBinsByBinIdResponses",
           "summary": "A bin's response rules, checked from top to bottom.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -4142,6 +4181,7 @@
           "path": "/api/v1/http/bins/{binId}/responses/preview",
           "operation_id": "postHttpBinsByBinIdResponsesPreview",
           "summary": "Which rule a captured request would match, and its answer.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -4559,6 +4599,7 @@
           "path": "/api/v1/http/bins/{binId}/responses",
           "operation_id": "putHttpBinsByBinIdResponses",
           "summary": "Replace a bin's response rules.",
+          "area_slug": "http-catcher",
           "selector": null
         }
       ],
@@ -4620,6 +4661,7 @@
           "path": "/catch/{binPath}",
           "operation_id": "getCatchByBinPath",
           "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
+          "area_slug": "http-catcher",
           "selector": {
             "input": "method",
             "value": "GET"
@@ -4630,6 +4672,7 @@
           "path": "/catch/{binPath}",
           "operation_id": "postCatchByBinPath",
           "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
+          "area_slug": "http-catcher",
           "selector": {
             "input": "method",
             "value": "POST"
@@ -4640,6 +4683,7 @@
           "path": "/catch/{binPath}",
           "operation_id": "putCatchByBinPath",
           "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
+          "area_slug": "http-catcher",
           "selector": {
             "input": "method",
             "value": "PUT"
@@ -4650,6 +4694,7 @@
           "path": "/catch/{binPath}",
           "operation_id": "patchCatchByBinPath",
           "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
+          "area_slug": "http-catcher",
           "selector": {
             "input": "method",
             "value": "PATCH"
@@ -4660,6 +4705,7 @@
           "path": "/catch/{binPath}",
           "operation_id": "deleteCatchByBinPath",
           "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
+          "area_slug": "http-catcher",
           "selector": {
             "input": "method",
             "value": "DELETE"
@@ -4774,6 +4820,7 @@
           "path": "/api/v1/wait/http",
           "operation_id": "getWaitHttp",
           "summary": "Wait until the catcher records a matching request; 408 on timeout.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -4890,6 +4937,7 @@
           "path": "/api/v1/inbound-routes",
           "operation_id": "postInboundRoutes",
           "summary": "Add a route.",
+          "area_slug": "inbound-routes",
           "selector": null
         }
       ],
@@ -5195,6 +5243,7 @@
           "path": "/api/v1/inbound-routes/{routeId}",
           "operation_id": "deleteInboundRoutesByRouteId",
           "summary": "Delete a route.",
+          "area_slug": "inbound-routes",
           "selector": null
         }
       ],
@@ -5256,6 +5305,7 @@
           "path": "/api/v1/inbound-routes",
           "operation_id": "getInboundRoutes",
           "summary": "Routes for incoming email, in priority order.",
+          "area_slug": "inbound-routes",
           "selector": null
         }
       ],
@@ -5291,6 +5341,7 @@
           "path": "/api/v1/inbound-routes/test",
           "operation_id": "postInboundRoutesTest",
           "summary": "Which routes a recipient or header would match, and what runs.",
+          "area_slug": "inbound-routes",
           "selector": null
         }
       ],
@@ -5431,6 +5482,7 @@
           "path": "/api/v1/inbound-routes/{routeId}",
           "operation_id": "patchInboundRoutesByRouteId",
           "summary": "Change a route.",
+          "area_slug": "inbound-routes",
           "selector": null
         }
       ],
@@ -5757,6 +5809,7 @@
           "path": "/api/v1/integrations/{stack}",
           "operation_id": "getIntegrationsByStack",
           "summary": "Copy-ready settings for a stack, as Settings > Connection shows them.",
+          "area_slug": "automation",
           "selector": null
         }
       ],
@@ -5858,6 +5911,7 @@
           "path": "/api/v1/links",
           "operation_id": "getLinks",
           "summary": "The links of the latest email to a recipient.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -5939,6 +5993,7 @@
           "path": "/api/v1/logs/http",
           "operation_id": "getLogsHttp",
           "summary": "Requests to the native and provider APIs, newest first.",
+          "area_slug": "logs",
           "selector": null
         }
       ],
@@ -6088,6 +6143,7 @@
           "path": "/api/v1/logs/http/{requestId}",
           "operation_id": "getLogsHttpByRequestId",
           "summary": "One API request with its request and response.",
+          "area_slug": "logs",
           "selector": null
         }
       ],
@@ -6149,6 +6205,7 @@
           "path": "/api/v1/logs/smtp",
           "operation_id": "getLogsSmtp",
           "summary": "SMTP sessions, newest first, including rejected ones.",
+          "area_slug": "logs",
           "selector": null
         }
       ],
@@ -6265,6 +6322,7 @@
           "path": "/api/v1/logs/smtp/{sessionId}",
           "operation_id": "getLogsSmtpBySessionId",
           "summary": "One SMTP session with its transcript.",
+          "area_slug": "logs",
           "selector": null
         }
       ],
@@ -6326,6 +6384,7 @@
           "path": "/api/v1/messaging-services",
           "operation_id": "postMessagingServices",
           "summary": "Add a Messaging Service.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6503,6 +6562,7 @@
           "path": "/api/v1/messaging-services/{serviceSid}",
           "operation_id": "deleteMessagingServicesByServiceSid",
           "summary": "Delete a Messaging Service.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6564,6 +6624,7 @@
           "path": "/api/v1/messaging-services",
           "operation_id": "getMessagingServices",
           "summary": "Messaging Services that pool numbers.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6599,6 +6660,7 @@
           "path": "/api/v1/messaging-services/{serviceSid}",
           "operation_id": "patchMessagingServicesByServiceSid",
           "summary": "Change a Messaging Service.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6797,6 +6859,7 @@
           "path": "/api/v1/numbers/{numberId}",
           "operation_id": "deleteNumbersByNumberId",
           "summary": "Delete a number.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6858,6 +6921,7 @@
           "path": "/api/v1/numbers",
           "operation_id": "getNumbers",
           "summary": "Fake numbers your app sends from, with their webhooks.",
+          "area_slug": "numbers",
           "selector": null
         }
       ],
@@ -6893,6 +6957,7 @@
           "path": "/api/v1/numbers",
           "operation_id": "postNumbers",
           "summary": "Add a number.",
+          "area_slug": "numbers",
           "selector": {
             "input": "number_id",
             "isGiven": false
@@ -6903,6 +6968,7 @@
           "path": "/api/v1/numbers/{numberId}",
           "operation_id": "patchNumbersByNumberId",
           "summary": "Change a number.",
+          "area_slug": "numbers",
           "selector": {
             "input": "number_id",
             "isGiven": true
@@ -7194,6 +7260,7 @@
           "path": "/api/v1/otp",
           "operation_id": "getOtp",
           "summary": "The latest one-time code sent to a recipient.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -7295,6 +7362,7 @@
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "postOutcomeRulesEmail",
           "summary": "Add an email outcome rule.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -7305,6 +7373,7 @@
           "path": "/api/v1/outcome-rules/sms",
           "operation_id": "postOutcomeRulesSms",
           "summary": "Add an SMS outcome rule.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -7596,6 +7665,7 @@
           "path": "/api/v1/outcome-rules/email/{ruleId}",
           "operation_id": "deleteOutcomeRulesEmailByRuleId",
           "summary": "Delete an email outcome rule.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -7606,6 +7676,7 @@
           "path": "/api/v1/outcome-rules/sms/{ruleId}",
           "operation_id": "deleteOutcomeRulesSmsByRuleId",
           "summary": "Delete an SMS outcome rule.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -7697,6 +7768,7 @@
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "getOutcomeRulesEmail",
           "summary": "email outcome rules, checked from top to bottom.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -7707,6 +7779,7 @@
           "path": "/api/v1/outcome-rules/sms",
           "operation_id": "getOutcomeRulesSms",
           "summary": "SMS outcome rules, checked from top to bottom.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -7777,6 +7850,7 @@
           "path": "/api/v1/outcome-rules/email/{ruleId}/move",
           "operation_id": "postOutcomeRulesEmailByRuleIdMove",
           "summary": "Move an email outcome rule up or down.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -7787,6 +7861,7 @@
           "path": "/api/v1/outcome-rules/sms/{ruleId}/move",
           "operation_id": "postOutcomeRulesSmsByRuleIdMove",
           "summary": "Move an SMS outcome rule up or down.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -7906,6 +7981,7 @@
           "path": "/api/v1/outcome-rules/email/test",
           "operation_id": "postOutcomeRulesEmailTest",
           "summary": "Which custom rule, magic address or profile decides an address's outcome.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -7916,6 +7992,7 @@
           "path": "/api/v1/outcome-rules/sms/test",
           "operation_id": "postOutcomeRulesSmsTest",
           "summary": "Which custom rule, magic number or profile decides a number's outcome.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -8051,6 +8128,7 @@
           "path": "/api/v1/outcome-rules/email/{ruleId}",
           "operation_id": "patchOutcomeRulesEmailByRuleId",
           "summary": "Change an email outcome rule; send only the changed keys.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "email"
@@ -8061,6 +8139,7 @@
           "path": "/api/v1/outcome-rules/sms/{ruleId}",
           "operation_id": "patchOutcomeRulesSmsByRuleId",
           "summary": "Change an SMS outcome rule; send only the changed keys.",
+          "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
             "value": "sms"
@@ -8365,6 +8444,7 @@
           "path": "/api/v1/payments/checkout",
           "operation_id": "postPaymentsCheckout",
           "summary": "Start a hosted checkout on a gateway and get its payment page URL.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -8537,6 +8617,7 @@
           "path": "/api/v1/payments/flows",
           "operation_id": "postPaymentsFlows",
           "summary": "Add a flow.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -8753,6 +8834,7 @@
           "path": "/api/v1/payments/flows/{flowKey}",
           "operation_id": "deletePaymentsFlowsByFlowKey",
           "summary": "Delete a custom flow; 409 while a method uses it.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -8814,6 +8896,7 @@
           "path": "/api/v1/payments/flows/{flowKey}",
           "operation_id": "getPaymentsFlowsByFlowKey",
           "summary": "One payment flow with its steps.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -8875,6 +8958,7 @@
           "path": "/api/v1/payments/flows",
           "operation_id": "getPaymentsFlows",
           "summary": "Flows: the steps a checkout page runs for a method.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -8910,6 +8994,7 @@
           "path": "/api/v1/payments/flows/{flowKey}/reset",
           "operation_id": "postPaymentsFlowsByFlowKeyReset",
           "summary": "Put a built-in flow back as shipped.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -8971,6 +9056,7 @@
           "path": "/api/v1/payments/flows/{flowKey}/steps",
           "operation_id": "postPaymentsFlowsByFlowKeySteps",
           "summary": "Add a step to a flow.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -9156,6 +9242,7 @@
           "path": "/api/v1/payments/flows/{flowKey}/steps/{stepIndex}",
           "operation_id": "deletePaymentsFlowsByFlowKeyStepsByStepIndex",
           "summary": "Remove one step of a flow.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -9238,6 +9325,7 @@
           "path": "/api/v1/payments/flows/{flowKey}/steps/{stepIndex}",
           "operation_id": "patchPaymentsFlowsByFlowKeyStepsByStepIndex",
           "summary": "Change one step of a flow.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -9419,6 +9507,7 @@
           "path": "/api/v1/payments/flows/{flowKey}",
           "operation_id": "patchPaymentsFlowsByFlowKey",
           "summary": "Change a flow.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -9656,6 +9745,7 @@
           "path": "/api/v1/payments/flow-variables",
           "operation_id": "getPaymentsFlowVariables",
           "summary": "The variables a step label can use.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -9691,6 +9781,7 @@
           "path": "/api/v1/payments/gateways",
           "operation_id": "postPaymentsGateways",
           "summary": "Add a custom gateway.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -9796,6 +9887,7 @@
           "path": "/api/v1/payments/gateways/{gatewayKey}",
           "operation_id": "deletePaymentsGatewaysByGatewayKey",
           "summary": "Delete a custom gateway; 409 while payments use it.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -9857,6 +9949,7 @@
           "path": "/api/v1/payments/gateways/{gatewayKey}",
           "operation_id": "getPaymentsGatewaysByGatewayKey",
           "summary": "One gateway definition; secret credentials masked.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -9918,6 +10011,7 @@
           "path": "/api/v1/payments/gateways",
           "operation_id": "getPaymentsGateways",
           "summary": "Gateways with their checkout, redirect and notification setup.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -9953,6 +10047,7 @@
           "path": "/api/v1/payments/gateways/{gatewayKey}/preview",
           "operation_id": "postPaymentsGatewaysByGatewayKeyPreview",
           "summary": "Render a gateway's redirect and notification for a payment.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -10667,6 +10762,7 @@
           "path": "/api/v1/payments/gateways/{gatewayKey}/reset",
           "operation_id": "postPaymentsGatewaysByGatewayKeyReset",
           "summary": "Put a built-in gateway back as shipped.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -10728,6 +10824,7 @@
           "path": "/api/v1/payments/gateways/{gatewayKey}",
           "operation_id": "patchPaymentsGatewaysByGatewayKey",
           "summary": "Change a gateway; secret credentials stay masked.",
+          "area_slug": "payment-gateways",
           "selector": null
         }
       ],
@@ -11400,6 +11497,7 @@
           "path": "/api/v1/payments/{paymentId}",
           "operation_id": "getPaymentsByPaymentId",
           "summary": "One payment with line items, timeline, redirects and notifications.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -11461,6 +11559,7 @@
           "path": "/api/v1/payments",
           "operation_id": "getPayments",
           "summary": "Test payments, newest first, with filters.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -11596,6 +11695,7 @@
           "path": "/api/v1/payments/methods",
           "operation_id": "postPaymentsMethods",
           "summary": "Add a custom method.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12024,6 +12124,7 @@
           "path": "/api/v1/payments/methods/{methodKey}",
           "operation_id": "deletePaymentsMethodsByMethodKey",
           "summary": "Delete a custom method; 409 while a gateway offers it.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12085,6 +12186,7 @@
           "path": "/api/v1/payments/methods/{methodKey}",
           "operation_id": "getPaymentsMethodsByMethodKey",
           "summary": "One payment method with its test values.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12146,6 +12248,7 @@
           "path": "/api/v1/payments/methods",
           "operation_id": "getPaymentsMethods",
           "summary": "Methods customers pay with, and their test values.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12181,6 +12284,7 @@
           "path": "/api/v1/payments/methods/{methodKey}/reset",
           "operation_id": "postPaymentsMethodsByMethodKeyReset",
           "summary": "Put a built-in method back as shipped.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12242,6 +12346,7 @@
           "path": "/api/v1/payments/methods/{methodKey}",
           "operation_id": "patchPaymentsMethodsByMethodKey",
           "summary": "Change a method.",
+          "area_slug": "payment-methods",
           "selector": null
         }
       ],
@@ -12691,6 +12796,7 @@
           "path": "/api/v1/payments/{paymentId}/notify",
           "operation_id": "postPaymentsByPaymentIdNotify",
           "summary": "Send the payment's notification (IPN or webhook) again.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -12752,6 +12858,7 @@
           "path": "/api/v1/payments/{paymentId}/simulate",
           "operation_id": "postPaymentsByPaymentIdSimulate",
           "summary": "Move the payment on: capture, refund, dispute, fail.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -12942,6 +13049,7 @@
           "path": "/api/v1/payments/step-types",
           "operation_id": "getPaymentsStepTypes",
           "summary": "The step types a flow can use, with their fields.",
+          "area_slug": "payment-flows",
           "selector": null
         }
       ],
@@ -12977,6 +13085,7 @@
           "path": "/api/v1/payments/test-cards",
           "operation_id": "getPaymentsTestCards",
           "summary": "The test values of every enabled payment method.",
+          "area_slug": "payments",
           "selector": null
         }
       ],
@@ -13012,6 +13121,7 @@
           "path": "/api/v1/wait/payment",
           "operation_id": "getWaitPayment",
           "summary": "Wait until a payment reaches a status; 408 on timeout.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -13128,6 +13238,7 @@
           "path": "/api/v1/reset",
           "operation_id": "postReset",
           "summary": "Delete all traffic and restore the seed configuration.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -13163,6 +13274,7 @@
           "path": "/api/v1/samples/{kind}",
           "operation_id": "postSamplesByKind",
           "summary": "Create a sample email, SMS, verification or HTTP request through the normal path.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -13285,6 +13397,7 @@
           "path": "/api/v1/scenarios/run",
           "operation_id": "postScenariosRun",
           "summary": "Run a scenario file step by step and report each step.",
+          "area_slug": "automation",
           "selector": null
         }
       ],
@@ -13346,6 +13459,7 @@
           "path": "/api/v1/scenarios/validate",
           "operation_id": "postScenariosValidate",
           "summary": "Check a scenario file without running it.",
+          "area_slug": "automation",
           "selector": null
         }
       ],
@@ -13407,6 +13521,7 @@
           "path": "/api/v1/seed/apply",
           "operation_id": "postSeedApply",
           "summary": "Apply a seed file; 422 with the errors when it is invalid.",
+          "area_slug": "seed",
           "selector": null
         }
       ],
@@ -13468,6 +13583,7 @@
           "path": "/api/v1/seed/export",
           "operation_id": "getSeedExport",
           "summary": "The current configuration as sendmock.seed.toml.",
+          "area_slug": "seed",
           "selector": null
         }
       ],
@@ -13503,6 +13619,7 @@
           "path": "/api/v1/seed/status",
           "operation_id": "getSeedStatus",
           "summary": "Whether a seed file is loaded and when it was applied.",
+          "area_slug": "seed",
           "selector": null
         }
       ],
@@ -13538,6 +13655,7 @@
           "path": "/api/v1/seed/validate",
           "operation_id": "postSeedValidate",
           "summary": "Check a seed file without applying it.",
+          "area_slug": "seed",
           "selector": null
         }
       ],
@@ -13599,6 +13717,7 @@
           "path": "/api/v1/settings",
           "operation_id": "getSettings",
           "summary": "Every runtime setting.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -13634,6 +13753,7 @@
           "path": "/api/v1/settings",
           "operation_id": "patchSettings",
           "summary": "Change settings; send only the changed keys.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -14323,6 +14443,7 @@
           "path": "/api/v1/sms/{smsId}",
           "operation_id": "deleteSmsBySmsId",
           "summary": "Delete one message.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14384,6 +14505,7 @@
           "path": "/api/v1/sms",
           "operation_id": "deleteSms",
           "summary": "Delete every message.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14419,6 +14541,7 @@
           "path": "/api/v1/sms/{smsId}",
           "operation_id": "getSmsBySmsId",
           "summary": "One message with its status history and callbacks.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14480,6 +14603,7 @@
           "path": "/api/v1/sms",
           "operation_id": "getSms",
           "summary": "SMS and WhatsApp messages, newest first, with filters.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14702,6 +14826,7 @@
           "path": "/api/v1/sms/{smsId}/open",
           "operation_id": "postSmsBySmsIdOpen",
           "summary": "Record a read and fire sms.opened.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14797,6 +14922,7 @@
           "path": "/api/v1/sms/{smsId}/reply-webhook/resend",
           "operation_id": "postSmsBySmsIdReplyWebhookResend",
           "summary": "Send an inbound message's reply webhook again.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -14858,6 +14984,7 @@
           "path": "/api/v1/sms",
           "operation_id": "postSms",
           "summary": "Native send, with optional media URLs or inline media.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -15101,6 +15228,7 @@
           "path": "/api/v1/sms/{smsId}/status",
           "operation_id": "postSmsBySmsIdStatus",
           "summary": "Set a delivery status by hand and fire its callback.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -15226,6 +15354,7 @@
           "path": "/api/v1/sms/inbound",
           "operation_id": "postSmsInbound",
           "summary": "Simulate a message from a contact to one of your numbers.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -15445,6 +15574,7 @@
           "path": "/api/v1/sms/threads",
           "operation_id": "getSmsThreads",
           "summary": "Conversations, one per contact and your number.",
+          "area_slug": "sms",
           "selector": null
         }
       ],
@@ -15480,6 +15610,7 @@
           "path": "/api/v1/wait/sms",
           "operation_id": "getWaitSms",
           "summary": "Wait until a matching SMS arrives; 408 on timeout.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -15596,6 +15727,7 @@
           "path": "/api/v1/stats",
           "operation_id": "getStats",
           "summary": "Counts and rates shown on the Overview.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -15631,6 +15763,7 @@
           "path": "/api/v1/health",
           "operation_id": "getHealth",
           "summary": "Liveness check; answers while the server runs.",
+          "area_slug": "system",
           "selector": {
             "input": "view",
             "value": "health"
@@ -15641,6 +15774,7 @@
           "path": "/api/v1/info",
           "operation_id": "getInfo",
           "summary": "Version, listen addresses and enabled features.",
+          "area_slug": "system",
           "selector": {
             "input": "view",
             "value": "info"
@@ -15711,6 +15845,7 @@
           "path": "/api/v1/tag-rules",
           "operation_id": "postTagRules",
           "summary": "Add a tag rule at the end of the list.",
+          "area_slug": "tag-rules",
           "selector": null
         }
       ],
@@ -15945,6 +16080,7 @@
           "path": "/api/v1/tag-rules/{ruleId}",
           "operation_id": "deleteTagRulesByRuleId",
           "summary": "Delete a tag rule.",
+          "area_slug": "tag-rules",
           "selector": null
         }
       ],
@@ -16006,6 +16142,7 @@
           "path": "/api/v1/tag-rules",
           "operation_id": "getTagRules",
           "summary": "Every tag rule, in the order they run.",
+          "area_slug": "tag-rules",
           "selector": null
         }
       ],
@@ -16041,6 +16178,7 @@
           "path": "/api/v1/tag-rules/{ruleId}/move",
           "operation_id": "postTagRulesByRuleIdMove",
           "summary": "Move a tag rule up or down.",
+          "area_slug": "tag-rules",
           "selector": null
         }
       ],
@@ -16130,6 +16268,7 @@
           "path": "/api/v1/tag-rules/{ruleId}",
           "operation_id": "patchTagRulesByRuleId",
           "summary": "Change a tag rule, or switch it on or off.",
+          "area_slug": "tag-rules",
           "selector": null
         }
       ],
@@ -16381,6 +16520,7 @@
           "path": "/api/v1/updates",
           "operation_id": "getUpdates",
           "summary": "Whether a newer release exists.",
+          "area_slug": "system",
           "selector": null
         }
       ],
@@ -16416,6 +16556,7 @@
           "path": "/api/v1/verify/{verificationSid}/force",
           "operation_id": "postVerifyByVerificationSidForce",
           "summary": "Force an outcome: approved, expired, canceled or max attempts.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16514,6 +16655,7 @@
           "path": "/api/v1/verify/{verificationSid}",
           "operation_id": "getVerifyByVerificationSid",
           "summary": "One verification with its code, attempts and timeline.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16575,6 +16717,7 @@
           "path": "/api/v1/verify",
           "operation_id": "getVerify",
           "summary": "Verifications your app started, newest first.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16726,6 +16869,7 @@
           "path": "/api/v1/verify/services",
           "operation_id": "postVerifyServices",
           "summary": "Add a Verify service.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16852,6 +16996,7 @@
           "path": "/api/v1/verify/services/{serviceSid}",
           "operation_id": "deleteVerifyServicesByServiceSid",
           "summary": "Delete a Verify service.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16913,6 +17058,7 @@
           "path": "/api/v1/verify/services",
           "operation_id": "getVerifyServices",
           "summary": "Verify services (code length, fixed code, lifetime).",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -16948,6 +17094,7 @@
           "path": "/api/v1/verify/services/{serviceSid}",
           "operation_id": "patchVerifyServicesByServiceSid",
           "summary": "Change a Verify service.",
+          "area_slug": "verify",
           "selector": null
         }
       ],
@@ -17095,6 +17242,7 @@
           "path": "/api/v1/webhooks/deliveries/{deliveryId}/cancel",
           "operation_id": "postWebhooksDeliveriesByDeliveryIdCancel",
           "summary": "Stop the remaining retries.",
+          "area_slug": "webhook-deliveries",
           "selector": null
         }
       ],
@@ -17156,6 +17304,7 @@
           "path": "/api/v1/webhooks/deliveries/{deliveryId}",
           "operation_id": "getWebhooksDeliveriesByDeliveryId",
           "summary": "One delivery: request, response and every attempt.",
+          "area_slug": "webhook-deliveries",
           "selector": null
         }
       ],
@@ -17217,6 +17366,7 @@
           "path": "/api/v1/webhooks/deliveries",
           "operation_id": "getWebhooksDeliveries",
           "summary": "Every webhook request sent, newest first.",
+          "area_slug": "webhook-deliveries",
           "selector": null
         }
       ],
@@ -17424,6 +17574,7 @@
           "path": "/api/v1/webhooks/deliveries/{deliveryId}/replay",
           "operation_id": "postWebhooksDeliveriesByDeliveryIdReplay",
           "summary": "Send the delivery again, as it was or edited.",
+          "area_slug": "webhook-deliveries",
           "selector": null
         }
       ],
@@ -17552,6 +17703,7 @@
           "path": "/api/v1/wait/webhook",
           "operation_id": "getWaitWebhook",
           "summary": "Wait until a matching delivery finishes; 408 on timeout.",
+          "area_slug": "test-helpers",
           "selector": null
         }
       ],
@@ -17687,6 +17839,7 @@
           "path": "/api/v1/webhooks/endpoints",
           "operation_id": "postWebhooksEndpoints",
           "summary": "Add an endpoint; its signing secret is generated.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18336,6 +18489,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}",
           "operation_id": "deleteWebhooksEndpointsByEndpointId",
           "summary": "Delete an endpoint and its rules.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18397,6 +18551,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}",
           "operation_id": "getWebhooksEndpointsByEndpointId",
           "summary": "One endpoint; its secret masked.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18458,6 +18613,7 @@
           "path": "/api/v1/webhooks/endpoints",
           "operation_id": "getWebhooksEndpoints",
           "summary": "Where webhooks go: URL, template, secret and retry policy.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18493,6 +18649,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}/rotate-secret",
           "operation_id": "postWebhooksEndpointsByEndpointIdRotateSecret",
           "summary": "New signing secret; the old one keeps working for the overlap.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18575,6 +18732,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}/save-as-template",
           "operation_id": "postWebhooksEndpointsByEndpointIdSaveAsTemplate",
           "summary": "Save the endpoint's request as a custom template.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18657,6 +18815,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}/test",
           "operation_id": "postWebhooksEndpointsByEndpointIdTest",
           "summary": "Send a test.ping delivery.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -18718,6 +18877,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}",
           "operation_id": "patchWebhooksEndpointsByEndpointId",
           "summary": "Change an endpoint; send only the changed keys.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -19331,6 +19491,7 @@
           "path": "/api/v1/webhooks/metrics",
           "operation_id": "getWebhooksMetrics",
           "summary": "Volume, success rate, latency and failures over a range.",
+          "area_slug": "webhook-deliveries",
           "selector": null
         }
       ],
@@ -19423,6 +19584,7 @@
           "path": "/api/v1/webhooks/endpoints/preview",
           "operation_id": "postWebhooksEndpointsPreview",
           "summary": "Render an unsaved endpoint's request against a message.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -20015,6 +20177,7 @@
           "path": "/api/v1/webhooks/rules",
           "operation_id": "postWebhooksRules",
           "summary": "Add a rule.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20356,6 +20519,7 @@
           "path": "/api/v1/webhooks/rules/{ruleId}",
           "operation_id": "deleteWebhooksRulesByRuleId",
           "summary": "Delete a rule.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20417,6 +20581,7 @@
           "path": "/api/v1/webhooks/rules/{ruleId}",
           "operation_id": "getWebhooksRulesByRuleId",
           "summary": "One webhook rule with its filter.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20478,6 +20643,7 @@
           "path": "/api/v1/webhooks/rules",
           "operation_id": "getWebhooksRules",
           "summary": "Which events go to which endpoint, checked from top to bottom.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20513,6 +20679,7 @@
           "path": "/api/v1/webhooks/rules/{ruleId}/move",
           "operation_id": "postWebhooksRulesByRuleIdMove",
           "summary": "Move a rule up or down; answers the reordered list.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20602,6 +20769,7 @@
           "path": "/api/v1/webhooks/rules/preview",
           "operation_id": "postWebhooksRulesPreview",
           "summary": "Which recent messages an unsaved rule would match.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -20873,6 +21041,7 @@
           "path": "/api/v1/webhooks/rules/{ruleId}",
           "operation_id": "patchWebhooksRulesByRuleId",
           "summary": "Change a rule; send only the changed keys.",
+          "area_slug": "webhook-rules",
           "selector": null
         }
       ],
@@ -21229,6 +21398,7 @@
           "path": "/api/v1/webhooks/saved",
           "operation_id": "postWebhooksSaved",
           "summary": "Save a delivery's request under a name.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21317,6 +21487,7 @@
           "path": "/api/v1/webhooks/saved/{savedId}",
           "operation_id": "deleteWebhooksSavedBySavedId",
           "summary": "Delete a saved delivery.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21378,6 +21549,7 @@
           "path": "/api/v1/webhooks/saved",
           "operation_id": "getWebhooksSaved",
           "summary": "Bookmarked requests, kept through pruning and reset.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21413,6 +21585,7 @@
           "path": "/api/v1/webhooks/saved/{savedId}/template",
           "operation_id": "postWebhooksSavedBySavedIdTemplate",
           "summary": "Turn a saved request into a custom template.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21495,6 +21668,7 @@
           "path": "/api/v1/webhooks/saved/{savedId}/send",
           "operation_id": "postWebhooksSavedBySavedIdSend",
           "summary": "Send a saved request to its endpoint or another one.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21604,6 +21778,7 @@
           "path": "/api/v1/webhooks/saved/{savedId}",
           "operation_id": "patchWebhooksSavedBySavedId",
           "summary": "Rename a saved delivery.",
+          "area_slug": "saved-deliveries",
           "selector": null
         }
       ],
@@ -21686,6 +21861,7 @@
           "path": "/api/v1/webhooks/endpoints/{endpointId}/send",
           "operation_id": "postWebhooksEndpointsByEndpointIdSend",
           "summary": "Send a webhook for a chosen message or the sample, by hand.",
+          "area_slug": "webhook-endpoints",
           "selector": null
         }
       ],
@@ -22274,6 +22450,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/clone",
           "operation_id": "postWebhooksTemplatesByTemplateIdClone",
           "summary": "Copy a template into a new custom one.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22356,6 +22533,7 @@
           "path": "/api/v1/webhooks/templates",
           "operation_id": "postWebhooksTemplates",
           "summary": "Add a custom template, starting as native JSON.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22417,6 +22595,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}",
           "operation_id": "deleteWebhooksTemplatesByTemplateId",
           "summary": "Delete a custom template; 409 while endpoints use it.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22498,6 +22677,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/export",
           "operation_id": "getWebhooksTemplatesByTemplateIdExport",
           "summary": "The template as TOML (variable names, never values).",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22559,6 +22739,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}",
           "operation_id": "getWebhooksTemplatesByTemplateId",
           "summary": "One template with its method, headers and body template.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22620,6 +22801,7 @@
           "path": "/api/v1/webhooks/templates/import",
           "operation_id": "postWebhooksTemplatesImport",
           "summary": "Import a template file; 409 when the id is taken.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22708,6 +22890,7 @@
           "path": "/api/v1/webhooks/templates",
           "operation_id": "getWebhooksTemplates",
           "summary": "Built-in and custom payload templates.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22743,6 +22926,7 @@
           "path": "/api/v1/webhooks/template-reference",
           "operation_id": "getWebhooksTemplateReference",
           "summary": "Every value a template can read for the chosen events.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -22801,6 +22985,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/render",
           "operation_id": "postWebhooksTemplatesByTemplateIdRender",
           "summary": "Render against an email, an SMS or the sample, optionally a draft.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -23013,6 +23198,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/reset",
           "operation_id": "postWebhooksTemplatesByTemplateIdReset",
           "summary": "Put an edited built-in template back as shipped.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -23074,6 +23260,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/revisions/{revision}/restore",
           "operation_id": "postWebhooksTemplatesByTemplateIdRevisionsByRevisionRestore",
           "summary": "Restore a revision as a new save.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -23156,6 +23343,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}/revisions",
           "operation_id": "getWebhooksTemplatesByTemplateIdRevisions",
           "summary": "Saved revisions, newest first.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -23217,6 +23405,7 @@
           "path": "/api/v1/webhooks/templates/{templateId}",
           "operation_id": "patchWebhooksTemplatesByTemplateId",
           "summary": "Edit a template; each save keeps a revision, 422 when it does not render.",
+          "area_slug": "webhook-templates",
           "selector": null
         }
       ],
@@ -23551,6 +23740,7 @@
           "path": "/api/v1/webhooks/variables",
           "operation_id": "getWebhooksVariables",
           "summary": "Global and endpoint variables; secret values are masked.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -23607,6 +23797,7 @@
           "path": "/api/v1/webhooks/variables/preview",
           "operation_id": "postWebhooksVariablesPreview",
           "summary": "What a variable definition resolves to against the sample.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -23715,6 +23906,7 @@
           "path": "/api/v1/webhooks/variables/{variableId}/regenerate",
           "operation_id": "postWebhooksVariablesByVariableIdRegenerate",
           "summary": "Make a new fixed value for a generated-once random variable.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -23776,6 +23968,7 @@
           "path": "/api/v1/webhooks/variables",
           "operation_id": "postWebhooksVariables",
           "summary": "Add a variable.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -24015,6 +24208,7 @@
           "path": "/api/v1/webhooks/variables/{variableId}",
           "operation_id": "deleteWebhooksVariablesByVariableId",
           "summary": "Delete a variable.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -24076,6 +24270,7 @@
           "path": "/api/v1/webhooks/variables/{variableId}",
           "operation_id": "patchWebhooksVariablesByVariableId",
           "summary": "Change a variable.",
+          "area_slug": "webhook-variables",
           "selector": null
         }
       ],
@@ -24328,6 +24523,7 @@
   "resources": [
     {
       "uri": "sendmock://docs/skill",
+      "slug": "resource-docs-skill",
       "summary": "The SendMock agent skill as Markdown.",
       "mime_type": "text/markdown",
       "area": "Automation",
@@ -24338,6 +24534,7 @@
         "path": "/api/v1/ai/skill",
         "operation_id": "getAiSkill",
         "summary": "The SendMock agent skill as Markdown.",
+        "area_slug": "automation",
         "selector": null
       },
       "cli": "sendmock ai skill",
@@ -24345,6 +24542,7 @@
     },
     {
       "uri": "sendmock://emails/{emailId}/raw",
+      "slug": "resource-emails-emailid-raw",
       "summary": "The raw message source.",
       "mime_type": "message/rfc822",
       "area": "Email",
@@ -24368,6 +24566,7 @@
         "path": "/api/v1/emails/{emailId}/raw",
         "operation_id": "getEmailsByEmailIdRaw",
         "summary": "The raw message source.",
+        "area_slug": "email",
         "selector": null
       },
       "cli": "sendmock email raw <emailId>",
@@ -24375,6 +24574,7 @@
     },
     {
       "uri": "sendmock://emails/{emailId}/attachments/{attachmentIndex}",
+      "slug": "resource-emails-emailid-attachments-attachmentindex",
       "summary": "Download one attachment.",
       "mime_type": "application/octet-stream",
       "area": "Email",
@@ -24410,6 +24610,7 @@
         "path": "/api/v1/emails/{emailId}/attachments/{attachmentIndex}",
         "operation_id": "getEmailsByEmailIdAttachmentsByAttachmentIndex",
         "summary": "Download one attachment.",
+        "area_slug": "email",
         "selector": null
       },
       "cli": "sendmock email attachments <emailId> <attachmentIndex>",
@@ -24417,6 +24618,7 @@
     },
     {
       "uri": "sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail",
+      "slug": "resource-emails-emailid-parts-attachmentindex-thumbnail",
       "summary": "A preview image of an attachment.",
       "mime_type": "image/*",
       "area": "Email",
@@ -24452,6 +24654,7 @@
         "path": "/api/v1/emails/{emailId}/parts/{attachmentIndex}/thumbnail",
         "operation_id": "getEmailsByEmailIdPartsByAttachmentIndexThumbnail",
         "summary": "A preview image of an attachment.",
+        "area_slug": "email",
         "selector": null
       },
       "cli": "sendmock email thumbnail <emailId> <attachmentIndex>",
@@ -24459,6 +24662,7 @@
     },
     {
       "uri": "sendmock://sms/{smsId}/media/{mediaIndex}",
+      "slug": "resource-sms-smsid-media-mediaindex",
       "summary": "Download one media item of an MMS or WhatsApp message.",
       "mime_type": "*/*",
       "area": "SMS",
@@ -24494,6 +24698,7 @@
         "path": "/api/v1/sms/{smsId}/media/{mediaIndex}",
         "operation_id": "getSmsBySmsIdMediaByMediaIndex",
         "summary": "Download one media item of an MMS or WhatsApp message.",
+        "area_slug": "sms",
         "selector": null
       },
       "cli": "sendmock sms media <smsId> <mediaIndex>",
@@ -24501,6 +24706,7 @@
     },
     {
       "uri": "sendmock://http/requests/{requestId}/files/{fileIndex}",
+      "slug": "resource-http-requests-requestid-files-fileindex",
       "summary": "Download a file uploaded in a captured request.",
       "mime_type": "application/octet-stream",
       "area": "HTTP catcher",
@@ -24536,6 +24742,7 @@
         "path": "/api/v1/http/requests/{requestId}/files/{fileIndex}",
         "operation_id": "getHttpRequestsByRequestIdFilesByFileIndex",
         "summary": "Download a file uploaded in a captured request.",
+        "area_slug": "http-catcher",
         "selector": null
       },
       "cli": "sendmock http file <requestId> <fileIndex>",
@@ -24549,6 +24756,7 @@
         "path": "/api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}",
         "operation_id": "getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName",
         "summary": "Reveal one secret credential (asked for after a confirmation).",
+        "area_slug": "payment-gateways",
         "selector": null
       },
       "reason": "Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.",
@@ -24560,6 +24768,7 @@
         "path": "/api/v1/webhooks/endpoints/{endpointId}/secret",
         "operation_id": "getWebhooksEndpointsByEndpointIdSecret",
         "summary": "Reveal the signing secret (asked for after a confirmation).",
+        "area_slug": "webhook-endpoints",
         "selector": null
       },
       "reason": "Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.",

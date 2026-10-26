@@ -1,5 +1,6 @@
 /** Spec operations joined with their surface catalogue entries, for both references. */
 import type { OperationSurfaces } from "../../../src/lib/api/surface-catalogue/surface-definition";
+import { toAreaSlug } from "./input-naming";
 import type { ReferencedOperation } from "./reference-types";
 import {
   listOperationInputs,
@@ -47,6 +48,9 @@ export function toReferencedOperation(
     path: catalogueOperation.entry.path,
     operation_id: catalogueOperation.entry.operation.operationId,
     summary: catalogueOperation.entry.operation.summary,
+    area_slug: toAreaSlug(
+      catalogueOperation.entry.operation.tags[0] ?? "Other",
+    ),
     selector: catalogueOperation.surfaces.selector ?? null,
   };
 }

@@ -8,6 +8,10 @@ const sitePaths = [
   "/docs/email/",
   "/api/",
   "/api/email/",
+  "/cli/",
+  "/cli/email/",
+  "/mcp/",
+  "/mcp/email/",
   "/playground/",
 ];
 

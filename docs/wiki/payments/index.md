@@ -93,13 +93,13 @@ Wallets (bKash, Nagad, Rocket) use test numbers such as `01770000001` (succeeds)
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| create a checkout | `sendmock payments checkout create` | [`POST /api/v1/payments/checkout`](/api/payments/#postPaymentsCheckout) | `sendmock_payment_create_checkout` |
-| list | `sendmock payments list` | [`GET /api/v1/payments`](/api/payments/#getPayments) | `sendmock_payment_list` |
-| one payment | `sendmock payments show <paymentId>` | [`GET /api/v1/payments/{paymentId}`](/api/payments/#getPaymentsByPaymentId) | `sendmock_payment_get` |
-| simulate | `sendmock payments simulate <paymentId> <action>` | [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate) | `sendmock_payment_simulate` |
-| resend the notification | `sendmock payments notify <paymentId>` | [`POST /api/v1/payments/{paymentId}/notify`](/api/payments/#postPaymentsByPaymentIdNotify) | `sendmock_payment_notify` |
-| test values | `sendmock payments test-cards` | [`GET /api/v1/payments/test-cards`](/api/payments/#getPaymentsTestCards) | `sendmock_payment_test_cards` |
-| wait in a test | `sendmock payments wait` | [`GET /api/v1/wait/payment`](/api/test-helpers/#getWaitPayment) | `sendmock_payment_wait` |
+| create a checkout | [`sendmock payments checkout create`](/cli/payments/#payments-checkout-create) | [`POST /api/v1/payments/checkout`](/api/payments/#postPaymentsCheckout) | [`sendmock_payment_create_checkout`](/mcp/payments/#sendmock_payment_create_checkout) |
+| list | [`sendmock payments list`](/cli/payments/#payments-list) | [`GET /api/v1/payments`](/api/payments/#getPayments) | [`sendmock_payment_list`](/mcp/payments/#sendmock_payment_list) |
+| one payment | [`sendmock payments show <paymentId>`](/cli/payments/#payments-show) | [`GET /api/v1/payments/{paymentId}`](/api/payments/#getPaymentsByPaymentId) | [`sendmock_payment_get`](/mcp/payments/#sendmock_payment_get) |
+| simulate | [`sendmock payments simulate <paymentId> <action>`](/cli/payments/#payments-simulate) | [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate) | [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate) |
+| resend the notification | [`sendmock payments notify <paymentId>`](/cli/payments/#payments-notify) | [`POST /api/v1/payments/{paymentId}/notify`](/api/payments/#postPaymentsByPaymentIdNotify) | [`sendmock_payment_notify`](/mcp/payments/#sendmock_payment_notify) |
+| test values | [`sendmock payments test-cards`](/cli/payments/#payments-test-cards) | [`GET /api/v1/payments/test-cards`](/api/payments/#getPaymentsTestCards) | [`sendmock_payment_test_cards`](/mcp/payments/#sendmock_payment_test_cards) |
+| wait in a test | [`sendmock payments wait`](/cli/test-helpers/#payments-wait) | [`GET /api/v1/wait/payment`](/api/test-helpers/#getWaitPayment) | [`sendmock_payment_wait`](/mcp/test-helpers/#sendmock_payment_wait) |
 
 ## Related
 
