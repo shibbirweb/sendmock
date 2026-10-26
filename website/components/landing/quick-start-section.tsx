@@ -2,45 +2,20 @@
 
 import { useEffect } from "react";
 
-import {
-  AnimatedSpan,
-  Terminal,
-  TypingAnimation,
-} from "@/components/ui/terminal";
 import { detectOperatingSystem } from "@/lib/detect-operating-system";
 import { cn } from "@/lib/utils";
 
 import { CopyCommandButton } from "./copy-command-button";
+import { installPlatforms } from "./install-platforms";
+import {
+  InstallTerminal,
+  InstallTerminalPlaceholder,
+} from "./install-terminal";
+import { ManualDownloadLinks } from "./manual-download-links";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
-/** The install scripts come from the latest GitHub release (docs/plan/10-open-questions.md, 13). */
-const releaseDownloadUrl =
-  "https://github.com/shibbirweb/sendmock/releases/latest/download";
-
-/** One install command per platform; every platform then runs the same server. */
-const installPlatforms = [
-  {
-    key: "macos",
-    label: "macOS",
-    prompt: "$",
-    installCommand: "brew install shibbirweb/tap/sendmock",
-  },
-  {
-    key: "windows",
-    label: "Windows",
-    prompt: "PS>",
-    installCommand: `irm ${releaseDownloadUrl}/install.ps1 | iex`,
-  },
-  {
-    key: "linux",
-    label: "Linux",
-    prompt: "$",
-    installCommand: `curl -fsSL ${releaseDownloadUrl}/install.sh | sh`,
-  },
-];
-
-/** Long commands wrap instead of scrolling sideways, and type faster. */
-const commandLineClassName = "whitespace-pre-wrap break-all";
+/** Overlaps an item with the others in the same grid cell; the cell takes the tallest. */
+const stackedInGridCellClassName = "[grid-area:1/1]";
 
 /** Shows the intended first run; commands go live with the first beta. */
 export function QuickStartSection() {
@@ -70,7 +45,7 @@ export function QuickStartSection() {
       </h2>
       <div
         role="tablist"
-        aria-label="Your operating system"
+        aria-label="Your platform"
         onKeyDown={moveSelection}
         className="flex flex-wrap justify-center gap-1 rounded-full border bg-fd-card p-1"
       >
@@ -95,29 +70,60 @@ export function QuickStartSection() {
           </button>
         ))}
       </div>
+      {/*
+        Every platform's finished terminal and download row sit invisibly in the
+        same grid cell as the live one, so the panel does not jump in height.
+      */}
       <div
         id={panelId}
         role="tabpanel"
         aria-labelledby={tabId(selectedIndex)}
-        data-testid="quick-start-terminal"
-        className="relative w-full max-w-2xl"
+        className="grid w-full max-w-2xl"
       >
-        <CopyCommandButton
-          command={selectedPlatform.installCommand}
-          className="absolute top-1.5 right-2 z-10"
-        />
-        {/* A new key replays the typing for the chosen platform. */}
-        <Terminal key={selectedPlatform.key} className="max-w-2xl">
-          <TypingAnimation className={commandLineClassName} duration={25}>
-            {`${selectedPlatform.prompt} ${selectedPlatform.installCommand}`}
-          </TypingAnimation>
-          <AnimatedSpan className="text-fd-primary">
-            ✔ Installed sendmock (one 12 MB binary)
-          </AnimatedSpan>
-          <TypingAnimation>{`${selectedPlatform.prompt} sendmock`}</TypingAnimation>
-          <AnimatedSpan>SMTP listening on 127.0.0.1:1025</AnimatedSpan>
-          <AnimatedSpan>Web UI and API on http://127.0.0.1:8025</AnimatedSpan>
-        </Terminal>
+        {installPlatforms.map((installPlatform) => (
+          <InstallTerminalPlaceholder
+            key={installPlatform.key}
+            installPlatform={installPlatform}
+            className={stackedInGridCellClassName}
+          />
+        ))}
+        <div
+          data-testid="quick-start-terminal"
+          className={cn("relative", stackedInGridCellClassName)}
+        >
+          <CopyCommandButton
+            command={selectedPlatform.installCommand}
+            className="absolute top-1.5 right-2 z-10"
+          />
+          {/* A new key replays the typing for the chosen platform. */}
+          <InstallTerminal
+            key={selectedPlatform.key}
+            installPlatform={selectedPlatform}
+          />
+        </div>
+        <div className="row-start-2 grid">
+          {installPlatforms.map((installPlatform) =>
+            installPlatform.downloads.length > 0 ? (
+              <ManualDownloadLinks
+                key={installPlatform.key}
+                platformLabel={installPlatform.label}
+                downloads={installPlatform.downloads}
+                className={cn("invisible", stackedInGridCellClassName)}
+              />
+            ) : null,
+          )}
+          {selectedPlatform.downloads.length > 0 ? (
+            <div
+              data-testid="quick-start-downloads"
+              className={stackedInGridCellClassName}
+            >
+              <ManualDownloadLinks
+                platformLabel={selectedPlatform.label}
+                downloads={selectedPlatform.downloads}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
     </section>
   );

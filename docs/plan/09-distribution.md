@@ -43,6 +43,10 @@ Config precedence: flags > `SENDMOCK_*` env vars > `sendmock.toml` (current dir,
 
 Cross-compilation via `cargo-zigbuild` for Linux targets and native GitHub Actions runners for macOS and Windows. Everything uses rustls (no OpenSSL) and bundled SQLite, so there are no system library dependencies.
 
+### Release archives
+
+Each GitHub release attaches one archive per target, named `sendmock-<target triple>` with `.tar.gz` for macOS and Linux and `.zip` for Windows (for example `sendmock-aarch64-apple-darwin.tar.gz`, `sendmock-x86_64-pc-windows-msvc.zip`), plus a `SHA256SUMS` file. Each archive holds the `sendmock` binary (`sendmock.exe` on Windows), the licence and the readme. The names carry no version, so `https://github.com/shibbirweb/sendmock/releases/latest/download/<archive>` always gives the latest stable build; the website's quick start links these for readers who download by hand (decided 2026-10-27).
+
 ## Release channels
 
 Every channel has a **beta** track (from `develop`) and a **stable** track (from `main`); see [16-website-and-releases.md](16-website-and-releases.md#what-each-channel-publishes).

@@ -94,6 +94,15 @@ pre span[style*="--shiki-dark:#6A737D"] {
     }
   }
 }
+
+/* Tailwind v4 gives buttons the default cursor; clickable controls show the pointer. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* WS-02.2: with reduced motion on, animations stop and the page stays readable. */
 @media (prefers-reduced-motion: reduce) {
   *,

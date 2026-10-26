@@ -52,7 +52,7 @@ test.describe("the quick start on a Mac", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const platformTabs = page.getByRole("tablist", {
-      name: "Your operating system",
+      name: "Your platform",
     });
     const terminal = page.getByTestId("quick-start-terminal");
 
@@ -60,6 +60,7 @@ test.describe("the quick start on a Mac", () => {
       "macOS",
       "Windows",
       "Linux",
+      "Docker",
     ]);
     await expect(
       platformTabs.getByRole("tab", { name: "macOS" }),
@@ -83,6 +84,105 @@ test.describe("the quick start on a Mac", () => {
     );
     await expect(terminal).not.toContainText("otp");
   });
+
+  test("WS-02.1 the quick start keeps one height on every platform tab", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const platformTabs = page.getByRole("tablist", { name: "Your platform" });
+    const panel = page
+      .getByRole("region", { name: "Install and run" })
+      .getByRole("tabpanel");
+    const panelHeights: number[] = [];
+
+    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker"]) {
+      await platformTabs.getByRole("tab", { name: platformLabel }).click();
+      const panelBox = await panel.boundingBox();
+      panelHeights.push(panelBox?.height ?? 0);
+    }
+
+    expect(panelHeights[0]).toBeGreaterThan(0);
+    expect(new Set(panelHeights).size).toBe(1);
+  });
+
+  test("WS-02.1 the platform tabs and the copy button show the pointer cursor", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const linuxTab = page
+      .getByRole("tablist", { name: "Your platform" })
+      .getByRole("tab", { name: "Linux" });
+    const copyButton = page
+      .getByTestId("quick-start-terminal")
+      .getByRole("button", { name: "Copy the install command" });
+
+    await expect(linuxTab).toHaveCSS("cursor", "pointer");
+    await expect(copyButton).toHaveCSS("cursor", "pointer");
+  });
+
+  test("WS-02.1 the Docker tab pulls and runs the image, with no binary downloads", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const terminal = page.getByTestId("quick-start-terminal");
+
+    await page
+      .getByRole("tablist", { name: "Your platform" })
+      .getByRole("tab", { name: "Docker" })
+      .click();
+
+    await expect(terminal).toContainText(
+      "$ docker pull ghcr.io/shibbirweb/sendmock",
+    );
+    await expect(terminal).toContainText(
+      "$ docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
+    );
+    await expect(terminal).toContainText("SMTP listening on 0.0.0.0:1025");
+    await expect(page.getByTestId("quick-start-downloads")).toHaveCount(0);
+  });
+});
+
+test.describe("the quick start downloads on a Mac", () => {
+  test.use({ userAgent: visitorUserAgents.macOS });
+
+  test("WS-02.1 the quick start links the release archives for the chosen system", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const downloads = page.getByTestId("quick-start-downloads");
+
+    await expect(downloads).toContainText("Or download the macOS binary:");
+    await expect(
+      downloads.getByRole("link", { name: "Apple silicon" }),
+    ).toHaveAttribute(
+      "href",
+      `${releaseUrl}/sendmock-aarch64-apple-darwin.tar.gz`,
+    );
+    await expect(
+      downloads.getByRole("link", { name: "Intel" }),
+    ).toHaveAttribute(
+      "href",
+      `${releaseUrl}/sendmock-x86_64-apple-darwin.tar.gz`,
+    );
+
+    await page
+      .getByRole("tablist", { name: "Your platform" })
+      .getByRole("tab", { name: "Windows" })
+      .click();
+    await expect(downloads).toContainText("Or download the Windows binary:");
+    await expect(downloads.getByRole("link", { name: "x64" })).toHaveAttribute(
+      "href",
+      `${releaseUrl}/sendmock-x86_64-pc-windows-msvc.zip`,
+    );
+    await expect(
+      downloads.getByRole("link", { name: "All files and checksums" }),
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/shibbirweb/sendmock/releases/latest",
+    );
+  });
 });
 
 test.describe("the quick start on Windows", () => {
@@ -96,7 +196,7 @@ test.describe("the quick start on Windows", () => {
 
     await expect(
       page
-        .getByRole("tablist", { name: "Your operating system" })
+        .getByRole("tablist", { name: "Your platform" })
         .getByRole("tab", { name: "Windows" }),
     ).toHaveAttribute("aria-selected", "true");
     await expect(page.getByTestId("quick-start-terminal")).toContainText(

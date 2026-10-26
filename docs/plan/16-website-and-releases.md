@@ -47,7 +47,7 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 |---------|------------------------------|------|
 | Hero | Animated gradient text, shimmer/rainbow button, retro grid or dot pattern background | "Catch every email, SMS and webhook locally" with Download and Try the demo buttons |
 | How it works | **Animated Beam** | Your app -> SendMock (SMTP, SMS API, HTTP) -> UI, and SendMock -> webhooks back to your app, with beams animating along each path |
-| Quick start | **Terminal** (typing animation) | tabs for macOS (Homebrew), Windows (`install.ps1`) and Linux (`install.sh`), each installing and then starting `sendmock`, the visitor's system selected first, with a copy button for the install command (changed 2026-10-27: no OTP step, which confused readers before they know what SendMock catches) |
+| Quick start | **Terminal** (typing animation) | tabs for macOS (Homebrew), Windows (`install.ps1`), Linux (`install.sh`) and Docker (`docker pull`, then `docker run` with both ports published), each installing and then starting SendMock, the visitor's system selected first, with a copy button for the install command and manual download links to the release archives below it (changed 2026-10-27: no OTP step, which confused readers before they know what SendMock catches) |
 | Works with | **Marquee** | Language logos (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) and provider names (Twilio, SendGrid, Mailgun, Postmark, Resend, Slack, ...) as text badges |
 | Features | **Bento Grid** with **Magic Card** / **Border Beam** | Email, SMS + Verify, Webhooks, Templates, HTTP catcher, AI/MCP, Docker |
 | Numbers | **Number Ticker** | binary size, startup time, providers emulated, languages |
