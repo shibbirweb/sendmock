@@ -76,10 +76,17 @@ export const automationHandlers = [
       : HttpResponse.json(scenarioOutcome);
   }),
 
-  http.get("*/api/v1/ai/agents", async () => {
+  http.get("*/api/v1/ai/agents", async ({ request }) => {
     await applyMockConditions();
+    const agentTarget = new URL(request.url).searchParams.get("target");
 
-    return HttpResponse.json(aiAgentSetups);
+    return HttpResponse.json(
+      agentTarget === null
+        ? aiAgentSetups
+        : aiAgentSetups.filter(
+            (agentSetup) => agentSetup.target === agentTarget,
+          ),
+    );
   }),
 
   http.get("*/api/v1/ai/skill", async () => {

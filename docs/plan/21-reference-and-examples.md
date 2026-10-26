@@ -48,24 +48,25 @@ The CLI and MCP inputs are derived from the operation's inputs by fixed rules, w
 | Path parameter | positional argument, in path order | `sendmock email update <emailId>` |
 | Literal word in the catalogue command | fixed positional | `sendmock email check <emailId> html` |
 | Query parameter or top-level body field (scalar) | `--kebab-case` flag | `to` → `--to`, `bounce_type` → `--bounce-type` |
-| Boolean | `--name` sets true, `--no-name` sets false; an `is_` or `has_` prefix is dropped | `is_read` → `--read`, `--no-read` |
+| Boolean | `--name` sets true, `--no-name` sets false; an `is_` prefix is dropped (`has_` stays: `--has-attachment`) | `is_read` → `--read`, `--no-read` |
 | List of scalars | the flag in the singular, repeated | `tags` → `--tag signup --tag qa` |
 | Allowed values (enum) | validated; a wrong value exits with code 2 and lists the allowed ones | `--event bounced` |
 | Object, or list of objects | the flag takes JSON (`--headers '{"X-Id":"1"}'`), or the whole body comes from `--data` / `--file` | `--data '{"steps":[...]}'` |
 | File body (`message/rfc822`, uploads) | `--file <path>`, `-` for stdin | `sendmock sendmail --file welcome.eml` |
 
 - Flags given next to `--data` or `--file` override the same keys.
-- **Global flags** on every command: `--json`, `--url` (`SENDMOCK_URL`), `--token` (`SENDMOCK_TOKEN`), `--data`, `--file`, `--help`; `--yes` on destructive commands (DELETE). Exit codes as in [14](14-ai-integration.md#agent-friendly-conventions).
-- **Overrides** go in the surface catalogue entry only where a rule gives a bad name: `cliFlags: { tags: "--tag" }` when the singular is not the name without its trailing `s`, or `cliFlags: { timeout_ms: "--wait" }` when a flag takes a friendlier unit (`--wait 10s`). A test (WS-07.5) fails when an override names an input that does not exist, or when two inputs of one command map to the same flag.
+- **Global flags** on every command: `--json`, `--server` (`SENDMOCK_SERVER`; not `--url`, which API fields named `url` use), `--token` (`SENDMOCK_TOKEN`), `--data`, `--file`, `--help`; `--yes` on destructive commands (DELETE). Exit codes as in [14](14-ai-integration.md#agent-friendly-conventions).
+- **Overrides** go in the surface catalogue entry only where a rule gives a bad name: `cliFlags: { tags: "--tag" }` when the singular is not the name without its trailing `s`, or `cliFlags: { timeout: "--wait" }` where another name reads better (`sendmock otp --wait 10s`). Placeholders in the catalogue command that are not path parameters name the input of the same name (or its snake_case form, or the flag's name in `--to <recipient>`); `cliArguments: { status: "state" }` maps the rest, and `<file>` reads a file into its input (`cliArguments: { file: "seed_toml" }`).
+- A nullable field (`endpoint_id: null` for a global variable) may be left out: the CLI and MCP send null for it. A test (WS-07.5) fails when an override names an input that does not exist, or when two inputs of one command map to the same flag.
 
 ### MCP tool inputs
 
 - One `inputSchema` object per tool: path parameters, query parameters and top-level body fields become top-level properties with their snake_case names, types, allowed values, descriptions and examples. File bodies are a `content` string (base64 for binary).
 - **Result:** the operation's success response schema (`outputSchema`), and the tool's text content is the same JSON.
-- **Annotations** from the method: GET `readOnlyHint`; DELETE `destructiveHint`; PUT, PATCH and DELETE `idempotentHint`. The catalogue may override (a POST that only reads, such as `sendmock_email_check` for links).
-- **Shared tools:** when several operations share one tool (`sendmock_email_check` runs the html, links, spam and unsubscribe checks), the catalogue names the property that picks the operation, `mcpSelector: { kind: "html" }`, and the tool's input is the union with `kind` as a required enum.
+- **Annotations** from the method: GET, and a POST whose path ends in `/preview`, `/render`, `/test`, `/validate`, `/link-check` or `/spam-check`, are `readOnlyHint`; DELETE under `/api/` and commands that need `--yes` (`reset`) are `destructiveHint` (a DELETE sent to a bin is only captured); PUT, PATCH and DELETE are `idempotentHint`.
+- **Shared tools:** when several operations share one tool (`sendmock_email_check` runs the html, links, spam and unsubscribe checks), each catalogue entry names what picks it, `selector: { input: "kind", value: "html" }`, and the tool's input is the union with `kind` as a required enum. The same `selector` serves CLI commands shared by several operations (`sendmock http send <bin> --method POST`). `selector: { input: "number_id", isGiven: true }` picks by whether an input is given (`sendmock_number_upsert`).
 - **Resources** (`sendmock://emails/{emailId}/raw`, ...) list their URI template, parameters and MIME type.
-- **Toolset:** each catalogue area file sets the toolset its tools belong to (`email`, `sms`, `webhooks`, ...), matching the toolsets in [14](14-ai-integration.md#mcp-server).
+- **Toolset:** one prefix table (`web/src/lib/api/surface-catalogue/mcp-toolsets.ts`, shared with the generated list in [14](14-ai-integration.md#mcp-server)) gives each tool its toolset (`email`, `sms`, `webhooks`, ...).
 - Same check as the CLI: a name clash between a path, query and body input of one tool fails the test.
 
 ### Generated contract files
@@ -73,9 +74,14 @@ The CLI and MCP inputs are derived from the operation's inputs by fixed rules, w
 `bun run openapi` also writes, next to the spec:
 
 - `docs/api/cli-reference.json`: every command with its usage line, positional arguments, flags (name, type, required, allowed values, default, description, example), the operation it runs and an example command line.
-- `docs/api/mcp-tools.json`: every tool with its `inputSchema`, `outputSchema`, annotations, toolset, the operations it runs and an example call, and every resource.
+- `docs/api/mcp-tools.json`: every tool with its `input_schema` (self-contained JSON Schema, the API types it uses copied into `$defs`), the result type, annotations, toolset, the operations it runs and an example call; every resource; and the exemptions. A full `outputSchema` is left to Stage B, where the server wraps list and file answers into the object MCP requires.
 
-`openapi:check` fails when they drift. In Stage B the binary's `sendmock help --all --json` and the MCP server's `tools/list` are compared with these files (WS-03.2), so the CLI and agents get exactly what the docs promise. Deriving the files surfaces real gaps, which are fixed in the contract as part of this work; one found already: the guide uses `sendmock otp --to ... --wait 10s`, but `GET /otp` has no wait input. `/otp` and `/links` gain an optional `timeout_ms` (long poll, 408 on timeout, like the wait helpers), recorded in [06-api.md](06-api.md#test-automation-helpers).
+`openapi:check` fails when they drift. In Stage B the binary's `sendmock help --all --json` and the MCP server's `tools/list` are compared with these files (WS-03.2), so the CLI and agents get exactly what the docs promise. Deriving the files surfaces real gaps, which are fixed in the contract as part of this work; found and fixed:
+
+- The guide uses `sendmock otp --to ... --wait 10s`, but `GET /otp` had no wait input. `/otp` and `/links` gained an optional `timeout` in the wait helpers' format (`10s`; long poll, 408 on timeout), recorded in [06-api.md](06-api.md#test-automation-helpers).
+- `sendmock ai install --target <agent>` had no input: `GET /ai/agents` gained an optional `target`.
+- `sendmock settings set <key> <value>` named no input; the command is now `sendmock settings set` with a flag per setting (`--max-emails 500`).
+- The global flag for the SendMock address was `--url`, which clashed with API fields named `url` (`sendmock webhook endpoint create --url ...`); it is now `--server` (`SENDMOCK_SERVER`).
 
 ## 3. The CLI and MCP reference pages
 
@@ -149,7 +155,7 @@ Examples call the REST API with the language's standard HTTP client (there are n
 
       $otp = Http::get('http://127.0.0.1:8025/api/v1/otp', [
           'to' => 'user@example.test',
-          'timeout_ms' => 10000,
+          'timeout' => '10s',
       ])->throw()->json('code');
 
       $this->post('/verify', ['code' => $otp])->assertRedirect('/dashboard');
@@ -193,9 +199,9 @@ In [acceptance/07-distribution-website.md](acceptance/07-distribution-website.md
 
 On `docs/user-guide-plan`, one commit per step:
 
-1. Plan: this document, [14-ai-integration.md](14-ai-integration.md) (flag and tool input rules), [06-api.md](06-api.md) (`timeout_ms` on `/otp` and `/links`), [19-user-guide.md](19-user-guide.md) (the From your code and In your code sections), [16-website-and-releases.md](16-website-and-releases.md) (the `/cli/` and `/mcp/` sections), acceptance criteria, PROGRESS.
+1. Plan: this document, [14-ai-integration.md](14-ai-integration.md) (flag and tool input rules), [06-api.md](06-api.md) (`timeout` on `/otp` and `/links`), [19-user-guide.md](19-user-guide.md) (the From your code and In your code sections), [16-website-and-releases.md](16-website-and-releases.md) (the `/cli/` and `/mcp/` sections), acceptance criteria, PROGRESS.
 2. Field docs: descriptions and examples on every input type and query parameter, extended JSDoc in the generator, the WS-07.1 test.
-3. Derivation: the CLI and MCP builders, catalogue overrides (`cliFlags`, `mcpSelector`, annotations, toolsets), `cli-reference.json` and `mcp-tools.json`, the drift check and the WS-07.5 tests; contract gaps it finds fixed.
+3. Derivation: the CLI and MCP builders, catalogue overrides (`selector`, `cliArguments`, `cliFlags`), `cli-reference.json` and `mcp-tools.json`, the drift check and the WS-07.5 tests; contract gaps it finds fixed.
 4. Website: `/cli/` and `/mcp/` pages, header and search, links from the API reference and the guide tables; WS-07.2 to WS-07.4 tests.
 5. Playground: the Inputs panel, the full example body, add and remove, controls, hints, CLI and MCP snippet tabs; WS-04.4 to WS-04.6 tests (Vitest for the builders, Playwright for the panel).
 6. Code examples: the 13 recipes, then the menu pages; WS-08.1 to WS-08.4 tests.

@@ -2,6 +2,7 @@ import { getResponse, HttpHandler } from "msw";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import type {
+  AiAgentSetup,
   EmailDetail,
   OtpLookup,
   OutcomeTestResult,
@@ -99,6 +100,38 @@ describe("operations added for surface parity", () => {
       (await callApi("GET", "/wait/sms?to=%2B10000000000&timeout=200ms"))
         .status,
     ).toBe(408);
+  });
+
+  test("UI-11.5 otp and links wait for a message when given a timeout", async () => {
+    expect((await callApi("GET", "/otp?to=nobody@example.test")).status).toBe(
+      404,
+    );
+    expect(
+      (await callApi("GET", "/otp?to=nobody@example.test&timeout=200ms"))
+        .status,
+    ).toBe(408);
+    expect(
+      (await callApi("GET", "/links?to=nobody@example.test&timeout=200ms"))
+        .status,
+    ).toBe(408);
+
+    const pendingOtpResponse = callApi(
+      "GET",
+      "/otp?to=later@example.test&timeout=2s",
+    );
+    await callApi("POST", "/samples/email", { to: "later@example.test" });
+    const otpLookup = (await (await pendingOtpResponse).json()) as OtpLookup;
+    expect(otpLookup.code).toBe("739104");
+  });
+
+  test("UI-11.5 AI agent setup can be asked for one agent", async () => {
+    const agentSetups = (await (
+      await callApi("GET", "/ai/agents?target=cursor")
+    ).json()) as AiAgentSetup[];
+
+    expect(agentSetups.map((agentSetup) => agentSetup.target)).toEqual([
+      "cursor",
+    ]);
   });
 
   test("UI-11.5 outcome tests answer with the testers' text", async () => {

@@ -104,7 +104,7 @@ Settings are part of the seed file, so a team shares them: [Advanced: seed file]
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
 | read | `sendmock settings get` | [`GET /api/v1/settings`](/api/system/#getSettings) | `sendmock_settings_get` |
-| change, chaos too | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
+| change, chaos too | `sendmock settings set` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
 | reset to seed | `sendmock reset --yes` | [`POST /api/v1/reset`](/api/system/#postReset) | `sendmock_reset` |
 | seed status | `sendmock seed status` | [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus) | `sendmock_seed_status` |
 | export the seed | `sendmock seed export` | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | `sendmock_seed_export` |

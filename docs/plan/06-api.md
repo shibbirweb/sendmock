@@ -152,8 +152,8 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/wait/sms?to=%2B8801700000000&timeout=10s` | same for SMS |
 | GET | `/wait/http?bin=slack&timeout=10s` | same for HTTP catcher requests |
 | GET | `/wait/webhook?endpoint=...&status=succeeded&timeout=10s` | wait for a webhook delivery outcome |
-| GET | `/otp?to=...&channel=sms\|email\|verify&timeout_ms=...` | latest OTP for a recipient (extracted from messages or from Twilio Verify); with `timeout_ms`, waits for one like the wait helpers (408 on timeout), so `sendmock otp --wait 10s` is one call ([21](21-reference-and-examples.md#generated-contract-files)) |
-| GET | `/links?to=...&timeout_ms=...` | latest extracted links for a recipient; `timeout_ms` waits as above |
+| GET | `/otp?to=...&channel=sms\|email\|verify&timeout=10s` | latest OTP for a recipient (extracted from messages or from Twilio Verify); with `timeout`, waits for one like the wait helpers (408 on timeout), so `sendmock otp --wait 10s` is one call ([21](21-reference-and-examples.md#generated-contract-files)) |
+| GET | `/links?to=...&timeout=10s` | latest extracted links for a recipient; `timeout` waits as above |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | same for payments |
 | GET | `/events/recent?since=&type=&limit=` | the latest events, newest first: the polling twin of the realtime stream |
 | GET | `/integrations/{stack}?channel=&host=` | copy-ready settings for a stack (Laravel, Django, Express, ...), as Settings > Connection shows them |

@@ -31,6 +31,7 @@ export const webhookTemplateSurfaces: SurfaceCatalogue = {
     cli: "sendmock webhook template import <file>",
     mcp: "sendmock_webhook_template_import",
     ui: "Webhooks > Templates > Import a template",
+    cliArguments: { file: "file_text" },
   },
   "GET /api/v1/webhooks/templates/{templateId}/export": {
     cli: "sendmock webhook template export <templateId>",

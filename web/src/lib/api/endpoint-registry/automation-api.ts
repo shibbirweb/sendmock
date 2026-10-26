@@ -23,6 +23,15 @@ const waitQueryParameters: QueryParameter[] = [
   },
 ];
 
+/** `/otp` and `/links` answer at once, or wait like the wait helpers when given a timeout. */
+const lookupTimeoutQueryParameter: QueryParameter = {
+  name: "timeout",
+  description:
+    "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
+  schema: "string",
+  example: "10s",
+};
+
 function stringQuery(
   name: string,
   description: string,
@@ -116,9 +125,10 @@ const waitEndpoints = tagEndpoints("Test helpers", [
         isRequired: true,
       },
       stringQuery("channel", "email, sms or verify (default: any).", "email"),
+      lookupTimeoutQueryParameter,
     ],
     response: typeRef("OtpLookup"),
-    errorStatuses: [404],
+    errorStatuses: [404, 408],
   },
   {
     method: "GET",
@@ -129,9 +139,10 @@ const waitEndpoints = tagEndpoints("Test helpers", [
         ...stringQuery("to", "The recipient address.", "user@example.test"),
         isRequired: true,
       },
+      lookupTimeoutQueryParameter,
     ],
     response: typeRef("LinksLookup"),
-    errorStatuses: [404],
+    errorStatuses: [404, 408],
   },
 ]);
 
@@ -197,6 +208,14 @@ const automationEndpoints = tagEndpoints("Automation", [
     path: "/api/v1/ai/agents",
     summary:
       "For each AI agent, the install command and its MCP configuration.",
+    queryParameters: [
+      {
+        name: "target",
+        description: "Only this agent.",
+        schema: typeRef("AiAgentTarget"),
+        example: "claude-code",
+      },
+    ],
     response: listOf("AiAgentSetup"),
   },
   {

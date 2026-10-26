@@ -31,11 +31,13 @@ export const testHelperSurfaces: SurfaceCatalogue = {
     cli: "sendmock otp --to <recipient>",
     mcp: "sendmock_otp_get",
     ui: "Mail, SMS and Verify: the code beside each message",
+    cliFlags: { timeout: "--wait" },
   },
   "GET /api/v1/links": {
     cli: "sendmock links --to <recipient>",
     mcp: "sendmock_links_get",
     ui: "Mail > open email > links panel",
+    cliFlags: { timeout: "--wait" },
   },
   "GET /api/v1/events/recent": {
     cli: "sendmock events tail",
@@ -52,11 +54,13 @@ export const testHelperSurfaces: SurfaceCatalogue = {
     cli: "sendmock scenario validate <file>",
     mcp: "sendmock_scenario_validate",
     ui: "Scenarios > Validate",
+    cliArguments: { file: "scenario" },
   },
   "POST /api/v1/scenarios/run": {
     cli: "sendmock scenario run <file>",
     mcp: "sendmock_scenario_run",
     ui: "Scenarios > Run",
+    cliArguments: { file: "scenario" },
   },
   "GET /api/v1/ai/agents": {
     cli: "sendmock ai install --target <agent>",

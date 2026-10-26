@@ -6,35 +6,7 @@
  */
 import { apiEndpoints } from "../../src/lib/api/endpoint-registry";
 import { surfaceCatalogue } from "../../src/lib/api/surface-catalogue";
-
-const toolsetPrefixes: [string, string][] = [
-  ["sendmock_webhook_template_", "templates"],
-  ["sendmock_webhook_variable_", "variables"],
-  ["sendmock_webhook_", "webhooks"],
-  ["sendmock_inbound_route_", "rules"],
-  ["sendmock_tag_rule_", "rules"],
-  ["sendmock_forward_rule_", "rules"],
-  ["sendmock_outcome_rule_", "rules"],
-  ["sendmock_email_", "email"],
-  ["sendmock_sms_", "sms"],
-  ["sendmock_messaging_service_", "numbers"],
-  ["sendmock_number_", "numbers"],
-  ["sendmock_verify_", "verify"],
-  ["sendmock_http_", "http"],
-  ["sendmock_logs_", "logs"],
-  ["sendmock_payment_", "payments"],
-  ["sendmock_checkout_", "payments"],
-  ["sendmock_otp_", "extract"],
-  ["sendmock_links_", "extract"],
-  ["sendmock_scenario_", "scenario"],
-  ["sendmock_settings_", "admin"],
-  ["sendmock_chaos_", "admin"],
-  ["sendmock_reset", "admin"],
-  ["sendmock_seed_", "admin"],
-  ["sendmock_sample_", "admin"],
-  ["sendmock_update_", "admin"],
-  ["sendmock_", "core"],
-];
+import { findMcpToolset } from "../../src/lib/api/surface-catalogue/mcp-toolsets";
 
 const operations = apiEndpoints.map(
   (apiEndpoint) =>
@@ -64,9 +36,7 @@ for (const operationSurfaces of operations) {
       resources.add(toolName);
       continue;
     }
-    const toolset =
-      toolsetPrefixes.find(([prefix]) => toolName.startsWith(prefix))?.[1] ??
-      "core";
+    const toolset = findMcpToolset(toolName);
     toolsByToolset.set(
       toolset,
       (toolsByToolset.get(toolset) ?? new Set()).add(toolName),

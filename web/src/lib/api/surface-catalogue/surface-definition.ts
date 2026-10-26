@@ -17,7 +17,20 @@ export type OperationSurfaces = {
   mcpAliases?: string[];
   /** Where it lives in the UI, as the path a user clicks. */
   ui: string;
+  /**
+   * Picks this operation when several share one CLI command or MCP tool:
+   * an extra input with a fixed value, or whether an input is given
+   * (docs/plan/21-reference-and-examples.md).
+   */
+  selector?: OperationSelector;
+  /** CLI placeholders that name another input, e.g. `{ status: "state" }`; `<file>` reads a file into its input. */
+  cliArguments?: Record<string, string>;
+  /** Flags the naming rules get wrong, by input, e.g. `{ timeout: "--wait" }`. */
+  cliFlags?: Record<string, string>;
 };
+
+export type OperationSelector =
+  { input: string; value: string } | { input: string; isGiven: boolean };
 
 /** `METHOD /api/v1/path` to its surfaces. */
 export type SurfaceCatalogue = Record<string, OperationSurfaces>;
