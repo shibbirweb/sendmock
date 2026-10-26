@@ -23,10 +23,14 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 ## DS-03 Package managers and install scripts
 
-Phase 1 (beta Homebrew), Phase 5 (all).
+Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs). Official distribution repositories are later and have no criteria yet ([09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27)).
 
 - [ ] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
 - [ ] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums.
+- [ ] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally.
+- [ ] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary.
+- [ ] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary.
+- [ ] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow.
 
 ## DS-04 Release workflows
 

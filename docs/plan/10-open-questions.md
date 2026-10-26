@@ -77,3 +77,16 @@ The HTML compatibility check embeds the caniemail.com support dataset (as Mailpi
 ## 12. Strictness defaults for provider emulation
 
 Lenient by default (unknown Messaging Service SIDs auto-created, any `From` accepted, any credentials accepted) with per-provider "strict mode" to reproduce real provider errors. Confirm this default with early users; strict-by-default catches more bugs but makes first setup harder.
+
+## 13. Install script URL
+
+`install.sh` and `install.ps1` ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) need a public URL, which the install page and the landing page's quick start print and people copy, so it is hard to change later. Options:
+
+| Option | Example | For | Against |
+|--------|---------|-----|---------|
+| The website | `https://shibbirweb.github.io/sendmock/install.sh` | shortest; can move to `sendmock.dev` behind the same path | served from the site's branch |
+| A GitHub release asset | `https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh` | always the latest release, no website | long; stable only |
+| A raw file in the repository | `https://raw.githubusercontent.com/shibbirweb/sendmock/main/scripts/install.sh` | versioned with the code | long; tied to the branch layout |
+
+Recommendation: the website now, moving to the custom domain (`sendmock.dev`) when it is registered. To decide with the owner before the first beta.
+

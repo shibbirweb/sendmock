@@ -137,7 +137,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Not started |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 3 | Not started |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
-| [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew), Phase 5 (all) | 2 | Not started |
+| [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
 | [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | Not started |
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 2 | Not started |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 5 (Testcontainers) | 2 | Not started |

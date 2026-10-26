@@ -124,7 +124,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - Switch Mail screens to live mode.
 - SMTP compatibility tests with real clients (Laravel, Nodemailer, Python smtplib, Go, Spring, lettre).
 - CORS for the docs origin and playground **Local mode**.
-- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release, Docker `beta`, Homebrew `sendmock-beta`).
+- First beta release `0.1.0-beta.1` through the beta channel (GitHub pre-release with `.deb` and `.rpm`, Docker `beta`, Homebrew `sendmock-beta`).
 
 **Done when:** a Laravel app and a Node app both send mail that appears live in the UI, and a pytest test reads an OTP via `/api/v1/otp`.
 
@@ -198,7 +198,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 
 - Release workflow for all targets, checksums, install scripts.
 - Docker: stable tags (`latest`, `1`, `1.x`, `1.x.y`), `-debug` variants, SBOM, provenance and cosign signatures, published-image smoke test, Docker-aware UI hints.
-- Homebrew tap, Scoop bucket, optional npm wrapper.
+- Homebrew tap, Scoop bucket, optional npm wrapper; our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)). Official distribution repositories and Homebrew core come later, with traction.
 - Testcontainers modules (Java, Node, Go, Python, .NET).
 - Remaining HTTP catcher presets (Teams, Google Chat, Expo, OneSignal) and dedicated catch-all port.
 - Performance and size budgets enforced in CI.

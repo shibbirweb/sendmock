@@ -190,7 +190,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] SMTP compatibility tests with real clients
 - [ ] CORS for the docs origin; playground Local mode
 - [ ] Done-when check: Laravel and Node mail appear live; pytest reads an OTP
-- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release, Docker `beta`, Homebrew `sendmock-beta`)
+- [ ] **Release `0.1.0-beta.1`** (GitHub pre-release with `.deb` and `.rpm`, Docker `beta`, Homebrew `sendmock-beta`)
 
 ### Phase 2: SMS and Verify backend
 
@@ -260,6 +260,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Release builds for all 6 targets, checksums, install scripts with `--channel`
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
 - [ ] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper
+- [ ] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6)
 - [ ] Testcontainers modules
 - [ ] Remaining catcher presets and catch-all port
 - [ ] Performance and size budgets enforced in CI
@@ -425,3 +426,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-26 | CI: the web end-to-end suite (256 tests, about 8.5 minutes in one job) now runs as four parallel jobs, "Web UI end-to-end (1/4)" to "(4/4)" (Playwright `--shard`, 64 tests each), next to the Web UI checks; a "Web UI end-to-end" job passes only when every shard does and is the one check to require. Also fixed two test races found on PR #32: the screen loops in `screen-states.spec.ts` now wait for each screen's title (and skip Scenarios, which loads nothing on open) with a two-minute budget, and the accessibility scans run without pop-up toasts, which could cover the screen under them. |
 | 2026-10-27 | CI: the four end-to-end shards run in Playwright's own image (`mcr.microsoft.com/playwright:v1.64.1-noble`), which has the browser and its system packages, so no shard downloads them; on the first sharded run one shard spent ten minutes on that download. `@playwright/test` is pinned to the image's version, and a repository test fails when they differ. |
 | 2026-10-27 | CI: the Website workflow's build job runs in the same Playwright image as the end-to-end shards, so it no longer downloads a browser; Lighthouse uses the image's Chromium (without its sandbox, since the container runs as root). The repository test now checks both workflows' image tags against their `@playwright/test`. |
+| 2026-10-27 | Plan: package channels by stage ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)). The first beta adds `.deb` and `.rpm` on each release to the planned archives, install scripts, Homebrew tap, Scoop bucket and Docker; 1.0 adds our own signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs; official Debian, Ubuntu, Fedora and Arch repositories and Homebrew core come later, with traction (they need an OSI licence, stable releases and a maintainer or sponsor). New criteria DS-03.3 to DS-03.6. The install-script URL is open question 13. |

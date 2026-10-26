@@ -164,6 +164,11 @@ flowchart LR
 | Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` (plus `edge` on every `develop` push) | `latest`, `X`, `X.Y`, `X.Y.Z` |
 | Homebrew tap | `sendmock-beta` formula | `sendmock` formula |
 | Scoop bucket | `sendmock-beta` manifest | `sendmock` manifest |
+| `.deb` and `.rpm` (release assets) | attached to the pre-release | attached to the release |
+| APT and YUM repository (from 1.0) | `beta` component | `stable` component |
+| WinGet, Chocolatey (from 1.0) | not published | new version submitted |
+| AUR (from 1.0) | `sendmock-beta-bin` | `sendmock-bin` |
+| COPR, Nixpkgs (from 1.0) | not published | new version |
 | npm wrapper | dist-tag `beta` | dist-tag `latest` |
 | Install scripts | `install.sh --channel beta` | default |
 | crates.io | not published | published |
