@@ -39,11 +39,12 @@ test("WS-02.1 the stack marquee fades out at both edges", async ({ page }) => {
   const maskImage = await page
     .getByTestId("works-with-marquee")
     .evaluate((marqueeElement) => getComputedStyle(marqueeElement).maskImage);
-  // Chrome reports `transparent` as rgba(0, 0, 0, 0).
+  // Chrome reports `to right` as 90deg and `transparent` as rgba(0, 0, 0, 0).
+  const toRight = "(?:to right|90deg)";
   const clear = "(?:transparent|rgba\\(0, 0, 0, 0\\))";
 
   expect(maskImage).toMatch(
-    new RegExp(`^linear-gradient\\(to right, ${clear}, .+, ${clear}\\)$`),
+    new RegExp(`^linear-gradient\\(${toRight}, ${clear}, .+, ${clear}\\)$`),
   );
 });
 
