@@ -53,7 +53,8 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | Numbers | **Number Ticker** | binary size, startup time, providers emulated, languages |
 | Product shots | **Safari** / **iPhone** mockups, **Hero Video Dialog** | app screenshots and a short tour video |
 | AI section | Animated list | an agent session: `sendmock_status` -> `sendmock_sms_wait` -> OTP |
-| Footer CTA | Confetti on copy of the install command, shiny text | |
+| Footer CTA | **Shimmer Button**, brand gradient text, dot pattern | a card with a brand glow: the logo, "Runs on your machine. No account, no cloud.", the heading with "before your users do" in the brand gradient, Try the live demo, Read the docs and Star on GitHub, and a copyable `brew install` line (changed 2026-10-27, U3 feedback F5) |
+| Footer | none (plain links) | the logo and tagline with a GitHub icon, then Product, Get started and Community link columns, and a bottom bar with the year (changed 2026-10-27, U3 feedback F5) |
 
 Exact component names are checked against the Magic UI registry when the site is built.
 

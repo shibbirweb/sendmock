@@ -311,6 +311,34 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   expect(runningAnimationCount).toBe(0);
 });
 
+test("WS-02.1 the closing call to action offers the demo, docs, GitHub and a copyable install command", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/");
+  const callToAction = page.getByRole("region", {
+    name: "Test the messages your app sends, before your users do",
+  });
+
+  await expect(
+    callToAction.getByRole("link", { name: "Try the live demo" }),
+  ).toBeVisible();
+  await expect(
+    callToAction.getByRole("link", { name: "Read the docs" }),
+  ).toHaveAttribute("href", "/docs/");
+  await expect(
+    callToAction.getByRole("link", { name: "Star on GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/shibbirweb/sendmock");
+
+  await callToAction
+    .getByRole("button", { name: "Copy the install command" })
+    .click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "brew install shibbirweb/tap/sendmock",
+  );
+});
+
 test("the footer and header link to docs, feedback forms, security and the repository", async ({
   page,
 }) => {
@@ -332,6 +360,15 @@ test("the footer and header link to docs, feedback forms, security and the repos
   await expect(
     footerNav.getByRole("link", { name: "Star on GitHub" }),
   ).toHaveAttribute("href", "https://github.com/shibbirweb/sendmock");
+  await expect(footerNav.getByRole("heading")).toHaveText([
+    "Product",
+    "Get started",
+    "Community",
+  ]);
+  await expect(footerNav.getByRole("link", { name: "Docker" })).toHaveAttribute(
+    "href",
+    "/docs/connect/docker/",
+  );
   await expect(
     page.getByRole("link", { name: /SendMock on GitHub/ }).first(),
   ).toBeVisible();
