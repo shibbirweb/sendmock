@@ -35,6 +35,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 19 | [User guide](19-user-guide.md) | The user docs as a guide: every sidebar menu explained with the problems it solves and how it connects, recipes with the built-ins, Advanced pages for customizing and creating (gateways, methods, flows, templates, rules), and building them with AI |
 | 20 | [Surface parity](20-surface-parity.md) | Every feature in every way: each REST operation names its CLI command, MCP tool and UI place in one catalogue, the missing names and REST helpers are added, the API reference shows all of them, and the user guide links every API cell to its parameters |
 | 21 | [Reference and examples](21-reference-and-examples.md) | CLI and MCP reference generated from the contract (every command's flags, every tool's inputs), a description and example for every input field, a playground that shows every accepted input, and code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# for every recipe and menu page |
+| 22 | [Configurable providers](22-configurable-providers.md) | Email and SMS providers as definitions like payment gateways: edit, reset, remove and restore the built-ins, add your own from blank or a built-in, in the UI, REST, CLI, MCP and the skill |
 
 ## Headline decisions
 

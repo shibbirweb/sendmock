@@ -35,6 +35,7 @@ All U3 workstreams are built on one branch, `feat/u3-design-review`, with a comm
 | W13 | User guide (not part of the sign-off gate) | `docs/user-guide-plan` | WS-06 | W9 |
 | W14 | Every feature in every way (inside the sign-off gate, it changes the contract) | `docs/user-guide-plan` | UI-11 | W7, W13 |
 | W15 | CLI and MCP reference, field docs, playground inputs and code examples (field docs and the flag and input rules are inside the gate) | `docs/user-guide-plan` | WS-07, WS-08, WS-04.4 to WS-04.6 | W14 |
+| W16 | Configurable email and SMS providers (inside the sign-off gate, it changes the contract) | `feat/u3-configurable-providers` | EM-18, SM-16 | W15 |
 
 ## W1 and W6: Design review
 
@@ -213,6 +214,10 @@ Every operation is reachable from the UI, the REST API, the CLI and the MCP serv
 Every input field gets a description and an example in the API types; the CLI flags and MCP tool inputs are derived from them by one rule set into `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` references linked from the API reference and every guide table; the playground shows every accepted input and starts with a full example body; recipes and menu pages get code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#. Plan: [21-reference-and-examples.md](21-reference-and-examples.md). The field docs and the flag and input rules are inside the sign-off gate, because Stage B builds the CLI and MCP server from them.
 
 - **As built:** field docs on every input, `cli-reference.json` and `mcp-tools.json`, the `/cli/` and `/mcp/` references, the playground's Inputs panel and CLI and MCP snippets, and 23 code examples in nine languages; details in [21-reference-and-examples.md](21-reference-and-examples.md#as-built-2026-10-26).
+
+## W16: Configurable email and SMS providers (EM-18, SM-16)
+
+Email and SMS providers become definitions like payment gateways: every built-in can be edited, reset to default, removed and restored, and a user can add a provider SendMock does not ship, from blank or from the closest built-in. Mail > Providers and SMS > Providers, sixteen new operations in every surface, `add-email-provider` and `add-sms-provider` skill workflows, and seed file support. Plan and build steps: [22-configurable-providers.md](22-configurable-providers.md).
 
 ## Re-audit before sign-off (2026-10-26)
 
