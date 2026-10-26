@@ -62,6 +62,157 @@ The SMTP address and API base URL with copy buttons, and a link to [Settings > C
 
 Nothing to configure here. What the tiles count follows your retention in [Settings > General](./settings.md#general).
 
+## From your code
+
+Start a test from a clean slate and read the numbers the Overview shows.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+sendmock reset --yes
+
+stats=$(sendmock stats --json)
+
+jq -e '.email_count == 0' <<<"$stats" >/dev/null
+jq -e '.sms_count == 0' <<<"$stats" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('starts with empty counts', function () {
+    Http::post(SENDMOCK.'/reset')->throw();
+
+    $stats = Http::get(SENDMOCK.'/stats')->throw()->json();
+
+    expect($stats['email_count'])->toBe(0);
+    expect($stats['sms_count'])->toBe(0);
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("starts with empty counts", async () => {
+  await call("POST", `${SENDMOCK}/reset`);
+
+  const stats = await call("GET", `${SENDMOCK}/stats`);
+
+  expect(stats.email_count).toBe(0);
+  expect(stats.sms_count).toBe(0);
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_starts_with_empty_counts():
+    requests.post(f"{SENDMOCK}/reset").raise_for_status()
+
+    stats = requests.get(f"{SENDMOCK}/stats").json()
+
+    assert stats["email_count"] == 0
+    assert stats["sms_count"] == 0
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestStartsWithEmptyCounts(t *testing.T) {
+	call(t, "POST", sendmock+"/reset", nil)
+
+	stats := call(t, "GET", sendmock+"/stats", nil).(map[string]any)
+
+	if got := stats["email_count"]; got != float64(0) {
+		t.Errorf("email_count is %v, want %v", got, float64(0))
+	}
+	if got := stats["sms_count"]; got != float64(0) {
+		t.Errorf("sms_count is %v, want %v", got, float64(0))
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+class OverviewTest {
+    @Test
+    void startsWithEmptyCounts() throws Exception {
+        call("POST", SENDMOCK + "/reset", null);
+
+        var stats = call("GET", SENDMOCK + "/stats", null);
+
+        assertEquals(0, stats.get("email_count").asInt());
+        assertEquals(0, stats.get("sms_count").asInt());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn starts_with_empty_counts() {
+    call("POST", &format!("{SENDMOCK}/reset"), None).await;
+
+    let stats = call("GET", &format!("{SENDMOCK}/stats"), None).await;
+
+    assert_eq!(stats["email_count"], 0);
+    assert_eq!(stats["sms_count"], 0);
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Overview" do
+  it "starts with empty counts" do
+    call("POST", "#{SENDMOCK}/reset")
+
+    stats = call("GET", "#{SENDMOCK}/stats")
+
+    expect(stats["email_count"]).to eq(0)
+    expect(stats["sms_count"]).to eq(0)
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class OverviewTests
+{
+    [Fact]
+    public async Task StartsWithEmptyCounts()
+    {
+        await Call("POST", Sendmock + "/reset");
+
+        var stats = await Call("GET", Sendmock + "/stats");
+
+        Assert.Equal(0, stats.GetProperty("email_count").GetInt32());
+        Assert.Equal(0, stats.GetProperty("sms_count").GetInt32());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

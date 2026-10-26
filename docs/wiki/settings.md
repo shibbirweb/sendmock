@@ -99,6 +99,133 @@ Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the 
 
 Settings are part of the seed file, so a team shares them: [Advanced: seed file](./advanced/seed-file.md) and [Recipe: share your setup](./recipes/share-your-setup.md). To check a whole flow on every run, write a [scenario](./advanced/scenarios.md).
 
+## From your code
+
+Change a setting for one test, for example a 10% random SMS failure rate.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+settings=$(sendmock settings set --sms-failure-rate-percent 10 --json)
+
+jq -e '.sms_failure_rate_percent == 10' <<<"$settings" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('fails one SMS in ten', function () {
+    $settings = Http::patch(SENDMOCK.'/settings', ['sms_failure_rate_percent' => 10])->throw()->json();
+
+    expect($settings['sms_failure_rate_percent'])->toBe(10);
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("fails one SMS in ten", async () => {
+  const settings = await call("PATCH", `${SENDMOCK}/settings`, { sms_failure_rate_percent: 10 });
+
+  expect(settings.sms_failure_rate_percent).toBe(10);
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_fails_one_sms_in_ten():
+    settings = requests.patch(
+        f"{SENDMOCK}/settings",
+        json={"sms_failure_rate_percent": 10},
+    ).json()
+
+    assert settings["sms_failure_rate_percent"] == 10
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestFailsOneSmsInTen(t *testing.T) {
+	settings := call(t, "PATCH", sendmock+"/settings", map[string]any{"sms_failure_rate_percent": 10}).(map[string]any)
+
+	if got := settings["sms_failure_rate_percent"]; got != float64(10) {
+		t.Errorf("sms_failure_rate_percent is %v, want %v", got, float64(10))
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class SettingsTest {
+    @Test
+    void failsOneSmsInTen() throws Exception {
+        var settings = call("PATCH", SENDMOCK + "/settings", Map.of("sms_failure_rate_percent", 10));
+
+        assertEquals(10, settings.get("sms_failure_rate_percent").asInt());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn fails_one_sms_in_ten() {
+    let settings = call("PATCH", &format!("{SENDMOCK}/settings"), Some(json!({"sms_failure_rate_percent": 10}))).await;
+
+    assert_eq!(settings["sms_failure_rate_percent"], 10);
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Settings" do
+  it "fails one SMS in ten" do
+    settings = call("PATCH", "#{SENDMOCK}/settings", { "sms_failure_rate_percent" => 10 })
+
+    expect(settings["sms_failure_rate_percent"]).to eq(10)
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class SettingsTests
+{
+    [Fact]
+    public async Task FailsOneSmsInTen()
+    {
+        var settings = await Call("PATCH", Sendmock + "/settings", new { sms_failure_rate_percent = 10 });
+
+        Assert.Equal(10, settings.GetProperty("sms_failure_rate_percent").GetInt32());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

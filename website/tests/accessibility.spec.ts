@@ -6,6 +6,7 @@ const sitePaths = [
   "/",
   "/docs/",
   "/docs/email/",
+  "/docs/recipes/read-a-code/",
   "/api/",
   "/api/email/",
   "/cli/",

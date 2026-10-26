@@ -66,6 +66,160 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 - Choose what happens to every email by default (nothing, always delivered, or realistic bounce rates): [Settings > Email](../settings.md#email).
 - Test what happens when the mail server misbehaves: [Advanced: chaos](../advanced/chaos.md).
 
+## From your code
+
+Wait for the email your app just sent, the way most tests use Mail.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+# In your app: sign up as user@example.test
+
+email=$(sendmock email wait --to user@example.test --subject Welcome --timeout 10s --json)
+
+jq -e '.is_read == false' <<<"$email" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('sends a welcome email', function () {
+    $this->post('/register', ['email' => 'user@example.test']);
+
+    $email = Http::get(SENDMOCK.'/wait/email', [
+        'to' => 'user@example.test',
+        'subject' => 'Welcome',
+        'timeout' => '10s',
+    ])->throw()->json();
+
+    expect($email['is_read'])->toBe(false);
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { APP, call, SENDMOCK } from "./sendmock.js";
+
+test("sends a welcome email", async () => {
+  await call("POST", `${APP}/register`, { email: "user@example.test" });
+
+  const email = await call("GET", `${SENDMOCK}/wait/email?to=user%40example.test&subject=Welcome&timeout=10s`);
+
+  expect(email.is_read).toBe(false);
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_sends_a_welcome_email():
+    requests.post(f"{APP}/register", json={"email": "user@example.test"})
+
+    email = requests.get(
+        f"{SENDMOCK}/wait/email",
+        params={
+            "to": "user@example.test",
+            "subject": "Welcome",
+            "timeout": "10s",
+        },
+    ).json()
+
+    assert email["is_read"] is False
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestSendsAWelcomeEmail(t *testing.T) {
+	call(t, "POST", app+"/register", map[string]any{"email": "user@example.test"})
+
+	email := call(t, "GET", sendmock+"/wait/email?to=user%40example.test&subject=Welcome&timeout=10s", nil).(map[string]any)
+
+	if got := email["is_read"]; got != false {
+		t.Errorf("is_read is %v, want %v", got, false)
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.APP;
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class MailTest {
+    @Test
+    void sendsAWelcomeEmail() throws Exception {
+        call("POST", APP + "/register", Map.of("email", "user@example.test"));
+
+        var email = call("GET", SENDMOCK + "/wait/email?to=user%40example.test&subject=Welcome&timeout=10s", null);
+
+        assertEquals(false, email.get("is_read").asBoolean());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, APP, SENDMOCK};
+
+#[tokio::test]
+async fn sends_a_welcome_email() {
+    call("POST", &format!("{APP}/register"), Some(json!({"email": "user@example.test"}))).await;
+
+    let email = call("GET", &format!("{SENDMOCK}/wait/email?to=user%40example.test&subject=Welcome&timeout=10s"), None).await;
+
+    assert_eq!(email["is_read"], false);
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Mail" do
+  it "sends a welcome email" do
+    call("POST", "#{APP}/register", { "email" => "user@example.test" })
+
+    email = call("GET", "#{SENDMOCK}/wait/email?to=user%40example.test&subject=Welcome&timeout=10s")
+
+    expect(email["is_read"]).to eq(false)
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class MailTests
+{
+    [Fact]
+    public async Task SendsAWelcomeEmail()
+    {
+        await Call("POST", App + "/register", new { email = "user@example.test" });
+
+        var email = await Call("GET", Sendmock + "/wait/email?to=user%40example.test&subject=Welcome&timeout=10s");
+
+        Assert.False(email.GetProperty("is_read").GetBoolean());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

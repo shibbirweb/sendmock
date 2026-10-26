@@ -12,6 +12,9 @@ const aiPlanText = readFileSync(
   "utf8",
 );
 
+/** File names of the code examples' test helpers (Ruby, Go), not MCP tools. */
+const testHelperFileNames = ["sendmock_helper", "sendmock_test"];
+
 /** Commands that start the servers or print help (`sendmock <command> --help`), not operations. */
 const processCommands = [
   "sendmock serve",
@@ -126,7 +129,8 @@ describe("the user guide and the surface catalogue", () => {
       [...guideText.matchAll(/\bsendmock_[a-z_]+\b/g)]
         .map((toolMatch) => toolMatch[0])
         // `sendmock_payment_*` and `_step_*` name a family of tools.
-        .filter((toolName) => !toolName.endsWith("_")),
+        .filter((toolName) => !toolName.endsWith("_"))
+        .filter((toolName) => !testHelperFileNames.includes(toolName)),
     );
 
     expect(

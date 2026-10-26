@@ -165,21 +165,28 @@ Examples call the REST API with the language's standard HTTP client (there are n
 - **Every menu page** gets a **From your code** section before "From the CLI, API and AI": the screen's most common task (Mail: wait for the newest email and read its link; SMS: send and read a reply; Webhooks: create an endpoint and check a delivery; ...).
 - **Connect pages** keep their setup snippets and link to the recipes for the rest.
 
-**How they are written:** Markdown code blocks with a tab title, which Fumadocs renders as tabs (its `remarkCodeTab` plugin, already in the build) and GitHub shows as one labelled block per language, so `docs/wiki/` still reads well on GitHub:
+**How they are written (changed 2026-10-26):** 23 examples in nine languages are about 200 snippets, which drift apart and away from the API when written by hand. So each example is written once, as steps, and generated into every language:
+
+- `website/lib/examples/recipe-examples.ts` and `menu-examples.ts` hold the steps: `app` (a call to the reader's app), `api` (a call to SendMock with path values, query and body), `pick` (name a part of an answer, such as the first item of a list) and `expect` (check an answer field). Values from earlier answers are `ref("otp", "code")`.
+- One renderer per tab (`render-cli.ts`, `render-php.ts`, ...) writes idiomatic code: Laravel's `Http` facade in a Pest test, `requests` in pytest, and a small `call` helper in JavaScript (Vitest), Go (`testing`), Java (JUnit 5 and Jackson), Rust (`tokio` and `serde_json`), Ruby (RSpec) and C# (xUnit). The CLI tab is built from `cli-reference.json`, so its commands and flags are the generated ones. Long maps are laid out one entry per line in each language's usual style.
+- Each Connect page shows its language's `call` helper under **Test helper** (`sendmock.js`, `sendmock_test.go`, `SendMock.java`, `tests/sendmock/mod.rs`, `sendmock_helper.rb`, `SendMock.cs`).
+- `bun run examples` (in `website/`) writes the **In your code** and **From your code** sections and the helpers into `docs/wiki/`, between their heading and the next one; `bun run examples:check` and a unit test fail when a page differs from a fresh render.
+
+In the Markdown each language is a code block with a tab title, which Fumadocs renders as tabs (`remarkCodeTab`); on GitHub each is its own highlighted block:
 
 ````markdown
-```php tab="PHP"
+```bash tab="CLI" tab-group="language"
 ...
 ```
 
-```js tab="JavaScript"
+```php tab="PHP"
 ...
 ```
 ````
 
-The chosen language is remembered across pages and visits (Fumadocs `groupId` and `persist`), and the tabs work with the keyboard.
+`tab-group="language"` makes the chosen language stick across pages and visits, and the tabs work with the keyboard.
 
-**Checks (WS-08.3):** a docs test reads every example block and fails when a recipe or menu page is missing a language, when an `/api/v1/...` method and path is not in the spec, when a JSON key or query name sent to an operation is not one of its inputs, or when a `sendmock` command or flag is not in `cli-reference.json`. In Stage B the cross-language matrix (`examples/`, [AGENTS.md](../../AGENTS.md#test-layers)) runs the recipe examples against a real binary (WS-08.5).
+**Checks (WS-08.3):** every example's steps are checked against the contract: the method and path are in the spec, each path value is given, each query name and body field is an input of that operation, required inputs are present, every checked or referenced field exists in the answer's schema, and every SendMock call has a CLI command. The generated code was also checked by hand with the local toolchains: `php -l`, `node --check`, `python -m py_compile`, `ruby -c`, `bash -n`, `javac` (against Jackson and JUnit stubs) and `cargo check` (all pass; Go and C# have no toolchain here). In Stage B the cross-language matrix (`examples/`, [AGENTS.md](../../AGENTS.md#test-layers)) runs the recipe examples against a real binary (WS-08.5).
 
 ## What is not in this plan
 

@@ -129,7 +129,7 @@ Phase U3 (W15) for WS-08.1 to WS-08.4; WS-08.5 in Phase 2, when email and SMS ru
 
 - [ ] WS-08.1 Every recipe has an In your code section with the whole flow as a tab per language: CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#; a test fails when a recipe misses a language.
 - [ ] WS-08.2 Every menu page has a From your code section with the screen's most common task in the same languages.
-- [ ] WS-08.3 Every example is checked against the contract: each `/api/v1/...` method and path is in the spec, each JSON key and query name sent is an input of that operation, and each `sendmock` command and flag is in `cli-reference.json`; a test reads every example block.
-- [ ] WS-08.4 The site shows the examples as tabs that work with the keyboard and remember the chosen language across pages and visits; on GitHub each language is a labelled code block.
+- [ ] WS-08.3 Every example is checked against the contract: each `/api/v1/...` method and path is in the spec, each JSON key and query name sent is an input of that operation, and each `sendmock` command and flag is in `cli-reference.json`; a test reads every example block. (Changed 2026-10-26: the examples are generated from steps, so the test checks the steps, including required inputs and the answer fields they read, and that every page holds a fresh render.)
+- [ ] WS-08.4 The site shows the examples as tabs that work with the keyboard and remember the chosen language across pages and visits; on GitHub each language is a labelled code block. (Clarified 2026-10-26: GitHub shows each language as its own highlighted code block; it does not display tab titles.)
 - [ ] WS-08.5 The cross-language matrix runs every recipe example against a real `sendmock` binary in CI.
 

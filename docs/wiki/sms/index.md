@@ -68,6 +68,177 @@ Facts (id, from, to, API, channel, segments, Messaging Service), the **status hi
 - Choose how every message is delivered (instantly, realistically, or only when you click): [Settings > SMS](../settings.md#sms).
 - Give numbers a reply webhook and sender pools: [Advanced: numbers and Messaging Services](../advanced/numbers-and-services.md).
 
+## From your code
+
+Send an SMS with the native API and read how it was encoded.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+sms=$(sendmock sms send --from +15550001111 --to +8801700000000 --body 'Your code is 482913' --json)
+
+jq -e '.segments == 1' <<<"$sms" >/dev/null
+jq -e '.encoding == "GSM-7"' <<<"$sms" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('sends an SMS', function () {
+    $sms = Http::post(SENDMOCK.'/sms', [
+        'from' => '+15550001111',
+        'to' => '+8801700000000',
+        'body' => 'Your code is 482913',
+    ])->throw()->json();
+
+    expect($sms['segments'])->toBe(1);
+    expect($sms['encoding'])->toBe('GSM-7');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("sends an SMS", async () => {
+  const sms = await call("POST", `${SENDMOCK}/sms`, {
+    from: "+15550001111",
+    to: "+8801700000000",
+    body: "Your code is 482913",
+  });
+
+  expect(sms.segments).toBe(1);
+  expect(sms.encoding).toBe("GSM-7");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_sends_an_sms():
+    sms = requests.post(
+        f"{SENDMOCK}/sms",
+        json={
+            "from": "+15550001111",
+            "to": "+8801700000000",
+            "body": "Your code is 482913",
+        },
+    ).json()
+
+    assert sms["segments"] == 1
+    assert sms["encoding"] == "GSM-7"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestSendsAnSms(t *testing.T) {
+	sms := call(t, "POST", sendmock+"/sms", map[string]any{
+		"from": "+15550001111",
+		"to":   "+8801700000000",
+		"body": "Your code is 482913",
+	}).(map[string]any)
+
+	if got := sms["segments"]; got != float64(1) {
+		t.Errorf("segments is %v, want %v", got, float64(1))
+	}
+	if got := sms["encoding"]; got != "GSM-7" {
+		t.Errorf("encoding is %v, want %v", got, "GSM-7")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class SmsTest {
+    @Test
+    void sendsAnSms() throws Exception {
+        var sms = call("POST", SENDMOCK + "/sms", Map.of(
+            "from", "+15550001111",
+            "to", "+8801700000000",
+            "body", "Your code is 482913"
+        ));
+
+        assertEquals(1, sms.get("segments").asInt());
+        assertEquals("GSM-7", sms.get("encoding").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn sends_an_sms() {
+    let sms = call("POST", &format!("{SENDMOCK}/sms"), Some(json!({
+        "from": "+15550001111",
+        "to": "+8801700000000",
+        "body": "Your code is 482913"
+    }))).await;
+
+    assert_eq!(sms["segments"], 1);
+    assert_eq!(sms["encoding"], "GSM-7");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Sms" do
+  it "sends an SMS" do
+    sms = call("POST", "#{SENDMOCK}/sms", {
+      "from" => "+15550001111",
+      "to" => "+8801700000000",
+      "body" => "Your code is 482913",
+    })
+
+    expect(sms["segments"]).to eq(1)
+    expect(sms["encoding"]).to eq("GSM-7")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class SmsTests
+{
+    [Fact]
+    public async Task SendsAnSms()
+    {
+        var sms = await Call("POST", Sendmock + "/sms", new
+        {
+            from = "+15550001111",
+            to = "+8801700000000",
+            body = "Your code is 482913",
+        });
+
+        Assert.Equal(1, sms.GetProperty("segments").GetInt32());
+        Assert.Equal("GSM-7", sms.GetProperty("encoding").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

@@ -49,6 +49,146 @@ The drawer: method, full path, status, duration and time; request headers (crede
 
 How long logs are kept follows retention in [Settings > General](./settings.md#general). To make SMTP fail on purpose, see [Advanced: chaos](./advanced/chaos.md).
 
+## From your code
+
+List the SMTP sessions that failed, for example after a test that expects your app to retry.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+sessions=$(sendmock logs smtp --result failed --json)
+
+session=$(jq '.items[0]' <<<"$sessions")
+
+jq -e '.result == "failed"' <<<"$session" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('lists failed SMTP sessions', function () {
+    $sessions = Http::get(SENDMOCK.'/logs/smtp', ['result' => 'failed'])->throw()->json();
+
+    $session = $sessions['items'][0];
+
+    expect($session['result'])->toBe('failed');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("lists failed SMTP sessions", async () => {
+  const sessions = await call("GET", `${SENDMOCK}/logs/smtp?result=failed`);
+
+  const session = sessions.items[0];
+
+  expect(session.result).toBe("failed");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_lists_failed_smtp_sessions():
+    sessions = requests.get(f"{SENDMOCK}/logs/smtp", params={"result": "failed"}).json()
+
+    session = sessions["items"][0]
+
+    assert session["result"] == "failed"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestListsFailedSmtpSessions(t *testing.T) {
+	sessions := call(t, "GET", sendmock+"/logs/smtp?result=failed", nil).(map[string]any)
+
+	session := sessions["items"].([]any)[0].(map[string]any)
+
+	if got := session["result"]; got != "failed" {
+		t.Errorf("result is %v, want %v", got, "failed")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+class LogsTest {
+    @Test
+    void listsFailedSmtpSessions() throws Exception {
+        var sessions = call("GET", SENDMOCK + "/logs/smtp?result=failed", null);
+
+        var session = sessions.get("items").get(0);
+
+        assertEquals("failed", session.get("result").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn lists_failed_smtp_sessions() {
+    let sessions = call("GET", &format!("{SENDMOCK}/logs/smtp?result=failed"), None).await;
+
+    let session = &sessions["items"][0];
+
+    assert_eq!(session["result"], "failed");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Logs" do
+  it "lists failed SMTP sessions" do
+    sessions = call("GET", "#{SENDMOCK}/logs/smtp?result=failed")
+
+    session = sessions["items"][0]
+
+    expect(session["result"]).to eq("failed")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class LogsTests
+{
+    [Fact]
+    public async Task ListsFailedSmtpSessions()
+    {
+        var sessions = await Call("GET", Sendmock + "/logs/smtp?result=failed");
+
+        var session = sessions.GetProperty("items")[0];
+
+        Assert.Equal("failed", session.GetProperty("result").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

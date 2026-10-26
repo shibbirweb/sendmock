@@ -64,6 +64,183 @@ Delete asks first and leaves the numbers unassigned.
 
 Two-way SMS and sender pools in depth: [Advanced: numbers and Messaging Services](./advanced/numbers-and-services.md). Numbers and services go into the seed file, so your team gets the same ones.
 
+## From your code
+
+Register your app's sending number with its reply webhook, as the test setup.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+number=$(sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-url http://localhost:3000/sms/inbound --inbound-method POST --json)
+
+jq -e '.number == "+15550001111"' <<<"$number" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('registers the support number', function () {
+    $number = Http::post(SENDMOCK.'/numbers', [
+        'number' => '+15550001111',
+        'label' => 'Support line',
+        'channels' => ['sms'],
+        'inbound_url' => 'http://localhost:3000/sms/inbound',
+        'inbound_method' => 'POST',
+    ])->throw()->json();
+
+    expect($number['number'])->toBe('+15550001111');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("registers the support number", async () => {
+  const number = await call("POST", `${SENDMOCK}/numbers`, {
+    number: "+15550001111",
+    label: "Support line",
+    channels: ["sms"],
+    inbound_url: "http://localhost:3000/sms/inbound",
+    inbound_method: "POST",
+  });
+
+  expect(number.number).toBe("+15550001111");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_registers_the_support_number():
+    number = requests.post(
+        f"{SENDMOCK}/numbers",
+        json={
+            "number": "+15550001111",
+            "label": "Support line",
+            "channels": ["sms"],
+            "inbound_url": "http://localhost:3000/sms/inbound",
+            "inbound_method": "POST",
+        },
+    ).json()
+
+    assert number["number"] == "+15550001111"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestRegistersTheSupportNumber(t *testing.T) {
+	number := call(t, "POST", sendmock+"/numbers", map[string]any{
+		"number":         "+15550001111",
+		"label":          "Support line",
+		"channels":       []any{"sms"},
+		"inbound_url":    "http://localhost:3000/sms/inbound",
+		"inbound_method": "POST",
+	}).(map[string]any)
+
+	if got := number["number"]; got != "+15550001111" {
+		t.Errorf("number is %v, want %v", got, "+15550001111")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class NumbersTest {
+    @Test
+    void registersTheSupportNumber() throws Exception {
+        var number = call("POST", SENDMOCK + "/numbers", Map.of(
+            "number", "+15550001111",
+            "label", "Support line",
+            "channels", List.of("sms"),
+            "inbound_url", "http://localhost:3000/sms/inbound",
+            "inbound_method", "POST"
+        ));
+
+        assertEquals("+15550001111", number.get("number").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn registers_the_support_number() {
+    let number = call("POST", &format!("{SENDMOCK}/numbers"), Some(json!({
+        "number": "+15550001111",
+        "label": "Support line",
+        "channels": ["sms"],
+        "inbound_url": "http://localhost:3000/sms/inbound",
+        "inbound_method": "POST"
+    }))).await;
+
+    assert_eq!(number["number"], "+15550001111");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Numbers" do
+  it "registers the support number" do
+    number = call("POST", "#{SENDMOCK}/numbers", {
+      "number" => "+15550001111",
+      "label" => "Support line",
+      "channels" => ["sms"],
+      "inbound_url" => "http://localhost:3000/sms/inbound",
+      "inbound_method" => "POST",
+    })
+
+    expect(number["number"]).to eq("+15550001111")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class NumbersTests
+{
+    [Fact]
+    public async Task RegistersTheSupportNumber()
+    {
+        var number = await Call("POST", Sendmock + "/numbers", new
+        {
+            number = "+15550001111",
+            label = "Support line",
+            channels = new[] { "sms" },
+            inbound_url = "http://localhost:3000/sms/inbound",
+            inbound_method = "POST",
+        });
+
+        Assert.Equal("+15550001111", number.GetProperty("number").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

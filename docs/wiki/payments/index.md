@@ -89,6 +89,183 @@ Wallets (bKash, Nagad, Rocket) use test numbers such as `01770000001` (succeeds)
 - Change the checkout steps: [Advanced: payment flow](../advanced/payment-flow.md).
 - Settle payments automatically in automated tests: **Automatic outcome** in [Settings > Payments](../settings.md#payments).
 
+## From your code
+
+Create a test checkout, settle it from the test and read the payment.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+payment=$(sendmock payments checkout create --provider stripe --amount-minor 1999 --currency USD --json)
+
+paid=$(sendmock payments simulate "$(jq -r '.id' <<<"$payment")" succeed --json)
+
+jq -e '.status == "succeeded"' <<<"$paid" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('settles a test payment', function () {
+    $payment = Http::post(SENDMOCK.'/payments/checkout', [
+        'provider' => 'stripe',
+        'amount_minor' => 1999,
+        'currency' => 'USD',
+    ])->throw()->json();
+
+    $paid = Http::post(SENDMOCK."/payments/{$payment['id']}/simulate", ['action' => 'succeed'])->throw()->json();
+
+    expect($paid['status'])->toBe('succeeded');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("settles a test payment", async () => {
+  const payment = await call("POST", `${SENDMOCK}/payments/checkout`, { provider: "stripe", amount_minor: 1999, currency: "USD" });
+
+  const paid = await call("POST", `${SENDMOCK}/payments/${payment.id}/simulate`, { action: "succeed" });
+
+  expect(paid.status).toBe("succeeded");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_settles_a_test_payment():
+    payment = requests.post(
+        f"{SENDMOCK}/payments/checkout",
+        json={
+            "provider": "stripe",
+            "amount_minor": 1999,
+            "currency": "USD",
+        },
+    ).json()
+
+    paid = requests.post(
+        f"{SENDMOCK}/payments/{payment['id']}/simulate",
+        json={"action": "succeed"},
+    ).json()
+
+    assert paid["status"] == "succeeded"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestSettlesATestPayment(t *testing.T) {
+	payment := call(t, "POST", sendmock+"/payments/checkout", map[string]any{
+		"provider":     "stripe",
+		"amount_minor": 1999,
+		"currency":     "USD",
+	}).(map[string]any)
+
+	paid := call(t, "POST", sendmock+"/payments/"+payment["id"].(string)+"/simulate", map[string]any{"action": "succeed"}).(map[string]any)
+
+	if got := paid["status"]; got != "succeeded" {
+		t.Errorf("status is %v, want %v", got, "succeeded")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class PaymentsTest {
+    @Test
+    void settlesATestPayment() throws Exception {
+        var payment = call("POST", SENDMOCK + "/payments/checkout", Map.of(
+            "provider", "stripe",
+            "amount_minor", 1999,
+            "currency", "USD"
+        ));
+
+        var paid = call("POST", SENDMOCK + "/payments/" + payment.get("id").asText() + "/simulate", Map.of("action", "succeed"));
+
+        assertEquals("succeeded", paid.get("status").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn settles_a_test_payment() {
+    let payment = call("POST", &format!("{SENDMOCK}/payments/checkout"), Some(json!({
+        "provider": "stripe",
+        "amount_minor": 1999,
+        "currency": "USD"
+    }))).await;
+
+    let paid = call("POST", &format!("{SENDMOCK}/payments/{}/simulate", payment["id"].as_str().unwrap()), Some(json!({"action": "succeed"}))).await;
+
+    assert_eq!(paid["status"], "succeeded");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Payments" do
+  it "settles a test payment" do
+    payment = call("POST", "#{SENDMOCK}/payments/checkout", {
+      "provider" => "stripe",
+      "amount_minor" => 1999,
+      "currency" => "USD",
+    })
+
+    paid = call("POST", "#{SENDMOCK}/payments/#{payment["id"]}/simulate", { "action" => "succeed" })
+
+    expect(paid["status"]).to eq("succeeded")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class PaymentsTests
+{
+    [Fact]
+    public async Task SettlesATestPayment()
+    {
+        var payment = await Call("POST", Sendmock + "/payments/checkout", new
+        {
+            provider = "stripe",
+            amount_minor = 1999,
+            currency = "USD",
+        });
+
+        var paid = await Call("POST", Sendmock + "/payments/" + payment.GetProperty("id").GetString() + "/simulate", new { action = "succeed" });
+
+        Assert.Equal("succeeded", paid.GetProperty("status").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

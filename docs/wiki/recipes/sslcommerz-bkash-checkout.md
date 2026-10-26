@@ -19,6 +19,241 @@ description: Pay through SSLCommerz with a test bKash wallet, get the POST redir
 
 Try `01770000002` (insufficient balance) for the fail path, and **Cancel payment** in the test controls for the cancel path.
 
+## In your code
+
+A test that starts an SSLCommerz checkout and pays it with the test bKash wallet, as a customer would on the checkout page.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+payment=$(sendmock payments checkout create --provider sslcommerz --amount-minor 150000 --currency BDT --json)
+
+checkout=$(sendmock payments checkout complete "$(jq -r '.id' <<<"$payment")" pay --method-key bkash --entries '{"number":"01770000001","otp":"123456","pin":"12121"}' --json)
+
+jq -e '.state == "completed"' <<<"$checkout" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('pays with a test bKash wallet', function () {
+    $payment = Http::post(SENDMOCK.'/payments/checkout', [
+        'provider' => 'sslcommerz',
+        'amount_minor' => 150000,
+        'currency' => 'BDT',
+    ])->throw()->json();
+
+    $checkout = Http::post(SENDMOCK."/checkout-sessions/{$payment['id']}/complete", [
+        'action' => 'pay',
+        'method_key' => 'bkash',
+        'entries' => [
+            'number' => '01770000001',
+            'otp' => '123456',
+            'pin' => '12121',
+        ],
+    ])->throw()->json();
+
+    expect($checkout['state'])->toBe('completed');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("pays with a test bKash wallet", async () => {
+  const payment = await call("POST", `${SENDMOCK}/payments/checkout`, {
+    provider: "sslcommerz",
+    amount_minor: 150000,
+    currency: "BDT",
+  });
+
+  const checkout = await call("POST", `${SENDMOCK}/checkout-sessions/${payment.id}/complete`, {
+    action: "pay",
+    method_key: "bkash",
+    entries: { number: "01770000001", otp: "123456", pin: "12121" },
+  });
+
+  expect(checkout.state).toBe("completed");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_pays_with_a_test_bkash_wallet():
+    payment = requests.post(
+        f"{SENDMOCK}/payments/checkout",
+        json={
+            "provider": "sslcommerz",
+            "amount_minor": 150000,
+            "currency": "BDT",
+        },
+    ).json()
+
+    checkout = requests.post(
+        f"{SENDMOCK}/checkout-sessions/{payment['id']}/complete",
+        json={
+            "action": "pay",
+            "method_key": "bkash",
+            "entries": {"number": "01770000001", "otp": "123456", "pin": "12121"},
+        },
+    ).json()
+
+    assert checkout["state"] == "completed"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestPaysWithATestBkashWallet(t *testing.T) {
+	payment := call(t, "POST", sendmock+"/payments/checkout", map[string]any{
+		"provider":     "sslcommerz",
+		"amount_minor": 150000,
+		"currency":     "BDT",
+	}).(map[string]any)
+
+	checkout := call(t, "POST", sendmock+"/checkout-sessions/"+payment["id"].(string)+"/complete", map[string]any{
+		"action":     "pay",
+		"method_key": "bkash",
+		"entries":    map[string]any{
+			"number": "01770000001",
+			"otp":    "123456",
+			"pin":    "12121",
+		},
+	}).(map[string]any)
+
+	if got := checkout["state"]; got != "completed" {
+		t.Errorf("state is %v, want %v", got, "completed")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class SslcommerzBkashCheckoutTest {
+    @Test
+    void paysWithATestBkashWallet() throws Exception {
+        var payment = call("POST", SENDMOCK + "/payments/checkout", Map.of(
+            "provider", "sslcommerz",
+            "amount_minor", 150000,
+            "currency", "BDT"
+        ));
+
+        var checkout = call("POST", SENDMOCK + "/checkout-sessions/" + payment.get("id").asText() + "/complete", Map.of(
+            "action", "pay",
+            "method_key", "bkash",
+            "entries", Map.of(
+                "number", "01770000001",
+                "otp", "123456",
+                "pin", "12121"
+            )
+        ));
+
+        assertEquals("completed", checkout.get("state").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn pays_with_a_test_bkash_wallet() {
+    let payment = call("POST", &format!("{SENDMOCK}/payments/checkout"), Some(json!({
+        "provider": "sslcommerz",
+        "amount_minor": 150000,
+        "currency": "BDT"
+    }))).await;
+
+    let checkout = call("POST", &format!("{SENDMOCK}/checkout-sessions/{}/complete", payment["id"].as_str().unwrap()), Some(json!({
+        "action": "pay",
+        "method_key": "bkash",
+        "entries": {"number": "01770000001", "otp": "123456", "pin": "12121"}
+    }))).await;
+
+    assert_eq!(checkout["state"], "completed");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Sslcommerz bkash checkout" do
+  it "pays with a test bKash wallet" do
+    payment = call("POST", "#{SENDMOCK}/payments/checkout", {
+      "provider" => "sslcommerz",
+      "amount_minor" => 150000,
+      "currency" => "BDT",
+    })
+
+    checkout = call("POST", "#{SENDMOCK}/checkout-sessions/#{payment["id"]}/complete", {
+      "action" => "pay",
+      "method_key" => "bkash",
+      "entries" => {
+        "number" => "01770000001",
+        "otp" => "123456",
+        "pin" => "12121",
+      },
+    })
+
+    expect(checkout["state"]).to eq("completed")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class SslcommerzBkashCheckoutTests
+{
+    [Fact]
+    public async Task PaysWithATestBkashWallet()
+    {
+        var payment = await Call("POST", Sendmock + "/payments/checkout", new
+        {
+            provider = "sslcommerz",
+            amount_minor = 150000,
+            currency = "BDT",
+        });
+
+        var checkout = await Call("POST", Sendmock + "/checkout-sessions/" + payment.GetProperty("id").GetString() + "/complete", new
+        {
+            action = "pay",
+            method_key = "bkash",
+            entries = new
+            {
+                number = "01770000001",
+                otp = "123456",
+                pin = "12121",
+            },
+        });
+
+        Assert.Equal("completed", checkout.GetProperty("state").GetString());
+    }
+}
+```
+
 ## What you should see
 
 The payment in **Payments** with its redirect (POST, with the fields) and IPN in the timeline, and the IPN in **Webhooks > Deliveries**.
