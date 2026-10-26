@@ -84,7 +84,7 @@ export function FeaturesSection() {
       className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-20"
     >
       <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-sm font-semibold tracking-wide text-(--brand-from) uppercase">
+        <p className="text-sm font-semibold tracking-wide text-(--brand-text) uppercase">
           Features
         </p>
         <h2

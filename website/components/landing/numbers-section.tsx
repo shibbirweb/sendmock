@@ -63,7 +63,7 @@ export function NumbersSection() {
           <span className="text-sm text-fd-muted-foreground">
             {statistic.label}
           </span>
-          <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-(--brand-from)">
+          <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-(--brand-text)">
             {statistic.listLabel}
             <ArrowRightIcon
               aria-hidden

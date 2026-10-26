@@ -8,11 +8,14 @@
 :root {
   --brand-from: #0d9488;
   --brand-to: #10b981;
+  /* Brand-coloured text: dark enough for WCAG AA (4.5:1) on the light surfaces. */
+  --brand-text: #0f766e;
 }
 
 .dark {
   --brand-from: #2dd4bf;
   --brand-to: #34d399;
+  --brand-text: #2dd4bf;
 }
 
 /* Fumadocs' neutral muted text (#737373) is 4.3:1 on its light background;

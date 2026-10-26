@@ -62,7 +62,7 @@ const BentoCard = ({
     <div className="z-10 flex flex-col gap-2 p-5">
       <div className="flex items-center gap-2.5">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border bg-fd-background shadow-sm">
-          <Icon className="size-4 text-(--brand-from)" />
+          <Icon className="size-4 text-(--brand-text)" />
         </span>
         <h3 className="text-xl font-semibold text-fd-foreground">{name}</h3>
         {/* Only the arrow links to the docs; the card itself is not a link. */}
@@ -70,7 +70,7 @@ const BentoCard = ({
           href={href}
           aria-label={cta}
           title={cta}
-          className="ms-auto rounded-md p-1 text-fd-muted-foreground transition-colors outline-none hover:bg-fd-accent hover:text-(--brand-from) focus-visible:ring-2 focus-visible:ring-fd-ring"
+          className="ms-auto rounded-md p-1 text-fd-muted-foreground transition-colors outline-none hover:bg-fd-accent hover:text-(--brand-text) focus-visible:ring-2 focus-visible:ring-fd-ring"
         >
           <ArrowUpRightIcon aria-hidden className="size-4" />
         </a>

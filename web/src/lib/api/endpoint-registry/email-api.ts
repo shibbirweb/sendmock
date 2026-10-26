@@ -53,7 +53,8 @@ const emailEndpoints = tagEndpoints("Email", [
       },
       {
         name: "source",
-        description: "How it arrived.",
+        description:
+          "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
         schema: typeRef("EmailSource"),
         example: "smtp",
       },

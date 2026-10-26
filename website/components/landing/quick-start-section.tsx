@@ -78,7 +78,7 @@ export function QuickStartSection() {
         id={panelId}
         role="tabpanel"
         aria-labelledby={tabId(selectedIndex)}
-        className="grid w-full max-w-2xl"
+        className="grid w-full max-w-2xl grid-cols-[minmax(0,1fr)]"
       >
         {installPlatforms.map((installPlatform) => (
           <InstallTerminalPlaceholder
@@ -101,7 +101,7 @@ export function QuickStartSection() {
             installPlatform={selectedPlatform}
           />
         </div>
-        <div className="row-start-2 grid">
+        <div className="row-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)]">
           {installPlatforms.map((installPlatform) =>
             installPlatform.downloads.length > 0 ? (
               <ManualDownloadLinks

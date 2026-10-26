@@ -42,7 +42,7 @@ function CaughtEmailCard({
   return (
     <SceneCard className="w-52">
       <div className="flex items-center gap-2">
-        <MailIcon className="size-3.5 text-(--brand-from)" />
+        <MailIcon className="size-3.5 text-(--brand-text)" />
         <span className="font-semibold">{caughtEmail.sender}</span>
       </div>
       <p className="mt-1 truncate text-fd-muted-foreground">

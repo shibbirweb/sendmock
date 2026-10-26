@@ -317,7 +317,8 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
 
   // The quick start shows every line at once instead of typing it.
   const terminal = page.getByTestId("quick-start-terminal");
-  await expect(terminal).toContainText("$ sendmock");
+  // Playwright's desktop Chrome reports Windows, so its tab (PS>) may open first.
+  await expect(terminal).toContainText(/(\$|PS>) sendmock/);
   await expect(terminal).toContainText(
     "Web UI and API on http://127.0.0.1:8025",
   );

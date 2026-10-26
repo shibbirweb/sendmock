@@ -20,16 +20,19 @@ export function VisualFrame({
   );
 }
 
-const statusToneClassNames = {
-  success: "bg-fd-success/15 text-fd-success",
-  warning: "bg-fd-warning/15 text-fd-warning",
-  error: "bg-fd-error/15 text-fd-error",
-  info: "bg-fd-info/15 text-fd-info",
+const statusToneDotClassNames = {
+  success: "bg-fd-success",
+  warning: "bg-fd-warning",
+  error: "bg-fd-error",
+  info: "bg-fd-info",
 };
 
-export type StatusTone = keyof typeof statusToneClassNames;
+export type StatusTone = keyof typeof statusToneDotClassNames;
 
-/** A small coloured label for a status such as "200", "delivered" or "retry". */
+/**
+ * A small label for a status such as "200", "delivered" or "retry": normal
+ * text with a coloured dot, so it stays readable in both themes.
+ */
 export function StatusPill({
   tone,
   children,
@@ -38,12 +41,11 @@ export function StatusPill({
   children: ReactNode;
 }) {
   return (
-    <span
-      className={cn(
-        "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-        statusToneClassNames[tone],
-      )}
-    >
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border bg-fd-background px-2 py-0.5 text-[10px] font-semibold text-fd-foreground">
+      <span
+        aria-hidden="true"
+        className={cn("size-1.5 rounded-full", statusToneDotClassNames[tone])}
+      />
       {children}
     </span>
   );

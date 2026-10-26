@@ -20,7 +20,7 @@ export function PaymentsVisual() {
           <CreditCardIcon className="size-3.5 text-fd-muted-foreground" />
           4242 4242 4242 4242
         </div>
-        <div className="mt-3 rounded-lg bg-linear-to-r from-(--brand-from) to-(--brand-to) py-1.5 text-center font-semibold text-white">
+        <div className="mt-3 rounded-lg bg-fd-primary py-1.5 text-center font-semibold text-fd-primary-foreground">
           Pay now
         </div>
         <div className="mt-2.5 flex items-center justify-between">
@@ -51,7 +51,7 @@ export function HttpCatcherVisual() {
           key={caughtRequest.path}
           className="flex items-center gap-2 font-mono"
         >
-          <span className="w-10 shrink-0 font-semibold text-(--brand-from)">
+          <span className="w-10 shrink-0 font-semibold text-(--brand-text)">
             {caughtRequest.method}
           </span>
           <span className="min-w-0 flex-1 truncate">{caughtRequest.path}</span>
@@ -81,7 +81,7 @@ export function AiAgentsVisual() {
             <span
               className={
                 agentSessionLine.speaker === "agent"
-                  ? "text-(--brand-from)"
+                  ? "text-(--brand-text)"
                   : "text-fd-muted-foreground"
               }
             >

@@ -1282,7 +1282,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "How it arrived.",
+          "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
           "example": "smtp"
         },
         {
@@ -1362,7 +1362,7 @@
           },
           "source": {
             "$ref": "#/$defs/EmailSource",
-            "description": "How it arrived.",
+            "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
             "examples": [
               "smtp"
             ]

@@ -1035,7 +1035,7 @@ paths:
         - name: source
           in: query
           required: false
-          description: How it arrived.
+          description: "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid."
           schema:
             $ref: "#/components/schemas/EmailSource"
           example: smtp

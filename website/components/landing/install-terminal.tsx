@@ -73,7 +73,7 @@ export function InstallTerminalPlaceholder({
   className?: string;
 }) {
   return (
-    <div aria-hidden className={cn("invisible", className)}>
+    <div aria-hidden className={cn("invisible min-w-0", className)}>
       <TerminalWindow className="max-w-2xl">
         {listTerminalLines(installPlatform).map((terminalLine, lineIndex) => (
           <div

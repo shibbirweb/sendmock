@@ -1380,7 +1380,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "How it arrived.",
+          "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
           "example": "smtp"
         },
         {

@@ -123,7 +123,7 @@ export function PromoVideoSection() {
           >
             <benefitPoint.icon
               aria-hidden
-              className="size-5 text-(--brand-from)"
+              className="size-5 text-(--brand-text)"
             />
             <h3 className="font-semibold">{benefitPoint.title}</h3>
             <p className="text-sm text-fd-muted-foreground">
