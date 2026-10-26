@@ -41,7 +41,7 @@ docs/wiki/
 ├── index.md                    Introduction (rewritten around problems, see below)
 ├── getting-started.md          First run with built-ins only, about 10 minutes
 ├── install.md                  (as today)
-├── connect/                    (as today, one page per language)
+├── connect/                    one page per language, plus Docker (Compose, CI, webhooks)
 │
 ├── ---Guide---
 ├── tour.md                     Tour of the app: sidebar, header, keys

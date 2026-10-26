@@ -102,7 +102,7 @@ Docker is a first-class release channel, not an afterthought: many teams run the
 
 | Item | Decision |
 |------|----------|
-| Registries | `ghcr.io/<owner>/sendmock` and Docker Hub `<owner>/sendmock` |
+| Registries | `ghcr.io/shibbirweb/sendmock` and Docker Hub `shibbirweb/sendmock` (https://hub.docker.com/r/shibbirweb/sendmock); the install page uses GHCR in its commands and links the Docker Hub page |
 | Platforms | `linux/amd64`, `linux/arm64` (Apple Silicon, Graviton, Raspberry Pi 4/5); `linux/arm/v7` if demand |
 | Base | `FROM scratch` with the static musl binary, CA certificates bundled (rustls + `webpki-roots`, so outbound HTTPS for webhooks, link check and relay works without OS packages) |
 | Size target | under 25 MB compressed |

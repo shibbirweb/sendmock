@@ -33,6 +33,8 @@ Every way has a **stable** build (from `main`) and a **beta** build (from `devel
 
 3. Go on to [Start SendMock](#start-sendmock).
 
+Prefer to download the binary yourself? Go to [Binaries](#binaries).
+
 ## Install script (Linux and macOS)
 
 The script downloads the right binary from the latest GitHub release, checks its checksum and puts `sendmock` on your `PATH`.
@@ -60,6 +62,8 @@ The script downloads the right binary from the latest GitHub release, checks its
    ```
 
 4. Go on to [Start SendMock](#start-sendmock).
+
+Prefer to download the binary yourself? Go to [Binaries](#binaries).
 
 ## Install script (Windows)
 
@@ -89,6 +93,8 @@ The script downloads the right binary from the latest GitHub release, checks its
 
 5. Go on to [Start SendMock](#start-sendmock).
 
+Prefer to download the binary yourself? Go to [Binaries](#binaries).
+
 ## Docker
 
 1. Start the container.
@@ -109,35 +115,29 @@ The script downloads the right binary from the latest GitHub release, checks its
 
 3. Point your app's SMTP settings at host `127.0.0.1`, port `1025`. [Connect your app](./connect/index.md) has the settings for each language.
 
+The same image is also on Docker Hub: [shibbirweb/sendmock](https://hub.docker.com/r/shibbirweb/sendmock).
+
 Good to know:
 
 - Inside Docker, SendMock listens on `0.0.0.0` so the published ports work. Outside Docker it listens on `127.0.0.1` only.
 - Captured mail and SMS live in the container's `/data` folder. With `--rm` they are gone when the container stops; use Docker Compose below to keep them.
+- To connect an app that also runs in Docker, see [Connect your app: Docker](./connect/docker.md).
 
 ## Docker Compose
 
-Use this to run SendMock next to your app, with captured mail and SMS kept across restarts.
+Use this to keep SendMock running with captured mail and SMS kept across restarts.
 
-1. In your project folder, create a file named `compose.yaml` (or add the `sendmock` service to the one you have):
+1. In your project folder, create a file named `compose.yaml`:
 
    ```yaml
    services:
      sendmock:
        image: ghcr.io/shibbirweb/sendmock
        ports:
-         - "1025:1025" # SMTP
-         - "8025:8025" # Web UI, API and MCP
+         - "1025:1025"
+         - "8025:8025"
        volumes:
-         - sendmock-data:/data # keeps captured mail and SMS across restarts
-
-     app:
-       build: .
-       environment:
-         MAIL_HOST: sendmock # the service name, not 127.0.0.1
-         MAIL_PORT: 1025
-       depends_on:
-         sendmock:
-           condition: service_healthy # waits for the image's built-in health check
+         - sendmock-data:/data
 
    volumes:
      sendmock-data:
@@ -149,7 +149,7 @@ Use this to run SendMock next to your app, with captured mail and SMS kept acros
    image: ghcr.io/shibbirweb/sendmock:beta
    ```
 
-2. Start everything:
+2. Start it:
 
    ```bash
    docker compose up
@@ -157,11 +157,7 @@ Use this to run SendMock next to your app, with captured mail and SMS kept acros
 
 3. Open the web UI at http://127.0.0.1:8025.
 
-Good to know:
-
-- Inside the Compose project, your app reaches SendMock by its service name: SMTP on `sendmock:1025` and the API on `http://sendmock:8025`.
-- Your browser, on your own machine, still uses http://127.0.0.1:8025.
-- [Connect your app](./connect/index.md) has the settings for each language.
+To run SendMock next to your app in the same Compose project, or for CI, webhooks and seed files, see [Connect your app: Docker](./connect/docker.md).
 
 ## Binaries
 
