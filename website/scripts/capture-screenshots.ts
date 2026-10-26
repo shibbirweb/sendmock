@@ -1,13 +1,16 @@
 /**
- * Captures the landing page screenshots from the mock-mode web app, so they
- * always show the current UI. Start the app first (`bun run dev` in web/),
- * then run `bun run screenshots` here; pass another base URL as the argument.
+ * Captures the landing page and user guide screenshots from the mock-mode web
+ * app, so they always show the current UI. Start the app first (`bun run dev`
+ * in web/), then run `bun run screenshots` here; pass another base URL as the
+ * argument.
  */
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { chromium, type Page } from "@playwright/test";
+import { chromium } from "@playwright/test";
+
+import { scenes } from "./screenshot-scenes";
 
 const appBaseUrl = process.argv[2] ?? "http://localhost:5173";
 const outputDirectory = fileURLToPath(
@@ -17,57 +20,6 @@ const outputDirectory = fileURLToPath(
 const docsImageDirectory = fileURLToPath(
   new URL("../../docs/wiki/images", import.meta.url),
 );
-
-type Scene = { name: string; open: (page: Page) => Promise<void> };
-
-async function navigateInApp(page: Page, targetPath: string) {
-  await page.evaluate((path) => {
-    window.history.pushState({}, "", path);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }, targetPath);
-}
-
-const scenes: Scene[] = [
-  {
-    name: "mail",
-    open: async (page) => {
-      await navigateInApp(page, "/mail");
-      await page.getByText("Welcome to Acme", { exact: false }).first().click();
-      await page.getByRole("tab", { name: "HTML" }).waitFor();
-    },
-  },
-  {
-    name: "sms",
-    open: async (page) => {
-      await navigateInApp(page, "/sms");
-      await page.getByText("+8801722222222", { exact: true }).click();
-      await page.getByTestId("reply-webhook-result").first().waitFor();
-    },
-  },
-  {
-    name: "webhooks",
-    open: async (page) => {
-      await navigateInApp(page, "/webhooks/overview");
-      await page.getByText("Deliveries over time").waitFor();
-    },
-  },
-  {
-    name: "checkout",
-    open: async (page) => {
-      await navigateInApp(page, "/payments");
-      const paymentHref = await page
-        .getByTestId("payment-row")
-        .filter({ hasText: "Nadia Islam" })
-        .getByRole("link")
-        .getAttribute("href");
-      const paymentId = new URL(paymentHref ?? "", appBaseUrl).searchParams.get(
-        "payment",
-      );
-      await navigateInApp(page, `/pay/${paymentId}`);
-      await page.getByRole("note", { name: "Test mode" }).waitFor();
-    },
-  },
-];
 
 mkdirSync(outputDirectory, { recursive: true });
 mkdirSync(docsImageDirectory, { recursive: true });
@@ -80,28 +32,42 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
   await page.goto(appBaseUrl);
   await page.getByText("Activity, last 24 hours").waitFor();
-  for (const scene of scenes) {
-    await scene.open(page);
-    // Live demo traffic raises toasts; they are not part of the product shot.
-    await page.evaluate(() => {
-      document
-        .querySelectorAll("[data-sonner-toaster]")
-        .forEach((toaster) => toaster.remove());
-    });
-    await page.waitForTimeout(500);
+  // Live demo traffic raises toasts; they are not part of the product shot.
+  // Hidden rather than removed: React still owns the toaster and crashes the
+  // page when a removed node gets its next toast.
+  await page.addStyleTag({
+    content: "[data-sonner-toaster] { display: none !important; }",
+  });
+  const themeScenes = scenes.filter(
+    (scene) => scene.isLandingShot || colorScheme === "light",
+  );
+  for (const scene of themeScenes) {
+    // A drawer left open by the previous scene would cover the next one.
+    await page.keyboard.press("Escape");
+    await scene.open(page, appBaseUrl);
+    await page.waitForTimeout(1_000);
+    const docsImagePath = join(docsImageDirectory, `${scene.name}.jpg`);
+    if (!scene.isLandingShot) {
+      await page.screenshot({
+        path: docsImagePath,
+        type: "jpeg",
+        quality: 80,
+        animations: "disabled",
+      });
+      continue;
+    }
     const screenshotPath = join(
       outputDirectory,
       `${scene.name}-${colorScheme}.jpg`,
     );
     await page.screenshot({ path: screenshotPath, type: "jpeg", quality: 80 });
     if (colorScheme === "light") {
-      copyFileSync(
-        screenshotPath,
-        join(docsImageDirectory, `${scene.name}.jpg`),
-      );
+      copyFileSync(screenshotPath, docsImagePath);
     }
   }
   await page.close();
 }
 await browser.close();
-console.log(`Saved ${scenes.length * 2} screenshots to public/screenshots/.`);
+console.log(
+  "Saved the landing screenshots to public/screenshots/ and the docs shots to docs/wiki/images/.",
+);
