@@ -40,10 +40,17 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    # Playwright's own image has the browser and its system packages, as in ci.yml.
+    # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v5
 
-      - uses: oven-sh/setup-bun@v2
+      # The image has Node but not unzip, which setup-bun needs, so Bun comes from npm.
+      - name: Install Bun
+        run: npm install -g bun
 
       - name: Install web app
         working-directory: web
@@ -52,10 +59,6 @@ jobs:
       - name: Install website
         working-directory: website
         run: bun install --frozen-lockfile
-
-      - name: Install Playwright browser
-        working-directory: website
-        run: bunx --bun playwright install --with-deps chromium
 
       - name: Unit tests (snippets)
         working-directory: website
@@ -66,9 +69,13 @@ jobs:
         run: bun run test:e2e
 
       # Uses the root build (with the demo) the tests just made; the Pages build below replaces it.
+      # The image has Playwright's Chromium, not Google Chrome, and runs as root,
+      # which Chrome allows only without its sandbox.
       - name: Lighthouse at least 90 in every category (WS-02.3)
         working-directory: website
-        run: bunx --bun @lhci/cli@0.15.1 autorun
+        run: |
+          chrome_path=$(find /ms-playwright -path "*/chromium-*/*" -type f -name chrome | head -1)
+          bunx --bun @lhci/cli@0.15.1 autorun --collect.chromePath="$chrome_path" --collect.settings.chromeFlags="--headless=new --no-sandbox"
 
       - name: Lighthouse scores test (names WS-02.3)
         working-directory: website
