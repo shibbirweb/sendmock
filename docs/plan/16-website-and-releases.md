@@ -160,7 +160,7 @@ flowchart LR
 
 | Channel | Beta (from `develop`) | Stable (from `main`) |
 |---------|------------------------|----------------------|
-| GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums | release `vX.Y.Z` marked latest |
+| GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums, and the rolling `beta` pre-release moved to the same files (fixed download links, [09](09-distribution.md#release-archives)) | release `vX.Y.Z` marked latest |
 | Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` (plus `edge` on every `develop` push) | `latest`, `X`, `X.Y`, `X.Y.Z` |
 | Homebrew tap | `sendmock-beta` formula | `sendmock` formula |
 | Scoop bucket | `sendmock-beta` manifest | `sendmock` manifest |
@@ -170,7 +170,7 @@ flowchart LR
 | AUR (from 1.0) | `sendmock-beta-bin` | `sendmock-bin` |
 | COPR, Nixpkgs (from 1.0) | not published | new version |
 | npm wrapper | dist-tag `beta` | dist-tag `latest` |
-| Install scripts | `install.sh --channel beta` | default |
+| Install scripts | `install.sh --channel beta`, `install.ps1 -Channel beta` (run as a script block, since `irm ... \| iex` takes no arguments) | default |
 | crates.io | not published | published |
 | Website | `/next/` | `/` (previous minor moves to `/vX.Y/`) |
 | Testcontainers modules | default image tag `beta` on request | default image tag = matching stable |

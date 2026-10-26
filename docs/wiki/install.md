@@ -7,30 +7,66 @@ description: Binaries, Homebrew, Docker and building from source.
 
 SendMock is one static binary with the web UI built in. Pick whichever channel suits you; all of them run the same thing.
 
+Every channel has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Each command below is on its own, so the copy button copies exactly that command.
+
 ## Homebrew (macOS and Linux)
 
+Stable:
+
 ```bash
-brew install shibbirweb/tap/sendmock        # stable
-brew install shibbirweb/tap/sendmock-beta   # beta from develop
+brew install shibbirweb/tap/sendmock
+```
+
+Beta:
+
+```bash
+brew install shibbirweb/tap/sendmock-beta
 ```
 
 ## Install script (Linux, macOS and Windows)
 
 Downloads the right binary from the latest GitHub release, checks its checksum and puts `sendmock` on your `PATH`.
 
+### Linux and macOS
+
+Stable:
+
 ```bash
-curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh                      # Linux and macOS
-curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta # beta from develop
+curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh
 ```
 
+Beta:
+
+```bash
+curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta
+```
+
+### Windows (PowerShell)
+
+Stable:
+
 ```powershell
-irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex   # Windows PowerShell
+irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex
+```
+
+Beta:
+
+```powershell
+& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta
 ```
 
 ## Docker
 
+Stable:
+
 ```bash
 docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock
+```
+
+Beta:
+
+```bash
+docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta
 ```
 
 In Docker, SendMock binds `0.0.0.0` so the published ports work; outside Docker it binds `127.0.0.1` only. Data lives in the `/data` volume.
@@ -62,22 +98,22 @@ volumes:
   sendmock-data:
 ```
 
-Inside the Compose project your app reaches SendMock by its service name (`sendmock:1025`, `http://sendmock:8025`); your browser still opens the UI at http://127.0.0.1:8025. [Connect your app](./connect/index.md) has the settings for each language.
+For the beta, use `image: ghcr.io/shibbirweb/sendmock:beta`. Inside the Compose project your app reaches SendMock by its service name (`sendmock:1025`, `http://sendmock:8025`); your browser still opens the UI at http://127.0.0.1:8025. [Connect your app](./connect/index.md) has the settings for each language.
 
 ## Binaries
 
-Download the archive for your system, unpack it and put `sendmock` (`sendmock.exe` on Windows) on your `PATH`. The links always point at the latest release:
+Download the archive for your system, unpack it and put `sendmock` (`sendmock.exe` on Windows) on your `PATH`. The links always point at the newest stable or beta build:
 
-| System | Archive |
-|--------|---------|
-| macOS, Apple silicon | [sendmock-aarch64-apple-darwin.tar.gz](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-apple-darwin.tar.gz) |
-| macOS, Intel | [sendmock-x86_64-apple-darwin.tar.gz](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-apple-darwin.tar.gz) |
-| Windows, x64 | [sendmock-x86_64-pc-windows-msvc.zip](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-pc-windows-msvc.zip) |
-| Windows, Arm64 | [sendmock-aarch64-pc-windows-msvc.zip](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-pc-windows-msvc.zip) |
-| Linux, x64 (static) | [sendmock-x86_64-unknown-linux-musl.tar.gz](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-unknown-linux-musl.tar.gz) |
-| Linux, Arm64 (static) | [sendmock-aarch64-unknown-linux-musl.tar.gz](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-unknown-linux-musl.tar.gz) |
+| System | Archive | Stable | Beta |
+|--------|---------|--------|------|
+| macOS, Apple silicon | `sendmock-aarch64-apple-darwin.tar.gz` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-apple-darwin.tar.gz) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-aarch64-apple-darwin.tar.gz) |
+| macOS, Intel | `sendmock-x86_64-apple-darwin.tar.gz` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-apple-darwin.tar.gz) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-x86_64-apple-darwin.tar.gz) |
+| Windows, x64 | `sendmock-x86_64-pc-windows-msvc.zip` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-pc-windows-msvc.zip) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-x86_64-pc-windows-msvc.zip) |
+| Windows, Arm64 | `sendmock-aarch64-pc-windows-msvc.zip` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-pc-windows-msvc.zip) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-aarch64-pc-windows-msvc.zip) |
+| Linux, x64 (static) | `sendmock-x86_64-unknown-linux-musl.tar.gz` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-x86_64-unknown-linux-musl.tar.gz) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-x86_64-unknown-linux-musl.tar.gz) |
+| Linux, Arm64 (static) | `sendmock-aarch64-unknown-linux-musl.tar.gz` | [Download](https://github.com/shibbirweb/sendmock/releases/latest/download/sendmock-aarch64-unknown-linux-musl.tar.gz) | [Download](https://github.com/shibbirweb/sendmock/releases/download/beta/sendmock-aarch64-unknown-linux-musl.tar.gz) |
 
-Every release also has a `SHA256SUMS` file to check the download, and older versions and beta builds are on the [releases page](https://github.com/shibbirweb/sendmock/releases).
+Every release also has a `SHA256SUMS` file to check the download, and older versions are on the [releases page](https://github.com/shibbirweb/sendmock/releases).
 
 ## Check it runs
 
