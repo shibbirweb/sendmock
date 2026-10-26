@@ -1,0 +1,40 @@
+# Every feature in every way (docs/plan/20-surface-parity.md, UI-11.7): fails when any
+# REST operation lacks a CLI command, an MCP tool (outside the recorded exemption) or a
+# UI place, or when the AI plan, the user guide or the spec name something that does
+# not exist. Runs on its own so a gap is one clearly named check; no browser, no build.
+name: Surface parity
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: parity-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    name: REST, CLI, MCP and UI for every operation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Every operation has REST, CLI, MCP and UI (summary on the job page)
+        run: bun run parity
+
+      - name: Catalogue, AI plan, user guide, mock handlers and spec agree
+        run: bun run test:parity

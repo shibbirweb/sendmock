@@ -18,6 +18,8 @@
     "test:budget": "bun test tests/budget",
     "test:contract": "bun test tests/contract",
     "test:repository": "bun test tests/repository",
+    "parity": "bun scripts/surfaces/check-surface-parity.ts",
+    "test:parity": "bun test tests/contract/surface-parity.test.ts tests/contract/surface-parity-report.test.ts && bun --bun vitest run src/lib/api/surface-catalogue src/mocks/handlers/handlers-match-endpoint-registry.test.ts && bun run openapi:check",
     "openapi": "bun scripts/build-openapi.ts",
     "openapi:check": "bun scripts/build-openapi.ts --check"
   },
