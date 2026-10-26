@@ -229,3 +229,12 @@ After W1 to W10 and W12, U3 was audited again across the whole app and site.
 - The preview URL (`/demo/` and the site) is shared; feedback is collected as GitHub issues with the `u3-feedback` label; each is fixed or recorded as a decision.
 - The owner walks through the review table and signs off each row; UI-07.3 is ticked.
 - When every U3 item and criterion above is done, the owner ticks **Sign-off: UI approved, Stage B may start**.
+
+### Feedback items
+
+Raised by the owner while reviewing the preview; each is done on `docs/user-guide-plan` in its own commit.
+
+| # | Date | Feedback | Change | Status |
+|---|------|----------|--------|--------|
+| F1 | 2026-10-26 | Toasts should appear at the bottom right by default. | The default toast position is bottom right (was top right); a position someone already picked in Settings > Notifications is kept. Plan [07](07-ui.md#notifications) updated; UI-08.1 tests the new default. | Done |
+| F2 | 2026-10-26 | The sidebar item "HTTP" should read **HTTP Catcher**. | Refactor: the sidebar label, the command palette and shortcut list, the screen's page title and heading (`HTTP Catcher · SendMock`), the UI places in the surface catalogue (`HTTP > bins` becomes `HTTP Catcher > bins`, 18 entries, then `bun run openapi`), the user guide (the menu page title, `**HTTP**` mentions and the "From the CLI, API and AI" UI names) and the tests that name the menu (`app-shell.spec.ts`, `app-screens.ts`). Then every guide screenshot is taken again with `bun run screenshots` in `website/`, since each one shows the sidebar. The route stays `/http` and the shortcut `G H`. | Planned |

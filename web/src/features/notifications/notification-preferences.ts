@@ -18,7 +18,7 @@ const preferencesStorageKey = "sendmock.notification-preferences";
 
 const defaultPreferences: NotificationPreferences = {
   areToastsShown: true,
-  toastPosition: "top-right",
+  toastPosition: "bottom-right",
 };
 
 const toastPositions: ToastPosition[] = [

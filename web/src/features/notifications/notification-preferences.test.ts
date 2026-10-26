@@ -9,7 +9,7 @@ describe("notification preferences", () => {
   test("UI-08.1 toasts and their position are remembered in this browser", () => {
     expect(readNotificationPreferences()).toEqual({
       areToastsShown: true,
-      toastPosition: "top-right",
+      toastPosition: "bottom-right",
     });
 
     updateNotificationPreferences({

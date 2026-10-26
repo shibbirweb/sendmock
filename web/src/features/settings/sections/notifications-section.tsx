@@ -14,7 +14,7 @@ const positionOptions: {
   label: string;
   description: string;
 }[] = [
-  { value: "top-right", label: "Top right", description: "The default." },
+  { value: "top-right", label: "Top right", description: "Under the bell." },
   {
     value: "top-center",
     label: "Top center",
@@ -24,7 +24,7 @@ const positionOptions: {
   {
     value: "bottom-right",
     label: "Bottom right",
-    description: "Out of the way of the header.",
+    description: "The default, out of the way of the header.",
   },
   {
     value: "bottom-center",
