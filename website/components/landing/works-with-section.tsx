@@ -26,9 +26,10 @@ export function WorksWithSection() {
       <p className="px-4 text-center text-fd-muted-foreground">
         Plain SMTP and HTTP, plus provider-compatible APIs. No SDK changes.
       </p>
+      {/* The rows fade out at both edges instead of being cut off (U3 feedback F3). */}
       <div
         data-testid="works-with-marquee"
-        className="relative w-full max-w-4xl overflow-hidden"
+        className="relative w-full max-w-4xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
       >
         <Marquee pauseOnHover className="[--duration:30s]">
           {[...testedLanguageNames, ...frameworkNames].map((stackName) => (

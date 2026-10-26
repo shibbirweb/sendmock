@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -17,8 +17,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. W11: the owner's feedback round on the preview, the review table sign-off (UI-07.3) and the sign-off tick.
-2. Add the required status checks (Web UI, Web UI end-to-end, Acceptance traceability, Website, Surface parity) to the `develop` and `main` rulesets. Require the single "Web UI end-to-end" check, not the shards, so the shard count can change.
+1. W11: the owner's feedback round on the preview (F3, the landing marquee fade, is done; more as it comes).
+2. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick.
 
 ## How to update this file
 
@@ -35,7 +35,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
-| U0 | UI foundations | In progress | 14 / 15 |
+| U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 13 / 15 |
@@ -82,7 +82,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] Lint (incl. `max-lines` 500 and `max-lines-per-function` limits from `AGENTS.md`), typecheck, Vitest, Playwright smoke test; `ci.yml` for `web/` and `website/` (f7dca57, 4f8d212, 3ae88c2; first GitHub run passed on #1)
 - [x] Website skeleton in `website/` (Fumadocs + shadcn + Magic UI, Magic UI MCP in `.mcp.json`) (3ae88c2)
 - [x] `website.yml` deploys GitHub Pages with the mock UI at `/demo/` (shareable preview URL): https://shibbirweb.github.io/sendmock/ (#1)
-- [ ] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (set up and passing in CI with an 80% gate on `src/lib`; still open: add Web UI, Acceptance traceability and Website as required checks in the rulesets)
+- [x] Test setup: Vitest + React Testing Library + Playwright in CI, coverage report on PRs, required checks on `develop` and `main` (an 80% gate on `src/lib`; since 2026-10-27 the "Core Protection" ruleset on `develop` and `main` requires Web UI, Web UI end-to-end and its four shards, Website, Acceptance traceability, and "REST, CLI, MCP and UI for every operation", the Surface parity job)
 - [x] `scripts/acceptance.ts` traceability check (criterion IDs in tests vs `docs/plan/acceptance/`) running in CI (4f8d212)
 
 ### Phase U1: Mail, SMS, Verify, Numbers, Logs, Settings screens
@@ -425,3 +425,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-26 | CI: the web end-to-end suite (256 tests, about 8.5 minutes in one job) now runs as four parallel jobs, "Web UI end-to-end (1/4)" to "(4/4)" (Playwright `--shard`, 64 tests each), next to the Web UI checks; a "Web UI end-to-end" job passes only when every shard does and is the one check to require. Also fixed two test races found on PR #32: the screen loops in `screen-states.spec.ts` now wait for each screen's title (and skip Scenarios, which loads nothing on open) with a two-minute budget, and the accessibility scans run without pop-up toasts, which could cover the screen under them. |
 | 2026-10-27 | CI: the four end-to-end shards run in Playwright's own image (`mcr.microsoft.com/playwright:v1.64.1-noble`), which has the browser and its system packages, so no shard downloads them; on the first sharded run one shard spent ten minutes on that download. `@playwright/test` is pinned to the image's version, and a repository test fails when they differ. |
 | 2026-10-27 | CI: the Website workflow's build job runs in the same Playwright image as the end-to-end shards, so it no longer downloads a browser; Lighthouse uses the image's Chromium (without its sandbox, since the container runs as root). The repository test now checks both workflows' image tags against their `@playwright/test`. |
+| 2026-10-27 | U0 done: the "Core Protection" ruleset on `develop` and `main` requires Web UI, Web UI end-to-end (and its four shards), Website, Acceptance traceability and the Surface parity job, "REST, CLI, MCP and UI for every operation" (rulesets list job names, not workflow names). U3 feedback F3 done ([18](18-phase-u3.md#feedback-items)): the landing page's "Works with your stack" rows fade out at both edges instead of being cut off. |
