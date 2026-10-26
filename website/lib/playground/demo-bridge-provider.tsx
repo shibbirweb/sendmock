@@ -40,6 +40,9 @@ export function DemoBridgeProvider({ children }: { children: ReactNode }) {
     new Map<string, (response: PlaygroundResponse) => void>(),
   );
   const [isReady, setIsReady] = useState(false);
+  // The bridge says "ready" once; it loads only after we listen, or a slow
+  // hydration (the dev server, a slow phone) misses it and never sends.
+  const [isListening, setIsListening] = useState(false);
   const [events, setEvents] = useState<PlaygroundEvent[]>([]);
   const bridgeUrl = readBridgeUrl(basePath);
 
@@ -72,6 +75,7 @@ export function DemoBridgeProvider({ children }: { children: ReactNode }) {
       }
     };
     window.addEventListener("message", handleMessage);
+    setIsListening(true);
     return () => window.removeEventListener("message", handleMessage);
   }, [bridgeUrl]);
 
@@ -101,14 +105,16 @@ export function DemoBridgeProvider({ children }: { children: ReactNode }) {
   return (
     <DemoBridgeContext.Provider value={demoBridge}>
       {children}
-      <iframe
-        ref={iframeRef}
-        src={bridgeUrl}
-        title="SendMock demo API"
-        aria-hidden="true"
-        tabIndex={-1}
-        className="hidden"
-      />
+      {isListening && (
+        <iframe
+          ref={iframeRef}
+          src={bridgeUrl}
+          title="SendMock demo API"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="hidden"
+        />
+      )}
     </DemoBridgeContext.Provider>
   );
 }

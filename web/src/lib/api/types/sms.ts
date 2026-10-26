@@ -31,10 +31,20 @@ export type SmsMedia = {
 
 /** An inline file in `media` of a native or simulated inbound send. */
 export type InlineSmsMedia = {
+  /**
+   * The file name, e.g. `photo.jpg`.
+   * @example "photo.jpg"
+   */
   filename: string;
-  /** The file bytes, base64 encoded. */
+  /**
+   * The file bytes, base64 encoded.
+   * @example "/9j/4AAQSkZJRgABAQ"
+   */
   content: string;
-  /** Guessed from the file extension when missing. */
+  /**
+   * Guessed from the file extension when missing.
+   * @example "image/jpeg"
+   */
   content_type?: string;
 };
 
@@ -155,28 +165,85 @@ export type SmsListFilters = PageRequest & {
 
 /** Body of POST /api/v1/sms (native send). */
 export type NativeSmsRequest = {
+  /**
+   * The sender: an E.164 number or an alphanumeric sender ID.
+   * @example "+15550001111"
+   */
   from: string;
+  /**
+   * The recipient, an E.164 number; `whatsapp:+...` sends over WhatsApp.
+   * @example "+8801700000000"
+   */
   to: string;
+  /**
+   * The message text. Its length and characters decide the segments and the encoding (GSM-7 or UCS-2).
+   * @example "Your code is 482913"
+   */
   body: string;
+  /**
+   * Your app's URL that receives each status change (queued, sent, delivered, failed).
+   * @example "http://localhost:3000/sms/status"
+   */
   status_callback?: string;
+  /**
+   * Any JSON you want stored with the message and echoed in its events.
+   * @example {"user_id": 42}
+   */
   metadata?: Record<string, unknown>;
-  /** Public links SendMock downloads, like Twilio's `MediaUrl`. */
+  /**
+   * Public links SendMock downloads, like Twilio's `MediaUrl`.
+   * @example ["https://example.test/receipt.png"]
+   */
   media_urls?: string[];
+  /**
+   * Files sent inline as MMS media, base64 encoded.
+   */
   media?: InlineSmsMedia[];
 };
 
 /** Body of POST /api/v1/sms/inbound (simulate an incoming message). */
 export type InboundSmsRequest = {
+  /**
+   * Who texts your app: the user's number.
+   * @example "+8801700000000"
+   */
   from: string;
+  /**
+   * Your app's number that receives it, usually a virtual number.
+   * @example "+15550001111"
+   */
   to: string;
+  /**
+   * The message text.
+   * @example "STOP"
+   */
   body: string;
+  /**
+   * `sms` (default) or `whatsapp`.
+   * @example "sms"
+   */
   channel?: SmsChannel;
+  /**
+   * The payload template for the inbound webhook, instead of the number's (e.g. `twilio.inbound_sms`).
+   * @example "twilio.inbound_sms"
+   */
   template_id?: string;
+  /**
+   * Files sent with the message, as MMS or WhatsApp media.
+   */
   media?: InlineSmsMedia[];
 };
 
 /** Body of `POST /sms/{smsId}/status`: a manual status change. */
 export type SmsStatusUpdate = {
+  /**
+   * The new status; fires the status callback and the matching event.
+   * @example "delivered"
+   */
   status: SmsStatus;
+  /**
+   * A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).
+   * @example "30003"
+   */
   error_code?: string | null;
 };

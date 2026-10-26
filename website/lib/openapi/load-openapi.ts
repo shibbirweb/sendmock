@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { parse } from "yaml";
 
+import { indexReferencesByOperation } from "@/lib/reference/load-references";
+
 import type {
   ApiBody,
   ApiOperation,
@@ -23,6 +25,7 @@ type RawOperation = {
     required?: boolean;
     description?: string;
     schema: JsonSchema;
+    example?: unknown;
   }[];
   requestBody?: { content: RawContent };
   "x-sendmock-cli": string;
@@ -64,6 +67,7 @@ function readOpenApiDocument(): RawDocument {
 
 export function loadApiReference() {
   const rawDocument = readOpenApiDocument();
+  const referenceLinks = indexReferencesByOperation();
   const sharedResponses = rawDocument.components.responses;
   const operations: ApiOperation[] = Object.entries(rawDocument.paths).flatMap(
     ([path, pathItem]) =>
@@ -75,6 +79,7 @@ export function loadApiReference() {
             isRequired: rawParameter.required ?? false,
             description: rawParameter.description ?? "",
             schema: rawParameter.schema,
+            example: rawParameter.example,
           }),
         );
         const responses: ApiResponse[] = Object.entries(
@@ -103,6 +108,11 @@ export function loadApiReference() {
           responses,
           surfaces: {
             cli: rawOperation["x-sendmock-cli"],
+            cliUrl: null,
+            mcpUrl: null,
+            cliSnippetSource: null,
+            mcpSnippetSource: null,
+            ...referenceLinks.get(`${method.toUpperCase()} ${path}`),
             mcp: rawOperation["x-sendmock-mcp"],
             mcpExemptReason: rawOperation["x-sendmock-mcp-exempt"] ?? null,
             ui: rawOperation["x-sendmock-ui"],

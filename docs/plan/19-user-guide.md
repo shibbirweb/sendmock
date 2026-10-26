@@ -111,9 +111,14 @@ tabs, buttons, menus, drawers, keyboard keys. This is the A to Z.
 ## Customize
 What can be changed here, one line each, linking to the Advanced page.
 
+## From your code
+The screen's most common task in your app or test, as tabs: CLI, PHP
+(Laravel), JavaScript, Python, Go, Java, Rust, Ruby, C# (added in W15, plan 21).
+
 ## From the CLI, API and AI
 | Do this | CLI | API | MCP tool |
-The same actions without the UI, with their phase.
+The same actions without the UI, with their phase; every cell links to its
+entry in the CLI, API or MCP reference.
 
 ## Related
 Links to the connected menus and recipes.
@@ -251,7 +256,7 @@ Each outline lists what the page's **What it solves**, **How it connects**, **Us
   - `replies-and-whatsapp`: reply composer, format picker, media, reply webhook result line, Reply webhook tab, fallback URL, TwiML replies, Resend reply webhook.
   - `verify`: Verifications tab (code, countdown, attempts), detail drawer and force buttons, Services tab (code length, fixed code for automated tests, lifetime), Start a sample verification.
 
-### HTTP (catcher)
+### HTTP Catcher
 
 - **Solves:** Slack, Discord, Teams, Telegram and push notifications going to real people during development; seeing exactly what your app sent to a third-party API; testing how your app handles slow or failing APIs.
 - **Connects:** gets any HTTP call to `/catch/<bin>/...`; answers with the bin's response rules; fires `http.captured` to Rules; **Forward to URL** sends a request on; **Send to webhook** turns it into a delivery; Webhooks' **Add a catcher endpoint** points test deliveries here.
@@ -316,7 +321,7 @@ One page, one section per Settings section in app order, each with what it solve
 
 ## Recipes (basic use)
 
-Short task pages using **built-ins only**, each: the situation, what you need, numbered steps (UI first, then the same with the CLI), what you should see, and next steps. Planned list:
+Short task pages using **built-ins only**, each: the situation, what you need, numbered steps (UI first, then the same with the CLI), **In your code** (the whole flow as a test in every supported language, added in W15, see [21](21-reference-and-examples.md#5-code-examples-in-every-supported-language)), what you should see, and next steps. Planned list:
 
 1. Catch your app's password reset email and click the link.
 2. Read a one-time code from an email or SMS (UI copy button, `sendmock otp`).

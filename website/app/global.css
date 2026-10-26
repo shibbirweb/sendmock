@@ -22,6 +22,22 @@
   --color-fd-muted-foreground: #5f5f5f;
 }
 
+/* Shiki's GitHub themes write code comments in #6A737D in both themes, below
+   WCAG AA on the code background; these comment colours pass (4.5:1 and up).
+   The colours are inline styles, so only !important overrides them. */
+:root {
+  --code-comment-light: #57606a;
+  --code-comment-dark: #959da5;
+}
+
+pre span[style*="--shiki-light:#6A737D"] {
+  --shiki-light: var(--code-comment-light) !important;
+}
+
+pre span[style*="--shiki-dark:#6A737D"] {
+  --shiki-dark: var(--code-comment-dark) !important;
+}
+
 @theme inline {
   --animate-shiny-text: shiny-text 8s infinite;
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite

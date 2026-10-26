@@ -16,6 +16,18 @@ export function toComponentName(definitionName: string): string {
     .replace(/[^A-Za-z0-9._-]/g, "_");
 }
 
+/** `(WH-05.1, WH-05.3)` and `, WH-12)`: requirement IDs mean nothing to API readers. */
+const requirementIdGroupPattern =
+  /\s*\((?:[A-Z]{2}-\d{2}(?:\.\d+)?(?:,\s*)?)+\)/g;
+const trailingRequirementIdPattern = /,\s*[A-Z]{2}-\d{2}(?:\.\d+)?(?=\))/g;
+
+/** A description as API readers see it, without internal requirement IDs. */
+export function removeRequirementIds(description: string): string {
+  return description
+    .replace(requirementIdGroupPattern, "")
+    .replace(trailingRequirementIdPattern, "");
+}
+
 /** Points every `#/definitions/...` reference at `#/components/schemas/...`. */
 function rewriteReferences(schemaNode: unknown): unknown {
   if (Array.isArray(schemaNode)) {
@@ -27,6 +39,9 @@ function rewriteReferences(schemaNode: unknown): unknown {
 
   return Object.fromEntries(
     Object.entries(schemaNode).map(([propertyName, propertyValue]) => {
+      if (propertyName === "description" && typeof propertyValue === "string") {
+        return [propertyName, removeRequirementIds(propertyValue)];
+      }
       if (propertyName === "$ref" && typeof propertyValue === "string") {
         const definitionName = propertyValue.replace("#/definitions/", "");
         return [
@@ -63,7 +78,7 @@ export function generateComponentSchemas(
     type: rootTypeName,
     expose: "export",
     topRef: true,
-    jsDoc: "basic",
+    jsDoc: "extended",
     // Objects stay open, so adding a field later is not a breaking change.
     additionalProperties: true,
     skipTypeCheck: true,

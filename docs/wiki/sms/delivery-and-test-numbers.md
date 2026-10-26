@@ -79,11 +79,11 @@ Step by step: [Recipe: failed SMS](../recipes/failed-sms.md).
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| set a status by hand | `sendmock sms status <smsId> <status>` | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | `sendmock_sms_set_status` |
-| profile and failure rate | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
-| list own outcome numbers | `sendmock outcome-rule sms list` | [`GET /api/v1/outcome-rules/sms`](/api/outcome-rules/#getOutcomeRulesSms) | `sendmock_outcome_rule_list` |
-| add one | `sendmock outcome-rule sms create` | [`POST /api/v1/outcome-rules/sms`](/api/outcome-rules/#postOutcomeRulesSms) | `sendmock_outcome_rule_create` |
-| test a number | `sendmock outcome-rule sms test <number>` | [`POST /api/v1/outcome-rules/sms/test`](/api/outcome-rules/#postOutcomeRulesSmsTest) | `sendmock_outcome_rule_test` |
+| set a status by hand | [`sendmock sms status <smsId> <status>`](/cli/sms/#sms-status) | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status) |
+| profile and failure rate | [`sendmock settings set`](/cli/system/#settings-set) | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update) |
+| list own outcome numbers | [`sendmock outcome-rule sms list`](/cli/outcome-rules/#outcome-rule-sms-list) | [`GET /api/v1/outcome-rules/sms`](/api/outcome-rules/#getOutcomeRulesSms) | [`sendmock_outcome_rule_list`](/mcp/outcome-rules/#sendmock_outcome_rule_list) |
+| add one | [`sendmock outcome-rule sms create`](/cli/outcome-rules/#outcome-rule-sms-create) | [`POST /api/v1/outcome-rules/sms`](/api/outcome-rules/#postOutcomeRulesSms) | [`sendmock_outcome_rule_create`](/mcp/outcome-rules/#sendmock_outcome_rule_create) |
+| test a number | [`sendmock outcome-rule sms test <number>`](/cli/outcome-rules/#outcome-rule-sms-test) | [`POST /api/v1/outcome-rules/sms/test`](/api/outcome-rules/#postOutcomeRulesSmsTest) | [`sendmock_outcome_rule_test`](/mcp/outcome-rules/#sendmock_outcome_rule_test) |
 
 ## Related
 

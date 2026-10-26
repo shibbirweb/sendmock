@@ -56,12 +56,12 @@ Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](.
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock webhook rule list` | [`GET /api/v1/webhooks/rules`](/api/webhook-rules/#getWebhooksRules) | `sendmock_webhook_rule_list` |
-| one rule | `sendmock webhook rule show <ruleId>` | [`GET /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#getWebhooksRulesByRuleId) | `sendmock_webhook_rule_get` |
-| create | `sendmock webhook rule create` | [`POST /api/v1/webhooks/rules`](/api/webhook-rules/#postWebhooksRules) | `sendmock_webhook_rule_create` |
-| update | `sendmock webhook rule update <ruleId>` | [`PATCH /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#patchWebhooksRulesByRuleId) | `sendmock_webhook_rule_update` |
-| move | `sendmock webhook rule move <ruleId>` | [`POST /api/v1/webhooks/rules/{ruleId}/move`](/api/webhook-rules/#postWebhooksRulesByRuleIdMove) | `sendmock_webhook_rule_move` |
-| preview a filter | `sendmock webhook rule preview` | [`POST /api/v1/webhooks/rules/preview`](/api/webhook-rules/#postWebhooksRulesPreview) | `sendmock_webhook_rule_preview` |
+| list | [`sendmock webhook rule list`](/cli/webhook-rules/#webhook-rule-list) | [`GET /api/v1/webhooks/rules`](/api/webhook-rules/#getWebhooksRules) | [`sendmock_webhook_rule_list`](/mcp/webhook-rules/#sendmock_webhook_rule_list) |
+| one rule | [`sendmock webhook rule show <ruleId>`](/cli/webhook-rules/#webhook-rule-show) | [`GET /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#getWebhooksRulesByRuleId) | [`sendmock_webhook_rule_get`](/mcp/webhook-rules/#sendmock_webhook_rule_get) |
+| create | [`sendmock webhook rule create`](/cli/webhook-rules/#webhook-rule-create) | [`POST /api/v1/webhooks/rules`](/api/webhook-rules/#postWebhooksRules) | [`sendmock_webhook_rule_create`](/mcp/webhook-rules/#sendmock_webhook_rule_create) |
+| update | [`sendmock webhook rule update <ruleId>`](/cli/webhook-rules/#webhook-rule-update) | [`PATCH /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#patchWebhooksRulesByRuleId) | [`sendmock_webhook_rule_update`](/mcp/webhook-rules/#sendmock_webhook_rule_update) |
+| move | [`sendmock webhook rule move <ruleId>`](/cli/webhook-rules/#webhook-rule-move) | [`POST /api/v1/webhooks/rules/{ruleId}/move`](/api/webhook-rules/#postWebhooksRulesByRuleIdMove) | [`sendmock_webhook_rule_move`](/mcp/webhook-rules/#sendmock_webhook_rule_move) |
+| preview a filter | [`sendmock webhook rule preview`](/cli/webhook-rules/#webhook-rule-preview) | [`POST /api/v1/webhooks/rules/preview`](/api/webhook-rules/#postWebhooksRulesPreview) | [`sendmock_webhook_rule_preview`](/mcp/webhook-rules/#sendmock_webhook_rule_preview) |
 
 ## Related
 

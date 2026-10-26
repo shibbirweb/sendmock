@@ -54,19 +54,51 @@ jobs:
       - name: GitHub issue forms and community files (UI-10.2)
         run: bun run test:repository
 
+
+  # The end-to-end suite is most of the run time, so four jobs share it
+  # (Playwright --shard) and run next to the checks above.
+  web-e2e:
+    name: Web UI end-to-end (${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    strategy:
+      # Every shard reports its own failures, even when another one fails.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
       - name: Install Playwright browser
         run: bunx --bun playwright install --with-deps chromium
 
       - name: End-to-end tests (production build, mock mode)
-        run: bun run test:e2e
+        run: bun run test:e2e --shard=${{ matrix.shard }}/4
 
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: web/playwright-report
           retention-days: 7
+
+  # One check for the rulesets to require, whatever the number of shards.
+  web-e2e-result:
+    name: Web UI end-to-end
+    if: always()
+    needs: web-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every shard passed
+        run: test "${{ needs.web-e2e.result }}" = "success"
 
   acceptance:
     name: Acceptance traceability

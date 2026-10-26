@@ -34,6 +34,7 @@ All U3 workstreams are built on one branch, `feat/u3-design-review`, with a comm
 | W12 | Community links and GitHub templates | `chore/u3-community` | UI-10 | |
 | W13 | User guide (not part of the sign-off gate) | `docs/user-guide-plan` | WS-06 | W9 |
 | W14 | Every feature in every way (inside the sign-off gate, it changes the contract) | `docs/user-guide-plan` | UI-11 | W7, W13 |
+| W15 | CLI and MCP reference, field docs, playground inputs and code examples (field docs and the flag and input rules are inside the gate) | `docs/user-guide-plan` | WS-07, WS-08, WS-04.4 to WS-04.6 | W14 |
 
 ## W1 and W6: Design review
 
@@ -207,6 +208,12 @@ The user docs become a guide that walks the sidebar menu by menu, says which rea
 
 Every operation is reachable from the UI, the REST API, the CLI and the MCP server, with one recorded exemption (agents never read secrets back). Plan and as-built notes: [20-surface-parity.md](20-surface-parity.md). Part of the sign-off gate, because it changes the contract.
 
+## W15: CLI and MCP reference, field docs and code examples (WS-07, WS-08)
+
+Every input field gets a description and an example in the API types; the CLI flags and MCP tool inputs are derived from them by one rule set into `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` references linked from the API reference and every guide table; the playground shows every accepted input and starts with a full example body; recipes and menu pages get code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#. Plan: [21-reference-and-examples.md](21-reference-and-examples.md). The field docs and the flag and input rules are inside the sign-off gate, because Stage B builds the CLI and MCP server from them.
+
+- **As built:** field docs on every input, `cli-reference.json` and `mcp-tools.json`, the `/cli/` and `/mcp/` references, the playground's Inputs panel and CLI and MCP snippets, and 23 code examples in nine languages; details in [21-reference-and-examples.md](21-reference-and-examples.md#as-built-2026-10-26).
+
 ## Re-audit before sign-off (2026-10-26)
 
 After W1 to W10 and W12, U3 was audited again across the whole app and site.
@@ -224,3 +231,12 @@ After W1 to W10 and W12, U3 was audited again across the whole app and site.
 - The preview URL (`/demo/` and the site) is shared; feedback is collected as GitHub issues with the `u3-feedback` label; each is fixed or recorded as a decision.
 - The owner walks through the review table and signs off each row; UI-07.3 is ticked.
 - When every U3 item and criterion above is done, the owner ticks **Sign-off: UI approved, Stage B may start**.
+
+### Feedback items
+
+Raised by the owner while reviewing the preview; each is done on `docs/user-guide-plan` in its own commit.
+
+| # | Date | Feedback | Change | Status |
+|---|------|----------|--------|--------|
+| F1 | 2026-10-26 | Toasts should appear at the bottom right by default. | The default toast position is bottom right (was top right); a position someone already picked in Settings > Notifications is kept. Plan [07](07-ui.md#notifications) updated; UI-08.1 tests the new default. | Done |
+| F2 | 2026-10-26 | The sidebar item "HTTP" should read **HTTP Catcher**. | Refactor: the sidebar label, the command palette and shortcut list, the screen's page title and heading (`HTTP Catcher · SendMock`), the UI places in the surface catalogue (`HTTP > bins` becomes `HTTP Catcher > bins`, 18 entries, then `bun run openapi`), the user guide (the menu page title, `**HTTP**` mentions and the "From the CLI, API and AI" UI names) and the tests that name the menu (`app-shell.spec.ts`, `app-screens.ts`). Then every guide screenshot is taken again with `bun run screenshots` in `website/`, since each one shows the sidebar. The route stays `/http` and the shortcut `G H`. | Done |

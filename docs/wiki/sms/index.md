@@ -68,20 +68,191 @@ Facts (id, from, to, API, channel, segments, Messaging Service), the **status hi
 - Choose how every message is delivered (instantly, realistically, or only when you click): [Settings > SMS](../settings.md#sms).
 - Give numbers a reply webhook and sender pools: [Advanced: numbers and Messaging Services](../advanced/numbers-and-services.md).
 
+## From your code
+
+Send an SMS with the native API and read how it was encoded.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+sms=$(sendmock sms send --from +15550001111 --to +8801700000000 --body 'Your code is 482913' --json)
+
+jq -e '.segments == 1' <<<"$sms" >/dev/null
+jq -e '.encoding == "GSM-7"' <<<"$sms" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('sends an SMS', function () {
+    $sms = Http::post(SENDMOCK.'/sms', [
+        'from' => '+15550001111',
+        'to' => '+8801700000000',
+        'body' => 'Your code is 482913',
+    ])->throw()->json();
+
+    expect($sms['segments'])->toBe(1);
+    expect($sms['encoding'])->toBe('GSM-7');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("sends an SMS", async () => {
+  const sms = await call("POST", `${SENDMOCK}/sms`, {
+    from: "+15550001111",
+    to: "+8801700000000",
+    body: "Your code is 482913",
+  });
+
+  expect(sms.segments).toBe(1);
+  expect(sms.encoding).toBe("GSM-7");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_sends_an_sms():
+    sms = requests.post(
+        f"{SENDMOCK}/sms",
+        json={
+            "from": "+15550001111",
+            "to": "+8801700000000",
+            "body": "Your code is 482913",
+        },
+    ).json()
+
+    assert sms["segments"] == 1
+    assert sms["encoding"] == "GSM-7"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestSendsAnSms(t *testing.T) {
+	sms := call(t, "POST", sendmock+"/sms", map[string]any{
+		"from": "+15550001111",
+		"to":   "+8801700000000",
+		"body": "Your code is 482913",
+	}).(map[string]any)
+
+	if got := sms["segments"]; got != float64(1) {
+		t.Errorf("segments is %v, want %v", got, float64(1))
+	}
+	if got := sms["encoding"]; got != "GSM-7" {
+		t.Errorf("encoding is %v, want %v", got, "GSM-7")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class SmsTest {
+    @Test
+    void sendsAnSms() throws Exception {
+        var sms = call("POST", SENDMOCK + "/sms", Map.of(
+            "from", "+15550001111",
+            "to", "+8801700000000",
+            "body", "Your code is 482913"
+        ));
+
+        assertEquals(1, sms.get("segments").asInt());
+        assertEquals("GSM-7", sms.get("encoding").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn sends_an_sms() {
+    let sms = call("POST", &format!("{SENDMOCK}/sms"), Some(json!({
+        "from": "+15550001111",
+        "to": "+8801700000000",
+        "body": "Your code is 482913"
+    }))).await;
+
+    assert_eq!(sms["segments"], 1);
+    assert_eq!(sms["encoding"], "GSM-7");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Sms" do
+  it "sends an SMS" do
+    sms = call("POST", "#{SENDMOCK}/sms", {
+      "from" => "+15550001111",
+      "to" => "+8801700000000",
+      "body" => "Your code is 482913",
+    })
+
+    expect(sms["segments"]).to eq(1)
+    expect(sms["encoding"]).to eq("GSM-7")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class SmsTests
+{
+    [Fact]
+    public async Task SendsAnSms()
+    {
+        var sms = await Call("POST", Sendmock + "/sms", new
+        {
+            from = "+15550001111",
+            to = "+8801700000000",
+            body = "Your code is 482913",
+        });
+
+        Assert.Equal(1, sms.GetProperty("segments").GetInt32());
+        Assert.Equal("GSM-7", sms.GetProperty("encoding").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| send | `sendmock sms send` | [`POST /api/v1/sms`](/api/sms/#postSms) | `sendmock_sms_send` |
-| list | `sendmock sms list` | [`GET /api/v1/sms`](/api/sms/#getSms) | `sendmock_sms_list` |
-| conversations | `sendmock sms threads` | [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads) | `sendmock_sms_threads` |
-| one message with its history | `sendmock sms show <smsId>` | [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId) | `sendmock_sms_get` |
-| wait in a test | `sendmock sms wait` | [`GET /api/v1/wait/sms`](/api/test-helpers/#getWaitSms) | `sendmock_sms_wait` |
-| read the latest code | `sendmock otp --to <recipient>` | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | `sendmock_otp_get` |
-| set a status | `sendmock sms status <smsId> <status>` | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | `sendmock_sms_set_status` |
-| reply as the contact | `sendmock sms inbound` | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | `sendmock_sms_simulate_inbound` |
-| delete one | `sendmock sms delete <smsId>` | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | `sendmock_sms_delete` |
-| delete everything | `sendmock sms delete-all --yes` | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | `sendmock_sms_delete_all` |
+| send | [`sendmock sms send`](/cli/sms/#sms-send) | [`POST /api/v1/sms`](/api/sms/#postSms) | [`sendmock_sms_send`](/mcp/sms/#sendmock_sms_send) |
+| list | [`sendmock sms list`](/cli/sms/#sms-list) | [`GET /api/v1/sms`](/api/sms/#getSms) | [`sendmock_sms_list`](/mcp/sms/#sendmock_sms_list) |
+| conversations | [`sendmock sms threads`](/cli/sms/#sms-threads) | [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads) | [`sendmock_sms_threads`](/mcp/sms/#sendmock_sms_threads) |
+| one message with its history | [`sendmock sms show <smsId>`](/cli/sms/#sms-show) | [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId) | [`sendmock_sms_get`](/mcp/sms/#sendmock_sms_get) |
+| wait in a test | [`sendmock sms wait`](/cli/test-helpers/#sms-wait) | [`GET /api/v1/wait/sms`](/api/test-helpers/#getWaitSms) | [`sendmock_sms_wait`](/mcp/test-helpers/#sendmock_sms_wait) |
+| read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |
+| set a status | [`sendmock sms status <smsId> <status>`](/cli/sms/#sms-status) | [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus) | [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status) |
+| reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
+| delete one | [`sendmock sms delete <smsId>`](/cli/sms/#sms-delete) | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | [`sendmock_sms_delete`](/mcp/sms/#sendmock_sms_delete) |
+| delete everything | [`sendmock sms delete-all --yes`](/cli/sms/#sms-delete-all) | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all) |
 
 The SMS commands and tools arrive in Phase 2.
 

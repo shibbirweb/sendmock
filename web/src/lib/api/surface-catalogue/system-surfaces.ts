@@ -5,12 +5,14 @@ export const systemSurfaces: SurfaceCatalogue = {
     cli: "sendmock health",
     mcp: "sendmock_status",
     ui: "Sidebar > live connection dot",
+    selector: { input: "view", value: "health" },
   },
   "GET /api/v1/info": {
     cli: "sendmock status",
     cliAliases: ["sendmock version"],
     mcp: "sendmock_status",
     ui: "Settings > About",
+    selector: { input: "view", value: "info" },
   },
   "GET /api/v1/stats": {
     cli: "sendmock stats",
@@ -28,7 +30,7 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Settings",
   },
   "PATCH /api/v1/settings": {
-    cli: "sendmock settings set <key> <value>",
+    cli: "sendmock settings set",
     cliAliases: [
       "sendmock chaos smtp-reject",
       "sendmock chaos smtp-latency",
@@ -65,11 +67,13 @@ export const systemSurfaces: SurfaceCatalogue = {
     cli: "sendmock seed validate <file>",
     mcp: "sendmock_seed_validate",
     ui: "Settings > Seed > Validate",
+    cliArguments: { file: "seed_toml" },
   },
   "POST /api/v1/seed/apply": {
     cli: "sendmock seed apply <file>",
     mcp: "sendmock_seed_apply",
     ui: "Settings > Seed > Apply a seed file",
+    cliArguments: { file: "seed_toml" },
   },
   "GET /api/v1/logs/smtp": {
     cli: "sendmock logs smtp",

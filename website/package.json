@@ -10,6 +10,8 @@
     "lint": "bun --bun eslint .",
     "screenshots": "bun scripts/capture-screenshots.ts",
     "sync-docs": "bun scripts/sync-docs.ts",
+    "examples": "bun scripts/write-examples.ts",
+    "examples:check": "bun scripts/write-examples.ts --check",
     "test:e2e": "bun --bun playwright test",
     "test:unit": "bun test lib",
     "test:lighthouse": "bun test lighthouse"

@@ -52,12 +52,12 @@ Step by step, with examples: [Advanced: catcher responses](../advanced/catcher-r
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list the rules | `sendmock http response list <binId>` | [`GET /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#getHttpBinsByBinIdResponses) | `sendmock_http_response_list` |
-| set the rules | `sendmock http response set <binId>` | [`PUT /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#putHttpBinsByBinIdResponses) | `sendmock_http_response_set` |
-| preview a rule | `sendmock http response preview <binId>` | [`POST /api/v1/http/bins/{binId}/responses/preview`](/api/http-catcher/#postHttpBinsByBinIdResponsesPreview) | `sendmock_http_response_preview` |
-| change the default reply | `sendmock http bin update <binId>` | [`PATCH /api/v1/http/bins/{binId}`](/api/http-catcher/#patchHttpBinsByBinId) | `sendmock_http_bin_update` |
+| list the rules | [`sendmock http response list <binId>`](/cli/http-catcher/#http-response-list) | [`GET /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#getHttpBinsByBinIdResponses) | [`sendmock_http_response_list`](/mcp/http-catcher/#sendmock_http_response_list) |
+| set the rules | [`sendmock http response set <binId>`](/cli/http-catcher/#http-response-set) | [`PUT /api/v1/http/bins/{binId}/responses`](/api/http-catcher/#putHttpBinsByBinIdResponses) | [`sendmock_http_response_set`](/mcp/http-catcher/#sendmock_http_response_set) |
+| preview a rule | [`sendmock http response preview <binId>`](/cli/http-catcher/#http-response-preview) | [`POST /api/v1/http/bins/{binId}/responses/preview`](/api/http-catcher/#postHttpBinsByBinIdResponsesPreview) | [`sendmock_http_response_preview`](/mcp/http-catcher/#sendmock_http_response_preview) |
+| change the default reply | [`sendmock http bin update <binId>`](/cli/http-catcher/#http-bin-update) | [`PATCH /api/v1/http/bins/{binId}`](/api/http-catcher/#patchHttpBinsByBinId) | [`sendmock_http_bin_update`](/mcp/http-catcher/#sendmock_http_bin_update) |
 
 ## Related
 
-- [HTTP catcher](./index.md)
+- [HTTP Catcher](./index.md)
 - [Variables](../webhooks/variables.md)

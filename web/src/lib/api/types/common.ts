@@ -46,6 +46,10 @@ export type OpenSource = "ui" | "manual" | "api";
 
 /** Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`. */
 export type OpenEventRequest = {
+  /**
+   * Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.
+   * @example "api"
+   */
   source?: OpenSource;
 };
 

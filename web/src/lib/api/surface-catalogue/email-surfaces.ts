@@ -44,11 +44,13 @@ export const emailSurfaces: SurfaceCatalogue = {
     cli: "sendmock email check <emailId> html",
     mcp: "sendmock_email_check",
     ui: "Mail > open email > Checks",
+    selector: { input: "kind", value: "html" },
   },
   "GET /api/v1/emails/{emailId}/list-unsubscribe": {
     cli: "sendmock email check <emailId> unsubscribe",
     mcp: "sendmock_email_check",
     ui: "Mail > open email > Headers",
+    selector: { input: "kind", value: "unsubscribe" },
   },
   "GET /api/v1/emails/{emailId}/mime": {
     cli: "sendmock email mime <emailId>",
@@ -74,11 +76,13 @@ export const emailSurfaces: SurfaceCatalogue = {
     cli: "sendmock email check <emailId> links",
     mcp: "sendmock_email_check",
     ui: "Mail > open email > Checks",
+    selector: { input: "kind", value: "links" },
   },
   "POST /api/v1/emails/{emailId}/spam-check": {
     cli: "sendmock email check <emailId> spam",
     mcp: "sendmock_email_check",
     ui: "Mail > open email > Checks",
+    selector: { input: "kind", value: "spam" },
   },
   "POST /api/v1/emails/{emailId}/open": {
     cli: "sendmock email open <emailId>",

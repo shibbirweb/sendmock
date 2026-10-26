@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type {
   ApiOperation,
   SchemaComponents,
@@ -11,16 +13,16 @@ import { MethodBadge } from "./method-badge";
 import { SchemaTable } from "./schema-table";
 import { TryItPanel } from "./try-it-panel";
 
-/** Only the schemas the operation's body needs, so each page stays small. */
-function pickBodySchemas(
+/** Only the schemas the operation's parameters and body need, so each page stays small. */
+function pickOperationSchemas(
   operation: ApiOperation,
   schemas: SchemaComponents,
 ): SchemaComponents {
-  if (operation.requestBody === null) {
-    return {};
-  }
   const schemaNames = collectSchemaNames(
-    [operation.requestBody.schema],
+    [
+      ...operation.parameters.map((parameter) => parameter.schema),
+      ...(operation.requestBody === null ? [] : [operation.requestBody.schema]),
+    ],
     schemas,
   );
   return Object.fromEntries(
@@ -31,7 +33,19 @@ function pickBodySchemas(
   );
 }
 
-/** One operation: method and path, parameters, body, answers and Try it. */
+/** A CLI command or MCP tool, linked to its reference entry (WS-07.4). */
+function ReferenceLink({ url, name }: { url: string | null; name: string }) {
+  const nameCode = <code className="font-mono break-all">{name}</code>;
+
+  return url === null ? (
+    nameCode
+  ) : (
+    <Link href={url} className="underline">
+      {nameCode}
+    </Link>
+  );
+}
+
 /** The same operation from the terminal, an AI agent and the UI (UI-11.3). */
 function OperationSurfacesList({
   surfaces,
@@ -45,14 +59,14 @@ function OperationSurfacesList({
     >
       <dt className="text-fd-muted-foreground">CLI</dt>
       <dd>
-        <code className="font-mono break-all">{surfaces.cli}</code>
+        <ReferenceLink url={surfaces.cliUrl} name={surfaces.cli} />
       </dd>
       <dt className="text-fd-muted-foreground">MCP tool</dt>
       <dd>
         {surfaces.mcp === null ? (
           <span>None: {surfaces.mcpExemptReason}</span>
         ) : (
-          <code className="font-mono break-all">{surfaces.mcp}</code>
+          <ReferenceLink url={surfaces.mcpUrl} name={surfaces.mcp} />
         )}
       </dd>
       <dt className="text-fd-muted-foreground">In the app</dt>
@@ -61,6 +75,7 @@ function OperationSurfacesList({
   );
 }
 
+/** One operation: method and path, parameters, body, answers and Try it. */
 export function OperationReference({
   operation,
   schemas,
@@ -126,7 +141,7 @@ export function OperationReference({
       </section>
       <TryItPanel
         operation={operation}
-        schemas={pickBodySchemas(operation, schemas)}
+        schemas={pickOperationSchemas(operation, schemas)}
       />
     </article>
   );

@@ -20,7 +20,7 @@ SendMock is a local stand-in for all of those services. It runs as one small bin
 | Email | catches mail over SMTP and the SendGrid, Mailgun, Postmark, Resend, SES and Brevo APIs; simulates delivery, bounces, complaints, opens and replies | [Mail](./mail/index.md) |
 | SMS | Twilio and Vonage compatible APIs with Twilio's real test numbers, status callbacks, two-way replies and WhatsApp | [SMS](./sms/index.md) |
 | Verify | Twilio Verify with codes you can read and outcomes you can force | [Verify](./sms/verify.md) |
-| HTTP | a catcher for any other call your app makes (Slack, Discord, push, third-party APIs), answered the way you choose | [HTTP catcher](./http/index.md) |
+| HTTP Catcher | a catcher for any other call your app makes (Slack, Discord, push, third-party APIs), answered the way you choose | [HTTP Catcher](./http/index.md) |
 | Webhooks | sends events to your app automatically or by hand, shaped like the provider you use, with retries and replay | [Webhooks](./webhooks/index.md) |
 | Payments | Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects and notifications, plus your own gateways | [Payments](./payments/index.md) |
 | AI agents | a CLI, an MCP server and an agent skill, so an agent can set up and test everything | [AI](./ai/index.md) |

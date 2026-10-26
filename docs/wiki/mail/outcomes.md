@@ -51,10 +51,10 @@ Step by step: [Recipe: bounces and complaints](../recipes/bounces-and-complaints
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| simulate | `sendmock email simulate <emailId> <event>` | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | `sendmock_email_simulate` |
-| list own outcome addresses | `sendmock outcome-rule email list` | [`GET /api/v1/outcome-rules/email`](/api/outcome-rules/#getOutcomeRulesEmail) | `sendmock_outcome_rule_list` |
-| add one | `sendmock outcome-rule email create` | [`POST /api/v1/outcome-rules/email`](/api/outcome-rules/#postOutcomeRulesEmail) | `sendmock_outcome_rule_create` |
-| test an address | `sendmock outcome-rule email test <address>` | [`POST /api/v1/outcome-rules/email/test`](/api/outcome-rules/#postOutcomeRulesEmailTest) | `sendmock_outcome_rule_test` |
+| simulate | [`sendmock email simulate <emailId> <event>`](/cli/email/#email-simulate) | [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate) | [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate) |
+| list own outcome addresses | [`sendmock outcome-rule email list`](/cli/outcome-rules/#outcome-rule-email-list) | [`GET /api/v1/outcome-rules/email`](/api/outcome-rules/#getOutcomeRulesEmail) | [`sendmock_outcome_rule_list`](/mcp/outcome-rules/#sendmock_outcome_rule_list) |
+| add one | [`sendmock outcome-rule email create`](/cli/outcome-rules/#outcome-rule-email-create) | [`POST /api/v1/outcome-rules/email`](/api/outcome-rules/#postOutcomeRulesEmail) | [`sendmock_outcome_rule_create`](/mcp/outcome-rules/#sendmock_outcome_rule_create) |
+| test an address | [`sendmock outcome-rule email test <address>`](/cli/outcome-rules/#outcome-rule-email-test) | [`POST /api/v1/outcome-rules/email/test`](/api/outcome-rules/#postOutcomeRulesEmailTest) | [`sendmock_outcome_rule_test`](/mcp/outcome-rules/#sendmock_outcome_rule_test) |
 
 ## Related
 

@@ -33,8 +33,8 @@ Open the email, choose **Release to real SMTP** from its actions, pick the recip
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| release | `sendmock email release <emailId>` | [`POST /api/v1/emails/{emailId}/release`](/api/email/#postEmailsByEmailIdRelease) | `sendmock_email_release` |
-| set the relay and allowlist | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
+| release | [`sendmock email release <emailId>`](/cli/email/#email-release) | [`POST /api/v1/emails/{emailId}/release`](/api/email/#postEmailsByEmailIdRelease) | [`sendmock_email_release`](/mcp/email/#sendmock_email_release) |
+| set the relay and allowlist | [`sendmock settings set`](/cli/system/#settings-set) | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update) |
 
 ## Related
 

@@ -3,8 +3,6 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { appScreens, navigateInApp } from "./support/app-screens";
 
-const screenPaths = appScreens.map((appScreen) => appScreen.path);
-
 /** Serious or critical WCAG A / AA violations, as "rule: element" lines. */
 async function findSeriousViolations(
   page: Page,
@@ -34,13 +32,28 @@ async function findSeriousViolations(
     );
 }
 
-async function openApp(page: Page, colorScheme: "light" | "dark") {
+async function openApp(
+  page: Page,
+  colorScheme: "light" | "dark",
+  { areToastsShown = false }: { areToastsShown?: boolean } = {},
+) {
   // Reduced motion settles transitions at once, so nothing is scanned mid-fade.
   await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
   await page.goto("/");
   await page.evaluate(
-    (themeName) => localStorage.setItem("sendmock.theme", themeName),
-    colorScheme,
+    ({ themeName, shouldShowToasts }) => {
+      localStorage.setItem("sendmock.theme", themeName);
+      // A pop-up toast over a screen hides what is under it, so axe misreads
+      // its contrast; page scans run without toasts, and toasts have their own test.
+      localStorage.setItem(
+        "sendmock.notification-preferences",
+        JSON.stringify({
+          areToastsShown: shouldShowToasts,
+          toastPosition: "bottom-right",
+        }),
+      );
+    },
+    { themeName: colorScheme, shouldShowToasts: areToastsShown },
   );
   await page.reload();
   await expect(page.getByText("Activity, last 24 hours")).toBeVisible();
@@ -52,10 +65,11 @@ for (const colorScheme of ["light", "dark"] as const) {
   }) => {
     test.setTimeout(120_000);
     await openApp(page, colorScheme);
-    for (const screenPath of screenPaths) {
-      await navigateInApp(page, screenPath);
+    for (const appScreen of appScreens) {
+      await navigateInApp(page, appScreen.path);
+      await expect(page).toHaveTitle(appScreen.title);
       await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(0);
-      expect(await findSeriousViolations(page), screenPath).toEqual([]);
+      expect(await findSeriousViolations(page), appScreen.path).toEqual([]);
     }
   });
 }
@@ -153,7 +167,7 @@ test("UI-05.3 a settled toast meets contrast in both themes", async ({
   page,
 }) => {
   for (const colorScheme of ["light", "dark"] as const) {
-    await openApp(page, colorScheme);
+    await openApp(page, colorScheme, { areToastsShown: true });
     await page.getByRole("button", { name: "Demo controls" }).click();
     await page.getByRole("button", { name: "Sample email" }).click();
     await page.keyboard.press("Escape");

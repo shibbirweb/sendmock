@@ -71,6 +71,7 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock verify force <verificationSid> <status>",
     mcp: "sendmock_verify_force",
     ui: "SMS > Verify > verification > Approve, Cancel, Expire, Max attempts",
+    cliArguments: { status: "state" },
   },
   "GET /api/v1/verify/services": {
     cli: "sendmock verify services list",
@@ -101,11 +102,13 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock numbers add",
     mcp: "sendmock_number_upsert",
     ui: "Numbers > Add number",
+    selector: { input: "number_id", isGiven: false },
   },
   "PATCH /api/v1/numbers/{numberId}": {
     cli: "sendmock numbers update <numberId>",
     mcp: "sendmock_number_upsert",
     ui: "Numbers > Edit",
+    selector: { input: "number_id", isGiven: true },
   },
   "DELETE /api/v1/numbers/{numberId}": {
     cli: "sendmock numbers remove <numberId>",

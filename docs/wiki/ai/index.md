@@ -25,6 +25,8 @@ It registers the MCP server with your agent and installs the agent skill (or an 
 
 Or register the MCP server yourself: the command is `sendmock mcp` (stdio). The running server also serves MCP over HTTP at `http://127.0.0.1:8025/mcp`.
 
+The [MCP reference](/mcp/) lists every tool with the inputs it takes, an example call and what it returns, and the [CLI reference](/cli/) does the same for every command.
+
 ## Three ways in
 
 | Surface | Best for |

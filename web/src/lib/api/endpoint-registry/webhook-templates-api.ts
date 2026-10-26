@@ -48,6 +48,7 @@ const templateEndpoints = tagEndpoints("Webhook templates", [
         description:
           "detach: move endpoints that use it to native JSON instead of failing.",
         schema: "string",
+        example: "detach",
       },
     ],
     response: null,
@@ -118,6 +119,7 @@ const templateEndpoints = tagEndpoints("Webhook templates", [
         name: "events",
         description: "Comma-separated event types.",
         schema: "string",
+        example: "email.received,sms.received",
       },
     ],
     response: typeRef("TemplateReference"),
@@ -134,6 +136,7 @@ const variableEndpoints = tagEndpoints("Webhook variables", [
         name: "endpoint_id",
         description: "Only this endpoint's variables.",
         schema: "string",
+        example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       },
     ],
     response: listOf("WebhookVariable"),

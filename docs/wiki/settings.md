@@ -87,7 +87,7 @@ Make SMTP fail on purpose: **Reject the next** N messages **With code** 421, 450
 
 ### Connection
 
-**Connect your app:** copy-ready settings for SMTP, the email API, SMS and the HTTP catcher. Pick a **Language** (Laravel and PHP, Node.js, Python, Go, Java, Ruby, .NET, cURL) and **Where does your app run?** (this machine `127.0.0.1`, a container talking to the host `host.docker.internal`, or the same Docker Compose project `sendmock`). Edit the request headers and the email and SMS bodies; every snippet follows as you type, and a value `"{{file:invoice.pdf}}"` is read and base64-encoded the way each language does it. **Send this request** under each body runs that email or SMS call against this SendMock, with your headers, so you see exactly what your app's call will do. The same content is in [Connect your app](./connect/index.md).
+**Connect your app:** copy-ready settings for SMTP, the email API, SMS and the HTTP Catcher. Pick a **Language** (Laravel and PHP, Node.js, Python, Go, Java, Ruby, .NET, cURL) and **Where does your app run?** (this machine `127.0.0.1`, a container talking to the host `host.docker.internal`, or the same Docker Compose project `sendmock`). Edit the request headers and the email and SMS bodies; every snippet follows as you type, and a value `"{{file:invoice.pdf}}"` is read and base64-encoded the way each language does it. **Send this request** under each body runs that email or SMS call against this SendMock, with your headers, so you see exactly what your app's call will do. The same content is in [Connect your app](./connect/index.md).
 
 **AI agents** (its own card): pick Claude Code, Codex, Cursor, Gemini CLI or VS Code to see the install command, the MCP configuration and where it goes, and **Download the skill**. See [AI](./ai/index.md).
 
@@ -99,26 +99,153 @@ Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the 
 
 Settings are part of the seed file, so a team shares them: [Advanced: seed file](./advanced/seed-file.md) and [Recipe: share your setup](./recipes/share-your-setup.md). To check a whole flow on every run, write a [scenario](./advanced/scenarios.md).
 
+## From your code
+
+Change a setting for one test, for example a 10% random SMS failure rate.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+settings=$(sendmock settings set --sms-failure-rate-percent 10 --json)
+
+jq -e '.sms_failure_rate_percent == 10' <<<"$settings" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('fails one SMS in ten', function () {
+    $settings = Http::patch(SENDMOCK.'/settings', ['sms_failure_rate_percent' => 10])->throw()->json();
+
+    expect($settings['sms_failure_rate_percent'])->toBe(10);
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("fails one SMS in ten", async () => {
+  const settings = await call("PATCH", `${SENDMOCK}/settings`, { sms_failure_rate_percent: 10 });
+
+  expect(settings.sms_failure_rate_percent).toBe(10);
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_fails_one_sms_in_ten():
+    settings = requests.patch(
+        f"{SENDMOCK}/settings",
+        json={"sms_failure_rate_percent": 10},
+    ).json()
+
+    assert settings["sms_failure_rate_percent"] == 10
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestFailsOneSmsInTen(t *testing.T) {
+	settings := call(t, "PATCH", sendmock+"/settings", map[string]any{"sms_failure_rate_percent": 10}).(map[string]any)
+
+	if got := settings["sms_failure_rate_percent"]; got != float64(10) {
+		t.Errorf("sms_failure_rate_percent is %v, want %v", got, float64(10))
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class SettingsTest {
+    @Test
+    void failsOneSmsInTen() throws Exception {
+        var settings = call("PATCH", SENDMOCK + "/settings", Map.of("sms_failure_rate_percent", 10));
+
+        assertEquals(10, settings.get("sms_failure_rate_percent").asInt());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn fails_one_sms_in_ten() {
+    let settings = call("PATCH", &format!("{SENDMOCK}/settings"), Some(json!({"sms_failure_rate_percent": 10}))).await;
+
+    assert_eq!(settings["sms_failure_rate_percent"], 10);
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Settings" do
+  it "fails one SMS in ten" do
+    settings = call("PATCH", "#{SENDMOCK}/settings", { "sms_failure_rate_percent" => 10 })
+
+    expect(settings["sms_failure_rate_percent"]).to eq(10)
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class SettingsTests
+{
+    [Fact]
+    public async Task FailsOneSmsInTen()
+    {
+        var settings = await Call("PATCH", Sendmock + "/settings", new { sms_failure_rate_percent = 10 });
+
+        Assert.Equal(10, settings.GetProperty("sms_failure_rate_percent").GetInt32());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| read | `sendmock settings get` | [`GET /api/v1/settings`](/api/system/#getSettings) | `sendmock_settings_get` |
-| change, chaos too | `sendmock settings set <key> <value>` | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | `sendmock_settings_update` |
-| reset to seed | `sendmock reset --yes` | [`POST /api/v1/reset`](/api/system/#postReset) | `sendmock_reset` |
-| seed status | `sendmock seed status` | [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus) | `sendmock_seed_status` |
-| export the seed | `sendmock seed export` | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | `sendmock_seed_export` |
-| validate a seed file | `sendmock seed validate <file>` | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | `sendmock_seed_validate` |
-| apply a seed file | `sendmock seed apply <file>` | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | `sendmock_seed_apply` |
-| tag rules | `sendmock email tag-rules list` | [`GET /api/v1/tag-rules`](/api/tag-rules/#getTagRules) | `sendmock_tag_rule_list` |
-| add a tag rule | `sendmock email tag-rules create` | [`POST /api/v1/tag-rules`](/api/tag-rules/#postTagRules) | `sendmock_tag_rule_create` |
-| auto-forward rules | `sendmock email forward-rules list` | [`GET /api/v1/forward-rules`](/api/forward-rules/#getForwardRules) | `sendmock_forward_rule_list` |
-| add an auto-forward rule | `sendmock email forward-rules create` | [`POST /api/v1/forward-rules`](/api/forward-rules/#postForwardRules) | `sendmock_forward_rule_create` |
-| connection snippet for a stack | `sendmock integrate <stack>` | [`GET /api/v1/integrations/{stack}`](/api/automation/#getIntegrationsByStack) | `sendmock_integration_snippet` |
-| AI agent setup | `sendmock ai install --target <agent>` | [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents) | `sendmock_ai_agents` |
-| the agent skill | `sendmock ai skill` | [`GET /api/v1/ai/skill`](/api/automation/#getAiSkill) | `sendmock://docs/skill` |
-| send a sample | `sendmock sample <kind>` | [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind) | `sendmock_sample_send` |
-| check for updates | `sendmock update check` | [`GET /api/v1/updates`](/api/system/#getUpdates) | `sendmock_update_check` |
+| read | [`sendmock settings get`](/cli/system/#settings-get) | [`GET /api/v1/settings`](/api/system/#getSettings) | [`sendmock_settings_get`](/mcp/system/#sendmock_settings_get) |
+| change, chaos too | [`sendmock settings set`](/cli/system/#settings-set) | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update) |
+| reset to seed | [`sendmock reset --yes`](/cli/system/#reset) | [`POST /api/v1/reset`](/api/system/#postReset) | [`sendmock_reset`](/mcp/system/#sendmock_reset) |
+| seed status | [`sendmock seed status`](/cli/seed/#seed-status) | [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus) | [`sendmock_seed_status`](/mcp/seed/#sendmock_seed_status) |
+| export the seed | [`sendmock seed export`](/cli/seed/#seed-export) | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | [`sendmock_seed_export`](/mcp/seed/#sendmock_seed_export) |
+| validate a seed file | [`sendmock seed validate <file>`](/cli/seed/#seed-validate) | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | [`sendmock_seed_validate`](/mcp/seed/#sendmock_seed_validate) |
+| apply a seed file | [`sendmock seed apply <file>`](/cli/seed/#seed-apply) | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | [`sendmock_seed_apply`](/mcp/seed/#sendmock_seed_apply) |
+| tag rules | [`sendmock email tag-rules list`](/cli/tag-rules/#email-tag-rules-list) | [`GET /api/v1/tag-rules`](/api/tag-rules/#getTagRules) | [`sendmock_tag_rule_list`](/mcp/tag-rules/#sendmock_tag_rule_list) |
+| add a tag rule | [`sendmock email tag-rules create`](/cli/tag-rules/#email-tag-rules-create) | [`POST /api/v1/tag-rules`](/api/tag-rules/#postTagRules) | [`sendmock_tag_rule_create`](/mcp/tag-rules/#sendmock_tag_rule_create) |
+| auto-forward rules | [`sendmock email forward-rules list`](/cli/forward-rules/#email-forward-rules-list) | [`GET /api/v1/forward-rules`](/api/forward-rules/#getForwardRules) | [`sendmock_forward_rule_list`](/mcp/forward-rules/#sendmock_forward_rule_list) |
+| add an auto-forward rule | [`sendmock email forward-rules create`](/cli/forward-rules/#email-forward-rules-create) | [`POST /api/v1/forward-rules`](/api/forward-rules/#postForwardRules) | [`sendmock_forward_rule_create`](/mcp/forward-rules/#sendmock_forward_rule_create) |
+| connection snippet for a stack | [`sendmock integrate <stack>`](/cli/automation/#integrate) | [`GET /api/v1/integrations/{stack}`](/api/automation/#getIntegrationsByStack) | [`sendmock_integration_snippet`](/mcp/automation/#sendmock_integration_snippet) |
+| AI agent setup | [`sendmock ai install --target <agent>`](/cli/automation/#ai-install) | [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents) | [`sendmock_ai_agents`](/mcp/automation/#sendmock_ai_agents) |
+| the agent skill | [`sendmock ai skill`](/cli/automation/#ai-skill) | [`GET /api/v1/ai/skill`](/api/automation/#getAiSkill) | [`sendmock://docs/skill`](/mcp/automation/#resource-docs-skill) |
+| send a sample | [`sendmock sample <kind>`](/cli/system/#sample) | [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind) | [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send) |
+| check for updates | [`sendmock update check`](/cli/system/#update-check) | [`GET /api/v1/updates`](/api/system/#getUpdates) | [`sendmock_update_check`](/mcp/system/#sendmock_update_check) |
 
 ## Related
 

@@ -1,9 +1,60 @@
+import {
+  formatExampleValue,
+  InlineCodeText,
+} from "@/components/reference/input-table";
 import type { JsonSchema, SchemaComponents } from "@/lib/openapi/openapi-types";
+import { readAllowedValues } from "@/lib/openapi/schema-fields";
 import {
   describeSchemaType,
   readReferenceName,
   resolveSchema,
 } from "@/lib/openapi/schema-tools";
+
+/** A field's description, the values it takes and an example (WS-04.4). */
+function FieldFacts({
+  propertySchema,
+  schemas,
+}: {
+  propertySchema: JsonSchema;
+  schemas: SchemaComponents;
+}) {
+  const description =
+    propertySchema.description ??
+    resolveSchema(propertySchema, schemas).description ??
+    "";
+  const allowedValues = readAllowedValues(propertySchema, schemas);
+  const example = propertySchema.examples?.[0];
+  const exampleText =
+    example === undefined || example === null || typeof example === "object"
+      ? null
+      : formatExampleValue(example);
+
+  return (
+    <div className="grid gap-0.5">
+      <span>
+        <InlineCodeText text={description} />
+      </span>
+      {allowedValues !== null && allowedValues.length > 0 && (
+        <span>
+          One of:{" "}
+          <InlineCodeText
+            text={allowedValues
+              .map((allowedValue) => `\`${formatExampleValue(allowedValue)}\``)
+              .join(", ")}
+          />
+        </span>
+      )}
+      {exampleText !== null && exampleText !== "" && (
+        <span>
+          Example:{" "}
+          <code className="font-mono text-xs break-all text-fd-foreground">
+            {exampleText}
+          </code>
+        </span>
+      )}
+    </div>
+  );
+}
 
 /** The fields of an object schema: name, type, whether required, description. */
 export function SchemaTable({
@@ -59,7 +110,10 @@ export function SchemaTable({
                       describeSchemaType(propertySchema)}
                   </td>
                   <td className="px-3 py-1.5 text-fd-muted-foreground">
-                    {resolveSchema(propertySchema, schemas).description ?? ""}
+                    <FieldFacts
+                      propertySchema={propertySchema}
+                      schemas={schemas}
+                    />
                   </td>
                 </tr>
               ))}

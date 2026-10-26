@@ -61,12 +61,12 @@ Add a new wallet end to end: [Advanced: payment method](../advanced/payment-meth
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock payments methods list` | [`GET /api/v1/payments/methods`](/api/payment-methods/#getPaymentsMethods) | `sendmock_payment_method_list` |
-| one method | `sendmock payments methods show <methodKey>` | [`GET /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#getPaymentsMethodsByMethodKey) | `sendmock_payment_method_get` |
-| create | `sendmock payments methods create` | [`POST /api/v1/payments/methods`](/api/payment-methods/#postPaymentsMethods) | `sendmock_payment_method_create` |
-| update | `sendmock payments methods update <methodKey>` | [`PATCH /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#patchPaymentsMethodsByMethodKey) | `sendmock_payment_method_update` |
-| reset a built-in | `sendmock payments methods reset <methodKey>` | [`POST /api/v1/payments/methods/{methodKey}/reset`](/api/payment-methods/#postPaymentsMethodsByMethodKeyReset) | `sendmock_payment_method_reset` |
-| delete a custom one | `sendmock payments methods delete <methodKey>` | [`DELETE /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#deletePaymentsMethodsByMethodKey) | `sendmock_payment_method_delete` |
+| list | [`sendmock payments methods list`](/cli/payment-methods/#payments-methods-list) | [`GET /api/v1/payments/methods`](/api/payment-methods/#getPaymentsMethods) | [`sendmock_payment_method_list`](/mcp/payment-methods/#sendmock_payment_method_list) |
+| one method | [`sendmock payments methods show <methodKey>`](/cli/payment-methods/#payments-methods-show) | [`GET /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#getPaymentsMethodsByMethodKey) | [`sendmock_payment_method_get`](/mcp/payment-methods/#sendmock_payment_method_get) |
+| create | [`sendmock payments methods create`](/cli/payment-methods/#payments-methods-create) | [`POST /api/v1/payments/methods`](/api/payment-methods/#postPaymentsMethods) | [`sendmock_payment_method_create`](/mcp/payment-methods/#sendmock_payment_method_create) |
+| update | [`sendmock payments methods update <methodKey>`](/cli/payment-methods/#payments-methods-update) | [`PATCH /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#patchPaymentsMethodsByMethodKey) | [`sendmock_payment_method_update`](/mcp/payment-methods/#sendmock_payment_method_update) |
+| reset a built-in | [`sendmock payments methods reset <methodKey>`](/cli/payment-methods/#payments-methods-reset) | [`POST /api/v1/payments/methods/{methodKey}/reset`](/api/payment-methods/#postPaymentsMethodsByMethodKeyReset) | [`sendmock_payment_method_reset`](/mcp/payment-methods/#sendmock_payment_method_reset) |
+| delete a custom one | [`sendmock payments methods delete <methodKey>`](/cli/payment-methods/#payments-methods-delete) | [`DELETE /api/v1/payments/methods/{methodKey}`](/api/payment-methods/#deletePaymentsMethodsByMethodKey) | [`sendmock_payment_method_delete`](/mcp/payment-methods/#sendmock_payment_method_delete) |
 
 ## Related
 

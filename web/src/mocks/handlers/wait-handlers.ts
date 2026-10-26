@@ -164,26 +164,48 @@ export const waitHandlers = [
   http.get("*/api/v1/otp", async ({ request }) => {
     await applyMockConditions();
     const lookupQuery = new URL(request.url).searchParams;
-    const otpLookup = findLatestOtp(
-      mockDatabase,
-      lookupQuery.get("to") ?? "",
-      lookupQuery.get("channel"),
+    const findOtp = () =>
+      findLatestOtp(
+        mockDatabase,
+        lookupQuery.get("to") ?? "",
+        lookupQuery.get("channel"),
+      );
+    const timeoutText = lookupQuery.get("timeout");
+    if (timeoutText === null) {
+      const otpLookup = findOtp();
+      return otpLookup === undefined
+        ? createNotFoundResponse("Code")
+        : HttpResponse.json(otpLookup);
+    }
+    const otpLookup = await waitForMatch(
+      findOtp,
+      parseWaitTimeout(timeoutText),
     );
 
     return otpLookup === undefined
-      ? createNotFoundResponse("Code")
+      ? createTimeoutResponse("code")
       : HttpResponse.json(otpLookup);
   }),
 
   http.get("*/api/v1/links", async ({ request }) => {
     await applyMockConditions();
-    const linksLookup = findLatestLinks(
-      mockDatabase.emails,
-      new URL(request.url).searchParams.get("to") ?? "",
+    const lookupQuery = new URL(request.url).searchParams;
+    const findLinks = () =>
+      findLatestLinks(mockDatabase.emails, lookupQuery.get("to") ?? "");
+    const timeoutText = lookupQuery.get("timeout");
+    if (timeoutText === null) {
+      const linksLookup = findLinks();
+      return linksLookup === undefined
+        ? createNotFoundResponse("Links")
+        : HttpResponse.json(linksLookup);
+    }
+    const linksLookup = await waitForMatch(
+      findLinks,
+      parseWaitTimeout(timeoutText),
     );
 
     return linksLookup === undefined
-      ? createNotFoundResponse("Links")
+      ? createTimeoutResponse("links")
       : HttpResponse.json(linksLookup);
   }),
 ];

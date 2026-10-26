@@ -1,12 +1,12 @@
 import type { Page } from "@playwright/test";
 
-/** Every screen of the app with its browser tab title (UI-07.4). */
+/** Every screen of the app with its browser tab title (UI-07.4); `loadsDataOnOpen` is false for a screen with no load state. */
 export const appScreens = [
   { path: "/", title: "Overview · SendMock" },
   { path: "/mail", title: "Mail · SendMock" },
   { path: "/sms", title: "SMS · SendMock" },
   { path: "/sms/verify", title: "Verify · SendMock" },
-  { path: "/http", title: "HTTP catcher · SendMock" },
+  { path: "/http", title: "HTTP Catcher · SendMock" },
   { path: "/webhooks/overview", title: "Overview · Webhooks · SendMock" },
   { path: "/webhooks/endpoints", title: "Endpoints · Webhooks · SendMock" },
   { path: "/webhooks/rules", title: "Rules · Webhooks · SendMock" },
@@ -24,7 +24,8 @@ export const appScreens = [
   { path: "/payments/methods", title: "Methods · Payments · SendMock" },
   { path: "/payments/flows", title: "Flows · Payments · SendMock" },
   { path: "/numbers", title: "Numbers · SendMock" },
-  { path: "/scenarios", title: "Scenarios · SendMock" },
+  // Loads nothing when it opens: the API is called by Validate and Run.
+  { path: "/scenarios", title: "Scenarios · SendMock", loadsDataOnOpen: false },
   { path: "/logs", title: "Logs · SendMock" },
   { path: "/settings", title: "General · Settings · SendMock" },
 ];

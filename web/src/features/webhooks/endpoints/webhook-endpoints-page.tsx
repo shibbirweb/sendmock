@@ -25,7 +25,7 @@ import { readPort } from "@/lib/settings/build-connection-snippets";
 /** Native JSON to SendMock's own catcher, so a test lands in HTTP. */
 function buildCatcherEndpointInput(httpPort: number): WebhookEndpointInput {
   return {
-    name: "HTTP catcher",
+    name: "HTTP Catcher",
     url: `http://127.0.0.1:${httpPort}/catch/webhooks`,
     method: "POST",
     headers: {},

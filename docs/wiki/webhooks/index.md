@@ -42,7 +42,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 
 | Gets from | Sends to |
 | --- | --- |
-| events from [Mail](../mail/index.md), [SMS](../sms/index.md), [Verify](../sms/verify.md), [HTTP](../http/index.md) and [Payments](../payments/index.md) | requests to your app |
+| events from [Mail](../mail/index.md), [SMS](../sms/index.md), [Verify](../sms/verify.md), [HTTP Catcher](../http/index.md) and [Payments](../payments/index.md) | requests to your app |
 | simulations: Simulate, Reply as recipient, Verify force, payment Simulate | [Deliveries](./deliveries.md), the [Overview](../overview.md) and the bell |
 
 ## Use it
@@ -66,7 +66,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated |
 | `sms.inbound` | the contact replied |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify activity |
-| `http.captured` | the HTTP catcher recorded a request |
+| `http.captured` | the HTTP Catcher recorded a request |
 | `payment.*`, `checkout.*` | payments were created, succeeded, failed, refunded, disputed; checkouts completed or expired |
 | `webhook.failed` | a delivery used up its retries (useful for alerts) |
 | `test.ping` | **Send test** on an endpoint |
@@ -94,13 +94,160 @@ SendMock's own JSON follows [Standard Webhooks](https://www.standardwebhooks.com
 - Values that change per send or come from the message: [Advanced: variables](../advanced/variables.md).
 - Exact filters: [Advanced: rules and filters](../advanced/rules-and-filters.md).
 
+## From your code
+
+Wait for the delivery an email triggers and check your handler accepted it.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](../connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+# In your app: email the order confirmation
+
+delivery=$(sendmock webhook deliveries wait --event email.received --timeout 10s --json)
+
+jq -e '.status == "succeeded"' <<<"$delivery" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('delivers the received email to the handler', function () {
+    $this->post('/orders/42/confirm');
+
+    $delivery = Http::get(SENDMOCK.'/wait/webhook', [
+        'event' => 'email.received',
+        'timeout' => '10s',
+    ])->throw()->json();
+
+    expect($delivery['status'])->toBe('succeeded');
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { APP, call, SENDMOCK } from "./sendmock.js";
+
+test("delivers the received email to the handler", async () => {
+  await call("POST", `${APP}/orders/42/confirm`);
+
+  const delivery = await call("GET", `${SENDMOCK}/wait/webhook?event=email.received&timeout=10s`);
+
+  expect(delivery.status).toBe("succeeded");
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_delivers_the_received_email_to_the_handler():
+    requests.post(f"{APP}/orders/42/confirm")
+
+    delivery = requests.get(
+        f"{SENDMOCK}/wait/webhook",
+        params={"event": "email.received", "timeout": "10s"},
+    ).json()
+
+    assert delivery["status"] == "succeeded"
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestDeliversTheReceivedEmailToTheHandler(t *testing.T) {
+	call(t, "POST", app+"/orders/42/confirm", nil)
+
+	delivery := call(t, "GET", sendmock+"/wait/webhook?event=email.received&timeout=10s", nil).(map[string]any)
+
+	if got := delivery["status"]; got != "succeeded" {
+		t.Errorf("status is %v, want %v", got, "succeeded")
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.APP;
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+class WebhooksTest {
+    @Test
+    void deliversTheReceivedEmailToTheHandler() throws Exception {
+        call("POST", APP + "/orders/42/confirm", null);
+
+        var delivery = call("GET", SENDMOCK + "/wait/webhook?event=email.received&timeout=10s", null);
+
+        assertEquals("succeeded", delivery.get("status").asText());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use sendmock::{call, APP, SENDMOCK};
+
+#[tokio::test]
+async fn delivers_the_received_email_to_the_handler() {
+    call("POST", &format!("{APP}/orders/42/confirm"), None).await;
+
+    let delivery = call("GET", &format!("{SENDMOCK}/wait/webhook?event=email.received&timeout=10s"), None).await;
+
+    assert_eq!(delivery["status"], "succeeded");
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Webhooks" do
+  it "delivers the received email to the handler" do
+    call("POST", "#{APP}/orders/42/confirm")
+
+    delivery = call("GET", "#{SENDMOCK}/wait/webhook?event=email.received&timeout=10s")
+
+    expect(delivery["status"]).to eq("succeeded")
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class WebhooksTests
+{
+    [Fact]
+    public async Task DeliversTheReceivedEmailToTheHandler()
+    {
+        await Call("POST", App + "/orders/42/confirm");
+
+        var delivery = await Call("GET", Sendmock + "/wait/webhook?event=email.received&timeout=10s");
+
+        Assert.Equal("succeeded", delivery.GetProperty("status").GetString());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| health | `sendmock webhook metrics` | [`GET /api/v1/webhooks/metrics`](/api/webhook-deliveries/#getWebhooksMetrics) | `sendmock_webhook_metrics` |
-| recent events | `sendmock events tail` | [`GET /api/v1/events/recent`](/api/automation/#getEventsRecent) | `sendmock_events_recent` |
-| wait for a delivery | `sendmock webhook deliveries wait` | [`GET /api/v1/wait/webhook`](/api/test-helpers/#getWaitWebhook) | `sendmock_webhook_delivery_wait` |
+| health | [`sendmock webhook metrics`](/cli/webhook-deliveries/#webhook-metrics) | [`GET /api/v1/webhooks/metrics`](/api/webhook-deliveries/#getWebhooksMetrics) | [`sendmock_webhook_metrics`](/mcp/webhook-deliveries/#sendmock_webhook_metrics) |
+| recent events | [`sendmock events tail`](/cli/automation/#events-tail) | [`GET /api/v1/events/recent`](/api/automation/#getEventsRecent) | [`sendmock_events_recent`](/mcp/automation/#sendmock_events_recent) |
+| wait for a delivery | [`sendmock webhook deliveries wait`](/cli/test-helpers/#webhook-deliveries-wait) | [`GET /api/v1/wait/webhook`](/api/test-helpers/#getWaitWebhook) | [`sendmock_webhook_delivery_wait`](/mcp/test-helpers/#sendmock_webhook_delivery_wait) |
 
 ## Related
 

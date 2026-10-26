@@ -13,16 +13,31 @@ const waitQueryParameters: QueryParameter[] = [
     name: "since",
     description: "Only match items newer than this time (default: 30 s ago).",
     schema: "string",
+    example: "2026-10-26T09:30:00Z",
   },
   {
     name: "timeout",
     description: "How long to wait, e.g. 10s (default 10s, at most 60s).",
     schema: "string",
+    example: "10s",
   },
 ];
 
-function stringQuery(name: string, description: string): QueryParameter {
-  return { name, description, schema: "string" };
+/** `/otp` and `/links` answer at once, or wait like the wait helpers when given a timeout. */
+const lookupTimeoutQueryParameter: QueryParameter = {
+  name: "timeout",
+  description:
+    "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
+  schema: "string",
+  example: "10s",
+};
+
+function stringQuery(
+  name: string,
+  description: string,
+  example: string,
+): QueryParameter {
+  return { name, description, schema: "string", example };
 }
 
 const waitEndpoints = tagEndpoints("Test helpers", [
@@ -31,8 +46,8 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     path: "/api/v1/wait/email",
     summary: "Wait until a matching email arrives; 408 on timeout.",
     queryParameters: [
-      stringQuery("to", "A recipient contains."),
-      stringQuery("subject", "Subject contains."),
+      stringQuery("to", "A recipient contains.", "user@example.test"),
+      stringQuery("subject", "Subject contains.", "Verify your email"),
       ...waitQueryParameters,
     ],
     response: typeRef("EmailDetail"),
@@ -43,8 +58,8 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     path: "/api/v1/wait/sms",
     summary: "Wait until a matching SMS arrives; 408 on timeout.",
     queryParameters: [
-      stringQuery("to", "The recipient number."),
-      stringQuery("from", "The sender number."),
+      stringQuery("to", "The recipient number.", "+8801700000000"),
+      stringQuery("from", "The sender number.", "+15550001111"),
       ...waitQueryParameters,
     ],
     response: typeRef("SmsMessageDetail"),
@@ -56,8 +71,8 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     summary:
       "Wait until the catcher records a matching request; 408 on timeout.",
     queryParameters: [
-      stringQuery("bin", "The bin name."),
-      stringQuery("method", "The HTTP method."),
+      stringQuery("bin", "The bin name.", "slack"),
+      stringQuery("method", "The HTTP method.", "POST"),
       ...waitQueryParameters,
     ],
     response: typeRef("CapturedHttpRequest"),
@@ -68,9 +83,13 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     path: "/api/v1/wait/webhook",
     summary: "Wait until a matching delivery finishes; 408 on timeout.",
     queryParameters: [
-      stringQuery("endpoint", "The endpoint id or name."),
-      stringQuery("event", "The event type, e.g. email.received."),
-      stringQuery("status", "succeeded or failed."),
+      stringQuery("endpoint", "The endpoint id or name.", "Team Slack alerts"),
+      stringQuery(
+        "event",
+        "The event type, e.g. email.received.",
+        "email.received",
+      ),
+      stringQuery("status", "succeeded or failed.", "failed"),
       ...waitQueryParameters,
     ],
     response: typeRef("WebhookDeliveryDetail"),
@@ -81,8 +100,12 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     path: "/api/v1/wait/payment",
     summary: "Wait until a payment reaches a status; 408 on timeout.",
     queryParameters: [
-      stringQuery("provider", "The gateway key, e.g. stripe."),
-      stringQuery("status", "The status to wait for, e.g. succeeded."),
+      stringQuery("provider", "The gateway key, e.g. stripe.", "stripe"),
+      stringQuery(
+        "status",
+        "The status to wait for, e.g. succeeded.",
+        "succeeded",
+      ),
       ...waitQueryParameters,
     ],
     response: typeRef("PaymentDetail"),
@@ -94,23 +117,32 @@ const waitEndpoints = tagEndpoints("Test helpers", [
     summary: "The latest one-time code sent to a recipient.",
     queryParameters: [
       {
-        ...stringQuery("to", "Email address or phone number."),
+        ...stringQuery(
+          "to",
+          "Email address or phone number.",
+          "user@example.test",
+        ),
         isRequired: true,
       },
-      stringQuery("channel", "email, sms or verify (default: any)."),
+      stringQuery("channel", "email, sms or verify (default: any).", "email"),
+      lookupTimeoutQueryParameter,
     ],
     response: typeRef("OtpLookup"),
-    errorStatuses: [404],
+    errorStatuses: [404, 408],
   },
   {
     method: "GET",
     path: "/api/v1/links",
     summary: "The links of the latest email to a recipient.",
     queryParameters: [
-      { ...stringQuery("to", "The recipient address."), isRequired: true },
+      {
+        ...stringQuery("to", "The recipient address.", "user@example.test"),
+        isRequired: true,
+      },
+      lookupTimeoutQueryParameter,
     ],
     response: typeRef("LinksLookup"),
-    errorStatuses: [404],
+    errorStatuses: [404, 408],
   },
 ]);
 
@@ -121,12 +153,21 @@ const automationEndpoints = tagEndpoints("Automation", [
     summary:
       "The latest events, newest first: the polling twin of the live stream.",
     queryParameters: [
-      stringQuery("since", "Only events newer than this time."),
-      stringQuery("type", "An event type, e.g. http.captured."),
+      stringQuery(
+        "since",
+        "Only events newer than this time.",
+        "2026-10-26T09:30:00Z",
+      ),
+      stringQuery(
+        "type",
+        "An event type, e.g. http.captured.",
+        "http.captured",
+      ),
       {
         name: "limit",
         description: "At most this many (default 50).",
         schema: "integer",
+        example: 50,
       },
     ],
     response: listOf("AppEvent"),
@@ -137,8 +178,12 @@ const automationEndpoints = tagEndpoints("Automation", [
     summary:
       "Copy-ready settings for a stack, as Settings > Connection shows them.",
     queryParameters: [
-      stringQuery("channel", "email, sms or http (default email)."),
-      stringQuery("host", "Where the app runs: local, docker-host or compose."),
+      stringQuery("channel", "email, sms or http (default email).", "email"),
+      stringQuery(
+        "host",
+        "Where the app runs: local, docker-host or compose.",
+        "local",
+      ),
     ],
     response: typeRef("IntegrationSnippet"),
     errorStatuses: [404],
@@ -163,6 +208,14 @@ const automationEndpoints = tagEndpoints("Automation", [
     path: "/api/v1/ai/agents",
     summary:
       "For each AI agent, the install command and its MCP configuration.",
+    queryParameters: [
+      {
+        name: "target",
+        description: "Only this agent.",
+        schema: typeRef("AiAgentTarget"),
+        example: "claude-code",
+      },
+    ],
     response: listOf("AiAgentSetup"),
   },
   {

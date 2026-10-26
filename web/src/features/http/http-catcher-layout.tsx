@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
  * Responses tab replaces the requests and detail with the bin's rules.
  */
 export function HttpCatcherLayout() {
-  usePageTitle("HTTP catcher");
+  usePageTitle("HTTP Catcher");
   const binsQuery = useHttpBins();
   const catcherSearch = useHttpCatcherSearch();
   const httpBins = binsQuery.data ?? [];

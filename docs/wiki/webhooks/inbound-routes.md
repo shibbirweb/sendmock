@@ -55,11 +55,11 @@ Ticket routing with named groups, store and notify, and other providers' formats
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock route list` | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | `sendmock_inbound_route_list` |
-| create | `sendmock route create` | [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes) | `sendmock_inbound_route_create` |
-| update or reorder | `sendmock route update <routeId>` | [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId) | `sendmock_inbound_route_update` |
-| delete | `sendmock route delete <routeId>` | [`DELETE /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#deleteInboundRoutesByRouteId) | `sendmock_inbound_route_delete` |
-| test a filter | `sendmock route test` | [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest) | `sendmock_inbound_route_test` |
+| list | [`sendmock route list`](/cli/inbound-routes/#route-list) | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | [`sendmock_inbound_route_list`](/mcp/inbound-routes/#sendmock_inbound_route_list) |
+| create | [`sendmock route create`](/cli/inbound-routes/#route-create) | [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes) | [`sendmock_inbound_route_create`](/mcp/inbound-routes/#sendmock_inbound_route_create) |
+| update or reorder | [`sendmock route update <routeId>`](/cli/inbound-routes/#route-update) | [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId) | [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update) |
+| delete | [`sendmock route delete <routeId>`](/cli/inbound-routes/#route-delete) | [`DELETE /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#deleteInboundRoutesByRouteId) | [`sendmock_inbound_route_delete`](/mcp/inbound-routes/#sendmock_inbound_route_delete) |
+| test a filter | [`sendmock route test`](/cli/inbound-routes/#route-test) | [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest) | [`sendmock_inbound_route_test`](/mcp/inbound-routes/#sendmock_inbound_route_test) |
 
 ## Related
 

@@ -58,12 +58,12 @@ Dynamic expressions, generators, computed values and send-time overrides in dept
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list | `sendmock webhook var list` | [`GET /api/v1/webhooks/variables`](/api/webhook-variables/#getWebhooksVariables) | `sendmock_webhook_variable_list` |
-| set | `sendmock webhook var set <name> <value>` | [`POST /api/v1/webhooks/variables`](/api/webhook-variables/#postWebhooksVariables) | `sendmock_webhook_variable_set` |
-| change | `sendmock webhook var update <variableId>` | [`PATCH /api/v1/webhooks/variables/{variableId}`](/api/webhook-variables/#patchWebhooksVariablesByVariableId) | `sendmock_webhook_variable_update` |
-| unset | `sendmock webhook var unset <variableId>` | [`DELETE /api/v1/webhooks/variables/{variableId}`](/api/webhook-variables/#deleteWebhooksVariablesByVariableId) | `sendmock_webhook_variable_unset` |
-| regenerate | `sendmock webhook var regenerate <variableId>` | [`POST /api/v1/webhooks/variables/{variableId}/regenerate`](/api/webhook-variables/#postWebhooksVariablesByVariableIdRegenerate) | `sendmock_webhook_variable_regenerate` |
-| preview what it resolves to | `sendmock webhook var preview` | [`POST /api/v1/webhooks/variables/preview`](/api/webhook-variables/#postWebhooksVariablesPreview) | `sendmock_webhook_variable_preview` |
+| list | [`sendmock webhook var list`](/cli/webhook-variables/#webhook-var-list) | [`GET /api/v1/webhooks/variables`](/api/webhook-variables/#getWebhooksVariables) | [`sendmock_webhook_variable_list`](/mcp/webhook-variables/#sendmock_webhook_variable_list) |
+| set | [`sendmock webhook var set <name> <value>`](/cli/webhook-variables/#webhook-var-set) | [`POST /api/v1/webhooks/variables`](/api/webhook-variables/#postWebhooksVariables) | [`sendmock_webhook_variable_set`](/mcp/webhook-variables/#sendmock_webhook_variable_set) |
+| change | [`sendmock webhook var update <variableId>`](/cli/webhook-variables/#webhook-var-update) | [`PATCH /api/v1/webhooks/variables/{variableId}`](/api/webhook-variables/#patchWebhooksVariablesByVariableId) | [`sendmock_webhook_variable_update`](/mcp/webhook-variables/#sendmock_webhook_variable_update) |
+| unset | [`sendmock webhook var unset <variableId>`](/cli/webhook-variables/#webhook-var-unset) | [`DELETE /api/v1/webhooks/variables/{variableId}`](/api/webhook-variables/#deleteWebhooksVariablesByVariableId) | [`sendmock_webhook_variable_unset`](/mcp/webhook-variables/#sendmock_webhook_variable_unset) |
+| regenerate | [`sendmock webhook var regenerate <variableId>`](/cli/webhook-variables/#webhook-var-regenerate) | [`POST /api/v1/webhooks/variables/{variableId}/regenerate`](/api/webhook-variables/#postWebhooksVariablesByVariableIdRegenerate) | [`sendmock_webhook_variable_regenerate`](/mcp/webhook-variables/#sendmock_webhook_variable_regenerate) |
+| preview what it resolves to | [`sendmock webhook var preview`](/cli/webhook-variables/#webhook-var-preview) | [`POST /api/v1/webhooks/variables/preview`](/api/webhook-variables/#postWebhooksVariablesPreview) | [`sendmock_webhook_variable_preview`](/mcp/webhook-variables/#sendmock_webhook_variable_preview) |
 
 ## Related
 

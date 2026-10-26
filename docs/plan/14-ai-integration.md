@@ -32,7 +32,7 @@ All features are implemented once as **operations** in a shared `sendmock-ops` c
 
 ## CLI
 
-The single binary is also the client. Commands talk to a running instance over HTTP (`--url`, `SENDMOCK_URL`, default `http://127.0.0.1:8025`, with `--token` / `SENDMOCK_TOKEN` when auth is on).
+The single binary is also the client. Commands talk to a running instance over HTTP (`--server`, `SENDMOCK_SERVER`, default `http://127.0.0.1:8025`, with `--token` / `SENDMOCK_TOKEN` when auth is on; named `--server` so that `--url` stays free for the many API fields called `url`).
 
 ### Agent-friendly conventions
 
@@ -41,6 +41,14 @@ The single binary is also the client. Commands talk to a running instance over H
 - Meaningful exit codes: `0` ok, `1` error, `2` usage, `3` not found, `4` timeout (for `wait`), `5` assertion failed.
 - `sendmock <command> --help` includes examples; `sendmock help --all --json` dumps the whole command tree for agents.
 - Inputs accept flags, `--data '<json>'`, or `--file payload.json|toml` (stdin with `-`).
+
+### Flags and tool inputs
+
+A command's flags and a tool's inputs are derived from the operation's inputs by fixed rules, so the docs, the playground and the binary agree. The full rules and examples are in [21-reference-and-examples.md](21-reference-and-examples.md#2-one-rule-set-for-cli-flags-and-mcp-inputs); in short:
+
+- **CLI:** path parameters are positional arguments in path order; query parameters and top-level body fields are `--kebab-case` flags; booleans are `--name` / `--no-name` without an `is_` prefix; lists of scalars repeat the flag in the singular (`--tag a --tag b`); objects take JSON or come from `--data` / `--file`; allowed values are validated (exit 2). Global flags: `--json`, `--server`, `--token`, `--data`, `--file`, `--help`, and `--yes` on destructive commands.
+- **MCP:** one `inputSchema` with the path, query and top-level body inputs as snake_case properties, annotations from the method (GET and previews, renders, tests and validations read only; DELETE destructive; PUT, PATCH and DELETE idempotent), and a selector property (`kind`, ...) when several operations share one tool. Nullable fields may be left out on both surfaces.
+- Exceptions to a rule are overrides in the surface catalogue (`selector`, `cliArguments`, `cliFlags`), never hand-written lists. `bun run openapi` writes the result to `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`, which the website's [CLI and MCP reference](21-reference-and-examples.md#3-the-cli-and-mcp-reference-pages) is built from and the Stage B binary is checked against.
 
 ### Command tree
 
@@ -182,7 +190,7 @@ sendmock seed status
 sendmock seed validate <file>
 sendmock sendmail
 sendmock settings get
-sendmock settings set <key> <value>
+sendmock settings set
 sendmock sms delete <smsId>
 sendmock sms delete-all --yes
 sendmock sms inbound

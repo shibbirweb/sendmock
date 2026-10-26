@@ -55,12 +55,160 @@ The summary ("Passed: 5 of 5 steps in 120 ms", or "Failed at step 2: ..."), then
 
 The full file format and a CI example: [Advanced: scenarios](./advanced/scenarios.md).
 
+## From your code
+
+Run a scenario from a test and check every step passed.
+
+The examples call SendMock's REST API with each language's usual HTTP client and test framework. JavaScript, Go, Java, Rust, Ruby and C# use the small `call` helper shown under **Test helper** on their page in [Connect your app](./connect/index.md).
+
+```bash tab="CLI" tab-group="language"
+report=$(sendmock scenario run 'name = "sample-sms"
+
+[[steps]]
+run = "sample.send"
+with = { kind = "sms" }' --json)
+
+jq -e '.is_passed == true' <<<"$report" >/dev/null
+```
+
+```php tab="PHP"
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+const SENDMOCK = 'http://127.0.0.1:8025/api/v1';
+
+it('runs the sample scenario', function () {
+    $report = Http::post(SENDMOCK.'/scenarios/run', [
+        'scenario' => "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+    ])->throw()->json();
+
+    expect($report['is_passed'])->toBe(true);
+});
+```
+
+```js tab="JavaScript"
+import { expect, test } from "vitest";
+
+import { call, SENDMOCK } from "./sendmock.js";
+
+test("runs the sample scenario", async () => {
+  const report = await call("POST", `${SENDMOCK}/scenarios/run`, {
+    scenario: "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+  });
+
+  expect(report.is_passed).toBe(true);
+});
+```
+
+```python tab="Python"
+import requests
+
+SENDMOCK = "http://127.0.0.1:8025/api/v1"
+APP = "http://localhost:8000"
+
+
+def test_runs_the_sample_scenario():
+    report = requests.post(
+        f"{SENDMOCK}/scenarios/run",
+        json={
+            "scenario": "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+        },
+    ).json()
+
+    assert report["is_passed"] is True
+```
+
+```go tab="Go"
+package app_test
+
+import "testing"
+
+func TestRunsTheSampleScenario(t *testing.T) {
+	report := call(t, "POST", sendmock+"/scenarios/run", map[string]any{
+		"scenario": "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+	}).(map[string]any)
+
+	if got := report["is_passed"]; got != true {
+		t.Errorf("is_passed is %v, want %v", got, true)
+	}
+}
+```
+
+```java tab="Java"
+import static app.SendMock.SENDMOCK;
+import static app.SendMock.call;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class ScenariosTest {
+    @Test
+    void runsTheSampleScenario() throws Exception {
+        var report = call("POST", SENDMOCK + "/scenarios/run", Map.of(
+            "scenario", "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
+        ));
+
+        assertEquals(true, report.get("is_passed").asBoolean());
+    }
+}
+```
+
+```rust tab="Rust"
+mod sendmock;
+
+use serde_json::json;
+use sendmock::{call, SENDMOCK};
+
+#[tokio::test]
+async fn runs_the_sample_scenario() {
+    let report = call("POST", &format!("{SENDMOCK}/scenarios/run"), Some(json!({
+        "scenario": "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
+    }))).await;
+
+    assert_eq!(report["is_passed"], true);
+}
+```
+
+```ruby tab="Ruby"
+require_relative "sendmock_helper"
+
+RSpec.describe "Scenarios" do
+  it "runs the sample scenario" do
+    report = call("POST", "#{SENDMOCK}/scenarios/run", {
+      "scenario" => "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+    })
+
+    expect(report["is_passed"]).to eq(true)
+  end
+end
+```
+
+```csharp tab="C#"
+using static SendMock;
+
+public class ScenariosTests
+{
+    [Fact]
+    public async Task RunsTheSampleScenario()
+    {
+        var report = await Call("POST", Sendmock + "/scenarios/run", new
+        {
+            scenario = "name = \"sample-sms\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
+        });
+
+        Assert.True(report.GetProperty("is_passed").GetBoolean());
+    }
+}
+```
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| check a scenario file | `sendmock scenario validate <file>` | [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate) | `sendmock_scenario_validate` |
-| run it | `sendmock scenario run <file>` | [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun) | `sendmock_scenario_run` |
+| check a scenario file | [`sendmock scenario validate <file>`](/cli/automation/#scenario-validate) | [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate) | [`sendmock_scenario_validate`](/mcp/automation/#sendmock_scenario_validate) |
+| run it | [`sendmock scenario run <file>`](/cli/automation/#scenario-run) | [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) |
 
 ## Related
 

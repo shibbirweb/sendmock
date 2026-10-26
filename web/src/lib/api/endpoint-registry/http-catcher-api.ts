@@ -14,6 +14,7 @@ const binIdQueryParameter = {
   name: "bin_id",
   description: "Only this bin.",
   schema: "string",
+  example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
 } as const;
 
 /** The capture URL apps call: any method, the bin name, then any path. */
@@ -37,7 +38,7 @@ const captureEndpoints: AreaEndpoint[] = captureMethods.map((method) => ({
   response: fileOf("*/*"),
 }));
 
-export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP catcher", [
+export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
   {
     method: "GET",
     path: "/api/v1/http/bins",

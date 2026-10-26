@@ -94,9 +94,20 @@ export type CardTestOutcome =
   "succeed" | "decline" | "three_ds" | "succeed_then_dispute";
 
 export type TestCardValue = {
+  /**
+   * The card number to type on the checkout page.
+   * @example "4242424242424242"
+   */
   number: string;
+  /**
+   * `succeed`, `decline`, `three_ds` (asks for 3-D Secure first) or `succeed_then_dispute`.
+   * @example "succeed"
+   */
   outcome: CardTestOutcome;
-  /** Set when the outcome is a decline. */
+  /**
+   * Set when the outcome is a decline.
+   * @example "insufficient_funds"
+   */
   decline_reason: DeclineReason | null;
 };
 
@@ -105,34 +116,80 @@ export type NumberTestOutcome = "succeed" | "decline" | "wrong_pin";
 
 /** A test account number or voucher code with its outcome. */
 export type TestNumberValue = {
+  /**
+   * The account number or voucher code to type.
+   * @example "01770000001"
+   */
   number: string;
+  /**
+   * `succeed`, `decline` or `wrong_pin` (needs a PIN step).
+   * @example "succeed"
+   */
   outcome: NumberTestOutcome;
+  /**
+   * Set when the outcome is a decline.
+   * @example "insufficient_funds"
+   */
   decline_reason: DeclineReason | null;
 };
 
 /** What a customer pays with on a checkout page, and its test values (PY-12.1). */
 export type PaymentMethodDefinition = {
+  /**
+   * The method's key; fixed after creation.
+   * @example "upay_wallet"
+   */
   key: string;
+  /**
+   * The method's name on checkout pages.
+   * @example "Upay wallet"
+   */
   name: string;
-  /** The key of the flow its checkout runs (PY-12.6). */
+  /**
+   * The key of the flow its checkout runs (PY-12.6).
+   * @example "wallet"
+   */
   flow: string;
-  /** `#rrggbb`, used on checkout pages. */
+  /**
+   * `#rrggbb`, used on checkout pages.
+   * @example "#e2136e"
+   */
   accent: string;
+  /**
+   * Off methods are hidden on checkout pages.
+   * @example true
+   */
   is_enabled: boolean;
   is_builtin: boolean;
   /** A built-in that differs from its shipped default. */
   is_modified: boolean;
-  /** Read by a card form step. */
+  /**
+   * Read by a card form step.
+   */
   test_cards: TestCardValue[];
-  /** Read by an account number or voucher code step. */
+  /**
+   * Read by an account number or voucher code step.
+   */
   test_numbers: TestNumberValue[];
-  /** Read by an OTP step. */
+  /**
+   * Read by an OTP step.
+   * @example "123456"
+   */
   otp: string;
-  /** Read by a PIN step. */
+  /**
+   * Read by a PIN step.
+   * @example "12121"
+   */
   pin: string;
-  /** The outcome when the flow has no deciding step. */
+  /**
+   * The outcome when the flow has no deciding step.
+   * @example "succeed"
+   */
   default_outcome: "succeed" | "decline";
-  /** Read by a signed-in account step. */
+  /**
+   * Read by a signed-in account step.
+   * @example "sb-buyer@personal.example.com"
+   */
   test_account: string;
   /** Gateways whose checkout offers this method. */
   gateway_keys: string[];
@@ -214,9 +271,25 @@ export type PaymentSimulateAction =
 
 /** Body of POST /api/v1/payments/{paymentId}/simulate (PY-09.3). */
 export type PaymentSimulateRequest = {
+  /**
+   * What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`.
+   * @example "refund"
+   */
   action: PaymentSimulateAction;
+  /**
+   * For `decline`: why the bank declined.
+   * @example "insufficient_funds"
+   */
   decline_reason?: DeclineReason;
+  /**
+   * For `refund`: the amount in minor units; the full amount when left out.
+   * @example 500
+   */
   refund_amount_minor?: number;
+  /**
+   * For `resolve_dispute`: `won` or `lost`.
+   * @example "won"
+   */
   dispute_outcome?: "won" | "lost";
 };
 
@@ -264,27 +337,75 @@ export type CheckoutAction =
 
 /** A card typed on the checkout page; only test cards are accepted, and none is stored (PY-01.1). */
 export type CheckoutCard = {
+  /**
+   * A test card number of the method.
+   * @example "4242424242424242"
+   */
   number: string;
+  /**
+   * Expiry month, 1 to 12.
+   * @example 12
+   */
   exp_month: number;
+  /**
+   * Expiry year, four digits.
+   * @example 2030
+   */
   exp_year: number;
+  /**
+   * Any three or four digits.
+   * @example "123"
+   */
   cvc: string;
+  /**
+   * The name on the card.
+   * @example "Sam Tester"
+   */
   holder_name: string;
 };
 
 /** What the customer typed in a flow's steps; only the flow's own steps are read. */
 export type CheckoutStepEntries = {
-  /** An account number or voucher code. */
+  /**
+   * An account number or voucher code.
+   * @example "01770000001"
+   */
   number?: string;
+  /**
+   * The one-time code typed in an OTP step.
+   * @example "123456"
+   */
   otp?: string;
+  /**
+   * The PIN typed in a PIN step.
+   * @example "12121"
+   */
   pin?: string;
 };
 
 /** Body of POST /api/v1/checkout-sessions/{sessionId}/complete. */
 export type CheckoutCompleteRequest = {
+  /**
+   * What the customer does: `pay`, `decline`, `cancel`, `delay` (pending), `require_three_ds`, `three_ds_approve` or `three_ds_fail`.
+   * @example "pay"
+   */
   action: CheckoutAction;
-  /** The method the customer paid with. */
+  /**
+   * The method the customer paid with.
+   * @example "card"
+   */
   method_key?: string;
+  /**
+   * The card typed, for card methods.
+   */
   card?: CheckoutCard;
+  /**
+   * What was typed in the flow's other steps.
+   */
   entries?: CheckoutStepEntries;
+  /**
+   * For `decline`: why the bank declined.
+   * @example "insufficient_funds"
+   */
   decline_reason?: DeclineReason;
 };
