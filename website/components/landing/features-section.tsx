@@ -1,6 +1,5 @@
 import {
   BotIcon,
-  ContainerIcon,
   CreditCardIcon,
   GlobeIcon,
   MailIcon,
@@ -17,7 +16,6 @@ import {
 } from "./feature-visuals/message-visuals";
 import {
   AiAgentsVisual,
-  DistributionVisual,
   HttpCatcherVisual,
   PaymentsVisual,
 } from "./feature-visuals/tool-visuals";
@@ -26,12 +24,11 @@ const featureCards = [
   {
     name: "Email",
     description:
-      "SMTP and SendGrid, Mailgun, Postmark, Resend, SES and Brevo compatible APIs. HTML preview, checks, bounces and opens.",
+      "SMTP plus SendGrid, Mailgun, Postmark, Resend, SES and Brevo APIs, with HTML preview and checks.",
     Icon: MailIcon,
     href: "/docs/mail",
     cta: "Email docs",
     Visual: EmailVisual,
-    className: "lg:col-span-2",
   },
   {
     name: "SMS and Verify",
@@ -41,57 +38,42 @@ const featureCards = [
     href: "/docs/sms",
     cta: "SMS docs",
     Visual: SmsVisual,
-    className: "lg:col-span-1",
   },
   {
     name: "Webhooks",
     description:
-      "Automatic rules or manual sends, provider-shaped templates, variables, retries, replay and Standard Webhooks signing.",
+      "Rules or manual sends, provider-shaped templates, retries, replay and Standard Webhooks signing.",
     Icon: WebhookIcon,
     href: "/docs/webhooks",
     cta: "Webhook docs",
     Visual: WebhooksVisual,
-    className: "lg:col-span-1",
   },
   {
     name: "Payments",
     description:
-      "Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects, IPNs and signatures. Test cards, wallets and your own flows.",
+      "Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects, signed IPNs and test cards.",
     Icon: CreditCardIcon,
     href: "/docs/payments",
     cta: "Payment docs",
     Visual: PaymentsVisual,
-    className: "lg:col-span-2",
   },
   {
     name: "HTTP Catcher",
     description:
-      "A bin for any HTTP call your app makes, with response rules, delays and failures you set.",
+      "A bin for any HTTP call your app makes, answered with the responses, delays and failures you set.",
     Icon: GlobeIcon,
     href: "/docs/http",
     cta: "HTTP Catcher docs",
     Visual: HttpCatcherVisual,
-    className: "lg:col-span-1",
   },
   {
     name: "Built for AI agents",
     description:
-      "A full CLI, an MCP server and an agent skill, so Claude Code, Codex and others can set up and test everything.",
+      "A CLI, an MCP server and an agent skill, so Claude Code, Codex and others can test everything.",
     Icon: BotIcon,
     href: "/docs/ai",
     cta: "AI docs",
     Visual: AiAgentsVisual,
-    className: "lg:col-span-1",
-  },
-  {
-    name: "One binary or Docker",
-    description:
-      "macOS, Linux and Windows binaries, plus a tiny multi-arch Docker image.",
-    Icon: ContainerIcon,
-    href: "/docs/install",
-    cta: "Install",
-    Visual: DistributionVisual,
-    className: "lg:col-span-1",
   },
 ];
 
@@ -118,12 +100,13 @@ export function FeaturesSection() {
       </div>
       <BentoGrid
         data-testid="features-bento"
-        className="auto-rows-[22rem] lg:grid-cols-3"
+        className="auto-rows-auto lg:grid-cols-3"
       >
         {featureCards.map(({ Visual, ...featureCard }) => (
           <BentoCard
             key={featureCard.name}
             {...featureCard}
+            className="lg:col-span-1"
             background={<Visual />}
           />
         ))}

@@ -287,7 +287,6 @@ test("WS-02.1 every feature card links to its own docs page", async ({
     "/docs/payments",
     "/docs/http",
     "/docs/ai",
-    "/docs/install",
   ]) {
     await expect(
       featuresBento.locator(`a[href="${docsPath}"]`).first(),

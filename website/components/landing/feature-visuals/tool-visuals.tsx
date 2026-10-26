@@ -1,4 +1,4 @@
-import { CheckIcon, CreditCardIcon } from "lucide-react";
+import { CreditCardIcon } from "lucide-react";
 
 import {
   SceneCard,
@@ -7,13 +7,11 @@ import {
   VisualFrame,
 } from "./visual-parts";
 
-const paymentGateways = ["Stripe", "PayPal", "SSLCommerz", "bKash"];
-
-/** A test checkout: the gateways, a test card and the signed result. */
+/** A test checkout with a test card, and the signed result it sends. */
 export function PaymentsVisual() {
   return (
-    <VisualFrame className="flex items-start justify-center gap-4 px-6 pt-4">
-      <SceneCard className="w-64">
+    <VisualFrame className="flex items-center justify-center px-5">
+      <SceneCard className="w-full max-w-64">
         <div className="flex items-center justify-between">
           <span className="font-semibold">Test checkout</span>
           <span className="font-semibold">$49.00</span>
@@ -25,22 +23,8 @@ export function PaymentsVisual() {
         <div className="mt-3 rounded-lg bg-linear-to-r from-(--brand-from) to-(--brand-to) py-1.5 text-center font-semibold text-white">
           Pay now
         </div>
-      </SceneCard>
-      <div className="hidden flex-col gap-2 sm:flex">
-        {paymentGateways.map((paymentGateway) => (
-          <SceneCard
-            key={paymentGateway}
-            className="flex items-center gap-2 py-2"
-          >
-            <CheckIcon className="size-3.5 text-fd-success" />
-            {paymentGateway}
-          </SceneCard>
-        ))}
-      </div>
-      <SceneCard className="hidden w-48 lg:block">
-        <p className="font-semibold">payment.succeeded</p>
-        <p className="mt-1 text-fd-muted-foreground">IPN signed and sent</p>
-        <div className="mt-2">
+        <div className="mt-2.5 flex items-center justify-between">
+          <span className="text-fd-muted-foreground">IPN signed and sent</span>
           <StatusPill tone="success">200 OK</StatusPill>
         </div>
       </SceneCard>
@@ -55,14 +39,13 @@ const caughtRequests: {
   tone: StatusTone;
 }[] = [
   { method: "POST", path: "/slack/webhook", status: "200", tone: "success" },
-  { method: "GET", path: "/v1/users/42", status: "404", tone: "warning" },
   { method: "PUT", path: "/orders/1042", status: "503", tone: "error" },
 ];
 
 /** Any HTTP call your app makes, answered with the response you chose. */
 export function HttpCatcherVisual() {
   return (
-    <VisualFrame className="flex flex-col gap-2 px-4 pt-4">
+    <VisualFrame className="flex flex-col justify-center gap-2 px-5">
       {caughtRequests.map((caughtRequest) => (
         <SceneCard
           key={caughtRequest.path}
@@ -91,8 +74,8 @@ const agentSessionLines = [
 /** An AI agent using SendMock's MCP tools to read what the app sent. */
 export function AiAgentsVisual() {
   return (
-    <VisualFrame className="px-4 pt-5">
-      <SceneCard className="flex flex-col gap-1.5 font-mono">
+    <VisualFrame className="flex items-center px-5">
+      <SceneCard className="flex w-full flex-col gap-1.5 font-mono">
         {agentSessionLines.map((agentSessionLine) => (
           <p key={agentSessionLine.text} className="truncate">
             <span
@@ -107,27 +90,6 @@ export function AiAgentsVisual() {
             {agentSessionLine.text}
           </p>
         ))}
-      </SceneCard>
-    </VisualFrame>
-  );
-}
-
-const releaseTargets = ["macOS", "Linux", "Windows", "Docker"];
-
-/** One small download for every system, or one image. */
-export function DistributionVisual() {
-  return (
-    <VisualFrame className="flex flex-col items-center gap-3 px-4 pt-4">
-      <div className="flex flex-wrap justify-center gap-2">
-        {releaseTargets.map((releaseTarget) => (
-          <SceneCard key={releaseTarget} className="px-3 py-1.5 font-medium">
-            {releaseTarget}
-          </SceneCard>
-        ))}
-      </div>
-      <SceneCard className="w-full font-mono">
-        <span className="text-fd-muted-foreground">$ </span>
-        docker run -p 8025:8025 ghcr.io/shibbirweb/sendmock
       </SceneCard>
     </VisualFrame>
   );

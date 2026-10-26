@@ -2,10 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/**
- * The top of a feature card where its small product scene sits, faded out
- * towards the card's text so the two never fight.
- */
+/** Fills a feature card's preview panel; each scene places itself inside. */
 export function VisualFrame({
   children,
   className,
@@ -16,10 +13,7 @@ export function VisualFrame({
   return (
     <div
       aria-hidden
-      className={cn(
-        "absolute inset-x-0 top-0 h-1/2 overflow-hidden [mask-image:linear-gradient(to_bottom,black_45%,transparent)]",
-        className,
-      )}
+      className={cn("absolute inset-0 overflow-hidden", className)}
     >
       {children}
     </div>

@@ -1,5 +1,5 @@
 import { type ComponentPropsWithoutRef, type ReactNode } from "react";
-import { BookOpenIcon } from "lucide-react";
+import { ArrowUpRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -45,7 +45,9 @@ const BentoCard = ({
   <div
     key={name}
     className={cn(
-      "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
+      // A preview panel of one fixed height, then the text: the card is as tall
+      // as its content, and every card's text starts on the same line.
+      "group relative col-span-3 flex flex-col overflow-hidden rounded-xl",
       // light styles
       "bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
       // dark styles
@@ -54,27 +56,28 @@ const BentoCard = ({
     )}
     {...props}
   >
-    <div>{background}</div>
-    <div className="z-10 flex flex-col gap-1 p-4">
-      <span className="mb-2 flex size-9 items-center justify-center rounded-lg border bg-fd-background shadow-sm">
-        <Icon className="size-4.5 text-(--brand-from)" />
-      </span>
-      {/* The docs link sits beside the title, so the text never moves on hover. */}
-      <div className="flex items-center gap-2">
+    <div className="relative h-44 shrink-0 overflow-hidden border-b bg-fd-muted/40">
+      {background}
+    </div>
+    <div className="z-10 flex flex-col gap-2 p-5">
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border bg-fd-background shadow-sm">
+          <Icon className="size-4 text-(--brand-from)" />
+        </span>
         <h3 className="text-xl font-semibold text-fd-foreground">{name}</h3>
+        {/* Only the arrow links to the docs; the card itself is not a link. */}
         <a
           href={href}
           aria-label={cta}
           title={cta}
-          className="relative z-20 rounded-md p-1 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-(--brand-from)"
+          className="ms-auto rounded-md p-1 text-fd-muted-foreground transition-colors outline-none hover:bg-fd-accent hover:text-(--brand-from) focus-visible:ring-2 focus-visible:ring-fd-ring"
         >
-          <BookOpenIcon aria-hidden className="size-4" />
+          <ArrowUpRightIcon aria-hidden className="size-4" />
         </a>
       </div>
-      <p className="max-w-lg text-fd-muted-foreground">{description}</p>
+      {/* One text width in every card, so every description wraps the same way. */}
+      <p className="max-w-72 text-fd-muted-foreground">{description}</p>
     </div>
-
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10" />
   </div>
 );
 

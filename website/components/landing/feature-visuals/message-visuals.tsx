@@ -30,10 +30,7 @@ const caughtEmails = [
   { sender: "Acme Store", subject: "Order 1042 has shipped", check: "Opened" },
 ];
 
-/**
- * Each row keeps its full height (the second row runs into the card's fade
- * instead of being squeezed), and fades at the left and right edges.
- */
+/** The row keeps its full height and fades at the left and right edges. */
 const emailMarqueeClassName =
   "shrink-0 [--duration:30s] [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]";
 
@@ -58,20 +55,12 @@ function CaughtEmailCard({
   );
 }
 
-/** Emails flowing past in two rows, each with what SendMock checked. */
+/** Emails flowing past, each with what SendMock checked. */
 export function EmailVisual() {
   return (
-    <VisualFrame className="flex flex-col pt-3">
+    <VisualFrame className="flex items-center">
       <Marquee pauseOnHover className={emailMarqueeClassName}>
         {caughtEmails.map((caughtEmail) => (
-          <CaughtEmailCard
-            key={caughtEmail.subject}
-            caughtEmail={caughtEmail}
-          />
-        ))}
-      </Marquee>
-      <Marquee pauseOnHover reverse className={emailMarqueeClassName}>
-        {[...caughtEmails].reverse().map((caughtEmail) => (
           <CaughtEmailCard
             key={caughtEmail.subject}
             caughtEmail={caughtEmail}
@@ -117,7 +106,7 @@ const caughtTextMessages: {
 /** Text messages arriving one by one, like notifications on a phone. */
 export function SmsVisual() {
   return (
-    <VisualFrame className="px-4 pt-4">
+    <VisualFrame className="px-5 pt-5 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
       <AnimatedList delay={1600} className="gap-2">
         {caughtTextMessages.map((textMessage) => (
           <SceneCard key={textMessage.body} className="flex items-center gap-3">
@@ -160,18 +149,12 @@ const webhookDeliveries: {
     tone: "error",
     note: "retry in 8 s",
   },
-  {
-    event: "payment.succeeded",
-    status: "200",
-    tone: "success",
-    note: "replayed",
-  },
 ];
 
 /** A delivery log: each event, the answer, and the retry or replay. */
 export function WebhooksVisual() {
   return (
-    <VisualFrame className="flex flex-col gap-1.5 px-4 pt-2">
+    <VisualFrame className="flex flex-col justify-center gap-2 px-5">
       {webhookDeliveries.map((webhookDelivery) => (
         <SceneCard
           key={webhookDelivery.event}
