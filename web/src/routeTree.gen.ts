@@ -14,6 +14,7 @@ import { Route as HttpRouteImport } from './routes/http'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as MailRouteImport } from './routes/mail'
 import { Route as NumbersRouteImport } from './routes/numbers'
+import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
@@ -59,6 +60,11 @@ const MailRoute = MailRouteImport.update({
 const NumbersRoute = NumbersRouteImport.update({
   id: '/numbers',
   path: '/numbers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScenariosRoute = ScenariosRouteImport.update({
+  id: '/scenarios',
+  path: '/scenarios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
+  '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/numbers': typeof NumbersRoute
+  '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
+  '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/logs'
     | '/mail'
     | '/numbers'
+    | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/http'
     | '/logs'
     | '/numbers'
+    | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/logs'
     | '/mail'
     | '/numbers'
+    | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
     | '/pay/$sessionId'
@@ -342,6 +354,7 @@ export interface RootRouteChildren {
   LogsRoute: typeof LogsRoute
   MailRoute: typeof MailRouteWithChildren
   NumbersRoute: typeof NumbersRoute
+  ScenariosRoute: typeof ScenariosRoute
   SettingsRoute: typeof SettingsRoute
   PaySessionIdRoute: typeof PaySessionIdRoute
   PaymentsFlowsRoute: typeof PaymentsFlowsRoute
@@ -396,6 +409,13 @@ declare module '@tanstack/react-router' {
       path: '/numbers'
       fullPath: '/numbers'
       preLoaderRoute: typeof NumbersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scenarios': {
+      id: '/scenarios'
+      path: '/scenarios'
+      fullPath: '/scenarios'
+      preLoaderRoute: typeof ScenariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -579,6 +599,7 @@ const rootRouteChildren: RootRouteChildren = {
   LogsRoute: LogsRoute,
   MailRoute: MailRouteWithChildren,
   NumbersRoute: NumbersRoute,
+  ScenariosRoute: ScenariosRoute,
   SettingsRoute: SettingsRoute,
   PaySessionIdRoute: PaySessionIdRoute,
   PaymentsFlowsRoute: PaymentsFlowsRoute,

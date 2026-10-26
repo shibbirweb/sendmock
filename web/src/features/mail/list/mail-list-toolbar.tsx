@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ImportEmailDialog } from "@/features/mail/list/import-email-dialog";
 import { useMailNotifications } from "@/features/mail/list/use-mail-notifications";
 
 type MailListToolbarProps = {
@@ -100,6 +101,7 @@ export function MailListToolbar({
                 </TooltipContent>
               </Tooltip>
             )}
+            <ImportEmailDialog />
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

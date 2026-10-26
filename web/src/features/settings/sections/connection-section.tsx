@@ -16,6 +16,8 @@ import {
   RequestBodyEditor,
 } from "@/features/settings/connection/request-body-editor";
 import { RequestHeadersEditor } from "@/features/settings/connection/request-headers-editor";
+import { SendRequestButton } from "@/features/settings/connection/send-request-button";
+import { AiAgentsCard } from "@/features/settings/connection/ai-agents-card";
 import { useRequestCustomization } from "@/features/settings/connection/use-request-customization";
 import { useAppLocation } from "@/features/onboarding/use-app-location";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
@@ -105,126 +107,154 @@ export function ConnectionSection() {
   );
 
   return (
-    <SettingsSectionCard
-      title="Connect your app"
-      description="Point your app at SendMock. Provider SDK recipes (Twilio, SendGrid, ...) are in the docs."
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Language" fieldId={`${fieldIdPrefix}-language`}>
-          <Select
-            value={language}
-            onValueChange={(nextLanguage) =>
-              setLanguage(nextLanguage as SnippetLanguage)
-            }
-          >
-            <SelectTrigger id={`${fieldIdPrefix}-language`} className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {snippetLanguages.map((snippetLanguage) => (
-                <SelectItem key={snippetLanguage} value={snippetLanguage}>
-                  {snippetLanguageLabels[snippetLanguage]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FormField>
-        <FormField
-          label="Where does your app run?"
-          fieldId={`${fieldIdPrefix}-location`}
-        >
-          <Select
-            value={appLocation}
-            onValueChange={(nextLocation) =>
-              setAppLocation(nextLocation as AppLocation)
-            }
-          >
-            <SelectTrigger id={`${fieldIdPrefix}-location`} className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(appLocationLabels) as AppLocation[]).map(
-                (locationOption) => (
-                  <SelectItem key={locationOption} value={locationOption}>
-                    {appLocationLabels[locationOption]}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
-        </FormField>
-      </div>
-      <details className="group/customize rounded-lg border">
-        <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
-          Customize the request
-          <span className="ml-2 font-normal text-muted-foreground">
-            headers and payload fields for the API snippets
-          </span>
-        </summary>
-        <div className="grid gap-5 border-t p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">
-              Changes here only shape the snippets below; nothing is sent.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!requestEditor.isCustomized}
-              onClick={requestEditor.resetCustomization}
-            >
-              <RotateCcwIcon />
-              Reset
-            </Button>
-          </div>
-          <RequestHeadersEditor
-            headerRows={requestEditor.headerRows}
-            onAdd={requestEditor.addHeaderRow}
-            onUpdate={requestEditor.updateHeaderRow}
-            onRemove={requestEditor.removeHeaderRow}
-          />
-          <div className="grid gap-4 md:grid-cols-2">
-            <RequestBodyEditor
-              label="Email body (POST /api/v1/send)"
-              bodyState={requestEditor.emailBody}
-              optionalFields={optionalEmailFields}
-              hint={
-                'Use "{{file:invoice.pdf}}" as a value to read and base64-encode that file in the snippets.'
+    <>
+      <SettingsSectionCard
+        title="Connect your app"
+        description="Point your app at SendMock. Provider SDK recipes (Twilio, SendGrid, ...) are in the docs."
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField label="Language" fieldId={`${fieldIdPrefix}-language`}>
+            <Select
+              value={language}
+              onValueChange={(nextLanguage) =>
+                setLanguage(nextLanguage as SnippetLanguage)
               }
-              onBodyTextChange={requestEditor.setEmailBodyText}
-              onAddField={requestEditor.addEmailBodyField}
-            />
-            <RequestBodyEditor
-              label="SMS body (POST /api/v1/sms)"
-              bodyState={requestEditor.smsBody}
-              optionalFields={optionalSmsFields}
-              hint="Media makes it an MMS (or WhatsApp media): up to 10 files, 5 MB in total."
-              onBodyTextChange={requestEditor.setSmsBodyText}
-              onAddField={requestEditor.addSmsBodyField}
-            />
-          </div>
-        </div>
-      </details>
-      <div className="grid gap-4">
-        {connectionSnippets.map((connectionSnippet) => (
-          <section
-            key={connectionSnippet.area}
-            aria-label={connectionSnippet.title}
-            className="grid gap-1.5"
+            >
+              <SelectTrigger
+                id={`${fieldIdPrefix}-language`}
+                className="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {snippetLanguages.map((snippetLanguage) => (
+                  <SelectItem key={snippetLanguage} value={snippetLanguage}>
+                    {snippetLanguageLabels[snippetLanguage]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+          <FormField
+            label="Where does your app run?"
+            fieldId={`${fieldIdPrefix}-location`}
           >
+            <Select
+              value={appLocation}
+              onValueChange={(nextLocation) =>
+                setAppLocation(nextLocation as AppLocation)
+              }
+            >
+              <SelectTrigger
+                id={`${fieldIdPrefix}-location`}
+                className="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(appLocationLabels) as AppLocation[]).map(
+                  (locationOption) => (
+                    <SelectItem key={locationOption} value={locationOption}>
+                      {appLocationLabels[locationOption]}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+          </FormField>
+        </div>
+        <details className="group/customize rounded-lg border">
+          <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
+            Customize the request
+            <span className="ml-2 font-normal text-muted-foreground">
+              headers and payload fields for the API snippets
+            </span>
+          </summary>
+          <div className="grid gap-5 border-t p-3">
             <div className="flex items-center justify-between gap-2">
-              <h4 className="text-sm font-medium">{connectionSnippet.title}</h4>
-              <CopyButton
-                copyText={connectionSnippet.code}
-                label={`Copy ${connectionSnippet.title} snippet`}
+              <p className="text-xs text-muted-foreground">
+                Changes shape the snippets below. Send this request runs the
+                call against this SendMock.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!requestEditor.isCustomized}
+                onClick={requestEditor.resetCustomization}
+              >
+                <RotateCcwIcon />
+                Reset
+              </Button>
+            </div>
+            <RequestHeadersEditor
+              headerRows={requestEditor.headerRows}
+              onAdd={requestEditor.addHeaderRow}
+              onUpdate={requestEditor.updateHeaderRow}
+              onRemove={requestEditor.removeHeaderRow}
+            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <RequestBodyEditor
+                label="Email body (POST /api/v1/send)"
+                bodyState={requestEditor.emailBody}
+                optionalFields={optionalEmailFields}
+                hint={
+                  'Use "{{file:invoice.pdf}}" as a value to read and base64-encode that file in the snippets.'
+                }
+                onBodyTextChange={requestEditor.setEmailBodyText}
+                onAddField={requestEditor.addEmailBodyField}
+              />
+              <RequestBodyEditor
+                label="SMS body (POST /api/v1/sms)"
+                bodyState={requestEditor.smsBody}
+                optionalFields={optionalSmsFields}
+                hint="Media makes it an MMS (or WhatsApp media): up to 10 files, 5 MB in total."
+                onBodyTextChange={requestEditor.setSmsBodyText}
+                onAddField={requestEditor.addSmsBodyField}
+              />
+              <SendRequestButton
+                apiPath="/send"
+                requestBody={requestEditor.emailBody.lastValidBody}
+                requestHeaders={
+                  requestEditor.requestCustomization.requestHeaders
+                }
+                isDisabled={requestEditor.emailBody.isInvalid}
+              />
+              <SendRequestButton
+                apiPath="/sms"
+                requestBody={requestEditor.smsBody.lastValidBody}
+                requestHeaders={
+                  requestEditor.requestCustomization.requestHeaders
+                }
+                isDisabled={requestEditor.smsBody.isInvalid}
               />
             </div>
-            <pre className="overflow-x-auto rounded-md border bg-muted/30 p-3 font-mono text-xs leading-relaxed">
-              {connectionSnippet.code}
-            </pre>
-          </section>
-        ))}
-      </div>
-    </SettingsSectionCard>
+          </div>
+        </details>
+        <div className="grid gap-4">
+          {connectionSnippets.map((connectionSnippet) => (
+            <section
+              key={connectionSnippet.area}
+              aria-label={connectionSnippet.title}
+              className="grid gap-1.5"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="text-sm font-medium">
+                  {connectionSnippet.title}
+                </h4>
+                <CopyButton
+                  copyText={connectionSnippet.code}
+                  label={`Copy ${connectionSnippet.title} snippet`}
+                />
+              </div>
+              <pre className="overflow-x-auto rounded-md border bg-muted/30 p-3 font-mono text-xs leading-relaxed">
+                {connectionSnippet.code}
+              </pre>
+            </section>
+          ))}
+        </div>
+      </SettingsSectionCard>
+      <AiAgentsCard />
+    </>
   );
 }

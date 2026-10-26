@@ -1,15 +1,13 @@
-import { Link } from "@tanstack/react-router";
-import { ExternalLinkIcon } from "lucide-react";
 import * as React from "react";
 
 import { ChipListInput } from "@/components/common/chip-list-input";
 import { FormField } from "@/components/common/form-field";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { emailMagicAddresses } from "@/lib/outcomes/magic-reference-data";
 import { MagicReferenceTable } from "@/features/settings/reference/magic-reference-table";
 import { EmailOutcomeRulesCard } from "@/features/settings/outcome-rules/email-outcome-rules-card";
+import { MessageRulesCard } from "@/features/settings/message-rules/message-rules-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import {
   SettingsNumberField,
@@ -217,19 +215,8 @@ export function EmailSection({ appSettings }: { appSettings: AppSettings }) {
     <div className="grid gap-4">
       <ReceivingCard appSettings={appSettings} />
       <RelayCard appSettings={appSettings} />
-      <SettingsSectionCard
-        title="Tag and forward rules"
-        description="Rules that tag or auto-forward arriving emails use the same visual rule builder as webhook rules."
-      >
-        <div>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/webhooks/rules">
-              <ExternalLinkIcon />
-              Open the rule builder
-            </Link>
-          </Button>
-        </div>
-      </SettingsSectionCard>
+      <MessageRulesCard ruleKind="tag-rules" />
+      <MessageRulesCard ruleKind="forward-rules" />
       <EmailOutcomeRulesCard appSettings={appSettings} />
       <SettingsSectionCard
         title="Magic addresses"
