@@ -99,3 +99,13 @@ Phase 1.
 - [ ] WS-05.1 After clicking Connect, requests reach a local SendMock at the configured URL and responses display.
 - [ ] WS-05.2 Nothing is sent to a local instance until the user clicks Connect.
 - [ ] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation.
+
+## WS-06 User guide
+
+Phase U3 (W13). Plan: [19-user-guide.md](../19-user-guide.md).
+
+- [ ] WS-06.1 Every sidebar item and every Settings section has a guide page with the template headings (What it solves, How it connects, Use it, Everything on this screen, Customize, From the CLI, API and AI); the test reads the list from `navigation-items.ts` and `settings-sections.ts`, so a new menu without a page fails CI.
+- [ ] WS-06.2 Every menu page shows its screenshot, produced by `bun run screenshots`.
+- [ ] WS-06.3 The connection map and the problem index link to every menu page, and every recipe and Advanced page is linked from at least one menu page.
+- [ ] WS-06.4 The UI steps of the recipes and the Advanced walkthroughs (gateway, method, flow, template, catcher response, inbound route, outcome rules) are followed by Playwright tests in the demo, so a renamed button fails CI.
+- [ ] WS-06.5 Every CLI command and MCP tool named in the user guide exists in the generated reference (checked once WS-03.2 generates it in Phase 0).

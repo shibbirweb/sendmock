@@ -146,6 +146,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | Phase 0 (`/next/`), Phase 5 (complete, versioned) | 3 | Not started |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 3 | Not started |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Not started |
+| [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | In progress |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Not started |
 | [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | In progress |

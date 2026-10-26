@@ -32,6 +32,8 @@ All U3 workstreams are built on one branch, `feat/u3-design-review`, with a comm
 | W10 | API reference and playground (Demo mode) | `feat/u3-playground` | WS-04 | W7 |
 | W11 | Feedback round and sign-off (D3) | `chore/u3-sign-off` | UI-07.3 signed | all |
 | W12 | Community links and GitHub templates | `chore/u3-community` | UI-10 | |
+| W13 | User guide (not part of the sign-off gate) | `docs/user-guide-plan` | WS-06 | W9 |
+| W14 | Every feature in every way (proposed: inside the sign-off gate, it changes the contract) | to decide | UI-11 | W7, W13 |
 
 ## W1 and W6: Design review
 
@@ -194,6 +196,12 @@ So people can find the project, give feedback and report problems from wherever 
   - Labels used by the templates (`bug`, `enhancement`, `provider`, `docs`, `u3-feedback`) are listed in `CONTRIBUTING.md`.
 - Tests: an end-to-end test checks the Help menu links (targets and pre-filled version); the YAML templates are validated in CI.
 - **As built:** the link builders are `web/src/lib/community/community-links.ts` (unit tested); the issue forms' `version`, `channel`, `os` and `browser` are inputs, since GitHub pre-fills inputs from the query string but not dropdowns. "What's new" opens the GitHub releases until `CHANGELOG.md` and the `/changelog/` page land in Phase 0. The community files live in `.github/` (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, the pull request template), and `bun run test:repository` (`web/tests/repository/`) validates the forms in CI. The website's star count is read once at build time and left out when GitHub does not answer. Adding the Help icon made the header too wide at 768 px next to the sidebar; below laptop width the search button is now an icon.
+
+## W13: User guide (WS-06)
+
+The user docs become a guide that walks the sidebar menu by menu, says which real-life problem each feature solves and how the menus connect, and adds recipes with the built-ins, Advanced pages for customizing and creating (gateways, methods, flows, templates, rules, routes, outcome rules, catcher responses) and AI pages for doing the same with an agent. The plan, page template, outlines and criteria are in [19-user-guide.md](19-user-guide.md). It does not block the sign-off; pages describe backend features with the phase they arrive in.
+
+- **As built:** 81 pages, 17 new screenshots and the WS-06 tests; details in [19-user-guide.md](19-user-guide.md#as-built-2026-10-26). WS-06.5 waits for the generated reference in Phase 0.
 
 ## Re-audit before sign-off (2026-10-26)
 
