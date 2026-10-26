@@ -9,6 +9,8 @@ Phase 0 (build), Phase 5 (all targets).
 - [ ] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64.
 - [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
 - [ ] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release.
+- [ ] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)).
+- [ ] DS-01.5 On each platform the install page's steps work as written: the unpack commands, the `PATH` step and the platform's install script (stable and beta) leave a working `sendmock` on the `PATH` of a new shell.
 
 ## DS-02 Docker image
 

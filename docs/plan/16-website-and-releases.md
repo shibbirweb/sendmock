@@ -139,7 +139,7 @@ bun scripts/version.ts bump beta   # beta | release | patch | minor | major | x.
 | `stable.yml` | manual, on `develop` | Only finishes a **published beta with nothing untried on top** (docs/tests/chores allowed); dates the changelog and opens release PR `chore:[REL-N] release X.Y.Z` |
 | `stable-promote.yml` | CI finished on `develop` | If `develop` holds an untagged stable version: opens the `develop` -> `main` PR (merge commit, never squash) |
 | `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) and calls `release.yml` |
-| `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); version comes from the code and must match the tag |
+| `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); runs the binary tests on every platform before anything is published ([09](09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)); version comes from the code and must match the tag |
 | `docker-edge.yml` | push to `develop` | Builds and pushes the `edge` image for people who want every merge |
 | `website.yml` | see [Versioned builds](#versioned-builds) | Builds all doc versions and deploys GitHub Pages |
 | `wiki.yml` (optional) | push to `main` touching `docs/wiki` | Mirrors docs to the GitHub wiki |

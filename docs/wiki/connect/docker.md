@@ -39,7 +39,7 @@ The examples below use Laravel's `.env` names (`MAIL_HOST`, `MAIL_PORT`). For ot
 
 ## SendMock and your app in one Compose project
 
-1. Add a `sendmock` service next to your app in `compose.yaml`, and point your app at it by the service name:
+1. Add the `sendmock` service to your `compose.yaml` (create the file if you do not have one):
 
    ```yaml
    services:
@@ -51,34 +51,77 @@ The examples below use Laravel's `.env` names (`MAIL_HOST`, `MAIL_PORT`). For ot
        volumes:
          - sendmock-data:/data
 
-     app:
-       build: .
-       environment:
-         MAIL_MAILER: smtp
-         MAIL_HOST: sendmock
-         MAIL_PORT: 1025
-         MAIL_ENCRYPTION: "null"
-       depends_on:
-         sendmock:
-           condition: service_healthy
-
    volumes:
      sendmock-data:
    ```
 
-2. Start everything:
+2. Start it:
 
    ```bash
    docker compose up
    ```
 
-3. Open http://127.0.0.1:8025 in your browser to see what your app sent.
+3. Open http://127.0.0.1:8025 in your browser.
+
+### With your existing app
+
+If your app is a service in the same `compose.yaml`, point it at SendMock by the service name.
+
+1. Add these lines to your app's service (here named `app`, with Laravel's settings):
+
+   ```yaml
+   app:
+     environment:
+       MAIL_MAILER: smtp
+       MAIL_HOST: sendmock
+       MAIL_PORT: 1025
+       MAIL_ENCRYPTION: "null"
+     depends_on:
+       sendmock:
+         condition: service_healthy
+   ```
+
+2. Start everything again:
+
+   ```bash
+   docker compose up
+   ```
+
+3. Send a message from your app and see it at http://127.0.0.1:8025.
+
+The whole `compose.yaml` then looks like this:
+
+```yaml
+services:
+  sendmock:
+    image: ghcr.io/shibbirweb/sendmock
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - sendmock-data:/data
+
+  app:
+    build: .
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: sendmock
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: "null"
+    depends_on:
+      sendmock:
+        condition: service_healthy
+
+volumes:
+  sendmock-data:
+```
 
 Good to know:
 
 - `depends_on` with `service_healthy` makes your app wait until SendMock's built-in health check passes, so the first email is not lost at start-up.
 - The `sendmock-data` volume keeps captured mail and SMS when the containers restart.
 - Symfony apps use one setting instead: `MAILER_DSN: smtp://sendmock:1025`.
+- Other languages use the same host (`sendmock`) and port (`1025`) in the settings on their page.
 
 ## Use provider SDKs from Compose (Twilio, SendGrid, ...)
 

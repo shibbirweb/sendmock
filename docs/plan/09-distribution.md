@@ -47,6 +47,33 @@ Cross-compilation via `cargo-zigbuild` for Linux targets and native GitHub Actio
 
 Each GitHub release attaches one archive per target, named `sendmock-<target triple>` with `.tar.gz` for macOS and Linux and `.zip` for Windows (for example `sendmock-aarch64-apple-darwin.tar.gz`, `sendmock-x86_64-pc-windows-msvc.zip`), plus a `SHA256SUMS` file. Each archive holds the `sendmock` binary (`sendmock.exe` on Windows), the licence and the readme at its top level, with no folder inside, so the install page's unpack steps leave `sendmock` in the current folder. The names carry no version, so `https://github.com/shibbirweb/sendmock/releases/latest/download/<archive>` always gives the latest stable build; the website's quick start links these for readers who download by hand (decided 2026-10-27). GitHub's `latest` skips pre-releases, so each beta release also moves a rolling `beta` pre-release to the same archives: `https://github.com/shibbirweb/sendmock/releases/download/beta/<archive>` always gives the newest beta, and the install page links both.
 
+### Binary tests on every platform (decided 2026-10-27)
+
+Every target a release builds is tested on its own operating system and CPU before anything is published. `release.yml` runs one job per target on a matching GitHub runner, and a failure on any platform stops the release.
+
+| Target | Runner |
+|--------|--------|
+| `aarch64-apple-darwin` | Apple silicon macOS runner |
+| `x86_64-apple-darwin` | Intel macOS runner (`macos-15-intel` while GitHub offers one) |
+| `x86_64-unknown-linux-musl` | `ubuntu-latest`, plus the `alpine` and `busybox` images |
+| `aarch64-unknown-linux-musl` | `ubuntu-24.04-arm`, plus the `alpine` image |
+| `x86_64-pc-windows-msvc` | `windows-latest` |
+| `aarch64-pc-windows-msvc` | `windows-11-arm` |
+
+Each job runs the same test cases against the archive the release will publish, following the install page's steps (`tar -xzf` or `Expand-Archive`), not a fresh build:
+
+1. The archive's checksum matches `SHA256SUMS`, and it holds `sendmock`, the licence and the readme at its top level.
+2. `sendmock --version` prints the release's version and channel.
+3. `sendmock` starts with no runtime installed (on Linux also in `alpine` and `busybox`, which have no glibc; on Windows with no Visual C++ redistributable) and listens on `127.0.0.1:1025` and `127.0.0.1:8025` only.
+4. `sendmock health` exits 0 once the listeners are ready.
+5. `GET /` serves the embedded web UI and `GET /api/v1/health` answers.
+6. An email sent over SMTP and an SMS sent through the API are read back through the API.
+7. After a restart, the captured email is still there (the default data folder for that operating system).
+8. Stopping it (`SIGTERM` on macOS and Linux, a console stop event on Windows) shuts down cleanly with exit code 0.
+9. The install script for the platform (`install.sh` on macOS and Linux, `install.ps1` on Windows) installs the stable and, with the beta option, the beta, and `sendmock` is on the `PATH` of a new shell.
+
+The test cases live in one script per shell (`scripts/release-tests/binary.sh` and `binary.ps1`) so every platform runs the same list, and the Docker image and package channels reuse cases 2 to 8 ([DS-03.6](acceptance/07-distribution-website.md#ds-03-package-managers-and-install-scripts)).
+
 ## Release channels
 
 Every channel has a **beta** track (from `develop`) and a **stable** track (from `main`); see [16-website-and-releases.md](16-website-and-releases.md#what-each-channel-publishes).
