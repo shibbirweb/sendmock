@@ -6,7 +6,8 @@ import type {
   WebhookTemplateSummary,
 } from "@/lib/api/types";
 import { validateTemplateDraft } from "@/lib/webhooks/validate-template-draft";
-import { findTemplateDefinition, mockDatabase } from "@/mocks/db/mock-database";
+import { mockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
 import { buildCustomTemplateId } from "@/mocks/webhooks/custom-template-id";

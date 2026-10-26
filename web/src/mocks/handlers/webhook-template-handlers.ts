@@ -7,7 +7,8 @@ import {
   type TemplateRenderRequest,
   type TemplateRenderResult,
 } from "@/lib/api/types";
-import { findTemplateDefinition, mockDatabase } from "@/mocks/db/mock-database";
+import { mockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import {
   applyMockConditions,
   createErrorResponse,

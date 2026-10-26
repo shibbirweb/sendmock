@@ -6,7 +6,8 @@ import type {
   TemplateImportRequest,
   TemplateUpdate,
 } from "@/lib/api/types";
-import { findTemplateDefinition, mockDatabase } from "@/mocks/db/mock-database";
+import { mockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import { readTemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import {
   applyMockConditions,

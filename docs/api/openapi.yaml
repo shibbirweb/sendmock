@@ -21,8 +21,12 @@ tags:
   - name: System
   - name: Seed
   - name: Logs
+  - name: Test helpers
+  - name: Automation
   - name: Email
   - name: Inbound routes
+  - name: Tag rules
+  - name: Forward rules
   - name: SMS
   - name: Outcome rules
   - name: Verify
@@ -55,6 +59,9 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock health
+      x-sendmock-mcp: sendmock_status
+      x-sendmock-ui: Sidebar > live connection dot
   /api/v1/info:
     get:
       operationId: getInfo
@@ -70,6 +77,9 @@ paths:
                 $ref: "#/components/schemas/AppInfo"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock status
+      x-sendmock-mcp: sendmock_status
+      x-sendmock-ui: Settings > About
   /api/v1/stats:
     get:
       operationId: getStats
@@ -85,6 +95,9 @@ paths:
                 $ref: "#/components/schemas/AppStats"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock stats
+      x-sendmock-mcp: sendmock_stats
+      x-sendmock-ui: Overview
   /api/v1/updates:
     get:
       operationId: getUpdates
@@ -102,6 +115,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock update check
+      x-sendmock-mcp: sendmock_update_check
+      x-sendmock-ui: Settings > About > Check GitHub Releases for updates
   /api/v1/settings:
     get:
       operationId: getSettings
@@ -117,6 +133,9 @@ paths:
                 $ref: "#/components/schemas/AppSettings"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock settings get
+      x-sendmock-mcp: sendmock_settings_get
+      x-sendmock-ui: Settings
     patch:
       operationId: patchSettings
       summary: Change settings; send only the changed keys.
@@ -139,6 +158,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock settings set <key> <value>
+      x-sendmock-mcp: sendmock_settings_update
+      x-sendmock-ui: Settings > Save changes
   /api/v1/reset:
     post:
       operationId: postReset
@@ -150,10 +172,13 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock reset --yes
+      x-sendmock-mcp: sendmock_reset
+      x-sendmock-ui: Settings > General > Reset to seed
   /api/v1/samples/{kind}:
     post:
       operationId: postSamplesByKind
-      summary: Create a sample email, SMS or verification for the demo.
+      summary: Create a sample email, SMS, verification or HTTP request through the normal path.
       tags:
         - System
       parameters:
@@ -162,6 +187,12 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SampleOptions"
       responses:
         "201":
           description: Created.
@@ -173,6 +204,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sample <kind>
+      x-sendmock-mcp: sendmock_sample_send
+      x-sendmock-ui: Empty screens > Send a sample email, SMS, verification or request
   /api/v1/seed/status:
     get:
       operationId: getSeedStatus
@@ -188,6 +222,9 @@ paths:
                 $ref: "#/components/schemas/SeedStatus"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock seed status
+      x-sendmock-mcp: sendmock_seed_status
+      x-sendmock-ui: Settings > Seed
   /api/v1/seed/export:
     get:
       operationId: getSeedExport
@@ -204,6 +241,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock seed export
+      x-sendmock-mcp: sendmock_seed_export
+      x-sendmock-ui: Settings > Seed > Export sendmock.seed.toml
   /api/v1/seed/validate:
     post:
       operationId: postSeedValidate
@@ -225,6 +265,9 @@ paths:
                 $ref: "#/components/schemas/SeedValidation"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock seed validate <file>
+      x-sendmock-mcp: sendmock_seed_validate
+      x-sendmock-ui: Settings > Seed > Validate
   /api/v1/seed/apply:
     post:
       operationId: postSeedApply
@@ -248,6 +291,9 @@ paths:
           $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock seed apply <file>
+      x-sendmock-mcp: sendmock_seed_apply
+      x-sendmock-ui: Settings > Seed > Apply a seed file
   /api/v1/logs/smtp:
     get:
       operationId: getLogsSmtp
@@ -288,6 +334,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_SmtpSession"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs smtp
+      x-sendmock-mcp: sendmock_logs_smtp
+      x-sendmock-ui: Logs > SMTP sessions
   /api/v1/logs/smtp/{sessionId}:
     get:
       operationId: getLogsSmtpBySessionId
@@ -311,6 +360,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs smtp show <sessionId>
+      x-sendmock-mcp: sendmock_logs_smtp_get
+      x-sendmock-ui: Logs > SMTP sessions > open a session
   /api/v1/logs/http:
     get:
       operationId: getLogsHttp
@@ -357,6 +409,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_ApiRequestLogEntry"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs http
+      x-sendmock-mcp: sendmock_logs_http
+      x-sendmock-ui: Logs > API requests
   /api/v1/logs/http/{requestId}:
     get:
       operationId: getLogsHttpByRequestId
@@ -380,6 +435,466 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs http show <requestId>
+      x-sendmock-mcp: sendmock_logs_http_get
+      x-sendmock-ui: Logs > API requests > open a request
+  /api/v1/wait/email:
+    get:
+      operationId: getWaitEmail
+      summary: Wait until a matching email arrives; 408 on timeout.
+      tags:
+        - Test helpers
+      parameters:
+        - name: to
+          in: query
+          required: false
+          description: A recipient contains.
+          schema:
+            type: string
+        - name: subject
+          in: query
+          required: false
+          description: Subject contains.
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          description: "Only match items newer than this time (default: 30 s ago)."
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDetail"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email wait
+      x-sendmock-mcp: sendmock_email_wait
+      x-sendmock-ui: Mail (new emails appear live)
+  /api/v1/wait/sms:
+    get:
+      operationId: getWaitSms
+      summary: Wait until a matching SMS arrives; 408 on timeout.
+      tags:
+        - Test helpers
+      parameters:
+        - name: to
+          in: query
+          required: false
+          description: The recipient number.
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          description: The sender number.
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          description: "Only match items newer than this time (default: 30 s ago)."
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SmsMessageDetail"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms wait
+      x-sendmock-mcp: sendmock_sms_wait
+      x-sendmock-ui: SMS (new messages appear live)
+  /api/v1/wait/http:
+    get:
+      operationId: getWaitHttp
+      summary: Wait until the catcher records a matching request; 408 on timeout.
+      tags:
+        - Test helpers
+      parameters:
+        - name: bin
+          in: query
+          required: false
+          description: The bin name.
+          schema:
+            type: string
+        - name: method
+          in: query
+          required: false
+          description: The HTTP method.
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          description: "Only match items newer than this time (default: 30 s ago)."
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapturedHttpRequest"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http wait
+      x-sendmock-mcp: sendmock_http_wait
+      x-sendmock-ui: HTTP (new requests appear live)
+  /api/v1/wait/webhook:
+    get:
+      operationId: getWaitWebhook
+      summary: Wait until a matching delivery finishes; 408 on timeout.
+      tags:
+        - Test helpers
+      parameters:
+        - name: endpoint
+          in: query
+          required: false
+          description: The endpoint id or name.
+          schema:
+            type: string
+        - name: event
+          in: query
+          required: false
+          description: The event type, e.g. email.received.
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          description: succeeded or failed.
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          description: "Only match items newer than this time (default: 30 s ago)."
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookDeliveryDetail"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries wait
+      x-sendmock-mcp: sendmock_webhook_delivery_wait
+      x-sendmock-ui: Webhooks > Deliveries (new deliveries appear live)
+  /api/v1/wait/payment:
+    get:
+      operationId: getWaitPayment
+      summary: Wait until a payment reaches a status; 408 on timeout.
+      tags:
+        - Test helpers
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          description: The gateway key, e.g. stripe.
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          description: The status to wait for, e.g. succeeded.
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          description: "Only match items newer than this time (default: 30 s ago)."
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentDetail"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments wait
+      x-sendmock-mcp: sendmock_payment_wait
+      x-sendmock-ui: Payments (new and changed payments appear live)
+  /api/v1/otp:
+    get:
+      operationId: getOtp
+      summary: The latest one-time code sent to a recipient.
+      tags:
+        - Test helpers
+      parameters:
+        - name: to
+          in: query
+          required: true
+          description: Email address or phone number.
+          schema:
+            type: string
+        - name: channel
+          in: query
+          required: false
+          description: "email, sms or verify (default: any)."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpLookup"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock otp --to <recipient>
+      x-sendmock-mcp: sendmock_otp_get
+      x-sendmock-ui: "Mail, SMS and Verify: the code beside each message"
+  /api/v1/links:
+    get:
+      operationId: getLinks
+      summary: The links of the latest email to a recipient.
+      tags:
+        - Test helpers
+      parameters:
+        - name: to
+          in: query
+          required: true
+          description: The recipient address.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LinksLookup"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock links --to <recipient>
+      x-sendmock-mcp: sendmock_links_get
+      x-sendmock-ui: Mail > open email > links panel
+  /api/v1/events/recent:
+    get:
+      operationId: getEventsRecent
+      summary: "The latest events, newest first: the polling twin of the live stream."
+      tags:
+        - Automation
+      parameters:
+        - name: since
+          in: query
+          required: false
+          description: Only events newer than this time.
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: An event type, e.g. http.captured.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: At most this many (default 50).
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppEvent"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock events tail
+      x-sendmock-mcp: sendmock_events_recent
+      x-sendmock-ui: Notification bell
+  /api/v1/integrations/{stack}:
+    get:
+      operationId: getIntegrationsByStack
+      summary: Copy-ready settings for a stack, as Settings > Connection shows them.
+      tags:
+        - Automation
+      parameters:
+        - name: stack
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: channel
+          in: query
+          required: false
+          description: email, sms or http (default email).
+          schema:
+            type: string
+        - name: host
+          in: query
+          required: false
+          description: "Where the app runs: local, docker-host or compose."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationSnippet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock integrate <stack>
+      x-sendmock-mcp: sendmock_integration_snippet
+      x-sendmock-ui: Settings > Connection
+  /api/v1/scenarios/validate:
+    post:
+      operationId: postScenariosValidate
+      summary: Check a scenario file without running it.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioValidation"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario validate <file>
+      x-sendmock-mcp: sendmock_scenario_validate
+      x-sendmock-ui: Scenarios > Validate
+  /api/v1/scenarios/run:
+    post:
+      operationId: postScenariosRun
+      summary: Run a scenario file step by step and report each step.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioReport"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario run <file>
+      x-sendmock-mcp: sendmock_scenario_run
+      x-sendmock-ui: Scenarios > Run
+  /api/v1/ai/agents:
+    get:
+      operationId: getAiAgents
+      summary: For each AI agent, the install command and its MCP configuration.
+      tags:
+        - Automation
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiAgentSetup"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ai install --target <agent>
+      x-sendmock-mcp: sendmock_ai_agents
+      x-sendmock-ui: Settings > Connection > AI agents
+  /api/v1/ai/skill:
+    get:
+      operationId: getAiSkill
+      summary: The SendMock agent skill as Markdown.
+      tags:
+        - Automation
+      responses:
+        "200":
+          description: OK.
+          content:
+            text/markdown:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ai skill
+      x-sendmock-mcp: sendmock://docs/skill
+      x-sendmock-ui: Settings > Connection > AI agents > Download the skill
   /api/v1/emails:
     get:
       operationId: getEmails
@@ -456,6 +971,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_EmailSummary"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email list
+      x-sendmock-mcp: sendmock_email_list
+      x-sendmock-ui: Mail
     delete:
       operationId: deleteEmails
       summary: Delete every email.
@@ -466,6 +984,68 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email delete-all --yes
+      x-sendmock-mcp: sendmock_email_delete_all
+      x-sendmock-ui: Mail > Delete all
+  /api/v1/emails/latest:
+    get:
+      operationId: getEmailsLatest
+      summary: The newest email to a recipient.
+      tags:
+        - Email
+      parameters:
+        - name: to
+          in: query
+          required: true
+          description: The recipient address.
+          schema:
+            type: string
+        - name: subject
+          in: query
+          required: false
+          description: Subject contains.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email latest --to <address>
+      x-sendmock-mcp: sendmock_email_latest
+      x-sendmock-ui: "Mail > search to:"
+  /api/v1/emails/inbound:
+    post:
+      operationId: postEmailsInbound
+      summary: Create an incoming email from fields or raw MIME; fires email.inbound.
+      tags:
+        - Email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailInboundRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeSendResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email inbound
+      x-sendmock-mcp: sendmock_email_inbound
+      x-sendmock-ui: Mail > Import .eml > Incoming to your app
   /api/v1/emails/{emailId}:
     get:
       operationId: getEmailsByEmailId
@@ -489,6 +1069,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email show <emailId>
+      x-sendmock-mcp: sendmock_email_get
+      x-sendmock-ui: Mail > open email
     patch:
       operationId: patchEmailsByEmailId
       summary: Mark read or unread, or change tags.
@@ -517,6 +1100,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email update <emailId>
+      x-sendmock-mcp: sendmock_email_update
+      x-sendmock-ui: Mail > open email > Mark as read, tags
     delete:
       operationId: deleteEmailsByEmailId
       summary: Delete one email.
@@ -533,6 +1119,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email delete <emailId>
+      x-sendmock-mcp: sendmock_email_delete
+      x-sendmock-ui: Mail > open email > Delete
   /api/v1/emails/{emailId}/timeline:
     get:
       operationId: getEmailsByEmailIdTimeline
@@ -556,6 +1145,9 @@ paths:
                   $ref: "#/components/schemas/EmailTimelineEntry"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email timeline <emailId>
+      x-sendmock-mcp: sendmock_email_timeline
+      x-sendmock-ui: Mail > open email > Timeline
   /api/v1/emails/{emailId}/html-check:
     get:
       operationId: getEmailsByEmailIdHtmlCheck
@@ -577,6 +1169,9 @@ paths:
                 $ref: "#/components/schemas/HtmlCheckReport"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email check <emailId> html
+      x-sendmock-mcp: sendmock_email_check
+      x-sendmock-ui: Mail > open email > Checks
   /api/v1/emails/{emailId}/list-unsubscribe:
     get:
       operationId: getEmailsByEmailIdListUnsubscribe
@@ -598,6 +1193,9 @@ paths:
                 $ref: "#/components/schemas/ListUnsubscribeReport"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email check <emailId> unsubscribe
+      x-sendmock-mcp: sendmock_email_check
+      x-sendmock-ui: Mail > open email > Headers
   /api/v1/emails/{emailId}/mime:
     get:
       operationId: getEmailsByEmailIdMime
@@ -619,6 +1217,9 @@ paths:
                 $ref: "#/components/schemas/MimePart"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mime <emailId>
+      x-sendmock-mcp: sendmock_email_mime
+      x-sendmock-ui: Mail > open email > MIME
   /api/v1/emails/{emailId}/raw:
     get:
       operationId: getEmailsByEmailIdRaw
@@ -641,6 +1242,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email raw <emailId>
+      x-sendmock-mcp: sendmock://emails/{emailId}/raw
+      x-sendmock-ui: Mail > open email > Source, download .eml
   /api/v1/emails/{emailId}/attachments/{attachmentIndex}:
     get:
       operationId: getEmailsByEmailIdAttachmentsByAttachmentIndex
@@ -670,6 +1274,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email attachments <emailId> <attachmentIndex>
+      x-sendmock-mcp: sendmock://emails/{emailId}/attachments/{attachmentIndex}
+      x-sendmock-ui: Mail > open email > Attachments
   /api/v1/emails/{emailId}/parts/{attachmentIndex}/thumbnail:
     get:
       operationId: getEmailsByEmailIdPartsByAttachmentIndexThumbnail
@@ -697,6 +1304,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email thumbnail <emailId> <attachmentIndex>
+      x-sendmock-mcp: sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail
+      x-sendmock-ui: Mail > open email > Attachments (thumbnails)
   /api/v1/emails/{emailId}/link-check:
     post:
       operationId: postEmailsByEmailIdLinkCheck
@@ -720,6 +1330,9 @@ paths:
                   $ref: "#/components/schemas/LinkCheckResult"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email check <emailId> links
+      x-sendmock-mcp: sendmock_email_check
+      x-sendmock-ui: Mail > open email > Checks
   /api/v1/emails/{emailId}/spam-check:
     post:
       operationId: postEmailsByEmailIdSpamCheck
@@ -741,6 +1354,9 @@ paths:
                 $ref: "#/components/schemas/SpamCheckReport"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email check <emailId> spam
+      x-sendmock-mcp: sendmock_email_check
+      x-sendmock-ui: Mail > open email > Checks
   /api/v1/emails/{emailId}/open:
     post:
       operationId: postEmailsByEmailIdOpen
@@ -766,6 +1382,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email open <emailId>
+      x-sendmock-mcp: sendmock_email_open
+      x-sendmock-ui: Mail > open email (opening it fires the open)
   /api/v1/emails/{emailId}/release:
     post:
       operationId: postEmailsByEmailIdRelease
@@ -791,6 +1410,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email release <emailId>
+      x-sendmock-mcp: sendmock_email_release
+      x-sendmock-ui: Mail > open email > Release to real SMTP
   /api/v1/emails/{emailId}/simulate:
     post:
       operationId: postEmailsByEmailIdSimulate
@@ -816,6 +1438,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email simulate <emailId> <event>
+      x-sendmock-mcp: sendmock_email_simulate
+      x-sendmock-ui: Mail > open email > Simulate
   /api/v1/emails/{emailId}/reply:
     post:
       operationId: postEmailsByEmailIdReply
@@ -845,6 +1470,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email reply <emailId>
+      x-sendmock-mcp: sendmock_email_reply
+      x-sendmock-ui: Mail > open email > Reply, Reply all
   /api/v1/emails/{emailId}/forward:
     post:
       operationId: postEmailsByEmailIdForward
@@ -874,6 +1502,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward <emailId>
+      x-sendmock-mcp: sendmock_email_forward
+      x-sendmock-ui: Mail > open email > Forward
   /api/v1/send:
     post:
       operationId: postSend
@@ -897,6 +1528,36 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email send
+      x-sendmock-mcp: sendmock_email_send
+      x-sendmock-ui: Settings > Connection > Send this request
+  /api/v1/send/raw:
+    post:
+      operationId: postSendRaw
+      summary: Store a raw message as sent by your app, as the sendmail shim does.
+      tags:
+        - Email
+      requestBody:
+        required: true
+        content:
+          message/rfc822:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeSendResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sendmail
+      x-sendmock-mcp: sendmock_email_send_raw
+      x-sendmock-ui: Mail > Import .eml > Sent by your app
   /api/v1/inbound-routes:
     get:
       operationId: getInboundRoutes
@@ -914,6 +1575,9 @@ paths:
                   $ref: "#/components/schemas/InboundRoute"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route list
+      x-sendmock-mcp: sendmock_inbound_route_list
+      x-sendmock-ui: Webhooks > Inbound routes
     post:
       operationId: postInboundRoutes
       summary: Add a route.
@@ -936,6 +1600,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route create
+      x-sendmock-mcp: sendmock_inbound_route_create
+      x-sendmock-ui: Webhooks > Inbound routes > Add route
   /api/v1/inbound-routes/{routeId}:
     patch:
       operationId: patchInboundRoutesByRouteId
@@ -967,6 +1634,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route update <routeId>
+      x-sendmock-mcp: sendmock_inbound_route_update
+      x-sendmock-ui: Webhooks > Inbound routes > Edit, move
     delete:
       operationId: deleteInboundRoutesByRouteId
       summary: Delete a route.
@@ -985,6 +1655,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route delete <routeId>
+      x-sendmock-mcp: sendmock_inbound_route_delete
+      x-sendmock-ui: Webhooks > Inbound routes > Delete
   /api/v1/inbound-routes/test:
     post:
       operationId: postInboundRoutesTest
@@ -1006,6 +1679,277 @@ paths:
                 $ref: "#/components/schemas/InboundRouteTestResult"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route test
+      x-sendmock-mcp: sendmock_inbound_route_test
+      x-sendmock-ui: Webhooks > Inbound routes > route sheet > Preview
+  /api/v1/tag-rules:
+    get:
+      operationId: getTagRules
+      summary: Every tag rule, in the order they run.
+      tags:
+        - Tag rules
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagRule"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email tag-rules list
+      x-sendmock-mcp: sendmock_tag_rule_list
+      x-sendmock-ui: Settings > Email > Tag rules
+    post:
+      operationId: postTagRules
+      summary: Add a tag rule at the end of the list.
+      tags:
+        - Tag rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagRuleInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email tag-rules create
+      x-sendmock-mcp: sendmock_tag_rule_create
+      x-sendmock-ui: Settings > Email > Tag rules > Add rule
+  /api/v1/tag-rules/{ruleId}:
+    patch:
+      operationId: patchTagRulesByRuleId
+      summary: Change a tag rule, or switch it on or off.
+      tags:
+        - Tag rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagRuleInputPatch"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email tag-rules update <ruleId>
+      x-sendmock-mcp: sendmock_tag_rule_update
+      x-sendmock-ui: Settings > Email > Tag rules > Edit, enabled switch
+    delete:
+      operationId: deleteTagRulesByRuleId
+      summary: Delete a tag rule.
+      tags:
+        - Tag rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email tag-rules delete <ruleId>
+      x-sendmock-mcp: sendmock_tag_rule_delete
+      x-sendmock-ui: Settings > Email > Tag rules > Delete
+  /api/v1/tag-rules/{ruleId}/move:
+    post:
+      operationId: postTagRulesByRuleIdMove
+      summary: Move a tag rule up or down.
+      tags:
+        - Tag rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageRuleMove"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagRule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email tag-rules move <ruleId>
+      x-sendmock-mcp: sendmock_tag_rule_move
+      x-sendmock-ui: Settings > Email > Tag rules > Move up, Move down
+  /api/v1/forward-rules:
+    get:
+      operationId: getForwardRules
+      summary: Every forward rule, in the order they run.
+      tags:
+        - Forward rules
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForwardRule"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward-rules list
+      x-sendmock-mcp: sendmock_forward_rule_list
+      x-sendmock-ui: Settings > Email > Auto-forward rules
+    post:
+      operationId: postForwardRules
+      summary: Add a forward rule at the end of the list.
+      tags:
+        - Forward rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForwardRuleInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForwardRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward-rules create
+      x-sendmock-mcp: sendmock_forward_rule_create
+      x-sendmock-ui: Settings > Email > Auto-forward rules > Add rule
+  /api/v1/forward-rules/{ruleId}:
+    patch:
+      operationId: patchForwardRulesByRuleId
+      summary: Change a forward rule, or switch it on or off.
+      tags:
+        - Forward rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForwardRuleInputPatch"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForwardRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward-rules update <ruleId>
+      x-sendmock-mcp: sendmock_forward_rule_update
+      x-sendmock-ui: Settings > Email > Auto-forward rules > Edit, enabled switch
+    delete:
+      operationId: deleteForwardRulesByRuleId
+      summary: Delete a forward rule.
+      tags:
+        - Forward rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward-rules delete <ruleId>
+      x-sendmock-mcp: sendmock_forward_rule_delete
+      x-sendmock-ui: Settings > Email > Auto-forward rules > Delete
+  /api/v1/forward-rules/{ruleId}/move:
+    post:
+      operationId: postForwardRulesByRuleIdMove
+      summary: Move a forward rule up or down.
+      tags:
+        - Forward rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageRuleMove"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForwardRule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email forward-rules move <ruleId>
+      x-sendmock-mcp: sendmock_forward_rule_move
+      x-sendmock-ui: Settings > Email > Auto-forward rules > Move up, Move down
   /api/v1/sms:
     get:
       operationId: getSms
@@ -1070,6 +2014,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_SmsMessage"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms list
+      x-sendmock-mcp: sendmock_sms_list
+      x-sendmock-ui: SMS
     delete:
       operationId: deleteSms
       summary: Delete every message.
@@ -1080,6 +2027,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms delete-all --yes
+      x-sendmock-mcp: sendmock_sms_delete_all
+      x-sendmock-ui: Settings > General > Delete all SMS
     post:
       operationId: postSms
       summary: Native send, with optional media URLs or inline media.
@@ -1102,6 +2052,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms send
+      x-sendmock-mcp: sendmock_sms_send
+      x-sendmock-ui: Settings > Connection > Send this request
   /api/v1/sms/threads:
     get:
       operationId: getSmsThreads
@@ -1119,6 +2072,9 @@ paths:
                   $ref: "#/components/schemas/SmsThread"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms threads
+      x-sendmock-mcp: sendmock_sms_threads
+      x-sendmock-ui: SMS > conversation list
   /api/v1/sms/{smsId}:
     get:
       operationId: getSmsBySmsId
@@ -1142,6 +2098,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms show <smsId>
+      x-sendmock-mcp: sendmock_sms_get
+      x-sendmock-ui: SMS > message > Message details
     delete:
       operationId: deleteSmsBySmsId
       summary: Delete one message.
@@ -1158,6 +2117,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms delete <smsId>
+      x-sendmock-mcp: sendmock_sms_delete
+      x-sendmock-ui: SMS > message menu > Delete
   /api/v1/sms/{smsId}/media/{mediaIndex}:
     get:
       operationId: getSmsBySmsIdMediaByMediaIndex
@@ -1187,6 +2149,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms media <smsId> <mediaIndex>
+      x-sendmock-mcp: sendmock://sms/{smsId}/media/{mediaIndex}
+      x-sendmock-ui: SMS > message > media
   /api/v1/sms/{smsId}/open:
     post:
       operationId: postSmsBySmsIdOpen
@@ -1214,6 +2179,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms open <smsId>
+      x-sendmock-mcp: sendmock_sms_open
+      x-sendmock-ui: SMS > message menu > Simulate read
   /api/v1/sms/{smsId}/reply-webhook/resend:
     post:
       operationId: postSmsBySmsIdReplyWebhookResend
@@ -1239,6 +2207,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms resend-reply-webhook <smsId>
+      x-sendmock-mcp: sendmock_sms_reply_webhook_resend
+      x-sendmock-ui: SMS > Message details > Reply webhook > Resend reply webhook
   /api/v1/sms/{smsId}/status:
     post:
       operationId: postSmsBySmsIdStatus
@@ -1268,6 +2239,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms status <smsId> <status>
+      x-sendmock-mcp: sendmock_sms_set_status
+      x-sendmock-ui: SMS > Message details > Set status
   /api/v1/sms/inbound:
     post:
       operationId: postSmsInbound
@@ -1291,6 +2265,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms inbound
+      x-sendmock-mcp: sendmock_sms_simulate_inbound
+      x-sendmock-ui: SMS > conversation > Reply as recipient
   /api/v1/outcome-rules/email:
     get:
       operationId: getOutcomeRulesEmail
@@ -1308,6 +2285,9 @@ paths:
                   $ref: "#/components/schemas/EmailOutcomeRule"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email list
+      x-sendmock-mcp: sendmock_outcome_rule_list
+      x-sendmock-ui: Settings > Email > Custom outcome addresses
     post:
       operationId: postOutcomeRulesEmail
       summary: Add an email outcome rule.
@@ -1330,6 +2310,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email create
+      x-sendmock-mcp: sendmock_outcome_rule_create
+      x-sendmock-ui: Settings > Email > Custom outcome addresses > Add address
   /api/v1/outcome-rules/email/{ruleId}:
     patch:
       operationId: patchOutcomeRulesEmailByRuleId
@@ -1361,6 +2344,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email update <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_update
+      x-sendmock-ui: Settings > Email > Custom outcome addresses > Edit, enabled switch
     delete:
       operationId: deleteOutcomeRulesEmailByRuleId
       summary: Delete an email outcome rule.
@@ -1377,6 +2363,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email delete <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_delete
+      x-sendmock-ui: Settings > Email > Custom outcome addresses > Delete
   /api/v1/outcome-rules/email/{ruleId}/move:
     post:
       operationId: postOutcomeRulesEmailByRuleIdMove
@@ -1408,6 +2397,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email move <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_move
+      x-sendmock-ui: Settings > Email > Custom outcome addresses > Move up, Move down
   /api/v1/outcome-rules/sms:
     get:
       operationId: getOutcomeRulesSms
@@ -1425,6 +2417,9 @@ paths:
                   $ref: "#/components/schemas/SmsOutcomeRule"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms list
+      x-sendmock-mcp: sendmock_outcome_rule_list
+      x-sendmock-ui: Settings > SMS > Custom outcome numbers
     post:
       operationId: postOutcomeRulesSms
       summary: Add an SMS outcome rule.
@@ -1447,6 +2442,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms create
+      x-sendmock-mcp: sendmock_outcome_rule_create
+      x-sendmock-ui: Settings > SMS > Custom outcome numbers > Add number
   /api/v1/outcome-rules/sms/{ruleId}:
     patch:
       operationId: patchOutcomeRulesSmsByRuleId
@@ -1478,6 +2476,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms update <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_update
+      x-sendmock-ui: Settings > SMS > Custom outcome numbers > Edit, enabled switch
     delete:
       operationId: deleteOutcomeRulesSmsByRuleId
       summary: Delete an SMS outcome rule.
@@ -1494,6 +2495,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms delete <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_delete
+      x-sendmock-ui: Settings > SMS > Custom outcome numbers > Delete
   /api/v1/outcome-rules/sms/{ruleId}/move:
     post:
       operationId: postOutcomeRulesSmsByRuleIdMove
@@ -1525,6 +2529,57 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms move <ruleId>
+      x-sendmock-mcp: sendmock_outcome_rule_move
+      x-sendmock-ui: Settings > SMS > Custom outcome numbers > Move up, Move down
+  /api/v1/outcome-rules/email/test:
+    post:
+      operationId: postOutcomeRulesEmailTest
+      summary: Which custom rule, magic address or profile decides an address's outcome.
+      tags:
+        - Outcome rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailOutcomeTestRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutcomeTestResult"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule email test <address>
+      x-sendmock-mcp: sendmock_outcome_rule_test
+      x-sendmock-ui: Settings > Email > Test an address
+  /api/v1/outcome-rules/sms/test:
+    post:
+      operationId: postOutcomeRulesSmsTest
+      summary: Which custom rule, magic number or profile decides a number's outcome.
+      tags:
+        - Outcome rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsOutcomeTestRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutcomeTestResult"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock outcome-rule sms test <number>
+      x-sendmock-mcp: sendmock_outcome_rule_test
+      x-sendmock-ui: Settings > SMS > Test a number
   /api/v1/verify:
     get:
       operationId: getVerify
@@ -1571,6 +2626,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_Verification"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify list
+      x-sendmock-mcp: sendmock_verify_list
+      x-sendmock-ui: SMS > Verify
   /api/v1/verify/{verificationSid}:
     get:
       operationId: getVerifyByVerificationSid
@@ -1594,6 +2652,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify show <verificationSid>
+      x-sendmock-mcp: sendmock_verify_get
+      x-sendmock-ui: SMS > Verify > open a verification
   /api/v1/verify/{verificationSid}/force:
     post:
       operationId: postVerifyByVerificationSidForce
@@ -1623,6 +2684,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify force <verificationSid> <status>
+      x-sendmock-mcp: sendmock_verify_force
+      x-sendmock-ui: SMS > Verify > verification > Approve, Cancel, Expire, Max attempts
   /api/v1/verify/services:
     get:
       operationId: getVerifyServices
@@ -1640,6 +2704,9 @@ paths:
                   $ref: "#/components/schemas/VerifyService"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify services list
+      x-sendmock-mcp: sendmock_verify_service_list
+      x-sendmock-ui: SMS > Verify > Services
     post:
       operationId: postVerifyServices
       summary: Add a Verify service.
@@ -1662,6 +2729,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify services create
+      x-sendmock-mcp: sendmock_verify_service_create
+      x-sendmock-ui: SMS > Verify > Services > New service
   /api/v1/verify/services/{serviceSid}:
     patch:
       operationId: patchVerifyServicesByServiceSid
@@ -1693,6 +2763,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify services update <serviceSid>
+      x-sendmock-mcp: sendmock_verify_service_update
+      x-sendmock-ui: SMS > Verify > Services > Edit
     delete:
       operationId: deleteVerifyServicesByServiceSid
       summary: Delete a Verify service.
@@ -1709,6 +2782,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify services delete <serviceSid>
+      x-sendmock-mcp: sendmock_verify_service_delete
+      x-sendmock-ui: SMS > Verify > Services > Delete
   /api/v1/numbers:
     get:
       operationId: getNumbers
@@ -1726,6 +2802,9 @@ paths:
                   $ref: "#/components/schemas/VirtualNumber"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock numbers list
+      x-sendmock-mcp: sendmock_number_list
+      x-sendmock-ui: Numbers
     post:
       operationId: postNumbers
       summary: Add a number.
@@ -1748,6 +2827,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock numbers add
+      x-sendmock-mcp: sendmock_number_upsert
+      x-sendmock-ui: Numbers > Add number
   /api/v1/numbers/{numberId}:
     patch:
       operationId: patchNumbersByNumberId
@@ -1779,6 +2861,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock numbers update <numberId>
+      x-sendmock-mcp: sendmock_number_upsert
+      x-sendmock-ui: Numbers > Edit
     delete:
       operationId: deleteNumbersByNumberId
       summary: Delete a number.
@@ -1795,6 +2880,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock numbers remove <numberId>
+      x-sendmock-mcp: sendmock_number_delete
+      x-sendmock-ui: Numbers > Delete
   /api/v1/messaging-services:
     get:
       operationId: getMessagingServices
@@ -1812,6 +2900,9 @@ paths:
                   $ref: "#/components/schemas/MessagingService"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms services list
+      x-sendmock-mcp: sendmock_messaging_service_list
+      x-sendmock-ui: Numbers > Messaging Services
     post:
       operationId: postMessagingServices
       summary: Add a Messaging Service.
@@ -1834,6 +2925,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms services create
+      x-sendmock-mcp: sendmock_messaging_service_create
+      x-sendmock-ui: Numbers > Messaging Services > New Messaging Service
   /api/v1/messaging-services/{serviceSid}:
     patch:
       operationId: patchMessagingServicesByServiceSid
@@ -1865,6 +2959,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms services update <serviceSid>
+      x-sendmock-mcp: sendmock_messaging_service_update
+      x-sendmock-ui: Numbers > Messaging Services > Edit
     delete:
       operationId: deleteMessagingServicesByServiceSid
       summary: Delete a Messaging Service.
@@ -1881,6 +2978,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms services delete <serviceSid>
+      x-sendmock-mcp: sendmock_messaging_service_delete
+      x-sendmock-ui: Numbers > Messaging Services > Delete
   /api/v1/http/bins:
     get:
       operationId: getHttpBins
@@ -1898,6 +2998,9 @@ paths:
                   $ref: "#/components/schemas/HttpBin"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http bin list
+      x-sendmock-mcp: sendmock_http_bin_list
+      x-sendmock-ui: HTTP > bins
     post:
       operationId: postHttpBins
       summary: Add a bin; 409 when the name is taken.
@@ -1922,6 +3025,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http bin create
+      x-sendmock-mcp: sendmock_http_bin_create
+      x-sendmock-ui: HTTP > New bin
   /api/v1/http/bins/{binId}:
     patch:
       operationId: patchHttpBinsByBinId
@@ -1951,6 +3057,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http bin update <binId>
+      x-sendmock-mcp: sendmock_http_bin_update
+      x-sendmock-ui: HTTP > bin > Responses > Edit default reply
     delete:
       operationId: deleteHttpBinsByBinId
       summary: Delete a bin and its requests.
@@ -1969,6 +3078,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http bin delete <binId>
+      x-sendmock-mcp: sendmock_http_bin_delete
+      x-sendmock-ui: HTTP > bin > Delete bin
   /api/v1/http/bins/{binId}/responses:
     get:
       operationId: getHttpBinsByBinIdResponses
@@ -1994,6 +3106,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http response list <binId>
+      x-sendmock-mcp: sendmock_http_response_list
+      x-sendmock-ui: HTTP > bin > Responses
     put:
       operationId: putHttpBinsByBinIdResponses
       summary: Replace a bin's response rules.
@@ -2028,6 +3143,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http response set <binId>
+      x-sendmock-mcp: sendmock_http_response_set
+      x-sendmock-ui: HTTP > bin > Responses > Add rule, edit, move, enabled switch
   /api/v1/http/bins/{binId}/responses/preview:
     post:
       operationId: postHttpBinsByBinIdResponsesPreview
@@ -2057,6 +3175,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http response preview <binId>
+      x-sendmock-mcp: sendmock_http_response_preview
+      x-sendmock-ui: HTTP > bin > Responses > rule sheet > Preview
   /api/v1/http/requests:
     get:
       operationId: getHttpRequests
@@ -2091,6 +3212,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_CapturedHttpRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http list
+      x-sendmock-mcp: sendmock_http_list
+      x-sendmock-ui: HTTP > Requests
     delete:
       operationId: deleteHttpRequests
       summary: Delete captured requests, all or one bin's.
@@ -2108,6 +3232,9 @@ paths:
           description: No content.
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http clear
+      x-sendmock-mcp: sendmock_http_clear
+      x-sendmock-ui: HTTP > bin > Clear requests
   /api/v1/http/requests/{requestId}:
     get:
       operationId: getHttpRequestsByRequestId
@@ -2131,6 +3258,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http show <requestId>
+      x-sendmock-mcp: sendmock_http_get
+      x-sendmock-ui: HTTP > open a request
   /api/v1/http/requests/{requestId}/files/{fileIndex}:
     get:
       operationId: getHttpRequestsByRequestIdFilesByFileIndex
@@ -2160,6 +3290,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http file <requestId> <fileIndex>
+      x-sendmock-mcp: sendmock://http/requests/{requestId}/files/{fileIndex}
+      x-sendmock-ui: HTTP > request > Body > files
   /api/v1/http/requests/{requestId}/forward:
     post:
       operationId: postHttpRequestsByRequestIdForward
@@ -2191,6 +3324,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http forward <requestId>
+      x-sendmock-mcp: sendmock_http_forward
+      x-sendmock-ui: HTTP > request > Forward to URL
   /catch/{binPath}:
     get:
       operationId: getCatchByBinPath
@@ -2213,6 +3349,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http send <bin>
+      x-sendmock-mcp: sendmock_http_send
+      x-sendmock-ui: HTTP > Send a sample request
     post:
       operationId: postCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
@@ -2241,6 +3380,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http send <bin>
+      x-sendmock-mcp: sendmock_http_send
+      x-sendmock-ui: HTTP > Send a sample request
     put:
       operationId: putCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
@@ -2269,6 +3411,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http send <bin>
+      x-sendmock-mcp: sendmock_http_send
+      x-sendmock-ui: HTTP > Send a sample request
     patch:
       operationId: patchCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
@@ -2297,6 +3442,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http send <bin>
+      x-sendmock-mcp: sendmock_http_send
+      x-sendmock-ui: HTTP > Send a sample request
     delete:
       operationId: deleteCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
@@ -2318,6 +3466,9 @@ paths:
                 format: binary
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http send <bin>
+      x-sendmock-mcp: sendmock_http_send
+      x-sendmock-ui: HTTP > Send a sample request
   /api/v1/payments:
     get:
       operationId: getPayments
@@ -2364,6 +3515,29 @@ paths:
                 $ref: "#/components/schemas/PageOf_PaymentSummary"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments list
+      x-sendmock-mcp: sendmock_payment_list
+      x-sendmock-ui: Payments
+  /api/v1/payments/test-cards:
+    get:
+      operationId: getPaymentsTestCards
+      summary: The test values of every enabled payment method.
+      tags:
+        - Payments
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentMethodDefinition"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments test-cards
+      x-sendmock-mcp: sendmock_payment_test_cards
+      x-sendmock-ui: Settings > Payments > Test values
   /api/v1/payments/{paymentId}:
     get:
       operationId: getPaymentsByPaymentId
@@ -2387,6 +3561,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments show <paymentId>
+      x-sendmock-mcp: sendmock_payment_get
+      x-sendmock-ui: Payments > open payment
   /api/v1/payments/{paymentId}/notify:
     post:
       operationId: postPaymentsByPaymentIdNotify
@@ -2412,6 +3589,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments notify <paymentId>
+      x-sendmock-mcp: sendmock_payment_notify
+      x-sendmock-ui: Payments > payment > Resend notification
   /api/v1/payments/{paymentId}/simulate:
     post:
       operationId: postPaymentsByPaymentIdSimulate
@@ -2443,6 +3623,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments simulate <paymentId> <action>
+      x-sendmock-mcp: sendmock_payment_simulate
+      x-sendmock-ui: Payments > payment > Simulate
   /api/v1/payments/checkout:
     post:
       operationId: postPaymentsCheckout
@@ -2466,6 +3649,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments checkout create
+      x-sendmock-mcp: sendmock_payment_create_checkout
+      x-sendmock-ui: Payments > Gateways > gateway > Checkout > Open a test checkout
   /api/v1/checkout-sessions/{sessionId}:
     get:
       operationId: getCheckoutSessionsBySessionId
@@ -2489,6 +3675,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments checkout show <sessionId>
+      x-sendmock-mcp: sendmock_checkout_get
+      x-sendmock-ui: Test checkout page
   /api/v1/checkout-sessions/{sessionId}/complete:
     post:
       operationId: postCheckoutSessionsBySessionIdComplete
@@ -2522,6 +3711,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments checkout complete <sessionId> <action>
+      x-sendmock-mcp: sendmock_checkout_complete
+      x-sendmock-ui: Test checkout page > pay, Test controls
   /api/v1/payments/flows:
     get:
       operationId: getPaymentsFlows
@@ -2539,6 +3731,9 @@ paths:
                   $ref: "#/components/schemas/PaymentFlowDefinition"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows list
+      x-sendmock-mcp: sendmock_payment_flow_list
+      x-sendmock-ui: Payments > Flows
     post:
       operationId: postPaymentsFlows
       summary: Add a flow.
@@ -2561,7 +3756,35 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows create
+      x-sendmock-mcp: sendmock_payment_flow_create
+      x-sendmock-ui: Payments > Flows > Add flow
   /api/v1/payments/flows/{flowKey}:
+    get:
+      operationId: getPaymentsFlowsByFlowKey
+      summary: One payment flow with its steps.
+      tags:
+        - Payment flows
+      parameters:
+        - name: flowKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentFlowDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows show <flowKey>
+      x-sendmock-mcp: sendmock_payment_flow_get
+      x-sendmock-ui: Payments > Flows > Edit
     patch:
       operationId: patchPaymentsFlowsByFlowKey
       summary: Change a flow.
@@ -2592,6 +3815,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows update <flowKey>
+      x-sendmock-mcp: sendmock_payment_flow_update
+      x-sendmock-ui: Payments > Flows > flow > Save flow
     delete:
       operationId: deletePaymentsFlowsByFlowKey
       summary: Delete a custom flow; 409 while a method uses it.
@@ -2612,6 +3838,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows delete <flowKey>
+      x-sendmock-mcp: sendmock_payment_flow_delete
+      x-sendmock-ui: Payments > Flows > flow > Delete
   /api/v1/payments/flows/{flowKey}/reset:
     post:
       operationId: postPaymentsFlowsByFlowKeyReset
@@ -2637,6 +3866,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows reset <flowKey>
+      x-sendmock-mcp: sendmock_payment_flow_reset
+      x-sendmock-ui: Payments > Flows > flow > Reset to default
   /api/v1/payments/flows/{flowKey}/steps:
     post:
       operationId: postPaymentsFlowsByFlowKeySteps
@@ -2668,6 +3900,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows steps add <flowKey>
+      x-sendmock-mcp: sendmock_payment_flow_step_add
+      x-sendmock-ui: Payments > Flows > flow > Add step
   /api/v1/payments/flows/{flowKey}/steps/{stepIndex}:
     patch:
       operationId: patchPaymentsFlowsByFlowKeyStepsByStepIndex
@@ -2704,6 +3939,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows steps update <flowKey> <stepIndex>
+      x-sendmock-mcp: sendmock_payment_flow_step_update
+      x-sendmock-ui: Payments > Flows > flow > step labels, Move up, Move down
     delete:
       operationId: deletePaymentsFlowsByFlowKeyStepsByStepIndex
       summary: Remove one step of a flow.
@@ -2733,6 +3971,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows steps remove <flowKey> <stepIndex>
+      x-sendmock-mcp: sendmock_payment_flow_step_remove
+      x-sendmock-ui: Payments > Flows > flow > Remove step
   /api/v1/payments/step-types:
     get:
       operationId: getPaymentsStepTypes
@@ -2750,6 +3991,9 @@ paths:
                   $ref: "#/components/schemas/PaymentStepTypeInfo"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows step-types
+      x-sendmock-mcp: sendmock_payment_step_type_list
+      x-sendmock-ui: Payments > Flows > flow > Add step menu
   /api/v1/payments/flow-variables:
     get:
       operationId: getPaymentsFlowVariables
@@ -2767,6 +4011,9 @@ paths:
                   $ref: "#/components/schemas/PaymentFlowVariable"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments flows variables
+      x-sendmock-mcp: sendmock_payment_flow_variable_list
+      x-sendmock-ui: Payments > Flows > flow > Label variables
   /api/v1/payments/gateways:
     get:
       operationId: getPaymentsGateways
@@ -2784,6 +4031,9 @@ paths:
                   $ref: "#/components/schemas/PaymentGatewayDefinition"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways list
+      x-sendmock-mcp: sendmock_payment_gateway_list
+      x-sendmock-ui: Payments > Gateways
     post:
       operationId: postPaymentsGateways
       summary: Add a custom gateway.
@@ -2806,7 +4056,35 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways create
+      x-sendmock-mcp: sendmock_payment_gateway_create
+      x-sendmock-ui: Payments > Gateways > Add gateway
   /api/v1/payments/gateways/{gatewayKey}:
+    get:
+      operationId: getPaymentsGatewaysByGatewayKey
+      summary: One gateway definition; secret credentials masked.
+      tags:
+        - Payment gateways
+      parameters:
+        - name: gatewayKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentGatewayDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways show <gatewayKey>
+      x-sendmock-mcp: sendmock_payment_gateway_get
+      x-sendmock-ui: Payments > Gateways > Edit
     patch:
       operationId: patchPaymentsGatewaysByGatewayKey
       summary: Change a gateway; secret credentials stay masked.
@@ -2837,6 +4115,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways update <gatewayKey>
+      x-sendmock-mcp: sendmock_payment_gateway_update
+      x-sendmock-ui: Payments > Gateways > gateway > Save gateway
     delete:
       operationId: deletePaymentsGatewaysByGatewayKey
       summary: Delete a custom gateway; 409 while payments use it.
@@ -2857,6 +4138,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways delete <gatewayKey>
+      x-sendmock-mcp: sendmock_payment_gateway_delete
+      x-sendmock-ui: Payments > Gateways > gateway > Delete
   /api/v1/payments/gateways/{gatewayKey}/reset:
     post:
       operationId: postPaymentsGatewaysByGatewayKeyReset
@@ -2882,6 +4166,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways reset <gatewayKey>
+      x-sendmock-mcp: sendmock_payment_gateway_reset
+      x-sendmock-ui: Payments > Gateways > gateway > Reset to default
   /api/v1/payments/gateways/{gatewayKey}/preview:
     post:
       operationId: postPaymentsGatewaysByGatewayKeyPreview
@@ -2909,6 +4196,9 @@ paths:
                 $ref: "#/components/schemas/PaymentGatewayPreview"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways preview <gatewayKey>
+      x-sendmock-mcp: sendmock_payment_gateway_preview
+      x-sendmock-ui: Payments > Gateways > gateway > Redirect, Notification preview
   /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}:
     get:
       operationId: getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName
@@ -2937,6 +4227,10 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments gateways credential <gatewayKey> <credentialName> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: Payments > Gateways > gateway > Merchant > Reveal
   /api/v1/payments/methods:
     get:
       operationId: getPaymentsMethods
@@ -2954,6 +4248,9 @@ paths:
                   $ref: "#/components/schemas/PaymentMethodDefinition"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods list
+      x-sendmock-mcp: sendmock_payment_method_list
+      x-sendmock-ui: Payments > Methods
     post:
       operationId: postPaymentsMethods
       summary: Add a custom method.
@@ -2976,7 +4273,35 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods create
+      x-sendmock-mcp: sendmock_payment_method_create
+      x-sendmock-ui: Payments > Methods > Add method
   /api/v1/payments/methods/{methodKey}:
+    get:
+      operationId: getPaymentsMethodsByMethodKey
+      summary: One payment method with its test values.
+      tags:
+        - Payment methods
+      parameters:
+        - name: methodKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethodDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods show <methodKey>
+      x-sendmock-mcp: sendmock_payment_method_get
+      x-sendmock-ui: Payments > Methods > Edit
     patch:
       operationId: patchPaymentsMethodsByMethodKey
       summary: Change a method.
@@ -3007,6 +4332,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods update <methodKey>
+      x-sendmock-mcp: sendmock_payment_method_update
+      x-sendmock-ui: Payments > Methods > method > Save method, enabled switch
     delete:
       operationId: deletePaymentsMethodsByMethodKey
       summary: Delete a custom method; 409 while a gateway offers it.
@@ -3027,6 +4355,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods delete <methodKey>
+      x-sendmock-mcp: sendmock_payment_method_delete
+      x-sendmock-ui: Payments > Methods > method > Delete
   /api/v1/payments/methods/{methodKey}/reset:
     post:
       operationId: postPaymentsMethodsByMethodKeyReset
@@ -3052,6 +4383,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments methods reset <methodKey>
+      x-sendmock-mcp: sendmock_payment_method_reset
+      x-sendmock-ui: Payments > Methods > method > Reset to default
   /api/v1/webhooks/endpoints:
     get:
       operationId: getWebhooksEndpoints
@@ -3069,6 +4403,9 @@ paths:
                   $ref: "#/components/schemas/WebhookEndpoint"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint list
+      x-sendmock-mcp: sendmock_webhook_endpoint_list
+      x-sendmock-ui: Webhooks > Endpoints
     post:
       operationId: postWebhooksEndpoints
       summary: Add an endpoint; its signing secret is generated.
@@ -3091,7 +4428,35 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint create
+      x-sendmock-mcp: sendmock_webhook_endpoint_create
+      x-sendmock-ui: Webhooks > Endpoints > Add endpoint
   /api/v1/webhooks/endpoints/{endpointId}:
+    get:
+      operationId: getWebhooksEndpointsByEndpointId
+      summary: One endpoint; its secret masked.
+      tags:
+        - Webhook endpoints
+      parameters:
+        - name: endpointId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookEndpoint"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint show <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_get
+      x-sendmock-ui: Webhooks > Endpoints > Edit
     patch:
       operationId: patchWebhooksEndpointsByEndpointId
       summary: Change an endpoint; send only the changed keys.
@@ -3122,6 +4487,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint update <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_update
+      x-sendmock-ui: Webhooks > Endpoints > endpoint > Save changes, enabled switch
     delete:
       operationId: deleteWebhooksEndpointsByEndpointId
       summary: Delete an endpoint and its rules.
@@ -3140,6 +4508,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint delete <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_delete
+      x-sendmock-ui: Webhooks > Endpoints > Delete
   /api/v1/webhooks/endpoints/preview:
     post:
       operationId: postWebhooksEndpointsPreview
@@ -3163,6 +4534,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook render --endpoint <endpointId>
+      x-sendmock-mcp: sendmock_webhook_render
+      x-sendmock-ui: Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview
   /api/v1/webhooks/endpoints/{endpointId}/secret:
     get:
       operationId: getWebhooksEndpointsByEndpointIdSecret
@@ -3186,6 +4560,10 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint secret <endpointId> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: Webhooks > Endpoints > endpoint > Security > Reveal
   /api/v1/webhooks/endpoints/{endpointId}/rotate-secret:
     post:
       operationId: postWebhooksEndpointsByEndpointIdRotateSecret
@@ -3217,6 +4595,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint rotate-secret <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_rotate_secret
+      x-sendmock-ui: Webhooks > Endpoints > endpoint > Security > Rotate secret
   /api/v1/webhooks/endpoints/{endpointId}/save-as-template:
     post:
       operationId: postWebhooksEndpointsByEndpointIdSaveAsTemplate
@@ -3248,6 +4629,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint save-as-template <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_save_as_template
+      x-sendmock-ui: Webhooks > Endpoints > endpoint > Request > Save as template
   /api/v1/webhooks/endpoints/{endpointId}/send:
     post:
       operationId: postWebhooksEndpointsByEndpointIdSend
@@ -3277,6 +4661,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook send --endpoint <endpointId>
+      x-sendmock-mcp: sendmock_webhook_send
+      x-sendmock-ui: Mail, SMS, HTTP > Send to webhook; Webhooks > Composer > Send
   /api/v1/webhooks/endpoints/{endpointId}/test:
     post:
       operationId: postWebhooksEndpointsByEndpointIdTest
@@ -3300,6 +4687,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook endpoint test <endpointId>
+      x-sendmock-mcp: sendmock_webhook_endpoint_test
+      x-sendmock-ui: Webhooks > Endpoints > Send test
   /api/v1/webhooks/rules:
     get:
       operationId: getWebhooksRules
@@ -3317,6 +4707,9 @@ paths:
                   $ref: "#/components/schemas/WebhookRule"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule list
+      x-sendmock-mcp: sendmock_webhook_rule_list
+      x-sendmock-ui: Webhooks > Rules
     post:
       operationId: postWebhooksRules
       summary: Add a rule.
@@ -3339,7 +4732,35 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule create
+      x-sendmock-mcp: sendmock_webhook_rule_create
+      x-sendmock-ui: Webhooks > Rules > Add rule
   /api/v1/webhooks/rules/{ruleId}:
+    get:
+      operationId: getWebhooksRulesByRuleId
+      summary: One webhook rule with its filter.
+      tags:
+        - Webhook rules
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookRule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule show <ruleId>
+      x-sendmock-mcp: sendmock_webhook_rule_get
+      x-sendmock-ui: Webhooks > Rules > Edit
     patch:
       operationId: patchWebhooksRulesByRuleId
       summary: Change a rule; send only the changed keys.
@@ -3370,6 +4791,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule update <ruleId>
+      x-sendmock-mcp: sendmock_webhook_rule_update
+      x-sendmock-ui: Webhooks > Rules > rule > Save changes, enabled switch
     delete:
       operationId: deleteWebhooksRulesByRuleId
       summary: Delete a rule.
@@ -3388,6 +4812,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule delete <ruleId>
+      x-sendmock-mcp: sendmock_webhook_rule_delete
+      x-sendmock-ui: Webhooks > Rules > Delete
   /api/v1/webhooks/rules/{ruleId}/move:
     post:
       operationId: postWebhooksRulesByRuleIdMove
@@ -3419,6 +4846,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule move <ruleId>
+      x-sendmock-mcp: sendmock_webhook_rule_move
+      x-sendmock-ui: Webhooks > Rules > Move up, Move down
   /api/v1/webhooks/rules/preview:
     post:
       operationId: postWebhooksRulesPreview
@@ -3440,6 +4870,9 @@ paths:
                 $ref: "#/components/schemas/RulePreviewResult"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule preview
+      x-sendmock-mcp: sendmock_webhook_rule_preview
+      x-sendmock-ui: Webhooks > Rules > rule sheet > Preview
   /api/v1/webhooks/deliveries:
     get:
       operationId: getWebhooksDeliveries
@@ -3486,6 +4919,9 @@ paths:
                 $ref: "#/components/schemas/PageOf_WebhookDelivery"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries list
+      x-sendmock-mcp: sendmock_webhook_delivery_list
+      x-sendmock-ui: Webhooks > Deliveries
   /api/v1/webhooks/deliveries/{deliveryId}:
     get:
       operationId: getWebhooksDeliveriesByDeliveryId
@@ -3509,6 +4945,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries show <deliveryId>
+      x-sendmock-mcp: sendmock_webhook_delivery_get
+      x-sendmock-ui: Webhooks > Deliveries > open a delivery
   /api/v1/webhooks/deliveries/{deliveryId}/cancel:
     post:
       operationId: postWebhooksDeliveriesByDeliveryIdCancel
@@ -3534,6 +4973,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries cancel <deliveryId>
+      x-sendmock-mcp: sendmock_webhook_delivery_cancel
+      x-sendmock-ui: Webhooks > Deliveries > delivery > Cancel retries
   /api/v1/webhooks/deliveries/{deliveryId}/replay:
     post:
       operationId: postWebhooksDeliveriesByDeliveryIdReplay
@@ -3565,6 +5007,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries replay <deliveryId>
+      x-sendmock-mcp: sendmock_webhook_delivery_replay
+      x-sendmock-ui: Webhooks > Deliveries > delivery > Replay, Edit and replay
   /api/v1/webhooks/metrics:
     get:
       operationId: getWebhooksMetrics
@@ -3593,6 +5038,9 @@ paths:
                 $ref: "#/components/schemas/WebhookMetrics"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook metrics
+      x-sendmock-mcp: sendmock_webhook_metrics
+      x-sendmock-ui: Webhooks > Overview
   /api/v1/webhooks/saved:
     get:
       operationId: getWebhooksSaved
@@ -3610,6 +5058,9 @@ paths:
                   $ref: "#/components/schemas/SavedDelivery"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved list
+      x-sendmock-mcp: sendmock_webhook_saved_list
+      x-sendmock-ui: Webhooks > Saved
     post:
       operationId: postWebhooksSaved
       summary: Save a delivery's request under a name.
@@ -3636,6 +5087,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved create --delivery <deliveryId>
+      x-sendmock-mcp: sendmock_webhook_saved_create
+      x-sendmock-ui: Webhooks > Deliveries > delivery > Save
   /api/v1/webhooks/saved/{savedId}:
     patch:
       operationId: patchWebhooksSavedBySavedId
@@ -3667,6 +5121,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved rename <savedId>
+      x-sendmock-mcp: sendmock_webhook_saved_update
+      x-sendmock-ui: Webhooks > Saved > Rename
     delete:
       operationId: deleteWebhooksSavedBySavedId
       summary: Delete a saved delivery.
@@ -3685,6 +5142,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved delete <savedId>
+      x-sendmock-mcp: sendmock_webhook_saved_delete
+      x-sendmock-ui: Webhooks > Saved > Delete
   /api/v1/webhooks/saved/{savedId}/send:
     post:
       operationId: postWebhooksSavedBySavedIdSend
@@ -3716,6 +5176,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved send <savedId>
+      x-sendmock-mcp: sendmock_webhook_saved_send
+      x-sendmock-ui: Webhooks > Saved > Send
   /api/v1/webhooks/saved/{savedId}/template:
     post:
       operationId: postWebhooksSavedBySavedIdTemplate
@@ -3747,6 +5210,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook saved save-as-template <savedId>
+      x-sendmock-mcp: sendmock_webhook_saved_save_as_template
+      x-sendmock-ui: Webhooks > Saved > Save as template
   /api/v1/webhooks/templates:
     get:
       operationId: getWebhooksTemplates
@@ -3764,6 +5230,9 @@ paths:
                   $ref: "#/components/schemas/WebhookTemplateSummary"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template list
+      x-sendmock-mcp: sendmock_webhook_template_list
+      x-sendmock-ui: Webhooks > Templates
     post:
       operationId: postWebhooksTemplates
       summary: Add a custom template, starting as native JSON.
@@ -3786,6 +5255,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template create
+      x-sendmock-mcp: sendmock_webhook_template_create
+      x-sendmock-ui: Webhooks > Templates > New template
   /api/v1/webhooks/templates/{templateId}:
     get:
       operationId: getWebhooksTemplatesByTemplateId
@@ -3809,6 +5281,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template show <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_get
+      x-sendmock-ui: Webhooks > Templates > open a template
     patch:
       operationId: patchWebhooksTemplatesByTemplateId
       summary: Edit a template; each save keeps a revision, 422 when it does not render.
@@ -3843,6 +5318,9 @@ paths:
           $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template update <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_update
+      x-sendmock-ui: Webhooks > Templates > template > Edit, Save template
     delete:
       operationId: deleteWebhooksTemplatesByTemplateId
       summary: Delete a custom template; 409 while endpoints use it.
@@ -3869,6 +5347,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template delete <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_delete
+      x-sendmock-ui: Webhooks > Templates > template > Delete
   /api/v1/webhooks/templates/import:
     post:
       operationId: postWebhooksTemplatesImport
@@ -3894,6 +5375,9 @@ paths:
           $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template import <file>
+      x-sendmock-mcp: sendmock_webhook_template_import
+      x-sendmock-ui: Webhooks > Templates > Import a template
   /api/v1/webhooks/templates/{templateId}/export:
     get:
       operationId: getWebhooksTemplatesByTemplateIdExport
@@ -3918,6 +5402,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template export <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_export
+      x-sendmock-ui: Webhooks > Templates > template > Export
   /api/v1/webhooks/templates/{templateId}/revisions:
     get:
       operationId: getWebhooksTemplatesByTemplateIdRevisions
@@ -3943,6 +5430,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template history <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_revisions
+      x-sendmock-ui: Webhooks > Templates > template > History
   /api/v1/webhooks/templates/{templateId}/revisions/{revision}/restore:
     post:
       operationId: postWebhooksTemplatesByTemplateIdRevisionsByRevisionRestore
@@ -3971,6 +5461,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template restore <templateId> <revision>
+      x-sendmock-mcp: sendmock_webhook_template_restore
+      x-sendmock-ui: Webhooks > Templates > template > History > Restore
   /api/v1/webhooks/templates/{templateId}/render:
     post:
       operationId: postWebhooksTemplatesByTemplateIdRender
@@ -4000,6 +5493,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template render <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_render
+      x-sendmock-ui: Webhooks > Templates > template > Preview
   /api/v1/webhooks/templates/{templateId}/reset:
     post:
       operationId: postWebhooksTemplatesByTemplateIdReset
@@ -4025,6 +5521,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template reset <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_reset
+      x-sendmock-ui: Webhooks > Templates > template > Reset to default
   /api/v1/webhooks/templates/{templateId}/clone:
     post:
       operationId: postWebhooksTemplatesByTemplateIdClone
@@ -4056,6 +5555,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template clone <templateId>
+      x-sendmock-mcp: sendmock_webhook_template_clone
+      x-sendmock-ui: Webhooks > Templates > template > Clone
   /api/v1/webhooks/template-reference:
     get:
       operationId: getWebhooksTemplateReference
@@ -4078,6 +5580,9 @@ paths:
                 $ref: "#/components/schemas/TemplateReference"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook template reference
+      x-sendmock-mcp: sendmock_webhook_template_reference
+      x-sendmock-ui: Webhooks > Templates > template editor > reference panel
   /api/v1/webhooks/variables:
     get:
       operationId: getWebhooksVariables
@@ -4102,6 +5607,9 @@ paths:
                   $ref: "#/components/schemas/WebhookVariable"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var list
+      x-sendmock-mcp: sendmock_webhook_variable_list
+      x-sendmock-ui: Webhooks > Variables
     post:
       operationId: postWebhooksVariables
       summary: Add a variable.
@@ -4124,6 +5632,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var set <name> <value>
+      x-sendmock-mcp: sendmock_webhook_variable_set
+      x-sendmock-ui: Webhooks > Variables > Add variable
   /api/v1/webhooks/variables/{variableId}:
     patch:
       operationId: patchWebhooksVariablesByVariableId
@@ -4155,6 +5666,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var update <variableId>
+      x-sendmock-mcp: sendmock_webhook_variable_update
+      x-sendmock-ui: Webhooks > Variables > Edit
     delete:
       operationId: deleteWebhooksVariablesByVariableId
       summary: Delete a variable.
@@ -4173,6 +5687,9 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var unset <variableId>
+      x-sendmock-mcp: sendmock_webhook_variable_unset
+      x-sendmock-ui: Webhooks > Variables > Delete
   /api/v1/webhooks/variables/{variableId}/regenerate:
     post:
       operationId: postWebhooksVariablesByVariableIdRegenerate
@@ -4198,6 +5715,9 @@ paths:
           $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var regenerate <variableId>
+      x-sendmock-mcp: sendmock_webhook_variable_regenerate
+      x-sendmock-ui: Webhooks > Variables > Regenerate
   /api/v1/webhooks/variables/preview:
     post:
       operationId: postWebhooksVariablesPreview
@@ -4219,6 +5739,9 @@ paths:
                 $ref: "#/components/schemas/VariablePreviewResult"
         default:
           $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook var preview
+      x-sendmock-mcp: sendmock_webhook_variable_preview
+      x-sendmock-ui: Webhooks > Variables > variable sheet > Resolves to
 components:
   schemas:
     ActivityBucket:
@@ -4240,6 +5763,36 @@ components:
         - sms_count
         - http_request_count
         - webhook_delivery_count
+    AiAgentSetup:
+      type: object
+      properties:
+        target:
+          $ref: "#/components/schemas/AiAgentTarget"
+        name:
+          type: string
+        install_command:
+          type: string
+        mcp_config_path:
+          type: string
+        mcp_config:
+          type: string
+        instructions_path:
+          type: string
+      required:
+        - target
+        - name
+        - install_command
+        - mcp_config_path
+        - mcp_config
+        - instructions_path
+    AiAgentTarget:
+      type: string
+      enum:
+        - claude-code
+        - codex
+        - cursor
+        - gemini
+        - vscode
     ApiErrorBody:
       type: object
       properties:
@@ -4322,6 +5875,23 @@ components:
         - 2xx
         - 4xx
         - 5xx
+    AppEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: "#/components/schemas/AppEventType"
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+        - id
+        - type
+        - created_at
+        - data
     AppEventType:
       type: string
       enum:
@@ -5250,6 +6820,23 @@ components:
           type: boolean
       required:
         - to
+    EmailInboundRequest:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        text:
+          type: string
+        html:
+          type: string
+        raw:
+          type: string
     EmailOutcomeKind:
       type: string
       enum:
@@ -5345,6 +6932,13 @@ components:
           type: string
         is_enabled:
           type: boolean
+    EmailOutcomeTestRequest:
+      type: object
+      properties:
+        address:
+          type: string
+      required:
+        - address
     EmailReleaseRequest:
       type: object
       properties:
@@ -5648,6 +7242,67 @@ components:
         - canceled
         - expired
         - max_attempts
+    ForwardRule:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Ulid"
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        to:
+          type: array
+          items:
+            type: string
+        is_enabled:
+          type: boolean
+        position:
+          type: number
+      required:
+        - id
+        - name
+        - filter
+        - to
+        - is_enabled
+        - position
+    ForwardRuleInput:
+      type: object
+      properties:
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        to:
+          type: array
+          items:
+            type: string
+        is_enabled:
+          type: boolean
+      required:
+        - name
+        - filter
+        - to
+        - is_enabled
+    ForwardRuleInputPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        to:
+          type: array
+          items:
+            type: string
+        is_enabled:
+          type: boolean
     GatewayCredential:
       type: object
       properties:
@@ -6138,6 +7793,31 @@ components:
       required:
         - filename
         - content
+    IntegrationChannel:
+      type: string
+      enum:
+        - email
+        - sms
+        - http
+    IntegrationSnippet:
+      type: object
+      properties:
+        stack:
+          type: string
+        channel:
+          $ref: "#/components/schemas/IntegrationChannel"
+        host:
+          type: string
+        language:
+          type: string
+        code:
+          type: string
+      required:
+        - stack
+        - channel
+        - host
+        - language
+        - code
     IsoTimestamp:
       type: string
     LinkCheckResult:
@@ -6173,6 +7853,24 @@ components:
         - redirect_url
         - duration_ms
         - error_message
+    LinksLookup:
+      type: object
+      properties:
+        to:
+          type: string
+        email_id:
+          $ref: "#/components/schemas/Ulid"
+        links:
+          type: array
+          items:
+            type: string
+        received_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - to
+        - email_id
+        - links
+        - received_at
     ListUnsubscribeReport:
       type: object
       properties:
@@ -6212,6 +7910,16 @@ components:
             type: string
         body:
           type: string
+    MessageRuleMove:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - up
+            - down
+      required:
+        - direction
     MessagingService:
       type: object
       properties:
@@ -6430,6 +8138,29 @@ components:
         - ui
         - manual
         - api
+    OtpLookup:
+      type: object
+      properties:
+        to:
+          type: string
+        channel:
+          type: string
+          enum:
+            - email
+            - sms
+            - verify
+        code:
+          type: string
+        source_id:
+          type: string
+        received_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - to
+        - channel
+        - code
+        - source_id
+        - received_at
     OutcomeRuleMove:
       type: object
       properties:
@@ -6440,6 +8171,30 @@ components:
             - down
       required:
         - direction
+    OutcomeTestResult:
+      type: object
+      properties:
+        source:
+          type: string
+          enum:
+            - custom
+            - magic
+            - profile
+        rule_id:
+          type:
+            - string
+            - "null"
+        rule_position:
+          type:
+            - number
+            - "null"
+        summary:
+          type: string
+      required:
+        - source
+        - rule_id
+        - rule_position
+        - summary
     PageOf_ApiRequestLogEntry:
       type: object
       properties:
@@ -7881,6 +9636,15 @@ components:
         - sms
         - verification
         - http
+    SampleOptions:
+      type: object
+      properties:
+        to:
+          type: string
+        subject:
+          type: string
+        html:
+          type: string
     SaveAsTemplateRequest:
       type: object
       properties:
@@ -7944,6 +9708,104 @@ components:
       required:
         - endpoint_id
         - rerender
+    ScenarioProblem:
+      type: object
+      properties:
+        step:
+          type:
+            - number
+            - "null"
+        message:
+          type: string
+      required:
+        - step
+        - message
+    ScenarioReport:
+      type: object
+      properties:
+        name:
+          type: string
+        is_passed:
+          type: boolean
+        started_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        duration_ms:
+          type: number
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioStepResult"
+      required:
+        - name
+        - is_passed
+        - started_at
+        - duration_ms
+        - steps
+    ScenarioRequest:
+      type: object
+      properties:
+        scenario:
+          type: string
+      required:
+        - scenario
+    ScenarioStepResult:
+      type: object
+      properties:
+        step:
+          type: number
+        run:
+          type: string
+        status:
+          $ref: "#/components/schemas/ScenarioStepStatus"
+        input:
+          type: object
+          additionalProperties: {}
+        output: {}
+        error:
+          type:
+            - string
+            - "null"
+        saved_as:
+          type:
+            - string
+            - "null"
+        duration_ms:
+          type: number
+      required:
+        - step
+        - run
+        - status
+        - input
+        - output
+        - error
+        - saved_as
+        - duration_ms
+    ScenarioStepStatus:
+      type: string
+      enum:
+        - passed
+        - failed
+        - skipped
+    ScenarioValidation:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        name:
+          type:
+            - string
+            - "null"
+        step_count:
+          type: number
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioProblem"
+      required:
+        - is_valid
+        - name
+        - step_count
+        - problems
     SeedChangedItem:
       type: object
       properties:
@@ -8428,6 +10290,19 @@ components:
           type: string
         is_enabled:
           type: boolean
+    SmsOutcomeTestRequest:
+      type: object
+      properties:
+        number:
+          type: string
+        match_field:
+          type: string
+          enum:
+            - to
+            - from
+      required:
+        - number
+        - match_field
     SmsReplyWebhookAttempt:
       type: object
       properties:
@@ -8656,6 +10531,61 @@ components:
         - name
         - score
         - description
+    TagRule:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Ulid"
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        tag:
+          type: string
+        is_enabled:
+          type: boolean
+        position:
+          type: number
+      required:
+        - id
+        - name
+        - filter
+        - tag
+        - is_enabled
+        - position
+    TagRuleInput:
+      type: object
+      properties:
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        tag:
+          type: string
+        is_enabled:
+          type: boolean
+      required:
+        - name
+        - filter
+        - tag
+        - is_enabled
+    TagRuleInputPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        filter:
+          anyOf:
+            - $ref: "#/components/schemas/RuleFilter"
+            - type: "null"
+        tag:
+          type: string
+        is_enabled:
+          type: boolean
     TemplateCategory:
       type: string
       enum:
@@ -10040,6 +11970,9 @@ components:
             $ref: "#/components/schemas/ApiErrorBody"
     NotFound:
       description: The item does not exist.
+      content: *a1
+    Timeout:
+      description: Nothing matched before the timeout.
       content: *a1
     Conflict:
       description: The item's state does not allow it.

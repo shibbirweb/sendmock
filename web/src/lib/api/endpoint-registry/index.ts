@@ -1,6 +1,8 @@
 import type { ApiEndpoint } from "./endpoint-definition";
+import { automationApi } from "./automation-api";
 import { emailApi } from "./email-api";
 import { httpCatcherApi } from "./http-catcher-api";
+import { messageRulesApi } from "./message-rules-api";
 import { numbersApi } from "./numbers-api";
 import { paymentConfigApi } from "./payment-config-api";
 import { paymentsApi } from "./payments-api";
@@ -23,7 +25,9 @@ export type {
  */
 export const apiEndpoints: ApiEndpoint[] = [
   ...systemApi,
+  ...automationApi,
   ...emailApi,
+  ...messageRulesApi,
   ...smsApi,
   ...numbersApi,
   ...httpCatcherApi,

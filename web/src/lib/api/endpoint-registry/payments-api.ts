@@ -1,5 +1,6 @@
 import {
   type ApiEndpoint,
+  listOf,
   pageOf,
   pageQueryParameters,
   tagEndpoints,
@@ -22,6 +23,12 @@ const paymentEndpoints = tagEndpoints("Payments", [
       { name: "currency", description: "ISO 4217 code.", schema: "string" },
     ],
     response: pageOf("PaymentSummary"),
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payments/test-cards",
+    summary: "The test values of every enabled payment method.",
+    response: listOf("PaymentMethodDefinition"),
   },
   {
     method: "GET",

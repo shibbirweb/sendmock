@@ -51,6 +51,32 @@ const emailEndpoints = tagEndpoints("Email", [
   },
   {
     method: "GET",
+    path: "/api/v1/emails/latest",
+    summary: "The newest email to a recipient.",
+    queryParameters: [
+      {
+        name: "to",
+        description: "The recipient address.",
+        schema: "string",
+        isRequired: true,
+      },
+      { name: "subject", description: "Subject contains.", schema: "string" },
+    ],
+    response: typeRef("EmailDetail"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/emails/inbound",
+    summary:
+      "Create an incoming email from fields or raw MIME; fires email.inbound.",
+    requestBody: typeRef("EmailInboundRequest"),
+    response: typeRef("NativeSendResult"),
+    successStatus: 201,
+    errorStatuses: [400],
+  },
+  {
+    method: "GET",
     path: "/api/v1/emails/{emailId}",
     summary: "One email with bodies, headers, attachments and extracted codes.",
     response: typeRef("EmailDetail"),
@@ -176,6 +202,16 @@ const emailEndpoints = tagEndpoints("Email", [
     path: "/api/v1/send",
     summary: "Native send: JSON with optional base64 attachments.",
     requestBody: typeRef("NativeSendRequest"),
+    response: typeRef("NativeSendResult"),
+    successStatus: 201,
+    errorStatuses: [400],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/send/raw",
+    summary:
+      "Store a raw message as sent by your app, as the sendmail shim does.",
+    requestBody: fileOf("message/rfc822"),
     response: typeRef("NativeSendResult"),
     successStatus: 201,
     errorStatuses: [400],

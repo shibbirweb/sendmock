@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import type { CreatedSample, SampleKind } from "@/lib/api/types";
+import type { CreatedSample, SampleKind, SampleOptions } from "@/lib/api/types";
 import {
   applyMockConditions,
   createErrorResponse,
@@ -10,8 +10,11 @@ import { createSampleHttpRequest } from "@/mocks/samples/create-sample-http-requ
 import { createSampleSms } from "@/mocks/samples/create-sample-sms";
 import { createSampleVerification } from "@/mocks/samples/create-sample-verification";
 
-/** One creator per sample kind; each returns the new item's ID. */
-const sampleCreators: Record<SampleKind, () => string> = {
+/** One creator per sample kind; each returns the new item's ID. Only email reads options. */
+const sampleCreators: Record<
+  SampleKind,
+  (sampleOptions: SampleOptions) => string
+> = {
   email: createSampleEmail,
   sms: createSampleSms,
   verification: createSampleVerification,
@@ -23,7 +26,7 @@ function isSampleKind(kindText: unknown): kindText is SampleKind {
 }
 
 export const samplesHandlers = [
-  http.post("*/api/v1/samples/:kind", async ({ params }) => {
+  http.post("*/api/v1/samples/:kind", async ({ params, request }) => {
     const conditionResponse = await applyMockConditions();
     if (conditionResponse) {
       return conditionResponse;
@@ -36,9 +39,17 @@ export const samplesHandlers = [
       );
     }
 
+    const requestText = await request.text();
+    let sampleOptions: SampleOptions = {};
+    try {
+      sampleOptions =
+        requestText === "" ? {} : (JSON.parse(requestText) as SampleOptions);
+    } catch {
+      // No options: the sample uses its defaults.
+    }
     const createdSample: CreatedSample = {
       kind: params.kind,
-      id: sampleCreators[params.kind](),
+      id: sampleCreators[params.kind](sampleOptions),
     };
 
     return HttpResponse.json(createdSample, { status: 201 });

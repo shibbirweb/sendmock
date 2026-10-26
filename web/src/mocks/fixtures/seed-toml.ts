@@ -1,8 +1,6 @@
 import type { SeedValidation, SeedValidationError } from "@/lib/api/types";
-import {
-  findTemplateDefinition,
-  type MockDatabase,
-} from "@/mocks/db/mock-database";
+import { type MockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 
 type TomlValue = string | number | boolean | string[] | null;
 

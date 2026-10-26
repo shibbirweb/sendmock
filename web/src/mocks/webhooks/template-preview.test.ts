@@ -1,9 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import {
-  createMockDatabase,
-  findTemplateDefinition,
-} from "@/mocks/db/mock-database";
+import { createMockDatabase } from "@/mocks/db/mock-database";
+import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
 import { exportTemplateToml } from "@/mocks/webhooks/export-template-toml";
 import { renderTemplateText } from "@/mocks/webhooks/render-template-text";

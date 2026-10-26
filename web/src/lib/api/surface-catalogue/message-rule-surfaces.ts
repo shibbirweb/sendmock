@@ -1,0 +1,115 @@
+import type { SurfaceCatalogue } from "./surface-definition";
+
+/** Tag, auto-forward and outcome rules: the rules that act on arriving mail and SMS. */
+export const messageRuleSurfaces: SurfaceCatalogue = {
+  "GET /api/v1/tag-rules": {
+    cli: "sendmock email tag-rules list",
+    mcp: "sendmock_tag_rule_list",
+    ui: "Settings > Email > Tag rules",
+  },
+  "POST /api/v1/tag-rules": {
+    cli: "sendmock email tag-rules create",
+    mcp: "sendmock_tag_rule_create",
+    ui: "Settings > Email > Tag rules > Add rule",
+  },
+  "PATCH /api/v1/tag-rules/{ruleId}": {
+    cli: "sendmock email tag-rules update <ruleId>",
+    mcp: "sendmock_tag_rule_update",
+    ui: "Settings > Email > Tag rules > Edit, enabled switch",
+  },
+  "DELETE /api/v1/tag-rules/{ruleId}": {
+    cli: "sendmock email tag-rules delete <ruleId>",
+    mcp: "sendmock_tag_rule_delete",
+    ui: "Settings > Email > Tag rules > Delete",
+  },
+  "POST /api/v1/tag-rules/{ruleId}/move": {
+    cli: "sendmock email tag-rules move <ruleId>",
+    mcp: "sendmock_tag_rule_move",
+    ui: "Settings > Email > Tag rules > Move up, Move down",
+  },
+  "GET /api/v1/forward-rules": {
+    cli: "sendmock email forward-rules list",
+    mcp: "sendmock_forward_rule_list",
+    ui: "Settings > Email > Auto-forward rules",
+  },
+  "POST /api/v1/forward-rules": {
+    cli: "sendmock email forward-rules create",
+    mcp: "sendmock_forward_rule_create",
+    ui: "Settings > Email > Auto-forward rules > Add rule",
+  },
+  "PATCH /api/v1/forward-rules/{ruleId}": {
+    cli: "sendmock email forward-rules update <ruleId>",
+    mcp: "sendmock_forward_rule_update",
+    ui: "Settings > Email > Auto-forward rules > Edit, enabled switch",
+  },
+  "DELETE /api/v1/forward-rules/{ruleId}": {
+    cli: "sendmock email forward-rules delete <ruleId>",
+    mcp: "sendmock_forward_rule_delete",
+    ui: "Settings > Email > Auto-forward rules > Delete",
+  },
+  "POST /api/v1/forward-rules/{ruleId}/move": {
+    cli: "sendmock email forward-rules move <ruleId>",
+    mcp: "sendmock_forward_rule_move",
+    ui: "Settings > Email > Auto-forward rules > Move up, Move down",
+  },
+  "GET /api/v1/outcome-rules/email": {
+    cli: "sendmock outcome-rule email list",
+    mcp: "sendmock_outcome_rule_list",
+    ui: "Settings > Email > Custom outcome addresses",
+  },
+  "POST /api/v1/outcome-rules/email": {
+    cli: "sendmock outcome-rule email create",
+    mcp: "sendmock_outcome_rule_create",
+    ui: "Settings > Email > Custom outcome addresses > Add address",
+  },
+  "PATCH /api/v1/outcome-rules/email/{ruleId}": {
+    cli: "sendmock outcome-rule email update <ruleId>",
+    mcp: "sendmock_outcome_rule_update",
+    ui: "Settings > Email > Custom outcome addresses > Edit, enabled switch",
+  },
+  "DELETE /api/v1/outcome-rules/email/{ruleId}": {
+    cli: "sendmock outcome-rule email delete <ruleId>",
+    mcp: "sendmock_outcome_rule_delete",
+    ui: "Settings > Email > Custom outcome addresses > Delete",
+  },
+  "POST /api/v1/outcome-rules/email/{ruleId}/move": {
+    cli: "sendmock outcome-rule email move <ruleId>",
+    mcp: "sendmock_outcome_rule_move",
+    ui: "Settings > Email > Custom outcome addresses > Move up, Move down",
+  },
+  "POST /api/v1/outcome-rules/email/test": {
+    cli: "sendmock outcome-rule email test <address>",
+    mcp: "sendmock_outcome_rule_test",
+    ui: "Settings > Email > Test an address",
+  },
+  "GET /api/v1/outcome-rules/sms": {
+    cli: "sendmock outcome-rule sms list",
+    mcp: "sendmock_outcome_rule_list",
+    ui: "Settings > SMS > Custom outcome numbers",
+  },
+  "POST /api/v1/outcome-rules/sms": {
+    cli: "sendmock outcome-rule sms create",
+    mcp: "sendmock_outcome_rule_create",
+    ui: "Settings > SMS > Custom outcome numbers > Add number",
+  },
+  "PATCH /api/v1/outcome-rules/sms/{ruleId}": {
+    cli: "sendmock outcome-rule sms update <ruleId>",
+    mcp: "sendmock_outcome_rule_update",
+    ui: "Settings > SMS > Custom outcome numbers > Edit, enabled switch",
+  },
+  "DELETE /api/v1/outcome-rules/sms/{ruleId}": {
+    cli: "sendmock outcome-rule sms delete <ruleId>",
+    mcp: "sendmock_outcome_rule_delete",
+    ui: "Settings > SMS > Custom outcome numbers > Delete",
+  },
+  "POST /api/v1/outcome-rules/sms/{ruleId}/move": {
+    cli: "sendmock outcome-rule sms move <ruleId>",
+    mcp: "sendmock_outcome_rule_move",
+    ui: "Settings > SMS > Custom outcome numbers > Move up, Move down",
+  },
+  "POST /api/v1/outcome-rules/sms/test": {
+    cli: "sendmock outcome-rule sms test <number>",
+    mcp: "sendmock_outcome_rule_test",
+    ui: "Settings > SMS > Test a number",
+  },
+};

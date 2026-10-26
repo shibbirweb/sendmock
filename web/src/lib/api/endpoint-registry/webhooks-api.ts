@@ -23,6 +23,13 @@ const endpointEndpoints = tagEndpoints("Webhook endpoints", [
     errorStatuses: [400],
   },
   {
+    method: "GET",
+    path: "/api/v1/webhooks/endpoints/{endpointId}",
+    summary: "One endpoint; its secret masked.",
+    response: typeRef("WebhookEndpoint"),
+    errorStatuses: [404],
+  },
+  {
     method: "PATCH",
     path: "/api/v1/webhooks/endpoints/{endpointId}",
     summary: "Change an endpoint; send only the changed keys.",
@@ -103,6 +110,13 @@ const ruleEndpoints = tagEndpoints("Webhook rules", [
     response: typeRef("WebhookRule"),
     successStatus: 201,
     errorStatuses: [400],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/webhooks/rules/{ruleId}",
+    summary: "One webhook rule with its filter.",
+    response: typeRef("WebhookRule"),
+    errorStatuses: [404],
   },
   {
     method: "PATCH",

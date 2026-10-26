@@ -26,6 +26,10 @@ import {
   buildHttpBinFixtures,
   buildHttpResponseRuleFixtures,
 } from "@/mocks/fixtures/http-catcher-fixtures";
+import {
+  buildMessageRuleFixtures,
+  type MessageRuleSets,
+} from "@/mocks/fixtures/message-rule-fixtures";
 import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
 import {
   buildInboundRouteFixtures,
@@ -83,10 +87,7 @@ import {
   paymentEndpointName,
 } from "@/mocks/fixtures/webhook-fixtures";
 import { buildTemplateRevisionFixtures } from "@/mocks/fixtures/template-revision-fixtures";
-import {
-  readTemplateDefinition,
-  type TemplateDefinition,
-} from "@/mocks/fixtures/template-definitions";
+import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
@@ -106,6 +107,7 @@ export type MockDatabase = {
   messagingServices: MessagingService[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
+  messageRules: MessageRuleSets;
   webhookEndpoints: WebhookEndpointRecord[];
   webhookRules: WebhookRule[];
   webhookDeliveries: WebhookDelivery[];
@@ -180,6 +182,7 @@ function buildConfiguration() {
     ),
     smsOutcomeRules: buildSmsOutcomeRuleFixtures(),
     emailOutcomeRules: buildEmailOutcomeRuleFixtures(),
+    messageRules: buildMessageRuleFixtures(),
     settings: buildDefaultSettings(),
     seedAppliedAt: new Date().toISOString(),
   };
@@ -281,15 +284,4 @@ export let mockDatabase: MockDatabase = createMockDatabase("standard");
 
 export function replaceMockDatabase(mockDataSize: MockDataSize) {
   mockDatabase = createMockDatabase(mockDataSize);
-}
-
-/** A template's request shape: a custom one from the database, else the fixtures. */
-export function findTemplateDefinition(
-  database: MockDatabase,
-  templateId: string,
-): TemplateDefinition {
-  return (
-    database.customTemplateDefinitions.get(templateId) ??
-    readTemplateDefinition(templateId)
-  );
 }
