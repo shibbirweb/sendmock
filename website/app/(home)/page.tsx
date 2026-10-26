@@ -1,8 +1,8 @@
-import { CallToActionSection } from "@/components/landing/call-to-action-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { FlowSection } from "@/components/landing/flow-section";
 import { HeroSection } from "@/components/landing/hero-section";
 import { NumbersSection } from "@/components/landing/numbers-section";
+import { PromoVideoSection } from "@/components/landing/promo-video-section";
 import { QuickStartSection } from "@/components/landing/quick-start-section";
 import { ScreenshotsSection } from "@/components/landing/screenshots-section";
 import { WorksWithSection } from "@/components/landing/works-with-section";
@@ -18,7 +18,7 @@ export default function HomePage() {
       <ScreenshotsSection />
       <FeaturesSection />
       <NumbersSection />
-      <CallToActionSection />
+      <PromoVideoSection />
     </main>
   );
 }

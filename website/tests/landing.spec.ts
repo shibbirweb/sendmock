@@ -311,32 +311,47 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   expect(runningAnimationCount).toBe(0);
 });
 
-test("WS-02.1 the closing call to action offers the demo, docs, GitHub and a copyable install command", async ({
+test("WS-02.4 the promotional video shows its poster, the three benefits and a disabled play button until the video exists", async ({
   page,
-  context,
 }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/");
-  const callToAction = page.getByRole("region", {
-    name: "Test the messages your app sends, before your users do",
+  const promoVideo = page.getByRole("region", {
+    name: "Stop testing on real inboxes and phones",
   });
 
+  await expect(promoVideo.getByTestId("promo-video-poster")).toBeVisible();
   await expect(
-    callToAction.getByRole("link", { name: "Try the live demo" }),
-  ).toBeVisible();
+    promoVideo.getByRole("button", { name: "Play the video (coming soon)" }),
+  ).toBeDisabled();
+  await expect(promoVideo).toContainText("Video coming soon");
   await expect(
-    callToAction.getByRole("link", { name: "Read the docs" }),
-  ).toHaveAttribute("href", "/docs/");
-  await expect(
-    callToAction.getByRole("link", { name: "Star on GitHub" }),
-  ).toHaveAttribute("href", "https://github.com/shibbirweb/sendmock");
+    promoVideo
+      .getByRole("list", { name: "Why developers use SendMock" })
+      .getByRole("heading"),
+  ).toHaveText([
+    "No real messages sent",
+    "Seconds, not minutes",
+    "One setting to switch",
+  ]);
+});
 
-  await callToAction
-    .getByRole("button", { name: "Copy the install command" })
-    .click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    "brew install shibbirweb/tap/sendmock",
-  );
+test("WS-02.4 the promotional video loads no third-party player before play is pressed", async ({
+  page,
+}) => {
+  const thirdPartyRequests: string[] = [];
+  page.on("request", (request) => {
+    const requestHost = new URL(request.url()).hostname;
+    if (/youtube|ytimg|googlevideo/.test(requestHost)) {
+      thirdPartyRequests.push(request.url());
+    }
+  });
+
+  await page.goto("/");
+  await page
+    .getByRole("region", { name: "Stop testing on real inboxes and phones" })
+    .scrollIntoViewIfNeeded();
+
+  expect(thirdPartyRequests).toEqual([]);
 });
 
 test("the footer and header link to docs, feedback forms, security and the repository", async ({

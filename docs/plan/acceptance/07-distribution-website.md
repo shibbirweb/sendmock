@@ -81,6 +81,7 @@ Phase U3.
 - [ ] WS-02.1 The landing page uses Magic UI components for the hero, flow (animated beam), quick start (terminal), marquee, bento grid and number ticker.
 - [ ] WS-02.2 With reduced motion on, all animations are static and the page stays readable.
 - [ ] WS-02.3 Lighthouse scores are at least 90 for performance, accessibility, best practices and SEO.
+- [ ] WS-02.4 The landing page has a promotional video section above the footer: a product poster in the current theme, three benefit points (no real messages sent, seconds instead of minutes, one setting), and a play button that is disabled with "Video coming soon" until the video exists; once it exists, pressing play loads the player (no autoplay and no third-party request before that) with captions ([16](../16-website-and-releases.md#promotional-video-decided-2026-10-27)).
 
 ## WS-03 Docs and versions
 
