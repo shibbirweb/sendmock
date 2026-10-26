@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { ArrowRightIcon } from "lucide-react";
+import Link from "next/link";
+
 import { NumberTicker } from "@/components/ui/number-ticker";
 import {
   allEmulatedProviderNames,
@@ -19,13 +22,26 @@ function countApiOperations(): number {
 }
 
 export function NumbersSection() {
+  // Each number links to the page that lists what it counts, so it can be checked.
   const statistics = [
     {
       value: allEmulatedProviderNames.length,
-      label: "provider APIs emulated",
+      label: "built-in provider APIs",
+      listHref: "/docs/providers",
+      listLabel: "See the providers",
     },
-    { value: testedLanguageNames.length, label: "languages tested in CI" },
-    { value: countApiOperations(), label: "REST API operations" },
+    {
+      value: testedLanguageNames.length,
+      label: "languages with connection guides",
+      listHref: "/docs/connect",
+      listLabel: "See the languages",
+    },
+    {
+      value: countApiOperations(),
+      label: "REST API operations",
+      listHref: "/api",
+      listLabel: "See the operations",
+    },
   ];
 
   return (
@@ -34,9 +50,10 @@ export function NumbersSection() {
       className="mx-auto grid w-full max-w-4xl gap-6 px-4 py-12 sm:grid-cols-3"
     >
       {statistics.map((statistic) => (
-        <div
+        <Link
           key={statistic.label}
-          className="flex flex-col items-center gap-1 rounded-xl border bg-fd-card p-6 text-center"
+          href={statistic.listHref}
+          className="group flex flex-col items-center gap-1 rounded-xl border bg-fd-card p-6 text-center transition-colors hover:border-(--brand-from)/50"
         >
           <NumberTicker
             value={statistic.value}
@@ -46,7 +63,14 @@ export function NumbersSection() {
           <span className="text-sm text-fd-muted-foreground">
             {statistic.label}
           </span>
-        </div>
+          <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-(--brand-from)">
+            {statistic.listLabel}
+            <ArrowRightIcon
+              aria-hidden
+              className="size-3 transition-transform group-hover:translate-x-0.5"
+            />
+          </span>
+        </Link>
       ))}
     </section>
   );

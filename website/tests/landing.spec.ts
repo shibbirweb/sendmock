@@ -274,6 +274,21 @@ test("WS-02.1 the product screens switch with the tabs and the arrow keys", asyn
   ).toHaveAttribute("aria-selected", "true");
 });
 
+test("WS-02.1 each number links to the list it counts", async ({ page }) => {
+  await page.goto("/");
+  const numbers = page.getByRole("region", { name: "SendMock in numbers" });
+
+  await expect(
+    numbers.getByRole("link", { name: /built-in provider APIs/ }),
+  ).toHaveAttribute("href", "/docs/providers/");
+  await expect(
+    numbers.getByRole("link", { name: /languages with connection guides/ }),
+  ).toHaveAttribute("href", "/docs/connect/");
+  await expect(
+    numbers.getByRole("link", { name: /REST API operations/ }),
+  ).toHaveAttribute("href", "/api/");
+});
+
 test("WS-02.1 every feature card links to its own docs page", async ({
   page,
 }) => {
