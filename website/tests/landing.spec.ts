@@ -128,6 +128,20 @@ test.describe("the quick start on Windows", () => {
   });
 });
 
+test("WS-02.1 the stack marquee fades out at both edges", async ({ page }) => {
+  await page.goto("/");
+  const maskImage = await page
+    .getByTestId("works-with-marquee")
+    .evaluate((marqueeElement) => getComputedStyle(marqueeElement).maskImage);
+  // Chrome reports `to right` as 90deg and `transparent` as rgba(0, 0, 0, 0).
+  const toRight = "(?:to right|90deg)";
+  const clear = "(?:transparent|rgba\\(0, 0, 0, 0\\))";
+
+  expect(maskImage).toMatch(
+    new RegExp(`^linear-gradient\\(${toRight}, ${clear}, .+, ${clear}\\)$`),
+  );
+});
+
 test("WS-02.1 the number ticker counts the providers, languages and API operations it shows", async ({
   page,
 }) => {
