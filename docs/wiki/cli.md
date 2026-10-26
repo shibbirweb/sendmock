@@ -12,3 +12,5 @@ sendmock status --json
 sendmock otp --to +8801700000000 --wait 10s
 sendmock email list --to user@example.test
 ```
+
+Every menu page ends with a **From the CLI, API and AI** table listing the commands for that screen, starting with [Mail](./mail/index.md). The [Advanced](./advanced/index.md) pages show complete examples, and [Scenarios](./advanced/scenarios.md) chain commands into a repeatable test.

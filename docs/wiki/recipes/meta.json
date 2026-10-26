@@ -1,0 +1,19 @@
+{
+  "title": "Recipes",
+  "pages": [
+    "index",
+    "password-reset-email",
+    "read-a-code",
+    "bounces-and-complaints",
+    "failed-sms",
+    "twilio-verify-login",
+    "two-way-sms",
+    "reply-by-email",
+    "inbound-email",
+    "stripe-payment",
+    "sslcommerz-bkash-checkout",
+    "slack-and-push",
+    "replay-a-failed-webhook",
+    "share-your-setup"
+  ]
+}

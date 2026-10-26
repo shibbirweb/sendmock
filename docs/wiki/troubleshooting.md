@@ -17,3 +17,11 @@ Look in **Logs > SMTP sessions**: failed sessions are kept with the reason, such
 ## The webhook never reached my app
 
 Open the delivery in **Webhooks > Deliveries**: it shows the request, the response or connection error and every retry. **Replay** sends it again after you fix your app.
+
+## Nothing shows up in Mail or SMS
+
+Check **Logs**: a rejected SMTP session or API request is kept with the reason, even though no message was stored. See [Logs](./logs.md).
+
+## An SMS or email was refused on purpose
+
+Twilio's test numbers, the magic addresses, your own outcome rules and **Settings > Chaos** all refuse messages by design. **Test a number** and **Test an address** in Settings tell you which applies. See [Delivery and test numbers](./sms/delivery-and-test-numbers.md) and [Outcomes](./mail/outcomes.md).

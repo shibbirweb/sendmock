@@ -1,0 +1,9 @@
+{
+  "title": "SMS",
+  "pages": [
+    "index",
+    "delivery-and-test-numbers",
+    "replies-and-whatsapp",
+    "verify"
+  ]
+}

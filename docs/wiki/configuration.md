@@ -26,4 +26,4 @@ Secrets are never written to an export in plain text.
 
 ## Runtime settings
 
-Retention, email and SMS options, opened events, chaos toggles and OTP patterns change at once from **Settings**, without a restart.
+Retention, email and SMS options, opened events, chaos toggles and OTP patterns change at once from **Settings**, without a restart. Each section is explained in [Settings](./settings.md); the seed file in depth is [Advanced: seed file](./advanced/seed-file.md).

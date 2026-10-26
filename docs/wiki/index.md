@@ -1,22 +1,33 @@
 ---
 title: Introduction
-description: What SendMock is and what it does for your app.
+description: What SendMock is, the problems it solves and where to start.
 ---
 
-SendMock is a local sandbox for everything your app sends: email, SMS, payments and webhooks. It runs as one small binary (or a Docker image), catches messages from any language, shows them in a web UI and calls your webhooks.
+Your app sends email, SMS, payments and webhooks. Testing them for real is slow, costs money and is risky: a test email reaches a real customer, an OTP needs a real phone and credits, a payment needs a sandbox account and a public URL for its notifications, and a Slack alert lands in the team channel.
 
-> **In development.** The web UI is ready to try as a [live demo with sample data](/demo/). The server arrives with the first beta in Phase 1; pages say which phase each part lands in.
+SendMock is a local stand-in for all of those services. It runs as one small binary (or a Docker image) on your machine:
 
-## What it does
+1. **Point your app at SendMock** instead of the real SMTP server, SMS provider, payment gateway or API.
+2. **See everything your app sent** in a web UI: every email, SMS, verification code, HTTP call and payment.
+3. **Get the answers back** the way the real service would send them: delivery receipts, bounces, inbound replies, payment notifications and webhooks, signed like the provider signs them.
 
-- **Email:** a catch-all SMTP server plus SendGrid, Mailgun, Postmark, Resend, SES and Brevo compatible HTTP APIs. See [Email](./email.md).
-- **SMS and Verify:** Twilio and Vonage compatible APIs, Twilio Verify, Twilio's real test numbers and delivery status callbacks. See [SMS](./sms.md) and [Verify](./verify.md).
-- **Webhooks:** automatic rules or manual sends, provider-shaped payload templates, variables, retries and replay, signed with Standard Webhooks. See [Webhooks](./webhooks.md).
-- **HTTP catcher:** a bin for any HTTP call your app makes, with the responses you choose. See [HTTP catcher](./http-catcher.md).
-- **Payments:** Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects and notifications. See [Payments](./payments.md).
-- **AI agents:** a CLI, an MCP server and an agent skill. See [MCP and AI](./mcp-and-ai.md).
+> **In development.** The web UI is ready to try as a [live demo with sample data](/demo/). The server arrives with the first beta in Phase 1; every page says which phase its part lands in.
 
-## Next steps
+## What it covers
 
-- [Getting started](./getting-started.md)
-- [Connect your app](./connect/index.md)
+| Area | What SendMock does | Read |
+| --- | --- | --- |
+| Email | catches mail over SMTP and the SendGrid, Mailgun, Postmark, Resend, SES and Brevo APIs; simulates delivery, bounces, complaints, opens and replies | [Mail](./mail/index.md) |
+| SMS | Twilio and Vonage compatible APIs with Twilio's real test numbers, status callbacks, two-way replies and WhatsApp | [SMS](./sms/index.md) |
+| Verify | Twilio Verify with codes you can read and outcomes you can force | [Verify](./sms/verify.md) |
+| HTTP | a catcher for any other call your app makes (Slack, Discord, push, third-party APIs), answered the way you choose | [HTTP catcher](./http/index.md) |
+| Webhooks | sends events to your app automatically or by hand, shaped like the provider you use, with retries and replay | [Webhooks](./webhooks/index.md) |
+| Payments | Stripe, PayPal, SSLCommerz and bKash test checkouts with real redirects and notifications, plus your own gateways | [Payments](./payments/index.md) |
+| AI agents | a CLI, an MCP server and an agent skill, so an agent can set up and test everything | [AI](./ai/index.md) |
+
+## Where to start
+
+- **New here?** Follow [Getting started](./getting-started.md), then take the [Tour of the app](./tour.md).
+- **Have a problem to solve?** Find it in [What can I test?](./use-cases.md).
+- **Want to know how the parts fit?** Read [How it all connects](./how-it-connects.md).
+- **Need something SendMock does not ship?** See [Advanced](./advanced/index.md) and [Build it with AI](./ai/build-with-ai.md).
