@@ -20,6 +20,7 @@ import { SendRequestButton } from "@/features/settings/connection/send-request-b
 import { AiAgentsCard } from "@/features/settings/connection/ai-agents-card";
 import { useRequestCustomization } from "@/features/settings/connection/use-request-customization";
 import { useAppLocation } from "@/features/onboarding/use-app-location";
+import { ProviderApisCard } from "@/features/settings/sections/provider-apis-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
 import {
@@ -110,7 +111,7 @@ export function ConnectionSection() {
     <>
       <SettingsSectionCard
         title="Connect your app"
-        description="Point your app at SendMock. Provider SDK recipes (Twilio, SendGrid, ...) are in the docs."
+        description="Point your app at SendMock. Provider SDKs are below, under Provider APIs; recipes are in the docs."
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField label="Language" fieldId={`${fieldIdPrefix}-language`}>
@@ -254,6 +255,7 @@ export function ConnectionSection() {
           ))}
         </div>
       </SettingsSectionCard>
+      <ProviderApisCard />
       <AiAgentsCard />
     </>
   );

@@ -1,6 +1,7 @@
 import type * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
+import { ProviderBadge } from "@/features/providers/provider-badge";
 import { labelSmsApi } from "@/features/sms/sms-labels";
 import { stripChannelPrefix } from "@/lib/sms/format-phone-number";
 import type { SmsMessageDetail } from "@/lib/api/types";
@@ -37,7 +38,13 @@ export function SmsMessageFacts({
         {smsMessage.channel === "whatsapp" ? "WhatsApp" : "SMS"},{" "}
         {smsMessage.direction}
       </SmsFact>
-      <SmsFact label="API">{labelSmsApi(smsMessage.api)}</SmsFact>
+      <SmsFact label="API">
+        {smsMessage.api === "native" ? (
+          labelSmsApi(smsMessage.api)
+        ) : (
+          <ProviderBadge providerArea="sms" providerKey={smsMessage.api} />
+        )}
+      </SmsFact>
       <SmsFact label="Message ID">
         <span className="truncate font-mono text-xs">
           {smsMessage.provider_id}

@@ -8,6 +8,7 @@ import { MailListEmptyState } from "@/features/mail/list/mail-list-empty-state";
 import { MailListToolbar } from "@/features/mail/list/mail-list-toolbar";
 import { MailSearchBar } from "@/features/mail/list/mail-search-bar";
 import { MailVirtualList } from "@/features/mail/list/mail-virtual-list";
+import { useMessageProviders } from "@/lib/api/hooks/use-message-provider-queries";
 import { parseMailSearch } from "@/features/mail/parse-mail-search";
 import {
   useDeleteAllEmails,
@@ -27,9 +28,14 @@ export function MailListPanel({
 }: MailListPanelProps) {
   const navigate = useNavigate({ from: "/mail" });
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const emailProviders = useMessageProviders("email").data;
   const emailFilters = React.useMemo(
-    () => parseMailSearch(searchText),
-    [searchText],
+    () =>
+      parseMailSearch(
+        searchText,
+        emailProviders?.map((emailProvider) => emailProvider.key),
+      ),
+    [searchText, emailProviders],
   );
   const emailListQuery = useInfiniteEmailList(emailFilters);
   const deleteEmail = useDeleteEmail();

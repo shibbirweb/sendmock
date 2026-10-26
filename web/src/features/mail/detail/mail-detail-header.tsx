@@ -13,7 +13,11 @@ import { MailDetailActions } from "@/features/mail/detail/mail-detail-actions";
 import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
 import { EmailResponseLinks } from "@/features/mail/detail/response/email-response-links";
 import { EmailOutcomeBadge } from "@/features/mail/email-outcome-badge";
-import { labelEmailSource } from "@/features/mail/mail-labels";
+import {
+  isEmailTransportSource,
+  labelEmailSource,
+} from "@/features/mail/mail-labels";
+import { ProviderBadge } from "@/features/providers/provider-badge";
 import type { EmailAddress, EmailDetail } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
 
@@ -85,7 +89,11 @@ export function MailDetailHeader({
           </Badge>
         )}
         {email.smtp_session_id === null ? (
-          <Badge variant="outline">{labelEmailSource(email.source)}</Badge>
+          isEmailTransportSource(email.source) ? (
+            <Badge variant="outline">{labelEmailSource(email.source)}</Badge>
+          ) : (
+            <ProviderBadge providerArea="email" providerKey={email.source} />
+          )
         ) : (
           <Badge variant="outline" asChild>
             <Link

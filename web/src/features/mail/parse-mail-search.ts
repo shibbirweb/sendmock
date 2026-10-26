@@ -1,17 +1,20 @@
 import type { EmailListFilters, EmailSource } from "@/lib/api/types";
 
-const knownEmailSources: EmailSource[] = [
+const emailTransportSources: EmailSource[] = [
   "smtp",
   "sendmail",
   "native_api",
+  "verify",
+  "simulated",
+];
+/** The shipped providers, until the providers list has loaded. */
+const builtinEmailProviderKeys = [
   "sendgrid",
   "mailgun",
   "postmark",
   "resend",
   "ses",
   "brevo",
-  "verify",
-  "simulated",
 ];
 
 export type MailSearchChip = {
@@ -23,7 +26,11 @@ export type MailSearchChip = {
  * Turns a search box value such as `from:acme is:unread invoice` into list
  * filters (EM-03.4). Unknown `key:value` tokens stay in the free-text query.
  */
-export function parseMailSearch(searchText: string): EmailListFilters {
+export function parseMailSearch(
+  searchText: string,
+  emailProviderKeys: string[] = builtinEmailProviderKeys,
+): EmailListFilters {
+  const knownEmailSources = [...emailTransportSources, ...emailProviderKeys];
   const emailFilters: EmailListFilters = {};
   const freeTextWords: string[] = [];
 
@@ -51,9 +58,9 @@ export function parseMailSearch(searchText: string): EmailListFilters {
       emailFilters.has_attachment = true;
     } else if (
       normalizedKey === "source" &&
-      knownEmailSources.includes(tokenValue as EmailSource)
+      knownEmailSources.includes(tokenValue)
     ) {
-      emailFilters.source = tokenValue as EmailSource;
+      emailFilters.source = tokenValue;
     } else {
       freeTextWords.push(searchToken);
     }

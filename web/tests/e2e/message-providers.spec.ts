@@ -134,3 +134,31 @@ test("SM-16.4 a template error is shown and blocks Save", async ({ page }) => {
     providerSheet.getByRole("button", { name: "Save provider" }),
   ).toBeDisabled();
 });
+
+test("EM-18.5 an email sent through a provider links to it, and the link opens its sheet", async ({
+  page,
+}) => {
+  await page.goto("/mail");
+  await page
+    .getByRole("link", { name: /Welcome to Acme: here is what is new/ })
+    .first()
+    .click();
+  await page.getByRole("link", { name: "SendGrid", exact: true }).click();
+
+  await expect(page).toHaveURL(/\/mail\/providers\?provider=sendgrid/);
+  await expect(page.getByRole("dialog", { name: "SendGrid" })).toBeVisible();
+});
+
+test("SM-16.5 Settings > Connection lists the enabled SMS providers, custom ones included", async ({
+  page,
+}) => {
+  await page.goto("/settings?section=connection");
+  const smsProviderApis = page.getByRole("region", {
+    name: "SMS provider APIs",
+  });
+
+  await expect(smsProviderApis).toContainText("SSL Wireless");
+  await expect(smsProviderApis).toContainText(
+    "http://127.0.0.1:8025/providers/sslwireless",
+  );
+});

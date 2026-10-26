@@ -63,8 +63,11 @@ function describeAction({ messageProvider, rowAction }: PendingAction) {
 /** Mail > Providers and SMS > Providers (EM-18, SM-16). */
 export function MessageProvidersPage({
   providerArea,
+  initialProviderKey,
 }: {
   providerArea: MessageProviderArea;
+  /** Opens this provider's sheet first, e.g. from a message's provider badge. */
+  initialProviderKey?: string;
 }) {
   const areaCopy = providerAreaCopy[providerArea];
   usePageTitle("Providers", areaCopy.menuName);
@@ -76,7 +79,9 @@ export function MessageProvidersPage({
   const [isAddOpen, setAddOpen] = React.useState(false);
   const [pendingAction, setPendingAction] =
     React.useState<PendingAction | null>(null);
-  const [editedKey, setEditedKey] = React.useState<string | null>(null);
+  const [editedKey, setEditedKey] = React.useState<string | null>(
+    initialProviderKey ?? null,
+  );
   const messageProviders = providersQuery.data ?? [];
   const activeProviders = messageProviders.filter(
     (messageProvider) => !messageProvider.is_removed,
