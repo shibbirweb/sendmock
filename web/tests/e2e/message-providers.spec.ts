@@ -135,7 +135,7 @@ test("SM-16.4 a template error is shown and blocks Save", async ({ page }) => {
   ).toBeDisabled();
 });
 
-test("EM-18.5 an email sent through a provider links to it, and the link opens its sheet", async ({
+test("an email sent through a provider links to it, and the link opens its sheet", async ({
   page,
 }) => {
   await page.goto("/mail");
@@ -149,7 +149,7 @@ test("EM-18.5 an email sent through a provider links to it, and the link opens i
   await expect(page.getByRole("dialog", { name: "SendGrid" })).toBeVisible();
 });
 
-test("SM-16.5 Settings > Connection lists the enabled SMS providers, custom ones included", async ({
+test("Settings > Connection lists the enabled SMS providers, custom ones included", async ({
   page,
 }) => {
   await page.goto("/settings?section=connection");

@@ -376,6 +376,8 @@ Ready-made prompts the user can pick in the harness:
 | `debug-failed-webhook` | inspect the latest failed delivery, explain the error, suggest a fix, replay |
 | `add-payment-flow` | compose a checkout flow step by step from the provider's docs (for example "Upay: wallet number, OTP, then PIN" or "a QR wallet"): list the step catalogue, add each step in order with its labels, check the flow is valid, attach it to a method and run a test checkout |
 | `add-payment-gateway` | add a gateway SendMock does not ship (or a new method such as a wallet): read the provider's docs the user points to, map them to a gateway, method and (when the provider's checkout steps differ from the built-in flows) flow definition (methods offered, redirect fields, notification event names, body and signature templates), create them, check the preview, run a test checkout and confirm the app receives the redirect and notification |
+| `add-email-provider` | add an email API SendMock does not ship (or change a built-in that differs from the account): read the provider's API docs, create the provider from the closest built-in or blank (`sendmock_email_provider_create`), set its requests, field mapping, checks and responses (`sendmock_email_provider_update`), check `sendmock_email_provider_preview`, send a test request with `curl` or the provider's SDK, and export the seed file ([22](22-configurable-providers.md)) |
+| `add-sms-provider` | the same for an SMS vendor (`sendmock_sms_provider_create`, `sendmock_sms_provider_update`, `sendmock_sms_provider_preview`), plus its status names and its error code for each delivery outcome |
 
 ## Agent skill
 

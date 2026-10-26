@@ -219,6 +219,8 @@ Every input field gets a description and an example in the API types; the CLI fl
 
 Email and SMS providers become definitions like payment gateways: every built-in can be edited, reset to default, removed and restored, and a user can add a provider SendMock does not ship, from blank or from the closest built-in. Mail > Providers and SMS > Providers, 18 new operations in every surface, `add-email-provider` and `add-sms-provider` skill workflows, and seed file support. Plan and build steps: [22-configurable-providers.md](22-configurable-providers.md).
 
+- **As built (2026-10-27):** the contract (18 operations), the mock API and preview runner, both Providers screens with the sheet and live preview, provider badges, filters and the Provider APIs card, guide pages and two walkthroughs with screenshots, and the skill workflows. EM-18 and SM-16 criteria 1 to 4 and 7 have tests; 5, 6 and 8 need the Stage B runtime.
+
 ## Re-audit before sign-off (2026-10-26)
 
 After W1 to W10 and W12, U3 was audited again across the whole app and site.

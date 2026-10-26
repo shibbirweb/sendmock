@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W16 (configurable email and SMS providers), W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W16 (configurable email and SMS providers) done for the UI; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -152,15 +152,15 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [x] User guide: every sidebar menu with the problems it solves and how it connects, recipes, Advanced customize and create pages, AI pages, screenshots and tests ([19](19-user-guide.md), WS-06); not part of the sign-off gate (W13)
 - [x] Every feature in every way: CLI command, MCP tool and UI place named for every REST operation, missing REST helpers added, API reference and user guide show all of them ([20](20-surface-parity.md), UI-11) (W14)
 - [x] CLI and MCP reference, field docs and code examples: a description and example for every input, CLI flags and MCP inputs derived by one rule set into `cli-reference.json` and `mcp-tools.json`, `/cli/` and `/mcp/` pages linked from the API reference and guide tables, a playground that shows every accepted input, and examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# ([21](21-reference-and-examples.md), WS-07, WS-08, WS-04.4 to WS-04.6) (W15)
-- [ ] Configurable email and SMS providers: Mail > Providers and SMS > Providers edit, reset, remove and restore the built-ins and add custom providers like payment gateways, in every surface, with skill workflows and seed support ([22](22-configurable-providers.md), EM-18, SM-16) (W16)
+- [x] Configurable email and SMS providers: Mail > Providers and SMS > Providers edit, reset, remove and restore the built-ins and add custom providers like payment gateways, in every surface, with skill workflows and seed support ([22](22-configurable-providers.md), EM-18, SM-16) (W16)
   - [x] Plan and criteria (step 1)
   - [x] Contract: types, endpoint registry, spec, surface catalogue, CLI and MCP reference (step 2)
   - [x] Mock data and handlers for the 11 built-ins and custom providers (step 3)
   - [x] Screens: lists, Removed group, Add provider, row actions (step 4)
   - [x] Screens: provider sheet and preview (step 5)
   - [x] Wiring: message badge, provider filters, Settings > Connection (step 6)
-  - [ ] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
-  - [ ] Tests per criterion, parity and walkthrough tests (step 8)
+  - [x] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
+  - [x] Tests per criterion, parity and walkthrough tests (step 8)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -444,3 +444,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | U3 feedback F7 done ([18](18-phase-u3.md#feedback-items)): the landing page's feature cards show small product scenes (Magic UI Marquee and Animated List, static with reduced motion) and link to their own docs pages. |
 | 2026-10-27 | U3 feedback F8 done ([18](18-phase-u3.md#feedback-items)): the landing numbers link to their lists (new docs page Supported providers, which presents them as built-ins users can change, remove or add to, Connect your app, the API reference). Fixed the provider count (Telnyx is only a webhook template; MessageBird is the emulated one) and the language label (connection guides, until the `examples/` CI matrix exists). |
 | 2026-10-27 | Plan: configurable email and SMS providers ([22](22-configurable-providers.md), U3 W16, new features EM-18 and SM-16 with 8 criteria each). Like payment gateways, every email and SMS provider becomes a definition (identity, host, credentials, operations from a fixed kind catalogue, field mapping, validation, success and error responses, message id, callbacks, status names and SMS error codes): built-ins are edited, reset, removed and restored; custom providers start blank or from a built-in and replace the "Generic HTTP" SMS adapter. Mail > Providers and SMS > Providers, 18 operations in REST, CLI and MCP (a secret reveal among them, not in MCP), `add-email-provider` and `add-sms-provider` skill workflows, seed support. The shipped built-ins keep passing the provider fixture and SDK tests. Inside the sign-off gate, as it changes the contract. |
+| 2026-10-27 | Configurable email and SMS providers built for the UI (U3 W16, [22](22-configurable-providers.md)): 18 operations in the contract (9 per area, a credential reveal among them), the mock API with the 11 built-in definitions and SSL Wireless as a custom example, a preview runner (request matching, field mapping, checks, responses, problems), seed export; Mail > Providers and SMS > Providers with Add provider, Reset, Remove and Restore, Delete, a six-tab sheet with a live preview, provider badges on messages, provider keys in mail search and the SMS rule picker, a Provider APIs card in Settings > Connection; guide pages, two Advanced walkthroughs with tests, and the `add-email-provider` and `add-sms-provider` skill workflows. `Email.source` and `SmsMessage.api` became provider keys; the Generic HTTP SMS adapter is dropped. EM-18 and SM-16 criteria 1 to 4 and 7 are proven on the UI and mock API; 5, 6 and 8 wait for the Stage B runtime. Also fixed on the way: the website accessibility and phone-width failures from the landing work. |

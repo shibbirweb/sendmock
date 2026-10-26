@@ -76,7 +76,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-15](01-email.md#em-15-smtp-chaos) | SMTP chaos | Phase 4 | 3 | Not started |
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | In progress |
 | [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 5 | In progress |
-| [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | Not started |
+| [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | In progress |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Not started |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Not started |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | In progress |
@@ -92,7 +92,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | In progress |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Not started |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | In progress |
-| [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Not started |
+| [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | In progress |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Not started |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Not started |

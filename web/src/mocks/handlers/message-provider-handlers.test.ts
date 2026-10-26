@@ -217,6 +217,40 @@ describe("email and SMS provider API", () => {
     expect(providerPreview.response.body).toContain("21604");
   });
 
+  test("SM-16.2 an SMS provider is added from blank with one send request", async () => {
+    const createResponse = await callApi("POST", "/sms/providers", {
+      name: "Africa's Talking",
+      key: "africastalking",
+      start_from: null,
+    });
+    const createdProvider =
+      await readJson<MessageProviderDefinition>(createResponse);
+
+    expect(createResponse.status).toBe(201);
+    expect(createdProvider.is_builtin).toBe(false);
+    expect(createdProvider.operations).toEqual([
+      { kind: "send", method: "POST", path: "/send", request_format: "json" },
+    ]);
+    expect(createdProvider.host).toBeNull();
+  });
+
+  test("EM-18.7 the seed file exports a changed built-in and leaves unchanged ones out", async () => {
+    const sendgrid = await readJson<MessageProviderDefinition>(
+      await callApi("GET", "/emails/providers/sendgrid"),
+    );
+    await callApi("PATCH", "/emails/providers/sendgrid", {
+      ...toInput(sendgrid),
+      host: "api.eu.sendgrid.com",
+    });
+    const seedToml = buildSeedToml(mockDatabase);
+
+    expect(seedToml).toContain("[[email.providers]]");
+    expect(seedToml).toContain('key = "sendgrid"');
+    expect(seedToml).toContain("edits_builtin = true");
+    expect(seedToml).not.toContain('key = "mailgun"');
+    expect(seedToml).not.toContain("SG.test_key_123");
+  });
+
   test("EM-18.6 a secret credential is revealed only on request", async () => {
     expect(
       await readJson(
