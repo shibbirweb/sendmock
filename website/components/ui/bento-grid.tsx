@@ -1,8 +1,7 @@
 import { type ComponentPropsWithoutRef, type ReactNode } from "react";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { BookOpenIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode;
@@ -56,48 +55,23 @@ const BentoCard = ({
     {...props}
   >
     <div>{background}</div>
-    <div className="p-4">
-      <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="h-12 w-12 origin-left transform-gpu text-fd-foreground transition-all duration-300 ease-in-out group-hover:scale-75" />
+    <div className="z-10 flex flex-col gap-1 p-4">
+      <span className="mb-2 flex size-9 items-center justify-center rounded-lg border bg-fd-background shadow-sm">
+        <Icon className="size-4.5 text-(--brand-from)" />
+      </span>
+      {/* The docs link sits beside the title, so the text never moves on hover. */}
+      <div className="flex items-center gap-2">
         <h3 className="text-xl font-semibold text-fd-foreground">{name}</h3>
-        <p className="max-w-lg text-fd-muted-foreground">{description}</p>
-      </div>
-
-      <div
-        className={cn(
-          "pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden",
-        )}
-      >
-        <Button
-          variant="link"
-          asChild
-          size="sm"
-          className="pointer-events-auto p-0"
+        <a
+          href={href}
+          aria-label={cta}
+          title={cta}
+          className="relative z-20 rounded-md p-1 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-(--brand-from)"
         >
-          <a href={href}>
-            {cta}
-            <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-          </a>
-        </Button>
-      </div>
-    </div>
-
-    <div
-      className={cn(
-        "pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex",
-      )}
-    >
-      <Button
-        variant="link"
-        asChild
-        size="sm"
-        className="pointer-events-auto p-0"
-      >
-        <a href={href}>
-          {cta}
-          <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
+          <BookOpenIcon aria-hidden className="size-4" />
         </a>
-      </Button>
+      </div>
+      <p className="max-w-lg text-fd-muted-foreground">{description}</p>
     </div>
 
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10" />

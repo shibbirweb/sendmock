@@ -274,6 +274,27 @@ test("WS-02.1 the product screens switch with the tabs and the arrow keys", asyn
   ).toHaveAttribute("aria-selected", "true");
 });
 
+test("WS-02.1 every feature card links to its own docs page", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const featuresBento = page.getByTestId("features-bento");
+
+  for (const docsPath of [
+    "/docs/mail",
+    "/docs/sms",
+    "/docs/webhooks",
+    "/docs/payments",
+    "/docs/http",
+    "/docs/ai",
+    "/docs/install",
+  ]) {
+    await expect(
+      featuresBento.locator(`a[href="${docsPath}"]`).first(),
+    ).toBeAttached();
+  }
+});
+
 test("WS-02.2 with reduced motion every animation is static and the page stays readable", async ({
   page,
 }) => {
@@ -292,6 +313,10 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
     "8",
     String(countSpecOperations()),
   ]);
+  // The feature cards' SMS list shows every message at once.
+  const featuresBento = page.getByTestId("features-bento");
+  await expect(featuresBento).toContainText("Your verification code is 482913");
+  await expect(featuresBento).toContainText("Your order is on its way");
   // The beams are drawn as plain paths, with no moving gradient.
   await expect(
     page.getByTestId("flow-diagram").locator("path[stroke^='url(']"),
