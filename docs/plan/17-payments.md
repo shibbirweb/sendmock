@@ -210,7 +210,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
 
-CLI: `sendmock payments list|show|simulate|notify|test-cards`. MCP toolset `payments`: `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_create_checkout`, `sendmock_payment_wait`.
+CLI and MCP: every payment operation has a command and a tool, listed in [14-ai-integration.md](14-ai-integration.md#command-tree) from the [surface catalogue](20-surface-parity.md); for example `sendmock payments simulate` and `sendmock_payment_simulate`, and `sendmock payments checkout complete` and `sendmock_checkout_complete` to finish a test checkout from a script or an agent.
 
 ## Roadmap placement
 

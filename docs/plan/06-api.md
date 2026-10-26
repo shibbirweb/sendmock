@@ -6,7 +6,7 @@ Base path: `/api/v1`. JSON in and out. The OpenAPI 3.1 document is served at `/a
 
 The contract is [docs/api/openapi.yaml](../api/openapi.yaml), frozen in Phase U3 ([18](18-phase-u3.md#w7-contract-freeze-ui-09)). It is generated, never edited by hand: `web/src/lib/api/endpoint-registry` lists every endpoint (method, path, summary, parameters, body, answer, errors) and the schemas come from the TypeScript types in `web/src/lib/api/types` (`bun run openapi` in `web/`). Tests keep it honest: the registry must equal the mock handlers, and the committed file must equal a fresh build and validate as OpenAPI 3.1. From the freeze on, an API change starts here in the plan, then the registry or types, then the spec. In Stage B the backend generates its document with `utoipa` and the contract tests (PL-01.1) compare it with this file.
 
-The spec covers the 164 endpoints the UI uses plus the `/catch/{binPath}` capture URL. The tables below also list planned endpoints that no screen calls yet; each joins the spec through the registry when its backend lands: `GET /emails/{emailId}/html`, `GET /emails/{emailId}/opens`, `GET /emails/latest`, `POST /emails/inbound`, `/tag-rules`, `/forward-rules`, `GET /sms/{smsId}/opens`, `POST /webhooks/render`, the test-automation helpers (`/wait/*`, `/otp`, `/links`), the payments test cards and `wait/payment` ([17](17-payments.md#api-sendmock-native)), and the realtime stream (`/ws`, `/events`), which OpenAPI does not describe.
+The spec covers every endpoint: the ones the UI uses, the `/catch/{binPath}` capture URL, and (since U3 W14, [20](20-surface-parity.md)) the ones that were planned for the CLI and MCP only: the test-automation helpers (`/wait/*`, `/otp`, `/links`), `GET /emails/latest`, `POST /emails/inbound`, `POST /send/raw`, `/tag-rules`, `/forward-rules`, the outcome tests, the payments test cards ([17](17-payments.md#api-sendmock-native)), `GET /events/recent`, `/integrations/{stack}`, `/scenarios` and `/ai`. Every operation also names its CLI command, MCP tool and UI place in the surface catalogue (`web/src/lib/api/surface-catalogue`), written into the spec as `x-sendmock-cli`, `x-sendmock-mcp` and `x-sendmock-ui`. Earlier ideas that the existing endpoints already answer are dropped: an email's HTML is in `GET /emails/{emailId}` (`html_body`), opens are in its timeline (and `opened_at` on an SMS), and rendering without sending is `POST /webhooks/endpoints/preview`. The realtime stream (`/ws`, SSE `/events`) is not described by OpenAPI; `GET /events/recent` is its polling twin.
 
 Auth: none by default; when `--ui-auth` is set, the same basic auth (or an API token from settings) protects the API.
 
@@ -39,7 +39,11 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/emails/{emailId}/release` | send to a real SMTP relay (`{ "to": [...] }` optional) |
 | POST | `/emails/{emailId}/reply`, `/emails/{emailId}/forward` | reply to or forward an email as its recipient; the result is stored as an inbound email and fires `email.inbound` ([03](03-email.md)) |
 | GET/POST/PATCH/DELETE | `/inbound-routes` | Mailgun-style routes for incoming email, in priority order; `POST /inbound-routes/test` shows which routes match and what runs ([05](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style)) |
-| GET/POST/PATCH/DELETE | `/tag-rules`, `/forward-rules` | automatic tagging and auto-forward rules |
+| GET/POST/PATCH/DELETE | `/tag-rules`, `/forward-rules` | automatic tagging and auto-forward rules (a filter, as in webhook rules, and the tag or the addresses to forward to); `POST /tag-rules/{ruleId}/move` and `/forward-rules/{ruleId}/move` reorder |
+| GET | `/emails/latest?to=&subject=` | the newest email to a recipient (404 when none) |
+| POST | `/emails/inbound` | create an incoming email from fields or raw MIME; fires `email.inbound` ([05](05-webhooks.md#simulating-replies-and-forwards)) |
+| POST | `/send/raw` | store a raw message (`message/rfc822`) as sent by your app, as the `sendmail` shim does |
+| POST | `/outcome-rules/email/test`, `/outcome-rules/sms/test` | which custom rule, magic address or number, or profile applies to an address or number |
 | GET/POST/PATCH/DELETE | `/outcome-rules/email` | custom outcome addresses; `POST /outcome-rules/email/{ruleId}/move` with `up` or `down` reorders |
 
 ## SMS
@@ -150,14 +154,19 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/wait/webhook?endpoint=...&status=succeeded&timeout=10s` | wait for a webhook delivery outcome |
 | GET | `/otp?to=...&channel=sms\|email\|verify` | latest OTP for a recipient (extracted from messages or from Twilio Verify) |
 | GET | `/links?to=...` | latest extracted links for a recipient |
-| POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `create_sample` |
+| GET | `/wait/payment?status=succeeded&timeout=10s` | same for payments |
+| GET | `/events/recent?since=&type=&limit=` | the latest events, newest first: the polling twin of the realtime stream |
+| GET | `/integrations/{stack}?channel=&host=` | copy-ready settings for a stack (Laravel, Django, Express, ...), as Settings > Connection shows them |
+| POST | `/scenarios/validate`, `/scenarios/run` | check or run a scenario file ([14](14-ai-integration.md#scenarios)); the run answers a step-by-step report |
+| GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration; the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
+| POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
 | GET | `/seed/status` | seed file path, when it was applied, and items added or changed since |
 | GET | `/stats` | totals and today's counts, 24 hourly activity buckets (emails, SMS, HTTP requests, deliveries), per-endpoint webhook metrics (deliveries, success rate, p50 / p95 latency, retries, top failure codes) and recent failed deliveries |
 
-`wait` endpoints only match messages received after an optional `since` timestamp (defaults to "now minus 30 s") to avoid matching stale messages.
+`wait` endpoints only match messages received after an optional `since` timestamp (defaults to "now minus 30 s") to avoid matching stale messages. In Demo mode the mock gives up after at most 3 s, so the playground stays quick.
 
 ## Settings and system
 

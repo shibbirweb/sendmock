@@ -44,72 +44,222 @@ The single binary is also the client. Commands talk to a running instance over H
 
 ### Command tree
 
+Generated from the surface catalogue (`web/src/lib/api/surface-catalogue`, see [20-surface-parity.md](20-surface-parity.md)) with `bun scripts/surfaces/print-surface-lists.ts`: every command runs one REST operation, and every REST operation has a command. Arguments in `<>` are positional; the operation's body and query fields are flags (`--to`, `--subject`, ...), or `--data '<json>'` / `--file`.
+
 ```
 sendmock serve                                   # run the servers
-sendmock status                                  # running? version, ports, counts
-sendmock sendmail ...                            # sendmail shim
-
-sendmock email list|show|raw|html|attachments|open|tag|delete|delete-all
-sendmock email send-test [--to --subject --html --attach]   # sends a real SMTP message to sendmock
-sendmock email send --via native|sendgrid|resend|... [...]   # send through an HTTP send API
-sendmock email simulate <emailId> delivered|bounced|complained|unsubscribed [--bounce-type hard|soft]
-sendmock email check <emailId> html|links|spam
-sendmock email mime|timeline <emailId>
-sendmock email release <emailId> [--to ...]
-sendmock email tag-rules|forward-rules list|create|delete
-sendmock email wait --to user@x.test [--subject ...] [--timeout 10s]
-
-sendmock sms send --from --to --body [--api native|twilio|vonage]
-sendmock sms list|show|threads|status <smsId> <status>|open|delete|delete-all
-sendmock sms inbound --from --to --body [--template twilio.inbound_sms]
-sendmock sms wait --to +8801700000000 [--timeout 10s]
-sendmock sms services list|create|delete                     # Messaging Services
-
-sendmock verify list|show|force <verificationId> approved|canceled|expired|max_attempts
-sendmock verify services list|create|update|delete
-
-sendmock http bins|list|show|tail|forward                   # HTTP catcher
-sendmock http response set --bin slack --status 200 --body '...'
-
-sendmock logs smtp|http [--failed] [--tail]
-
-sendmock payments list|show|simulate <paymentId> succeed|decline|refund|dispute|notify|test-cards
-sendmock payments gateways list|show|create|update|reset|delete|preview   # gateway definitions (JSON in / out)
-sendmock payments methods list|show|create|update|reset|delete
-sendmock payments flows list|show|create|update|reset|delete   # flows built step by step from the step catalogue
-sendmock payments flows steps add|move|remove|update            # edit one step of a flow (type, position, labels)
-sendmock payments flows step-types                             # the step catalogue with each step's fields
-sendmock payments flows variables                              # the label variables ({method}, {amount}, ...) with what each becomes
-
-sendmock otp --to <address|number> [--channel email|sms] [--wait 10s]
-sendmock links --to <address>
-
-sendmock numbers list|add|update|remove
-
-sendmock webhook endpoint list|show|create|update|delete|test
-sendmock webhook rule list|show|create|update|delete|preview
-sendmock webhook template list|show|create|clone|update|delete|render|export|import
-sendmock webhook var list|set|unset|regenerate [--endpoint <name>] [--secret]
-sendmock webhook send --endpoint <name> (--email <id>|--sms <id>|--data ...) [--var k=v]
-sendmock webhook render --endpoint <name> --email <id>
-sendmock webhook deliveries list|show|replay [--rerender]|cancel
-sendmock webhook tail                            # live stream of deliveries
-sendmock webhook saved list|send|delete
-sendmock webhook endpoint rotate-secret <name>
-
-sendmock settings get|set <key> <value>
-sendmock chaos smtp-reject|smtp-latency|sms-failure-rate|clear
-sendmock events tail [--type email.received]     # live event stream (SSE)
-sendmock reset [--yes]                           # wipe traffic, restore seed state
-sendmock seed export|apply|validate [file]
-sendmock stats
-
-sendmock scenario run <file.toml>                # scripted simulation (see below)
-sendmock integrate <stack>                       # print config snippet: laravel, django, express, spring, ...
-
 sendmock mcp [--toolsets ...] [--read-only]      # MCP server over stdio
-sendmock ai install --target claude-code|codex|cursor|gemini|vscode [--scope user|project]
-sendmock ai skill [--print|--write <dir>]        # output the agent skill
+sendmock ai install --target <agent>
+sendmock ai skill
+sendmock chaos clear
+sendmock chaos sms-failure-rate
+sendmock chaos smtp-latency
+sendmock chaos smtp-reject
+sendmock email attachments <emailId> <attachmentIndex>
+sendmock email check <emailId> html
+sendmock email check <emailId> links
+sendmock email check <emailId> spam
+sendmock email check <emailId> unsubscribe
+sendmock email delete <emailId>
+sendmock email delete-all --yes
+sendmock email forward <emailId>
+sendmock email forward-rules create
+sendmock email forward-rules delete <ruleId>
+sendmock email forward-rules list
+sendmock email forward-rules move <ruleId>
+sendmock email forward-rules update <ruleId>
+sendmock email html <emailId>
+sendmock email inbound
+sendmock email latest --to <address>
+sendmock email list
+sendmock email mime <emailId>
+sendmock email open <emailId>
+sendmock email raw <emailId>
+sendmock email release <emailId>
+sendmock email reply <emailId>
+sendmock email send
+sendmock email send-test
+sendmock email show <emailId>
+sendmock email simulate <emailId> <event>
+sendmock email tag <emailId>
+sendmock email tag-rules create
+sendmock email tag-rules delete <ruleId>
+sendmock email tag-rules list
+sendmock email tag-rules move <ruleId>
+sendmock email tag-rules update <ruleId>
+sendmock email thumbnail <emailId> <attachmentIndex>
+sendmock email timeline <emailId>
+sendmock email update <emailId>
+sendmock email wait
+sendmock events tail
+sendmock health
+sendmock http bin create
+sendmock http bin delete <binId>
+sendmock http bin list
+sendmock http bin update <binId>
+sendmock http bins
+sendmock http clear
+sendmock http file <requestId> <fileIndex>
+sendmock http forward <requestId>
+sendmock http list
+sendmock http response list <binId>
+sendmock http response preview <binId>
+sendmock http response set <binId>
+sendmock http send <bin>
+sendmock http show <requestId>
+sendmock http tail
+sendmock http wait
+sendmock integrate <stack>
+sendmock links --to <recipient>
+sendmock logs http
+sendmock logs http show <requestId>
+sendmock logs smtp
+sendmock logs smtp show <sessionId>
+sendmock numbers add
+sendmock numbers list
+sendmock numbers remove <numberId>
+sendmock numbers update <numberId>
+sendmock otp --to <recipient>
+sendmock outcome-rule email create
+sendmock outcome-rule email delete <ruleId>
+sendmock outcome-rule email list
+sendmock outcome-rule email move <ruleId>
+sendmock outcome-rule email test <address>
+sendmock outcome-rule email update <ruleId>
+sendmock outcome-rule sms create
+sendmock outcome-rule sms delete <ruleId>
+sendmock outcome-rule sms list
+sendmock outcome-rule sms move <ruleId>
+sendmock outcome-rule sms test <number>
+sendmock outcome-rule sms update <ruleId>
+sendmock payments checkout complete <sessionId> <action>
+sendmock payments checkout create
+sendmock payments checkout show <sessionId>
+sendmock payments flows create
+sendmock payments flows delete <flowKey>
+sendmock payments flows list
+sendmock payments flows reset <flowKey>
+sendmock payments flows show <flowKey>
+sendmock payments flows step-types
+sendmock payments flows steps add <flowKey>
+sendmock payments flows steps move <flowKey> <stepIndex>
+sendmock payments flows steps remove <flowKey> <stepIndex>
+sendmock payments flows steps update <flowKey> <stepIndex>
+sendmock payments flows update <flowKey>
+sendmock payments flows variables
+sendmock payments gateways create
+sendmock payments gateways credential <gatewayKey> <credentialName> --reveal
+sendmock payments gateways delete <gatewayKey>
+sendmock payments gateways list
+sendmock payments gateways preview <gatewayKey>
+sendmock payments gateways reset <gatewayKey>
+sendmock payments gateways show <gatewayKey>
+sendmock payments gateways update <gatewayKey>
+sendmock payments list
+sendmock payments methods create
+sendmock payments methods delete <methodKey>
+sendmock payments methods list
+sendmock payments methods reset <methodKey>
+sendmock payments methods show <methodKey>
+sendmock payments methods update <methodKey>
+sendmock payments notify <paymentId>
+sendmock payments show <paymentId>
+sendmock payments simulate <paymentId> <action>
+sendmock payments test-cards
+sendmock payments wait
+sendmock reset --yes
+sendmock route create
+sendmock route delete <routeId>
+sendmock route list
+sendmock route test
+sendmock route update <routeId>
+sendmock sample <kind>
+sendmock scenario run <file>
+sendmock scenario validate <file>
+sendmock seed apply <file>
+sendmock seed export
+sendmock seed status
+sendmock seed validate <file>
+sendmock sendmail
+sendmock settings get
+sendmock settings set <key> <value>
+sendmock sms delete <smsId>
+sendmock sms delete-all --yes
+sendmock sms inbound
+sendmock sms list
+sendmock sms media <smsId> <mediaIndex>
+sendmock sms open <smsId>
+sendmock sms resend-reply-webhook <smsId>
+sendmock sms send
+sendmock sms services create
+sendmock sms services delete <serviceSid>
+sendmock sms services list
+sendmock sms services update <serviceSid>
+sendmock sms show <smsId>
+sendmock sms status <smsId> <status>
+sendmock sms threads
+sendmock sms wait
+sendmock stats
+sendmock status
+sendmock update check
+sendmock verify force <verificationSid> <status>
+sendmock verify list
+sendmock verify services create
+sendmock verify services delete <serviceSid>
+sendmock verify services list
+sendmock verify services update <serviceSid>
+sendmock verify show <verificationSid>
+sendmock version
+sendmock webhook deliveries cancel <deliveryId>
+sendmock webhook deliveries list
+sendmock webhook deliveries replay <deliveryId>
+sendmock webhook deliveries show <deliveryId>
+sendmock webhook deliveries wait
+sendmock webhook endpoint create
+sendmock webhook endpoint delete <endpointId>
+sendmock webhook endpoint list
+sendmock webhook endpoint rotate-secret <endpointId>
+sendmock webhook endpoint save-as-template <endpointId>
+sendmock webhook endpoint secret <endpointId> --reveal
+sendmock webhook endpoint show <endpointId>
+sendmock webhook endpoint test <endpointId>
+sendmock webhook endpoint update <endpointId>
+sendmock webhook metrics
+sendmock webhook render --endpoint <endpointId>
+sendmock webhook rule create
+sendmock webhook rule delete <ruleId>
+sendmock webhook rule list
+sendmock webhook rule move <ruleId>
+sendmock webhook rule preview
+sendmock webhook rule show <ruleId>
+sendmock webhook rule update <ruleId>
+sendmock webhook saved create --delivery <deliveryId>
+sendmock webhook saved delete <savedId>
+sendmock webhook saved list
+sendmock webhook saved rename <savedId>
+sendmock webhook saved save-as-template <savedId>
+sendmock webhook saved send <savedId>
+sendmock webhook send --endpoint <endpointId>
+sendmock webhook tail
+sendmock webhook template clone <templateId>
+sendmock webhook template create
+sendmock webhook template delete <templateId>
+sendmock webhook template export <templateId>
+sendmock webhook template history <templateId>
+sendmock webhook template import <file>
+sendmock webhook template list
+sendmock webhook template reference
+sendmock webhook template render <templateId>
+sendmock webhook template reset <templateId>
+sendmock webhook template restore <templateId> <revision>
+sendmock webhook template show <templateId>
+sendmock webhook template update <templateId>
+sendmock webhook var list
+sendmock webhook var preview
+sendmock webhook var regenerate <variableId>
+sendmock webhook var set <name> <value>
+sendmock webhook var unset <variableId>
+sendmock webhook var update <variableId>
 ```
 
 ### Scenarios
@@ -145,11 +295,11 @@ run = "sms.open"
 with = { id = "{{ otp_sms.id }}" }
 
 [[steps]]
-run = "webhook.deliveries.wait"
+run = "webhook.delivery.wait"
 with = { endpoint = "app-sms-status", status = "succeeded", count = 3, timeout = "15s" }
 ```
 
-Steps are operation names from the registry, plus `http`, `assert`, `sleep`. Output is a step-by-step report (`--json` for agents). Scenarios are also exposed as an MCP tool.
+Steps are operation names, plus `http`, `assert` and `sleep`: an operation's step name is its MCP tool without the `sendmock_` prefix, with dots (`sendmock_webhook_endpoint_create` is `webhook.endpoint.create`). `with` holds the operation's input: path parameters by name, the rest as the query or body. The **Scenarios** screen and `POST /scenarios/run` run the same files. Output is a step-by-step report (`--json` for agents). Scenarios are also exposed as an MCP tool.
 
 ## MCP server
 
@@ -164,25 +314,29 @@ Built with `rmcp` (the official Rust MCP SDK).
 
 Tool names are prefixed `sendmock_` and generated from the registry. Each carries MCP annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) so harnesses can auto-approve reads and ask before destructive actions.
 
+Generated from the surface catalogue like the command tree; every tool runs one REST operation (a few run several, such as `sendmock_email_check` for the four checks). Revealing an endpoint secret or a gateway credential has no tool on purpose: agents may set secrets but never read them back.
+
 | Toolset | Tools |
 |---------|-------|
-| `core` | `sendmock_status`, `sendmock_stats`, `sendmock_integration_snippet`, `sendmock_events_recent` |
-| `email` | `sendmock_email_list`, `sendmock_email_get`, `sendmock_email_search`, `sendmock_email_wait`, `sendmock_email_send_test`, `sendmock_email_send` (HTTP APIs), `sendmock_email_open`, `sendmock_email_simulate` (delivered/bounce/complaint/unsubscribe), `sendmock_email_check` (html/links/spam), `sendmock_email_mime`, `sendmock_email_timeline`, `sendmock_email_tag`, `sendmock_email_delete` |
-| `email_relay` | `sendmock_email_release`, `sendmock_forward_rule_{list,create,delete}`, `sendmock_tag_rule_{list,create,delete}` |
-| `sms` | `sendmock_sms_send`, `sendmock_sms_list`, `sendmock_sms_get`, `sendmock_sms_threads`, `sendmock_sms_wait`, `sendmock_sms_set_status`, `sendmock_sms_open`, `sendmock_sms_simulate_inbound`, `sendmock_sms_delete`, `sendmock_messaging_service_{list,create,delete}` |
-| `verify` | `sendmock_verify_list`, `sendmock_verify_get`, `sendmock_verify_force`, `sendmock_verify_service_{list,create,update,delete}` |
-| `http` | `sendmock_http_bins`, `sendmock_http_list`, `sendmock_http_get`, `sendmock_http_wait`, `sendmock_http_forward`, `sendmock_http_response_set` |
-| `logs` | `sendmock_logs_smtp`, `sendmock_logs_http` |
-| `payments` | `sendmock_payment_create_checkout`, `sendmock_payment_list`, `sendmock_payment_get`, `sendmock_payment_simulate`, `sendmock_payment_notify`, `sendmock_payment_wait`, `sendmock_payment_gateway_list`, `sendmock_payment_gateway_get`, `sendmock_payment_gateway_create`, `sendmock_payment_gateway_update`, `sendmock_payment_gateway_preview`, `sendmock_payment_gateway_reset`, `sendmock_payment_method_list`, `sendmock_payment_method_get`, `sendmock_payment_method_create`, `sendmock_payment_method_update`, `sendmock_payment_method_reset`, `sendmock_payment_flow_list`, `sendmock_payment_flow_get`, `sendmock_payment_flow_create`, `sendmock_payment_flow_update`, `sendmock_payment_flow_reset`, `sendmock_payment_flow_delete`, `sendmock_payment_flow_step_add`, `sendmock_payment_flow_step_move`, `sendmock_payment_flow_step_remove`, `sendmock_payment_flow_step_update`, `sendmock_payment_step_type_list`, `sendmock_payment_flow_variable_list` (create and update take the same definition as the UI and are checked by the same validation; reset and delete are marked destructive and ask first) |
-| `extract` | `sendmock_otp_get`, `sendmock_links_get` |
-| `numbers` | `sendmock_number_list`, `sendmock_number_upsert`, `sendmock_number_delete` |
-| `webhooks` | `sendmock_webhook_endpoint_{list,get,create,update,delete,test,rotate_secret}`, `sendmock_webhook_saved_{list,send,delete}`, `sendmock_webhook_rule_{list,create,update,delete,preview}`, `sendmock_webhook_send`, `sendmock_webhook_render`, `sendmock_webhook_delivery_{list,get,replay,cancel,wait}` |
-| `templates` | `sendmock_webhook_template_{list,get,create,clone,update,delete,render,export,import}` |
-| `variables` | `sendmock_webhook_variable_{list,set,unset,regenerate}` |
-| `admin` | `sendmock_settings_get`, `sendmock_settings_update`, `sendmock_chaos_set`, `sendmock_reset`, `sendmock_seed_export`, `sendmock_seed_apply` |
+| `admin` | `sendmock_chaos_set`, `sendmock_reset`, `sendmock_sample_send`, `sendmock_seed_apply`, `sendmock_seed_export`, `sendmock_seed_status`, `sendmock_seed_validate`, `sendmock_settings_get`, `sendmock_settings_update`, `sendmock_update_check` |
+| `core` | `sendmock_ai_agents`, `sendmock_events_recent`, `sendmock_integration_snippet`, `sendmock_stats`, `sendmock_status` |
+| `email` | `sendmock_email_check`, `sendmock_email_delete`, `sendmock_email_delete_all`, `sendmock_email_forward`, `sendmock_email_get`, `sendmock_email_inbound`, `sendmock_email_latest`, `sendmock_email_list`, `sendmock_email_mime`, `sendmock_email_open`, `sendmock_email_release`, `sendmock_email_reply`, `sendmock_email_search`, `sendmock_email_send`, `sendmock_email_send_raw`, `sendmock_email_send_test`, `sendmock_email_simulate`, `sendmock_email_tag`, `sendmock_email_timeline`, `sendmock_email_update`, `sendmock_email_wait` |
+| `extract` | `sendmock_links_get`, `sendmock_otp_get` |
+| `http` | `sendmock_http_bin_create`, `sendmock_http_bin_delete`, `sendmock_http_bin_list`, `sendmock_http_bin_update`, `sendmock_http_bins`, `sendmock_http_clear`, `sendmock_http_forward`, `sendmock_http_get`, `sendmock_http_list`, `sendmock_http_response_list`, `sendmock_http_response_preview`, `sendmock_http_response_set`, `sendmock_http_send`, `sendmock_http_wait` |
+| `logs` | `sendmock_logs_http`, `sendmock_logs_http_get`, `sendmock_logs_smtp`, `sendmock_logs_smtp_get` |
+| `numbers` | `sendmock_messaging_service_create`, `sendmock_messaging_service_delete`, `sendmock_messaging_service_list`, `sendmock_messaging_service_update`, `sendmock_number_delete`, `sendmock_number_list`, `sendmock_number_upsert` |
+| `payments` | `sendmock_checkout_complete`, `sendmock_checkout_get`, `sendmock_payment_create_checkout`, `sendmock_payment_flow_create`, `sendmock_payment_flow_delete`, `sendmock_payment_flow_get`, `sendmock_payment_flow_list`, `sendmock_payment_flow_reset`, `sendmock_payment_flow_step_add`, `sendmock_payment_flow_step_move`, `sendmock_payment_flow_step_remove`, `sendmock_payment_flow_step_update`, `sendmock_payment_flow_update`, `sendmock_payment_flow_variable_list`, `sendmock_payment_gateway_create`, `sendmock_payment_gateway_delete`, `sendmock_payment_gateway_get`, `sendmock_payment_gateway_list`, `sendmock_payment_gateway_preview`, `sendmock_payment_gateway_reset`, `sendmock_payment_gateway_update`, `sendmock_payment_get`, `sendmock_payment_list`, `sendmock_payment_method_create`, `sendmock_payment_method_delete`, `sendmock_payment_method_get`, `sendmock_payment_method_list`, `sendmock_payment_method_reset`, `sendmock_payment_method_update`, `sendmock_payment_notify`, `sendmock_payment_simulate`, `sendmock_payment_step_type_list`, `sendmock_payment_test_cards`, `sendmock_payment_wait` |
+| `rules` | `sendmock_forward_rule_create`, `sendmock_forward_rule_delete`, `sendmock_forward_rule_list`, `sendmock_forward_rule_move`, `sendmock_forward_rule_update`, `sendmock_inbound_route_create`, `sendmock_inbound_route_delete`, `sendmock_inbound_route_list`, `sendmock_inbound_route_test`, `sendmock_inbound_route_update`, `sendmock_outcome_rule_create`, `sendmock_outcome_rule_delete`, `sendmock_outcome_rule_list`, `sendmock_outcome_rule_move`, `sendmock_outcome_rule_test`, `sendmock_outcome_rule_update`, `sendmock_tag_rule_create`, `sendmock_tag_rule_delete`, `sendmock_tag_rule_list`, `sendmock_tag_rule_move`, `sendmock_tag_rule_update` |
 | `scenario` | `sendmock_scenario_run`, `sendmock_scenario_validate` |
+| `sms` | `sendmock_sms_delete`, `sendmock_sms_delete_all`, `sendmock_sms_get`, `sendmock_sms_list`, `sendmock_sms_open`, `sendmock_sms_reply_webhook_resend`, `sendmock_sms_send`, `sendmock_sms_set_status`, `sendmock_sms_simulate_inbound`, `sendmock_sms_threads`, `sendmock_sms_wait` |
+| `templates` | `sendmock_webhook_template_clone`, `sendmock_webhook_template_create`, `sendmock_webhook_template_delete`, `sendmock_webhook_template_export`, `sendmock_webhook_template_get`, `sendmock_webhook_template_import`, `sendmock_webhook_template_list`, `sendmock_webhook_template_reference`, `sendmock_webhook_template_render`, `sendmock_webhook_template_reset`, `sendmock_webhook_template_restore`, `sendmock_webhook_template_revisions`, `sendmock_webhook_template_update` |
+| `variables` | `sendmock_webhook_variable_list`, `sendmock_webhook_variable_preview`, `sendmock_webhook_variable_regenerate`, `sendmock_webhook_variable_set`, `sendmock_webhook_variable_unset`, `sendmock_webhook_variable_update` |
+| `verify` | `sendmock_verify_force`, `sendmock_verify_get`, `sendmock_verify_list`, `sendmock_verify_service_create`, `sendmock_verify_service_delete`, `sendmock_verify_service_list`, `sendmock_verify_service_update` |
+| `webhooks` | `sendmock_webhook_delivery_cancel`, `sendmock_webhook_delivery_get`, `sendmock_webhook_delivery_list`, `sendmock_webhook_delivery_replay`, `sendmock_webhook_delivery_wait`, `sendmock_webhook_endpoint_create`, `sendmock_webhook_endpoint_delete`, `sendmock_webhook_endpoint_get`, `sendmock_webhook_endpoint_list`, `sendmock_webhook_endpoint_rotate_secret`, `sendmock_webhook_endpoint_save_as_template`, `sendmock_webhook_endpoint_test`, `sendmock_webhook_endpoint_update`, `sendmock_webhook_metrics`, `sendmock_webhook_render`, `sendmock_webhook_rule_create`, `sendmock_webhook_rule_delete`, `sendmock_webhook_rule_get`, `sendmock_webhook_rule_list`, `sendmock_webhook_rule_move`, `sendmock_webhook_rule_preview`, `sendmock_webhook_rule_update`, `sendmock_webhook_saved_create`, `sendmock_webhook_saved_delete`, `sendmock_webhook_saved_list`, `sendmock_webhook_saved_save_as_template`, `sendmock_webhook_saved_send`, `sendmock_webhook_saved_update`, `sendmock_webhook_send` |
 
-- **Toolsets** keep the tool list small for the model: default is `core,email,sms,verify,extract,webhooks`; `--toolsets all` or a custom list enables more.
+Resources: `sendmock://docs/skill`, `sendmock://emails/{emailId}/attachments/{attachmentIndex}`, `sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail`, `sendmock://emails/{emailId}/raw`, `sendmock://http/requests/{requestId}/files/{fileIndex}`, `sendmock://sms/{smsId}/media/{mediaIndex}`
+
+- **Toolsets** keep the tool list small for the model: default is `core,email,sms,verify,extract,webhooks`; `--toolsets all` or a custom list enables more (`rules`, `http`, `logs`, `numbers`, `payments`, `templates`, `variables`, `admin`, `scenario`).
 - **`--read-only`** exposes only read tools (safe for exploratory sessions).
 - Tool results return compact JSON plus a one-line human summary. Large content (HTML bodies, raw source, attachments) is returned as MCP **resources** links instead of inline text, to protect the model's context window.
 - **Secrets never leave as plain text**: variable and endpoint secrets are always masked in tool output. Agents can set secrets but not read them back.

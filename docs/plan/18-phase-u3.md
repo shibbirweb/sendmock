@@ -33,7 +33,7 @@ All U3 workstreams are built on one branch, `feat/u3-design-review`, with a comm
 | W11 | Feedback round and sign-off (D3) | `chore/u3-sign-off` | UI-07.3 signed | all |
 | W12 | Community links and GitHub templates | `chore/u3-community` | UI-10 | |
 | W13 | User guide (not part of the sign-off gate) | `docs/user-guide-plan` | WS-06 | W9 |
-| W14 | Every feature in every way (proposed: inside the sign-off gate, it changes the contract) | to decide | UI-11 | W7, W13 |
+| W14 | Every feature in every way (inside the sign-off gate, it changes the contract) | `docs/user-guide-plan` | UI-11 | W7, W13 |
 
 ## W1 and W6: Design review
 
@@ -201,7 +201,11 @@ So people can find the project, give feedback and report problems from wherever 
 
 The user docs become a guide that walks the sidebar menu by menu, says which real-life problem each feature solves and how the menus connect, and adds recipes with the built-ins, Advanced pages for customizing and creating (gateways, methods, flows, templates, rules, routes, outcome rules, catcher responses) and AI pages for doing the same with an agent. The plan, page template, outlines and criteria are in [19-user-guide.md](19-user-guide.md). It does not block the sign-off; pages describe backend features with the phase they arrive in.
 
-- **As built:** 81 pages, 17 new screenshots and the WS-06 tests; details in [19-user-guide.md](19-user-guide.md#as-built-2026-10-26). WS-06.5 waits for the generated reference in Phase 0.
+- **As built:** 81 pages, 17 new screenshots and the WS-06 tests; details in [19-user-guide.md](19-user-guide.md#as-built-2026-10-26). WS-06.5 is checked against the surface catalogue since W14.
+
+## W14: Every feature in every way (UI-11)
+
+Every operation is reachable from the UI, the REST API, the CLI and the MCP server, with one recorded exemption (agents never read secrets back). Plan and as-built notes: [20-surface-parity.md](20-surface-parity.md). Part of the sign-off gate, because it changes the contract.
 
 ## Re-audit before sign-off (2026-10-26)
 
