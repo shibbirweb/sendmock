@@ -40,7 +40,7 @@ test("UI-01.1 sidebar lists every section and highlights the current one", async
     "Overview",
     "Mail",
     "SMS",
-    "HTTP",
+    "HTTP Catcher",
     "Webhooks",
     "Numbers",
     "Logs",
@@ -69,7 +69,13 @@ test("UI-01.1 sections with sub-items show a chevron that turns when the group o
     await expect(chevronOf(groupTitle)).toBeVisible();
     await expect(chevronOf(groupTitle)).not.toHaveClass(/rotate-90/);
   }
-  for (const plainTitle of ["Overview", "Mail", "HTTP", "Numbers", "Logs"]) {
+  for (const plainTitle of [
+    "Overview",
+    "Mail",
+    "HTTP Catcher",
+    "Numbers",
+    "Logs",
+  ]) {
     await expect(chevronOf(plainTitle)).toHaveCount(0);
   }
 

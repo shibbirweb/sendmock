@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W11 feedback (F2, the HTTP Catcher rename, is next) and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 14 / 15, required CI checks still to add) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
@@ -17,9 +17,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. U3 feedback F2: rename the HTTP menu to HTTP Catcher and take the guide screenshots again ([18](18-phase-u3.md#feedback-items)).
-2. W11: the owner's feedback round on the preview, the review table sign-off (UI-07.3) and the sign-off tick.
-3. Add the required status checks (Web UI, Acceptance traceability, Website, Surface parity) to the `develop` and `main` rulesets.
+1. W11: the owner's feedback round on the preview, the review table sign-off (UI-07.3) and the sign-off tick.
+2. Add the required status checks (Web UI, Acceptance traceability, Website, Surface parity) to the `develop` and `main` rulesets.
 
 ## How to update this file
 
@@ -422,3 +421,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-26 | Plan: CLI and MCP reference, field docs and code examples ([21](21-reference-and-examples.md), U3 W15, new features WS-07 and WS-08 with 5 criteria each, and WS-04.4 to WS-04.6). The guide named every command and tool but not their flags or inputs, none of the spec's 1,228 fields had a description and none of its 86 bodies an example, so the playground showed an empty or `{}` body with no list of what it accepts. Every input gets a description and example in the API types; CLI flags and MCP inputs are derived by one rule set ([14](14-ai-integration.md#flags-and-tool-inputs)) into generated `docs/api/cli-reference.json` and `docs/api/mcp-tools.json`; the website gains `/cli/` and `/mcp/` pages linked from the API reference and every guide table; the playground gets an Inputs panel, a full example body and CLI and MCP snippet tabs; recipes and menu pages get code examples in nine tabs. `/otp` and `/links` gain `timeout_ms` so `sendmock otp --wait` maps to one call. The field docs and the rules are inside the sign-off gate. |
 | 2026-10-26 | U3 feedback ([18](18-phase-u3.md#feedback-items)): toasts now appear at the bottom right by default (F1, done); the HTTP sidebar item becomes HTTP Catcher across the app, catalogue, guide and tests, with every guide screenshot taken again (F2, planned). |
 | 2026-10-26 | CLI and MCP reference, field docs and code examples built (U3 W15, [21](21-reference-and-examples.md#as-built-2026-10-26)): every request input in the spec has a description and an example; `bun run openapi` also writes `docs/api/cli-reference.json` (199 commands) and `docs/api/mcp-tools.json` (180 tools, 6 resources) by one rule set, which found and fixed contract gaps (`timeout` on `/otp` and `/links`, `target` on `/ai/agents`, a flag per setting, and the global `--server` flag instead of `--url`). The website has `/cli/` and `/mcp/` references linked from the API reference, every guide table and the search; the playground shows every input with a full example body, hints, and CLI and MCP snippets; every recipe and menu page has code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C#, generated from checked steps. Also fixed: the playground bridge race (never ready in development), code comment contrast, and the website workflow now runs on guide changes. WS-04.4 to WS-04.6, WS-07.1 to WS-07.5 and WS-08.1 to WS-08.4 have tests. |
+| 2026-10-26 | U3 feedback F2 done ([18](18-phase-u3.md#feedback-items)): the HTTP sidebar item, its screen title and header, the command palette and shortcut list, the surface catalogue's UI places, the API tag, the Settings connection snippet, the landing page and the user guide now say **HTTP Catcher**; every guide screenshot was taken again. The route stays `/http` and the shortcut `G H`. |

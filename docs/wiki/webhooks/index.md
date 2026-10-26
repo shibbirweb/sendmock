@@ -42,7 +42,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 
 | Gets from | Sends to |
 | --- | --- |
-| events from [Mail](../mail/index.md), [SMS](../sms/index.md), [Verify](../sms/verify.md), [HTTP](../http/index.md) and [Payments](../payments/index.md) | requests to your app |
+| events from [Mail](../mail/index.md), [SMS](../sms/index.md), [Verify](../sms/verify.md), [HTTP Catcher](../http/index.md) and [Payments](../payments/index.md) | requests to your app |
 | simulations: Simulate, Reply as recipient, Verify force, payment Simulate | [Deliveries](./deliveries.md), the [Overview](../overview.md) and the bell |
 
 ## Use it
@@ -66,7 +66,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated |
 | `sms.inbound` | the contact replied |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify activity |
-| `http.captured` | the HTTP catcher recorded a request |
+| `http.captured` | the HTTP Catcher recorded a request |
 | `payment.*`, `checkout.*` | payments were created, succeeded, failed, refunded, disputed; checkouts completed or expired |
 | `webhook.failed` | a delivery used up its retries (useful for alerts) |
 | `test.ping` | **Send test** on an endpoint |

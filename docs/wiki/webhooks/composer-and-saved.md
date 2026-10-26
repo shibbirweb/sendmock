@@ -19,7 +19,7 @@ Rules send automatically. These three tools send when you say so.
 
 | Gets from | Sends to |
 | --- | --- |
-| a message in [Mail](../mail/index.md), [SMS](../sms/index.md) or the [HTTP catcher](../http/index.md) (**Send to webhook**) | an [endpoint](./endpoints.md), which signs the request |
+| a message in [Mail](../mail/index.md), [SMS](../sms/index.md) or the [HTTP Catcher](../http/index.md) (**Send to webhook**) | an [endpoint](./endpoints.md), which signs the request |
 | [templates](./templates.md) as presets, [variables](./variables.md) and Prompt variables | a `manual` delivery in [Deliveries](./deliveries.md) |
 | **Save** on a delivery | Saved deliveries, and **Save as template** to [Templates](./templates.md) |
 

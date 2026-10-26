@@ -59,5 +59,5 @@ Step by step, with examples: [Advanced: catcher responses](../advanced/catcher-r
 
 ## Related
 
-- [HTTP catcher](./index.md)
+- [HTTP Catcher](./index.md)
 - [Variables](../webhooks/variables.md)

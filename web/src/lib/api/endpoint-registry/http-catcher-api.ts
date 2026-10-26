@@ -38,7 +38,7 @@ const captureEndpoints: AreaEndpoint[] = captureMethods.map((method) => ({
   response: fileOf("*/*"),
 }));
 
-export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP catcher", [
+export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
   {
     method: "GET",
     path: "/api/v1/http/bins",

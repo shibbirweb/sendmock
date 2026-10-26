@@ -256,7 +256,7 @@ Each outline lists what the page's **What it solves**, **How it connects**, **Us
   - `replies-and-whatsapp`: reply composer, format picker, media, reply webhook result line, Reply webhook tab, fallback URL, TwiML replies, Resend reply webhook.
   - `verify`: Verifications tab (code, countdown, attempts), detail drawer and force buttons, Services tab (code length, fixed code for automated tests, lifetime), Start a sample verification.
 
-### HTTP (catcher)
+### HTTP Catcher
 
 - **Solves:** Slack, Discord, Teams, Telegram and push notifications going to real people during development; seeing exactly what your app sent to a third-party API; testing how your app handles slow or failing APIs.
 - **Connects:** gets any HTTP call to `/catch/<bin>/...`; answers with the bin's response rules; fires `http.captured` to Rules; **Forward to URL** sends a request on; **Send to webhook** turns it into a delivery; Webhooks' **Add a catcher endpoint** points test deliveries here.

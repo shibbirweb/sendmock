@@ -31,7 +31,7 @@ tags:
   - name: Outcome rules
   - name: Verify
   - name: Numbers
-  - name: HTTP catcher
+  - name: HTTP Catcher
   - name: Payments
   - name: Checkout
   - name: Payment flows
@@ -599,7 +599,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http wait
       x-sendmock-mcp: sendmock_http_wait
-      x-sendmock-ui: HTTP (new requests appear live)
+      x-sendmock-ui: HTTP Catcher (new requests appear live)
   /api/v1/wait/webhook:
     get:
       operationId: getWaitWebhook
@@ -3179,7 +3179,7 @@ paths:
       operationId: getHttpBins
       summary: Bins, each a capture URL with its own responses.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       responses:
         "200":
           description: OK.
@@ -3193,12 +3193,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http bin list
       x-sendmock-mcp: sendmock_http_bin_list
-      x-sendmock-ui: HTTP > bins
+      x-sendmock-ui: HTTP Catcher > bins
     post:
       operationId: postHttpBins
       summary: Add a bin; 409 when the name is taken.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       requestBody:
         required: true
         content:
@@ -3220,13 +3220,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http bin create
       x-sendmock-mcp: sendmock_http_bin_create
-      x-sendmock-ui: HTTP > New bin
+      x-sendmock-ui: HTTP Catcher > New bin
   /api/v1/http/bins/{binId}:
     patch:
       operationId: patchHttpBinsByBinId
       summary: Change a bin's default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binId
           in: path
@@ -3254,12 +3254,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http bin update <binId>
       x-sendmock-mcp: sendmock_http_bin_update
-      x-sendmock-ui: HTTP > bin > Responses > Edit default reply
+      x-sendmock-ui: HTTP Catcher > bin > Responses > Edit default reply
     delete:
       operationId: deleteHttpBinsByBinId
       summary: Delete a bin and its requests.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binId
           in: path
@@ -3277,13 +3277,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http bin delete <binId>
       x-sendmock-mcp: sendmock_http_bin_delete
-      x-sendmock-ui: HTTP > bin > Delete bin
+      x-sendmock-ui: HTTP Catcher > bin > Delete bin
   /api/v1/http/bins/{binId}/responses:
     get:
       operationId: getHttpBinsByBinIdResponses
       summary: A bin's response rules, checked from top to bottom.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binId
           in: path
@@ -3307,12 +3307,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http response list <binId>
       x-sendmock-mcp: sendmock_http_response_list
-      x-sendmock-ui: HTTP > bin > Responses
+      x-sendmock-ui: HTTP Catcher > bin > Responses
     put:
       operationId: putHttpBinsByBinIdResponses
       summary: Replace a bin's response rules.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binId
           in: path
@@ -3346,13 +3346,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http response set <binId>
       x-sendmock-mcp: sendmock_http_response_set
-      x-sendmock-ui: HTTP > bin > Responses > Add rule, edit, move, enabled switch
+      x-sendmock-ui: HTTP Catcher > bin > Responses > Add rule, edit, move, enabled switch
   /api/v1/http/bins/{binId}/responses/preview:
     post:
       operationId: postHttpBinsByBinIdResponsesPreview
       summary: Which rule a captured request would match, and its answer.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binId
           in: path
@@ -3380,13 +3380,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http response preview <binId>
       x-sendmock-mcp: sendmock_http_response_preview
-      x-sendmock-ui: HTTP > bin > Responses > rule sheet > Preview
+      x-sendmock-ui: HTTP Catcher > bin > Responses > rule sheet > Preview
   /api/v1/http/requests:
     get:
       operationId: getHttpRequests
       summary: Captured requests, newest first.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: cursor
           in: query
@@ -3420,12 +3420,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http list
       x-sendmock-mcp: sendmock_http_list
-      x-sendmock-ui: HTTP > Requests
+      x-sendmock-ui: HTTP Catcher > Requests
     delete:
       operationId: deleteHttpRequests
       summary: Delete captured requests, all or one bin's.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: bin_id
           in: query
@@ -3441,13 +3441,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http clear
       x-sendmock-mcp: sendmock_http_clear
-      x-sendmock-ui: HTTP > bin > Clear requests
+      x-sendmock-ui: HTTP Catcher > bin > Clear requests
   /api/v1/http/requests/{requestId}:
     get:
       operationId: getHttpRequestsByRequestId
       summary: One captured request and what SendMock answered.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: requestId
           in: path
@@ -3469,13 +3469,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http show <requestId>
       x-sendmock-mcp: sendmock_http_get
-      x-sendmock-ui: HTTP > open a request
+      x-sendmock-ui: HTTP Catcher > open a request
   /api/v1/http/requests/{requestId}/files/{fileIndex}:
     get:
       operationId: getHttpRequestsByRequestIdFilesByFileIndex
       summary: Download a file uploaded in a captured request.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: requestId
           in: path
@@ -3505,13 +3505,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http file <requestId> <fileIndex>
       x-sendmock-mcp: sendmock://http/requests/{requestId}/files/{fileIndex}
-      x-sendmock-ui: HTTP > request > Body > files
+      x-sendmock-ui: HTTP Catcher > request > Body > files
   /api/v1/http/requests/{requestId}/forward:
     post:
       operationId: postHttpRequestsByRequestIdForward
       summary: Send a captured request on to another URL.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: requestId
           in: path
@@ -3541,13 +3541,13 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http forward <requestId>
       x-sendmock-mcp: sendmock_http_forward
-      x-sendmock-ui: HTTP > request > Forward to URL
+      x-sendmock-ui: HTTP Catcher > request > Forward to URL
   /catch/{binPath}:
     get:
       operationId: getCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binPath
           in: path
@@ -3568,12 +3568,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
-      x-sendmock-ui: HTTP > Send a sample request
+      x-sendmock-ui: HTTP Catcher > Send a sample request
     post:
       operationId: postCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binPath
           in: path
@@ -3601,12 +3601,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
-      x-sendmock-ui: HTTP > Send a sample request
+      x-sendmock-ui: HTTP Catcher > Send a sample request
     put:
       operationId: putCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binPath
           in: path
@@ -3634,12 +3634,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
-      x-sendmock-ui: HTTP > Send a sample request
+      x-sendmock-ui: HTTP Catcher > Send a sample request
     patch:
       operationId: patchCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binPath
           in: path
@@ -3667,12 +3667,12 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
-      x-sendmock-ui: HTTP > Send a sample request
+      x-sendmock-ui: HTTP Catcher > Send a sample request
     delete:
       operationId: deleteCatchByBinPath
       summary: Capture a request in a bin and answer with its matching response rule or default response.
       tags:
-        - HTTP catcher
+        - HTTP Catcher
       parameters:
         - name: binPath
           in: path
@@ -3693,7 +3693,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
-      x-sendmock-ui: HTTP > Send a sample request
+      x-sendmock-ui: HTTP Catcher > Send a sample request
   /api/v1/payments:
     get:
       operationId: getPayments

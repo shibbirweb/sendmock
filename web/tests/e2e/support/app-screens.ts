@@ -6,7 +6,7 @@ export const appScreens = [
   { path: "/mail", title: "Mail · SendMock" },
   { path: "/sms", title: "SMS · SendMock" },
   { path: "/sms/verify", title: "Verify · SendMock" },
-  { path: "/http", title: "HTTP catcher · SendMock" },
+  { path: "/http", title: "HTTP Catcher · SendMock" },
   { path: "/webhooks/overview", title: "Overview · Webhooks · SendMock" },
   { path: "/webhooks/endpoints", title: "Endpoints · Webhooks · SendMock" },
   { path: "/webhooks/rules", title: "Rules · Webhooks · SendMock" },

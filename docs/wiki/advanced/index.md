@@ -45,4 +45,4 @@ Everything here can also be done by an AI agent: see [Build it with AI](../ai/bu
 
 ## What still needs code
 
-Almost everything is data you can change. A few things need a change to SendMock itself: a new **checkout step type**, a new **HTTP catcher preset**, and a provider's **API calls** beyond what a gateway or provider emulation already answers. Ask for them with a provider request issue (Help menu > **Request a feature**).
+Almost everything is data you can change. A few things need a change to SendMock itself: a new **checkout step type**, a new **HTTP Catcher preset**, and a provider's **API calls** beyond what a gateway or provider emulation already answers. Ask for them with a provider request issue (Help menu > **Request a feature**).

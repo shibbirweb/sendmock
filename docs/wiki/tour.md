@@ -17,7 +17,7 @@ Press `G` and then the key in the table to jump to a menu from anywhere.
 | Mail | `G M` | every email your app sent, and the replies you simulate | [Mail](./mail/index.md) |
 | SMS | `G S` | every SMS and WhatsApp message, as conversations | [SMS](./sms/index.md) |
 | SMS > Verify | `G V` | Twilio Verify codes, with their expiry and attempts | [Verify](./sms/verify.md) |
-| HTTP | `G H` | the catcher for any other HTTP call your app makes | [HTTP catcher](./http/index.md) |
+| HTTP Catcher | `G H` | the catcher for any other HTTP call your app makes | [HTTP Catcher](./http/index.md) |
 | Webhooks | `G W` | what SendMock sends back to your app, and its health | [Webhooks](./webhooks/index.md) |
 | Webhooks > Endpoints | | where deliveries go and how they are shaped and signed | [Endpoints](./webhooks/endpoints.md) |
 | Webhooks > Rules | | which events go to which endpoint, automatically | [Rules](./webhooks/rules.md) |

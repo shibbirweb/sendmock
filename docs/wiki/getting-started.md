@@ -51,10 +51,10 @@ Trigger a password reset or a sign-up in your app. The email appears in **Mail**
 
 Webhooks are how SendMock talks back to your app. Try it without touching your app first:
 
-1. Go to **Webhooks > Endpoints**. On a fresh install press **Add a catcher endpoint**; otherwise press **Add endpoint**, name it `Catcher` and set the URL to `http://127.0.0.1:8025/catch/webhooks`. Either way, deliveries land in SendMock's own HTTP catcher.
+1. Go to **Webhooks > Endpoints**. On a fresh install press **Add a catcher endpoint**; otherwise press **Add endpoint**, name it `Catcher` and set the URL to `http://127.0.0.1:8025/catch/webhooks`. Either way, deliveries land in SendMock's own HTTP Catcher.
 2. Press **Send test** on the endpoint. The dialog shows the status code and the signed request.
 3. Go to **Webhooks > Rules**, press **Add rule**, pick the endpoint and the `email.received` event, and save.
-4. Send another sample email. A delivery appears in **Webhooks > Deliveries**, and the request itself in **HTTP** under the `webhooks` bin.
+4. Send another sample email. A delivery appears in **Webhooks > Deliveries**, and the request itself in **HTTP Catcher** under the `webhooks` bin.
 
 When you are ready, change the endpoint's URL to your app's handler and pick the template your app expects (for example Postmark inbound). See [Webhooks](./webhooks/index.md).
 

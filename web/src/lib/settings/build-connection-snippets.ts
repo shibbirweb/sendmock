@@ -133,7 +133,7 @@ export function buildConnectionSnippets(
     },
     {
       area: "catcher",
-      title: "HTTP catcher (point Slack, push or other webhooks here)",
+      title: "HTTP Catcher (point Slack, push or other webhooks here)",
       code: `${apiBaseUrl}/catch/slack/services/T000/B000/XXXX`,
     },
   ];

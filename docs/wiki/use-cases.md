@@ -46,8 +46,8 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 
 | I want to... | Use | Read |
 | --- | --- | --- |
-| keep Slack, Discord or push notifications away from real people | HTTP catcher presets | [Recipe: Slack and push](./recipes/slack-and-push.md) |
-| see exactly what my app sent to a third-party API | HTTP catcher | [HTTP catcher](./http/index.md) |
+| keep Slack, Discord or push notifications away from real people | HTTP Catcher presets | [Recipe: Slack and push](./recipes/slack-and-push.md) |
+| see exactly what my app sent to a third-party API | HTTP Catcher | [HTTP Catcher](./http/index.md) |
 | see how my app copes when an API is slow, rate limited or failing | response rules: delay, failure rate | [Advanced: catcher responses](./advanced/catcher-responses.md) |
 
 ## Webhooks
@@ -76,4 +76,4 @@ Find your situation, then follow the link. **Recipes** use only what SendMock sh
 
 ## Browse by menu
 
-[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)
+[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP Catcher](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)

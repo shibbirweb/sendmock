@@ -19,7 +19,7 @@ The first screen you see: what SendMock has caught, how your webhooks are doing,
 
 | Gets from | Sends to |
 | --- | --- |
-| counts from [Mail](./mail/index.md), [SMS](./sms/index.md), [Verify](./sms/verify.md), [HTTP](./http/index.md) and [Payments](./payments/index.md) | each tile links to its screen |
+| counts from [Mail](./mail/index.md), [SMS](./sms/index.md), [Verify](./sms/verify.md), [HTTP Catcher](./http/index.md) and [Payments](./payments/index.md) | each tile links to its screen |
 | delivery health from [Webhooks](./webhooks/index.md) | each failure links to its delivery in [Deliveries](./webhooks/deliveries.md) |
 | the listeners from [Settings > Connection](./settings.md#connection) | copy buttons for your app's settings |
 

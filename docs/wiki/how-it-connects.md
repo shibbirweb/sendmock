@@ -39,7 +39,7 @@ Your app ──SMTP, provider APIs, HTTP──►  CAPTURE                      
 
 Read it top to bottom:
 
-1. **Capture.** Your app talks to SendMock the way it talks to the real service. Each message lands in its menu (**Mail**, **SMS**, **Verify**, **HTTP**, **Payments**), and the raw conversation behind it (the SMTP session, the API request) lands in **Logs**.
+1. **Capture.** Your app talks to SendMock the way it talks to the real service. Each message lands in its menu (**Mail**, **SMS**, **Verify**, **HTTP Catcher**, **Payments**), and the raw conversation behind it (the SMTP session, the API request) lands in **Logs**.
 2. **Events.** Every capture fires an event, such as `email.received`, `sms.status`, `verify.started`, `http.captured` or `payment.succeeded`. You can also make events happen yourself: **Simulate** a bounce, reply as the recipient, force a Verify outcome, refund a payment.
 3. **Deliver.** Events turn into requests to your app. **Rules** pick events and send them to an **endpoint**, which shapes the request with a **template**, fills it with **variables** and signs it with its **secret**. Some deliveries do not need a rule, because a real provider would send them anyway: a message's status callback, a number's reply webhook, an inbound route, a gateway's payment notification.
 4. **Log and replay.** Every request SendMock sends is in **Webhooks > Deliveries**, with the response your app gave, retries and **Replay**.
@@ -54,7 +54,7 @@ Read it top to bottom:
 | [Mail](./mail/index.md) | your app over SMTP or an email API; **Reply as recipient** | `email.*` events to Rules; incoming mail to Inbound routes; **Release** to a real SMTP relay; the session to Logs > SMTP |
 | [SMS](./sms/index.md) | your app over the native, Twilio or Vonage API; replies typed in a conversation | `sms.*` events to Rules; status callbacks; the number's reply webhook (set in Numbers); the request to Logs > API requests |
 | [Verify](./sms/verify.md) | your app over the Twilio Verify API | the code as an SMS (shown in SMS) or an email; `verify.*` events to Rules |
-| [HTTP](./http/index.md) | any HTTP call your app makes to `/catch/<bin>` | the reply your bin's rules choose; `http.captured` to Rules; **Forward to URL** |
+| [HTTP Catcher](./http/index.md) | any HTTP call your app makes to `/catch/<bin>` | the reply your bin's rules choose; `http.captured` to Rules; **Forward to URL** |
 | [Webhooks](./webhooks/index.md) | events from every capture menu; gateway notifications from Payments | requests to your app, all logged in Deliveries |
 | [Payments](./payments/index.md) | your app over a gateway API; the test checkout page | redirects to your app; notifications through the gateway's endpoint into Deliveries; `payment.*` events to Rules |
 | [Numbers](./numbers.md) | your setup, as in a provider console | where incoming SMS go; which number a Messaging Service sends from |
@@ -88,7 +88,7 @@ Read it top to bottom:
 
 ## Every menu page
 
-[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)
+[Overview](./overview.md) · [Mail](./mail/index.md) · [SMS](./sms/index.md) · [Verify](./sms/verify.md) · [HTTP Catcher](./http/index.md) · [Webhooks](./webhooks/index.md): [Endpoints](./webhooks/endpoints.md), [Rules](./webhooks/rules.md), [Inbound routes](./webhooks/inbound-routes.md), [Deliveries](./webhooks/deliveries.md), [Composer and Saved](./webhooks/composer-and-saved.md), [Templates](./webhooks/templates.md), [Variables](./webhooks/variables.md) · [Payments](./payments/index.md): [Gateways](./payments/gateways.md), [Methods](./payments/methods.md), [Flows](./payments/flows.md) · [Numbers](./numbers.md) · [Scenarios](./scenarios.md) · [Logs](./logs.md) · [Settings](./settings.md)
 
 ## Where to go next
 

@@ -36,7 +36,7 @@ An endpoint is one destination for webhooks, usually one handler in your app.
 
 Name, method and URL, template, an enabled switch (applies at once), deliveries in the last 24 hours, and a success-rate sparkline with the rate. Row actions: **Send test**, Edit and Delete (the confirmation says how many rules go with it). When SendMock runs in Docker, a `localhost` URL shows a hint to use `host.docker.internal`, with a button that swaps it in.
 
-With no endpoints yet, the screen offers **Add endpoint** and **Add a catcher endpoint** (native JSON to `/catch/webhooks`, so test sends land in the [HTTP catcher](../http/index.md)).
+With no endpoints yet, the screen offers **Add endpoint** and **Add a catcher endpoint** (native JSON to `/catch/webhooks`, so test sends land in the [HTTP Catcher](../http/index.md)).
 
 ### The edit sheet
 

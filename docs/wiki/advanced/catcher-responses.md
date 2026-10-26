@@ -1,6 +1,6 @@
 ---
 title: Catcher responses
-description: Make an HTTP catcher bin answer like a real API, or like a failing one. Rules by path, templated bodies, delays and failure rates.
+description: Make an HTTP Catcher bin answer like a real API, or like a failing one. Rules by path, templated bodies, delays and failure rates.
 ---
 
 > Works in your install from Phase 4. Try it in the [demo](/demo/http) today.
@@ -15,7 +15,7 @@ Each bin answers every request with its default reply, unless a response rule ma
 
 ## Steps: a rate-limited push API
 
-1. Open **HTTP**, click the `push` bin, and open the **Responses** tab.
+1. Open **HTTP Catcher**, click the `push` bin, and open the **Responses** tab.
 2. Press **Add rule**. **Name** `Quota exceeded`, **Path** `/v1/*`, **Status code** `429`, **Failure rate (%)** `10`.
 3. The preview runs against the bin's latest request: "This rule answers this request." Change **Path** to `/v2/*` and it says why not ("Path ... does not match /v2/*").
 4. Press **Add rule**. The rule shows as "Any method /v1/*: 429, 10% fail with 500".

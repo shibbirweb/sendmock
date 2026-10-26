@@ -1,5 +1,5 @@
 ---
-title: HTTP catcher
+title: HTTP Catcher
 description: A bin for any HTTP call your app makes (Slack, Discord, push, third-party APIs), recorded and answered the way you choose.
 ---
 
@@ -7,7 +7,7 @@ description: A bin for any HTTP call your app makes (Slack, Discord, push, third
 
 Apps send more than email and SMS: Slack alerts, Discord messages, push notifications, analytics pings, calls to partner APIs. Point any of them at a SendMock bin and every request is recorded, shown, and answered with a reply your app accepts.
 
-![The HTTP catcher with a Slack message preview](../images/http.jpg)
+![The HTTP Catcher with a Slack message preview](../images/http.jpg)
 
 ## What it solves
 

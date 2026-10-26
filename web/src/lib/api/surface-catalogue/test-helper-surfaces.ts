@@ -15,7 +15,7 @@ export const testHelperSurfaces: SurfaceCatalogue = {
   "GET /api/v1/wait/http": {
     cli: "sendmock http wait",
     mcp: "sendmock_http_wait",
-    ui: "HTTP (new requests appear live)",
+    ui: "HTTP Catcher (new requests appear live)",
   },
   "GET /api/v1/wait/webhook": {
     cli: "sendmock webhook deliveries wait",

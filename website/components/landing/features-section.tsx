@@ -48,12 +48,12 @@ const featureCards = [
     className: "lg:col-span-2",
   },
   {
-    name: "HTTP catcher",
+    name: "HTTP Catcher",
     description:
       "A bin for any HTTP call your app makes, with response rules, delays and failures you set.",
     Icon: GlobeIcon,
     href: "/docs",
-    cta: "HTTP catcher docs",
+    cta: "HTTP Catcher docs",
     className: "lg:col-span-1",
   },
   {

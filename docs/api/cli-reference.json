@@ -2904,7 +2904,7 @@
       "slug": "http-bin-create",
       "usage": "sendmock http bin create [flags]",
       "summary": "Add a bin; 409 when the name is taken.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -2971,7 +2971,7 @@
         "sendmock_http_bin_create"
       ],
       "ui": [
-        "HTTP > New bin"
+        "HTTP Catcher > New bin"
       ]
     },
     {
@@ -2979,7 +2979,7 @@
       "slug": "http-bin-delete",
       "usage": "sendmock http bin delete <binId> [flags]",
       "summary": "Delete a bin and its requests.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3032,7 +3032,7 @@
         "sendmock_http_bin_delete"
       ],
       "ui": [
-        "HTTP > bin > Delete bin"
+        "HTTP Catcher > bin > Delete bin"
       ]
     },
     {
@@ -3040,7 +3040,7 @@
       "slug": "http-bin-list",
       "usage": "sendmock http bin list",
       "summary": "Bins, each a capture URL with its own responses.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3068,7 +3068,7 @@
         "sendmock_http_bin_list"
       ],
       "ui": [
-        "HTTP > bins"
+        "HTTP Catcher > bins"
       ]
     },
     {
@@ -3076,7 +3076,7 @@
       "slug": "http-bin-update",
       "usage": "sendmock http bin update <binId> [flags]",
       "summary": "Change a bin's default response.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3138,7 +3138,7 @@
         "sendmock_http_bin_update"
       ],
       "ui": [
-        "HTTP > bin > Responses > Edit default reply"
+        "HTTP Catcher > bin > Responses > Edit default reply"
       ]
     },
     {
@@ -3146,7 +3146,7 @@
       "slug": "http-clear",
       "usage": "sendmock http clear [flags]",
       "summary": "Delete captured requests, all or one bin's.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3200,7 +3200,7 @@
         "sendmock_http_clear"
       ],
       "ui": [
-        "HTTP > bin > Clear requests"
+        "HTTP Catcher > bin > Clear requests"
       ]
     },
     {
@@ -3208,7 +3208,7 @@
       "slug": "http-file",
       "usage": "sendmock http file <requestId> <fileIndex>",
       "summary": "Download a file uploaded in a captured request.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3260,7 +3260,7 @@
         "sendmock://http/requests/{requestId}/files/{fileIndex}"
       ],
       "ui": [
-        "HTTP > request > Body > files"
+        "HTTP Catcher > request > Body > files"
       ]
     },
     {
@@ -3268,7 +3268,7 @@
       "slug": "http-forward",
       "usage": "sendmock http forward <requestId> [flags]",
       "summary": "Send a captured request on to another URL.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3324,7 +3324,7 @@
         "sendmock_http_forward"
       ],
       "ui": [
-        "HTTP > request > Forward to URL"
+        "HTTP Catcher > request > Forward to URL"
       ]
     },
     {
@@ -3332,7 +3332,7 @@
       "slug": "http-list",
       "usage": "sendmock http list [flags]",
       "summary": "Captured requests, newest first.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3404,7 +3404,7 @@
         "sendmock_http_list"
       ],
       "ui": [
-        "HTTP > Requests"
+        "HTTP Catcher > Requests"
       ]
     },
     {
@@ -3412,7 +3412,7 @@
       "slug": "http-response-list",
       "usage": "sendmock http response list <binId>",
       "summary": "A bin's response rules, checked from top to bottom.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3452,7 +3452,7 @@
         "sendmock_http_response_list"
       ],
       "ui": [
-        "HTTP > bin > Responses"
+        "HTTP Catcher > bin > Responses"
       ]
     },
     {
@@ -3460,7 +3460,7 @@
       "slug": "http-response-preview",
       "usage": "sendmock http response preview <binId> [flags]",
       "summary": "Which rule a captured request would match, and its answer.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3553,7 +3553,7 @@
         "sendmock_http_response_preview"
       ],
       "ui": [
-        "HTTP > bin > Responses > rule sheet > Preview"
+        "HTTP Catcher > bin > Responses > rule sheet > Preview"
       ]
     },
     {
@@ -3561,7 +3561,7 @@
       "slug": "http-response-set",
       "usage": "sendmock http response set <binId>",
       "summary": "Replace a bin's response rules.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3601,7 +3601,7 @@
         "sendmock_http_response_set"
       ],
       "ui": [
-        "HTTP > bin > Responses > Add rule, edit, move, enabled switch"
+        "HTTP Catcher > bin > Responses > Add rule, edit, move, enabled switch"
       ]
     },
     {
@@ -3609,7 +3609,7 @@
       "slug": "http-send",
       "usage": "sendmock http send <bin> [flags]",
       "summary": "Capture a request in a bin and answer with its matching response rule or default response.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3729,7 +3729,7 @@
         "sendmock_http_send"
       ],
       "ui": [
-        "HTTP > Send a sample request"
+        "HTTP Catcher > Send a sample request"
       ]
     },
     {
@@ -3737,7 +3737,7 @@
       "slug": "http-show",
       "usage": "sendmock http show <requestId>",
       "summary": "One captured request and what SendMock answered.",
-      "area": "HTTP catcher",
+      "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
         {
@@ -3777,7 +3777,7 @@
         "sendmock_http_get"
       ],
       "ui": [
-        "HTTP > open a request"
+        "HTTP Catcher > open a request"
       ]
     },
     {
@@ -3873,7 +3873,7 @@
         "sendmock_http_wait"
       ],
       "ui": [
-        "HTTP (new requests appear live)"
+        "HTTP Catcher (new requests appear live)"
       ]
     },
     {

@@ -56,7 +56,7 @@ export const navigationItems: NavigationItem[] = [
       },
     ],
   },
-  { title: "HTTP", path: "/http", icon: GlobeIcon, shortcutKey: "h" },
+  { title: "HTTP Catcher", path: "/http", icon: GlobeIcon, shortcutKey: "h" },
   {
     title: "Webhooks",
     path: "/webhooks/overview",
