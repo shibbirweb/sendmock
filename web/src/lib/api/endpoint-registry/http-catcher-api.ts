@@ -14,6 +14,7 @@ const binIdQueryParameter = {
   name: "bin_id",
   description: "Only this bin.",
   schema: "string",
+  example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
 } as const;
 
 /** The capture URL apps call: any method, the bin name, then any path. */

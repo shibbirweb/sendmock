@@ -24,21 +24,53 @@ export type PaymentMethodValueKind =
  * label are replaced with the method's name and the amount to pay.
  */
 export type PaymentFlowStep = {
+  /**
+   * The step type, e.g. `account_number`, `otp`, `pin` or `card_form`.
+   * @example "otp"
+   */
   type: PaymentStepType;
-  /** Shown above the step; may be empty. */
+  /**
+   * Shown above the step; may be empty.
+   * @example "Enter the code sent to your phone"
+   */
   title: string;
-  /** The input's label; empty for steps without a field. */
+  /**
+   * The input's label; empty for steps without a field.
+   * @example "Verification code"
+   */
   field_label: string;
+  /**
+   * Small text under the input; `{method}` and `{amount}` are replaced.
+   * @example "We sent a 6 digit code to your {method} number."
+   */
   hint: string;
+  /**
+   * The button's text.
+   * @example "Verify"
+   */
   button_label: string;
 };
 
 /** How a customer pays, step by step (PY-12.6). */
 export type PaymentFlowDefinition = {
+  /**
+   * The flow's key; fixed after creation.
+   * @example "wallet_otp"
+   */
   key: string;
+  /**
+   * The flow's name.
+   * @example "Wallet with OTP"
+   */
   name: string;
-  /** The checkout picker tab its methods show under, e.g. "Mobile banking". */
+  /**
+   * The checkout picker tab its methods show under, e.g. "Mobile banking".
+   * @example "Mobile banking"
+   */
   picker_tab: string;
+  /**
+   * The steps in order.
+   */
   steps: PaymentFlowStep[];
   is_builtin: boolean;
   /** A built-in that differs from its shipped default. */
@@ -55,8 +87,14 @@ export type PaymentFlowInput = Pick<
 
 /** Body of POST /api/v1/payments/flows/{flowKey}/steps: one step, appended unless a position is given. */
 export type PaymentFlowStepAddRequest = {
+  /**
+   * The step to add.
+   */
   step: PaymentFlowStep;
-  /** Zero-based; the end of the flow when left out. */
+  /**
+   * Zero-based; the end of the flow when left out.
+   * @example 1
+   */
   position?: number;
 };
 
@@ -64,7 +102,10 @@ export type PaymentFlowStepAddRequest = {
 export type PaymentFlowStepUpdateRequest = Partial<
   Omit<PaymentFlowStep, "type">
 > & {
-  /** Moves the step to this zero-based position. */
+  /**
+   * Moves the step to this zero-based position.
+   * @example 0
+   */
   position?: number;
 };
 

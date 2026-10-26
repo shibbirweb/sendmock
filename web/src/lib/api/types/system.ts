@@ -186,47 +186,150 @@ export type EmailOutcomeProfile = "off" | "auto-delivered" | "realistic";
 export type ChaosSmtpRejectCode = 421 | 450 | 550 | 552;
 
 export type AppSettings = {
+  /**
+   * The most emails kept; the oldest are deleted past it.
+   * @example 1000
+   */
   max_emails: number;
+  /**
+   * The most SMS kept; the oldest are deleted past it.
+   * @example 1000
+   */
   max_sms: number;
-  /** Null keeps traffic until the count limits prune it. */
+  /**
+   * Null keeps traffic until the count limits prune it.
+   * @example 7
+   */
   max_age_days: number | null;
+  /**
+   * Tags `user+invoice@app.test` with `invoice`.
+   * @example true
+   */
   is_plus_address_tagging_enabled: boolean;
+  /**
+   * `off` sends no delivery events, `auto-delivered` marks every email delivered after a short delay, `realistic` adds bounces and complaints at the rates below.
+   * @example "off"
+   */
   email_outcome_profile: EmailOutcomeProfile;
-  /** Used by the `realistic` outcome profile. */
+  /**
+   * Used by the `realistic` outcome profile.
+   * @example 5
+   */
   email_outcome_bounce_rate_percent: number;
+  /**
+   * Complaints in the `realistic` outcome profile, 0 to 100.
+   * @example 1
+   */
   email_outcome_complaint_rate_percent: number;
-  /** Relay for release and auto-forward; the password is always masked. */
+  /**
+   * Relay for release and auto-forward; the password is always masked.
+   * @example "smtp://user:pass@smtp.yourcompany.com:587"
+   */
   relay_smtp_url: string | null;
-  /** Glob patterns; release stays off while this is empty. */
+  /**
+   * Glob patterns; release stays off while this is empty.
+   * @example ["*@yourcompany.com"]
+   */
   relay_recipient_allowlist: string[];
-  /** `host:port` of a SpamAssassin `spamd`; null turns the spam check off. */
+  /**
+   * `host:port` of a SpamAssassin `spamd`; null turns the spam check off.
+   * @example "127.0.0.1:783"
+   */
   spamassassin_address: string | null;
+  /**
+   * `instant` delivers at once, `realistic` goes queued, sent, then delivered over a few seconds, `manual` stays sent until you pick a status.
+   * @example "instant"
+   */
   sms_simulation_profile: SmsSimulationProfile;
+  /**
+   * The share of SMS that fail at random, 0 to 100.
+   * @example 0
+   */
   sms_failure_rate_percent: number;
+  /**
+   * Rejects numbers that are not Twilio test numbers with error 21606, like real test credentials.
+   * @example false
+   */
   is_strict_twilio_test_mode: boolean;
-  /** Off: the built-in Twilio and SendMock numbers behave like any number. */
+  /**
+   * Off: the built-in Twilio and SendMock numbers behave like any number.
+   * @example true
+   */
   is_magic_numbers_enabled: boolean;
-  /** Off: the built-in magic addresses behave like any address. */
+  /**
+   * Off: the built-in magic addresses behave like any address.
+   * @example true
+   */
   is_magic_addresses_enabled: boolean;
+  /**
+   * Fires `email.opened` and `sms.opened` when you open a message in the UI.
+   * @example true
+   */
   fire_opened_events_on_view: boolean;
+  /**
+   * `first_open` fires on the first view only, `every_open` on each view.
+   * @example "first_open"
+   */
   opened_event_mode: "first_open" | "every_open";
+  /**
+   * Rejects the next N SMTP messages, to test your app's retries.
+   * @example 0
+   */
   chaos_smtp_reject_next_count: number;
+  /**
+   * The SMTP code used for rejected messages: 421, 450, 550 or 552.
+   * @example 450
+   */
   chaos_smtp_reject_code: ChaosSmtpRejectCode;
-  /** Glob; matching recipients get `550 No such user`. */
+  /**
+   * Glob; matching recipients get `550 No such user`.
+   * @example "*@unknown.test"
+   */
   chaos_smtp_reject_recipient_pattern: string | null;
+  /**
+   * Delay added to every SMTP command, in milliseconds.
+   * @example 0
+   */
   chaos_smtp_command_latency_ms: number;
+  /**
+   * Drops the connection during `DATA`, to test half-sent messages.
+   * @example false
+   */
   is_chaos_smtp_drop_during_data_enabled: boolean;
-  /** Ordered; the first capture group of the first match is the code. */
+  /**
+   * Ordered; the first capture group of the first match is the code.
+   * @example ["code[:\\s]+(\\d{4,8})"]
+   */
   otp_patterns: string[];
+  /**
+   * Checks for a newer SendMock version.
+   * @example true
+   */
   is_update_check_enabled: boolean;
-  /** Mail for these domains is incoming; offered as Forward suggestions. */
+  /**
+   * Mail for these domains is incoming; offered as Forward suggestions.
+   * @example ["reply.app.test"]
+   */
   inbound_email_domains: string[];
-  /** Shown on checkout pages and as `{merchant}` in step labels. */
+  /**
+   * Shown on checkout pages and as `{merchant}` in step labels.
+   * @example "Demo Shop"
+   */
   payment_merchant_name: string;
-  /** For hosted checkouts created without a currency. */
+  /**
+   * For hosted checkouts created without a currency.
+   * @example "USD"
+   */
   payment_default_currency: string;
+  /**
+   * What a new hosted checkout does: `interactive` waits for the page, `auto_success` and `auto_decline` settle at once, `random` succeeds at the rate below.
+   * @example "interactive"
+   */
   payment_outcome_profile: PaymentOutcomeProfile;
-  /** Used by the `random` outcome profile. */
+  /**
+   * Used by the `random` outcome profile.
+   * @example 80
+   */
   payment_random_success_rate_percent: number;
 };
 
@@ -267,6 +370,10 @@ export type SeedValidation = {
 
 /** Body of POST /api/v1/seed/validate and /seed/apply. */
 export type SeedFileRequest = {
+  /**
+   * The seed file's text (`sendmock.seed.toml`).
+   * @example "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\""
+   */
   seed_toml: string;
 };
 

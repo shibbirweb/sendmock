@@ -3,6 +3,7 @@ import type {
   QueryParameter,
   SchemaReference,
 } from "../../src/lib/api/endpoint-registry";
+import { pathParameterDocs } from "../../src/lib/api/endpoint-registry/path-parameters";
 import { surfaceCatalogue } from "../../src/lib/api/surface-catalogue";
 import { type JsonSchema, toComponentName } from "./generate-schemas";
 import { readSchemaTypeName } from "./schema-roots";
@@ -61,11 +62,20 @@ function buildPathParameter(parameterName: string): JsonSchema {
   const isInteger =
     /Index$/.test(parameterName) || parameterName === "revision";
 
+  const pathParameterDoc = pathParameterDocs[parameterName];
+  if (pathParameterDoc === undefined) {
+    throw new Error(
+      `Path parameter {${parameterName}} has no entry in path-parameters.ts`,
+    );
+  }
+
   return {
     name: parameterName,
     in: "path",
     required: true,
+    description: pathParameterDoc.description,
     schema: { type: isInteger ? "integer" : "string" },
+    example: pathParameterDoc.example,
   };
 }
 
@@ -79,6 +89,7 @@ function buildQueryParameter(queryParameter: QueryParameter): JsonSchema {
       typeof queryParameter.schema === "string"
         ? { type: queryParameter.schema }
         : buildSchema(queryParameter.schema),
+    example: queryParameter.example,
   };
 }
 

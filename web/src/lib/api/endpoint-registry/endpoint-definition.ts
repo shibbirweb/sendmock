@@ -19,6 +19,8 @@ export type QueryParameter = {
   name: string;
   description: string;
   schema: "string" | "integer" | "boolean" | SchemaReference;
+  /** A value that works, shown in the reference and the playground (WS-07.1). */
+  example: string | number | boolean;
   isRequired?: boolean;
 };
 
@@ -74,10 +76,12 @@ export const pageQueryParameters: QueryParameter[] = [
     name: "cursor",
     description: "The next_cursor of the previous page.",
     schema: "string",
+    example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
   },
   {
     name: "limit",
     description: "Items per page, 1 to 200 (default 50).",
     schema: "integer",
+    example: 50,
   },
 ];

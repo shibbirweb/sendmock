@@ -15,8 +15,20 @@ export type HttpBinPreset =
 
 /** A reply SendMock sends; headers and body are templates. */
 export type HttpMockResponse = {
+  /**
+   * The HTTP status of the reply.
+   * @example 200
+   */
   status_code: number;
+  /**
+   * Reply headers, by name; values are templates.
+   * @example {"Content-Type": "application/json"}
+   */
   headers: Record<string, string>;
+  /**
+   * The reply body, a template over the captured request.
+   * @example "{\"ok\": true}"
+   */
   body: string;
 };
 
@@ -32,33 +44,85 @@ export type HttpBin = {
 
 /** Body of POST /api/v1/http/bins. */
 export type HttpBinInput = {
+  /**
+   * The bin's name; your app calls `/catch/<name>/...`.
+   * @example "slack"
+   */
   name: string;
+  /**
+   * A ready-made bin that answers like the real service (`slack`, `discord`, `teams`, `google_chat`, `telegram`, `fcm`, `expo`, `onesignal`, `generic`); null for a plain bin.
+   * @example "slack"
+   */
   preset: HttpBinPreset | null;
 };
 
 /** One mock response rule; rules are checked in order and the first match answers (HC-02.1). */
 export type HttpResponseRule = {
-  /** Empty for a new rule in a PUT; the API assigns it. */
+  /**
+   * Empty for a new rule in a PUT; the API assigns it.
+   * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+   */
   id: Ulid;
+  /**
+   * A name for the rule, shown in the list.
+   * @example "Rate limit the push API"
+   */
   name: string;
+  /**
+   * Off rules are kept but skipped.
+   * @example true
+   */
   is_enabled: boolean;
-  /** Null matches any method. */
+  /**
+   * Null matches any method.
+   * @example "POST"
+   */
   method: HttpMethod | null;
-  /** Relative to the bin, e.g. `/v1/*`; empty matches any path. */
+  /**
+   * Relative to the bin, e.g. `/v1/*`; empty matches any path.
+   * @example "/v1/*"
+   */
   path_glob: string;
-  /** Header and body conditions, as in webhook rules. */
+  /**
+   * Header and body conditions, as in webhook rules.
+   */
   filter: RuleFilter | null;
+  /**
+   * The reply sent when the rule matches.
+   */
   response: HttpMockResponse;
-  /** A fixed delay when both are equal, else a random one in the range (HC-02.3). */
+  /**
+   * A fixed delay when both are equal, else a random one in the range (HC-02.3).
+   * @example 0
+   */
   delay_min_ms: number;
+  /**
+   * The longest delay before replying, in milliseconds; equal to `delay_min_ms` for a fixed delay.
+   * @example 500
+   */
   delay_max_ms: number;
+  /**
+   * The share of matching requests answered with `failure_status_code` instead, 0 to 100.
+   * @example 10
+   */
   failure_rate_percent: number;
+  /**
+   * The status sent for a simulated failure.
+   * @example 503
+   */
   failure_status_code: number;
 };
 
 /** Body of POST /api/v1/http/bins/{binId}/responses/preview (HC-02.4). */
 export type HttpRulePreviewRequest = {
+  /**
+   * The rule to try, saved or not.
+   */
   rule: HttpResponseRule;
+  /**
+   * The captured request to try it on.
+   * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+   */
   request_id: Ulid;
 };
 
@@ -105,7 +169,13 @@ export type CapturedHttpRequest = {
 };
 
 /** Body of POST /api/v1/http/requests/{requestId}/forward (HC-01.5). */
-export type HttpForwardRequest = { url: string };
+export type HttpForwardRequest = {
+  /**
+   * Where the captured request is sent again, e.g. your local handler.
+   * @example "http://localhost:3000/webhooks/slack"
+   */
+  url: string;
+};
 
 export type HttpForwardResult = {
   status_code: number;
@@ -115,5 +185,8 @@ export type HttpForwardResult = {
 
 /** Body of `PATCH /http/bins/{binId}`. */
 export type HttpBinUpdate = {
+  /**
+   * The reply sent when no rule matches.
+   */
   default_response: HttpMockResponse;
 };

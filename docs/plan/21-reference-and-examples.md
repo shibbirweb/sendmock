@@ -33,7 +33,9 @@ export type EmailUpdate = {
 
 - **Scope:** every field of every request body type (and the types they nest), every query parameter (they already have a description in the registry; they gain an example) and every path parameter. Response fields are documented where the type is shared with a request; the rest stay as they are for now.
 - `generate-schemas.ts` switches ts-json-schema-generator from `jsDoc: "basic"` to `"extended"`, so `@example` becomes `examples` in the spec (JSON5 values, as the generator expects). Defaults (`@default`) are written the same way where a field has one.
-- **Check (WS-07.1):** a contract test walks every operation's inputs in the spec and fails on an input without a description, or a body field without an example. `bun run openapi:check` keeps the spec in step.
+- **Check (WS-07.1):** a contract test (`web/tests/contract/openapi-input-docs.test.ts`) walks every operation's inputs in the spec and fails on an input without a description, or a body field without an example. A field whose type has fields of its own takes its example from them, a one-value discriminator (`kind: "stop"`) needs none, and a map such as a gateway's `event_names` is documented by one whole-object example. `bun run openapi:check` keeps the spec in step.
+- Path parameters are documented once by name in `web/src/lib/api/endpoint-registry/path-parameters.ts`; the build fails on a path parameter missing there. Query parameters carry a required `example` in the registry.
+- Requirement IDs in the type comments (`(WH-05.6)`) stay in the source for traceability and are removed from the published descriptions.
 
 ## 2. One rule set for CLI flags and MCP inputs
 

@@ -20,8 +20,20 @@ export type LinksLookup = {
 
 /** Optional body of POST /api/v1/samples/email (`sendmock email send-test`). */
 export type SampleOptions = {
+  /**
+   * The recipient of the sample email.
+   * @example "user@example.test"
+   */
   to?: string;
+  /**
+   * The subject of the sample email.
+   * @example "Hello from SendMock"
+   */
   subject?: string;
+  /**
+   * The HTML body of the sample email.
+   * @example "<p>It works!</p>"
+   */
   html?: string;
 };
 
@@ -39,6 +51,10 @@ export type IntegrationSnippet = {
 
 /** Body of POST /api/v1/scenarios/validate and /run: a scenario file's TOML text. */
 export type ScenarioRequest = {
+  /**
+   * The scenario file's text, in TOML.
+   * @example "name = \"otp-login\"\n\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
+   */
   scenario: string;
 };
 
