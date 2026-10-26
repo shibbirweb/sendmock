@@ -38,6 +38,62 @@ test("every page in docs/wiki is published under /docs/", async ({
   }
 });
 
+test("every copy of the logo on a docs page has its own gradient, so the sidebar logo is not blank", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const gradientIds = await page
+    .locator('svg[viewBox="0 0 64 64"] linearGradient')
+    .evaluateAll((gradients) => gradients.map((gradient) => gradient.id));
+
+  // The docs render the nav title twice (mobile bar and sidebar).
+  expect(gradientIds.length).toBeGreaterThan(1);
+  expect(new Set(gradientIds).size).toBe(gradientIds.length);
+});
+
+test("the docs sidebar links to GitHub and the feature request, bug report and security report forms", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const repositoryUrl = "https://github.com/shibbirweb/sendmock";
+  const feedbackLinks = [
+    { name: "Star SendMock on GitHub", url: repositoryUrl },
+    {
+      name: "Request a feature",
+      url: `${repositoryUrl}/issues/new?template=feature_request.yml`,
+    },
+    {
+      name: "Report a bug",
+      url: `${repositoryUrl}/issues/new?template=bug_report.yml`,
+    },
+    {
+      name: "Report a security issue",
+      url: `${repositoryUrl}/security/advisories/new`,
+    },
+  ];
+
+  for (const feedbackLink of feedbackLinks) {
+    await expect(
+      page
+        .getByRole("link", { name: feedbackLink.name, exact: true })
+        .filter({ visible: true }),
+    ).toHaveAttribute("href", feedbackLink.url);
+  }
+});
+
+test("hovering a docs sidebar icon shows its label", async ({ page }) => {
+  await page.goto("/docs/install/");
+  const bugReportLink = page
+    .getByRole("link", { name: "Report a bug", exact: true })
+    .filter({ visible: true });
+  const tooltip = bugReportLink.getByText("Report a bug");
+
+  await expect(tooltip).toHaveCSS("opacity", "0");
+  await bugReportLink.hover();
+
+  await expect(tooltip).toHaveCSS("opacity", "1");
+});
+
 test("WS-03.3 every internal link in the docs leads to a page and an existing anchor", async ({
   page,
 }) => {

@@ -1,8 +1,14 @@
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 /**
+ * A client component, so every copy gets its own `useId`: the docs render the
+ * nav title twice (mobile bar and sidebar), and a shared gradient id would
+ * point at the hidden copy and leave the visible logo blank.
+ *
  * The SendMock mark: an envelope between code brackets, with a small hook at
  * the flap point for webhooks. Filled with the brand gradient from the
  * `--brand-from` and `--brand-to` theme tokens.
