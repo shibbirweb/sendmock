@@ -60,6 +60,12 @@ jobs:
   web-e2e:
     name: Web UI end-to-end (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
+    # Playwright's own image has the browser and its system packages, so no shard
+    # downloads them (a slow download once held a shard for ten minutes). The tag
+    # must equal @playwright/test in web/package.json; tests/repository checks it.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
     strategy:
       # Every shard reports its own failures, even when another one fails.
       fail-fast: false
@@ -71,13 +77,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: oven-sh/setup-bun@v2
+      # The image has Node but not unzip, which setup-bun needs, so Bun comes from npm.
+      - name: Install Bun
+        run: npm install -g bun
 
       - name: Install
         run: bun install --frozen-lockfile
-
-      - name: Install Playwright browser
-        run: bunx --bun playwright install --with-deps chromium
 
       - name: End-to-end tests (production build, mock mode)
         run: bun run test:e2e --shard=${{ matrix.shard }}/4
