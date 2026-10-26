@@ -156,10 +156,10 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Plan and criteria (step 1)
   - [x] Contract: types, endpoint registry, spec, surface catalogue, CLI and MCP reference (step 2)
   - [x] Mock data and handlers for the 11 built-ins and custom providers (step 3)
-  - [ ] Screens: lists, Removed group, Add provider (step 4)
+  - [ ] Screens: lists, Removed group, Add provider, row actions (step 4)
   - [ ] Screens: provider sheet and preview (step 5)
-  - [ ] Wiring: sidebar, palette, message badge, Settings > Connection (step 6)
-  - [ ] Docs: menu pages, Advanced walkthroughs, providers page, screenshots (step 7)
+  - [ ] Wiring: message badge, provider filters, Settings > Connection (step 6)
+  - [ ] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
   - [ ] Tests per criterion, parity and walkthrough tests (step 8)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**

@@ -234,10 +234,10 @@ Each step is one commit on `feat/landing-install-tabs`. Static checks (format, l
 | 1 | This plan and the criteria | done |
 | 2 | Contract: the new and changed types, the 18 endpoints, `providerKey`, the surface catalogue, the regenerated spec and references | with step 3 (the registry test needs the handlers) |
 | 3 | Mock: fixtures for the 11 built-ins and SSL Wireless, the record, renderer and preview runner, the handlers, seed TOML, demo messages with provider keys | yes |
-| 4 | Screens: sidebar children, the two lists, the Removed group, Add provider | yes |
+| 4 | Screens: the two lists at `/mail/providers` and `/sms/providers`, the Removed group, Add provider, the row actions with their confirmations | yes |
 | 5 | Screens: the provider sheet tabs and the preview | yes |
 | 6 | Wiring: the provider badge on messages, the provider filters, Settings > Connection | yes |
-| 7 | Docs: the two menu pages, the two Advanced walkthroughs, the providers page, screenshots | yes |
+| 7 | Docs and the sidebar: the two menu pages with screenshots and their links from the connection map and the problem index, the sidebar children (a menu cannot ship without its guide page, WS-06.1), the two Advanced walkthroughs, the providers page | yes |
 | 8 | Tests for every criterion that is not yet covered, the walkthrough tests, criteria ticked, PROGRESS updated | yes |
 
 ## 13. Stage B

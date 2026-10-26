@@ -5,6 +5,8 @@ import type {
   EndpointPreviewRequest,
   HttpRulePreviewRequest,
   InboundRouteTestRequest,
+  MessageProviderArea,
+  MessageProviderPreviewRequest,
   PaymentGatewayPreviewRequest,
   PaymentListFilters,
   RulePreviewRequest,
@@ -97,6 +99,16 @@ export const queryKeys = {
     gateways: ["payments", "gateways"] as const,
     gatewayPreview: (previewRequest: PaymentGatewayPreviewRequest) =>
       ["payments", "gateway-preview", previewRequest] as const,
+  },
+  messageProviders: {
+    all: ["message-providers"] as const,
+    list: (providerArea: MessageProviderArea) =>
+      ["message-providers", "list", providerArea] as const,
+    preview: (
+      providerArea: MessageProviderArea,
+      previewRequest: MessageProviderPreviewRequest,
+    ) =>
+      ["message-providers", "preview", providerArea, previewRequest] as const,
   },
   inboundRoutes: {
     all: ["inbound-routes"] as const,
