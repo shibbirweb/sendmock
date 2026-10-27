@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   },
   description:
     "A single binary that catches email, SMS and payments from any app, shows them in a web UI and calls your webhooks.",
+  // Agents given only the site's address find the docs and install steps (WS-09.4).
+  alternates: { types: { "text/plain": `${basePath}/llms.txt` } },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

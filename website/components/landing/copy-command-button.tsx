@@ -10,9 +10,12 @@ const copiedIndicatorDurationMs = 2000;
 /** Copies a shell command, without its prompt, and briefly confirms it. */
 export function CopyCommandButton({
   command,
+  label = "Copy the install command",
   className,
 }: {
   command: string;
+  /** What the button copies, for its name and tooltip. */
+  label?: string;
   className?: string;
 }) {
   const [isCopied, setIsCopied] = useState(false);
@@ -41,8 +44,8 @@ export function CopyCommandButton({
     <button
       type="button"
       onClick={copyCommand}
-      aria-label={isCopied ? "Copied" : "Copy the install command"}
-      title={isCopied ? "Copied" : "Copy the install command"}
+      aria-label={isCopied ? "Copied" : label}
+      title={isCopied ? "Copied" : label}
       className={cn(
         "rounded-md p-1.5 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground",
         className,

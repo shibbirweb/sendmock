@@ -259,6 +259,31 @@ test("WS-02.1 every main section has a label, a title and a line of text in one 
   expect([...headingStyles]).toHaveLength(1);
 });
 
+test("WS-09.4 the landing page has an Install with AI card with the whole prompt and links agents to llms.txt", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const aiCard = page.getByTestId("install-with-ai-card");
+
+  await expect(
+    aiCard.getByRole("heading", { name: "Install with AI" }),
+  ).toBeVisible();
+  await expect(
+    aiCard.getByRole("button", { name: "Copy the install prompt" }),
+  ).toBeVisible();
+  // The prompt is in the HTML even while folded, so an agent reading the page finds it.
+  await expect(aiCard.locator("pre")).toContainText(
+    "Before you install anything, check this computer",
+  );
+  await expect(aiCard.getByRole("link", { name: "llms.txt" })).toHaveAttribute(
+    "href",
+    "/llms.txt",
+  );
+  await expect(
+    page.locator('head link[rel="alternate"][type="text/plain"]'),
+  ).toHaveAttribute("href", "/llms.txt");
+});
+
 test("WS-02.1 the stack marquee fades out at both edges", async ({ page }) => {
   await page.goto("/");
   const maskImage = await page

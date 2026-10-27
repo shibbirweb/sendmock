@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 
 import { detectOperatingSystem } from "@/lib/detect-operating-system";
 import { cn } from "@/lib/utils";
@@ -18,8 +18,15 @@ import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 /** Overlaps an item with the others in the same grid cell; the cell takes the tallest. */
 const stackedInGridCellClassName = "[grid-area:1/1]";
 
-/** Shows the intended first run; commands go live with the first beta. */
-export function QuickStartSection() {
+/**
+ * Shows the intended first run; commands go live with the first beta.
+ * `installWithAiCard` is rendered on the server, since it reads the docs.
+ */
+export function QuickStartSection({
+  installWithAiCard,
+}: {
+  installWithAiCard?: ReactNode;
+}) {
   const { selectedIndex, setSelectedIndex, moveSelection, tabId, panelId } =
     useArrowKeyTabs(installPlatforms.length);
   const selectedPlatform =
@@ -130,6 +137,7 @@ export function QuickStartSection() {
           ) : null}
         </div>
       </div>
+      {installWithAiCard}
     </section>
   );
 }

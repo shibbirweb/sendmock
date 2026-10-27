@@ -109,6 +109,24 @@ Fumadocs' built-in OpenAPI pages may be used for the reference text; the interac
   - Configuration flags and env vars from `clap`.
 - Screenshots for docs are generated from the mock-mode UI with Playwright (stable, reproducible fixtures).
 
+### Install with AI (decided 2026-10-27, owner feedback F16)
+
+A reader who uses an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, ...) can let it install SendMock instead of following the steps by hand.
+
+- **The prompt.** Getting started and Install each have an **Install with AI** section with one copyable prompt. The agent is told to:
+  1. check the computer first and report what it found: the operating system and CPU, whether Docker is installed and running, whether Homebrew is there, and whether `sendmock` is already installed;
+  2. ask, in plain words, whether to run SendMock with **Docker** (nothing installed on the computer, easy to remove, fits a Docker Compose project; needs Docker running) or as the **binary** (one small program, starts instantly, no Docker needed), and recommend one from what it found;
+  3. ask for **stable** (recommended) or **beta** (newest features first);
+  4. use only the official commands, listed in the prompt itself, so an agent without web access can follow it; show each command with what it does and wait for an OK;
+  5. stop with a clear message when a download fails because there is no release yet, and point to the live demo;
+  6. start SendMock, check it works, and tell the user the web UI address, the SMTP host and port for their app, and how to stop it;
+  7. change nothing else on the computer.
+- **One source.** The prompt lives in `docs/wiki/install.md`; Getting started repeats it word for word, and a website test checks the two match and that every command in the prompt is one of the Install page's own commands.
+- **From just the site's address.** An agent given only `https://shibbirweb.github.io/sendmock/` can find the way:
+  - `/llms.txt` (the [llms.txt](https://llmstxt.org/) convention) is built with each docs version: what SendMock is, the same install instructions for agents, and every docs page with its link and description. This is the website half of AI-06; the binary's own `/llms.txt` stays in Phase 4.
+  - The landing page's quick start has an **Install with AI** card: a copy button for the prompt, the full prompt in the page HTML (in a collapsible block), and a link to `/llms.txt`; the page head links to `/llms.txt` too.
+- Criteria: WS-09 in [acceptance](acceptance/07-distribution-website.md#ws-09-install-with-ai).
+
 ### Versioned builds
 
 Every release keeps its own docs, so what a reader sees matches the version they run, and the beta channel has its own docs. Built in U3 (W17, owner feedback F14, 2026-10-27) so the first release freezes its docs with no extra work; same approach as phpdebugger's `website/scripts/build-versions.ts`.

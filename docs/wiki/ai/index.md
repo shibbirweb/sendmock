@@ -17,6 +17,8 @@ Every SendMock feature is an operation that the UI, the REST API, the CLI and th
 
 ## Set it up
 
+SendMock not installed yet? Your agent can install it too: paste the prompt from [Install with AI](../install.md#install-with-ai).
+
 ```bash
 sendmock ai install --target claude-code     # or codex, cursor, gemini, vscode
 ```

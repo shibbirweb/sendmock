@@ -147,3 +147,11 @@ Phase U3 (W15) for WS-08.1 to WS-08.4; WS-08.5 in Phase 2, when email and SMS ru
 - [ ] WS-08.4 The site shows the examples as tabs that work with the keyboard and remember the chosen language across pages and visits; on GitHub each language is a labelled code block. (Clarified 2026-10-26: GitHub shows each language as its own highlighted code block; it does not display tab titles.)
 - [ ] WS-08.5 The cross-language matrix runs every recipe example against a real `sendmock` binary in CI.
 
+## WS-09 Install with AI
+
+Phase U3 (owner feedback F16). Plan: [16-website-and-releases.md](../16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16).
+
+- [x] WS-09.1 Getting started and Install each have an "Install with AI" section with the same copyable prompt, and every install command in the prompt is one of the Install page's own commands.
+- [x] WS-09.2 The prompt makes the agent check the computer first (system and CPU, Docker, Homebrew, an existing install), ask in plain words for Docker or the binary with the benefits of each and for stable or beta, show each command and wait for an OK, stop with a clear message when there is no release yet, and finish by checking SendMock runs and giving the web UI address, the SMTP host and port, and how to stop it.
+- [x] WS-09.3 Each docs version publishes `/llms.txt` with what SendMock is, the same install instructions for agents, and a link with its description for every docs page.
+- [x] WS-09.4 The landing page shows an "Install with AI" card with a copy button for the prompt, the full prompt in its HTML and a link to `/llms.txt`, and the page head links to `/llms.txt`.

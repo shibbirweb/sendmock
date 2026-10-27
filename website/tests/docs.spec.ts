@@ -169,6 +169,27 @@ test("WS-03.7 the demo links its guide pages to the docs of the same version", a
   ).toHaveAttribute("href", "/docs/overview/");
 });
 
+test("WS-09.3 llms.txt says what SendMock is, how an agent installs it, and links every docs page", async ({
+  request,
+}) => {
+  const llmsResponse = await request.get("/llms.txt");
+  const llmsText = await llmsResponse.text();
+
+  expect(llmsResponse.ok()).toBe(true);
+  expect(llmsText.startsWith("# SendMock\n\n> ")).toBe(true);
+  expect(llmsText).toContain(
+    "## Install SendMock (instructions for AI agents)",
+  );
+  expect(llmsText).toContain(
+    "Before you install anything, check this computer",
+  );
+  for (const wikiPagePath of listWikiPagePaths()) {
+    expect(llmsText, `llms.txt links ${wikiPagePath}`).toContain(
+      `${wikiPagePath.replace(/\/$/, "")}/)`,
+    );
+  }
+});
+
 test("hovering a docs sidebar icon shows its label", async ({ page }) => {
   await page.goto("/docs/install/");
   const bugReportLink = page

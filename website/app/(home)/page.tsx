@@ -1,6 +1,7 @@
 import { FeaturesSection } from "@/components/landing/features-section";
 import { FlowSection } from "@/components/landing/flow-section";
 import { HeroSection } from "@/components/landing/hero-section";
+import { InstallWithAiCard } from "@/components/landing/install-with-ai-card";
 import { NumbersSection } from "@/components/landing/numbers-section";
 import { PromoVideoSection } from "@/components/landing/promo-video-section";
 import { QuickStartSection } from "@/components/landing/quick-start-section";
@@ -14,7 +15,7 @@ export default function HomePage() {
       <HeroSection />
       <FlowSection />
       <WorksWithSection />
-      <QuickStartSection />
+      <QuickStartSection installWithAiCard={<InstallWithAiCard />} />
       <ScreenshotsSection />
       <FeaturesSection />
       <NumbersSection />
