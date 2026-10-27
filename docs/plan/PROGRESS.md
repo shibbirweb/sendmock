@@ -163,7 +163,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Tests per criterion, parity and walkthrough tests (step 8)
 - [ ] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
   - [x] Plan and criteria (step 1)
-  - [ ] Version list from the git tags, and a build of every version (step 2)
+  - [x] Version list from the git tags, and a build of every version (step 2)
   - [ ] Version switcher and banner (step 3)
   - [ ] Deploy workflow and per-version app docs links (step 4)
   - [ ] Docs page and tests per criterion (step 5)
