@@ -56,6 +56,33 @@ test("UI-01.1 sidebar lists every section and highlights the current one", async
   await expect(sidebar.getByRole("link", { name: "Verify" })).toBeVisible();
 });
 
+test("UI-01.1 Mail and SMS list their messages as Inbox and Messages, lit only on their own page", async ({
+  page,
+}) => {
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  const inboxLink = sidebar.getByRole("link", { name: "Inbox", exact: true });
+  const messagesLink = sidebar.getByRole("link", {
+    name: "Messages",
+    exact: true,
+  });
+
+  await sidebar.getByRole("link", { name: "Mail", exact: true }).click();
+  await expect(inboxLink).toHaveAttribute("data-active", "true");
+  await sidebar.getByRole("link", { name: "Providers", exact: true }).click();
+  await expect(page).toHaveURL(/\/mail\/providers$/);
+  await expect(inboxLink).not.toHaveAttribute("data-active", "true");
+  await inboxLink.click();
+  await expect(page).toHaveURL(/\/mail$/);
+
+  await sidebar.getByRole("link", { name: "SMS", exact: true }).click();
+  await expect(messagesLink).toHaveAttribute("data-active", "true");
+  await sidebar.getByRole("link", { name: "Verify", exact: true }).click();
+  await expect(page).toHaveURL(/\/sms\/verify$/);
+  await expect(messagesLink).not.toHaveAttribute("data-active", "true");
+  await messagesLink.click();
+  await expect(page).toHaveURL(/\/sms$/);
+});
+
 test("UI-01.1 sections with sub-items show a chevron that turns when the group opens", async ({
   page,
 }) => {
@@ -69,12 +96,7 @@ test("UI-01.1 sections with sub-items show a chevron that turns when the group o
     await expect(chevronOf(groupTitle)).toBeVisible();
     await expect(chevronOf(groupTitle)).not.toHaveClass(/rotate-90/);
   }
-  for (const plainTitle of [
-    "Overview",
-    "HTTP Catcher",
-    "Numbers",
-    "Logs",
-  ]) {
+  for (const plainTitle of ["Overview", "HTTP Catcher", "Numbers", "Logs"]) {
     await expect(chevronOf(plainTitle)).toHaveCount(0);
   }
 
