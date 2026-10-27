@@ -1,33 +1,11 @@
 import type { SeedValidation, SeedValidationError } from "@/lib/api/types";
 import { type MockDatabase } from "@/mocks/db/mock-database";
 import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
-
-type TomlValue = string | number | boolean | string[] | null;
-
-function formatTomlValue(tomlValue: Exclude<TomlValue, null>): string {
-  if (Array.isArray(tomlValue)) {
-    return `[${tomlValue.map((arrayItem) => JSON.stringify(arrayItem)).join(", ")}]`;
-  }
-
-  return typeof tomlValue === "string"
-    ? JSON.stringify(tomlValue)
-    : String(tomlValue);
-}
-
-/** `key = value` lines, skipping nulls (TOML has no null). */
-function formatTomlTable(
-  tableHeader: string,
-  tableEntries: Record<string, TomlValue>,
-): string {
-  const valueLines = Object.entries(tableEntries)
-    .filter(([, tomlValue]) => tomlValue !== null)
-    .map(
-      ([tableKey, tomlValue]) =>
-        `${tableKey} = ${formatTomlValue(tomlValue as Exclude<TomlValue, null>)}`,
-    );
-
-  return [tableHeader, ...valueLines].join("\n");
-}
+import { buildProviderTables } from "@/mocks/fixtures/seed-provider-tables";
+import {
+  formatTomlTable,
+  toSecretReference,
+} from "@/mocks/fixtures/seed-toml-format";
 
 function readEndpointName(
   mockDatabase: MockDatabase,
@@ -45,10 +23,6 @@ function listExportableHeaders(headers: Record<string, string>): string[] {
   return Object.entries(headers)
     .filter(([headerName]) => !headerName.toLowerCase().startsWith("webhook-"))
     .map(([headerName, headerValue]) => `${headerName}: ${headerValue}`);
-}
-
-function toSecretReference(itemName: string): string {
-  return `\${${itemName.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}_SECRET}`;
 }
 
 /**
@@ -161,6 +135,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         body: savedDelivery.request.body,
       }),
     ),
+    ...buildProviderTables(mockDatabase),
   ];
 
   return [
@@ -188,6 +163,8 @@ const knownSeedSections: Record<string, string> = {
   "[[email.forward_rules]]": "Forward rule",
   "[[sms.outcome_rules]]": "Custom outcome number",
   "[[email.outcome_rules]]": "Custom outcome address",
+  "[[email.providers]]": "Email provider",
+  "[[sms.providers]]": "SMS provider",
 };
 
 const keyValuePattern = /^[A-Za-z0-9_.-]+\s*=\s*(.+)$/;

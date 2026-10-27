@@ -9,6 +9,8 @@ Phase 0 (build), Phase 5 (all targets).
 - [ ] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64.
 - [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
 - [ ] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release.
+- [ ] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)).
+- [ ] DS-01.5 On each platform the install page's steps work as written: the unpack commands, the `PATH` step and the platform's install script (stable and beta) leave a working `sendmock` on the `PATH` of a new shell.
 
 ## DS-02 Docker image
 
@@ -23,10 +25,14 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 ## DS-03 Package managers and install scripts
 
-Phase 1 (beta Homebrew), Phase 5 (all).
+Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs). Official distribution repositories are later and have no criteria yet ([09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27)).
 
 - [ ] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
 - [ ] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums.
+- [ ] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally.
+- [ ] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary.
+- [ ] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary.
+- [ ] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow.
 
 ## DS-04 Release workflows
 
@@ -75,6 +81,7 @@ Phase U3.
 - [ ] WS-02.1 The landing page uses Magic UI components for the hero, flow (animated beam), quick start (terminal), marquee, bento grid and number ticker.
 - [ ] WS-02.2 With reduced motion on, all animations are static and the page stays readable.
 - [ ] WS-02.3 Lighthouse scores are at least 90 for performance, accessibility, best practices and SEO.
+- [ ] WS-02.4 The landing page has a promotional video section above the footer: a product poster in the current theme, three benefit points (no real messages sent, seconds instead of minutes, one setting), and a play button that is disabled with "Video coming soon" until the video exists; once it exists, pressing play loads the player (no autoplay and no third-party request before that) with captions ([16](../16-website-and-releases.md#promotional-video-decided-2026-10-27)).
 
 ## WS-03 Docs and versions
 

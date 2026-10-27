@@ -19,8 +19,10 @@ const webSourceDirectory = fileURLToPath(
 const guidePageByMenuPath: Record<string, string> = {
   "/": "overview.md",
   "/mail": "mail/index.md",
+  "/mail/providers": "mail/providers.md",
   "/sms": "sms/index.md",
   "/sms/verify": "sms/verify.md",
+  "/sms/providers": "sms/providers.md",
   "/http": "http/index.md",
   "/webhooks/overview": "webhooks/index.md",
   "/webhooks/endpoints": "webhooks/endpoints.md",

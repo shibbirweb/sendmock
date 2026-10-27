@@ -11,8 +11,12 @@ import type {
 
 export type SmsDirection = "outbound" | "inbound";
 export type SmsChannel = "sms" | "whatsapp";
-export type SmsApi =
-  "native" | "twilio" | "vonage" | "plivo" | "messagebird" | "generic";
+/**
+ * The API a message was sent through: `native`, or the key of the SMS provider
+ * (`twilio`, or a custom provider's key; docs/plan/22).
+ * @example "twilio"
+ */
+export type SmsApi = string;
 export type SmsEncoding = "GSM-7" | "UCS-2";
 export type SmsStatus =
   "queued" | "sent" | "delivered" | "undelivered" | "failed" | "received";

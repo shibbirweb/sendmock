@@ -47,15 +47,34 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 |---------|------------------------------|------|
 | Hero | Animated gradient text, shimmer/rainbow button, retro grid or dot pattern background | "Catch every email, SMS and webhook locally" with Download and Try the demo buttons |
 | How it works | **Animated Beam** | Your app -> SendMock (SMTP, SMS API, HTTP) -> UI, and SendMock -> webhooks back to your app, with beams animating along each path |
-| Quick start | **Terminal** (typing animation) | `brew install ...`, SendMock, then a captured OTP appearing |
+| Quick start | **Terminal** (typing animation) | tabs for macOS (Homebrew), Windows (`install.ps1`), Linux (`install.sh`) and Docker (`docker pull`, then `docker run` with both ports published), each installing and then starting SendMock, the visitor's system selected first, with a copy button for the install command and manual download links to the release archives below it (changed 2026-10-27: no OTP step, which confused readers before they know what SendMock catches) |
 | Works with | **Marquee** | Language logos (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) and provider names (Twilio, SendGrid, Mailgun, Postmark, Resend, Slack, ...) as text badges |
-| Features | **Bento Grid** with **Magic Card** / **Border Beam** | Email, SMS + Verify, Webhooks, Templates, HTTP catcher, AI/MCP, Docker |
-| Numbers | **Number Ticker** | binary size, startup time, providers emulated, languages |
+| Features | **Bento Grid** with **Marquee** and **Animated List** | six equal cards in a 3 by 2 grid: Email, SMS + Verify, Webhooks, Payments, HTTP Catcher, AI agents. Each has a preview panel of one height with a small product scene (emails flowing past with their checks, text messages arriving, webhook deliveries, a test checkout, caught HTTP calls, an agent using MCP tools), then the icon, title and a three-line description; an arrow at the end of the title row links to its docs page (the card itself is not a link). Install and Docker live in the quick start, not here (changed 2026-10-27, U3 feedback F7) |
+| Numbers | **Number Ticker** | built-in provider APIs, languages with connection guides, REST API operations; each number links to the page that lists what it counts (Supported providers, Connect your app, the API reference), and a unit test keeps the providers page and the count in sync (changed 2026-10-27, U3 feedback F8) |
 | Product shots | **Safari** / **iPhone** mockups, **Hero Video Dialog** | app screenshots and a short tour video |
 | AI section | Animated list | an agent session: `sendmock_status` -> `sendmock_sms_wait` -> OTP |
-| Footer CTA | Confetti on copy of the install command, shiny text | |
+| Promotional video | **Safari** mockup as the poster, play button | "Stop testing on real inboxes and phones": the poster in both themes, a play button and three benefit points; replaces the closing call to action, which repeated the hero (changed 2026-10-27, U3 feedback F6). See [Promotional video](#promotional-video-decided-2026-10-27) |
+| Footer | none (plain links) | the logo and tagline with a GitHub icon, then Product, Get started and Community link columns, and a bottom bar with the year (changed 2026-10-27, U3 feedback F5) |
 
 Exact component names are checked against the Magic UI registry when the site is built.
+
+### Promotional video (decided 2026-10-27)
+
+A short marketing video that sells the idea, not a feature tour: what problem SendMock solves, how much time it saves and why a developer would install it today.
+
+| Item | Decision |
+|------|----------|
+| Goal | a developer who has never heard of SendMock understands the problem, the fix and the payoff, and installs it or opens the demo |
+| Audience | backend and full-stack developers and QA engineers who send email, SMS, payments or webhooks from their app |
+| Length | about 90 seconds (at most 2 minutes), plus a 30-second cut for social media and the README |
+| Story | 1. **The problem** (0:00): testing what your app sends is slow and risky: real messages reach real inboxes and phones, OTPs are copied from a phone, provider sandboxes need accounts and keys, webhooks are hard to trigger and replay, and nobody sees what was really sent. 2. **The fix** (0:25): one binary on your machine; change one host and port and every email, SMS, payment and webhook is caught and answered like the real provider. 3. **The payoff** (0:45): the same tasks shown fast in the real app: read the OTP in a second, preview the email in every client, fire and replay a webhook, run a test checkout, wait for a message from a test with the API. 4. **Fits your work** (1:10): any language, Docker and CI, and AI agents through the CLI and MCP. 5. **Call to action** (1:20): `brew install` (or the demo) and the website |
+| Claims | only what SendMock does; no invented numbers (time saved is shown by doing the task on screen, not by a statistic) |
+| Production | motion graphics for the problem and the call to action, real screen captures of the app (1920 x 1080, demo seed data, light theme) for the fix and the payoff, a professional voice-over from a written script, licensed background music, the brand colours and logo |
+| Captions | English WebVTT captions burned into the social cut and as a track on the full video, so it works muted |
+| Hosting | YouTube (public); the landing page loads the player only after the play button is pressed (`youtube-nocookie.com`), so the page stays fast and sets no third-party cookies before that |
+| Before the video exists | the landing section shows the poster, a disabled play button with "Video coming soon" and the three benefit points |
+| Where | the landing page (the section above the footer), the README and social posts for releases |
+| Refresh | when the product's story changes (for example payments or AI agents grow), at the latest for 1.0 |
 
 ### API playground
 
@@ -139,7 +158,7 @@ bun scripts/version.ts bump beta   # beta | release | patch | minor | major | x.
 | `stable.yml` | manual, on `develop` | Only finishes a **published beta with nothing untried on top** (docs/tests/chores allowed); dates the changelog and opens release PR `chore:[REL-N] release X.Y.Z` |
 | `stable-promote.yml` | CI finished on `develop` | If `develop` holds an untagged stable version: opens the `develop` -> `main` PR (merge commit, never squash) |
 | `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) and calls `release.yml` |
-| `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); version comes from the code and must match the tag |
+| `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); runs the binary tests on every platform before anything is published ([09](09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)); version comes from the code and must match the tag |
 | `docker-edge.yml` | push to `develop` | Builds and pushes the `edge` image for people who want every merge |
 | `website.yml` | see [Versioned builds](#versioned-builds) | Builds all doc versions and deploys GitHub Pages |
 | `wiki.yml` (optional) | push to `main` touching `docs/wiki` | Mirrors docs to the GitHub wiki |
@@ -160,12 +179,17 @@ flowchart LR
 
 | Channel | Beta (from `develop`) | Stable (from `main`) |
 |---------|------------------------|----------------------|
-| GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums | release `vX.Y.Z` marked latest |
+| GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums, and the rolling `beta` pre-release moved to the same files (fixed download links, [09](09-distribution.md#release-archives)) | release `vX.Y.Z` marked latest |
 | Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` (plus `edge` on every `develop` push) | `latest`, `X`, `X.Y`, `X.Y.Z` |
 | Homebrew tap | `sendmock-beta` formula | `sendmock` formula |
 | Scoop bucket | `sendmock-beta` manifest | `sendmock` manifest |
+| `.deb` and `.rpm` (release assets) | attached to the pre-release | attached to the release |
+| APT and YUM repository (from 1.0) | `beta` component | `stable` component |
+| WinGet, Chocolatey (from 1.0) | not published | new version submitted |
+| AUR (from 1.0) | `sendmock-beta-bin` | `sendmock-bin` |
+| COPR, Nixpkgs (from 1.0) | not published | new version |
 | npm wrapper | dist-tag `beta` | dist-tag `latest` |
-| Install scripts | `install.sh --channel beta` | default |
+| Install scripts | `install.sh --channel beta`, `install.ps1 -Channel beta` (run as a script block, since `irm ... \| iex` takes no arguments) | default |
 | crates.io | not published | published |
 | Website | `/next/` | `/` (previous minor moves to `/vX.Y/`) |
 | Testcontainers modules | default image tag `beta` on request | default image tag = matching stable |

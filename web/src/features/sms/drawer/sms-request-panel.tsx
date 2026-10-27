@@ -3,7 +3,7 @@ import { ScrollTextIcon } from "lucide-react";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { Button } from "@/components/ui/button";
-import { smsApiLabels } from "@/features/sms/sms-labels";
+import { labelSmsApi } from "@/features/sms/sms-labels";
 import type { SmsMessageDetail } from "@/lib/api/types";
 
 /** The body the app sent to the SMS API, with a link to the request log. */
@@ -27,7 +27,7 @@ export function SmsRequestPanel({
     <div className="grid gap-2">
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs text-muted-foreground">
-          Sent to the {smsApiLabels[smsMessage.api]} API
+          Sent to the {labelSmsApi(smsMessage.api)} API
         </span>
         <div className="flex items-center gap-1">
           <CopyButton copyText={requestJson} label="Copy request JSON" />

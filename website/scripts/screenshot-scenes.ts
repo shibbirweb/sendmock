@@ -150,6 +150,8 @@ const docsScenes: Scene[] = [
       await page.getByRole("dialog").waitFor();
     },
   },
+  listScene("mail-providers", "/mail/providers", "Providers · Mail · SendMock"),
+  listScene("sms-providers", "/sms/providers", "Providers · SMS · SendMock"),
   listScene(
     "payment-gateways",
     "/payments/gateways",

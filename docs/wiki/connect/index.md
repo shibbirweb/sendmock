@@ -14,7 +14,7 @@ SendMock speaks the protocols your app already uses, so connecting is a settings
 | SendMock's own API | `http://127.0.0.1:8025/api/v1` ([API reference](/api/)) |
 | Your webhooks | an endpoint in **Webhooks** pointing at your app ([webhooks](../webhooks/index.md)) |
 
-From inside Docker, use `host.docker.internal` (or the Compose service name) instead of `127.0.0.1`.
+When your app or SendMock runs in Docker, the address changes; [Docker](./docker.md) shows which one to use, with Compose, CI and webhook examples.
 
 Pick your language:
 
@@ -26,3 +26,7 @@ Pick your language:
 - [Rust](./rust.md)
 - [Ruby](./ruby.md)
 - [.NET](./dotnet.md)
+
+Running in containers:
+
+- [Docker](./docker.md)

@@ -43,6 +43,37 @@ Config precedence: flags > `SENDMOCK_*` env vars > `sendmock.toml` (current dir,
 
 Cross-compilation via `cargo-zigbuild` for Linux targets and native GitHub Actions runners for macOS and Windows. Everything uses rustls (no OpenSSL) and bundled SQLite, so there are no system library dependencies.
 
+### Release archives
+
+Each GitHub release attaches one archive per target, named `sendmock-<target triple>` with `.tar.gz` for macOS and Linux and `.zip` for Windows (for example `sendmock-aarch64-apple-darwin.tar.gz`, `sendmock-x86_64-pc-windows-msvc.zip`), plus a `SHA256SUMS` file. Each archive holds the `sendmock` binary (`sendmock.exe` on Windows), the licence and the readme at its top level, with no folder inside, so the install page's unpack steps leave `sendmock` in the current folder. The names carry no version, so `https://github.com/shibbirweb/sendmock/releases/latest/download/<archive>` always gives the latest stable build; the website's quick start links these for readers who download by hand (decided 2026-10-27). GitHub's `latest` skips pre-releases, so each beta release also moves a rolling `beta` pre-release to the same archives: `https://github.com/shibbirweb/sendmock/releases/download/beta/<archive>` always gives the newest beta, and the install page links both.
+
+### Binary tests on every platform (decided 2026-10-27)
+
+Every target a release builds is tested on its own operating system and CPU before anything is published. `release.yml` runs one job per target on a matching GitHub runner, and a failure on any platform stops the release.
+
+| Target | Runner |
+|--------|--------|
+| `aarch64-apple-darwin` | Apple silicon macOS runner |
+| `x86_64-apple-darwin` | Intel macOS runner (`macos-15-intel` while GitHub offers one) |
+| `x86_64-unknown-linux-musl` | `ubuntu-latest`, plus the `alpine` and `busybox` images |
+| `aarch64-unknown-linux-musl` | `ubuntu-24.04-arm`, plus the `alpine` image |
+| `x86_64-pc-windows-msvc` | `windows-latest` |
+| `aarch64-pc-windows-msvc` | `windows-11-arm` |
+
+Each job runs the same test cases against the archive the release will publish, following the install page's steps (`tar -xzf` or `Expand-Archive`), not a fresh build:
+
+1. The archive's checksum matches `SHA256SUMS`, and it holds `sendmock`, the licence and the readme at its top level.
+2. `sendmock --version` prints the release's version and channel.
+3. `sendmock` starts with no runtime installed (on Linux also in `alpine` and `busybox`, which have no glibc; on Windows with no Visual C++ redistributable) and listens on `127.0.0.1:1025` and `127.0.0.1:8025` only.
+4. `sendmock health` exits 0 once the listeners are ready.
+5. `GET /` serves the embedded web UI and `GET /api/v1/health` answers.
+6. An email sent over SMTP and an SMS sent through the API are read back through the API.
+7. After a restart, the captured email is still there (the default data folder for that operating system).
+8. Stopping it (`SIGTERM` on macOS and Linux, a console stop event on Windows) shuts down cleanly with exit code 0.
+9. The install script for the platform (`install.sh` on macOS and Linux, `install.ps1` on Windows) installs the stable and, with the beta option, the beta, and `sendmock` is on the `PATH` of a new shell.
+
+The test cases live in one script per shell (`scripts/release-tests/binary.sh` and `binary.ps1`) so every platform runs the same list, and the Docker image and package channels reuse cases 2 to 8 ([DS-03.6](acceptance/07-distribution-website.md#ds-03-package-managers-and-install-scripts)).
+
 ## Release channels
 
 Every channel has a **beta** track (from `develop`) and a **stable** track (from `main`); see [16-website-and-releases.md](16-website-and-releases.md#what-each-channel-publishes).
@@ -52,12 +83,43 @@ Every channel has a **beta** track (from `develop`) and a **stable** track (from
 | GitHub Releases | archives + SHA256 checksums, built by a tag-triggered workflow (consider `cargo-dist`) |
 | Install scripts | `curl -fsSL .../install.sh \| sh`, `irm .../install.ps1 \| iex` |
 | Homebrew | tap first (`brew install <owner>/tap/sendmock`), core later |
+| Linux packages | `.deb` and `.rpm` on every GitHub release (`cargo-deb`, `cargo-generate-rpm`); later our own signed APT and YUM repository |
 | Scoop / WinGet | manifest in a bucket repo, WinGet later |
+| Chocolatey | community package, later |
+| AUR, COPR, Nixpkgs | community packages for Arch, Fedora and Nix, later |
 | Docker | `ghcr.io/<owner>/sendmock` and Docker Hub; multi-arch; see [Docker](#docker) |
 | Cargo | `cargo install sendmock` (requires prebuilt UI in the crate package) |
 | npm (optional) | `npx sendmock` wrapper that downloads the right binary, handy for JS projects and CI |
 
 Optional later: a macOS menu-bar / system tray launcher.
+
+### Package channels by stage (decided 2026-10-27)
+
+Channels we run ourselves ship early; a distribution's official repository is run by that distribution's maintainers, takes months and needs an established project, so it comes last. Each channel is one more publish step in the release workflows ([16](16-website-and-releases.md#workflows)), with its token stored as a repository secret.
+
+| Stage | Channel | Users run | Notes |
+|-------|---------|-----------|-------|
+| First beta (Phase 1) | GitHub Releases archives | download and unpack | macOS, Linux, Windows; checksums |
+| | Install scripts | `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh \| sh`, `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 \| iex` | attached to every release ([open question 13](10-open-questions.md#13-install-script-url-decided-2026-10-27-github-release-assets), decided) |
+| | `.deb` and `.rpm` on each release | `sudo apt install ./sendmock_<version>_amd64.deb`, `sudo dnf install ./sendmock-<version>.x86_64.rpm` | built by `cargo-deb` and `cargo-generate-rpm` |
+| | Homebrew tap | `brew install shibbirweb/tap/sendmock` | repository `shibbirweb/homebrew-tap`; macOS and Linux |
+| | Scoop bucket | `scoop bucket add shibbirweb <bucket url>`, `scoop install sendmock` | repository `shibbirweb/scoop-bucket` |
+| | Docker | `docker run ... ghcr.io/shibbirweb/sendmock` | see [Docker](#docker) |
+| 1.0 stable (Phase 5) | Our own APT and YUM repository | add our signing key and repository once, then `sudo apt install sendmock` / `sudo dnf install sendmock` with normal upgrades | signed with our GPG key; hosted on GitHub Pages or a free open-source host (Cloudsmith, packagecloud); `stable` and `beta` components |
+| | WinGet | `winget install shibbirweb.sendmock` | a PR to Microsoft's `winget-pkgs` per stable release, scripted from the workflow (`wingetcreate`); built into Windows 10 and 11 |
+| | Chocolatey | `choco install sendmock` | each version waits in human moderation (often days), so it lags the release |
+| | AUR | `yay -S sendmock-bin` | `sendmock-bin` and `sendmock-beta-bin`, from the release archives |
+| | COPR | `sudo dnf copr enable shibbirweb/sendmock`, `sudo dnf install sendmock` | Fedora's personal repositories |
+| | Nixpkgs | `nix-env -iA nixpkgs.sendmock` | a PR to `nixpkgs`; the update bot follows new releases |
+| | npm wrapper, `cargo install` | as in the table above | |
+| Optional | Snap Store | `sudo snap install sendmock` | cross-distribution, reviewed by Canonical; only if users ask |
+| | Ubuntu PPA | `sudo add-apt-repository ppa:shibbirweb/sendmock` | Launchpad builds from source with vendored crates; our APT repository covers the same need |
+| With traction | Homebrew core | `brew install sendmock` | needs a well-known project with stable releases that build from source; tap users keep working |
+| | Debian (then Ubuntu), Fedora, Arch official repositories | `sudo apt install sendmock` with no setup | needs a Debian sponsor or a Fedora packager or an Arch package maintainer, and every Rust dependency packaged by the distribution; Ubuntu takes Debian's package |
+
+Before any official repository will take SendMock it needs an OSI licence (the Phase 0 README and licence item), a history of stable releases, and users. Windows code signing is optional: it removes SmartScreen's "unknown publisher" warning, and neither WinGet nor Chocolatey requires it.
+
+The landing page's quick start has a tab per platform: Homebrew (macOS), `install.ps1` (Windows) and `install.sh` (Linux), the scripts served from the latest GitHub release; each tab then starts `sendmock`. When our APT repository and WinGet exist, the Linux and Windows tabs can switch to `apt install` and `winget install`.
 
 ## Docker
 
@@ -67,7 +129,7 @@ Docker is a first-class release channel, not an afterthought: many teams run the
 
 | Item | Decision |
 |------|----------|
-| Registries | `ghcr.io/<owner>/sendmock` and Docker Hub `<owner>/sendmock` |
+| Registries | `ghcr.io/shibbirweb/sendmock` and Docker Hub `shibbirweb/sendmock` (https://hub.docker.com/r/shibbirweb/sendmock); the install page uses GHCR in its commands and links the Docker Hub page |
 | Platforms | `linux/amd64`, `linux/arm64` (Apple Silicon, Graviton, Raspberry Pi 4/5); `linux/arm/v7` if demand |
 | Base | `FROM scratch` with the static musl binary, CA certificates bundled (rustls + `webpki-roots`, so outbound HTTPS for webhooks, link check and relay works without OS packages) |
 | Size target | under 25 MB compressed |

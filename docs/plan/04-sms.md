@@ -56,6 +56,8 @@ Mounted under `/providers/<name>/...` on the main HTTP port, and at the **real p
 | Infobip | `POST /sms/2/text/advanced` | later |
 | Generic HTTP GET/POST | configurable param names (`to`, `msg`, `api_key`...) for regional vendors | 4 |
 
+**Built in, not fixed (decided 2026-10-27).** The providers in this table ship as built-in presets, like payment gateways ([17](17-payments.md)) and webhook templates ([13](13-webhook-templates.md)): a user can edit one (paths, field names, response and error shapes), delete the ones they do not use, or add a provider that is not listed, starting blank or from the closest built-in; **Reset to default** brings a built-in back. The definition, screens and operations are planned in [22-configurable-providers.md](22-configurable-providers.md) (EM-18, SM-16).
+
 Each emulated endpoint:
 
 - Validates required params and returns the provider's error shape and HTTP status for invalid requests (missing `To`, bad number, empty body).

@@ -7,18 +7,17 @@ import type {
 } from "@/lib/api/types/common";
 
 /** How the message reached SendMock. */
-export type EmailSource =
-  | "smtp"
-  | "sendmail"
-  | "native_api"
-  | "sendgrid"
-  | "mailgun"
-  | "postmark"
-  | "resend"
-  | "ses"
-  | "brevo"
-  | "verify"
-  | "simulated";
+/** How an email reached SendMock without a provider's API. */
+export type EmailTransportSource =
+  "smtp" | "sendmail" | "native_api" | "verify" | "simulated";
+
+/**
+ * How an email reached SendMock: a transport (`smtp`, `sendmail`, `native_api`,
+ * `verify`, `simulated`) or the key of the email provider whose API it was
+ * sent through (`sendgrid`, or a custom provider's key; docs/plan/22).
+ * @example "sendgrid"
+ */
+export type EmailSource = string;
 
 /** `outbound`: mail your app sent; `inbound`: mail coming in to your app. */
 export type EmailDirection = "outbound" | "inbound";

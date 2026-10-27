@@ -71,6 +71,8 @@ Apps using an email provider's HTTP API point the SDK (or base URL) at SendMock 
 | Amazon SES v2 | `POST /v2/email/outbound-emails` | simple and raw content; SigV4 accepted without verification | 4 |
 | Brevo | `POST /v3/smtp/email` | `api-key` header | 4 |
 
+**Built in, not fixed (decided 2026-10-27).** The providers in this table ship as built-in presets, like payment gateways ([17](17-payments.md)) and webhook templates ([13](13-webhook-templates.md)): a user can edit one (paths, field names, response and error shapes), delete the ones they do not use, or add a provider that is not listed, starting blank or from the closest built-in; **Reset to default** brings a built-in back. The definition, screens and operations are planned in [22-configurable-providers.md](22-configurable-providers.md) (EM-18, SM-16).
+
 ### Native send attachments
 
 `attachments` on `POST /api/v1/send` uses the shape SendGrid and Resend use, so it feels familiar:

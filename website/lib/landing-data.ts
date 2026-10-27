@@ -3,7 +3,7 @@
  * ticker counts them, so the two always agree.
  */
 
-/** Languages the cross-language CI matrix sends from (examples/). */
+/** Languages with a connection guide (docs/wiki/connect/), later the CI matrix (examples/). */
 export const testedLanguageNames = [
   "PHP",
   "Node.js",
@@ -24,10 +24,14 @@ export const frameworkNames = [
   "Express",
 ];
 
-/** Providers whose real API SendMock answers, by product area. */
+/**
+ * The built-in providers whose real API SendMock answers, by product area.
+ * Users can change, remove or add providers; the landing page counts the
+ * built-ins. docs/wiki/providers.md lists the same names (landing-data.test.ts).
+ */
 export const emulatedProviderNames = {
   email: ["SendGrid", "Mailgun", "Postmark", "Resend", "Amazon SES", "Brevo"],
-  sms: ["Twilio", "Twilio Verify", "Vonage", "Plivo", "Telnyx"],
+  sms: ["Twilio", "Twilio Verify", "Vonage", "Plivo", "MessageBird"],
   payments: ["Stripe", "PayPal", "SSLCommerz", "bKash"],
 };
 

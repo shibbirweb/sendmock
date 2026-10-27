@@ -7,6 +7,8 @@ import { surfaceCatalogue } from "@/lib/api/surface-catalogue";
 const secretRevealOperations = [
   "GET /api/v1/webhooks/endpoints/{endpointId}/secret",
   "GET /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}",
+  "GET /api/v1/emails/providers/{providerKey}/credentials/{credentialName}",
+  "GET /api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
 ];
 
 const registeredOperationKeys = apiEndpoints.map(
@@ -47,7 +49,7 @@ describe("surface catalogue", () => {
     }
   });
 
-  test("UI-11.1 the only operations without an MCP tool are the two secret reveals", () => {
+  test("UI-11.1 the only operations without an MCP tool are the secret reveals", () => {
     const operationsWithoutTool = catalogueEntries
       .filter(([, operationSurfaces]) => operationSurfaces.mcp === null)
       .map(([operationKey]) => operationKey);

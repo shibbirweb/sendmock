@@ -2,7 +2,8 @@
  * Captures the landing page and user guide screenshots from the mock-mode web
  * app, so they always show the current UI. Start the app first (`bun run dev`
  * in web/), then run `bun run screenshots` here; pass another base URL as the
- * argument.
+ * argument, and scene names after it to take only those, e.g.
+ * `bun run screenshots http://localhost:5173 mail-providers sms-providers`.
  */
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -13,6 +14,7 @@ import { chromium } from "@playwright/test";
 import { scenes } from "./screenshot-scenes";
 
 const appBaseUrl = process.argv[2] ?? "http://localhost:5173";
+const onlySceneNames = process.argv.slice(3);
 const outputDirectory = fileURLToPath(
   new URL("../public/screenshots", import.meta.url),
 );
@@ -39,7 +41,9 @@ for (const colorScheme of ["light", "dark"] as const) {
     content: "[data-sonner-toaster] { display: none !important; }",
   });
   const themeScenes = scenes.filter(
-    (scene) => scene.isLandingShot || colorScheme === "light",
+    (scene) =>
+      (scene.isLandingShot || colorScheme === "light") &&
+      (onlySceneNames.length === 0 || onlySceneNames.includes(scene.name)),
   );
   for (const scene of themeScenes) {
     // A drawer left open by the previous scene would cover the next one.

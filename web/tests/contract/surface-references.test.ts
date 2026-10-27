@@ -90,7 +90,8 @@ describe("CLI and MCP references (WS-07.5)", () => {
     expect(mcpReference.tools.map((tool) => tool.name).sort()).toEqual(
       [...new Set(catalogueTools)].sort(),
     );
-    expect(mcpReference.exemptions).toHaveLength(2);
+    // The endpoint secret and the gateway and provider credentials (agents never read secrets).
+    expect(mcpReference.exemptions).toHaveLength(4);
   });
 
   test("WS-07.5 flags follow the naming rules", () => {

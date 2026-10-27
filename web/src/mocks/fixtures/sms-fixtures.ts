@@ -179,6 +179,8 @@ const smsFixtureSpecs: SmsFixtureSpec[] = [
     appNumber: supportLine,
     contactNumber: "+8801711111111",
     body: "আপনার Acme যাচাইকরণ কোড 739201। কোডটি ১০ মিনিটের মধ্যে ব্যবহার করুন। এই কোড কারও সাথে শেয়ার করবেন না।",
+    // Sent through the demo's custom provider (docs/plan/22).
+    api: "sslwireless",
   },
   {
     minutesAgo: 9,

@@ -4,6 +4,7 @@
     "index",
     "delivery-and-test-numbers",
     "replies-and-whatsapp",
-    "verify"
+    "verify",
+    "providers"
   ]
 }

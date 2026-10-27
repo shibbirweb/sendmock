@@ -36,7 +36,9 @@ test("WS-04.4 the Inputs panel lists every parameter and body field with what it
     .getByRole("combobox", { name: "Endpoint" })
     .selectOption({ label: "GET /api/v1/emails" });
   await expect(inputsPanel).toContainText("No body.");
-  await expect(inputsPanel).toContainText("One of: smtp, sendmail");
+  await expect(inputsPanel).toContainText(
+    "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key",
+  );
 
   await page
     .getByRole("combobox", { name: "Endpoint" })
@@ -79,7 +81,7 @@ test("WS-04.5 the body starts as a full example, fields can be added and removed
   await page
     .getByRole("combobox", { name: "Endpoint" })
     .selectOption({ label: "GET /api/v1/emails" });
-  await page.getByRole("combobox", { name: /source/ }).selectOption("smtp");
+  await page.getByRole("textbox", { name: /source/ }).fill("smtp");
   await page.getByRole("checkbox", { name: /is_unread/ }).check();
   await expect(page.getByTestId("code-snippet")).toContainText(
     "source=smtp&is_unread=true",

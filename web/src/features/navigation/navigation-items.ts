@@ -15,6 +15,7 @@ import {
   PhoneIcon,
   ReceiptIcon,
   ScrollTextIcon,
+  ServerCogIcon,
   SendIcon,
   SettingsIcon,
   ShieldCheckIcon,
@@ -41,7 +42,15 @@ export type NavigationItem = {
  */
 export const navigationItems: NavigationItem[] = [
   { title: "Overview", path: "/", icon: GaugeIcon, shortcutKey: "o" },
-  { title: "Mail", path: "/mail", icon: MailIcon, shortcutKey: "m" },
+  {
+    title: "Mail",
+    path: "/mail",
+    icon: MailIcon,
+    shortcutKey: "m",
+    children: [
+      { title: "Providers", path: "/mail/providers", icon: ServerCogIcon },
+    ],
+  },
   {
     title: "SMS",
     path: "/sms",
@@ -54,6 +63,7 @@ export const navigationItems: NavigationItem[] = [
         icon: ShieldCheckIcon,
         shortcutKey: "v",
       },
+      { title: "Providers", path: "/sms/providers", icon: ServerCogIcon },
     ],
   },
   { title: "HTTP Catcher", path: "/http", icon: GlobeIcon, shortcutKey: "h" },

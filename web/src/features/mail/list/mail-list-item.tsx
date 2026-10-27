@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { emailSourceLabels } from "@/features/mail/mail-labels";
+import { labelEmailSource } from "@/features/mail/mail-labels";
 import { EmailOutcomeBadge } from "@/features/mail/email-outcome-badge";
 import type { EmailSummary } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -111,7 +111,7 @@ export function MailListItem({
           ) : (
             email.source !== "smtp" && (
               <span className="shrink-0 rounded border px-1 text-[10px] uppercase">
-                {emailSourceLabels[email.source]}
+                {labelEmailSource(email.source)}
               </span>
             )
           )}

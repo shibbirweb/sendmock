@@ -238,3 +238,121 @@ test("WS-06.4 advanced outcome rules: an email address and an SMS number of your
     "Accepted, then failed, 30008",
   );
 });
+
+/** Adds a blank provider in Mail or SMS > Providers and returns its sheet. */
+async function addBlankProvider(
+  page: Page,
+  providersPath: string,
+  providerName: string,
+  providerKey?: string,
+) {
+  await page.goto(providersPath);
+  await page.getByRole("button", { name: "Add provider" }).click();
+  const addDialog = page.getByRole("dialog", { name: "Add a provider" });
+  await addDialog.getByLabel("Name").fill(providerName);
+  if (providerKey !== undefined) {
+    await addDialog.getByLabel("Key").fill(providerKey);
+  }
+  await addDialog.getByRole("button", { name: "Add provider" }).click();
+
+  return page.getByRole("dialog", { name: providerName });
+}
+
+async function mapParts(
+  page: Page,
+  providerSheet: ReturnType<Page["getByRole"]>,
+  partSources: [part: string, source: string][],
+) {
+  for (const [mappingIndex, [part, source]] of partSources.entries()) {
+    await providerSheet.getByRole("button", { name: "Map a part" }).click();
+    await providerSheet
+      .getByRole("combobox", { name: `Mapping ${mappingIndex + 1} part` })
+      .click();
+    await page.getByRole("option", { name: part, exact: true }).click();
+    await providerSheet
+      .getByLabel(`Mapping ${mappingIndex + 1} source`)
+      .fill(source);
+  }
+}
+
+test("WS-06.4 advanced create an email provider: Mailjet from blank to a saved provider", async ({
+  page,
+}) => {
+  const providerSheet = await addBlankProvider(
+    page,
+    "/mail/providers",
+    "Mailjet",
+  );
+  await providerSheet.getByLabel("Host").fill("api.mailjet.com");
+  await providerSheet.getByRole("tab", { name: "Requests" }).click();
+  await providerSheet.getByLabel("Request 1 path").fill("/v3.1/send");
+  await mapParts(page, providerSheet, [
+    ["from", "Messages[0].From.Email"],
+    ["to", "Messages[0].To[*].Email"],
+    ["subject", "Messages[0].Subject"],
+    ["text", "Messages[0].TextPart"],
+  ]);
+  await providerSheet.getByRole("tab", { name: "Responses" }).click();
+  await providerSheet.getByLabel("Message id").fill("{{ random_hex(16) }}");
+  await providerSheet
+    .getByLabel("Success response body")
+    .fill(
+      '{"Messages": [{"Status": "success", "To": [{"Email": "{{ message.to }}", "MessageID": "{{ message.provider_id }}"}]}]}',
+    );
+
+  await providerSheet.getByRole("tab", { name: "Preview" }).click();
+  await expect(
+    providerSheet.getByTestId("provider-stored-message"),
+  ).toContainText("ana@example.test");
+  await expect(
+    providerSheet.getByTestId("provider-preview-response"),
+  ).toContainText("200");
+  await providerSheet.getByRole("button", { name: "Save provider" }).click();
+  await expect(providerSheet).toBeHidden();
+  await expect(
+    page.getByTestId("message-provider-row").filter({ hasText: "Mailjet" }),
+  ).toContainText("Custom");
+});
+
+test("WS-06.4 advanced create an SMS provider: Africa's Talking from blank to a saved provider", async ({
+  page,
+}) => {
+  const providerSheet = await addBlankProvider(
+    page,
+    "/sms/providers",
+    "Africa's Talking",
+    "africastalking",
+  );
+  await providerSheet.getByLabel("Host").fill("api.africastalking.com");
+  await providerSheet.getByRole("tab", { name: "Requests" }).click();
+  await providerSheet.getByLabel("Request 1 path").fill("/version1/messaging");
+  await providerSheet
+    .getByRole("combobox", { name: "Request 1 format" })
+    .click();
+  await page.getByRole("option", { name: "Form", exact: true }).click();
+  await mapParts(page, providerSheet, [
+    ["to", "to"],
+    ["body", "message"],
+    ["from", "from"],
+  ]);
+  await providerSheet.getByRole("tab", { name: "Responses" }).click();
+  await providerSheet
+    .getByLabel("Message id")
+    .fill("ATXid_{{ random_hex(32) }}");
+  await providerSheet.getByLabel("Success response status").fill("201");
+
+  await providerSheet.getByRole("tab", { name: "Preview" }).click();
+  await expect(
+    providerSheet.getByTestId("provider-stored-message"),
+  ).toContainText("+15551234567");
+  await expect(
+    providerSheet.getByTestId("provider-preview-response"),
+  ).toContainText("201");
+  await providerSheet.getByRole("button", { name: "Save provider" }).click();
+  await expect(providerSheet).toBeHidden();
+  await expect(
+    page
+      .getByTestId("message-provider-row")
+      .filter({ hasText: "Africa's Talking" }),
+  ).toContainText("Custom");
+});

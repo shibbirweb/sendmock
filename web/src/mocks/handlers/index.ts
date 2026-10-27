@@ -2,6 +2,7 @@ import { automationHandlers } from "@/mocks/handlers/automation-handlers";
 import { definitionLookupHandlers } from "@/mocks/handlers/definition-lookup-handlers";
 import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
 import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
+import { messageProviderHandlers } from "@/mocks/handlers/message-provider-handlers";
 import { messageRuleHandlers } from "@/mocks/handlers/message-rule-handlers";
 import { outcomeTestHandlers } from "@/mocks/handlers/outcome-test-handlers";
 import { paymentTestValueHandlers } from "@/mocks/handlers/payment-test-value-handlers";
@@ -49,6 +50,7 @@ export const mockHandlers = [
   ...paymentTestValueHandlers,
   ...outcomeTestHandlers,
   ...definitionLookupHandlers,
+  ...messageProviderHandlers,
   ...messageRuleHandlers,
   ...emailDetailHandlers,
   ...nativeSendHandlers,

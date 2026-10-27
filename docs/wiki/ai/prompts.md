@@ -17,6 +17,8 @@ Agents that support MCP prompts show these in their prompt picker (in Claude Cod
 | `debug-failed-webhook` | read the latest failed delivery, explain the error, suggest a fix and replay |
 | `add-payment-flow` | compose a checkout flow step by step from a provider's docs, attach it to a method and run a test checkout |
 | `add-payment-gateway` | add a gateway (and its method and flow when needed) from the provider's docs, preview it, run a test checkout and confirm your app gets the redirect and notification |
+| `add-email-provider` | add an email API from its docs: requests, field mapping, checks and answers, checked in the preview and exported to the seed file |
+| `add-sms-provider` | add an SMS vendor from its docs, with its status names and error codes, checked in the preview and exported to the seed file |
 
 ## Related
 

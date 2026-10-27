@@ -5,6 +5,8 @@
     "payment-gateway",
     "payment-method",
     "payment-flow",
+    "email-provider",
+    "sms-provider",
     "templates",
     "request-editor",
     "variables",

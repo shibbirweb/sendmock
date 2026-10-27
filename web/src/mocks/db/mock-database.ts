@@ -87,6 +87,12 @@ import {
   paymentEndpointName,
 } from "@/mocks/fixtures/webhook-fixtures";
 import { buildTemplateRevisionFixtures } from "@/mocks/fixtures/template-revision-fixtures";
+import { buildBuiltinEmailProviders } from "@/mocks/fixtures/email-provider-fixtures";
+import type { MessageProviderRecord } from "@/mocks/fixtures/message-provider-builder";
+import {
+  buildBuiltinSmsProviders,
+  buildExampleCustomSmsProvider,
+} from "@/mocks/fixtures/sms-provider-fixtures";
 import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
@@ -122,6 +128,8 @@ export type MockDatabase = {
   paymentMethods: PaymentMethodRecord[];
   paymentFlows: PaymentFlowRecord[];
   paymentGateways: PaymentGatewayRecord[];
+  /** Email and SMS providers, built in and custom (docs/plan/22). */
+  messageProviders: MessageProviderRecord[];
   inboundRoutes: InboundRouteRecord[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
@@ -169,6 +177,11 @@ function buildConfiguration() {
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
     inboundRoutes: buildInboundRouteFixtures(),
+    messageProviders: [
+      ...buildBuiltinEmailProviders(),
+      ...buildBuiltinSmsProviders(),
+      buildExampleCustomSmsProvider(),
+    ],
     paymentGateways: buildBuiltinPaymentGateways(
       webhookEndpoints.find(
         (webhookEndpoint) => webhookEndpoint.name === paymentEndpointName,

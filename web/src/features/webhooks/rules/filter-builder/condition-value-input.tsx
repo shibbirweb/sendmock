@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMessageProviders } from "@/lib/api/hooks/use-message-provider-queries";
 import type { SmsApi, SmsStatus } from "@/lib/api/types";
 import type { RuleValueKind } from "@/lib/webhooks/rule-filter/rule-fields";
 
@@ -17,19 +18,9 @@ const smsStatusOptions: SmsStatus[] = [
   "failed",
   "received",
 ];
-const smsApiOptions: SmsApi[] = [
-  "native",
-  "twilio",
-  "vonage",
-  "plivo",
-  "messagebird",
-  "generic",
-];
-
 const pickerOptionsByKind: Partial<Record<RuleValueKind, string[]>> = {
   boolean: ["true", "false"],
   "sms-status": smsStatusOptions,
-  "sms-api": smsApiOptions,
 };
 
 /** The value control that fits the field: text, a number or a fixed list. */
@@ -46,7 +37,16 @@ export function ConditionValueInput({
   isInvalid: boolean;
   onChange: (nextValue: string) => void;
 }) {
-  const pickerOptions = pickerOptionsByKind[valueKind];
+  // The SMS API picker lists the native API and every SMS provider (docs/plan/22).
+  const smsProviders = useMessageProviders("sms").data ?? [];
+  const smsApiOptions: SmsApi[] = [
+    "native",
+    ...smsProviders
+      .filter((smsProvider) => !smsProvider.is_removed)
+      .map((smsProvider) => smsProvider.key),
+  ];
+  const pickerOptions =
+    valueKind === "sms-api" ? smsApiOptions : pickerOptionsByKind[valueKind];
   if (pickerOptions !== undefined) {
     return (
       <Select value={value} onValueChange={onChange}>

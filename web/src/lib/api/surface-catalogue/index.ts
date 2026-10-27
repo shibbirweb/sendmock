@@ -1,5 +1,6 @@
 import { emailSurfaces } from "./email-surfaces";
 import { httpCatcherSurfaces } from "./http-catcher-surfaces";
+import { messageProviderSurfaces } from "./message-provider-surfaces";
 import { messageRuleSurfaces } from "./message-rule-surfaces";
 import { paymentSurfaces } from "./payment-surfaces";
 import { smsSurfaces } from "./sms-surfaces";
@@ -21,6 +22,7 @@ export const surfaceCatalogue: SurfaceCatalogue = {
   ...emailSurfaces,
   ...messageRuleSurfaces,
   ...smsSurfaces,
+  ...messageProviderSurfaces,
   ...httpCatcherSurfaces,
   ...paymentSurfaces,
   ...webhookSurfaces,
