@@ -1,12 +1,11 @@
 import { basePath } from "@/lib/base-path";
 import { cn } from "@/lib/utils";
 
-import { AiAgentWindow } from "./ai-agent-window";
-import { CopyCommandButton } from "./copy-command-button";
+import { AiInstallRun } from "./ai-install-run";
 
 /**
- * The quick start's AI tab (WS-09.4): an AI coding agent installing SendMock,
- * with fade-ins like the platform terminals. The copy button copies the whole prompt.
+ * The quick start's AI tab (WS-09.4): the prompt, copying it, then an AI coding
+ * agent installing SendMock. The copy button copies the whole prompt.
  */
 export function AiInstallPromptWindow({
   installPrompt,
@@ -23,13 +22,8 @@ export function AiInstallPromptWindow({
       hidden={!isSelected}
       className={cn("relative min-w-0", className)}
     >
-      <CopyCommandButton
-        command={installPrompt}
-        label="Copy the install prompt"
-        className="absolute top-1.5 right-2 z-10"
-      />
-      {/* Mounted when the tab opens, so the conversation plays from the start. */}
-      {isSelected && <AiAgentWindow installPrompt={installPrompt} />}
+      {/* Mounted when the tab opens, so the run plays from the start. */}
+      {isSelected && <AiInstallRun installPrompt={installPrompt} />}
       {/* The whole prompt stays in the HTML, so an agent reading the page finds it. */}
       <pre hidden data-testid="quick-start-ai-full-prompt">
         {installPrompt}

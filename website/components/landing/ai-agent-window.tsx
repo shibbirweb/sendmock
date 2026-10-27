@@ -1,139 +1,42 @@
 "use client";
 
-import {
-  ArrowUpIcon,
-  CheckCircle2Icon,
-  SparklesIcon,
-  TerminalSquareIcon,
-} from "lucide-react";
-import { useReducedMotion } from "motion/react";
-import { type ReactNode, useEffect, useRef } from "react";
+import { ArrowUpIcon, SparklesIcon } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { AnimatedSpan, AnimationSequence } from "@/components/ui/terminal";
+import { cn } from "@/lib/utils";
+
+import {
+  buildConversation,
+  ConversationMessage,
+  ThinkingIndicator,
+} from "./ai-agent-conversation";
+import { useAgentTimeline } from "./use-agent-timeline";
 
 /** Room above a tall message for its "You" label. */
-const youLabelHeightPx = 32;
-/** Each message fades in after a short pause, like a reply arriving. */
-const messageFadeIn = { duration: 0.4, delay: 0.7 };
-/** The first reply waits longer, so the reader sees the prompt first. */
-const firstReplyFadeIn = { duration: 0.4, delay: 2 };
-
-/** Who wrote a message, above it, like an agent's chat shows it. */
-function SpeakerLabel({ speaker }: { speaker: "you" | "agent" }) {
-  return speaker === "you" ? (
-    <span className="text-xs font-medium text-fd-muted-foreground">You</span>
-  ) : (
-    <span className="flex items-center gap-1.5 text-xs font-medium text-(--brand-text)">
-      <SparklesIcon aria-hidden="true" className="size-3.5" />
-      Agent
-    </span>
-  );
-}
-
-/** An agent message: its label, then what it says. */
-function AgentMessage({
-  children,
-  isFirstReply = false,
-}: {
-  children: ReactNode;
-  isFirstReply?: boolean;
-}) {
-  return (
-    <AnimatedSpan
-      transition={isFirstReply ? firstReplyFadeIn : messageFadeIn}
-      className="gap-1 font-sans"
-    >
-      <SpeakerLabel speaker="agent" />
-      <div className="flex flex-col gap-1.5">{children}</div>
-    </AnimatedSpan>
-  );
-}
-
-/** Your short answer to the agent. */
-function YourAnswer({ children }: { children: string }) {
-  return (
-    <AnimatedSpan
-      transition={messageFadeIn}
-      className="max-w-[80%] self-end rounded-lg bg-fd-secondary px-3 py-1.5 font-sans"
-    >
-      {children}
-    </AnimatedSpan>
-  );
-}
+const youLabelHeightPx = 24;
 
 /**
- * The scroll position that shows a message: a short one with its bottom (and the
- * window's bottom padding) in view, a tall one (the prompt) from its "You" label.
- */
-function findMessageScrollTop(
-  scrollingBody: HTMLElement,
-  message: HTMLElement,
-) {
-  const bottomPaddingPx = Number.parseFloat(
-    getComputedStyle(scrollingBody).paddingBottom,
-  );
-  const isTallerThanWindow =
-    message.offsetHeight + bottomPaddingPx > scrollingBody.clientHeight;
-
-  return isTallerThanWindow
-    ? message.offsetTop - youLabelHeightPx
-    : message.offsetTop +
-        message.offsetHeight +
-        bottomPaddingPx -
-        scrollingBody.clientHeight;
-}
-
-/**
- * Keeps the newest message in view while the run plays, until the reader
- * scrolls the window themselves. The fades run as browser animations, which
- * change no attribute to watch, so it checks once a frame which messages have
- * started to appear; messages not shown yet still take their space below.
+ * Brings the newest message into view: a short one fully, with the window's
+ * bottom padding, a tall one (the prompt) from its "You" label. Stops once the
+ * reader scrolls the window themselves.
  */
 function useFollowNewestMessage(
   scrollingBodyRef: React.RefObject<HTMLDivElement | null>,
+  /** Changes whenever a message or the thinking line is added or replaced. */
+  conversationStep: string,
 ) {
   const shouldReduceMotion = useReducedMotion();
+  const isFollowingRef = useRef(true);
 
   useEffect(() => {
     const scrollingBody = scrollingBodyRef.current;
-    if (shouldReduceMotion || scrollingBody === null) {
+    if (scrollingBody === null) {
       return;
     }
-
-    let isFollowing = true;
-    let followedScrollTop = scrollingBody.scrollTop;
-    let animationFrameId = 0;
     const stopFollowing = () => {
-      isFollowing = false;
+      isFollowingRef.current = false;
     };
-    const followNewestMessage = () => {
-      if (!isFollowing) {
-        return;
-      }
-      const messages = [...scrollingBody.children] as HTMLElement[];
-      const shownMessages = messages.filter(
-        (message) => Number(getComputedStyle(message).opacity) > 0,
-      );
-      const newestMessage = shownMessages.at(-1);
-      if (newestMessage !== undefined) {
-        const targetScrollTop = findMessageScrollTop(
-          scrollingBody,
-          newestMessage,
-        );
-        if (Math.abs(targetScrollTop - followedScrollTop) > 1) {
-          followedScrollTop = targetScrollTop;
-          scrollingBody.scrollTo({ top: targetScrollTop, behavior: "smooth" });
-        }
-      }
-      const lastMessage = messages.at(-1);
-      const isRunFinished =
-        lastMessage !== undefined &&
-        getComputedStyle(lastMessage).opacity === "1";
-      if (!isRunFinished) {
-        animationFrameId = requestAnimationFrame(followNewestMessage);
-      }
-    };
-    animationFrameId = requestAnimationFrame(followNewestMessage);
     const readerEvents = ["wheel", "touchstart", "keydown"];
     for (const readerEvent of readerEvents) {
       scrollingBody.addEventListener(readerEvent, stopFollowing, {
@@ -142,24 +45,107 @@ function useFollowNewestMessage(
     }
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
       for (const readerEvent of readerEvents) {
         scrollingBody.removeEventListener(readerEvent, stopFollowing);
       }
     };
-  }, [shouldReduceMotion, scrollingBodyRef]);
+  }, [scrollingBodyRef]);
+
+  useEffect(() => {
+    const scrollingBody = scrollingBodyRef.current;
+    const newestMessage = scrollingBody?.lastElementChild as HTMLElement | null;
+    if (
+      shouldReduceMotion ||
+      !isFollowingRef.current ||
+      scrollingBody === null ||
+      scrollingBody === undefined ||
+      newestMessage === null
+    ) {
+      return;
+    }
+    const isTallerThanWindow =
+      newestMessage.offsetHeight > scrollingBody.clientHeight;
+    scrollingBody.scrollTo({
+      top: isTallerThanWindow
+        ? newestMessage.offsetTop - youLabelHeightPx
+        : scrollingBody.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [scrollingBodyRef, conversationStep, shouldReduceMotion]);
+}
+
+/** The message box: what you paste or type before it is sent. */
+function MessageComposer({
+  composerText,
+  isComposerPasted,
+}: {
+  composerText: string;
+  isComposerPasted: boolean;
+}) {
+  const hasText = composerText !== "";
+  const pastedLineCount = composerText.split("\n").length;
+
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="quick-start-ai-composer"
+      className="flex items-end gap-2 border-t px-4 py-2.5"
+    >
+      <div className="flex min-w-0 flex-1 flex-col text-xs">
+        {!hasText && (
+          <span className="text-fd-muted-foreground">Message your agent…</span>
+        )}
+        {hasText && isComposerPasted && (
+          <>
+            <span className="truncate font-mono">
+              {composerText.split("\n")[0]}
+            </span>
+            <span className="text-fd-muted-foreground">
+              Pasted text, {pastedLineCount} lines
+            </span>
+          </>
+        )}
+        {hasText && !isComposerPasted && (
+          <span>
+            {composerText}
+            <span className="ml-px inline-block h-3.5 w-px animate-pulse bg-fd-foreground align-middle" />
+          </span>
+        )}
+      </div>
+      <span
+        className={cn(
+          "flex size-6 shrink-0 items-center justify-center rounded-full transition-colors",
+          hasText
+            ? "bg-fd-primary text-fd-primary-foreground"
+            : "bg-fd-muted text-fd-muted-foreground",
+        )}
+      >
+        <ArrowUpIcon className="size-3.5" />
+      </span>
+    </div>
+  );
 }
 
 /**
  * The quick start's AI tab (WS-09.4): an AI coding agent's window, not a plain
- * terminal. The whole Install with AI prompt fades in as your message, then the
- * agent checks the computer, asks Docker or the binary, asks before running the
- * install command and reports SendMock running. It fills the platform
- * terminals' height and scrolls inside.
+ * terminal. Your whole prompt is pasted into the message box and sent, the
+ * agent checks the computer and asks Docker or the binary, your answers are
+ * typed and sent, and it asks before running the install. It fills the
+ * platform terminals' height and scrolls inside.
  */
 export function AiAgentWindow({ installPrompt }: { installPrompt: string }) {
+  const conversation = useMemo(
+    () => buildConversation(installPrompt),
+    [installPrompt],
+  );
+  const { shownMessageCount, composerText, isComposerPasted, isThinking } =
+    useAgentTimeline(conversation);
   const scrollingBodyRef = useRef<HTMLDivElement | null>(null);
-  useFollowNewestMessage(scrollingBodyRef);
+  // The reply replaces the thinking line, so the count alone would not change.
+  useFollowNewestMessage(
+    scrollingBodyRef,
+    `${shownMessageCount}:${isThinking ? "thinking" : "shown"}`,
+  );
 
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden rounded-xl border bg-fd-background text-sm">
@@ -183,63 +169,25 @@ export function AiAgentWindow({ installPrompt }: { installPrompt: string }) {
         data-testid="quick-start-ai-conversation"
         className="relative flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto p-4"
       >
-        <AnimationSequence>
-          <AnimatedSpan className="font-sans">
-            <SpeakerLabel speaker="you" />
-          </AnimatedSpan>
-          <AnimatedSpan className="-mt-2 min-w-0 rounded-lg border bg-fd-secondary/50 p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
-            {installPrompt}
-          </AnimatedSpan>
-          <AgentMessage isFirstReply>
-            <p>
-              I checked this computer: macOS on Apple silicon, Docker is running
-              and Homebrew is installed.
-            </p>
-          </AgentMessage>
-          <AgentMessage>
-            <p className="font-medium">How do you want to run SendMock?</p>
-            <p>
-              <span className="font-medium">Docker or the binary?</span> Docker
-              keeps your computer clean and is easy to remove. The binary starts
-              instantly and needs no Docker.
-            </p>
-          </AgentMessage>
-          <YourAnswer>The binary, stable</YourAnswer>
-          <AgentMessage>
-            <div className="flex flex-col gap-1 rounded-lg border p-3">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-fd-muted-foreground">
-                <TerminalSquareIcon aria-hidden="true" className="size-3.5" />
-                Run command
-              </span>
-              <code className="font-mono text-xs break-all">
-                brew install shibbirweb/tap/sendmock
-              </code>
-              <span className="text-xs text-fd-muted-foreground">
-                Installs the stable SendMock with Homebrew. OK to run?
-              </span>
-            </div>
-          </AgentMessage>
-          <YourAnswer>OK</YourAnswer>
-          <AgentMessage>
-            <p className="flex items-center gap-1.5 font-medium text-(--brand-text)">
-              <CheckCircle2Icon aria-hidden="true" className="size-4" />
-              SendMock is running
-            </p>
-            <p className="text-fd-muted-foreground">
-              Web UI http://127.0.0.1:8025 · SMTP 127.0.0.1:1025
-            </p>
-          </AgentMessage>
-        </AnimationSequence>
+        {conversation
+          .slice(0, shownMessageCount)
+          .map((conversationEntry, entryIndex) => (
+            <motion.div
+              key={entryIndex}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex min-w-0 flex-col"
+            >
+              <ConversationMessage conversationEntry={conversationEntry} />
+            </motion.div>
+          ))}
+        {isThinking && <ThinkingIndicator />}
       </div>
-      <div
-        aria-hidden="true"
-        className="flex items-center gap-2 border-t px-4 py-2.5 text-fd-muted-foreground"
-      >
-        <span className="flex-1 text-xs">Message your agent…</span>
-        <span className="flex size-6 items-center justify-center rounded-full bg-fd-primary text-fd-primary-foreground">
-          <ArrowUpIcon className="size-3.5" />
-        </span>
-      </div>
+      <MessageComposer
+        composerText={composerText}
+        isComposerPasted={isComposerPasted}
+      />
     </div>
   );
 }
