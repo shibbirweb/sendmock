@@ -12,6 +12,7 @@ import {
   InstallTerminalPlaceholder,
 } from "./install-terminal";
 import { ManualDownloadLinks } from "./manual-download-links";
+import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
 /** Overlaps an item with the others in the same grid cell; the cell takes the tallest. */
@@ -38,11 +39,15 @@ export function QuickStartSection() {
   return (
     <section
       aria-labelledby="quick-start-heading"
-      className="flex flex-col items-center gap-6 px-4 py-16"
+      className="flex flex-col items-center gap-6 px-4 py-20"
     >
-      <h2 id="quick-start-heading" className="text-2xl font-semibold">
-        Install and run
-      </h2>
+      <SectionHeading
+        headingId="quick-start-heading"
+        eyebrow="Quick start"
+        title="Install and run"
+        description="One binary for macOS, Windows and Linux, or a Docker image. Running in under a minute."
+        className="mb-4"
+      />
       <div
         role="tablist"
         aria-label="Your platform"

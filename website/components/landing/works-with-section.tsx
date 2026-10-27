@@ -20,10 +20,14 @@ export function WorksWithSection() {
       aria-labelledby="works-with-heading"
       className="flex flex-col items-center gap-4 py-12"
     >
-      <h2 id="works-with-heading" className="text-2xl font-semibold">
+      {/* A logo strip, so a quieter title than the main sections. */}
+      <h2
+        id="works-with-heading"
+        className="px-4 text-xl font-semibold tracking-tight"
+      >
         Works with your stack
       </h2>
-      <p className="px-4 text-center text-fd-muted-foreground">
+      <p className="px-4 text-center text-balance text-fd-muted-foreground">
         Plain SMTP and HTTP, plus provider-compatible APIs. No SDK changes.
       </p>
       {/* The rows fade out at both edges instead of being cut off (U3 feedback F3). */}

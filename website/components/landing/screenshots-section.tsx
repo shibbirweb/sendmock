@@ -4,6 +4,7 @@ import { Safari } from "@/components/ui/safari";
 import { basePath } from "@/lib/layout.shared";
 import { cn } from "@/lib/utils";
 
+import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
 /** Captured from the demo app by `bun run screenshots`. */
@@ -42,16 +43,15 @@ export function ScreenshotsSection() {
   return (
     <section
       aria-labelledby="screenshots-heading"
-      className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-4 py-16"
+      className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-4 py-20"
     >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h2 id="screenshots-heading" className="text-2xl font-semibold">
-          See what your app sent
-        </h2>
-        <p className="max-w-xl text-fd-muted-foreground">
-          Every message, delivery and payment in one web UI, live as it happens.
-        </p>
-      </div>
+      <SectionHeading
+        headingId="screenshots-heading"
+        eyebrow="Screenshots"
+        title="See what your app sent"
+        description="Every message, delivery and payment in one web UI, live as it happens."
+        className="mb-4"
+      />
       <div
         role="tablist"
         aria-label="Product screens"

@@ -228,6 +228,37 @@ test.describe("the quick start on Windows", () => {
   });
 });
 
+test("WS-02.1 every main section has a label, a title and a line of text in one style", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const sectionHeadings = [
+    ["How it works", "Point your app at SendMock"],
+    ["Quick start", "Install and run"],
+    ["Screenshots", "See what your app sent"],
+    ["Features", "Everything in one place"],
+    ["Why SendMock", "Stop testing on real inboxes and phones"],
+  ];
+  const headingStyles = new Set<string>();
+
+  for (const [eyebrow, title] of sectionHeadings) {
+    const section = page.getByRole("region", { name: title });
+    const heading = section.getByRole("heading", { level: 2, name: title });
+
+    await expect(heading).toBeVisible();
+    await expect(section.getByText(eyebrow, { exact: true })).toBeVisible();
+    headingStyles.add(
+      await heading.evaluate((element) => {
+        const style = getComputedStyle(element);
+
+        return `${style.fontSize} ${style.fontWeight} ${style.letterSpacing}`;
+      }),
+    );
+  }
+
+  expect([...headingStyles]).toHaveLength(1);
+});
+
 test("WS-02.1 the stack marquee fades out at both edges", async ({ page }) => {
   await page.goto("/");
   const maskImage = await page

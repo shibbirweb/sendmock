@@ -19,6 +19,7 @@ import {
   HttpCatcherVisual,
   PaymentsVisual,
 } from "./feature-visuals/tool-visuals";
+import { SectionHeading } from "./section-heading";
 
 const featureCards = [
   {
@@ -83,21 +84,12 @@ export function FeaturesSection() {
       aria-labelledby="features-heading"
       className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-20"
     >
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-sm font-semibold tracking-wide text-(--brand-text) uppercase">
-          Features
-        </p>
-        <h2
-          id="features-heading"
-          className="max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl"
-        >
-          Everything in one place
-        </h2>
-        <p className="max-w-2xl text-fd-muted-foreground sm:text-lg">
-          Every email, SMS, payment, webhook and HTTP call your app makes,
-          caught and answered like the real provider, on your own machine.
-        </p>
-      </div>
+      <SectionHeading
+        headingId="features-heading"
+        eyebrow="Features"
+        title="Everything in one place"
+        description="Every email, SMS, payment, webhook and HTTP call your app makes, caught and answered like the real provider, on your own machine."
+      />
       <BentoGrid
         data-testid="features-bento"
         className="auto-rows-auto lg:grid-cols-3"
