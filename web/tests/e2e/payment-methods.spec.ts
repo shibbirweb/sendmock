@@ -41,12 +41,11 @@ test("PY-12.1 the table lists every method with its flow, gateways and test valu
   await expect(methodRow(page, "bKash")).toContainText("3 test numbers");
   await expect(methodRow(page, "DBBL Nexus")).toContainText("Always succeeds");
   await expect(
-    page.getByRole("link", { name: "All payments" }),
+    page.getByRole("link", { name: "All payments", exact: true }),
   ).not.toHaveAttribute("data-active", "true");
-  await expect(page.getByRole("link", { name: "Methods" })).toHaveAttribute(
-    "data-active",
-    "true",
-  );
+  await expect(
+    page.getByRole("link", { name: "Methods", exact: true }),
+  ).toHaveAttribute("data-active", "true");
 });
 
 test("PY-12.1 a built-in method is edited, used by checkout pages, and reset to default", async ({

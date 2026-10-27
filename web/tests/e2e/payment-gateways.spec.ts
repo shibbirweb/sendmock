@@ -36,10 +36,9 @@ test("PY-12.2 the table lists every gateway with its methods and notification en
     "Card, bKash, Nagad, Rocket, DBBL Nexus, City Touch, BRAC iBanking",
   );
   await expect(gatewayRow(page, "Stripe")).toContainText("Shop payments");
-  await expect(page.getByRole("link", { name: "Gateways" })).toHaveAttribute(
-    "data-active",
-    "true",
-  );
+  await expect(
+    page.getByRole("link", { name: "Gateways", exact: true }),
+  ).toHaveAttribute("data-active", "true");
 });
 
 test("PY-12.2 a built-in is edited, used by its next notification, and reset to default", async ({
