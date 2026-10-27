@@ -50,6 +50,9 @@ Phase 0.
 
 - [ ] DS-05.1 `scripts/version.ts` computes the next version from tags and commits and syncs it into every file that carries it.
 - [ ] DS-05.2 CI fails when version files disagree.
+- [ ] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta.
+- [ ] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas.
+- [ ] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word.
 
 ## DS-06 Test harness integration
 

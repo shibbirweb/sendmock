@@ -100,7 +100,7 @@ The UI items listed in these phases already exist from Stage A; backend phases i
 - `rust-embed` wiring of `web/dist`, SPA fallback, Vite dev proxy to the Rust server.
 - Config (clap + env + TOML), tracing, graceful shutdown.
 - SQLite setup, migrations, WAL mode.
-- Release machinery: `scripts/version.ts`, `CHANGELOG.md`, `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`; versioned website builds (`/next/` from `develop`).
+- Release machinery: `scripts/version.ts`, `CHANGELOG.md`, `release-prepare.yml`, `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`; versioned website builds (`/next/` from `develop`).
 - `sendmock-ops` operation registry, CLI client skeleton (`sendmock status --json`, exit codes), parity CI check (every operation has REST + CLI + MCP).
 - Seed loader skeleton (`sendmock.seed.toml` parsing, `seed validate`), extended by each later phase.
 - Dockerfile (`scratch` + static musl binary, non-root, `/data` volume, `sendmock health` HEALTHCHECK) and an `edge` multi-arch image published from `develop`, so Docker users can follow along from the start.

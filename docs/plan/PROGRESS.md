@@ -38,7 +38,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 17 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 18 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -167,6 +167,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [ ] Version switcher and banner (step 3)
   - [ ] Deploy workflow and per-version app docs links (step 4)
   - [ ] Docs page and tests per criterion (step 5)
+- [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -183,8 +184,8 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] OpenAPI contract tests against handlers
 - [ ] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check)
 - [ ] Rust test setup: nextest, `insta` snapshots, `cargo llvm-cov` coverage gate (80% overall, 90% domain/operations), test fakes for `Clock`, `IdGenerator`, random source
-- [ ] `scripts/version.ts`, `CHANGELOG.md`
-- [ ] Release workflows: `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
+- [ ] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow
+- [ ] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
 - [ ] Versioned website builds (moved to U3 W17 on 2026-10-27)
 - [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
@@ -458,3 +459,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | U3 feedback F12 done ([18](18-phase-u3.md#feedback-items)): the landing page's five main sections share one heading style (label, title, line of text) through a `SectionHeading` component; the logo strip keeps a quieter title. |
 | 2026-10-27 | U3 feedback F13 done ([18](18-phase-u3.md#feedback-items)): Getting started installs on macOS, Linux, Windows or Docker from one tabbed step, with links to each system's section on Install. |
 | 2026-10-27 | Plan: versioned docs (U3 W17, owner feedback F14, [16](16-website-and-releases.md#versioned-builds)), moved from Phase 0 so the first release freezes its docs. `/` the latest stable (a Preview from `develop` until the first stable tag), `/next/` the beta docs, `/vX.Y/` older minors, each tag built in a temporary worktree with the current website code; a version switcher in the docs sidebar and banners on non-stable versions. New criteria WS-03.4 to WS-03.7. |
+| 2026-10-27 | Plan: releases without hand-written versions or notes (owner feedback F15, [16](16-website-and-releases.md#versioning)). One Prepare release workflow with a `bump` choice (beta, patch, minor, major, stable) and a dry run writes the version and the `CHANGELOG.md` section from merged pull request titles, which is also the release body; AGENTS.md and the PR template now treat the PR title as the release note. The update check gains Off, Manual and Daily modes, release notes, the upgrade command and a notification (W18 on mock data, real check in Phase 1). New criteria DS-05.3 to DS-05.5 and PL-05.10 to PL-05.12. |

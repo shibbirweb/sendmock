@@ -31,7 +31,7 @@ On top of its own criteria, a feature is done only when:
 2. The UI works in mock mode (Stage A) and live mode (Stage B).
 3. Backend features are reachable through REST, CLI and MCP (parity check passes) and the agent skill docs mention them.
 4. Tests cover the main path, edge cases and errors at every layer touched, and coverage thresholds hold (see Testing in [AGENTS.md](../../../AGENTS.md#testing)).
-5. User docs (`docs/wiki/`) and generated references are updated; `CHANGELOG.md` has an entry.
+5. User docs (`docs/wiki/`) and generated references are updated; the pull request title reads as its release note (the Prepare release workflow writes `CHANGELOG.md` from it).
 6. Security defaults hold (no secrets exposed, localhost binding, allowlists respected).
 7. Size, memory and bundle budgets still pass.
 8. Accessibility checks pass for any UI it adds.
@@ -116,7 +116,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Not started |
 | [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
-| [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 9 | In progress |
+| [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 12 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | Not started |
 | [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Not started |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Not started |
@@ -141,7 +141,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
 | [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | Not started |
-| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 2 | Not started |
+| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Not started |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 5 (Testcontainers) | 2 | Not started |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Not started |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |

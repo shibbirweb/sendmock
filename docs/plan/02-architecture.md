@@ -163,7 +163,7 @@ sendmock/
 ├── docs/
 │   ├── plan/               # this plan
 │   └── wiki/               # user docs (source for the website and GitHub wiki)
-├── CHANGELOG.md            # [Unreleased] becomes release notes
+├── CHANGELOG.md            # written by the Prepare release workflow; each section is a release's notes
 ├── examples/               # per-language sample apps (see 08-integrations.md)
 ├── scripts/                # build, version.ts, install.sh, install.ps1
 ├── Dockerfile
