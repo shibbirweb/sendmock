@@ -9,6 +9,8 @@ import { Safari } from "@/components/ui/safari";
 import { basePath } from "@/lib/layout.shared";
 import { cn } from "@/lib/utils";
 
+import { SectionHeading } from "./section-heading";
+
 /**
  * The published promotional video on YouTube, or null until it is produced
  * (docs/plan/16-website-and-releases.md, Promotional video).
@@ -82,18 +84,12 @@ export function PromoVideoSection() {
       aria-labelledby="promo-video-heading"
       className="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-4 py-20"
     >
-      <div className="flex flex-col items-center gap-3 text-center">
-        <h2
-          id="promo-video-heading"
-          className="max-w-3xl text-3xl font-bold tracking-tight text-balance sm:text-4xl"
-        >
-          Stop testing on real inboxes and phones
-        </h2>
-        <p className="max-w-2xl text-fd-muted-foreground sm:text-lg">
-          See in a short video why testing what your app sends is slow and
-          risky, and how SendMock makes it safe and fast.
-        </p>
-      </div>
+      <SectionHeading
+        headingId="promo-video-heading"
+        eyebrow="Why SendMock"
+        title="Stop testing on real inboxes and phones"
+        description="See in a short video why testing what your app sends is slow and risky, and how SendMock makes it safe and fast."
+      />
       <div
         data-testid="promo-video-poster"
         className="relative w-full overflow-hidden rounded-xl"

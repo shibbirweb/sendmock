@@ -16,6 +16,8 @@ import { SendMockLogo } from "@/components/sendmock-logo";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
 
+import { SectionHeading } from "./section-heading";
+
 type FlowNode = { label: string; Icon: LucideIcon };
 
 const inboundNodes: FlowNode[] = [
@@ -68,17 +70,14 @@ export function FlowSection() {
   return (
     <section
       aria-labelledby="flow-heading"
-      className="mx-auto flex w-full max-w-4xl flex-col items-center gap-8 px-4 py-16"
+      className="mx-auto flex w-full max-w-4xl flex-col items-center gap-10 px-4 py-20"
     >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h2 id="flow-heading" className="text-2xl font-semibold">
-          Point your app at SendMock
-        </h2>
-        <p className="max-w-xl text-fd-muted-foreground">
-          Change one host and port. Everything your app sends is caught, shown
-          and answered like the real provider would.
-        </p>
-      </div>
+      <SectionHeading
+        headingId="flow-heading"
+        eyebrow="How it works"
+        title="Point your app at SendMock"
+        description="Change one host and port. Everything your app sends is caught, shown and answered like the real provider would."
+      />
       <div
         ref={containerRef}
         data-testid="flow-diagram"
