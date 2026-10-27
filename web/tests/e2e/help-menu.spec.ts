@@ -79,12 +79,40 @@ test("UI-10.1 Settings > About has the same help and feedback links", async ({
   });
 
   await expect(
-    page.getByRole("link", { name: "Report an issue" }),
+    helpCard.getByRole("link", { name: "Report an issue" }),
   ).toHaveAttribute("href", /template=bug_report\.yml/);
   await expect(
-    page.getByRole("link", { name: "Star on GitHub" }),
+    helpCard.getByRole("link", { name: "Star on GitHub" }),
   ).toHaveAttribute("href", repositoryUrl);
   await expect(
     helpCard.getByRole("button", { name: "Keyboard shortcuts" }),
   ).toBeVisible();
+});
+
+test("UI-10.1 the sidebar footer has icon links to star the repository, the docs and the feedback forms", async ({
+  page,
+}) => {
+  const projectLinks = page.getByRole("navigation", { name: "Project links" });
+
+  await expect(
+    projectLinks.getByRole("link", { name: "Star on GitHub" }),
+  ).toHaveAttribute("href", repositoryUrl);
+  await expect(
+    projectLinks.getByRole("link", { name: "Documentation" }),
+  ).toHaveAttribute("href", "https://shibbirweb.github.io/sendmock/docs/");
+  await expect(
+    projectLinks.getByRole("link", { name: "Report an issue" }),
+  ).toHaveAttribute("href", /template=bug_report\.yml/);
+  await expect(
+    projectLinks.getByRole("link", { name: "Request a feature" }),
+  ).toHaveAttribute("href", /template=feature_request\.yml/);
+  await expect(
+    projectLinks.getByRole("link", { name: "Report a security issue" }),
+  ).toHaveAttribute("href", `${repositoryUrl}/security/advisories/new`);
+  for (const projectLink of await projectLinks.getByRole("link").all()) {
+    await expect(projectLink).toHaveAttribute("target", "_blank");
+  }
+
+  await projectLinks.getByRole("link", { name: "Star on GitHub" }).hover();
+  await expect(page.getByRole("tooltip")).toHaveText("Star on GitHub");
 });

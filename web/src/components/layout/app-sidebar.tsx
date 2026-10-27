@@ -21,6 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ConnectionStatus } from "@/features/connection/connection-status";
+import { SidebarCommunityLinks } from "@/features/help/sidebar-community-links";
 import { cn } from "@/lib/utils";
 import { useAppStats } from "@/lib/api/hooks/use-system-queries";
 import type { AppStats } from "@/lib/api/types";
@@ -174,6 +175,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarCommunityLinks />
         <ConnectionStatus />
       </SidebarFooter>
       <SidebarRail />

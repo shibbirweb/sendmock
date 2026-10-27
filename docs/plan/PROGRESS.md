@@ -38,7 +38,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 13 / 15 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 16 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -313,7 +313,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | Trademark check for "SendMock" | search USPTO, EUIPO, WIPO before branding | Open |
 | Default ports | 1025 / 8025 (Mailpit compatible) | Open (using recommendation) |
 | Licence | dual MIT / Apache-2.0 | Open |
-| Provider emulation priority | Twilio, Vonage, generic, then others | Open (using recommendation) |
+| Provider emulation priority | Twilio, Vonage, then others; any other vendor is added as a custom provider, which replaced the Generic HTTP adapter ([22](22-configurable-providers.md)) | Open (using recommendation) |
 | SDK redirection per SDK | verify in Phase 4 | Open |
 | Attachment storage | inside SQLite | Open (using recommendation) |
 | Telemetry | none, opt-in update check | Open (using recommendation) |
@@ -322,8 +322,8 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | caniemail data licence | confirm before shipping | Open |
 | Lenient vs strict provider emulation | lenient default, strict mode per provider | Open (using recommendation) |
 | Docs-site CORS default for local playground | allow docs origin, connect on click | Open |
-| Fumadocs static export and search on Pages | confirm in U0 | Open |
-| Magic UI MCP command for Claude Code | confirm in U0 | Open |
+| Fumadocs static export and search on Pages | static export with a static search index the browser downloads (`staticGET`), live on Pages since #1 | Decided 2026-10-25 |
+| Magic UI MCP command for Claude Code | the Magic UI MCP server in the repo's `.mcp.json` ([16](16-website-and-releases.md)) | Decided 2026-10-25 |
 
 ## Update log
 
@@ -446,3 +446,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | Plan: configurable email and SMS providers ([22](22-configurable-providers.md), U3 W16, new features EM-18 and SM-16 with 8 criteria each). Like payment gateways, every email and SMS provider becomes a definition (identity, host, credentials, operations from a fixed kind catalogue, field mapping, validation, success and error responses, message id, callbacks, status names and SMS error codes): built-ins are edited, reset, removed and restored; custom providers start blank or from a built-in and replace the "Generic HTTP" SMS adapter. Mail > Providers and SMS > Providers, 18 operations in REST, CLI and MCP (a secret reveal among them, not in MCP), `add-email-provider` and `add-sms-provider` skill workflows, seed support. The shipped built-ins keep passing the provider fixture and SDK tests. Inside the sign-off gate, as it changes the contract. |
 | 2026-10-27 | Configurable email and SMS providers built for the UI (U3 W16, [22](22-configurable-providers.md)): 18 operations in the contract (9 per area, a credential reveal among them), the mock API with the 11 built-in definitions and SSL Wireless as a custom example, a preview runner (request matching, field mapping, checks, responses, problems), seed export; Mail > Providers and SMS > Providers with Add provider, Reset, Remove and Restore, Delete, a six-tab sheet with a live preview, provider badges on messages, provider keys in mail search and the SMS rule picker, a Provider APIs card in Settings > Connection; guide pages, two Advanced walkthroughs with tests, and the `add-email-provider` and `add-sms-provider` skill workflows. `Email.source` and `SmsMessage.api` became provider keys; the Generic HTTP SMS adapter is dropped. EM-18 and SM-16 criteria 1 to 4 and 7 are proven on the UI and mock API; 5, 6 and 8 wait for the Stage B runtime. Also fixed on the way: the website accessibility and phone-width failures from the landing work. |
 | 2026-10-27 | U3 feedback F9 done ([18](18-phase-u3.md#feedback-items)): the sidebar shows Mail > Inbox and SMS > Messages as submenus, beside Providers and Verify; the tour table now lists Mail > Providers and SMS > Providers too, and the screenshots with the sidebar were retaken. |
+| 2026-10-27 | PROGRESS corrected: U3 counts 14 / 16 (W16 added an item); the Fumadocs static search and Magic UI MCP decisions, settled in U0, are marked Decided; the provider priority no longer names the Generic HTTP adapter, which W16 dropped. |
+| 2026-10-27 | U3 feedback F10 done ([18](18-phase-u3.md#feedback-items)): the sidebar footer has icon links with tooltips to the docs, Report an issue, Request a feature, Report a security issue and Star on GitHub, the Help menu's own links; UI-10.1 names the sidebar footer. |
+| 2026-10-27 | U3 feedback F11 done ([18](18-phase-u3.md#feedback-items)): a book icon next to the header title opens the open screen's guide page; every sidebar item names its guide page and the WS-06.1 test checks they match. |

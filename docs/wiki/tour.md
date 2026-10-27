@@ -38,10 +38,11 @@ Press `G` and then the key in the table to jump to a menu from anywhere.
 | Logs | `G L` | the raw SMTP sessions and API requests behind every message | [Logs](./logs.md) |
 | Settings | `G ,` | how SendMock behaves: outcomes, profiles, chaos, seed file, connection snippets | [Settings](./settings.md) |
 
-The bottom of the sidebar shows whether the live connection is up and the version. `Mod+B` (`Cmd+B` on macOS, `Ctrl+B` elsewhere) hides or shows the sidebar.
+The bottom of the sidebar has icon links to the docs, **Report an issue**, **Request a feature**, private security reporting and **Star on GitHub** (hover one for its name), and shows whether the live connection is up and the version. `Mod+B` (`Cmd+B` on macOS, `Ctrl+B` elsewhere) hides or shows the sidebar.
 
 ## The header
 
+- **Guide link**: the book icon next to the page title opens that screen's page in this guide, in a new tab.
 - **Search** and the **command palette** (`Mod+K`): jump to any screen, or run an action, by typing its name.
 - **Notification bell**: the unread count and the last 50 notable events (new email, new or inbound SMS, failed webhook deliveries), each linking to its item. Pop-up toasts can be turned off or moved in **Settings > Notifications**.
 - **Help menu**: the docs, keyboard shortcuts, what's new, **Report an issue**, **Request a feature**, private security reporting and the repository.

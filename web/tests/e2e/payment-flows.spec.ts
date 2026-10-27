@@ -58,10 +58,9 @@ test("PY-12.6 the table lists the built-in flows with their steps in order", asy
   await expect(flowRow(page, "Wallet")).toContainText("3 methods");
   await expect(flowRow(page, "QR")).toContainText("None yet");
   await expect(flowRow(page, "Bank transfer")).toContainText("Reference code");
-  await expect(page.getByRole("link", { name: "Flows" })).toHaveAttribute(
-    "data-active",
-    "true",
-  );
+  await expect(
+    page.getByRole("link", { name: "Flows", exact: true }),
+  ).toHaveAttribute("data-active", "true");
 });
 
 test("PY-12.6 a built-in flow is edited step by step, run at checkout, and reset to default", async ({

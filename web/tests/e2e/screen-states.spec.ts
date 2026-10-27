@@ -57,7 +57,9 @@ test("UI-07.2 every screen shows an error with Try again when the API fails, and
       screenContent(page).getByRole("alert").first(),
       `${screen.path} shows an error`,
     ).toContainText("Could not load");
-    await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Settings", exact: true }),
+    ).toBeVisible();
   }
 
   // Back to normal, the screen loads again (the demo controls refetch).

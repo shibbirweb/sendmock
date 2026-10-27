@@ -23,7 +23,7 @@ test("WH-12.7 routes are listed by priority with their Mailgun expression and ac
   await expect(routeRows(page).first()).toContainText("stop()");
   await expect(routeRows(page).last()).toContainText("catch_all()");
   await expect(
-    page.getByRole("link", { name: "Inbound routes" }),
+    page.getByRole("link", { name: "Inbound routes", exact: true }),
   ).toHaveAttribute("data-active", "true");
 
   await page
