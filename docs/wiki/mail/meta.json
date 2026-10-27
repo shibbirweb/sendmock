@@ -2,10 +2,10 @@
   "title": "Mail",
   "pages": [
     "index",
-    "providers",
     "reading-and-checks",
     "outcomes",
     "replies-and-forwards",
-    "release"
+    "release",
+    "providers"
   ]
 }

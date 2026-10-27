@@ -1,5 +1,5 @@
 ---
-title: SMS
+title: Messages
 description: Twilio and Vonage compatible SMS and WhatsApp, shown as conversations, with delivery status, callbacks and replies.
 ---
 
