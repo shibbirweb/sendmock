@@ -2,23 +2,36 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-25
+**Last updated:** 2026-10-27
 
 ## Current position
 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W16 (configurable email and SMS providers) done for the UI; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
-| **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), 16 / 19: W1 to W10 and W12 to W17 and W19 done (W16 configurable providers for the UI, W17 versioned docs, W19 Install with AI); left: W18 update checker on mock data, W11 the owner's feedback round, and the sign-off (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
+| **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
-| **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 103 accepted, 10 / 451 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
+| **Feature acceptance** | 0 / 107 accepted, 27 / 492 criteria ticked; Stage A features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. W11: the owner's feedback round on the preview (F3, the landing marquee fade, is done; more as it comes).
-2. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick.
+1. Merge the open pull request (see "Resume here").
+2. W18: the update checker on mock data (Off, Manual and Daily modes, release notes, the upgrade command, a header notification; [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12).
+3. W11: the owner's feedback round on the preview (feedback items so far: F1 to F17 in [18](18-phase-u3.md#feedback-items); new ones come as `u3-feedback` issues, the label exists).
+4. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick. Before Phase 0, settle the open placeholder decisions (name trademark check, ports, licence).
+
+### Resume here (2026-10-27)
+
+- **Open pull request:** #40 from `feat/landing-section-headings` into `develop`, "feat:[U3] versioned docs with beta docs and a version switcher, and install tabs on Getting started". It holds F13 (install tabs on Getting started), F14 (versioned docs, W17), the F15 plan (Prepare release with a `bump` choice, a generated `CHANGELOG.md`, the update checker), F16 (Install with AI, W19: the prompt, `/llms.txt`, the AI tab in the landing quick start), the docs sidebar names Inbox and Messages, and the F17 plan (Deeper docs, WS-10). CI on its head must pass before merging; its PR description lists what was tested.
+- **One-time setting for the owner:** Settings > Environments > `github-pages` must also allow the tags `v*`, or the deploy after a published release is rejected.
+- **Working rules** (also in [AGENTS.md](../../AGENTS.md)): ask before creating a branch, committing or pushing; tests run in GitHub CI, not locally (only format, lint, typecheck and quick unit tests locally); CI runs on pull requests and on pushes to `develop` and `main`, not on other branch pushes; check CI with the public GitHub API (no `gh` CLI); install and setup docs are numbered steps with each command in its own block; never use the em-dash character; no co-authors or AI tool names in commits or pull requests.
+- **To pick up in a fresh session,** paste this prompt:
+
+  ```text
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up". Ask me before creating a branch, committing or pushing.
+  ```
 
 ## How to update this file
 
