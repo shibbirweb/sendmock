@@ -38,7 +38,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 16 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 17 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -161,6 +161,12 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Wiring: message badge, provider filters, Settings > Connection (step 6)
   - [x] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
   - [x] Tests per criterion, parity and walkthrough tests (step 8)
+- [ ] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
+  - [x] Plan and criteria (step 1)
+  - [ ] Version list from the git tags, and a build of every version (step 2)
+  - [ ] Version switcher and banner (step 3)
+  - [ ] Deploy workflow and per-version app docs links (step 4)
+  - [ ] Docs page and tests per criterion (step 5)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -180,7 +186,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] `scripts/version.ts`, `CHANGELOG.md`
 - [ ] Release workflows: `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
-- [ ] Versioned website builds (`/next/` from `develop`)
+- [ ] Versioned website builds (moved to U3 W17 on 2026-10-27)
 - [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
 
 ### Phase 1: Email backend and first beta
@@ -451,3 +457,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | U3 feedback F11 done ([18](18-phase-u3.md#feedback-items)): a book icon next to the header title opens the open screen's guide page; every sidebar item names its guide page and the WS-06.1 test checks they match. |
 | 2026-10-27 | U3 feedback F12 done ([18](18-phase-u3.md#feedback-items)): the landing page's five main sections share one heading style (label, title, line of text) through a `SectionHeading` component; the logo strip keeps a quieter title. |
 | 2026-10-27 | U3 feedback F13 done ([18](18-phase-u3.md#feedback-items)): Getting started installs on macOS, Linux, Windows or Docker from one tabbed step, with links to each system's section on Install. |
+| 2026-10-27 | Plan: versioned docs (U3 W17, owner feedback F14, [16](16-website-and-releases.md#versioned-builds)), moved from Phase 0 so the first release freezes its docs. `/` the latest stable (a Preview from `develop` until the first stable tag), `/next/` the beta docs, `/vX.Y/` older minors, each tag built in a temporary worktree with the current website code; a version switcher in the docs sidebar and banners on non-stable versions. New criteria WS-03.4 to WS-03.7. |

@@ -111,12 +111,44 @@ Fumadocs' built-in OpenAPI pages may be used for the reference text; the interac
 
 ### Versioned builds
 
-Same approach as phpdebugger's `website/scripts/build-versions.ts`:
+Every release keeps its own docs, so what a reader sees matches the version they run, and the beta channel has its own docs. Built in U3 (W17, owner feedback F14, 2026-10-27) so the first release freezes its docs with no extra work; same approach as phpdebugger's `website/scripts/build-versions.ts`.
 
-- `/` = latest stable minor (from its newest stable tag), `/next/` = `develop`, `/v0.1/`, `/v0.2/` ... = older stable minors.
-- Each version is built from its own `docs/wiki` and its own OpenAPI spec (`git archive <ref>`), with the current site look and a version switcher.
-- `website.yml` builds every version and deploys to Pages when: a stable release is published, `develop` changes docs (updates `/next/`), `main` changes the website, or "Run workflow". Pull requests only build the working tree to catch broken pages.
+#### Which versions exist
+
+| Path | Built from | Label in the switcher | Banner |
+| --- | --- | --- | --- |
+| `/` | the newest stable tag of the newest minor (`v0.3.2`) | **Stable v0.3.2** | none |
+| `/next/` | `develop` | **Beta (next)** | "Beta docs: they follow `develop` and the beta channel." with a link to the stable docs |
+| `/v0.2/`, `/v0.1/`, ... | the newest stable tag of each older minor | **v0.2.4** | "Docs for v0.2, an older release." with a link to the latest |
+| `/` before the first stable tag | `develop` | **Preview** | "Preview: SendMock has no stable release yet. These docs follow `develop`." |
+
+- Stable tags are `vX.Y.Z` with no pre-release part. Beta tags (`vX.Y.Z-beta.N`) do not get their own docs: the beta channel always reads `/next/`.
+- Before the first stable tag, `/` and `/next/` are both built from `develop`, so links to `/next/` work from day one.
+- The version list is worked out from the tags by one pure function (`website/lib/docs-versions.ts`, unit tested), never typed by hand.
+
+#### How a version is built
+
+- `scripts/build-docs-versions.ts` builds every version into `website/out/<path>/` and is what `website.yml` runs on deploys. The existing `scripts/build-pages-site.ts` builds one version (website plus `/demo/`) and takes the base path of that version.
+- `develop` (and the Preview `/`) build from the working tree. A tag builds in a temporary `git worktree` of that tag: its own `docs/wiki`, `docs/api` and `web/` (so its demo is that release's UI), with the **current** `website/` code copied over it, so every version has today's look, switcher and fixes. The working tree is never changed.
+- Every build gets `NEXT_PUBLIC_DOCS_VERSION` (its own key) and `NEXT_PUBLIC_DOCS_VERSIONS` (the whole list as JSON), so each version's switcher lists all versions. Because every deploy rebuilds every version, a new release shows up in old versions' switchers too.
+- The demo of each version gets `VITE_DOCS_URL` (`<base>/docs/`, `<base>/next/docs/`, ...), so the in-app guide links (F11) and the Help menu open the docs of the same version.
+- Each version has its own static search index under its own path, so search only finds pages of the version being read.
+- Pull requests build only the working tree (as the Preview `/`) to catch broken pages; deploys build every version.
+
+#### The switcher and banner
+
+- The switcher sits at the top of the docs sidebar, under search: a dropdown with every version, the current one ticked. Picking one opens **the same page** in that version (the path after the version prefix is kept); a page that does not exist there falls back to that version's docs home through the 404 page.
+- The banner shows on every docs, API, CLI, MCP and playground page of a non-stable version.
+- The running app links to its own docs version: stable installs to `/`, beta, edge and dev installs to `/next/` (see [In-app update channel](#in-app-update-channel)).
+
+#### Deploys
+
+- `website.yml` builds every version and deploys to Pages when: a stable release is published, `develop` changes docs (updates `/next/`), `main` changes the website, or "Run workflow". The checkout fetches all tags.
 - One-time setup: Settings > Pages > Source: GitHub Actions; Environments > `github-pages` > allow `main` and `develop`.
+
+#### Criteria
+
+WS-03.1 (unchanged) plus WS-03.4 to WS-03.7 in [acceptance](acceptance/07-distribution-website.md#ws-03-docs-and-versions).
 
 ---
 
@@ -210,7 +242,7 @@ Conventional prefixes drive the version bump and changelog grouping (`feat:`, `f
 
 - **Phase U0:** `develop` and `main` branches, branch protection, `ci.yml` for `web/` and `website/`, website skeleton (Fumadocs + Magic UI landing draft), `website.yml` deploying to Pages with `/demo/` = mock-mode UI. This replaces the generic "static preview build" as the shareable preview URL.
 - **Phase U3:** API reference and **playground in Demo mode** generated from the frozen OpenAPI spec; landing page polished with Magic UI; docs IA drafted.
-- **Phase 0:** `scripts/version.ts`, `CHANGELOG.md`, all release workflows (`beta*`, `stable*`, `release.yml`, `docker-edge.yml`), versioned website builds (`/next/`).
+- **Phase 0:** `scripts/version.ts`, `CHANGELOG.md`, all release workflows (`beta*`, `stable*`, `release.yml`, `docker-edge.yml`). Versioned website builds (`/next/`, switcher, banner) moved to U3 W17 on 2026-10-27, so the first release freezes its docs.
 - **Phase 1:** first beta `0.1.0-beta.1` (email backend) published through the beta channel; playground **Local mode** with CORS support in SendMock.
 - **Phases 2-4:** a beta per phase (or more often); docs pages and generated references grow with each feature.
 - **Phase 5:** first stable `1.0.0` promoted to `main`; all stable channels go live; `main` becomes the default branch.

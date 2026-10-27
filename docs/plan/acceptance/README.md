@@ -146,7 +146,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Not started |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Not started |
-| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | Phase 0 (`/next/`), Phase 5 (complete, versioned) | 3 | Not started |
+| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | Not started |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Not started |
 | [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Not started |
