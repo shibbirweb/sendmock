@@ -7,7 +7,7 @@ description: Binaries, Homebrew, Docker and building from source.
 
 SendMock is one static binary with the web UI built in. Pick one way to install it below and follow its steps; all of them run the same thing.
 
-Every way has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Use one or the other.
+Every way has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Use one or the other. The beta has its own docs; see [Docs versions](./versions.md).
 
 ## Homebrew (macOS and Linux)
 

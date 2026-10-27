@@ -8,46 +8,30 @@
  *     PAGES_BASE_PATH=/sendmock bun scripts/build-docs-versions.ts
  *
  * A tag is built in a temporary git worktree with the current website code
- * copied over it, so the working tree is never changed (WS-03.5).
+ * copied over it (scripts/docs-version-worktree.ts), so the working tree is
+ * never changed (WS-03.5).
  * Output: website/out (upload it as the Pages artifact).
  */
 
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative } from "node:path";
+import { join } from "node:path";
 
 import {
   type DocsVersion,
   resolveDocsVersions,
 } from "../website/lib/docs-versions";
 import { buildPagesSite } from "./build-pages-site";
+import { prepareTagWorktree, removeTagWorktree } from "./docs-version-worktree";
 
 const repositoryRoot = join(import.meta.dir, "..");
 const pagesBasePath = (process.env.PAGES_BASE_PATH ?? "").replace(/\/$/, "");
 
-/** Top-level website/ entries (build output, dependencies) a tag's worktree must not get. */
-const websiteCopySkips = new Set([
-  "node_modules",
-  ".next",
-  ".source",
-  "out",
-  "content",
-  "test-results",
-  ".lighthouseci",
-]);
-
-function runGit(gitArguments: string[], workingDirectory = repositoryRoot) {
+function runGit(gitArguments: string[]) {
   return execFileSync("git", gitArguments, {
-    cwd: workingDirectory,
+    cwd: repositoryRoot,
     encoding: "utf8",
-  });
-}
-
-function runBunInstall(workingDirectory: string) {
-  execFileSync("bun", ["install", "--frozen-lockfile"], {
-    cwd: workingDirectory,
-    stdio: "inherit",
   });
 }
 
@@ -69,23 +53,6 @@ function serialiseDocsVersions(docsVersions: DocsVersion[]): string {
   );
 }
 
-/** A worktree of the tag, with today's website/ in place of the tag's own. */
-function prepareTagWorktree(gitRef: string, worktreesDirectory: string) {
-  const worktreeRoot = join(worktreesDirectory, gitRef);
-  runGit(["worktree", "add", "--detach", worktreeRoot, gitRef]);
-  rmSync(join(worktreeRoot, "website"), { recursive: true, force: true });
-  const currentWebsiteDirectory = join(repositoryRoot, "website");
-  cpSync(currentWebsiteDirectory, join(worktreeRoot, "website"), {
-    recursive: true,
-    filter: (sourcePath) =>
-      !websiteCopySkips.has(relative(currentWebsiteDirectory, sourcePath)),
-  });
-  runBunInstall(join(worktreeRoot, "web"));
-  runBunInstall(join(worktreeRoot, "website"));
-
-  return worktreeRoot;
-}
-
 function buildDocsVersion(
   docsVersion: DocsVersion,
   docsVersionsJson: string,
@@ -98,7 +65,12 @@ function buildDocsVersion(
   const buildRoot =
     docsVersion.gitRef === null
       ? repositoryRoot
-      : prepareTagWorktree(docsVersion.gitRef, worktreesDirectory);
+      : prepareTagWorktree({
+          repositoryRoot,
+          gitRef: docsVersion.gitRef,
+          worktreesDirectory,
+          shouldInstallDependencies: true,
+        });
   const outputDirectory = buildPagesSite({
     repositoryRoot: buildRoot,
     basePath: `${pagesBasePath}${docsVersion.path}`,
@@ -110,7 +82,7 @@ function buildDocsVersion(
   });
 
   if (docsVersion.gitRef !== null) {
-    runGit(["worktree", "remove", "--force", buildRoot]);
+    removeTagWorktree(repositoryRoot, buildRoot);
   }
 }
 

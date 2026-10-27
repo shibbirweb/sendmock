@@ -38,7 +38,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 18 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 15 / 18 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -161,12 +161,12 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Wiring: message badge, provider filters, Settings > Connection (step 6)
   - [x] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
   - [x] Tests per criterion, parity and walkthrough tests (step 8)
-- [ ] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
+- [x] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
   - [x] Plan and criteria (step 1)
   - [x] Version list from the git tags, and a build of every version (step 2)
   - [x] Version switcher and banner (step 3)
   - [x] Deploy workflow and per-version app docs links (step 4)
-  - [ ] Docs page and tests per criterion (step 5)
+  - [x] Docs page and tests per criterion (step 5)
 - [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
@@ -460,3 +460,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | U3 feedback F13 done ([18](18-phase-u3.md#feedback-items)): Getting started installs on macOS, Linux, Windows or Docker from one tabbed step, with links to each system's section on Install. |
 | 2026-10-27 | Plan: versioned docs (U3 W17, owner feedback F14, [16](16-website-and-releases.md#versioned-builds)), moved from Phase 0 so the first release freezes its docs. `/` the latest stable (a Preview from `develop` until the first stable tag), `/next/` the beta docs, `/vX.Y/` older minors, each tag built in a temporary worktree with the current website code; a version switcher in the docs sidebar and banners on non-stable versions. New criteria WS-03.4 to WS-03.7. |
 | 2026-10-27 | Plan: releases without hand-written versions or notes (owner feedback F15, [16](16-website-and-releases.md#versioning)). One Prepare release workflow with a `bump` choice (beta, patch, minor, major, stable) and a dry run writes the version and the `CHANGELOG.md` section from merged pull request titles, which is also the release body; AGENTS.md and the PR template now treat the PR title as the release note. The update check gains Off, Manual and Daily modes, release notes, the upgrade command and a notification (W18 on mock data, real check in Phase 1). New criteria DS-05.3 to DS-05.5 and PL-05.10 to PL-05.12. |
+| 2026-10-27 | Versioned docs built (U3 W17, F14): `website/lib/docs-versions.ts` works the versions out from the tags, `scripts/build-docs-versions.ts` builds each one (a tag in a temporary worktree with the current website code, `scripts/docs-version-worktree.ts`), the docs sidebar has a Version menu, non-stable versions show a banner, a Page not found page links to every version, and each demo links to its own docs. `website.yml` deploys every version from `develop` and on published releases; the `github-pages` environment must also allow the tags `v*`. New docs page Docs versions. WS-03.4 to WS-03.6 proven; WS-03.1 and WS-03.7 wait for the first stable tag. |
