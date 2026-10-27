@@ -260,15 +260,16 @@ test("WS-02.1 every main section has a label, a title and a line of text in one 
   expect([...headingStyles]).toHaveLength(1);
 });
 
-test("WS-09.4 the quick start's AI tab shows the prompt with a copy button and links agents to llms.txt", async ({
+test("WS-09.4 the quick start's AI tab shows an agent window with the whole prompt, copies it and links agents to llms.txt", async ({
   page,
 }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const aiPrompt = page.getByTestId("quick-start-ai-prompt");
 
-  // The prompt is in the HTML before the tab is opened, so an agent reading the page finds it.
+  // The whole prompt is in the HTML, open tab or not, so an agent reading the page finds it.
   await expect(aiPrompt).toBeHidden();
-  await expect(aiPrompt.locator("pre")).toContainText(
+  await expect(page.getByTestId("quick-start-ai-full-prompt")).toContainText(
     "Before you install anything, check this computer",
   );
 
@@ -278,6 +279,15 @@ test("WS-09.4 the quick start's AI tab shows the prompt with a copy button and l
     .click();
   await expect(aiPrompt).toBeVisible();
   await expect(page.getByTestId("quick-start-terminal")).toHaveCount(0);
+  // An agent's window, not a plain terminal: your whole prompt, its question, the result.
+  const conversation = page.getByTestId("quick-start-ai-conversation");
+  await expect(aiPrompt).toContainText("AI coding agent");
+  await expect(conversation).toContainText(
+    "Before you install anything, check this computer",
+  );
+  await expect(conversation).toContainText("Docker or the binary?");
+  await expect(conversation).toContainText("Run command");
+  await expect(conversation).toContainText("SendMock is running");
   await expect(
     aiPrompt.getByRole("button", { name: "Copy the install prompt" }),
   ).toBeVisible();

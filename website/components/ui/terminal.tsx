@@ -106,6 +106,8 @@ export const AnimatedSpan = ({
       onAnimationComplete={() => {
         if (!sequence) return;
         if (itemIndex === null) return;
+        // Settling into the hidden start is not finishing: wait for the fade-in.
+        if (!shouldAnimate) return;
         sequence.completeItem(itemIndex);
       }}
       {...props}
@@ -269,6 +271,43 @@ interface TerminalProps {
   sequence?: boolean;
   startOnView?: boolean;
 }
+
+/**
+ * Plays its children one after another, as the terminal does, without the
+ * terminal window: for other windows built from TypingAnimation and AnimatedSpan.
+ */
+export const AnimationSequence = ({
+  children,
+  isStarted = true,
+}: {
+  children: React.ReactNode;
+  isStarted?: boolean;
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const contextValue = useMemo<SequenceContextValue>(
+    () => ({
+      completeItem: (index: number) => {
+        setActiveIndex((current) =>
+          index === current ? current + 1 : current,
+        );
+      },
+      activeIndex,
+      sequenceStarted: isStarted,
+    }),
+    [activeIndex, isStarted],
+  );
+
+  return (
+    <SequenceContext.Provider value={contextValue}>
+      {Children.toArray(children).map((child, index) => (
+        <ItemIndexContext.Provider key={index} value={index}>
+          {child as React.ReactNode}
+        </ItemIndexContext.Provider>
+      ))}
+    </SequenceContext.Provider>
+  );
+};
 
 export const Terminal = ({
   children,

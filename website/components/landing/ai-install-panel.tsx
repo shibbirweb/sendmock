@@ -1,11 +1,12 @@
 import { basePath } from "@/lib/base-path";
 import { cn } from "@/lib/utils";
 
+import { AiAgentWindow } from "./ai-agent-window";
 import { CopyCommandButton } from "./copy-command-button";
 
 /**
- * The quick start's AI tab (WS-09.4): the Install with AI prompt in a window the
- * size of the terminal, scrolling inside it so the panel keeps one height.
+ * The quick start's AI tab (WS-09.4): an AI coding agent installing SendMock,
+ * with fade-ins like the platform terminals. The copy button copies the whole prompt.
  */
 export function AiInstallPromptWindow({
   installPrompt,
@@ -17,26 +18,22 @@ export function AiInstallPromptWindow({
   className?: string;
 }) {
   return (
-    // Kept in the HTML while another tab is open, so an agent reading the page finds the prompt.
     <div
       data-testid="quick-start-ai-prompt"
       hidden={!isSelected}
       className={cn("relative min-w-0", className)}
     >
-      <div className="absolute inset-0 flex flex-col rounded-xl border bg-fd-background">
-        <div className="flex items-center justify-between gap-2 border-b px-4 py-2">
-          <span className="text-sm font-medium">
-            Paste this prompt into your AI coding agent
-          </span>
-          <CopyCommandButton
-            command={installPrompt}
-            label="Copy the install prompt"
-          />
-        </div>
-        <pre className="min-h-0 flex-1 overflow-auto p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap">
-          {installPrompt}
-        </pre>
-      </div>
+      <CopyCommandButton
+        command={installPrompt}
+        label="Copy the install prompt"
+        className="absolute top-1.5 right-2 z-10"
+      />
+      {/* Mounted when the tab opens, so the conversation plays from the start. */}
+      {isSelected && <AiAgentWindow installPrompt={installPrompt} />}
+      {/* The whole prompt stays in the HTML, so an agent reading the page finds it. */}
+      <pre hidden data-testid="quick-start-ai-full-prompt">
+        {installPrompt}
+      </pre>
     </div>
   );
 }
@@ -59,8 +56,8 @@ export function AiInstallLinks({
       )}
     >
       <p className="text-fd-muted-foreground">
-        It checks your computer, asks whether you want Docker or the binary, and
-        shows every command before it runs it.
+        Copy the prompt, paste it into your AI coding agent and answer its
+        questions. It shows every command before it runs it.
       </p>
       <p className="flex flex-wrap justify-center gap-x-4 gap-y-1">
         <a
