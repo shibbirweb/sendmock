@@ -116,3 +116,16 @@ pre span[style*="--shiki-dark:#6A737D"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* An empty line in a code block is an empty span with no height; keep its line. */
+figure.shiki code .line > span:empty::before,
+figure.shiki code .line:empty::before {
+  content: "\200b";
+}
+
+/* Plain-text blocks (the Install with AI prompt) wrap instead of scrolling sideways;
+   they are the only code blocks without syntax colours. */
+figure.shiki:not(:has(code span[style])) pre {
+  width: 100%;
+  white-space: pre-wrap;
+}

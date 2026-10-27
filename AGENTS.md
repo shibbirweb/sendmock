@@ -26,7 +26,7 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 
 - Pull requests go into `develop`, the beta line. `main` only takes merges from `develop` when a stable release is promoted.
 - Start every change on a new branch from the latest `develop` (`feat/*`, `fix/*`, `docs/*`, `chore/*`). Never commit straight to `develop` or `main`.
-- Add every user-visible change under **Unreleased** in `CHANGELOG.md` in the same pull request (once `CHANGELOG.md` exists in Phase 0).
+- Never edit `CHANGELOG.md` or a version number by hand: the Prepare release workflow writes both ([docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md#the-changelog)). The pull request title becomes the release note, so write it for users in the commit format (`feat:[TICKET] ...`, `fix:[TICKET] ...`); use `chore:` for changes users should not read about.
 - Releases are cut by workflows, never by hand. See [docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md).
 
 ## Commits and pull requests

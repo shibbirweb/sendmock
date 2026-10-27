@@ -50,6 +50,9 @@ Phase 0.
 
 - [ ] DS-05.1 `scripts/version.ts` computes the next version from tags and commits and syncs it into every file that carries it.
 - [ ] DS-05.2 CI fails when version files disagree.
+- [ ] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta.
+- [ ] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas.
+- [ ] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word.
 
 ## DS-06 Test harness integration
 
@@ -85,11 +88,15 @@ Phase U3.
 
 ## WS-03 Docs and versions
 
-Phase 0 (`/next/`), Phase 5 (complete, versioned).
+U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
 
 - [ ] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher.
 - [ ] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift.
 - [ ] WS-03.3 The link checker finds no broken internal links; search works on the static site.
+- [x] WS-03.4 The version list is worked out from the git tags: the newest stable tag of the newest minor at `/`, the newest tag of each older minor at `/vX.Y/`, `develop` at `/next/`; beta tags get no docs of their own; with no stable tag yet, `/` is a Preview built from `develop`.
+- [x] WS-03.5 A tagged version is built from that tag's `docs/wiki`, `docs/api` and `web/` (its own demo) with the current website code, without changing the working tree.
+- [x] WS-03.6 The docs sidebar has a version switcher listing every version with the current one marked; picking a version opens the same page in that version.
+- [ ] WS-03.7 (the Preview banner and the demo's docs links are tested; the Beta and older banners with their stable link are proven once the first stable tag exists) Every page of a non-stable version (Beta, Preview, older) shows its banner with a link to the latest stable docs when one exists, and the demo of each version links its guide and Help links to the docs of the same version.
 
 ## WS-04 API playground: Demo mode
 
@@ -140,3 +147,20 @@ Phase U3 (W15) for WS-08.1 to WS-08.4; WS-08.5 in Phase 2, when email and SMS ru
 - [ ] WS-08.4 The site shows the examples as tabs that work with the keyboard and remember the chosen language across pages and visits; on GitHub each language is a labelled code block. (Clarified 2026-10-26: GitHub shows each language as its own highlighted code block; it does not display tab titles.)
 - [ ] WS-08.5 The cross-language matrix runs every recipe example against a real `sendmock` binary in CI.
 
+## WS-09 Install with AI
+
+Phase U3 (owner feedback F16). Plan: [16-website-and-releases.md](../16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16).
+
+- [x] WS-09.1 Getting started and Install each have an "Install with AI" section with the same copyable prompt, and every install command in the prompt is one of the Install page's own commands.
+- [x] WS-09.2 The prompt makes the agent check the computer first (system and CPU, Docker, Homebrew, an existing install), ask in plain words for Docker or the binary with the benefits of each and for stable or beta, show each command and wait for an OK, stop with a clear message when there is no release yet, and finish by checking SendMock runs and giving the web UI address, the SMTP host and port, and how to stop it.
+- [x] WS-09.3 Each docs version publishes `/llms.txt` with what SendMock is, the same install instructions for agents, and a link with its description for every docs page.
+- [x] WS-09.4 The landing page's quick start has an AI tab after the platform tabs, playing three stages: the whole prompt to read (it waits when the reader scrolls it, and with reduced motion, until "Show the agent run"), a pointer copying it, then an AI coding agent's window, not a plain terminal (title bar; your prompt pasted into the message box and sent; the agent thinking, then reporting its checks and asking Docker or the binary; your answers typed into the message box and sent; a Run command card waiting for your OK; SendMock running), a copy button for the whole prompt, links to the Install with AI steps and `/llms.txt`, and the full prompt in the HTML while another tab is open; the page head links to `/llms.txt`. (Changed 2026-10-27, owner request: an AI tab instead of a separate card.)
+
+## WS-10 Deeper docs: every control
+
+Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17). Plan: [19-user-guide.md](../19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started).
+
+- [ ] WS-10.1 Every screen has a Deeper page under `docs/wiki/deeper/`, linked from its menu page, with an entry for every button, menu item, switch, tab, field, filter, column, badge, shortcut and every text the screen can show (empty states, errors, toasts, dialogs, status labels).
+- [ ] WS-10.2 Each entry says where the control is (an annotated screenshot), what it does and what you see afterwards, what it changes or sends (data, events, webhooks, logs), where its text comes from, how it links to other screens, the same action from the CLI, REST API and MCP, and the errors it can show with what to do.
+- [ ] WS-10.3 A Playwright crawl of the demo lists every control per screen, and a test fails when a control has no entry or an entry names a control that no longer exists.
+- [ ] WS-10.4 The data sources and the CLI, REST API and MCP equivalents are generated from the OpenAPI spec and the surface catalogue, and the annotated screenshots from `bun run screenshots`, so they cannot drift from the code.

@@ -1,5 +1,5 @@
 ---
-title: Mail
+title: Inbox
 description: Catch every email your app sends over SMTP or a provider API, read it, check it, and simulate what happens next.
 ---
 

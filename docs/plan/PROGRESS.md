@@ -2,23 +2,36 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-25
+**Last updated:** 2026-10-27
 
 ## Current position
 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), W1 to W10, W12, W13 (user guide) and W14 (every feature in every way) and W15 (CLI and MCP reference, field docs, code examples) done; W16 (configurable email and SMS providers) done for the UI; W11 feedback and the owner's sign-off remain (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
-| **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), 16 / 19: W1 to W10 and W12 to W17 and W19 done (W16 configurable providers for the UI, W17 versioned docs, W19 Install with AI); left: W18 update checker on mock data, W11 the owner's feedback round, and the sign-off (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
+| **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
-| **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop` |
-| **Feature acceptance** | 0 / 103 accepted, 10 / 451 criteria ticked; the U1 screen features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
+| **Feature acceptance** | 0 / 107 accepted, 27 / 492 criteria ticked; Stage A features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. W11: the owner's feedback round on the preview (F3, the landing marquee fade, is done; more as it comes).
-2. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick.
+1. Merge the open pull request (see "Resume here").
+2. W18: the update checker on mock data (Off, Manual and Daily modes, release notes, the upgrade command, a header notification; [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12).
+3. W11: the owner's feedback round on the preview (feedback items so far: F1 to F17 in [18](18-phase-u3.md#feedback-items); new ones come as `u3-feedback` issues, the label exists).
+4. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick. Before Phase 0, settle the open placeholder decisions (name trademark check, ports, licence).
+
+### Resume here (2026-10-27)
+
+- **Open pull request:** #40 from `feat/landing-section-headings` into `develop`, "feat:[U3] versioned docs with beta docs and a version switcher, and install tabs on Getting started". It holds F13 (install tabs on Getting started), F14 (versioned docs, W17), the F15 plan (Prepare release with a `bump` choice, a generated `CHANGELOG.md`, the update checker), F16 (Install with AI, W19: the prompt, `/llms.txt`, the AI tab in the landing quick start), the docs sidebar names Inbox and Messages, and the F17 plan (Deeper docs, WS-10). CI on its head must pass before merging; its PR description lists what was tested.
+- **One-time setting for the owner:** Settings > Environments > `github-pages` must also allow the tags `v*`, or the deploy after a published release is rejected.
+- **Working rules** (also in [AGENTS.md](../../AGENTS.md)): ask before creating a branch, committing or pushing; tests run in GitHub CI, not locally (only format, lint, typecheck and quick unit tests locally); CI runs on pull requests and on pushes to `develop` and `main`, not on other branch pushes; check CI with the public GitHub API (no `gh` CLI); install and setup docs are numbered steps with each command in its own block; never use the em-dash character; no co-authors or AI tool names in commits or pull requests.
+- **To pick up in a fresh session,** paste this prompt:
+
+  ```text
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up". Ask me before creating a branch, committing or pushing.
+  ```
 
 ## How to update this file
 
@@ -38,14 +51,14 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 14 / 16 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 16 / 19 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
 | 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
-| 5 | Distribution and 1.0 stable | Not started | 0 / 13 |
+| 5 | Distribution and 1.0 stable | Not started | 0 / 14 |
 
 ---
 
@@ -161,6 +174,14 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Wiring: message badge, provider filters, Settings > Connection (step 6)
   - [x] Docs and sidebar: menu pages with screenshots, sidebar children, Advanced walkthroughs, providers page (step 7)
   - [x] Tests per criterion, parity and walkthrough tests (step 8)
+- [x] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
+  - [x] Plan and criteria (step 1)
+  - [x] Version list from the git tags, and a build of every version (step 2)
+  - [x] Version switcher and banner (step 3)
+  - [x] Deploy workflow and per-version app docs links (step 4)
+  - [x] Docs page and tests per criterion (step 5)
+- [x] Install with AI: a copyable prompt on Getting started and Install that checks the computer and asks for Docker or the binary, `/llms.txt` per docs version, and an AI tab in the landing quick start ([16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16), WS-09); not part of the sign-off gate (W19)
+- [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -177,10 +198,10 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] OpenAPI contract tests against handlers
 - [ ] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check)
 - [ ] Rust test setup: nextest, `insta` snapshots, `cargo llvm-cov` coverage gate (80% overall, 90% domain/operations), test fakes for `Clock`, `IdGenerator`, random source
-- [ ] `scripts/version.ts`, `CHANGELOG.md`
-- [ ] Release workflows: `beta.yml`, `beta-publish.yml`, `stable.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
+- [ ] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow
+- [ ] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
-- [ ] Versioned website builds (`/next/` from `develop`)
+- [ ] Versioned website builds (moved to U3 W17 on 2026-10-27)
 - [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
 
 ### Phase 1: Email backend and first beta
@@ -276,6 +297,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] `sendmock --demo`
 - [ ] Claude Code plugin, MCP registry listing, skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
+- [ ] Deeper docs: a page per screen explaining every control and text (what it does, what it changes or sends, where its text comes from, how it links, CLI/API/MCP, errors), kept true by a Playwright crawl ([19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started), WS-10); written screen by screen as each live mode lands
 - [ ] Final product name applied everywhere
 - [ ] **Release `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
@@ -450,3 +472,10 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | U3 feedback F10 done ([18](18-phase-u3.md#feedback-items)): the sidebar footer has icon links with tooltips to the docs, Report an issue, Request a feature, Report a security issue and Star on GitHub, the Help menu's own links; UI-10.1 names the sidebar footer. |
 | 2026-10-27 | U3 feedback F11 done ([18](18-phase-u3.md#feedback-items)): a book icon next to the header title opens the open screen's guide page; every sidebar item names its guide page and the WS-06.1 test checks they match. |
 | 2026-10-27 | U3 feedback F12 done ([18](18-phase-u3.md#feedback-items)): the landing page's five main sections share one heading style (label, title, line of text) through a `SectionHeading` component; the logo strip keeps a quieter title. |
+| 2026-10-27 | U3 feedback F13 done ([18](18-phase-u3.md#feedback-items)): Getting started installs on macOS, Linux, Windows or Docker from one tabbed step, with links to each system's section on Install. |
+| 2026-10-27 | Plan: versioned docs (U3 W17, owner feedback F14, [16](16-website-and-releases.md#versioned-builds)), moved from Phase 0 so the first release freezes its docs. `/` the latest stable (a Preview from `develop` until the first stable tag), `/next/` the beta docs, `/vX.Y/` older minors, each tag built in a temporary worktree with the current website code; a version switcher in the docs sidebar and banners on non-stable versions. New criteria WS-03.4 to WS-03.7. |
+| 2026-10-27 | Plan: releases without hand-written versions or notes (owner feedback F15, [16](16-website-and-releases.md#versioning)). One Prepare release workflow with a `bump` choice (beta, patch, minor, major, stable) and a dry run writes the version and the `CHANGELOG.md` section from merged pull request titles, which is also the release body; AGENTS.md and the PR template now treat the PR title as the release note. The update check gains Off, Manual and Daily modes, release notes, the upgrade command and a notification (W18 on mock data, real check in Phase 1). New criteria DS-05.3 to DS-05.5 and PL-05.10 to PL-05.12. |
+| 2026-10-27 | Versioned docs built (U3 W17, F14): `website/lib/docs-versions.ts` works the versions out from the tags, `scripts/build-docs-versions.ts` builds each one (a tag in a temporary worktree with the current website code, `scripts/docs-version-worktree.ts`), the docs sidebar has a Version menu, non-stable versions show a banner, a Page not found page links to every version, and each demo links to its own docs. `website.yml` deploys every version from `develop` and on published releases; the `github-pages` environment must also allow the tags `v*`. New docs page Docs versions. WS-03.4 to WS-03.6 proven; WS-03.1 and WS-03.7 wait for the first stable tag. |
+| 2026-10-27 | Plan: Install with AI (U3 W19, owner feedback F16, [16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16)): a prompt on Getting started and Install that checks the computer, asks for Docker or the binary in plain words and uses only the official commands; `/llms.txt` per docs version; an Install with AI card on the landing page. New feature WS-09 with 4 criteria. |
+| 2026-10-27 | Install with AI built (U3 W19, F16): the prompt lives in the Install page's "Install with AI" section and Getting started repeats it (unit tests check they match and every command is the Install page's own); `/llms.txt` is built per docs version from it and the docs pages; the landing quick start has an AI tab with the prompt (kept in the HTML), and every page head links to `/llms.txt`. Code blocks now keep their blank lines, and plain-text blocks wrap. |
+| 2026-10-27 | Plan: Deeper docs (owner feedback F17, [19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started)), not started: a page per screen explaining every button, field, badge and text, what it changes and sends, where its text comes from and how it links, kept true by a Playwright crawl of the demo and tables generated from the spec. Written screen by screen with Stage B's live modes, complete before 1.0; new feature WS-10 in Phase 5. Also on this branch: the docs sidebar names the Mail and SMS index pages Inbox and Messages, as the app does. |

@@ -214,4 +214,4 @@ Releases are cut by workflows (`beta.yml`, `beta-publish.yml`, `stable.yml`, `st
 
 ## Versioning
 
-SemVer with `-beta.N` pre-releases. `0.x` while the API settles; `1.0` freezes `/api/v1`, CLI flags and native webhook format. `CHANGELOG.md` `[Unreleased]` section becomes the release notes; `scripts/version.ts` works out and syncs the version.
+SemVer with `-beta.N` pre-releases. `0.x` while the API settles; `1.0` freezes `/api/v1`, CLI flags and native webhook format. The Prepare release workflow works out the version from its `bump` choice and writes the `CHANGELOG.md` section from the merged pull request titles; that section is the release notes ([16](16-website-and-releases.md#versioning)).

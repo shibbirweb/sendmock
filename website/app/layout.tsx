@@ -4,6 +4,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { VersionBanner } from "@/components/docs/version-banner";
 import { basePath } from "@/lib/layout.shared";
 
 export const metadata: Metadata = {
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
   },
   description:
     "A single binary that catches email, SMS and payments from any app, shows them in a web UI and calls your webhooks.",
+  // Agents given only the site's address find the docs and install steps (WS-09.4).
+  alternates: { types: { "text/plain": `${basePath}/llms.txt` } },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -26,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             options: { type: "static", api: `${basePath}/api/search` },
           }}
         >
+          <VersionBanner />
           {children}
         </RootProvider>
       </body>

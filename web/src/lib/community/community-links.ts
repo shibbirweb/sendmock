@@ -5,7 +5,13 @@
  */
 
 export const repositoryUrl = "https://github.com/shibbirweb/sendmock";
-export const documentationUrl = "https://shibbirweb.github.io/sendmock/docs/";
+/**
+ * The docs of this build's version (WS-03.7): each Pages demo is built with
+ * its own version's docs path, and a release sets its channel's docs.
+ */
+export const documentationUrl =
+  import.meta.env.VITE_DOCS_URL ??
+  "https://shibbirweb.github.io/sendmock/docs/";
 /** Release notes; the changelog page arrives with CHANGELOG.md in Phase 0. */
 export const changelogUrl = `${repositoryUrl}/releases`;
 /** GitHub's private vulnerability reporting, so reports are not public. */

@@ -7,7 +7,7 @@ description: Binaries, Homebrew, Docker and building from source.
 
 SendMock is one static binary with the web UI built in. Pick one way to install it below and follow its steps; all of them run the same thing.
 
-Every way has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Use one or the other.
+Every way has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Use one or the other. The beta has its own docs; see [Docs versions](./versions.md).
 
 ## Homebrew (macOS and Linux)
 
@@ -158,6 +158,46 @@ Use this to keep SendMock running with captured mail and SMS kept across restart
 3. Open the web UI at http://127.0.0.1:8025.
 
 To run SendMock next to your app in the same Compose project, or for CI, webhooks and seed files, see [Connect your app: Docker](./connect/docker.md).
+
+## Install with AI
+
+Let your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI or another one that can run commands) install SendMock for you. It checks your computer first, asks you a few simple questions and shows every command before it runs it.
+
+1. Open your AI agent in a terminal on the computer where SendMock should run, and allow it to run commands.
+2. Copy this prompt and paste it into the agent:
+
+   ```text
+   Install SendMock on this computer for me. SendMock is a local sandbox that catches the emails, SMS and webhooks my apps send: https://shibbirweb.github.io/sendmock/
+
+   Follow these steps and talk to me in plain, simple words:
+
+   1. Before you install anything, check this computer and tell me what you found: the operating system and CPU (for example macOS on Apple silicon, Windows on x64, Linux on ARM), whether Docker is installed and running, whether Homebrew is installed, and whether SendMock is already installed (`sendmock --version`).
+
+   2. Ask me how I want to run SendMock, and recommend one based on what you found:
+      - Docker: SendMock runs in a container, nothing is installed on my computer, and it is easy to remove. Good if I already use Docker or Docker Compose. Docker must be running.
+      - The binary: one small program installed on my computer. It starts instantly and does not need Docker.
+
+   3. Ask me whether I want the stable version (recommended) or the beta (newest features first).
+
+   4. Use only these official commands, for my choice and my system:
+      - macOS or Linux with Homebrew, stable: `brew install shibbirweb/tap/sendmock`
+      - macOS or Linux with Homebrew, beta: `brew install shibbirweb/tap/sendmock-beta`
+      - Linux or macOS without Homebrew, stable: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`
+      - Linux or macOS without Homebrew, beta: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta`
+      - Windows (PowerShell), stable: `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`
+      - Windows (PowerShell), beta: `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta`
+      - Docker, stable: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock`
+      - Docker, beta: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta`
+      The full steps are on https://shibbirweb.github.io/sendmock/docs/install/. Before you run each command, show it to me, say in one sentence what it does, and wait for my OK.
+
+   5. If a download fails because SendMock has no release yet, stop and tell me so. I can try the live demo instead: https://shibbirweb.github.io/sendmock/demo/
+
+   6. When it is installed, start SendMock so it keeps running after you finish (in the background, or give me the command to run in a new terminal), and check that it works: open http://127.0.0.1:8025. Then tell me the web UI address, the SMTP settings for my app (host 127.0.0.1, port 1025, no username, password or TLS) and how to stop SendMock.
+
+   Do not change any other settings on this computer, and ask me before you install anything else.
+   ```
+
+3. Answer its questions: Docker or the binary, and stable or beta. Approve each command once you have read what it does.
 
 ## Binaries
 

@@ -61,6 +61,7 @@ test.describe("the quick start on a Mac", () => {
       "Windows",
       "Linux",
       "Docker",
+      "AI",
     ]);
     await expect(
       platformTabs.getByRole("tab", { name: "macOS" }),
@@ -95,7 +96,7 @@ test.describe("the quick start on a Mac", () => {
       .getByRole("tabpanel");
     const panelHeights: number[] = [];
 
-    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker"]) {
+    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker", "AI"]) {
       await platformTabs.getByRole("tab", { name: platformLabel }).click();
       const panelBox = await panel.boundingBox();
       panelHeights.push(panelBox?.height ?? 0);
@@ -257,6 +258,81 @@ test("WS-02.1 every main section has a label, a title and a line of text in one 
   }
 
   expect([...headingStyles]).toHaveLength(1);
+});
+
+test("WS-09.4 the quick start's AI tab shows an agent window with the whole prompt, copies it and links agents to llms.txt", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const aiPrompt = page.getByTestId("quick-start-ai-prompt");
+
+  // The whole prompt is in the HTML, open tab or not, so an agent reading the page finds it.
+  await expect(aiPrompt).toBeHidden();
+  await expect(page.getByTestId("quick-start-ai-full-prompt")).toContainText(
+    "Before you install anything, check this computer",
+  );
+
+  await page
+    .getByRole("tablist", { name: "Your platform" })
+    .getByRole("tab", { name: "AI" })
+    .click();
+  await expect(aiPrompt).toBeVisible();
+  await expect(page.getByTestId("quick-start-terminal")).toHaveCount(0);
+  // First the whole prompt to read; with reduced motion it waits for the reader.
+  await expect(page.getByTestId("quick-start-ai-prompt-text")).toContainText(
+    "Before you install anything, check this computer",
+  );
+  await page.getByRole("button", { name: "Show the agent run" }).click();
+  // Then an agent's window, not a plain terminal: your whole prompt, its question, the result.
+  const conversation = page.getByTestId("quick-start-ai-conversation");
+  await expect(aiPrompt).toContainText("AI coding agent");
+  await expect(conversation).toContainText(
+    "Before you install anything, check this computer",
+  );
+  await expect(conversation).toContainText("Docker or the binary?");
+  await expect(conversation).toContainText("Run command");
+  await expect(conversation).toContainText("SendMock is running");
+  await expect(
+    aiPrompt.getByRole("button", { name: "Copy the install prompt" }),
+  ).toBeVisible();
+  const aiLinks = page.getByTestId("quick-start-ai-links");
+  await expect(
+    aiLinks.getByRole("link", { name: "llms.txt for AI agents" }),
+  ).toHaveAttribute("href", "/llms.txt");
+  await expect(
+    aiLinks.getByRole("link", { name: "Step by step" }),
+  ).toHaveAttribute("href", "/docs/install/#install-with-ai");
+  await expect(
+    page.locator('head link[rel="alternate"][type="text/plain"]'),
+  ).toHaveAttribute("href", "/llms.txt");
+});
+
+test("WS-09.4 the AI tab shows the prompt, copies it, then opens the agent window", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("tablist", { name: "Your platform" })
+    .getByRole("tab", { name: "AI" })
+    .click();
+
+  await expect(page.getByTestId("quick-start-ai-prompt-text")).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Copied to clipboard", {
+    timeout: 10_000,
+  });
+  await expect(page.getByTestId("quick-start-ai-conversation")).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByTestId("quick-start-ai-prompt-text")).toHaveCount(0);
+  // Your messages are pasted or typed into the message box before they are sent.
+  const messageBox = page.getByTestId("quick-start-ai-composer");
+  await expect(messageBox).toContainText("Pasted text", { timeout: 5_000 });
+  await expect(messageBox).toContainText("The binary", { timeout: 15_000 });
+  await expect(page.getByTestId("quick-start-ai-conversation")).toContainText(
+    "The binary, stable",
+    { timeout: 5_000 },
+  );
 });
 
 test("WS-02.1 the stack marquee fades out at both edges", async ({ page }) => {

@@ -106,6 +106,8 @@ export const AnimatedSpan = ({
       onAnimationComplete={() => {
         if (!sequence) return;
         if (itemIndex === null) return;
+        // Settling into the hidden start is not finishing: wait for the fade-in.
+        if (!shouldAnimate) return;
         sequence.completeItem(itemIndex);
       }}
       {...props}
