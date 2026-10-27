@@ -146,6 +146,24 @@ test("WS-06.1 every sidebar item has a guide page with the template headings", (
   expect(problems).toEqual([]);
 });
 
+test("WS-06.1 every sidebar item's docs link opens its guide page", () => {
+  const navigationSource = readFileSync(
+    join(webSourceDirectory, "navigation/navigation-items.ts"),
+    "utf8",
+  );
+  const docsPathByMenuPath = [
+    ...navigationSource.matchAll(/path: "([^"]+)",\s*docsPath: "([^"]+)"/g),
+  ].map((pathMatch) => [pathMatch[1] ?? "", pathMatch[2] ?? ""]);
+
+  expect(docsPathByMenuPath.length).toBe(readSidebarPaths().length);
+  for (const [menuPath, docsPath] of docsPathByMenuPath) {
+    const guidePage = guidePageByMenuPath[menuPath] ?? "";
+    const expectedDocsPath = `${guidePage.replace(/(\/index)?\.md$/, "")}/`;
+
+    expect(docsPath, `docs link of ${menuPath}`).toBe(expectedDocsPath);
+  }
+});
+
 test("WS-06.1 every Settings section has its own part of the Settings page", () => {
   const sectionLabels = readSettingsSectionLabels();
   expect(sectionLabels.length).toBeGreaterThan(5);

@@ -83,6 +83,37 @@ test("UI-01.1 Mail and SMS list their messages as Inbox and Messages, lit only o
   await expect(page).toHaveURL(/\/sms$/);
 });
 
+test("UI-01.1 the header has a link to the open screen's guide page", async ({
+  page,
+}) => {
+  const docsRoot = "https://shibbirweb.github.io/sendmock/docs/";
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  const guideLink = (screenTitle: string) =>
+    page
+      .locator("header")
+      .getByRole("link", { name: `Read the ${screenTitle} guide` });
+
+  await expect(guideLink("Overview")).toHaveAttribute(
+    "href",
+    `${docsRoot}overview/`,
+  );
+  await expect(guideLink("Overview")).toHaveAttribute("target", "_blank");
+
+  await sidebar.getByRole("link", { name: "Mail", exact: true }).click();
+  await sidebar.getByRole("link", { name: "Providers", exact: true }).click();
+  await expect(guideLink("Providers")).toHaveAttribute(
+    "href",
+    `${docsRoot}mail/providers/`,
+  );
+
+  await sidebar.getByRole("link", { name: "Webhooks", exact: true }).click();
+  await sidebar.getByRole("link", { name: "Composer", exact: true }).click();
+  await expect(guideLink("Composer")).toHaveAttribute(
+    "href",
+    `${docsRoot}webhooks/composer-and-saved/`,
+  );
+});
+
 test("UI-01.1 sections with sub-items show a chevron that turns when the group opens", async ({
   page,
 }) => {
