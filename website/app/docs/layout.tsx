@@ -11,6 +11,7 @@ import {
   securityReportUrl,
 } from "@/lib/community-links";
 import { IconWithTooltip } from "@/components/docs/icon-with-tooltip";
+import { VersionSwitcher } from "@/components/docs/version-switcher";
 import { baseOptions } from "@/lib/layout.shared";
 import { source } from "@/lib/source";
 
@@ -79,6 +80,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <DocsLayout
       tree={source.getPageTree()}
       {...sharedOptions}
+      sidebar={{ banner: <VersionSwitcher /> }}
       links={[
         ...(sharedOptions.links ?? []).filter(
           (linkItem) => !("url" in linkItem && linkItem.url === repositoryUrl),

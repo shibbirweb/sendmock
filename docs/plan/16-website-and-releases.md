@@ -137,8 +137,8 @@ Every release keeps its own docs, so what a reader sees matches the version they
 
 #### The switcher and banner
 
-- The switcher sits at the top of the docs sidebar, under search: a dropdown with every version, the current one ticked. Picking one opens **the same page** in that version (the path after the version prefix is kept); a page that does not exist there falls back to that version's docs home through the 404 page.
-- The banner shows on every docs, API, CLI, MCP and playground page of a non-stable version.
+- The switcher sits at the top of the docs sidebar, under search: a dropdown with every version, the current one ticked. Picking one opens **the same page** in that version (the path after the version prefix is kept); a page that does not exist there opens the site's "Page not found" page, which links to the docs home of every version.
+- The banner shows on every page of a non-stable version (landing, docs, API, CLI, MCP and playground), above the header.
 - The running app links to its own docs version: stable installs to `/`, beta, edge and dev installs to `/next/` (see [In-app update channel](#in-app-update-channel)).
 
 #### Deploys

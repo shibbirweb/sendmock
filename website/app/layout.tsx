@@ -4,6 +4,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { VersionBanner } from "@/components/docs/version-banner";
 import { basePath } from "@/lib/layout.shared";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             options: { type: "static", api: `${basePath}/api/search` },
           }}
         >
+          <VersionBanner />
           {children}
         </RootProvider>
       </body>

@@ -127,6 +127,48 @@ test("Getting started installs on macOS, Linux, Windows and Docker with the Inst
   }
 });
 
+test("WS-03.6 the docs sidebar switcher lists every version and opens the same page in another", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const versionButton = page.getByRole("button", {
+    name: "Docs version: Preview",
+  });
+
+  await versionButton.click();
+  await expect(page.getByRole("menuitem")).toHaveText([
+    "Preview",
+    "Beta (next)",
+  ]);
+  await expect(page.getByRole("menuitem", { name: "Preview" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(
+    page.getByRole("menuitem", { name: "Beta (next)" }),
+  ).toHaveAttribute("href", "/next/docs/install/");
+});
+
+test("WS-03.7 every page of the Preview shows its banner", async ({ page }) => {
+  for (const pagePath of ["/", "/docs/", "/api/", "/cli/", "/playground/"]) {
+    await page.goto(pagePath);
+    await expect(page.getByTestId("docs-version-banner")).toHaveText(
+      "Preview: SendMock has no stable release yet. These docs follow develop.",
+    );
+  }
+});
+
+test("WS-03.7 the demo links its guide pages to the docs of the same version", async ({
+  page,
+}) => {
+  await page.goto("/demo/");
+  await expect(
+    page
+      .locator("header")
+      .getByRole("link", { name: "Read the Overview guide" }),
+  ).toHaveAttribute("href", "/docs/overview/");
+});
+
 test("hovering a docs sidebar icon shows its label", async ({ page }) => {
   await page.goto("/docs/install/");
   const bugReportLink = page

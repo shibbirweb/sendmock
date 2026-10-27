@@ -164,7 +164,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Versioned docs: `/` latest stable (Preview until the first stable tag), `/next/` beta docs from `develop`, `/vX.Y/` older minors, a version switcher in the docs sidebar and a banner on non-stable versions ([16](16-website-and-releases.md#versioned-builds), WS-03.1, WS-03.4 to WS-03.7); not part of the sign-off gate (W17)
   - [x] Plan and criteria (step 1)
   - [x] Version list from the git tags, and a build of every version (step 2)
-  - [ ] Version switcher and banner (step 3)
+  - [x] Version switcher and banner (step 3)
   - [ ] Deploy workflow and per-version app docs links (step 4)
   - [ ] Docs page and tests per criterion (step 5)
 - [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
