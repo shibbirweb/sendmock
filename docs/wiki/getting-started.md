@@ -9,10 +9,35 @@ This first run uses only what SendMock ships with. Nothing needs to be configure
 
 ## 1. Install and run
 
-```bash
-brew install shibbirweb/tap/sendmock
-sendmock
-```
+1. Install SendMock. Pick your system:
+
+   ```bash tab="macOS" tab-group="os"
+   brew install shibbirweb/tap/sendmock
+   ```
+
+   ```bash tab="Linux"
+   curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh
+   ```
+
+   ```powershell tab="Windows"
+   irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex
+   ```
+
+   ```bash tab="Docker"
+   docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock
+   ```
+
+   On Linux and Windows, open a new terminal window afterwards, so it picks up the new `PATH`.
+
+2. Start SendMock:
+
+   ```bash
+   sendmock
+   ```
+
+   With Docker, the container from step 1 is already running, so skip this step.
+
+Need a beta build, Docker Compose, Homebrew on Linux or a binary to download yourself? [Install](./install.md) has every way to install, step by step: [macOS](./install.md#homebrew-macos-and-linux), [Linux](./install.md#install-script-linux-and-macos), [Windows](./install.md#install-script-windows), [Docker](./install.md#docker) and [Binaries](./install.md#binaries).
 
 SendMock listens on `127.0.0.1` only:
 
@@ -21,8 +46,6 @@ SendMock listens on `127.0.0.1` only:
 | `1025` | SMTP |
 | `8025` | Web UI, REST API, WebSocket, native send APIs and `/catch/*` |
 | `8026` | Provider emulation at the real provider paths (Twilio, SendGrid, ...) |
-
-Other ways to install (Docker, Scoop, npm, install scripts) are on [Install](./install.md).
 
 ## 2. Look around with samples
 

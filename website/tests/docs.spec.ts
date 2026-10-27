@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -78,6 +78,52 @@ test("the docs sidebar links to GitHub and the feature request, bug report and s
         .getByRole("link", { name: feedbackLink.name, exact: true })
         .filter({ visible: true }),
     ).toHaveAttribute("href", feedbackLink.url);
+  }
+});
+
+test("Getting started installs on macOS, Linux, Windows and Docker with the Install page's commands and links to it", async ({
+  page,
+}) => {
+  const installPage = readFileSync(join(wikiDirectory, "install.md"), "utf8");
+  const gettingStartedPage = readFileSync(
+    join(wikiDirectory, "getting-started.md"),
+    "utf8",
+  );
+  const tabCommands = [
+    ...gettingStartedPage.matchAll(/```\w+ tab="([^"]+)"[^\n]*\n\s*(.+)\n/g),
+  ].map((tabMatch) => [tabMatch[1] ?? "", (tabMatch[2] ?? "").trim()]);
+
+  expect(tabCommands.map(([tabName]) => tabName)).toEqual([
+    "macOS",
+    "Linux",
+    "Windows",
+    "Docker",
+  ]);
+  for (const [tabName, command] of tabCommands) {
+    expect(installPage, `the ${tabName} command is on Install`).toContain(
+      command,
+    );
+  }
+
+  await page.goto("/docs/getting-started/");
+  for (const [tabName, command] of tabCommands) {
+    await page.getByRole("tab", { name: tabName, exact: true }).click();
+    await expect(
+      page.getByRole("tabpanel").filter({ visible: true }),
+    ).toContainText(command);
+  }
+  for (const [linkName, installAnchor] of [
+    ["macOS", "#homebrew-macos-and-linux"],
+    ["Linux", "#install-script-linux-and-macos"],
+    ["Windows", "#install-script-windows"],
+    ["Docker", "#docker"],
+    ["Binaries", "#binaries"],
+  ]) {
+    await expect(
+      page
+        .getByRole("article")
+        .getByRole("link", { name: linkName, exact: true }),
+    ).toHaveAttribute("href", new RegExp(`/docs/install/${installAnchor}$`));
   }
 });
 
