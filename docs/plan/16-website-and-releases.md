@@ -143,8 +143,8 @@ Every release keeps its own docs, so what a reader sees matches the version they
 
 #### Deploys
 
-- `website.yml` builds every version and deploys to Pages when: a stable release is published, `develop` changes docs (updates `/next/`), `main` changes the website, or "Run workflow". The checkout fetches all tags.
-- One-time setup: Settings > Pages > Source: GitHub Actions; Environments > `github-pages` > allow `main` and `develop`.
+- `website.yml` builds every version and deploys to Pages when: a release is published, `develop` changes the website or docs (updates `/next/`), or "Run workflow". Deploys always check out `develop` with the full history, since `/next/` and the website code come from it and the stable versions from their tags.
+- One-time setup: Settings > Pages > Source: GitHub Actions; Environments > `github-pages` > Deployment branches and tags: allow `develop`, `main` and the tags `v*` (a published release runs on its tag).
 
 #### Criteria
 

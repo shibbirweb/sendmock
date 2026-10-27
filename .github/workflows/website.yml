@@ -1,11 +1,13 @@
 # Builds the website (website/, Fumadocs) with the mock-mode web app at /demo/ and
 # publishes it to GitHub Pages (docs/plan/16-website-and-releases.md).
 #
-# Until the versioned builds land in Phase 0 (/ = stable, /next/ = develop), the site
-# is published from develop so the UI preview is always the latest work.
+# Every deploy builds every docs version (WS-03.4, WS-03.5): / is the newest stable
+# tag (a Preview from develop until the first one), /next/ is develop, /vX.Y/ the older
+# minors. Deploys always check out develop, since /next/ and the website code come from it.
 #
 # Set up once: Settings > Pages > Build and deployment > Source: GitHub Actions, then
-# Settings > Environments > github-pages > Deployment branches: allow develop and main.
+# Settings > Environments > github-pages > Deployment branches and tags: allow develop,
+# main and the tags v* (a published release runs on its tag).
 name: Website
 run-name: ${{ github.event_name == 'pull_request' && 'Build the website' || 'Publish the website' }}
 
@@ -18,6 +20,7 @@ on:
       - "docs/api/**"
       - "docs/wiki/**"
       - "scripts/build-pages-site.ts"
+      - "scripts/build-docs-versions.ts"
       - ".github/workflows/website.yml"
   pull_request:
     paths:
@@ -26,7 +29,11 @@ on:
       - "docs/api/**"
       - "docs/wiki/**"
       - "scripts/build-pages-site.ts"
+      - "scripts/build-docs-versions.ts"
       - ".github/workflows/website.yml"
+  # A new stable release becomes / and the previous minor moves to /vX.Y/.
+  release:
+    types: [published]
   workflow_dispatch:
 
 concurrency:
@@ -46,7 +53,19 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --ipc=host
     steps:
+      # Without git, checkout downloads files with no history; the docs versions
+      # need the tags and git worktree.
+      - name: Install git
+        run: |
+          if ! command -v git >/dev/null; then
+            apt-get update
+            apt-get install --yes --no-install-recommends git
+          fi
+
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name != 'pull_request' && 'develop' || '' }}
+          fetch-depth: 0
 
       # The image has Node but not unzip, which setup-bun needs, so Bun comes from npm.
       - name: Install Bun
@@ -60,7 +79,7 @@ jobs:
         working-directory: website
         run: bun install --frozen-lockfile
 
-      - name: Unit tests (snippets)
+      - name: Unit tests (snippets, docs versions)
         working-directory: website
         run: bun run test:unit
 
@@ -87,10 +106,21 @@ jobs:
         working-directory: website
         run: bun run test:lighthouse
 
+      # Pull requests only build the working tree, as the Preview, to catch broken pages.
       - name: Build website with the demo at /demo/
+        if: github.event_name == 'pull_request'
         env:
           PAGES_BASE_PATH: /${{ github.event.repository.name }}
         run: bun scripts/build-pages-site.ts
+
+      - name: Build every docs version, each with its demo
+        if: github.event_name != 'pull_request'
+        env:
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+        run: |
+          # The checkout belongs to another user than the container's root.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          bun scripts/build-docs-versions.ts
 
       - name: Upload
         if: github.event_name != 'pull_request'

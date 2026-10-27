@@ -165,7 +165,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Plan and criteria (step 1)
   - [x] Version list from the git tags, and a build of every version (step 2)
   - [x] Version switcher and banner (step 3)
-  - [ ] Deploy workflow and per-version app docs links (step 4)
+  - [x] Deploy workflow and per-version app docs links (step 4)
   - [ ] Docs page and tests per criterion (step 5)
 - [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
