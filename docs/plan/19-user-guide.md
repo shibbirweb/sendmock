@@ -394,6 +394,27 @@ Every create and update above is an operation in the registry, so an agent can d
 - **`ai/prompts`:** the built-in MCP prompts (`setup-email-capture`, `setup-sms-capture`, `setup-inbound-webhook`, `test-otp-flow`, `simulate-sms-conversation`, `debug-failed-webhook`, `add-payment-flow`, `add-payment-gateway`) with when to use each.
 - Phases: CLI and MCP tools arrive with each backend phase (payments in 3P), the skill, prompts and `sendmock ai install` in Phase 4. Each AI page carries the status line like every other page.
 
+## Deeper: every control explained (planned 2026-10-27, owner feedback F17; not started)
+
+A later layer of the guide, for readers who want to know exactly what each thing on a screen does. The menu pages explain a screen as a whole; these pages go one level down, control by control. **Not built now:** it starts once a screen has its live mode in Stage B, so the pages describe the real behaviour, and it is complete before 1.0 (Phase 5).
+
+- **What is covered, for every screen:** every button, menu item, switch, tab, field, filter, column, badge and keyboard shortcut, and every text the screen can show (empty states, errors, toasts, confirmation dialogs, status labels).
+- **What each entry says**, in plain words:
+  1. its name as the screen shows it, and where it is (numbered on an annotated screenshot);
+  2. what it does, step by step, and what you see afterwards;
+  3. what it changes or sends: stored data, events, the webhooks and rules it can trigger, the log entries it writes;
+  4. where its text and numbers come from: the setting, seed file key, provider definition or API field behind them;
+  5. how it links to other screens (for example a message badge opening its provider, a delivery opening its rule);
+  6. the same action from the CLI, REST API and MCP, from the surface catalogue;
+  7. the errors it can show, why, and what to do.
+- **Where:** one page per screen under `docs/wiki/deeper/<menu>/<screen>.md`, in a new **Deeper** section of the sidebar under Advanced. Each menu page's "Everything on this screen" ends with a link to its Deeper page.
+- **Kept true, not hand-maintained:**
+  - an inventory of every control and text per screen is read from the demo app by a Playwright crawl (accessible names and roles), and a test fails when a control has no entry or an entry names a control that no longer exists;
+  - "where it comes from" and "the same action from the CLI, REST API and MCP" are generated from the OpenAPI spec and the surface catalogue, as the menu pages' tables already are;
+  - the annotated screenshots come from `bun run screenshots` scenes with numbered markers.
+- **Order:** the screens people use most first (Mail, SMS and Verify, Webhooks, Payments), then the rest, each in the same pull request as its live mode where possible.
+- Criteria: WS-10 in [acceptance](acceptance/07-distribution-website.md#ws-10-deeper-docs-every-control).
+
 ## Screenshots
 
 - `bun run screenshots` (website) gains a scene per menu and sub-page that has its own screen (about 25), written to `docs/wiki/images/<page>.jpg` in the light theme, as today's four are.

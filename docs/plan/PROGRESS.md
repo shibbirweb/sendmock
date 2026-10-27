@@ -45,7 +45,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3 | Webhooks backend | Not started | 0 / 15 |
 | 3P | Payment gateway backend | Not started | 0 / 6 |
 | 4 | Integrations, fidelity and AI | Not started | 0 / 18 |
-| 5 | Distribution and 1.0 stable | Not started | 0 / 13 |
+| 5 | Distribution and 1.0 stable | Not started | 0 / 14 |
 
 ---
 
@@ -284,6 +284,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] `sendmock --demo`
 - [ ] Claude Code plugin, MCP registry listing, skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
+- [ ] Deeper docs: a page per screen explaining every control and text (what it does, what it changes or sends, where its text comes from, how it links, CLI/API/MCP, errors), kept true by a Playwright crawl ([19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started), WS-10); written screen by screen as each live mode lands
 - [ ] Final product name applied everywhere
 - [ ] **Release `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
@@ -464,3 +465,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | Versioned docs built (U3 W17, F14): `website/lib/docs-versions.ts` works the versions out from the tags, `scripts/build-docs-versions.ts` builds each one (a tag in a temporary worktree with the current website code, `scripts/docs-version-worktree.ts`), the docs sidebar has a Version menu, non-stable versions show a banner, a Page not found page links to every version, and each demo links to its own docs. `website.yml` deploys every version from `develop` and on published releases; the `github-pages` environment must also allow the tags `v*`. New docs page Docs versions. WS-03.4 to WS-03.6 proven; WS-03.1 and WS-03.7 wait for the first stable tag. |
 | 2026-10-27 | Plan: Install with AI (U3 W19, owner feedback F16, [16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16)): a prompt on Getting started and Install that checks the computer, asks for Docker or the binary in plain words and uses only the official commands; `/llms.txt` per docs version; an Install with AI card on the landing page. New feature WS-09 with 4 criteria. |
 | 2026-10-27 | Install with AI built (U3 W19, F16): the prompt lives in the Install page's "Install with AI" section and Getting started repeats it (unit tests check they match and every command is the Install page's own); `/llms.txt` is built per docs version from it and the docs pages; the landing quick start has an AI tab with the prompt (kept in the HTML), and every page head links to `/llms.txt`. Code blocks now keep their blank lines, and plain-text blocks wrap. |
+| 2026-10-27 | Plan: Deeper docs (owner feedback F17, [19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started)), not started: a page per screen explaining every button, field, badge and text, what it changes and sends, where its text comes from and how it links, kept true by a Playwright crawl of the demo and tables generated from the spec. Written screen by screen with Stage B's live modes, complete before 1.0; new feature WS-10 in Phase 5. Also on this branch: the docs sidebar names the Mail and SMS index pages Inbox and Messages, as the app does. |
