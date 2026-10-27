@@ -124,7 +124,7 @@ A reader who uses an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, ..
 - **One source.** The prompt lives in `docs/wiki/install.md`; Getting started repeats it word for word, and a website test checks the two match and that every command in the prompt is one of the Install page's own commands.
 - **From just the site's address.** An agent given only `https://shibbirweb.github.io/sendmock/` can find the way:
   - `/llms.txt` (the [llms.txt](https://llmstxt.org/) convention) is built with each docs version: what SendMock is, the same install instructions for agents, and every docs page with its link and description. This is the website half of AI-06; the binary's own `/llms.txt` stays in Phase 4.
-  - The landing page's quick start has an **Install with AI** card: a copy button for the prompt, the full prompt in the page HTML (in a collapsible block), and a link to `/llms.txt`; the page head links to `/llms.txt` too.
+  - The landing page's quick start has an **AI** tab after macOS, Windows, Linux and Docker: the prompt in a window the size of the terminal (so the panel keeps one height), a copy button, and links to the Install with AI steps and `/llms.txt`. The prompt stays in the page HTML while another tab is open, and the page head links to `/llms.txt` too. (Changed 2026-10-27 from a separate card, owner request.)
 - Criteria: WS-09 in [acceptance](acceptance/07-distribution-website.md#ws-09-install-with-ai).
 
 ### Versioned builds

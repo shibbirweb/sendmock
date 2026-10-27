@@ -61,6 +61,7 @@ test.describe("the quick start on a Mac", () => {
       "Windows",
       "Linux",
       "Docker",
+      "AI",
     ]);
     await expect(
       platformTabs.getByRole("tab", { name: "macOS" }),
@@ -95,7 +96,7 @@ test.describe("the quick start on a Mac", () => {
       .getByRole("tabpanel");
     const panelHeights: number[] = [];
 
-    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker"]) {
+    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker", "AI"]) {
       await platformTabs.getByRole("tab", { name: platformLabel }).click();
       const panelBox = await panel.boundingBox();
       panelHeights.push(panelBox?.height ?? 0);
@@ -259,26 +260,34 @@ test("WS-02.1 every main section has a label, a title and a line of text in one 
   expect([...headingStyles]).toHaveLength(1);
 });
 
-test("WS-09.4 the landing page has an Install with AI card with the whole prompt and links agents to llms.txt", async ({
+test("WS-09.4 the quick start's AI tab shows the prompt with a copy button and links agents to llms.txt", async ({
   page,
 }) => {
   await page.goto("/");
-  const aiCard = page.getByTestId("install-with-ai-card");
+  const aiPrompt = page.getByTestId("quick-start-ai-prompt");
 
-  await expect(
-    aiCard.getByRole("heading", { name: "Install with AI" }),
-  ).toBeVisible();
-  await expect(
-    aiCard.getByRole("button", { name: "Copy the install prompt" }),
-  ).toBeVisible();
-  // The prompt is in the HTML even while folded, so an agent reading the page finds it.
-  await expect(aiCard.locator("pre")).toContainText(
+  // The prompt is in the HTML before the tab is opened, so an agent reading the page finds it.
+  await expect(aiPrompt).toBeHidden();
+  await expect(aiPrompt.locator("pre")).toContainText(
     "Before you install anything, check this computer",
   );
-  await expect(aiCard.getByRole("link", { name: "llms.txt" })).toHaveAttribute(
-    "href",
-    "/llms.txt",
-  );
+
+  await page
+    .getByRole("tablist", { name: "Your platform" })
+    .getByRole("tab", { name: "AI" })
+    .click();
+  await expect(aiPrompt).toBeVisible();
+  await expect(page.getByTestId("quick-start-terminal")).toHaveCount(0);
+  await expect(
+    aiPrompt.getByRole("button", { name: "Copy the install prompt" }),
+  ).toBeVisible();
+  const aiLinks = page.getByTestId("quick-start-ai-links");
+  await expect(
+    aiLinks.getByRole("link", { name: "llms.txt for AI agents" }),
+  ).toHaveAttribute("href", "/llms.txt");
+  await expect(
+    aiLinks.getByRole("link", { name: "Step by step" }),
+  ).toHaveAttribute("href", "/docs/install/#install-with-ai");
   await expect(
     page.locator('head link[rel="alternate"][type="text/plain"]'),
   ).toHaveAttribute("href", "/llms.txt");
