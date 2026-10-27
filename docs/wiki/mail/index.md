@@ -5,7 +5,7 @@ description: Catch every email your app sends over SMTP or a provider API, read 
 
 > Try it in the [demo](/demo/mail). Works in your install from Phase 1 (SMTP and the native API), Phase 3 (outcome events) and Phase 4 (provider APIs, checks, replies and release).
 
-Every email your app sends lands here, whatever the recipient, and nothing is delivered to a real inbox.
+Every email your app sends lands in **Mail > Inbox**, whatever the recipient, and nothing is delivered to a real inbox. **Mail** opens the inbox; [Mail > Providers](./providers.md) lists the email APIs SendMock answers.
 
 ![The Mail screen with an email open on its HTML preview](../images/mail.jpg)
 
@@ -28,10 +28,11 @@ Every email your app sends lands here, whatever the recipient, and nothing is de
 
 ## Use it
 
-1. Point your app's mail settings at `127.0.0.1:1025` (any username and password, no TLS needed), or press **Send a sample email** on the empty screen.
-2. Trigger an email in your app. It appears at the top of the list within a second.
-3. Open it. Read the **HTML** tab, switch to the phone width, and copy the code or link from the extracted panel.
-4. Press **Simulate** and pick **Hard bounce**. The email shows the outcome, its **Timeline** gets an entry, and any rule on `email.bounced` sends a delivery.
+1. Open **Mail > Inbox** (`G M`).
+2. Point your app's mail settings at `127.0.0.1:1025` (any username and password, no TLS needed), or press **Send a sample email** on the empty screen.
+3. Trigger an email in your app. It appears at the top of the list within a second.
+4. Open it. Read the **HTML** tab, switch to the phone width, and copy the code or link from the extracted panel.
+5. Press **Simulate** and pick **Hard bounce**. The email shows the outcome, its **Timeline** gets an entry, and any rule on `email.bounced` sends a delivery.
 
 ## Everything on this screen
 

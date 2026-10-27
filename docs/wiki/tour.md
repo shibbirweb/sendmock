@@ -14,9 +14,11 @@ Press `G` and then the key in the table to jump to a menu from anywhere.
 | Menu | Key | What it is for | Page |
 | --- | --- | --- | --- |
 | Overview | `G O` | the home dashboard: counts, activity, webhook health, recent failures and how to connect | [Overview](./overview.md) |
-| Mail | `G M` | every email your app sent, and the replies you simulate | [Mail](./mail/index.md) |
-| SMS | `G S` | every SMS and WhatsApp message, as conversations | [SMS](./sms/index.md) |
+| Mail > Inbox | `G M` | every email your app sent, and the replies you simulate | [Mail](./mail/index.md) |
+| Mail > Providers | | the email APIs SendMock answers (SendGrid, Mailgun, ..., your own) | [Providers](./mail/providers.md) |
+| SMS > Messages | `G S` | every SMS and WhatsApp message, as conversations | [SMS](./sms/index.md) |
 | SMS > Verify | `G V` | Twilio Verify codes, with their expiry and attempts | [Verify](./sms/verify.md) |
+| SMS > Providers | | the SMS APIs SendMock answers (Twilio, Vonage, ..., your own) | [Providers](./sms/providers.md) |
 | HTTP Catcher | `G H` | the catcher for any other HTTP call your app makes | [HTTP Catcher](./http/index.md) |
 | Webhooks | `G W` | what SendMock sends back to your app, and its health | [Webhooks](./webhooks/index.md) |
 | Webhooks > Endpoints | | where deliveries go and how they are shaped and signed | [Endpoints](./webhooks/endpoints.md) |

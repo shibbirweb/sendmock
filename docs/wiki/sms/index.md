@@ -5,7 +5,7 @@ description: Twilio and Vonage compatible SMS and WhatsApp, shown as conversatio
 
 > Try it in the [demo](/demo/sms). Works in your install from Phase 2 (sending, status and callbacks), Phase 3 (reply webhooks) and Phase 4 (WhatsApp and more providers).
 
-Every SMS and WhatsApp message your app sends lands here, grouped into conversations like a phone shows them. Nothing reaches a real phone.
+Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, grouped into conversations like a phone shows them. Nothing reaches a real phone. **SMS** opens the messages; [SMS > Verify](./verify.md) and [SMS > Providers](./providers.md) sit under it.
 
 ![The SMS screen with a WhatsApp conversation open](../images/sms.jpg)
 
@@ -29,10 +29,11 @@ Every SMS and WhatsApp message your app sends lands here, grouped into conversat
 
 ## Use it
 
-1. Point your app's SMS provider base URL at `http://127.0.0.1:8026` (Twilio and Vonage SDKs keep working), or press **Send a sample SMS** on the empty screen.
-2. Send an SMS from your app. The conversation for that number pair moves to the top.
-3. Open it. Watch the ticks go from sent to delivered, and copy the code if the message has one.
-4. Type "YES" in **Reply as recipient** at the bottom and send. The contact's reply appears on the left, and the number's reply webhook is called.
+1. Open **SMS > Messages** (`G S`).
+2. Point your app's SMS provider base URL at `http://127.0.0.1:8026` (Twilio and Vonage SDKs keep working), or press **Send a sample SMS** on the empty screen.
+3. Send an SMS from your app. The conversation for that number pair moves to the top.
+4. Open it. Watch the ticks go from sent to delivered, and copy the code if the message has one.
+5. Type "YES" in **Reply as recipient** at the bottom and send. The contact's reply appears on the left, and the number's reply webhook is called.
 
 ## Everything on this screen
 

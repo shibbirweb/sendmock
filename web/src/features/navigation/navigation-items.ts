@@ -6,12 +6,14 @@ import {
   FileCode2Icon,
   GaugeIcon,
   GlobeIcon,
+  InboxIcon,
   ListChecksIcon,
   ListTodoIcon,
   MailPlusIcon,
   type LucideIcon,
   MailIcon,
   MessageSquareIcon,
+  MessagesSquareIcon,
   PhoneIcon,
   ReceiptIcon,
   ScrollTextIcon,
@@ -48,6 +50,7 @@ export const navigationItems: NavigationItem[] = [
     icon: MailIcon,
     shortcutKey: "m",
     children: [
+      { title: "Inbox", path: "/mail", icon: InboxIcon },
       { title: "Providers", path: "/mail/providers", icon: ServerCogIcon },
     ],
   },
@@ -57,6 +60,7 @@ export const navigationItems: NavigationItem[] = [
     icon: MessageSquareIcon,
     shortcutKey: "s",
     children: [
+      { title: "Messages", path: "/sms", icon: MessagesSquareIcon },
       {
         title: "Verify",
         path: "/sms/verify",
