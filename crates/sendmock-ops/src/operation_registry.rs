@@ -7,23 +7,23 @@ use std::sync::Arc;
 use schemars::Schema;
 use serde_json::Value;
 
-use crate::{Operation, OperationContext, OperationDefinition, OperationError};
+use crate::{Operation, OperationAnswer, OperationContext, OperationDefinition, OperationError};
 use typed_operation::TypedOperation;
 
-pub type JsonResultFuture<'call> =
-    Pin<Box<dyn Future<Output = Result<Value, OperationError>> + Send + 'call>>;
+pub type AnswerFuture<'call> =
+    Pin<Box<dyn Future<Output = Result<OperationAnswer, OperationError>> + Send + 'call>>;
 
-/// An operation behind JSON in and JSON out, so the registry can hold operations of
-/// different types and every surface can call them the same way.
+/// An operation behind JSON in and an [`OperationAnswer`] out, so the registry can hold
+/// operations of different types and every surface can call them the same way.
 pub trait ErasedOperation: Send + Sync {
     fn definition(&self) -> &OperationDefinition;
     fn input_schema(&self) -> Schema;
     fn output_schema(&self) -> Schema;
-    fn execute_json<'call>(
+    fn execute_answer<'call>(
         &'call self,
         operation_context: &'call OperationContext,
         input: Value,
-    ) -> JsonResultFuture<'call>;
+    ) -> AnswerFuture<'call>;
 }
 
 #[derive(Default, Clone)]

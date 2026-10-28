@@ -40,13 +40,25 @@ pub enum CliError {
 
     #[error("Check failed: {field_name} is false")]
     CheckFailed { field_name: String },
+
+    #[error("{0}")]
+    InvalidInput(String),
+
+    #[error("`{command}` deletes data; run it again with --yes to confirm")]
+    ConfirmationRequired { command: String },
+
+    #[error("Could not write {file_path}: {reason}")]
+    UnwritableFile { file_path: String, reason: String },
 }
 
 impl CliError {
     pub fn exit_code(&self) -> CliExitCode {
         match self {
             Self::ServerUnreachable { .. } | Self::UnreadableAnswer(_) => CliExitCode::Error,
-            Self::UnreadableFile { .. } => CliExitCode::Usage,
+            Self::UnreadableFile { .. }
+            | Self::InvalidInput(_)
+            | Self::ConfirmationRequired { .. } => CliExitCode::Usage,
+            Self::UnwritableFile { .. } => CliExitCode::Error,
             Self::CheckFailed { .. } => CliExitCode::AssertionFailed,
             Self::Api { http_status, .. } => match http_status {
                 400 => CliExitCode::Usage,

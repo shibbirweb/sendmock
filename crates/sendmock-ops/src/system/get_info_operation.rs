@@ -25,8 +25,7 @@ impl Operation for GetInfoOperation {
                 input_name: "view",
                 value: "info",
             }),
-            cli_arguments: &[],
-            success_flag_field: None,
+            ..OperationDefinition::DEFAULTS
         }
     }
 
@@ -111,8 +110,13 @@ mod tests {
             .find_by_operation_id("getInfo")
             .ok_or_else(|| OperationError::Internal("getInfo is not registered".to_owned()))?;
         let app_info_json = info_operation
-            .execute_json(&operation_context, serde_json::json!({}))
+            .execute_answer(&operation_context, serde_json::json!({}))
             .await?;
+        let crate::OperationAnswer::Json(app_info_json) = app_info_json else {
+            return Err(OperationError::Internal(
+                "info answered without JSON".to_owned(),
+            ));
+        };
 
         assert_eq!(app_info_json["database_path"], "memory");
         assert_eq!(app_info_json["channel"], "dev");

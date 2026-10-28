@@ -1,17 +1,26 @@
 //! The operation registry: each feature is one operation that REST, the CLI and MCP all call.
 
+mod input_coercion;
+mod input_shape;
 mod instance_details;
 mod no_input;
 mod operation;
+mod operation_answer;
 mod operation_context;
 mod operation_error;
 mod operation_registry;
 mod seed;
 mod system;
 
+pub use input_coercion::build_input_from_text;
+pub use input_shape::{InputShape, ScalarType, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
 pub use no_input::NoInput;
-pub use operation::{CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector};
+pub use operation::{
+    AnswerKind, CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector,
+    RawBodyInput, SuccessStatus, to_snake_case,
+};
+pub use operation_answer::{FileAnswer, NoContent, OperationAnswer};
 pub use operation_context::OperationContext;
 pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};

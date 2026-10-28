@@ -1,8 +1,13 @@
 use schemars::Schema;
 use serde_json::Value;
 
-use super::{ErasedOperation, JsonResultFuture};
-use crate::{Operation, OperationContext, OperationDefinition, OperationError};
+use std::any::Any;
+
+use super::{AnswerFuture, ErasedOperation};
+use crate::{
+    FileAnswer, NoContent, Operation, OperationAnswer, OperationContext, OperationDefinition,
+    OperationError,
+};
 
 pub struct TypedOperation<WrappedOperation: Operation> {
     operation: WrappedOperation,
@@ -32,11 +37,11 @@ impl<WrappedOperation: Operation> ErasedOperation for TypedOperation<WrappedOper
         schemars::schema_for!(WrappedOperation::Output)
     }
 
-    fn execute_json<'call>(
+    fn execute_answer<'call>(
         &'call self,
         operation_context: &'call OperationContext,
         input: Value,
-    ) -> JsonResultFuture<'call> {
+    ) -> AnswerFuture<'call> {
         Box::pin(async move {
             let typed_input = serde_json::from_value::<WrappedOperation::Input>(input).map_err(
                 |decode_error| OperationError::InvalidInput {
@@ -48,8 +53,27 @@ impl<WrappedOperation: Operation> ErasedOperation for TypedOperation<WrappedOper
                 .operation
                 .execute(operation_context, typed_input)
                 .await?;
-            serde_json::to_value(output)
-                .map_err(|encode_error| OperationError::Internal(encode_error.to_string()))
+            into_answer::<WrappedOperation::Output>(output)
         })
     }
+}
+
+/// Files and empty answers are told apart by their type; everything else is JSON.
+fn into_answer<Output: serde::Serialize + 'static>(
+    output: Output,
+) -> Result<OperationAnswer, OperationError> {
+    let boxed_output: Box<dyn Any> = Box::new(output);
+    let boxed_output = match boxed_output.downcast::<FileAnswer>() {
+        Ok(file_answer) => return Ok(OperationAnswer::File(*file_answer)),
+        Err(other_output) => other_output,
+    };
+    if boxed_output.is::<NoContent>() {
+        return Ok(OperationAnswer::Empty);
+    }
+    let typed_output = boxed_output.downcast::<Output>().map_err(|_| {
+        OperationError::Internal("the operation answered an unexpected type".to_owned())
+    })?;
+    serde_json::to_value(*typed_output)
+        .map(OperationAnswer::Json)
+        .map_err(|encode_error| OperationError::Internal(encode_error.to_string()))
 }

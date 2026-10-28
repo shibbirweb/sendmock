@@ -91,7 +91,7 @@ fn merge_input_schemas(tool_operations: &[Arc<dyn ErasedOperation>]) -> Value {
     json!({ "type": "object", "properties": properties, "required": required_inputs })
 }
 
-/// GET and other read-only operations read only; DELETE destructive; PUT, PATCH and DELETE
+/// Read-only operations read only, destructive ones destructive; PUT, PATCH and DELETE
 /// idempotent (docs/plan/21-reference-and-examples.md).
 fn annotate_tool(tool_operations: &[Arc<dyn ErasedOperation>]) -> McpToolAnnotations {
     let methods: Vec<HttpMethod> = tool_operations
@@ -103,7 +103,9 @@ fn annotate_tool(tool_operations: &[Arc<dyn ErasedOperation>]) -> McpToolAnnotat
         .all(|operation| operation.definition().is_read_only);
     McpToolAnnotations {
         read_only_hint: is_read_only,
-        destructive_hint: methods.contains(&HttpMethod::Delete),
+        destructive_hint: tool_operations
+            .iter()
+            .any(|operation| operation.definition().is_destructive),
         idempotent_hint: !is_read_only
             && methods.iter().all(|method| {
                 matches!(

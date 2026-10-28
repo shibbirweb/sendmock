@@ -25,6 +25,7 @@ impl Operation for ValidateSeedOperation {
                 reads_file: true,
             }],
             success_flag_field: Some("is_valid"),
+            ..OperationDefinition::DEFAULTS
         }
     }
 

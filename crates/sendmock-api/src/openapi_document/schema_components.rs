@@ -42,6 +42,16 @@ impl SchemaComponents {
         }
     }
 
+    /// The schema a reference from [`Self::add_root_schema`] points to, or the schema itself.
+    pub fn resolve(&self, schema: &Value) -> Value {
+        schema["$ref"]
+            .as_str()
+            .and_then(|reference| reference.strip_prefix(COMPONENTS_PREFIX))
+            .and_then(|schema_name| self.schemas.get(schema_name))
+            .cloned()
+            .unwrap_or_else(|| schema.clone())
+    }
+
     pub fn into_schemas(self) -> Map<String, Value> {
         self.schemas
     }

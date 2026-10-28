@@ -4,11 +4,16 @@ use std::sync::Arc;
 use axum::Json;
 use axum::Router;
 use axum::body::Bytes;
-use axum::extract::Query;
+use axum::extract::{Query, RawPathParams};
+use axum::http::StatusCode;
+use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, on};
-use sendmock_ops::{ErasedOperation, HttpMethod, OperationContext, OperationRegistry};
-use serde_json::Value;
+use sendmock_ops::{
+    ErasedOperation, HttpMethod, OperationAnswer, OperationContext, OperationRegistry,
+    build_input_from_text, to_snake_case,
+};
+use serde_json::{Map, Value};
 
 use crate::api_error_response::ApiErrorResponse;
 
@@ -35,43 +40,92 @@ pub fn build_rest_router(
         })
 }
 
+/// The pieces of a request an operation's input is built from.
+struct RequestParts {
+    path_parameters: Vec<(String, String)>,
+    query_parameters: Vec<(String, String)>,
+    body: Bytes,
+}
+
 fn build_operation_route(
     operation: Arc<dyn ErasedOperation>,
     operation_context: OperationContext,
 ) -> MethodRouter {
-    let method = operation.definition().method;
-    let method_filter = to_method_filter(method);
-    match method {
-        HttpMethod::Get | HttpMethod::Delete => on(
-            method_filter,
-            move |Query(query_parameters): Query<HashMap<String, String>>| async move {
-                let input = Value::Object(
-                    query_parameters
-                        .into_iter()
-                        .map(|(name, value)| (name, Value::String(value)))
-                        .collect(),
-                );
-                run_operation(operation.as_ref(), &operation_context, input).await
-            },
-        ),
-        HttpMethod::Post | HttpMethod::Put | HttpMethod::Patch => {
-            on(method_filter, move |request_body: Bytes| async move {
-                match parse_json_body(&request_body) {
-                    Ok(input) => run_operation(operation.as_ref(), &operation_context, input).await,
-                    Err(error_response) => error_response.into_response(),
-                }
-            })
+    let method_filter = to_method_filter(operation.definition().method);
+    let input_schema = Arc::new(operation.input_schema().to_value());
+    on(
+        method_filter,
+        move |path_parameters: RawPathParams,
+              Query(query_parameters): Query<Vec<(String, String)>>,
+              body: Bytes| async move {
+            let request_parts = RequestParts {
+                path_parameters: path_parameters
+                    .iter()
+                    .map(|(name, value)| (to_snake_case(name), value.to_owned()))
+                    .collect(),
+                query_parameters,
+                body,
+            };
+            match assemble_input(operation.as_ref(), &input_schema, request_parts) {
+                Ok(input) => run_operation(operation.as_ref(), &operation_context, input).await,
+                Err(error_response) => error_response.into_response(),
+            }
+        },
+    )
+}
+
+/// The JSON body (or the raw body in its input field), with the query and path values
+/// converted to the input's types on top; path values win, since they name the item.
+fn assemble_input(
+    operation: &dyn ErasedOperation,
+    input_schema: &Value,
+    request_parts: RequestParts,
+) -> Result<Value, ApiErrorResponse> {
+    let definition = operation.definition();
+    let mut input = match definition.raw_body_input {
+        Some(raw_body_input) => {
+            let mut raw_input = Map::new();
+            let body_text = String::from_utf8_lossy(&request_parts.body).into_owned();
+            raw_input.insert(
+                raw_body_input.input_name.to_owned(),
+                Value::String(body_text),
+            );
+            raw_input
         }
-    }
+        None if has_json_body(definition.method) => parse_json_body(&request_parts.body)?,
+        None => Map::new(),
+    };
+    let text_values: Vec<(String, String)> = request_parts
+        .query_parameters
+        .into_iter()
+        .chain(request_parts.path_parameters)
+        .collect();
+    input
+        .extend(build_input_from_text(input_schema, &text_values).map_err(ApiErrorResponse::from)?);
+    Ok(Value::Object(input))
+}
+
+fn has_json_body(method: HttpMethod) -> bool {
+    matches!(
+        method,
+        HttpMethod::Post | HttpMethod::Put | HttpMethod::Patch
+    )
 }
 
 /// An empty body counts as `{}`, so operations with only optional fields need no body.
-fn parse_json_body(request_body: &[u8]) -> Result<Value, ApiErrorResponse> {
+fn parse_json_body(request_body: &[u8]) -> Result<Map<String, Value>, ApiErrorResponse> {
     if request_body.is_empty() {
-        return Ok(Value::Object(serde_json::Map::new()));
+        return Ok(Map::new());
     }
-    serde_json::from_slice(request_body)
-        .map_err(|parse_error| ApiErrorResponse::invalid_json_body(&parse_error.to_string()))
+    match serde_json::from_slice(request_body) {
+        Ok(Value::Object(body_fields)) => Ok(body_fields),
+        Ok(_) => Err(ApiErrorResponse::invalid_json_body(
+            "expected a JSON object",
+        )),
+        Err(parse_error) => Err(ApiErrorResponse::invalid_json_body(
+            &parse_error.to_string(),
+        )),
+    }
 }
 
 async fn run_operation(
@@ -79,8 +133,28 @@ async fn run_operation(
     operation_context: &OperationContext,
     input: Value,
 ) -> Response {
-    match operation.execute_json(operation_context, input).await {
-        Ok(output) => Json(output).into_response(),
+    let success_status = StatusCode::from_u16(operation.definition().success_status.code())
+        .unwrap_or(StatusCode::OK);
+    match operation.execute_answer(operation_context, input).await {
+        Ok(OperationAnswer::Json(answer)) => (success_status, Json(answer)).into_response(),
+        Ok(OperationAnswer::File(file_answer)) => {
+            let content_disposition = match &file_answer.file_name {
+                Some(file_name) => {
+                    format!("attachment; filename=\"{}\"", file_name.replace('"', ""))
+                }
+                None => "inline".to_owned(),
+            };
+            (
+                StatusCode::OK,
+                [
+                    (CONTENT_TYPE, file_answer.content_type),
+                    (CONTENT_DISPOSITION, content_disposition),
+                ],
+                file_answer.bytes,
+            )
+                .into_response()
+        }
+        Ok(OperationAnswer::Empty) => StatusCode::NO_CONTENT.into_response(),
         Err(operation_error) => ApiErrorResponse::from(operation_error).into_response(),
     }
 }
@@ -148,6 +222,71 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(read_json_body(response).await, json!({ "text": "hello" }));
+    }
+
+    #[tokio::test]
+    async fn fills_path_and_query_values_with_their_types() {
+        let response = build_test_router()
+            .oneshot(build_request(
+                "GET",
+                "/api/v1/test/items/01J0ITEM?count=3&is_urgent=true",
+                "",
+            ))
+            .await
+            .expect("a response");
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            read_json_body(response).await,
+            json!({ "item_id": "01J0ITEM", "count": 3, "is_urgent": true })
+        );
+    }
+
+    #[tokio::test]
+    async fn a_query_value_of_the_wrong_type_is_a_bad_request_naming_it() {
+        let response = build_test_router()
+            .oneshot(build_request(
+                "GET",
+                "/api/v1/test/items/01J0ITEM?count=many",
+                "",
+            ))
+            .await
+            .expect("a response");
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(read_json_body(response).await["error"]["field"], "count");
+    }
+
+    #[tokio::test]
+    async fn answers_created_files_and_no_content_with_their_status() {
+        let created = build_test_router()
+            .oneshot(build_request(
+                "POST",
+                "/api/v1/test/raw",
+                "From: a@b.test\r\n\r\nHi",
+            ))
+            .await
+            .expect("a response");
+        let file = build_test_router()
+            .oneshot(build_request("GET", "/api/v1/test/file", ""))
+            .await
+            .expect("a response");
+        let deleted = build_test_router()
+            .oneshot(build_request("DELETE", "/api/v1/test/items/01J0ITEM", ""))
+            .await
+            .expect("a response");
+
+        assert_eq!(created.status(), StatusCode::CREATED);
+        assert_eq!(
+            read_json_body(created).await,
+            json!({ "text": "From: a@b.test\r\n\r\nHi" })
+        );
+        assert_eq!(file.headers()[CONTENT_TYPE], "message/rfc822");
+        assert_eq!(
+            file.headers()[CONTENT_DISPOSITION],
+            "attachment; filename=\"message.eml\""
+        );
+        assert_eq!(deleted.status(), StatusCode::NO_CONTENT);
     }
 
     // AC: PL-01.2

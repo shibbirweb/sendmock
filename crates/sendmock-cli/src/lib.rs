@@ -3,11 +3,17 @@
 mod api_client;
 mod cli_error;
 mod client_arguments;
+mod command_arguments;
 mod command_description;
+mod command_input;
+mod flag_naming;
 mod operation_command_runner;
 mod operation_commands;
 mod output_printer;
 mod server_url;
+
+#[cfg(test)]
+mod test_operations;
 
 pub use cli_error::{CliError, CliExitCode};
 pub use client_arguments::ClientArguments;

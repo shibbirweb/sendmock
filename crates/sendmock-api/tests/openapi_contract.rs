@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
 use std::sync::Arc;
 
 use axum::body::Body;
@@ -6,7 +6,8 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel, build_operation_registry,
+    AnswerKind, InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel,
+    SuccessStatus, build_operation_registry,
 };
 use sendmock_store::{Database, DatabaseLocation, EMBEDDED_MIGRATIONS};
 use serde_json::{Value, json};
@@ -23,17 +24,21 @@ impl UiAssets for NoUiAssets {
     }
 }
 
-/// One request body per operation, sent through the router; an operation without a sample
-/// fails the answer test, so every new operation brings one.
-fn sample_inputs(operation_id: &str) -> Option<Vec<Value>> {
-    match operation_id {
-        "getHealth" | "getInfo" => Some(vec![json!({})]),
-        "postSeedValidate" => Some(vec![
-            json!({ "seed_toml": "[[numbers]]\nnumber = \"+15550001111\"\n" }),
-            json!({ "seed_toml": "[[mystery]]\nkey = 1\n" }),
-        ]),
-        _ => None,
-    }
+/// Inputs per operation, sent through the router; an operation without samples fails the
+/// answer test, so every new operation brings some. Samples that need an item create it
+/// first through the API.
+async fn prepare_sample_inputs(_app_router: &axum::Router) -> HashMap<&'static str, Vec<Value>> {
+    HashMap::from([
+        ("getHealth", vec![json!({})]),
+        ("getInfo", vec![json!({})]),
+        (
+            "postSeedValidate",
+            vec![
+                json!({ "seed_toml": "[[numbers]]\nnumber = \"+15550001111\"\n" }),
+                json!({ "seed_toml": "[[mystery]]\nkey = 1\n" }),
+            ],
+        ),
+    ])
 }
 
 fn read_frozen_contract() -> Value {
@@ -97,25 +102,46 @@ fn top_level_shape(document: &Value, schema: &Value) -> (BTreeSet<String>, BTree
     (property_names, required_names)
 }
 
-fn response_schema(operation_object: &Value) -> &Value {
-    &operation_object["responses"]["200"]["content"]["application/json"]["schema"]
+fn response_schema<'operation>(
+    operation_object: &'operation Value,
+    success_code: &str,
+) -> &'operation Value {
+    &operation_object["responses"][success_code]["content"]["application/json"]["schema"]
 }
 
 fn request_schema(operation_object: &Value) -> &Value {
     &operation_object["requestBody"]["content"]["application/json"]["schema"]
 }
 
-fn served_operations(operation_registry: &OperationRegistry) -> Vec<(String, String, String)> {
+/// What the tests need to know about one operation the binary serves.
+struct ServedOperation {
+    path: String,
+    method: String,
+    operation_id: String,
+    success_code: String,
+    is_json_answer: bool,
+    raw_body_input: Option<String>,
+    path_inputs: Vec<(String, String)>,
+}
+
+fn served_operations(operation_registry: &OperationRegistry) -> Vec<ServedOperation> {
     operation_registry
         .operations()
         .iter()
         .map(|operation| {
             let definition = operation.definition();
-            (
-                definition.path.to_owned(),
-                definition.method.as_str().to_lowercase(),
-                definition.operation_id.to_owned(),
-            )
+            ServedOperation {
+                path: definition.path.to_owned(),
+                method: definition.method.as_str().to_lowercase(),
+                operation_id: definition.operation_id.to_owned(),
+                success_code: definition.success_status.code().to_string(),
+                is_json_answer: definition.answer_kind == AnswerKind::Json
+                    && definition.success_status != SuccessStatus::NoContent,
+                raw_body_input: definition
+                    .raw_body_input
+                    .map(|raw_body| raw_body.input_name.to_owned()),
+                path_inputs: definition.path_parameter_names(),
+            }
         })
         .collect()
 }
@@ -126,16 +152,23 @@ fn every_served_operation_is_in_the_frozen_contract_with_the_same_id_and_summary
     let frozen_contract = read_frozen_contract();
     let generated_document = build_openapi_document(&build_operation_registry(), "0.0.0");
 
-    for (path, method, operation_id) in served_operations(&build_operation_registry()) {
-        let frozen_operation = &frozen_contract["paths"][&path][&method];
-        let generated_operation = &generated_document["paths"][&path][&method];
+    for served_operation in served_operations(&build_operation_registry()) {
+        let ServedOperation {
+            path,
+            method,
+            operation_id,
+            ..
+        } = &served_operation;
+        let frozen_operation = &frozen_contract["paths"][path][method];
+        let generated_operation = &generated_document["paths"][path][method];
 
         assert!(
             frozen_operation.is_object(),
             "{method} {path} is not in docs/api/openapi.yaml"
         );
         assert_eq!(
-            frozen_operation["operationId"], operation_id,
+            frozen_operation["operationId"],
+            operation_id.as_str(),
             "{method} {path}"
         );
         assert_eq!(
@@ -151,13 +184,25 @@ fn bodies_have_the_contract_properties_and_required_fields() {
     let frozen_contract = read_frozen_contract();
     let generated_document = build_openapi_document(&build_operation_registry(), "0.0.0");
 
-    for (path, method, _) in served_operations(&build_operation_registry()) {
-        let frozen_operation = &frozen_contract["paths"][&path][&method];
-        let generated_operation = &generated_document["paths"][&path][&method];
+    for served_operation in served_operations(&build_operation_registry()) {
+        let ServedOperation {
+            path,
+            method,
+            success_code,
+            ..
+        } = &served_operation;
+        let frozen_operation = &frozen_contract["paths"][path][method];
+        let generated_operation = &generated_document["paths"][path][method];
 
         assert_eq!(
-            top_level_shape(&generated_document, response_schema(generated_operation)),
-            top_level_shape(&frozen_contract, response_schema(frozen_operation)),
+            top_level_shape(
+                &generated_document,
+                response_schema(generated_operation, success_code)
+            ),
+            top_level_shape(
+                &frozen_contract,
+                response_schema(frozen_operation, success_code)
+            ),
             "the answer of {method} {path}"
         );
         assert_eq!(
@@ -183,37 +228,83 @@ fn validate_against_frozen_schema(
         .collect()
 }
 
+/// The request an operation's input makes: path values in the URL, the rest in the query
+/// string, the JSON body or the raw body.
+fn build_operation_request(served_operation: &ServedOperation, input: &Value) -> Request<Body> {
+    let mut remaining_input = input.as_object().cloned().unwrap_or_default();
+    let mut request_path = served_operation.path.clone();
+    for (placeholder, input_name) in &served_operation.path_inputs {
+        let path_value = remaining_input.remove(input_name).unwrap_or_default();
+        let path_text = path_value
+            .as_str()
+            .map_or_else(|| path_value.to_string(), str::to_owned);
+        request_path = request_path.replace(&format!("{{{placeholder}}}"), &path_text);
+    }
+    let has_body = served_operation.method != "get" && served_operation.method != "delete";
+    if !has_body && !remaining_input.is_empty() {
+        let query_string: Vec<String> = remaining_input
+            .iter()
+            .map(|(name, value)| {
+                format!(
+                    "{name}={}",
+                    value
+                        .as_str()
+                        .map_or_else(|| value.to_string(), str::to_owned)
+                )
+            })
+            .collect();
+        request_path = format!("{request_path}?{}", query_string.join("&"));
+    }
+    let body = match (&served_operation.raw_body_input, has_body) {
+        (Some(raw_input_name), _) => Body::from(
+            remaining_input[raw_input_name]
+                .as_str()
+                .unwrap_or_default()
+                .to_owned(),
+        ),
+        (None, true) => Body::from(Value::Object(remaining_input).to_string()),
+        (None, false) => Body::empty(),
+    };
+    Request::builder()
+        .method(served_operation.method.to_uppercase().as_str())
+        .uri(request_path)
+        .header("content-type", "application/json")
+        .body(body)
+        .unwrap_or_else(|error| panic!("a valid request: {error}"))
+}
+
+/// Sends the request and checks the status; the JSON answer, when the operation has one.
 async fn send_operation_request(
     app_router: &axum::Router,
-    method: &str,
-    path: &str,
+    served_operation: &ServedOperation,
     input: &Value,
-) -> Value {
-    let has_request_body = method != "get" && method != "delete";
-    let request = Request::builder()
-        .method(method.to_uppercase().as_str())
-        .uri(path)
-        .header("content-type", "application/json")
-        .body(if has_request_body {
-            Body::from(input.to_string())
-        } else {
-            Body::empty()
-        })
-        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+) -> Option<Value> {
     let response = app_router
         .clone()
-        .oneshot(request)
+        .oneshot(build_operation_request(served_operation, input))
         .await
         .unwrap_or_else(|error| panic!("a response: {error}"));
-    assert!(
-        response.status().is_success(),
-        "{method} {path} answered {}",
+    assert_eq!(
+        response.status().as_u16().to_string(),
+        served_operation.success_code,
+        "{} answered {}",
+        served_operation.operation_id,
         response.status()
     );
     let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
         .await
         .unwrap_or_else(|error| panic!("a body: {error}"));
-    serde_json::from_slice(&body_bytes).unwrap_or_else(|error| panic!("a JSON answer: {error}"))
+    served_operation.is_json_answer.then(|| {
+        serde_json::from_slice(&body_bytes).unwrap_or_else(|error| panic!("a JSON answer: {error}"))
+    })
+}
+
+fn without_path_inputs(served_operation: &ServedOperation, input: &Value) -> Value {
+    let mut body_input = input.as_object().cloned().unwrap_or_default();
+    for (_, input_name) in &served_operation.path_inputs {
+        body_input.remove(input_name);
+    }
+    Value::Object(body_input)
 }
 
 // AC: PL-01.1
@@ -226,17 +317,28 @@ async fn real_answers_and_sample_requests_match_the_frozen_schemas() {
         &build_operation_context(),
         Arc::new(NoUiAssets),
     );
+    let prepared_samples = prepare_sample_inputs(&app_router).await;
 
-    for (path, method, operation_id) in served_operations(&operation_registry) {
-        let frozen_operation = &frozen_contract["paths"][&path][&method];
-        let inputs = sample_inputs(&operation_id)
+    for served_operation in served_operations(&operation_registry) {
+        let ServedOperation {
+            path,
+            method,
+            operation_id,
+            success_code,
+            ..
+        } = &served_operation;
+        let frozen_operation = &frozen_contract["paths"][path][method];
+        let inputs = prepared_samples
+            .get(operation_id.as_str())
             .unwrap_or_else(|| panic!("add sample inputs for {operation_id}"));
         for input in inputs {
-            if method != "get" && method != "delete" {
+            let has_json_body =
+                method != "get" && method != "delete" && served_operation.raw_body_input.is_none();
+            if has_json_body {
                 let request_errors = validate_against_frozen_schema(
                     &frozen_contract,
                     request_schema(frozen_operation),
-                    &input,
+                    &without_path_inputs(&served_operation, input),
                 );
                 assert!(
                     request_errors.is_empty(),
@@ -244,17 +346,19 @@ async fn real_answers_and_sample_requests_match_the_frozen_schemas() {
                 );
             }
 
-            let answer = send_operation_request(&app_router, &method, &path, &input).await;
+            let answer = send_operation_request(&app_router, &served_operation, input).await;
 
-            let answer_errors = validate_against_frozen_schema(
-                &frozen_contract,
-                response_schema(frozen_operation),
-                &answer,
-            );
-            assert!(
-                answer_errors.is_empty(),
-                "the answer of {operation_id}: {answer_errors:?}"
-            );
+            if let Some(answer) = answer {
+                let answer_errors = validate_against_frozen_schema(
+                    &frozen_contract,
+                    response_schema(frozen_operation, success_code),
+                    &answer,
+                );
+                assert!(
+                    answer_errors.is_empty(),
+                    "the answer of {operation_id}: {answer_errors:?}"
+                );
+            }
         }
     }
 }
