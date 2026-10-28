@@ -17,7 +17,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): every workstream (W0 to W12) is built, with a commit each, in pull request #48 into `develop`. Next: CI green on the last commit, then mark #48 ready for review and merge it; after the merge, check that Docker edge pushed and signed the first `edge` image (DS-02.5) and do the owner setup below.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 (operation framework) first, then W2 to W9 in order. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -209,6 +209,8 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 - [x] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12) (#48)
 
 ### Phase 1: Email backend and first beta
+
+Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29: every phase on this branch), W1 to W9 in order.
 
 - [ ] SMTP server (EHLO, MAIL, RCPT, DATA, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH, STARTTLS)
 - [ ] MIME parsing, storage, retention, FTS search
@@ -522,3 +524,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 0 W12 (done before W10, since release archives carry these files): `README.md` (what SendMock is, status, demo, docs, run from source, contributing, licence) and the dual licence files `LICENSE-MIT` and `LICENSE-APACHE`. |
 | 2026-10-29 | Phase 0 W10: Prepare release (bump choice and dry run, CI and in-progress checks, version and changelog written, release pull request), Publish beta, Promote stable and Publish stable (after CI passes on a push; a tagged version is left alone, so re-runs are safe; `0.0.0` is never published), and Release build (six targets, each archive tested on its own runner with the alpine and busybox images for Linux, `SHA256SUMS`, then the draft release is published and the rolling `beta` moved). The decisions are tested Bun scripts in `scripts/release/`. DS-04.2, DS-04.4 and DS-04.5 ticked; DS-04.1 and DS-04.3 wait for the first beta and stable. Owner setup: allow Actions to create pull requests, and optionally a `RELEASE_TOKEN` so release pull requests start CI. |
 | 2026-10-29 | Phase 0 W11: the `Dockerfile` (static musl binary on `scratch`, UID 10001, `/data`, `/config`, HEALTHCHECK `sendmock health`, 2 MB compressed) and Docker edge (each architecture built and tested on its own runner; on `develop`, pushed with an SBOM and provenance, tagged `edge` and signed with cosign). The binary loads `/config/sendmock.toml` and warns when it listens beyond this machine without UI auth. PL-06.1, DS-02.1 and DS-02.2 ticked; DS-02.5 after the first signed `edge` push. Every Phase 0 workstream is built; the phase is done when #48 merges. Owner setup: Docker Hub secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (optional; GHCR works without them). |
+| 2026-10-29 | Plan: Phase 1 in full ([25](25-phase-1.md)): nine workstreams (operation framework, email storage and parsing, email operations, SMTP server, realtime, logs and settings, CLI and MCP, live UI with auth and CORS, compatibility and packaging) with their criteria. The owner asked for every phase on `feat/phase-0`, so Phase 1 continues in #48; publishing `0.1.0-beta.1` waits for the merge. |

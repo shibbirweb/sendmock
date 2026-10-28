@@ -136,6 +136,8 @@ Workstreams, order, criteria and dependencies: [23-phase-0.md](23-phase-0.md).
 
 **Done when:** a Laravel app and a Node app both send mail that appears live in the UI, and a pytest test reads an OTP via `/api/v1/otp`.
 
+Workstreams, order and criteria: [25-phase-1.md](25-phase-1.md).
+
 ## Phase 2: SMS backend (about 2 weeks)
 
 - Native SMS API (JSON, form, GET).
