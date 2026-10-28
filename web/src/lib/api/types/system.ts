@@ -157,7 +157,7 @@ export type AppStats = {
   recent_failures: RecentFailedDelivery[];
 };
 
-/** The release line a build comes from; it decides which updates are offered (PL-05.12). */
+/** The release line a build comes from; it decides which updates are offered. */
 export type ReleaseChannel = "stable" | "beta" | "edge" | "dev";
 
 export type AppInfo = {
@@ -380,10 +380,10 @@ export type SeedFileRequest = {
   seed_toml: string;
 };
 
-/** When the update check runs (PL-05.10); `off` is the default. */
+/** When the update check runs; `off` is the default. */
 export type UpdateCheckMode = "off" | "manual" | "daily";
 
-/** How SendMock was installed, baked in by each package; it picks the upgrade command (PL-05.11). */
+/** How SendMock was installed, baked in by each package; it picks the upgrade command. */
 export type InstallMethod =
   "homebrew" | "scoop" | "docker" | "install_script" | "npm" | "unknown";
 
@@ -403,7 +403,7 @@ export type AvailableRelease = {
   upgrade_command: string | null;
 };
 
-/** GET /api/v1/updates: the result of the opt-in update check (PL-05.10 to PL-05.12). */
+/** GET /api/v1/updates: the result of the opt-in update check. */
 export type UpdateCheckResult = {
   current_version: string;
   channel: ReleaseChannel;

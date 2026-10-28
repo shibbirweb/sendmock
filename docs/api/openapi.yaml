@@ -13942,7 +13942,7 @@ components:
         - available_release
         - checked_at
         - is_from_cache
-      description: "GET /api/v1/updates: the result of the opt-in update check (PL-05.10 to PL-05.12)."
+      description: "GET /api/v1/updates: the result of the opt-in update check."
     VariableKind:
       type: string
       enum:

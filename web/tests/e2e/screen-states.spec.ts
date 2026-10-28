@@ -82,9 +82,11 @@ test("UI-07.2 every screen shows a skeleton while its data loads", async ({
   await page.getByRole("slider", { name: "Latency" }).focus();
   await page.keyboard.press("End");
   await page.keyboard.press("Escape");
-  // The overview and the SMS threads (the sidebar badge) are already loaded.
+  // The overview, the SMS threads (the sidebar badge) and the settings (the
+  // daily update check reads its mode on start) are already loaded.
+  const preloadedPaths = ["/", "/sms", "/settings"];
   const unloadedScreens = screensWithData.filter(
-    (screen) => screen.path !== "/" && screen.path !== "/sms",
+    (screen) => !preloadedPaths.includes(screen.path),
   );
   for (const screen of unloadedScreens) {
     await navigateInApp(page, screen.path);
