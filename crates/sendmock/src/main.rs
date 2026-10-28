@@ -7,6 +7,7 @@ mod help_output;
 mod instance_details_builder;
 mod listener_binding;
 mod logging;
+mod seed_file_check;
 mod server_runner;
 mod server_startup;
 mod shutdown_signal;

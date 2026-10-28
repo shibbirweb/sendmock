@@ -34,6 +34,15 @@ pub struct OperationSelector {
     pub value: &'static str,
 }
 
+/// A `<placeholder>` in a CLI usage and the input it fills; `reads_file` sends the named
+/// file's text instead of the path.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CliArgument {
+    pub placeholder: &'static str,
+    pub input_name: &'static str,
+    pub reads_file: bool,
+}
+
 /// What every surface needs to know about an operation, named as in `docs/api/openapi.yaml`
 /// and the surface catalogue, so the binary serves exactly the commands and tools documented.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,6 +56,9 @@ pub struct OperationDefinition {
     pub cli_usage: &'static str,
     pub mcp_tool: &'static str,
     pub selector: Option<OperationSelector>,
+    pub cli_arguments: &'static [CliArgument],
+    /// A boolean output field that must be true for the CLI to exit 0, such as `is_valid`.
+    pub success_flag_field: Option<&'static str>,
 }
 
 /// One feature, defined once: typed input, typed output and the handler (the Command pattern).

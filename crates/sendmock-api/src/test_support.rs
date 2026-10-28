@@ -63,6 +63,8 @@ impl Operation for EchoOperation {
             cli_usage: "sendmock test echo",
             mcp_tool: "sendmock_test_echo",
             selector: None,
+            cli_arguments: &[],
+            success_flag_field: None,
         }
     }
 
@@ -91,6 +93,8 @@ impl Operation for SlowOperation {
             cli_usage: "sendmock test slow",
             mcp_tool: "sendmock_test_slow",
             selector: None,
+            cli_arguments: &[],
+            success_flag_field: None,
         }
     }
 

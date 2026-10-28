@@ -25,6 +25,8 @@ impl Operation for GetInfoOperation {
                 input_name: "view",
                 value: "info",
             }),
+            cli_arguments: &[],
+            success_flag_field: None,
         }
     }
 

@@ -40,5 +40,21 @@ expression: command_descriptions
     "mcp": [
       "sendmock_status"
     ]
+  },
+  {
+    "command": "sendmock seed validate",
+    "usage": "sendmock seed validate <file>",
+    "summary": "Check a seed file without applying it.",
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/seed/validate",
+        "operation_id": "postSeedValidate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_seed_validate"
+    ]
   }
 ]

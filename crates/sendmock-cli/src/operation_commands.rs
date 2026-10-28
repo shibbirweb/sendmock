@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use clap::{ArgMatches, Args, Command};
+use clap::{Arg, ArgMatches, Args, Command};
 use sendmock_ops::{ErasedOperation, OperationRegistry};
 
 use crate::ClientArguments;
@@ -74,7 +74,11 @@ fn build_command_tree(operation_registry: &OperationRegistry) -> CommandNode {
 fn build_clap_command(command_name: &'static str, command_node: CommandNode) -> Command {
     let mut command = Command::new(command_name);
     if let Some(operation) = &command_node.operation {
-        command = ClientArguments::augment_args(command.about(operation.definition().summary));
+        let definition = operation.definition();
+        command = ClientArguments::augment_args(command.about(definition.summary));
+        for cli_argument in definition.cli_arguments {
+            command = command.arg(Arg::new(cli_argument.placeholder).required(true));
+        }
     } else {
         command = command.subcommand_required(true);
     }
@@ -115,6 +119,13 @@ mod tests {
         for operation in operation_registry.operations() {
             let mut arguments = vec![BINARY_NAME];
             arguments.extend(command_words(operation.definition().cli_usage));
+            arguments.extend(
+                operation
+                    .definition()
+                    .cli_arguments
+                    .iter()
+                    .map(|_| "argument-value"),
+            );
 
             let matched_operation_id =
                 parse(&arguments).map(|matched| matched.operation.definition().operation_id);

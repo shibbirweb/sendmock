@@ -168,6 +168,45 @@ fn answers_the_health_check_and_unknown_api_paths_over_http() {
     assert!(unknown_response.contains(r#""code":"not_found""#));
 }
 
+#[test]
+fn an_invalid_seed_file_stops_startup_with_its_line_numbers() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    fs::write(
+        working_directory.path().join("sendmock.seed.toml"),
+        "[[mystery]]\nkey = 1\n",
+    )
+    .expect("the seed file is written");
+
+    let output =
+        run_until_exit(sendmock_command(working_directory.path()).args(FREE_PORT_ARGUMENTS))
+            .expect("sendmock runs");
+
+    let error_output = String::from_utf8_lossy(&output.stderr);
+    assert_eq!(output.status.code(), Some(2));
+    assert!(error_output.contains("line 1: Unknown section [[mystery]]"));
+}
+
+#[test]
+fn a_valid_seed_file_lets_the_server_start() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    fs::write(
+        working_directory.path().join("sendmock.seed.toml"),
+        "[[numbers]]\nnumber = \"+15550001111\"\n",
+    )
+    .expect("the seed file is written");
+
+    let sendmock = SendmockProcess::start(
+        sendmock_command(working_directory.path()).args(FREE_PORT_ARGUMENTS),
+    )
+    .expect("sendmock starts");
+
+    assert!(
+        sendmock
+            .wait_for_line("Seed file is valid")
+            .contains("sendmock.seed.toml")
+    );
+}
+
 #[cfg(unix)]
 #[test]
 fn stops_cleanly_on_sigterm() {

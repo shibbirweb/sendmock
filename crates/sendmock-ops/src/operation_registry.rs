@@ -62,7 +62,7 @@ mod tests {
             .map(|operation| operation.definition().operation_id)
             .collect();
 
-        assert_eq!(operation_ids, ["getHealth", "getInfo"]);
+        assert_eq!(operation_ids, ["getHealth", "getInfo", "postSeedValidate"]);
         assert!(
             operation_registry
                 .find_by_operation_id("getHealth")

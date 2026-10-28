@@ -5,6 +5,7 @@ use sendmock_store::DatabaseLocation;
 
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
+use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
 use super::{ConfigError, LogFormat, LogLevel};
 use crate::cli_arguments::ServeArguments;
 
@@ -38,12 +39,18 @@ impl ServerConfig {
             Some(file_path) => ConfigFile::read(file_path)?,
             None => ConfigFile::default(),
         };
-        Ok(Self::resolve(
+        let mut server_config = Self::resolve(
             serve_arguments,
             config_file,
             config_file_path,
             default_database_location(dirs::data_dir().as_deref()),
-        ))
+        );
+        server_config.seed_file_path = locate_seed_file(
+            server_config.seed_file_path.as_deref(),
+            &current_directory,
+            Path::new(CONTAINER_CONFIG_DIRECTORY),
+        );
+        Ok(server_config)
     }
 
     /// Flags and environment variables (already merged by clap) win over the file, which

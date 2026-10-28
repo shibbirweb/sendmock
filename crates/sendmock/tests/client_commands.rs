@@ -113,3 +113,67 @@ fn version_answers_without_a_server() {
     assert_eq!(version["version"], env!("CARGO_PKG_VERSION"));
     assert_eq!(version["channel"], "dev");
 }
+
+// AC: PL-04.5
+#[test]
+fn seed_validate_reports_problems_with_line_numbers_and_exits_five() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let (_sendmock, server_url) = start_server(working_directory.path());
+    std::fs::write(
+        working_directory.path().join("broken.seed.toml"),
+        "[settings]\n\n[[webhook.endpoint]]\nname = \"typo\"\n",
+    )
+    .expect("the seed file is written");
+
+    let output = run_until_exit(sendmock_command(working_directory.path()).args([
+        "seed",
+        "validate",
+        "broken.seed.toml",
+        "--server",
+        &server_url,
+    ]))
+    .expect("the command runs");
+
+    let seed_validation: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("stdout is JSON");
+    assert_eq!(output.status.code(), Some(5));
+    assert_eq!(seed_validation["is_valid"], false);
+    assert_eq!(seed_validation["errors"][0]["line"], 3);
+}
+
+#[test]
+fn seed_validate_passes_a_valid_file() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let (_sendmock, server_url) = start_server(working_directory.path());
+    std::fs::write(
+        working_directory.path().join("valid.seed.toml"),
+        "[[numbers]]\nnumber = \"+15550001111\"\n",
+    )
+    .expect("the seed file is written");
+
+    let output = run_until_exit(sendmock_command(working_directory.path()).args([
+        "seed",
+        "validate",
+        "valid.seed.toml",
+        "--server",
+        &server_url,
+    ]))
+    .expect("the command runs");
+
+    assert_eq!(output.status.code(), Some(0));
+}
+
+#[test]
+fn seed_validate_with_a_missing_file_is_a_usage_error() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+
+    let output = run_until_exit(sendmock_command(working_directory.path()).args([
+        "seed",
+        "validate",
+        "missing.seed.toml",
+    ]))
+    .expect("the command runs");
+
+    assert_eq!(output.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("missing.seed.toml"));
+}

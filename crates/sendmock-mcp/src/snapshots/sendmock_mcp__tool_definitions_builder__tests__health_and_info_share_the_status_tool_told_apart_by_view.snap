@@ -30,5 +30,29 @@ expression: tool_definitions
       "getHealth",
       "getInfo"
     ]
+  },
+  {
+    "name": "sendmock_seed_validate",
+    "description": "Check a seed file without applying it.",
+    "inputSchema": {
+      "properties": {
+        "seed_toml": {
+          "description": "The seed file's text (`sendmock.seed.toml`).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seed_toml"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": false
+    },
+    "operationIds": [
+      "postSeedValidate"
+    ]
   }
 ]

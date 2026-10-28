@@ -23,6 +23,8 @@ impl Operation for GetHealthOperation {
                 input_name: "view",
                 value: "health",
             }),
+            cli_arguments: &[],
+            success_flag_field: None,
         }
     }
 

@@ -34,12 +34,20 @@ pub enum CliError {
 
     #[error("SendMock answered with something that is not JSON: {0}")]
     UnreadableAnswer(String),
+
+    #[error("Could not read {file_path}: {reason}")]
+    UnreadableFile { file_path: String, reason: String },
+
+    #[error("Check failed: {field_name} is false")]
+    CheckFailed { field_name: String },
 }
 
 impl CliError {
     pub fn exit_code(&self) -> CliExitCode {
         match self {
             Self::ServerUnreachable { .. } | Self::UnreadableAnswer(_) => CliExitCode::Error,
+            Self::UnreadableFile { .. } => CliExitCode::Usage,
+            Self::CheckFailed { .. } => CliExitCode::AssertionFailed,
             Self::Api { http_status, .. } => match http_status {
                 400 => CliExitCode::Usage,
                 404 => CliExitCode::NotFound,
@@ -74,6 +82,10 @@ mod tests {
             reason: "connection refused".to_owned(),
         };
         assert_eq!(unreachable.exit_code(), CliExitCode::Error);
+        let check_failed = CliError::CheckFailed {
+            field_name: "is_valid".to_owned(),
+        };
+        assert_eq!(check_failed.exit_code(), CliExitCode::AssertionFailed);
     }
 
     // AC: AI-01.3
