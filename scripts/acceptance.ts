@@ -14,9 +14,11 @@ import { join, relative } from "node:path";
 
 const repositoryRoot = join(import.meta.dir, "..");
 const acceptanceDirectory = join(repositoryRoot, "docs/plan/acceptance");
-const testRoots = ["web/src", "web/tests", "website", "crates"];
+const testRoots = ["web/src", "web/tests", "website", "crates", "scripts"];
 const testFilePattern = /(\.test\.tsx?|\.spec\.ts|_test\.rs|\.rs)$/;
 const ignoredDirectoryNames = new Set(["node_modules", "dist", "target", ".git"]);
+// Its fixtures use real criterion IDs as sample data, not as proof.
+const ignoredFileNames = new Set(["acceptance.test.ts"]);
 
 export const criterionIdPattern = /\b([A-Z]{2}-\d{2}\.\d+)\b/g;
 
@@ -77,7 +79,7 @@ function listTestFiles(directoryPath: string): string[] {
   }
 
   return directoryEntries.flatMap((entryName) => {
-    if (ignoredDirectoryNames.has(entryName)) {
+    if (ignoredDirectoryNames.has(entryName) || ignoredFileNames.has(entryName)) {
       return [];
     }
 

@@ -5,7 +5,6 @@ import { SendMockLogo } from "@/components/sendmock-logo";
 import { basePath } from "@/lib/base-path";
 import {
   bugReportUrl,
-  changelogUrl,
   featureRequestUrl,
   repositoryUrl,
   securityReportUrl,
@@ -49,7 +48,7 @@ const footerColumns: { heading: string; links: FooterLink[] }[] = [
         href: securityReportUrl,
         isExternal: true,
       },
-      { label: "What's new", href: changelogUrl, isExternal: true },
+      { label: "What's new", href: "/changelog" },
       { label: "Star on GitHub", href: repositoryUrl, isExternal: true },
     ],
   },

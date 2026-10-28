@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 108 features, 64 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 0 / 108 features, 68 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -142,7 +142,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
 | [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | Not started |
-| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Not started |
+| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | In progress |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 5 (Testcontainers) | 2 | Not started |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Not started |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |

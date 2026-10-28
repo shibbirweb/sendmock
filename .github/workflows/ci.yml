@@ -242,6 +242,9 @@ jobs:
       - name: Criteria named by tests exist, accepted features are proven
         run: bun scripts/acceptance.ts
 
+      - name: Every file carries the same version (DS-05.2)
+        run: bun scripts/version.ts check
+
   website:
     name: Website
     runs-on: ubuntu-latest

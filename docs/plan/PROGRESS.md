@@ -9,15 +9,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (9 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (10 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 108 accepted, 64 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 108 accepted, 68 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream, and one pull request into `develop` whose CI runs the tests. W0 to W8 are done (the binary serves the API and the embedded UI, and the done-when check passes in CI on all three operating systems); next is **W9, the version script and changelog**, then W10 (release workflows), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
+1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream, and one pull request into `develop` whose CI runs the tests. W0 to W9 are done (the binary serves the API and the embedded UI, and the done-when check passes in CI on all three operating systems); next is **W10, the release workflows**, then W11 (Dockerfile and `edge` image) and W12 (README and licence), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -55,7 +55,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | In progress | 9 / 13 |
+| 0 | Backend foundations | In progress | 10 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -203,7 +203,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 - [x] OpenAPI contract tests against handlers (#48)
 - [x] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check) (#48)
 - [x] Rust test setup: nextest, `insta` snapshots, `cargo llvm-cov` coverage gate (80% overall, 90% domain/operations), test fakes for `Clock`, `IdGenerator`, random source (#48)
-- [ ] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow
+- [x] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow (#48)
 - [ ] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
 - [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
@@ -518,3 +518,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 0 W6: CLI commands generated from the operation registry (`sendmock health`, `sendmock status`) with `--server`, `--token` and `--json` (the default when piped) and the documented exit codes; `sendmock version` and `sendmock help --all --json` (commands and MCP tools); MCP tool definitions from the registry (`sendmock_status` with its `view` selector); the Surface parity workflow checks the binary against `docs/api/cli-reference.json` and `mcp-tools.json`. AI-01.1, AI-01.2, AI-01.3 and AI-01.5 ticked. New dependencies `reqwest` (without TLS for now) and `insta` for tests. |
 | 2026-10-29 | Phase 0 W7: seed file validation in the operations layer (TOML syntax, the 16 known sections and their shape, `${NAME}` references, no literal secrets, each problem with its line, item counts per kind) as `POST /api/v1/seed/validate`, `sendmock seed validate <file>` (exit 5 when invalid) and the `sendmock_seed_validate` tool; the server validates `--seed`, `./sendmock.seed.toml` or `/config/sendmock.seed.toml` at startup and refuses a broken one. PL-04.5 ticked. |
 | 2026-10-29 | Phase 0 W8: the OpenAPI document generated from the registry and served at `/api/openapi.json`, and contract tests that check every served operation against the frozen `docs/api/openapi.yaml` (id, summary, top-level body shape, and real answers and sample requests validated against its schemas). PL-01.3 ticked; PL-01.1 grows with each phase. New test-only dependencies `jsonschema` and `serde_yaml_ng`. |
+| 2026-10-29 | Phase 0 W9: `scripts/version.ts` works out the next version from the bump choice and the merged pull requests (the plan 16 table, tested row by row), writes it into `Cargo.toml`, `Cargo.lock` and both `package.json` files, checks they agree in CI, writes the `CHANGELOG.md` section (Breaking changes, Added, Fixed; stables collect their betas) and prints a version's notes; the website has a `/changelog/` page. DS-05.1 to DS-05.4 ticked; DS-05.5 waits for the first published release. |
