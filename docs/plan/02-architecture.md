@@ -146,6 +146,7 @@ sendmock/
 │   ├── sendmock/                # binary: CLI, wiring, config
 │   ├── sendmock-core/           # shared types: Event, Email, Sms, errors
 │   ├── sendmock-store/          # SQLite, migrations, search, retention
+│   ├── sendmock-mail/           # email domain: parsing, extraction, tags, ingest
 │   ├── sendmock-smtp/           # SMTP server
 │   ├── sendmock-sms/            # SMS gateway + provider emulation
 │   ├── sendmock-webhooks/       # rules, rendering, delivery queue

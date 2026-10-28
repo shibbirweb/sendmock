@@ -19,6 +19,7 @@ homepage = "https://shibbirweb.github.io/sendmock/"
 sendmock-api = { path = "crates/sendmock-api" }
 sendmock-cli = { path = "crates/sendmock-cli" }
 sendmock-core = { path = "crates/sendmock-core" }
+sendmock-mail = { path = "crates/sendmock-mail" }
 sendmock-mcp = { path = "crates/sendmock-mcp" }
 sendmock-ops = { path = "crates/sendmock-ops" }
 sendmock-smtp = { path = "crates/sendmock-smtp" }
@@ -34,10 +35,13 @@ clap = { version = "4", features = [
 ] }
 dirs = "7"
 jsonschema = { version = "0.60", default-features = false }
+mail-parser = "1"
+base64 = "0.23"
 insta = { version = "1", features = [
     "json",
 ] }
 rand = "0.10"
+regex = "1"
 reqwest = { version = "0.13", default-features = false, features = [
     "json",
     "query",
@@ -76,6 +80,7 @@ tracing-subscriber = { version = "0.3", default-features = false, features = [
     "std",
 ] }
 ulid = "3"
+zstd = "0.14"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

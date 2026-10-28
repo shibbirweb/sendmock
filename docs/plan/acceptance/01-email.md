@@ -27,10 +27,10 @@ Phase 1.
 
 Phase 1.
 
-- [ ] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received.
+- [x] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received. (#48)
 - [ ] EM-03.2 With `--max-emails N` the oldest messages are pruned so at most N remain; `--max-age` prunes by age.
 - [ ] EM-03.3 `--db memory` keeps nothing on disk.
-- [ ] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails.
+- [x] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails. (#48)
 - [ ] EM-03.5 Delete one, delete by filter and delete all work from UI, API, CLI and MCP.
 
 ## EM-04 Email viewer
@@ -50,7 +50,7 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 
 UI in U1, backend Phase 1.
 
-- [ ] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies.
+- [x] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies. (#48)
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
 - [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
 - [ ] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code.
@@ -119,8 +119,8 @@ Phase 3. Docs: [Opened events](../05-webhooks.md#opened-events).
 
 Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules).
 
-- [ ] EM-12.1 `X-Tags` header values become tags.
-- [ ] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`.
+- [x] EM-12.1 `X-Tags` header values become tags. (#48)
+- [x] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`. (#48)
 - [ ] EM-12.3 Tag rules add tags to matching new messages.
 - [ ] EM-12.4 Manual tags can be added and removed from UI, API, CLI and MCP.
 

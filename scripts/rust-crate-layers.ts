@@ -22,6 +22,7 @@ export const crateLayers: Record<
 > = {
   "sendmock-core": { layerName: "foundation", layerRank: 0 },
   "sendmock-store": { layerName: "storage", layerRank: 1 },
+  "sendmock-mail": { layerName: "domain", layerRank: 2 },
   "sendmock-sms": { layerName: "domain", layerRank: 2 },
   "sendmock-webhooks": { layerName: "domain", layerRank: 2 },
   "sendmock-ops": { layerName: "operations", layerRank: 3 },
