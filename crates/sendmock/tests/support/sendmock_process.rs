@@ -55,6 +55,7 @@ impl SendmockProcess {
         })
     }
 
+    #[cfg(unix)]
     pub fn process_id(&self) -> u32 {
         self.child.id()
     }
@@ -72,6 +73,7 @@ impl SendmockProcess {
         panic!("sendmock never printed a line with {expected_text:?}");
     }
 
+    #[cfg(unix)]
     pub fn wait_for_exit_success(mut self) -> bool {
         self.child
             .wait()
