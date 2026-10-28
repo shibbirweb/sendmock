@@ -166,6 +166,7 @@ As planned in [09](09-distribution.md#docker):
 
 - `README.md` at the root: what SendMock is in two sentences, the screenshot from the landing page, install (a note that the first beta comes with Phase 1, and the `edge` image until then), the quick start, and links to the docs, the demo, `CONTRIBUTING.md` and `SECURITY.md`.
 - The licence files from W0 (`LICENSE-MIT` and `LICENSE-APACHE` for the recommendation), which `release.yml` puts in every archive next to the readme.
+- **As built:** done before W10, since the release archives carry these files. `LICENSE-APACHE` is the standard Apache-2.0 text, copied from a crate in the Cargo registry rather than typed; `LICENSE-MIT` names MD. Shibbir Ahmed. The README says there is no release yet, points to the demo, the docs and PROGRESS, gives run-from-source steps, and states the dual licence; the `sendmock` crate points its `readme` at it.
 
 ## Criteria
 
