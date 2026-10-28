@@ -26,14 +26,16 @@ How it was chosen (2026-10-25). Candidates were checked on package registries, b
 - **Rejected for existing brands or conflicts:** Gateway Lab (`gatewaylab.net` belongs to GatewayAPI, an SMS gateway), MailSMS (CM.com's "Mail SMS" product), Sendlab (several email marketing businesses), Outbox Lab, SMSHook (Indian bulk SMS provider), PingPost (lead generation), Postnest (social scheduler), Sendvault, Sendpark (Sendspark), Pingmere and other "Ping" names (Ping Identity actively opposes "PING" marks), Courion, Mittio (Mitto SMS), Messio (Messagio), Envoyo (Envoy proxy), Dingbox, Beepost (bpost), MessageHook (descriptive; a Landbot feature name; the `.com` is parked for sale).
 - **Clear alternatives kept on file:** SendMockway (the "Mockway" part is an existing Scaleway mock server project), Telvara, Heraldyn, Msgvane, Missivio, Missivr, Hootpit, Hookwick, Gatepit, Mockway, Sandport, Pigeonix.
 
-**Remaining check:** search "SendMock" in the USPTO, EUIPO and WIPO trademark databases (and Bangladesh DPDT if registering locally) before investing in branding.
+**Remaining check:** search "SendMock" in the USPTO, EUIPO and WIPO trademark databases (and Bangladesh DPDT if registering locally) before investing in branding. **Deferred on 2026-10-29** to before 1.0 (Phase 5, "Final product name applied everywhere"); nothing in Phases 0 to 4 depends on it.
 
-## 2. Default ports
+## 2. Default ports (decided 2026-10-29: 1025 / 8025)
 
 - **Option A (recommended):** SMTP `1025`, HTTP `8025`. Drop-in for existing Mailpit/MailHog configs. Downside: conflicts if both tools run at once.
 - **Option B:** unique ports (e.g. `2025` / `8125`) to coexist.
 
 Recommendation: A, with a clear "port in use" error message suggesting `--http-addr`.
+
+**Decided 2026-10-29:** Option A, SMTP `1025` and HTTP `8025`, with the "port in use" message from PL-07.3.
 
 ## 3. Provider emulation priority
 
@@ -54,9 +56,11 @@ Recommendation: A for v1; revisit if users report DBs over ~1 GB.
 
 TanStack Router + Vite is recommended (mature shadcn support). Bun's built-in HTML bundler is an option to drop Vite later if it covers Tailwind v4 and shadcn cleanly.
 
-## 7. Licence
+## 7. Licence (decided 2026-10-29: MIT OR Apache-2.0)
 
 MIT or Apache-2.0 (dual licence is the Rust norm). Recommendation: dual MIT/Apache-2.0.
+
+**Decided 2026-10-29:** dual licence, `MIT OR Apache-2.0` in `Cargo.toml`, with `LICENSE-MIT` and `LICENSE-APACHE` at the repository root and in every release archive.
 
 ## 8. Telemetry
 

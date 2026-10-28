@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), not started (0 / 13). Before it starts: settle or defer the open placeholder decisions (name trademark check, ports, licence). Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (0 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
@@ -17,13 +17,13 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. Merge the Phase 0 plan pull request from `docs/phase-0-plan` (below) once its CI is green.
-2. Phase 0 W0: settle or defer the open placeholder decisions (Decisions > Open below, [10](10-open-questions.md#2-default-ports)): the default ports (1025 / 8025 recommended) and the licence (dual MIT / Apache-2.0 recommended) are needed by W1 and W3; the "SendMock" trademark check may wait until before 1.0. This is the last Planning item.
-3. Phase 0 W1 onwards, in the workstream order of [23](23-phase-0.md): the Cargo workspace and crate skeletons, then Rust CI and the test setup.
+1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream after the owner approves it, and one pull request into `develop` whose CI runs the tests. W0 is done; next is **W1, the Cargo workspace and crate skeletons**, then W2 (Rust CI and the test setup), in the order of [23](23-phase-0.md#workstreams-and-order).
+2. When the pull request is opened, add its number to the ticked Phase 0 and Planning items.
 
 ### Resume here (2026-10-29)
 
-- **Phase 0 planned, Stage B audited (branch `docs/phase-0-plan`, from `develop` at `4613b27`):** [23-phase-0.md](23-phase-0.md) splits Phase 0 into W0 to W12 with branches, deliverables, tests, criteria and dependencies. [24-stage-b-coverage.md](24-stage-b-coverage.md) maps all 221 UI operations to the phase that builds them; the gaps it found are now in the Stage B phases below. Owner decisions from the audit: the binary embeds the live UI build only from Phase 1, with **Not available yet** for operations not built yet (new feature UI-12, `available_operations` in `GET /info`, [07](07-ui.md#not-available-yet-stage-b)); virtual numbers move to Phase 2 (SM-12); UI and API auth lands in Phase 1. Open point in [23](23-phase-0.md#criteria): whether the three-OS smoke job proves DS-01.2 for the host build, or it waits for the release binaries.
+- **Phase 0 under way on `feat/phase-0` (2026-10-29):** one branch for the whole phase, a commit per workstream, one pull request; tests run in its CI. W0 settled the ports (1025 / 8025) and the licence (MIT OR Apache-2.0) and deferred the trademark check to before 1.0.
+- **Phase 0 planned, Stage B audited (#47, merged):** [23-phase-0.md](23-phase-0.md) splits Phase 0 into W0 to W12 with branches, deliverables, tests, criteria and dependencies. [24-stage-b-coverage.md](24-stage-b-coverage.md) maps all 221 UI operations to the phase that builds them; the gaps it found are now in the Stage B phases below. Owner decisions from the audit: the binary embeds the live UI build only from Phase 1, with **Not available yet** for operations not built yet (new feature UI-12, `available_operations` in `GET /info`, [07](07-ui.md#not-available-yet-stage-b)); virtual numbers move to Phase 2 (SM-12); UI and API auth lands in Phase 1. Open point in [23](23-phase-0.md#criteria): whether the three-OS smoke job proves DS-01.2 for the host build, or it waits for the release binaries.
 - **Working copy:** this work was done in the worktree `~/prefetch/mail-sms-server`; the main checkout `~/Personal/mail-sms-server` is on `feat/promo-video` with the promo video work uncommitted.
 - **UI signed off on 2026-10-29:** Stage A is done and Stage B may start. The sign-off pull request from `chore/u3-sign-off` ticks W11 and the sign-off, signs off every row of the review table in [18](18-phase-u3.md#review-table) (UI-07.3, with new rows for Mail providers, SMS providers and Scenarios), ticks 28 gate criteria (27 proven by passing tests, plus UI-07.3 proven by the sign-off) and sets UI-05 to UI-10, WS-02 and WS-04 to `UI done`. WS-02.4 (the video player) and WS-04.2 (snippets against a real instance) wait for Stage B.
 - **Merged before it:** #40 (versioned docs, Install with AI), #42 (W18 update checker, F18), #43 (PR number fix) and #44 (the ask-first rule for commits, pushes and branches in [AGENTS.md](../../AGENTS.md)). #45 was closed unmerged (an older copy of #44). #41 is the GitHub Discussions welcome post; Discussions share numbers with issues and pull requests.
@@ -50,12 +50,12 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
-| P | Planning | In progress | 12 / 13 |
+| P | Planning | Done | 13 / 13 |
 | U0 | UI foundations | Done | 15 / 15 |
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | Not started | 0 / 13 |
+| 0 | Backend foundations | In progress | 0 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -79,7 +79,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - [x] `AGENTS.md` with the common rules, imported by `CLAUDE.md`
 - [x] Acceptance criteria for every feature (81 features, 289 criteria) in [acceptance/](acceptance/README.md)
 - [x] Plan committed to the repository on `develop`
-- [ ] Placeholder decisions confirmed or deferred (name, ports, licence)
+- [x] Placeholder decisions confirmed or deferred (name, ports, licence): ports 1025 / 8025 and licence MIT OR Apache-2.0 decided, the trademark check deferred to before 1.0 (2026-10-29, Phase 0 W0)
 
 ## Stage A: UI with mock data
 
@@ -349,6 +349,9 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 | 2026-10-29 | From Phase 1 the binary embeds the live UI build only; operations not built yet show Not available yet with their phase (UI-12) | [07](07-ui.md#not-available-yet-stage-b), [24](24-stage-b-coverage.md) |
 | 2026-10-29 | Virtual numbers and Messaging Services backend moved from Phase 4 to Phase 2 | [11](11-roadmap.md), [24](24-stage-b-coverage.md) |
 | 2026-10-29 | UI and API auth (`--ui-auth`, API token) lands in Phase 1 with the first beta | [11](11-roadmap.md), [24](24-stage-b-coverage.md) |
+| 2026-10-29 | Default ports SMTP `1025` and HTTP `8025` (Mailpit compatible) | [10](10-open-questions.md#2-default-ports-decided-2026-10-29-1025--8025) |
+| 2026-10-29 | Licence `MIT OR Apache-2.0` (`LICENSE-MIT`, `LICENSE-APACHE`) | [10](10-open-questions.md#7-licence-decided-2026-10-29-mit-or-apache-20) |
+| 2026-10-29 | Phase 0 on one branch, `feat/phase-0`, with a commit per workstream and one pull request | [23](23-phase-0.md#workstreams-and-order) |
 
 ### Open
 
@@ -356,9 +359,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 
 | Question | Recommendation | Status |
 |----------|----------------|--------|
-| Trademark check for "SendMock" | search USPTO, EUIPO, WIPO before branding | Open |
-| Default ports | 1025 / 8025 (Mailpit compatible) | Open (using recommendation) |
-| Licence | dual MIT / Apache-2.0 | Open |
+| Trademark check for "SendMock" | search USPTO, EUIPO, WIPO before branding | Deferred to before 1.0 (2026-10-29) |
 | Provider emulation priority | Twilio, Vonage, then others; any other vendor is added as a custom provider, which replaced the Generic HTTP adapter ([22](22-configurable-providers.md)) | Open (using recommendation) |
 | SDK redirection per SDK | verify in Phase 4 | Open |
 | Attachment storage | inside SQLite | Open (using recommendation) |
@@ -508,3 +509,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | **UI signed off; Stage A done, Stage B may start** (U3 W11). The feedback round closed after F1 to F18 with no open `u3-feedback` issues. The owner signed off every row of the design review table in [18](18-phase-u3.md#review-table), with rows added for Mail providers, SMS providers and Scenarios (UI-07.3). 28 gate criteria are ticked (27 proven by passing tests, plus UI-07.3 by the sign-off) and UI-05 to UI-10, WS-02 and WS-04 are `UI done`; WS-02.4 and WS-04.2 wait for Stage B. U1, U2 and U3 are Done. Next: settle the placeholder decisions, then Phase 0. |
 | 2026-10-29 | Plan: Phase 0 in full ([23](23-phase-0.md)): W0 settles the default ports and the licence (the trademark check may wait), then twelve workstreams in order with branches, deliverables, tests and dependencies, the criteria Phase 0 ticks and the ones that wait for the first beta, and the new dependencies (`thiserror`, `dirs`, and `insta`, `tempfile`, `jsonschema` for tests only). The binary embeds the mock-mode UI until Phase 1 switches screens to live data. "Versioned website builds" left the Phase 0 list, since it moved to U3 W17 and was done there (#40), so Phase 0 has 13 items. |
 | 2026-10-29 | Stage B coverage audit ([24](24-stage-b-coverage.md)): all 221 operations of the signed-off UI are mapped to the phase that builds them. Added to the roadmap and this file: `/send/raw`, `/emails/latest`, SSE and `/events/recent`, `/samples/{kind}`, `/integrations/{stack}`, the Settings API and the real update check (Phase 1); MMS, custom outcome numbers, the SMS built-in provider runtime and `wait/sms` (Phase 2); `wait/webhook`, custom outcome addresses and the Overview going live (Phase 3); gateway, method and flow configuration and the missing Phase 3P items; the email and custom provider runtime and the Phase 4 payment items; a live step for every screen and a phase for every CLI and MCP toolset. Owner decisions: live UI build only from Phase 1 with Not available yet for operations not built yet (new feature UI-12, `available_operations` in `/info`), virtual numbers moved to Phase 2 (SM-12), UI and API auth in Phase 1. |
+| 2026-10-29 | Phase 0 started on `feat/phase-0` (one branch, a commit per workstream, one pull request, tests in its CI). W0: default ports 1025 / 8025 and licence MIT OR Apache-2.0 decided, the "SendMock" trademark check deferred to before 1.0; Planning is Done (13 / 13). |

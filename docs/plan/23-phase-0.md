@@ -26,9 +26,11 @@ Three placeholder decisions are still open ([10](10-open-questions.md)). Phase 0
 
 The owner records each decision in [10](10-open-questions.md) and in Decisions > Made in [PROGRESS.md](PROGRESS.md).
 
+**Decided 2026-10-29:** ports `1025` / `8025`, licence `MIT OR Apache-2.0`, and the trademark check deferred to before 1.0.
+
 ## Workstreams and order
 
-One pull request per workstream into `develop`, so each Rust change gets its own CI run and review. Each branch is created only after the owner approves it ([AGENTS.md](../../AGENTS.md#commits-and-pull-requests)). W9 and W12 only need W1 and can run beside the others.
+All Phase 0 workstreams are built on one branch, `feat/phase-0`, with a commit per workstream, and one pull request into `develop` whose CI runs the tests on each push (decided 2026-10-29, as in U3); the Branch column names the part only. Each commit is made after the owner approves it ([AGENTS.md](../../AGENTS.md#commits-and-pull-requests)). W9 and W12 only need W1 and can be done in any order after it.
 
 | # | Workstream | Branch | Criteria | Depends on |
 |---|------------|--------|----------|------------|
