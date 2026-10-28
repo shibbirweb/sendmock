@@ -192,22 +192,23 @@ test("PL-05.7 custom headers and payload fields show up in the snippets", async 
   );
 });
 
-test("PL-05.6 the update check stays off until it is turned on", async ({
+test("PL-05.6 About shows the version and channel, and the update check stays off until it is turned on", async ({
   page,
 }) => {
   await page.goto("/settings?section=about");
-  // Exact: the sidebar footer shows "v0.0.0-dev" too once /info loads.
-  await expect(page.getByText("0.0.0-dev", { exact: true })).toBeVisible();
+  await expect(page.getByText("0.1.0-beta.2", { exact: true })).toBeVisible();
+  await expect(page.getByText("(beta)")).toBeVisible();
   const checkButton = page.getByRole("button", { name: "Check for updates" });
   await expect(checkButton).toBeDisabled();
 
-  await page.getByLabel("Check GitHub Releases for updates").click();
-  await page
-    .getByRole("form", { name: "Updates" })
-    .getByRole("button", { name: "Save changes" })
-    .click();
+  const updatesForm = page.getByRole("form", { name: "Updates" });
+  await updatesForm.getByRole("radio", { name: /^Manual/ }).check();
+  await expect(checkButton).toBeDisabled();
+  await updatesForm.getByRole("button", { name: "Save changes" }).click();
   await checkButton.click();
-  await expect(page.getByText("0.1.0-beta.1 is available")).toBeVisible();
+  await expect(
+    page.getByText("SendMock 0.2.0-beta.1 is available"),
+  ).toBeVisible();
 });
 
 test("Reset puts the request back to the sample", async ({ page }) => {

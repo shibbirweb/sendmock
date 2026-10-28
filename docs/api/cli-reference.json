@@ -11043,19 +11043,23 @@
           ]
         },
         {
-          "flag": "--update-check-enabled",
+          "flag": "--update-check-mode",
           "input": {
-            "name": "is_update_check_enabled",
+            "name": "update_check_mode",
             "location": "body"
           },
-          "type": "boolean",
-          "value_label": null,
+          "type": "string",
+          "value_label": "<update-check-mode>",
           "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
-          "allowed_values": null,
-          "description": "Checks for a newer SendMock version.",
-          "example": true
+          "allowed_values": [
+            "off",
+            "manual",
+            "daily"
+          ],
+          "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day.",
+          "example": "off"
         },
         {
           "flag": "--inbound-email-domain",
@@ -13453,7 +13457,7 @@
       "command": "sendmock update check",
       "slug": "update-check",
       "usage": "sendmock update check",
-      "summary": "Whether a newer release exists.",
+      "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -13461,7 +13465,7 @@
           "method": "GET",
           "path": "/api/v1/updates",
           "operation_id": "getUpdates",
-          "summary": "Whether a newer release exists.",
+          "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
           "area_slug": "system",
           "selector": null
         }

@@ -5,6 +5,8 @@ export type AppSettingsFieldErrors = Partial<Record<keyof AppSettings, string>>;
 
 export const chaosSmtpRejectCodes = [421, 450, 550, 552] as const;
 
+export const updateCheckModes = ["off", "manual", "daily"] as const;
+
 function isWholeNumberBetween(value: unknown, min: number, max: number) {
   return (
     typeof value === "number" &&
@@ -126,6 +128,12 @@ export function validateAppSettingsUpdate(
     !chaosSmtpRejectCodes.includes(settingsUpdate.chaos_smtp_reject_code)
   ) {
     fieldErrors.chaos_smtp_reject_code = "Choose 421, 450, 550 or 552";
+  }
+  if (
+    settingsUpdate.update_check_mode !== undefined &&
+    !updateCheckModes.includes(settingsUpdate.update_check_mode)
+  ) {
+    fieldErrors.update_check_mode = "Choose off, manual or daily";
   }
   if (
     typeof settingsUpdate.relay_smtp_url === "string" &&

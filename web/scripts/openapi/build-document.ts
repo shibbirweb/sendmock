@@ -20,6 +20,10 @@ const errorResponses: Record<number, { name: string; description: string }> = {
     name: "Unprocessable",
     description: "The content does not parse or render.",
   },
+  502: {
+    name: "BadGateway",
+    description: "An outside service, such as GitHub, could not be reached.",
+  },
 };
 
 const apiDescription = [

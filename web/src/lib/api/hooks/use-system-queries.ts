@@ -61,9 +61,30 @@ export function useResetToSeed() {
   });
 }
 
+/** The server keeps an update check for 24 hours, so the UI does too. */
+const updateCheckIntervalMs = 24 * 60 * 60 * 1000;
+
 /** Asks GitHub Releases for a newer version; only works once opted in. */
 export function useCheckForUpdates() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: () => requestApi<UpdateCheckResult>("/updates"),
+    onSuccess: (updateCheckResult) => {
+      queryClient.setQueryData(queryKeys.system.updates, updateCheckResult);
+    },
+  });
+}
+
+/** The daily update check (PL-05.10): on start and then once a day. */
+export function useDailyUpdateCheck({ isEnabled }: { isEnabled: boolean }) {
+  return useQuery({
+    queryKey: queryKeys.system.updates,
+    queryFn: ({ signal }) =>
+      requestApi<UpdateCheckResult>("/updates", { abortSignal: signal }),
+    enabled: isEnabled,
+    staleTime: updateCheckIntervalMs,
+    refetchInterval: updateCheckIntervalMs,
+    retry: false,
   });
 }

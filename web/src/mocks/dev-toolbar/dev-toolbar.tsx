@@ -25,6 +25,8 @@ import {
 } from "@/mocks/conditions/mock-conditions";
 import { replaceMockDatabase } from "@/mocks/db/mock-database";
 import { DevToolbarSelect } from "@/mocks/dev-toolbar/dev-toolbar-select";
+import { mockInstallProfiles } from "@/mocks/updates/mock-releases";
+import { clearCachedUpdateCheck } from "@/mocks/updates/run-mock-update-check";
 import {
   generateSampleEmail,
   generateSampleSms,
@@ -127,6 +129,30 @@ export function DevToolbar() {
             onCheckedChange={(isRunningInContainer) => {
               updateMockConditions({ isRunningInContainer });
               refreshAllData();
+            }}
+          />
+        </div>
+        <DevToolbarSelect
+          label="Installed as"
+          value={mockConditions.installProfileKey}
+          options={mockInstallProfiles.map((installProfile) => ({
+            value: installProfile.key,
+            label: installProfile.label,
+          }))}
+          onValueChange={(installProfileKey) => {
+            updateMockConditions({ installProfileKey });
+            clearCachedUpdateCheck();
+            refreshAllData();
+          }}
+        />
+        <div className="flex items-center justify-between">
+          <Label htmlFor="github-reachable">GitHub reachable</Label>
+          <Switch
+            id="github-reachable"
+            checked={mockConditions.isGitHubReachable}
+            onCheckedChange={(isGitHubReachable) => {
+              updateMockConditions({ isGitHubReachable });
+              clearCachedUpdateCheck();
             }}
           />
         </div>

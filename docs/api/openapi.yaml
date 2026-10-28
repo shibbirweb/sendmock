@@ -103,7 +103,7 @@ paths:
   /api/v1/updates:
     get:
       operationId: getUpdates
-      summary: Whether a newer release exists.
+      summary: Whether a newer release exists for this channel, with its notes and upgrade command.
       tags:
         - System
       responses:
@@ -115,6 +115,8 @@ paths:
                 $ref: "#/components/schemas/UpdateCheckResult"
         "409":
           $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/BadGateway"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock update check
@@ -6823,12 +6825,7 @@ components:
         version:
           type: string
         channel:
-          type: string
-          enum:
-            - stable
-            - beta
-            - edge
-            - dev
+          $ref: "#/components/schemas/ReleaseChannel"
         uptime_seconds:
           type: number
         smtp_address:
@@ -6989,11 +6986,11 @@ components:
           description: Ordered; the first capture group of the first match is the code.
           examples:
             - - code[:\s]+(\d{4,8})
-        is_update_check_enabled:
-          type: boolean
-          description: Checks for a newer SendMock version.
+        update_check_mode:
+          $ref: "#/components/schemas/UpdateCheckMode"
+          description: "When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day."
           examples:
-            - true
+            - off
         inbound_email_domains:
           type: array
           items:
@@ -7045,7 +7042,7 @@ components:
         - chaos_smtp_command_latency_ms
         - is_chaos_smtp_drop_during_data_enabled
         - otp_patterns
-        - is_update_check_enabled
+        - update_check_mode
         - inbound_email_domains
         - payment_merchant_name
         - payment_default_currency
@@ -7184,11 +7181,11 @@ components:
           description: Ordered; the first capture group of the first match is the code.
           examples:
             - - code[:\s]+(\d{4,8})
-        is_update_check_enabled:
-          type: boolean
-          description: Checks for a newer SendMock version.
+        update_check_mode:
+          $ref: "#/components/schemas/UpdateCheckMode"
+          description: "When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day."
           examples:
-            - true
+            - off
         inbound_email_domains:
           type: array
           items:
@@ -7307,6 +7304,36 @@ components:
         - endpoint_metrics
         - recent_failures
       description: "GET /api/v1/stats: everything the Overview shows."
+    AvailableRelease:
+      type: object
+      properties:
+        version:
+          type: string
+          examples:
+            - 0.2.0-beta.1
+        published_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        release_notes_markdown:
+          type: string
+          description: The release's `CHANGELOG.md` section, in Markdown.
+        release_url:
+          type: string
+          examples:
+            - https://github.com/shibbirweb/sendmock/releases/tag/v0.2.0-beta.1
+        upgrade_command:
+          type:
+            - string
+            - "null"
+          description: The command for the install method; null when the method is unknown, so follow `release_url`.
+          examples:
+            - brew upgrade sendmock
+      required:
+        - version
+        - published_at
+        - release_notes_markdown
+        - release_url
+        - upgrade_command
+      description: The newer release an update check offers.
     BodyFieldType:
       type: string
       enum:
@@ -9304,6 +9331,16 @@ components:
         - filename
         - content
       description: An inline file in `media` of a native or simulated inbound send.
+    InstallMethod:
+      type: string
+      enum:
+        - homebrew
+        - scoop
+        - docker
+        - install_script
+        - npm
+        - unknown
+      description: How SendMock was installed, baked in by each package; it picks the upgrade command.
     IntegrationChannel:
       type: string
       enum:
@@ -12055,6 +12092,14 @@ components:
         - headers
         - body
         - is_body_truncated
+    ReleaseChannel:
+      type: string
+      enum:
+        - stable
+        - beta
+        - edge
+        - dev
+      description: The release line a build comes from; it decides which updates are offered.
     RenderMode:
       type: string
       enum:
@@ -13857,26 +13902,47 @@ components:
     Ulid:
       type: string
       description: Sortable unique ID (ULID), e.g. "01JB6Z3K8Q2W5X7Y9A1B3C5D7E".
+    UpdateCheckMode:
+      type: string
+      enum:
+        - off
+        - manual
+        - daily
+      description: When the update check runs; `off` is the default.
     UpdateCheckResult:
       type: object
       properties:
         current_version:
           type: string
-        latest_version:
-          type: string
+        channel:
+          $ref: "#/components/schemas/ReleaseChannel"
+        install_method:
+          $ref: "#/components/schemas/InstallMethod"
+        is_channel_checked:
+          type: boolean
+          description: False for edge and dev builds, which are offered no updates.
         is_update_available:
           type: boolean
-        release_url:
-          type: string
+        available_release:
+          anyOf:
+            - $ref: "#/components/schemas/AvailableRelease"
+            - type: "null"
+          description: Null when up to date or when the channel is not checked.
         checked_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        is_from_cache:
+          type: boolean
+          description: True when the answer is the last check's, kept for 24 hours.
       required:
         - current_version
-        - latest_version
+        - channel
+        - install_method
+        - is_channel_checked
         - is_update_available
-        - release_url
+        - available_release
         - checked_at
-      description: GET /api/v1/updates (opt-in).
+        - is_from_cache
+      description: "GET /api/v1/updates: the result of the opt-in update check."
     VariableKind:
       type: string
       enum:
@@ -15279,6 +15345,9 @@ components:
       content: *a1
     Unprocessable:
       description: The content does not parse or render.
+      content: *a1
+    BadGateway:
+      description: An outside service, such as GitHub, could not be reached.
       content: *a1
     Error:
       description: Any other error.

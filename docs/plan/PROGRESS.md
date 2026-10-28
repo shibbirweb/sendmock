@@ -2,29 +2,29 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-27
+**Last updated:** 2026-10-28
 
 ## Current position
 
 | | |
 |---|---|
 | **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), 16 / 19: W1 to W10 and W12 to W17 and W19 done (W16 configurable providers for the UI, W17 versioned docs, W19 Install with AI); left: W18 update checker on mock data, W11 the owner's feedback round, and the sign-off (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
+| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), 17 / 19: W1 to W10 and W12 to W19 done (W16 configurable providers for the UI, W17 versioned docs, W18 update checker on mock data, W19 Install with AI); left: W11 the owner's feedback round and the sign-off (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 107 accepted, 27 / 492 criteria ticked; Stage A features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 107 accepted, 27 / 493 criteria ticked; Stage A features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
 1. Merge the open pull request (see "Resume here").
-2. W18: the update checker on mock data (Off, Manual and Daily modes, release notes, the upgrade command, a header notification; [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12).
-3. W11: the owner's feedback round on the preview (feedback items so far: F1 to F17 in [18](18-phase-u3.md#feedback-items); new ones come as `u3-feedback` issues, the label exists).
-4. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick. Before Phase 0, settle the open placeholder decisions (name trademark check, ports, licence).
+2. W11: the owner's feedback round on the preview (feedback items so far: F1 to F18 in [18](18-phase-u3.md#feedback-items); new ones come as `u3-feedback` issues, the label exists).
+3. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick. Before Phase 0, settle the open placeholder decisions (name trademark check, ports, licence).
 
-### Resume here (2026-10-27)
+### Resume here (2026-10-28)
 
-- **Open pull request:** #40 from `feat/landing-section-headings` into `develop`, "feat:[U3] versioned docs with beta docs and a version switcher, and install tabs on Getting started". It holds F13 (install tabs on Getting started), F14 (versioned docs, W17), the F15 plan (Prepare release with a `bump` choice, a generated `CHANGELOG.md`, the update checker), F16 (Install with AI, W19: the prompt, `/llms.txt`, the AI tab in the landing quick start), the docs sidebar names Inbox and Messages, and the F17 plan (Deeper docs, WS-10). CI on its head must pass before merging; its PR description lists what was tested.
+- **Merged:** PR #40 (F13 install tabs on Getting started, F14 versioned docs W17, the F15 plan, F16 Install with AI W19, the F17 plan) went into `develop` as `37fc933`; CI, Surface parity and Publish the website passed on `develop`.
+- **Open pull request:** #41 from `feat/update-checker` into `develop`, "feat:[U3] update checker with Off, Manual and Daily modes, release notes and the upgrade command". It holds W18: `update_check_mode` replaces `is_update_check_enabled`, `GET /api/v1/updates` returns the offered release with its notes and upgrade command (`502` when GitHub cannot be reached), Settings > About shows the modes and the result, Daily adds one bell notification per new version, the upgrade command follows the platform SendMock runs on (owner feedback F18, new criterion PL-05.13: `install.ps1` on Windows, `install.sh` on macOS and Linux, Homebrew only on macOS and Linux, Scoop only on Windows), and the demo controls pick a pretend install and can make GitHub unreachable ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15)). CI on its head must pass before merging.
 - **One-time setting for the owner:** Settings > Environments > `github-pages` must also allow the tags `v*`, or the deploy after a published release is rejected.
 - **Working rules** (also in [AGENTS.md](../../AGENTS.md)): ask before creating a branch, committing or pushing; tests run in GitHub CI, not locally (only format, lint, typecheck and quick unit tests locally); CI runs on pull requests and on pushes to `develop` and `main`, not on other branch pushes; check CI with the public GitHub API (no `gh` CLI); install and setup docs are numbered steps with each command in its own block; never use the em-dash character; no co-authors or AI tool names in commits or pull requests.
 - **To pick up in a fresh session,** paste this prompt:
@@ -181,7 +181,7 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Deploy workflow and per-version app docs links (step 4)
   - [x] Docs page and tests per criterion (step 5)
 - [x] Install with AI: a copyable prompt on Getting started and Install that checks the computer and asks for Docker or the binary, `/llms.txt` per docs version, and an AI tab in the landing quick start ([16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16), WS-09); not part of the sign-off gate (W19)
-- [ ] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18)
+- [x] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18) (#41)
 - [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
 - [ ] **Sign-off: UI approved, Stage B may start**
 
@@ -479,3 +479,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | Plan: Install with AI (U3 W19, owner feedback F16, [16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16)): a prompt on Getting started and Install that checks the computer, asks for Docker or the binary in plain words and uses only the official commands; `/llms.txt` per docs version; an Install with AI card on the landing page. New feature WS-09 with 4 criteria. |
 | 2026-10-27 | Install with AI built (U3 W19, F16): the prompt lives in the Install page's "Install with AI" section and Getting started repeats it (unit tests check they match and every command is the Install page's own); `/llms.txt` is built per docs version from it and the docs pages; the landing quick start has an AI tab with the prompt (kept in the HTML), and every page head links to `/llms.txt`. Code blocks now keep their blank lines, and plain-text blocks wrap. |
 | 2026-10-27 | Plan: Deeper docs (owner feedback F17, [19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started)), not started: a page per screen explaining every button, field, badge and text, what it changes and sends, where its text comes from and how it links, kept true by a Playwright crawl of the demo and tables generated from the spec. Written screen by screen with Stage B's live modes, complete before 1.0; new feature WS-10 in Phase 5. Also on this branch: the docs sidebar names the Mail and SMS index pages Inbox and Messages, as the app does. |
+| 2026-10-28 | Update checker built on mock data (U3 W18, F15, PR #41): `update_check_mode` (off, manual, daily) replaces `is_update_check_enabled`; `GET /api/v1/updates` answers with the channel, install method and the offered release (date, release notes, upgrade command, release page), `409` while off and `502` "Could not check for updates" when GitHub cannot be reached; spec, CLI and MCP references regenerated. Settings > About has the mode choice and the result with a copyable upgrade command; Daily checks on start and once a day and adds one bell notification per new version. The mock picks the offered release per channel and keeps a check for 24 hours; the demo controls choose a pretend install and can make GitHub unreachable. Tests: unit tests in `web/src/mocks/updates/` and `web/src/features/updates/`, end to end in `web/tests/e2e/update-check.spec.ts`; PL-05.10 to PL-05.12 stay unticked until the server check in Phase 1. |
+| 2026-10-28 | Owner feedback F18: when the backend is built, the upgrade command follows the platform SendMock runs on. Recorded in [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15) with the command per platform, channel and install method, and as new criterion PL-05.13 (493 criteria). The mock does it already: each pretend install has a platform, unit tests cover the commands, and `web/tests/repository/upgrade-commands.test.ts` checks the install script, Homebrew and Docker commands against the Install page. |

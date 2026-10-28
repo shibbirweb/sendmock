@@ -116,7 +116,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Not started |
 | [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
-| [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 12 | In progress |
+| [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | Not started |
 | [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Not started |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Not started |

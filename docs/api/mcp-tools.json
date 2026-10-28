@@ -16190,16 +16190,20 @@
           ]
         },
         {
-          "name": "is_update_check_enabled",
+          "name": "update_check_mode",
           "input": {
-            "name": "is_update_check_enabled",
+            "name": "update_check_mode",
             "location": "body"
           },
-          "type": "boolean",
+          "type": "string",
           "is_required": false,
-          "allowed_values": null,
-          "description": "Checks for a newer SendMock version.",
-          "example": true
+          "allowed_values": [
+            "off",
+            "manual",
+            "daily"
+          ],
+          "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day.",
+          "example": "off"
         },
         {
           "name": "inbound_email_domains",
@@ -16459,11 +16463,11 @@
               ]
             ]
           },
-          "is_update_check_enabled": {
-            "type": "boolean",
-            "description": "Checks for a newer SendMock version.",
+          "update_check_mode": {
+            "$ref": "#/$defs/UpdateCheckMode",
+            "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day.",
             "examples": [
-              true
+              "off"
             ]
           },
           "inbound_email_domains": {
@@ -16543,6 +16547,15 @@
               "realistic",
               "manual"
             ]
+          },
+          "UpdateCheckMode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "manual",
+              "daily"
+            ],
+            "description": "When the update check runs; `off` is the default."
           }
         }
       },
@@ -20787,7 +20800,7 @@
     {
       "name": "sendmock_update_check",
       "toolset": "admin",
-      "summary": "Whether a newer release exists.",
+      "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -20795,7 +20808,7 @@
           "method": "GET",
           "path": "/api/v1/updates",
           "operation_id": "getUpdates",
-          "summary": "Whether a newer release exists.",
+          "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
           "area_slug": "system",
           "selector": null
         }

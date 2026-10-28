@@ -1,4 +1,5 @@
 import type { MockDataSize } from "@/mocks/db/mock-database";
+import { defaultMockInstallProfileKey } from "@/mocks/updates/mock-releases";
 
 export type SimulatedApiError = "none" | "server-error" | "not-found";
 
@@ -11,6 +12,10 @@ export type MockConditions = {
   realtimeIntervalMs: number;
   /** Makes `/info` report a Docker install, to try container hostnames. */
   isRunningInContainer: boolean;
+  /** Which pretend install `/info` and the update check report. */
+  installProfileKey: string;
+  /** Off makes the update check fail as if GitHub were down. */
+  isGitHubReachable: boolean;
 };
 
 type MockConditionsListener = (mockConditions: MockConditions) => void;
@@ -22,6 +27,8 @@ const defaultMockConditions: MockConditions = {
   isRealtimeEnabled: true,
   realtimeIntervalMs: 12_000,
   isRunningInContainer: false,
+  installProfileKey: defaultMockInstallProfileKey,
+  isGitHubReachable: true,
 };
 
 let currentMockConditions: MockConditions = defaultMockConditions;

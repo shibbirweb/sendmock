@@ -93,7 +93,12 @@ Make SMTP fail on purpose: **Reject the next** N messages **With code** 421, 450
 
 ### About
 
-Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the database path and size, links to the changelog and docs, **Check GitHub Releases for updates** (off by default; SendMock never calls out unless you turn it on), and the help and feedback links.
+Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the database path and size, links to the changelog and docs, the help and feedback links, and **Updates**:
+
+- **Check GitHub Releases for updates** has three modes. **Off** (the default) never calls out. **Manual** checks only when you press **Check for updates**. **Daily** checks on start and once a day, and a new version shows once in the notification bell.
+- Stable installs are offered stable releases; beta installs the newer of the newest beta and the newest stable. Edge and development builds are offered nothing.
+- A found version shows its release date, its release notes and the upgrade command for how you installed SendMock (Homebrew, Scoop, Docker, the install script or npm), with a copy button. When SendMock does not know how it was installed, use the release page link.
+- A check is kept for 24 hours. When GitHub cannot be reached, it says "Could not check for updates" and tries again on the next check.
 
 ## Customize
 

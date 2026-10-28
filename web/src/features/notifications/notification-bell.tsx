@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+  ArrowUpCircleIcon,
   BellIcon,
   MailIcon,
   MessageSquareIcon,
@@ -27,6 +28,7 @@ const areaIcons = {
   email: MailIcon,
   sms: MessageSquareIcon,
   webhook: WebhookIcon,
+  update: ArrowUpCircleIcon,
 };
 
 function NotificationLinkTarget({
@@ -70,6 +72,18 @@ function NotificationLinkTarget({
       <Link
         to="/webhooks/deliveries"
         search={{ delivery: notificationLink.deliveryId }}
+        className={className}
+        onClick={onOpen}
+      >
+        {children}
+      </Link>
+    );
+  }
+  if (notificationLink?.kind === "about") {
+    return (
+      <Link
+        to="/settings"
+        search={{ section: "about" }}
         className={className}
         onClick={onOpen}
       >
