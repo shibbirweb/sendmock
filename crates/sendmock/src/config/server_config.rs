@@ -1,0 +1,173 @@
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::path::{Path, PathBuf};
+
+use sendmock_store::DatabaseLocation;
+
+use super::config_file::ConfigFile;
+use super::config_file_locator::locate_config_file;
+use super::{ConfigError, LogFormat, LogLevel};
+use crate::cli_arguments::ServeArguments;
+
+/// Only this machine can reach the defaults; Docker sets `0.0.0.0` through the environment.
+pub const DEFAULT_HTTP_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8025);
+pub const DEFAULT_SMTP_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 1025);
+const DATABASE_FILE_NAME: &str = "sendmock.db";
+const OS_DATA_SUBDIRECTORY: &str = "sendmock";
+
+/// The settings the server runs with, after flags, environment, file and defaults are merged.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ServerConfig {
+    pub http_addr: SocketAddr,
+    pub smtp_addr: SocketAddr,
+    pub database_location: DatabaseLocation,
+    pub log_format: LogFormat,
+    pub log_level: LogLevel,
+    pub seed_file_path: Option<PathBuf>,
+    pub config_file_path: Option<PathBuf>,
+}
+
+impl ServerConfig {
+    pub fn load(serve_arguments: &ServeArguments) -> Result<Self, ConfigError> {
+        let current_directory = std::env::current_dir().unwrap_or_default();
+        let config_file_path = locate_config_file(
+            serve_arguments.config_file_path.as_deref(),
+            &current_directory,
+            dirs::config_dir().as_deref(),
+        );
+        let config_file = match &config_file_path {
+            Some(file_path) => ConfigFile::read(file_path)?,
+            None => ConfigFile::default(),
+        };
+        Ok(Self::resolve(
+            serve_arguments,
+            config_file,
+            config_file_path,
+            default_database_location(dirs::data_dir().as_deref()),
+        ))
+    }
+
+    /// Flags and environment variables (already merged by clap) win over the file, which
+    /// wins over the defaults.
+    pub fn resolve(
+        serve_arguments: &ServeArguments,
+        config_file: ConfigFile,
+        config_file_path: Option<PathBuf>,
+        default_database_location: DatabaseLocation,
+    ) -> Self {
+        let database_setting = serve_arguments.database_setting.clone().or(config_file.db);
+        Self {
+            http_addr: serve_arguments
+                .http_addr
+                .or(config_file.http_addr)
+                .unwrap_or(DEFAULT_HTTP_ADDR),
+            smtp_addr: serve_arguments
+                .smtp_addr
+                .or(config_file.smtp_addr)
+                .unwrap_or(DEFAULT_SMTP_ADDR),
+            database_location: database_setting
+                .map(|setting| DatabaseLocation::from_setting(&setting))
+                .unwrap_or(default_database_location),
+            log_format: serve_arguments
+                .log_format
+                .or(config_file.log_format)
+                .unwrap_or_default(),
+            log_level: serve_arguments
+                .log_level
+                .or(config_file.log_level)
+                .unwrap_or_default(),
+            seed_file_path: serve_arguments.seed_file_path.clone().or(config_file.seed),
+            config_file_path,
+        }
+    }
+}
+
+/// `sendmock/sendmock.db` in the OS data folder, or the current folder when the OS has none.
+pub fn default_database_location(os_data_directory: Option<&Path>) -> DatabaseLocation {
+    let database_file_path = match os_data_directory {
+        Some(directory) => directory
+            .join(OS_DATA_SUBDIRECTORY)
+            .join(DATABASE_FILE_NAME),
+        None => PathBuf::from(DATABASE_FILE_NAME),
+    };
+    DatabaseLocation::File(database_file_path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn resolve_config(serve_arguments: &ServeArguments, config_file: ConfigFile) -> ServerConfig {
+        ServerConfig::resolve(
+            serve_arguments,
+            config_file,
+            None,
+            DatabaseLocation::File(PathBuf::from("default.db")),
+        )
+    }
+
+    // AC: PL-06.1
+    #[test]
+    fn listens_on_this_machine_only_by_default() {
+        let server_config = resolve_config(&ServeArguments::default(), ConfigFile::default());
+
+        assert!(server_config.http_addr.ip().is_loopback());
+        assert!(server_config.smtp_addr.ip().is_loopback());
+        assert_eq!(server_config.http_addr.port(), 8025);
+        assert_eq!(server_config.smtp_addr.port(), 1025);
+    }
+
+    // AC: PL-07.1
+    #[test]
+    fn a_flag_wins_over_the_file() {
+        let serve_arguments = ServeArguments {
+            http_addr: "127.0.0.1:7000".parse().ok(),
+            log_format: Some(LogFormat::Human),
+            ..ServeArguments::default()
+        };
+        let config_file = ConfigFile {
+            http_addr: "127.0.0.1:8000".parse().ok(),
+            log_format: Some(LogFormat::Json),
+            ..ConfigFile::default()
+        };
+
+        let server_config = resolve_config(&serve_arguments, config_file);
+
+        assert_eq!(server_config.http_addr.port(), 7000);
+        assert_eq!(server_config.log_format, LogFormat::Human);
+    }
+
+    // AC: PL-07.1
+    #[test]
+    fn the_file_wins_over_the_defaults() {
+        let config_file = ConfigFile {
+            smtp_addr: "127.0.0.1:2525".parse().ok(),
+            db: Some("memory".to_owned()),
+            log_level: Some(LogLevel::Debug),
+            ..ConfigFile::default()
+        };
+
+        let server_config = resolve_config(&ServeArguments::default(), config_file);
+
+        assert_eq!(server_config.smtp_addr.port(), 2525);
+        assert_eq!(server_config.database_location, DatabaseLocation::InMemory);
+        assert_eq!(server_config.log_level, LogLevel::Debug);
+    }
+
+    #[test]
+    fn keeps_the_database_in_the_os_data_folder_by_default() {
+        let database_location = default_database_location(Some(Path::new("/data")));
+
+        assert_eq!(
+            database_location,
+            DatabaseLocation::File(PathBuf::from("/data/sendmock/sendmock.db"))
+        );
+    }
+
+    #[test]
+    fn keeps_the_database_in_the_current_folder_without_an_os_data_folder() {
+        assert_eq!(
+            default_database_location(None),
+            DatabaseLocation::File(PathBuf::from("sendmock.db"))
+        );
+    }
+}

@@ -78,6 +78,7 @@ The PROGRESS item "Versioned website builds" is no longer part of Phase 0: it mo
 - The native binary binds `127.0.0.1` by default (PL-06.1, native half).
 - **Tracing:** `tracing` and `tracing-subscriber`, human-readable by default and JSON with `SENDMOCK_LOG_FORMAT=json`.
 - **Graceful shutdown:** `SIGTERM` and Ctrl-C stop accepting connections, let in-flight requests finish for up to 10 s, then exit `0`. Tested by starting the server in a test, sending the signal (Unix) or the Ctrl-C event (Windows), and checking the exit code and that an in-flight request completed.
+- **As built:** config lives in the binary crate (`config/`: `ConfigFile`, `config_file_locator`, `ServerConfig`, `LogFormat`, `LogLevel`), `DatabaseLocation` in `sendmock-store`. `StartupError` maps a configuration mistake to exit `2` and a listener or runtime failure to exit `1` in `main` only. Binary tests in `crates/sendmock/tests/startup.rs` start the real binary, since setting environment variables inside a test is `unsafe` in Rust 2024 and the workspace forbids `unsafe`: the file, variable and flag precedence (shown by the log format), the unknown key and invalid value errors, the busy port, and `SIGTERM` (Unix). Letting in-flight requests finish is tested in W5, once there is an HTTP server to hold a request open.
 
 ## W4: SQLite store and migrations
 

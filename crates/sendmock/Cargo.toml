@@ -17,5 +17,17 @@ sendmock-api.workspace = true
 sendmock-cli.workspace = true
 sendmock-mcp.workspace = true
 
+clap.workspace = true
+dirs.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
 [lints]
 workspace = true

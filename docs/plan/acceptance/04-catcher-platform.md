@@ -99,9 +99,9 @@ Phase 0 onwards.
 
 Phase 0.
 
-- [ ] PL-07.1 Flags override `SENDMOCK_*` env vars, which override `sendmock.toml`, which overrides defaults.
-- [ ] PL-07.2 Unknown keys and invalid values fail at startup with a clear message.
-- [ ] PL-07.3 A port already in use fails with a message suggesting the flag to change it.
+- [x] PL-07.1 Flags override `SENDMOCK_*` env vars, which override `sendmock.toml`, which overrides defaults. (#48)
+- [x] PL-07.2 Unknown keys and invalid values fail at startup with a clear message. (#48)
+- [x] PL-07.3 A port already in use fails with a message suggesting the flag to change it. (#48)
 
 ## PL-08 Retention
 
