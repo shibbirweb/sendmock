@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (3 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (4 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
@@ -17,7 +17,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream after the owner approves it, and one pull request into `develop` whose CI runs the tests. W0, W1 and W2 are done (the Rust test setup item stays open until `insta` arrives with the first snapshot in W6); W3 is done too; next is **W4, the SQLite store and migrations**, then W5 (HTTP server, operation registry and embedded UI), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
+1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream after the owner approves it, and one pull request into `develop` whose CI runs the tests. W0, W1 and W2 are done (the Rust test setup item stays open until `insta` arrives with the first snapshot in W6); W3 and W4 are done too; next is **W5, the HTTP server, operation registry and embedded UI**, then W6 (CLI skeleton, MCP tool definitions and parity check), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -55,7 +55,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | In progress | 3 / 13 |
+| 0 | Backend foundations | In progress | 4 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -197,7 +197,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 - [x] Cargo workspace and crate skeletons (#48)
 - [ ] `rust-embed` UI embedding, SPA fallback, dev proxy
 - [x] Config (clap, env, `sendmock.toml`), tracing, graceful shutdown (#48)
-- [ ] SQLite, migrations, WAL mode
+- [x] SQLite, migrations, WAL mode (#48)
 - [ ] `sendmock-ops` registry, CLI skeleton (`sendmock status --json`, exit codes), parity CI check
 - [ ] Seed loader skeleton (`seed validate`)
 - [ ] OpenAPI contract tests against handlers
@@ -513,3 +513,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | AGENTS.md gains two code style rules: comments explain why, never what (no phase numbers, dates or plan progress in code), and the module layout inside a crate or feature (one main type per file, domain folders declared with a sibling `.rs` file instead of `mod.rs`, thin `lib.rs` and `main.rs`). W1 done: the Cargo workspace with the ten crates from [02](02-architecture.md#repository-layout), pinned toolchain, workspace lints (no `unwrap`/`expect` outside tests, 50-line functions, no `unsafe`), and `scripts/rust-crate-layers.ts`, which fails when a crate depends on its own or a higher layer. |
 | 2026-10-29 | Phase 0 W2: Rust CI on Linux, macOS and Windows (fmt, Clippy with `-D warnings`, nextest), a coverage job (`cargo llvm-cov`, 80% overall and 90% for operations and domain crates, per-crate table on the job page) with the 500-line file check, and one `Rust` check for the rulesets; `Clock`, `IdGenerator` and `RandomSource` with fixed fakes in `sendmock-core`. New dependencies `ulid` and `rand` (both in the planned stack). |
 | 2026-10-29 | Phase 0 W3: configuration from flags, `SENDMOCK_*` variables, `sendmock.toml` (current folder, then the OS config folder) and defaults, unknown keys and invalid values refused with exit 2, a busy port refused with the flag to change it, `127.0.0.1` by default, human or JSON logs on stdout, and a clean stop on Ctrl-C and `SIGTERM`. PL-07.1 to PL-07.3 ticked; PL-06.1 has its native test and waits for the Docker half (W11). New dependencies `clap`, `serde`, `toml`, `tokio`, `tracing`, `tracing-subscriber`, `thiserror`, `dirs`, and `tempfile` for tests. AGENTS.md: run `cargo clean` after each commit to free disk space. |
+| 2026-10-29 | Phase 0 W4: the SQLite store (`rusqlite` bundled), one writer thread and four read-only connections, WAL with the planned pragmas, embedded forward-only migrations in `PRAGMA user_version` (`0001_init.sql` creates `settings`), a `VACUUM INTO` backup before migrating an existing file, and a newer schema refused untouched. The binary opens it at startup. |

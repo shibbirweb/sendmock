@@ -90,6 +90,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 - A database from a newer SendMock version is refused with a clear message; an on-disk database is copied to `sendmock.db.bak-<version>` before migrating.
 - **Locations:** the OS data directory by default, `--db <path>` / `SENDMOCK_DB`, and `--db memory`.
 - Tests: each opens its own temporary database; cases cover a fresh database, re-running migrations (no change), the backup file, refusing a newer database, and `--db memory`.
+- **As built:** `Database` (`database/`: `DatabaseWriter` on its own thread, `DatabaseReaders` with four read-only connections, `connection_settings`) and `migration/` (`EMBEDDED_MIGRATIONS`, `apply_migrations`, which takes the migration list so tests can pass their own). Every connection of an in-memory store opens one named shared-cache database (`file:sendmock-<process>-<n>?mode=memory&cache=shared`), since SQLite gives each plain `:memory:` connection its own empty database. The backup is `VACUUM INTO <file>.bak-<schema version>`, a consistent copy while the WAL is in use. The writer runs `PRAGMA optimize` when the store closes. The binary opens the database before the runtime starts; a newer schema stops startup with exit `1`.
 
 ## W5: HTTP server, operation registry and embedded UI
 

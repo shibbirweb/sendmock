@@ -1,9 +1,14 @@
+use sendmock_store::Database;
+
 use crate::config::ServerConfig;
 use crate::listener_binding::bind_listener;
 use crate::shutdown_signal::wait_for_shutdown_signal;
 use crate::startup_error::StartupError;
 
-pub async fn run_server(server_config: &ServerConfig) -> Result<(), StartupError> {
+pub async fn run_server(
+    server_config: &ServerConfig,
+    database: &Database,
+) -> Result<(), StartupError> {
     let http_listener = bind_listener(server_config.http_addr, "--http-addr").await?;
     let http_addr = http_listener
         .local_addr()
@@ -13,7 +18,7 @@ pub async fn run_server(server_config: &ServerConfig) -> Result<(), StartupError
         })?;
     tracing::info!(
         http_addr = %http_addr,
-        database = %server_config.database_location,
+        database = %database.location(),
         config_file = ?server_config.config_file_path,
         "SendMock is ready"
     );

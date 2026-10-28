@@ -11,6 +11,7 @@ mod startup_error;
 use std::process::ExitCode;
 
 use clap::Parser;
+use sendmock_store::{Database, EMBEDDED_MIGRATIONS};
 
 use cli_arguments::CliArguments;
 use config::ServerConfig;
@@ -30,9 +31,10 @@ fn main() -> ExitCode {
 fn serve(cli_arguments: &CliArguments) -> Result<(), StartupError> {
     let server_config = ServerConfig::load(cli_arguments.serve_arguments())?;
     logging::initialise_logging(server_config.log_format, server_config.log_level);
+    let database = Database::open(server_config.database_location.clone(), EMBEDDED_MIGRATIONS)?;
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .map_err(StartupError::Runtime)?;
-    runtime.block_on(server_runner::run_server(&server_config))
+    runtime.block_on(server_runner::run_server(&server_config, &database))
 }

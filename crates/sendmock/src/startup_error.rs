@@ -2,6 +2,8 @@ use std::io;
 use std::net::SocketAddr;
 use std::process::ExitCode;
 
+use sendmock_store::StoreError;
+
 use crate::config::ConfigError;
 
 /// The exit code for a configuration or usage mistake, as in the CLI exit code table.
@@ -29,6 +31,9 @@ pub enum StartupError {
         source: io::Error,
     },
 
+    #[error(transparent)]
+    Database(#[from] StoreError),
+
     #[error("Could not start the server runtime: {0}")]
     Runtime(io::Error),
 }
@@ -37,7 +42,7 @@ impl StartupError {
     pub fn exit_code(&self) -> ExitCode {
         match self {
             Self::Config(_) => ExitCode::from(USAGE_ERROR_EXIT_CODE),
-            Self::PortInUse { .. } | Self::Listen { .. } | Self::Runtime(_) => {
+            Self::PortInUse { .. } | Self::Listen { .. } | Self::Database(_) | Self::Runtime(_) => {
                 ExitCode::from(ERROR_EXIT_CODE)
             }
         }

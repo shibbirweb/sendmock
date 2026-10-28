@@ -32,6 +32,9 @@ clap = { version = "4", features = [
 ] }
 dirs = "7"
 rand = "0.10"
+rusqlite = { version = "0.41", features = [
+    "bundled",
+] }
 serde = { version = "1", features = [
     "derive",
 ] }
@@ -42,6 +45,7 @@ tokio = { version = "1", features = [
     "net",
     "rt-multi-thread",
     "signal",
+    "sync",
 ] }
 toml = "1"
 tracing = "0.1"

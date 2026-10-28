@@ -124,6 +124,26 @@ fn a_busy_port_stops_startup_and_suggests_the_flag() {
     assert!(error_output.contains("--http-addr"));
 }
 
+#[test]
+fn refuses_a_database_from_a_newer_version() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let database_file_path = working_directory.path().join("sendmock.db");
+    rusqlite::Connection::open(&database_file_path)
+        .and_then(|connection| connection.pragma_update(None, "user_version", 99))
+        .expect("a database from a newer version");
+
+    let output = run_until_exit(sendmock_command(working_directory.path()).args([
+        "--http-addr",
+        "127.0.0.1:0",
+        "--db",
+        "sendmock.db",
+    ]))
+    .expect("sendmock runs");
+
+    assert_eq!(output.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("newer SendMock"));
+}
+
 #[cfg(unix)]
 #[test]
 fn stops_cleanly_on_sigterm() {
