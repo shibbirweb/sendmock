@@ -2,6 +2,7 @@
 
 mod cli_arguments;
 mod config;
+mod instance_details_builder;
 mod listener_binding;
 mod logging;
 mod server_runner;
@@ -36,5 +37,5 @@ fn serve(cli_arguments: &CliArguments) -> Result<(), StartupError> {
         .enable_all()
         .build()
         .map_err(StartupError::Runtime)?;
-    runtime.block_on(server_runner::run_server(&server_config, &database))
+    runtime.block_on(server_runner::run_server(&server_config, database))
 }

@@ -100,6 +100,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 - **Mock mode in the binary:** in Phase 0 only, the binary embeds the mock-mode UI build, so every screen keeps working on fixtures as the done-when line says. From Phase 1 it embeds the live build only, and operations it does not serve yet show Not available yet (decided 2026-10-29, [07](07-ui.md#not-available-yet-stage-b), UI-12). The bundle budget (UI-06) measures the live build throughout.
 - **Dev proxy:** `web/vite.config.ts` proxies `/api` and `/ws` to `http://127.0.0.1:8025` when `VITE_API_MODE=live`, so the UI can run against `cargo run` with hot reload.
 - **Done-when smoke job** in `ci.yml` on all three operating systems: build the UI and the binary, start it, wait for `/api/v1/health`, fetch `/` and a deep link (`/mail`, the SPA fallback), stop it and check the exit code (DS-01.2 for the host build).
+- **As built:** `sendmock-ops` has the `Operation` trait (typed input and output, `definition()`, `execute()`), `OperationRegistry` holding operations behind `ErasedOperation` (JSON in, JSON out, input and output JSON Schemas from `schemars`), `OperationContext` (database, clock, instance details) and `OperationError`; `getHealth` and `getInfo` are the first operations. `sendmock-api` builds one route per operation and merges methods that share a path; GET and DELETE read the query string, the other methods a JSON body (empty counts as `{}`). The UI comes through the `UiAssets` trait (`EmbeddedUiAssets` with `rust-embed`, an in-memory fake in tests); `/assets/` files are cached as immutable and everything else revalidates. `serve_http` gives in-flight requests up to 10 s after the signal, tested with a slow fake operation. The smoke test is `scripts/binary-smoke-test.ts`; CI builds the UI once (`web-dist`) and runs it against a release binary on each operating system, and the `Rust` check now also needs it. `opt-level = "z"`: 5.2 MB against 6.5 MB with `3`, UI included.
 
 ## W6: CLI skeleton, MCP tool definitions and parity check
 
@@ -121,7 +122,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 
 ## W8: OpenAPI contract tests
 
-- `utoipa` describes the REST adapter, and the server serves the generated document at `/api/openapi.json` (PL-01.3).
+- The OpenAPI document is generated from the operation registry: paths, methods and summaries from each `OperationDefinition`, schemas from `schemars` (JSON Schema 2020-12, which OpenAPI 3.1 uses). The server serves it at `/api/openapi.json` (PL-01.3). This replaces `utoipa` (decided 2026-10-29 in W5): the registry already knows every route, so a second description of them would only be one more dependency to keep in step.
 - A contract test compares each operation the binary serves with the same operation in the frozen `docs/api/openapi.yaml`: path, method, parameters, request and response schemas. It fails when they differ, or when the binary serves an operation the frozen file does not have.
 - Handler answers recorded in the integration tests are validated against the frozen file's schemas with `jsonschema` (dev dependency only).
 - PL-01.1 (every endpoint exists and matches) stays open: each phase adds its endpoints to this test, and it is ticked when the last one lands.
@@ -191,12 +192,13 @@ Every crate below is already in the tech stack in [02](02-architecture.md#tech-s
 | `tracing`, `tracing-subscriber` | W3 | logs |
 | `rusqlite` (bundled) | W4 | the database |
 | `rust-embed` | W5 | the embedded UI |
-| `utoipa`, `schemars` | W5, W8 | OpenAPI and shared schemas |
+| `axum` | W5 | REST routes on `tokio` |
+| `schemars`, `serde_json` | W5, W8 | input and output schemas for OpenAPI, CLI and MCP, and JSON |
 | `reqwest` (rustls) | W6 | the CLI's HTTP client |
 | `ulid` | W2 | the `IdGenerator` |
 | `thiserror` (new) | all | typed errors per layer, as [AGENTS.md](../../AGENTS.md#layers-and-dependency-direction) requires; no runtime cost |
 | `dirs` (new) | W3, W4 | the OS config and data directories on three platforms; small, no dependencies of note |
-| `insta`, `tempfile`, `jsonschema` (new, dev only) | W2, W4, W8 | snapshots, temporary databases, schema checks; not in the binary |
+| `insta`, `tempfile`, `jsonschema`, `tower` (new, dev only) | W2, W4, W5, W8 | snapshots, temporary databases, schema checks, calling the router in tests; not in the binary |
 | `cargo-nextest`, `cargo-llvm-cov`, `cargo-zigbuild` (CI tools) | W2, W10 | test runner, coverage, Linux cross builds |
 
 The binary size, idle memory and cold start budgets in [09](09-distribution.md#performance-budget-checked-in-ci-on-linux-x64) are measured from W5 on and recorded here, so later phases can see what each one adds.

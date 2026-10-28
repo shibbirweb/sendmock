@@ -1,10 +1,12 @@
 mod support {
+    pub mod http_get;
     pub mod sendmock_process;
 }
 
 use std::fs;
 use std::net::TcpListener;
 
+use support::http_get::send_http_get;
 use support::sendmock_process::{READY_MESSAGE, SendmockProcess, run_until_exit, sendmock_command};
 
 const FREE_PORT_ARGUMENTS: [&str; 4] = ["--http-addr", "127.0.0.1:0", "--db", "memory"];
@@ -142,6 +144,31 @@ fn refuses_a_database_from_a_newer_version() {
 
     assert_eq!(output.status.code(), Some(1));
     assert!(String::from_utf8_lossy(&output.stderr).contains("newer SendMock"));
+}
+
+#[test]
+fn answers_the_health_check_and_unknown_api_paths_over_http() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let sendmock = SendmockProcess::start(
+        sendmock_command(working_directory.path())
+            .args(FREE_PORT_ARGUMENTS)
+            .args(["--log-format", "json"]),
+    )
+    .expect("sendmock starts");
+    let ready_line: serde_json::Value =
+        serde_json::from_str(&sendmock.wait_for_line(READY_MESSAGE)).expect("a JSON log line");
+    let http_addr = ready_line["fields"]["http_addr"]
+        .as_str()
+        .expect("the bound address");
+
+    let health_response = send_http_get(http_addr, "/api/v1/health").expect("health answers");
+    let unknown_response =
+        send_http_get(http_addr, "/api/v1/nothing-here").expect("the unknown path answers");
+
+    assert!(health_response.starts_with("HTTP/1.1 200"));
+    assert!(health_response.ends_with(r#"{"status":"ok"}"#));
+    assert!(unknown_response.starts_with("HTTP/1.1 404"));
+    assert!(unknown_response.contains(r#""code":"not_found""#));
 }
 
 #[cfg(unix)]

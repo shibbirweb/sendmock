@@ -110,7 +110,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | CLI / config | `clap` (derive, env), `serde`, `toml` | flags, `SENDMOCK_*` env vars, `sendmock.toml` |
 | IDs | `ulid` | sortable IDs, good for pagination |
 | Logging | `tracing`, `tracing-subscriber` | |
-| OpenAPI | `utoipa` | spec served at `/api/openapi.json` |
+| OpenAPI | generated from the operation registry and `schemars` | spec served at `/api/openapi.json`; no separate OpenAPI library, since the registry already knows every route |
 | JSON Schema | `schemars` | shared input/output schemas for CLI, MCP tools and OpenAPI |
 | MCP | `rmcp` | official Rust MCP SDK, stdio and streamable HTTP |
 | Phone numbers | `phonenumber` (optional) | E.164 normalisation and validation |
