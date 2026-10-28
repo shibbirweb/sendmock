@@ -15,7 +15,7 @@ test("the footer's What's new link opens the changelog", async ({ page }) => {
   await page.goto("/");
 
   await page
-    .getByRole("contentinfo")
+    .getByRole("navigation", { name: "Footer" })
     .getByRole("link", { name: "What's new" })
     .click();
 
