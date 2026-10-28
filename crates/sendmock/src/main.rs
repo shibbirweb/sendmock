@@ -1,41 +1,41 @@
-//! The `sendmock` binary: reads the configuration and runs the server.
+//! The `sendmock` binary: runs the server, or a client command against a running one.
 
 mod cli_arguments;
+mod client_command;
 mod config;
+mod help_output;
 mod instance_details_builder;
 mod listener_binding;
 mod logging;
 mod server_runner;
+mod server_startup;
 mod shutdown_signal;
 mod startup_error;
+mod version_output;
 
 use std::process::ExitCode;
 
-use clap::Parser;
-use sendmock_store::{Database, EMBEDDED_MIGRATIONS};
+use clap::{CommandFactory, FromArgMatches};
+use sendmock_cli::{build_operation_commands, find_matched_operation};
+use sendmock_ops::build_operation_registry;
 
-use cli_arguments::CliArguments;
-use config::ServerConfig;
-use startup_error::StartupError;
+use cli_arguments::{BuiltInCommand, CliArguments};
 
 fn main() -> ExitCode {
-    let cli_arguments = CliArguments::parse();
-    match serve(&cli_arguments) {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(startup_error) => {
-            eprintln!("{startup_error}");
-            startup_error.exit_code()
+    let operation_registry = build_operation_registry();
+    let root_command =
+        CliArguments::command().subcommands(build_operation_commands(&operation_registry));
+    let root_matches = root_command.clone().get_matches();
+    if let Some(matched_operation) = find_matched_operation(&operation_registry, &root_matches) {
+        return client_command::run_client_command(&matched_operation);
+    }
+    let cli_arguments = CliArguments::from_arg_matches(&root_matches)
+        .unwrap_or_else(|parse_error| parse_error.exit());
+    match cli_arguments.built_in_command() {
+        BuiltInCommand::Serve(serve_arguments) => server_startup::start_server(serve_arguments),
+        BuiltInCommand::Version { json } => version_output::print_version(*json),
+        BuiltInCommand::Help { all, json } => {
+            help_output::print_help(root_command, &operation_registry, *all, *json)
         }
     }
-}
-
-fn serve(cli_arguments: &CliArguments) -> Result<(), StartupError> {
-    let server_config = ServerConfig::load(cli_arguments.serve_arguments())?;
-    logging::initialise_logging(server_config.log_format, server_config.log_level);
-    let database = Database::open(server_config.database_location.clone(), EMBEDDED_MIGRATIONS)?;
-    let runtime = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .map_err(StartupError::Runtime)?;
-    runtime.block_on(server_runner::run_server(&server_config, database))
 }

@@ -32,7 +32,13 @@ clap = { version = "4", features = [
     "env",
 ] }
 dirs = "7"
+insta = { version = "1", features = [
+    "json",
+] }
 rand = "0.10"
+reqwest = { version = "0.13", default-features = false, features = [
+    "json",
+] }
 rust-embed = { version = "8", features = [
     "mime-guess",
 ] }

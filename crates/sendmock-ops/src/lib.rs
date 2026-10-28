@@ -10,7 +10,7 @@ mod system;
 
 pub use instance_details::{InstanceDetails, ReleaseChannel};
 pub use no_input::NoInput;
-pub use operation::{HttpMethod, Operation, OperationDefinition};
+pub use operation::{HttpMethod, Operation, OperationDefinition, OperationSelector};
 pub use operation_context::OperationContext;
 pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};

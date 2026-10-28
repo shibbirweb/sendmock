@@ -60,6 +60,9 @@ impl Operation for EchoOperation {
             path: "/api/v1/test/echo",
             summary: "Answers with the text it was sent.",
             is_read_only: true,
+            cli_usage: "sendmock test echo",
+            mcp_tool: "sendmock_test_echo",
+            selector: None,
         }
     }
 
@@ -85,6 +88,9 @@ impl Operation for SlowOperation {
             path: "/api/v1/test/slow",
             summary: "Answers after a short wait.",
             is_read_only: true,
+            cli_usage: "sendmock test slow",
+            mcp_tool: "sendmock_test_slow",
+            selector: None,
         }
     }
 

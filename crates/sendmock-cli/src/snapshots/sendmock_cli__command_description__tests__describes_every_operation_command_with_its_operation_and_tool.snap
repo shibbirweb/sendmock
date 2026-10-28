@@ -1,0 +1,44 @@
+---
+source: crates/sendmock-cli/src/command_description.rs
+expression: command_descriptions
+---
+[
+  {
+    "command": "sendmock health",
+    "usage": "sendmock health",
+    "summary": "Liveness check; answers while the server runs.",
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/health",
+        "operation_id": "getHealth",
+        "selector": {
+          "input": "view",
+          "value": "health"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_status"
+    ]
+  },
+  {
+    "command": "sendmock status",
+    "usage": "sendmock status",
+    "summary": "Version, listen addresses and enabled features.",
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/info",
+        "operation_id": "getInfo",
+        "selector": {
+          "input": "view",
+          "value": "info"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_status"
+    ]
+  }
+]

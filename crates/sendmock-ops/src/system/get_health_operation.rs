@@ -1,6 +1,7 @@
 use super::health_status::{HealthState, HealthStatus};
 use crate::{
     HttpMethod, NoInput, Operation, OperationContext, OperationDefinition, OperationError,
+    OperationSelector,
 };
 
 pub struct GetHealthOperation;
@@ -16,6 +17,12 @@ impl Operation for GetHealthOperation {
             path: "/api/v1/health",
             summary: "Liveness check; answers while the server runs.",
             is_read_only: true,
+            cli_usage: "sendmock health",
+            mcp_tool: "sendmock_status",
+            selector: Some(OperationSelector {
+                input_name: "view",
+                value: "health",
+            }),
         }
     }
 

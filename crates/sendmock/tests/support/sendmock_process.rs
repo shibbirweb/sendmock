@@ -31,6 +31,18 @@ pub struct SendmockProcess {
 }
 
 impl SendmockProcess {
+    /// A server on a free port with an in-memory database and JSON logs.
+    pub fn start_with_free_port(working_directory: &Path) -> io::Result<Self> {
+        Self::start(sendmock_command(working_directory).args([
+            "--http-addr",
+            "127.0.0.1:0",
+            "--db",
+            "memory",
+            "--log-format",
+            "json",
+        ]))
+    }
+
     pub fn start(command: &mut Command) -> io::Result<Self> {
         let mut child = command
             .stdin(Stdio::null())
@@ -53,6 +65,16 @@ impl SendmockProcess {
             child,
             stdout_lines,
         })
+    }
+
+    /// The address the server bound, read from its JSON ready line (`--log-format json`).
+    pub fn wait_for_http_addr(&self) -> String {
+        let ready_line: serde_json::Value =
+            serde_json::from_str(&self.wait_for_line(READY_MESSAGE)).unwrap_or_default();
+        ready_line["fields"]["http_addr"]
+            .as_str()
+            .map(str::to_owned)
+            .unwrap_or_else(|| panic!("the ready line has no http_addr: {ready_line}"))
     }
 
     #[cfg(unix)]

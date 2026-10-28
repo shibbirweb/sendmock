@@ -1,6 +1,7 @@
 use super::app_info::AppInfo;
 use crate::{
     HttpMethod, NoInput, Operation, OperationContext, OperationDefinition, OperationError,
+    OperationSelector,
 };
 
 const MILLISECONDS_PER_SECOND: i64 = 1000;
@@ -18,6 +19,12 @@ impl Operation for GetInfoOperation {
             path: "/api/v1/info",
             summary: "Version, listen addresses and enabled features.",
             is_read_only: true,
+            cli_usage: "sendmock status",
+            mcp_tool: "sendmock_status",
+            selector: Some(OperationSelector {
+                input_name: "view",
+                value: "info",
+            }),
         }
     }
 

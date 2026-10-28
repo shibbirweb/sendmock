@@ -12,5 +12,15 @@ publish = false
 sendmock-core.workspace = true
 sendmock-ops.workspace = true
 
+clap.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+tokio.workspace = true
+
 [lints]
 workspace = true

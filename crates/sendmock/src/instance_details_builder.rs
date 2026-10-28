@@ -15,7 +15,7 @@ pub fn build_instance_details(
 ) -> InstanceDetails {
     InstanceDetails {
         version: env!("CARGO_PKG_VERSION"),
-        channel: ReleaseChannel::from_build_setting(option_env!("SENDMOCK_RELEASE_CHANNEL")),
+        channel: current_release_channel(),
         started_at_unix_ms,
         http_address: bound_http_addr.to_string(),
         smtp_address: server_config.smtp_addr.to_string(),
@@ -24,4 +24,9 @@ pub fn build_instance_details(
             .iter()
             .any(|marker_file| Path::new(marker_file).exists()),
     }
+}
+
+/// The channel a release workflow builds for (`SENDMOCK_RELEASE_CHANNEL`), else `dev`.
+pub fn current_release_channel() -> ReleaseChannel {
+    ReleaseChannel::from_build_setting(option_env!("SENDMOCK_RELEASE_CHANNEL"))
 }
