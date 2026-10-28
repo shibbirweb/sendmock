@@ -36,6 +36,8 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 20 | [Surface parity](20-surface-parity.md) | Every feature in every way: each REST operation names its CLI command, MCP tool and UI place in one catalogue, the missing names and REST helpers are added, the API reference shows all of them, and the user guide links every API cell to its parameters |
 | 21 | [Reference and examples](21-reference-and-examples.md) | CLI and MCP reference generated from the contract (every command's flags, every tool's inputs), a description and example for every input field, a playground that shows every accepted input, and code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# for every recipe and menu page |
 | 22 | [Configurable providers](22-configurable-providers.md) | Email and SMS providers as definitions like payment gateways: edit, reset, remove and restore the built-ins, add your own from blank or a built-in, in the UI, REST, CLI, MCP and the skill |
+| 23 | [Phase 0](23-phase-0.md) | Backend foundations: workstreams in order (workspace, Rust CI, config, SQLite, HTTP server with the embedded UI, operation registry, CLI and parity, seed validate, contract tests, version script, release workflows, Docker `edge`, README and licence), the criteria each one ticks and the new dependencies |
+| 24 | [Stage B coverage](24-stage-b-coverage.md) | Every operation the signed-off UI calls, mapped to the Stage B phase that builds it and the phase its screen goes live; the 2026-10-29 audit and what it changed |
 
 ## Headline decisions
 

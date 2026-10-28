@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 107 features, 55 / 493 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 0 / 108 features, 55 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -88,7 +88,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Not started |
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Not started |
 | [SM-11](02-sms-verify.md#sm-11-whatsapp-via-twilio) | WhatsApp via Twilio | Phase 4 | 3 | Not started |
-| [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 4 | 3 | In progress |
+| [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 2 | 3 | In progress |
 | [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | In progress |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Not started |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | In progress |
@@ -137,6 +137,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | UI done (2026-10-29) |
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | UI done (2026-10-29) |
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Not started |
+| [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Not started |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Not started |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
