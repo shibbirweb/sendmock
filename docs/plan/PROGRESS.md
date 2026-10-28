@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (1 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (2 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
@@ -17,7 +17,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 **Next up:**
 
-1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream after the owner approves it, and one pull request into `develop` whose CI runs the tests. W0 and W1 are done; next is **W2, Rust CI and the test setup**, then W3 (config, tracing and graceful shutdown), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
+1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream after the owner approves it, and one pull request into `develop` whose CI runs the tests. W0, W1 and W2 are done (the Rust test setup item stays open until `insta` arrives with the first snapshot in W6); next is **W3, config, tracing and graceful shutdown**, then W4 (SQLite store and migrations), in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -55,7 +55,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | In progress | 1 / 13 |
+| 0 | Backend foundations | In progress | 2 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -201,7 +201,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 - [ ] `sendmock-ops` registry, CLI skeleton (`sendmock status --json`, exit codes), parity CI check
 - [ ] Seed loader skeleton (`seed validate`)
 - [ ] OpenAPI contract tests against handlers
-- [ ] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check)
+- [x] Rust CI on Linux, macOS, Windows (incl. Clippy `too_many_lines` and a 500-line file check) (#48)
 - [ ] Rust test setup: nextest, `insta` snapshots, `cargo llvm-cov` coverage gate (80% overall, 90% domain/operations), test fakes for `Clock`, `IdGenerator`, random source
 - [ ] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow
 - [ ] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
@@ -511,3 +511,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Stage B coverage audit ([24](24-stage-b-coverage.md)): all 221 operations of the signed-off UI are mapped to the phase that builds them. Added to the roadmap and this file: `/send/raw`, `/emails/latest`, SSE and `/events/recent`, `/samples/{kind}`, `/integrations/{stack}`, the Settings API and the real update check (Phase 1); MMS, custom outcome numbers, the SMS built-in provider runtime and `wait/sms` (Phase 2); `wait/webhook`, custom outcome addresses and the Overview going live (Phase 3); gateway, method and flow configuration and the missing Phase 3P items; the email and custom provider runtime and the Phase 4 payment items; a live step for every screen and a phase for every CLI and MCP toolset. Owner decisions: live UI build only from Phase 1 with Not available yet for operations not built yet (new feature UI-12, `available_operations` in `/info`), virtual numbers moved to Phase 2 (SM-12), UI and API auth in Phase 1. |
 | 2026-10-29 | Phase 0 started on `feat/phase-0` (one branch, a commit per workstream, one pull request, tests in its CI). W0: default ports 1025 / 8025 and licence MIT OR Apache-2.0 decided, the "SendMock" trademark check deferred to before 1.0; Planning is Done (13 / 13). |
 | 2026-10-29 | AGENTS.md gains two code style rules: comments explain why, never what (no phase numbers, dates or plan progress in code), and the module layout inside a crate or feature (one main type per file, domain folders declared with a sibling `.rs` file instead of `mod.rs`, thin `lib.rs` and `main.rs`). W1 done: the Cargo workspace with the ten crates from [02](02-architecture.md#repository-layout), pinned toolchain, workspace lints (no `unwrap`/`expect` outside tests, 50-line functions, no `unsafe`), and `scripts/rust-crate-layers.ts`, which fails when a crate depends on its own or a higher layer. |
+| 2026-10-29 | Phase 0 W2: Rust CI on Linux, macOS and Windows (fmt, Clippy with `-D warnings`, nextest), a coverage job (`cargo llvm-cov`, 80% overall and 90% for operations and domain crates, per-crate table on the job page) with the 500-line file check, and one `Rust` check for the rulesets; `Clock`, `IdGenerator` and `RandomSource` with fixed fakes in `sendmock-core`. New dependencies `ulid` and `rand` (both in the planned stack). |

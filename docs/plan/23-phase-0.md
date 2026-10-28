@@ -65,8 +65,9 @@ The PROGRESS item "Versioned website builds" is no longer part of Phase 0: it mo
 - **Coverage:** `cargo llvm-cov nextest` on Linux, reported on the pull request, failing below 80% lines overall or 90% for `sendmock-ops` and the domain crates ([AGENTS.md](../../AGENTS.md#ci-enforcement)).
 - **File size:** `scripts/check-file-lines.ts` (Bun, no new dependency) fails on a Rust source file over 500 lines and lists files over 300, excluding tests, generated code and fixtures. ESLint already does this for TypeScript.
 - **Test fakes** in `sendmock-core`: the `Clock`, `IdGenerator` and `RandomSource` traits with system implementations and fixed fakes (`FixedClock`, `SequentialIdGenerator`, `SeededRandomSource`), so no test uses real time or randomness.
-- **Snapshots:** `insta` (dev dependency) for CLI `--json` output and MCP tool definitions; snapshots are reviewed in the pull request, never auto-accepted in CI.
+- **Snapshots:** `insta` (dev dependency) for CLI `--json` output and MCP tool definitions; snapshots are reviewed in the pull request, never auto-accepted in CI. It is added in W6 with the first snapshot test, not before.
 - The `rust` job and the coverage gate join the required status checks on `develop` and `main` (owner, in GitHub settings).
+- **As built:** `ci.yml` has `Rust (<os>)` on three operating systems, `Rust coverage and file size` on Linux, and one `Rust` check that passes only when both do, for the rulesets to require. `scripts/rust-file-lines.ts` counts each file up to its `#[cfg(test)]` module, and `scripts/rust-coverage.ts` reads the `cargo llvm-cov` JSON summary, gates it and writes a per-crate table to the job summary; both have Bun tests. The fakes are in `sendmock-core` (`clock/`, `id_generator/`, `random_source/`); `SeededRandomSource` is SplitMix64, checked against its published first value.
 
 ## W3: Config, tracing and graceful shutdown
 

@@ -26,6 +26,9 @@ sendmock-sms = { path = "crates/sendmock-sms" }
 sendmock-store = { path = "crates/sendmock-store" }
 sendmock-webhooks = { path = "crates/sendmock-webhooks" }
 
+rand = "0.10"
+ulid = "3"
+
 [workspace.lints.rust]
 unsafe_code = "forbid"
 
