@@ -7,6 +7,8 @@ expression: command_descriptions
     "command": "sendmock health",
     "usage": "sendmock health",
     "summary": "Liveness check; answers while the server runs.",
+    "arguments": [],
+    "flags": [],
     "operations": [
       {
         "method": "GET",
@@ -26,6 +28,8 @@ expression: command_descriptions
     "command": "sendmock status",
     "usage": "sendmock status",
     "summary": "Version, listen addresses and enabled features.",
+    "arguments": [],
+    "flags": [],
     "operations": [
       {
         "method": "GET",
@@ -45,6 +49,10 @@ expression: command_descriptions
     "command": "sendmock seed validate",
     "usage": "sendmock seed validate <file>",
     "summary": "Check a seed file without applying it.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
     "operations": [
       {
         "method": "POST",

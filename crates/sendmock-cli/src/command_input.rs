@@ -5,7 +5,7 @@ use sendmock_ops::{ErasedOperation, InputShape, ScalarType, build_input_from_tex
 use serde_json::{Map, Value};
 
 use crate::CliError;
-use crate::command_arguments::describe_command_inputs;
+use crate::command_arguments::{FlagInput, describe_command_inputs};
 
 /// The operation's input from a parsed command line: `--data` or `--file` first, then the
 /// positional arguments and flags on top, converted to the input's types.
@@ -14,7 +14,7 @@ pub fn build_command_input(
     command_matches: &ArgMatches,
 ) -> Result<Value, CliError> {
     let command_inputs = describe_command_inputs(operation);
-    let mut input = read_whole_body(command_matches)?;
+    let mut input = read_initial_input(operation, command_matches)?;
     let mut text_values: Vec<(String, String)> = Vec::new();
     for positional_input in &command_inputs.positional_inputs {
         let argument_value = command_matches
@@ -31,36 +31,61 @@ pub fn build_command_input(
         }
     }
     for flag_input in &command_inputs.flag_inputs {
-        let input_name = &flag_input.input_name;
-        match flag_input.input_shape {
-            InputShape::Scalar(ScalarType::Boolean) => {
-                if command_matches.get_flag(input_name) {
-                    text_values.push((input_name.clone(), "true".to_owned()));
-                } else if command_matches.get_flag(&format!("no-{}", flag_input.flag_name)) {
-                    text_values.push((input_name.clone(), "false".to_owned()));
-                }
-            }
-            InputShape::List(_) => {
-                for list_value in command_matches
-                    .get_many::<String>(input_name)
-                    .into_iter()
-                    .flatten()
-                {
-                    text_values.push((input_name.clone(), list_value.clone()));
-                }
-            }
-            InputShape::Scalar(_) | InputShape::Object => {
-                if let Some(flag_value) = command_matches.get_one::<String>(input_name) {
-                    text_values.push((input_name.clone(), flag_value.clone()));
-                }
-            }
-        }
+        text_values.extend(read_flag_values(flag_input, command_matches));
     }
     let input_schema = operation.input_schema().to_value();
     let typed_values = build_input_from_text(&input_schema, &text_values)
         .map_err(|operation_error| CliError::InvalidInput(operation_error.to_string()))?;
     input.extend(typed_values);
     Ok(Value::Object(input))
+}
+
+/// The raw body from `--file` (stdin by default) for raw-body operations, else `--data` or
+/// the `--file` JSON.
+fn read_initial_input(
+    operation: &dyn ErasedOperation,
+    command_matches: &ArgMatches,
+) -> Result<Map<String, Value>, CliError> {
+    let Some(raw_body_input) = operation.definition().raw_body_input else {
+        return read_whole_body(command_matches);
+    };
+    let body_path = command_matches
+        .try_get_one::<String>("file")
+        .ok()
+        .flatten()
+        .map_or("-", String::as_str);
+    let mut raw_input = Map::new();
+    raw_input.insert(
+        raw_body_input.input_name.to_owned(),
+        Value::String(read_text_file(body_path)?),
+    );
+    Ok(raw_input)
+}
+
+/// One flag's values as text: a switch gives `true` or `false`, a list each repetition.
+fn read_flag_values(flag_input: &FlagInput, command_matches: &ArgMatches) -> Vec<(String, String)> {
+    let input_name = &flag_input.input_name;
+    match flag_input.input_shape {
+        InputShape::Scalar(ScalarType::Boolean) => {
+            if command_matches.get_flag(input_name) {
+                vec![(input_name.clone(), "true".to_owned())]
+            } else if command_matches.get_flag(&format!("no-{}", flag_input.flag_name)) {
+                vec![(input_name.clone(), "false".to_owned())]
+            } else {
+                Vec::new()
+            }
+        }
+        InputShape::List(_) => command_matches
+            .get_many::<String>(input_name)
+            .into_iter()
+            .flatten()
+            .map(|list_value| (input_name.clone(), list_value.clone()))
+            .collect(),
+        InputShape::Scalar(_) | InputShape::Object => command_matches
+            .get_one::<String>(input_name)
+            .map(|flag_value| vec![(input_name.clone(), flag_value.clone())])
+            .unwrap_or_default(),
+    }
 }
 
 fn read_whole_body(command_matches: &ArgMatches) -> Result<Map<String, Value>, CliError> {

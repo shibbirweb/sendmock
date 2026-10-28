@@ -13,12 +13,16 @@ const catalogue: CatalogueSurfaces = {
     {
       command: "sendmock health",
       usage: "sendmock health",
+      arguments: [],
+      flags: [],
       operations: [{ operation_id: "getHealth", selector: healthSelector }],
       mcp: ["sendmock_status"],
     },
     {
       command: "sendmock email list",
       usage: "sendmock email list",
+      arguments: [],
+      flags: [],
       operations: [{ operation_id: "getEmails", selector: null }],
       mcp: ["sendmock_email_list"],
     },
@@ -42,12 +46,16 @@ function binaryWith(usage: string, toolName: string): BinarySurfaces {
       {
         command: "sendmock serve",
         usage: "sendmock serve",
+        arguments: [],
+        flags: [],
         operations: [],
         mcp: [],
       },
       {
         command: usage,
         usage,
+        arguments: [],
+        flags: [],
         operations: [{ operation_id: "getHealth", selector: healthSelector }],
         mcp: [toolName],
       },

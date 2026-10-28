@@ -92,6 +92,8 @@ pub struct OperationDefinition {
     pub mcp_tool: &'static str,
     pub selector: Option<OperationSelector>,
     pub cli_arguments: &'static [CliArgument],
+    /// Flags the naming rules get wrong, by input, e.g. `("timeout", "wait")` for `--wait`.
+    pub cli_flag_names: &'static [(&'static str, &'static str)],
     /// A boolean output field that must be true for the CLI to exit 0, such as `is_valid`.
     pub success_flag_field: Option<&'static str>,
     pub success_status: SuccessStatus,
@@ -113,11 +115,17 @@ impl OperationDefinition {
         mcp_tool: "",
         selector: None,
         cli_arguments: &[],
+        cli_flag_names: &[],
         success_flag_field: None,
         success_status: SuccessStatus::Ok,
         answer_kind: AnswerKind::Json,
         raw_body_input: None,
     };
+
+    /// Whether the MCP name is a resource (`sendmock://...`) rather than a tool.
+    pub fn has_mcp_resource(&self) -> bool {
+        self.mcp_tool.starts_with("sendmock://")
+    }
 
     /// The path's `{placeholders}` as input names: `{emailId}` is `email_id`.
     pub fn path_parameter_names(&self) -> Vec<(String, String)> {

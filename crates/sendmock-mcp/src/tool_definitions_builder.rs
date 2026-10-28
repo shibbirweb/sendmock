@@ -9,7 +9,11 @@ use crate::{McpToolAnnotations, McpToolDefinition};
 /// tool are told apart by their selector input, as the surface catalogue defines them.
 pub fn build_tool_definitions(operation_registry: &OperationRegistry) -> Vec<McpToolDefinition> {
     let mut operations_by_tool: Vec<(&'static str, Vec<Arc<dyn ErasedOperation>>)> = Vec::new();
-    for operation in operation_registry.operations() {
+    let tool_operations = operation_registry
+        .operations()
+        .iter()
+        .filter(|operation| !operation.definition().has_mcp_resource());
+    for operation in tool_operations {
         let tool_name = operation.definition().mcp_tool;
         match operations_by_tool
             .iter_mut()

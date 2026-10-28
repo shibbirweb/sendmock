@@ -56,6 +56,8 @@ fn describe_all_commands(operation_registry: &OperationRegistry) -> Vec<CommandD
             command: (*command).to_owned(),
             usage: (*command).to_owned(),
             summary: (*summary).to_owned(),
+            arguments: Vec::new(),
+            flags: Vec::new(),
             operations: Vec::new(),
             mcp: Vec::new(),
         });

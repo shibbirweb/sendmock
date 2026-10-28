@@ -53,6 +53,7 @@ impl From<OperationError> for ApiErrorResponse {
         let status = match &operation_error {
             OperationError::InvalidInput { .. } => StatusCode::BAD_REQUEST,
             OperationError::NotFound { .. } => StatusCode::NOT_FOUND,
+            OperationError::Timeout { .. } => StatusCode::REQUEST_TIMEOUT,
             OperationError::Store(_) | OperationError::Internal(_) => {
                 tracing::error!(error = %operation_error, "operation failed");
                 StatusCode::INTERNAL_SERVER_ERROR

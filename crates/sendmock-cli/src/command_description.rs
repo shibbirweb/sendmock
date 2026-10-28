@@ -8,6 +8,8 @@ pub struct CommandDescription {
     pub command: String,
     pub usage: String,
     pub summary: String,
+    pub arguments: Vec<String>,
+    pub flags: Vec<String>,
     pub operations: Vec<OperationReference>,
     pub mcp: Vec<String>,
 }
@@ -34,6 +36,8 @@ pub fn describe_operation_commands(
         .iter()
         .map(|operation| {
             let definition = operation.definition();
+            let command_inputs =
+                crate::command_arguments::describe_command_inputs(operation.as_ref());
             CommandDescription {
                 command: format!(
                     "sendmock {}",
@@ -41,6 +45,16 @@ pub fn describe_operation_commands(
                 ),
                 usage: definition.cli_usage.to_owned(),
                 summary: definition.summary.to_owned(),
+                arguments: command_inputs
+                    .positional_inputs
+                    .iter()
+                    .map(|positional_input| positional_input.placeholder.clone())
+                    .collect(),
+                flags: command_inputs
+                    .flag_inputs
+                    .iter()
+                    .map(|flag_input| format!("--{}", flag_input.flag_name))
+                    .collect(),
                 operations: vec![OperationReference {
                     method: definition.method.as_str().to_owned(),
                     path: definition.path.to_owned(),

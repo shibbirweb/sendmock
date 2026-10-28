@@ -12,6 +12,9 @@ pub enum OperationError {
     #[error("{message}")]
     NotFound { message: String },
 
+    #[error("{message}")]
+    Timeout { message: String },
+
     #[error(transparent)]
     Store(#[from] StoreError),
 
@@ -25,6 +28,7 @@ impl OperationError {
         match self {
             Self::InvalidInput { .. } => "invalid_input",
             Self::NotFound { .. } => "not_found",
+            Self::Timeout { .. } => "timeout",
             Self::Store(_) | Self::Internal(_) => "internal_error",
         }
     }
@@ -32,7 +36,9 @@ impl OperationError {
     pub fn field(&self) -> Option<&str> {
         match self {
             Self::InvalidInput { field, .. } => field.as_deref(),
-            Self::NotFound { .. } | Self::Store(_) | Self::Internal(_) => None,
+            Self::NotFound { .. } | Self::Timeout { .. } | Self::Store(_) | Self::Internal(_) => {
+                None
+            }
         }
     }
 }

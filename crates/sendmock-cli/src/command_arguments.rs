@@ -1,6 +1,7 @@
 use clap::{Arg, ArgAction, Command};
 use sendmock_ops::{
-    AnswerKind, ErasedOperation, InputShape, ScalarType, describe_input_shape, to_snake_case,
+    AnswerKind, ErasedOperation, InputShape, OperationDefinition, ScalarType, describe_input_shape,
+    to_snake_case,
 };
 use serde_json::Value;
 
@@ -25,6 +26,7 @@ pub struct FlagInput {
     pub input_name: String,
     pub flag_name: String,
     pub input_shape: InputShape,
+    pub is_required: bool,
 }
 
 /// How a command's command line maps to its operation's input.
@@ -36,25 +38,7 @@ pub struct CommandInputs {
 
 pub fn describe_command_inputs(operation: &dyn ErasedOperation) -> CommandInputs {
     let definition = operation.definition();
-    let positional_inputs: Vec<PositionalInput> = definition
-        .cli_usage
-        .split_whitespace()
-        .filter_map(|word| word.strip_prefix('<')?.strip_suffix('>'))
-        .map(|placeholder| {
-            let file_argument = definition
-                .cli_arguments
-                .iter()
-                .find(|argument| argument.placeholder == placeholder);
-            PositionalInput {
-                placeholder: placeholder.to_owned(),
-                input_name: file_argument.map_or_else(
-                    || to_snake_case(placeholder),
-                    |argument| argument.input_name.to_owned(),
-                ),
-                reads_file: file_argument.is_some_and(|argument| argument.reads_file),
-            }
-        })
-        .collect();
+    let positional_inputs = describe_positional_inputs(definition);
     let input_schema = operation.input_schema().to_value();
     let raw_body_name = definition
         .raw_body_input
@@ -70,18 +54,62 @@ pub fn describe_command_inputs(operation: &dyn ErasedOperation) -> CommandInputs
                     .any(|positional| &positional.input_name == *input_name)
         })
         .map(|(input_name, property_schema)| {
-            let input_shape = describe_input_shape(property_schema, &input_schema);
-            FlagInput {
-                input_name: input_name.clone(),
-                flag_name: build_flag_name(input_name, input_shape),
-                input_shape,
-            }
+            describe_flag_input(definition, &input_schema, input_name, property_schema)
         })
         .filter(|flag_input| !RESERVED_FLAG_NAMES.contains(&flag_input.flag_name.as_str()))
         .collect();
     CommandInputs {
         positional_inputs,
         flag_inputs,
+    }
+}
+
+/// The `<placeholders>` of the usage that are not a flag's value, in order.
+fn describe_positional_inputs(definition: &OperationDefinition) -> Vec<PositionalInput> {
+    let usage_words: Vec<&str> = definition.cli_usage.split_whitespace().collect();
+    usage_words
+        .iter()
+        .enumerate()
+        .filter(|(word_position, _)| {
+            *word_position == 0 || !usage_words[word_position - 1].starts_with("--")
+        })
+        .filter_map(|(_, word)| word.strip_prefix('<')?.strip_suffix('>'))
+        .map(|placeholder| {
+            let file_argument = definition
+                .cli_arguments
+                .iter()
+                .find(|argument| argument.placeholder == placeholder);
+            PositionalInput {
+                placeholder: placeholder.to_owned(),
+                input_name: file_argument.map_or_else(
+                    || to_snake_case(placeholder),
+                    |argument| argument.input_name.to_owned(),
+                ),
+                reads_file: file_argument.is_some_and(|argument| argument.reads_file),
+            }
+        })
+        .collect()
+}
+
+fn describe_flag_input(
+    definition: &OperationDefinition,
+    input_schema: &Value,
+    input_name: &str,
+    property_schema: &Value,
+) -> FlagInput {
+    let input_shape = describe_input_shape(property_schema, input_schema);
+    let renamed_flag = definition
+        .cli_flag_names
+        .iter()
+        .find(|(renamed_input, _)| *renamed_input == input_name)
+        .map(|(_, flag_name)| (*flag_name).to_owned());
+    FlagInput {
+        input_name: input_name.to_owned(),
+        flag_name: renamed_flag.unwrap_or_else(|| build_flag_name(input_name, input_shape)),
+        input_shape,
+        is_required: input_schema["required"]
+            .as_array()
+            .is_some_and(|required_names| required_names.iter().any(|name| name == input_name)),
     }
 }
 
@@ -145,6 +173,14 @@ fn add_body_and_answer_flags(
                 .help("Confirm; destructive commands never run without it"),
         );
     }
+    if definition.raw_body_input.is_some() {
+        command = command.arg(
+            Arg::new("file")
+                .long("file")
+                .value_name("PATH")
+                .help("Read the body from this file, or stdin with - (the default)"),
+        );
+    }
     if let AnswerKind::File { .. } = definition.answer_kind {
         command = command.arg(
             Arg::new("output")
@@ -185,6 +221,7 @@ fn add_flag(command: Command, flag_input: &FlagInput, help_text: String) -> Comm
         InputShape::Scalar(_) | InputShape::Object => command.arg(
             Arg::new(flag_input.input_name.clone())
                 .long(flag_input.flag_name.clone())
+                .required(flag_input.is_required)
                 .help(help_text),
         ),
     }

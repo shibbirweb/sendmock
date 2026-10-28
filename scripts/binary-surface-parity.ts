@@ -20,9 +20,36 @@ type OperationReference = { operation_id: string; selector?: Selector };
 type CommandEntry = {
   command: string;
   usage: string;
+  arguments: ({ name: string } | string)[];
+  flags: ({ name: string } | string)[];
   operations: OperationReference[];
   mcp: string[];
 };
+
+/** Flags every command has; the comparison is about the flags an operation's inputs give. */
+const globalFlagNames = new Set([
+  "--json",
+  "--server",
+  "--token",
+  "--data",
+  "--file",
+  "--yes",
+  "--output",
+  "--help",
+]);
+
+function readNames(entries: ({ name: string } | string)[]): string[] {
+  return entries.map((entry) =>
+    typeof entry === "string" ? entry : entry.name,
+  );
+}
+
+function readInputFlags(entries: ({ name: string } | string)[]): string[] {
+  return readNames(entries)
+    .filter((flagName) => !globalFlagNames.has(flagName))
+    .sort();
+}
+
 type ToolAnnotations = {
   read_only_hint: boolean;
   destructive_hint: boolean;
@@ -87,9 +114,24 @@ function compareCommands(
       const catalogueOperation = catalogueCommand.operations.find(
         (operation) => operation.operation_id === binaryOperation.operation_id,
       );
-      if (catalogueCommand.usage !== binaryCommand.usage) {
+      if (catalogueCommand.command !== binaryCommand.command) {
         mismatches.push(
-          `${binaryOperation.operation_id}: the binary's command is "${binaryCommand.usage}", the catalogue's "${catalogueCommand.usage}"`,
+          `${binaryOperation.operation_id}: the binary's command is "${binaryCommand.command}", the catalogue's "${catalogueCommand.command}"`,
+        );
+      }
+      if (
+        JSON.stringify(readNames(catalogueCommand.arguments)) !==
+        JSON.stringify(readNames(binaryCommand.arguments))
+      ) {
+        mismatches.push(
+          `${binaryOperation.operation_id}: the arguments differ`,
+        );
+      }
+      const binaryFlags = readInputFlags(binaryCommand.flags);
+      const catalogueFlags = readInputFlags(catalogueCommand.flags);
+      if (JSON.stringify(binaryFlags) !== JSON.stringify(catalogueFlags)) {
+        mismatches.push(
+          `${binaryOperation.operation_id}: the binary's flags are ${binaryFlags.join(" ") || "none"}, the catalogue's ${catalogueFlags.join(" ") || "none"}`,
         );
       }
       if (

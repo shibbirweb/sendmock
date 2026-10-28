@@ -50,12 +50,15 @@ pub fn find_matched_operation(
         })
 }
 
-/// The literal words of a usage after `sendmock`, without `<placeholders>`.
+/// The command words of a usage after `sendmock`: everything before its first flag or
+/// `<placeholder>` (`sendmock otp --to <recipient>` is `otp`).
 pub fn command_words(cli_usage: &'static str) -> Vec<&'static str> {
     cli_usage
         .split_whitespace()
         .skip_while(|word| *word == BINARY_NAME)
-        .filter(|word| !word.starts_with('<'))
+        .take_while(|word| {
+            !word.starts_with('<') && !word.starts_with("--") && !word.starts_with('[')
+        })
         .collect()
 }
 
@@ -106,6 +109,7 @@ mod tests {
             ["seed", "validate"]
         );
         assert_eq!(command_words("sendmock status"), ["status"]);
+        assert_eq!(command_words("sendmock otp --to <recipient>"), ["otp"]);
     }
 
     // AC: AI-01.1
