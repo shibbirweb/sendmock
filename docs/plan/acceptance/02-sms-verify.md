@@ -105,7 +105,7 @@ Phase 4.
 
 ## SM-12 Virtual numbers
 
-UI in U1, backend Phase 4.
+UI in U1, backend Phase 2 (moved from Phase 4 on 2026-10-29).
 
 - [ ] SM-12.1 Numbers can be created, edited and deleted with label, channels, inbound URL and format, and status callback.
 - [ ] SM-12.2 An inbound message to a registered number goes to its inbound URL without needing a rule.

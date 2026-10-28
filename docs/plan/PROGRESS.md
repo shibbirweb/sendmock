@@ -9,28 +9,31 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([11](11-roadmap.md)), not started (0 / 14). Before it starts: settle or defer the open placeholder decisions (name trademark check, ports, licence). Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), not started (0 / 13). Before it starts: settle or defer the open placeholder decisions (name trademark check, ports, licence). Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 107 accepted, 55 / 493 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 108 accepted, 55 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Settle or defer the open placeholder decisions before Phase 0 (Decisions > Open below, [10](10-open-questions.md)): the "SendMock" trademark check, the default ports (1025 / 8025 in use), the licence (dual MIT / Apache-2.0 recommended). This is the last Planning item.
-2. Phase 0: Backend foundations, starting with the Cargo workspace and crate skeletons (see Phase 0 below and [11](11-roadmap.md)).
+1. Merge the Phase 0 plan pull request from `docs/phase-0-plan` (below) once its CI is green.
+2. Phase 0 W0: settle or defer the open placeholder decisions (Decisions > Open below, [10](10-open-questions.md#2-default-ports)): the default ports (1025 / 8025 recommended) and the licence (dual MIT / Apache-2.0 recommended) are needed by W1 and W3; the "SendMock" trademark check may wait until before 1.0. This is the last Planning item.
+3. Phase 0 W1 onwards, in the workstream order of [23](23-phase-0.md): the Cargo workspace and crate skeletons, then Rust CI and the test setup.
 
 ### Resume here (2026-10-29)
 
+- **Phase 0 planned, Stage B audited (branch `docs/phase-0-plan`, from `develop` at `4613b27`):** [23-phase-0.md](23-phase-0.md) splits Phase 0 into W0 to W12 with branches, deliverables, tests, criteria and dependencies. [24-stage-b-coverage.md](24-stage-b-coverage.md) maps all 221 UI operations to the phase that builds them; the gaps it found are now in the Stage B phases below. Owner decisions from the audit: the binary embeds the live UI build only from Phase 1, with **Not available yet** for operations not built yet (new feature UI-12, `available_operations` in `GET /info`, [07](07-ui.md#not-available-yet-stage-b)); virtual numbers move to Phase 2 (SM-12); UI and API auth lands in Phase 1. Open point in [23](23-phase-0.md#criteria): whether the three-OS smoke job proves DS-01.2 for the host build, or it waits for the release binaries.
+- **Working copy:** this work was done in the worktree `~/prefetch/mail-sms-server`; the main checkout `~/Personal/mail-sms-server` is on `feat/promo-video` with the promo video work uncommitted.
 - **UI signed off on 2026-10-29:** Stage A is done and Stage B may start. The sign-off pull request from `chore/u3-sign-off` ticks W11 and the sign-off, signs off every row of the review table in [18](18-phase-u3.md#review-table) (UI-07.3, with new rows for Mail providers, SMS providers and Scenarios), ticks 28 gate criteria (27 proven by passing tests, plus UI-07.3 proven by the sign-off) and sets UI-05 to UI-10, WS-02 and WS-04 to `UI done`. WS-02.4 (the video player) and WS-04.2 (snippets against a real instance) wait for Stage B.
 - **Merged before it:** #40 (versioned docs, Install with AI), #42 (W18 update checker, F18), #43 (PR number fix) and #44 (the ask-first rule for commits, pushes and branches in [AGENTS.md](../../AGENTS.md)). #45 was closed unmerged (an older copy of #44). #41 is the GitHub Discussions welcome post; Discussions share numbers with issues and pull requests.
-- **Still open on GitHub:** PR #42 is titled "Feat/update checker"; rename it to `feat:[U3] update checker with Off, Manual and Daily modes, release notes and the upgrade command for the running platform` so the first changelog lists it.
+- **Still open on GitHub (checked 2026-10-29):** merged PR #42 is still titled "Feat/update checker"; rename it to `feat:[U3] update checker with Off, Manual and Daily modes, release notes and the upgrade command for the running platform` so the first changelog lists it.
 - **One-time setting for the owner:** Settings > Environments > `github-pages` must also allow the tags `v*`, or the deploy after a published release is rejected.
 - **Working rules** (also in [AGENTS.md](../../AGENTS.md)): ask before creating a branch, committing or pushing; tests run in GitHub CI, not locally (only format, lint, typecheck and quick unit tests locally); CI runs on pull requests and on pushes to `develop` and `main`, not on other branch pushes; check CI with the public GitHub API (no `gh` CLI); install and setup docs are numbered steps with each command in its own block; never use the em-dash character; no co-authors or AI tool names in commits or pull requests.
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up". Ask me before creating a branch, committing or pushing.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up"; for Phase 0 work, follow the workstream order in docs/plan/23-phase-0.md. Ask me before creating a branch, committing or pushing.
   ```
 
 ## How to update this file
@@ -52,7 +55,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | Not started | 0 / 14 |
+| 0 | Backend foundations | Not started | 0 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -189,6 +192,8 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 
 ### Phase 0: Backend foundations
 
+Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
+
 - [ ] Cargo workspace and crate skeletons
 - [ ] `rust-embed` UI embedding, SPA fallback, dev proxy
 - [ ] Config (clap, env, `sendmock.toml`), tracing, graceful shutdown
@@ -201,7 +206,6 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow
 - [ ] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`
 - [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
-- [ ] Versioned website builds (moved to U3 W17 on 2026-10-27)
 - [ ] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12)
 
 ### Phase 1: Email backend and first beta
@@ -212,11 +216,17 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Email REST API and WebSocket events
 - [ ] `sendmail` shim
 - [ ] Native HTTP send API (`POST /api/v1/send`)
+- [ ] `POST /send/raw` and `GET /emails/latest`
+- [ ] SSE `/events` and `GET /events/recent`
 - [ ] SMTP session log and HTTP API request log
 - [ ] Plus-address tagging, MIME tree, thumbnails, List-Unsubscribe check
 - [ ] `wait/email`, `otp`, `links`, `reset`; `--ready-json`
 - [ ] CLI `email` / `otp` / `links`; MCP `core`, `email`, `extract` toolsets
-- [ ] Mail screens switched to live mode
+- [ ] Mail screens switched to live mode; the binary embeds the live UI build and `/info` lists `available_operations`; Not available yet for the rest (UI-12)
+- [ ] UI and API auth (`--ui-auth`, API token; PL-06.2)
+- [ ] Settings API (General, Email, Notifications), `/integrations/{stack}`, `POST /samples/email`
+- [ ] Real update check (`GET /updates`, `sendmock update check`, Daily mode)
+- [ ] Logs and Settings switched to live mode; CLI `logs`, `settings`, `reset`, `sample`, `update`; MCP `logs`, `admin` toolsets
 - [ ] SMTP compatibility tests with real clients
 - [ ] CORS for the docs origin; playground Local mode
 - [ ] Done-when check: Laravel and Node mail appear live; pytest reads an OTP
@@ -233,6 +243,9 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] GSM-7/UCS-2 encoding and segments
 - [ ] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode, custom outcome numbers)
 - [ ] Status callbacks (Twilio, Vonage) and inbound SMS simulation
+- [ ] Virtual numbers and Messaging Services registry; Numbers screen live; `POST /samples/number`; CLI and MCP `numbers` (moved from Phase 4)
+- [ ] SMS built-in provider definitions (Twilio, Twilio Verify, Vonage) from the database; SMS > Providers live for them (SM-16)
+- [ ] `wait/sms`, SMS OTP extraction, `POST /samples/sms` and `/samples/verification`
 - [ ] CLI `sms` / `verify`; MCP `sms`, `verify` toolsets
 - [ ] SMS and Verify screens switched to live mode
 - [ ] Done-when check: Twilio-shaped send with callbacks; Verify OTP login works; beta released
@@ -249,6 +262,8 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Payload templates (native, Twilio, Vonage, Slack, Discord) and custom templates
 - [ ] Manual send, replay, edit-and-replay
 - [ ] Saved deliveries and `/stats`
+- [ ] `wait/webhook`, `seed status`
+- [ ] Overview switched to live mode; MCP `rules` toolset (outcome rules)
 - [ ] Seed file covers all configuration; `reset` restores seed; `seed export/apply`
 - [ ] CLI `webhook`; MCP `webhooks`, `templates`, `variables` toolsets
 - [ ] Webhook screens switched to live mode
@@ -258,15 +273,19 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 ### Phase 3P: Payment gateway backend
 
 - [ ] Native payments API and hosted checkout flow
+- [ ] Gateway, method and flow configuration (edit, reset, delete, add custom, step types, flow variables, previews, credential reveal; PY-12)
 - [ ] Test cards and the real-card safety rule
 - [ ] Stripe emulation with `Stripe-Signature` webhooks
 - [ ] PayPal emulation (Orders v2, webhooks, IPN postback)
 - [ ] SSLCommerz emulation (init, IPN, validation, refund, query)
+- [ ] Capture, void, full and partial refunds; `payment.*` and `checkout.*` events; payment templates; `wait/payment`
+- [ ] CLI `payments`; MCP `payments` toolset; Payments screens switched to live mode
 - [ ] Done-when check: Stripe, PayPal and SSLCommerz flows end to end offline; beta released
 
 ### Phase 4: Integrations, fidelity and AI
 
 - [ ] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo)
+- [ ] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16)
 - [ ] HTML compatibility, link check, SpamAssassin check
 - [ ] Release to real SMTP, auto-forward, tag rules
 - [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
@@ -277,7 +296,9 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 - [ ] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API
 - [ ] WhatsApp via Twilio
 - [ ] HTTP catcher backend (bins, mock responses, core presets, `wait/http`)
-- [ ] Virtual numbers backend and chaos toggles
+- [ ] HTTP Catcher and Scenarios switched to live mode; `POST /samples/http`; CLI and MCP `http`, `rules`, `scenario` toolsets
+- [ ] Payments: bKash, Razorpay and Paddle; subscriptions; disputes (PY-07, PY-10)
+- [ ] Chaos toggles
 - [ ] SDK redirection recipes verified per SDK
 - [ ] `examples/` apps for 8 languages with CI smoke tests
 - [ ] OpenAPI published, API docs page in UI
@@ -325,6 +346,9 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
 | 2026-10-25 | Commits authored as `MD. Shibbir Ahmed <shibbirweb@gmail.com>` (rule in `AGENTS.md`); existing local commits rewritten before the first push | [AGENTS.md](../../AGENTS.md#commits-and-pull-requests) |
 | 2026-10-25 | Product name **SendMock** (binary and packages `sendmock`) | [10](10-open-questions.md#1-product-name-decided-2026-10-25-sendmock) |
 | 2026-10-25 | SQLite is the only database: embedded (`rusqlite`, bundled, FTS5), one file, WAL mode, on disk at the OS data directory by default and `--db memory` for CI, hand-rolled `user_version` migrations | [02](02-architecture.md#database-sqlite) |
+| 2026-10-29 | From Phase 1 the binary embeds the live UI build only; operations not built yet show Not available yet with their phase (UI-12) | [07](07-ui.md#not-available-yet-stage-b), [24](24-stage-b-coverage.md) |
+| 2026-10-29 | Virtual numbers and Messaging Services backend moved from Phase 4 to Phase 2 | [11](11-roadmap.md), [24](24-stage-b-coverage.md) |
+| 2026-10-29 | UI and API auth (`--ui-auth`, API token) lands in Phase 1 with the first beta | [11](11-roadmap.md), [24](24-stage-b-coverage.md) |
 
 ### Open
 
@@ -482,3 +506,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-28 | Update checker built on mock data (U3 W18, F15, PR #42): `update_check_mode` (off, manual, daily) replaces `is_update_check_enabled`; `GET /api/v1/updates` answers with the channel, install method and the offered release (date, release notes, upgrade command, release page), `409` while off and `502` "Could not check for updates" when GitHub cannot be reached; spec, CLI and MCP references regenerated. Settings > About has the mode choice and the result with a copyable upgrade command; Daily checks on start and once a day and adds one bell notification per new version. The mock picks the offered release per channel and keeps a check for 24 hours; the demo controls choose a pretend install and can make GitHub unreachable. Tests: unit tests in `web/src/mocks/updates/` and `web/src/features/updates/`, end to end in `web/tests/e2e/update-check.spec.ts`; PL-05.10 to PL-05.12 stay unticked until the server check in Phase 1. |
 | 2026-10-28 | Owner feedback F18: when the backend is built, the upgrade command follows the platform SendMock runs on. Recorded in [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15) with the command per platform, channel and install method, and as new criterion PL-05.13 (493 criteria). The mock does it already: each pretend install has a platform, unit tests cover the commands, and `web/tests/repository/upgrade-commands.test.ts` checks the install script, Homebrew and Docker commands against the Install page. |
 | 2026-10-29 | **UI signed off; Stage A done, Stage B may start** (U3 W11). The feedback round closed after F1 to F18 with no open `u3-feedback` issues. The owner signed off every row of the design review table in [18](18-phase-u3.md#review-table), with rows added for Mail providers, SMS providers and Scenarios (UI-07.3). 28 gate criteria are ticked (27 proven by passing tests, plus UI-07.3 by the sign-off) and UI-05 to UI-10, WS-02 and WS-04 are `UI done`; WS-02.4 and WS-04.2 wait for Stage B. U1, U2 and U3 are Done. Next: settle the placeholder decisions, then Phase 0. |
+| 2026-10-29 | Plan: Phase 0 in full ([23](23-phase-0.md)): W0 settles the default ports and the licence (the trademark check may wait), then twelve workstreams in order with branches, deliverables, tests and dependencies, the criteria Phase 0 ticks and the ones that wait for the first beta, and the new dependencies (`thiserror`, `dirs`, and `insta`, `tempfile`, `jsonschema` for tests only). The binary embeds the mock-mode UI until Phase 1 switches screens to live data. "Versioned website builds" left the Phase 0 list, since it moved to U3 W17 and was done there (#40), so Phase 0 has 13 items. |
+| 2026-10-29 | Stage B coverage audit ([24](24-stage-b-coverage.md)): all 221 operations of the signed-off UI are mapped to the phase that builds them. Added to the roadmap and this file: `/send/raw`, `/emails/latest`, SSE and `/events/recent`, `/samples/{kind}`, `/integrations/{stack}`, the Settings API and the real update check (Phase 1); MMS, custom outcome numbers, the SMS built-in provider runtime and `wait/sms` (Phase 2); `wait/webhook`, custom outcome addresses and the Overview going live (Phase 3); gateway, method and flow configuration and the missing Phase 3P items; the email and custom provider runtime and the Phase 4 payment items; a live step for every screen and a phase for every CLI and MCP toolset. Owner decisions: live UI build only from Phase 1 with Not available yet for operations not built yet (new feature UI-12, `available_operations` in `/info`), virtual numbers moved to Phase 2 (SM-12), UI and API auth in Phase 1. |

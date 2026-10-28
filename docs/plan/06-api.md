@@ -179,7 +179,7 @@ These make SendMock useful from any test framework without polling loops:
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, email and SMS options, opened events, chaos toggles, OTP patterns; `PATCH` takes only the changed keys and returns field-level errors for invalid values |
-| GET | `/info` | version, uptime, listeners, counts, DB size, and `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames) |
+| GET | `/info` | version, uptime, listeners, counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 
