@@ -4,12 +4,13 @@ import * as React from "react";
 export type NotificationLink =
   | { kind: "email"; emailId: string }
   | { kind: "sms"; threadId: string }
-  | { kind: "delivery"; deliveryId: string };
+  | { kind: "delivery"; deliveryId: string }
+  | { kind: "about" };
 
 export type AppNotification = {
   id: string;
   /** What it is about, for its icon. */
-  area: "email" | "sms" | "webhook";
+  area: "email" | "sms" | "webhook" | "update";
   title: string;
   description: string;
   link: NotificationLink | null;

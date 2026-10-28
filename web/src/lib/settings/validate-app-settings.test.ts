@@ -27,6 +27,19 @@ describe("validateAppSettingsUpdate", () => {
     ).toEqual({});
   });
 
+  test("PL-05.10 accepts the off, manual and daily update check modes only", () => {
+    for (const updateCheckMode of ["off", "manual", "daily"] as const) {
+      expect(
+        validateAppSettingsUpdate({ update_check_mode: updateCheckMode }),
+      ).toEqual({});
+    }
+    expect(
+      validateAppSettingsUpdate({
+        update_check_mode: "weekly" as unknown as "daily",
+      }),
+    ).toEqual({ update_check_mode: "Choose off, manual or daily" });
+  });
+
   test("PL-05.2 accepts valid values and checks only the keys sent", () => {
     expect(
       validateAppSettingsUpdate({

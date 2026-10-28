@@ -5,15 +5,20 @@ import { readMockConditions } from "@/mocks/conditions/mock-conditions";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { applyMockConditions } from "@/mocks/handlers/handler-utils";
 import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
+import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
 
 /** What `/info` reports; Docker binds every interface instead of loopback. */
 function buildMockAppInfo(): AppInfo {
-  const isRunningInContainer = readMockConditions().isRunningInContainer;
+  const mockConditions = readMockConditions();
+  const isRunningInContainer = mockConditions.isRunningInContainer;
   const listenHost = isRunningInContainer ? "0.0.0.0" : "127.0.0.1";
+  const installProfile = findMockInstallProfile(
+    mockConditions.installProfileKey,
+  );
 
   return {
-    version: "0.0.0-dev",
-    channel: "dev",
+    version: installProfile.version,
+    channel: installProfile.releaseChannel,
     uptime_seconds: 0,
     smtp_address: `${listenHost}:1025`,
     http_address: `${listenHost}:8025`,

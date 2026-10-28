@@ -1,20 +1,12 @@
-import { RefreshCwIcon } from "lucide-react";
 import type * as React from "react";
 
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CommunityLinksCard } from "@/features/help/community-links-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
-import { SettingsSwitchRow } from "@/features/settings/settings-fields";
-import { useSettingsSectionForm } from "@/features/settings/use-settings-section-form";
-import {
-  useAppInfo,
-  useCheckForUpdates,
-} from "@/lib/api/hooks/use-system-queries";
+import { UpdatesCard } from "@/features/updates/updates-card";
+import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
 import type { AppSettings } from "@/lib/api/types";
 import { formatBytes } from "@/lib/format/format-values";
-
-const updateCheckKeys = ["is_update_check_enabled"] as const;
 
 function formatUptime(uptimeSeconds: number): string {
   const uptimeMinutes = Math.floor(uptimeSeconds / 60);
@@ -36,65 +28,6 @@ function AboutFact({
       <dt className="text-muted-foreground">{label}</dt>
       <dd className="min-w-0 break-words">{children}</dd>
     </div>
-  );
-}
-
-function UpdatesCard({ appSettings }: { appSettings: AppSettings }) {
-  const sectionForm = useSettingsSectionForm(appSettings, updateCheckKeys);
-  const checkForUpdates = useCheckForUpdates();
-  const updateCheckResult = checkForUpdates.data;
-  // The check uses the saved setting, so it stays off until the switch is saved.
-  const canCheck = appSettings.is_update_check_enabled;
-
-  return (
-    <SettingsSectionCard
-      title="Updates"
-      description="Off by default: SendMock never calls out unless you turn this on."
-      isDirty={sectionForm.isDirty}
-      isSaving={sectionForm.isSaving}
-      onSave={sectionForm.saveChanges}
-      onDiscard={sectionForm.discardChanges}
-    >
-      <SettingsSwitchRow
-        label="Check GitHub Releases for updates"
-        description="Stable installs are offered stable releases; beta installs betas and stables."
-        isChecked={sectionForm.draftValues.is_update_check_enabled}
-        onCheckedChange={(isEnabled) => {
-          sectionForm.updateDraft({ is_update_check_enabled: isEnabled });
-        }}
-      />
-      <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!canCheck || checkForUpdates.isPending}
-          onClick={() => checkForUpdates.mutate()}
-        >
-          <RefreshCwIcon />
-          Check for updates
-        </Button>
-        {updateCheckResult !== undefined && (
-          <p aria-live="polite" className="text-sm">
-            {updateCheckResult.is_update_available ? (
-              <>
-                {updateCheckResult.latest_version} is available.{" "}
-                <a
-                  href={updateCheckResult.release_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline underline-offset-2"
-                >
-                  Release notes
-                </a>
-              </>
-            ) : (
-              "You are on the latest version."
-            )}
-          </p>
-        )}
-      </div>
-    </SettingsSectionCard>
   );
 }
 

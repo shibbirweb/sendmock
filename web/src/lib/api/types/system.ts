@@ -157,9 +157,12 @@ export type AppStats = {
   recent_failures: RecentFailedDelivery[];
 };
 
+/** The release line a build comes from; it decides which updates are offered (PL-05.12). */
+export type ReleaseChannel = "stable" | "beta" | "edge" | "dev";
+
 export type AppInfo = {
   version: string;
-  channel: "stable" | "beta" | "edge" | "dev";
+  channel: ReleaseChannel;
   uptime_seconds: number;
   smtp_address: string;
   http_address: string;
@@ -302,10 +305,10 @@ export type AppSettings = {
    */
   otp_patterns: string[];
   /**
-   * Checks for a newer SendMock version.
-   * @example true
+   * When SendMock looks for a newer release: `off` never calls out, `manual` only on request, `daily` on start and once a day.
+   * @example "off"
    */
-  is_update_check_enabled: boolean;
+  update_check_mode: UpdateCheckMode;
   /**
    * Mail for these domains is incoming; offered as Forward suggestions.
    * @example ["reply.app.test"]
@@ -377,13 +380,42 @@ export type SeedFileRequest = {
   seed_toml: string;
 };
 
-/** GET /api/v1/updates (opt-in). */
+/** When the update check runs (PL-05.10); `off` is the default. */
+export type UpdateCheckMode = "off" | "manual" | "daily";
+
+/** How SendMock was installed, baked in by each package; it picks the upgrade command (PL-05.11). */
+export type InstallMethod =
+  "homebrew" | "scoop" | "docker" | "install_script" | "npm" | "unknown";
+
+/** The newer release an update check offers. */
+export type AvailableRelease = {
+  /** @example "0.2.0-beta.1" */
+  version: string;
+  published_at: IsoTimestamp;
+  /** The release's `CHANGELOG.md` section, in Markdown. */
+  release_notes_markdown: string;
+  /** @example "https://github.com/shibbirweb/sendmock/releases/tag/v0.2.0-beta.1" */
+  release_url: string;
+  /**
+   * The command for the install method; null when the method is unknown, so follow `release_url`.
+   * @example "brew upgrade sendmock"
+   */
+  upgrade_command: string | null;
+};
+
+/** GET /api/v1/updates: the result of the opt-in update check (PL-05.10 to PL-05.12). */
 export type UpdateCheckResult = {
   current_version: string;
-  latest_version: string;
+  channel: ReleaseChannel;
+  install_method: InstallMethod;
+  /** False for edge and dev builds, which are offered no updates. */
+  is_channel_checked: boolean;
   is_update_available: boolean;
-  release_url: string;
+  /** Null when up to date or when the channel is not checked. */
+  available_release: AvailableRelease | null;
   checked_at: IsoTimestamp;
+  /** True when the answer is the last check's, kept for 24 hours. */
+  is_from_cache: boolean;
 };
 
 /** Answer of `GET /health`. */

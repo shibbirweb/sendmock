@@ -6,7 +6,6 @@ import type {
   SeedChangedItem,
   SeedFileRequest,
   SeedStatus,
-  UpdateCheckResult,
 } from "@/lib/api/types";
 import { validateAppSettingsUpdate } from "@/lib/settings/validate-app-settings";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
@@ -17,6 +16,8 @@ import {
   createErrorResponse,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
+import { runMockUpdateCheck } from "@/mocks/updates/run-mock-update-check";
 
 const maskedPassword = "••••••••";
 const seedSourcePath = "./sendmock.seed.toml";
@@ -159,21 +160,26 @@ export const settingsHandlers = [
 
   http.get("*/api/v1/updates", async () => {
     await applyMockConditions();
-    if (!mockDatabase.settings.is_update_check_enabled) {
+    if (mockDatabase.settings.update_check_mode === "off") {
       return createErrorResponse(
         409,
         "update_check_off",
         "Turn on the update check first",
       );
     }
-
-    const updateCheckResult: UpdateCheckResult = {
-      current_version: "0.0.0-dev",
-      latest_version: "0.1.0-beta.1",
-      is_update_available: true,
-      release_url: "https://github.com/shibbirweb/sendmock/releases",
-      checked_at: new Date().toISOString(),
-    };
+    const mockConditions = readMockConditions();
+    const updateCheckResult = runMockUpdateCheck({
+      installProfile: findMockInstallProfile(mockConditions.installProfileKey),
+      isGitHubReachable: mockConditions.isGitHubReachable,
+      nowMs: Date.now(),
+    });
+    if (updateCheckResult === null) {
+      return createErrorResponse(
+        502,
+        "update_source_unreachable",
+        "Could not check for updates",
+      );
+    }
 
     return HttpResponse.json(updateCheckResult);
   }),

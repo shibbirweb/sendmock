@@ -29,9 +29,10 @@ const systemEndpoints = tagEndpoints("System", [
   {
     method: "GET",
     path: "/api/v1/updates",
-    summary: "Whether a newer release exists.",
+    summary:
+      "Whether a newer release exists for this channel, with its notes and upgrade command.",
     response: typeRef("UpdateCheckResult"),
-    errorStatuses: [409],
+    errorStatuses: [409, 502],
   },
   {
     method: "GET",

@@ -8,6 +8,7 @@ import { NotificationToaster } from "@/features/notifications/notification-toast
 import { RealtimeProvider } from "@/features/realtime/realtime-provider";
 import { AppOverlaysProvider } from "@/features/shortcuts/app-overlays-provider";
 import { ThemeProvider } from "@/features/theme/theme-provider";
+import { DailyUpdateNotifier } from "@/features/updates/daily-update-notifier";
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
             <RealtimeProvider>
               <RouterProvider router={router} />
               <NotificationToaster />
+              <DailyUpdateNotifier />
             </RealtimeProvider>
           </AppOverlaysProvider>
         </TooltipProvider>

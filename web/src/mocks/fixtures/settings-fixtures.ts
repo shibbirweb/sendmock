@@ -27,7 +27,7 @@ export function buildDefaultSettings(): AppSettings {
     chaos_smtp_command_latency_ms: 0,
     is_chaos_smtp_drop_during_data_enabled: false,
     otp_patterns: [...defaultOtpPatterns],
-    is_update_check_enabled: false,
+    update_check_mode: "off",
     payment_merchant_name: "Acme Shop",
     payment_default_currency: "USD",
     payment_outcome_profile: "interactive",
