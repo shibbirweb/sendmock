@@ -39,10 +39,10 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 Phase 0.
 
 - [ ] DS-04.1 Beta release opens a release PR with the next beta version and notes from `[Unreleased]`; merging it publishes a GitHub pre-release and builds all channels' beta artefacts.
-- [ ] DS-04.2 Stable release refuses unless the current beta is published and nothing untried landed after it.
+- [x] DS-04.2 Stable release refuses unless the current beta is published and nothing untried landed after it. (#48)
 - [ ] DS-04.3 Promote stable opens the `develop` to `main` PR; merging it publishes the stable release and all stable channels.
-- [ ] DS-04.4 No release is cut from a commit where CI did not pass; the version in code, tag and pre-release flag always agree.
-- [ ] DS-04.5 Every workflow supports dry run (where documented) and can be re-run safely.
+- [x] DS-04.4 No release is cut from a commit where CI did not pass; the version in code, tag and pre-release flag always agree. (#48)
+- [x] DS-04.5 Every workflow supports dry run (where documented) and can be re-run safely. (#48)
 
 ## DS-05 Version management
 

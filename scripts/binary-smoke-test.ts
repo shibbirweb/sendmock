@@ -6,6 +6,8 @@
  *     bun scripts/binary-smoke-test.ts target/release/sendmock
  */
 
+import type { Subprocess } from "bun";
+
 const startupTimeoutMs = 30_000;
 const readyMessage = "SendMock is ready";
 
@@ -47,14 +49,14 @@ async function drainRemainingOutput(
   }
 }
 
-function check(isPassing: boolean, description: string) {
+export function check(isPassing: boolean, description: string) {
   if (!isPassing) {
     throw new Error(`Failed: ${description}`);
   }
   console.log(`ok   ${description}`);
 }
 
-async function checkRunningBinary(baseUrl: string) {
+export async function checkRunningBinary(baseUrl: string) {
   const healthResponse = await fetch(`${baseUrl}/api/v1/health`);
   check(
     healthResponse.status === 200 &&
@@ -92,41 +94,67 @@ async function checkRunningBinary(baseUrl: string) {
   );
 }
 
+export type RunningSendmock = {
+  sendmock: Subprocess<"ignore", "pipe", "inherit">;
+  httpAddress: string;
+};
+
+/** Starts the binary and waits for its ready line; serve flags come from the caller. */
+export async function startSendmock(
+  binaryPath: string,
+  serveArguments: string[],
+): Promise<RunningSendmock> {
+  const sendmock = Bun.spawn(
+    [binaryPath, ...serveArguments, "--log-format", "json"],
+    { stdout: "pipe", stderr: "inherit" },
+  );
+  const startupTimeout = setTimeout(() => sendmock.kill(), startupTimeoutMs);
+  try {
+    return {
+      sendmock,
+      httpAddress: await readHttpAddressFromReadyLine(sendmock.stdout),
+    };
+  } finally {
+    clearTimeout(startupTimeout);
+  }
+}
+
+/** Stops it the way Docker and service managers do, and returns the exit code. */
+export async function stopSendmock(
+  runningSendmock: RunningSendmock,
+): Promise<number> {
+  runningSendmock.sendmock.kill(
+    process.platform === "win32" ? undefined : "SIGTERM",
+  );
+  return await runningSendmock.sendmock.exited;
+}
+
+export function withExecutableSuffix(binaryPath: string): string {
+  return process.platform === "win32" && !binaryPath.endsWith(".exe")
+    ? `${binaryPath}.exe`
+    : binaryPath;
+}
+
 async function main() {
   const binaryArgument = process.argv[2];
   if (!binaryArgument) {
     console.error("Usage: bun scripts/binary-smoke-test.ts <path to sendmock>");
     process.exit(2);
   }
-  const binaryPath =
-    process.platform === "win32" && !binaryArgument.endsWith(".exe")
-      ? `${binaryArgument}.exe`
-      : binaryArgument;
-  const sendmock = Bun.spawn(
-    [
-      binaryPath,
-      "--http-addr",
-      "127.0.0.1:0",
-      "--db",
-      "memory",
-      "--log-format",
-      "json",
-    ],
-    { stdout: "pipe", stderr: "inherit" },
+  const runningSendmock = await startSendmock(
+    withExecutableSuffix(binaryArgument),
+    ["--http-addr", "127.0.0.1:0", "--db", "memory"],
   );
-  const startupTimeout = setTimeout(() => sendmock.kill(), startupTimeoutMs);
   try {
-    const httpAddress = await readHttpAddressFromReadyLine(sendmock.stdout);
-    clearTimeout(startupTimeout);
-    await checkRunningBinary(`http://${httpAddress}`);
+    await checkRunningBinary(`http://${runningSendmock.httpAddress}`);
   } finally {
-    clearTimeout(startupTimeout);
-    sendmock.kill(process.platform === "win32" ? undefined : "SIGTERM");
-  }
-  const exitCode = await sendmock.exited;
-  if (process.platform !== "win32") {
-    check(exitCode === 0, "SIGTERM stops it with exit code 0");
+    const exitCode = await stopSendmock(runningSendmock);
+    if (process.platform !== "win32") {
+      check(exitCode === 0, "SIGTERM stops it with exit code 0");
+    }
   }
 }
 
-await main();
+if (import.meta.main) {
+  await main();
+}

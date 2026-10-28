@@ -96,13 +96,13 @@ describe("computeNextVersion from beta 0.4.0-beta.2 (DS-05.3)", () => {
     );
   });
 
-  test("DS-05.3 stable is refused with untried changes on top of its beta", () => {
+  test("DS-04.2 DS-05.3 stable is refused with untried changes on top of its beta", () => {
     expect(next("stable", releaseState("0.4.0-beta.2", ["fix"]))).toStartWith(
       "refused: Features or fixes",
     );
   });
 
-  test("stable is refused while the beta is unpublished", () => {
+  test("DS-04.2 stable is refused while the beta is unpublished", () => {
     expect(next("stable", releaseState("0.4.0-beta.2", [], false))).toStartWith(
       "refused:",
     );

@@ -1,0 +1,78 @@
+# Prepare release: the only place a release starts (docs/plan/16-website-and-releases.md).
+# Choose the kind of release; the workflow works out the version, writes it and the
+# CHANGELOG.md section, and opens the release pull request. Dry run only prints them.
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Kind of release (plan 16, The bump choices)
+        type: choice
+        options: [beta, patch, minor, major, stable]
+      dry_run:
+        description: Only print the version and the changelog section
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: release-prepare
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare ${{ inputs.bump }}${{ inputs.dry_run && ' (dry run)' || '' }}
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    env:
+      BUMP: ${{ inputs.bump }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          # A token other than GITHUB_TOKEN lets the release pull request start CI.
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: CI passed on this commit and no release is in progress
+        run: bun scripts/release/release.ts readiness
+
+      - name: Pull requests merged since the last tag and the last stable
+        run: |
+          bun scripts/release/release.ts merged-pull-requests --since last-tag > "$RUNNER_TEMP/merged-since-last-tag.json"
+          bun scripts/release/release.ts merged-pull-requests --since last-stable > "$RUNNER_TEMP/merged-since-last-stable.json"
+
+      - name: Write the version and the changelog section
+        id: release
+        run: |
+          version="$(bun scripts/version.ts bump "$BUMP" --pull-requests "$RUNNER_TEMP/merged-since-last-tag.json")"
+          if [[ "$version" == *-beta.* ]]; then since=last-tag; else since=last-stable; fi
+          bun scripts/version.ts changelog --pull-requests "$RUNNER_TEMP/merged-since-$since.json"
+          bun scripts/version.ts notes "$version" > "$RUNNER_TEMP/release-notes.md"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "release_number=$(bun scripts/release/release.ts release-number)" >> "$GITHUB_OUTPUT"
+          echo "## $version" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/release-notes.md" >> "$GITHUB_STEP_SUMMARY"
+          git diff --stat
+
+      - name: Open the release pull request
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_NUMBER: ${{ steps.release.outputs.release_number }}
+        run: |
+          title="chore:[REL-$RELEASE_NUMBER] release $VERSION"
+          git config user.name "MD. Shibbir Ahmed"
+          git config user.email "shibbirweb@gmail.com"
+          git switch -c "release/v$VERSION"
+          git commit -am "$title"
+          git push origin "release/v$VERSION"
+          gh pr create --base develop --head "release/v$VERSION" --title "$title" --body-file "$RUNNER_TEMP/release-notes.md"

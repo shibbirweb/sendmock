@@ -4,6 +4,9 @@ import {
   parseVersion,
 } from "../version/semantic-version";
 
+/** The version the code carries before the first Prepare release run. */
+const unreleasedVersion = "0.0.0";
+
 export type PublicationWorkflow =
   "beta-publish" | "stable-promote" | "stable-publish";
 
@@ -25,6 +28,12 @@ export function decidePublication(
     return { shouldAct: false, reason: `${versionInCode} is not a version` };
   }
   const tagName = `v${formatVersion(version)}`;
+  if (formatVersion(version) === unreleasedVersion) {
+    return {
+      shouldAct: false,
+      reason: "No release has been prepared yet; run Prepare release.",
+    };
+  }
   if (existingTagNames.includes(tagName)) {
     return { shouldAct: false, reason: `${tagName} is already published` };
   }

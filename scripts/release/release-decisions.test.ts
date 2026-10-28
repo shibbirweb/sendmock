@@ -34,6 +34,15 @@ describe("decidePublication", () => {
     });
   });
 
+  test("never publishes the 0.0.0 the code carries before the first release", () => {
+    expect(decidePublication("stable-promote", "0.0.0", []).shouldAct).toBe(
+      false,
+    );
+    expect(decidePublication("stable-publish", "0.0.0", []).shouldAct).toBe(
+      false,
+    );
+  });
+
   test("leaves a stable to the stable workflows and a beta to the beta one", () => {
     expect(decidePublication("beta-publish", "0.4.0", []).shouldAct).toBe(
       false,

@@ -1,0 +1,269 @@
+# Builds every target, tests each archive on its own operating system and CPU, and only then
+# publishes (docs/plan/09-distribution.md, Binary tests on every platform; plan 16, Workflows).
+# The publish workflows call it; "Run workflow" rebuilds without publishing unless asked, and
+# pull requests that change the release machinery run it without publishing.
+name: Release build
+
+on:
+  workflow_call:
+    inputs:
+      commit_sha:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      tag_name:
+        type: string
+        required: true
+      channel:
+        type: string
+        required: true
+      publish:
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Release channel baked into the binaries
+        type: choice
+        options: [dev, beta, stable]
+        default: dev
+      publish:
+        description: Upload to the release for the version in the code (off builds and tests only)
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - scripts/release/**
+      - scripts/binary-smoke-test.ts
+
+permissions:
+  contents: write
+
+env:
+  COMMIT_SHA: ${{ inputs.commit_sha || github.sha }}
+  RELEASE_CHANNEL: ${{ inputs.channel || 'dev' }}
+
+jobs:
+  plan:
+    name: Version from the code
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: The version in the code must match the release being built
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          version="$(bun scripts/version.ts show)"
+          if [ -n "$REQUESTED_VERSION" ] && [ "$REQUESTED_VERSION" != "$version" ]; then
+            echo "The code carries $version, not $REQUESTED_VERSION." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  web-dist:
+    name: Web UI build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build the UI the binaries embed
+        working-directory: web
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+          retention-days: 1
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: web-dist
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
+          - { target: aarch64-apple-darwin, runner: macos-latest, cross: cargo }
+          - { target: x86_64-apple-darwin, runner: macos-latest, cross: cargo }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
+          - { target: aarch64-pc-windows-msvc, runner: windows-latest, cross: cargo }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+
+      - name: Toolchain and target
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Zig for static Linux builds
+        if: matrix.cross == 'zigbuild'
+        uses: mlugg/setup-zig@v2
+
+      - uses: taiki-e/install-action@v2
+        if: matrix.cross == 'zigbuild'
+        with:
+          tool: cargo-zigbuild
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build
+        shell: bash
+        env:
+          SENDMOCK_RELEASE_CHANNEL: ${{ env.RELEASE_CHANNEL }}
+        run: |
+          if [ "${{ matrix.cross }}" = "zigbuild" ]; then
+            cargo zigbuild --release --locked -p sendmock --target ${{ matrix.target }}
+          else
+            cargo build --release --locked -p sendmock --target ${{ matrix.target }}
+          fi
+
+      - name: Pack the archive and its checksum
+        shell: bash
+        run: |
+          binary="target/${{ matrix.target }}/release/sendmock"
+          if [[ "${{ matrix.target }}" == *windows* ]]; then binary="$binary.exe"; fi
+          bun scripts/release/package-archive.ts ${{ matrix.target }} "$binary" dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist
+          retention-days: 3
+
+  test:
+    name: Test ${{ matrix.target }}
+    needs: [plan, build]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz }
+          - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz, containers: "alpine:3.22 busybox:1.37" }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz, containers: "alpine:3.22" }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip }
+          - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Checksum, layout, version, default listeners, API, UI and a clean stop
+        shell: bash
+        run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
+
+      - name: Starts with no runtime in minimal Linux images
+        if: matrix.containers
+        run: |
+          mkdir extracted
+          tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C extracted
+          for image in ${{ matrix.containers }}; do
+            docker run --rm -v "$PWD/extracted:/sendmock:ro" "$image" /sendmock/sendmock version --json
+          done
+
+  checksums:
+    name: SHA256SUMS
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: archive-*
+          path: dist
+          merge-multiple: true
+
+      - name: One checksum file for every archive
+        working-directory: dist
+        run: |
+          cat *.sha256 > SHA256SUMS
+          rm *.sha256
+          cat SHA256SUMS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: dist
+          retention-days: 7
+
+  publish:
+    name: Publish ${{ inputs.tag_name }}
+    if: inputs.publish
+    needs: [plan, checksums]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: The tag and pre-release flag agree with the code
+        run: bun scripts/release/release.ts agreement "${{ inputs.tag_name }}" "${{ env.RELEASE_CHANNEL == 'beta' }}"
+
+      - name: Upload the files and publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+        run: |
+          gh release upload "$TAG_NAME" dist/* --clobber
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then
+            gh release edit "$TAG_NAME" --draft=false --prerelease
+          else
+            gh release edit "$TAG_NAME" --draft=false --latest
+          fi
+
+      - name: Move the rolling beta pre-release to these files
+        if: env.RELEASE_CHANNEL == 'beta'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+        run: |
+          gh release delete beta --cleanup-tag --yes || true
+          gh release create beta dist/* --prerelease --target "$COMMIT_SHA" \
+            --title "Latest beta" \
+            --notes "The newest beta, now $TAG_NAME. These links always give the newest beta; see $TAG_NAME for its notes."
