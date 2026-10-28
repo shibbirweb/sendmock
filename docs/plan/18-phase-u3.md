@@ -12,6 +12,10 @@ Phase U3 turns the Stage A UI into something the owner can approve, publishes th
 - `docs/api/openapi.yaml` is frozen;
 - the owner approves the UI on the preview URL and ticks **Sign-off: UI approved, Stage B may start**.
 
+"Accepted" here means `UI done` ([acceptance README](acceptance/README.md#how-to-tick)): every criterion a Stage A test can prove is ticked, and the features reach `Accepted` in Stage B, since the Definition of Done also needs live mode and a beta release. Two criteria wait for Stage B: WS-02.4 (the player half needs the video) and WS-04.2 (running the snippets against a real instance).
+
+**Signed off by the owner on 2026-10-29.** Every U3 item is done, the review table is signed off row by row (UI-07.3), and the gate features are `UI done`. Stage B may start; Phase 0 is next.
+
 Left over from U0 and done by the owner in GitHub settings: add the required status checks (Web UI, Acceptance traceability, Website) to the `develop` and `main` rulesets.
 
 ## Workstreams and order
@@ -74,28 +78,31 @@ The review table: each row is filled during the pass (`OK`, or the fix made), an
 
 | Screen | Path | Hierarchy | Spacing | Copy | Loading | Empty | Error | Dark | Notes | Signed off |
 |--------|------|-----------|---------|------|---------|-------|-------|------|-------|------------|
-| Overview | `/` | OK | Capped at `max-w-6xl` like the other pages (was `max-w-7xl`, so it stretched on wide screens) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Mail | `/mail`, `/mail/{id}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The subject wraps beside its actions on narrow screens (W4) | |
-| SMS | `/sms`, `/sms/{thread}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Verify | `/sms/verify` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| HTTP catcher | `/http` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The request detail tabs scroll sideways without clipping (W4) | |
-| Webhooks overview | `/webhooks/overview` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Endpoints | `/webhooks/endpoints` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The sheet footer says Close, not Cancel, on purpose: the Security and Variables tabs save on their own | |
-| Rules | `/webhooks/rules` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Inbound routes | `/webhooks/inbound-routes` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Deliveries | `/webhooks/deliveries` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Composer | `/webhooks/composer` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Templates | `/webhooks/templates` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Variables | `/webhooks/variables` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Saved deliveries | `/webhooks/saved` | OK | Capped at `max-w-6xl` like the other webhook pages (was `max-w-5xl`) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Payments | `/payments` | OK | OK | The payment drawer shows provider id names as the provider writes them, in monospace (`tran_id`, not "tran id") | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Gateways | `/payments/gateways` | OK | The preview pickers fill their columns instead of a long payment name running into the next one | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The tabs stay in view while the form scrolls (W4) | |
-| Methods | `/payments/methods` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Flows | `/payments/flows` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The variables table drops its Example column on phones (W4) | |
-| Test checkout | `/pay/{session}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | Pay successfully is the only filled button in Test controls | |
-| Numbers | `/numbers` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Logs | `/logs` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
-| Settings | `/settings` (every section) | Delete all emails and Delete all SMS are red like Reset to seed (they were outline) | OK | Keep forever reads "Turn off to delete traffic after a number of days." (it pointed at an age field that is hidden while on) | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | |
+| Overview | `/` | OK | Capped at `max-w-6xl` like the other pages (was `max-w-7xl`, so it stretched on wide screens) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Mail | `/mail`, `/mail/{id}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The subject wraps beside its actions on narrow screens (W4) | Owner, 2026-10-29 |
+| Mail providers | `/mail/providers` | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (W1 test) | Not applicable: the built-in providers are always listed, removed ones move to the Removed group | OK (W1 test) | OK (axe in both themes; owner sign-off, W11) | Added in W16 after the W6 pass; reviewed at the W11 sign-off | Owner, 2026-10-29 |
+| SMS | `/sms`, `/sms/{thread}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Verify | `/sms/verify` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| SMS providers | `/sms/providers` | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (W1 test) | Not applicable: the built-in providers are always listed, removed ones move to the Removed group | OK (W1 test) | OK (axe in both themes; owner sign-off, W11) | Added in W16 after the W6 pass; reviewed at the W11 sign-off | Owner, 2026-10-29 |
+| HTTP catcher | `/http` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The request detail tabs scroll sideways without clipping (W4) | Owner, 2026-10-29 |
+| Webhooks overview | `/webhooks/overview` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Endpoints | `/webhooks/endpoints` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The sheet footer says Close, not Cancel, on purpose: the Security and Variables tabs save on their own | Owner, 2026-10-29 |
+| Rules | `/webhooks/rules` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Inbound routes | `/webhooks/inbound-routes` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Deliveries | `/webhooks/deliveries` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Composer | `/webhooks/composer` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Templates | `/webhooks/templates` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Variables | `/webhooks/variables` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Saved deliveries | `/webhooks/saved` | OK | Capped at `max-w-6xl` like the other webhook pages (was `max-w-5xl`) | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Payments | `/payments` | OK | OK | The payment drawer shows provider id names as the provider writes them, in monospace (`tran_id`, not "tran id") | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Gateways | `/payments/gateways` | OK | The preview pickers fill their columns instead of a long payment name running into the next one | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The tabs stay in view while the form scrolls (W4) | Owner, 2026-10-29 |
+| Methods | `/payments/methods` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Flows | `/payments/flows` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The variables table drops its Example column on phones (W4) | Owner, 2026-10-29 |
+| Test checkout | `/pay/{session}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | Pay successfully is the only filled button in Test controls | Owner, 2026-10-29 |
+| Numbers | `/numbers` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Scenarios | `/scenarios` | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (owner sign-off, W11) | Not applicable: the screen loads nothing until a scenario is run | Not applicable: the screen loads nothing until a scenario is run | Not applicable: the screen loads nothing until a scenario is run | OK (axe in both themes; owner sign-off, W11) | Added in W14 after the W6 pass; reviewed at the W11 sign-off | Owner, 2026-10-29 |
+| Logs | `/logs` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| Settings | `/settings` (every section) | Delete all emails and Delete all SMS are red like Reset to seed (they were outline) | OK | Keep forever reads "Turn off to delete traffic after a number of days." (it pointed at an age field that is hidden while on) | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
 
 #### Pass (W6)
 
@@ -239,6 +246,7 @@ After W1 to W10 and W12, U3 was audited again across the whole app and site.
 - The preview URL (`/demo/` and the site) is shared; feedback is collected as GitHub issues with the `u3-feedback` label; each is fixed or recorded as a decision.
 - The owner walks through the review table and signs off each row; UI-07.3 is ticked.
 - When every U3 item and criterion above is done, the owner ticks **Sign-off: UI approved, Stage B may start**.
+- **Closed on 2026-10-29:** the round ended after F1 to F18 (below), with no open `u3-feedback` issues. The owner reviewed the preview, signed off every row of the review table (three rows were added for Mail providers, SMS providers and Scenarios, built after the W6 pass) and signed off the UI.
 
 ### Feedback items
 
