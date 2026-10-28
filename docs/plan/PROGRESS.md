@@ -2,28 +2,29 @@
 
 Where the project stands, what is done, and what is left. The plan itself is in [README.md](README.md) and the phase details in [11-roadmap.md](11-roadmap.md); this file only tracks status.
 
-**Last updated:** 2026-10-28
+**Last updated:** 2026-10-29
 
 ## Current position
 
 | | |
 |---|---|
-| **Stage** | Stage A: UI with mock data |
-| **Current phase** | **Phase U3: polish, website, contract freeze and sign-off** ([18](18-phase-u3.md)), 17 / 19: W1 to W10 and W12 to W19 done (W16 configurable providers for the UI, W17 versioned docs, W18 update checker on mock data, W19 Install with AI); left: W11 the owner's feedback round and the sign-off (U2: 14 / 14) (U1: 18 / 18) (U0: 15 / 15) |
+| **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
+| **Current phase** | **Phase 0: Backend foundations** ([11](11-roadmap.md)), not started (0 / 14). Before it starts: settle or defer the open placeholder decisions (name trademark check, ports, licence). Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 107 accepted, 27 / 493 criteria ticked; Stage A features are in progress with their UI criteria tested on mock data ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 107 accepted, 55 / 493 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. W11: the owner's feedback round on the preview (feedback items so far: F1 to F18 in [18](18-phase-u3.md#feedback-items); new ones come as `u3-feedback` issues, the label exists).
-2. Sign-off: the review table (UI-07.3) and the "Sign-off: UI approved, Stage B may start" tick. Before Phase 0, settle the open placeholder decisions (name trademark check, ports, licence).
+1. Settle or defer the open placeholder decisions before Phase 0 (Decisions > Open below, [10](10-open-questions.md)): the "SendMock" trademark check, the default ports (1025 / 8025 in use), the licence (dual MIT / Apache-2.0 recommended). This is the last Planning item.
+2. Phase 0: Backend foundations, starting with the Cargo workspace and crate skeletons (see Phase 0 below and [11](11-roadmap.md)).
 
-### Resume here (2026-10-28)
+### Resume here (2026-10-29)
 
-- **Merged:** PR #40 (F13 install tabs on Getting started, F14 versioned docs W17, the F15 plan, F16 Install with AI W19, the F17 plan) went into `develop` as `37fc933`, and PR #42 (W18 update checker, F18) as `551581a`. PR #42 holds: `update_check_mode` replaces `is_update_check_enabled`, `GET /api/v1/updates` returns the offered release with its notes and upgrade command (`502` when GitHub cannot be reached), Settings > About shows the modes and the result, Daily adds one bell notification per new version, the upgrade command follows the platform SendMock runs on (owner feedback F18, new criterion PL-05.13: `install.ps1` on Windows, `install.sh` on macOS and Linux, Homebrew only on macOS and Linux, Scoop only on Windows), and the demo controls pick a pretend install and can make GitHub unreachable ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15)).
-- **Numbering:** GitHub Discussions shares numbers with issues and pull requests; #41 is the Discussions welcome post, not a pull request.
+- **UI signed off on 2026-10-29:** Stage A is done and Stage B may start. The sign-off pull request from `chore/u3-sign-off` ticks W11 and the sign-off, signs off every row of the review table in [18](18-phase-u3.md#review-table) (UI-07.3, with new rows for Mail providers, SMS providers and Scenarios), ticks 28 gate criteria (27 proven by passing tests, plus UI-07.3 proven by the sign-off) and sets UI-05 to UI-10, WS-02 and WS-04 to `UI done`. WS-02.4 (the video player) and WS-04.2 (snippets against a real instance) wait for Stage B.
+- **Merged before it:** #40 (versioned docs, Install with AI), #42 (W18 update checker, F18), #43 (PR number fix) and #44 (the ask-first rule for commits, pushes and branches in [AGENTS.md](../../AGENTS.md)). #45 was closed unmerged (an older copy of #44). #41 is the GitHub Discussions welcome post; Discussions share numbers with issues and pull requests.
+- **Still open on GitHub:** PR #42 is titled "Feat/update checker"; rename it to `feat:[U3] update checker with Off, Manual and Daily modes, release notes and the upgrade command for the running platform` so the first changelog lists it.
 - **One-time setting for the owner:** Settings > Environments > `github-pages` must also allow the tags `v*`, or the deploy after a published release is rejected.
 - **Working rules** (also in [AGENTS.md](../../AGENTS.md)): ask before creating a branch, committing or pushing; tests run in GitHub CI, not locally (only format, lint, typecheck and quick unit tests locally); CI runs on pull requests and on pushes to `develop` and `main`, not on other branch pushes; check CI with the public GitHub API (no `gh` CLI); install and setup docs are numbered steps with each command in its own block; never use the em-dash character; no co-authors or AI tool names in commits or pull requests.
 - **To pick up in a fresh session,** paste this prompt:
@@ -48,9 +49,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 |-------|------|--------|----------|
 | P | Planning | In progress | 12 / 13 |
 | U0 | UI foundations | Done | 15 / 15 |
-| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | In progress | 18 / 18 |
-| U2 | Webhook, HTTP catcher and payment screens | In progress | 14 / 14 |
-| U3 | Polish, website, contract freeze, **sign-off gate** | In progress | 17 / 19 |
+| U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
+| U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
+| U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
 | 0 | Backend foundations | Not started | 0 / 14 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
@@ -181,8 +182,8 @@ Plan: [18-phase-u3.md](18-phase-u3.md). Work in this order (W1 to W11):
   - [x] Docs page and tests per criterion (step 5)
 - [x] Install with AI: a copyable prompt on Getting started and Install that checks the computer and asks for Docker or the binary, `/llms.txt` per docs version, and an AI tab in the landing quick start ([16](16-website-and-releases.md#install-with-ai-decided-2026-10-27-owner-feedback-f16), WS-09); not part of the sign-off gate (W19)
 - [x] Update checker on mock data: Off, Manual and Daily modes in Settings > About, release notes and the upgrade command for the install method, a header notification for a new version ([16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15), PL-05.10 to PL-05.12); not part of the sign-off gate (W18) (#42)
-- [ ] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
-- [ ] **Sign-off: UI approved, Stage B may start**
+- [x] Feedback round on the preview URL, iterations done, design review table signed off (UI-07.3) (W11)
+- [x] **Sign-off: UI approved, Stage B may start** (owner, 2026-10-29)
 
 ## Stage B: Backend
 
@@ -480,3 +481,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-27 | Plan: Deeper docs (owner feedback F17, [19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started)), not started: a page per screen explaining every button, field, badge and text, what it changes and sends, where its text comes from and how it links, kept true by a Playwright crawl of the demo and tables generated from the spec. Written screen by screen with Stage B's live modes, complete before 1.0; new feature WS-10 in Phase 5. Also on this branch: the docs sidebar names the Mail and SMS index pages Inbox and Messages, as the app does. |
 | 2026-10-28 | Update checker built on mock data (U3 W18, F15, PR #42): `update_check_mode` (off, manual, daily) replaces `is_update_check_enabled`; `GET /api/v1/updates` answers with the channel, install method and the offered release (date, release notes, upgrade command, release page), `409` while off and `502` "Could not check for updates" when GitHub cannot be reached; spec, CLI and MCP references regenerated. Settings > About has the mode choice and the result with a copyable upgrade command; Daily checks on start and once a day and adds one bell notification per new version. The mock picks the offered release per channel and keeps a check for 24 hours; the demo controls choose a pretend install and can make GitHub unreachable. Tests: unit tests in `web/src/mocks/updates/` and `web/src/features/updates/`, end to end in `web/tests/e2e/update-check.spec.ts`; PL-05.10 to PL-05.12 stay unticked until the server check in Phase 1. |
 | 2026-10-28 | Owner feedback F18: when the backend is built, the upgrade command follows the platform SendMock runs on. Recorded in [16](16-website-and-releases.md#update-checker-extended-2026-10-27-owner-feedback-f15) with the command per platform, channel and install method, and as new criterion PL-05.13 (493 criteria). The mock does it already: each pretend install has a platform, unit tests cover the commands, and `web/tests/repository/upgrade-commands.test.ts` checks the install script, Homebrew and Docker commands against the Install page. |
+| 2026-10-29 | **UI signed off; Stage A done, Stage B may start** (U3 W11). The feedback round closed after F1 to F18 with no open `u3-feedback` issues. The owner signed off every row of the design review table in [18](18-phase-u3.md#review-table), with rows added for Mail providers, SMS providers and Scenarios (UI-07.3). 28 gate criteria are ticked (27 proven by passing tests, plus UI-07.3 by the sign-off) and UI-05 to UI-10, WS-02 and WS-04 are `UI done`; WS-02.4 and WS-04.2 wait for Stage B. U1, U2 and U3 are Done. Next: settle the placeholder decisions, then Phase 0. |

@@ -81,10 +81,11 @@ Phase U0.
 
 Phase U3.
 
-- [ ] WS-02.1 The landing page uses Magic UI components for the hero, flow (animated beam), quick start (terminal), marquee, bento grid and number ticker.
-- [ ] WS-02.2 With reduced motion on, all animations are static and the page stays readable.
-- [ ] WS-02.3 Lighthouse scores are at least 90 for performance, accessibility, best practices and SEO.
+- [x] WS-02.1 The landing page uses Magic UI components for the hero, flow (animated beam), quick start (terminal), marquee, bento grid and number ticker.
+- [x] WS-02.2 With reduced motion on, all animations are static and the page stays readable.
+- [x] WS-02.3 Lighthouse scores are at least 90 for performance, accessibility, best practices and SEO.
 - [ ] WS-02.4 The landing page has a promotional video section above the footer: a product poster in the current theme, three benefit points (no real messages sent, seconds instead of minutes, one setting), and a play button that is disabled with "Video coming soon" until the video exists; once it exists, pressing play loads the player (no autoplay and no third-party request before that) with captions ([16](../16-website-and-releases.md#promotional-video-decided-2026-10-27)).
+  - Waiting (U3 sign-off, 2026-10-29): the section, poster, benefit points and disabled play button are built and tested; the player half waits for the video.
 
 ## WS-03 Docs and versions
 
@@ -102,12 +103,13 @@ U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27,
 
 Phase U3.
 
-- [ ] WS-04.1 Every endpoint in the OpenAPI spec can be called from the playground and is answered by the in-browser mock.
+- [x] WS-04.1 Every endpoint in the OpenAPI spec can be called from the playground and is answered by the in-browser mock.
 - [ ] WS-04.2 Code snippets in cURL, PHP, JavaScript, Python, Go, Java, Rust, Ruby and C# stay in sync with the form and run successfully against a real instance (CI).
-- [ ] WS-04.3 The event stream panel shows events triggered by requests; scenario mode runs multi-step flows.
-- [ ] WS-04.4 When an operation is picked, the playground shows every input it accepts in an Inputs panel: path and query parameters and every body field (nested fields included) with type, required, allowed values, default, description and example; an operation without a body says so (added 2026-10-26, [21](../21-reference-and-examples.md#4-playground-show-every-input)).
-- [ ] WS-04.5 The body starts as a full example (required and optional fields with their example values); each field can be added to or removed from the body from the Inputs panel, Reset to example restores it, query parameters with allowed values are dropdowns, booleans are switches, and an unknown field, a missing required field or a value outside the allowed ones is pointed out before sending.
-- [ ] WS-04.6 The snippet tabs include CLI and MCP, built from the same form values as the other languages, each linking to its entry in the CLI or MCP reference.
+  - Waiting (U3 sign-off, 2026-10-29): the snippets in every language are tested against the form; running them against a real instance in CI needs the Stage B binary.
+- [x] WS-04.3 The event stream panel shows events triggered by requests; scenario mode runs multi-step flows.
+- [x] WS-04.4 When an operation is picked, the playground shows every input it accepts in an Inputs panel: path and query parameters and every body field (nested fields included) with type, required, allowed values, default, description and example; an operation without a body says so (added 2026-10-26, [21](../21-reference-and-examples.md#4-playground-show-every-input)).
+- [x] WS-04.5 The body starts as a full example (required and optional fields with their example values); each field can be added to or removed from the body from the Inputs panel, Reset to example restores it, query parameters with allowed values are dropdowns, booleans are switches, and an unknown field, a missing required field or a value outside the allowed ones is pointed out before sending.
+- [x] WS-04.6 The snippet tabs include CLI and MCP, built from the same form values as the other languages, each linking to its entry in the CLI or MCP reference.
 
 ## WS-05 API playground: Local mode
 
