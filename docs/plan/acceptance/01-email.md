@@ -29,7 +29,7 @@ Phase 1.
 
 - [x] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received. (#48)
 - [ ] EM-03.2 With `--max-emails N` the oldest messages are pruned so at most N remain; `--max-age` prunes by age.
-- [ ] EM-03.3 `--db memory` keeps nothing on disk.
+- [x] EM-03.3 `--db memory` keeps nothing on disk. (#48)
 - [x] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails. (#48)
 - [ ] EM-03.5 Delete one, delete by filter and delete all work from UI, API, CLI and MCP.
 
@@ -41,7 +41,7 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 - [x] EM-04.2 Remote images are blocked by default and load after clicking "Load images". (UI on mock data; live in Phase 1)
 - [x] EM-04.3 Desktop, tablet and mobile width toggles resize the preview. (UI on mock data; live in Phase 1)
 - [x] EM-04.4 Text, Source (highlighted), Headers and Attachments tabs show the correct content; CID inline images display in the HTML view. (UI on mock data; live in Phase 1)
-- [ ] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails.
+- [x] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails. (#48)
 - [ ] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded.
 - [ ] EM-04.7 "Screenshot" saves a PNG of the rendered HTML.
 - [ ] EM-04.8 Broken HTML, missing charsets and non-English content (Bangla, Arabic, Japanese) render without errors.
@@ -54,7 +54,7 @@ UI in U1, backend Phase 1.
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
 - [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
 - [ ] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code.
-- [ ] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient.
+- [x] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient. (#48)
 
 ## EM-06 sendmail shim
 
@@ -70,9 +70,9 @@ Phase 1.
 
 - [ ] EM-07.1 `POST /api/v1/send` with from, to, cc, bcc, subject, text, html, attachments and headers stores a message equal to the equivalent SMTP message.
 - [ ] EM-07.2 Invalid input returns `400` with a field-level error and is recorded in the HTTP request log.
-- [ ] EM-07.3 The stored email shows source `native_api`.
-- [ ] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message.
-- [ ] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment.
+- [x] EM-07.3 The stored email shows source `native_api`. (#48)
+- [x] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message. (#48)
+- [x] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment. (#48)
 
 ## EM-08 Email provider HTTP send APIs
 
@@ -131,7 +131,7 @@ Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam).
 - [ ] EM-13.1 The HTML check reports per-client support for the CSS/HTML used and points at the offending source lines.
 - [ ] EM-13.2 The link check reports status, redirects and timeouts for every link and image, and runs only when requested.
 - [ ] EM-13.3 With `--spamassassin` configured, the spam score and rules are shown; without it the tab is hidden.
-- [ ] EM-13.4 Invalid `List-Unsubscribe` / `List-Unsubscribe-Post` headers produce warnings.
+- [x] EM-13.4 Invalid `List-Unsubscribe` / `List-Unsubscribe-Post` headers produce warnings. (#48)
 
 ## EM-14 Release and auto-forward
 

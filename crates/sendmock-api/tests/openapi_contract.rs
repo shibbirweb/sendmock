@@ -24,11 +24,46 @@ impl UiAssets for NoUiAssets {
     }
 }
 
+/// A small PNG (one pixel), base64 encoded, so image attachments have real bytes.
+const ONE_PIXEL_PNG_BASE64: &str = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+async fn post_json(app_router: &axum::Router, path: &str, body: &Value) -> Value {
+    let request = Request::builder()
+        .method("POST")
+        .uri(path)
+        .header("content-type", "application/json")
+        .body(Body::from(body.to_string()))
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    let response = app_router
+        .clone()
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_else(|error| panic!("a body: {error}"));
+    serde_json::from_slice(&body_bytes).unwrap_or_else(|error| panic!("a JSON answer: {error}"))
+}
+
+fn native_send_sample() -> Value {
+    json!({
+        "from": "Shop <no-reply@shop.test>",
+        "to": ["sam@example.test"],
+        "bcc": ["audit@shop.test"],
+        "subject": "Your code",
+        "text": "Your verification code is 482913. Visit https://shop.test/confirm?t=1",
+        "html": "<p>Your verification code is <b>482913</b>.</p>",
+        "headers": { "List-Unsubscribe": "<https://shop.test/unsubscribe>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
+        "tags": ["signup"],
+        "attachments": [{ "filename": "logo.png", "content": ONE_PIXEL_PNG_BASE64 }]
+    })
+}
+
 /// Inputs per operation, sent through the router; an operation without samples fails the
 /// answer test, so every new operation brings some. Samples that need an item create it
 /// first through the API.
-async fn prepare_sample_inputs(_app_router: &axum::Router) -> HashMap<&'static str, Vec<Value>> {
-    HashMap::from([
+async fn prepare_sample_inputs(app_router: &axum::Router) -> HashMap<&'static str, Vec<Value>> {
+    let mut samples = HashMap::from([
         ("getHealth", vec![json!({})]),
         ("getInfo", vec![json!({})]),
         (
@@ -38,7 +73,71 @@ async fn prepare_sample_inputs(_app_router: &axum::Router) -> HashMap<&'static s
                 json!({ "seed_toml": "[[mystery]]\nkey = 1\n" }),
             ],
         ),
-    ])
+    ]);
+    samples.extend(prepare_email_samples(app_router).await);
+    samples
+}
+
+async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let email_id = post_json(app_router, "/api/v1/send", &native_send_sample()).await["id"].clone();
+    let deleted_email_id =
+        post_json(app_router, "/api/v1/send", &native_send_sample()).await["id"].clone();
+    let by_email = json!({ "email_id": email_id });
+    let by_attachment = json!({ "email_id": email_id, "attachment_index": 0 });
+    let raw_message = "From: app@shop.test\r\nTo: sam@example.test\r\nSubject: Raw\r\n\r\nHello";
+    vec![
+        (
+            "getEmails",
+            vec![
+                json!({}),
+                json!({ "query": "from:shop is:unread code", "limit": 5 }),
+            ],
+        ),
+        ("getEmailsLatest", vec![json!({ "to": "sam@example.test" })]),
+        ("getEmailsByEmailId", vec![by_email.clone()]),
+        (
+            "patchEmailsByEmailId",
+            vec![json!({ "email_id": email_id, "is_read": true, "tags": ["qa"] })],
+        ),
+        ("getEmailsByEmailIdTimeline", vec![by_email.clone()]),
+        ("getEmailsByEmailIdListUnsubscribe", vec![by_email.clone()]),
+        ("getEmailsByEmailIdMime", vec![by_email.clone()]),
+        ("getEmailsByEmailIdRaw", vec![by_email]),
+        (
+            "getEmailsByEmailIdAttachmentsByAttachmentIndex",
+            vec![by_attachment.clone()],
+        ),
+        (
+            "getEmailsByEmailIdPartsByAttachmentIndexThumbnail",
+            vec![by_attachment],
+        ),
+        ("postSend", vec![native_send_sample()]),
+        ("postSendRaw", vec![json!({ "raw_message": raw_message })]),
+        ("getOtp", vec![json!({ "to": "sam@example.test" })]),
+        ("getLinks", vec![json!({ "to": "sam@example.test" })]),
+        (
+            "getWaitEmail",
+            vec![json!({ "to": "sam@example.test", "timeout": "1s" })],
+        ),
+        (
+            "deleteEmailsByEmailId",
+            vec![json!({ "email_id": deleted_email_id })],
+        ),
+        ("deleteEmails", vec![json!({})]),
+    ]
+}
+
+/// Percent-encodes a query value, keeping only the characters URLs allow as they are.
+fn encode_query_value(query_value: &str) -> String {
+    query_value
+        .bytes()
+        .map(|byte| match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                (byte as char).to_string()
+            }
+            _ => format!("%{byte:02X}"),
+        })
+        .collect()
 }
 
 fn read_frozen_contract() -> Value {
@@ -49,13 +148,14 @@ fn read_frozen_contract() -> Value {
 }
 
 fn build_operation_context() -> OperationContext {
-    OperationContext {
-        database: Arc::new(
+    OperationContext::new(
+        Arc::new(
             Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)
                 .unwrap_or_else(|error| panic!("an in-memory database: {error}")),
         ),
-        clock: Arc::new(FixedClock::new(1_767_225_600_000)),
-        instance_details: Arc::new(InstanceDetails {
+        Arc::new(FixedClock::new(1_767_225_600_000)),
+        Arc::new(sendmock_core::SystemIdGenerator),
+        InstanceDetails {
             version: "0.0.0",
             channel: ReleaseChannel::Dev,
             started_at_unix_ms: 1_767_225_600_000,
@@ -63,8 +163,8 @@ fn build_operation_context() -> OperationContext {
             smtp_address: "127.0.0.1:1025".to_owned(),
             provider_address: None,
             is_container: false,
-        }),
-    }
+        },
+    )
 }
 
 /// Follows `$ref`s into `components.schemas` until it reaches a schema with a body.
@@ -122,6 +222,7 @@ struct ServedOperation {
     is_json_answer: bool,
     raw_body_input: Option<String>,
     path_inputs: Vec<(String, String)>,
+    is_destructive: bool,
 }
 
 fn served_operations(operation_registry: &OperationRegistry) -> Vec<ServedOperation> {
@@ -141,9 +242,22 @@ fn served_operations(operation_registry: &OperationRegistry) -> Vec<ServedOperat
                     .raw_body_input
                     .map(|raw_body| raw_body.input_name.to_owned()),
                 path_inputs: definition.path_parameter_names(),
+                is_destructive: definition.is_destructive,
             }
         })
         .collect()
+}
+
+/// Destructive operations last, deleting one before deleting all, so samples that read an
+/// item still find it.
+fn in_safe_order(mut served: Vec<ServedOperation>) -> Vec<ServedOperation> {
+    served.sort_by_key(|served_operation| {
+        (
+            served_operation.is_destructive,
+            served_operation.path.len() < 20,
+        )
+    });
+    served
 }
 
 // AC: PL-01.1
@@ -247,9 +361,11 @@ fn build_operation_request(served_operation: &ServedOperation, input: &Value) ->
             .map(|(name, value)| {
                 format!(
                     "{name}={}",
-                    value
-                        .as_str()
-                        .map_or_else(|| value.to_string(), str::to_owned)
+                    encode_query_value(
+                        &value
+                            .as_str()
+                            .map_or_else(|| value.to_string(), str::to_owned)
+                    )
                 )
             })
             .collect();
@@ -319,7 +435,7 @@ async fn real_answers_and_sample_requests_match_the_frozen_schemas() {
     );
     let prepared_samples = prepare_sample_inputs(&app_router).await;
 
-    for served_operation in served_operations(&operation_registry) {
+    for served_operation in in_safe_order(served_operations(&operation_registry)) {
         let ServedOperation {
             path,
             method,

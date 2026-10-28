@@ -8,4 +8,4 @@ pub mod timestamp;
 pub use clock::{Clock, FixedClock, SystemClock};
 pub use id_generator::{IdGenerator, SequentialIdGenerator, SystemIdGenerator};
 pub use random_source::{RandomSource, SeededRandomSource, SystemRandomSource};
-pub use timestamp::{format_rfc3339, parse_duration_ms, parse_rfc3339};
+pub use timestamp::{format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339};

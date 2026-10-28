@@ -26,7 +26,11 @@ pub async fn run_operation_command(matched_operation: &MatchedOperation) -> Resu
             command: definition.cli_usage.to_owned(),
         });
     }
-    let input = build_command_input(matched_operation.operation.as_ref(), command_matches)?;
+    let input = build_command_input(
+        matched_operation.operation.as_ref(),
+        command_matches,
+        &matched_operation.level_matches,
+    )?;
     let server_url = resolve_server_url(
         command_matches
             .get_one::<String>("server")

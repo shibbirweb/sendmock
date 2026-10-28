@@ -6,6 +6,7 @@ use sendmock_ops::{
 use serde_json::Value;
 
 use crate::flag_naming::build_flag_name;
+use crate::operation_commands::{UsageSegment, usage_segments};
 
 /// Flags every client command already has, which an input may not take over.
 const RESERVED_FLAG_NAMES: [&str; 8] = [
@@ -15,6 +16,7 @@ const RESERVED_FLAG_NAMES: [&str; 8] = [
 /// One positional argument, in the order the usage names it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PositionalInput {
+    pub is_on_this_level: bool,
     pub placeholder: String,
     pub input_name: String,
     pub reads_file: bool,
@@ -66,20 +68,25 @@ pub fn describe_command_inputs(operation: &dyn ErasedOperation) -> CommandInputs
 
 /// The `<placeholders>` of the usage that are not a flag's value, in order.
 fn describe_positional_inputs(definition: &OperationDefinition) -> Vec<PositionalInput> {
-    let usage_words: Vec<&str> = definition.cli_usage.split_whitespace().collect();
-    usage_words
+    let segments = usage_segments(definition.cli_usage);
+    let last_word_position = segments
+        .iter()
+        .rposition(|segment| matches!(segment, UsageSegment::CommandWord(_)));
+    segments
         .iter()
         .enumerate()
-        .filter(|(word_position, _)| {
-            *word_position == 0 || !usage_words[word_position - 1].starts_with("--")
+        .filter_map(|(segment_position, segment)| match segment {
+            UsageSegment::Placeholder(placeholder) => Some((segment_position, *placeholder)),
+            UsageSegment::CommandWord(_) => None,
         })
-        .filter_map(|(_, word)| word.strip_prefix('<')?.strip_suffix('>'))
-        .map(|placeholder| {
+        .map(|(segment_position, placeholder)| {
             let file_argument = definition
                 .cli_arguments
                 .iter()
                 .find(|argument| argument.placeholder == placeholder);
             PositionalInput {
+                is_on_this_level: last_word_position
+                    .is_none_or(|position| segment_position > position),
                 placeholder: placeholder.to_owned(),
                 input_name: file_argument.map_or_else(
                     || to_snake_case(placeholder),
@@ -118,7 +125,11 @@ pub fn add_operation_arguments(mut command: Command, operation: &dyn ErasedOpera
     let definition = operation.definition();
     let command_inputs = describe_command_inputs(operation);
     let input_schema = operation.input_schema().to_value();
-    for positional_input in &command_inputs.positional_inputs {
+    for positional_input in command_inputs
+        .positional_inputs
+        .iter()
+        .filter(|positional| positional.is_on_this_level)
+    {
         command = command.arg(
             Arg::new(positional_input.input_name.clone())
                 .value_name(positional_input.placeholder.clone())

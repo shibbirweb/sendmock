@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use sendmock_api::{EmbeddedUiAssets, build_app_router, serve_http};
-use sendmock_core::{Clock, SystemClock};
+use sendmock_core::{Clock, SystemClock, SystemIdGenerator};
 use sendmock_ops::{OperationContext, build_operation_registry};
 use sendmock_store::Database;
 
@@ -22,15 +22,13 @@ pub async fn run_server(
     };
     let http_addr = http_listener.local_addr().map_err(listen_error)?;
     let clock: Arc<dyn Clock> = Arc::new(SystemClock);
-    let operation_context = OperationContext {
-        database: Arc::new(database),
-        instance_details: Arc::new(build_instance_details(
-            server_config,
-            http_addr,
-            clock.now_unix_ms(),
-        )),
+    let started_at_unix_ms = clock.now_unix_ms();
+    let operation_context = OperationContext::new(
+        Arc::new(database),
         clock,
-    };
+        Arc::new(SystemIdGenerator),
+        build_instance_details(server_config, http_addr, started_at_unix_ms),
+    );
     let app_router = build_app_router(
         &build_operation_registry(),
         &operation_context,

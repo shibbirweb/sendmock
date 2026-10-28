@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use mail_parser::{Address, AddressList, HeaderValue, MessageParser};
+use mail_parser::{Address, AddressList, HeaderValue, MessageParser, MessagePart};
 use sendmock_store::StoredEmailAddress;
 
 use super::mime_tree::{MimeTreeNode, build_mime_tree};
@@ -37,7 +37,9 @@ pub fn parse_email(raw_message: &[u8]) -> ParsedEmail {
         return ParsedEmail::from_unreadable(raw_message);
     };
     let attachments = message
-        .attachments()
+        .root()
+        .parts()
+        .filter(|message_part| is_attachment_part(*message_part))
         .enumerate()
         .map(|(attachment_position, attachment_part)| ParsedAttachment {
             filename: attachment_part.attachment_name().map_or_else(
@@ -104,6 +106,18 @@ impl ParsedEmail {
             },
         }
     }
+}
+
+/// Every part that is not structure and not the text or HTML body: attachments, inline
+/// images (which RFC 8621 counts as body) and attached messages.
+fn is_attachment_part(message_part: MessagePart<'_>) -> bool {
+    if message_part.is_multipart() {
+        return false;
+    }
+    let is_body_text = message_part.is_text()
+        && message_part.attachment_name().is_none()
+        && (message_part.in_text_body() || message_part.in_html_body());
+    !is_body_text
 }
 
 fn to_stored_addresses(address_list: AddressList<'_>) -> Vec<StoredEmailAddress> {

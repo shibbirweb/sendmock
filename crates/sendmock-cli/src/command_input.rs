@@ -12,14 +12,22 @@ use crate::command_arguments::{FlagInput, describe_command_inputs};
 pub fn build_command_input(
     operation: &dyn ErasedOperation,
     command_matches: &ArgMatches,
+    level_matches: &[ArgMatches],
 ) -> Result<Value, CliError> {
     let command_inputs = describe_command_inputs(operation);
     let mut input = read_initial_input(operation, command_matches)?;
     let mut text_values: Vec<(String, String)> = Vec::new();
     for positional_input in &command_inputs.positional_inputs {
-        let argument_value = command_matches
-            .get_one::<String>(&positional_input.input_name)
-            .cloned()
+        let argument_value = level_matches
+            .iter()
+            .chain(std::iter::once(command_matches))
+            .find_map(|matches| {
+                matches
+                    .try_get_one::<String>(&positional_input.input_name)
+                    .ok()
+                    .flatten()
+                    .cloned()
+            })
             .unwrap_or_default();
         if positional_input.reads_file {
             input.insert(
@@ -144,6 +152,7 @@ mod tests {
         build_command_input(
             matched_operation.operation.as_ref(),
             &matched_operation.command_matches,
+            &matched_operation.level_matches,
         )
     }
 

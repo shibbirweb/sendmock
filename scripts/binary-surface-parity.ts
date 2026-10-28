@@ -17,11 +17,14 @@ const repositoryRoot = join(import.meta.dir, "..");
 
 type Selector = { input: string; value: string } | null;
 type OperationReference = { operation_id: string; selector?: Selector };
+/** A name as the binary writes it, or an entry of the reference with `name` or `flag`. */
+type NamedEntry = { name?: string; flag?: string } | string;
+
 type CommandEntry = {
   command: string;
   usage: string;
-  arguments: ({ name: string } | string)[];
-  flags: ({ name: string } | string)[];
+  arguments: NamedEntry[];
+  flags: NamedEntry[];
   operations: OperationReference[];
   mcp: string[];
 };
@@ -38,13 +41,13 @@ const globalFlagNames = new Set([
   "--help",
 ]);
 
-function readNames(entries: ({ name: string } | string)[]): string[] {
+function readNames(entries: NamedEntry[]): string[] {
   return entries.map((entry) =>
-    typeof entry === "string" ? entry : entry.name,
+    typeof entry === "string" ? entry : (entry.name ?? entry.flag ?? ""),
   );
 }
 
-function readInputFlags(entries: ({ name: string } | string)[]): string[] {
+function readInputFlags(entries: NamedEntry[]): string[] {
   return readNames(entries)
     .filter((flagName) => !globalFlagNames.has(flagName))
     .sort();

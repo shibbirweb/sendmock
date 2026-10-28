@@ -64,5 +64,374 @@ expression: command_descriptions
     "mcp": [
       "sendmock_seed_validate"
     ]
+  },
+  {
+    "command": "sendmock email list",
+    "usage": "sendmock email list",
+    "summary": "Stored emails, newest first, with search and filters.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--direction",
+      "--from",
+      "--has-attachment",
+      "--unread",
+      "--limit",
+      "--query",
+      "--source",
+      "--tag",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails",
+        "operation_id": "getEmails",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_list"
+    ]
+  },
+  {
+    "command": "sendmock email delete-all",
+    "usage": "sendmock email delete-all",
+    "summary": "Delete every email.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails",
+        "operation_id": "deleteEmails",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock email latest",
+    "usage": "sendmock email latest --to <address>",
+    "summary": "The newest email to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--subject",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/latest",
+        "operation_id": "getEmailsLatest",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_latest"
+    ]
+  },
+  {
+    "command": "sendmock email show",
+    "usage": "sendmock email show <emailId>",
+    "summary": "One email with bodies, headers, attachments and extracted codes.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "getEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_get"
+    ]
+  },
+  {
+    "command": "sendmock email update",
+    "usage": "sendmock email update <emailId>",
+    "summary": "Mark read or unread, or change tags.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--read",
+      "--tag"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "patchEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_update"
+    ]
+  },
+  {
+    "command": "sendmock email delete",
+    "usage": "sendmock email delete <emailId>",
+    "summary": "Delete one email.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "deleteEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_delete"
+    ]
+  },
+  {
+    "command": "sendmock email timeline",
+    "usage": "sendmock email timeline <emailId>",
+    "summary": "Delivery events: received, delivered, opened, bounced.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/timeline",
+        "operation_id": "getEmailsByEmailIdTimeline",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_timeline"
+    ]
+  },
+  {
+    "command": "sendmock email check unsubscribe",
+    "usage": "sendmock email check <emailId> unsubscribe",
+    "summary": "List-Unsubscribe and one-click unsubscribe checks.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/list-unsubscribe",
+        "operation_id": "getEmailsByEmailIdListUnsubscribe",
+        "selector": {
+          "input": "kind",
+          "value": "unsubscribe"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_email_check"
+    ]
+  },
+  {
+    "command": "sendmock email mime",
+    "usage": "sendmock email mime <emailId>",
+    "summary": "The MIME tree of the message.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/mime",
+        "operation_id": "getEmailsByEmailIdMime",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_mime"
+    ]
+  },
+  {
+    "command": "sendmock email raw",
+    "usage": "sendmock email raw <emailId>",
+    "summary": "The raw message source.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/raw",
+        "operation_id": "getEmailsByEmailIdRaw",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/raw"
+    ]
+  },
+  {
+    "command": "sendmock email attachments",
+    "usage": "sendmock email attachments <emailId> <attachmentIndex>",
+    "summary": "Download one attachment.",
+    "arguments": [
+      "emailId",
+      "attachmentIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/attachments/{attachmentIndex}",
+        "operation_id": "getEmailsByEmailIdAttachmentsByAttachmentIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/attachments/{attachmentIndex}"
+    ]
+  },
+  {
+    "command": "sendmock email thumbnail",
+    "usage": "sendmock email thumbnail <emailId> <attachmentIndex>",
+    "summary": "A preview image of an attachment.",
+    "arguments": [
+      "emailId",
+      "attachmentIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/parts/{attachmentIndex}/thumbnail",
+        "operation_id": "getEmailsByEmailIdPartsByAttachmentIndexThumbnail",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail"
+    ]
+  },
+  {
+    "command": "sendmock email send",
+    "usage": "sendmock email send",
+    "summary": "Native send: JSON with optional base64 attachments.",
+    "arguments": [],
+    "flags": [
+      "--attachments",
+      "--bcc",
+      "--cc",
+      "--from",
+      "--headers",
+      "--html",
+      "--subject",
+      "--tag",
+      "--text",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/send",
+        "operation_id": "postSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_send"
+    ]
+  },
+  {
+    "command": "sendmock sendmail",
+    "usage": "sendmock sendmail",
+    "summary": "Store a raw message as sent by your app, as the sendmail shim does.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/send/raw",
+        "operation_id": "postSendRaw",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_send_raw"
+    ]
+  },
+  {
+    "command": "sendmock otp",
+    "usage": "sendmock otp --to <recipient>",
+    "summary": "The latest one-time code sent to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--wait",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/otp",
+        "operation_id": "getOtp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_otp_get"
+    ]
+  },
+  {
+    "command": "sendmock links",
+    "usage": "sendmock links --to <recipient>",
+    "summary": "The links of the latest email to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--wait",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/links",
+        "operation_id": "getLinks",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_links_get"
+    ]
+  },
+  {
+    "command": "sendmock email wait",
+    "usage": "sendmock email wait",
+    "summary": "Wait until a matching email arrives; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--since",
+      "--subject",
+      "--timeout",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/email",
+        "operation_id": "getWaitEmail",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_wait"
+    ]
   }
 ]

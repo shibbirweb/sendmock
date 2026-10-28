@@ -1533,7 +1533,9 @@ dependencies = [
 name = "sendmock-mail"
 version = "0.0.0"
 dependencies = [
+ "base64",
  "mail-parser",
+ "mime_guess",
  "regex",
  "sendmock-core",
  "sendmock-store",
@@ -1559,8 +1561,10 @@ dependencies = [
 name = "sendmock-ops"
 version = "0.0.0"
 dependencies = [
+ "base64",
  "schemars",
  "sendmock-core",
+ "sendmock-mail",
  "sendmock-sms",
  "sendmock-store",
  "sendmock-webhooks",

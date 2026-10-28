@@ -61,13 +61,14 @@ mod tests {
     use crate::{InstanceDetails, ReleaseChannel};
 
     fn build_operation_context(now_unix_ms: i64) -> Result<OperationContext, OperationError> {
-        Ok(OperationContext {
-            database: Arc::new(Database::open(
+        Ok(OperationContext::new(
+            Arc::new(Database::open(
                 DatabaseLocation::InMemory,
                 EMBEDDED_MIGRATIONS,
             )?),
-            clock: Arc::new(FixedClock::new(now_unix_ms)),
-            instance_details: Arc::new(InstanceDetails {
+            Arc::new(FixedClock::new(now_unix_ms)),
+            Arc::new(sendmock_core::SystemIdGenerator),
+            InstanceDetails {
                 version: "0.1.0",
                 channel: ReleaseChannel::Dev,
                 started_at_unix_ms: 1_767_225_600_000,
@@ -75,8 +76,8 @@ mod tests {
                 smtp_address: "127.0.0.1:1025".to_owned(),
                 provider_address: None,
                 is_container: false,
-            }),
-        })
+            },
+        ))
     }
 
     #[tokio::test]

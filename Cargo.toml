@@ -36,6 +36,7 @@ clap = { version = "4", features = [
 dirs = "7"
 jsonschema = { version = "0.60", default-features = false }
 mail-parser = "1"
+mime_guess = "2"
 base64 = "0.23"
 insta = { version = "1", features = [
     "json",

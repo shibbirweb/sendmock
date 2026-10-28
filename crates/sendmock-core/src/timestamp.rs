@@ -19,6 +19,26 @@ pub fn format_rfc3339(unix_ms: i64) -> String {
     }
 }
 
+/// The `Date` header form of RFC 5322: `Thu, 29 Oct 2026 10:00:00 +0000`.
+pub fn format_rfc5322(unix_ms: i64) -> String {
+    const WEEKDAY_NAMES: [&str; 7] = ["Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed"];
+    const MONTH_NAMES: [&str; 12] = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    let days_since_epoch = unix_ms.div_euclid(MILLISECONDS_PER_DAY);
+    let second_of_day = unix_ms.rem_euclid(MILLISECONDS_PER_DAY) / 1000;
+    let (year, month, day) = civil_from_days(days_since_epoch);
+    let weekday_name =
+        WEEKDAY_NAMES[usize::try_from(days_since_epoch.rem_euclid(7)).unwrap_or_default()];
+    let month_name = MONTH_NAMES[usize::try_from(month - 1).unwrap_or_default()];
+    format!(
+        "{weekday_name}, {day:02} {month_name} {year} {:02}:{:02}:{:02} +0000",
+        second_of_day / 3600,
+        second_of_day / 60 % 60,
+        second_of_day % 60
+    )
+}
+
 /// Reads `YYYY-MM-DDTHH:MM:SS`, optional fractional seconds, and `Z` or a `+HH:MM` offset.
 pub fn parse_rfc3339(timestamp_text: &str) -> Option<i64> {
     let (date_text, time_text) = timestamp_text.trim().split_once(['T', 't', ' '])?;
@@ -114,6 +134,7 @@ fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
 mod tests {
     use super::*;
 
+    // AC: PL-01.2
     #[test]
     fn formats_unix_milliseconds_as_rfc3339_utc() {
         assert_eq!(format_rfc3339(0), "1970-01-01T00:00:00Z");
@@ -135,6 +156,15 @@ mod tests {
         );
         assert_eq!(parse_rfc3339("not a time"), None);
         assert_eq!(parse_rfc3339("2026-13-01T00:00:00Z"), None);
+    }
+
+    #[test]
+    fn formats_the_date_header_form() {
+        assert_eq!(format_rfc5322(0), "Thu, 01 Jan 1970 00:00:00 +0000");
+        assert_eq!(
+            format_rfc5322(1_793_268_000_000),
+            "Thu, 29 Oct 2026 10:00:00 +0000"
+        );
     }
 
     #[test]

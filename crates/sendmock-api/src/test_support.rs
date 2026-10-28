@@ -17,13 +17,14 @@ use serde_json::Value;
 pub const SLOW_OPERATION_DURATION: Duration = Duration::from_millis(300);
 
 pub fn build_test_operation_context() -> OperationContext {
-    OperationContext {
-        database: Arc::new(
+    OperationContext::new(
+        Arc::new(
             Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)
                 .expect("an in-memory database opens"),
         ),
-        clock: Arc::new(FixedClock::new(1_767_225_600_000)),
-        instance_details: Arc::new(InstanceDetails {
+        Arc::new(FixedClock::new(1_767_225_600_000)),
+        Arc::new(sendmock_core::SystemIdGenerator),
+        InstanceDetails {
             version: "0.1.0",
             channel: ReleaseChannel::Dev,
             started_at_unix_ms: 1_767_225_600_000,
@@ -31,8 +32,8 @@ pub fn build_test_operation_context() -> OperationContext {
             smtp_address: "127.0.0.1:1025".to_owned(),
             provider_address: None,
             is_container: false,
-        }),
-    }
+        },
+    )
 }
 
 /// The real operations plus two fakes that exercise request bodies and slow answers.
