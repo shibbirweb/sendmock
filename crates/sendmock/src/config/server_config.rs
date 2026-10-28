@@ -34,6 +34,7 @@ impl ServerConfig {
             serve_arguments.config_file_path.as_deref(),
             &current_directory,
             dirs::config_dir().as_deref(),
+            Path::new(CONTAINER_CONFIG_DIRECTORY),
         );
         let config_file = match &config_file_path {
             Some(file_path) => ConfigFile::read(file_path)?,

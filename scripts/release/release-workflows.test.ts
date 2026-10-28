@@ -99,3 +99,29 @@ describe("Release build", () => {
     });
   });
 });
+
+describe("Docker edge", () => {
+  const dockerEdgeWorkflow = readWorkflow("docker-edge.yml") as Workflow & {
+    on: { push?: { branches?: string[] } };
+  };
+
+  test("DS-02.1 builds and tests the image for amd64 and arm64, each on its own runner", () => {
+    const builtPlatforms = Object.fromEntries(
+      (dockerEdgeWorkflow.jobs.image?.strategy?.matrix?.include ?? []).map(
+        (entry) => [entry.platform, entry.runner],
+      ),
+    );
+
+    expect(builtPlatforms).toEqual({
+      "linux/amd64": "ubuntu-latest",
+      "linux/arm64": "ubuntu-24.04-arm",
+    });
+  });
+
+  test("pushes and signs edge only for pushes to develop", () => {
+    expect(dockerEdgeWorkflow.on.push?.branches).toEqual(["develop"]);
+    expect(dockerEdgeWorkflow.jobs.manifest?.if).toBe(
+      "github.event_name == 'push'",
+    );
+  });
+});

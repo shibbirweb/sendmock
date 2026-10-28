@@ -16,8 +16,8 @@ Phase 0 (build), Phase 5 (all targets).
 
 Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
-- [ ] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`.
-- [ ] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully.
+- [x] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`. (#48)
+- [x] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully. (#48)
 - [ ] DS-02.3 Mounted `/config/sendmock.toml`, `/config/sendmock.seed.toml` and `/templates` are loaded.
 - [ ] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`.
 - [ ] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB.

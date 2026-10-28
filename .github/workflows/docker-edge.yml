@@ -1,0 +1,139 @@
+# The `edge` image: every push to develop, for linux/amd64 and linux/arm64, each built and
+# tested on its own runner, then joined under one tag and signed (docs/plan/09-distribution.md).
+# Pull requests that change the image build and test it without pushing.
+name: Docker edge
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/docker-edge.yml
+      - scripts/docker-image-test.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GHCR_IMAGE: ghcr.io/shibbirweb/sendmock
+  DOCKERHUB_IMAGE: docker.io/shibbirweb/sendmock
+
+jobs:
+  image:
+    name: Image for ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest }
+          - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm }
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build for testing
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: sendmock:test
+          cache-from: type=gha,scope=${{ matrix.architecture }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.architecture }}
+
+      - name: Non-root, data in /data, healthy, the notice, a clean stop and the size
+        run: scripts/docker-image-test.sh sendmock:test
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Push by digest, with an SBOM and provenance
+        if: github.event_name == 'push'
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          sbom: true
+          provenance: mode=max
+          cache-from: type=gha,scope=${{ matrix.architecture }}
+
+      - name: Keep the digest for the manifest
+        if: github.event_name == 'push'
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${IMAGE_DIGEST#sha256:}"
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: digest-${{ matrix.architecture }}
+          path: ${{ runner.temp }}/digests/*
+          retention-days: 1
+
+  manifest:
+    name: Tag edge and sign it
+    if: github.event_name == 'push'
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      HAS_DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN != '' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          path: ${{ runner.temp }}/digests
+          merge-multiple: true
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Log in to Docker Hub
+        if: env.HAS_DOCKERHUB_TOKEN == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: One edge tag for both platforms
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          tags=(-t "$GHCR_IMAGE:edge")
+          if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then tags+=(-t "$DOCKERHUB_IMAGE:edge"); fi
+          docker buildx imagetools create "${tags[@]}" $(printf "$GHCR_IMAGE@sha256:%s " *)
+
+      - uses: sigstore/cosign-installer@v3
+
+      - name: Sign it without a stored key (GitHub OIDC)
+        run: |
+          manifest_digest="$(docker buildx imagetools inspect "$GHCR_IMAGE:edge" --format '{{json .Manifest}}' | jq -r .digest)"
+          cosign sign --yes "$GHCR_IMAGE@$manifest_digest"
+          if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then cosign sign --yes "$DOCKERHUB_IMAGE@$manifest_digest"; fi

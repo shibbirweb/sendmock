@@ -207,6 +207,26 @@ fn a_valid_seed_file_lets_the_server_start() {
     );
 }
 
+// AC: PL-06.1
+#[test]
+fn warns_when_listening_beyond_this_machine_without_ui_auth() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+
+    let sendmock = SendmockProcess::start(sendmock_command(working_directory.path()).args([
+        "--http-addr",
+        "0.0.0.0:0",
+        "--db",
+        "memory",
+    ]))
+    .expect("sendmock starts");
+
+    assert!(
+        sendmock
+            .wait_for_line("without UI auth")
+            .contains("0.0.0.0")
+    );
+}
+
 #[cfg(unix)]
 #[test]
 fn stops_cleanly_on_sigterm() {

@@ -36,6 +36,12 @@ pub async fn run_server(
         &operation_context,
         Arc::new(EmbeddedUiAssets),
     );
+    if !http_addr.ip().is_loopback() {
+        tracing::warn!(
+            http_addr = %http_addr,
+            "SendMock is listening beyond this machine without UI auth; anyone who can reach this port can read what it captured"
+        );
+    }
     tracing::info!(
         http_addr = %http_addr,
         database = %operation_context.database.location(),

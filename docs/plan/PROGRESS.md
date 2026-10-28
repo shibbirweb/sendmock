@@ -9,15 +9,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (12 / 13) on `feat/phase-0`. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (13 / 13) on `feat/phase-0`, waiting for #48 to merge. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 108 accepted, 71 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 0 / 108 accepted, 74 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): all workstreams on this one branch, a commit per workstream, and one pull request into `develop` whose CI runs the tests. W0 to W10 and W12 are done (the binary serves the API and the embedded UI, and the done-when check passes in CI on all three operating systems); next is **W11, the Dockerfile and the `edge` image**, then marking #48 ready for review, in the order of [23](23-phase-0.md#workstreams-and-order). The pull request is #48 (draft).
+1. Phase 0 on the branch `feat/phase-0` (from `develop` at `a81962e`): every workstream (W0 to W12) is built, with a commit each, in pull request #48 into `develop`. Next: CI green on the last commit, then mark #48 ready for review and merge it; after the merge, check that Docker edge pushed and signed the first `edge` image (DS-02.5) and do the owner setup below.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -55,7 +55,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | U1 | Mail, SMS, Verify, Numbers, Logs, Settings screens | Done | 18 / 18 |
 | U2 | Webhook, HTTP catcher and payment screens | Done | 14 / 14 |
 | U3 | Polish, website, contract freeze, **sign-off gate** | Done (signed off 2026-10-29) | 19 / 19 |
-| 0 | Backend foundations | In progress | 12 / 13 |
+| 0 | Backend foundations | In progress | 13 / 13 |
 | 1 | Email backend + first beta | Not started | 0 / 15 |
 | 2 | SMS and Verify backend | Not started | 0 / 12 |
 | 3 | Webhooks backend | Not started | 0 / 15 |
@@ -205,7 +205,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 - [x] Rust test setup: nextest, `insta` snapshots, `cargo llvm-cov` coverage gate (80% overall, 90% domain/operations), test fakes for `Clock`, `IdGenerator`, random source (#48)
 - [x] `scripts/version.ts` with the bump choices and changelog writing (DS-05), `CHANGELOG.md` written by the release workflow (#48)
 - [x] Release workflows: `release-prepare.yml` (Prepare release, choice `bump`: beta, patch, minor, major, stable), `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml` (#48)
-- [ ] Dockerfile and `docker-edge.yml` (`edge` image from `develop`)
+- [x] Dockerfile and `docker-edge.yml` (`edge` image from `develop`) (#48)
 - [x] Repo `README.md` and licence (`CONTRIBUTING.md` was added in `.github/` in U3 W12) (#48)
 
 ### Phase 1: Email backend and first beta
@@ -521,3 +521,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 0 W9: `scripts/version.ts` works out the next version from the bump choice and the merged pull requests (the plan 16 table, tested row by row), writes it into `Cargo.toml`, `Cargo.lock` and both `package.json` files, checks they agree in CI, writes the `CHANGELOG.md` section (Breaking changes, Added, Fixed; stables collect their betas) and prints a version's notes; the website has a `/changelog/` page. DS-05.1 to DS-05.4 ticked; DS-05.5 waits for the first published release. |
 | 2026-10-29 | Phase 0 W12 (done before W10, since release archives carry these files): `README.md` (what SendMock is, status, demo, docs, run from source, contributing, licence) and the dual licence files `LICENSE-MIT` and `LICENSE-APACHE`. |
 | 2026-10-29 | Phase 0 W10: Prepare release (bump choice and dry run, CI and in-progress checks, version and changelog written, release pull request), Publish beta, Promote stable and Publish stable (after CI passes on a push; a tagged version is left alone, so re-runs are safe; `0.0.0` is never published), and Release build (six targets, each archive tested on its own runner with the alpine and busybox images for Linux, `SHA256SUMS`, then the draft release is published and the rolling `beta` moved). The decisions are tested Bun scripts in `scripts/release/`. DS-04.2, DS-04.4 and DS-04.5 ticked; DS-04.1 and DS-04.3 wait for the first beta and stable. Owner setup: allow Actions to create pull requests, and optionally a `RELEASE_TOKEN` so release pull requests start CI. |
+| 2026-10-29 | Phase 0 W11: the `Dockerfile` (static musl binary on `scratch`, UID 10001, `/data`, `/config`, HEALTHCHECK `sendmock health`, 2 MB compressed) and Docker edge (each architecture built and tested on its own runner; on `develop`, pushed with an SBOM and provenance, tagged `edge` and signed with cosign). The binary loads `/config/sendmock.toml` and warns when it listens beyond this machine without UI auth. PL-06.1, DS-02.1 and DS-02.2 ticked; DS-02.5 after the first signed `edge` push. Every Phase 0 workstream is built; the phase is done when #48 merges. Owner setup: Docker Hub secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (optional; GHCR works without them). |

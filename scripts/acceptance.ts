@@ -15,7 +15,7 @@ import { join, relative } from "node:path";
 const repositoryRoot = join(import.meta.dir, "..");
 const acceptanceDirectory = join(repositoryRoot, "docs/plan/acceptance");
 const testRoots = ["web/src", "web/tests", "website", "crates", "scripts"];
-const testFilePattern = /(\.test\.tsx?|\.spec\.ts|_test\.rs|\.rs)$/;
+const testFilePattern = /(\.test\.tsx?|\.spec\.ts|_test\.rs|\.rs|-test\.sh)$/;
 const ignoredDirectoryNames = new Set(["node_modules", "dist", "target", ".git"]);
 // Its fixtures use real criterion IDs as sample data, not as proof.
 const ignoredFileNames = new Set(["acceptance.test.ts"]);
