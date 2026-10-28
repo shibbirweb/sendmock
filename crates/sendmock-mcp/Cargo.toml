@@ -1,0 +1,16 @@
+[package]
+name = "sendmock-mcp"
+description = "The SendMock MCP server and its tools."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-ops.workspace = true
+
+[lints]
+workspace = true

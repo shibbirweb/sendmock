@@ -1,0 +1,16 @@
+[package]
+name = "sendmock-sms"
+description = "SMS domain for SendMock: messages, providers and delivery simulation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-store.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,12 @@
+[package]
+name = "sendmock-core"
+description = "Shared types for SendMock: events, value objects, errors, clock and id traits."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true

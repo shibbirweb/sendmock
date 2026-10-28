@@ -1,0 +1,18 @@
+[package]
+name = "sendmock-ops"
+description = "The SendMock operation registry shared by REST, CLI and MCP."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-store.workspace = true
+sendmock-sms.workspace = true
+sendmock-webhooks.workspace = true
+
+[lints]
+workspace = true
