@@ -11,6 +11,8 @@ pub struct AppInfo {
     pub uptime_seconds: u64,
     pub smtp_address: String,
     pub http_address: String,
+    /// Always present, null when the provider port is off, as the contract requires.
+    #[schemars(required)]
     pub provider_address: Option<String>,
     pub database_path: String,
     pub database_size_bytes: u64,
