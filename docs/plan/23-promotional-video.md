@@ -54,8 +54,8 @@ Owner brief: a promotional trailer that shows the main features (webhooks for em
 | 7 | Events | "32 events. Subscribe to any." | every built-in event as a chip, grouped by area (email, SMS, verify, HTTP, payment, checkout, webhook, test), cascading in by column, then events firing live across the wall | 9 s |
 | 8 | Build your own | "Missing one? Build it." | four builders at work: a webhook template being typed with its live preview, a new email provider from blank, an SMS provider from a built-in, a payment gateway's checkout flow getting its steps (wallet number, OTP, PIN) | 11 s |
 | 9 | AI ready | "AI ready. Everything, by prompt." | an AI agent window: three prompts typed one after another, each followed by the SendMock tool calls it makes and a one-line answer; then the agents it sets up (Claude Code, Codex, Cursor, Gemini CLI, VS Code) and `sendmock ai install` | 19 s |
-| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the stable install commands exactly as the docs Install page gives them, cycling through Homebrew, the install script (macOS and Linux), the PowerShell install script (Windows) and Docker, and the languages with examples (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) | 10 s |
-| 11 | Close | "Your app talks. SendMock talks back." | the logo and name, the install command, the website (`https://shibbirweb.github.io/sendmock/`, shown as `shibbirweb.github.io/sendmock`), `github.com/shibbirweb/sendmock`, and one line of facts: open source, runs on your machine | 7 s |
+| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the stable install commands exactly as the docs Install page gives them, cycling through Homebrew, the install script (macOS and Linux), the PowerShell install script (Windows) and Docker, and under it "No SDK needed" with the ways an app connects (SMTP, REST API, Provider APIs, Webhooks, CLI, MCP) | 10 s |
+| 11 | Close | "Your app talks. SendMock talks back." | the logo and name, the install bar turning into the platforms (Windows, macOS, Linux, Docker), the website (`https://shibbirweb.github.io/sendmock/`, shown as `shibbirweb.github.io/sendmock`), `github.com/shibbirweb/sendmock`, and one line of facts: open source, runs on your machine | 7 s |
 
 The example prompts in scene 9:
 
@@ -67,7 +67,7 @@ The example prompts in scene 9:
 
 ### Where it lives
 
-The `SendMockTrailer` composition in `video/src/trailer/`: one file per scene in `scenes/`, shared parts (backdrop, window, headline, flow line, request card, terminal) in `parts/`, and the product facts (providers, templates, events, agents, platforms, copied from the app's mock data and plans) in `trailer-facts.ts`. Preview in Remotion Studio (`bun run studio` in `video/`); an MP4 is rendered only once the owner approves.
+One composition, `SendMockTrailerTourConnections`, in `video/src/trailer/` (see [One film](#one-film-2026-10-29)): one file per scene in `scenes/`, shared parts (backdrop, window, headline, flow line, request card, terminal) in `parts/`, and the product facts (providers, templates, events, agents, platforms, copied from the app's mock data and plans) in `trailer-facts.ts`. Preview in Remotion Studio (`bun run studio` in `video/`); an MP4 is rendered only once the owner approves.
 
 ### Version with an app tour (`SendMockTrailerTour`, 2026-10-29)
 
@@ -81,7 +81,15 @@ Platforms becomes `10 · Everywhere` in this version. The screenshots are taken 
 
 ### Version with every platform at the close (`SendMockTrailerTourPlatforms`, 2026-10-29)
 
-Owner request: a copy of the tour version whose closing card shows that SendMock runs on Windows, macOS, Linux and Docker instead of only the Homebrew command. `SendMockTrailer` and `SendMockTrailerTour` stay as they are. In the copy, the install bar still carries over from the platforms scene (the match cut); while it settles, the Homebrew command fades out and the four platforms fade in, each with the icon its tile has in the platforms scene. This is the cut uploaded to YouTube.
+Owner request: a copy of the tour version whose closing card shows that SendMock runs on Windows, macOS, Linux and Docker instead of only the Homebrew command. In the copy, the install bar still carries over from the platforms scene (the match cut); while it settles, the Homebrew command fades out and the four platforms fade in, each with the icon its tile has in the platforms scene.
+
+### Version with the ways to connect (`SendMockTrailerTourConnections`, 2026-10-29)
+
+Owner request: SendMock needs no SDK and no particular language, so the language names under the install bar read as if SendMock depended on them. A copy of the platforms version replaces "Any language" and the eight language names with "No SDK needed" and the ways an app talks to SendMock: SMTP (any mail library), REST API (SendMock's own), Provider APIs (the official provider SDKs with the base URL swapped), Webhooks (plain HTTP to your app), CLI and MCP. Everything else is the platforms version.
+
+### One film (2026-10-29)
+
+Owner decision: keep only the last cut. `SendMockTrailer`, `SendMockTrailerTour` and `SendMockTrailerTourPlatforms` are removed, and `SendMockTrailerTourConnections` is the trailer: the eleven scenes, the app tour after the AI prompts, the ways to connect in the platforms scene and every platform on the closing card. The sections above record how it got there.
 
 ### Frame rate and render (2026-10-29)
 
@@ -92,7 +100,7 @@ Owner request: render for YouTube in 4K at 60 fps.
 - **Render** (in `video/`, `out/` is ignored):
 
   ```bash
-  bunx remotion render src/index.ts SendMockTrailerTourPlatforms out/sendmock-trailer-tour-platforms-4k60.mp4 --scale=2 --codec=h264 --crf=18
+  bunx remotion render src/index.ts SendMockTrailerTourConnections out/sendmock-trailer-4k60.mp4 --scale=2 --codec=h264 --crf=18
   ```
 
 ### Sound effects (2026-10-29)

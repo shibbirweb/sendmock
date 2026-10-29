@@ -137,15 +137,14 @@ export const aiAgentNames = [
   "VS Code",
 ];
 
-export const languageNames = [
-  "PHP",
-  "Node",
-  "Python",
-  "Go",
-  "Java",
-  "Rust",
-  "Ruby",
-  ".NET",
+/** How an app talks to SendMock: standard protocols and APIs, no SDK. */
+export const connectionNames = [
+  "SMTP",
+  "REST API",
+  "Provider APIs",
+  "Webhooks",
+  "CLI",
+  "MCP",
 ];
 
 /** The stable install commands, exactly as the docs Install page gives them (website/content/docs/install.md). */

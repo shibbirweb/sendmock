@@ -186,14 +186,6 @@ export function getTrailerDurationFrames(scenes: TrailerScene[]): number {
   );
 }
 
-export const sendMockTrailerDurationFrames =
-  getTrailerDurationFrames(trailerScenes);
-
-/** The SendMock promotional trailer. */
-export function SendMockTrailer() {
-  return <TrailerFilm scenes={trailerScenes} />;
-}
-
 type TrailerFilmProps = {
   scenes: TrailerScene[];
 };

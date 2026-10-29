@@ -2,7 +2,6 @@ import { AbsoluteFill, Easing, Img, interpolate, staticFile } from "remotion";
 
 import { monoFontFamily, videoHeight, videoWidth } from "../../brand";
 import { cameraDriftPx, cameraPushScale } from "../parts/scene-camera";
-import { installCommands } from "../trailer-facts";
 import { getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
 import type { UiCue } from "../ui-cues";
@@ -45,42 +44,30 @@ const barStartLayout = {
   borderRadiusPx: installBarLayout.borderRadiusPx,
 };
 
+/** Wide enough to name every platform on one line. */
 const barEndLayout = {
-  leftPx: videoWidth / 2 - 390,
+  leftPx: videoWidth / 2 - 450,
   topPx: 560,
-  widthPx: 780,
+  widthPx: 900,
   paddingYPx: 18,
   paddingXPx: 30,
   fontSizePx: 30,
   borderRadiusPx: 14,
 };
 
-/** The platforms cut's bar is wider, to name every platform on one line. */
-const platformsBarEndLayout = {
-  ...barEndLayout,
-  leftPx: videoWidth / 2 - 450,
-  widthPx: 900,
-};
-
-type ClosingSceneProps = {
-  /** What the bar settles into: the first install command, or every platform. */
-  barContent?: "installCommand" | "platforms";
-};
-
-/** Scene 11: the install bar carries over and the closing card builds around it. */
-export function ClosingScene({
-  barContent = "installCommand",
-}: ClosingSceneProps) {
+/**
+ * Scene 11: the install bar carries over, turns into every platform SendMock
+ * runs on, and the closing card builds around it.
+ */
+export function ClosingScene() {
   const frame = useDesignFrame();
-  const endLayout =
-    barContent === "platforms" ? platformsBarEndLayout : barEndLayout;
   const morphProgress = interpolate(frame, [0, morphFrames], [0, 1], {
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
   const getBarValue = (layoutKey: keyof typeof barEndLayout) =>
     barStartLayout[layoutKey] +
-    (endLayout[layoutKey] - barStartLayout[layoutKey]) * morphProgress;
+    (barEndLayout[layoutKey] - barStartLayout[layoutKey]) * morphProgress;
 
   return (
     <AbsoluteFill style={{ color: trailerPalette.text }}>
@@ -143,14 +130,7 @@ export function ClosingScene({
           whiteSpace: "nowrap",
         }}
       >
-        {barContent === "platforms" ? (
-          <ClosingPlatformsBar morphProgress={morphProgress} />
-        ) : (
-          <>
-            <span style={{ color: trailerPalette.accent }}>$ </span>
-            {installCommands[0]}
-          </>
-        )}
+        <ClosingPlatformsBar morphProgress={morphProgress} />
       </div>
       <div
         style={{

@@ -3,7 +3,6 @@ import {
   appTourSceneCues,
   appTourSceneDurationFrames,
 } from "./scenes/app-tour/app-tour-scene";
-import { ClosingScene } from "./scenes/closing-scene";
 import { PlatformsScene } from "./scenes/platforms/platforms-scene";
 import {
   getTrailerDurationFrames,
@@ -50,28 +49,11 @@ export const tourScenes: TrailerScene[] = trailerScenes.flatMap(
 export const sendMockTrailerTourDurationFrames =
   getTrailerDurationFrames(tourScenes);
 
-/** The SendMock trailer with a glance at the app's real pages. */
-export function SendMockTrailerTour() {
-  return <TrailerFilm scenes={tourScenes} />;
-}
-
-function ClosingSceneWithPlatforms() {
-  return <ClosingScene barContent="platforms" />;
-}
-
 /**
- * The tour cut with a closing bar that names every platform instead of one
- * install command (docs/plan/23-promotional-video.md, Version with every
- * platform at the close).
+ * The SendMock trailer: the scenes with an app tour after the AI prompts, a
+ * platforms scene that shows how apps connect, and a closing card naming
+ * every platform (docs/plan/23-promotional-video.md).
  */
-export const tourScenesWithPlatforms: TrailerScene[] = tourScenes.map(
-  (trailerScene): TrailerScene =>
-    trailerScene.sceneName === "closing"
-      ? { ...trailerScene, Scene: ClosingSceneWithPlatforms }
-      : trailerScene,
-);
-
-/** A copy of the tour cut whose closing card shows every platform. */
-export function SendMockTrailerTourPlatforms() {
-  return <TrailerFilm scenes={tourScenesWithPlatforms} />;
+export function SendMockTrailerTourConnections() {
+  return <TrailerFilm scenes={tourScenes} />;
 }

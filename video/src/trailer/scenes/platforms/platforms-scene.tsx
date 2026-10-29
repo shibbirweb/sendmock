@@ -9,7 +9,7 @@ import { AbsoluteFill, interpolate } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
 import { SceneHeadline } from "../../parts/scene-headline";
-import { installCommands, languageNames } from "../../trailer-facts";
+import { connectionNames, installCommands } from "../../trailer-facts";
 import { getProgress, getRiseInStyle } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
 import type { UiCue } from "../../ui-cues";
@@ -68,7 +68,7 @@ type PlatformsSceneProps = {
   chapterLabel?: string;
 };
 
-/** Scene 10: every operating system, Docker, and any language. */
+/** Scene 10: every operating system, Docker, and the ways an app connects. */
 export function PlatformsScene({
   chapterLabel = "09 · Everywhere",
 }: PlatformsSceneProps) {
@@ -190,15 +190,15 @@ export function PlatformsScene({
             marginRight: 8,
           }}
         >
-          Any language
+          No SDK needed
         </span>
-        {languageNames.map((languageName, languageIndex) => (
+        {connectionNames.map((connectionName, connectionIndex) => (
           <span
-            key={languageName}
+            key={connectionName}
             style={{
               ...getRiseInStyle(
                 frame,
-                languagesStartFrame + 4 + languageIndex * 4,
+                languagesStartFrame + 4 + connectionIndex * 4,
                 12,
                 10,
               ),
@@ -208,7 +208,7 @@ export function PlatformsScene({
               backgroundColor: trailerPalette.surface,
             }}
           >
-            {languageName}
+            {connectionName}
           </span>
         ))}
       </div>
