@@ -130,8 +130,14 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
+      # macOS allows 256 open files by default; the SMTP load test holds 1000 sockets.
       - name: Tests
-        run: cargo nextest run --workspace --locked
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" != "Windows" ]; then
+            ulimit -n 4096
+          fi
+          cargo nextest run --workspace --locked
 
   rust-coverage:
     name: Rust coverage and file size

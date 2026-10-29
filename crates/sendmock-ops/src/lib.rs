@@ -12,6 +12,7 @@ mod operation_error;
 mod operation_registry;
 mod page_of;
 mod seed;
+mod smtp_delivery;
 mod system;
 
 pub use email::{EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData};
@@ -32,6 +33,7 @@ pub use seed::{
     SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError, ValidateSeedOperation,
     validate_seed_toml,
 };
+pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
 
 /// Every operation this build of SendMock serves.

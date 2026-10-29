@@ -21,6 +21,44 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_SMTP_ADDR", value_name = "HOST:PORT")]
     pub smtp_addr: Option<SocketAddr>,
 
+    /// Address for the SMTPS listener (TLS from the first byte); off unless set
+    #[arg(long, env = "SENDMOCK_SMTPS_ADDR", value_name = "HOST:PORT")]
+    pub smtps_addr: Option<SocketAddr>,
+
+    /// Largest message SMTP accepts; larger ones get 552 [default: 25MB]
+    #[arg(long, env = "SENDMOCK_SMTP_MAX_SIZE", value_name = "SIZE")]
+    pub smtp_max_size: Option<String>,
+
+    /// SMTP AUTH: `accept-any`, `none` (not offered) or `file:<path>` with `user:password` lines [default: accept-any]
+    #[arg(long, env = "SENDMOCK_SMTP_AUTH", value_name = "MODE")]
+    pub smtp_auth: Option<String>,
+
+    /// Certificate (PEM) for STARTTLS and SMTPS [default: a self-signed one generated on first run]
+    #[arg(
+        long,
+        env = "SENDMOCK_SMTP_TLS_CERT",
+        value_name = "FILE",
+        requires = "smtp_tls_key"
+    )]
+    pub smtp_tls_cert: Option<PathBuf>,
+
+    /// Private key (PEM) for `--smtp-tls-cert`
+    #[arg(
+        long,
+        env = "SENDMOCK_SMTP_TLS_KEY",
+        value_name = "FILE",
+        requires = "smtp_tls_cert"
+    )]
+    pub smtp_tls_key: Option<PathBuf>,
+
+    /// Refuse MAIL with 530 until the client has run STARTTLS
+    #[arg(long, env = "SENDMOCK_SMTP_REQUIRE_TLS")]
+    pub smtp_require_tls: bool,
+
+    /// Recipients SMTP accepts, as comma-separated globs; others get 550 [default: *]
+    #[arg(long, env = "SENDMOCK_SMTP_ALLOW_RCPT", value_name = "GLOBS")]
+    pub smtp_allow_rcpt: Option<String>,
+
     /// Database file, or `memory` to keep nothing after exit [default: sendmock.db in the OS data folder]
     #[arg(long = "db", env = "SENDMOCK_DB", value_name = "PATH|memory")]
     pub database_setting: Option<String>,

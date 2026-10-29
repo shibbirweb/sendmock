@@ -3,14 +3,12 @@ use std::path::Path;
 
 use sendmock_ops::{InstanceDetails, ReleaseChannel};
 
-use crate::config::ServerConfig;
-
 /// Docker creates `/.dockerenv` and Podman `/run/.containerenv` in every container.
 const CONTAINER_MARKER_FILES: [&str; 2] = ["/.dockerenv", "/run/.containerenv"];
 
 pub fn build_instance_details(
-    server_config: &ServerConfig,
     bound_http_addr: SocketAddr,
+    bound_smtp_addr: SocketAddr,
     started_at_unix_ms: i64,
 ) -> InstanceDetails {
     InstanceDetails {
@@ -18,7 +16,7 @@ pub fn build_instance_details(
         channel: current_release_channel(),
         started_at_unix_ms,
         http_address: bound_http_addr.to_string(),
-        smtp_address: server_config.smtp_addr.to_string(),
+        smtp_address: bound_smtp_addr.to_string(),
         provider_address: None,
         is_container: CONTAINER_MARKER_FILES
             .iter()

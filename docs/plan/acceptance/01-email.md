@@ -6,22 +6,22 @@ Plan: [03-email.md](../03-email.md). Rules for IDs, ticking and tests: [README.m
 
 Phase 1. Docs: [SMTP server](../03-email.md#smtp-server).
 
-- [ ] EM-01.1 A message sent with `EHLO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` to `127.0.0.1:1025` is stored and appears in the UI and `GET /api/v1/emails` within 1 second.
-- [ ] EM-01.2 Mail for any recipient and any domain is accepted (catch-all); nothing is relayed anywhere.
-- [ ] EM-01.3 `PIPELINING`, `8BITMIME`, `SMTPUTF8` and `SIZE` are advertised and work; a message larger than `--smtp-max-size` is rejected with `552`.
-- [ ] EM-01.4 Multiple recipients in one session are stored once with all envelope recipients; envelope recipients missing from `To`/`Cc` are shown as BCC.
+- [x] EM-01.1 A message sent with `EHLO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` to `127.0.0.1:1025` is stored and appears in the UI and `GET /api/v1/emails` within 1 second. (#48)
+- [x] EM-01.2 Mail for any recipient and any domain is accepted (catch-all); nothing is relayed anywhere. (#48)
+- [x] EM-01.3 `PIPELINING`, `8BITMIME`, `SMTPUTF8` and `SIZE` are advertised and work; a message larger than `--smtp-max-size` is rejected with `552`. (#48)
+- [x] EM-01.4 Multiple recipients in one session are stored once with all envelope recipients; envelope recipients missing from `To`/`Cc` are shown as BCC. (#48)
 - [ ] EM-01.5 Mail from Laravel, Symfony, Nodemailer, Python smtplib, Django, Go net/smtp, Spring, lettre, Rails and MailKit is received correctly (cross-language CI).
-- [ ] EM-01.6 Malformed commands get the correct SMTP error code and never crash the server; 500 concurrent sessions are handled without errors.
+- [x] EM-01.6 Malformed commands get the correct SMTP error code and never crash the server; 500 concurrent sessions are handled without errors. (#48)
 
 ## EM-02 SMTP TLS and AUTH
 
 Phase 1.
 
-- [ ] EM-02.1 `STARTTLS` works with an auto-generated self-signed certificate on first run, and with a user-provided cert/key.
-- [ ] EM-02.2 Implicit TLS works on the optional SMTPS listener.
-- [ ] EM-02.3 `AUTH PLAIN`, `LOGIN` and `CRAM-MD5` accept any credentials in `accept-any` mode; with `file:<path>` wrong credentials get `535`; with `none` no AUTH is advertised.
-- [ ] EM-02.4 `--smtp-require-tls` rejects `MAIL` before `STARTTLS` with `530`.
-- [ ] EM-02.5 The authenticated username is stored on the email and shown in the UI.
+- [x] EM-02.1 `STARTTLS` works with an auto-generated self-signed certificate on first run, and with a user-provided cert/key. (#48)
+- [x] EM-02.2 Implicit TLS works on the optional SMTPS listener. (#48)
+- [x] EM-02.3 `AUTH PLAIN`, `LOGIN` and `CRAM-MD5` accept any credentials in `accept-any` mode; with `file:<path>` wrong credentials get `535`; with `none` no AUTH is advertised. (#48)
+- [x] EM-02.4 `--smtp-require-tls` rejects `MAIL` before `STARTTLS` with `530`. (#48)
+- [x] EM-02.5 The authenticated username is stored on the email and shown in the UI. (#48)
 
 ## EM-03 Storage, retention and search
 
@@ -89,7 +89,7 @@ Phase 4. Docs: [HTTP send APIs](../03-email.md#http-send-apis).
 UI in U1, backend Phase 1.
 
 - [ ] EM-09.1 Every SMTP session, including failed ones, is listed with client, EHLO name, TLS, AUTH user, result and duration.
-- [ ] EM-09.2 The transcript shows every command and reply; AUTH passwords are masked; DATA content is linked, not duplicated.
+- [x] EM-09.2 The transcript shows every command and reply; AUTH passwords are masked; DATA content is linked, not duplicated. (#48)
 - [ ] EM-09.3 Each stored email links to its session.
 - [ ] EM-09.4 Failed sessions are highlighted with their reason, and the transcript viewer tells commands from replies and colours reply codes by class.
 - [ ] EM-09.5 The session list loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of sessions.

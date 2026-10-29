@@ -5,6 +5,7 @@ mod log_format;
 mod log_level;
 mod seed_file_locator;
 mod server_config;
+mod smtp_config;
 
 pub use config_error::ConfigError;
 pub use log_format::LogFormat;

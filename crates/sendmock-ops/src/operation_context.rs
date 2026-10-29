@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use sendmock_core::{Clock, IdGenerator};
 use sendmock_mail::EmailIngestService;
-use sendmock_store::{Database, EmailRepository};
+use sendmock_store::{Database, EmailRepository, SmtpSessionRepository};
 
 use crate::InstanceDetails;
 
@@ -15,6 +15,7 @@ pub struct OperationContext {
     pub instance_details: Arc<InstanceDetails>,
     pub email_repository: EmailRepository,
     pub email_ingest_service: EmailIngestService,
+    pub smtp_session_repository: SmtpSessionRepository,
 }
 
 impl OperationContext {
@@ -31,7 +32,9 @@ impl OperationContext {
             Arc::clone(&clock),
             Arc::clone(&id_generator),
         );
+        let smtp_session_repository = SmtpSessionRepository::new(Arc::clone(&database));
         Self {
+            smtp_session_repository,
             database,
             clock,
             id_generator,

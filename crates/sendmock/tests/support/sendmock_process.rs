@@ -8,7 +8,8 @@ use std::time::{Duration, Instant};
 pub const READY_MESSAGE: &str = "SendMock is ready";
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(20);
 
-/// A `sendmock` command that inherits no `SENDMOCK_*` variable from the machine running the tests.
+/// A `sendmock` command that inherits no `SENDMOCK_*` variable from the machine running the
+/// tests, with SMTP on a free port so servers started in parallel never collide.
 pub fn sendmock_command(working_directory: &Path) -> Command {
     let mut command = Command::new(env!("CARGO_BIN_EXE_sendmock"));
     command.current_dir(working_directory);
@@ -17,6 +18,7 @@ pub fn sendmock_command(working_directory: &Path) -> Command {
             command.env_remove(variable_name);
         }
     }
+    command.env("SENDMOCK_SMTP_ADDR", "127.0.0.1:0");
     command
 }
 
@@ -75,6 +77,16 @@ impl SendmockProcess {
             .as_str()
             .map(str::to_owned)
             .unwrap_or_else(|| panic!("the ready line has no http_addr: {ready_line}"))
+    }
+
+    /// The SMTP address the server bound, read from its JSON ready line.
+    pub fn wait_for_smtp_addr(&self) -> String {
+        let ready_line: serde_json::Value =
+            serde_json::from_str(&self.wait_for_line(READY_MESSAGE)).unwrap_or_default();
+        ready_line["fields"]["smtp_addr"]
+            .as_str()
+            .map(str::to_owned)
+            .unwrap_or_else(|| panic!("the ready line has no smtp_addr: {ready_line}"))
     }
 
     #[cfg(unix)]

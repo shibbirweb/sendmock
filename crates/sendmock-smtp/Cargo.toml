@@ -11,6 +11,23 @@ publish = false
 [dependencies]
 sendmock-core.workspace = true
 sendmock-ops.workspace = true
+sendmock-store.workspace = true
+
+base64.workspace = true
+hmac.workspace = true
+md5.workspace = true
+rcgen.workspace = true
+rustls.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio = { workspace = true, features = [
+    "io-util",
+] }
 
 [lints]
 workspace = true

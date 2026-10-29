@@ -13,6 +13,13 @@ use super::{ConfigError, LogFormat, LogLevel};
 pub struct ConfigFile {
     pub http_addr: Option<SocketAddr>,
     pub smtp_addr: Option<SocketAddr>,
+    pub smtps_addr: Option<SocketAddr>,
+    pub smtp_max_size: Option<String>,
+    pub smtp_auth: Option<String>,
+    pub smtp_tls_cert: Option<PathBuf>,
+    pub smtp_tls_key: Option<PathBuf>,
+    pub smtp_require_tls: Option<bool>,
+    pub smtp_allow_rcpt: Option<String>,
     pub db: Option<String>,
     pub log_format: Option<LogFormat>,
     pub log_level: Option<LogLevel>,
@@ -67,6 +74,7 @@ mod tests {
                 log_format: Some(LogFormat::Json),
                 log_level: Some(LogLevel::Debug),
                 seed: Some(PathBuf::from("sendmock.seed.toml")),
+                ..ConfigFile::default()
             })
         );
     }

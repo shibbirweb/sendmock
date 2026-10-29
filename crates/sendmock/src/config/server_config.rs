@@ -6,6 +6,7 @@ use sendmock_store::DatabaseLocation;
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
 use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
+use super::smtp_config::SmtpConfig;
 use super::{ConfigError, LogFormat, LogLevel};
 use crate::cli_arguments::ServeArguments;
 
@@ -20,6 +21,7 @@ const OS_DATA_SUBDIRECTORY: &str = "sendmock";
 pub struct ServerConfig {
     pub http_addr: SocketAddr,
     pub smtp_addr: SocketAddr,
+    pub smtp: SmtpConfig,
     pub database_location: DatabaseLocation,
     pub log_format: LogFormat,
     pub log_level: LogLevel,
@@ -45,7 +47,7 @@ impl ServerConfig {
             config_file,
             config_file_path,
             default_database_location(dirs::data_dir().as_deref()),
-        );
+        )?;
         server_config.seed_file_path = locate_seed_file(
             server_config.seed_file_path.as_deref(),
             &current_directory,
@@ -61,9 +63,10 @@ impl ServerConfig {
         config_file: ConfigFile,
         config_file_path: Option<PathBuf>,
         default_database_location: DatabaseLocation,
-    ) -> Self {
+    ) -> Result<Self, ConfigError> {
+        let smtp = SmtpConfig::resolve(serve_arguments, &config_file)?;
         let database_setting = serve_arguments.database_setting.clone().or(config_file.db);
-        Self {
+        Ok(Self {
             http_addr: serve_arguments
                 .http_addr
                 .or(config_file.http_addr)
@@ -72,6 +75,7 @@ impl ServerConfig {
                 .smtp_addr
                 .or(config_file.smtp_addr)
                 .unwrap_or(DEFAULT_SMTP_ADDR),
+            smtp,
             database_location: database_setting
                 .map(|setting| DatabaseLocation::from_setting(&setting))
                 .unwrap_or(default_database_location),
@@ -85,6 +89,17 @@ impl ServerConfig {
                 .unwrap_or_default(),
             seed_file_path: serve_arguments.seed_file_path.clone().or(config_file.seed),
             config_file_path,
+        })
+    }
+
+    /// Where the generated TLS certificate is kept: beside the database file, nowhere for
+    /// an in-memory database.
+    pub fn generated_files_folder(&self) -> Option<PathBuf> {
+        match &self.database_location {
+            DatabaseLocation::File(database_file_path) => {
+                database_file_path.parent().map(Path::to_path_buf)
+            }
+            DatabaseLocation::InMemory => None,
         }
     }
 }
@@ -111,6 +126,7 @@ mod tests {
             None,
             DatabaseLocation::File(PathBuf::from("default.db")),
         )
+        .unwrap_or_else(|config_error| panic!("{config_error}"))
     }
 
     // AC: PL-06.1

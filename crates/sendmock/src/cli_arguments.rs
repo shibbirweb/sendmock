@@ -24,7 +24,7 @@ pub struct CliArguments {
 #[derive(Debug, Subcommand)]
 enum CliCommand {
     /// Run the servers (the default when no command is given).
-    Serve(ServeArguments),
+    Serve(Box<ServeArguments>),
 
     /// Print the version and release channel of this binary.
     Version {

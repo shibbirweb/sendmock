@@ -11,6 +11,7 @@ mod seed_file_check;
 mod server_runner;
 mod server_startup;
 mod shutdown_signal;
+mod smtp_startup;
 mod startup_error;
 mod version_output;
 

@@ -11,12 +11,14 @@ import type { Subprocess } from "bun";
 const startupTimeoutMs = 30_000;
 const readyMessage = "SendMock is ready";
 
-type ReadyLine = { fields?: { http_addr?: string } };
+type ReadyLine = { fields?: { http_addr?: string; smtp_addr?: string } };
+
+type ListenerAddresses = { httpAddress: string; smtpAddress: string };
 
 /** Reads stdout until the ready line, then keeps draining it so later log lines can be written. */
-async function readHttpAddressFromReadyLine(
+async function readAddressesFromReadyLine(
   stdout: ReadableStream<Uint8Array>,
-): Promise<string> {
+): Promise<ListenerAddresses> {
   const reader = stdout.getReader();
   const decoder = new TextDecoder();
   let bufferedText = "";
@@ -31,12 +33,13 @@ async function readHttpAddressFromReadyLine(
     const readyLine = lines.find((line) => line.includes(readyMessage));
     if (readyLine) {
       void drainRemainingOutput(reader);
-      const httpAddress =
-        (JSON.parse(readyLine) as ReadyLine).fields?.http_addr ?? null;
-      if (!httpAddress) {
-        throw new Error("the ready line has no http_addr");
+      const readyFields = (JSON.parse(readyLine) as ReadyLine).fields ?? {};
+      const httpAddress = readyFields.http_addr ?? null;
+      const smtpAddress = readyFields.smtp_addr ?? null;
+      if (!httpAddress || !smtpAddress) {
+        throw new Error("the ready line has no http_addr or smtp_addr");
       }
-      return httpAddress;
+      return { httpAddress, smtpAddress };
     }
   }
 }
@@ -97,6 +100,7 @@ export async function checkRunningBinary(baseUrl: string) {
 export type RunningSendmock = {
   sendmock: Subprocess<"ignore", "pipe", "inherit">;
   httpAddress: string;
+  smtpAddress: string;
 };
 
 /** Starts the binary and waits for its ready line; serve flags come from the caller. */
@@ -112,7 +116,7 @@ export async function startSendmock(
   try {
     return {
       sendmock,
-      httpAddress: await readHttpAddressFromReadyLine(sendmock.stdout),
+      ...(await readAddressesFromReadyLine(sendmock.stdout)),
     };
   } finally {
     clearTimeout(startupTimeout);
@@ -143,7 +147,14 @@ async function main() {
   }
   const runningSendmock = await startSendmock(
     withExecutableSuffix(binaryArgument),
-    ["--http-addr", "127.0.0.1:0", "--db", "memory"],
+    [
+      "--http-addr",
+      "127.0.0.1:0",
+      "--smtp-addr",
+      "127.0.0.1:0",
+      "--db",
+      "memory",
+    ],
   );
   try {
     await checkRunningBinary(`http://${runningSendmock.httpAddress}`);

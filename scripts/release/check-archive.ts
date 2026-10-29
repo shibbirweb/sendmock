@@ -82,6 +82,10 @@ async function checkDefaultListeners(binaryPath: string) {
     runningSendmock.httpAddress === "127.0.0.1:8025",
     "it listens on 127.0.0.1:8025 by default",
   );
+  check(
+    runningSendmock.smtpAddress === "127.0.0.1:1025",
+    "it takes SMTP on 127.0.0.1:1025 by default",
+  );
   if (process.platform !== "win32") {
     check(exitCode === 0, "SIGTERM stops it with exit code 0");
   }
@@ -107,6 +111,8 @@ async function main() {
   await checkDefaultListeners(binaryPath);
   const runningSendmock = await startSendmock(binaryPath, [
     "--http-addr",
+    "127.0.0.1:0",
+    "--smtp-addr",
     "127.0.0.1:0",
     "--db",
     "memory",

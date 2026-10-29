@@ -4,6 +4,7 @@ mod database;
 mod database_location;
 mod email;
 mod migration;
+mod smtp_session;
 mod store_error;
 
 pub use database::Database;
@@ -13,4 +14,5 @@ pub use email::{
     NewAttachmentRecord, NewEmailRecord, StoredEmailAddress, TimelineRecord,
 };
 pub use migration::{EMBEDDED_MIGRATIONS, Migration};
+pub use smtp_session::{SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository};
 pub use store_error::StoreError;

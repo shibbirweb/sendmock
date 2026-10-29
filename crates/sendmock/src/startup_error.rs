@@ -47,6 +47,9 @@ pub enum StartupError {
         problems: String,
     },
 
+    #[error(transparent)]
+    SmtpTls(#[from] sendmock_smtp::TlsSetupError),
+
     #[error("Could not start the server runtime: {0}")]
     Runtime(io::Error),
 }
@@ -57,9 +60,11 @@ impl StartupError {
             Self::Config(_) | Self::UnreadableSeed { .. } | Self::InvalidSeed { .. } => {
                 ExitCode::from(USAGE_ERROR_EXIT_CODE)
             }
-            Self::PortInUse { .. } | Self::Listen { .. } | Self::Database(_) | Self::Runtime(_) => {
-                ExitCode::from(ERROR_EXIT_CODE)
-            }
+            Self::PortInUse { .. }
+            | Self::Listen { .. }
+            | Self::Database(_)
+            | Self::SmtpTls(_)
+            | Self::Runtime(_) => ExitCode::from(ERROR_EXIT_CODE),
         }
     }
 }

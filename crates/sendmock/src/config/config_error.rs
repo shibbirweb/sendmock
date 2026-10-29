@@ -11,4 +11,10 @@ pub enum ConfigError {
 
     #[error("The configuration file {} is not valid: {reason}", file_path.display())]
     InvalidFile { file_path: PathBuf, reason: String },
+
+    #[error("The setting {setting_name} is not valid: {reason}")]
+    InvalidSetting {
+        setting_name: &'static str,
+        reason: String,
+    },
 }

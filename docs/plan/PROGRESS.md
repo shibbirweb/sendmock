@@ -13,11 +13,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 0 / 108 accepted, 88 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 1 / 108 accepted (EM-02), 99 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W3 are done; next W4 (the SMTP server), then W5 to W9 in order. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W4 are done; next W5 (event bus, WebSocket, SSE), then W6 to W9 in order. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -212,7 +212,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 
 Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29: every phase on this branch), W1 to W9 in order.
 
-- [ ] SMTP server (EHLO, MAIL, RCPT, DATA, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH, STARTTLS)
+- [x] SMTP server (EHLO, MAIL, RCPT, DATA, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH, STARTTLS) (#48)
 - [ ] MIME parsing, storage, retention, FTS search
 - [x] OTP and link extractors (#48)
 - [ ] Email REST API and WebSocket events
@@ -528,3 +528,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 1 W1: the operation framework takes path values, typed query values, raw bodies, file answers and `201` / `204` in REST, OpenAPI, the CLI (positional arguments, flags from the input schema by the published naming rules, `--data`, `--file`, `--yes`, `--output`) and MCP. AI-01.4 ticked. |
 | 2026-10-29 | Phase 1 W2: email storage and parsing. New domain crate `sendmock-mail` (parsing on `mail-parser`, OTP, link and tag extraction, zstd, `EmailIngestService`); migration `0002_email.sql` with FTS5 search; `EmailRepository` with filters, cursor pages, timeline and pruning. EM-03.1, EM-03.4, EM-05.1, EM-12.1 and EM-12.2 ticked. New dependencies `mail-parser`, `zstd`, `regex`. |
 | 2026-10-29 | Phase 1 W3: 17 email operations in REST, CLI and MCP (list and search, latest, show, update read state and tags, delete one and all, timeline, MIME, List-Unsubscribe check, raw, attachment, thumbnail, native send with field errors, send raw, `otp`, `links`, `wait/email` with 408), checked against the frozen contract with real answers and against the CLI and MCP references (commands, arguments, flags). EM-03.3, EM-04.5, EM-05.4, EM-07.3 to EM-07.5, EM-13.4 and PL-01.2 ticked. |
+| 2026-10-29 | Phase 1 W4: the SMTP server. `sendmock-smtp` splits a socket-free session state machine (EHLO, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH PLAIN, LOGIN and CRAM-MD5 in `accept-any`, `none` and `file:` modes, require-TLS, a recipient allowlist) from the tokio listener; STARTTLS and the optional SMTPS listener (`--smtps-addr`) use rustls with a certificate generated on first run beside the database, or `--smtp-tls-cert` and `--smtp-tls-key`. Each session is recorded in `smtp_sessions` (migration `0003`) with its masked transcript and email ids. New flags `--smtp-max-size`, `--smtp-auth`, `--smtp-require-tls`, `--smtp-allow-rcpt`; the ready line gains `smtp_addr`. Tests over real TCP include 500 sessions at once. EM-01.1 to EM-01.4, EM-01.6, EM-02 (accepted) and EM-09.2 ticked. New dependencies `rustls`, `tokio-rustls`, `rcgen`, `hmac`, `md-5`. |
