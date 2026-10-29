@@ -59,6 +59,14 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_SMTP_ALLOW_RCPT", value_name = "GLOBS")]
     pub smtp_allow_rcpt: Option<String>,
 
+    /// The most emails kept; older ones (and older SMTP and API log entries) are pruned [default: 1000]
+    #[arg(long, env = "SENDMOCK_MAX_EMAILS", value_name = "COUNT")]
+    pub max_emails: Option<u64>,
+
+    /// Prune traffic older than this, such as 7d [default: keep until the count limit]
+    #[arg(long, env = "SENDMOCK_MAX_AGE", value_name = "DAYS")]
+    pub max_age: Option<String>,
+
     /// Database file, or `memory` to keep nothing after exit [default: sendmock.db in the OS data folder]
     #[arg(long = "db", env = "SENDMOCK_DB", value_name = "PATH|memory")]
     pub database_setting: Option<String>,

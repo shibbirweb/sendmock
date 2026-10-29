@@ -78,6 +78,14 @@ async fn prepare_sample_inputs(
                 json!({ "seed_toml": "[[mystery]]\nkey = 1\n" }),
             ],
         ),
+        ("getSettings", vec![json!({})]),
+        (
+            "patchSettings",
+            vec![
+                json!({ "max_emails": 500, "max_age_days": null, "relay_smtp_url": "smtp://mailer:s3cret@relay.test:587" }),
+            ],
+        ),
+        ("postReset", vec![json!({})]),
         (
             "getEventsRecent",
             vec![

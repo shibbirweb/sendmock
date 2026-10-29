@@ -1,7 +1,7 @@
-use sendmock_mail::{EmailEnvelope, IncomingEmail, IngestOptions};
+use sendmock_mail::{EmailEnvelope, IncomingEmail};
 use sendmock_store::SmtpSessionRecord;
 
-use crate::{OperationContext, OperationError, publish_email_received};
+use crate::{OperationContext, OperationError, publish_email_received, read_ingest_options};
 
 /// A message as an SMTP session received it.
 #[derive(Debug, Clone)]
@@ -32,7 +32,10 @@ pub async fn store_smtp_message(
     };
     let stored_email = operation_context
         .email_ingest_service
-        .ingest(incoming_email, &IngestOptions::default())
+        .ingest(
+            incoming_email,
+            &read_ingest_options(operation_context).await?,
+        )
         .await
         .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
     publish_email_received(operation_context, &stored_email);

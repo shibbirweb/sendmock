@@ -14,6 +14,7 @@ mod operation_error;
 mod operation_registry;
 mod page_of;
 mod seed;
+mod settings;
 mod smtp_delivery;
 mod system;
 
@@ -43,6 +44,10 @@ pub use seed::{
     SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError, ValidateSeedOperation,
     validate_seed_toml,
 };
+pub use settings::{
+    AppSettings, AppSettingsStore, AppSettingsUpdate, UpdateCheckMode, build_ingest_options,
+    prune_traffic, read_ingest_options,
+};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
 
@@ -55,5 +60,6 @@ pub fn build_operation_registry() -> OperationRegistry {
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
+    settings::register_settings_operations(&mut operation_registry);
     operation_registry
 }

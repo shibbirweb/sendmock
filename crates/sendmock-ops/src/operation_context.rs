@@ -2,9 +2,11 @@ use std::sync::Arc;
 
 use sendmock_core::{Clock, IdGenerator};
 use sendmock_mail::EmailIngestService;
-use sendmock_store::{ApiRequestRepository, Database, EmailRepository, SmtpSessionRepository};
+use sendmock_store::{
+    ApiRequestRepository, Database, EmailRepository, SettingsRepository, SmtpSessionRepository,
+};
 
-use crate::{EventBus, InstanceDetails};
+use crate::{AppSettingsStore, EventBus, InstanceDetails};
 
 /// The dependencies operations run with, passed in rather than reached through globals.
 #[derive(Clone)]
@@ -18,6 +20,7 @@ pub struct OperationContext {
     pub smtp_session_repository: SmtpSessionRepository,
     pub api_request_repository: ApiRequestRepository,
     pub event_bus: EventBus,
+    pub settings_store: AppSettingsStore,
 }
 
 impl OperationContext {
@@ -36,6 +39,7 @@ impl OperationContext {
         );
         let smtp_session_repository = SmtpSessionRepository::new(Arc::clone(&database));
         let api_request_repository = ApiRequestRepository::new(Arc::clone(&database));
+        let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
         Self {
             smtp_session_repository,
             api_request_repository,
@@ -46,6 +50,7 @@ impl OperationContext {
             email_repository,
             email_ingest_service,
             event_bus: EventBus::default(),
+            settings_store,
         }
     }
 }

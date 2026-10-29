@@ -542,5 +542,89 @@ expression: command_descriptions
     "mcp": [
       "sendmock_logs_http_get"
     ]
+  },
+  {
+    "command": "sendmock settings get",
+    "usage": "sendmock settings get",
+    "summary": "Every runtime setting.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/settings",
+        "operation_id": "getSettings",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_settings_get"
+    ]
+  },
+  {
+    "command": "sendmock settings set",
+    "usage": "sendmock settings set",
+    "summary": "Change settings; send only the changed keys.",
+    "arguments": [],
+    "flags": [
+      "--chaos-smtp-command-latency-ms",
+      "--chaos-smtp-reject-code",
+      "--chaos-smtp-reject-next-count",
+      "--chaos-smtp-reject-recipient-pattern",
+      "--email-outcome-bounce-rate-percent",
+      "--email-outcome-complaint-rate-percent",
+      "--email-outcome-profile",
+      "--fire-opened-events-on-view",
+      "--inbound-email-domain",
+      "--chaos-smtp-drop-during-data-enabled",
+      "--magic-addresses-enabled",
+      "--magic-numbers-enabled",
+      "--plus-address-tagging-enabled",
+      "--strict-twilio-test-mode",
+      "--max-age-days",
+      "--max-emails",
+      "--max-sms",
+      "--opened-event-mode",
+      "--otp-pattern",
+      "--payment-default-currency",
+      "--payment-merchant-name",
+      "--payment-outcome-profile",
+      "--payment-random-success-rate-percent",
+      "--relay-recipient-allowlist",
+      "--relay-smtp-url",
+      "--sms-failure-rate-percent",
+      "--sms-simulation-profile",
+      "--spamassassin-address",
+      "--update-check-mode"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/settings",
+        "operation_id": "patchSettings",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_settings_update"
+    ]
+  },
+  {
+    "command": "sendmock reset",
+    "usage": "sendmock reset --yes",
+    "summary": "Delete all traffic and restore the seed configuration.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/reset",
+        "operation_id": "postReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_reset"
+    ]
   }
 ]

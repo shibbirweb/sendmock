@@ -20,6 +20,8 @@ pub struct ConfigFile {
     pub smtp_tls_key: Option<PathBuf>,
     pub smtp_require_tls: Option<bool>,
     pub smtp_allow_rcpt: Option<String>,
+    pub max_emails: Option<u64>,
+    pub max_age: Option<String>,
     pub db: Option<String>,
     pub log_format: Option<LogFormat>,
     pub log_level: Option<LogLevel>,

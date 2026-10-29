@@ -73,7 +73,7 @@ UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage).
 UI in U1, backend per feature phase.
 
 - [ ] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`.
-- [ ] PL-05.2 Invalid values are rejected with a field-level error.
+- [x] PL-05.2 Invalid values are rejected with a field-level error. (#48)
 - [ ] PL-05.3 Each section saves only its own changes, Save is disabled until something changed, and Discard restores the saved values.
 - [ ] PL-05.4 Reset to seed and the delete-all buttons ask for confirmation before acting.
 - [ ] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`.

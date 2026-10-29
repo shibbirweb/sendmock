@@ -1,12 +1,12 @@
 use sendmock_core::format_rfc5322;
-use sendmock_mail::{EmailEnvelope, IncomingEmail, IngestOptions, build_raw_message, parse_email};
+use sendmock_mail::{EmailEnvelope, IncomingEmail, build_raw_message, parse_email};
 
 use super::email_inputs::RawMessageInput;
 use super::lookups::NativeSendResult;
 use super::native_send_request::{NativeSendRequest, read_bare_address};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, RawBodyInput,
-    RequestLogSettings, SuccessStatus, publish_email_received,
+    RequestLogSettings, SuccessStatus, publish_email_received, read_ingest_options,
 };
 
 /// Native sends appear in the API request log, linked to the email they created.
@@ -59,7 +59,10 @@ impl Operation for SendEmailOperation {
         incoming_email.extra_tags = input.tags.clone().unwrap_or_default();
         let stored_email = operation_context
             .email_ingest_service
-            .ingest(incoming_email, &IngestOptions::default())
+            .ingest(
+                incoming_email,
+                &read_ingest_options(operation_context).await?,
+            )
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
         publish_email_received(operation_context, &stored_email);
@@ -120,7 +123,7 @@ impl Operation for SendRawEmailOperation {
             .email_ingest_service
             .ingest(
                 IncomingEmail::sent_by_app(raw_message, envelope, "sendmail"),
-                &IngestOptions::default(),
+                &read_ingest_options(operation_context).await?,
             )
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;

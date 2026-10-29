@@ -13,6 +13,7 @@ use tokio::task::JoinSet;
 use crate::config::ServerConfig;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
+use crate::retention_task::{apply_retention_flags, run_retention_task};
 use crate::shutdown_signal::wait_for_shutdown_signal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
@@ -45,13 +46,19 @@ pub async fn run_server(
         Arc::new(EmbeddedUiAssets),
     );
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
-    let mut smtp_listeners = start_smtp_listeners(
+    let shutdown_receiver_for_retention = shutdown_receiver.clone();
+    let mut background_tasks = start_smtp_listeners(
         server_config,
         &operation_context,
         listeners.smtp_listener,
         listeners.smtps_listener,
         shutdown_receiver,
     )?;
+    apply_retention_flags(server_config, &operation_context).await;
+    background_tasks.spawn(run_retention_task(
+        operation_context.clone(),
+        shutdown_receiver_for_retention,
+    ));
     announce_ready(
         server_config,
         &listeners.http_addr,
@@ -68,7 +75,7 @@ pub async fn run_server(
             address: listeners.http_addr,
             source,
         })?;
-    while smtp_listeners.join_next().await.is_some() {}
+    while background_tasks.join_next().await.is_some() {}
     tracing::info!("SendMock stopped");
     Ok(())
 }
