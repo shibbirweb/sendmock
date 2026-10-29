@@ -161,8 +161,11 @@ jobs:
       - name: File size (500-line limit, 300-line warning)
         run: bun scripts/rust-file-lines.ts
 
+      # The SMTP load test holds 1000 sockets, as in the Tests step above.
       - name: Coverage
-        run: cargo llvm-cov nextest --workspace --locked --json --summary-only --output-path coverage.json
+        run: |
+          ulimit -n 4096
+          cargo llvm-cov nextest --workspace --locked --json --summary-only --output-path coverage.json
 
       - name: Coverage gate (80% overall, 90% operations and domain; table on the job page)
         run: bun scripts/rust-coverage.ts coverage.json

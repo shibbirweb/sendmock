@@ -8,11 +8,13 @@ use std::io;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use support::smtp_test_client::{build_test_message, connect, reply_code};
+use support::smtp_test_client::{SmtpTestClient, build_test_message, connect, reply_code};
 use support::test_smtp_server::{TestServerOptions, TestSmtpServer};
+use tokio::net::TcpStream;
 use tokio::sync::Barrier;
 
 const CONCURRENT_SESSION_COUNT: usize = 500;
+const LOAD_TEST_TIMEOUT: Duration = Duration::from_secs(120);
 
 // AC: EM-01.1
 // AC: EM-01.2
@@ -173,27 +175,41 @@ async fn handles_500_sessions_open_at_the_same_time() -> io::Result<()> {
         let smtp_addr = server.smtp_addr;
         let all_connected = Arc::clone(&all_connected);
         sessions.spawn(async move {
-            let mut client = connect(smtp_addr).await?;
+            // Every session reaches the barrier, even one whose connect failed,
+            // so a single failure ends the test instead of blocking the other sessions.
+            let connect_result = connect(smtp_addr).await;
             all_connected.wait().await;
-            client.command("EHLO app.test").await?;
-            let subject = format!("Concurrent {session_number}");
-            let final_reply = client
-                .send_message(
-                    "app@shop.test",
-                    &["load@one.test"],
-                    &build_test_message(&subject, "load@one.test", None),
-                )
-                .await?;
-            client.command("QUIT").await?;
-            Ok::<u16, io::Error>(reply_code(&final_reply))
+            send_one_concurrent_message(connect_result?, session_number).await
         });
     }
-    let mut final_codes = Vec::new();
-    while let Some(session_result) = sessions.join_next().await {
-        final_codes.push(session_result.map_err(io::Error::other)??);
-    }
+    let final_codes = tokio::time::timeout(LOAD_TEST_TIMEOUT, async {
+        let mut final_codes = Vec::new();
+        while let Some(session_result) = sessions.join_next().await {
+            final_codes.push(session_result.map_err(io::Error::other)??);
+        }
+        Ok::<Vec<u16>, io::Error>(final_codes)
+    })
+    .await
+    .map_err(|_| io::Error::new(io::ErrorKind::TimedOut, "the sessions did not finish"))??;
 
     assert!(final_codes.iter().all(|final_code| *final_code == 250));
     assert_eq!(server.list_emails().await?.len(), CONCURRENT_SESSION_COUNT);
     Ok(())
+}
+
+async fn send_one_concurrent_message(
+    mut client: SmtpTestClient<TcpStream>,
+    session_number: usize,
+) -> io::Result<u16> {
+    client.command("EHLO app.test").await?;
+    let subject = format!("Concurrent {session_number}");
+    let final_reply = client
+        .send_message(
+            "app@shop.test",
+            &["load@one.test"],
+            &build_test_message(&subject, "load@one.test", None),
+        )
+        .await?;
+    client.command("QUIT").await?;
+    Ok(reply_code(&final_reply))
 }
