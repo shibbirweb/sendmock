@@ -13,6 +13,7 @@ mod sms;
 mod smtp_session;
 mod store_error;
 mod verify;
+mod webhook_delivery;
 mod webhook_endpoint;
 
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
@@ -41,6 +42,10 @@ pub use store_error::StoreError;
 pub use verify::{
     VerificationFilter, VerificationPage, VerificationRecord, VerificationRepository,
     VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,
+};
+pub use webhook_delivery::{
+    DeliveryAttemptResult, WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord,
+    WebhookDeliveryRepository,
 };
 pub use webhook_endpoint::{
     WebhookEndpointRecord, WebhookEndpointRepository, WebhookSecretRotation,

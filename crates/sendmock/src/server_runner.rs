@@ -16,6 +16,7 @@ use tokio::task::JoinSet;
 use crate::config::ServerConfig;
 use crate::http_media_fetcher::HttpMediaFetcher;
 use crate::http_status_callback_sender::HttpStatusCallbackSender;
+use crate::http_webhook_sender::HttpWebhookSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
 use crate::provider_listeners::{
@@ -26,6 +27,7 @@ use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
 use crate::update_check_task::{build_update_checker, run_update_check_task};
+use crate::webhook_dispatch_task::run_webhook_dispatch_task;
 
 /// Where harnesses that prefer a URL reach the MCP server.
 const MCP_HTTP_PATH: &str = "/mcp";
@@ -57,8 +59,7 @@ pub async fn run_server(
     let operation_context = build_operation_context(database, &listeners);
     let app_router = build_http_router(server_config, &operation_context, &listeners.addresses);
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
-    let shutdown_receiver_for_retention = shutdown_receiver.clone();
-    let shutdown_receiver_for_update_check = shutdown_receiver.clone();
+    let shutdown_receiver_for_tasks = shutdown_receiver.clone();
     let shutdown_receiver_for_providers = shutdown_receiver.clone();
     let mut background_tasks = start_smtp_listeners(
         server_config,
@@ -75,14 +76,11 @@ pub async fn run_server(
     );
     apply_startup_settings(server_config, &operation_context).await;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
-    background_tasks.spawn(run_update_check_task(
-        operation_context.clone(),
-        shutdown_receiver_for_update_check,
-    ));
-    background_tasks.spawn(run_retention_task(
-        operation_context.clone(),
-        shutdown_receiver_for_retention,
-    ));
+    spawn_background_tasks(
+        &mut background_tasks,
+        &operation_context,
+        &shutdown_receiver_for_tasks,
+    );
     announce_ready(server_config, &listeners.addresses, &operation_context);
     let http_shutdown = async move {
         shutdown_signal.wait().await;
@@ -152,6 +150,26 @@ fn build_http_router(
     apply_access_control(app_router, server_config.access_control.clone())
 }
 
+/// The update check, the retention trim and the webhook dispatcher, each stopping on shutdown.
+fn spawn_background_tasks(
+    background_tasks: &mut JoinSet<()>,
+    operation_context: &OperationContext,
+    shutdown_receiver: &watch::Receiver<bool>,
+) {
+    background_tasks.spawn(run_update_check_task(
+        operation_context.clone(),
+        shutdown_receiver.clone(),
+    ));
+    background_tasks.spawn(run_retention_task(
+        operation_context.clone(),
+        shutdown_receiver.clone(),
+    ));
+    background_tasks.spawn(run_webhook_dispatch_task(
+        operation_context.clone(),
+        shutdown_receiver.clone(),
+    ));
+}
+
 /// The context every operation runs with, able to send samples through the SMTP listener.
 fn build_operation_context(database: Database, listeners: &BoundListeners) -> OperationContext {
     let clock: Arc<dyn Clock> = Arc::new(SystemClock);
@@ -175,10 +193,14 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),
         None => operation_context,
     };
-    match HttpStatusCallbackSender::new() {
+    let operation_context = match HttpStatusCallbackSender::new() {
         Some(callback_sender) => {
             operation_context.with_status_callback_sender(Arc::new(callback_sender))
         }
+        None => operation_context,
+    };
+    match HttpWebhookSender::new() {
+        Some(webhook_sender) => operation_context.with_webhook_sender(Arc::new(webhook_sender)),
         None => operation_context,
     }
 }

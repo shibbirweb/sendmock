@@ -8,9 +8,10 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    AnswerKind, AppSettingsUpdate, InstanceDetails, MessageProviderInput, OperationContext,
-    OperationRegistry, ReleaseChannel, SampleEmail, SampleEmailSender, SmtpMessage, SuccessStatus,
-    UpdateCheckMode, build_operation_registry, builtin_sms_providers, store_smtp_message,
+    AnswerKind, AppEvent, AppSettingsUpdate, DeliveryOrder, DeliveryTrigger, InstanceDetails,
+    MessageProviderInput, OperationContext, OperationRegistry, ReleaseChannel, SampleEmail,
+    SampleEmailSender, SmtpMessage, SuccessStatus, UpdateCheckMode, build_operation_registry,
+    builtin_sms_providers, enqueue_webhook_delivery, run_due_deliveries, store_smtp_message,
 };
 use sendmock_store::{
     ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
@@ -125,6 +126,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
+    samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
     samples
 }
 
@@ -351,6 +353,78 @@ async fn prepare_webhook_endpoint_samples(
         (
             "deleteWebhooksEndpointsByEndpointId",
             vec![json!({ "endpoint_id": deleted_endpoint_id })],
+        ),
+    ]
+}
+
+/// Queues one delivery of a sample event to a new endpoint, without sending it.
+async fn queue_sample_delivery(
+    operation_context: &OperationContext,
+    endpoint_id: &str,
+    event_id: &str,
+) -> String {
+    let stored_endpoint = operation_context
+        .webhook_endpoint_repository
+        .find_endpoint(endpoint_id)
+        .await
+        .ok()
+        .flatten()
+        .unwrap_or_else(|| panic!("the endpoint {endpoint_id} exists"));
+    let delivery_order = DeliveryOrder {
+        app_event: AppEvent {
+            id: event_id.to_owned(),
+            event_type: "email.received".to_owned(),
+            created_at: "2026-01-01T00:00:00Z".to_owned(),
+            data: json!({ "subject": "Welcome" }),
+        },
+        subject_id: None,
+        rule_id: None,
+        delivery_trigger: DeliveryTrigger::Manual,
+    };
+    enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order)
+        .await
+        .unwrap_or_else(|error| panic!("the delivery is queued: {error}"))
+        .delivery_id
+}
+
+/// A finished delivery (sent without an HTTP client, so it fails and waits to retry) for
+/// the list, the detail and wait, and a queued one to cancel.
+async fn prepare_webhook_delivery_samples(
+    app_router: &axum::Router,
+    operation_context: &OperationContext,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let endpoint = post_json(
+        app_router,
+        "/api/v1/webhooks/endpoints",
+        &webhook_endpoint_sample("Deliveries"),
+    )
+    .await;
+    let endpoint_id = endpoint["id"].as_str().unwrap_or_default();
+    let sent_delivery_id = queue_sample_delivery(operation_context, endpoint_id, "evt_sent").await;
+    run_due_deliveries(operation_context, 8)
+        .await
+        .unwrap_or_else(|error| panic!("the pass runs: {error}"));
+    let queued_delivery_id =
+        queue_sample_delivery(operation_context, endpoint_id, "evt_queued").await;
+    vec![
+        (
+            "getWebhooksDeliveries",
+            vec![
+                json!({}),
+                json!({ "status": "failed,pending", "limit": 10 }),
+            ],
+        ),
+        (
+            "getWebhooksDeliveriesByDeliveryId",
+            vec![json!({ "delivery_id": sent_delivery_id })],
+        ),
+        (
+            "postWebhooksDeliveriesByDeliveryIdCancel",
+            vec![json!({ "delivery_id": queued_delivery_id })],
+        ),
+        (
+            "getWaitWebhook",
+            vec![json!({ "endpoint": "Deliveries", "event": "email.received", "timeout": "1s" })],
         ),
     ]
 }

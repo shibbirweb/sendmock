@@ -32,6 +32,7 @@ jsonschema.workspace = true
 serde_yaml_ng.workspace = true
 tempfile.workspace = true
 sendmock-store.workspace = true
+sendmock-webhooks.workspace = true
 tokio = { workspace = true, features = [
     "io-util",
 ] }

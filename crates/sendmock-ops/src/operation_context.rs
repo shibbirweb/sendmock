@@ -6,12 +6,12 @@ use sendmock_store::{
     ApiRequestRepository, Database, EmailRepository, MessageProviderRepository,
     MessagingServiceRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
     SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookEndpointRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
 };
 
 use crate::{
     AppSettingsStore, EventBus, InstanceDetails, MediaFetcher, SampleEmailSender,
-    StatusCallbackSender, UpdateChecker,
+    StatusCallbackSender, UpdateChecker, WebhookSender,
 };
 
 /// The dependencies operations run with, passed in rather than reached through globals.
@@ -34,6 +34,12 @@ pub struct OperationContext {
     /// Provider definitions changed from the shipped ones, and custom providers.
     pub message_provider_repository: MessageProviderRepository,
     pub webhook_endpoint_repository: WebhookEndpointRepository,
+    /// Delivery attempts; the rows are also the persistent delivery queue.
+    pub webhook_delivery_repository: WebhookDeliveryRepository,
+    /// Wakes the webhook dispatcher when a delivery is queued.
+    pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
+    /// Sends webhook requests; set by the binary, which owns the HTTP client.
+    pub webhook_sender: Option<Arc<dyn WebhookSender>>,
     /// Decides random SMS failures; tests pass a seeded one.
     pub random_source: Arc<dyn RandomSource>,
     pub event_bus: EventBus,
@@ -72,6 +78,7 @@ impl OperationContext {
         let verification_repository = VerificationRepository::new(Arc::clone(&database));
         let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         let webhook_endpoint_repository = WebhookEndpointRepository::new(Arc::clone(&database));
+        let webhook_delivery_repository = WebhookDeliveryRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
@@ -83,6 +90,9 @@ impl OperationContext {
             verification_repository,
             message_provider_repository,
             webhook_endpoint_repository,
+            webhook_delivery_repository,
+            webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
+            webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
             database,
             clock,
@@ -109,6 +119,11 @@ impl OperationContext {
         status_callback_sender: Arc<dyn StatusCallbackSender>,
     ) -> Self {
         self.status_callback_sender = Some(status_callback_sender);
+        self
+    }
+
+    pub fn with_webhook_sender(mut self, webhook_sender: Arc<dyn WebhookSender>) -> Self {
+        self.webhook_sender = Some(webhook_sender);
         self
     }
 

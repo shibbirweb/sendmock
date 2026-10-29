@@ -2169,6 +2169,7 @@ dependencies = [
  "sendmock-core",
  "sendmock-ops",
  "sendmock-store",
+ "sendmock-webhooks",
  "serde",
  "serde_json",
  "serde_urlencoded",

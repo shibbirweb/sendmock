@@ -87,7 +87,11 @@ pub use updates::{
     UpdateCheckResult, UpdateChecker,
 };
 pub use verify::{Verification, VerificationDetail, VerifyService, find_newest_verification};
-pub use webhooks::{RevealedEndpointSecret, WebhookEndpoint};
+pub use webhooks::{
+    DeliveryOrder, DeliveryTrigger, RevealedEndpointSecret, WebhookDelivery, WebhookDeliveryDetail,
+    WebhookEndpoint, WebhookSendFailure, WebhookSendResult, WebhookSender,
+    enqueue_webhook_delivery, run_due_deliveries, run_webhook_dispatcher,
+};
 
 /// Every operation this build of SendMock serves.
 pub fn build_operation_registry() -> OperationRegistry {

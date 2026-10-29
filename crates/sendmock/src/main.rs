@@ -6,7 +6,9 @@ mod config;
 mod github_release_source;
 mod help_output;
 mod http_media_fetcher;
+mod http_response_recording;
 mod http_status_callback_sender;
+mod http_webhook_sender;
 mod instance_details_builder;
 mod listener_binding;
 mod logging;
@@ -23,6 +25,7 @@ mod startup_error;
 mod tls_provider;
 mod update_check_task;
 mod version_output;
+mod webhook_dispatch_task;
 
 use std::process::ExitCode;
 

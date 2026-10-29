@@ -1526,6 +1526,94 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook deliveries list",
+    "usage": "sendmock webhook deliveries list",
+    "summary": "Every webhook request sent, newest first.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--endpoint-id",
+      "--event-type",
+      "--limit",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/deliveries",
+        "operation_id": "getWebhooksDeliveries",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries show",
+    "usage": "sendmock webhook deliveries show <deliveryId>",
+    "summary": "One delivery: request, response and every attempt.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}",
+        "operation_id": "getWebhooksDeliveriesByDeliveryId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries cancel",
+    "usage": "sendmock webhook deliveries cancel <deliveryId>",
+    "summary": "Stop the remaining retries.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}/cancel",
+        "operation_id": "postWebhooksDeliveriesByDeliveryIdCancel",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_cancel"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries wait",
+    "usage": "sendmock webhook deliveries wait",
+    "summary": "Wait until a matching delivery finishes; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--endpoint",
+      "--event",
+      "--since",
+      "--status",
+      "--timeout"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/webhook",
+        "operation_id": "getWaitWebhook",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_wait"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

@@ -14,6 +14,8 @@ pub enum AppEventType {
     VerifyStarted,
     VerifyChecked,
     VerifyExpired,
+    WebhookDelivered,
+    WebhookFailed,
 }
 
 impl AppEventType {
@@ -28,6 +30,8 @@ impl AppEventType {
             Self::VerifyStarted => "verify.started",
             Self::VerifyChecked => "verify.checked",
             Self::VerifyExpired => "verify.expired",
+            Self::WebhookDelivered => "webhook.delivered",
+            Self::WebhookFailed => "webhook.failed",
         }
     }
 }
