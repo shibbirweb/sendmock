@@ -13,7 +13,9 @@ mod operation_answer;
 mod operation_context;
 mod operation_error;
 mod operation_registry;
+mod outcome_rules;
 mod page_of;
+mod present_value;
 mod samples;
 mod seed;
 mod settings;
@@ -44,6 +46,7 @@ pub use operation_answer::{FileAnswer, NoContent, OperationAnswer};
 pub use operation_context::OperationContext;
 pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};
+pub use outcome_rules::{OutcomeTestResult, SmsOutcomeRule};
 pub use page_of::PageOf;
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
@@ -51,12 +54,14 @@ pub use seed::{
     validate_seed_toml,
 };
 pub use settings::{
-    AppSettings, AppSettingsStore, AppSettingsUpdate, UpdateCheckMode, build_ingest_options,
-    prune_traffic, read_ingest_options,
+    AppSettings, AppSettingsStore, AppSettingsUpdate, SmsSimulationProfile, UpdateCheckMode,
+    build_ingest_options, prune_traffic, read_ingest_options,
 };
 pub use sms::{
-    FetchedMedia, IncomingSms, MediaFetcher, SmsMessage, SmsMessageDetail, SmsThread,
-    apply_status_change, describe_sms_code, find_newest_sms_with_code, store_sms,
+    FetchedMedia, IncomingSms, MediaFetcher, RecordedHttpRequest, RecordedHttpResponse, SmsMessage,
+    SmsMessageDetail, SmsThread, StatusCallbackResult, StatusCallbackSender, apply_status_change,
+    decide_outbound_send, describe_rejection, describe_sms_code, find_newest_sms_with_code,
+    load_custom_outcome_rules, start_sms_delivery, store_sms, to_simulation_profile,
 };
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
@@ -74,6 +79,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
+    outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);

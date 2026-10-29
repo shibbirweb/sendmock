@@ -10,6 +10,7 @@ pub enum AppEventType {
     SmsSent,
     SmsInbound,
     SmsStatus,
+    SmsOpened,
 }
 
 impl AppEventType {
@@ -20,6 +21,7 @@ impl AppEventType {
             Self::SmsSent => "sms.sent",
             Self::SmsInbound => "sms.inbound",
             Self::SmsStatus => "sms.status",
+            Self::SmsOpened => "sms.opened",
         }
     }
 }

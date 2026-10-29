@@ -112,7 +112,52 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
+    samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples
+}
+
+fn sms_outcome_rule_sample(pattern: &str) -> Value {
+    json!({
+        "match_field": "to", "pattern": pattern, "outcome": "undelivered",
+        "error_code": "30007", "delay_seconds": null, "note": "Filtered", "is_enabled": true,
+    })
+}
+
+/// Two custom outcome numbers: one to edit and move, one to delete.
+async fn prepare_outcome_rule_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let path = "/api/v1/outcome-rules/sms";
+    let edited_rule_id =
+        post_json(app_router, path, &sms_outcome_rule_sample("+1555777*")).await["id"].clone();
+    let deleted_rule_id =
+        post_json(app_router, path, &sms_outcome_rule_sample("+1555888*")).await["id"].clone();
+    vec![
+        ("getOutcomeRulesSms", vec![json!({})]),
+        (
+            "postOutcomeRulesSms",
+            vec![sms_outcome_rule_sample("+15559990000")],
+        ),
+        (
+            "patchOutcomeRulesSmsByRuleId",
+            vec![json!({ "rule_id": edited_rule_id, "is_enabled": false })],
+        ),
+        (
+            "postOutcomeRulesSmsByRuleIdMove",
+            vec![json!({ "rule_id": edited_rule_id, "direction": "down" })],
+        ),
+        (
+            "deleteOutcomeRulesSmsByRuleId",
+            vec![json!({ "rule_id": deleted_rule_id })],
+        ),
+        (
+            "postOutcomeRulesSmsTest",
+            vec![
+                json!({ "number": "+15005550001", "match_field": "to" }),
+                json!({ "number": "+1555777000", "match_field": "to" }),
+            ],
+        ),
+    ]
 }
 
 fn mms_sample() -> Value {

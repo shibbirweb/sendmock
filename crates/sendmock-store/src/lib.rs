@@ -5,6 +5,7 @@ mod database;
 mod database_location;
 mod email;
 mod migration;
+mod outcome_rule;
 mod settings;
 mod sms;
 mod smtp_session;
@@ -18,6 +19,7 @@ pub use email::{
     NewAttachmentRecord, NewEmailRecord, StoredEmailAddress, TimelineRecord,
 };
 pub use migration::{EMBEDDED_MIGRATIONS, Migration};
+pub use outcome_rule::{RuleMoveDirection, SmsOutcomeRuleRecord, SmsOutcomeRuleRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
     NewSmsRecord, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord,

@@ -1,18 +1,12 @@
 use schemars::JsonSchema;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 
 use super::app_settings::AppSettings;
 use super::setting_choices::{
     EmailOutcomeProfile, OpenedEventMode, PaymentOutcomeProfile, SmsSimulationProfile,
     UpdateCheckMode,
 };
-
-/// A present key, even when its value is `null`, so `null` can clear a nullable setting.
-fn read_present_value<'de, Value: Deserialize<'de>, Reader: Deserializer<'de>>(
-    reader: Reader,
-) -> Result<Option<Option<Value>>, Reader::Error> {
-    Option::<Value>::deserialize(reader).map(Some)
-}
+use crate::present_value::read_present_value;
 
 /// Only the changed keys; every other setting keeps its value.
 #[derive(Debug, Clone, Default, Deserialize, JsonSchema)]

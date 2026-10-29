@@ -4,6 +4,7 @@ use serde_json::json;
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
 use super::sms_inputs::{SmsReference, SmsStatusUpdate};
 use super::sms_views::SmsMessage;
+use super::status_callback::send_status_callback;
 use crate::{
     AppEventType, HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
     OperationError, SuccessStatus, publish_event,
@@ -138,12 +139,22 @@ impl Operation for SetSmsStatusOperation {
             at_unix_ms: operation_context.clock.now_unix_ms(),
         };
         let updated_sms =
-            apply_status_change(operation_context, &input.sms_id, status_change).await?;
+            apply_status_change(operation_context, &input.sms_id, status_change.clone()).await?;
+        let background_context = operation_context.clone();
+        let sms_for_callback = updated_sms.clone();
+        tokio::spawn(async move {
+            if let Err(callback_error) =
+                send_status_callback(&background_context, &sms_for_callback, &status_change).await
+            {
+                tracing::warn!(error = %callback_error, "could not record the status callback");
+            }
+        });
         load_sms_detail(operation_context, updated_sms).await
     }
 }
 
-/// Records a status change and publishes `sms.status`; the status callback follows in W3.
+/// Records a status change and publishes `sms.status`; callers send the status callback, so
+/// callbacks for one message keep their order.
 pub async fn apply_status_change(
     operation_context: &OperationContext,
     sms_id: &str,

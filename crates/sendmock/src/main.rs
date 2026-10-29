@@ -6,6 +6,7 @@ mod config;
 mod github_release_source;
 mod help_output;
 mod http_media_fetcher;
+mod http_status_callback_sender;
 mod instance_details_builder;
 mod listener_binding;
 mod logging;

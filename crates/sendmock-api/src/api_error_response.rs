@@ -51,7 +51,9 @@ impl ApiErrorResponse {
 impl From<OperationError> for ApiErrorResponse {
     fn from(operation_error: OperationError) -> Self {
         let status = match &operation_error {
-            OperationError::InvalidInput { .. } => StatusCode::BAD_REQUEST,
+            OperationError::InvalidInput { .. } | OperationError::Rejected { .. } => {
+                StatusCode::BAD_REQUEST
+            }
             OperationError::NotFound { .. } => StatusCode::NOT_FOUND,
             OperationError::Timeout { .. } => StatusCode::REQUEST_TIMEOUT,
             OperationError::Conflict { .. } => StatusCode::CONFLICT,

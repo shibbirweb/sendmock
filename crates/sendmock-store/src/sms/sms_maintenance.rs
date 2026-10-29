@@ -33,6 +33,23 @@ impl SmsRepository {
             .await
     }
 
+    /// Records that the recipient read the message; false when it is gone.
+    pub async fn record_read_receipt(
+        &self,
+        sms_id: &str,
+        read_at_unix_ms: i64,
+    ) -> Result<bool, StoreError> {
+        let sms_id = sms_id.to_owned();
+        self.database()
+            .write(move |connection| {
+                Ok(connection.execute(
+                    "UPDATE sms_messages SET opened_at = COALESCE(opened_at, ?2), open_count = open_count + 1, updated_at = ?2 WHERE id = ?1",
+                    params![sms_id, read_at_unix_ms],
+                )? > 0)
+            })
+            .await
+    }
+
     /// Keeps the newest `max_count` messages and drops those created before the cutoff.
     pub async fn prune_messages(
         &self,

@@ -11,6 +11,13 @@ use tower::ServiceExt;
 
 /// The whole HTTP surface over a fresh in-memory database, with its context for direct checks.
 pub fn build_test_app() -> (axum::Router, OperationContext) {
+    build_test_app_with(|operation_context| operation_context)
+}
+
+/// Like `build_test_app`, with fakes such as a status callback sender put into the context.
+pub fn build_test_app_with(
+    configure_context: impl FnOnce(OperationContext) -> OperationContext,
+) -> (axum::Router, OperationContext) {
     let database = Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)
         .unwrap_or_else(|error| panic!("an in-memory database: {error}"));
     let operation_context = OperationContext::new(
@@ -27,6 +34,7 @@ pub fn build_test_app() -> (axum::Router, OperationContext) {
             is_container: false,
         },
     );
+    let operation_context = configure_context(operation_context);
     let app_router = build_app_router(
         &build_operation_registry(),
         &operation_context,

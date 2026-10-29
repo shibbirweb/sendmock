@@ -1,7 +1,11 @@
+use sendmock_sms::SendDecision;
+
+use super::sms_delivery_runner::start_sms_delivery;
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
 use super::sms_ingest::{IncomingSms, store_sms};
 use super::sms_inputs::{InboundSmsRequest, NativeSmsRequest};
 use super::sms_media_intake::{MediaProblem, accept_media};
+use super::sms_send_decision::{decide_outbound_send, describe_rejection};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
     RequestLogSettings, SuccessStatus,
@@ -44,8 +48,9 @@ impl Operation for SendSmsOperation {
         }
     }
 
-    /// Stores the message as `queued`; a link that cannot be fetched stores it `failed` with
-    /// Twilio's `11200`, as Twilio does.
+    /// Refuses magic and custom reject numbers before storing anything, then stores the message
+    /// as `queued` and starts its delivery simulation. A link that cannot be fetched stores it
+    /// `failed` with Twilio's `11200`, as Twilio does.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -54,48 +59,69 @@ impl Operation for SendSmsOperation {
         require_text("to", &input.to)?;
         require_text("body", &input.body)?;
         require_text("from", &input.from)?;
-        let request_body_json = serde_json::to_string(&serde_json::json!({
-            "from": input.from, "to": input.to, "body": input.body,
-            "status_callback": input.status_callback, "media_urls": input.media_urls,
-        }))
-        .ok();
-        let (media, status, error_code) = match accept_media(
-            operation_context,
-            input.media.as_deref().unwrap_or_default(),
-            input.media_urls.as_deref().unwrap_or_default(),
-        )
-        .await
-        {
-            Ok(accepted_media) => (accepted_media, "queued", None),
-            Err(MediaProblem::Invalid(operation_error)) => return Err(operation_error),
-            Err(MediaProblem::Unfetchable { .. }) => {
-                (Default::default(), "failed", Some("11200".to_owned()))
-            }
-        };
+        let delivery_steps =
+            match decide_outbound_send(operation_context, &input.to, &input.from).await? {
+                SendDecision::Rejected { error_code, reason } => {
+                    return Err(describe_rejection(&error_code, &reason));
+                }
+                SendDecision::Accepted(delivery_steps) => delivery_steps,
+            };
         let sms = store_sms(
             operation_context,
-            IncomingSms {
-                is_inbound: false,
-                api: "native".to_owned(),
-                from: input.from,
-                to: input.to,
-                body: input.body,
-                status: status.to_owned(),
-                error_code,
-                status_callback_url: input.status_callback.filter(|url| !url.trim().is_empty()),
-                messaging_service_sid: None,
-                account: None,
-                metadata_json: input
-                    .metadata
-                    .map(|metadata| serde_json::Value::Object(metadata).to_string()),
-                request_body_json,
-                provider_id: None,
-                media,
-            },
+            build_native_sms(operation_context, input).await?,
         )
         .await?;
+        let sms = if sms.status == "queued" {
+            start_sms_delivery(operation_context, sms, delivery_steps).await?
+        } else {
+            sms
+        };
         load_sms_detail(operation_context, sms).await
     }
+}
+
+/// The message as the native API received it; a media link that cannot be fetched makes it
+/// `failed` with `11200`.
+async fn build_native_sms(
+    operation_context: &OperationContext,
+    input: NativeSmsRequest,
+) -> Result<IncomingSms, OperationError> {
+    let request_body_json = serde_json::to_string(&serde_json::json!({
+        "from": input.from, "to": input.to, "body": input.body,
+        "status_callback": input.status_callback, "media_urls": input.media_urls,
+    }))
+    .ok();
+    let (media, status, error_code) = match accept_media(
+        operation_context,
+        input.media.as_deref().unwrap_or_default(),
+        input.media_urls.as_deref().unwrap_or_default(),
+    )
+    .await
+    {
+        Ok(accepted_media) => (accepted_media, "queued", None),
+        Err(MediaProblem::Invalid(operation_error)) => return Err(operation_error),
+        Err(MediaProblem::Unfetchable { .. }) => {
+            (Default::default(), "failed", Some("11200".to_owned()))
+        }
+    };
+    Ok(IncomingSms {
+        is_inbound: false,
+        api: "native".to_owned(),
+        from: input.from,
+        to: input.to,
+        body: input.body,
+        status: status.to_owned(),
+        error_code,
+        status_callback_url: input.status_callback.filter(|url| !url.trim().is_empty()),
+        messaging_service_sid: None,
+        account: None,
+        metadata_json: input
+            .metadata
+            .map(|metadata| serde_json::Value::Object(metadata).to_string()),
+        request_body_json,
+        provider_id: None,
+        media,
+    })
 }
 
 pub struct SimulateInboundSmsOperation;

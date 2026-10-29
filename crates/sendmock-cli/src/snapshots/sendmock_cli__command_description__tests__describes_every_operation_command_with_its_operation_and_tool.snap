@@ -678,6 +678,160 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock outcome-rule sms list",
+    "usage": "sendmock outcome-rule sms list",
+    "summary": "SMS outcome rules, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/outcome-rules/sms",
+        "operation_id": "getOutcomeRulesSms",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms create",
+    "usage": "sendmock outcome-rule sms create",
+    "summary": "Add an SMS outcome rule.",
+    "arguments": [],
+    "flags": [
+      "--delay-seconds",
+      "--error-code",
+      "--enabled",
+      "--match-field",
+      "--note",
+      "--outcome",
+      "--pattern"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms",
+        "operation_id": "postOutcomeRulesSms",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms update",
+    "usage": "sendmock outcome-rule sms update <ruleId>",
+    "summary": "Change an SMS outcome rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--delay-seconds",
+      "--error-code",
+      "--enabled",
+      "--match-field",
+      "--note",
+      "--outcome",
+      "--pattern"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}",
+        "operation_id": "patchOutcomeRulesSmsByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms delete",
+    "usage": "sendmock outcome-rule sms delete <ruleId>",
+    "summary": "Delete an SMS outcome rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}",
+        "operation_id": "deleteOutcomeRulesSmsByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms move",
+    "usage": "sendmock outcome-rule sms move <ruleId>",
+    "summary": "Move an SMS outcome rule up or down.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}/move",
+        "operation_id": "postOutcomeRulesSmsByRuleIdMove",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms test",
+    "usage": "sendmock outcome-rule sms test <number>",
+    "summary": "Which custom rule, magic number or profile decides a number's outcome.",
+    "arguments": [
+      "number"
+    ],
+    "flags": [
+      "--match-field"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms/test",
+        "operation_id": "postOutcomeRulesSmsTest",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_test"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

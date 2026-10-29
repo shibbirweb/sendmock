@@ -19,6 +19,10 @@ pub enum OperationError {
     #[error("{message}")]
     Conflict { code: &'static str, message: String },
 
+    /// The request is well formed but refused, as a provider refuses a magic test number.
+    #[error("{message}")]
+    Rejected { code: &'static str, message: String },
+
     /// A service SendMock depends on, such as GitHub for the update check, could not answer.
     #[error("{message}")]
     Upstream { code: &'static str, message: String },
@@ -37,7 +41,9 @@ impl OperationError {
             Self::InvalidInput { .. } => "invalid_input",
             Self::NotFound { .. } => "not_found",
             Self::Timeout { .. } => "timeout",
-            Self::Conflict { code, .. } | Self::Upstream { code, .. } => code,
+            Self::Conflict { code, .. }
+            | Self::Rejected { code, .. }
+            | Self::Upstream { code, .. } => code,
             Self::Store(_) | Self::Internal(_) => "internal_error",
         }
     }
@@ -48,6 +54,7 @@ impl OperationError {
             Self::NotFound { .. }
             | Self::Timeout { .. }
             | Self::Conflict { .. }
+            | Self::Rejected { .. }
             | Self::Upstream { .. }
             | Self::Store(_)
             | Self::Internal(_) => None,

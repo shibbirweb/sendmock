@@ -15,6 +15,7 @@ use tokio::task::JoinSet;
 
 use crate::config::ServerConfig;
 use crate::http_media_fetcher::HttpMediaFetcher;
+use crate::http_status_callback_sender::HttpStatusCallbackSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
 use crate::retention_task::{apply_startup_settings, run_retention_task};
@@ -156,8 +157,14 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         listeners.addresses.smtp_addr,
     ))))
     .with_update_checker(build_update_checker());
-    match HttpMediaFetcher::new() {
+    let operation_context = match HttpMediaFetcher::new() {
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),
+        None => operation_context,
+    };
+    match HttpStatusCallbackSender::new() {
+        Some(callback_sender) => {
+            operation_context.with_status_callback_sender(Arc::new(callback_sender))
+        }
         None => operation_context,
     }
 }
