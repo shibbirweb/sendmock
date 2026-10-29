@@ -51,7 +51,11 @@ pub struct ServeArguments {
     )]
     pub smtp_tls_key: Option<PathBuf>,
 
-    /// Refuse MAIL with 530 until the client has run STARTTLS
+    /// Offer STARTTLS on the SMTP port, with a self-signed certificate generated on first run unless --smtp-tls-cert is set
+    #[arg(long, env = "SENDMOCK_SMTP_STARTTLS")]
+    pub smtp_starttls: bool,
+
+    /// Refuse MAIL with 530 until the client has run STARTTLS (turns STARTTLS on)
     #[arg(long, env = "SENDMOCK_SMTP_REQUIRE_TLS")]
     pub smtp_require_tls: bool,
 

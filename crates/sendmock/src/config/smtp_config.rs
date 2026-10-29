@@ -19,6 +19,10 @@ pub struct SmtpConfig {
     pub tls_certificate_file: Option<PathBuf>,
     pub tls_key_file: Option<PathBuf>,
     pub is_tls_required: bool,
+    /// Offer STARTTLS on the SMTP port. Off by default: many mailers (Symfony Mailer and so
+    /// Laravel, Nodemailer, Rails, MailKit) upgrade whenever it is offered and then refuse
+    /// the self-signed certificate. On with `--smtp-starttls`, a certificate or require-TLS.
+    pub is_starttls_offered: bool,
     pub recipient_policy: RecipientPolicy,
 }
 
@@ -29,6 +33,7 @@ impl SmtpConfig {
         config_file: &ConfigFile,
     ) -> Result<Self, ConfigError> {
         let (tls_certificate_file, tls_key_file) = resolve_tls_files(serve_arguments, config_file)?;
+        let has_certificate = tls_certificate_file.is_some();
         Ok(Self {
             smtps_addr: serve_arguments.smtps_addr.or(config_file.smtps_addr),
             max_size_bytes: resolve_max_size_bytes(serve_arguments, config_file)?,
@@ -37,6 +42,11 @@ impl SmtpConfig {
             tls_key_file,
             is_tls_required: serve_arguments.smtp_require_tls
                 || config_file.smtp_require_tls.unwrap_or(false),
+            is_starttls_offered: serve_arguments.smtp_starttls
+                || config_file.smtp_starttls.unwrap_or(false)
+                || serve_arguments.smtp_require_tls
+                || config_file.smtp_require_tls.unwrap_or(false)
+                || has_certificate,
             recipient_policy: serve_arguments
                 .smtp_allow_rcpt
                 .as_ref()
@@ -131,6 +141,7 @@ mod tests {
                 .is_allowed("anyone@anywhere.test")
         );
         assert!(!smtp_config.is_tls_required);
+        assert!(!smtp_config.is_starttls_offered);
         assert_eq!(smtp_config.smtps_addr, None);
     }
 
@@ -193,5 +204,33 @@ mod tests {
         };
 
         assert!(SmtpConfig::resolve(&ServeArguments::default(), &config_file).is_err());
+    }
+
+    // AC: EM-02.1
+    #[test]
+    fn starttls_is_offered_when_asked_for_or_implied() {
+        let asked_for = ServeArguments {
+            smtp_starttls: true,
+            ..ServeArguments::default()
+        };
+        let implied_by_require_tls = ConfigFile {
+            smtp_require_tls: Some(true),
+            ..ConfigFile::default()
+        };
+        let implied_by_certificate = ConfigFile {
+            smtp_tls_cert: Some(PathBuf::from("cert.pem")),
+            smtp_tls_key: Some(PathBuf::from("key.pem")),
+            ..ConfigFile::default()
+        };
+
+        assert!(resolve_smtp_config(&asked_for, &ConfigFile::default()).is_starttls_offered);
+        assert!(
+            resolve_smtp_config(&ServeArguments::default(), &implied_by_require_tls)
+                .is_starttls_offered
+        );
+        assert!(
+            resolve_smtp_config(&ServeArguments::default(), &implied_by_certificate)
+                .is_starttls_offered
+        );
     }
 }

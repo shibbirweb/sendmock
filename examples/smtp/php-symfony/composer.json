@@ -1,0 +1,6 @@
+{
+    "name": "sendmock/example-symfony-mailer",
+    "require": {
+        "symfony/mailer": "^7.3"
+    }
+}

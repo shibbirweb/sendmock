@@ -226,10 +226,14 @@ jobs:
           path: dist
           retention-days: 7
 
+  # Real mailers in eight languages against this commit's SMTP server, before publishing.
+  smtp-clients:
+    uses: ./.github/workflows/smtp-clients.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums]
+    needs: [plan, checksums, smtp-clients]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

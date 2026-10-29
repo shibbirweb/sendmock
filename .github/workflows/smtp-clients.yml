@@ -1,0 +1,191 @@
+# Real mailers in eight languages send to a SendMock release binary, and each message is
+# checked through the API (EM-01.5, EM-06.2, the Phase 1 done-when check). Runs on changes
+# to the SMTP code or the examples, and from Release build before anything is published.
+name: SMTP clients
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-smtp/**
+      - crates/sendmock-mail/**
+      - crates/sendmock/src/sendmail_shim.rs
+      - crates/sendmock/src/sendmail_shim/**
+      - examples/smtp/**
+      - .github/workflows/smtp-clients.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-smtp/**
+      - crates/sendmock-mail/**
+      - examples/smtp/**
+      - .github/workflows/smtp-clients.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  binary:
+    name: Release binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sendmock-for-clients
+          path: target/release/sendmock
+          retention-days: 1
+
+  client:
+    name: ${{ matrix.client }}
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - client: Laravel
+            language: php
+            folder: php-laravel
+            run: ./send-with-laravel.sh
+          - client: Symfony Mailer
+            language: php
+            folder: php-symfony
+            run: composer install --no-interaction --quiet && php send.php
+          - client: PHP mail() through sendmail
+            language: php
+            folder: php-mail
+            run: php -d sendmail_path="$GITHUB_WORKSPACE/sendmock-binary/sendmock sendmail -t -i" send.php
+          - client: Nodemailer
+            language: node
+            folder: node-nodemailer
+            run: bun install && node send.js
+          - client: Python smtplib
+            language: python
+            folder: python-smtplib
+            run: python send.py
+          - client: Django
+            language: python
+            folder: python-django
+            run: pip install --quiet -r requirements.txt && python send.py
+          - client: pytest reads the OTP
+            language: python
+            folder: python-pytest
+            run: pip install --quiet -r requirements.txt && pytest -q
+            checks_itself: true
+          - client: Go net/smtp
+            language: go
+            folder: go-net-smtp
+            run: go run .
+          - client: Spring
+            language: java
+            folder: java-spring
+            run: mvn --quiet --batch-mode compile exec:java
+          - client: lettre
+            language: rust
+            folder: rust-lettre
+            run: cargo run --quiet
+          - client: Action Mailer (Rails)
+            language: ruby
+            folder: ruby-action-mailer
+            run: bundle install --quiet && bundle exec ruby send.rb
+          - client: MailKit
+            language: dotnet
+            folder: dotnet-mailkit
+            run: dotnet run
+    env:
+      SUBJECT: From ${{ matrix.client }}
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: "1025"
+      SENDMOCK_SMTP_ADDR: 127.0.0.1:1025
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-clients
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Start SendMock with its default settings
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: shivammathur/setup-php@v2
+        if: matrix.language == 'php'
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - uses: actions/setup-node@v4
+        if: matrix.language == 'node'
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        if: matrix.language == 'python'
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-go@v5
+        if: matrix.language == 'go'
+        with:
+          go-version: "1.23"
+
+      - uses: actions/setup-java@v4
+        if: matrix.language == 'java'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: ruby/setup-ruby@v1
+        if: matrix.language == 'ruby'
+        with:
+          ruby-version: "3.3"
+
+      - uses: actions/setup-dotnet@v4
+        if: matrix.language == 'dotnet'
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Send with ${{ matrix.client }}
+        working-directory: examples/smtp/${{ matrix.folder }}
+        run: ${{ matrix.run }}
+
+      - name: SendMock stored it, with the code extracted
+        if: ${{ !matrix.checks_itself }}
+        run: bun examples/smtp/check-received.ts "$SUBJECT"
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log

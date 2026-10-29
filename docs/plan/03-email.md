@@ -34,8 +34,10 @@ Custom async implementation on tokio. A full MTA library is unnecessary: we only
 | `--smtp-addr` | `SENDMOCK_SMTP_ADDR` | `127.0.0.1:1025` | listen address |
 | `--smtp-max-size` | `SENDMOCK_SMTP_MAX_SIZE` | `25MB` | reject larger messages with 552 |
 | `--smtp-auth` | `SENDMOCK_SMTP_AUTH` | `accept-any` | `accept-any`, `none` (advertise no AUTH), `file:<path>` |
-| `--smtp-tls-cert`, `--smtp-tls-key` | | auto | custom certificate |
-| `--smtp-require-tls` | | off | refuse `MAIL` before `STARTTLS` |
+| `--smtp-starttls` | `SENDMOCK_SMTP_STARTTLS` | off | offer STARTTLS, with a self-signed certificate generated on first run; off by default because many mailers (Symfony Mailer and so Laravel, Nodemailer, Rails, MailKit) upgrade whenever it is offered and then refuse a self-signed certificate |
+| `--smtps-addr` | `SENDMOCK_SMTPS_ADDR` | off | listen address for implicit TLS (SMTPS) |
+| `--smtp-tls-cert`, `--smtp-tls-key` | `SENDMOCK_SMTP_TLS_CERT`, `SENDMOCK_SMTP_TLS_KEY` | generated | custom certificate; turns STARTTLS on |
+| `--smtp-require-tls` | `SENDMOCK_SMTP_REQUIRE_TLS` | off | refuse `MAIL` before `STARTTLS`; turns STARTTLS on |
 | `--smtp-allow-rcpt` | | `*` | glob list; others get 550 (useful to test bounce handling) |
 
 ### SMTP session log
