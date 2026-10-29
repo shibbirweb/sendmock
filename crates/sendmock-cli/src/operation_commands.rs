@@ -133,7 +133,7 @@ fn build_clap_command(command_name: &'static str, command_node: CommandNode) -> 
         );
     }
     if let Some(operation) = &command_node.operation {
-        command = ClientArguments::augment_args(command.about(operation.definition().summary));
+        command = ClientArguments::augment_args(command).about(operation.definition().summary);
         command = crate::command_arguments::add_operation_arguments(command, operation.as_ref());
     } else {
         command = command.subcommand_required(true);
@@ -185,6 +185,24 @@ mod tests {
 
             assert!(found_command.is_some(), "no command for {cli_usage}");
         }
+    }
+
+    #[test]
+    fn a_command_is_described_by_its_operation_summary() {
+        let operation_registry = sendmock_ops::build_operation_registry();
+        let root_command =
+            Command::new(BINARY_NAME).subcommands(build_operation_commands(&operation_registry));
+
+        let validate_about = root_command
+            .find_subcommand("seed")
+            .and_then(|seed_command| seed_command.find_subcommand("validate"))
+            .and_then(Command::get_about)
+            .map(ToString::to_string);
+
+        assert_eq!(
+            validate_about.as_deref(),
+            Some("Check a seed file without applying it.")
+        );
     }
 
     #[test]

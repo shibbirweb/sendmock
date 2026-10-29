@@ -23,3 +23,12 @@ pub struct SmtpSessionPage {
     pub next_cursor: Option<String>,
     pub total_count: u64,
 }
+
+/// Which sessions to list; every field narrows the list.
+#[derive(Debug, Clone, Default)]
+pub struct SmtpSessionFilter {
+    /// `true` for rejected and aborted sessions, `false` for delivered ones.
+    pub is_failed: Option<bool>,
+    /// Part of the client address, EHLO name or AUTH user.
+    pub search_text: Option<String>,
+}

@@ -88,11 +88,11 @@ Phase 4. Docs: [HTTP send APIs](../03-email.md#http-send-apis).
 
 UI in U1, backend Phase 1.
 
-- [ ] EM-09.1 Every SMTP session, including failed ones, is listed with client, EHLO name, TLS, AUTH user, result and duration.
+- [x] EM-09.1 Every SMTP session, including failed ones, is listed with client, EHLO name, TLS, AUTH user, result and duration. (#48)
 - [x] EM-09.2 The transcript shows every command and reply; AUTH passwords are masked; DATA content is linked, not duplicated. (#48)
-- [ ] EM-09.3 Each stored email links to its session.
-- [ ] EM-09.4 Failed sessions are highlighted with their reason, and the transcript viewer tells commands from replies and colours reply codes by class.
-- [ ] EM-09.5 The session list loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of sessions.
+- [x] EM-09.3 Each stored email links to its session. (#48)
+- [x] EM-09.4 Failed sessions are highlighted with their reason, and the transcript viewer tells commands from replies and colours reply codes by class. (#48)
+- [x] EM-09.5 The session list loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of sessions. (#48)
 
 ## EM-10 Delivery outcome simulation
 

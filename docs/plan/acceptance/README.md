@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 2 / 108 features, 101 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 3 / 108 features, 109 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -67,7 +67,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Not started |
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | In progress |
 | [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Not started |
-| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | In progress |
+| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | Accepted |
 | [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | UI in U1, native events Phase 3, provider formats Phase 4 | 6 | In progress |
 | [EM-11](01-email.md#em-11-email-opened-events) | Email opened events | Phase 3 | 5 | Not started |
 | [EM-12](01-email.md#em-12-tags) | Tags | Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules) | 4 | In progress |

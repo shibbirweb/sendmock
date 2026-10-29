@@ -433,5 +433,114 @@ expression: command_descriptions
     "mcp": [
       "sendmock_email_wait"
     ]
+  },
+  {
+    "command": "sendmock events tail",
+    "usage": "sendmock events tail",
+    "summary": "The latest events, newest first: the polling twin of the live stream.",
+    "arguments": [],
+    "flags": [
+      "--limit",
+      "--since",
+      "--type"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/events/recent",
+        "operation_id": "getEventsRecent",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_events_recent"
+    ]
+  },
+  {
+    "command": "sendmock logs smtp",
+    "usage": "sendmock logs smtp",
+    "summary": "SMTP sessions, newest first, including rejected ones.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--limit",
+      "--query",
+      "--result"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/smtp",
+        "operation_id": "getLogsSmtp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp"
+    ]
+  },
+  {
+    "command": "sendmock logs smtp show",
+    "usage": "sendmock logs smtp show <sessionId>",
+    "summary": "One SMTP session with its transcript.",
+    "arguments": [
+      "sessionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/smtp/{sessionId}",
+        "operation_id": "getLogsSmtpBySessionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp_get"
+    ]
+  },
+  {
+    "command": "sendmock logs http",
+    "usage": "sendmock logs http",
+    "summary": "Requests to the native and provider APIs, newest first.",
+    "arguments": [],
+    "flags": [
+      "--api",
+      "--cursor",
+      "--limit",
+      "--path",
+      "--status-class"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/http",
+        "operation_id": "getLogsHttp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http"
+    ]
+  },
+  {
+    "command": "sendmock logs http show",
+    "usage": "sendmock logs http show <requestId>",
+    "summary": "One API request with its request and response.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/http/{requestId}",
+        "operation_id": "getLogsHttpByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http_get"
+    ]
   }
 ]

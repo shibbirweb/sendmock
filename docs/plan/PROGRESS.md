@@ -13,11 +13,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 2 / 108 accepted (EM-02, PL-02), 101 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 3 / 108 accepted (EM-02, EM-09, PL-02), 109 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W5 are done; next W6 (logs, settings and system), then W7 to W9 in order. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W5 are done and W6 is under way (logs done; next settings, reset and retention, then samples, integrations and the update check), then W7 to W9 in order. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -220,7 +220,7 @@ Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29
 - [x] Native HTTP send API (`POST /api/v1/send`) (#48)
 - [x] `POST /send/raw` and `GET /emails/latest` (#48)
 - [x] SSE `/events` and `GET /events/recent` (#48)
-- [ ] SMTP session log and HTTP API request log
+- [x] SMTP session log and HTTP API request log (#48)
 - [ ] Plus-address tagging, MIME tree, thumbnails, List-Unsubscribe check
 - [ ] `wait/email`, `otp`, `links`, `reset`; `--ready-json`
 - [ ] CLI `email` / `otp` / `links`; MCP `core`, `email`, `extract` toolsets
@@ -530,3 +530,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 1 W3: 17 email operations in REST, CLI and MCP (list and search, latest, show, update read state and tags, delete one and all, timeline, MIME, List-Unsubscribe check, raw, attachment, thumbnail, native send with field errors, send raw, `otp`, `links`, `wait/email` with 408), checked against the frozen contract with real answers and against the CLI and MCP references (commands, arguments, flags). EM-03.3, EM-04.5, EM-05.4, EM-07.3 to EM-07.5, EM-13.4 and PL-01.2 ticked. |
 | 2026-10-29 | Phase 1 W4: the SMTP server. `sendmock-smtp` splits a socket-free session state machine (EHLO, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH PLAIN, LOGIN and CRAM-MD5 in `accept-any`, `none` and `file:` modes, require-TLS, a recipient allowlist) from the tokio listener; STARTTLS and the optional SMTPS listener (`--smtps-addr`) use rustls with a certificate generated on first run beside the database, or `--smtp-tls-cert` and `--smtp-tls-key`. Each session is recorded in `smtp_sessions` (migration `0003`) with its masked transcript and email ids. New flags `--smtp-max-size`, `--smtp-auth`, `--smtp-require-tls`, `--smtp-allow-rcpt`; the ready line gains `smtp_addr`. Tests over real TCP include 500 sessions at once. EM-01.1 to EM-01.4, EM-01.6, EM-02 (accepted) and EM-09.2 ticked. New dependencies `rustls`, `tokio-rustls`, `rcgen`, `hmac`, `md-5`. |
 | 2026-10-29 | Phase 1 W5: the event bus and realtime streams. Operations publish `email.received` (SMTP, `POST /send`, `POST /send/raw`, with the email as the list shows it) and `email.deleted` as the native webhook envelope; the bus keeps the last 1,000 events. `GET /api/v1/ws` (WebSocket) and `GET /api/v1/events` (SSE) push them, and a client that reconnects with its last event id (`Last-Event-ID`, or `?last_event_id=` on the WebSocket) gets exactly the events it missed. `GET /events/recent` with `sendmock events tail` and the `sendmock_events_recent` tool is the polling twin. PL-02 accepted. Dependencies: axum's `ws` feature (`tokio-tungstenite`) and `futures-util`. |
+| 2026-10-29 | Phase 1 W6 (logs): `GET /logs/smtp` (filters `result`, `query`, pages of 50 up to 200) and `GET /logs/smtp/{sessionId}`; the API request log (migration `0004`, `ApiRequestRepository`) records each call to an operation marked with `request_log` (for now `POST /send` and `POST /send/raw` as the `native` API) with credentials masked, bodies capped at 64 KB, the exact response and a link to the email it created; `GET /logs/http` (filters `api`, `status_class`, `path`) and `GET /logs/http/{requestId}`, with `sendmock logs smtp|http [show]` and the `logs` MCP tools. CLI help now shows each command's operation summary. EM-09 accepted; SM-13.2 to SM-13.5 ticked, SM-13.1 waits for the provider APIs in Phase 2. |

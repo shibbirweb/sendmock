@@ -63,3 +63,55 @@ fn a_message_sent_over_smtp_is_listed_by_the_api_within_a_second() -> io::Result
     assert!(sent_at.elapsed() < Duration::from_secs(1));
     Ok(())
 }
+
+/// The body of a GET, parsed as JSON.
+fn get_json(http_addr: &str, path: &str) -> io::Result<serde_json::Value> {
+    let response = send_http_get(http_addr, path)?;
+    let body_text = response.split("\r\n\r\n").nth(1).unwrap_or_default();
+    serde_json::from_str(body_text).map_err(io::Error::other)
+}
+
+// AC: EM-09.1
+// AC: EM-09.3
+#[test]
+fn each_smtp_session_is_listed_and_its_email_links_to_it() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let ready_addresses = sendmock.wait_for_ready_addresses();
+    let mut reader = BufReader::new(TcpStream::connect(&ready_addresses.smtp_addr)?);
+    for line in [
+        None,
+        Some("EHLO app.test"),
+        Some("MAIL FROM:<app@shop.test>"),
+        Some("RCPT TO:<customer@example.test>"),
+        Some("DATA"),
+        Some("Subject: Logged\r\n\r\nHello\r\n."),
+        Some("QUIT"),
+    ] {
+        exchange(&mut reader, line)?;
+    }
+    drop(reader);
+    let failed_session = TcpStream::connect(&ready_addresses.smtp_addr)?;
+    drop(failed_session);
+    std::thread::sleep(Duration::from_millis(300));
+
+    let sessions = get_json(&ready_addresses.http_addr, "/api/v1/logs/smtp")?;
+    let delivered = get_json(
+        &ready_addresses.http_addr,
+        "/api/v1/logs/smtp?result=delivered",
+    )?;
+    let email_id = delivered["items"][0]["email_ids"][0]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+    let email = get_json(
+        &ready_addresses.http_addr,
+        &format!("/api/v1/emails/{email_id}"),
+    )?;
+
+    assert_eq!(sessions["total_count"], 2);
+    assert_eq!(delivered["items"][0]["helo_name"], "app.test");
+    assert_eq!(delivered["items"][0]["result"], "delivered");
+    assert_eq!(email["smtp_session_id"], delivered["items"][0]["id"]);
+    Ok(())
+}

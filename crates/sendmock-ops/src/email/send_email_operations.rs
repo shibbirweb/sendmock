@@ -6,7 +6,13 @@ use super::lookups::NativeSendResult;
 use super::native_send_request::{NativeSendRequest, read_bare_address};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, RawBodyInput,
-    SuccessStatus, publish_email_received,
+    RequestLogSettings, SuccessStatus, publish_email_received,
+};
+
+/// Native sends appear in the API request log, linked to the email they created.
+const NATIVE_EMAIL_REQUEST_LOG: RequestLogSettings = RequestLogSettings {
+    api: "native",
+    linked_message_kind: Some("email"),
 };
 
 pub struct SendEmailOperation;
@@ -24,6 +30,7 @@ impl Operation for SendEmailOperation {
             cli_usage: "sendmock email send",
             mcp_tool: "sendmock_email_send",
             success_status: SuccessStatus::Created,
+            request_log: Some(NATIVE_EMAIL_REQUEST_LOG),
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -81,6 +88,7 @@ impl Operation for SendRawEmailOperation {
                 input_name: "raw_message",
                 content_type: "message/rfc822",
             }),
+            request_log: Some(NATIVE_EMAIL_REQUEST_LOG),
             ..OperationDefinition::DEFAULTS
         }
     }

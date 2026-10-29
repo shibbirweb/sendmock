@@ -9,7 +9,9 @@ use sendmock_ops::{
     AnswerKind, InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel,
     SuccessStatus, build_operation_registry,
 };
-use sendmock_store::{Database, DatabaseLocation, EMBEDDED_MIGRATIONS};
+use sendmock_store::{
+    ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
+};
 use serde_json::{Value, json};
 use tower::ServiceExt;
 
@@ -62,7 +64,10 @@ fn native_send_sample() -> Value {
 /// Inputs per operation, sent through the router; an operation without samples fails the
 /// answer test, so every new operation brings some. Samples that need an item create it
 /// first through the API.
-async fn prepare_sample_inputs(app_router: &axum::Router) -> HashMap<&'static str, Vec<Value>> {
+async fn prepare_sample_inputs(
+    app_router: &axum::Router,
+    operation_context: &OperationContext,
+) -> HashMap<&'static str, Vec<Value>> {
     let mut samples = HashMap::from([
         ("getHealth", vec![json!({})]),
         ("getInfo", vec![json!({})]),
@@ -82,7 +87,69 @@ async fn prepare_sample_inputs(app_router: &axum::Router) -> HashMap<&'static st
         ),
     ]);
     samples.extend(prepare_email_samples(app_router).await);
+    samples.extend(prepare_log_samples(operation_context).await);
     samples
+}
+
+fn sample_smtp_session() -> SmtpSessionRecord {
+    SmtpSessionRecord {
+        session_id: "01JSESSION0000000000000000".to_owned(),
+        started_at_unix_ms: 1_767_225_600_000,
+        ended_at_unix_ms: 1_767_225_600_120,
+        remote_address: "127.0.0.1:52144".to_owned(),
+        helo_name: "app.test".to_owned(),
+        tls_version: Some("TLSv1.3".to_owned()),
+        auth_mechanism: None,
+        auth_user: None,
+        result: "rejected".to_owned(),
+        failure_reason: Some("552 Message size exceeds the limit".to_owned()),
+        email_ids: Vec::new(),
+        transcript: "S: 220 localhost ESMTP SendMock\nC: EHLO app.test".to_owned(),
+    }
+}
+
+/// An SMTP session stored directly, and one of the API requests the email samples made.
+async fn prepare_log_samples(
+    operation_context: &OperationContext,
+) -> Vec<(&'static str, Vec<Value>)> {
+    operation_context
+        .smtp_session_repository
+        .insert_session(sample_smtp_session())
+        .await
+        .unwrap_or_else(|error| panic!("a session is stored: {error}"));
+    let logged_request_id = operation_context
+        .api_request_repository
+        .list_requests(ApiRequestFilter::default(), None, 1)
+        .await
+        .unwrap_or_else(|error| panic!("requests are listed: {error}"))
+        .requests
+        .first()
+        .map(|request| request.request_id.clone())
+        .unwrap_or_else(|| panic!("the email samples were logged"));
+    vec![
+        (
+            "getLogsSmtp",
+            vec![
+                json!({}),
+                json!({ "result": "failed", "query": "app", "limit": 5 }),
+            ],
+        ),
+        (
+            "getLogsSmtpBySessionId",
+            vec![json!({ "session_id": "01JSESSION0000000000000000" })],
+        ),
+        (
+            "getLogsHttp",
+            vec![
+                json!({}),
+                json!({ "api": "native", "status_class": "2xx", "path": "send" }),
+            ],
+        ),
+        (
+            "getLogsHttpByRequestId",
+            vec![json!({ "request_id": logged_request_id })],
+        ),
+    ]
 }
 
 async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
@@ -435,12 +502,13 @@ fn without_path_inputs(served_operation: &ServedOperation, input: &Value) -> Val
 async fn real_answers_and_sample_requests_match_the_frozen_schemas() {
     let frozen_contract = read_frozen_contract();
     let operation_registry = build_operation_registry();
+    let operation_context = build_operation_context();
     let app_router = build_app_router(
         &operation_registry,
-        &build_operation_context(),
+        &operation_context,
         Arc::new(NoUiAssets),
     );
-    let prepared_samples = prepare_sample_inputs(&app_router).await;
+    let prepared_samples = prepare_sample_inputs(&app_router, &operation_context).await;
 
     for served_operation in in_safe_order(served_operations(&operation_registry)) {
         let ServedOperation {

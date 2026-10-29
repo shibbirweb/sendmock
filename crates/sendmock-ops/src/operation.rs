@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
-use crate::{OperationContext, OperationError};
+use crate::{OperationContext, OperationError, RequestLogSettings};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HttpMethod {
@@ -100,6 +100,8 @@ pub struct OperationDefinition {
     pub answer_kind: AnswerKind,
     /// Takes the request body as text into an input field, for non-JSON bodies.
     pub raw_body_input: Option<RawBodyInput>,
+    /// Records each call in the API request log (native and provider send APIs).
+    pub request_log: Option<RequestLogSettings>,
 }
 
 impl OperationDefinition {
@@ -120,6 +122,7 @@ impl OperationDefinition {
         success_status: SuccessStatus::Ok,
         answer_kind: AnswerKind::Json,
         raw_body_input: None,
+        request_log: None,
     };
 
     /// Whether the MCP name is a resource (`sendmock://...`) rather than a tool.

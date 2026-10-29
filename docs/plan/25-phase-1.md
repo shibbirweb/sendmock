@@ -69,7 +69,9 @@ An `EventBus` (a `tokio::sync::broadcast` channel behind a trait) carries every 
 
 ## W6: Logs, settings and system
 
-A tower layer records every API request (method, path, status, duration, bodies capped) into `api_requests`. Settings are typed sections stored in the `settings` table; each phase adds its section. `reset` deletes traffic; `samples/email` sends a message over SMTP to SendMock itself, so it shows in Logs > SMTP. The update check calls the GitHub Releases API once a day at most, caches the answer for 24 hours, and builds the upgrade command for the running platform (PL-05.10 to PL-05.13).
+A tower layer records every API request (method, path, status, duration, bodies capped) into `api_requests`.
+
+**As built (logs):** "every API request" means the native and provider APIs, as the Logs screen and SM-13 describe, not the UI's own reads. An operation opts in with `request_log: Some(RequestLogSettings { api, linked_message_kind })` in its definition; the REST adapter wraps just those routes with an axum middleware (`api_request_logging.rs`) that keeps the request and the response it got, and `record_api_request` (ops) masks `Authorization`, `Cookie` and API key headers, caps bodies at 64 KB and links the created email from the answer's `id`. `POST /send` and `POST /send/raw` are the `native` API; the provider APIs join in Phase 2 and Phase 4. The SMTP and HTTP log lists page 50 at a time (at most 200). Settings are typed sections stored in the `settings` table; each phase adds its section. `reset` deletes traffic; `samples/email` sends a message over SMTP to SendMock itself, so it shows in Logs > SMTP. The update check calls the GitHub Releases API once a day at most, caches the answer for 24 hours, and builds the upgrade command for the running platform (PL-05.10 to PL-05.13).
 
 ## W7: CLI and MCP
 

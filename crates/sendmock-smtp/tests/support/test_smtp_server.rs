@@ -12,7 +12,7 @@ use sendmock_smtp::{
 };
 use sendmock_store::{
     Database, DatabaseLocation, EMBEDDED_MIGRATIONS, EmailListFilter, EmailRecord,
-    SmtpSessionRecord,
+    SmtpSessionFilter, SmtpSessionRecord,
 };
 use tokio::net::TcpListener;
 use tokio::sync::watch;
@@ -105,7 +105,7 @@ impl TestSmtpServer {
             let sessions = self
                 .operation_context
                 .smtp_session_repository
-                .list_sessions(None, 1000)
+                .list_sessions(SmtpSessionFilter::default(), None, 1000)
                 .await
                 .map_err(io::Error::other)?
                 .sessions;

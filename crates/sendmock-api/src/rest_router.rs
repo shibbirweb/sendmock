@@ -7,6 +7,7 @@ use axum::body::Bytes;
 use axum::extract::{Query, RawPathParams};
 use axum::http::StatusCode;
 use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
+use axum::middleware;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, on};
 use sendmock_ops::{
@@ -16,6 +17,7 @@ use sendmock_ops::{
 use serde_json::{Map, Value};
 
 use crate::api_error_response::ApiErrorResponse;
+use crate::api_request_logging::log_api_request;
 
 /// One route per registered operation, at the path and method the contract gives it.
 pub fn build_rest_router(
@@ -25,8 +27,14 @@ pub fn build_rest_router(
     let mut method_routers: HashMap<&'static str, MethodRouter> = HashMap::new();
     for operation in operation_registry.operations() {
         let definition = operation.definition();
-        let operation_route =
+        let mut operation_route =
             build_operation_route(Arc::clone(operation), operation_context.clone());
+        if let Some(request_log_settings) = definition.request_log {
+            operation_route = operation_route.layer(middleware::from_fn_with_state(
+                (operation_context.clone(), request_log_settings),
+                log_api_request,
+            ));
+        }
         let method_router = match method_routers.remove(definition.path) {
             Some(existing_router) => existing_router.merge(operation_route),
             None => operation_route,

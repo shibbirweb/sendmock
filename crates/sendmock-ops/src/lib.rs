@@ -5,6 +5,7 @@ mod events;
 mod input_coercion;
 mod input_shape;
 mod instance_details;
+mod logs;
 mod no_input;
 mod operation;
 mod operation_answer;
@@ -24,6 +25,10 @@ pub use events::{
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
+pub use logs::{
+    ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, RequestLogSettings,
+    SmtpSessionLogEntry, record_api_request,
+};
 pub use no_input::NoInput;
 pub use operation::{
     AnswerKind, CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector,
@@ -49,5 +54,6 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(ValidateSeedOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
+    logs::register_log_operations(&mut operation_registry);
     operation_registry
 }

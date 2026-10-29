@@ -1,6 +1,7 @@
 //! The HTTP server: REST routes from the operation registry, realtime streams, OpenAPI and the embedded UI.
 
 mod api_error_response;
+mod api_request_logging;
 mod app_router;
 mod http_server;
 mod openapi_document;

@@ -2,8 +2,12 @@ use std::sync::Arc;
 
 use rusqlite::{OptionalExtension, Row, params};
 
-use super::{SmtpSessionPage, SmtpSessionRecord};
+use super::{SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord};
 use crate::{Database, StoreError};
+
+/// Filters shared by the count and the page; `?1` is the failed flag, `?2` the search text.
+const FILTER_CONDITIONS: &str = "(?1 IS NULL OR (result <> 'delivered') = ?1) \
+     AND (?2 IS NULL OR instr(lower(remote_address || ' ' || helo_name || ' ' || coalesce(auth_user, '')), lower(?2)) > 0)";
 
 const SESSION_COLUMNS: &str = "id, started_at, ended_at, remote_address, helo_name, tls_version, auth_mechanism, \
      auth_user, result, failure_reason, email_ids, transcript";
@@ -65,17 +69,25 @@ impl SmtpSessionRepository {
     /// Newest first; `cursor` is the id of the last session of the previous page.
     pub async fn list_sessions(
         &self,
+        filter: SmtpSessionFilter,
         cursor: Option<String>,
         limit: u32,
     ) -> Result<SmtpSessionPage, StoreError> {
         self.database
             .read(move |connection| {
-                let total_count: i64 = connection.query_row("SELECT count(*) FROM smtp_sessions", [], |row| row.get(0))?;
+                let total_count: i64 = connection.query_row(
+                    &format!("SELECT count(*) FROM smtp_sessions WHERE {FILTER_CONDITIONS}"),
+                    params![filter.is_failed, filter.search_text],
+                    |row| row.get(0),
+                )?;
                 let mut statement = connection.prepare(&format!(
-                    "SELECT {SESSION_COLUMNS} FROM smtp_sessions WHERE (?1 IS NULL OR id < ?1) ORDER BY id DESC LIMIT ?2"
+                    "SELECT {SESSION_COLUMNS} FROM smtp_sessions WHERE {FILTER_CONDITIONS} AND (?3 IS NULL OR id < ?3) ORDER BY id DESC LIMIT ?4"
                 ))?;
                 let mut sessions = statement
-                    .query_map(params![cursor, i64::from(limit) + 1], read_session_row)?
+                    .query_map(
+                        params![filter.is_failed, filter.search_text, cursor, i64::from(limit) + 1],
+                        read_session_row,
+                    )?
                     .collect::<rusqlite::Result<Vec<_>>>()?;
                 let has_more = sessions.len() > limit as usize;
                 sessions.truncate(limit as usize);
@@ -85,6 +97,14 @@ impl SmtpSessionRepository {
                     total_count: u64::try_from(total_count).unwrap_or_default(),
                 })
             })
+            .await
+    }
+}
+
+impl SmtpSessionRepository {
+    pub async fn delete_all_sessions(&self) -> Result<u64, StoreError> {
+        self.database
+            .write(|connection| Ok(connection.execute("DELETE FROM smtp_sessions", [])? as u64))
             .await
     }
 }
