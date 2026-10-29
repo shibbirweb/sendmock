@@ -1,69 +1,15 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod recording_callback_sender;
     pub mod test_app;
 }
 
-use std::collections::BTreeMap;
-use std::future::Future;
-use std::pin::Pin;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Duration;
 
-use sendmock_ops::{
-    RecordedHttpRequest, RecordedHttpResponse, StatusCallbackResult, StatusCallbackSender,
-};
 use serde_json::{Value, json};
+use support::recording_callback_sender::RecordingCallbackSender;
 use support::test_app::{build_test_app, build_test_app_with, call_api};
-
-/// Records every callback and answers 204, so tests see what a handler would receive.
-#[derive(Default)]
-struct RecordingCallbackSender {
-    received_requests: Mutex<Vec<RecordedHttpRequest>>,
-}
-
-impl RecordingCallbackSender {
-    fn received_statuses(&self) -> Vec<String> {
-        self.received_requests
-            .lock()
-            .map(|received_requests| {
-                received_requests
-                    .iter()
-                    .map(|callback_request| {
-                        let callback_body: Value =
-                            serde_json::from_str(&callback_request.body).unwrap_or(Value::Null);
-                        callback_body["status"]
-                            .as_str()
-                            .unwrap_or_default()
-                            .to_owned()
-                    })
-                    .collect()
-            })
-            .unwrap_or_default()
-    }
-}
-
-impl StatusCallbackSender for RecordingCallbackSender {
-    fn send_status_callback<'sender>(
-        &'sender self,
-        callback_request: &'sender RecordedHttpRequest,
-    ) -> Pin<Box<dyn Future<Output = StatusCallbackResult> + Send + 'sender>> {
-        Box::pin(async move {
-            if let Ok(mut received_requests) = self.received_requests.lock() {
-                received_requests.push(callback_request.clone());
-            }
-            StatusCallbackResult {
-                response: Some(RecordedHttpResponse {
-                    status_code: 204,
-                    headers: BTreeMap::new(),
-                    body: String::new(),
-                    is_body_truncated: false,
-                }),
-                error_message: None,
-                duration_ms: 3,
-            }
-        })
-    }
-}
 
 fn sms_to(to_number: &str) -> Value {
     json!({ "from": "+15550001111", "to": to_number, "body": "Your code is 482913" })

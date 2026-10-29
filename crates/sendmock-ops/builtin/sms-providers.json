@@ -372,6 +372,17 @@
         "body": "{\"message-count\": \"1\", \"messages\": [{\"status\": \"2\", \"error-text\": \"Missing {{ error.part }}\"}]}"
       },
       {
+        "kind": "invalid_value",
+        "status": 200,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message-count\": \"1\", \"messages\": [{\"status\": \"3\", \"error-text\": \"{{ error.reason | default(\"Invalid Message\") }}\"}]}"
+      },
+      {
         "kind": "unauthorized",
         "status": 200,
         "headers": [

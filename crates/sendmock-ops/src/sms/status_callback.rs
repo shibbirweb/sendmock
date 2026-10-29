@@ -3,14 +3,16 @@ use std::collections::BTreeMap;
 use sendmock_store::{SmsCallbackAttemptRecord, SmsRecord, SmsStatusChangeRecord};
 
 use super::sms_views::RecordedHttpRequest;
+use crate::providers::{ProviderCallback, render_provider_status_callback};
 use crate::{OperationContext, OperationError};
 
 /// Phase 2 makes one attempt; Phase 3 moves callbacks onto the webhook queue with retries.
 const FIRST_ATTEMPT: u32 = 1;
 const NO_SENDER_MESSAGE: &str = "This build cannot make HTTP calls, so the callback was not sent";
 
-/// Calls the message's status callback URL for one status change and records the attempt on
-/// the message. Does nothing for a message without a callback URL.
+/// Calls the message's status callback URL for one status change, in its provider's format
+/// (SendMock's JSON for the native API), and records the attempt on the message. Does nothing
+/// for a message without a callback URL, or a status its provider does not report.
 pub async fn send_status_callback(
     operation_context: &OperationContext,
     sms: &SmsRecord,
@@ -19,7 +21,18 @@ pub async fn send_status_callback(
     let Some(callback_url) = sms.status_callback_url.as_deref() else {
         return Ok(());
     };
-    let callback_request = render_native_status_callback(sms, callback_url, status_change);
+    let callback_request = match render_provider_status_callback(
+        operation_context,
+        sms,
+        callback_url,
+        status_change,
+    ) {
+        ProviderCallback::Rendered(callback_request) => callback_request,
+        ProviderCallback::NotReported => return Ok(()),
+        ProviderCallback::NoTemplate => {
+            render_native_status_callback(sms, callback_url, status_change)
+        }
+    };
     let callback_result = match &operation_context.status_callback_sender {
         Some(status_callback_sender) => Some(
             status_callback_sender
@@ -54,8 +67,7 @@ pub async fn send_status_callback(
     Ok(())
 }
 
-/// SendMock's JSON callback for the native API; Twilio and Vonage formats come with their
-/// emulations.
+/// SendMock's JSON callback for the native API.
 fn render_native_status_callback(
     sms: &SmsRecord,
     callback_url: &str,

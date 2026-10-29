@@ -34,9 +34,9 @@ UI in U1, backend Phase 2.
 
 Phase 2.
 
-- [ ] SM-04.1 `POST /sms/json` returns Vonage's response shape with message IDs and status.
-- [ ] SM-04.2 Errors use Vonage's status codes and error text.
-- [ ] SM-04.3 Delivery receipts are sent in Vonage DLR format.
+- [x] SM-04.1 `POST /sms/json` returns Vonage's response shape with message IDs and status.
+- [x] SM-04.2 Errors use Vonage's status codes and error text.
+- [x] SM-04.3 Delivery receipts are sent in Vonage DLR format.
 
 ## SM-05 Other SMS providers and generic vendor
 
@@ -71,8 +71,8 @@ Phase 2. Docs: [Delivery simulation](../04-sms.md#delivery-simulation).
 
 Phase 2.
 
-- [ ] SM-08.1 `StatusCallback` (Twilio) and the DLR URL (Vonage) receive one callback per status change, in the provider's format and order.
-- [ ] SM-08.2 Twilio callbacks carry a valid `X-Twilio-Signature` for the configured auth token.
+- [x] SM-08.1 `StatusCallback` (Twilio) and the DLR URL (Vonage) receive one callback per status change, in the provider's format and order.
+- [x] SM-08.2 Twilio callbacks carry a valid `X-Twilio-Signature` for the configured auth token.
 - [ ] SM-08.3 Callbacks are logged and visible in the message drawer, and failed callbacks are retried like webhooks.
 
 ## SM-09 Inbound SMS and two-way conversations

@@ -238,6 +238,11 @@ function buildVonageProvider(): MessageProviderRecord {
         '{"message-count": "1", "messages": [{"status": "2", "error-text": "Missing {{ error.part }}"}]}',
       ),
       answerError(
+        "invalid_value",
+        200,
+        '{"message-count": "1", "messages": [{"status": "3", "error-text": "{{ error.reason | default("Invalid Message") }}"}]}',
+      ),
+      answerError(
         "unauthorized",
         200,
         '{"message-count": "1", "messages": [{"status": "4", "error-text": "Bad Credentials"}]}',
