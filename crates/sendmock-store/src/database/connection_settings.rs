@@ -51,6 +51,10 @@ pub fn open_read_connection(connection_target: &str) -> Result<Connection, Store
         OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI,
     )?;
     connection.busy_timeout(std::time::Duration::from_millis(u64::from(BUSY_TIMEOUT_MS)))?;
+    // In the shared cache of the in-memory store, readers take table locks that make the
+    // writer fail with SQLITE_LOCKED, which no busy timeout retries; read-uncommitted
+    // readers take none. Files use WAL, where this pragma has no effect.
+    connection.pragma_update(None, "read_uncommitted", true)?;
     Ok(connection)
 }
 
