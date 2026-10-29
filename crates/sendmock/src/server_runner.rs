@@ -1,10 +1,10 @@
-use std::net::SocketAddr;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
 
 use sendmock_api::{EmbeddedUiAssets, build_app_router, serve_http};
 use sendmock_core::{Clock, SystemClock, SystemIdGenerator};
 use sendmock_ops::{OperationContext, build_operation_registry};
-use sendmock_smtp::serve_smtp;
+use sendmock_smtp::{LoopbackSmtpClient, serve_smtp};
 use sendmock_store::Database;
 use tokio::net::TcpListener;
 use tokio::sync::watch;
@@ -32,14 +32,7 @@ pub async fn run_server(
     database: Database,
 ) -> Result<(), StartupError> {
     let listeners = bind_listeners(server_config).await?;
-    let clock: Arc<dyn Clock> = Arc::new(SystemClock);
-    let started_at_unix_ms = clock.now_unix_ms();
-    let operation_context = OperationContext::new(
-        Arc::new(database),
-        clock,
-        Arc::new(SystemIdGenerator),
-        build_instance_details(listeners.http_addr, listeners.smtp_addr, started_at_unix_ms),
-    );
+    let operation_context = build_operation_context(database, &listeners);
     let app_router = build_app_router(
         &build_operation_registry(),
         &operation_context,
@@ -106,6 +99,34 @@ fn start_smtp_listeners(
         ));
     }
     Ok(smtp_listeners)
+}
+
+/// The context every operation runs with, able to send samples through the SMTP listener.
+fn build_operation_context(database: Database, listeners: &BoundListeners) -> OperationContext {
+    let clock: Arc<dyn Clock> = Arc::new(SystemClock);
+    let started_at_unix_ms = clock.now_unix_ms();
+    OperationContext::new(
+        Arc::new(database),
+        clock,
+        Arc::new(SystemIdGenerator),
+        build_instance_details(listeners.http_addr, listeners.smtp_addr, started_at_unix_ms),
+    )
+    .with_sample_email_sender(Arc::new(LoopbackSmtpClient::new(reachable_address(
+        listeners.smtp_addr,
+    ))))
+}
+
+/// The address to connect to a listener on; one bound to every interface is reached on loopback.
+fn reachable_address(listen_address: SocketAddr) -> SocketAddr {
+    match listen_address.ip() {
+        IpAddr::V4(ipv4) if ipv4.is_unspecified() => {
+            SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), listen_address.port())
+        }
+        IpAddr::V6(ipv6) if ipv6.is_unspecified() => {
+            SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), listen_address.port())
+        }
+        _ => listen_address,
+    }
 }
 
 async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, StartupError> {

@@ -5,6 +5,7 @@ mod events;
 mod input_coercion;
 mod input_shape;
 mod instance_details;
+mod integrations;
 mod logs;
 mod no_input;
 mod operation;
@@ -13,6 +14,7 @@ mod operation_context;
 mod operation_error;
 mod operation_registry;
 mod page_of;
+mod samples;
 mod seed;
 mod settings;
 mod smtp_delivery;
@@ -26,6 +28,7 @@ pub use events::{
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
+pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
     ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, RequestLogSettings,
     SmtpSessionLogEntry, record_api_request,
@@ -40,6 +43,7 @@ pub use operation_context::OperationContext;
 pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};
 pub use page_of::PageOf;
+pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
     SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError, ValidateSeedOperation,
     validate_seed_toml,
@@ -61,5 +65,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     events::register_event_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
+    operation_registry.register(CreateSampleOperation);
+    operation_registry.register(GetIntegrationOperation);
     operation_registry
 }

@@ -6,7 +6,7 @@ use sendmock_store::{
     ApiRequestRepository, Database, EmailRepository, SettingsRepository, SmtpSessionRepository,
 };
 
-use crate::{AppSettingsStore, EventBus, InstanceDetails};
+use crate::{AppSettingsStore, EventBus, InstanceDetails, SampleEmailSender};
 
 /// The dependencies operations run with, passed in rather than reached through globals.
 #[derive(Clone)]
@@ -21,6 +21,8 @@ pub struct OperationContext {
     pub api_request_repository: ApiRequestRepository,
     pub event_bus: EventBus,
     pub settings_store: AppSettingsStore,
+    /// Set once the SMTP listener runs, so samples can go through it.
+    pub sample_email_sender: Option<Arc<dyn SampleEmailSender>>,
 }
 
 impl OperationContext {
@@ -51,6 +53,15 @@ impl OperationContext {
             email_ingest_service,
             event_bus: EventBus::default(),
             settings_store,
+            sample_email_sender: None,
         }
+    }
+
+    pub fn with_sample_email_sender(
+        mut self,
+        sample_email_sender: Arc<dyn SampleEmailSender>,
+    ) -> Self {
+        self.sample_email_sender = Some(sample_email_sender);
+        self
     }
 }

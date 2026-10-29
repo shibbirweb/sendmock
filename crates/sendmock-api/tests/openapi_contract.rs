@@ -1,4 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
+use std::future::Future;
+use std::pin::Pin;
 use std::sync::Arc;
 
 use axum::body::Body;
@@ -6,8 +8,8 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    AnswerKind, InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel,
-    SuccessStatus, build_operation_registry,
+    AnswerKind, InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel, SampleEmail,
+    SampleEmailSender, SmtpMessage, SuccessStatus, build_operation_registry, store_smtp_message,
 };
 use sendmock_store::{
     ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
@@ -86,6 +88,17 @@ async fn prepare_sample_inputs(
             ],
         ),
         ("postReset", vec![json!({})]),
+        (
+            "postSamplesByKind",
+            vec![json!({ "kind": "email", "to": "sam@example.test", "subject": "Sample" })],
+        ),
+        (
+            "getIntegrationsByStack",
+            vec![
+                json!({ "stack": "laravel" }),
+                json!({ "stack": "django", "channel": "http", "host": "compose" }),
+            ],
+        ),
         (
             "getEventsRecent",
             vec![
@@ -229,7 +242,39 @@ fn read_frozen_contract() -> Value {
         .unwrap_or_else(|error| panic!("the frozen contract is valid YAML: {error}"))
 }
 
+/// Stores samples the way the SMTP listener would, without a socket.
+struct StoringSampleSender {
+    operation_context: OperationContext,
+}
+
+impl SampleEmailSender for StoringSampleSender {
+    fn send_sample_email<'sender>(
+        &'sender self,
+        sample_email: SampleEmail,
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + 'sender>> {
+        Box::pin(async move {
+            let smtp_message = SmtpMessage {
+                raw_message: sample_email.raw_message,
+                mail_from: sample_email.mail_from,
+                recipients: vec![sample_email.recipient],
+                smtp_session_id: "01JSAMPLESESSION0000000000".to_owned(),
+                auth_user: None,
+            };
+            store_smtp_message(&self.operation_context, smtp_message)
+                .await
+                .map_err(|store_error| store_error.to_string())
+        })
+    }
+}
+
 fn build_operation_context() -> OperationContext {
+    let operation_context = build_bare_operation_context();
+    operation_context
+        .clone()
+        .with_sample_email_sender(Arc::new(StoringSampleSender { operation_context }))
+}
+
+fn build_bare_operation_context() -> OperationContext {
     OperationContext::new(
         Arc::new(
             Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)

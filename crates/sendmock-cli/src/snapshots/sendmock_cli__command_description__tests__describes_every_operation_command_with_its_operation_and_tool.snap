@@ -626,5 +626,52 @@ expression: command_descriptions
     "mcp": [
       "sendmock_reset"
     ]
+  },
+  {
+    "command": "sendmock sample",
+    "usage": "sendmock sample <kind>",
+    "summary": "Create a sample email, SMS, verification or HTTP request through the normal path.",
+    "arguments": [
+      "kind"
+    ],
+    "flags": [
+      "--html",
+      "--subject",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/samples/{kind}",
+        "operation_id": "postSamplesByKind",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sample_send"
+    ]
+  },
+  {
+    "command": "sendmock integrate",
+    "usage": "sendmock integrate <stack>",
+    "summary": "Copy-ready settings for a stack, as Settings > Connection shows them.",
+    "arguments": [
+      "stack"
+    ],
+    "flags": [
+      "--channel",
+      "--host"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations/{stack}",
+        "operation_id": "getIntegrationsByStack",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_integration_snippet"
+    ]
   }
 ]
