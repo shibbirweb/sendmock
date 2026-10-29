@@ -36,6 +36,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/release.yml
+      - packaging/**
       - scripts/release/**
       - scripts/binary-smoke-test.ts
 
@@ -52,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      docker_tags: ${{ steps.version.outputs.docker_tags }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -70,6 +72,12 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          # beta: `beta` and the version; stable: `latest`, the version and major.minor.
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then
+            echo "docker_tags=beta $version" >> "$GITHUB_OUTPUT"
+          else
+            echo "docker_tags=latest $version ${version%.*}" >> "$GITHUB_OUTPUT"
+          fi
 
   web-dist:
     name: Web UI build
@@ -202,9 +210,63 @@ jobs:
             docker run --rm -v "$PWD/extracted:/sendmock:ro" "$image" /sendmock/sendmock version --json
           done
 
+  # .deb and .rpm from the tested Linux archives, installed with apt and dnf (DS-03.3).
+  linux-packages:
+    name: .deb and .rpm (${{ matrix.architecture }})
+    needs: [plan, test]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, architecture: amd64, runner: ubuntu-latest, nfpm_platform: x86_64 }
+          - { target: aarch64-unknown-linux-musl, architecture: arm64, runner: ubuntu-24.04-arm, nfpm_platform: arm64 }
+    env:
+      NFPM_VERSION: "2.48.0"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: archives
+
+      - name: Install nfpm
+        run: curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_${{ matrix.nfpm_platform }}.tar.gz" | tar -xz -C "$RUNNER_TEMP" nfpm
+
+      - name: Build the packages and their checksums
+        env:
+          NFPM_ARCH: ${{ matrix.architecture }}
+          SENDMOCK_VERSION: ${{ needs.plan.outputs.version }}
+          BINARY_PATH: extracted/sendmock
+        run: |
+          mkdir extracted packages
+          tar -xzf archives/sendmock-${{ matrix.target }}.tar.gz -C extracted
+          for packager in deb rpm; do
+            "$RUNNER_TEMP/nfpm" package --config packaging/nfpm.yaml --packager "$packager" --target packages/
+          done
+          cd packages
+          for package_file in *; do sha256sum "$package_file" > "$package_file.sha256"; done
+          ls -l
+
+      - name: apt install and dnf install give a working sendmock
+        run: |
+          docker run --rm -v "$PWD/packages:/packages:ro" debian:stable-slim \
+            sh -c 'apt-get install -y -qq /packages/*.deb > /dev/null && sendmock version --json'
+          docker run --rm -v "$PWD/packages:/packages:ro" fedora:42 \
+            sh -c 'dnf install -y -q /packages/*.rpm > /dev/null && sendmock version --json'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive-packages-${{ matrix.architecture }}
+          path: packages
+          retention-days: 3
+
   checksums:
     name: SHA256SUMS
-    needs: test
+    needs: [test, linux-packages]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -273,3 +335,61 @@ jobs:
           gh release create beta dist/* --prerelease --target "$COMMIT_SHA" \
             --title "Latest beta" \
             --notes "The newest beta, now $TAG_NAME. These links always give the newest beta; see $TAG_NAME for its notes."
+
+  # The release images on GHCR (and Docker Hub with its token), signed like edge.
+  docker:
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/docker-edge.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ inputs.commit_sha }}
+      image_tags: ${{ needs.plan.outputs.docker_tags }}
+      channel: ${{ inputs.channel }}
+
+  # The formula in the tap, when the owner has set HOMEBREW_TAP_TOKEN (DS-03.1).
+  homebrew:
+    name: Homebrew formula
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    env:
+      HAS_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write the formula from SHA256SUMS
+        run: |
+          bun scripts/release/homebrew-formula.ts "${{ needs.plan.outputs.version }}" "$RELEASE_CHANNEL" dist/SHA256SUMS > formula.rb
+          cat formula.rb
+
+      - name: Push it to shibbirweb/homebrew-tap
+        if: env.HAS_TAP_TOKEN == 'true'
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          formula_name="sendmock"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then formula_name="sendmock-beta"; fi
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/shibbirweb/homebrew-tap.git" tap
+          mkdir -p tap/Formula
+          cp formula.rb "tap/Formula/${formula_name}.rb"
+          cd tap
+          git config user.name "MD. Shibbir Ahmed"
+          git config user.email "shibbirweb@gmail.com"
+          git add Formula
+          git diff --cached --quiet || git commit -m "chore: ${formula_name} ${VERSION}"
+          git push

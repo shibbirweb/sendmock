@@ -118,10 +118,35 @@ describe("Docker edge", () => {
     });
   });
 
-  test("pushes and signs edge only for pushes to develop", () => {
+  test("pushes edge for pushes to develop, and other tags only when Release build calls it", () => {
     expect(dockerEdgeWorkflow.on.push?.branches).toEqual(["develop"]);
     expect(dockerEdgeWorkflow.jobs.manifest?.if).toBe(
-      "github.event_name == 'push'",
+      "github.event_name == 'push' || inputs.image_tags != ''",
     );
+  });
+
+  test("a published beta or stable gets its Docker tags, Homebrew formula and Linux packages", () => {
+    const releaseJobs = readWorkflow("release.yml").jobs as Record<
+      string,
+      {
+        if?: string;
+        uses?: string;
+        needs?: string[] | string;
+        with?: Record<string, string>;
+      }
+    >;
+    const publishedChannelCondition =
+      "inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')";
+
+    expect(releaseJobs.docker?.uses).toBe(
+      "./.github/workflows/docker-edge.yml",
+    );
+    expect(releaseJobs.docker?.if).toBe(publishedChannelCondition);
+    expect(releaseJobs.docker?.with?.image_tags).toBe(
+      "${{ needs.plan.outputs.docker_tags }}",
+    );
+    expect(releaseJobs.homebrew?.if).toBe(publishedChannelCondition);
+    expect(releaseJobs.checksums?.needs).toEqual(["test", "linux-packages"]);
+    expect(releaseJobs.publish?.needs).toContain("smtp-clients");
   });
 });
