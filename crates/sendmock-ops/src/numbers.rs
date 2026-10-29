@@ -6,6 +6,7 @@ mod registry_fields;
 mod virtual_number_builder;
 mod virtual_number_operations;
 
+pub(crate) use messaging_service_builder::generate_service_sid;
 pub use messaging_service_operations::{
     CreateMessagingServiceOperation, DeleteMessagingServiceOperation,
     ListMessagingServicesOperation, UpdateMessagingServiceOperation,

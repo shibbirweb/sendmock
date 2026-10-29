@@ -71,7 +71,7 @@ async fn read_registered_pool(
 }
 
 /// `MG` and 32 hex digits, as Twilio writes service SIDs.
-fn generate_service_sid(operation_context: &OperationContext) -> String {
+pub fn generate_service_sid(operation_context: &OperationContext) -> String {
     let random_source = &operation_context.random_source;
     format!(
         "MG{:016x}{:016x}",

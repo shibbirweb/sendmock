@@ -25,8 +25,8 @@ Phase 2.
 
 UI in U1, backend Phase 2.
 
-- [ ] SM-03.1 A send with `MessagingServiceSid` and no `From` picks a sender from the service's number pool.
-- [ ] SM-03.2 Unknown service SIDs are auto-created in lenient mode and rejected with error `21701` in strict mode.
+- [x] SM-03.1 A send with `MessagingServiceSid` and no `From` picks a sender from the service's number pool.
+- [x] SM-03.2 Unknown service SIDs are auto-created in lenient mode and rejected with error `21701` in strict mode.
 - [ ] SM-03.3 Services can be managed from UI, API, CLI, MCP and the seed file.
 - [x] SM-03.4 A service has a sender pool and inbound handling (send a webhook with fallback, defer to the sender's webhook, or drop); a number belongs to at most one service, and moving it updates both services.
 

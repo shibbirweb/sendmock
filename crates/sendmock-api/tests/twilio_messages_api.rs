@@ -3,10 +3,15 @@ mod support {
     pub mod test_app;
 }
 
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+
 use axum::body::Body;
 use axum::http::Request;
+use sendmock_ops::{FetchedMedia, MediaFetcher};
 use serde_json::Value;
-use support::test_app::{build_test_app, call_api};
+use support::test_app::{build_test_app, build_test_app_with, call_api};
 use tower::ServiceExt;
 
 const MESSAGES_PATH: &str =
@@ -239,8 +244,18 @@ async fn provider_requests_are_logged_with_the_exact_response_and_masked_credent
     let (_, logged_page) = call_api(&app_router, "GET", "/api/v1/logs/http?api=twilio", None).await;
     let (_, stored_messages) = call_api(&app_router, "GET", "/api/v1/sms", None).await;
 
-    let rejected_entry = &logged_page["items"][0];
-    let accepted_entry = &logged_page["items"][1];
+    let find_entry = |response_status: u16| {
+        logged_page["items"]
+            .as_array()
+            .and_then(|entries| {
+                entries
+                    .iter()
+                    .find(|entry| entry["response_status"] == response_status)
+            })
+            .cloned()
+            .unwrap_or(Value::Null)
+    };
+    let (rejected_entry, accepted_entry) = (&find_entry(400), &find_entry(201));
     assert_eq!(logged_page["total_count"], 2);
     assert_eq!(rejected_entry["response_status"], 400);
     assert_eq!(
@@ -278,4 +293,50 @@ async fn a_path_no_provider_answers_gets_sendmocks_own_404() {
     assert_eq!(unknown_provider_status, 404);
     assert_eq!(unknown_body["error"]["code"], "not_found");
     assert_eq!(wrong_path_status, 404);
+}
+
+/// Serves one image link; every other link fails, as an unreachable host does.
+struct OneImageFetcher;
+
+impl MediaFetcher for OneImageFetcher {
+    fn fetch_media<'fetcher>(
+        &'fetcher self,
+        media_url: &'fetcher str,
+        _maximum_bytes: usize,
+    ) -> Pin<Box<dyn Future<Output = Result<FetchedMedia, String>> + Send + 'fetcher>> {
+        Box::pin(async move {
+            if media_url == "https://cdn.test/logo.png" {
+                Ok(FetchedMedia {
+                    content_type: Some("image/png".to_owned()),
+                    bytes: vec![137, 80, 78, 71],
+                })
+            } else {
+                Err("connection refused".to_owned())
+            }
+        })
+    }
+}
+
+// AC: SM-15.1
+#[tokio::test]
+async fn media_urls_are_copied_and_an_unreachable_one_fails_with_11200() {
+    let (app_router, _) = build_test_app_with(|operation_context| {
+        operation_context.with_media_fetcher(Arc::new(OneImageFetcher))
+    });
+
+    let (_, mms) = send_twilio(
+        &app_router,
+        "To=%2B8801700000000&From=%2B15005550006&MediaUrl=https%3A%2F%2Fcdn.test%2Flogo.png",
+    )
+    .await;
+    let (_, failed_mms) = send_twilio(
+        &app_router,
+        "To=%2B8801700000000&From=%2B15005550006&Body=Hi&MediaUrl=https%3A%2F%2Fdown.test%2Fa.png",
+    )
+    .await;
+
+    assert_eq!(mms["num_media"], "1");
+    assert_eq!(mms["status"], "queued");
+    assert_eq!(failed_mms["status"], "failed");
+    assert_eq!(failed_mms["error_code"], 11200);
 }

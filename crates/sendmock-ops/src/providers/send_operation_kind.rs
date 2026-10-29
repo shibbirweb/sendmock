@@ -1,6 +1,7 @@
 use sendmock_sms::{SendDecision, describe_error_code, outcome_name_for_error_code};
 use sendmock_store::SmsRecord;
 
+use super::messaging_service_sender::pick_pool_sender;
 use super::provider_call::{ProviderCall, describe_message};
 use super::provider_http::ProviderHttpResponse;
 use super::request_checks::{ProviderFailure, find_rule_failure};
@@ -9,6 +10,8 @@ use crate::sms::{
 };
 use crate::{OperationContext, OperationError};
 
+/// Twilio answers a send through a Messaging Service as `accepted` until it picks a sender.
+const SERVICE_ACCEPTED_STATUS: &str = "accepted";
 /// Twilio's code for a media link that cannot be fetched; the message is stored `failed`.
 const MEDIA_UNFETCHABLE_ERROR_CODE: &str = "11200";
 
@@ -46,26 +49,32 @@ pub async fn answer_send(
     operation_context: &OperationContext,
     provider_call: &ProviderCall<'_>,
 ) -> Result<ProviderAnswer, OperationError> {
-    let send_parts = match read_send_parts(provider_call) {
-        Ok(send_parts) => send_parts,
-        Err(failure) => {
-            return Ok(ProviderAnswer::without_message(
-                provider_call.render_failure(&failure),
-            ));
-        }
+    let refuse = |failure: ProviderFailure| {
+        Ok(ProviderAnswer::without_message(
+            provider_call.render_failure(&failure),
+        ))
     };
+    let mut send_parts = match read_send_parts(provider_call) {
+        Ok(send_parts) => send_parts,
+        Err(failure) => return refuse(failure),
+    };
+    let is_pool_send = send_parts.from.is_empty();
+    if let Err(failure) = resolve_pool_sender(operation_context, &mut send_parts).await? {
+        return refuse(failure);
+    }
     let delivery_steps =
         match decide_outbound_send(operation_context, &send_parts.to, &send_parts.from).await? {
             SendDecision::Accepted(delivery_steps) => delivery_steps,
             SendDecision::Rejected { error_code, reason } => {
-                let failure = describe_rejection(provider_call, &error_code, &reason);
-                return Ok(ProviderAnswer::without_message(
-                    provider_call.render_failure(&failure),
-                ));
+                return refuse(describe_rejection(provider_call, &error_code, &reason));
             }
         };
     let sms = store_provider_sms(operation_context, provider_call, send_parts).await?;
-    let response = provider_call.render_success(&describe_message(provider_call.provider, &sms));
+    let mut answered_message = describe_message(provider_call.provider, &sms);
+    if is_pool_send && sms.status == "queued" {
+        answered_message["status"] = serde_json::Value::from(SERVICE_ACCEPTED_STATUS);
+    }
+    let response = provider_call.render_success(&answered_message);
     let created_sms_id = Some(sms.sms_id.clone());
     if sms.status == "queued" {
         start_sms_delivery(operation_context, sms, delivery_steps).await?;
@@ -98,7 +107,7 @@ fn read_send_parts(provider_call: &ProviderCall<'_>) -> Result<SendParts, Provid
     if send_parts.to.is_empty() {
         return Err(missing_part(provider_call, "to", None));
     }
-    if send_parts.from.is_empty() {
+    if send_parts.from.is_empty() && send_parts.messaging_service_sid.is_none() {
         return Err(missing_part(
             provider_call,
             "from",
@@ -113,6 +122,25 @@ fn read_send_parts(provider_call: &ProviderCall<'_>) -> Result<SendParts, Provid
         ));
     }
     Ok(send_parts)
+}
+
+/// Fills `from` from the Messaging Service's pool when the request names a service instead.
+async fn resolve_pool_sender(
+    operation_context: &OperationContext,
+    send_parts: &mut SendParts,
+) -> Result<Result<(), ProviderFailure>, OperationError> {
+    let Some(service_sid) = send_parts
+        .messaging_service_sid
+        .as_deref()
+        .filter(|_| send_parts.from.is_empty())
+    else {
+        return Ok(Ok(()));
+    };
+    Ok(
+        pick_pool_sender(operation_context, service_sid, &send_parts.to)
+            .await?
+            .map(|pool_sender| send_parts.from = pool_sender),
+    )
 }
 
 fn missing_part(

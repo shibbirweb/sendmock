@@ -9,7 +9,11 @@ use super::read_operation_kinds::{answer_fetch, answer_list};
 use super::request_checks::{ProviderFailure, has_valid_credentials};
 use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
+use super::twilio_messaging_services::answer_messaging_services_request;
 use crate::{OperationContext, OperationError};
+
+/// Messaging Services are Twilio's; their API is served under its key.
+const TWILIO_PROVIDER_KEY: &str = "twilio";
 
 /// A provider request's answer, with what the request log needs.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -36,6 +40,11 @@ pub async fn answer_provider_request(
     request: &ProviderHttpRequest,
 ) -> Result<ProviderOutcome, OperationError> {
     let providers = load_sms_provider_definitions();
+    if let Some(services_outcome) =
+        answer_twilio_services(operation_context, &providers, provider_route, request).await?
+    {
+        return Ok(services_outcome);
+    }
     let Some(matched_operation) = match_operation(&providers, provider_route, request) else {
         return Ok(answer_unmatched(provider_route));
     };
@@ -76,6 +85,34 @@ pub async fn answer_provider_request(
         created_sms_id: provider_answer.created_sms_id,
         secret_values: list_secret_values(provider),
     })
+}
+
+/// Twilio's Messaging Services API, served with the Twilio provider while it is routable.
+async fn answer_twilio_services(
+    operation_context: &OperationContext,
+    providers: &[MessageProviderDefinition],
+    provider_route: ProviderRoute<'_>,
+    request: &ProviderHttpRequest,
+) -> Result<Option<ProviderOutcome>, OperationError> {
+    let is_twilio_route = matches!(
+        provider_route,
+        ProviderRoute::Prefixed(TWILIO_PROVIDER_KEY) | ProviderRoute::ProviderPort
+    );
+    let Some(twilio_provider) = providers
+        .iter()
+        .find(|provider| provider.key == TWILIO_PROVIDER_KEY && provider.is_routable())
+        .filter(|_| is_twilio_route)
+    else {
+        return Ok(None);
+    };
+    let services_response =
+        answer_messaging_services_request(operation_context, twilio_provider, request).await?;
+    Ok(services_response.map(|response| ProviderOutcome {
+        response,
+        provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
+        created_sms_id: None,
+        secret_values: list_secret_values(twilio_provider),
+    }))
 }
 
 /// SendMock's own `404`, logged under the prefix's provider when there is one.

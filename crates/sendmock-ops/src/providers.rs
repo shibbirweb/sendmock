@@ -2,6 +2,7 @@ mod builtin_providers;
 mod builtin_webhook_templates;
 mod callback_template_functions;
 mod message_provider_definition;
+mod messaging_service_sender;
 mod operation_matcher;
 mod provider_call;
 mod provider_http;
@@ -11,6 +12,7 @@ mod read_operation_kinds;
 mod request_checks;
 mod request_reader;
 mod send_operation_kind;
+mod twilio_messaging_services;
 
 pub use builtin_providers::builtin_sms_providers;
 pub use callback_template_functions::sign_twilio_request;
