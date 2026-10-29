@@ -64,6 +64,12 @@ async fn services_are_created_edited_and_deleted_with_the_rules_enforced() {
     );
     assert_eq!(delete_status, 204);
     assert_eq!(remaining_services, json!([]));
+}
+
+// AC: VF-01.3
+#[tokio::test]
+async fn invalid_services_are_refused_with_their_field() {
+    let (app_router, _) = build_test_app();
     let invalid_cases = [
         (
             json!({ "friendly_name": " ", "code_length": 6, "fixed_code": null, "ttl_seconds": 600 }),
