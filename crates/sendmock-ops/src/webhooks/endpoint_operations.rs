@@ -96,6 +96,7 @@ impl Operation for CreateWebhookEndpointOperation {
             url: input.url.trim().to_owned(),
             is_enabled: input.is_enabled,
             request_settings_json: write_request_settings(&input.request_settings)?,
+            detached_template_json: None,
             signing_secret: WebhookSecret::generate(operation_context.random_source.as_ref())
                 .expose()
                 .to_owned(),

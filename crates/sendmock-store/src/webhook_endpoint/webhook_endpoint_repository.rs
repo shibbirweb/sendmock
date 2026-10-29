@@ -5,7 +5,7 @@ use rusqlite::{OptionalExtension, Row, params};
 use super::{WebhookEndpointRecord, WebhookSecretRotation};
 use crate::{Database, StoreError};
 
-const ENDPOINT_COLUMNS: &str = "id, name, url, is_enabled, request_settings, signing_secret, previous_signing_secret, previous_secret_expires_at, created_by, created_at";
+const ENDPOINT_COLUMNS: &str = "id, name, url, is_enabled, request_settings, signing_secret, previous_signing_secret, previous_secret_expires_at, created_by, created_at, detached_template";
 
 /// Webhook endpoints with their signing secrets.
 #[derive(Clone)]
@@ -58,7 +58,7 @@ impl WebhookEndpointRepository {
         self.database
             .write(move |connection| {
                 connection.execute(
-                    &format!("INSERT INTO webhook_endpoints ({ENDPOINT_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)"),
+                    &format!("INSERT INTO webhook_endpoints ({ENDPOINT_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)"),
                     params![
                         new_endpoint.endpoint_id,
                         new_endpoint.name,
@@ -70,6 +70,7 @@ impl WebhookEndpointRepository {
                         new_endpoint.previous_secret_expires_at_unix_ms,
                         new_endpoint.created_by,
                         new_endpoint.created_at_unix_ms,
+                        new_endpoint.detached_template_json,
                     ],
                 )?;
                 Ok(())
@@ -77,7 +78,8 @@ impl WebhookEndpointRepository {
             .await
     }
 
-    /// Saves the name, URL, enabled state and request settings; secrets and the creator stay.
+    /// Saves the name, URL, enabled state, request settings and detached template copy; secrets
+    /// and the creator stay.
     /// False when the endpoint is gone.
     pub async fn update_endpoint(
         &self,
@@ -86,13 +88,14 @@ impl WebhookEndpointRepository {
         self.database
             .write(move |connection| {
                 let changed_count = connection.execute(
-                    "UPDATE webhook_endpoints SET name = ?2, url = ?3, is_enabled = ?4, request_settings = ?5 WHERE id = ?1",
+                    "UPDATE webhook_endpoints SET name = ?2, url = ?3, is_enabled = ?4, request_settings = ?5, detached_template = ?6 WHERE id = ?1",
                     params![
                         changed_endpoint.endpoint_id,
                         changed_endpoint.name,
                         changed_endpoint.url,
                         changed_endpoint.is_enabled,
                         changed_endpoint.request_settings_json,
+                        changed_endpoint.detached_template_json,
                     ],
                 )?;
                 Ok(changed_count > 0)
@@ -147,5 +150,6 @@ fn read_endpoint_row(row: &Row<'_>) -> rusqlite::Result<WebhookEndpointRecord> {
         previous_secret_expires_at_unix_ms: row.get(7)?,
         created_by: row.get(8)?,
         created_at_unix_ms: row.get(9)?,
+        detached_template_json: row.get(10)?,
     })
 }

@@ -7,6 +7,8 @@ pub struct WebhookEndpointRecord {
     pub is_enabled: bool,
     /// The method, headers, body, retry policy and other request settings as a JSON document.
     pub request_settings_json: String,
+    /// A detached endpoint's own copy of its template as JSON; None while it is linked.
+    pub detached_template_json: Option<String>,
     /// The `whsec_` secret deliveries are signed with.
     pub signing_secret: String,
     /// The secret before the last rotation, still signing until it expires.

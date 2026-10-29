@@ -19,6 +19,7 @@ fn endpoint(endpoint_id: &str, created_at_unix_ms: i64) -> WebhookEndpointRecord
         url: "http://localhost:3000/hooks".to_owned(),
         is_enabled: true,
         request_settings_json: r#"{"method":"POST"}"#.to_owned(),
+        detached_template_json: None,
         signing_secret: "whsec_first".to_owned(),
         previous_signing_secret: None,
         previous_secret_expires_at_unix_ms: None,
@@ -68,6 +69,34 @@ async fn an_update_keeps_the_secret_and_creator() -> Result<(), StoreError> {
             is_enabled: false,
             ..endpoint("a", 1_000)
         })
+    );
+    Ok(())
+}
+
+// AC: WH-09.2
+#[tokio::test]
+async fn an_update_saves_and_clears_the_detached_template_copy() -> Result<(), StoreError> {
+    let repository = repository()?;
+    repository.insert_endpoint(endpoint("a", 1_000)).await?;
+    let detached_template_json = Some(r#"{"method":"POST","body_template":"{}"}"#.to_owned());
+
+    repository
+        .update_endpoint(WebhookEndpointRecord {
+            detached_template_json: detached_template_json.clone(),
+            ..endpoint("a", 1_000)
+        })
+        .await?;
+    let detached_endpoint = repository.find_endpoint("a").await?;
+    repository.update_endpoint(endpoint("a", 1_000)).await?;
+    let linked_endpoint = repository.find_endpoint("a").await?;
+
+    assert_eq!(
+        detached_endpoint.and_then(|stored_endpoint| stored_endpoint.detached_template_json),
+        detached_template_json
+    );
+    assert_eq!(
+        linked_endpoint.and_then(|stored_endpoint| stored_endpoint.detached_template_json),
+        None
     );
     Ok(())
 }

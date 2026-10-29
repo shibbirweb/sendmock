@@ -66,4 +66,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 14,
         sql: include_str!("../migrations/0014_webhook_templates.sql"),
     },
+    Migration {
+        schema_version: 15,
+        sql: include_str!("../migrations/0015_detached_endpoint_templates.sql"),
+    },
 ];
