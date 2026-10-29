@@ -14,7 +14,7 @@ use crate::config::ServerConfig;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
 use crate::retention_task::{apply_retention_flags, run_retention_task};
-use crate::shutdown_signal::wait_for_shutdown_signal;
+use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
 
@@ -55,6 +55,7 @@ pub async fn run_server(
         shutdown_receiver,
     )?;
     apply_retention_flags(server_config, &operation_context).await;
+    let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
     background_tasks.spawn(run_retention_task(
         operation_context.clone(),
         shutdown_receiver_for_retention,
@@ -66,7 +67,7 @@ pub async fn run_server(
         &operation_context,
     );
     let http_shutdown = async move {
-        wait_for_shutdown_signal().await;
+        shutdown_signal.wait().await;
         let _ = shutdown_sender.send(true);
     };
     serve_http(listeners.http_listener, app_router, http_shutdown)

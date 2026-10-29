@@ -1,29 +1,45 @@
-/// Resolves on Ctrl-C, or on `SIGTERM` (what `docker stop` sends) on Unix.
-pub async fn wait_for_shutdown_signal() {
-    let interrupt = async {
-        if tokio::signal::ctrl_c().await.is_err() {
-            std::future::pending::<()>().await;
-        }
-    };
-    tokio::select! {
-        () = interrupt => {}
-        () = wait_for_terminate_signal() => {}
-    }
+use std::io;
+
+/// The signals that stop the server, registered when created so a signal that arrives
+/// right after the ready line is never missed: Ctrl-C, and `SIGTERM` (what `docker stop`
+/// sends) on Unix.
+pub struct ShutdownSignal {
+    #[cfg(unix)]
+    interrupt: tokio::signal::unix::Signal,
+    #[cfg(unix)]
+    terminate: tokio::signal::unix::Signal,
+    #[cfg(windows)]
+    ctrl_c: tokio::signal::windows::CtrlC,
 }
 
-#[cfg(unix)]
-async fn wait_for_terminate_signal() {
-    use tokio::signal::unix::{SignalKind, signal};
+impl ShutdownSignal {
+    #[cfg(unix)]
+    pub fn install() -> io::Result<Self> {
+        use tokio::signal::unix::{SignalKind, signal};
 
-    match signal(SignalKind::terminate()) {
-        Ok(mut terminate_signal) => {
-            terminate_signal.recv().await;
-        }
-        Err(_) => std::future::pending::<()>().await,
+        Ok(Self {
+            interrupt: signal(SignalKind::interrupt())?,
+            terminate: signal(SignalKind::terminate())?,
+        })
     }
-}
 
-#[cfg(not(unix))]
-async fn wait_for_terminate_signal() {
-    std::future::pending::<()>().await;
+    #[cfg(windows)]
+    pub fn install() -> io::Result<Self> {
+        Ok(Self {
+            ctrl_c: tokio::signal::windows::ctrl_c()?,
+        })
+    }
+
+    #[cfg(unix)]
+    pub async fn wait(mut self) {
+        tokio::select! {
+            _ = self.interrupt.recv() => {}
+            _ = self.terminate.recv() => {}
+        }
+    }
+
+    #[cfg(windows)]
+    pub async fn wait(mut self) {
+        self.ctrl_c.recv().await;
+    }
 }
