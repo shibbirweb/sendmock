@@ -77,6 +77,9 @@ export const agentRoundTiming = {
   holdFrames: 54,
 };
 
+/** Frames after a tool call appears until its check mark lands. */
+export const toolCallCheckDelayFrames = 8;
+
 /** Frame (inside the round) at which the given part starts. */
 export function getRoundPartFrames(agentRound: AgentRound) {
   const promptEndFrame = Math.ceil(

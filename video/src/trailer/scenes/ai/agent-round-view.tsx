@@ -11,6 +11,7 @@ import {
   type AgentRound,
   agentRoundTiming,
   getRoundPartFrames,
+  toolCallCheckDelayFrames,
 } from "./agent-rounds";
 
 type AgentRoundViewProps = {
@@ -67,7 +68,11 @@ export function AgentRoundView({ agentRound }: AgentRoundViewProps) {
           if (frame < callFrame) {
             return null;
           }
-          const doneAmount = getProgress(frame, callFrame + 8, 6);
+          const doneAmount = getProgress(
+            frame,
+            callFrame + toolCallCheckDelayFrames,
+            6,
+          );
           return (
             <div
               key={toolCall.toolName}

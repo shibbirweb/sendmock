@@ -6,7 +6,7 @@
     "studio": "remotion studio src/index.ts",
     "typecheck": "bun --bun tsc --noEmit",
     "app-pages": "bun scripts/capture-app-pages.ts",
-    "music": "bun scripts/compose-trailer-music.ts"
+    "sounds": "bun scripts/compose-ui-sounds.ts"
   },
   "dependencies": {
     "@remotion/cli": "4.0.539",

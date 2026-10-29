@@ -1,9 +1,11 @@
 import type { TerminalLine } from "../../parts/app-terminal";
 import {
+  buildWebhookFlowCues,
   WebhookFlowScene,
   type WebhookFlowStep,
 } from "../../parts/webhook-flow-scene";
 import { getTypingDurationFrames } from "../../trailer-motion";
+import { createTypingCue, type UiCue } from "../../ui-cues";
 import { MailPanel, replyText } from "./mail-panel";
 
 export const emailSceneDurationFrames = 330;
@@ -64,6 +66,16 @@ const emailSteps: WebhookFlowStep[] = [
     },
     logLine: "POST /mail/inbound  reply from Maya",
   },
+];
+
+/** Sounds: each event lights its chip as it is sent; Maya's reply is typed. */
+export const emailSceneCues: UiCue[] = [
+  ...buildWebhookFlowCues(emailSteps),
+  ...emailSteps.map((step): UiCue => ({
+    frame: step.startFrame,
+    cueKind: "fire",
+  })),
+  createTypingCue(replyTypingStartFrame, replyText, 13 / 30),
 ];
 
 const appOwnLines: TerminalLine[] = [

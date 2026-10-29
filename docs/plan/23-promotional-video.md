@@ -14,7 +14,7 @@ Where it is shown on the website (the landing page's video section above the foo
 | Story | the eleven scenes in [Trailer (2026-10-29)](#trailer-2026-10-29) below. All earlier films and act plans were cleared on 2026-10-29 at the owner's request |
 | Claims | only what SendMock does, with its real names: provider names, template ids, event names and MCP tool names come from the app's own data. No invented numbers |
 | Production | motion graphics built in Remotion (`video/`), with SendMock's UI parts drawn from the app's dark theme and real data, so every scene can move: requests travel, events fire, prompts type |
-| Sound | no voice-over: the film tells its story in on-screen words and works muted. Copyright-free generated music is added once the picture is approved |
+| Sound | no voice-over and no music (owner direction 2026-10-29): the film tells its story in on-screen words and works muted, and each change in the picture makes a short synthesized sound effect (see [Sound effects](#sound-effects-2026-10-29)) |
 | Captions | English WebVTT captions burned into the social cut and as a track on the full video, so it works muted |
 | Hosting | YouTube (public); the landing page loads the player only after the play button is pressed (`youtube-nocookie.com`), so the page stays fast and sets no third-party cookies before that |
 | Before the video exists | the landing section shows the poster, a disabled play button with "Video coming soon" and the three benefit points |
@@ -39,7 +39,7 @@ Owner brief: a promotional trailer that shows the main features (webhooks for em
 | Canvas | GitHub's dark background `#0d1117` with two soft teal and emerald glows drifting slowly, fine grain; surfaces `#161b22` with `#30363d` borders; words off-white `#e6edf3`, supporting words at about 62 percent; one calm mint accent `#7ccfbd` |
 | Type | Geist for words, a monospace font for requests, logs, tool names and commands. Each scene has a small chapter label (for example `01 · Email`) and one headline at the top |
 | Motif | a dashed mint line between SendMock and your app. A webhook travels along it as a soft dot of light and the request card shows what was sent, in the provider's own format |
-| Motion | elements rise in through a small blur over about half a second, no overshoot; scenes change with short crossfades (about half a second); the canvas always drifts. No ripples, rings, expanding circles or thin arcs: a press or an arrival shows as a soft bloom of light. Respects the brand colours of each provider only as a small dot |
+| Motion | elements rise in through a small blur over about half a second, no overshoot; scenes change without overlap through pushes, zoom-throughs and one match cut (see [Transitions and motion](#transitions-and-motion-2026-10-29)); the canvas always drifts. No ripples, rings, expanding circles or thin arcs: a press or an arrival shows as a soft bloom of light. Respects the brand colours of each provider only as a small dot |
 
 ### The scenes
 
@@ -48,7 +48,7 @@ Owner brief: a promotional trailer that shows the main features (webhooks for em
 | 1 | Open | big words, one at a time: **Email. SMS. Payments. Any API.**, then **Every webhook, on localhost.** and the SendMock logo | words land on the beat, each channel with a small icon | 7 s |
 | 2 | Email | "Every email event, back to your app." | the order email in SendMock's inbox; Delivered, Opened and the customer's reply light up one after another; each sends a SendGrid-format request (Event Webhook, then Inbound Parse) along the line; your app logs `200` | 11 s |
 | 3 | SMS | "Texts, receipts and replies, like Twilio." | the "Reply YES" text in the thread; its ticks turn delivered (status callback); the customer replies YES (inbound SMS with `X-Twilio-Signature`); your app answers with TwiML and the answer appears in the thread | 11 s |
-| 4 | Payments | "Checkouts that pay, decline and refund." | the test checkout (Stripe, $42.00) with its test controls (Pay successfully, Decline, Require 3-D Secure, Refund); Pay successfully is pressed and the order turns Paid (`checkout.session.completed`), then Refund turns it Refunded (`charge.refunded`); each Stripe-format event carries `Stripe-Signature` | 10 s |
+| 4 | Payments | "Checkouts that pay, decline and refund." | the test checkout (Stripe, $42.00) with its test controls (Pay successfully, Decline, Require 3-D Secure, Refund); Decline is pressed and the order turns Declined (`payment_intent.payment_failed`, `card_declined`), then Pay successfully turns it Paid (`checkout.session.completed`), then Refund turns it Refunded (`charge.refunded`); each Stripe-format event carries `Stripe-Signature` | 10 s |
 | 5 | Any API | "Any other API call, caught." | the direction flips: your app posts to Slack, Discord and a CRM API, and the HTTP catcher catches each call, answers it and previews the message | 9 s |
 | 6 | Built in | "Built in. Ready on first run." | a bento of tiles: 6 email providers, 6 SMS providers, 5 payment gateways, 17 webhook templates (each tile counts up and its names rise in), plus "Signed like the real thing" and "Real responses and errors" | 11 s |
 | 7 | Events | "32 events. Subscribe to any." | every built-in event as a chip, grouped by area (email, SMS, verify, HTTP, payment, checkout, webhook, test), cascading in by column, then events firing live across the wall | 9 s |
@@ -79,23 +79,32 @@ Owner request: a copy of the trailer that, after the AI prompts, shows some of t
 
 Platforms becomes `10 · Everywhere` in this version. The screenshots are taken from the web app in mock mode (`bun run dev` in `web/`, then `bun run app-pages` in `video/`), at 1440 by 900 and twice the pixel density, with the demo controls hidden, into `video/public/app-pages/`.
 
-### Music (2026-10-29)
+### Sound effects (2026-10-29)
 
-Owner request: unique, copyright-free music that suits a developer-tool introduction, playable in Remotion Studio.
-
-**How it is made:** composed in code. A small synthesizer script (`bun run music` in `video/`, sources in `video/scripts/music/`) writes an original track for each composition from oscillators and noise, with no samples, loops or third-party recordings, so SendMock owns it outright and no licence is needed. The script reads the trailer's own scene list, so every section change and hit lands on a cut, and it is re-run whenever scene lengths change. Output: `video/public/music/sendmock-trailer.mp3` and `sendmock-trailer-tour.mp3` (192 kbps), played by each composition.
-
-**What the research showed** (launch and tech-video music): about 110 to 120 BPM, uplifting and medium-driving; plucked synth arpeggios, warm pads and a steady electronic pulse; different energy per part with one continuous theme; a riser into each reveal; the biggest lift on the product moment; quiet enough to read on-screen words over it.
+Owner direction: no background music. Instead, every change in the picture makes its own short sound: a click when a control is pressed, a swoosh when data is sent, a soft blip when it lands, a success chime or a gentle error tone for the outcome, typing while text is typed, a pop when something appears, a swipe for each page of the app tour, a whoosh for each scene transition and a soft reveal for the logo and the closing line. The earlier composed music (`bun run music`) was removed.
 
 | Item | Decision |
 |------|----------|
-| Tempo and key | 120 BPM, so one beat is exactly 15 frames at 30 fps; A minor, the loop Am9, Fmaj7, Cadd9, G6 (one chord per bar), resolving to C major at the end |
-| Palette | plucked saw arpeggio in sixteenths with a ping-pong delay, warm detuned pad, sub bass, soft kick, hats and claps, a riser and a low impact for reveals, small bells for events; one shared reverb |
-| Opening | a soft hit on each word (Email, SMS, Payments, Any API), a riser under "Every webhook, on localhost." and an impact with the pad swelling as the logo lands |
-| Feature scenes (email to any API) | groove: kick on beats 1 and 3, off-beat hats, pumping bass, the arpeggio at medium brightness |
-| Built in, events | lift: four-on-the-floor, claps on 2 and 4, brighter arpeggio; bells sparkle while the events fire |
-| Build your own | back to the groove |
-| AI ready | breakdown: drums out, pad and a darker, sparser arpeggio, then a riser into the next scene |
-| At a glance (tour) and platforms | the drop: every layer at full brightness plus a short lead melody (in the version without the tour, platforms takes the drop) |
-| Close | an impact on the closing line, the pad resolving to C major, the arpeggio thinning out, a long fade |
-| Mix | drums duck the music slightly on each kick (sidechain); a soft limiter keeps peaks under -1 dBFS; the music stays under the picture, no voice-over to leave room for |
+| How they are made | synthesized in code (`bun run sounds` in `video/`, sources in `video/scripts/sounds/`) from oscillators and filtered noise, with no samples or recordings, so no licence is needed; written to `video/public/sounds/*.wav` |
+| Sync | each scene lists its sound cues from the same constants that drive its animation (step frames, typing speeds, tile and page timings), and the trailer plays them inside that scene's sequence, so a timing change moves the sound with the picture without regenerating anything |
+| Character | soft and rounded so a two-minute watch never tires the ear: pitched in a calm major key, gentle attacks, only warm octave overtones (no metallic bell partials), nothing above the middle of the piano; outcomes (success, error) a little more forward than the rest |
+| Typing (owner review 2026-10-29) | one soft key press for every character as it appears on screen, timed from the same typing speed the text uses (the email reply, Maya's YES, every builder field and template, every AI prompt); fast typing is capped at 15 presses a second, and four slightly different keys take turns so it sounds like a real keyboard |
+| Repeated sounds (owner review 2026-10-29) | a high bell on the events wall was disturbing, so the event sound is now a soft low note (G4 to E5, slow attack, pure tone) that takes turns on five notes in a gentle pattern instead of repeating one, plays for every third live event only, and sits quietest in the mix; the same sound is used for tool-call checks and install commands |
+| Data transfer | in the feature scenes each request leaves with a swoosh; a webhook that reaches your app with `200` lands with a success chime; in payments the order's status answers at once (an error tone for the decline, a chime for paid and refunded) and each Stripe event lands with a blip; in the HTTP catcher each call is caught with a blip and SendMock's answer returns with a chime |
+
+### Transitions and motion (2026-10-29)
+
+Owner review: the crossfade between scenes put two busy layouts on top of each other (the logo over the email scene), and the motion should feel more professional and engaging, with elements that move and transform.
+
+**What the research showed** (motion-design transitions, launch videos): crossfading between scenes is the classic anti-pattern; the way a scene exits decides how the next one enters (same axis, same direction, matched speed, cut in the middle of the motion); use a small set of transition types consistently, plus one shared-element match cut for the key moment; directional moves with speed ramps give a video energy; a dynamic zoom takes the viewer deeper into the product.
+
+| Element | Decision |
+|---------|----------|
+| No overlap | scenes never crossfade. In every transition the outgoing scene leaves before or as the incoming one arrives, so two layouts never sit on top of each other |
+| Push (series) | between the feature chapters (email, SMS, payments, any API) the camera pans left: the outgoing scene is pushed out to the left as the next one comes in from the right, side by side, with a speed ramp and motion blur at the fastest point. Built in to events to build your own, and the tour to platforms, push upward the same way |
+| Zoom-through (reveals) | into the first chapter, into the bento, into the AI scene and into the app tour (the drop): the outgoing scene flies toward the camera and dissolves into blur, a soft mint bloom fills the frame for a moment, and the next scene settles in from slightly small and soft to sharp |
+| Match cut (finale) | the install command bar of the platforms scene stays while everything else leaves, then carries across the cut and transforms into the closing card's install command while the closing line and logo build around it |
+| Camera | every scene is filmed by a slow camera push (about 3 percent over the scene), so no frame is still |
+| Headlines | each word of a headline rises out of a mask one after another (kinetic type) |
+| Feature scenes | the SendMock window slides in from the left and your app's terminal from the right; each request card is launched from the sending window, grows and travels to its place beside the line |
+| Sound | each transition plays a whoosh that peaks at its midpoint, where the new scene takes over |

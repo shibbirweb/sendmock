@@ -16,6 +16,7 @@ import {
 import { fontFamily } from "../../brand";
 import { getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
+import type { UiCue } from "../ui-cues";
 
 type ChannelBeat = {
   word: string;
@@ -49,6 +50,15 @@ export const openingCueFrames = {
   localhostLineFrame: channelBeatsDurationFrames,
   logoFrame: channelBeatsDurationFrames + localhostLineDurationFrames,
 };
+
+export const openingSceneCues: UiCue[] = [
+  ...openingCueFrames.channelWordFrames.map((wordFrame): UiCue => ({
+    frame: wordFrame,
+    cueKind: "appear",
+  })),
+  { frame: openingCueFrames.localhostLineFrame, cueKind: "whoosh" },
+  { frame: openingCueFrames.logoFrame, cueKind: "reveal" },
+];
 
 /** Scene 1: the channels in big words, the promise, then the logo. */
 export function OpeningScene() {

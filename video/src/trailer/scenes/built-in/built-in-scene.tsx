@@ -1,6 +1,7 @@
 import { AbsoluteFill } from "remotion";
 
 import { SceneHeadline } from "../../parts/scene-headline";
+import type { UiCue } from "../../ui-cues";
 import {
   emailProviders,
   paymentGateways,
@@ -24,6 +25,11 @@ const tileStartFrames = {
   signed: 58,
   errors: 66,
 };
+
+/** Sounds: a soft pop as each tile lands. */
+export const builtInSceneCues: UiCue[] = Object.values(tileStartFrames).map(
+  (tileStartFrame): UiCue => ({ frame: tileStartFrame, cueKind: "appear" }),
+);
 
 /** Scene 6: the built-in providers, gateways and templates, as a bento grid. */
 export function BuiltInScene() {

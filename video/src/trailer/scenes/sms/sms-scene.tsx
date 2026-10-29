@@ -1,9 +1,11 @@
 import type { TerminalLine } from "../../parts/app-terminal";
 import {
+  buildWebhookFlowCues,
   WebhookFlowScene,
   type WebhookFlowStep,
 } from "../../parts/webhook-flow-scene";
-import { SmsPanel } from "./sms-panel";
+import { createTypingCue, type UiCue } from "../../ui-cues";
+import { customerReplyText, SmsPanel } from "./sms-panel";
 
 export const smsSceneDurationFrames = 330;
 
@@ -46,6 +48,13 @@ const smsSteps: WebhookFlowStep[] = [
     },
     logLine: "POST /sms/inbound  Body=YES",
   },
+];
+
+/** Sounds: Maya types YES, and your app's TwiML answer lands in the thread. */
+export const smsSceneCues: UiCue[] = [
+  ...buildWebhookFlowCues(smsSteps),
+  createTypingCue(replyTypingStartFrame, customerReplyText, 0.2),
+  { frame: appAnswerFrame, cueKind: "arrive" },
 ];
 
 const appOwnLines: TerminalLine[] = [

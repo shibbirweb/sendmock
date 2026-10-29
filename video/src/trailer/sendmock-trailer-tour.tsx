@@ -1,5 +1,6 @@
 import {
   AppTourScene,
+  appTourSceneCues,
   appTourSceneDurationFrames,
 } from "./scenes/app-tour/app-tour-scene";
 import { PlatformsScene } from "./scenes/platforms/platforms-scene";
@@ -19,7 +20,7 @@ function PlatformsSceneAfterTour() {
  * (docs/plan/23-promotional-video.md, Version with an app tour).
  */
 export const tourScenes: TrailerScene[] = trailerScenes.flatMap(
-  (trailerScene) => {
+  (trailerScene): TrailerScene[] => {
     if (trailerScene.sceneName === "ai") {
       return [
         trailerScene,
@@ -27,11 +28,19 @@ export const tourScenes: TrailerScene[] = trailerScenes.flatMap(
           sceneName: "app-tour",
           Scene: AppTourScene,
           durationFrames: appTourSceneDurationFrames,
+          transitionIn: "zoomThrough",
+          cues: appTourSceneCues,
         },
       ];
     }
     if (trailerScene.sceneName === "platforms") {
-      return [{ ...trailerScene, Scene: PlatformsSceneAfterTour }];
+      return [
+        {
+          ...trailerScene,
+          Scene: PlatformsSceneAfterTour,
+          transitionIn: "pushUp",
+        },
+      ];
     }
     return [trailerScene];
   },
@@ -42,10 +51,5 @@ export const sendMockTrailerTourDurationFrames =
 
 /** The SendMock trailer with a glance at the app's real pages. */
 export function SendMockTrailerTour() {
-  return (
-    <TrailerFilm
-      scenes={tourScenes}
-      musicPath="music/sendmock-trailer-tour.mp3"
-    />
-  );
+  return <TrailerFilm scenes={tourScenes} />;
 }

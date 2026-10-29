@@ -1,7 +1,7 @@
 import { useCurrentFrame } from "remotion";
 
 import { fontFamily, monoFontFamily } from "../../brand";
-import { getRiseInStyle } from "../trailer-motion";
+import { getProgress, getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
 
 type SceneHeadlineProps = {
@@ -11,7 +11,10 @@ type SceneHeadlineProps = {
   topPx?: number;
 };
 
-/** The chapter label and one headline at the top of a scene. */
+const wordStaggerFrames = 3;
+const wordRiseFrames = 14;
+
+/** The chapter label and one headline whose words rise out of a mask in turn. */
 export function SceneHeadline({
   chapterLabel,
   headline,
@@ -19,6 +22,9 @@ export function SceneHeadline({
   topPx = 72,
 }: SceneHeadlineProps) {
   const frame = useCurrentFrame();
+  const headlineWords = headline.split(" ");
+  const supportingLineFrame = 6 + headlineWords.length * wordStaggerFrames;
+  const labelProgress = getProgress(frame, 0, 14);
 
   return (
     <div
@@ -33,19 +39,18 @@ export function SceneHeadline({
     >
       <div
         style={{
-          ...getRiseInStyle(frame, 0, 12, 10),
           fontFamily: monoFontFamily,
           fontSize: 22,
-          letterSpacing: 3,
+          letterSpacing: 3 + (1 - labelProgress) * 10,
           textTransform: "uppercase",
           color: trailerPalette.accent,
+          opacity: labelProgress,
         }}
       >
         {chapterLabel}
       </div>
       <div
         style={{
-          ...getRiseInStyle(frame, 4, 16),
           marginTop: 14,
           fontSize: 64,
           fontWeight: 600,
@@ -53,12 +58,40 @@ export function SceneHeadline({
           color: trailerPalette.text,
         }}
       >
-        {headline}
+        {headlineWords.map((headlineWord, wordIndex) => {
+          const wordProgress = getProgress(
+            frame,
+            4 + wordIndex * wordStaggerFrames,
+            wordRiseFrames,
+          );
+          return (
+            <span
+              key={`${headlineWord}-${wordIndex}`}
+              style={{
+                display: "inline-block",
+                overflow: "hidden",
+                verticalAlign: "bottom",
+                paddingBottom: 6,
+                marginRight:
+                  wordIndex < headlineWords.length - 1 ? "0.26em" : 0,
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  transform: `translateY(${(1 - wordProgress) * 105}%)`,
+                }}
+              >
+                {headlineWord}
+              </span>
+            </span>
+          );
+        })}
       </div>
       {supportingLine === undefined ? null : (
         <div
           style={{
-            ...getRiseInStyle(frame, 10, 16),
+            ...getRiseInStyle(frame, supportingLineFrame, 16),
             marginTop: 12,
             fontSize: 28,
             color: trailerPalette.textMuted,

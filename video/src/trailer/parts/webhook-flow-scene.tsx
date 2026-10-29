@@ -1,11 +1,12 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 
 import {
   getActiveStepIndex,
-  getFadeOutOpacity,
-  getRiseInStyle,
+  getProgress,
+  getSlideInStyle,
 } from "../trailer-motion";
+import type { UiCue, UiCueKind } from "../ui-cues";
 import { AppTerminal, type TerminalLine } from "./app-terminal";
 import { AppWindow } from "./app-window";
 import { type FlowDirection, FlowLine } from "./flow-line";
@@ -37,6 +38,36 @@ const flowLineYPx = 430;
 const requestCard = { leftPx: 838, topPx: 490, widthPx: 484 };
 const travelDurationFrames = 20;
 const requestLeadFrames = 6;
+const cardLaunchFrames = 16;
+const productWindowAppearFrame = 6;
+const appWindowAppearFrame = 12;
+
+/** The frame a step's request lands at the other end of the line. */
+export function getStepArrivalFrame(step: WebhookFlowStep): number {
+  return step.startFrame + requestLeadFrames + travelDurationFrames;
+}
+
+/**
+ * The sounds every feature scene shares: the windows appear, each request
+ * leaves with a swoosh and lands with its outcome (a success chime unless the
+ * scene says otherwise).
+ */
+export function buildWebhookFlowCues(
+  steps: WebhookFlowStep[],
+  getArrivalCueKind: (stepIndex: number) => UiCueKind = () => "success",
+): UiCue[] {
+  return [
+    { frame: productWindowAppearFrame, cueKind: "appear" },
+    { frame: appWindowAppearFrame, cueKind: "appear" },
+    ...steps.flatMap((step, stepIndex): UiCue[] => [
+      { frame: step.startFrame, cueKind: "send" },
+      {
+        frame: getStepArrivalFrame(step),
+        cueKind: getArrivalCueKind(stepIndex),
+      },
+    ]),
+  ];
+}
 
 /**
  * The feature scenes' shared layout: SendMock on the left, your app's terminal
@@ -76,7 +107,7 @@ export function WebhookFlowScene({
       <AppWindow
         title={productTitle}
         style={{
-          ...getRiseInStyle(frame, 6, 18, 30),
+          ...getSlideInStyle(frame, productWindowAppearFrame, 20, -140),
           left: productWindow.leftPx,
           top: productWindow.topPx,
           width: productWindow.widthPx,
@@ -89,7 +120,7 @@ export function WebhookFlowScene({
         title={appTitle}
         lines={terminalLines}
         style={{
-          ...getRiseInStyle(frame, 12, 18, 30),
+          ...getSlideInStyle(frame, appWindowAppearFrame, 20, 140),
           left: appWindow.leftPx,
           top: appWindow.topPx,
           width: appWindow.widthPx,
@@ -108,22 +139,21 @@ export function WebhookFlowScene({
         const nextStep = steps[stepIndex + 1];
         const isVisible =
           frame >= step.startFrame &&
-          (nextStep === undefined || frame < nextStep.startFrame + 8);
+          (nextStep === undefined || frame < nextStep.startFrame + 10);
         if (!isVisible) {
           return null;
         }
-        const fadeOutOpacity =
-          nextStep === undefined
-            ? 1
-            : getFadeOutOpacity(frame, nextStep.startFrame, 8);
-        const riseInStyle = getRiseInStyle(frame, step.startFrame, 14, 24);
         return (
           <RequestCard
             key={step.startFrame}
             request={step.request}
             style={{
-              ...riseInStyle,
-              opacity: Number(riseInStyle.opacity) * fadeOutOpacity,
+              ...getRequestCardMotionStyle(
+                frame,
+                step.startFrame,
+                nextStep?.startFrame,
+                direction,
+              ),
               left: requestCard.leftPx,
               top: requestCard.topPx,
               width: requestCard.widthPx,
@@ -133,4 +163,41 @@ export function WebhookFlowScene({
       })}
     </AbsoluteFill>
   );
+}
+
+/**
+ * A request card is launched from the sending window's edge: it starts small
+ * on the line, grows as it travels into place, and drops away when the next
+ * request takes over.
+ */
+function getRequestCardMotionStyle(
+  frame: number,
+  startFrame: number,
+  nextStartFrame: number | undefined,
+  direction: FlowDirection,
+): CSSProperties {
+  const launchProgress = getProgress(frame, startFrame, cardLaunchFrames);
+  const leaveProgress =
+    nextStartFrame === undefined ? 0 : getProgress(frame, nextStartFrame, 10);
+  const senderEdgeXPx =
+    direction === "toApp"
+      ? productWindow.leftPx + productWindow.widthPx
+      : appWindow.leftPx;
+  const cardCenterXPx = requestCard.leftPx + requestCard.widthPx / 2;
+  const launchOffsetXPx =
+    (senderEdgeXPx - cardCenterXPx) * (1 - launchProgress);
+  const launchOffsetYPx =
+    (flowLineYPx - requestCard.topPx) * (1 - launchProgress);
+  return {
+    opacity: Math.min(1, launchProgress * 2) * (1 - leaveProgress),
+    transform: [
+      `translate(${launchOffsetXPx}px, ${launchOffsetYPx + leaveProgress * 40}px)`,
+      `scale(${0.25 + launchProgress * 0.75 - leaveProgress * 0.06})`,
+    ].join(" "),
+    transformOrigin: "50% 0%",
+    filter:
+      launchProgress < 1 || leaveProgress > 0
+        ? `blur(${(1 - launchProgress) * 6 + leaveProgress * 8}px)`
+        : undefined,
+  };
 }

@@ -9,6 +9,7 @@ import {
   getTypedText,
 } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import { fieldCharactersPerFrame } from "./builder-script";
 
 type BuilderPanelProps = {
   title: string;
@@ -58,7 +59,12 @@ export function TypedField({
   isMonospace = false,
 }: TypedFieldProps) {
   const frame = useCurrentFrame();
-  const typedValue = getTypedText(value, frame, typingStartFrame, 0.8);
+  const typedValue = getTypedText(
+    value,
+    frame,
+    typingStartFrame,
+    fieldCharactersPerFrame,
+  );
   const isTyping = typedValue.length > 0 && typedValue.length < value.length;
 
   return (

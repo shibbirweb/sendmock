@@ -6,12 +6,14 @@ import { trailerPalette } from "../../trailer-palette";
 
 type CheckoutPanelProps = {
   activeStepIndex: number;
+  declinePressFrame: number;
   payPressFrame: number;
   refundPressFrame: number;
 };
 
 const orderStatuses = [
   { label: "Pending", color: trailerPalette.textMuted },
+  { label: "Declined", color: trailerPalette.danger },
   { label: "Paid", color: trailerPalette.success },
   { label: "Refunded", color: trailerPalette.amber },
 ];
@@ -19,6 +21,7 @@ const orderStatuses = [
 /** SendMock's test checkout for Stripe, with its one-press test outcomes. */
 export function CheckoutPanel({
   activeStepIndex,
+  declinePressFrame,
   payPressFrame,
   refundPressFrame,
 }: CheckoutPanelProps) {
@@ -113,7 +116,10 @@ export function CheckoutPanel({
             isPrimary
             pressAmount={getPressAmount(frame, payPressFrame)}
           />
-          <ControlButton label="Decline" pressAmount={0} />
+          <ControlButton
+            label="Decline"
+            pressAmount={getPressAmount(frame, declinePressFrame)}
+          />
           <ControlButton label="Require 3-D Secure" pressAmount={0} />
           <ControlButton
             label="Refund"

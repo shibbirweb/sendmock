@@ -14,6 +14,7 @@ import {
   getRiseInStyle,
 } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import type { UiCue } from "../../ui-cues";
 import { appTourPages } from "./app-tour-pages";
 
 const firstPageFrame = 20;
@@ -26,6 +27,15 @@ const pageStartFrames = appTourPages.map(
 
 export const appTourSceneDurationFrames =
   firstPageFrame + appTourPages.length * pageHoldFrames + outroFrames;
+
+/** Sounds: the window pops in, then each page swipes in. */
+export const appTourSceneCues: UiCue[] = [
+  { frame: 4, cueKind: "appear" },
+  ...pageStartFrames.map((pageStartFrame): UiCue => ({
+    frame: pageStartFrame,
+    cueKind: "page",
+  })),
+];
 
 const screenshotWidthPx = 1200;
 const screenshotHeightPx = (screenshotWidthPx * 900) / 1440;

@@ -1,8 +1,10 @@
 import type { TerminalLine } from "../../parts/app-terminal";
 import {
+  buildWebhookFlowCues,
   WebhookFlowScene,
   type WebhookFlowStep,
 } from "../../parts/webhook-flow-scene";
+import type { UiCue } from "../../ui-cues";
 import { type CaughtCall, CatcherPanel } from "./catcher-panel";
 
 export const anyApiSceneDurationFrames = 270;
@@ -77,6 +79,15 @@ const caughtCalls: CaughtCall[] = [
     previewTitle: "JSON body",
     previewText: '{ "email": "maya@example.com" }',
   },
+];
+
+/** Sounds: each call is caught with a blip, then SendMock's answer returns as a success. */
+export const anyApiSceneCues: UiCue[] = [
+  ...buildWebhookFlowCues(anyApiSteps, () => "arrive"),
+  ...caughtCalls.map((caughtCall): UiCue => ({
+    frame: caughtCall.catchFrame + 8,
+    cueKind: "success",
+  })),
 ];
 
 const appOwnLines: TerminalLine[] = [

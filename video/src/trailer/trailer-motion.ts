@@ -79,3 +79,18 @@ export function getActiveStepIndex(
   });
   return activeIndex;
 }
+
+/** Slides in from the side (negative is left) through a small blur. */
+export function getSlideInStyle(
+  frame: number,
+  startFrame: number,
+  durationFrames: number,
+  fromXPx: number,
+): CSSProperties {
+  const progress = getProgress(frame, startFrame, durationFrames);
+  return {
+    opacity: Math.min(1, progress * 1.6),
+    transform: `translateX(${(1 - progress) * fromXPx}px)`,
+    filter: progress < 1 ? `blur(${(1 - progress) * 10}px)` : undefined,
+  };
+}

@@ -2,6 +2,7 @@ import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
 
 import { EventChip } from "../../parts/event-chip";
 import { SceneHeadline } from "../../parts/scene-headline";
+import type { UiCue } from "../../ui-cues";
 import { eventGroups } from "../../trailer-facts";
 import { getRiseInStyle } from "../../trailer-motion";
 import { areaColors, trailerPalette } from "../../trailer-palette";
@@ -21,6 +22,31 @@ const firingStartFrame =
   cascadeStartFrame + allEvents.length * cascadeStaggerFrames + 10;
 const firingIntervalFrames = 5;
 const litDurationFrames = 22;
+
+/**
+ * Sounds: a soft tick for every few chips as the wall cascades in, then a
+ * soft low note for every third event that fires live.
+ */
+export const eventsSceneCues: UiCue[] = [
+  ...allEvents
+    .filter((_eventEntry, eventIndex) => eventIndex % 4 === 0)
+    .map((_eventEntry, groupIndex): UiCue => ({
+      frame: cascadeStartFrame + groupIndex * 4 * cascadeStaggerFrames,
+      cueKind: "appear",
+    })),
+  ...Array.from(
+    {
+      length: Math.floor(
+        (eventsSceneDurationFrames - firingStartFrame) /
+          (firingIntervalFrames * 3),
+      ),
+    },
+    (_unused, fireIndex): UiCue => ({
+      frame: firingStartFrame + fireIndex * firingIntervalFrames * 3,
+      cueKind: "fire",
+    }),
+  ),
+];
 
 /** How lit an event chip is from the live firing that follows the cascade. */
 function getFiringLitAmount(frame: number, eventIndex: number): number {

@@ -6,8 +6,14 @@ import { SceneHeadline } from "../../parts/scene-headline";
 import { aiAgentNames } from "../../trailer-facts";
 import { getFadeOutOpacity, getRiseInStyle } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import { createTypingCue, type UiCue } from "../../ui-cues";
 import { AgentRoundView } from "./agent-round-view";
-import { agentRounds, getRoundPartFrames } from "./agent-rounds";
+import {
+  agentRounds,
+  agentRoundTiming,
+  getRoundPartFrames,
+  toolCallCheckDelayFrames,
+} from "./agent-rounds";
 
 const firstRoundStartFrame = 24;
 const roundFadeFrames = 8;
@@ -33,6 +39,35 @@ export const aiSceneDurationFrames =
   (roundStartFrames[roundStartFrames.length - 1] ?? 0) +
   (lastRound === undefined ? 0 : getRoundPartFrames(lastRound).roundEndFrame) +
   20;
+
+/**
+ * Sounds: each prompt is typed, every tool call ticks as its check mark
+ * lands, and the agent's answer arrives with a success chime.
+ */
+export const aiSceneCues: UiCue[] = [
+  { frame: 8, cueKind: "appear" },
+  ...agentRounds.flatMap((agentRound, roundIndex): UiCue[] => {
+    const roundStartFrame = roundStartFrames[roundIndex] ?? 0;
+    const { firstToolFrame, answerFrame } = getRoundPartFrames(agentRound);
+    return [
+      createTypingCue(
+        roundStartFrame,
+        agentRound.prompt,
+        agentRoundTiming.promptCharactersPerFrame,
+      ),
+      ...agentRound.toolCalls.map((_toolCall, callIndex): UiCue => ({
+        frame:
+          roundStartFrame +
+          firstToolFrame +
+          callIndex * agentRoundTiming.toolCallIntervalFrames +
+          toolCallCheckDelayFrames,
+        cueKind: "fire",
+      })),
+      { frame: roundStartFrame + answerFrame, cueKind: "success" },
+    ];
+  }),
+  { frame: agentStripFrame, cueKind: "appear" },
+];
 
 /** Scene 9: everything SendMock does, asked for in plain words to an AI agent. */
 export function AiScene() {

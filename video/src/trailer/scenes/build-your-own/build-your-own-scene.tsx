@@ -7,8 +7,11 @@ import {
   SmsProviderBuilder,
   TemplateBuilder,
 } from "./builder-panels";
+import { buildBuilderCues, builderTimings } from "./builder-script";
 
 export const buildYourOwnSceneDurationFrames = 330;
+
+export const buildYourOwnSceneCues = buildBuilderCues();
 
 /** Scene 8: templates, providers and gateways SendMock does not ship, built. */
 export function BuildYourOwnScene() {
@@ -33,10 +36,10 @@ export function BuildYourOwnScene() {
           gap: 24,
         }}
       >
-        <TemplateBuilder appearFrame={16} workStartFrame={50} />
-        <EmailProviderBuilder appearFrame={26} workStartFrame={80} />
-        <SmsProviderBuilder appearFrame={36} workStartFrame={120} />
-        <PaymentGatewayBuilder appearFrame={46} workStartFrame={160} />
+        <TemplateBuilder {...builderTimings.template} />
+        <EmailProviderBuilder {...builderTimings.emailProvider} />
+        <SmsProviderBuilder {...builderTimings.smsProvider} />
+        <PaymentGatewayBuilder {...builderTimings.paymentGateway} />
       </div>
     </AbsoluteFill>
   );

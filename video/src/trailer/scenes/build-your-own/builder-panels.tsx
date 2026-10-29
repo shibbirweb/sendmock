@@ -4,31 +4,57 @@ import { monoFontFamily } from "../../../brand";
 import { getRiseInStyle, getTypedText } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
 import { BuilderPanel, ChoicePills, TypedField } from "./builder-parts";
+import {
+  type BuilderTiming,
+  emailProviderFields,
+  flowStepIntervalFrames,
+  flowStepOffsetFrames,
+  getTemplatePreviewFrame,
+  type ScriptedField,
+  smsProviderFields,
+  templateBody,
+  templateCharactersPerFrame,
+  templateNameLeadFrames,
+  templatePreview,
+  upayFlowSteps,
+} from "./builder-script";
 
-type BuilderPanelTiming = {
-  appearFrame: number;
+/** The scripted fields of a builder, typed in turn after `workStartFrame`. */
+function ScriptedFields({
+  fields,
+  workStartFrame,
+}: {
+  fields: ScriptedField[];
   workStartFrame: number;
-};
-
-const templateBody = `{
-  "text": "{{ data.subject }}",
-  "to": "{{ data.to[0].address }}"
-}`;
-
-const templatePreview = `{
-  "text": "Order #1042 shipped",
-  "to": "maya@example.com"
-}`;
+}) {
+  return (
+    <>
+      {fields.map((scriptedField) => (
+        <TypedField
+          key={scriptedField.label}
+          label={scriptedField.label}
+          value={scriptedField.value}
+          typingStartFrame={workStartFrame + scriptedField.offsetFrames}
+          isMonospace={scriptedField.isMonospace}
+        />
+      ))}
+    </>
+  );
+}
 
 /** A webhook template typed by hand, with its live preview. */
 export function TemplateBuilder({
   appearFrame,
   workStartFrame,
-}: BuilderPanelTiming) {
+}: BuilderTiming) {
   const frame = useCurrentFrame();
-  const typedBody = getTypedText(templateBody, frame, workStartFrame, 1.2);
-  const previewFrame =
-    workStartFrame + Math.ceil(templateBody.length / 1.2) + 4;
+  const typedBody = getTypedText(
+    templateBody,
+    frame,
+    workStartFrame,
+    templateCharactersPerFrame,
+  );
+  const previewFrame = getTemplatePreviewFrame(workStartFrame);
   const codeBoxStyle = {
     flex: 1,
     margin: 0,
@@ -50,7 +76,7 @@ export function TemplateBuilder({
       <TypedField
         label="Name"
         value="Ops alert"
-        typingStartFrame={workStartFrame - 14}
+        typingStartFrame={workStartFrame - templateNameLeadFrames}
       />
       <div style={{ display: "flex", gap: 14 }}>
         <pre style={{ ...codeBoxStyle, color: trailerPalette.text }}>
@@ -74,7 +100,7 @@ export function TemplateBuilder({
 export function EmailProviderBuilder({
   appearFrame,
   workStartFrame,
-}: BuilderPanelTiming) {
+}: BuilderTiming) {
   return (
     <BuilderPanel
       title="Mail › Providers › Add provider"
@@ -86,22 +112,9 @@ export function EmailProviderBuilder({
         chosenChoice="Blank"
         chooseFrame={workStartFrame}
       />
-      <TypedField
-        label="Name"
-        value="Acme Mail"
-        typingStartFrame={workStartFrame + 12}
-      />
-      <TypedField
-        label="Send path"
-        value="POST /v1/messages"
-        typingStartFrame={workStartFrame + 30}
-        isMonospace
-      />
-      <TypedField
-        label="Response"
-        value={'202 { "id": "{{ email.id }}" }'}
-        typingStartFrame={workStartFrame + 56}
-        isMonospace
+      <ScriptedFields
+        fields={emailProviderFields}
+        workStartFrame={workStartFrame}
       />
     </BuilderPanel>
   );
@@ -111,7 +124,7 @@ export function EmailProviderBuilder({
 export function SmsProviderBuilder({
   appearFrame,
   workStartFrame,
-}: BuilderPanelTiming) {
+}: BuilderTiming) {
   return (
     <BuilderPanel
       title="SMS › Providers › Add provider"
@@ -123,34 +136,19 @@ export function SmsProviderBuilder({
         chosenChoice="Twilio"
         chooseFrame={workStartFrame}
       />
-      <TypedField
-        label="Name"
-        value="Infobip"
-        typingStartFrame={workStartFrame + 12}
-      />
-      <TypedField
-        label="Delivered"
-        value="DELIVERED_TO_HANDSET"
-        typingStartFrame={workStartFrame + 28}
-        isMonospace
-      />
-      <TypedField
-        label="Failed"
-        value="UNDELIVERABLE_NOT_DELIVERED"
-        typingStartFrame={workStartFrame + 58}
-        isMonospace
+      <ScriptedFields
+        fields={smsProviderFields}
+        workStartFrame={workStartFrame}
       />
     </BuilderPanel>
   );
 }
 
-const upayFlowSteps = ["Wallet number", "OTP", "PIN", "Paid"];
-
 /** A new payment gateway whose checkout flow gets its steps one by one. */
 export function PaymentGatewayBuilder({
   appearFrame,
   workStartFrame,
-}: BuilderPanelTiming) {
+}: BuilderTiming) {
   const frame = useCurrentFrame();
 
   return (
@@ -166,7 +164,10 @@ export function PaymentGatewayBuilder({
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {upayFlowSteps.map((flowStep, stepIndex) => {
-          const stepFrame = workStartFrame + 20 + stepIndex * 18;
+          const stepFrame =
+            workStartFrame +
+            flowStepOffsetFrames +
+            stepIndex * flowStepIntervalFrames;
           const isLastStep = stepIndex === upayFlowSteps.length - 1;
           return (
             <div
