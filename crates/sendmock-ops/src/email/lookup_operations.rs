@@ -85,45 +85,77 @@ impl Operation for GetOtpOperation {
     ) -> Result<OtpLookup, OperationError> {
         let channel = input.channel.clone().unwrap_or_else(|| "email".to_owned());
         let wait_duration = read_wait_duration(input.timeout.as_deref(), Duration::ZERO)?;
-        if channel == "sms" {
-            let sms_with_code =
-                crate::find_newest_sms_with_code(operation_context, &input.to, wait_duration)
-                    .await?
-                    .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
-            let (code, source_id, received_at) = crate::describe_sms_code(&sms_with_code);
-            return Ok(OtpLookup {
-                to: input.to,
-                channel,
-                code,
-                source_id,
-                received_at,
-            });
-        }
-        if channel != "email" {
-            return Err(OperationError::InvalidInput {
-                message: format!("channel must be email or sms, not {channel}"),
+        match channel.as_str() {
+            "sms" => lookup_sms_code(operation_context, input, wait_duration).await,
+            "verify" => lookup_verify_code(operation_context, input, wait_duration).await,
+            "email" => lookup_email_code(operation_context, input, wait_duration).await,
+            _ => Err(OperationError::InvalidInput {
+                message: format!("channel must be email, sms or verify, not {channel}"),
                 field: Some("channel".to_owned()),
-            });
+            }),
         }
-        let email_with_code =
-            find_newest_with(operation_context, &input.to, wait_duration, |email| {
-                !email.otp_codes.is_empty()
-            })
-            .await?;
-        let email_with_code =
-            email_with_code.ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
-        Ok(OtpLookup {
-            to: input.to,
-            channel,
-            code: email_with_code
-                .otp_codes
-                .first()
-                .cloned()
-                .unwrap_or_default(),
-            source_id: email_with_code.email_id.clone(),
-            received_at: format_rfc3339(email_with_code.received_at_unix_ms),
-        })
     }
+}
+
+async fn lookup_sms_code(
+    operation_context: &OperationContext,
+    input: RecipientLookupQuery,
+    wait_duration: Duration,
+) -> Result<OtpLookup, OperationError> {
+    let sms_with_code =
+        crate::find_newest_sms_with_code(operation_context, &input.to, wait_duration)
+            .await?
+            .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+    let (code, source_id, received_at) = crate::describe_sms_code(&sms_with_code);
+    Ok(OtpLookup {
+        to: input.to,
+        channel: "sms".to_owned(),
+        code,
+        source_id,
+        received_at,
+    })
+}
+
+/// The code of the recipient's newest Twilio Verify verification, whatever its channel.
+async fn lookup_verify_code(
+    operation_context: &OperationContext,
+    input: RecipientLookupQuery,
+    wait_duration: Duration,
+) -> Result<OtpLookup, OperationError> {
+    let verification = crate::find_newest_verification(operation_context, &input.to, wait_duration)
+        .await?
+        .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+    Ok(OtpLookup {
+        to: input.to,
+        channel: "verify".to_owned(),
+        code: verification.code,
+        source_id: verification.verification_sid,
+        received_at: format_rfc3339(verification.updated_at_unix_ms),
+    })
+}
+
+async fn lookup_email_code(
+    operation_context: &OperationContext,
+    input: RecipientLookupQuery,
+    wait_duration: Duration,
+) -> Result<OtpLookup, OperationError> {
+    let email_with_code = find_newest_with(operation_context, &input.to, wait_duration, |email| {
+        !email.otp_codes.is_empty()
+    })
+    .await?;
+    let email_with_code =
+        email_with_code.ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+    Ok(OtpLookup {
+        to: input.to,
+        channel: "email".to_owned(),
+        code: email_with_code
+            .otp_codes
+            .first()
+            .cloned()
+            .unwrap_or_default(),
+        source_id: email_with_code.email_id.clone(),
+        received_at: format_rfc3339(email_with_code.received_at_unix_ms),
+    })
 }
 
 fn missing_value_error(

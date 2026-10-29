@@ -1022,6 +1022,157 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock verify list",
+    "usage": "sendmock verify list",
+    "summary": "Verifications your app started, newest first.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--cursor",
+      "--limit",
+      "--status",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify",
+        "operation_id": "getVerify",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_list"
+    ]
+  },
+  {
+    "command": "sendmock verify show",
+    "usage": "sendmock verify show <verificationSid>",
+    "summary": "One verification with its code, attempts and timeline.",
+    "arguments": [
+      "verificationSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify/{verificationSid}",
+        "operation_id": "getVerifyByVerificationSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_get"
+    ]
+  },
+  {
+    "command": "sendmock verify force",
+    "usage": "sendmock verify force <verificationSid> <status>",
+    "summary": "Force an outcome: approved, expired, canceled or max attempts.",
+    "arguments": [
+      "verificationSid",
+      "status"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/verify/{verificationSid}/force",
+        "operation_id": "postVerifyByVerificationSidForce",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_force"
+    ]
+  },
+  {
+    "command": "sendmock verify services list",
+    "usage": "sendmock verify services list",
+    "summary": "Verify services (code length, fixed code, lifetime).",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify/services",
+        "operation_id": "getVerifyServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_list"
+    ]
+  },
+  {
+    "command": "sendmock verify services create",
+    "usage": "sendmock verify services create",
+    "summary": "Add a Verify service.",
+    "arguments": [],
+    "flags": [
+      "--code-length",
+      "--fixed-code",
+      "--friendly-name",
+      "--ttl-seconds"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/verify/services",
+        "operation_id": "postVerifyServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_create"
+    ]
+  },
+  {
+    "command": "sendmock verify services update",
+    "usage": "sendmock verify services update <serviceSid>",
+    "summary": "Change a Verify service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [
+      "--code-length",
+      "--fixed-code",
+      "--friendly-name",
+      "--ttl-seconds"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/verify/services/{serviceSid}",
+        "operation_id": "patchVerifyServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_update"
+    ]
+  },
+  {
+    "command": "sendmock verify services delete",
+    "usage": "sendmock verify services delete <serviceSid>",
+    "summary": "Delete a Verify service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/verify/services/{serviceSid}",
+        "operation_id": "deleteVerifyServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_delete"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

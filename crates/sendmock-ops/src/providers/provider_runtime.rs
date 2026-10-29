@@ -10,10 +10,13 @@ use super::request_checks::{ProviderFailure, has_valid_credentials};
 use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
+use super::twilio_verify_api::answer_twilio_verify_request;
 use crate::{OperationContext, OperationError};
 
 /// Messaging Services are Twilio's; their API is served under its key.
 const TWILIO_PROVIDER_KEY: &str = "twilio";
+/// Twilio Verify's API is served under its own key.
+const TWILIO_VERIFY_PROVIDER_KEY: &str = "twilio_verify";
 
 /// A provider request's answer, with what the request log needs.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -40,10 +43,10 @@ pub async fn answer_provider_request(
     request: &ProviderHttpRequest,
 ) -> Result<ProviderOutcome, OperationError> {
     let providers = load_sms_provider_definitions();
-    if let Some(services_outcome) =
-        answer_twilio_services(operation_context, &providers, provider_route, request).await?
+    if let Some(code_served_outcome) =
+        answer_code_served_api(operation_context, &providers, provider_route, request).await?
     {
-        return Ok(services_outcome);
+        return Ok(code_served_outcome);
     }
     let Some(matched_operation) = match_operation(&providers, provider_route, request) else {
         return Ok(answer_unmatched(provider_route));
@@ -87,6 +90,21 @@ pub async fn answer_provider_request(
     })
 }
 
+/// The APIs served in code beside the definitions: Twilio's Messaging Services and Verify.
+async fn answer_code_served_api(
+    operation_context: &OperationContext,
+    providers: &[MessageProviderDefinition],
+    provider_route: ProviderRoute<'_>,
+    request: &ProviderHttpRequest,
+) -> Result<Option<ProviderOutcome>, OperationError> {
+    if let Some(services_outcome) =
+        answer_twilio_services(operation_context, providers, provider_route, request).await?
+    {
+        return Ok(Some(services_outcome));
+    }
+    answer_twilio_verify(operation_context, providers, provider_route, request).await
+}
+
 /// Twilio's Messaging Services API, served with the Twilio provider while it is routable.
 async fn answer_twilio_services(
     operation_context: &OperationContext,
@@ -112,6 +130,34 @@ async fn answer_twilio_services(
         provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
         created_sms_id: None,
         secret_values: list_secret_values(twilio_provider),
+    }))
+}
+
+/// Twilio Verify's API, served with the Twilio Verify provider while it is routable.
+async fn answer_twilio_verify(
+    operation_context: &OperationContext,
+    providers: &[MessageProviderDefinition],
+    provider_route: ProviderRoute<'_>,
+    request: &ProviderHttpRequest,
+) -> Result<Option<ProviderOutcome>, OperationError> {
+    let is_verify_route = matches!(
+        provider_route,
+        ProviderRoute::Prefixed(TWILIO_VERIFY_PROVIDER_KEY) | ProviderRoute::ProviderPort
+    );
+    let Some(verify_provider) = providers
+        .iter()
+        .find(|provider| provider.key == TWILIO_VERIFY_PROVIDER_KEY && provider.is_routable())
+        .filter(|_| is_verify_route)
+    else {
+        return Ok(None);
+    };
+    let verify_response =
+        answer_twilio_verify_request(operation_context, verify_provider, request).await?;
+    Ok(verify_response.map(|response| ProviderOutcome {
+        response,
+        provider_key: Some(TWILIO_VERIFY_PROVIDER_KEY.to_owned()),
+        created_sms_id: None,
+        secret_values: list_secret_values(verify_provider),
     }))
 }
 

@@ -13,11 +13,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 11 / 108 accepted (EM-01, EM-02, EM-06, EM-09, PL-02, SM-01, SM-04, SM-13, SM-14, UI-12, WS-05), 166 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 12 / 108 accepted (EM-01, EM-02, EM-06, EM-09, PL-02, SM-01, SM-04, SM-13, SM-14, UI-12, VF-02, WS-05), 178 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); the done-when check passed (Laravel and Nodemailer mail stored and pushed live, pytest reads the OTP). Phase 1 is complete apart from the release, which the owner makes after merging #48 (Prepare release with `bump: minor` for `0.1.0-beta.1`). Phase 2 (SMS and Verify, [26](26-phase-2.md)) is under way on the same branch: W1 to W4, W5a (provider runtime, Twilio Messages) W5b (callback formats, Vonage), W5c (Messaging Services) and W5d (provider port) done; next W6 (Twilio Verify). The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); the done-when check passed (Laravel and Nodemailer mail stored and pushed live, pytest reads the OTP). Phase 1 is complete apart from the release, which the owner makes after merging #48 (Prepare release with `bump: minor` for `0.1.0-beta.1`). Phase 2 (SMS and Verify, [26](26-phase-2.md)) is under way on the same branch: W1 to W4, W5a (provider runtime, Twilio Messages) W5b (callback formats, Vonage), W5c (Messaging Services), W5d (provider port) and W6 (Twilio Verify) done; next W7 (SMS provider definitions in the database). The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -242,14 +242,14 @@ Plan: [26-phase-2.md](26-phase-2.md). Built on `feat/phase-0` in #48, W1 to W9 i
 - [x] Twilio Messages API and Messaging Services (#48)
 - [x] MMS media: Twilio `MediaUrl`, native `media_urls` and inline `media`, `/sms/{smsId}/media/{mediaIndex}` (#48)
 - [x] Vonage `/sms/json` (#48)
-- [ ] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state)
+- [x] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state) (#48)
 - [x] Provider port serving real provider paths (#48)
 - [x] GSM-7/UCS-2 encoding and segments (#48)
 - [x] Delivery simulation (profiles, failure rate, Twilio magic numbers, extensions, strict mode, custom outcome numbers) (#48)
 - [x] Status callbacks (Twilio, Vonage) and inbound SMS simulation (#48)
 - [x] Virtual numbers and Messaging Services registry; Numbers screen live; CLI and MCP `numbers` (moved from Phase 4; `POST /samples/number` dropped, not in the signed-off contract) (#48)
 - [ ] SMS built-in provider definitions (Twilio, Twilio Verify, Vonage) from the database; SMS > Providers live for them (SM-16)
-- [ ] `wait/sms`, SMS OTP extraction, `POST /samples/sms` and `/samples/verification`
+- [x] `wait/sms`, SMS OTP extraction, `POST /samples/sms` and `/samples/verification` (#48)
 - [ ] CLI `sms` / `verify`; MCP `sms`, `verify` toolsets
 - [ ] SMS and Verify screens switched to live mode
 - [ ] Done-when check: Twilio-shaped send with callbacks; Verify OTP login works; beta released
@@ -551,3 +551,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 2 W5b: status callbacks in the provider's format from its callback template: Twilio forms signed with `X-Twilio-Signature` (checked against Twilio's documented example) in status order, Vonage JSON delivery receipts with Vonage's status names and no receipt for `queued`. Vonage `POST /sms/json` answers Vonage's shape for form and JSON bodies, with status `2` for a missing field and `3` for rejected numbers; secrets sent in a body are masked in the request log. New dependency `sha1` 0.11. SM-04 accepted; SM-08.1 and SM-08.2 ticked (SM-08.3 retries come with the Phase 3 webhook queue). |
 | 2026-10-29 | Phase 2 W5c: Twilio sends with `MessagingServiceSid` pick a sender from the service's pool (or Twilio's test sender when it is empty) and answer `accepted`; unknown service SIDs are created in lenient mode and refused with `21701` in strict test mode; Twilio's `/v1/Services` API creates, lists, fetches, updates and deletes the same services as the Numbers screen. Twilio `MediaUrl` is copied, and an unreachable link fails the message with `11200`. SM-03.1 and SM-03.2 ticked. |
 | 2026-10-29 | Phase 2 W5d: the provider port. `--provider-addr` serves every provider at its real paths (routed by path, then `Host`), `--provider-port twilio=8027` gives a provider its own port, both also from the environment and `sendmock.toml`; the ready line and `/info` report the provider address. SM-14 accepted, so W5 is complete. |
+| 2026-10-29 | Phase 2 W6: Twilio Verify. Verify services and verifications (migration `0008`) with native REST, CLI and MCP (list, show, force; services create, edit, delete with the code length, fixed code and TTL rules), codes delivered as captured SMS, WhatsApp or email, or a timeline entry for calls, `/samples/verification` and `/otp?channel=verify`, events `verify.started`, `verify.checked` and `verify.expired`. Twilio's `/v2/Services` API starts, resends, fetches, updates and checks verifications with Twilio's shapes and codes (`60200`, `60202`, `60203`, `20404`). Reset now also deletes SMS and verifications. VF-02 accepted; VF-01.1, VF-01.3, VF-03.1 to VF-03.3, VF-04.1 and VF-04.2 ticked (VF-03.4 waits for the SDK run in W9, VF-01.2's global defaults for a contract change). |

@@ -4,6 +4,7 @@ use sendmock_mail::{NativeMessage, build_raw_message};
 use serde::{Deserialize, Serialize};
 
 use super::sample_email_sender::SampleEmail;
+use super::sample_verification::create_sample_verification;
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, SuccessStatus,
 };
@@ -49,8 +50,8 @@ impl Operation for CreateSampleOperation {
         }
     }
 
-    /// An email goes over SMTP to SendMock itself and an SMS through the native path; the
-    /// other kinds come with their phases.
+    /// An email goes over SMTP to SendMock itself, an SMS through the native path and a
+    /// verification through the Verify flow; HTTP requests come with the catcher in Phase 3.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -58,6 +59,9 @@ impl Operation for CreateSampleOperation {
     ) -> Result<CreatedSample, OperationError> {
         if input.kind == "sms" {
             return create_sample_sms(operation_context, input.to).await;
+        }
+        if input.kind == "verification" {
+            return create_sample_verification(operation_context, input.to).await;
         }
         if input.kind != "email" {
             return Err(OperationError::NotFound {

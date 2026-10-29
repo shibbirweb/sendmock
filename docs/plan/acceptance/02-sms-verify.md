@@ -158,34 +158,34 @@ UI in U3 (W16), runtime in Phase 2 (built-ins) and 4 (custom). Plan: [22-configu
 
 UI in U1, backend Phase 2. Docs: [Twilio Verify](../04-sms.md#twilio-verify).
 
-- [ ] VF-01.1 `POST /v2/Services` creates a service and `GET` returns it in Twilio's shape.
+- [x] VF-01.1 `POST /v2/Services` creates a service and `GET` returns it in Twilio's shape.
 - [ ] VF-01.2 Code length (4 to 10), fixed code and TTL can be set per service and globally.
-- [ ] VF-01.3 Services can be created, edited and deleted from the Services tab, with the code length, fixed code and TTL rules enforced in the form and the API.
+- [x] VF-01.3 Services can be created, edited and deleted from the Services tab, with the code length, fixed code and TTL rules enforced in the form and the API.
 
 ## VF-02 Start a verification and deliver the code
 
 Phase 2.
 
-- [ ] VF-02.1 Starting a verification returns `status: pending` in Twilio's shape.
-- [ ] VF-02.2 The `sms` and `whatsapp` channels create a captured SMS with the code; the `email` channel creates a captured email; `call` creates a Verify log entry.
-- [ ] VF-02.3 With a fixed code configured, that code is always used.
-- [ ] VF-02.4 `GET /api/v1/otp?to=...&channel=verify`, `sendmock otp` and `sendmock_otp_get` return the code.
-- [ ] VF-02.5 Too many sends return error `60203`.
+- [x] VF-02.1 Starting a verification returns `status: pending` in Twilio's shape.
+- [x] VF-02.2 The `sms` and `whatsapp` channels create a captured SMS with the code; the `email` channel creates a captured email; `call` creates a Verify log entry.
+- [x] VF-02.3 With a fixed code configured, that code is always used.
+- [x] VF-02.4 `GET /api/v1/otp?to=...&channel=verify`, `sendmock otp` and `sendmock_otp_get` return the code.
+- [x] VF-02.5 Too many sends return error `60203`.
 
 ## VF-03 Check a verification
 
 Phase 2.
 
-- [ ] VF-03.1 The correct code returns `approved`; a wrong code returns `pending`.
-- [ ] VF-03.2 After 5 wrong checks the verification fails with `60202`.
-- [ ] VF-03.3 Expired or unknown verifications return `20404`.
+- [x] VF-03.1 The correct code returns `approved`; a wrong code returns `pending`.
+- [x] VF-03.2 After 5 wrong checks the verification fails with `60202`.
+- [x] VF-03.3 Expired or unknown verifications return `20404`.
 - [ ] VF-03.4 An app using the official Twilio Verify SDK completes an OTP login against SendMock.
 
 ## VF-04 Force state and events
 
 UI in U1, backend Phase 2.
 
-- [ ] VF-04.1 Forcing `approved`, `canceled`, `expired` or `max_attempts` from UI, API, CLI or MCP changes the state immediately.
-- [ ] VF-04.2 `verify.started`, `verify.checked` and `verify.expired` fire and can trigger webhook rules.
+- [x] VF-04.1 Forcing `approved`, `canceled`, `expired` or `max_attempts` from UI, API, CLI or MCP changes the state immediately.
+- [x] VF-04.2 `verify.started`, `verify.checked` and `verify.expired` fire and can trigger webhook rules.
 - [ ] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown.
 - [ ] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code.

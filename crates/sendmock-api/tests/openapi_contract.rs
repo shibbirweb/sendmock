@@ -91,7 +91,10 @@ async fn prepare_sample_inputs(
         ("postReset", vec![json!({})]),
         (
             "postSamplesByKind",
-            vec![json!({ "kind": "email", "to": "sam@example.test", "subject": "Sample" })],
+            vec![
+                json!({ "kind": "email", "to": "sam@example.test", "subject": "Sample" }),
+                json!({ "kind": "verification" }),
+            ],
         ),
         (
             "getIntegrationsByStack",
@@ -114,7 +117,54 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_sms_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
+    samples.extend(prepare_verify_samples(app_router).await);
     samples
+}
+
+fn verify_service_sample() -> Value {
+    json!({ "friendly_name": "Shop", "code_length": 6, "fixed_code": "123456", "ttl_seconds": 600 })
+}
+
+/// Two Verify services (one to edit, one to delete) and a verification to read and force.
+async fn prepare_verify_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let services_path = "/api/v1/verify/services";
+    let edited_service_sid =
+        post_json(app_router, services_path, &verify_service_sample()).await["sid"].clone();
+    let deleted_service_sid =
+        post_json(app_router, services_path, &verify_service_sample()).await["sid"].clone();
+    let verification_sid = post_json(
+        app_router,
+        "/api/v1/samples/verification",
+        &json!({ "to": "+14155550111" }),
+    )
+    .await["id"]
+        .clone();
+    let mut service_update = verify_service_sample();
+    service_update["service_sid"] = edited_service_sid;
+    vec![
+        (
+            "getVerify",
+            vec![
+                json!({}),
+                json!({ "status": "pending,approved", "to": "+1415", "channel": "sms", "limit": 5 }),
+            ],
+        ),
+        (
+            "getVerifyByVerificationSid",
+            vec![json!({ "verification_sid": verification_sid })],
+        ),
+        (
+            "postVerifyByVerificationSidForce",
+            vec![json!({ "verification_sid": verification_sid, "state": "approved" })],
+        ),
+        ("getVerifyServices", vec![json!({})]),
+        ("postVerifyServices", vec![verify_service_sample()]),
+        ("patchVerifyServicesByServiceSid", vec![service_update]),
+        (
+            "deleteVerifyServicesByServiceSid",
+            vec![json!({ "service_sid": deleted_service_sid })],
+        ),
+    ]
 }
 
 fn virtual_number_sample(e164_number: &str) -> Value {

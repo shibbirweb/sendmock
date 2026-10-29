@@ -11,6 +11,7 @@ mod settings;
 mod sms;
 mod smtp_session;
 mod store_error;
+mod verify;
 
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
 pub use database::Database;
@@ -34,3 +35,7 @@ pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,
 };
 pub use store_error::StoreError;
+pub use verify::{
+    VerificationFilter, VerificationPage, VerificationRecord, VerificationRepository,
+    VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,
+};

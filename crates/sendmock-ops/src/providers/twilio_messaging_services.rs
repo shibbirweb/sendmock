@@ -1,5 +1,3 @@
-use base64::Engine;
-use base64::engine::general_purpose::STANDARD;
 use sendmock_core::format_rfc3339;
 use sendmock_store::MessagingServiceRecord;
 use serde_json::{Value, json};
@@ -7,6 +5,10 @@ use serde_json::{Value, json};
 use super::message_provider_definition::MessageProviderDefinition;
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::request_reader::read_request_fields;
+use super::twilio_answers::{
+    answer_json, answer_no_content, answer_twilio_error, describe_page_meta, read_account_sid,
+    read_form_field,
+};
 use crate::numbers::generate_service_sid;
 use crate::{OperationContext, OperationError};
 
@@ -53,11 +55,7 @@ pub async fn answer_messaging_services_request(
         },
         ("DELETE", Some(service_sid)) => {
             if repository.delete_service(service_sid).await? {
-                ProviderHttpResponse {
-                    status: 204,
-                    headers: Vec::new(),
-                    body: String::new(),
-                }
+                answer_no_content()
             } else {
                 answer_not_found(service_sid)
             }
@@ -72,7 +70,7 @@ async fn create_service(
     fields: &Value,
     account_sid: &str,
 ) -> Result<ProviderHttpResponse, OperationError> {
-    if read_field(fields, "FriendlyName").is_none() {
+    if read_form_field(fields, "FriendlyName").is_none() {
         return Ok(answer_twilio_error(
             400,
             20001,
@@ -104,51 +102,22 @@ async fn create_service(
 
 /// `FriendlyName`, `InboundRequestUrl`, `FallbackUrl` and `UseInboundWebhookOnNumber`.
 fn apply_fields(mut service: MessagingServiceRecord, fields: &Value) -> MessagingServiceRecord {
-    if let Some(friendly_name) = read_field(fields, "FriendlyName") {
+    if let Some(friendly_name) = read_form_field(fields, "FriendlyName") {
         service.friendly_name = friendly_name;
     }
-    if let Some(inbound_url) = read_field(fields, "InboundRequestUrl") {
+    if let Some(inbound_url) = read_form_field(fields, "InboundRequestUrl") {
         service.inbound_url = Some(inbound_url);
         service.inbound_mode = "webhook".to_owned();
     }
-    if let Some(fallback_url) = read_field(fields, "FallbackUrl") {
+    if let Some(fallback_url) = read_form_field(fields, "FallbackUrl") {
         service.inbound_fallback_url = Some(fallback_url);
     }
-    if read_field(fields, "UseInboundWebhookOnNumber")
+    if read_form_field(fields, "UseInboundWebhookOnNumber")
         .is_some_and(|flag| flag.eq_ignore_ascii_case("true"))
     {
         service.inbound_mode = "defer_to_sender".to_owned();
     }
     service
-}
-
-fn read_field(fields: &Value, field_name: &str) -> Option<String> {
-    fields
-        .get(field_name)
-        .and_then(Value::as_str)
-        .map(str::trim)
-        .filter(|value| !value.is_empty())
-        .map(str::to_owned)
-}
-
-/// The account in the Basic auth user name (`AC...`), or the definition's.
-fn read_account_sid(
-    twilio_provider: &MessageProviderDefinition,
-    request: &ProviderHttpRequest,
-) -> String {
-    request
-        .header("authorization")
-        .and_then(|authorization| authorization.strip_prefix("Basic "))
-        .and_then(|encoded| STANDARD.decode(encoded.trim()).ok())
-        .and_then(|decoded| String::from_utf8(decoded).ok())
-        .and_then(|credentials| credentials.split(':').next().map(str::to_owned))
-        .filter(|user_name| user_name.starts_with("AC"))
-        .or_else(|| {
-            twilio_provider
-                .find_credential("account_sid")
-                .map(str::to_owned)
-        })
-        .unwrap_or_default()
 }
 
 /// A service as Twilio's Messaging Services API answers it.
@@ -198,15 +167,7 @@ fn answer_service_page(
         200,
         json!({
             "services": described_services,
-            "meta": {
-                "page": 0,
-                "page_size": 50,
-                "first_page_url": format!("{SERVICES_URL}?PageSize=50&Page=0"),
-                "previous_page_url": Value::Null,
-                "url": format!("{SERVICES_URL}?PageSize=50&Page=0"),
-                "next_page_url": Value::Null,
-                "key": "services",
-            },
+            "meta": describe_page_meta(SERVICES_URL, "services"),
         }),
     )
 }
@@ -217,24 +178,4 @@ fn answer_not_found(service_sid: &str) -> ProviderHttpResponse {
         20404,
         &format!("The requested resource /Services/{service_sid} was not found"),
     )
-}
-
-fn answer_twilio_error(status: u16, error_code: u32, message: &str) -> ProviderHttpResponse {
-    answer_json(
-        status,
-        json!({
-            "code": error_code,
-            "message": message,
-            "more_info": format!("https://www.twilio.com/docs/errors/{error_code}"),
-            "status": status,
-        }),
-    )
-}
-
-fn answer_json(status: u16, body: Value) -> ProviderHttpResponse {
-    ProviderHttpResponse {
-        status,
-        headers: vec![("Content-Type".to_owned(), "application/json".to_owned())],
-        body: body.to_string(),
-    }
 }

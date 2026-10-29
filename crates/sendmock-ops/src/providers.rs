@@ -12,7 +12,11 @@ mod read_operation_kinds;
 mod request_checks;
 mod request_reader;
 mod send_operation_kind;
+mod twilio_answers;
 mod twilio_messaging_services;
+mod twilio_verify_api;
+mod twilio_verify_services;
+mod twilio_verify_verifications;
 
 pub use builtin_providers::builtin_sms_providers;
 pub use callback_template_functions::sign_twilio_request;

@@ -11,6 +11,9 @@ pub enum AppEventType {
     SmsInbound,
     SmsStatus,
     SmsOpened,
+    VerifyStarted,
+    VerifyChecked,
+    VerifyExpired,
 }
 
 impl AppEventType {
@@ -22,6 +25,9 @@ impl AppEventType {
             Self::SmsInbound => "sms.inbound",
             Self::SmsStatus => "sms.status",
             Self::SmsOpened => "sms.opened",
+            Self::VerifyStarted => "verify.started",
+            Self::VerifyChecked => "verify.checked",
+            Self::VerifyExpired => "verify.expired",
         }
     }
 }

@@ -24,8 +24,9 @@ impl Operation for ResetOperation {
         }
     }
 
-    /// Deletes every email, SMS, SMTP session and logged request and puts the settings back to
-    /// their defaults; applying the seed file again comes with seed apply in Phase 3.
+    /// Deletes every email, SMS, verification, SMTP session and logged request and puts the
+    /// settings back to their defaults; configuration such as numbers, services and outcome
+    /// rules stays. Applying the seed file again comes with seed apply in Phase 3.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -34,6 +35,14 @@ impl Operation for ResetOperation {
         let deleted_email_count = operation_context
             .email_repository
             .delete_all_emails()
+            .await?;
+        operation_context
+            .sms_repository
+            .delete_all_messages()
+            .await?;
+        operation_context
+            .verification_repository
+            .delete_all_verifications()
             .await?;
         operation_context
             .smtp_session_repository
