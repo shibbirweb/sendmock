@@ -9,15 +9,15 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 0: Backend foundations** ([23](23-phase-0.md)), in progress (13 / 13) on `feat/phase-0`, waiting for #48 to merge. W0 done: ports 1025 / 8025, licence MIT OR Apache-2.0, trademark check deferred to before 1.0. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 2: SMS and Verify backend**, next on `feat/phase-0` (#48). Phase 1 (email backend) is complete apart from publishing `0.1.0-beta.1`, which the owner does after merging #48; Phase 0 is complete. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 5 / 108 accepted (EM-02, EM-09, PL-02, UI-12, WS-05), 130 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 7 / 108 accepted (EM-01, EM-02, EM-06, EM-09, PL-02, UI-12, WS-05), 132 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); next the Phase 1 done-when check, then the owner merges #48 and runs Prepare release with `bump: minor` for `0.1.0-beta.1`. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); the done-when check passed (Laravel and Nodemailer mail stored and pushed live, pytest reads the OTP). Phase 1 is complete apart from the release, which the owner makes after merging #48 (Prepare release with `bump: minor` for `0.1.0-beta.1`). Next: Phase 2 (SMS and Verify) on the same branch. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -213,7 +213,7 @@ Plan: [23-phase-0.md](23-phase-0.md). Work in the order W0 to W12 there.
 Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29: every phase on this branch), W1 to W9 in order.
 
 - [x] SMTP server (EHLO, MAIL, RCPT, DATA, PIPELINING, SIZE, 8BITMIME, SMTPUTF8, AUTH, STARTTLS) (#48)
-- [ ] MIME parsing, storage, retention, FTS search
+- [x] MIME parsing, storage, retention, FTS search (#48)
 - [x] OTP and link extractors (#48)
 - [x] Email REST API and WebSocket events (#48)
 - [x] `sendmail` shim (#48)
@@ -221,7 +221,7 @@ Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29
 - [x] `POST /send/raw` and `GET /emails/latest` (#48)
 - [x] SSE `/events` and `GET /events/recent` (#48)
 - [x] SMTP session log and HTTP API request log (#48)
-- [ ] Plus-address tagging, MIME tree, thumbnails, List-Unsubscribe check
+- [x] Plus-address tagging, MIME tree, thumbnails, List-Unsubscribe check (#48)
 - [x] `wait/email`, `otp`, `links`, `reset`; `--ready-json` (#48)
 - [x] CLI `email` / `otp` / `links`; MCP `core`, `email`, `extract` toolsets (#48)
 - [x] Mail screens switched to live mode; the binary embeds the live UI build and `/info` lists `available_operations`; Not available yet for the rest (UI-12) (#48)
@@ -231,7 +231,7 @@ Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29
 - [x] Logs and Settings switched to live mode; CLI `logs`, `settings`, `reset`, `sample`, `update`; MCP `logs`, `admin` toolsets (#48)
 - [x] SMTP compatibility tests with real clients (#48)
 - [x] CORS for the docs origin; playground Local mode (#48)
-- [ ] Done-when check: Laravel and Node mail appear live; pytest reads an OTP
+- [x] Done-when check: Laravel and Node mail appear live; pytest reads an OTP (#48)
 - [ ] **Release `0.1.0-beta.1`** (GitHub pre-release with `.deb` and `.rpm`, Docker `beta`, Homebrew `sendmock-beta`)
 
 ### Phase 2: SMS and Verify backend
@@ -539,3 +539,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 1 W8 (live UI): the binary, the Docker image and the release archives embed the live UI build (`VITE_API_MODE=live`), with no mock layer; `/demo/` keeps the mock build. `GET /info` lists `available_operations`, every surface catalogue entry names its phase (from the audit in [24](24-stage-b-coverage.md)), and the UI reads both: a screen whose list operation is not served shows "<Screen> arrives in Phase N" with the roadmap link (one `ScreenAvailabilityGate` around the routed page), the sidebar marks it "Phase N", cards and sections inside live screens use `FeatureAvailabilityGate`, and buttons and menu items use `OperationButton` and `OperationMenuItem` (disabled, "Available in Phase N" as tooltip and accessible name); queries for operations not served wait for `/info` and never run. A new CI job runs the live UI against the release binary from the smoke test (`bun run test:live`), visiting every screen and Settings section and opening an email, and fails on any API error. The Docker image gains a CA bundle for the update check. UI-12 accepted. |
 | 2026-10-29 | Phase 1 W8 (auth, CORS, MCP over HTTP, playground): `--ui-auth user:password` (or `file:<path>` with `user:password` lines) and `--api-token` protect the UI, the API, the WebSocket and SSE streams and `/mcp` with HTTP basic auth or `Authorization: Bearer`, leaving `/api/v1/health` open for container health checks; `--cors-origins` (default the docs site, empty for none) allows browser origins, with private network preflights, so the playground can reach a local instance. `/mcp` serves the same tools over streamable HTTP (rmcp), with the in-process runner. The website playground gains Your local SendMock and Custom URL (with an API token): nothing is sent before Connect, and a failed connection says whether SendMock is not running or blocked by the browser, refuses this site's origin, or needs the token. Client commands now reach a plain-HTTP server on a machine without a certificate store. PL-06.2, PL-06.4, AI-02.1 and WS-05 ticked; WS-05 accepted. |
 | 2026-10-29 | Phase 1 W9: twelve real mailers (Laravel, Symfony Mailer, PHP `mail()` through the sendmail shim, Nodemailer, smtplib, Django, pytest reading the OTP, Go `net/smtp`, Spring, lettre, Action Mailer, MailKit) send to a release binary in CI with default settings (`.github/workflows/smtp-clients.yml`, also run by Release build before publishing). They showed that offering STARTTLS by default breaks Symfony Mailer, Laravel, Nodemailer, Rails and MailKit, so STARTTLS is now opt-in. Release build adds `.deb` and `.rpm` (nfpm, installed with apt and dnf in CI), the Docker release tags through the now reusable Docker workflow, and the Homebrew `sendmock` / `sendmock-beta` formula pushed to the tap when `HOMEBREW_TAP_TOKEN` is set. DS-06.1 (Testcontainers) moves to Phase 2. |
+| 2026-10-29 | Phase 1 done-when check: in the SMTP clients workflow a fresh Laravel app and a Nodemailer script send with their default settings and the messages are stored with their codes, the live UI suite shows real mail, the realtime test pushes `email.received` within 500 ms, and a pytest test reads the code through `/api/v1/otp`. All twelve clients pass. EM-01 and EM-06 accepted. Phase 1 is done apart from publishing `0.1.0-beta.1`, the owner's step after the merge. |

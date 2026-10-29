@@ -10,7 +10,7 @@ Phase 1. Docs: [SMTP server](../03-email.md#smtp-server).
 - [x] EM-01.2 Mail for any recipient and any domain is accepted (catch-all); nothing is relayed anywhere. (#48)
 - [x] EM-01.3 `PIPELINING`, `8BITMIME`, `SMTPUTF8` and `SIZE` are advertised and work; a message larger than `--smtp-max-size` is rejected with `552`. (#48)
 - [x] EM-01.4 Multiple recipients in one session are stored once with all envelope recipients; envelope recipients missing from `To`/`Cc` are shown as BCC. (#48)
-- [ ] EM-01.5 Mail from Laravel, Symfony, Nodemailer, Python smtplib, Django, Go net/smtp, Spring, lettre, Rails and MailKit is received correctly (cross-language CI).
+- [x] EM-01.5 Mail from Laravel, Symfony, Nodemailer, Python smtplib, Django, Go net/smtp, Spring, lettre, Rails and MailKit is received correctly (cross-language CI). (#48)
 - [x] EM-01.6 Malformed commands get the correct SMTP error code and never crash the server; 500 concurrent sessions are handled without errors. (#48)
 
 ## EM-02 SMTP TLS and AUTH
@@ -61,7 +61,7 @@ UI in U1, backend Phase 1.
 Phase 1.
 
 - [x] EM-06.1 `sendmock sendmail -t` reads a message from stdin and it is stored like an SMTP message. (#48)
-- [ ] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to SendMock.
+- [x] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to SendMock. (#48)
 - [x] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender. (#48)
 
 ## EM-07 Native HTTP send API
