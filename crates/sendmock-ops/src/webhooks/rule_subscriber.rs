@@ -105,6 +105,7 @@ pub async fn fire_matching_rules(
             subject_id: subject_id.clone(),
             rule_id: Some(stored_rule.rule_id),
             delivery_trigger: DeliveryTrigger::Automatic,
+            send_time_values: serde_json::Map::new(),
         };
         enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order).await?;
         queued_count += 1;

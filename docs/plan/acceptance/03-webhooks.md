@@ -75,7 +75,7 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.2 Scope precedence is send-time, then endpoint, then global, then `SENDMOCK_VAR_*`.
 - [ ] WH-07.3 Every documented function and filter returns the documented output (table-driven tests).
 - [ ] WH-07.4 Random values stay the same across retries of one delivery and change on re-render; Fixed values change only on Regenerate.
-- [ ] WH-07.5 Strict mode stops a delivery with `render_failed` and a clear error; lenient mode renders empty values and logs a warning.
+- [x] WH-07.5 Strict mode stops a delivery with `render_failed` and a clear error; lenient mode renders empty values and logs a warning.
 - [ ] WH-07.6 Fields mode always produces valid JSON, form or multipart bodies.
 - [x] WH-07.7 Templates cannot read files, network or environment, and a runaway template is stopped by the fuel/time limit.
 - [ ] WH-07.8 The live preview matches what is actually sent for the same message.

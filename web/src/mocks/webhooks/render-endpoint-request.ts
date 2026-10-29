@@ -220,7 +220,14 @@ export function renderEndpointRequest(
   mockDatabase: MockDatabase,
   previewRequest: EndpointPreviewRequest,
 ): EndpointPreviewResult | null {
-  const endpointInput = previewRequest.endpoint;
+  const endpointInput =
+    previewRequest.endpoint ??
+    mockDatabase.webhookEndpoints.find(
+      (webhookEndpoint) => webhookEndpoint.id === previewRequest.endpoint_id,
+    );
+  if (endpointInput === undefined) {
+    return null;
+  }
   const templateEvents = mockDatabase.webhookTemplates.find(
     (webhookTemplate) => webhookTemplate.id === endpointInput.template_id,
   )?.events;

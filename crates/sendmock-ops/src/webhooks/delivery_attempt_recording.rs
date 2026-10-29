@@ -2,6 +2,7 @@ use sendmock_store::{DeliveryAttemptResult, WebhookDeliveryRecord};
 use sendmock_webhooks::AttemptDecision;
 
 use super::delivery_view::WebhookDelivery;
+use super::secret_value_masking::{load_secret_values, mask_request_secrets};
 use super::webhook_sender::WebhookSendResult;
 use crate::{AppEventType, OperationContext, OperationError, RecordedHttpRequest, publish_event};
 
@@ -31,9 +32,12 @@ pub async fn record_attempt(
             .filter(|_| attempt_decision != AttemptDecision::Succeeded)
             .map(|response| format!("Your app answered {}", response.status_code))
     });
+    // The request is stored for display, so secret variable values are masked.
+    let shown_request =
+        mask_request_secrets(sent_request, &load_secret_values(operation_context).await?);
     let attempt_result = DeliveryAttemptResult {
         status: status.to_owned(),
-        sent_request_json: Some(serde_json::to_string(sent_request).map_err(internal_error)?),
+        sent_request_json: Some(serde_json::to_string(&shown_request).map_err(internal_error)?),
         response_json: send_result
             .response
             .as_ref()

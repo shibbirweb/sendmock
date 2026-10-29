@@ -1484,6 +1484,31 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook render",
+    "usage": "sendmock webhook render",
+    "summary": "Render an unsaved endpoint's request against a message.",
+    "arguments": [],
+    "flags": [
+      "--email-id",
+      "--endpoint",
+      "--endpoint-id",
+      "--http-request-id",
+      "--sms-id",
+      "--variables"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/preview",
+        "operation_id": "postWebhooksEndpointsPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_render"
+    ]
+  },
+  {
     "command": "sendmock webhook endpoint secret",
     "usage": "sendmock webhook endpoint secret <endpointId> --reveal",
     "summary": "Reveal the signing secret (asked for after a confirmation).",

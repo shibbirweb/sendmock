@@ -92,6 +92,7 @@ impl DispatchFixture {
                 subject_id: None,
                 rule_id: None,
                 delivery_trigger: DeliveryTrigger::Automatic,
+                send_time_values: serde_json::Map::new(),
             },
         )
         .await

@@ -129,6 +129,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
     samples.extend(prepare_webhook_rule_samples(app_router).await);
     samples.extend(prepare_webhook_variable_samples(app_router).await);
+    samples.extend([webhook_preview_samples()]);
     samples
 }
 
@@ -382,6 +383,7 @@ async fn queue_sample_delivery(
         subject_id: None,
         rule_id: None,
         delivery_trigger: DeliveryTrigger::Manual,
+        send_time_values: serde_json::Map::new(),
     };
     enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order)
         .await
@@ -448,6 +450,22 @@ async fn create_sample_rule(
 ) -> Value {
     let rule_sample = webhook_rule_sample(rule_name, endpoint_id);
     post_json(app_router, "/api/v1/webhooks/rules", &rule_sample).await["id"].clone()
+}
+
+/// A plain preview, and one whose undefined header and mistyped field report problems.
+fn webhook_preview_samples() -> (&'static str, Vec<Value>) {
+    let mut endpoint_with_problems = webhook_endpoint_sample("Preview");
+    endpoint_with_problems["headers"] = json!({ "X-Missing": "{{ vars.missing }}" });
+    endpoint_with_problems["body_mode"] = json!("fields");
+    endpoint_with_problems["body_fields"] =
+        json!([{ "name": "count", "value_type": "number", "value": "{{ data.subject }}" }]);
+    (
+        "postWebhooksEndpointsPreview",
+        vec![
+            json!({ "endpoint": webhook_endpoint_sample("Preview") }),
+            json!({ "endpoint": endpoint_with_problems, "variables": { "tenant": "acme" } }),
+        ],
+    )
 }
 
 async fn prepare_webhook_rule_samples(

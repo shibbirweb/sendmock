@@ -233,7 +233,7 @@ sendmock webhook endpoint show <endpointId>
 sendmock webhook endpoint test <endpointId>
 sendmock webhook endpoint update <endpointId>
 sendmock webhook metrics
-sendmock webhook render --endpoint <endpointId>
+sendmock webhook render --endpoint-id <endpointId>
 sendmock webhook rule create
 sendmock webhook rule delete <ruleId>
 sendmock webhook rule list

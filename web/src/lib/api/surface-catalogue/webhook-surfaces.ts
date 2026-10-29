@@ -37,7 +37,7 @@ export const webhookSurfaces: SurfaceCatalogue = {
   },
   "POST /api/v1/webhooks/endpoints/preview": {
     phase: "3",
-    cli: "sendmock webhook render --endpoint <endpointId>",
+    cli: "sendmock webhook render --endpoint-id <endpointId>",
     mcp: "sendmock_webhook_render",
     ui: "Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview",
   },

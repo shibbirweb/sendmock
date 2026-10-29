@@ -4,15 +4,21 @@ mod delivery_dispatch;
 mod delivery_inputs;
 mod delivery_operations;
 mod delivery_queue;
+mod delivery_request_rendering;
 mod delivery_signing;
+mod delivery_template_context;
 mod delivery_view;
 mod delivery_wait_operation;
+mod endpoint_body_rendering;
 mod endpoint_inputs;
 mod endpoint_operations;
+mod endpoint_preview_operation;
+mod endpoint_request_rendering;
 mod endpoint_secret_operations;
 mod endpoint_settings;
 mod endpoint_validation;
 mod endpoint_view;
+mod request_part_renderer;
 mod rule_filter_wire;
 mod rule_inputs;
 mod rule_messages;
@@ -22,6 +28,7 @@ mod rule_preview_operation;
 mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
+mod secret_value_masking;
 mod template_context;
 mod variable_inputs;
 mod variable_operations;
@@ -43,6 +50,7 @@ pub use endpoint_operations::{
     CreateWebhookEndpointOperation, DeleteWebhookEndpointOperation, GetWebhookEndpointOperation,
     ListWebhookEndpointsOperation, UpdateWebhookEndpointOperation,
 };
+pub use endpoint_preview_operation::{EndpointPreviewResult, PreviewWebhookEndpointOperation};
 pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
@@ -77,6 +85,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(GetWebhookEndpointOperation);
     operation_registry.register(UpdateWebhookEndpointOperation);
     operation_registry.register(DeleteWebhookEndpointOperation);
+    operation_registry.register(PreviewWebhookEndpointOperation);
     operation_registry.register(RevealWebhookEndpointSecretOperation);
     operation_registry.register(RotateWebhookEndpointSecretOperation);
     operation_registry.register(ListWebhookDeliveriesOperation);

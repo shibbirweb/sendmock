@@ -15592,7 +15592,7 @@
     {
       "command": "sendmock webhook render",
       "slug": "webhook-render",
-      "usage": "sendmock webhook render --endpoint <endpointId> [flags]",
+      "usage": "sendmock webhook render --endpoint-id <endpointId> [flags]",
       "summary": "Render an unsaved endpoint's request against a message.",
       "area": "Webhook endpoints",
       "area_slug": "webhook-endpoints",
@@ -15610,7 +15610,7 @@
       "arguments": [],
       "flags": [
         {
-          "flag": "--endpoint",
+          "flag": "--endpoint-id",
           "input": {
             "name": "endpoint_id",
             "location": "body"
@@ -15621,7 +15621,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "A saved endpoint's own variables are used too.",
+          "description": "A saved endpoint's own variables are used too; alone, its stored settings are rendered.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
@@ -15632,11 +15632,11 @@
           },
           "type": "WebhookEndpointInput",
           "value_label": "<endpoint>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
-          "description": "The endpoint settings to render, saved or not.",
+          "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
           "example": {
             "name": "Orders app",
             "url": "http://localhost:3000/webhooks/sendmock",
@@ -15745,7 +15745,7 @@
           }
         }
       ],
-      "example": "sendmock webhook render --endpoint 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "example": "sendmock webhook render --endpoint-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "EndpointPreviewResult",
       "exit_codes": [
         0,
