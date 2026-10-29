@@ -3,7 +3,8 @@ use std::sync::Arc;
 use sendmock_core::{Clock, IdGenerator};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
-    ApiRequestRepository, Database, EmailRepository, SettingsRepository, SmtpSessionRepository,
+    ApiRequestRepository, Database, EmailRepository, SettingsRepository, SmsRepository,
+    SmtpSessionRepository,
 };
 
 use crate::{AppSettingsStore, EventBus, InstanceDetails, SampleEmailSender, UpdateChecker};
@@ -19,6 +20,7 @@ pub struct OperationContext {
     pub email_ingest_service: EmailIngestService,
     pub smtp_session_repository: SmtpSessionRepository,
     pub api_request_repository: ApiRequestRepository,
+    pub sms_repository: SmsRepository,
     pub event_bus: EventBus,
     pub settings_store: AppSettingsStore,
     /// Set once the SMTP listener runs, so samples can go through it.
@@ -43,9 +45,11 @@ impl OperationContext {
         let smtp_session_repository = SmtpSessionRepository::new(Arc::clone(&database));
         let api_request_repository = ApiRequestRepository::new(Arc::clone(&database));
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
+        let sms_repository = SmsRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
+            sms_repository,
             database,
             clock,
             id_generator,

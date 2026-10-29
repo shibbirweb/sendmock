@@ -24,7 +24,7 @@ impl Operation for ResetOperation {
         }
     }
 
-    /// Deletes every email, SMTP session and logged request and puts the settings back to
+    /// Deletes every email, SMS, SMTP session and logged request and puts the settings back to
     /// their defaults; applying the seed file again comes with seed apply in Phase 3.
     async fn execute(
         &self,

@@ -5,8 +5,8 @@ use crate::{OperationContext, OperationError};
 
 const MILLISECONDS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
 
-/// Deletes traffic past the count and age limits in Settings: emails, SMTP sessions and
-/// logged requests, never configuration. Answers how many rows went.
+/// Deletes traffic past the count and age limits in Settings: emails, SMTP sessions, logged
+/// requests and SMS, never configuration. Answers how many rows went.
 pub async fn prune_traffic(operation_context: &OperationContext) -> Result<u64, OperationError> {
     let settings = operation_context.settings_store.current().await?;
     let cutoff_unix_ms = settings.max_age_days.map(|max_age_days| {
@@ -24,7 +24,11 @@ pub async fn prune_traffic(operation_context: &OperationContext) -> Result<u64, 
         .api_request_repository
         .prune_requests(settings.max_emails, cutoff_unix_ms)
         .await?;
-    Ok(pruned_email_count + pruned_session_count + pruned_request_count)
+    let pruned_sms_count = operation_context
+        .sms_repository
+        .prune_messages(settings.max_sms, cutoff_unix_ms)
+        .await?;
+    Ok(pruned_email_count + pruned_session_count + pruned_request_count + pruned_sms_count)
 }
 
 /// How new mail is read with the current settings: their OTP patterns (the defaults when

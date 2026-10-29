@@ -9,7 +9,7 @@ Phase 2.
 - [ ] SM-01.1 `POST /api/v1/sms` (JSON and form) stores the SMS and returns `201` with id, status, segments and encoding.
 - [ ] SM-01.2 The `GET /api/v1/sms/send?to=...&body=...` variant works.
 - [ ] SM-01.3 Missing `to` or `body` returns `400` with a field-level error.
-- [ ] SM-01.4 Numbers are normalised to E.164 where possible and the raw value is kept.
+- [x] SM-01.4 Numbers are normalised to E.164 where possible and the raw value is kept. (#48)
 - [ ] SM-01.5 The SMS appears in the UI thread within 1 second.
 
 ## SM-02 Twilio Messages API
@@ -49,8 +49,8 @@ Phase 4.
 
 Phase 2.
 
-- [ ] SM-06.1 GSM-7 text: 160 characters is 1 segment, 161 is 2 (153 per segment); extension-table characters count as 2.
-- [ ] SM-06.2 Any non-GSM character switches to UCS-2: 70 characters is 1 segment, 71 is 2 (67 per segment).
+- [x] SM-06.1 GSM-7 text: 160 characters is 1 segment, 161 is 2 (153 per segment); extension-table characters count as 2. (#48)
+- [x] SM-06.2 Any non-GSM character switches to UCS-2: 70 characters is 1 segment, 71 is 2 (67 per segment). (#48)
 - [ ] SM-06.3 Encoding and segment count are shown on each bubble and returned by the API.
 
 ## SM-07 Delivery simulation and magic numbers

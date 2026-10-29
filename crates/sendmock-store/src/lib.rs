@@ -6,6 +6,7 @@ mod database_location;
 mod email;
 mod migration;
 mod settings;
+mod sms;
 mod smtp_session;
 mod store_error;
 
@@ -18,6 +19,10 @@ pub use email::{
 };
 pub use migration::{EMBEDDED_MIGRATIONS, Migration};
 pub use settings::SettingsRepository;
+pub use sms::{
+    NewSmsRecord, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord,
+    SmsPage, SmsRecord, SmsRepository, SmsStatusChangeRecord, SmsThreadRecord,
+};
 pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,
 };

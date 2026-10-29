@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 7 / 108 features, 132 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 7 / 108 features, 135 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -77,12 +77,12 @@ On top of its own criteria, a feature is done only when:
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | In progress |
 | [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 5 | In progress |
 | [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | In progress |
-| [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Not started |
+| [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | In progress |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Not started |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | In progress |
 | [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Not started |
 | [SM-05](02-sms-verify.md#sm-05-other-sms-providers-and-generic-vendor) | Other SMS providers and generic vendor | Phase 4 | 2 | Not started |
-| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Not started |
+| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | In progress |
 | [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | In progress |
 | [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | Not started |
 | [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Not started |
