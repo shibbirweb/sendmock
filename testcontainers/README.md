@@ -57,7 +57,7 @@ bun install
 ```
 
 ```sh
-node --test test/
+node --test 'test/*.test.ts'
 ```
 
 Go:

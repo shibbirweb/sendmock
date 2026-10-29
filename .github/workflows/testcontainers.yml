@@ -66,7 +66,7 @@ jobs:
           - module: Node
             language: node
             folder: node
-            run: bun install && node --test test/
+            run: bun install && node --test 'test/*.test.ts'
           - module: Go
             language: go
             folder: go
