@@ -5,9 +5,9 @@ use sendmock_store::DatabaseLocation;
 
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
-use super::retention_config::RetentionConfig;
 use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
 use super::smtp_config::SmtpConfig;
+use super::startup_settings_config::StartupSettingsConfig;
 use super::{ConfigError, LogFormat, LogLevel};
 use crate::cli_arguments::ServeArguments;
 
@@ -23,7 +23,7 @@ pub struct ServerConfig {
     pub http_addr: SocketAddr,
     pub smtp_addr: SocketAddr,
     pub smtp: SmtpConfig,
-    pub retention: RetentionConfig,
+    pub startup_settings: StartupSettingsConfig,
     pub database_location: DatabaseLocation,
     pub log_format: LogFormat,
     pub log_level: LogLevel,
@@ -67,7 +67,7 @@ impl ServerConfig {
         default_database_location: DatabaseLocation,
     ) -> Result<Self, ConfigError> {
         let smtp = SmtpConfig::resolve(serve_arguments, &config_file)?;
-        let retention = RetentionConfig::resolve(serve_arguments, &config_file)?;
+        let startup_settings = StartupSettingsConfig::resolve(serve_arguments, &config_file)?;
         let database_setting = serve_arguments.database_setting.clone().or(config_file.db);
         Ok(Self {
             http_addr: serve_arguments
@@ -79,7 +79,7 @@ impl ServerConfig {
                 .or(config_file.smtp_addr)
                 .unwrap_or(DEFAULT_SMTP_ADDR),
             smtp,
-            retention,
+            startup_settings,
             database_location: database_setting
                 .map(|setting| DatabaseLocation::from_setting(&setting))
                 .unwrap_or(default_database_location),

@@ -673,5 +673,23 @@ expression: command_descriptions
     "mcp": [
       "sendmock_integration_snippet"
     ]
+  },
+  {
+    "command": "sendmock update check",
+    "usage": "sendmock update check",
+    "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/updates",
+        "operation_id": "getUpdates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_update_check"
+    ]
   }
 ]

@@ -3,23 +3,25 @@ use std::time::Duration;
 use sendmock_ops::{AppSettingsUpdate, OperationContext, prune_traffic};
 use tokio::sync::watch;
 
-use crate::config::ServerConfig;
+use crate::config::{ServerConfig, StartupSettingsConfig};
 
 /// Often enough that a burst of mail is trimmed within seconds, rarely enough to cost nothing.
 const PRUNE_INTERVAL: Duration = Duration::from_secs(10);
 
-/// Writes `--max-emails` and `--max-age` into the settings, so the UI shows the limits in force.
-pub async fn apply_retention_flags(
+/// Writes `--max-emails`, `--max-age` and `--update-check` into the settings, so the UI
+/// shows the values in force.
+pub async fn apply_startup_settings(
     server_config: &ServerConfig,
     operation_context: &OperationContext,
 ) {
-    let retention = &server_config.retention;
-    if retention.max_emails.is_none() && retention.max_age_days.is_none() {
+    let startup_settings = &server_config.startup_settings;
+    if startup_settings == &StartupSettingsConfig::default() {
         return;
     }
     let retention_update = AppSettingsUpdate {
-        max_emails: retention.max_emails,
-        max_age_days: retention.max_age_days.map(Some),
+        max_emails: startup_settings.max_emails,
+        max_age_days: startup_settings.max_age_days.map(Some),
+        update_check_mode: startup_settings.update_check_mode,
         ..AppSettingsUpdate::default()
     };
     let saved = match operation_context.settings_store.current().await {
@@ -35,7 +37,7 @@ pub async fn apply_retention_flags(
         Err(store_error) => Err(store_error),
     };
     if let Err(store_error) = saved {
-        tracing::warn!(error = %store_error, "could not apply the retention limits");
+        tracing::warn!(error = %store_error, "could not apply the startup settings");
     }
 }
 

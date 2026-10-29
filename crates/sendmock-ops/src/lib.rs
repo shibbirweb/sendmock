@@ -19,6 +19,7 @@ mod seed;
 mod settings;
 mod smtp_delivery;
 mod system;
+mod updates;
 
 pub use email::{EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData};
 pub use events::{
@@ -54,6 +55,10 @@ pub use settings::{
 };
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
+pub use updates::{
+    AvailableRelease, GetUpdatesOperation, InstallMethod, PublishedRelease, ReleaseSource,
+    UpdateCheckResult, UpdateChecker,
+};
 
 /// Every operation this build of SendMock serves.
 pub fn build_operation_registry() -> OperationRegistry {
@@ -67,5 +72,6 @@ pub fn build_operation_registry() -> OperationRegistry {
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);
     operation_registry.register(GetIntegrationOperation);
+    operation_registry.register(GetUpdatesOperation);
     operation_registry
 }

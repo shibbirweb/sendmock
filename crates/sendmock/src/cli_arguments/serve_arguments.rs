@@ -67,6 +67,10 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_MAX_AGE", value_name = "DAYS")]
     pub max_age: Option<String>,
 
+    /// When to look for a newer release: off, manual or daily [default: off]
+    #[arg(long, env = "SENDMOCK_UPDATE_CHECK", value_name = "MODE")]
+    pub update_check: Option<String>,
+
     /// Database file, or `memory` to keep nothing after exit [default: sendmock.db in the OS data folder]
     #[arg(long = "db", env = "SENDMOCK_DB", value_name = "PATH|memory")]
     pub database_setting: Option<String>,

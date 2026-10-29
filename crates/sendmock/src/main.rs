@@ -3,6 +3,7 @@
 mod cli_arguments;
 mod client_command;
 mod config;
+mod github_release_source;
 mod help_output;
 mod instance_details_builder;
 mod listener_binding;
@@ -14,6 +15,8 @@ mod server_startup;
 mod shutdown_signal;
 mod smtp_startup;
 mod startup_error;
+mod tls_provider;
+mod update_check_task;
 mod version_output;
 
 use std::process::ExitCode;
@@ -25,6 +28,7 @@ use sendmock_ops::build_operation_registry;
 use cli_arguments::{BuiltInCommand, CliArguments};
 
 fn main() -> ExitCode {
+    tls_provider::install_tls_provider();
     let operation_registry = build_operation_registry();
     let root_command =
         CliArguments::command().subcommands(build_operation_commands(&operation_registry));

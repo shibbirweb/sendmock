@@ -15,6 +15,14 @@ pub enum OperationError {
     #[error("{message}")]
     Timeout { message: String },
 
+    /// The request clashes with the current state, such as a check that is turned off.
+    #[error("{message}")]
+    Conflict { code: &'static str, message: String },
+
+    /// A service SendMock depends on, such as GitHub for the update check, could not answer.
+    #[error("{message}")]
+    Upstream { code: &'static str, message: String },
+
     #[error(transparent)]
     Store(#[from] StoreError),
 
@@ -29,6 +37,7 @@ impl OperationError {
             Self::InvalidInput { .. } => "invalid_input",
             Self::NotFound { .. } => "not_found",
             Self::Timeout { .. } => "timeout",
+            Self::Conflict { code, .. } | Self::Upstream { code, .. } => code,
             Self::Store(_) | Self::Internal(_) => "internal_error",
         }
     }
@@ -36,9 +45,12 @@ impl OperationError {
     pub fn field(&self) -> Option<&str> {
         match self {
             Self::InvalidInput { field, .. } => field.as_deref(),
-            Self::NotFound { .. } | Self::Timeout { .. } | Self::Store(_) | Self::Internal(_) => {
-                None
-            }
+            Self::NotFound { .. }
+            | Self::Timeout { .. }
+            | Self::Conflict { .. }
+            | Self::Upstream { .. }
+            | Self::Store(_)
+            | Self::Internal(_) => None,
         }
     }
 }

@@ -13,10 +13,11 @@ use tokio::task::JoinSet;
 use crate::config::ServerConfig;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
-use crate::retention_task::{apply_retention_flags, run_retention_task};
+use crate::retention_task::{apply_startup_settings, run_retention_task};
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
+use crate::update_check_task::{build_update_checker, run_update_check_task};
 
 /// Every listener, bound before anything is announced so a busy port stops startup.
 struct BoundListeners {
@@ -40,6 +41,7 @@ pub async fn run_server(
     );
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
     let shutdown_receiver_for_retention = shutdown_receiver.clone();
+    let shutdown_receiver_for_update_check = shutdown_receiver.clone();
     let mut background_tasks = start_smtp_listeners(
         server_config,
         &operation_context,
@@ -47,8 +49,12 @@ pub async fn run_server(
         listeners.smtps_listener,
         shutdown_receiver,
     )?;
-    apply_retention_flags(server_config, &operation_context).await;
+    apply_startup_settings(server_config, &operation_context).await;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
+    background_tasks.spawn(run_update_check_task(
+        operation_context.clone(),
+        shutdown_receiver_for_update_check,
+    ));
     background_tasks.spawn(run_retention_task(
         operation_context.clone(),
         shutdown_receiver_for_retention,
@@ -114,6 +120,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
     .with_sample_email_sender(Arc::new(LoopbackSmtpClient::new(reachable_address(
         listeners.smtp_addr,
     ))))
+    .with_update_checker(build_update_checker())
 }
 
 /// The address to connect to a listener on; one bound to every interface is reached on loopback.

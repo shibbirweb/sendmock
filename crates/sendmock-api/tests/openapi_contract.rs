@@ -8,8 +8,9 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    AnswerKind, InstanceDetails, OperationContext, OperationRegistry, ReleaseChannel, SampleEmail,
-    SampleEmailSender, SmtpMessage, SuccessStatus, build_operation_registry, store_smtp_message,
+    AnswerKind, AppSettingsUpdate, InstanceDetails, OperationContext, OperationRegistry,
+    ReleaseChannel, SampleEmail, SampleEmailSender, SmtpMessage, SuccessStatus, UpdateCheckMode,
+    build_operation_registry, store_smtp_message,
 };
 use sendmock_store::{
     ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
@@ -109,7 +110,29 @@ async fn prepare_sample_inputs(
     ]);
     samples.extend(prepare_email_samples(app_router).await);
     samples.extend(prepare_log_samples(operation_context).await);
+    samples.extend(prepare_update_samples(operation_context).await);
     samples
+}
+
+/// The update check answers only once it is turned on; this dev build is offered nothing.
+async fn prepare_update_samples(
+    operation_context: &OperationContext,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let manual_mode = AppSettingsUpdate {
+        update_check_mode: Some(UpdateCheckMode::Manual),
+        ..AppSettingsUpdate::default()
+    };
+    let current_settings = operation_context
+        .settings_store
+        .current()
+        .await
+        .unwrap_or_else(|error| panic!("settings: {error}"));
+    operation_context
+        .settings_store
+        .save(manual_mode.apply_to(current_settings), 0)
+        .await
+        .unwrap_or_else(|error| panic!("settings are saved: {error}"));
+    vec![("getUpdates", vec![json!({})])]
 }
 
 fn sample_smtp_session() -> SmtpSessionRecord {

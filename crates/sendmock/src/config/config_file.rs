@@ -22,6 +22,7 @@ pub struct ConfigFile {
     pub smtp_allow_rcpt: Option<String>,
     pub max_emails: Option<u64>,
     pub max_age: Option<String>,
+    pub update_check: Option<String>,
     pub db: Option<String>,
     pub log_format: Option<LogFormat>,
     pub log_level: Option<LogLevel>,

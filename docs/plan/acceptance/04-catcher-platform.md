@@ -80,11 +80,11 @@ UI in U1, backend per feature phase.
 - [ ] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged.
 - [ ] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body.
 - [ ] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips.
-- [ ] PL-05.6 About shows the version, channel, listeners and database, and the update check never runs until it is turned on.
-- [ ] PL-05.10 The update check has the modes Off (default), Manual and Daily in Settings > About, `sendmock.toml` and `SENDMOCK_UPDATE_CHECK`; Daily checks on start and once a day, and Manual only on request.
-- [ ] PL-05.11 A found version shows its date, its release notes and the upgrade command for the install method (Homebrew, Scoop, Docker, install script, npm, or the release page when unknown); with Daily it raises one header notification per new version.
-- [ ] PL-05.12 Stable installs are offered stables only, beta installs the newer of the newest beta and stable, edge and dev builds nothing; the check sends no identifiers, is cached for 24 hours, and reports "Could not check for updates" when GitHub cannot be reached.
-- [ ] PL-05.13 The upgrade command matches the platform SendMock runs on and is one the Install page gives for that platform and channel: the install script is `install.sh` on macOS and Linux and `install.ps1` in PowerShell on Windows, Homebrew is offered only on macOS and Linux, Scoop only on Windows, Docker and npm everywhere; a method that does not exist on the platform shows only the release page link.
+- [x] PL-05.6 About shows the version, channel, listeners and database, and the update check never runs until it is turned on. (#48)
+- [x] PL-05.10 The update check has the modes Off (default), Manual and Daily in Settings > About, `sendmock.toml` and `SENDMOCK_UPDATE_CHECK`; Daily checks on start and once a day, and Manual only on request. (#48)
+- [x] PL-05.11 A found version shows its date, its release notes and the upgrade command for the install method (Homebrew, Scoop, Docker, install script, npm, or the release page when unknown); with Daily it raises one header notification per new version. (#48)
+- [x] PL-05.12 Stable installs are offered stables only, beta installs the newer of the newest beta and stable, edge and dev builds nothing; the check sends no identifiers, is cached for 24 hours, and reports "Could not check for updates" when GitHub cannot be reached. (#48)
+- [x] PL-05.13 The upgrade command matches the platform SendMock runs on and is one the Install page gives for that platform and channel: the install script is `install.sh` on macOS and Linux and `install.ps1` in PowerShell on Windows, Homebrew is offered only on macOS and Linux, Scoop only on Windows, Docker and npm everywhere; a method that does not exist on the platform shows only the release page link. (#48)
 
 ## PL-06 Security defaults
 
