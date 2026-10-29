@@ -4,7 +4,7 @@ use sendmock_core::{Clock, IdGenerator};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{Database, EmailRepository, SmtpSessionRepository};
 
-use crate::InstanceDetails;
+use crate::{EventBus, InstanceDetails};
 
 /// The dependencies operations run with, passed in rather than reached through globals.
 #[derive(Clone)]
@@ -16,6 +16,7 @@ pub struct OperationContext {
     pub email_repository: EmailRepository,
     pub email_ingest_service: EmailIngestService,
     pub smtp_session_repository: SmtpSessionRepository,
+    pub event_bus: EventBus,
 }
 
 impl OperationContext {
@@ -41,6 +42,7 @@ impl OperationContext {
             instance_details: Arc::new(instance_details),
             email_repository,
             email_ingest_service,
+            event_bus: EventBus::default(),
         }
     }
 }

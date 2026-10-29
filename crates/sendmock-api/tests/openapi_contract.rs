@@ -73,6 +73,13 @@ async fn prepare_sample_inputs(app_router: &axum::Router) -> HashMap<&'static st
                 json!({ "seed_toml": "[[mystery]]\nkey = 1\n" }),
             ],
         ),
+        (
+            "getEventsRecent",
+            vec![
+                json!({}),
+                json!({ "type": "email.received", "since": "2025-01-01T00:00:00Z", "limit": 5 }),
+            ],
+        ),
     ]);
     samples.extend(prepare_email_samples(app_router).await);
     samples

@@ -1,6 +1,7 @@
 //! The operation registry: each feature is one operation that REST, the CLI and MCP all call.
 
 mod email;
+mod events;
 mod input_coercion;
 mod input_shape;
 mod instance_details;
@@ -16,6 +17,10 @@ mod smtp_delivery;
 mod system;
 
 pub use email::{EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData};
+pub use events::{
+    AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
+    RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_received, publish_event,
+};
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
@@ -43,5 +48,6 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(GetInfoOperation);
     operation_registry.register(ValidateSeedOperation);
     email::register_email_operations(&mut operation_registry);
+    events::register_event_operations(&mut operation_registry);
     operation_registry
 }

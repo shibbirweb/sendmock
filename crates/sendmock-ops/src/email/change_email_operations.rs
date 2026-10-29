@@ -2,7 +2,7 @@ use super::email_inputs::{EmailReference, EmailUpdateInput};
 use super::email_summary::EmailSummary;
 use crate::{
     HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
-    OperationError, SuccessStatus,
+    OperationError, SuccessStatus, publish_email_deleted,
 };
 
 pub struct UpdateEmailOperation;
@@ -71,10 +71,13 @@ impl Operation for DeleteEmailOperation {
         operation_context: &OperationContext,
         input: EmailReference,
     ) -> Result<NoContent, OperationError> {
-        operation_context
+        let was_deleted = operation_context
             .email_repository
             .delete_email(&input.email_id)
             .await?;
+        if was_deleted {
+            publish_email_deleted(operation_context, Some(&input.email_id), 1);
+        }
         Ok(NoContent)
     }
 }
@@ -104,10 +107,13 @@ impl Operation for DeleteAllEmailsOperation {
         operation_context: &OperationContext,
         _input: NoInput,
     ) -> Result<NoContent, OperationError> {
-        operation_context
+        let deleted_count = operation_context
             .email_repository
             .delete_all_emails()
             .await?;
+        if deleted_count > 0 {
+            publish_email_deleted(operation_context, None, deleted_count);
+        }
         Ok(NoContent)
     }
 }

@@ -4,6 +4,7 @@ mod api_error_response;
 mod app_router;
 mod http_server;
 mod openapi_document;
+mod realtime;
 mod rest_router;
 mod ui_assets;
 mod ui_router;

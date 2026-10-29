@@ -65,6 +65,8 @@ Each operation is one command object in `sendmock-ops/src/email/`, answering exa
 
 An `EventBus` (a `tokio::sync::broadcast` channel behind a trait) carries every event as the native webhook envelope (`{ id, type, created_at, data }`). The WebSocket and SSE handlers subscribe; `/events/recent` reads a ring buffer of the last events. Webhooks subscribe in Phase 3.
 
+**As built:** `EventBus` lives in `sendmock-ops/src/events/` and is a plain struct in `OperationContext` for now; the trait comes when a second implementation needs one. Each event gets an `evt_` id, the clock's time and a sequence number; the bus keeps the last 1,000 for `GET /events/recent` (filters `since`, `type`, `limit`) and for resuming. Operations publish after the write succeeds: `email.received` from every ingest path (SMTP, `POST /send`, `POST /send/raw`) with the `EmailSummary` as `data`, and `email.deleted` with the id (or none and the count after deleting all). In `sendmock-api/src/realtime/`, `ResumableEventStream` subscribes first, then replays the events after the client's last event id, and drops anything it already sent by sequence number, so a reconnect has no gap and no duplicate. `/api/v1/ws` sends one JSON envelope per text frame; `/api/v1/events` sends SSE with `id:` and `event:` lines and keep-alive comments and reads `Last-Event-ID`. A slow client that falls more than 1,024 events behind is told in the log and keeps receiving new ones.
+
 ## W6: Logs, settings and system
 
 A tower layer records every API request (method, path, status, duration, bodies capped) into `api_requests`. Settings are typed sections stored in the `settings` table; each phase adds its section. `reset` deletes traffic; `samples/email` sends a message over SMTP to SendMock itself, so it shows in Logs > SMTP. The update check calls the GitHub Releases API once a day at most, caches the answer for 24 hours, and builds the upgrade command for the running platform (PL-05.10 to PL-05.13).
@@ -90,3 +92,7 @@ A tower layer records every API request (method, path, status, duration, bodies 
 | `rustls`, `tokio-rustls`, `rcgen` | W4 | STARTTLS and SMTPS without OpenSSL; already in the plan |
 | `rmcp` | W7 | the official Rust MCP SDK; already in the plan |
 | `base64` | W1, W3 | cursors and attachment content |
+| `hmac`, `md-5` | W4 | the CRAM-MD5 AUTH mechanism |
+| axum `ws` feature (`tokio-tungstenite`) | W5 | the WebSocket at `/api/v1/ws` the UI already uses |
+| `futures-util` | W5 | the SSE stream; already in the tree through axum |
+| `tokio-tungstenite` (tests only) | W5 | a WebSocket client for the realtime tests |

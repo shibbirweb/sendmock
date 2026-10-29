@@ -44,8 +44,8 @@ Phase 0 onwards.
 
 Phase 1.
 
-- [ ] PL-02.1 Every event is pushed over WebSocket (`/api/v1/ws`) and SSE (`/api/v1/events`) within 500 ms.
-- [ ] PL-02.2 A client that reconnects resumes without duplicate or missing list entries.
+- [x] PL-02.1 Every event is pushed over WebSocket (`/api/v1/ws`) and SSE (`/api/v1/events`) within 500 ms. (#48)
+- [x] PL-02.2 A client that reconnects resumes without duplicate or missing list entries. (#48)
 
 ## PL-03 Test helpers
 

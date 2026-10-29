@@ -6,7 +6,7 @@ use super::lookups::NativeSendResult;
 use super::native_send_request::{NativeSendRequest, read_bare_address};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, RawBodyInput,
-    SuccessStatus,
+    SuccessStatus, publish_email_received,
 };
 
 pub struct SendEmailOperation;
@@ -55,6 +55,7 @@ impl Operation for SendEmailOperation {
             .ingest(incoming_email, &IngestOptions::default())
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
+        publish_email_received(operation_context, &stored_email);
         Ok(NativeSendResult {
             id: stored_email.email_id,
         })
@@ -115,6 +116,7 @@ impl Operation for SendRawEmailOperation {
             )
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
+        publish_email_received(operation_context, &stored_email);
         Ok(NativeSendResult {
             id: stored_email.email_id,
         })

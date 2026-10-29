@@ -1,0 +1,39 @@
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+/// The events SendMock publishes so far; webhook rules use the same names.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppEventType {
+    EmailReceived,
+    EmailDeleted,
+}
+
+impl AppEventType {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::EmailReceived => "email.received",
+            Self::EmailDeleted => "email.deleted",
+        }
+    }
+}
+
+/// The envelope pushed over the realtime streams and sent in native webhooks.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct AppEvent {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub event_type: String,
+    pub created_at: String,
+    /// Trimmed to list-view fields of the subject (email, SMS, delivery, ...).
+    pub data: Value,
+}
+
+/// An event as the bus keeps it: `sequence` orders events and lets a reconnecting
+/// client skip what it already has.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RecordedEvent {
+    pub sequence: u64,
+    pub created_at_unix_ms: i64,
+    pub app_event: AppEvent,
+}
