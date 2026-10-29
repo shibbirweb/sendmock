@@ -1,9 +1,9 @@
 use sendmock_core::StandardTemplateFunctions;
 
-use super::builtin_providers::builtin_sms_providers;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::operation_matcher::{ProviderRoute, match_operation};
 use super::provider_call::ProviderCall;
+use super::provider_catalog::{SMS_PROVIDER_AREA, load_area_providers};
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::read_operation_kinds::{answer_fetch, answer_list};
 use super::request_checks::{ProviderFailure, has_valid_credentials};
@@ -29,9 +29,11 @@ pub struct ProviderOutcome {
     pub secret_values: Vec<String>,
 }
 
-/// The providers requests can reach now; Phase 2 serves the shipped SMS definitions.
-pub fn load_sms_provider_definitions() -> Vec<MessageProviderDefinition> {
-    builtin_sms_providers()
+/// The SMS providers as they are now, so a saved change applies to the next request.
+pub async fn load_sms_provider_definitions(
+    operation_context: &OperationContext,
+) -> Result<Vec<MessageProviderDefinition>, OperationError> {
+    load_area_providers(operation_context, SMS_PROVIDER_AREA).await
 }
 
 /// Answers a request at a provider path from the provider's current definition: the matching
@@ -42,7 +44,7 @@ pub async fn answer_provider_request(
     provider_route: ProviderRoute<'_>,
     request: &ProviderHttpRequest,
 ) -> Result<ProviderOutcome, OperationError> {
-    let providers = load_sms_provider_definitions();
+    let providers = load_sms_provider_definitions(operation_context).await?;
     if let Some(code_served_outcome) =
         answer_code_served_api(operation_context, &providers, provider_route, request).await?
     {

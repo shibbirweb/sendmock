@@ -1,7 +1,7 @@
 use std::io::{IsTerminal, Write};
 
 use clap::ArgMatches;
-use sendmock_ops::OperationDefinition;
+use sendmock_ops::{OperationDefinition, mask_secret_value};
 use serde_json::Value;
 
 use crate::api_client::{ApiAnswer, ApiClient};
@@ -42,7 +42,8 @@ pub async fn run_operation_command(matched_operation: &MatchedOperation) -> Resu
         command_matches.get_one::<String>("token").cloned(),
     );
     match api_client.call_operation(definition, &input).await? {
-        ApiAnswer::Json(answer) => {
+        ApiAnswer::Json(mut answer) => {
+            mask_unrevealed_secret(definition, command_matches, &mut answer);
             let as_json = command_matches.get_flag("json") || !std::io::stdout().is_terminal();
             println!("{}", format_output(&answer, as_json));
             check_success_flag(definition, &answer)
@@ -70,6 +71,26 @@ fn write_file_answer(command_matches: &ArgMatches, file_bytes: &[u8]) -> Result<
                 file_path: "stdout".to_owned(),
                 reason: write_error.to_string(),
             }),
+    }
+}
+
+/// A revealing command shows the secret only with `--reveal`, which is its confirmation.
+fn mask_unrevealed_secret(
+    definition: &OperationDefinition,
+    command_matches: &ArgMatches,
+    answer: &mut Value,
+) {
+    let is_revealed = command_matches
+        .try_get_one::<bool>("reveal")
+        .ok()
+        .flatten()
+        .copied()
+        .unwrap_or(false);
+    if let Some(secret_field) = definition.revealed_secret_field
+        && !is_revealed
+        && let Some(secret_value) = answer[secret_field].as_str()
+    {
+        answer[secret_field] = Value::from(mask_secret_value(secret_value));
     }
 }
 

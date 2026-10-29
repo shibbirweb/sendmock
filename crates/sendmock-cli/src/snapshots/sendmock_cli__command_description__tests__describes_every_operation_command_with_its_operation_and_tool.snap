@@ -1173,6 +1173,185 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms providers list",
+    "usage": "sendmock sms providers list",
+    "summary": "SMS providers, built in and custom, removed ones included.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers",
+        "operation_id": "getSmsProviders",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_list"
+    ]
+  },
+  {
+    "command": "sendmock sms providers show",
+    "usage": "sendmock sms providers show <providerKey>",
+    "summary": "One provider definition; secret credentials masked.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "getSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_get"
+    ]
+  },
+  {
+    "command": "sendmock sms providers update",
+    "usage": "sendmock sms providers update <providerKey>",
+    "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--accent",
+      "--callback-template-key",
+      "--check-credentials",
+      "--credentials",
+      "--error-responses",
+      "--field-mapping",
+      "--host",
+      "--enabled",
+      "--key",
+      "--message-id-template",
+      "--name",
+      "--operations",
+      "--outcome-error-codes",
+      "--status-names",
+      "--success-response",
+      "--validation-rules"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "patchSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_update"
+    ]
+  },
+  {
+    "command": "sendmock sms providers delete",
+    "usage": "sendmock sms providers delete <providerKey>",
+    "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "deleteSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms providers restore",
+    "usage": "sendmock sms providers restore <providerKey>",
+    "summary": "Bring a removed built-in back as it was.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/restore",
+        "operation_id": "postSmsProvidersByProviderKeyRestore",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_restore"
+    ]
+  },
+  {
+    "command": "sendmock sms providers reset",
+    "usage": "sendmock sms providers reset <providerKey>",
+    "summary": "Put a built-in provider back as shipped.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/reset",
+        "operation_id": "postSmsProvidersByProviderKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_reset"
+    ]
+  },
+  {
+    "command": "sendmock sms providers preview",
+    "usage": "sendmock sms providers preview <providerKey>",
+    "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--provider",
+      "--sample-request"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/preview",
+        "operation_id": "postSmsProvidersByProviderKeyPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_preview"
+    ]
+  },
+  {
+    "command": "sendmock sms providers credential",
+    "usage": "sendmock sms providers credential <providerKey> <credentialName> --reveal",
+    "summary": "Reveal one secret credential (asked for after a confirmation).",
+    "arguments": [
+      "providerKey",
+      "credentialName"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
+        "operation_id": "getSmsProvidersByProviderKeyCredentialsByCredentialName",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

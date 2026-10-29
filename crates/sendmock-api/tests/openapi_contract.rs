@@ -8,9 +8,9 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    AnswerKind, AppSettingsUpdate, InstanceDetails, OperationContext, OperationRegistry,
-    ReleaseChannel, SampleEmail, SampleEmailSender, SmtpMessage, SuccessStatus, UpdateCheckMode,
-    build_operation_registry, store_smtp_message,
+    AnswerKind, AppSettingsUpdate, InstanceDetails, MessageProviderInput, OperationContext,
+    OperationRegistry, ReleaseChannel, SampleEmail, SampleEmailSender, SmtpMessage, SuccessStatus,
+    UpdateCheckMode, build_operation_registry, builtin_sms_providers, store_smtp_message,
 };
 use sendmock_store::{
     ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
@@ -64,14 +64,9 @@ fn native_send_sample() -> Value {
     })
 }
 
-/// Inputs per operation, sent through the router; an operation without samples fails the
-/// answer test, so every new operation brings some. Samples that need an item create it
-/// first through the API.
-async fn prepare_sample_inputs(
-    app_router: &axum::Router,
-    operation_context: &OperationContext,
-) -> HashMap<&'static str, Vec<Value>> {
-    let mut samples = HashMap::from([
+/// Health, info, seed, settings, samples, integrations and events: no item needed first.
+fn system_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
         ("getHealth", vec![json!({})]),
         ("getInfo", vec![json!({})]),
         (
@@ -110,7 +105,17 @@ async fn prepare_sample_inputs(
                 json!({ "type": "email.received", "since": "2025-01-01T00:00:00Z", "limit": 5 }),
             ],
         ),
-    ]);
+    ]
+}
+
+/// Inputs per operation, sent through the router; an operation without samples fails the
+/// answer test, so every new operation brings some. Samples that need an item create it
+/// first through the API.
+async fn prepare_sample_inputs(
+    app_router: &axum::Router,
+    operation_context: &OperationContext,
+) -> HashMap<&'static str, Vec<Value>> {
+    let mut samples: HashMap<&'static str, Vec<Value>> = system_samples().into_iter().collect();
     samples.extend(prepare_email_samples(app_router).await);
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
@@ -118,7 +123,71 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
+    samples.extend(prepare_sms_provider_samples(app_router).await);
     samples
+}
+
+/// A shipped SMS provider's settings, as `PATCH` and the preview take them.
+fn sms_provider_input(provider_key: &str) -> Value {
+    builtin_sms_providers()
+        .into_iter()
+        .find(|provider| provider.key == provider_key)
+        .map(|provider| serde_json::to_value(MessageProviderInput::from(provider)))
+        .and_then(Result::ok)
+        .unwrap_or_else(|| panic!("{provider_key} is shipped"))
+}
+
+/// MessageBird removed first, so restoring it applies; Plivo is the one the delete sample removes.
+async fn prepare_sms_provider_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let removal = Request::delete("/api/v1/sms/providers/messagebird")
+        .body(Body::empty())
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    app_router
+        .clone()
+        .oneshot(removal)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let mut vonage_update = sms_provider_input("vonage");
+    vonage_update["provider_key"] = json!("vonage");
+    let twilio_send = json!({
+        "method": "POST",
+        "path": "/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+        "headers": { "content-type": "application/x-www-form-urlencoded" },
+        "body": "To=%2B15551234567&From=%2B15005550006&Body=Hi",
+    });
+    vec![
+        ("getSmsProviders", vec![json!({})]),
+        (
+            "getSmsProvidersByProviderKey",
+            vec![json!({ "provider_key": "twilio" })],
+        ),
+        ("patchSmsProvidersByProviderKey", vec![vonage_update]),
+        (
+            "postSmsProvidersByProviderKeyRestore",
+            vec![json!({ "provider_key": "messagebird" })],
+        ),
+        (
+            "postSmsProvidersByProviderKeyReset",
+            vec![json!({ "provider_key": "twilio" })],
+        ),
+        (
+            "postSmsProvidersByProviderKeyPreview",
+            vec![
+                json!({ "provider_key": "twilio", "provider": sms_provider_input("twilio") }),
+                json!({ "provider_key": "twilio", "provider": sms_provider_input("twilio"), "sample_request": twilio_send }),
+            ],
+        ),
+        (
+            "getSmsProvidersByProviderKeyCredentialsByCredentialName",
+            vec![json!({ "provider_key": "twilio", "credential_name": "auth_token" })],
+        ),
+        (
+            "deleteSmsProvidersByProviderKey",
+            vec![json!({ "provider_key": "plivo" })],
+        ),
+    ]
 }
 
 fn verify_service_sample() -> Value {

@@ -3,9 +3,10 @@ use std::sync::Arc;
 use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
-    ApiRequestRepository, Database, EmailRepository, MessagingServiceRepository,
-    SettingsRepository, SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    ApiRequestRepository, Database, EmailRepository, MessageProviderRepository,
+    MessagingServiceRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
+    SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository,
 };
 
 use crate::{
@@ -30,6 +31,8 @@ pub struct OperationContext {
     pub messaging_service_repository: MessagingServiceRepository,
     pub verify_service_repository: VerifyServiceRepository,
     pub verification_repository: VerificationRepository,
+    /// Provider definitions changed from the shipped ones, and custom providers.
+    pub message_provider_repository: MessageProviderRepository,
     /// Decides random SMS failures; tests pass a seeded one.
     pub random_source: Arc<dyn RandomSource>,
     pub event_bus: EventBus,
@@ -66,6 +69,7 @@ impl OperationContext {
         let messaging_service_repository = MessagingServiceRepository::new(Arc::clone(&database));
         let verify_service_repository = VerifyServiceRepository::new(Arc::clone(&database));
         let verification_repository = VerificationRepository::new(Arc::clone(&database));
+        let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
@@ -75,6 +79,7 @@ impl OperationContext {
             messaging_service_repository,
             verify_service_repository,
             verification_repository,
+            message_provider_repository,
             random_source: Arc::new(SystemRandomSource),
             database,
             clock,

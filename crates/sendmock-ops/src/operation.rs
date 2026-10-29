@@ -129,6 +129,9 @@ pub struct OperationDefinition {
     /// A `GET` path that runs the same operation from the query string, for vendors whose
     /// APIs send that way (`GET /api/v1/sms/send?to=...&body=...`); not in OpenAPI.
     pub get_alias_path: Option<&'static str>,
+    /// An answer field that holds a secret in plain text: the operation has no MCP tool, since
+    /// agents never read secrets back, and the CLI masks the field unless `--reveal` is given.
+    pub revealed_secret_field: Option<&'static str>,
 }
 
 impl OperationDefinition {
@@ -151,7 +154,13 @@ impl OperationDefinition {
         raw_body_input: None,
         request_log: None,
         get_alias_path: None,
+        revealed_secret_field: None,
     };
+
+    /// Whether MCP serves it: not when it reveals a secret.
+    pub fn has_mcp_surface(&self) -> bool {
+        self.revealed_secret_field.is_none() && !self.mcp_tool.is_empty()
+    }
 
     /// Whether the MCP name is a resource (`sendmock://...`) rather than a tool.
     pub fn has_mcp_resource(&self) -> bool {

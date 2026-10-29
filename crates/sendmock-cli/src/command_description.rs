@@ -1,6 +1,9 @@
 use sendmock_ops::{OperationRegistry, OperationSelector, SelectorChoice};
 use serde::Serialize;
 
+/// Prints a secret in plain text instead of masked.
+const REVEAL_FLAG: &str = "--reveal";
+
 /// One command as `sendmock help --all --json` lists it, shaped like
 /// `docs/api/cli-reference.json` so the two can be compared.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -72,6 +75,11 @@ pub fn describe_operation_commands(
                     .flag_inputs
                     .iter()
                     .map(|flag_input| format!("--{}", flag_input.flag_name))
+                    .chain(
+                        definition
+                            .revealed_secret_field
+                            .map(|_| REVEAL_FLAG.to_owned()),
+                    )
                     .collect(),
                 operations: vec![OperationReference {
                     method: definition.method.as_str().to_owned(),
@@ -79,7 +87,11 @@ pub fn describe_operation_commands(
                     operation_id: definition.operation_id.to_owned(),
                     selector: definition.selector.map(SelectorReference::from),
                 }],
-                mcp: vec![definition.mcp_tool.to_owned()],
+                mcp: definition
+                    .has_mcp_surface()
+                    .then(|| definition.mcp_tool.to_owned())
+                    .into_iter()
+                    .collect(),
             }
         })
         .collect()

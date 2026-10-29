@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// An email or SMS provider as data: the requests it answers, how it reads them and what it
@@ -28,7 +29,7 @@ pub struct MessageProviderDefinition {
     pub is_removed: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderCredential {
     pub name: String,
@@ -37,7 +38,7 @@ pub struct ProviderCredential {
 }
 
 /// One request the provider answers: `send`, `fetch`, `list`, `cancel`, ...
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderOperation {
     pub kind: String,
@@ -49,14 +50,14 @@ pub struct ProviderOperation {
 }
 
 /// Where a message part (`to`, `body`, ...) is read from in the request.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderFieldMapping {
     pub part: String,
     pub source: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderValidationRule {
     pub part: String,
@@ -66,7 +67,7 @@ pub struct ProviderValidationRule {
     pub error_kind: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderResponseTemplate {
     pub status: u16,
@@ -74,7 +75,7 @@ pub struct ProviderResponseTemplate {
     pub body: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderHeaderTemplate {
     pub name: String,
@@ -83,7 +84,7 @@ pub struct ProviderHeaderTemplate {
 
 /// The answer for one error kind: `missing_field`, `invalid_value`, `unauthorized`,
 /// `not_found` or `rate_limited`.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ProviderErrorResponse {
     pub kind: String,

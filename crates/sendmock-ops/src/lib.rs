@@ -7,6 +7,7 @@ mod input_shape;
 mod instance_details;
 mod integrations;
 mod logs;
+mod message_providers;
 mod no_input;
 mod numbers;
 mod operation;
@@ -39,6 +40,10 @@ pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
     ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, ProviderRequestLogEntry,
     RequestLogSettings, SmtpSessionLogEntry, record_api_request, record_provider_request,
+};
+pub use message_providers::{
+    MessageProviderInput, MessageProviderPreview, MessageProviderView, ProviderCredentialReveal,
+    ProviderSampleRequest, mask_secret_value,
 };
 pub use no_input::NoInput;
 pub use numbers::{MessagingService, VirtualNumber};
@@ -92,6 +97,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
+    message_providers::register_sms_provider_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);

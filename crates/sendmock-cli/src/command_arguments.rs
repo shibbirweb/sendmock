@@ -147,10 +147,34 @@ pub fn add_operation_arguments(mut command: Command, operation: &dyn ErasedOpera
             .to_owned();
         command = add_flag(command, flag_input, help_text);
     }
-    add_body_and_answer_flags(command, definition)
+    add_confirmation_flags(add_body_and_answer_flags(command, definition), definition)
 }
 
-/// `--data` and `--file` for JSON bodies, `--yes` for destructive commands, `--output` for files.
+/// `--yes` for destructive commands, `--reveal` for commands that answer a secret.
+fn add_confirmation_flags(
+    mut command: Command,
+    definition: &sendmock_ops::OperationDefinition,
+) -> Command {
+    if definition.is_destructive {
+        command = command.arg(
+            Arg::new("yes")
+                .long("yes")
+                .action(ArgAction::SetTrue)
+                .help("Confirm; destructive commands never run without it"),
+        );
+    }
+    if definition.revealed_secret_field.is_some() {
+        command = command.arg(
+            Arg::new("reveal")
+                .long("reveal")
+                .action(ArgAction::SetTrue)
+                .help("Prints the secret in plain text instead of masked"),
+        );
+    }
+    command
+}
+
+/// `--data` and `--file` for JSON bodies, `--output` for files.
 fn add_body_and_answer_flags(
     mut command: Command,
     definition: &sendmock_ops::OperationDefinition,
@@ -175,14 +199,6 @@ fn add_body_and_answer_flags(
                     .value_name("PATH")
                     .help("Read the request body from a JSON file, or stdin with -"),
             );
-    }
-    if definition.is_destructive {
-        command = command.arg(
-            Arg::new("yes")
-                .long("yes")
-                .action(ArgAction::SetTrue)
-                .help("Confirm; destructive commands never run without it"),
-        );
     }
     if definition.raw_body_input.is_some() {
         command = command.arg(

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use rusqlite::{OptionalExtension, params};
@@ -98,6 +99,24 @@ impl SmsRepository {
     pub async fn list_threads(&self) -> Result<Vec<SmsThreadRecord>, StoreError> {
         self.database
             .read(|connection| Ok(sms_reader::list_threads(connection)?))
+            .await
+    }
+
+    /// Messages created at or after the time, counted by the API that sent them (`native` or a
+    /// provider key).
+    pub async fn count_messages_by_api_since(
+        &self,
+        since_unix_ms: i64,
+    ) -> Result<HashMap<String, u32>, StoreError> {
+        self.database
+            .read(move |connection| {
+                let mut statement = connection.prepare(
+                    "SELECT api, COUNT(*) FROM sms_messages WHERE created_at >= ?1 GROUP BY api",
+                )?;
+                Ok(statement
+                    .query_map([since_unix_ms], |row| Ok((row.get(0)?, row.get(1)?)))?
+                    .collect::<rusqlite::Result<_>>()?)
+            })
             .await
     }
 

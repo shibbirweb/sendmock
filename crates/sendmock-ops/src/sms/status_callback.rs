@@ -21,18 +21,16 @@ pub async fn send_status_callback(
     let Some(callback_url) = sms.status_callback_url.as_deref() else {
         return Ok(());
     };
-    let callback_request = match render_provider_status_callback(
-        operation_context,
-        sms,
-        callback_url,
-        status_change,
-    ) {
-        ProviderCallback::Rendered(callback_request) => callback_request,
-        ProviderCallback::NotReported => return Ok(()),
-        ProviderCallback::NoTemplate => {
-            render_native_status_callback(sms, callback_url, status_change)
-        }
-    };
+    let callback_request =
+        match render_provider_status_callback(operation_context, sms, callback_url, status_change)
+            .await?
+        {
+            ProviderCallback::Rendered(callback_request) => callback_request,
+            ProviderCallback::NotReported => return Ok(()),
+            ProviderCallback::NoTemplate => {
+                render_native_status_callback(sms, callback_url, status_change)
+            }
+        };
     let callback_result = match &operation_context.status_callback_sender {
         Some(status_callback_sender) => Some(
             status_callback_sender

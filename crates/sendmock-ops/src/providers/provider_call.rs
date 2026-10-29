@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 
-use sendmock_core::{TemplateEscape, TemplateFunctions, format_rfc3339, render_template};
+use sendmock_core::{
+    TemplateEscape, TemplateFunctions, TemplateProblem, format_rfc3339, render_template,
+};
 use sendmock_store::SmsRecord;
 use serde_json::{Value, json};
 
@@ -10,6 +12,12 @@ use super::message_provider_definition::{
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::request_checks::ProviderFailure;
 use super::request_reader::read_source_values;
+
+/// A rendered answer, with the template problems of each part (`header Content-Type`, `body`).
+pub struct RenderedProviderResponse {
+    pub response: ProviderHttpResponse,
+    pub problems: Vec<(String, TemplateProblem)>,
+}
 
 /// One request matched to a provider operation, with its fields read.
 pub struct ProviderCall<'call> {
@@ -56,16 +64,20 @@ impl ProviderCall<'_> {
     /// The answer a success template gives for a message.
     pub fn render_success(&self, message: &Value) -> ProviderHttpResponse {
         self.render_response(&self.provider.success_response, message, None)
+            .response
     }
 
     /// The provider's answer for a failure, or SendMock's own when it has none for that kind.
     pub fn render_failure(&self, failure: &ProviderFailure) -> ProviderHttpResponse {
         match self.provider.find_error_response(&failure.kind) {
-            Some(error_response) => self.render_response(
-                &error_response.as_response_template(),
-                &json!({}),
-                Some(failure),
-            ),
+            Some(error_response) => {
+                self.render_response(
+                    &error_response.as_response_template(),
+                    &json!({}),
+                    Some(failure),
+                )
+                .response
+            }
             None => ProviderHttpResponse {
                 status: if failure.kind == "not_found" {
                     404
@@ -79,13 +91,14 @@ impl ProviderCall<'_> {
         }
     }
 
-    fn render_response(
+    pub fn render_response(
         &self,
         response_template: &ProviderResponseTemplate,
         message: &Value,
         failure: Option<&ProviderFailure>,
-    ) -> ProviderHttpResponse {
+    ) -> RenderedProviderResponse {
         let template_context = self.build_template_context(message, failure);
+        let mut problems = Vec::new();
         let headers: Vec<(String, String)> = response_template
             .headers
             .iter()
@@ -95,6 +108,13 @@ impl ProviderCall<'_> {
                     &template_context,
                     self.template_functions,
                     TemplateEscape::None,
+                );
+                let part = format!("header {}", header_template.name);
+                problems.extend(
+                    rendered
+                        .problems
+                        .into_iter()
+                        .map(|problem| (part.clone(), problem)),
                 );
                 (header_template.name.clone(), rendered.text)
             })
@@ -113,15 +133,27 @@ impl ProviderCall<'_> {
             self.template_functions,
             body_escape,
         );
-        ProviderHttpResponse {
-            status: response_template.status,
-            headers,
-            body: body.text,
+        problems.extend(
+            body.problems
+                .into_iter()
+                .map(|problem| ("body".to_owned(), problem)),
+        );
+        RenderedProviderResponse {
+            response: ProviderHttpResponse {
+                status: response_template.status,
+                headers,
+                body: body.text,
+            },
+            problems,
         }
     }
 
     /// `request`, `message`, `error` and `credentials`, as the template reference lists them.
-    fn build_template_context(&self, message: &Value, failure: Option<&ProviderFailure>) -> Value {
+    pub fn build_template_context(
+        &self,
+        message: &Value,
+        failure: Option<&ProviderFailure>,
+    ) -> Value {
         let credentials: serde_json::Map<String, Value> = self
             .provider
             .credentials

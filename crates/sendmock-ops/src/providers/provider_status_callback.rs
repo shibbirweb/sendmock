@@ -8,8 +8,8 @@ use super::builtin_webhook_templates::{WebhookTemplateDefinition, find_builtin_w
 use super::callback_template_functions::CallbackTemplateFunctions;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::provider_runtime::load_sms_provider_definitions;
-use crate::OperationContext;
 use crate::sms::RecordedHttpRequest;
+use crate::{OperationContext, OperationError};
 
 /// What a provider message's status change calls back with.
 #[derive(Debug, Clone, PartialEq)]
@@ -25,27 +25,27 @@ pub enum ProviderCallback {
 /// Renders the provider's callback template for a status change: the provider's status name,
 /// its credentials as `vars.<key>_<credential>` (the message's account as the account SID), and
 /// the form fields as `body_fields` for signatures such as `X-Twilio-Signature`.
-pub fn render_provider_status_callback(
+pub async fn render_provider_status_callback(
     operation_context: &OperationContext,
     sms: &SmsRecord,
     callback_url: &str,
     status_change: &SmsStatusChangeRecord,
-) -> ProviderCallback {
-    let providers = load_sms_provider_definitions();
+) -> Result<ProviderCallback, OperationError> {
+    let providers = load_sms_provider_definitions(operation_context).await?;
     let Some(provider) = providers.iter().find(|provider| provider.key == sms.api) else {
-        return ProviderCallback::NoTemplate;
+        return Ok(ProviderCallback::NoTemplate);
     };
     let Some(callback_template) = provider
         .callback_template_key
         .as_deref()
         .and_then(find_builtin_webhook_template)
     else {
-        return ProviderCallback::NoTemplate;
+        return Ok(ProviderCallback::NoTemplate);
     };
     if !provider.status_names.is_empty()
         && !provider.status_names.contains_key(&status_change.status)
     {
-        return ProviderCallback::NotReported;
+        return Ok(ProviderCallback::NotReported);
     }
     let template_functions = CallbackTemplateFunctions {
         standard_functions: StandardTemplateFunctions::new(
@@ -59,12 +59,12 @@ pub fn render_provider_status_callback(
         "vars": collect_template_vars(provider, sms),
         "endpoint": { "url": callback_url },
     });
-    ProviderCallback::Rendered(render_callback_request(
+    Ok(ProviderCallback::Rendered(render_callback_request(
         &callback_template,
         callback_url,
         &mut template_context,
         &template_functions,
-    ))
+    )))
 }
 
 fn render_callback_request(
