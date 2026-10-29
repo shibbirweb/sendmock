@@ -14,6 +14,31 @@ pub use sendmock_mcp_server::SendmockMcpServer;
 pub use tool_definitions_builder::build_tool_definitions;
 pub use toolsets::{DEFAULT_TOOLSETS, ToolFilter, find_toolset};
 
+/// The streamable HTTP endpoint the server mounts at `/mcp`. On loopback only local Host
+/// names are accepted, against DNS rebinding; a server reachable from other machines
+/// (Docker) accepts any, and UI auth guards it.
+pub fn build_mcp_http_service(
+    mcp_server: SendmockMcpServer,
+    is_reachable_from_other_machines: bool,
+) -> rmcp::transport::streamable_http_server::StreamableHttpService<
+    SendmockMcpServer,
+    rmcp::transport::streamable_http_server::session::local::LocalSessionManager,
+> {
+    use rmcp::transport::streamable_http_server::{
+        StreamableHttpServerConfig, StreamableHttpService,
+    };
+
+    let mut server_config = StreamableHttpServerConfig::default();
+    if is_reachable_from_other_machines {
+        server_config = server_config.disable_allowed_hosts();
+    }
+    StreamableHttpService::new(
+        move || Ok(mcp_server.clone()),
+        std::sync::Arc::default(),
+        server_config,
+    )
+}
+
 /// Serves MCP over stdin and stdout until the client disconnects.
 pub async fn serve_mcp_over_stdio(mcp_server: SendmockMcpServer) -> Result<(), String> {
     use rmcp::ServiceExt;

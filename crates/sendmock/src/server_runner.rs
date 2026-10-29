@@ -1,8 +1,11 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
 
-use sendmock_api::{EmbeddedUiAssets, build_app_router, serve_http};
+use sendmock_api::{EmbeddedUiAssets, apply_access_control, build_app_router, serve_http};
 use sendmock_core::{Clock, SystemClock, SystemIdGenerator};
+use sendmock_mcp::{
+    InProcessOperationRunner, McpToolCatalog, SendmockMcpServer, ToolFilter, build_mcp_http_service,
+};
 use sendmock_ops::{OperationContext, build_operation_registry};
 use sendmock_smtp::{SmtpSubmissionClient, serve_smtp};
 use sendmock_store::Database;
@@ -18,6 +21,9 @@ use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
 use crate::update_check_task::{build_update_checker, run_update_check_task};
+
+/// Where harnesses that prefer a URL reach the MCP server.
+const MCP_HTTP_PATH: &str = "/mcp";
 
 /// Every listener, bound before anything is announced so a busy port stops startup.
 struct BoundListeners {
@@ -41,11 +47,7 @@ pub async fn run_server(
 ) -> Result<(), StartupError> {
     let listeners = bind_listeners(server_config).await?;
     let operation_context = build_operation_context(database, &listeners);
-    let app_router = build_app_router(
-        &build_operation_registry(),
-        &operation_context,
-        Arc::new(EmbeddedUiAssets),
-    );
+    let app_router = build_http_router(server_config, &operation_context, &listeners.addresses);
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
     let shutdown_receiver_for_retention = shutdown_receiver.clone();
     let shutdown_receiver_for_update_check = shutdown_receiver.clone();
@@ -107,6 +109,32 @@ fn start_smtp_listeners(
         ));
     }
     Ok(smtp_listeners)
+}
+
+/// The REST API, realtime streams and UI, MCP over HTTP at `/mcp`, and UI auth and CORS
+/// around all of it.
+fn build_http_router(
+    server_config: &ServerConfig,
+    operation_context: &OperationContext,
+    addresses: &ListenerAddresses,
+) -> axum::Router {
+    let operation_registry = build_operation_registry();
+    let mcp_tool_catalog = McpToolCatalog::new(
+        &operation_registry,
+        &ToolFilter::default(),
+        Arc::new(InProcessOperationRunner::new(operation_context.clone())),
+    );
+    let mcp_http_service = build_mcp_http_service(
+        SendmockMcpServer::new(mcp_tool_catalog, env!("CARGO_PKG_VERSION")),
+        !addresses.http_addr.ip().is_loopback(),
+    );
+    let app_router = build_app_router(
+        &operation_registry,
+        operation_context,
+        Arc::new(EmbeddedUiAssets),
+    )
+    .nest_service(MCP_HTTP_PATH, mcp_http_service);
+    apply_access_control(app_router, server_config.access_control.clone())
 }
 
 /// The context every operation runs with, able to send samples through the SMTP listener.
@@ -182,7 +210,7 @@ fn announce_ready(
         smtp_addr,
         smtps_addr,
     } = addresses;
-    if !http_addr.ip().is_loopback() {
+    if !http_addr.ip().is_loopback() && server_config.access_control.ui_auth.is_none() {
         tracing::warn!(
             http_addr = %http_addr,
             "SendMock is listening beyond this machine without UI auth; anyone who can reach this port can read what it captured"

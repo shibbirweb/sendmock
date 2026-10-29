@@ -1,8 +1,10 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::{Path, PathBuf};
 
+use sendmock_api::AccessControlSettings;
 use sendmock_store::DatabaseLocation;
 
+use super::access_config::resolve_access_control;
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
 use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
@@ -24,6 +26,7 @@ pub struct ServerConfig {
     pub smtp_addr: SocketAddr,
     pub smtp: SmtpConfig,
     pub startup_settings: StartupSettingsConfig,
+    pub access_control: AccessControlSettings,
     pub database_location: DatabaseLocation,
     pub log_format: LogFormat,
     pub log_level: LogLevel,
@@ -70,6 +73,7 @@ impl ServerConfig {
     ) -> Result<Self, ConfigError> {
         let smtp = SmtpConfig::resolve(serve_arguments, &config_file)?;
         let startup_settings = StartupSettingsConfig::resolve(serve_arguments, &config_file)?;
+        let access_control = resolve_access_control(serve_arguments, &config_file)?;
         let database_setting = serve_arguments.database_setting.clone().or(config_file.db);
         Ok(Self {
             http_addr: serve_arguments
@@ -82,6 +86,7 @@ impl ServerConfig {
                 .unwrap_or(DEFAULT_SMTP_ADDR),
             smtp,
             startup_settings,
+            access_control,
             database_location: database_setting
                 .map(|setting| DatabaseLocation::from_setting(&setting))
                 .unwrap_or(default_database_location),

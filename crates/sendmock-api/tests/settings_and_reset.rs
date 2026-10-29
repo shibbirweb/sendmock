@@ -1,3 +1,4 @@
+#[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
     pub mod test_app;
 }

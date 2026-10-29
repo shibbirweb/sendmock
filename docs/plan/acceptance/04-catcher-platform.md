@@ -91,9 +91,9 @@ UI in U1, backend per feature phase.
 Phase 0 onwards.
 
 - [x] PL-06.1 The native binary binds only `127.0.0.1` by default; Docker binds `0.0.0.0` and prints a notice when no UI auth is set. (#48)
-- [ ] PL-06.2 With `--ui-auth`, UI, API, WebSocket and MCP over HTTP all require credentials or the API token.
+- [x] PL-06.2 With `--ui-auth`, UI, API, WebSocket and MCP over HTTP all require credentials or the API token. (#48)
 - [ ] PL-06.3 No secret (webhook secrets, provider tokens, SMTP AUTH passwords, relay passwords) appears in any API response, log line, MCP result or export.
-- [ ] PL-06.4 CORS only allows the configured origins; the docs playground origin can be removed with `--cors-origins`.
+- [x] PL-06.4 CORS only allows the configured origins; the docs playground origin can be removed with `--cors-origins`. (#48)
 
 ## PL-07 Configuration
 

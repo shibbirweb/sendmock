@@ -141,3 +141,58 @@ test("the reference page for a tag documents its endpoints with Try it", async (
     "200",
   );
 });
+
+const corsHeaders = { "access-control-allow-origin": "*" };
+
+test("WS-05.1 WS-05.2 after Connect, requests reach your local SendMock and its answers show", async ({
+  page,
+}) => {
+  const localPaths: string[] = [];
+  await page.route("http://localhost:8025/**", async (route) => {
+    const requestPath = new URL(route.request().url()).pathname;
+    localPaths.push(requestPath);
+    await route.fulfill({
+      status: 200,
+      headers: corsHeaders,
+      json:
+        requestPath === "/api/v1/info"
+          ? { version: "0.1.0-beta.1" }
+          : { status: "ok" },
+    });
+  });
+  await openPlayground(page);
+
+  await page.getByRole("radio", { name: "Your local SendMock" }).check();
+  const pathsBeforeConnect = [...localPaths];
+  await page.getByRole("button", { name: "Connect" }).click();
+  await expect(
+    page.getByText("Connected to SendMock 0.1.0-beta.1."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Send to your SendMock" }).click();
+
+  await expect(page.getByTestId("response-status")).toHaveText("200");
+  expect(pathsBeforeConnect).toEqual([]);
+  expect(localPaths[0]).toBe("/api/v1/info");
+  expect(localPaths.length).toBeGreaterThan(1);
+});
+
+test("WS-05.3 a local SendMock that cannot be reached is explained", async ({
+  page,
+}) => {
+  await page.route("http://localhost:8025/**", (route) =>
+    route.abort("connectionrefused"),
+  );
+  await openPlayground(page);
+
+  await page.getByRole("radio", { name: "Your local SendMock" }).check();
+  await page.getByRole("button", { name: "Connect" }).click();
+
+  const connectionAlert = page
+    .getByRole("region", { name: "Target" })
+    .getByRole("alert");
+  await expect(connectionAlert).toContainText(
+    "Could not reach SendMock at http://localhost:8025",
+  );
+  await expect(connectionAlert).toContainText("local network");
+  await expect(sendButton(page)).toBeEnabled();
+});

@@ -1,3 +1,4 @@
+mod access_config;
 mod config_error;
 mod config_file;
 mod config_file_locator;

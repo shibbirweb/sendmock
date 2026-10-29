@@ -18,6 +18,7 @@ sendmock-api.workspace = true
 sendmock-cli.workspace = true
 sendmock-mcp.workspace = true
 
+axum.workspace = true
 clap.workspace = true
 dirs.workspace = true
 reqwest.workspace = true

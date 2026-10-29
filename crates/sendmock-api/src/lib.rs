@@ -1,5 +1,6 @@
 //! The HTTP server: REST routes from the operation registry, realtime streams, OpenAPI and the embedded UI.
 
+mod access_control;
 mod api_error_response;
 mod api_request_logging;
 mod app_router;
@@ -13,6 +14,7 @@ mod ui_router;
 #[cfg(test)]
 mod test_support;
 
+pub use access_control::{AccessControlSettings, UiAuth, UiAuthError, apply_access_control};
 pub use app_router::build_app_router;
 pub use http_server::serve_http;
 pub use openapi_document::build_openapi_document;

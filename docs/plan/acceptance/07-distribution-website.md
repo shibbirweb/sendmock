@@ -115,9 +115,9 @@ Phase U3.
 
 Phase 1.
 
-- [ ] WS-05.1 After clicking Connect, requests reach a local SendMock at the configured URL and responses display.
-- [ ] WS-05.2 Nothing is sent to a local instance until the user clicks Connect.
-- [ ] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation.
+- [x] WS-05.1 After clicking Connect, requests reach a local SendMock at the configured URL and responses display. (#48)
+- [x] WS-05.2 Nothing is sent to a local instance until the user clicks Connect. (#48)
+- [x] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation. (#48)
 
 ## WS-06 User guide
 

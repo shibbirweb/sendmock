@@ -75,6 +75,28 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_READY_JSON")]
     pub ready_json: bool,
 
+    /// Protect the UI, API, realtime streams and MCP over HTTP: `user:password`, or `file:<path>` with `user:password` lines
+    #[arg(
+        long,
+        env = "SENDMOCK_UI_AUTH",
+        hide_env_values = true,
+        value_name = "USER:PASSWORD|file:PATH"
+    )]
+    pub ui_auth: Option<String>,
+
+    /// With --ui-auth, also accept `Authorization: Bearer <token>` (for the CLI, scripts and the docs playground)
+    #[arg(
+        long,
+        env = "SENDMOCK_API_TOKEN",
+        hide_env_values = true,
+        value_name = "TOKEN"
+    )]
+    pub api_token: Option<String>,
+
+    /// Browser origins allowed to call the API, comma-separated; empty turns CORS off [default: https://shibbirweb.github.io]
+    #[arg(long, env = "SENDMOCK_CORS_ORIGINS", value_name = "ORIGINS")]
+    pub cors_origins: Option<String>,
+
     /// Database file, or `memory` to keep nothing after exit [default: sendmock.db in the OS data folder]
     #[arg(long = "db", env = "SENDMOCK_DB", value_name = "PATH|memory")]
     pub database_setting: Option<String>,
