@@ -138,6 +138,47 @@ fn the_tools_send_mail_and_read_the_code_with_honest_annotations() -> io::Result
     Ok(())
 }
 
+#[test]
+fn the_sms_and_verify_tools_send_an_sms_and_keep_provider_secrets_masked() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let mut mcp_session = McpSession::start(
+        working_directory.path(),
+        &sendmock.wait_for_http_addr(),
+        &["--toolsets", "sms,verify,numbers,extract"],
+    )?;
+
+    let tools = mcp_session.list_tools()?;
+    let send_result = mcp_session.call_tool(
+        "sendmock_sms_send",
+        json!({ "from": "+15550001111", "to": "+8801700000000", "body": "Your code is 482913" }),
+    )?;
+    let otp_result = mcp_session.call_tool(
+        "sendmock_otp_get",
+        json!({ "to": "+8801700000000", "channel": "sms" }),
+    )?;
+    let service_result = mcp_session.call_tool(
+        "sendmock_verify_service_create",
+        json!({ "friendly_name": "Shop", "fixed_code": "123456" }),
+    )?;
+    let provider_result = mcp_session.call_tool(
+        "sendmock_sms_provider_get",
+        json!({ "provider_key": "twilio" }),
+    )?;
+
+    assert_eq!(send_result["structuredContent"]["segments"], 1);
+    assert_eq!(otp_result["structuredContent"]["code"], "482913");
+    assert_eq!(service_result["structuredContent"]["fixed_code"], "123456");
+    assert!(find_tool(&tools, "sendmock_number_list").is_some());
+    assert!(!provider_result.to_string().contains("twilio-test-token"));
+    assert!(tools.iter().all(|tool| {
+        !tool["name"]
+            .as_str()
+            .is_some_and(|name| name.contains("credential"))
+    }));
+    Ok(())
+}
+
 // AC: AI-02.3
 #[test]
 fn toolsets_and_read_only_limit_what_an_agent_sees() -> io::Result<()> {

@@ -67,7 +67,7 @@ export const messageProviderSurfaces: SurfaceCatalogue = {
     ui: "SMS > Providers",
   },
   "POST /api/v1/sms/providers": {
-    phase: "2",
+    phase: "4",
     cli: "sendmock sms providers create",
     mcp: "sendmock_sms_provider_create",
     ui: "SMS > Providers > Add provider",

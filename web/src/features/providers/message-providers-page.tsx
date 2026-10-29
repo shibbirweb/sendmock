@@ -4,8 +4,8 @@ import { toast } from "sonner";
 
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { QueryErrorState } from "@/components/common/query-error-state";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { OperationButton } from "@/features/availability/operation-button";
 import { AddProviderDialog } from "@/features/providers/add-provider-dialog";
 import { MessageProviderSheet } from "@/features/providers/message-provider-sheet";
 import {
@@ -17,6 +17,7 @@ import { RemovedProvidersGroup } from "@/features/providers/removed-providers-gr
 import { toProviderInput } from "@/features/providers/to-provider-input";
 import { usePageTitle } from "@/hooks/use-page-title";
 import {
+  toProvidersPath,
   useDeleteMessageProvider,
   useMessageProviders,
   useResetMessageProvider,
@@ -119,10 +120,15 @@ export function MessageProvidersPage({
               {areaCopy.description}
             </p>
           </div>
-          <Button size="sm" onClick={() => setAddOpen(true)}>
+          <OperationButton
+            operationKey={`POST /api/v1${toProvidersPath(providerArea)}`}
+            actionName="Add provider"
+            size="sm"
+            onClick={() => setAddOpen(true)}
+          >
             <PlusIcon />
             Add provider
-          </Button>
+          </OperationButton>
         </header>
         <div className="min-w-0 rounded-lg border">
           {providersQuery.isPending ? (

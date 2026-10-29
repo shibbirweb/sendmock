@@ -82,10 +82,10 @@ On top of its own criteria, a feature is done only when:
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | In progress |
 | [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Accepted |
 | [SM-05](02-sms-verify.md#sm-05-other-sms-providers-and-generic-vendor) | Other SMS providers and generic vendor | Phase 4 | 2 | Not started |
-| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | In progress |
+| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Accepted |
 | [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | In progress |
 | [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | In progress |
-| [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Not started |
+| [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | In progress |
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Not started |
 | [SM-11](02-sms-verify.md#sm-11-whatsapp-via-twilio) | WhatsApp via Twilio | Phase 4 | 3 | Not started |
 | [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 2 | 3 | In progress |
@@ -96,7 +96,7 @@ On top of its own criteria, a feature is done only when:
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | In progress |
-| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | In progress |
+| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | Accepted |
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 8 | In progress |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | UI in U2, backend Phase 3 | 9 | In progress |

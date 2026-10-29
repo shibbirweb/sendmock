@@ -51,7 +51,7 @@ Phase 2.
 
 - [x] SM-06.1 GSM-7 text: 160 characters is 1 segment, 161 is 2 (153 per segment); extension-table characters count as 2. (#48)
 - [x] SM-06.2 Any non-GSM character switches to UCS-2: 70 characters is 1 segment, 71 is 2 (67 per segment). (#48)
-- [ ] SM-06.3 Encoding and segment count are shown on each bubble and returned by the API.
+- [x] SM-06.3 Encoding and segment count are shown on each bubble and returned by the API. (#48)
 
 ## SM-07 Delivery simulation and magic numbers
 
@@ -79,7 +79,7 @@ Phase 2.
 
 Phase 2 (inbound), Phase 3 (reply webhook and TwiML; moved from Phase 4 on 2026-10-25). Docs: [Reply webhook](../04-sms.md#reply-webhook-twilio-style).
 
-- [ ] SM-09.1 The UI composer and `POST /api/v1/sms/inbound` create an inbound SMS and fire `sms.inbound`.
+- [x] SM-09.1 The UI composer and `POST /api/v1/sms/inbound` create an inbound SMS and fire `sms.inbound`. (#48)
 - [ ] SM-09.2 The number's inbound URL (or a matching rule) receives it in the chosen provider format with a valid signature.
 - [ ] SM-09.3 A TwiML `<Message>` response from the app is recorded as an outbound reply in the same thread.
 - [ ] SM-09.4 The inbound message goes to the Messaging Service request URL, else the number's inbound URL, with the configured method, all of Twilio's inbound fields, `X-Twilio-Signature` and `I-Twilio-Idempotency-Token`.
@@ -187,5 +187,5 @@ UI in U1, backend Phase 2.
 
 - [x] VF-04.1 Forcing `approved`, `canceled`, `expired` or `max_attempts` from UI, API, CLI or MCP changes the state immediately.
 - [x] VF-04.2 `verify.started`, `verify.checked` and `verify.expired` fire and can trigger webhook rules.
-- [ ] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown.
-- [ ] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code.
+- [x] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown. (#48)
+- [x] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code. (#48)
