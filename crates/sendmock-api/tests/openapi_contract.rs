@@ -124,6 +124,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
+    samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples
 }
 
@@ -297,6 +298,59 @@ async fn prepare_number_samples(app_router: &axum::Router) -> Vec<(&'static str,
         (
             "deleteMessagingServicesByServiceSid",
             vec![json!({ "service_sid": deleted_service_sid })],
+        ),
+    ]
+}
+
+fn webhook_endpoint_sample(endpoint_name: &str) -> Value {
+    json!({
+        "name": endpoint_name, "url": "http://localhost:3000/webhooks/sendmock", "method": "POST",
+        "headers": { "X-Source": "sendmock" }, "extra_fields": {}, "template_id": "native",
+        "template_mode": "linked", "timeout_ms": 10_000,
+        "retry_policy": {
+            "max_attempts": 5, "backoff_seconds": [1, 5, 30, 120, 600],
+            "retry_on_client_errors": false,
+        },
+        "is_enabled": true, "query_params": [], "body_mode": "template", "body_fields": [],
+        "fields_encoding": "json", "raw_content_type": "application/json", "raw_body": "",
+        "render_mode": "strict",
+    })
+}
+
+/// Two endpoints: one to edit, reveal and rotate, one to delete.
+async fn prepare_webhook_endpoint_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let path = "/api/v1/webhooks/endpoints";
+    let edited_endpoint_id =
+        post_json(app_router, path, &webhook_endpoint_sample("Orders app")).await["id"].clone();
+    let deleted_endpoint_id =
+        post_json(app_router, path, &webhook_endpoint_sample("Old app")).await["id"].clone();
+    vec![
+        ("getWebhooksEndpoints", vec![json!({})]),
+        (
+            "postWebhooksEndpoints",
+            vec![webhook_endpoint_sample("Billing")],
+        ),
+        (
+            "getWebhooksEndpointsByEndpointId",
+            vec![json!({ "endpoint_id": edited_endpoint_id })],
+        ),
+        (
+            "patchWebhooksEndpointsByEndpointId",
+            vec![json!({ "endpoint_id": edited_endpoint_id, "is_enabled": false })],
+        ),
+        (
+            "getWebhooksEndpointsByEndpointIdSecret",
+            vec![json!({ "endpoint_id": edited_endpoint_id })],
+        ),
+        (
+            "postWebhooksEndpointsByEndpointIdRotateSecret",
+            vec![json!({ "endpoint_id": edited_endpoint_id, "overlap_hours": 24 })],
+        ),
+        (
+            "deleteWebhooksEndpointsByEndpointId",
+            vec![json!({ "endpoint_id": deleted_endpoint_id })],
         ),
     ]
 }

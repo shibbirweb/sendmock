@@ -28,6 +28,7 @@ mod smtp_delivery;
 mod system;
 mod updates;
 mod verify;
+mod webhooks;
 
 pub use email::{EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData};
 pub use events::{
@@ -86,6 +87,7 @@ pub use updates::{
     UpdateCheckResult, UpdateChecker,
 };
 pub use verify::{Verification, VerificationDetail, VerifyService, find_newest_verification};
+pub use webhooks::{RevealedEndpointSecret, WebhookEndpoint};
 
 /// Every operation this build of SendMock serves.
 pub fn build_operation_registry() -> OperationRegistry {
@@ -100,6 +102,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);
+    webhooks::register_webhook_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);

@@ -12,6 +12,7 @@ pub use messaging_service_operations::{
     ListMessagingServicesOperation, UpdateMessagingServiceOperation,
 };
 pub use number_views::{MessagingService, VirtualNumber};
+pub(crate) use registry_fields::is_http_url;
 pub use virtual_number_operations::{
     CreateVirtualNumberOperation, DeleteVirtualNumberOperation, ListVirtualNumbersOperation,
     UpdateVirtualNumberOperation,

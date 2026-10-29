@@ -1352,6 +1352,180 @@ expression: command_descriptions
     "mcp": []
   },
   {
+    "command": "sendmock webhook endpoint list",
+    "usage": "sendmock webhook endpoint list",
+    "summary": "Where webhooks go: URL, template, secret and retry policy.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints",
+        "operation_id": "getWebhooksEndpoints",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint create",
+    "usage": "sendmock webhook endpoint create",
+    "summary": "Add an endpoint; its signing secret is generated.",
+    "arguments": [],
+    "flags": [
+      "--body-fields",
+      "--body-mode",
+      "--extra-fields",
+      "--fields-encoding",
+      "--headers",
+      "--enabled",
+      "--method",
+      "--name",
+      "--query-params",
+      "--raw-body",
+      "--raw-content-type",
+      "--render-mode",
+      "--retry-policy",
+      "--template-id",
+      "--template-mode",
+      "--timeout-ms",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints",
+        "operation_id": "postWebhooksEndpoints",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint show",
+    "usage": "sendmock webhook endpoint show <endpointId>",
+    "summary": "One endpoint; its secret masked.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "getWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint update",
+    "usage": "sendmock webhook endpoint update <endpointId>",
+    "summary": "Change an endpoint; send only the changed keys.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--body-fields",
+      "--body-mode",
+      "--extra-fields",
+      "--fields-encoding",
+      "--headers",
+      "--enabled",
+      "--method",
+      "--name",
+      "--query-params",
+      "--raw-body",
+      "--raw-content-type",
+      "--render-mode",
+      "--retry-policy",
+      "--template-id",
+      "--template-mode",
+      "--timeout-ms",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "patchWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint delete",
+    "usage": "sendmock webhook endpoint delete <endpointId>",
+    "summary": "Delete an endpoint and its rules.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "deleteWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint secret",
+    "usage": "sendmock webhook endpoint secret <endpointId> --reveal",
+    "summary": "Reveal the signing secret (asked for after a confirmation).",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/secret",
+        "operation_id": "getWebhooksEndpointsByEndpointIdSecret",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
+    "command": "sendmock webhook endpoint rotate-secret",
+    "usage": "sendmock webhook endpoint rotate-secret <endpointId>",
+    "summary": "New signing secret; the old one keeps working for the overlap.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--overlap-hours"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/rotate-secret",
+        "operation_id": "postWebhooksEndpointsByEndpointIdRotateSecret",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_rotate_secret"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

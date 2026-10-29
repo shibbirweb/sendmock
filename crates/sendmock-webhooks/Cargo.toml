@@ -9,8 +9,11 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+base64.workspace = true
+hmac.workspace = true
 sendmock-core.workspace = true
-sendmock-store.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
 
 [lints]
 workspace = true

@@ -2303,8 +2303,11 @@ dependencies = [
 name = "sendmock-webhooks"
 version = "0.0.0"
 dependencies = [
+ "base64 0.23.1",
+ "hmac",
  "sendmock-core",
- "sendmock-store",
+ "sha2",
+ "thiserror",
 ]
 
 [[package]]

@@ -22,7 +22,7 @@ pub fn is_e164(number: &str) -> bool {
 }
 
 /// An absolute `http` or `https` URL with a host.
-fn is_http_url(url_text: &str) -> bool {
+pub fn is_http_url(url_text: &str) -> bool {
     let lowercase_url = url_text.to_ascii_lowercase();
     let after_scheme = lowercase_url
         .strip_prefix("http://")

@@ -259,6 +259,8 @@ Plan: [26-phase-2.md](26-phase-2.md). Built on `feat/phase-0` in #48, W1 to W9 i
 
 ### Phase 3: Webhooks backend
 
+Plan: [27-phase-3.md](27-phase-3.md). Built on `feat/phase-0` in #48, W1 to W11 in order.
+
 - [ ] Endpoints, rules, persistent queue, retries, cancel
 - [ ] Standard Webhooks signing and secret rotation
 - [ ] Email delivery outcome simulation and events (including custom outcome addresses)
@@ -562,3 +564,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Fix after W8: fields that are always sent but may be `null` lost the `null` in the binary's schemas (`#[schemars(required)]` on an `Option` emits the bare type), so the CLI required every such flag and MCP tools offered no way to leave one out. They now keep `[T, "null"]` through `nullable_schema`, as the contract has them, and the CLI only requires flags whose input cannot be null. |
 | 2026-10-29 | Phase 2 W9a: the official Twilio SDKs for Node (twilio 6.2.0) and Python (twilio 9.12.0) in `examples/sms/`, each through a custom HTTP client to the provider port, send an SMS with `queued`, `sent` and `delivered` callbacks to a local handler and complete a Verify login; `sms-clients.yml` runs them against a release binary and Release build runs it before publishing. VF-03.4 ticked and VF-03 accepted; SM-02.4 waits for the other SDKs in Phase 4. |
 | 2026-10-29 | Phase 2 W9b: Testcontainers modules in `testcontainers/` for Java (Testcontainers 2.0.5), Node (12.2.1), Go (testcontainers-go 0.44.0), Python (4.15.0) and .NET (4.16.0), each a `SendMockContainer` that starts the image with the provider port and gives the SMTP host and port, the HTTP URL and the provider URL. `testcontainers.yml` builds the image from the commit and runs each module's test (health, SMTP greeting, a Twilio send through the provider URL). Publishing the packages is Phase 5 release work. DS-06.1 and DS-06.2 ticked and DS-06 accepted (moved from Phase 5). |
+| 2026-10-29 | Phase 3 planned in [27](27-phase-3.md) (W1 to W11, all on `feat/phase-0` in #48). Phase 3 W1: webhook endpoints (migration `0010`, `WebhookEndpointRepository`, list, create, show, update, delete, secret reveal and rotation with a 1, 24 or 168 hour overlap) in REST, CLI and MCP, validated with the edit sheet's rules; the `WebhookSecret` value object and Standard Webhooks signing, checked against the spec's example. New direct dependency `sha2` 0.11 (already in the tree). |
