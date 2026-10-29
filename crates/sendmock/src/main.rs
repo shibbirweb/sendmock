@@ -11,6 +11,7 @@ mod instance_details_builder;
 mod listener_binding;
 mod logging;
 mod mcp_command;
+mod provider_listeners;
 mod retention_task;
 mod seed_file_check;
 mod sendmail_shim;

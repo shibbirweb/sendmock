@@ -26,6 +26,29 @@ pub fn build_provider_router(operation_context: &OperationContext) -> Router {
         .with_state(operation_context.clone())
 }
 
+/// A provider port: every path is a provider's real path. With a provider key, only that
+/// provider answers (`--provider-port twilio=8027`); without, every provider does, told apart
+/// by path and then `Host`.
+pub fn build_provider_port_router(
+    operation_context: &OperationContext,
+    dedicated_provider_key: Option<String>,
+) -> Router {
+    let operation_context = operation_context.clone();
+    Router::new().fallback(move |request: Request| {
+        let operation_context = operation_context.clone();
+        let dedicated_provider_key = dedicated_provider_key.clone();
+        async move {
+            let provider_route = match dedicated_provider_key.as_deref() {
+                Some(provider_key) => ProviderRoute::Prefixed(provider_key),
+                None => ProviderRoute::ProviderPort,
+            };
+            let provider_path = request.uri().path().to_owned();
+            answer_provider_http_request(&operation_context, provider_route, provider_path, request)
+                .await
+        }
+    })
+}
+
 async fn answer_prefixed_provider_request(
     State(operation_context): State<OperationContext>,
     Path((provider_key, provider_path)): Path<(String, String)>,

@@ -20,4 +20,5 @@ pub use access_control::{AccessControlSettings, UiAuth, UiAuthError, apply_acces
 pub use app_router::build_app_router;
 pub use http_server::serve_http;
 pub use openapi_document::build_openapi_document;
+pub use provider_routes::build_provider_port_router;
 pub use ui_assets::{EmbeddedUiAssets, UiAsset, UiAssets};

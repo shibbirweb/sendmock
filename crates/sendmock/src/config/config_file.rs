@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
@@ -14,6 +15,9 @@ pub struct ConfigFile {
     pub http_addr: Option<SocketAddr>,
     pub smtp_addr: Option<SocketAddr>,
     pub smtps_addr: Option<SocketAddr>,
+    pub provider_addr: Option<SocketAddr>,
+    /// `{ twilio = 8027 }`: providers with their own port.
+    pub provider_ports: Option<BTreeMap<String, u16>>,
     pub smtp_max_size: Option<String>,
     pub smtp_auth: Option<String>,
     pub smtp_tls_cert: Option<PathBuf>,

@@ -7,6 +7,7 @@ use sendmock_store::DatabaseLocation;
 use super::access_config::resolve_access_control;
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
+use super::provider_port_config::ProviderPortConfig;
 use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
 use super::smtp_config::SmtpConfig;
 use super::startup_settings_config::StartupSettingsConfig;
@@ -25,6 +26,7 @@ pub struct ServerConfig {
     pub http_addr: SocketAddr,
     pub smtp_addr: SocketAddr,
     pub smtp: SmtpConfig,
+    pub provider_ports: ProviderPortConfig,
     pub startup_settings: StartupSettingsConfig,
     pub access_control: AccessControlSettings,
     pub database_location: DatabaseLocation,
@@ -74,17 +76,23 @@ impl ServerConfig {
         let smtp = SmtpConfig::resolve(serve_arguments, &config_file)?;
         let startup_settings = StartupSettingsConfig::resolve(serve_arguments, &config_file)?;
         let access_control = resolve_access_control(serve_arguments, &config_file)?;
-        let database_setting = serve_arguments.database_setting.clone().or(config_file.db);
+        let database_setting = serve_arguments
+            .database_setting
+            .clone()
+            .or(config_file.db.clone());
+        let http_addr = serve_arguments
+            .http_addr
+            .or(config_file.http_addr)
+            .unwrap_or(DEFAULT_HTTP_ADDR);
+        let provider_ports = ProviderPortConfig::resolve(serve_arguments, &config_file, http_addr)?;
         Ok(Self {
-            http_addr: serve_arguments
-                .http_addr
-                .or(config_file.http_addr)
-                .unwrap_or(DEFAULT_HTTP_ADDR),
+            http_addr,
             smtp_addr: serve_arguments
                 .smtp_addr
                 .or(config_file.smtp_addr)
                 .unwrap_or(DEFAULT_SMTP_ADDR),
             smtp,
+            provider_ports,
             startup_settings,
             access_control,
             database_location: database_setting

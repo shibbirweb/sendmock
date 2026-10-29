@@ -9,6 +9,7 @@ const CONTAINER_MARKER_FILES: [&str; 2] = ["/.dockerenv", "/run/.containerenv"];
 pub fn build_instance_details(
     bound_http_addr: SocketAddr,
     bound_smtp_addr: SocketAddr,
+    bound_provider_addr: Option<SocketAddr>,
     started_at_unix_ms: i64,
 ) -> InstanceDetails {
     InstanceDetails {
@@ -17,7 +18,7 @@ pub fn build_instance_details(
         started_at_unix_ms,
         http_address: bound_http_addr.to_string(),
         smtp_address: bound_smtp_addr.to_string(),
-        provider_address: None,
+        provider_address: bound_provider_addr.map(|provider_addr| provider_addr.to_string()),
         is_container: CONTAINER_MARKER_FILES
             .iter()
             .any(|marker_file| Path::new(marker_file).exists()),

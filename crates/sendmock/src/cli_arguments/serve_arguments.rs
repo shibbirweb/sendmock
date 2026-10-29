@@ -25,6 +25,19 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_SMTPS_ADDR", value_name = "HOST:PORT")]
     pub smtps_addr: Option<SocketAddr>,
 
+    /// Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; off unless set
+    #[arg(long, env = "SENDMOCK_PROVIDER_ADDR", value_name = "HOST:PORT")]
+    pub provider_addr: Option<SocketAddr>,
+
+    /// Give one provider its own port, as `provider=port` (repeat or separate with commas), for providers that share a path
+    #[arg(
+        long = "provider-port",
+        env = "SENDMOCK_PROVIDER_PORTS",
+        value_name = "PROVIDER=PORT",
+        value_delimiter = ','
+    )]
+    pub provider_ports: Vec<String>,
+
     /// Largest message SMTP accepts; larger ones get 552 [default: 25MB]
     #[arg(long, env = "SENDMOCK_SMTP_MAX_SIZE", value_name = "SIZE")]
     pub smtp_max_size: Option<String>,

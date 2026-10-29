@@ -18,6 +18,9 @@ use crate::http_media_fetcher::HttpMediaFetcher;
 use crate::http_status_callback_sender::HttpStatusCallbackSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
+use crate::provider_listeners::{
+    ProviderListener, bind_provider_listeners, start_provider_listeners,
+};
 use crate::retention_task::{apply_startup_settings, run_retention_task};
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
@@ -32,6 +35,7 @@ struct BoundListeners {
     http_listener: TcpListener,
     smtp_listener: TcpListener,
     smtps_listener: Option<TcpListener>,
+    provider_listeners: Vec<ProviderListener>,
     addresses: ListenerAddresses,
 }
 
@@ -41,6 +45,8 @@ struct ListenerAddresses {
     http_addr: SocketAddr,
     smtp_addr: SocketAddr,
     smtps_addr: Option<SocketAddr>,
+    /// The listener serving every provider at its real paths, when configured.
+    provider_addr: Option<SocketAddr>,
 }
 
 pub async fn run_server(
@@ -53,6 +59,7 @@ pub async fn run_server(
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
     let shutdown_receiver_for_retention = shutdown_receiver.clone();
     let shutdown_receiver_for_update_check = shutdown_receiver.clone();
+    let shutdown_receiver_for_providers = shutdown_receiver.clone();
     let mut background_tasks = start_smtp_listeners(
         server_config,
         &operation_context,
@@ -60,6 +67,12 @@ pub async fn run_server(
         listeners.smtps_listener,
         shutdown_receiver,
     )?;
+    start_provider_listeners(
+        &mut background_tasks,
+        listeners.provider_listeners,
+        &operation_context,
+        &shutdown_receiver_for_providers,
+    );
     apply_startup_settings(server_config, &operation_context).await;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
     background_tasks.spawn(run_update_check_task(
@@ -150,6 +163,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         build_instance_details(
             listeners.addresses.http_addr,
             listeners.addresses.smtp_addr,
+            listeners.addresses.provider_addr,
             started_at_unix_ms,
         ),
     )
@@ -189,6 +203,7 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         Some(smtps_addr) => Some(bind_listener(smtps_addr, "--smtps-addr").await?),
         None => None,
     };
+    let provider_listeners = bind_provider_listeners(&server_config.provider_ports).await?;
     let local_address = |listener: &TcpListener, configured_address: SocketAddr| {
         listener
             .local_addr()
@@ -203,11 +218,16 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         smtps_addr: smtps_listener
             .as_ref()
             .and_then(|listener| listener.local_addr().ok()),
+        provider_addr: provider_listeners
+            .iter()
+            .find(|provider_listener| provider_listener.is_shared())
+            .map(|provider_listener| provider_listener.bound_addr),
     };
     Ok(BoundListeners {
         http_listener,
         smtp_listener,
         smtps_listener,
+        provider_listeners,
         addresses,
     })
 }
@@ -221,6 +241,7 @@ fn announce_ready(
         http_addr,
         smtp_addr,
         smtps_addr,
+        provider_addr,
     } = addresses;
     if !http_addr.ip().is_loopback() && server_config.access_control.ui_auth.is_none() {
         tracing::warn!(
@@ -233,6 +254,7 @@ fn announce_ready(
             "http_addr": http_addr.to_string(),
             "smtp_addr": smtp_addr.to_string(),
             "smtps_addr": smtps_addr.map(|smtps_addr| smtps_addr.to_string()),
+            "provider_addr": provider_addr.map(|provider_addr| provider_addr.to_string()),
             "version": env!("CARGO_PKG_VERSION"),
         });
         println!("{ready_line}");
@@ -241,6 +263,7 @@ fn announce_ready(
         http_addr = %http_addr,
         smtp_addr = %smtp_addr,
         smtps_addr = ?smtps_addr,
+        provider_addr = ?provider_addr,
         database = %operation_context.database.location(),
         config_file = ?server_config.config_file_path,
         "SendMock is ready"

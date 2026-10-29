@@ -125,9 +125,9 @@ UI in U1, backend Phase 1 (email APIs) and Phase 2 (SMS APIs).
 
 Phase 2.
 
-- [ ] SM-14.1 With `--provider-addr`, provider routes answer at their real root paths (Twilio, Verify, Messaging Services, email providers).
-- [ ] SM-14.2 The same routes answer under `/providers/<name>/` on the main port.
-- [ ] SM-14.3 `--provider-port <provider>=<port>` gives a provider its own port.
+- [x] SM-14.1 With `--provider-addr`, provider routes answer at their real root paths (Twilio, Verify, Messaging Services, email providers).
+- [x] SM-14.2 The same routes answer under `/providers/<name>/` on the main port.
+- [x] SM-14.3 `--provider-port <provider>=<port>` gives a provider its own port.
 
 ## SM-15 MMS and media
 
