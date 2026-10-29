@@ -89,7 +89,7 @@ impl WebhookDeliveryRepository {
             .await
     }
 
-    /// Rows due at `now_unix_ms`, the longest waiting first.
+    /// Rows due at `now_unix_ms`, the longest waiting first, then in the order they were queued.
     pub async fn list_due_deliveries(
         &self,
         now_unix_ms: i64,
@@ -98,7 +98,7 @@ impl WebhookDeliveryRepository {
         self.database
             .read(move |connection| {
                 let mut statement = connection.prepare(&format!(
-                    "SELECT {DELIVERY_COLUMNS} FROM webhook_deliveries WHERE {DUE_CONDITION} ORDER BY next_attempt_at, id LIMIT ?2"
+                    "SELECT {DELIVERY_COLUMNS} FROM webhook_deliveries WHERE {DUE_CONDITION} ORDER BY next_attempt_at, rowid LIMIT ?2"
                 ))?;
                 let due_deliveries = statement
                     .query_map(params![now_unix_ms, limit], read_delivery_row)?

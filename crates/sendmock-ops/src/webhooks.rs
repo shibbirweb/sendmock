@@ -13,6 +13,15 @@ mod endpoint_secret_operations;
 mod endpoint_settings;
 mod endpoint_validation;
 mod endpoint_view;
+mod rule_filter_wire;
+mod rule_inputs;
+mod rule_messages;
+mod rule_move_operation;
+mod rule_operations;
+mod rule_preview_operation;
+mod rule_subscriber;
+mod rule_validation;
+mod rule_view;
 mod webhook_sender;
 
 pub use delivery_detail::WebhookDeliveryDetail;
@@ -32,6 +41,14 @@ pub use endpoint_secret_operations::{
     RotateWebhookEndpointSecretOperation,
 };
 pub use endpoint_view::WebhookEndpoint;
+pub use rule_move_operation::MoveWebhookRuleOperation;
+pub use rule_operations::{
+    CreateWebhookRuleOperation, DeleteWebhookRuleOperation, GetWebhookRuleOperation,
+    ListWebhookRulesOperation, UpdateWebhookRuleOperation,
+};
+pub use rule_preview_operation::PreviewWebhookRuleOperation;
+pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
+pub use rule_view::WebhookRule;
 pub use webhook_sender::{WebhookSendFailure, WebhookSendResult, WebhookSender};
 
 use crate::OperationRegistry;
@@ -49,4 +66,11 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(GetWebhookDeliveryOperation);
     operation_registry.register(CancelWebhookDeliveryOperation);
     operation_registry.register(WaitForWebhookOperation);
+    operation_registry.register(ListWebhookRulesOperation);
+    operation_registry.register(CreateWebhookRuleOperation);
+    operation_registry.register(GetWebhookRuleOperation);
+    operation_registry.register(UpdateWebhookRuleOperation);
+    operation_registry.register(DeleteWebhookRuleOperation);
+    operation_registry.register(MoveWebhookRuleOperation);
+    operation_registry.register(PreviewWebhookRuleOperation);
 }

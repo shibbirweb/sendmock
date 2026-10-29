@@ -127,6 +127,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
+    samples.extend(prepare_webhook_rule_samples(app_router).await);
     samples
 }
 
@@ -425,6 +426,66 @@ async fn prepare_webhook_delivery_samples(
         (
             "getWaitWebhook",
             vec![json!({ "endpoint": "Deliveries", "event": "email.received", "timeout": "1s" })],
+        ),
+    ]
+}
+
+fn webhook_rule_sample(rule_name: &str, endpoint_id: &Value) -> Value {
+    json!({
+        "name": rule_name,
+        "endpoint_id": endpoint_id,
+        "events": ["email.received"],
+        "filter": { "all": [{ "field": "to", "operator": "matches", "value": "*@inbound.local" }] },
+        "is_enabled": true,
+    })
+}
+
+async fn create_sample_rule(
+    app_router: &axum::Router,
+    rule_name: &str,
+    endpoint_id: &Value,
+) -> Value {
+    let rule_sample = webhook_rule_sample(rule_name, endpoint_id);
+    post_json(app_router, "/api/v1/webhooks/rules", &rule_sample).await["id"].clone()
+}
+
+async fn prepare_webhook_rule_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let endpoint_id = post_json(
+        app_router,
+        "/api/v1/webhooks/endpoints",
+        &webhook_endpoint_sample("Rules"),
+    )
+    .await["id"]
+        .clone();
+    let edited_rule_id = create_sample_rule(app_router, "Inbound", &endpoint_id).await;
+    let deleted_rule_id = create_sample_rule(app_router, "Old rule", &endpoint_id).await;
+    vec![
+        ("getWebhooksRules", vec![json!({})]),
+        (
+            "postWebhooksRules",
+            vec![webhook_rule_sample("Support", &endpoint_id)],
+        ),
+        (
+            "getWebhooksRulesByRuleId",
+            vec![json!({ "rule_id": edited_rule_id })],
+        ),
+        (
+            "patchWebhooksRulesByRuleId",
+            vec![json!({ "rule_id": edited_rule_id, "is_enabled": false })],
+        ),
+        (
+            "postWebhooksRulesByRuleIdMove",
+            vec![json!({ "rule_id": edited_rule_id, "direction": "down" })],
+        ),
+        (
+            "postWebhooksRulesPreview",
+            vec![json!({ "events": ["email.received"], "filter": null })],
+        ),
+        (
+            "deleteWebhooksRulesByRuleId",
+            vec![json!({ "rule_id": deleted_rule_id })],
         ),
     ]
 }

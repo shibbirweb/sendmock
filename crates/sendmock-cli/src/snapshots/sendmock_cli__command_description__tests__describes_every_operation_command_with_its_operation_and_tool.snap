@@ -1614,6 +1614,157 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook rule list",
+    "usage": "sendmock webhook rule list",
+    "summary": "Which events go to which endpoint, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/rules",
+        "operation_id": "getWebhooksRules",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule create",
+    "usage": "sendmock webhook rule create",
+    "summary": "Add a rule.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id",
+      "--event",
+      "--filter",
+      "--enabled",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules",
+        "operation_id": "postWebhooksRules",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule show",
+    "usage": "sendmock webhook rule show <ruleId>",
+    "summary": "One webhook rule with its filter.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "getWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule update",
+    "usage": "sendmock webhook rule update <ruleId>",
+    "summary": "Change a rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--endpoint-id",
+      "--event",
+      "--filter",
+      "--enabled",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "patchWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule delete",
+    "usage": "sendmock webhook rule delete <ruleId>",
+    "summary": "Delete a rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "deleteWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule move",
+    "usage": "sendmock webhook rule move <ruleId>",
+    "summary": "Move a rule up or down; answers the reordered list.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/{ruleId}/move",
+        "operation_id": "postWebhooksRulesByRuleIdMove",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule preview",
+    "usage": "sendmock webhook rule preview",
+    "summary": "Which recent messages an unsaved rule would match.",
+    "arguments": [],
+    "flags": [
+      "--event",
+      "--filter"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/preview",
+        "operation_id": "postWebhooksRulesPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_preview"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

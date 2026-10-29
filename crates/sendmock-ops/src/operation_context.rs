@@ -7,6 +7,7 @@ use sendmock_store::{
     MessagingServiceRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
     SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository,
 };
 
 use crate::{
@@ -36,6 +37,7 @@ pub struct OperationContext {
     pub webhook_endpoint_repository: WebhookEndpointRepository,
     /// Delivery attempts; the rows are also the persistent delivery queue.
     pub webhook_delivery_repository: WebhookDeliveryRepository,
+    pub webhook_rule_repository: WebhookRuleRepository,
     /// Wakes the webhook dispatcher when a delivery is queued.
     pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
     /// Sends webhook requests; set by the binary, which owns the HTTP client.
@@ -79,6 +81,7 @@ impl OperationContext {
         let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         let webhook_endpoint_repository = WebhookEndpointRepository::new(Arc::clone(&database));
         let webhook_delivery_repository = WebhookDeliveryRepository::new(Arc::clone(&database));
+        let webhook_rule_repository = WebhookRuleRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
@@ -91,6 +94,7 @@ impl OperationContext {
             message_provider_repository,
             webhook_endpoint_repository,
             webhook_delivery_repository,
+            webhook_rule_repository,
             webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),

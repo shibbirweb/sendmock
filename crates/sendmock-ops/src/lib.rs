@@ -89,8 +89,9 @@ pub use updates::{
 pub use verify::{Verification, VerificationDetail, VerifyService, find_newest_verification};
 pub use webhooks::{
     DeliveryOrder, DeliveryTrigger, RevealedEndpointSecret, WebhookDelivery, WebhookDeliveryDetail,
-    WebhookEndpoint, WebhookSendFailure, WebhookSendResult, WebhookSender,
-    enqueue_webhook_delivery, run_due_deliveries, run_webhook_dispatcher,
+    WebhookEndpoint, WebhookRule, WebhookSendFailure, WebhookSendResult, WebhookSender,
+    enqueue_webhook_delivery, fire_matching_rules, run_due_deliveries, run_webhook_dispatcher,
+    run_webhook_rule_subscriber,
 };
 
 /// Every operation this build of SendMock serves.

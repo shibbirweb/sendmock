@@ -222,6 +222,10 @@ impl Operation for DeleteWebhookEndpointOperation {
                 message: format!("No webhook endpoint with id {}", input.endpoint_id),
             });
         }
+        operation_context
+            .webhook_rule_repository
+            .delete_endpoint_rules(&input.endpoint_id)
+            .await?;
         Ok(NoContent)
     }
 }

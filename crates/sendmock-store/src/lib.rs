@@ -15,6 +15,7 @@ mod store_error;
 mod verify;
 mod webhook_delivery;
 mod webhook_endpoint;
+mod webhook_rule;
 
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
 pub use database::Database;
@@ -50,3 +51,4 @@ pub use webhook_delivery::{
 pub use webhook_endpoint::{
     WebhookEndpointRecord, WebhookEndpointRepository, WebhookSecretRotation,
 };
+pub use webhook_rule::{WebhookRuleRecord, WebhookRuleRepository};

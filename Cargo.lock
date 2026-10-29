@@ -2306,6 +2306,7 @@ version = "0.0.0"
 dependencies = [
  "base64 0.23.1",
  "hmac",
+ "regex",
  "sendmock-core",
  "sha2",
  "thiserror",
