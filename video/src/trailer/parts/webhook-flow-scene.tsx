@@ -1,0 +1,136 @@
+import type { ReactNode } from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+
+import {
+  getActiveStepIndex,
+  getFadeOutOpacity,
+  getRiseInStyle,
+} from "../trailer-motion";
+import { AppTerminal, type TerminalLine } from "./app-terminal";
+import { AppWindow } from "./app-window";
+import { type FlowDirection, FlowLine } from "./flow-line";
+import { RequestCard, type WebhookRequest } from "./request-card";
+import { SceneHeadline } from "./scene-headline";
+
+export type WebhookFlowStep = {
+  /** When the event happens in SendMock (or, for "fromApp", in your app). */
+  startFrame: number;
+  request: WebhookRequest;
+  logLine: string;
+};
+
+type WebhookFlowSceneProps = {
+  chapterLabel: string;
+  headline: string;
+  productTitle: string;
+  renderProductPanel: (activeStepIndex: number) => ReactNode;
+  appTitle: string;
+  /** Lines your app prints itself, besides the webhooks it receives. */
+  appOwnLines: TerminalLine[];
+  steps: WebhookFlowStep[];
+  direction: FlowDirection;
+};
+
+const productWindow = { leftPx: 80, topPx: 270, widthPx: 740, heightPx: 640 };
+const appWindow = { leftPx: 1340, topPx: 300, widthPx: 500, heightPx: 460 };
+const flowLineYPx = 430;
+const requestCard = { leftPx: 838, topPx: 490, widthPx: 484 };
+const travelDurationFrames = 20;
+const requestLeadFrames = 6;
+
+/**
+ * The feature scenes' shared layout: SendMock on the left, your app's terminal
+ * on the right, and each webhook travelling between them with its request.
+ */
+export function WebhookFlowScene({
+  chapterLabel,
+  headline,
+  productTitle,
+  renderProductPanel,
+  appTitle,
+  appOwnLines,
+  steps,
+  direction,
+}: WebhookFlowSceneProps) {
+  const frame = useCurrentFrame();
+  const stepStartFrames = steps.map((step) => step.startFrame);
+  const activeStepIndex = getActiveStepIndex(frame, stepStartFrames);
+  const travelStartFrames = stepStartFrames.map(
+    (startFrame) => startFrame + requestLeadFrames,
+  );
+  const terminalLines: TerminalLine[] = [
+    ...appOwnLines,
+    ...steps.map((step) => ({
+      text: step.logLine,
+      appearFrame:
+        direction === "toApp"
+          ? step.startFrame + requestLeadFrames + travelDurationFrames
+          : step.startFrame,
+      tone: direction === "toApp" ? ("status" as const) : ("plain" as const),
+    })),
+  ].sort((first, second) => first.appearFrame - second.appearFrame);
+
+  return (
+    <AbsoluteFill>
+      <SceneHeadline chapterLabel={chapterLabel} headline={headline} />
+      <AppWindow
+        title={productTitle}
+        style={{
+          ...getRiseInStyle(frame, 6, 18, 30),
+          left: productWindow.leftPx,
+          top: productWindow.topPx,
+          width: productWindow.widthPx,
+          height: productWindow.heightPx,
+        }}
+      >
+        {renderProductPanel(activeStepIndex)}
+      </AppWindow>
+      <AppTerminal
+        title={appTitle}
+        lines={terminalLines}
+        style={{
+          ...getRiseInStyle(frame, 12, 18, 30),
+          left: appWindow.leftPx,
+          top: appWindow.topPx,
+          width: appWindow.widthPx,
+          height: appWindow.heightPx,
+        }}
+      />
+      <FlowLine
+        startXPx={productWindow.leftPx + productWindow.widthPx}
+        endXPx={appWindow.leftPx}
+        yPx={flowLineYPx}
+        direction={direction}
+        travelStartFrames={travelStartFrames}
+        travelDurationFrames={travelDurationFrames}
+      />
+      {steps.map((step, stepIndex) => {
+        const nextStep = steps[stepIndex + 1];
+        const isVisible =
+          frame >= step.startFrame &&
+          (nextStep === undefined || frame < nextStep.startFrame + 8);
+        if (!isVisible) {
+          return null;
+        }
+        const fadeOutOpacity =
+          nextStep === undefined
+            ? 1
+            : getFadeOutOpacity(frame, nextStep.startFrame, 8);
+        const riseInStyle = getRiseInStyle(frame, step.startFrame, 14, 24);
+        return (
+          <RequestCard
+            key={step.startFrame}
+            request={step.request}
+            style={{
+              ...riseInStyle,
+              opacity: Number(riseInStyle.opacity) * fadeOutOpacity,
+              left: requestCard.leftPx,
+              top: requestCard.topPx,
+              width: requestCard.widthPx,
+            }}
+          />
+        );
+      })}
+    </AbsoluteFill>
+  );
+}

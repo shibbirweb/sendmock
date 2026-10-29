@@ -36,6 +36,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 20 | [Surface parity](20-surface-parity.md) | Every feature in every way: each REST operation names its CLI command, MCP tool and UI place in one catalogue, the missing names and REST helpers are added, the API reference shows all of them, and the user guide links every API cell to its parameters |
 | 21 | [Reference and examples](21-reference-and-examples.md) | CLI and MCP reference generated from the contract (every command's flags, every tool's inputs), a description and example for every input field, a playground that shows every accepted input, and code examples in CLI, PHP (Laravel), JavaScript, Python, Go, Java, Rust, Ruby and C# for every recipe and menu page |
 | 22 | [Configurable providers](22-configurable-providers.md) | Email and SMS providers as definitions like payment gateways: edit, reset, remove and restore the built-ins, add your own from blank or a built-in, in the UI, REST, CLI, MCP and the skill |
+| 23 | [Promotional video](23-promotional-video.md) | The promotional trailer: goal, audience, length, production, captions and hosting, and its eleven scenes (email, SMS, payment and any-API webhooks, the built-in providers bento, the built-in events, building your own, AI agents, platforms), the motif and the look and feel |
 
 ## Headline decisions
 
