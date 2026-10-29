@@ -240,7 +240,6 @@ jobs:
         env:
           NFPM_ARCH: ${{ matrix.architecture }}
           SENDMOCK_VERSION: ${{ needs.plan.outputs.version }}
-          BINARY_PATH: extracted/sendmock
         run: |
           mkdir extracted packages
           tar -xzf archives/sendmock-${{ matrix.target }}.tar.gz -C extracted

@@ -1,5 +1,6 @@
 # The .deb and .rpm packages, built by Release build from the tested Linux archive
-# (DS-03.3). nfpm reads the values in ${...} from the environment.
+# (DS-03.3), which it extracts to extracted/. nfpm reads the values in ${...} from the
+# environment; it does not expand them in file paths.
 name: sendmock
 arch: ${NFPM_ARCH}
 platform: linux
@@ -13,7 +14,7 @@ vendor: SendMock
 homepage: https://github.com/shibbirweb/sendmock
 license: MIT OR Apache-2.0
 contents:
-  - src: ${BINARY_PATH}
+  - src: extracted/sendmock
     dst: /usr/bin/sendmock
     file_info:
       mode: 0755
