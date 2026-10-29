@@ -11,10 +11,16 @@ use std::time::{Duration, Instant};
 use support::smtp_test_client::{SmtpTestClient, build_test_message, connect, reply_code};
 use support::test_smtp_server::{TestServerOptions, TestSmtpServer};
 use tokio::net::TcpStream;
-use tokio::sync::Barrier;
+use tokio::sync::{Barrier, Semaphore};
 
 const CONCURRENT_SESSION_COUNT: usize = 500;
 const LOAD_TEST_TIMEOUT: Duration = Duration::from_secs(120);
+/// Connections still in their TCP handshake at once. Linux runners keep 256 half-open
+/// connections (`tcp_max_syn_backlog`) and then answer with SYN cookies, where a lost final ACK
+/// leaves the client connected and the server unaware; as SMTP waits for the server's greeting,
+/// such a session never starts. Apps do not open 500 connections in the same instant, so the
+/// sessions connect a batch at a time and are then all open together.
+const CONNECTS_IN_FLIGHT: usize = 64;
 
 // AC: EM-01.1
 // AC: EM-01.2
@@ -169,15 +175,22 @@ async fn garbage_and_overlong_lines_get_errors_and_the_server_keeps_working() ->
 async fn handles_500_sessions_open_at_the_same_time() -> io::Result<()> {
     let server = TestSmtpServer::start().await?;
     let all_connected = Arc::new(Barrier::new(CONCURRENT_SESSION_COUNT));
+    let connect_slots = Arc::new(Semaphore::new(CONNECTS_IN_FLIGHT));
     let mut sessions = tokio::task::JoinSet::new();
 
     for session_number in 0..CONCURRENT_SESSION_COUNT {
         let smtp_addr = server.smtp_addr;
         let all_connected = Arc::clone(&all_connected);
+        let connect_slots = Arc::clone(&connect_slots);
         sessions.spawn(async move {
             // Every session reaches the barrier, even one whose connect failed,
             // so a single failure ends the test instead of blocking the other sessions.
+            let connect_slot = connect_slots
+                .acquire_owned()
+                .await
+                .map_err(io::Error::other)?;
             let connect_result = connect(smtp_addr).await;
+            drop(connect_slot);
             all_connected.wait().await;
             send_one_concurrent_message(connect_result?, session_number).await
         });
