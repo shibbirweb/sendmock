@@ -13,11 +13,11 @@ pub struct EmailAttachment {
     pub filename: String,
     pub content_type: String,
     pub size_bytes: u64,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub content_id: Option<String>,
     pub is_inline: bool,
     pub download_url: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub thumbnail_url: Option<String>,
 }
 
@@ -42,14 +42,14 @@ pub struct EmailDetail {
     pub is_read: bool,
     pub tags: Vec<String>,
     pub source: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub delivery_status: Option<String>,
     pub open_count: u64,
     pub has_otp: bool,
     pub direction: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub response_kind: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub message_id: Option<String>,
     pub cc: Vec<EmailAddress>,
     pub bcc: Vec<EmailAddress>,
@@ -57,21 +57,21 @@ pub struct EmailDetail {
     pub envelope_from: String,
     pub envelope_to: Vec<String>,
     pub headers: BTreeMap<String, Vec<String>>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub text_body: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub html_body: Option<String>,
     pub attachments: Vec<EmailAttachment>,
     pub extracted: ExtractedData,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub opened_at: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub smtp_session_id: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub smtp_auth_user: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<serde_json::Value>")]
     pub template: Option<serde_json::Value>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<serde_json::Value>")]
     pub response_to: Option<serde_json::Value>,
     pub responses: Vec<serde_json::Value>,
 }

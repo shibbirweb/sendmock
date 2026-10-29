@@ -66,7 +66,7 @@ pub struct PreviewStoredMessage {
     pub from: String,
     pub to: Vec<String>,
     /// The email subject; null for SMS.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub subject: Option<String>,
     pub body: String,
     pub metadata: BTreeMap<String, String>,
@@ -84,10 +84,13 @@ pub struct PreviewResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 pub struct MessageProviderPreview {
     /// The operation the request matched, or null when none matched.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub operation_kind: Option<String>,
     /// The message SendMock would store; null when the request is refused.
-    #[schemars(required)]
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<PreviewStoredMessage>"
+    )]
     pub stored_message: Option<PreviewStoredMessage>,
     pub response: PreviewResponse,
     pub problems: Vec<ProviderDefinitionProblem>,

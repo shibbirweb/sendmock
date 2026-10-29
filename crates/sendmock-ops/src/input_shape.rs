@@ -38,6 +38,27 @@ pub fn describe_input_shape(property_schema: &Value, root_schema: &Value) -> Inp
     }
 }
 
+/// Whether an input accepts `null`: leaving it out then means none, even when the schema lists
+/// it as required (nullable fields are listed so the contract always shows them).
+pub fn accepts_null(property_schema: &Value) -> bool {
+    if has_null_type(property_schema) {
+        return true;
+    }
+    property_schema
+        .get("anyOf")
+        .or_else(|| property_schema.get("oneOf"))
+        .and_then(Value::as_array)
+        .is_some_and(|variants| variants.iter().any(has_null_type))
+}
+
+fn has_null_type(schema: &Value) -> bool {
+    match schema.get("type") {
+        Some(Value::String(type_name)) => type_name == "null",
+        Some(Value::Array(type_names)) => type_names.iter().any(|type_name| type_name == "null"),
+        _ => false,
+    }
+}
+
 fn read_type_name(schema: &Value) -> Option<&str> {
     match schema.get("type")? {
         Value::String(type_name) => Some(type_name),
@@ -118,5 +139,20 @@ mod tests {
             shape_of("direction", &root_schema),
             InputShape::Scalar(ScalarType::Text)
         );
+    }
+
+    #[test]
+    fn nullable_inputs_accept_null_and_others_do_not() {
+        let root_schema = json!({
+            "properties": {
+                "inbound_url": { "type": ["string", "null"] },
+                "direction": { "anyOf": [{ "$ref": "#/$defs/Direction" }, { "type": "null" }] },
+                "number": { "type": "string" }
+            }
+        });
+
+        assert!(accepts_null(&root_schema["properties"]["inbound_url"]));
+        assert!(accepts_null(&root_schema["properties"]["direction"]));
+        assert!(!accepts_null(&root_schema["properties"]["number"]));
     }
 }

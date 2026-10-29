@@ -22,7 +22,7 @@ pub struct TemplateReferenceField {
     pub value_type: String,
     pub description: String,
     /// The value in the sample, or null for objects and lists.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub example: Option<String>,
     pub children: Vec<TemplateReferenceField>,
 }

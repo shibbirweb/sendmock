@@ -9,15 +9,15 @@ pub struct SmtpSessionLogEntry {
     pub id: String,
     pub remote_address: String,
     pub helo_name: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub tls_version: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub auth_mechanism: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub auth_user: Option<String>,
     /// `delivered`, `rejected` or `aborted`.
     pub result: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub failure_reason: Option<String>,
     pub email_ids: Vec<String>,
     /// One line per command or reply, prefixed `C: ` (client) or `S: ` (server).

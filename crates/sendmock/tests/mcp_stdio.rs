@@ -159,7 +159,7 @@ fn the_sms_and_verify_tools_send_an_sms_and_keep_provider_secrets_masked() -> io
     )?;
     let service_result = mcp_session.call_tool(
         "sendmock_verify_service_create",
-        json!({ "friendly_name": "Shop", "fixed_code": "123456" }),
+        json!({ "friendly_name": "Shop", "code_length": 6, "fixed_code": "123456", "ttl_seconds": 600 }),
     )?;
     let provider_result = mcp_session.call_tool(
         "sendmock_sms_provider_get",

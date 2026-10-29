@@ -1,7 +1,7 @@
 use clap::{Arg, ArgAction, Command};
 use sendmock_ops::{
-    AnswerKind, ErasedOperation, InputShape, OperationDefinition, ScalarType, describe_input_shape,
-    to_snake_case,
+    AnswerKind, ErasedOperation, InputShape, OperationDefinition, ScalarType, accepts_null,
+    describe_input_shape, to_snake_case,
 };
 use serde_json::Value;
 
@@ -114,9 +114,10 @@ fn describe_flag_input(
         input_name: input_name.to_owned(),
         flag_name: renamed_flag.unwrap_or_else(|| build_flag_name(input_name, input_shape)),
         input_shape,
-        is_required: input_schema["required"]
-            .as_array()
-            .is_some_and(|required_names| required_names.iter().any(|name| name == input_name)),
+        is_required: !accepts_null(property_schema)
+            && input_schema["required"]
+                .as_array()
+                .is_some_and(|required_names| required_names.iter().any(|name| name == input_name)),
     }
 }
 

@@ -103,12 +103,15 @@ test("VF-04.3 VF-04.4 a live verification is listed and its drawer opens the SMS
   request,
 }) => {
   const recipient = "+8801700000000";
-  await request.post("/api/v1/verify/services", {
+  const serviceResponse = await request.post("/api/v1/verify/services", {
     data: {
       friendly_name: "Live shop",
+      code_length: 6,
       fixed_code: "482913",
+      ttl_seconds: 600,
     },
   });
+  expect(serviceResponse.status()).toBe(201);
   const sampleResponse = await request.post("/api/v1/samples/verification", {
     data: {
       to: recipient,
@@ -142,13 +145,20 @@ test("UI-12.2 Numbers lists a number registered through the API", async ({
   page,
   request,
 }) => {
-  await request.post("/api/v1/numbers", {
+  const numberResponse = await request.post("/api/v1/numbers", {
     data: {
       number: "+15550004444",
       label: "Sales",
       channels: ["sms"],
+      inbound_url: null,
+      inbound_method: "POST",
+      inbound_fallback_url: null,
+      inbound_template_id: null,
+      status_callback_url: null,
+      messaging_service_sid: null,
     },
   });
+  expect(numberResponse.status()).toBe(201);
   const failedApiCalls = watchFailedApiCalls(page);
 
   await page.goto("/numbers");

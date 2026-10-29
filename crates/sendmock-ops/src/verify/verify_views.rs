@@ -8,7 +8,7 @@ pub struct VerifyService {
     pub sid: String,
     pub friendly_name: String,
     pub code_length: u32,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub fixed_code: Option<String>,
     pub ttl_seconds: u32,
     pub created_by: String,
@@ -41,9 +41,9 @@ pub struct Verification {
     pub expires_at: String,
     pub created_at: String,
     /// The captured SMS or email that carried the code; null for `call`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub linked_message_id: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub linked_thread_id: Option<String>,
 }
 

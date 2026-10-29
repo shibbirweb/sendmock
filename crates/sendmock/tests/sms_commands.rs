@@ -108,6 +108,8 @@ fn numbers_and_messaging_services_are_managed_from_the_cli() {
         "Support line",
         "--channel",
         "sms",
+        "--inbound-method",
+        "POST",
     ]);
     let number_id = virtual_number["id"].as_str().unwrap_or_default().to_owned();
     let messaging_service = run(&[
@@ -116,6 +118,8 @@ fn numbers_and_messaging_services_are_managed_from_the_cli() {
         "create",
         "--friendly-name",
         "Notifications",
+        "--inbound-mode",
+        "defer_to_sender",
         "--number-id",
         &number_id,
     ]);
@@ -190,8 +194,12 @@ fn a_verification_started_from_the_cli_can_be_shown_and_forced() {
         "create",
         "--friendly-name",
         "Shop",
+        "--code-length",
+        "6",
         "--fixed-code",
         "123456",
+        "--ttl-seconds",
+        "600",
     ]);
     let sample = run(&["sample", "verification", "--to", CONTACT_NUMBER]);
     let verification_sid = sample["id"].as_str().unwrap_or_default().to_owned();

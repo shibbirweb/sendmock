@@ -22,7 +22,7 @@ pub struct MessageProviderInput {
     pub is_enabled: bool,
     /// The provider's API host, used on the provider port to tell apart providers that share
     /// a path; null when not needed.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub host: Option<String>,
     /// The credentials your app is configured with; a masked secret keeps the stored value.
     pub credentials: Vec<ProviderCredential>,
@@ -41,7 +41,7 @@ pub struct MessageProviderInput {
     /// The provider's id for each message, a template.
     pub message_id_template: String,
     /// The webhook template its status callbacks are sent with; null sends none.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub callback_template_key: Option<String>,
     /// The provider's name for each SendMock status.
     pub status_names: BTreeMap<String, String>,

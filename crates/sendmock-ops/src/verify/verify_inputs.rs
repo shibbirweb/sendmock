@@ -9,7 +9,7 @@ pub struct VerifyServiceInput {
     /// Digits in each code, 4 to 10.
     pub code_length: u32,
     /// Always send this code instead of a random one; null for random.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub fixed_code: Option<String>,
     /// How long a code stays valid, in seconds.
     pub ttl_seconds: u32,

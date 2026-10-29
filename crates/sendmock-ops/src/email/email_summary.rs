@@ -36,13 +36,13 @@ pub struct EmailSummary {
     pub is_read: bool,
     pub tags: Vec<String>,
     pub source: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub delivery_status: Option<String>,
     pub open_count: u64,
     pub has_otp: bool,
     pub direction: String,
     /// Set on inbound emails made by Reply or Forward, for the list icon.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub response_kind: Option<String>,
 }
 

@@ -15,12 +15,12 @@ use crate::email::ExtractedData;
 pub struct SmsMediaView {
     pub media_index: u32,
     pub content_type: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u64>")]
     pub size_bytes: Option<u64>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub filename: Option<String>,
     /// Where the app said to fetch it (`MediaUrl`), null for inline files.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub source_url: Option<String>,
     /// SendMock's copy: `/api/v1/sms/{smsId}/media/{mediaIndex}`.
     pub url: String,
@@ -41,23 +41,23 @@ pub struct SmsMessage {
     pub segments: u32,
     pub media: Vec<SmsMediaView>,
     pub status: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub error_code: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub status_callback_url: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub account: Option<String>,
     pub extracted: ExtractedData,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub opened_at: Option<String>,
     pub open_count: u64,
     /// Inbound only: what the number's reply webhook answered; null until Phase 3.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<Value>")]
     pub reply_webhook: Option<Value>,
     /// A TwiML reply: the inbound message it answers.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub in_reply_to_sms_id: Option<String>,
     pub created_at: String,
     pub updated_at: String,
@@ -115,7 +115,7 @@ fn to_media_view(sms_id: &str, media: &SmsMediaRecord) -> SmsMediaView {
 pub struct SmsStatusChange {
     pub status: String,
     pub at: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub error_code: Option<String>,
 }
 
@@ -136,11 +136,14 @@ pub struct SmsCallbackAttempt {
     pub reported_status: String,
     pub attempt: u32,
     pub request: RecordedHttpRequest,
-    #[schemars(required)]
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<RecordedHttpResponse>"
+    )]
     pub response: Option<RecordedHttpResponse>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u64>")]
     pub duration_ms: Option<u64>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub error_message: Option<String>,
     pub created_at: String,
 }

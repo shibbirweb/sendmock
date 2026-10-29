@@ -9,6 +9,7 @@ mod integrations;
 mod logs;
 mod message_providers;
 mod no_input;
+mod nullable_schema;
 mod numbers;
 mod operation;
 mod operation_answer;
@@ -34,7 +35,7 @@ pub use events::{
     RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_received, publish_event,
 };
 pub use input_coercion::build_input_from_text;
-pub use input_shape::{InputShape, ScalarType, describe_input_shape};
+pub use input_shape::{InputShape, ScalarType, accepts_null, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
 pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
@@ -46,6 +47,7 @@ pub use message_providers::{
     ProviderSampleRequest, mask_secret_value,
 };
 pub use no_input::NoInput;
+pub(crate) use nullable_schema::nullable_schema;
 pub use numbers::{MessagingService, VirtualNumber};
 pub use operation::{
     AnswerKind, CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector,

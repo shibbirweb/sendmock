@@ -13,7 +13,7 @@ pub struct AvailableRelease {
     pub release_notes_markdown: String,
     pub release_url: String,
     /// The command for the install method; null when the method is unknown, so follow `release_url`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub upgrade_command: Option<String>,
 }
 
@@ -27,7 +27,7 @@ pub struct UpdateCheckResult {
     pub is_channel_checked: bool,
     pub is_update_available: bool,
     /// Null when up to date or when the channel is not checked.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<AvailableRelease>")]
     pub available_release: Option<AvailableRelease>,
     pub checked_at: String,
     /// True when the answer is the last check's, kept for 24 hours.

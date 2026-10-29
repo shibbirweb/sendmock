@@ -12,7 +12,7 @@ pub struct ApiRequestLinkedMessage {
     pub kind: String,
     pub id: String,
     /// Conversation of a linked SMS, for the "Open message" link.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub sms_thread_id: Option<String>,
 }
 
@@ -29,7 +29,10 @@ pub struct ApiRequestLogEntry {
     pub response_body: String,
     pub duration_ms: u64,
     /// The SMS or email this request created; null for rejected requests.
-    #[schemars(required)]
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<ApiRequestLinkedMessage>"
+    )]
     pub linked_message: Option<ApiRequestLinkedMessage>,
     pub created_at: String,
 }

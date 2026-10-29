@@ -63,21 +63,21 @@ pub struct VirtualNumberInput {
     /// Where the number works: `sms`, `whatsapp` or both.
     pub channels: Vec<NumberChannel>,
     /// Reply webhook (Twilio "A message comes in"); null means rules only.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
     /// The HTTP method of the reply webhook.
     pub inbound_method: InboundWebhookMethod,
     /// Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
     /// Payload template for the inbound webhook, e.g. `twilio.inbound_sms`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_template_id: Option<String>,
     /// Your app's URL for status changes of messages sent from this number.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub status_callback_url: Option<String>,
     /// The Messaging Service this number belongs to, `MG...`; null for none.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
 }
 
@@ -105,10 +105,10 @@ pub struct MessagingServiceInput {
     /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
     pub inbound_mode: MessagingServiceInboundMode,
     /// Used when `inbound_mode` is `webhook`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
     /// Called when `inbound_url` fails.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
 }
 

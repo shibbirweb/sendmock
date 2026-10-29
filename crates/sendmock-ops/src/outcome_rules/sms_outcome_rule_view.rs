@@ -14,9 +14,9 @@ pub struct SmsOutcomeRule {
     pub match_field: String,
     pub pattern: String,
     pub outcome: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub error_code: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u32>")]
     pub delay_seconds: Option<u32>,
     pub note: String,
     pub is_enabled: bool,
@@ -45,10 +45,10 @@ impl From<SmsOutcomeRuleRecord> for SmsOutcomeRule {
 pub struct OutcomeTestResult {
     /// `custom`, `magic` or `profile`.
     pub source: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub rule_id: Option<String>,
     /// One-based position of the matching custom rule.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u32>")]
     pub rule_position: Option<u32>,
     /// What the testers show, e.g. "Custom rule 2: Accepted, then undelivered, 30007".
     pub summary: String,

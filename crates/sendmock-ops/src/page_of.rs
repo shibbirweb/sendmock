@@ -5,7 +5,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 pub struct PageOf<Item: JsonSchema> {
     pub items: Vec<Item>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub next_cursor: Option<String>,
     pub total_count: u64,
 }

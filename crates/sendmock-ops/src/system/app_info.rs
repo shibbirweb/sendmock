@@ -12,7 +12,7 @@ pub struct AppInfo {
     pub smtp_address: String,
     pub http_address: String,
     /// Always present, null when the provider port is off, as the contract requires.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub provider_address: Option<String>,
     pub database_path: String,
     pub database_size_bytes: u64,

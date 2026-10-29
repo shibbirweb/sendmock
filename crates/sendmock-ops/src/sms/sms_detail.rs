@@ -12,9 +12,9 @@ pub struct SmsMessageDetail {
     #[serde(flatten)]
     pub message: SmsMessage,
     pub status_history: Vec<SmsStatusChange>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<Value>")]
     pub request_body: Option<Value>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub api_request_id: Option<String>,
     pub callback_attempts: Vec<SmsCallbackAttempt>,
     /// Inbound only, oldest first; every Resend adds attempts. Reply webhooks come in Phase 3.

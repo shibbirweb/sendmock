@@ -15,7 +15,7 @@ pub struct AppSettings {
     /// The most SMS kept; the oldest are deleted past it.
     pub max_sms: u64,
     /// Null keeps traffic until the count limits prune it.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u32>")]
     pub max_age_days: Option<u32>,
     /// Tags `user+invoice@app.test` with `invoice`.
     pub is_plus_address_tagging_enabled: bool,
@@ -25,12 +25,12 @@ pub struct AppSettings {
     /// Complaints in the `realistic` outcome profile, 0 to 100.
     pub email_outcome_complaint_rate_percent: u32,
     /// Relay for release and auto-forward; the password is always masked.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub relay_smtp_url: Option<String>,
     /// Glob patterns; release stays off while this is empty.
     pub relay_recipient_allowlist: Vec<String>,
     /// `host:port` of a SpamAssassin `spamd`; null turns the spam check off.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub spamassassin_address: Option<String>,
     pub sms_simulation_profile: SmsSimulationProfile,
     /// The share of SMS that fail at random, 0 to 100.
@@ -49,7 +49,7 @@ pub struct AppSettings {
     /// The SMTP code used for rejected messages: 421, 450, 550 or 552.
     pub chaos_smtp_reject_code: u16,
     /// Glob; matching recipients get `550 No such user`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub chaos_smtp_reject_recipient_pattern: Option<String>,
     /// Delay added to every SMTP command, in milliseconds.
     pub chaos_smtp_command_latency_ms: u32,

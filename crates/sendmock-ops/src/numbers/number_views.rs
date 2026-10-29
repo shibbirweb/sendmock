@@ -8,16 +8,16 @@ pub struct VirtualNumber {
     pub number: String,
     pub label: String,
     pub channels: Vec<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
     pub inbound_method: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_template_id: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub status_callback_url: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
     pub created_by: String,
 }
@@ -46,9 +46,9 @@ pub struct MessagingService {
     pub friendly_name: String,
     pub number_ids: Vec<String>,
     pub inbound_mode: String,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
     pub created_by: String,
 }

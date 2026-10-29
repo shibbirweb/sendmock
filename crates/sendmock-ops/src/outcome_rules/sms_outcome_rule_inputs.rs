@@ -33,10 +33,10 @@ pub struct SmsOutcomeRuleInput {
     /// `delayed_delivery` or `read`.
     pub outcome: SmsOutcomeChoice,
     /// Required for `reject`, `undelivered` and `failed`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub error_code: Option<String>,
     /// Required for `delayed_delivery`.
-    #[schemars(required)]
+    #[schemars(required, schema_with = "crate::nullable_schema::<u32>")]
     pub delay_seconds: Option<u32>,
     /// Why the rule exists, shown in the list.
     pub note: String,
