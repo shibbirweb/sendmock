@@ -54,17 +54,76 @@ pub async fn record_api_request(
                 .to_owned();
             Some((linked_message_kind.to_owned(), created_id))
         });
+    insert_logged_request(
+        operation_context,
+        LoggedRequest {
+            api: request_log_settings.api.to_owned(),
+            linked_message,
+            secret_values: Vec::new(),
+        },
+        completed_request,
+    )
+    .await
+}
+
+/// A provider request as the log keeps it: the provider's key as the API, the SMS it created,
+/// and the provider's secrets, masked wherever they appear in the body.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderRequestLogEntry {
+    pub provider_key: String,
+    pub created_sms_id: Option<String>,
+    pub secret_values: Vec<String>,
+}
+
+pub async fn record_provider_request(
+    operation_context: &OperationContext,
+    log_entry: ProviderRequestLogEntry,
+    completed_request: CompletedApiRequest,
+) -> Result<(), OperationError> {
+    insert_logged_request(
+        operation_context,
+        LoggedRequest {
+            api: log_entry.provider_key,
+            linked_message: log_entry
+                .created_sms_id
+                .map(|sms_id| ("sms".to_owned(), sms_id)),
+            secret_values: log_entry.secret_values,
+        },
+        completed_request,
+    )
+    .await
+}
+
+struct LoggedRequest {
+    api: String,
+    linked_message: Option<(String, String)>,
+    secret_values: Vec<String>,
+}
+
+async fn insert_logged_request(
+    operation_context: &OperationContext,
+    logged_request: LoggedRequest,
+    completed_request: CompletedApiRequest,
+) -> Result<(), OperationError> {
+    let mut request_body = read_logged_body(&completed_request.request_body);
+    for secret_value in logged_request
+        .secret_values
+        .iter()
+        .filter(|secret_value| !secret_value.is_empty())
+    {
+        request_body = request_body.replace(secret_value.as_str(), MASKED_VALUE);
+    }
     let api_request = ApiRequestRecord {
         request_id: operation_context.id_generator.generate_id().to_string(),
-        api: request_log_settings.api.to_owned(),
+        api: logged_request.api,
         method: completed_request.method,
         path: completed_request.path,
         request_headers: mask_credential_headers(completed_request.request_headers),
-        request_body: read_logged_body(&completed_request.request_body),
+        request_body,
         response_status: completed_request.response_status,
-        response_body,
+        response_body: read_logged_body(&completed_request.response_body),
         duration_ms: completed_request.duration_ms,
-        linked_message,
+        linked_message: logged_request.linked_message,
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     };
     Ok(operation_context

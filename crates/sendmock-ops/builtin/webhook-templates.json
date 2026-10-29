@@ -1,0 +1,173 @@
+{
+  "native": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"type\": \"{{ event.type }}\",\n  \"timestamp\": \"{{ event.created_at }}\",\n  \"data\": {{ data | json }}\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "twilio.inbound_sms": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {
+      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
+    },
+    "body_template": "MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&Body={{ data.body | urlencode }}&NumMedia=0",
+    "doc_url": "https://www.twilio.com/docs/messaging/guides/webhook-request",
+    "verified_on": "2026-09-30"
+  },
+  "twilio.status_callback": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {
+      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
+    },
+    "body_template": "MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&MessageStatus={{ data.status }}&ErrorCode={{ data.error_code | default(\"\") }}",
+    "doc_url": "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
+    "verified_on": "2026-09-30"
+  },
+  "vonage.inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"msisdn\": \"{{ data.from_number }}\",\n  \"to\": \"{{ data.to_number }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"text\": \"{{ data.body }}\",\n  \"type\": \"text\"\n}",
+    "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/inbound-sms",
+    "verified_on": "2026-09-30"
+  },
+  "vonage.dlr": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"msisdn\": \"{{ data.to_number }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"status\": \"{{ data.status }}\",\n  \"err-code\": \"{{ data.error_code | default(\"0\") }}\"\n}",
+    "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts",
+    "verified_on": "2026-09-30"
+  },
+  "plivo.inbound": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&Text={{ data.body | urlencode }}&MessageUUID={{ data.provider_id }}",
+    "doc_url": "https://www.plivo.com/docs/messaging/concepts/receive-sms",
+    "verified_on": "2026-09-30"
+  },
+  "telnyx.message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"data\": {\n    \"event_type\": \"message.received\",\n    \"payload\": {\n      \"id\": \"{{ data.provider_id }}\",\n      \"from\": { \"phone_number\": \"{{ data.from_number }}\" },\n      \"to\": [{ \"phone_number\": \"{{ data.to_number }}\" }],\n      \"text\": \"{{ data.body }}\"\n    }\n  }\n}",
+    "doc_url": "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "mailgun.routes": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ now_unix() }}&token={{ random_string(50) }}&signature={{ mailgun_signature(vars.mailgun_signing_key) }}",
+    "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
+    "verified_on": "2026-09-30"
+  },
+  "sendgrid.inbound_parse": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "from={{ data.from.address | urlencode }}&to={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&text={{ data.text_body | urlencode }}",
+    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "sendgrid.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "[\n  {\n    \"email\": \"{{ data.to[0].address }}\",\n    \"event\": \"{{ event.type | sendgrid_event }}\",\n    \"sg_message_id\": \"{{ data.message_id }}\",\n    \"timestamp\": {{ now_unix() }}\n  }\n]",
+    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
+    "verified_on": "2026-09-30"
+  },
+  "postmark.inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"FromName\": \"{{ data.from.name }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\",\n  \"MessageID\": \"{{ data.message_id }}\"\n}",
+    "doc_url": "https://postmarkapp.com/developer/webhooks/inbound-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "ses.sns": {
+    "method": "POST",
+    "content_type": "text/plain; charset=UTF-8",
+    "header_templates": {
+      "x-amz-sns-message-type": "Notification"
+    },
+    "body_template": "{\n  \"Type\": \"Notification\",\n  \"Message\": \"{\\\"notificationType\\\":\\\"{{ event.type | ses_type }}\\\",\\\"mail\\\":{\\\"destination\\\":[\\\"{{ data.to[0].address }}\\\"]}}\"\n}",
+    "doc_url": "https://docs.aws.amazon.com/ses/latest/dg/notification-contents.html",
+    "verified_on": "2026-09-30"
+  },
+  "resend.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "svix-id": "{{ event.id }}",
+      "svix-signature": "{{ svix_signature(vars.resend_signing_secret) }}"
+    },
+    "body_template": "{\n  \"type\": \"{{ event.type | resend_type }}\",\n  \"created_at\": \"{{ event.created_at }}\",\n  \"data\": { \"to\": [\"{{ data.to[0].address }}\"], \"subject\": \"{{ data.subject }}\" }\n}",
+    "doc_url": "https://resend.com/docs/dashboard/webhooks/event-types",
+    "verified_on": "2026-09-30"
+  },
+  "slack.incoming_webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"text\": \"New {{ event.type }}: {{ data.subject | default(data.body) }}\",\n  \"blocks\": [\n    { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"*{{ data.subject | default(\"SMS\") }}*\\nFrom {{ data.from.address | default(data.from_number) }}\" } }\n  ]\n}",
+    "doc_url": "https://api.slack.com/messaging/webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "discord.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"embeds\": [\n    { \"title\": \"{{ data.subject | default(\"New message\") }}\", \"description\": \"{{ data.text_body | default(data.body) }}\" }\n  ]\n}",
+    "doc_url": "https://discord.com/developers/docs/resources/webhook",
+    "verified_on": "2026-09-30"
+  },
+  "teams.adaptive_card": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"type\": \"message\",\n  \"attachments\": [\n    { \"contentType\": \"application/vnd.microsoft.card.adaptive\", \"content\": { \"type\": \"AdaptiveCard\", \"body\": [{ \"type\": \"TextBlock\", \"text\": \"{{ data.subject }}\" }] } }\n  ]\n}",
+    "doc_url": "https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "telegram.send_message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"chat_id\": \"{{ vars.telegram_chat_id }}\",\n  \"text\": \"{{ data.subject | default(data.body) }}\"\n}",
+    "doc_url": "https://core.telegram.org/bots/api#sendmessage",
+    "verified_on": "2026-09-30"
+  },
+  "n8n.flat_json": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"event\": \"{{ event.type }}\",\n  \"from\": \"{{ data.from.address | default(data.from_number) }}\",\n  \"to\": \"{{ data.to[0].address | default(data.to_number) }}\",\n  \"subject\": \"{{ data.subject | default(\"\") }}\",\n  \"text\": \"{{ data.text_body | default(data.body) }}\"\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "custom.tenant_inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Tenant": "{{ vars.tenant_id }}"
+    },
+    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\"\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "custom.ops_alert": {
+    "method": "POST",
+    "content_type": "text/plain",
+    "header_templates": {},
+    "body_template": "Delivery to {{ data.endpoint_name }} failed: {{ data.error_message }}",
+    "doc_url": null,
+    "verified_on": null
+  }
+}

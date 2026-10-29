@@ -16,8 +16,8 @@ Phase 2.
 
 Phase 2.
 
-- [ ] SM-02.1 Create, fetch and list at `/2010-04-01/Accounts/{AccountSid}/Messages[...].json` return Twilio-shaped JSON with `SM` + 32 hex IDs.
-- [ ] SM-02.2 Missing or invalid params return Twilio's error JSON and HTTP status.
+- [x] SM-02.1 Create, fetch and list at `/2010-04-01/Accounts/{AccountSid}/Messages[...].json` return Twilio-shaped JSON with `SM` + 32 hex IDs.
+- [x] SM-02.2 Missing or invalid params return Twilio's error JSON and HTTP status.
 - [ ] SM-02.3 Any credentials are accepted by default; with credentials enforced, wrong ones return `401` in Twilio's format.
 - [ ] SM-02.4 The official Twilio SDKs (PHP, Node, Python, Go, Java, C#, Ruby) send successfully using the documented redirection recipe.
 
@@ -115,7 +115,7 @@ UI in U1, backend Phase 2 (moved from Phase 4 on 2026-10-29).
 
 UI in U1, backend Phase 1 (email APIs) and Phase 2 (SMS APIs).
 
-- [ ] SM-13.1 Every request to native and provider APIs is logged, including `4xx` rejections, with the exact response returned.
+- [x] SM-13.1 Every request to native and provider APIs is logged, including `4xx` rejections, with the exact response returned.
 - [x] SM-13.2 Credentials are masked in the log. (#48)
 - [x] SM-13.3 The log can be filtered by provider, status class and path, and each accepted message links to its request. (#48)
 - [x] SM-13.4 Rejected requests are highlighted, and request and response bodies are shown formatted (JSON pretty-printed, form fields as a table). (#48)

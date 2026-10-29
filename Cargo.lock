@@ -2203,6 +2203,7 @@ name = "sendmock-core"
 version = "0.0.0"
 dependencies = [
  "rand 0.10.3",
+ "serde_json",
  "ulid",
 ]
 
@@ -2249,6 +2250,7 @@ dependencies = [
  "sendmock-webhooks",
  "serde",
  "serde_json",
+ "serde_urlencoded",
  "thiserror",
  "tokio",
  "toml",

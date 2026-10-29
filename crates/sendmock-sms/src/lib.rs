@@ -10,7 +10,7 @@ pub use phone_number::{PhoneNumber, split_channel_prefix};
 pub use simulation::{
     CustomOutcomeRule, DeliveryChange, DeliveryStep, MagicNumber, MatchField, OutcomeSource,
     PlannedOutcome, SendDecision, SendSimulation, SimulationProfile, SmsOutcomeKind,
-    find_magic_number, is_twilio_test_from_number, is_valid_outcome_pattern,
-    matches_outcome_pattern, plan_send, resolve_number_outcome,
+    describe_error_code, find_magic_number, is_twilio_test_from_number, is_valid_outcome_pattern,
+    matches_outcome_pattern, outcome_name_for_error_code, plan_send, resolve_number_outcome,
 };
 pub use sms_thread::build_thread_id;

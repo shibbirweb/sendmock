@@ -9,9 +9,23 @@ import {
 
 const twilioMessagesPath = "/2010-04-01/Accounts/{AccountSid}/Messages";
 
-/** Twilio's own message resource, as create, fetch and cancel answer it. */
-const twilioMessageBody =
-  '{"sid": "{{ message.provider_id }}", "account_sid": "{{ request.path_params.AccountSid }}", "to": "{{ message.to }}", "from": "{{ message.from }}", "body": "{{ message.body }}", "status": "{{ message.status }}", "num_segments": "1", "direction": "outbound-api", "date_created": "{{ now_iso() }}", "error_code": null}';
+const twilioMessageUri =
+  "/2010-04-01/Accounts/{{ request.path_params.AccountSid }}/Messages/{{ message.provider_id }}";
+
+/**
+ * Twilio's own message resource, as create, fetch and cancel answer it; the
+ * defaults keep the preview readable where a sample has no stored message.
+ */
+const twilioMessageBody = `{"sid": "{{ message.provider_id }}", "account_sid": "{{ request.path_params.AccountSid }}", "api_version": "2010-04-01", "messaging_service_sid": {{ message.messaging_service_sid | json | default("null") }}, "to": "{{ message.to }}", "from": "{{ message.from }}", "body": "{{ message.body }}", "status": "{{ message.status }}", "num_segments": "{{ message.segments | default("1") }}", "num_media": "{{ message.num_media | default("0") }}", "direction": "outbound-api", "date_created": "{{ message.created_at | default(now_iso()) }}", "date_updated": "{{ message.updated_at | default(now_iso()) }}", "date_sent": null, "price": null, "price_unit": "USD", "error_code": {{ message.error_code | default("null") }}, "error_message": null, "uri": "${twilioMessageUri}.json", "subresource_uris": {"media": "${twilioMessageUri}/Media.json"}}`;
+
+/** Twilio's error JSON; the code and message come from the check that failed, when it has them. */
+function twilioErrorFromCheck(
+  defaultCode: number,
+  defaultMessage: string,
+  status: number,
+) {
+  return `{"code": {{ error.code | default("${defaultCode}") }}, "message": "{{ error.reason | default("${defaultMessage}") }}", "more_info": "https://www.twilio.com/docs/errors/{{ error.code | default("${defaultCode}") }}", "status": ${status}}`;
+}
 
 function twilioError(code: number, message: string, status: number) {
   return `{"code": ${code}, "message": "${message}", "more_info": "https://www.twilio.com/docs/errors/${code}", "status": ${status}}`;
@@ -72,12 +86,16 @@ function buildTwilioProvider(): MessageProviderRecord {
       answerError(
         "missing_field",
         400,
-        twilioError(21604, "A 'To' phone number is required.", 400),
+        twilioErrorFromCheck(21604, "A 'To' phone number is required.", 400),
       ),
       answerError(
         "invalid_value",
         400,
-        twilioError(21211, "The 'To' number is not a valid phone number.", 400),
+        twilioErrorFromCheck(
+          21211,
+          "The 'To' number is not a valid phone number.",
+          400,
+        ),
       ),
       answerError("unauthorized", 401, twilioError(20003, "Authenticate", 401)),
       answerError(
@@ -110,6 +128,9 @@ function buildTwilioProvider(): MessageProviderRecord {
       landline: "30006",
       carrier_filtered: "30007",
       unknown_error: "30008",
+      missing_to: "21604",
+      missing_from: "21603",
+      missing_body: "21602",
     },
   });
 }

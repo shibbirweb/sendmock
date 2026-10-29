@@ -10,6 +10,9 @@ use super::ui_auth::UiAuth;
 
 /// Liveness stays open, so container health checks work with auth on; it reveals nothing.
 const UNPROTECTED_PATHS: [&str; 1] = ["/api/v1/health"];
+/// Provider APIs carry the provider's own credentials (Twilio sends Basic auth), checked by
+/// the provider's definition, so they cannot also carry SendMock's.
+const PROVIDER_PATH_PREFIX: &str = "/providers/";
 
 /// Who may reach the server, and from which browser origins.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -37,8 +40,10 @@ pub fn apply_access_control(
 }
 
 async fn require_ui_auth(State(ui_auth): State<UiAuth>, request: Request, next: Next) -> Response {
-    let is_unprotected =
-        request.method() == Method::OPTIONS || UNPROTECTED_PATHS.contains(&request.uri().path());
+    let request_path = request.uri().path();
+    let is_unprotected = request.method() == Method::OPTIONS
+        || UNPROTECTED_PATHS.contains(&request_path)
+        || request_path.starts_with(PROVIDER_PATH_PREFIX);
     let is_authorized = request
         .headers()
         .get(AUTHORIZATION)

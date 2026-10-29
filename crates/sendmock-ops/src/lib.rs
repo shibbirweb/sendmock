@@ -17,6 +17,7 @@ mod operation_registry;
 mod outcome_rules;
 mod page_of;
 mod present_value;
+mod providers;
 mod samples;
 mod seed;
 mod settings;
@@ -35,8 +36,8 @@ pub use input_shape::{InputShape, ScalarType, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
 pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
-    ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, RequestLogSettings,
-    SmtpSessionLogEntry, record_api_request,
+    ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, ProviderRequestLogEntry,
+    RequestLogSettings, SmtpSessionLogEntry, record_api_request, record_provider_request,
 };
 pub use no_input::NoInput;
 pub use numbers::{MessagingService, VirtualNumber};
@@ -50,6 +51,10 @@ pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};
 pub use outcome_rules::{OutcomeTestResult, SmsOutcomeRule};
 pub use page_of::PageOf;
+pub use providers::{
+    MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
+    ProviderRoute, answer_provider_request, builtin_sms_providers, load_sms_provider_definitions,
+};
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
     SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError, ValidateSeedOperation,

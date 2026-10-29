@@ -131,6 +131,36 @@ pub fn is_twilio_test_from_number(number: &str) -> bool {
     find_magic_number(MatchField::From, number).is_some()
 }
 
+/// What a test-number error code means, as the magic number tables describe it.
+pub fn describe_error_code(error_code: &str) -> Option<&'static str> {
+    TWILIO_TO_NUMBERS
+        .iter()
+        .chain(&TWILIO_FROM_NUMBERS)
+        .chain(&SENDMOCK_AFTER_SEND_NUMBERS)
+        .find(|magic_number| magic_number.error_code == Some(error_code))
+        .map(|magic_number| magic_number.description)
+}
+
+/// The outcome name a provider definition maps to its own error code, for each Twilio code
+/// the simulation uses.
+pub fn outcome_name_for_error_code(error_code: &str) -> Option<&'static str> {
+    match error_code {
+        "21211" => Some("invalid_number"),
+        "21612" => Some("cannot_route"),
+        "21408" => Some("no_international_permission"),
+        "21610" => Some("blocked"),
+        "21614" => Some("cannot_receive_sms"),
+        "21212" => Some("invalid_from"),
+        "21606" => Some("not_sms_capable"),
+        "21611" => Some("queue_full"),
+        "30003" => Some("unreachable_handset"),
+        "30006" => Some("landline"),
+        "30007" => Some("carrier_filtered"),
+        "30008" => Some("unknown_error"),
+        _ => None,
+    }
+}
+
 fn strip_whatsapp_prefix(number: &str) -> &str {
     number
         .strip_prefix("whatsapp:")

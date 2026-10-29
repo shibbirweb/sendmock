@@ -25,6 +25,8 @@ fn build_conditions(filter: &SmsListFilter) -> (String, Vec<SqlValue>) {
         ("status = ?", &filter.status),
         ("direction = ?", &filter.direction),
         ("thread_id = ?", &filter.thread_id),
+        ("api = ?", &filter.api),
+        ("provider_id = ?", &filter.provider_id),
     ] {
         if let Some(filter_value) = filter_value {
             conditions.push(condition);

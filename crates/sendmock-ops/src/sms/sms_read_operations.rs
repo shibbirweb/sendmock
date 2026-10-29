@@ -65,7 +65,7 @@ impl Operation for ListSmsOperation {
             status: input.status,
             direction: input.direction,
             thread_id: input.thread_id,
-            created_after_unix_ms: None,
+            ..SmsListFilter::default()
         };
         let page_size = input
             .limit

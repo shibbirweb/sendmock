@@ -87,6 +87,10 @@ pub struct SmsListFilter {
     pub status: Option<String>,
     pub direction: Option<String>,
     pub thread_id: Option<String>,
+    /// `native` or a provider key.
+    pub api: Option<String>,
+    /// The provider's id for the message, such as Twilio's `SM...` SID.
+    pub provider_id: Option<String>,
     pub created_after_unix_ms: Option<i64>,
 }
 

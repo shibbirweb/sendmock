@@ -6,6 +6,7 @@ mod api_request_logging;
 mod app_router;
 mod http_server;
 mod openapi_document;
+mod provider_routes;
 mod realtime;
 mod request_input;
 mod rest_router;

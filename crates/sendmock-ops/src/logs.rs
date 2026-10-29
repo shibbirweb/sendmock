@@ -6,7 +6,10 @@ mod smtp_log_operations;
 mod smtp_session_log_entry;
 
 pub use api_request_log_entry::{ApiRequestLinkedMessage, ApiRequestLogEntry};
-pub use api_request_recording::{CompletedApiRequest, RequestLogSettings, record_api_request};
+pub use api_request_recording::{
+    CompletedApiRequest, ProviderRequestLogEntry, RequestLogSettings, record_api_request,
+    record_provider_request,
+};
 pub use http_log_operations::{GetApiRequestOperation, ListApiRequestsOperation};
 pub use smtp_log_operations::{GetSmtpSessionOperation, ListSmtpSessionsOperation};
 pub use smtp_session_log_entry::SmtpSessionLogEntry;

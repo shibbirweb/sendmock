@@ -21,6 +21,7 @@ pub use sms_delivery_runner::start_sms_delivery;
 pub use sms_detail::SmsMessageDetail;
 pub use sms_ingest::{IncomingSms, store_sms};
 pub use sms_lookups::{describe_sms_code, find_newest_sms_with_code};
+pub use sms_media_intake::{MediaProblem, accept_media};
 pub use sms_read_operations::{
     DownloadSmsMediaOperation, GetSmsOperation, ListSmsOperation, ListSmsThreadsOperation,
     WaitForSmsOperation,
