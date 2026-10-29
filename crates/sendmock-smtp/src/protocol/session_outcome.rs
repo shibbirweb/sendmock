@@ -54,13 +54,15 @@ impl SmtpSession {
         )
     }
 
+    /// The client went away, sent garbage the connection could not read, or TLS failed.
     pub fn note_connection_problem(&mut self, problem: &str) {
         self.transcript.record_note(problem);
-        if self.email_ids.is_empty() {
-            self.failure_reason = Some(problem.to_owned());
-        }
+        self.connection_problem
+            .get_or_insert_with(|| problem.to_owned());
     }
 
+    /// Delivered when any message was stored, rejected when the server refused something,
+    /// otherwise aborted.
     pub fn result(&self) -> SessionResult {
         match (self.email_ids.is_empty(), &self.failure_reason) {
             (false, _) => SessionResult::Delivered,
@@ -69,9 +71,11 @@ impl SmtpSession {
         }
     }
 
+    /// The refusal, else the connection problem; none for a session that delivered.
     pub fn failure_reason(&self) -> Option<&str> {
         self.failure_reason
             .as_deref()
+            .or(self.connection_problem.as_deref())
             .filter(|_| self.email_ids.is_empty())
     }
 

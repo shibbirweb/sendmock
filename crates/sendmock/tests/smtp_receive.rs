@@ -35,9 +35,8 @@ fn exchange(reader: &mut BufReader<TcpStream>, line: Option<&str>) -> io::Result
 fn a_message_sent_over_smtp_is_listed_by_the_api_within_a_second() -> io::Result<()> {
     let working_directory = tempfile::tempdir()?;
     let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
-    let http_addr = sendmock.wait_for_http_addr();
-    let smtp_addr = sendmock.wait_for_smtp_addr();
-    let mut reader = BufReader::new(TcpStream::connect(&smtp_addr)?);
+    let ready_addresses = sendmock.wait_for_ready_addresses();
+    let mut reader = BufReader::new(TcpStream::connect(&ready_addresses.smtp_addr)?);
 
     let reply_codes = [
         exchange(&mut reader, None)?,
@@ -54,7 +53,7 @@ fn a_message_sent_over_smtp_is_listed_by_the_api_within_a_second() -> io::Result
     ];
     let sent_at = Instant::now();
     exchange(&mut reader, Some("QUIT"))?;
-    let emails_response = send_http_get(&http_addr, "/api/v1/emails")?;
+    let emails_response = send_http_get(&ready_addresses.http_addr, "/api/v1/emails")?;
 
     assert_eq!(reply_codes, [220, 250, 250, 250, 354, 250]);
     assert!(

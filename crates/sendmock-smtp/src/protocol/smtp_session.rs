@@ -52,6 +52,7 @@ pub struct SmtpSession {
     pub(super) transcript: SessionTranscript,
     pub(super) email_ids: Vec<String>,
     pub(super) failure_reason: Option<String>,
+    pub(super) connection_problem: Option<String>,
 }
 
 impl SmtpSession {
@@ -69,6 +70,7 @@ impl SmtpSession {
             transcript: SessionTranscript::default(),
             email_ids: Vec::new(),
             failure_reason: None,
+            connection_problem: None,
         }
     }
 

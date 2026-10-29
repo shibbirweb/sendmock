@@ -26,6 +26,11 @@ pub fn run_until_exit(command: &mut Command) -> io::Result<Output> {
     command.stdin(Stdio::null()).output()
 }
 
+pub struct ReadyAddresses {
+    pub http_addr: String,
+    pub smtp_addr: String,
+}
+
 /// A running server whose stdout lines can be awaited.
 pub struct SendmockProcess {
     child: Child,
@@ -69,24 +74,25 @@ impl SendmockProcess {
         })
     }
 
-    /// The address the server bound, read from its JSON ready line (`--log-format json`).
+    /// The HTTP address the server bound, read from its JSON ready line (`--log-format json`).
     pub fn wait_for_http_addr(&self) -> String {
-        let ready_line: serde_json::Value =
-            serde_json::from_str(&self.wait_for_line(READY_MESSAGE)).unwrap_or_default();
-        ready_line["fields"]["http_addr"]
-            .as_str()
-            .map(str::to_owned)
-            .unwrap_or_else(|| panic!("the ready line has no http_addr: {ready_line}"))
+        self.wait_for_ready_addresses().http_addr
     }
 
-    /// The SMTP address the server bound, read from its JSON ready line.
-    pub fn wait_for_smtp_addr(&self) -> String {
+    /// The addresses the server bound, read from its JSON ready line, which comes once.
+    pub fn wait_for_ready_addresses(&self) -> ReadyAddresses {
         let ready_line: serde_json::Value =
             serde_json::from_str(&self.wait_for_line(READY_MESSAGE)).unwrap_or_default();
-        ready_line["fields"]["smtp_addr"]
-            .as_str()
-            .map(str::to_owned)
-            .unwrap_or_else(|| panic!("the ready line has no smtp_addr: {ready_line}"))
+        let read_address = |field_name: &str| {
+            ready_line["fields"][field_name]
+                .as_str()
+                .map(str::to_owned)
+                .unwrap_or_else(|| panic!("the ready line has no {field_name}: {ready_line}"))
+        };
+        ReadyAddresses {
+            http_addr: read_address("http_addr"),
+            smtp_addr: read_address("smtp_addr"),
+        }
     }
 
     #[cfg(unix)]
