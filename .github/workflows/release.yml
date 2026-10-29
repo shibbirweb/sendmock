@@ -291,10 +291,14 @@ jobs:
   smtp-clients:
     uses: ./.github/workflows/smtp-clients.yml
 
+  # The official Twilio SDKs send and run a Verify login against this commit, before publishing.
+  sms-clients:
+    uses: ./.github/workflows/sms-clients.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients]
+    needs: [plan, checksums, smtp-clients, sms-clients]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

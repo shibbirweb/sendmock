@@ -179,7 +179,7 @@ Phase 2.
 - [x] VF-03.1 The correct code returns `approved`; a wrong code returns `pending`.
 - [x] VF-03.2 After 5 wrong checks the verification fails with `60202`.
 - [x] VF-03.3 Expired or unknown verifications return `20404`.
-- [ ] VF-03.4 An app using the official Twilio Verify SDK completes an OTP login against SendMock.
+- [x] VF-03.4 An app using the official Twilio Verify SDK completes an OTP login against SendMock. (#48)
 
 ## VF-04 Force state and events
 
