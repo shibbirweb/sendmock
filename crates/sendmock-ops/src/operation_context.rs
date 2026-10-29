@@ -7,7 +7,7 @@ use sendmock_store::{
     MessagingServiceRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
     SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookVariableRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -38,6 +38,7 @@ pub struct OperationContext {
     /// Delivery attempts; the rows are also the persistent delivery queue.
     pub webhook_delivery_repository: WebhookDeliveryRepository,
     pub webhook_rule_repository: WebhookRuleRepository,
+    pub webhook_template_repository: WebhookTemplateRepository,
     pub webhook_variable_repository: WebhookVariableRepository,
     /// Wakes the webhook dispatcher when a delivery is queued.
     pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
@@ -80,10 +81,6 @@ impl OperationContext {
         let verify_service_repository = VerifyServiceRepository::new(Arc::clone(&database));
         let verification_repository = VerificationRepository::new(Arc::clone(&database));
         let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
-        let webhook_endpoint_repository = WebhookEndpointRepository::new(Arc::clone(&database));
-        let webhook_delivery_repository = WebhookDeliveryRepository::new(Arc::clone(&database));
-        let webhook_rule_repository = WebhookRuleRepository::new(Arc::clone(&database));
-        let webhook_variable_repository = WebhookVariableRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
@@ -94,10 +91,11 @@ impl OperationContext {
             verify_service_repository,
             verification_repository,
             message_provider_repository,
-            webhook_endpoint_repository,
-            webhook_delivery_repository,
-            webhook_rule_repository,
-            webhook_variable_repository,
+            webhook_endpoint_repository: WebhookEndpointRepository::new(Arc::clone(&database)),
+            webhook_delivery_repository: WebhookDeliveryRepository::new(Arc::clone(&database)),
+            webhook_rule_repository: WebhookRuleRepository::new(Arc::clone(&database)),
+            webhook_template_repository: WebhookTemplateRepository::new(Arc::clone(&database)),
+            webhook_variable_repository: WebhookVariableRepository::new(Arc::clone(&database)),
             webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),

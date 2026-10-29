@@ -244,3 +244,13 @@ fn every_listed_filter_exists_in_the_engine() {
         );
     }
 }
+
+// AC: WH-07.3
+#[test]
+fn provider_event_name_filters() {
+    assert_renders(&[
+        ("{{ 'email.delivered' | sendgrid_event }}", "delivered"),
+        ("{{ 'email.bounced' | ses_type }}", "Bounced"),
+        ("{{ 'email.opened' | resend_type }}", "email.opened"),
+    ]);
+}

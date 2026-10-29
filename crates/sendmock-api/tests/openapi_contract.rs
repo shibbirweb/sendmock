@@ -34,8 +34,12 @@ impl UiAssets for NoUiAssets {
 const ONE_PIXEL_PNG_BASE64: &str = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
 async fn post_json(app_router: &axum::Router, path: &str, body: &Value) -> Value {
+    send_json(app_router, "POST", path, body).await
+}
+
+async fn send_json(app_router: &axum::Router, method: &str, path: &str, body: &Value) -> Value {
     let request = Request::builder()
-        .method("POST")
+        .method(method)
         .uri(path)
         .header("content-type", "application/json")
         .body(Body::from(body.to_string()))
@@ -130,6 +134,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_rule_samples(app_router).await);
     samples.extend(prepare_webhook_variable_samples(app_router).await);
     samples.extend([webhook_preview_samples()]);
+    samples.extend(prepare_webhook_template_samples(app_router).await);
     samples
 }
 
@@ -466,6 +471,83 @@ fn webhook_preview_samples() -> (&'static str, Vec<Value>) {
             json!({ "endpoint": endpoint_with_problems, "variables": { "tenant": "acme" } }),
         ],
     )
+}
+
+fn template_draft_sample(body_template: &str) -> Value {
+    json!({
+        "method": "POST", "content_type": "application/json",
+        "header_templates": { "X-Source": "sendmock" }, "body_template": body_template,
+    })
+}
+
+/// Two custom templates (one to edit, one to delete) and an edited built-in to reset.
+async fn prepare_sample_templates(app_router: &axum::Router) -> (Value, Value) {
+    let path = "/api/v1/webhooks/templates";
+    let edited_id = post_json(app_router, path, &json!({ "name": "Orders" })).await["id"].clone();
+    let deleted_id = post_json(app_router, path, &json!({ "name": "Old" })).await["id"].clone();
+    let mut slack_edit = template_draft_sample("{\"text\": \"{{ data.subject }}\"}");
+    slack_edit["template_id"] = json!("slack.incoming_webhook");
+    let edited_slack = send_json(
+        app_router,
+        "PATCH",
+        &format!("{path}/slack.incoming_webhook"),
+        &slack_edit,
+    )
+    .await;
+    assert_eq!(edited_slack["is_modified"], true, "{edited_slack}");
+    (edited_id, deleted_id)
+}
+
+/// A custom template to edit, restore and render, one to delete, and an edited built-in to
+/// reset.
+async fn prepare_webhook_template_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let (edited_id, deleted_id) = prepare_sample_templates(app_router).await;
+    let mut custom_edit = template_draft_sample("{\"subject\": \"{{ data.subject }}\"}");
+    custom_edit["template_id"] = edited_id.clone();
+    custom_edit["required_variables"] = json!(["tenant_id"]);
+    let with_draft =
+        json!({ "template_id": "native", "draft": template_draft_sample("{{ vars.missing }}") });
+    vec![
+        ("getWebhooksTemplates", vec![json!({})]),
+        (
+            "postWebhooksTemplates",
+            vec![json!({ "name": "Order webhook" })],
+        ),
+        (
+            "getWebhooksTemplatesByTemplateId",
+            vec![
+                json!({ "template_id": "twilio.inbound_sms" }),
+                json!({ "template_id": edited_id }),
+            ],
+        ),
+        ("patchWebhooksTemplatesByTemplateId", vec![custom_edit]),
+        (
+            "getWebhooksTemplatesByTemplateIdRevisions",
+            vec![json!({ "template_id": edited_id })],
+        ),
+        (
+            "postWebhooksTemplatesByTemplateIdRevisionsByRevisionRestore",
+            vec![json!({ "template_id": edited_id, "revision": 1 })],
+        ),
+        (
+            "postWebhooksTemplatesByTemplateIdRender",
+            vec![json!({ "template_id": "twilio.inbound_sms" }), with_draft],
+        ),
+        (
+            "postWebhooksTemplatesByTemplateIdReset",
+            vec![json!({ "template_id": "slack.incoming_webhook" })],
+        ),
+        (
+            "postWebhooksTemplatesByTemplateIdClone",
+            vec![json!({ "template_id": "native", "name": "Native copy" })],
+        ),
+        (
+            "deleteWebhooksTemplatesByTemplateId",
+            vec![json!({ "template_id": deleted_id })],
+        ),
+    ]
 }
 
 async fn prepare_webhook_rule_samples(

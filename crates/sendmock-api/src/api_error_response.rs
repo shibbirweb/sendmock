@@ -57,6 +57,7 @@ impl From<OperationError> for ApiErrorResponse {
             OperationError::NotFound { .. } => StatusCode::NOT_FOUND,
             OperationError::Timeout { .. } => StatusCode::REQUEST_TIMEOUT,
             OperationError::Conflict { .. } => StatusCode::CONFLICT,
+            OperationError::Unprocessable { .. } => StatusCode::UNPROCESSABLE_ENTITY,
             OperationError::Upstream { .. } => StatusCode::BAD_GATEWAY,
             OperationError::Store(_) | OperationError::Internal(_) => {
                 tracing::error!(error = %operation_error, "operation failed");

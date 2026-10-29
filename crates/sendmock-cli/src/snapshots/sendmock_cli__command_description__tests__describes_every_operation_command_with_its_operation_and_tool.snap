@@ -1926,6 +1926,223 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook template list",
+    "usage": "sendmock webhook template list",
+    "summary": "Built-in and custom payload templates.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates",
+        "operation_id": "getWebhooksTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook template create",
+    "usage": "sendmock webhook template create",
+    "summary": "Add a custom template, starting as native JSON.",
+    "arguments": [],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates",
+        "operation_id": "postWebhooksTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook template show",
+    "usage": "sendmock webhook template show <templateId>",
+    "summary": "One template with its method, headers and body template.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "getWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook template update",
+    "usage": "sendmock webhook template update <templateId>",
+    "summary": "Edit a template; each save keeps a revision, 422 when it does not render.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--body-template",
+      "--content-type",
+      "--description",
+      "--event",
+      "--header-templates",
+      "--method",
+      "--name",
+      "--required-variable"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "patchWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook template delete",
+    "usage": "sendmock webhook template delete <templateId>",
+    "summary": "Delete a custom template; 409 while endpoints use it.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--endpoints"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "deleteWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook template history",
+    "usage": "sendmock webhook template history <templateId>",
+    "summary": "Saved revisions, newest first.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}/revisions",
+        "operation_id": "getWebhooksTemplatesByTemplateIdRevisions",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_revisions"
+    ]
+  },
+  {
+    "command": "sendmock webhook template restore",
+    "usage": "sendmock webhook template restore <templateId> <revision>",
+    "summary": "Restore a revision as a new save.",
+    "arguments": [
+      "templateId",
+      "revision"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/revisions/{revision}/restore",
+        "operation_id": "postWebhooksTemplatesByTemplateIdRevisionsByRevisionRestore",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_restore"
+    ]
+  },
+  {
+    "command": "sendmock webhook template render",
+    "usage": "sendmock webhook template render <templateId>",
+    "summary": "Render against an email, an SMS or the sample, optionally a draft.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--draft",
+      "--email-id",
+      "--http-request-id",
+      "--sms-id"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/render",
+        "operation_id": "postWebhooksTemplatesByTemplateIdRender",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_render"
+    ]
+  },
+  {
+    "command": "sendmock webhook template reset",
+    "usage": "sendmock webhook template reset <templateId>",
+    "summary": "Put an edited built-in template back as shipped.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/reset",
+        "operation_id": "postWebhooksTemplatesByTemplateIdReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_reset"
+    ]
+  },
+  {
+    "command": "sendmock webhook template clone",
+    "usage": "sendmock webhook template clone <templateId>",
+    "summary": "Copy a template into a new custom one.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/clone",
+        "operation_id": "postWebhooksTemplatesByTemplateIdClone",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_clone"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

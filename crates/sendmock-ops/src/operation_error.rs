@@ -23,6 +23,11 @@ pub enum OperationError {
     #[error("{message}")]
     Rejected { code: &'static str, message: String },
 
+    /// The input has the right shape but cannot be used, such as a template that does not
+    /// render.
+    #[error("{message}")]
+    Unprocessable { code: &'static str, message: String },
+
     /// A service SendMock depends on, such as GitHub for the update check, could not answer.
     #[error("{message}")]
     Upstream { code: &'static str, message: String },
@@ -43,6 +48,7 @@ impl OperationError {
             Self::Timeout { .. } => "timeout",
             Self::Conflict { code, .. }
             | Self::Rejected { code, .. }
+            | Self::Unprocessable { code, .. }
             | Self::Upstream { code, .. } => code,
             Self::Store(_) | Self::Internal(_) => "internal_error",
         }
@@ -55,6 +61,7 @@ impl OperationError {
             | Self::Timeout { .. }
             | Self::Conflict { .. }
             | Self::Rejected { .. }
+            | Self::Unprocessable { .. }
             | Self::Upstream { .. }
             | Self::Store(_)
             | Self::Internal(_) => None,

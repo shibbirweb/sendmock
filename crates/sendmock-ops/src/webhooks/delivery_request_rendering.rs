@@ -4,6 +4,7 @@ use super::delivery_template_context::{DeliveryContextDetails, build_delivery_te
 use super::endpoint_request_rendering::{render_endpoint_request, to_template_render_mode};
 use super::endpoint_settings::EndpointRequestSettings;
 use super::request_part_renderer::{RenderProblem, RenderProblemSeverity, RequestPartRenderer};
+use super::webhook_template_functions::WebhookTemplateFunctions;
 use crate::{OperationContext, OperationError, RecordedHttpRequest};
 
 pub struct RenderedDeliveryRequest {
@@ -42,10 +43,12 @@ pub async fn render_delivery_request(
     request_settings: &EndpointRequestSettings,
 ) -> Result<RenderedDeliveryRequest, OperationError> {
     let render_mode = to_template_render_mode(request_settings.render_mode);
-    let template_functions = StandardTemplateFunctions::new(
-        operation_context.clock.clone(),
-        operation_context.random_source.clone(),
-    );
+    let template_functions = WebhookTemplateFunctions {
+        standard_functions: StandardTemplateFunctions::new(
+            operation_context.clock.clone(),
+            operation_context.random_source.clone(),
+        ),
+    };
     let delivery_context = build_delivery_template_context(
         operation_context,
         details,

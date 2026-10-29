@@ -31,6 +31,20 @@ pub fn build_event_template_context(app_event: &AppEvent) -> Map<String, Value> 
     template_context
 }
 
+/// The SMS a preview uses when none is chosen.
+fn build_sample_sms_data() -> Value {
+    json!({
+        "id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E",
+        "provider_id": "SM00000000000000000000000000000001",
+        "from_number": "+15550001111",
+        "to_number": "+14155550100",
+        "body": "Your Acme code is 482913",
+        "status": "delivered",
+        "error_code": null,
+        "extracted": { "otp": ["482913"], "links": [] },
+    })
+}
+
 /// The email a preview uses when none is stored yet.
 fn build_sample_email_data() -> Value {
     json!({
@@ -51,6 +65,16 @@ fn build_sample_email_data() -> Value {
         "direction": "inbound",
         "response_kind": null,
     })
+}
+
+/// The message a preview renders against; with none, the sample of `sample_event_type`
+/// (`email.received` when it is not given).
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ChosenMessage<'message> {
+    pub email_id: Option<&'message str>,
+    pub sms_id: Option<&'message str>,
+    pub http_request_id: Option<&'message str>,
+    pub sample_event_type: Option<&'message str>,
 }
 
 /// The event a preview renders against, and what to call it.
@@ -101,10 +125,14 @@ fn not_found(message: String) -> OperationError {
 /// email is stored yet. Captured HTTP requests arrive with the HTTP catcher (Phase 5).
 pub async fn find_template_subject(
     operation_context: &OperationContext,
-    email_id: Option<&str>,
-    sms_id: Option<&str>,
-    http_request_id: Option<&str>,
+    chosen_message: ChosenMessage<'_>,
 ) -> Result<TemplateSubject, OperationError> {
+    let ChosenMessage {
+        email_id,
+        sms_id,
+        http_request_id,
+        sample_event_type,
+    } = chosen_message;
     if let Some(email_id) = email_id {
         let stored_email = operation_context
             .email_repository
@@ -128,22 +156,49 @@ pub async fn find_template_subject(
             "No captured HTTP request with id {http_request_id}"
         )));
     }
+    let sample_event_type = sample_event_type.unwrap_or("email.received");
+    if sample_event_type != "email.received" {
+        return Ok(build_sample_subject(sample_event_type));
+    }
     let email_page = operation_context
         .email_repository
         .list_emails(EmailListFilter::default(), None, 1)
         .await?;
     Ok(match email_page.emails.first() {
         Some(latest_email) => to_email_subject(latest_email),
-        None => TemplateSubject {
-            app_event: AppEvent {
-                id: "evt_sample".to_owned(),
-                event_type: "email.received".to_owned(),
-                created_at: "2026-01-01T09:00:00Z".to_owned(),
-                data: build_sample_email_data(),
-            },
-            rendered_against: "Built-in sample".to_owned(),
-        },
+        None => build_sample_subject(sample_event_type),
     })
+}
+
+/// A fixed example of an event type, for a preview when no message is chosen.
+pub fn build_sample_subject(event_type: &str) -> TemplateSubject {
+    let sample_data = if event_type.starts_with("sms.") {
+        build_sample_sms_data()
+    } else if event_type.starts_with("http.") {
+        json!({
+            "bin": "slack",
+            "method": "POST",
+            "url": "http://127.0.0.1:8025/catch/slack",
+            "path": "/catch/slack",
+            "query": {},
+            "headers": { "content-type": "application/json" },
+            "body": "{\"text\":\"Deploy finished\"}",
+            "json": { "text": "Deploy finished" },
+        })
+    } else if event_type.starts_with("webhook.") {
+        json!({ "endpoint_name": "Laravel inbound mail", "error_message": "HTTP 500" })
+    } else {
+        build_sample_email_data()
+    };
+    TemplateSubject {
+        app_event: AppEvent {
+            id: "evt_sample".to_owned(),
+            event_type: event_type.to_owned(),
+            created_at: "2026-01-01T09:00:00Z".to_owned(),
+            data: sample_data,
+        },
+        rendered_against: "Built-in sample".to_owned(),
+    }
 }
 
 /// The latest email as an `email.received` event, or a built-in sample when there is none,
@@ -151,6 +206,6 @@ pub async fn find_template_subject(
 pub async fn build_sample_template_context(
     operation_context: &OperationContext,
 ) -> Result<Map<String, Value>, OperationError> {
-    let sample_subject = find_template_subject(operation_context, None, None, None).await?;
+    let sample_subject = find_template_subject(operation_context, ChosenMessage::default()).await?;
     Ok(build_event_template_context(&sample_subject.app_event))
 }

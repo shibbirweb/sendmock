@@ -86,6 +86,9 @@ pub const SENDMOCK_FILTER_NAMES: &[&str] = &[
     "sha512",
     "hmac_sha256",
     "hmac_sha1",
+    "sendgrid_event",
+    "ses_type",
+    "resend_type",
 ];
 
 /// The `minijinja` global functions templates may call.

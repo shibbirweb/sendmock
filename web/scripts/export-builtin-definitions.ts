@@ -9,12 +9,28 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { buildBuiltinSmsProviders } from "../src/mocks/fixtures/sms-provider-fixtures";
+import { buildWebhookTemplateFixtures } from "../src/mocks/fixtures/template-and-variable-fixtures";
 import { templateDefinitions } from "../src/mocks/fixtures/template-definitions";
 
 const builtinDirectory = join(
   import.meta.dir,
   "../../crates/sendmock-ops/builtin",
 );
+
+/** The gallery entries of the shipped templates, without the state the binary keeps. */
+function buildBuiltinTemplateCatalogue() {
+  return buildWebhookTemplateFixtures()
+    .filter((webhookTemplate) => webhookTemplate.source === "builtin")
+    .map((webhookTemplate) => ({
+      id: webhookTemplate.id,
+      name: webhookTemplate.name,
+      service: webhookTemplate.service,
+      category: webhookTemplate.category,
+      events: webhookTemplate.events,
+      description: webhookTemplate.description,
+      required_variables: webhookTemplate.required_variables,
+    }));
+}
 
 /** Each generated file and its content, ready to write or compare. */
 export function buildBuiltinDefinitionFiles(): {
@@ -29,6 +45,10 @@ export function buildBuiltinDefinitionFiles(): {
     {
       filePath: join(builtinDirectory, "webhook-templates.json"),
       content: `${JSON.stringify(templateDefinitions, null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "webhook-template-catalogue.json"),
+      content: `${JSON.stringify(buildBuiltinTemplateCatalogue(), null, 2)}\n`,
     },
   ];
 }

@@ -5,6 +5,7 @@
 mod template_date_filters;
 mod template_encoding_filters;
 mod template_environment;
+mod template_event_name_filters;
 mod template_expression_evaluation;
 mod template_functions;
 mod template_hash_filters;

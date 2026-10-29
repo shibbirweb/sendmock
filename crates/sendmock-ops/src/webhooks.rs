@@ -29,7 +29,16 @@ mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
 mod secret_value_masking;
+mod template_catalogue;
 mod template_context;
+mod template_delete_operation;
+mod template_edit_operations;
+mod template_inputs;
+mod template_operations;
+mod template_rendering;
+mod template_request_rendering;
+mod template_store;
+mod template_view;
 mod variable_inputs;
 mod variable_operations;
 mod variable_resolution;
@@ -37,6 +46,7 @@ mod variable_validation;
 mod variable_value_operations;
 mod variable_view;
 mod webhook_sender;
+mod webhook_template_functions;
 
 pub use delivery_detail::WebhookDeliveryDetail;
 pub use delivery_dispatch::{run_due_deliveries, run_webhook_dispatcher};
@@ -65,6 +75,17 @@ pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
 pub use rule_view::WebhookRule;
 pub use template_context::{build_event_template_context, build_sample_template_context};
+pub use template_delete_operation::DeleteWebhookTemplateOperation;
+pub use template_edit_operations::{
+    ListWebhookTemplateRevisionsOperation, ResetWebhookTemplateOperation,
+    RestoreWebhookTemplateRevisionOperation, UpdateWebhookTemplateOperation,
+};
+pub use template_operations::{
+    CloneWebhookTemplateOperation, CreateWebhookTemplateOperation, GetWebhookTemplateOperation,
+    ListWebhookTemplatesOperation, RenderWebhookTemplateOperation,
+};
+pub use template_rendering::TemplateRenderResult;
+pub use template_view::{TemplateRevision, WebhookTemplateDetail, WebhookTemplateSummary};
 pub use variable_operations::{
     CreateWebhookVariableOperation, DeleteWebhookVariableOperation, ListWebhookVariablesOperation,
     UpdateWebhookVariableOperation,
@@ -105,4 +126,14 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteWebhookVariableOperation);
     operation_registry.register(RegenerateWebhookVariableOperation);
     operation_registry.register(PreviewWebhookVariableOperation);
+    operation_registry.register(ListWebhookTemplatesOperation);
+    operation_registry.register(CreateWebhookTemplateOperation);
+    operation_registry.register(GetWebhookTemplateOperation);
+    operation_registry.register(UpdateWebhookTemplateOperation);
+    operation_registry.register(DeleteWebhookTemplateOperation);
+    operation_registry.register(ListWebhookTemplateRevisionsOperation);
+    operation_registry.register(RestoreWebhookTemplateRevisionOperation);
+    operation_registry.register(RenderWebhookTemplateOperation);
+    operation_registry.register(ResetWebhookTemplateOperation);
+    operation_registry.register(CloneWebhookTemplateOperation);
 }

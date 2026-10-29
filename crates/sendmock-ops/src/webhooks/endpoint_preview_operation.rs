@@ -11,7 +11,7 @@ use super::endpoint_inputs::WebhookEndpointInput;
 use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblem;
 use super::secret_value_masking::{load_secret_values, mask_request_secrets};
-use super::template_context::find_template_subject;
+use super::template_context::{ChosenMessage, find_template_subject};
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
 
 /// Body of `POST /api/v1/webhooks/endpoints/preview` (WH-07.15).
@@ -103,9 +103,12 @@ impl Operation for PreviewWebhookEndpointOperation {
         let endpoint_input = read_previewed_endpoint(operation_context, &input).await?;
         let template_subject = find_template_subject(
             operation_context,
-            input.email_id.as_deref(),
-            input.sms_id.as_deref(),
-            input.http_request_id.as_deref(),
+            ChosenMessage {
+                email_id: input.email_id.as_deref(),
+                sms_id: input.sms_id.as_deref(),
+                http_request_id: input.http_request_id.as_deref(),
+                sample_event_type: None,
+            },
         )
         .await?;
         let send_time_values: Map<String, Value> = input
