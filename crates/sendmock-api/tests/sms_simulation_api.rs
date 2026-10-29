@@ -246,7 +246,12 @@ async fn the_status_callback_receives_each_status_in_order_and_is_logged() {
 
     let (_, sent_sms) =
         call_api(&app_router, "POST", "/api/v1/sms", Some(&sms_with_callback)).await;
-    wait_until(async || callback_sender.received_statuses().len() == 3).await;
+    wait_until(async || {
+        read_sms(&app_router, &sent_sms["id"]).await["callback_attempts"]
+            .as_array()
+            .is_some_and(|callback_attempts| callback_attempts.len() == 3)
+    })
+    .await;
     let sms_detail = read_sms(&app_router, &sent_sms["id"]).await;
 
     assert_eq!(
