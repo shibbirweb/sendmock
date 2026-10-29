@@ -23,6 +23,19 @@ pub enum ApiAnswer {
     Empty,
 }
 
+/// Plain HTTP needs no certificates, so a machine without a certificate store (such as the
+/// scratch Docker image) still gets a client; only HTTPS servers then fail verification.
+fn build_http_client() -> reqwest::Client {
+    reqwest::Client::builder()
+        .build()
+        .or_else(|_| {
+            reqwest::Client::builder()
+                .tls_certs_only(Vec::<reqwest::Certificate>::new())
+                .build()
+        })
+        .unwrap_or_else(|_| reqwest::Client::new())
+}
+
 /// Calls operations on a running SendMock through its REST API.
 pub struct ApiClient {
     http_client: reqwest::Client,
@@ -33,7 +46,7 @@ pub struct ApiClient {
 impl ApiClient {
     pub fn new(server_url: String, token: Option<String>) -> Self {
         Self {
-            http_client: reqwest::Client::new(),
+            http_client: build_http_client(),
             server_url,
             token,
         }
