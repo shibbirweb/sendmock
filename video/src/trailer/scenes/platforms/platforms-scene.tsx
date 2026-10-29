@@ -31,9 +31,13 @@ export const platformTiles: PlatformTile[] = [
 ];
 
 const commandsStartFrame = 60;
-const commandHoldFrames = 42;
 const exitFrames = 18;
 const exitStartFrame = platformsSceneDurationFrames - exitFrames;
+/** Each install command shows once; the last one stays until the cut. */
+const commandHoldFrames = Math.floor(
+  (exitStartFrame - commandsStartFrame) / installCommands.length,
+);
+const lastCommandIndex = installCommands.length - 1;
 const languagesStartFrame = 90;
 
 /**
@@ -74,13 +78,12 @@ export function PlatformsScene({
 }: PlatformsSceneProps) {
   const frame = useDesignFrame();
   const commandFrame = frame - commandsStartFrame;
-  const commandIndex =
-    Math.max(0, Math.floor(commandFrame / commandHoldFrames)) %
-    installCommands.length;
-  const frameInCommand =
-    commandFrame -
-    Math.floor(commandFrame / commandHoldFrames) * commandHoldFrames;
-  const isExiting = frame >= exitStartFrame;
+  const commandIndex = Math.min(
+    lastCommandIndex,
+    Math.max(0, Math.floor(commandFrame / commandHoldFrames)),
+  );
+  const frameInCommand = commandFrame - commandIndex * commandHoldFrames;
+  const isLastCommand = commandIndex === lastCommandIndex;
   const exitProgress = getProgress(frame, exitStartFrame, exitFrames - 4);
   const exitStyle = {
     opacity: 1 - exitProgress,
@@ -165,8 +168,12 @@ export function PlatformsScene({
         }}
       >
         <span style={{ color: trailerPalette.accent }}>$ </span>
-        <span style={{ opacity: isExiting ? 1 : commandOpacity }}>
-          {installCommands[isExiting ? 0 : commandIndex]}
+        <span
+          style={{
+            opacity: isLastCommand && frameInCommand > 6 ? 1 : commandOpacity,
+          }}
+        >
+          {installCommands[commandIndex]}
         </span>
       </div>
       <div

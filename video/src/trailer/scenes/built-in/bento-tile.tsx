@@ -12,6 +12,8 @@ type BentoTileProps = {
   startFrame: number;
   gridArea: string;
   titleFontSizePx?: number;
+  /** Shown at the right end of the title row. */
+  titleEnd?: ReactNode;
   children: ReactNode;
   style?: CSSProperties;
 };
@@ -26,6 +28,7 @@ export function BentoTile({
   startFrame,
   gridArea,
   titleFontSizePx = 28,
+  titleEnd,
   children,
   style,
 }: BentoTileProps) {
@@ -84,6 +87,11 @@ export function BentoTile({
         >
           {title}
         </span>
+        {titleEnd === undefined ? null : (
+          <div style={{ marginLeft: "auto", alignSelf: "center" }}>
+            {titleEnd}
+          </div>
+        )}
       </div>
       <div style={{ marginTop: 18 }}>{children}</div>
       <div

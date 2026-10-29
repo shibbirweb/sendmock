@@ -128,6 +128,7 @@ export function ClosingScene() {
           fontFamily: monoFontFamily,
           fontSize: getBarValue("fontSizePx"),
           whiteSpace: "nowrap",
+          overflow: "hidden",
         }}
       >
         <ClosingPlatformsBar morphProgress={morphProgress} />

@@ -2,17 +2,17 @@ import { Composition } from "remotion";
 
 import { videoFps, videoHeight, videoWidth } from "./brand";
 import {
+  SendMockTrailerMechanicalTyping,
   sendMockTrailerTourDurationFrames,
-  SendMockTrailerTourConnections,
 } from "./trailer/sendmock-trailer-tour";
 import { toVideoFrames } from "./trailer/trailer-time";
 
-/** Registers the video's composition. */
+/** Registers the video's compositions. */
 export function RemotionRoot() {
   return (
     <Composition
-      id="SendMockTrailerTourConnections"
-      component={SendMockTrailerTourConnections}
+      id="SendMockTrailerMechanicalTyping"
+      component={SendMockTrailerMechanicalTyping}
       durationInFrames={toVideoFrames(sendMockTrailerTourDurationFrames)}
       fps={videoFps}
       width={videoWidth}

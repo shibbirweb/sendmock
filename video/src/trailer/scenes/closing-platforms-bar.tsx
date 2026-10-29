@@ -5,6 +5,9 @@ import { trailerPalette } from "../trailer-palette";
 import { installCommands } from "../trailer-facts";
 import { platformTiles } from "./platforms/platforms-scene";
 
+/** The command the platforms scene leaves in the bar at the cut. */
+const lastInstallCommand = installCommands[installCommands.length - 1] ?? "";
+
 /** The platforms the closing bar names, in the owner's order. */
 const closingPlatformNames = ["Windows", "macOS", "Linux", "Docker"];
 
@@ -18,8 +21,8 @@ type ClosingPlatformsBarProps = {
 };
 
 /**
- * The closing bar's contents in the platforms cut: the install command from
- * the platforms scene fades into every platform SendMock runs on.
+ * The closing bar's contents: the last install command from the platforms
+ * scene fades into every platform SendMock runs on.
  */
 export function ClosingPlatformsBar({
   morphProgress,
@@ -35,7 +38,7 @@ export function ClosingPlatformsBar({
     <>
       <span style={{ opacity: commandOpacity }}>
         <span style={{ color: trailerPalette.accent }}>$ </span>
-        {installCommands[0]}
+        {lastInstallCommand}
       </span>
       <div
         style={{

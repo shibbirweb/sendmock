@@ -12,6 +12,8 @@ import { BentoTile } from "./bento-tile";
 import {
   BrandedNameList,
   CodeLines,
+  CustomEntry,
+  getCustomEntryStartFrame,
   ScrollingNameList,
 } from "./bento-contents";
 
@@ -31,7 +33,10 @@ export const builtInSceneCues: UiCue[] = Object.values(tileStartFrames).map(
   (tileStartFrame): UiCue => ({ frame: tileStartFrame, cueKind: "appear" }),
 );
 
-/** Scene 6: the built-in providers, gateways and templates, as a bento grid. */
+/**
+ * Scene 6: the built-in providers, gateways and templates, as a bento grid.
+ * Each count tile ends with a "Custom" entry: you can add your own.
+ */
 export function BuiltInScene() {
   return (
     <AbsoluteFill>
@@ -47,13 +52,13 @@ export function BuiltInScene() {
           top: 250,
           bottom: 80,
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(8, 1fr)",
           gridTemplateRows: "repeat(4, 1fr)",
           gridTemplateAreas: [
-            '"email email sms sms"',
-            '"email email sms sms"',
-            '"payments templates templates signed"',
-            '"payments templates templates errors"',
+            '"email email email email sms sms sms sms"',
+            '"email email email email sms sms sms sms"',
+            '"payments payments payments templates templates templates signed signed"',
+            '"payments payments payments templates templates templates errors errors"',
           ].join(" "),
           gap: 20,
         }}
@@ -68,6 +73,7 @@ export function BuiltInScene() {
             brandedNames={emailProviders}
             startFrame={tileStartFrames.email}
             columnCount={3}
+            hasCustomEntry
           />
         </BentoTile>
         <BentoTile
@@ -80,6 +86,7 @@ export function BuiltInScene() {
             brandedNames={smsProviders}
             startFrame={tileStartFrames.sms}
             columnCount={3}
+            hasCustomEntry
           />
         </BentoTile>
         <BentoTile
@@ -93,6 +100,7 @@ export function BuiltInScene() {
             brandedNames={paymentGateways}
             startFrame={tileStartFrames.payments}
             columnCount={2}
+            hasCustomEntry
           />
         </BentoTile>
         <BentoTile
@@ -100,6 +108,14 @@ export function BuiltInScene() {
           count={webhookTemplateNames.length}
           startFrame={tileStartFrames.templates}
           gridArea="templates"
+          titleEnd={
+            <CustomEntry
+              startFrame={getCustomEntryStartFrame(
+                tileStartFrames.templates,
+                6,
+              )}
+            />
+          }
         >
           <ScrollingNameList
             names={webhookTemplateNames}

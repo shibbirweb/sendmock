@@ -51,9 +51,9 @@ export const sendMockTrailerTourDurationFrames =
 
 /**
  * The SendMock trailer: the scenes with an app tour after the AI prompts, a
- * platforms scene that shows how apps connect, and a closing card naming
- * every platform (docs/plan/23-promotional-video.md).
+ * platforms scene that shows how apps connect, a closing card naming every
+ * platform, and mechanical keyboard typing (docs/plan/23-promotional-video.md).
  */
-export function SendMockTrailerTourConnections() {
+export function SendMockTrailerMechanicalTyping() {
   return <TrailerFilm scenes={tourScenes} />;
 }

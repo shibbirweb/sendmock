@@ -1,9 +1,13 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
-import { videoFps } from "../src/brand";
+import { designFps } from "../src/brand";
 import { transitionDurationFrames } from "../src/trailer/parts/scene-transitions";
 import { normaliseSound } from "./sounds/audio-buffer";
+import {
+  mechanicalKeySpecs,
+  renderMechanicalKeySound,
+} from "./sounds/mechanical-key-voice";
 import {
   renderAppearSound,
   renderArriveSound,
@@ -15,8 +19,6 @@ import {
   renderRevealSound,
   renderSendSound,
   renderSuccessSound,
-  keystrokeSpecs,
-  renderKeystrokeSound,
   renderWhooshSound,
 } from "./sounds/ui-sound-voices";
 import { writeMonoWav } from "./sounds/wav-writer";
@@ -26,7 +28,7 @@ import { writeMonoWav } from "./sounds/wav-writer";
  * (docs/plan/23-promotional-video.md, Sound effects). Every sound is
  * synthesized here, with no samples or recordings, so none needs a licence.
  */
-const whooshLengthSeconds = transitionDurationFrames.zoomThrough / videoFps;
+const whooshLengthSeconds = transitionDurationFrames.zoomThrough / designFps;
 
 const uiSounds: Record<string, () => Float32Array> = {
   click: renderClickSound,
@@ -39,9 +41,9 @@ const uiSounds: Record<string, () => Float32Array> = {
   whoosh: () => renderWhooshSound(whooshLengthSeconds),
   reveal: renderRevealSound,
   ...Object.fromEntries(
-    keystrokeSpecs.map((keystrokeSpec, keyIndex) => [
-      `key-${keyIndex + 1}`,
-      () => renderKeystrokeSound(keystrokeSpec),
+    mechanicalKeySpecs.map((mechanicalKeySpec, keyIndex) => [
+      `mechanical-key-${keyIndex + 1}`,
+      () => renderMechanicalKeySound(mechanicalKeySpec),
     ]),
   ),
   ...Object.fromEntries(

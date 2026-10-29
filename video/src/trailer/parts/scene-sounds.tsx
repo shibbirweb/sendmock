@@ -21,10 +21,17 @@ const cueVolumes: Record<UiCueKind, number> = {
 /**
  * Repeated sounds take turns on a few variants in a loose pattern, so a run
  * of them sounds natural instead of one sample repeating: five calm notes for
- * events, four key sounds for typing.
+ * events, six mechanical keys for typing (each with its press, bottom-out and
+ * release; docs/plan/23-promotional-video.md, Mechanical typing).
  */
 const fireVariantPattern = [1, 3, 2, 4, 3, 5, 2, 4];
-const keyVariantPattern = [1, 3, 2, 4, 2, 1, 4, 3];
+const keyVariantPattern = [1, 4, 2, 6, 3, 5, 2, 4, 6, 1, 5, 3];
+
+/** A light touch on some keys, as a typist's hand varies. */
+const keyTouchVolumes = [1, 0.85, 0.95, 0.8, 1, 0.9, 0.85];
+
+/** Mounted long enough for the whole key, release included. */
+const keySoundFrames = 6;
 
 type SoundEvent = {
   frame: number;
@@ -34,7 +41,6 @@ type SoundEvent = {
   durationFrames: number;
 };
 
-const keySoundFrames = 4;
 const otherSoundFrames = 75;
 
 /** Turns a scene's cues into the sounds to play; typing becomes one key per character. */
@@ -46,11 +52,12 @@ function getSoundEvents(cues: UiCue[]): SoundEvent[] {
     if (uiCue.cueKind === "typing") {
       return getKeystrokeFrames(uiCue).map((keystrokeFrame) => {
         const variant = keyVariantPattern[keyCount % keyVariantPattern.length];
+        const touchVolume = keyTouchVolumes[keyCount % keyTouchVolumes.length];
         keyCount += 1;
         return {
           frame: uiCue.frame + keystrokeFrame,
-          fileName: `key-${variant ?? 1}`,
-          volume: volume * (keyCount % 3 === 0 ? 0.8 : 1),
+          fileName: `mechanical-key-${variant ?? 1}`,
+          volume: volume * (touchVolume ?? 1),
           durationFrames: keySoundFrames,
         };
       });

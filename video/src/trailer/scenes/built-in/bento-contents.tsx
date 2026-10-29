@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { interpolate } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
@@ -10,6 +11,8 @@ type BrandedNameListProps = {
   brandedNames: BrandedName[];
   startFrame: number;
   columnCount: number;
+  /** Ends the list with a "Custom" entry: you can add your own. */
+  hasCustomEntry?: boolean;
 };
 
 const spotlightIntervalFrames = 16;
@@ -19,6 +22,7 @@ export function BrandedNameList({
   brandedNames,
   startFrame,
   columnCount,
+  hasCustomEntry = false,
 }: BrandedNameListProps) {
   const frame = useDesignFrame();
   const spotlightIndex =
@@ -68,6 +72,53 @@ export function BrandedNameList({
           </div>
         );
       })}
+      {hasCustomEntry ? (
+        <CustomEntry
+          startFrame={getCustomEntryStartFrame(startFrame, brandedNames.length)}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** The custom entry rises in just after the last name of its list. */
+export function getCustomEntryStartFrame(
+  listStartFrame: number,
+  nameCount: number,
+): number {
+  return listStartFrame + 8 + nameCount * 3 + 8;
+}
+
+type CustomEntryProps = {
+  startFrame: number;
+};
+
+const customEntryFontSizePx = 22;
+
+/** A dashed "+ Custom" chip: each of these lists takes your own additions. */
+export function CustomEntry({ startFrame }: CustomEntryProps) {
+  const frame = useDesignFrame();
+
+  return (
+    <div
+      style={{
+        ...getRiseInStyle(frame, startFrame, 12, 10),
+        display: "flex",
+        alignItems: "center",
+        alignSelf: "center",
+        justifySelf: "start",
+        gap: 8,
+        padding: "8px 16px",
+        borderRadius: 12,
+        border: `1px dashed ${trailerPalette.accent}`,
+        backgroundColor: trailerPalette.accentSoft,
+        fontSize: customEntryFontSizePx,
+        color: trailerPalette.accent,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <Plus size={customEntryFontSizePx * 0.85} strokeWidth={2} />
+      Custom
     </div>
   );
 }

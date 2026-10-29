@@ -50,12 +50,12 @@ Owner brief: a promotional trailer that shows the main features (webhooks for em
 | 3 | SMS | "Texts, receipts and replies, like Twilio." | the "Reply YES" text in the thread; its ticks turn delivered (status callback); the customer replies YES (inbound SMS with `X-Twilio-Signature`); your app answers with TwiML and the answer appears in the thread | 11 s |
 | 4 | Payments | "Checkouts that pay, decline and refund." | the test checkout (Stripe, $42.00) with its test controls (Pay successfully, Decline, Require 3-D Secure, Refund); Decline is pressed and the order turns Declined (`payment_intent.payment_failed`, `card_declined`), then Pay successfully turns it Paid (`checkout.session.completed`), then Refund turns it Refunded (`charge.refunded`); each Stripe-format event carries `Stripe-Signature` | 10 s |
 | 5 | Any API | "Any other API call, caught." | the direction flips: your app posts to Slack, Discord and a CRM API, and the HTTP catcher catches each call, answers it and previews the message | 9 s |
-| 6 | Built in | "Built in. Ready on first run." | a bento of tiles: 6 email providers, 6 SMS providers, 5 payment gateways, 17 webhook templates (each tile counts up and its names rise in), plus "Signed like the real thing" and "Real responses and errors" | 11 s |
+| 6 | Built in | "Built in. Ready on first run." | a bento of tiles: 6 email providers, 6 SMS providers, 5 payment gateways, 17 webhook templates (each tile counts up and its names rise in, then a dashed "+ Custom" chip shows you can add your own), plus "Signed like the real thing" and "Real responses and errors" | 11 s |
 | 7 | Events | "32 events. Subscribe to any." | every built-in event as a chip, grouped by area (email, SMS, verify, HTTP, payment, checkout, webhook, test), cascading in by column, then events firing live across the wall | 9 s |
 | 8 | Build your own | "Missing one? Build it." | four builders at work: a webhook template being typed with its live preview, a new email provider from blank, an SMS provider from a built-in, a payment gateway's checkout flow getting its steps (wallet number, OTP, PIN) | 11 s |
 | 9 | AI ready | "AI ready. Everything, by prompt." | an AI agent window: three prompts typed one after another, each followed by the SendMock tool calls it makes and a one-line answer; then the agents it sets up (Claude Code, Codex, Cursor, Gemini CLI, VS Code) and `sendmock ai install` | 19 s |
-| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the stable install commands exactly as the docs Install page gives them, cycling through Homebrew, the install script (macOS and Linux), the PowerShell install script (Windows) and Docker, and under it "No SDK needed" with the ways an app connects (SMTP, REST API, Provider APIs, Webhooks, CLI, MCP) | 10 s |
-| 11 | Close | "Your app talks. SendMock talks back." | the logo and name, the install bar turning into the platforms (Windows, macOS, Linux, Docker), the website (`https://shibbirweb.github.io/sendmock/`, shown as `shibbirweb.github.io/sendmock`), `github.com/shibbirweb/sendmock`, and one line of facts: open source, runs on your machine | 7 s |
+| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the stable install commands exactly as the docs Install page gives them, each shown once: Homebrew, the install script (macOS and Linux), the PowerShell install script (Windows), then Docker, which stays until the cut; under it "No SDK needed" with the ways an app connects (SMTP, REST API, Provider APIs, Webhooks, CLI, MCP) | 10 s |
+| 11 | Close | "Your app talks. SendMock talks back." | the logo and name, the install bar carrying the Docker command across the cut and turning into the platforms (Windows, macOS, Linux, Docker), the website (`https://shibbirweb.github.io/sendmock/`, shown as `shibbirweb.github.io/sendmock`), `github.com/shibbirweb/sendmock`, and one line of facts: open source, runs on your machine | 7 s |
 
 The example prompts in scene 9:
 
@@ -67,7 +67,7 @@ The example prompts in scene 9:
 
 ### Where it lives
 
-One composition, `SendMockTrailerTourConnections`, in `video/src/trailer/` (see [One film](#one-film-2026-10-29)): one file per scene in `scenes/`, shared parts (backdrop, window, headline, flow line, request card, terminal) in `parts/`, and the product facts (providers, templates, events, agents, platforms, copied from the app's mock data and plans) in `trailer-facts.ts`. Preview in Remotion Studio (`bun run studio` in `video/`); an MP4 is rendered only once the owner approves.
+One composition, `SendMockTrailerMechanicalTyping`, in `video/src/trailer/` (see [One film](#one-film-2026-10-29) and [Mechanical typing](#mechanical-typing-sendmocktrailermechanicaltyping-2026-10-29)): one file per scene in `scenes/`, shared parts (backdrop, window, headline, flow line, request card, terminal) in `parts/`, and the product facts (providers, templates, events, agents, platforms, copied from the app's mock data and plans) in `trailer-facts.ts`. Preview in Remotion Studio (`bun run studio` in `video/`); an MP4 is rendered only once the owner approves.
 
 ### Version with an app tour (`SendMockTrailerTour`, 2026-10-29)
 
@@ -91,6 +91,14 @@ Owner request: SendMock needs no SDK and no particular language, so the language
 
 Owner decision: keep only the last cut. `SendMockTrailer`, `SendMockTrailerTour` and `SendMockTrailerTourPlatforms` are removed, and `SendMockTrailerTourConnections` is the trailer: the eleven scenes, the app tour after the AI prompts, the ways to connect in the platforms scene and every platform on the closing card. The sections above record how it got there.
 
+### Mechanical typing (`SendMockTrailerMechanicalTyping`, 2026-10-29)
+
+Owner request: a copy of the trailer whose typing sounds like a real mechanical keyboard. The picture, the cues and every other sound are the same as `SendMockTrailerTourConnections`; only the key sound changes. Owner decision the same day: keep only this copy. `SendMockTrailerTourConnections` and the four soft key sounds are removed, so `SendMockTrailerMechanicalTyping` is the trailer and mechanical keys are its only typing sound.
+
+- **One key is a press and a release.** A mechanical key is several sounds, not one click: the switch clicks (a short resonant tick near 3.3 to 4 kHz), about 10 ms later the keycap bottoms out on the plate (a knock near 1.5 kHz) and the case rings low for a moment (the "thock", near 300 Hz), then 80 to 105 ms after the press the key springs back with a quieter click. Each `mechanical-key-*.wav` holds the whole press and release.
+- **Six keys.** Six keys with slightly different pitches, bottom-out times and release loudness (`video/scripts/sounds/mechanical-key-voice.ts`) take turns in an uneven pattern, and the press volume varies a little, so fast typing never repeats one sample.
+- **Still soft.** Everything above 7 kHz is rolled off, so the clicks stay crisp without being sharp. Typing keeps the same cue timing as the soft version (one press per character, at most 15 a second).
+
 ### Frame rate and render (2026-10-29)
 
 Owner request: render for YouTube in 4K at 60 fps.
@@ -100,7 +108,7 @@ Owner request: render for YouTube in 4K at 60 fps.
 - **Render** (in `video/`, `out/` is ignored):
 
   ```bash
-  bunx remotion render src/index.ts SendMockTrailerTourConnections out/sendmock-trailer-4k60.mp4 --scale=2 --codec=h264 --crf=18
+  bunx remotion render src/index.ts SendMockTrailerMechanicalTyping out/sendmock-trailer-4k60.mp4 --scale=2 --codec=h264 --crf=18
   ```
 
 ### Sound effects (2026-10-29)
@@ -112,7 +120,7 @@ Owner direction: no background music. Instead, every change in the picture makes
 | How they are made | synthesized in code (`bun run sounds` in `video/`, sources in `video/scripts/sounds/`) from oscillators and filtered noise, with no samples or recordings, so no licence is needed; written to `video/public/sounds/*.wav` |
 | Sync | each scene lists its sound cues from the same constants that drive its animation (step frames, typing speeds, tile and page timings), and the trailer plays them inside that scene's sequence, so a timing change moves the sound with the picture without regenerating anything |
 | Character | soft and rounded so a two-minute watch never tires the ear: pitched in a calm major key, gentle attacks, only warm octave overtones (no metallic bell partials), nothing above the middle of the piano; outcomes (success, error) a little more forward than the rest |
-| Typing (owner review 2026-10-29) | one soft key press for every character as it appears on screen, timed from the same typing speed the text uses (the email reply, Maya's YES, every builder field and template, every AI prompt); fast typing is capped at 15 presses a second, and four slightly different keys take turns so it sounds like a real keyboard |
+| Typing (owner review 2026-10-29) | one key press for every character as it appears on screen, timed from the same typing speed the text uses (the email reply, Maya's YES, every builder field and template, every AI prompt); fast typing is capped at 15 presses a second; the keys are mechanical keyboard keys (see [Mechanical typing](#mechanical-typing-sendmocktrailermechanicaltyping-2026-10-29)) |
 | Repeated sounds (owner review 2026-10-29) | a high bell on the events wall was disturbing, so the event sound is now a soft low note (G4 to E5, slow attack, pure tone) that takes turns on five notes in a gentle pattern instead of repeating one, plays for every third live event only, and sits quietest in the mix; the same sound is used for tool-call checks and install commands |
 | Data transfer | in the feature scenes each request leaves with a swoosh; a webhook that reaches your app with `200` lands with a success chime; in payments the order's status answers at once (an error tone for the decline, a chime for paid and refunded) and each Stripe event lands with a blip; in the HTTP catcher each call is caught with a blip and SendMock's answer returns with a chime |
 

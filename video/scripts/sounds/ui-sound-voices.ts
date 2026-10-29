@@ -219,40 +219,6 @@ export function renderErrorSound(): Float32Array {
   return errorSamples.map((sampleValue) => lowpass.process(sampleValue, 1800));
 }
 
-type KeystrokeSpec = {
-  clickCutoffHz: number;
-  thockFrequencyHz: number;
-};
-
-/** The four key sounds typing takes turns on, slightly different keys. */
-export const keystrokeSpecs: KeystrokeSpec[] = [
-  { clickCutoffHz: 2200, thockFrequencyHz: 180 },
-  { clickCutoffHz: 2600, thockFrequencyHz: 200 },
-  { clickCutoffHz: 1900, thockFrequencyHz: 165 },
-  { clickCutoffHz: 2400, thockFrequencyHz: 190 },
-];
-
-/** One soft key press: a muted click and a low thock, no sharp highs. */
-export function renderKeystrokeSound(
-  keystrokeSpec: KeystrokeSpec,
-): Float32Array {
-  const keystrokeSamples = new Float32Array(secondsToSamples(0.07));
-  const click = renderNoiseSweep(random, {
-    lengthSeconds: 0.03,
-    filterKind: "bandpass",
-    getCutoffHz: () => keystrokeSpec.clickCutoffHz,
-    getLoudness: (progress) => Math.exp(-progress * 7),
-  });
-  const thock = renderTone({
-    frequencyHz: keystrokeSpec.thockFrequencyHz,
-    lengthSeconds: 0.06,
-    decayRate: 70,
-  });
-  mixInto(keystrokeSamples, click, 0, 0.7);
-  mixInto(keystrokeSamples, thock, 0, 0.6);
-  return keystrokeSamples;
-}
-
 /** The calm notes event sounds take turns on (G4, A4, C5, D5, E5). */
 export const fireNotes = [67, 69, 72, 74, 76];
 
