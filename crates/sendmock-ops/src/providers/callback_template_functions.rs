@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use hmac::{Hmac, KeyInit, Mac};
@@ -6,6 +8,7 @@ use serde_json::Value;
 use sha1::Sha1;
 
 /// The standard functions plus the signature helpers callback templates use.
+#[derive(Clone)]
 pub struct CallbackTemplateFunctions {
     pub standard_functions: StandardTemplateFunctions,
 }
@@ -31,6 +34,16 @@ impl TemplateFunctions for CallbackTemplateFunctions {
                 .standard_functions
                 .call_function(function_name, arguments),
         }
+    }
+
+    fn function_names(&self) -> Vec<&'static str> {
+        let mut function_names = self.standard_functions.function_names();
+        function_names.push("twilio_signature");
+        function_names
+    }
+
+    fn to_shared(&self) -> Arc<dyn TemplateFunctions> {
+        Arc::new(self.clone())
     }
 }
 

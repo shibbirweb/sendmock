@@ -1376,6 +1376,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "minijinja"
+version = "3.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f384a3e3726ee69716c351e921b72138104afd1e5362561733c8a656fc8c6a9a"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2203,8 +2212,16 @@ dependencies = [
 name = "sendmock-core"
 version = "0.0.0"
 dependencies = [
+ "base64 0.23.1",
+ "chrono",
+ "hmac",
+ "md-5",
+ "minijinja",
  "rand 0.10.3",
+ "regex",
  "serde_json",
+ "sha1 0.11.0",
+ "sha2",
  "ulid",
 ]
 

@@ -13,6 +13,7 @@ pub use id_generator::{IdGenerator, SequentialIdGenerator, SystemIdGenerator};
 pub use random_source::{RandomSource, SeededRandomSource, SystemRandomSource};
 pub use template::{
     RenderedTemplate, StandardTemplateFunctions, TemplateEscape, TemplateFunctions,
-    TemplateProblem, TemplateProblemSeverity, render_template,
+    TemplateProblem, TemplateProblemSeverity, TemplateRenderMode, render_template,
+    render_template_in_mode,
 };
 pub use timestamp::{format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339};

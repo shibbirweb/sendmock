@@ -28,6 +28,9 @@ sendmock-store = { path = "crates/sendmock-store" }
 sendmock-webhooks = { path = "crates/sendmock-webhooks" }
 
 axum = "0.8"
+chrono = { version = "0.4", default-features = false, features = [
+    "alloc",
+] }
 clap = { version = "4", features = [
     "derive",
     "env",
@@ -39,6 +42,12 @@ jsonschema = { version = "0.60", default-features = false }
 mail-parser = "1"
 md5 = { package = "md-5", version = "0.11" }
 mime_guess = "2"
+minijinja = { version = "3", default-features = false, features = [
+    "builtins",
+    "debug",
+    "fuel",
+    "serde",
+] }
 base64 = "0.23"
 hmac = "0.13"
 insta = { version = "1", features = [

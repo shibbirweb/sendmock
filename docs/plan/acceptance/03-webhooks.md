@@ -77,7 +77,7 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [ ] WH-07.4 Random values stay the same across retries of one delivery and change on re-render; Fixed values change only on Regenerate.
 - [ ] WH-07.5 Strict mode stops a delivery with `render_failed` and a clear error; lenient mode renders empty values and logs a warning.
 - [ ] WH-07.6 Fields mode always produces valid JSON, form or multipart bodies.
-- [ ] WH-07.7 Templates cannot read files, network or environment, and a runaway template is stopped by the fuel/time limit.
+- [x] WH-07.7 Templates cannot read files, network or environment, and a runaway template is stopped by the fuel/time limit.
 - [ ] WH-07.8 The live preview matches what is actually sent for the same message.
 - [ ] WH-07.9 The reference panel lists every context field for the chosen events, the variables, functions and filters with type, description and example, and clicking one inserts it at the cursor.
 - [ ] WH-07.10 Typing inside `{{ }}` suggests matching keys, the children after a dot, filters after `|` and functions with their signature; the keyboard picks and inserts one.
