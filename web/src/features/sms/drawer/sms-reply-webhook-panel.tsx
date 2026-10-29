@@ -2,9 +2,9 @@ import { ChevronRightIcon, RotateCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { RecordedExchange } from "@/features/sms/drawer/recorded-exchange";
 import { ApiError } from "@/lib/api/api-client";
+import { OperationButton } from "@/features/availability/operation-button";
 import { useResendReplyWebhook } from "@/lib/api/hooks/use-sms-queries";
 import type {
   SmsMessageDetail,
@@ -120,7 +120,9 @@ export function SmsReplyWebhookPanel({
                 : "Sent to the number's inbound URL."}
           </p>
         </div>
-        <Button
+        <OperationButton
+          operationKey="POST /api/v1/sms/{smsId}/reply-webhook/resend"
+          actionName="Resend reply webhook"
           variant="outline"
           size="sm"
           disabled={replyWebhook === null || resendReplyWebhook.isPending}
@@ -139,7 +141,7 @@ export function SmsReplyWebhookPanel({
         >
           <RotateCwIcon />
           Resend reply webhook
-        </Button>
+        </OperationButton>
       </div>
       {smsMessage.reply_webhook_attempts.length > 0 && (
         <ol aria-label="Reply webhook attempts" className="grid gap-2">

@@ -14,6 +14,7 @@ use tokio::sync::watch;
 use tokio::task::JoinSet;
 
 use crate::config::ServerConfig;
+use crate::http_media_fetcher::HttpMediaFetcher;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
 use crate::retention_task::{apply_startup_settings, run_retention_task};
@@ -141,7 +142,7 @@ fn build_http_router(
 fn build_operation_context(database: Database, listeners: &BoundListeners) -> OperationContext {
     let clock: Arc<dyn Clock> = Arc::new(SystemClock);
     let started_at_unix_ms = clock.now_unix_ms();
-    OperationContext::new(
+    let operation_context = OperationContext::new(
         Arc::new(database),
         clock,
         Arc::new(SystemIdGenerator),
@@ -154,7 +155,11 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
     .with_sample_email_sender(Arc::new(SmtpSubmissionClient::new(reachable_address(
         listeners.addresses.smtp_addr,
     ))))
-    .with_update_checker(build_update_checker())
+    .with_update_checker(build_update_checker());
+    match HttpMediaFetcher::new() {
+        Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),
+        None => operation_context,
+    }
 }
 
 /// The address to connect to a listener on; one bound to every interface is reached on loopback.

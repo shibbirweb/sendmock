@@ -7,6 +7,9 @@ use serde_json::Value;
 pub enum AppEventType {
     EmailReceived,
     EmailDeleted,
+    SmsSent,
+    SmsInbound,
+    SmsStatus,
 }
 
 impl AppEventType {
@@ -14,6 +17,9 @@ impl AppEventType {
         match self {
             Self::EmailReceived => "email.received",
             Self::EmailDeleted => "email.deleted",
+            Self::SmsSent => "sms.sent",
+            Self::SmsInbound => "sms.inbound",
+            Self::SmsStatus => "sms.status",
         }
     }
 }

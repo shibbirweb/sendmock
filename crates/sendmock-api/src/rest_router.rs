@@ -5,19 +5,48 @@ use axum::Json;
 use axum::Router;
 use axum::body::Bytes;
 use axum::extract::{Query, RawPathParams};
-use axum::http::StatusCode;
 use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
+use axum::http::{HeaderMap, StatusCode};
 use axum::middleware;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, on};
 use sendmock_ops::{
     ErasedOperation, HttpMethod, OperationAnswer, OperationContext, OperationRegistry,
-    build_input_from_text, to_snake_case,
+    to_snake_case,
 };
-use serde_json::{Map, Value};
+
+use serde_json::Value;
 
 use crate::api_error_response::ApiErrorResponse;
 use crate::api_request_logging::log_api_request;
+use crate::request_input::{RequestParts, assemble_input};
+
+fn add_route(
+    method_routers: &mut HashMap<&'static str, MethodRouter>,
+    path: &'static str,
+    route: MethodRouter,
+) {
+    let method_router = match method_routers.remove(path) {
+        Some(existing_router) => existing_router.merge(route),
+        None => route,
+    };
+    method_routers.insert(path, method_router);
+}
+
+/// Operations marked `request_log` record each call in the API request log.
+fn with_request_log(
+    route: MethodRouter,
+    operation: &dyn ErasedOperation,
+    operation_context: &OperationContext,
+) -> MethodRouter {
+    match operation.definition().request_log {
+        Some(request_log_settings) => route.layer(middleware::from_fn_with_state(
+            (operation_context.clone(), request_log_settings),
+            log_api_request,
+        )),
+        None => route,
+    }
+}
 
 /// One route per registered operation, at the path and method the contract gives it.
 pub fn build_rest_router(
@@ -27,19 +56,30 @@ pub fn build_rest_router(
     let mut method_routers: HashMap<&'static str, MethodRouter> = HashMap::new();
     for operation in operation_registry.operations() {
         let definition = operation.definition();
-        let mut operation_route =
-            build_operation_route(Arc::clone(operation), operation_context.clone());
-        if let Some(request_log_settings) = definition.request_log {
-            operation_route = operation_route.layer(middleware::from_fn_with_state(
-                (operation_context.clone(), request_log_settings),
-                log_api_request,
-            ));
+        let operation_route = build_operation_route(
+            Arc::clone(operation),
+            operation_context.clone(),
+            to_method_filter(definition.method),
+            true,
+        );
+        add_route(
+            &mut method_routers,
+            definition.path,
+            with_request_log(operation_route, operation.as_ref(), operation_context),
+        );
+        if let Some(alias_path) = definition.get_alias_path {
+            let alias_route = build_operation_route(
+                Arc::clone(operation),
+                operation_context.clone(),
+                MethodFilter::GET,
+                false,
+            );
+            add_route(
+                &mut method_routers,
+                alias_path,
+                with_request_log(alias_route, operation.as_ref(), operation_context),
+            );
         }
-        let method_router = match method_routers.remove(definition.path) {
-            Some(existing_router) => existing_router.merge(operation_route),
-            None => operation_route,
-        };
-        method_routers.insert(definition.path, method_router);
     }
     method_routers
         .into_iter()
@@ -48,23 +88,18 @@ pub fn build_rest_router(
         })
 }
 
-/// The pieces of a request an operation's input is built from.
-struct RequestParts {
-    path_parameters: Vec<(String, String)>,
-    query_parameters: Vec<(String, String)>,
-    body: Bytes,
-}
-
 fn build_operation_route(
     operation: Arc<dyn ErasedOperation>,
     operation_context: OperationContext,
+    method_filter: MethodFilter,
+    reads_body: bool,
 ) -> MethodRouter {
-    let method_filter = to_method_filter(operation.definition().method);
     let input_schema = Arc::new(operation.input_schema().to_value());
     on(
         method_filter,
         move |path_parameters: RawPathParams,
               Query(query_parameters): Query<Vec<(String, String)>>,
+              headers: HeaderMap,
               body: Bytes| async move {
             let request_parts = RequestParts {
                 path_parameters: path_parameters
@@ -72,7 +107,12 @@ fn build_operation_route(
                     .map(|(name, value)| (to_snake_case(name), value.to_owned()))
                     .collect(),
                 query_parameters,
+                content_type: headers
+                    .get(CONTENT_TYPE)
+                    .and_then(|header_value| header_value.to_str().ok())
+                    .map(str::to_owned),
                 body,
+                reads_body,
             };
             match assemble_input(operation.as_ref(), &input_schema, request_parts) {
                 Ok(input) => run_operation(operation.as_ref(), &operation_context, input).await,
@@ -80,60 +120,6 @@ fn build_operation_route(
             }
         },
     )
-}
-
-/// The JSON body (or the raw body in its input field), with the query and path values
-/// converted to the input's types on top; path values win, since they name the item.
-fn assemble_input(
-    operation: &dyn ErasedOperation,
-    input_schema: &Value,
-    request_parts: RequestParts,
-) -> Result<Value, ApiErrorResponse> {
-    let definition = operation.definition();
-    let mut input = match definition.raw_body_input {
-        Some(raw_body_input) => {
-            let mut raw_input = Map::new();
-            let body_text = String::from_utf8_lossy(&request_parts.body).into_owned();
-            raw_input.insert(
-                raw_body_input.input_name.to_owned(),
-                Value::String(body_text),
-            );
-            raw_input
-        }
-        None if has_json_body(definition.method) => parse_json_body(&request_parts.body)?,
-        None => Map::new(),
-    };
-    let text_values: Vec<(String, String)> = request_parts
-        .query_parameters
-        .into_iter()
-        .chain(request_parts.path_parameters)
-        .collect();
-    input
-        .extend(build_input_from_text(input_schema, &text_values).map_err(ApiErrorResponse::from)?);
-    Ok(Value::Object(input))
-}
-
-fn has_json_body(method: HttpMethod) -> bool {
-    matches!(
-        method,
-        HttpMethod::Post | HttpMethod::Put | HttpMethod::Patch
-    )
-}
-
-/// An empty body counts as `{}`, so operations with only optional fields need no body.
-fn parse_json_body(request_body: &[u8]) -> Result<Map<String, Value>, ApiErrorResponse> {
-    if request_body.is_empty() {
-        return Ok(Map::new());
-    }
-    match serde_json::from_slice(request_body) {
-        Ok(Value::Object(body_fields)) => Ok(body_fields),
-        Ok(_) => Err(ApiErrorResponse::invalid_json_body(
-            "expected a JSON object",
-        )),
-        Err(parse_error) => Err(ApiErrorResponse::invalid_json_body(
-            &parse_error.to_string(),
-        )),
-    }
 }
 
 async fn run_operation(

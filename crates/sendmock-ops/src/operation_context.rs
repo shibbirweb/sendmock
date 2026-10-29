@@ -7,7 +7,9 @@ use sendmock_store::{
     SmtpSessionRepository,
 };
 
-use crate::{AppSettingsStore, EventBus, InstanceDetails, SampleEmailSender, UpdateChecker};
+use crate::{
+    AppSettingsStore, EventBus, InstanceDetails, MediaFetcher, SampleEmailSender, UpdateChecker,
+};
 
 /// The dependencies operations run with, passed in rather than reached through globals.
 #[derive(Clone)]
@@ -26,6 +28,8 @@ pub struct OperationContext {
     /// Set once the SMTP listener runs, so samples can go through it.
     pub sample_email_sender: Option<Arc<dyn SampleEmailSender>>,
     pub update_checker: UpdateChecker,
+    /// Downloads `MediaUrl` links; set by the binary, which owns the HTTP client.
+    pub media_fetcher: Option<Arc<dyn MediaFetcher>>,
 }
 
 impl OperationContext {
@@ -60,7 +64,13 @@ impl OperationContext {
             settings_store,
             sample_email_sender: None,
             update_checker: UpdateChecker::default(),
+            media_fetcher: None,
         }
+    }
+
+    pub fn with_media_fetcher(mut self, media_fetcher: Arc<dyn MediaFetcher>) -> Self {
+        self.media_fetcher = Some(media_fetcher);
+        self
     }
 
     pub fn with_update_checker(mut self, update_checker: UpdateChecker) -> Self {

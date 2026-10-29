@@ -5,6 +5,7 @@ mod client_command;
 mod config;
 mod github_release_source;
 mod help_output;
+mod http_media_fetcher;
 mod instance_details_builder;
 mod listener_binding;
 mod logging;

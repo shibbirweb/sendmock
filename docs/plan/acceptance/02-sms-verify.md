@@ -6,11 +6,11 @@ Plan: [04-sms.md](../04-sms.md). Rules for IDs, ticking and tests: [README.md](R
 
 Phase 2.
 
-- [ ] SM-01.1 `POST /api/v1/sms` (JSON and form) stores the SMS and returns `201` with id, status, segments and encoding.
-- [ ] SM-01.2 The `GET /api/v1/sms/send?to=...&body=...` variant works.
-- [ ] SM-01.3 Missing `to` or `body` returns `400` with a field-level error.
+- [x] SM-01.1 `POST /api/v1/sms` (JSON and form) stores the SMS and returns `201` with id, status, segments and encoding. (#48)
+- [x] SM-01.2 The `GET /api/v1/sms/send?to=...&body=...` variant works. (#48)
+- [x] SM-01.3 Missing `to` or `body` returns `400` with a field-level error. (#48)
 - [x] SM-01.4 Numbers are normalised to E.164 where possible and the raw value is kept. (#48)
-- [ ] SM-01.5 The SMS appears in the UI thread within 1 second.
+- [x] SM-01.5 The SMS appears in the UI thread within 1 second. (#48)
 
 ## SM-02 Twilio Messages API
 
@@ -133,9 +133,9 @@ Phase 2.
 
 UI in U1, backend Phase 2 (Twilio and native), Phase 4 (WhatsApp). Docs: [MMS and media](../04-sms.md#mms-and-media).
 
-- [ ] SM-15.1 A Twilio send with `MediaUrl` stores a copy of each file; a URL that cannot be fetched fails the message with `11200`.
-- [ ] SM-15.2 A native send with `media_urls` and / or inline base64 `media` stores the media, and `GET /sms/{smsId}/media/{mediaIndex}` returns each file with its content type.
-- [ ] SM-15.3 More than 10 items, more than 5 MB, a missing filename or invalid base64 returns `400` naming the item.
+- [x] SM-15.1 A Twilio send with `MediaUrl` stores a copy of each file; a URL that cannot be fetched fails the message with `11200`. (#48)
+- [x] SM-15.2 A native send with `media_urls` and / or inline base64 `media` stores the media, and `GET /sms/{smsId}/media/{mediaIndex}` returns each file with its content type. (#48)
+- [x] SM-15.3 More than 10 items, more than 5 MB, a missing filename or invalid base64 returns `400` naming the item. (#48)
 - [ ] SM-15.4 Bubbles show image thumbnails and file chips with an "MMS" or "Media" badge, and the message drawer lists the media.
 - [ ] SM-15.5 "Reply as recipient" can attach files, and the reply webhook sends `NumMedia` and `MediaUrl{N}` pointing at SendMock's copies.
 

@@ -166,3 +166,33 @@ async fn a_reconnecting_event_stream_gets_only_what_it_missed() -> std::io::Resu
     assert_eq!(replayed_event["id"], newest_event_id);
     Ok(())
 }
+
+// AC: SM-01.5
+#[tokio::test]
+async fn a_new_sms_is_pushed_to_the_ui_within_a_second() -> std::io::Result<()> {
+    let http_addr = start_server().await?;
+    let (mut websocket, _) =
+        tokio_tungstenite::connect_async(format!("ws://{http_addr}/api/v1/ws"))
+            .await
+            .map_err(std::io::Error::other)?;
+
+    let sent_at = Instant::now();
+    send_request(
+        http_addr,
+        "POST /api/v1/sms",
+        r#"{"from":"+15550001111","to":"+8801700000000","body":"Your code is 482913"}"#,
+    )
+    .await?;
+    let pushed_frame = tokio::time::timeout(Duration::from_secs(1), websocket.next())
+        .await
+        .map_err(std::io::Error::other)?
+        .ok_or_else(|| std::io::Error::other("the websocket closed"))?
+        .map_err(std::io::Error::other)?;
+
+    let pushed_event: Value =
+        serde_json::from_str(pushed_frame.to_text().map_err(std::io::Error::other)?)?;
+    assert!(sent_at.elapsed() < Duration::from_secs(1));
+    assert_eq!(pushed_event["type"], "sms.sent");
+    assert_eq!(pushed_event["data"]["to_number"], "+8801700000000");
+    Ok(())
+}

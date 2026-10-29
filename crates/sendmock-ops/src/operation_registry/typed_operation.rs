@@ -43,12 +43,8 @@ impl<WrappedOperation: Operation> ErasedOperation for TypedOperation<WrappedOper
         input: Value,
     ) -> AnswerFuture<'call> {
         Box::pin(async move {
-            let typed_input = serde_json::from_value::<WrappedOperation::Input>(input).map_err(
-                |decode_error| OperationError::InvalidInput {
-                    message: decode_error.to_string(),
-                    field: None,
-                },
-            )?;
+            let typed_input = serde_json::from_value::<WrappedOperation::Input>(input)
+                .map_err(|decode_error| describe_decode_error(&decode_error))?;
             let output = self
                 .operation
                 .execute(operation_context, typed_input)
@@ -76,4 +72,46 @@ fn into_answer<Output: serde::Serialize + 'static>(
     serde_json::to_value(*typed_output)
         .map(OperationAnswer::Json)
         .map_err(|encode_error| OperationError::Internal(encode_error.to_string()))
+}
+
+/// A field error from serde's message: `missing field \`to\`` names `to`.
+fn describe_decode_error(decode_error: &serde_json::Error) -> OperationError {
+    let decode_message = decode_error.to_string();
+    let missing_field = decode_message
+        .strip_prefix("missing field `")
+        .and_then(|rest| rest.split_once('`'))
+        .map(|(field_name, _)| field_name.to_owned());
+    match missing_field {
+        Some(field_name) => OperationError::InvalidInput {
+            message: format!("{field_name} is required"),
+            field: Some(field_name),
+        },
+        None => OperationError::InvalidInput {
+            message: decode_message,
+            field: None,
+        },
+    }
+}
+
+#[cfg(test)]
+mod decode_error_tests {
+    use super::*;
+
+    #[derive(Debug, serde::Deserialize)]
+    struct NeedsRecipient {
+        #[allow(dead_code, reason = "only decoding is tested")]
+        to: String,
+    }
+
+    #[test]
+    fn a_missing_field_is_named() {
+        let decode_error = serde_json::from_value::<NeedsRecipient>(serde_json::json!({})).err();
+
+        let operation_error = decode_error.map(|decode_error| describe_decode_error(&decode_error));
+
+        assert!(matches!(
+            operation_error,
+            Some(OperationError::InvalidInput { field: Some(field_name), .. }) if field_name == "to"
+        ));
+    }
 }

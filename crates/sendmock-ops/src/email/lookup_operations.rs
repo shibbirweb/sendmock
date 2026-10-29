@@ -84,12 +84,27 @@ impl Operation for GetOtpOperation {
         input: RecipientLookupQuery,
     ) -> Result<OtpLookup, OperationError> {
         let channel = input.channel.clone().unwrap_or_else(|| "email".to_owned());
-        if channel != "email" {
-            return Err(OperationError::NotFound {
-                message: format!("No {channel} codes yet: SendMock catches email so far"),
+        let wait_duration = read_wait_duration(input.timeout.as_deref(), Duration::ZERO)?;
+        if channel == "sms" {
+            let sms_with_code =
+                crate::find_newest_sms_with_code(operation_context, &input.to, wait_duration)
+                    .await?
+                    .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+            let (code, source_id, received_at) = crate::describe_sms_code(&sms_with_code);
+            return Ok(OtpLookup {
+                to: input.to,
+                channel,
+                code,
+                source_id,
+                received_at,
             });
         }
-        let wait_duration = read_wait_duration(input.timeout.as_deref(), Duration::ZERO)?;
+        if channel != "email" {
+            return Err(OperationError::InvalidInput {
+                message: format!("channel must be email or sms, not {channel}"),
+                field: Some("channel".to_owned()),
+            });
+        }
         let email_with_code =
             find_newest_with(operation_context, &input.to, wait_duration, |email| {
                 !email.otp_codes.is_empty()

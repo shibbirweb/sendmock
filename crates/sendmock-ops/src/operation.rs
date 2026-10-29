@@ -102,6 +102,9 @@ pub struct OperationDefinition {
     pub raw_body_input: Option<RawBodyInput>,
     /// Records each call in the API request log (native and provider send APIs).
     pub request_log: Option<RequestLogSettings>,
+    /// A `GET` path that runs the same operation from the query string, for vendors whose
+    /// APIs send that way (`GET /api/v1/sms/send?to=...&body=...`); not in OpenAPI.
+    pub get_alias_path: Option<&'static str>,
 }
 
 impl OperationDefinition {
@@ -123,6 +126,7 @@ impl OperationDefinition {
         answer_kind: AnswerKind::Json,
         raw_body_input: None,
         request_log: None,
+        get_alias_path: None,
     };
 
     /// Whether the MCP name is a resource (`sendmock://...`) rather than a tool.

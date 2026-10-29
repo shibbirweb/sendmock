@@ -49,12 +49,16 @@ impl Operation for CreateSampleOperation {
         }
     }
 
-    /// An email goes over SMTP to SendMock itself; the other kinds come with their phases.
+    /// An email goes over SMTP to SendMock itself and an SMS through the native path; the
+    /// other kinds come with their phases.
     async fn execute(
         &self,
         operation_context: &OperationContext,
         input: SampleRequest,
     ) -> Result<CreatedSample, OperationError> {
+        if input.kind == "sms" {
+            return create_sample_sms(operation_context, input.to).await;
+        }
         if input.kind != "email" {
             return Err(OperationError::NotFound {
                 message: format!(
@@ -122,4 +126,36 @@ fn build_sample_email(operation_context: &OperationContext, input: &SampleReques
             &format_rfc5322(operation_context.clock.now_unix_ms()),
         ),
     }
+}
+
+async fn create_sample_sms(
+    operation_context: &OperationContext,
+    recipient: Option<String>,
+) -> Result<CreatedSample, OperationError> {
+    let stored_sms = crate::store_sms(
+        operation_context,
+        crate::IncomingSms {
+            is_inbound: false,
+            api: "native".to_owned(),
+            from: "+15550001111".to_owned(),
+            to: recipient
+                .filter(|number| !number.trim().is_empty())
+                .unwrap_or_else(|| "+8801700000000".to_owned()),
+            body: "Your SendMock code is 482913".to_owned(),
+            status: "queued".to_owned(),
+            error_code: None,
+            status_callback_url: None,
+            messaging_service_sid: None,
+            account: None,
+            metadata_json: None,
+            request_body_json: None,
+            provider_id: None,
+            media: Default::default(),
+        },
+    )
+    .await?;
+    Ok(CreatedSample {
+        kind: "sms".to_owned(),
+        id: stored_sms.sms_id,
+    })
 }

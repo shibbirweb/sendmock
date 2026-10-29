@@ -7,6 +7,7 @@ mod app_router;
 mod http_server;
 mod openapi_document;
 mod realtime;
+mod request_input;
 mod rest_router;
 mod ui_assets;
 mod ui_router;

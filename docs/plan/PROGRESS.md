@@ -13,11 +13,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 7 / 108 accepted (EM-01, EM-02, EM-06, EM-09, PL-02, UI-12, WS-05), 135 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 8 / 108 accepted (EM-01, EM-02, EM-06, EM-09, PL-02, SM-01, UI-12, WS-05), 142 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); the done-when check passed (Laravel and Nodemailer mail stored and pushed live, pytest reads the OTP). Phase 1 is complete apart from the release, which the owner makes after merging #48 (Prepare release with `bump: minor` for `0.1.0-beta.1`). Phase 2 (SMS and Verify, [26](26-phase-2.md)) is under way on the same branch: W1 done; next W2 (native SMS operations). The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W9 are done (W9: real SMTP clients in CI, `.deb` and `.rpm`, Homebrew beta, Docker `beta` tags); the done-when check passed (Laravel and Nodemailer mail stored and pushed live, pytest reads the OTP). Phase 1 is complete apart from the release, which the owner makes after merging #48 (Prepare release with `bump: minor` for `0.1.0-beta.1`). Phase 2 (SMS and Verify, [26](26-phase-2.md)) is under way on the same branch: W1 and W2 done; next W3 (delivery simulation and status callbacks). The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -238,9 +238,9 @@ Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29
 
 Plan: [26-phase-2.md](26-phase-2.md). Built on `feat/phase-0` in #48, W1 to W9 in order.
 
-- [ ] Native SMS API (JSON, form, GET)
+- [x] Native SMS API (JSON, form, GET) (#48)
 - [ ] Twilio Messages API and Messaging Services
-- [ ] MMS media: Twilio `MediaUrl`, native `media_urls` and inline `media`, `/sms/{smsId}/media/{mediaIndex}`
+- [ ] MMS media: Twilio `MediaUrl`, native `media_urls` and inline `media`, `/sms/{smsId}/media/{mediaIndex}` (native done; Twilio `MediaUrl` with W5)
 - [ ] Vonage `/sms/json`
 - [ ] Twilio Verify emulation (services, start/check/update, fixed codes, limits, force state)
 - [ ] Provider port serving real provider paths
@@ -544,3 +544,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 1 done-when check: in the SMTP clients workflow a fresh Laravel app and a Nodemailer script send with their default settings and the messages are stored with their codes, the live UI suite shows real mail, the realtime test pushes `email.received` within 500 ms, and a pytest test reads the code through `/api/v1/otp`. All twelve clients pass. EM-01 and EM-06 accepted. Phase 1 is done apart from publishing `0.1.0-beta.1`, the owner's step after the merge. |
 | 2026-10-29 | Plan: Phase 2 in full ([26](26-phase-2.md)): nine workstreams (SMS domain and storage, native SMS operations with MMS, delivery simulation and callbacks, numbers and Messaging Services, Twilio and Vonage emulation with the provider port, Twilio Verify, built-in SMS provider definitions, surfaces and live screens, done-when with the Twilio SDKs and Testcontainers) with their criteria. |
 | 2026-10-29 | Phase 2 W1: the SMS domain in `sendmock-sms` (`PhoneNumber` to E.164 with the raw value kept, GSM-7 and UCS-2 segment counting with extension characters and UTF-16 units, thread ids shared by both directions); migration `0005_sms.sql` (messages, media, status history, callback attempts) and `SmsRepository` (filters, conversations with unread counts, status changes with history, media bytes, pruning); SMS joins retention (`max_sms`) and reset. SM-01.4, SM-06.1 and SM-06.2 ticked. |
+| 2026-10-29 | Phase 2 W2: native SMS operations in REST, CLI and MCP: send (JSON, form and the `GET /api/v1/sms/send` alias), list with filters, conversations, show with status history and callback attempts, media download, delete, delete all, manual status, simulated inbound, `wait/sms`, SMS codes in `/otp?channel=sms`, and `samples/sms`; MMS media inline (base64) and by URL (downloaded by the binary's fetcher, a failed fetch fails the message with Twilio's `11200`), within Twilio's limits of 10 items and 5 MB. `sms.sent`, `sms.inbound` and `sms.status` events. The REST adapter now takes form bodies for every operation, an operation can declare a `GET` alias, and a missing field names itself in the 400. The SMS screen is live; its Phase 3 controls (Simulate read, Send to webhook, Resend reply webhook) say when they arrive. SM-01 accepted; SM-15.1 to SM-15.3 ticked. |

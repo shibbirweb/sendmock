@@ -111,7 +111,65 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_email_samples(app_router).await);
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
+    samples.extend(prepare_sms_samples(app_router).await);
     samples
+}
+
+fn mms_sample() -> Value {
+    json!({
+        "from": "+15550001111", "to": "+8801700000000", "body": "Your code is 482913",
+        "status_callback": "http://127.0.0.1:9/status", "metadata": { "user_id": 42 },
+        "media": [{ "filename": "logo.png", "content": ONE_PIXEL_PNG_BASE64 }],
+    })
+}
+
+/// Two messages, one with media, created through `POST /sms`.
+async fn prepare_sms_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let mms = mms_sample();
+    let sms_id = post_json(app_router, "/api/v1/sms", &mms).await["id"].clone();
+    let deleted_sms_id = post_json(
+        app_router,
+        "/api/v1/sms",
+        &json!({ "from": "ACME", "to": "+15005550006", "body": "Bye" }),
+    )
+    .await["id"]
+        .clone();
+    vec![
+        (
+            "getSms",
+            vec![
+                json!({}),
+                json!({ "query": "code", "direction": "outbound", "limit": 5 }),
+            ],
+        ),
+        (
+            "postSms",
+            vec![json!({ "from": "+15550001111", "to": "+8801700000000", "body": "Hello" })],
+        ),
+        ("getSmsThreads", vec![json!({})]),
+        ("getSmsBySmsId", vec![json!({ "sms_id": sms_id })]),
+        (
+            "getSmsBySmsIdMediaByMediaIndex",
+            vec![json!({ "sms_id": sms_id, "media_index": 0 })],
+        ),
+        (
+            "postSmsBySmsIdStatus",
+            vec![json!({ "sms_id": sms_id, "status": "delivered" })],
+        ),
+        (
+            "postSmsInbound",
+            vec![json!({ "from": "+8801700000000", "to": "+15550001111", "body": "STOP" })],
+        ),
+        (
+            "getWaitSms",
+            vec![json!({ "to": "+8801700000000", "timeout": "1s" })],
+        ),
+        (
+            "deleteSmsBySmsId",
+            vec![json!({ "sms_id": deleted_sms_id })],
+        ),
+        ("deleteSms", vec![json!({})]),
+    ]
 }
 
 /// The update check answers only once it is turned on; this dev build is offered nothing.

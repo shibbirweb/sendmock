@@ -17,6 +17,7 @@ mod page_of;
 mod samples;
 mod seed;
 mod settings;
+mod sms;
 mod smtp_delivery;
 mod system;
 mod updates;
@@ -53,6 +54,10 @@ pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, UpdateCheckMode, build_ingest_options,
     prune_traffic, read_ingest_options,
 };
+pub use sms::{
+    FetchedMedia, IncomingSms, MediaFetcher, SmsMessage, SmsMessageDetail, SmsThread,
+    apply_status_change, describe_sms_code, find_newest_sms_with_code, store_sms,
+};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
 pub use updates::{
@@ -68,6 +73,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(ValidateSeedOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
+    sms::register_sms_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);

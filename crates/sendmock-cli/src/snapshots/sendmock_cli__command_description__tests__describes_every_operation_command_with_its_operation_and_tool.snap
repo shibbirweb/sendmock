@@ -457,6 +457,227 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms list",
+    "usage": "sendmock sms list",
+    "summary": "SMS and WhatsApp messages, newest first, with filters.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--direction",
+      "--from",
+      "--limit",
+      "--query",
+      "--status",
+      "--thread-id",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms",
+        "operation_id": "getSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_list"
+    ]
+  },
+  {
+    "command": "sendmock sms delete-all",
+    "usage": "sendmock sms delete-all --yes",
+    "summary": "Delete every message.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms",
+        "operation_id": "deleteSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock sms send",
+    "usage": "sendmock sms send",
+    "summary": "Native send, with optional media URLs or inline media.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--from",
+      "--media",
+      "--media-url",
+      "--metadata",
+      "--status-callback",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms",
+        "operation_id": "postSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_send"
+    ]
+  },
+  {
+    "command": "sendmock sms threads",
+    "usage": "sendmock sms threads",
+    "summary": "Conversations, one per contact and your number.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/threads",
+        "operation_id": "getSmsThreads",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_threads"
+    ]
+  },
+  {
+    "command": "sendmock sms show",
+    "usage": "sendmock sms show <smsId>",
+    "summary": "One message with its status history and callbacks.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/{smsId}",
+        "operation_id": "getSmsBySmsId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_get"
+    ]
+  },
+  {
+    "command": "sendmock sms delete",
+    "usage": "sendmock sms delete <smsId>",
+    "summary": "Delete one message.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/{smsId}",
+        "operation_id": "deleteSmsBySmsId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms media",
+    "usage": "sendmock sms media <smsId> <mediaIndex>",
+    "summary": "Download one media item of an MMS or WhatsApp message.",
+    "arguments": [
+      "smsId",
+      "mediaIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/{smsId}/media/{mediaIndex}",
+        "operation_id": "getSmsBySmsIdMediaByMediaIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://sms/{smsId}/media/{mediaIndex}"
+    ]
+  },
+  {
+    "command": "sendmock sms status",
+    "usage": "sendmock sms status <smsId> <status>",
+    "summary": "Set a delivery status by hand and fire its callback.",
+    "arguments": [
+      "smsId",
+      "status"
+    ],
+    "flags": [
+      "--error-code"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/{smsId}/status",
+        "operation_id": "postSmsBySmsIdStatus",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_set_status"
+    ]
+  },
+  {
+    "command": "sendmock sms inbound",
+    "usage": "sendmock sms inbound",
+    "summary": "Simulate a message from a contact to one of your numbers.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--channel",
+      "--from",
+      "--media",
+      "--template-id",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/inbound",
+        "operation_id": "postSmsInbound",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_simulate_inbound"
+    ]
+  },
+  {
+    "command": "sendmock sms wait",
+    "usage": "sendmock sms wait",
+    "summary": "Wait until a matching SMS arrives; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--from",
+      "--since",
+      "--timeout",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/sms",
+        "operation_id": "getWaitSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_wait"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",
