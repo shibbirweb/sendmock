@@ -18,4 +18,6 @@ pub struct AppInfo {
     pub database_size_bytes: u64,
     /// True when SendMock runs in Docker, so the UI defaults to container hostnames.
     pub is_container: bool,
+    /// The `operationId`s this binary serves; the UI shows Not available yet for the rest.
+    pub available_operations: Vec<String>,
 }

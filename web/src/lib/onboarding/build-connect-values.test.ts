@@ -16,6 +16,7 @@ const localAppInfo: AppInfo = {
   database_path: "sendmock.db",
   database_size_bytes: 0,
   is_container: false,
+  available_operations: [],
 };
 
 describe("buildConnectValues", () => {

@@ -7,10 +7,11 @@ WORKDIR /src/web
 COPY web/package.json web/bun.lock ./
 RUN bun install --frozen-lockfile
 COPY web/ ./
-RUN bun run build
+# The live build: the binary serves the real API, so the mock layer stays out (UI-12.3).
+RUN VITE_API_MODE=live bun run build
 
 FROM rust:1.98-alpine AS binary-build
-RUN apk add --no-cache gcc musl-dev
+RUN apk add --no-cache gcc musl-dev ca-certificates
 WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
 COPY crates crates
@@ -23,6 +24,8 @@ RUN SENDMOCK_RELEASE_CHANNEL="$SENDMOCK_RELEASE_CHANNEL" cargo build --release -
 
 FROM scratch
 COPY --from=binary-build /image/sendmock /sendmock
+# The opt-in update check reaches GitHub over HTTPS; scratch has no certificate store.
+COPY --from=binary-build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=binary-build --chown=10001:10001 /image/data /data
 COPY --from=binary-build /image/config /config
 # SQLite writes temporary files to /tmp, which scratch does not have.

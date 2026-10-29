@@ -1,6 +1,6 @@
 import { ForwardIcon, ReplyAllIcon, ReplyIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { OperationButton } from "@/features/availability/operation-button";
 import {
   type EmailComposerMode,
   hasSeveralRecipients,
@@ -17,7 +17,9 @@ export function EmailResponseButtons({
 }) {
   return (
     <div className="flex items-center gap-1">
-      <Button
+      <OperationButton
+        operationKey="POST /api/v1/emails/{emailId}/reply"
+        actionName="Reply"
         variant="outline"
         size="sm"
         aria-keyshortcuts="R"
@@ -27,9 +29,11 @@ export function EmailResponseButtons({
       >
         <ReplyIcon />
         <span className="sr-only sm:not-sr-only">Reply</span>
-      </Button>
+      </OperationButton>
       {hasSeveralRecipients(email) && (
-        <Button
+        <OperationButton
+          operationKey="POST /api/v1/emails/{emailId}/reply"
+          actionName="Reply all"
           variant="outline"
           size="sm"
           aria-keyshortcuts="Shift+R"
@@ -39,9 +43,11 @@ export function EmailResponseButtons({
         >
           <ReplyAllIcon />
           <span className="sr-only sm:not-sr-only">Reply all</span>
-        </Button>
+        </OperationButton>
       )}
-      <Button
+      <OperationButton
+        operationKey="POST /api/v1/emails/{emailId}/forward"
+        actionName="Forward"
         variant="outline"
         size="sm"
         aria-keyshortcuts="F"
@@ -51,7 +57,7 @@ export function EmailResponseButtons({
       >
         <ForwardIcon />
         <span className="sr-only sm:not-sr-only">Forward</span>
-      </Button>
+      </OperationButton>
     </div>
   );
 }

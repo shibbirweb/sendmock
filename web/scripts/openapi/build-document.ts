@@ -3,6 +3,7 @@ import type {
   QueryParameter,
   SchemaReference,
 } from "../../src/lib/api/endpoint-registry";
+import { buildOperationId } from "../../src/lib/api/endpoint-registry/operation-id";
 import { pathParameterDocs } from "../../src/lib/api/endpoint-registry/path-parameters";
 import { surfaceCatalogue } from "../../src/lib/api/surface-catalogue";
 import { type JsonSchema, toComponentName } from "./generate-schemas";
@@ -97,20 +98,9 @@ function buildQueryParameter(queryParameter: QueryParameter): JsonSchema {
   };
 }
 
-/** `GET /api/v1/emails/{emailId}/timeline` becomes `getEmailsByEmailIdTimeline`. */
-export function buildOperationId(apiEndpoint: ApiEndpoint): string {
-  const pathWords = apiEndpoint.path
-    .replace(/^\/api\/v1/, "")
-    .split(/[/-]/)
-    .filter((pathSegment) => pathSegment !== "")
-    .map((pathSegment) => {
-      const parameterMatch = pathSegment.match(/^\{(\w+)\}$/);
-      const word = parameterMatch?.[1] ?? pathSegment;
-      const capitalizedWord = word.charAt(0).toUpperCase() + word.slice(1);
-      return parameterMatch ? `By${capitalizedWord}` : capitalizedWord;
-    });
-
-  return `${apiEndpoint.method.toLowerCase()}${pathWords.join("")}`;
+/** The `operationId` of an endpoint, shared with the UI's availability check. */
+export function buildEndpointOperationId(apiEndpoint: ApiEndpoint): string {
+  return buildOperationId(apiEndpoint.method, apiEndpoint.path);
 }
 
 function buildResponses(apiEndpoint: ApiEndpoint): JsonSchema {
@@ -164,7 +154,7 @@ function buildOperation(apiEndpoint: ApiEndpoint): JsonSchema {
   ];
 
   return {
-    operationId: buildOperationId(apiEndpoint),
+    operationId: buildEndpointOperationId(apiEndpoint),
     summary: apiEndpoint.summary,
     tags: [apiEndpoint.tag],
     ...(parameters.length > 0 ? { parameters } : {}),

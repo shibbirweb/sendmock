@@ -46,6 +46,11 @@ impl Operation for GetInfoOperation {
             database_path: operation_context.database.location().to_string(),
             database_size_bytes: operation_context.database.size_bytes().await?,
             is_container: instance_details.is_container,
+            available_operations: crate::build_operation_registry()
+                .operations()
+                .iter()
+                .map(|operation| operation.definition().operation_id.to_owned())
+                .collect(),
         })
     }
 }
@@ -99,6 +104,34 @@ mod tests {
         assert_eq!(app_info.database_path, "memory");
         assert!(app_info.database_size_bytes > 0);
         assert!(!app_info.is_container);
+        assert!(
+            app_info
+                .available_operations
+                .iter()
+                .any(|operation_id| operation_id == "getEmails")
+        );
+        Ok(())
+    }
+
+    // AC: UI-12.1
+    #[tokio::test]
+    async fn lists_exactly_the_operations_this_binary_serves() -> Result<(), OperationError> {
+        let app_info = GetInfoOperation
+            .execute(&build_operation_context(1_767_225_690_000)?, NoInput {})
+            .await?;
+
+        let served_operation_ids: Vec<String> = crate::build_operation_registry()
+            .operations()
+            .iter()
+            .map(|operation| operation.definition().operation_id.to_owned())
+            .collect();
+        assert_eq!(app_info.available_operations, served_operation_ids);
+        assert!(
+            !app_info
+                .available_operations
+                .iter()
+                .any(|operation_id| operation_id == "getSms")
+        );
         Ok(())
     }
 

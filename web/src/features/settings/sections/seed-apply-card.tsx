@@ -1,4 +1,5 @@
 import { CheckCircle2Icon, CircleAlertIcon, UploadIcon } from "lucide-react";
+import { OperationButton } from "@/features/availability/operation-button";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -126,13 +127,15 @@ export function SeedApplyCard() {
         >
           Validate
         </Button>
-        <Button
+        <OperationButton
+          operationKey="POST /api/v1/seed/apply"
+          actionName="Apply"
           type="button"
           disabled={!isValidated || applySeed.isPending}
           onClick={() => setConfirmOpen(true)}
         >
           Apply
-        </Button>
+        </OperationButton>
       </div>
       <ConfirmActionDialog
         isOpen={isConfirmOpen}

@@ -1,4 +1,5 @@
 import { RotateCcwIcon } from "lucide-react";
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
@@ -256,7 +257,13 @@ export function ConnectionSection() {
         </div>
       </SettingsSectionCard>
       <ProviderApisCard />
-      <AiAgentsCard />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/ai/agents"
+        featureName="AI agent setup"
+        description="Set up Claude Code, Codex, Cursor and other agents with the MCP server and skill."
+      >
+        <AiAgentsCard />
+      </FeatureAvailabilityGate>
     </>
   );
 }

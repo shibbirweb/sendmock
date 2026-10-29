@@ -6,15 +6,20 @@ import {
   hasSeveralRecipients,
 } from "@/features/mail/detail/response/email-composer-mode";
 import { isTypingInEditableElement } from "@/features/shortcuts/is-typing-in-editable-element";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import type { EmailDetail } from "@/lib/api/types";
 
-/** R replies, Shift+R replies to all, F forwards the open email. */
+/** R replies, Shift+R replies to all, F forwards the open email, once the server serves them. */
 export function useEmailResponseShortcuts(
   email: EmailDetail | undefined,
   onStartResponse: (composerMode: EmailComposerMode) => void,
 ) {
+  const isReplyAvailable = useOperationAvailability(
+    "POST /api/v1/emails/{emailId}/reply",
+  ).isAvailable;
+
   React.useEffect(() => {
-    if (email === undefined || !canRespondToEmail(email)) {
+    if (email === undefined || !canRespondToEmail(email) || !isReplyAvailable) {
       return;
     }
 
@@ -45,5 +50,5 @@ export function useEmailResponseShortcuts(
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [email, onStartResponse]);
+  }, [email, onStartResponse, isReplyAvailable]);
 }

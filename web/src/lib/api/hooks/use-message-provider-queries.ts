@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
+import { useIsOperationQueryable } from "@/lib/api/hooks/use-operation-availability";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   MessageProviderArea,
@@ -22,13 +23,19 @@ export function toProvidersPath(providerArea: MessageProviderArea): string {
   return providerArea === "email" ? "/emails/providers" : "/sms/providers";
 }
 
+/** Not asked for until the server serves the area's providers (UI-12). */
 export function useMessageProviders(providerArea: MessageProviderArea) {
+  const isQueryable = useIsOperationQueryable(
+    `GET /api/v1${toProvidersPath(providerArea)}`,
+  );
+
   return useQuery({
     queryKey: queryKeys.messageProviders.list(providerArea),
     queryFn: ({ signal }) =>
       requestApi<MessageProviderDefinition[]>(toProvidersPath(providerArea), {
         abortSignal: signal,
       }),
+    enabled: isQueryable,
   });
 }
 

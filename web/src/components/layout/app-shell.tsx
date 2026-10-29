@@ -3,6 +3,7 @@ import { Outlet, useRouterState } from "@tanstack/react-router";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ScreenAvailabilityGate } from "@/features/availability/screen-availability-gate";
 import { CommandPalette } from "@/features/command-palette/command-palette";
 import { ShortcutHelpDialog } from "@/features/shortcuts/shortcut-help-dialog";
 import { useGlobalShortcuts } from "@/features/shortcuts/use-global-shortcuts";
@@ -34,7 +35,9 @@ function AppFrame() {
           tabIndex={-1}
           className="flex min-h-0 flex-1 flex-col overflow-auto outline-none"
         >
-          <Outlet />
+          <ScreenAvailabilityGate>
+            <Outlet />
+          </ScreenAvailabilityGate>
         </div>
       </SidebarInset>
       <CommandPalette />
@@ -49,5 +52,11 @@ export function AppShell() {
     select: (routerState) => routerState.location.pathname,
   });
 
-  return isStandalonePath(pathname) ? <Outlet /> : <AppFrame />;
+  return isStandalonePath(pathname) ? (
+    <ScreenAvailabilityGate>
+      <Outlet />
+    </ScreenAvailabilityGate>
+  ) : (
+    <AppFrame />
+  );
 }

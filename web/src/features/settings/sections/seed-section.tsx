@@ -1,4 +1,5 @@
 import { DownloadIcon, FileCode2Icon } from "lucide-react";
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -91,7 +92,13 @@ function SeedStatusCard() {
 export function SeedSection() {
   return (
     <div className="grid gap-4">
-      <SeedStatusCard />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/seed/status"
+        featureName="Seed status and export"
+        description="What the seed file set up, what changed since, and an export of the current setup."
+      >
+        <SeedStatusCard />
+      </FeatureAvailabilityGate>
       <SeedApplyCard />
     </div>
   );

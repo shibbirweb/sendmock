@@ -27,6 +27,10 @@ import {
   canRespondToEmail,
   type EmailComposerMode,
 } from "@/features/mail/detail/response/email-composer-mode";
+import {
+  OperationButton,
+  OperationMenuItem,
+} from "@/features/availability/operation-button";
 import { EmailResponseButtons } from "@/features/mail/detail/response/email-response-buttons";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
 import { buildApiUrl } from "@/lib/api/api-client";
@@ -36,6 +40,7 @@ import {
   useSimulateEmailOutcome,
   useUpdateEmail,
 } from "@/lib/api/hooks/use-email-queries";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import type { EmailDetail, SimulatedEmailOutcome } from "@/lib/api/types";
 
 const simulatedOutcomes: { label: string; outcome: SimulatedEmailOutcome }[] = [
@@ -62,6 +67,9 @@ export function MailDetailActions({
   const [isSendDialogOpen, setSendDialogOpen] = React.useState(false);
   // Replies, forwards and outcome simulations only apply to mail your app sent.
   const isSentByApp = canRespondToEmail(email);
+  const simulateAvailability = useOperationAvailability(
+    "POST /api/v1/emails/{emailId}/simulate",
+  );
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-1">
@@ -96,7 +104,18 @@ export function MailDetailActions({
       >
         <Trash2Icon />
       </Button>
-      {isSentByApp && (
+      {isSentByApp && !simulateAvailability.isAvailable && (
+        <OperationButton
+          operationKey="POST /api/v1/emails/{emailId}/simulate"
+          actionName="Simulate an event"
+          variant="outline"
+          size="sm"
+        >
+          <FlaskConicalIcon />
+          Simulate
+        </OperationButton>
+      )}
+      {isSentByApp && simulateAvailability.isAvailable && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" aria-label="Simulate an event">
@@ -149,22 +168,24 @@ export function MailDetailActions({
               Download .eml
             </a>
           </DropdownMenuItem>
-          <DropdownMenuItem
+          <OperationMenuItem
+            operationKey="POST /api/v1/emails/{emailId}/release"
             onSelect={() => {
               setReleaseDialogOpen(true);
             }}
           >
             <SendIcon />
             Release to real SMTP
-          </DropdownMenuItem>
-          <DropdownMenuItem
+          </OperationMenuItem>
+          <OperationMenuItem
+            operationKey="POST /api/v1/webhooks/endpoints/{endpointId}/send"
             onSelect={() => {
               setSendDialogOpen(true);
             }}
           >
             <WebhookIcon />
             Send to webhook
-          </DropdownMenuItem>
+          </OperationMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {isSendDialogOpen && (

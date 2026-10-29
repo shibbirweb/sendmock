@@ -167,7 +167,7 @@ jobs:
       - name: Coverage gate (80% overall, 90% operations and domain; table on the job page)
         run: bun scripts/rust-coverage.ts coverage.json
 
-  # The mock-mode UI the binary embeds, built once and shared with every smoke test job.
+  # The live UI the binary embeds, built once and shared with every smoke test job.
   web-dist:
     name: Web UI build for the binary
     runs-on: ubuntu-latest
@@ -182,7 +182,9 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: Build
+      - name: Build (live mode, no mock layer)
+        env:
+          VITE_API_MODE: live
         run: bun run build
 
       - uses: actions/upload-artifact@v4
@@ -221,11 +223,60 @@ jobs:
       - name: Start it, check the API and the UI, stop it
         run: bun scripts/binary-smoke-test.ts target/release/sendmock
 
+      # The live UI suite runs against this binary in the Playwright image.
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: sendmock-linux
+          path: target/release/sendmock
+          retention-days: 1
+
+  # The live UI build against a real binary (UI-12.2): every screen shows its data or
+  # Not available yet, and no screen calls an operation the binary does not serve.
+  web-live:
+    name: Web UI against the binary
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: Install Bun
+        run: npm install -g bun
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Live UI tests
+        env:
+          SENDMOCK_BINARY: ../sendmock-binary/sendmock
+        run: |
+          chmod +x ../sendmock-binary/sendmock
+          bun run test:live
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-live
+          path: web/playwright-report
+          retention-days: 7
+
   # One check for the rulesets to require, whatever the number of operating systems.
   rust-result:
     name: Rust
     if: always()
-    needs: [rust, rust-coverage, binary-smoke]
+    needs: [rust, rust-coverage, binary-smoke, web-live]
     runs-on: ubuntu-latest
     steps:
       - name: Every Rust job passed
@@ -233,6 +284,7 @@ jobs:
           test "${{ needs.rust.result }}" = "success"
           test "${{ needs.rust-coverage.result }}" = "success"
           test "${{ needs.binary-smoke.result }}" = "success"
+          test "${{ needs.web-live.result }}" = "success"
 
   acceptance:
     name: Acceptance traceability

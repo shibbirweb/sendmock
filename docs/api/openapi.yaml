@@ -6843,6 +6843,11 @@ components:
         is_container:
           type: boolean
           description: True when SendMock runs in Docker, so the UI defaults to container hostnames.
+        available_operations:
+          type: array
+          items:
+            type: string
+          description: The `operationId`s this binary serves; the UI shows Not available yet for the rest.
       required:
         - version
         - channel
@@ -6853,6 +6858,7 @@ components:
         - database_path
         - database_size_bytes
         - is_container
+        - available_operations
     AppSettings:
       type: object
       properties:

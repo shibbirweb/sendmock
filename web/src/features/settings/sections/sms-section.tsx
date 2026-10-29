@@ -1,4 +1,5 @@
 import { RadioCardGroup } from "@/components/common/radio-card-group";
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { Slider } from "@/components/ui/slider";
 import {
   sendmockAfterSendNumbers,
@@ -104,7 +105,13 @@ export function SmsSection({ appSettings }: { appSettings: AppSettings }) {
           }}
         />
       </SettingsSectionCard>
-      <SmsOutcomeRulesCard appSettings={appSettings} />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/outcome-rules/sms"
+        featureName="Outcome numbers"
+        description="Numbers that fail, stay queued or reply, to test how your app reacts."
+      >
+        <SmsOutcomeRulesCard appSettings={appSettings} />
+      </FeatureAvailabilityGate>
       <SettingsSectionCard
         title="Magic numbers"
         description={

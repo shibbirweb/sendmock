@@ -81,8 +81,10 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Build the UI the binaries embed
+      - name: Build the UI the binaries embed (live mode, no mock layer)
         working-directory: web
+        env:
+          VITE_API_MODE: live
         run: |
           bun install --frozen-lockfile
           bun run build

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
+import { isOperationServed } from "@/lib/api/operation-availability";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   AppInfo,
@@ -10,11 +11,17 @@ import type {
   AppStats,
 } from "@/lib/api/types";
 
+/** Counts for the sidebar and Overview; not asked for until the server serves them. */
 export function useAppStats() {
+  const appInfoQuery = useAppInfo();
+
   return useQuery({
     queryKey: queryKeys.system.stats,
     queryFn: ({ signal }) =>
       requestApi<AppStats>("/stats", { abortSignal: signal }),
+    enabled:
+      !appInfoQuery.isPending &&
+      isOperationServed(appInfoQuery.data, "GET /api/v1/stats", true),
   });
 }
 

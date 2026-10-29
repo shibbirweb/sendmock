@@ -55,7 +55,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 3 / 108 features, 121 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 4 / 108 features, 124 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -114,7 +114,7 @@ On top of its own criteria, a feature is done only when:
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | In progress |
 | [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 3 | In progress |
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Accepted |
-| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
+| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | In progress |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | In progress |
@@ -137,7 +137,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | UI done (2026-10-29) |
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | UI done (2026-10-29) |
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Not started |
-| [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Not started |
+| [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Not started |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | In progress |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
