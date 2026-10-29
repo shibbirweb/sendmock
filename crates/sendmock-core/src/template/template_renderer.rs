@@ -126,7 +126,14 @@ pub fn render_template_in_mode(
 /// The expression an error points at, without its `{{ }}`.
 fn read_error_source(template_text: &str, render_error: &Error) -> Option<String> {
     let error_range = render_error.range()?;
-    let source_text = template_text.get(error_range)?;
+    // A failed lookup such as `.missing.address` points after its root; reach back to it.
+    let path_start = template_text
+        .get(..error_range.start)?
+        .rfind(|character: char| {
+            !(character.is_ascii_alphanumeric() || matches!(character, '_' | '.' | '[' | ']'))
+        })
+        .map_or(0, |boundary_index| boundary_index + 1);
+    let source_text = template_text.get(path_start..error_range.end)?;
     let expression_text = source_text
         .trim()
         .trim_start_matches("{{")
@@ -135,7 +142,7 @@ fn read_error_source(template_text: &str, render_error: &Error) -> Option<String
     (!expression_text.is_empty()).then(|| expression_text.to_owned())
 }
 
-fn describe_render_error(template_text: &str, render_error: &Error) -> TemplateProblem {
+pub(super) fn describe_render_error(template_text: &str, render_error: &Error) -> TemplateProblem {
     let detail = render_error.detail().unwrap_or_default();
     let message = match render_error.kind() {
         ErrorKind::UndefinedError => match read_error_source(template_text, render_error) {

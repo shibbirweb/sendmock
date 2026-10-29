@@ -22,6 +22,13 @@ mod rule_preview_operation;
 mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
+mod template_context;
+mod variable_inputs;
+mod variable_operations;
+mod variable_resolution;
+mod variable_validation;
+mod variable_value_operations;
+mod variable_view;
 mod webhook_sender;
 
 pub use delivery_detail::WebhookDeliveryDetail;
@@ -49,6 +56,16 @@ pub use rule_operations::{
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
 pub use rule_view::WebhookRule;
+pub use template_context::{build_event_template_context, build_sample_template_context};
+pub use variable_operations::{
+    CreateWebhookVariableOperation, DeleteWebhookVariableOperation, ListWebhookVariablesOperation,
+    UpdateWebhookVariableOperation,
+};
+pub use variable_resolution::{ResolvedVariables, resolve_template_variables};
+pub use variable_value_operations::{
+    PreviewWebhookVariableOperation, RegenerateWebhookVariableOperation, VariablePreviewResult,
+};
+pub use variable_view::WebhookVariable;
 pub use webhook_sender::{WebhookSendFailure, WebhookSendResult, WebhookSender};
 
 use crate::OperationRegistry;
@@ -73,4 +90,10 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteWebhookRuleOperation);
     operation_registry.register(MoveWebhookRuleOperation);
     operation_registry.register(PreviewWebhookRuleOperation);
+    operation_registry.register(ListWebhookVariablesOperation);
+    operation_registry.register(CreateWebhookVariableOperation);
+    operation_registry.register(UpdateWebhookVariableOperation);
+    operation_registry.register(DeleteWebhookVariableOperation);
+    operation_registry.register(RegenerateWebhookVariableOperation);
+    operation_registry.register(PreviewWebhookVariableOperation);
 }

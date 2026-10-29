@@ -5,6 +5,7 @@
 mod template_date_filters;
 mod template_encoding_filters;
 mod template_environment;
+mod template_expression_evaluation;
 mod template_functions;
 mod template_hash_filters;
 mod template_names;
@@ -15,6 +16,7 @@ mod template_renderer;
 mod template_text_filters;
 
 pub use template_environment::TEMPLATE_FUEL_LIMIT;
+pub use template_expression_evaluation::evaluate_template_expression;
 pub use template_functions::{StandardTemplateFunctions, TemplateFunctions};
 pub use template_names::{BUILTIN_FILTER_NAMES, SENDMOCK_FILTER_NAMES};
 pub use template_renderer::{

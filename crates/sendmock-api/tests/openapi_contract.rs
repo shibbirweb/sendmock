@@ -128,6 +128,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
     samples.extend(prepare_webhook_rule_samples(app_router).await);
+    samples.extend(prepare_webhook_variable_samples(app_router).await);
     samples
 }
 
@@ -486,6 +487,60 @@ async fn prepare_webhook_rule_samples(
         (
             "deleteWebhooksRulesByRuleId",
             vec![json!({ "rule_id": deleted_rule_id })],
+        ),
+    ]
+}
+
+fn webhook_variable_sample(variable_name: &str, kind: &str, value: &str) -> Value {
+    json!({
+        "name": variable_name,
+        "kind": kind,
+        "scope": "global",
+        "endpoint_id": null,
+        "value": value,
+        "random_mode": if kind == "random" { json!("fixed") } else { Value::Null },
+        "description": "",
+    })
+}
+
+async fn prepare_webhook_variable_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let path = "/api/v1/webhooks/variables";
+    let fixed_variable_id = post_json(
+        app_router,
+        path,
+        &webhook_variable_sample("nonce", "random", "random_string(16)"),
+    )
+    .await["id"]
+        .clone();
+    let deleted_variable_id = post_json(
+        app_router,
+        path,
+        &webhook_variable_sample("old_token", "secret", "sk_live_1234"),
+    )
+    .await["id"]
+        .clone();
+    let mut edited_variable = webhook_variable_sample("nonce", "random", "random_string(16)");
+    edited_variable["variable_id"] = fixed_variable_id.clone();
+    vec![
+        ("getWebhooksVariables", vec![json!({})]),
+        (
+            "postWebhooksVariables",
+            vec![webhook_variable_sample("tenant_id", "text", "acme")],
+        ),
+        ("patchWebhooksVariablesByVariableId", vec![edited_variable]),
+        (
+            "postWebhooksVariablesByVariableIdRegenerate",
+            vec![json!({ "variable_id": fixed_variable_id })],
+        ),
+        (
+            "postWebhooksVariablesPreview",
+            vec![json!({ "kind": "dynamic", "value": "data.subject" })],
+        ),
+        (
+            "deleteWebhooksVariablesByVariableId",
+            vec![json!({ "variable_id": deleted_variable_id })],
         ),
     ]
 }

@@ -226,6 +226,10 @@ impl Operation for DeleteWebhookEndpointOperation {
             .webhook_rule_repository
             .delete_endpoint_rules(&input.endpoint_id)
             .await?;
+        operation_context
+            .webhook_variable_repository
+            .delete_endpoint_variables(&input.endpoint_id)
+            .await?;
         Ok(NoContent)
     }
 }

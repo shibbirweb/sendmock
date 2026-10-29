@@ -1765,6 +1765,142 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook var list",
+    "usage": "sendmock webhook var list",
+    "summary": "Global and endpoint variables; secret values are masked.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/variables",
+        "operation_id": "getWebhooksVariables",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook var set",
+    "usage": "sendmock webhook var set <name> <value>",
+    "summary": "Add a variable.",
+    "arguments": [
+      "name",
+      "value"
+    ],
+    "flags": [
+      "--description",
+      "--endpoint-id",
+      "--kind",
+      "--random-mode",
+      "--scope"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables",
+        "operation_id": "postWebhooksVariables",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_set"
+    ]
+  },
+  {
+    "command": "sendmock webhook var update",
+    "usage": "sendmock webhook var update <variableId>",
+    "summary": "Change a variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [
+      "--description",
+      "--endpoint-id",
+      "--kind",
+      "--name",
+      "--random-mode",
+      "--scope",
+      "--value"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/variables/{variableId}",
+        "operation_id": "patchWebhooksVariablesByVariableId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook var unset",
+    "usage": "sendmock webhook var unset <variableId>",
+    "summary": "Delete a variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/variables/{variableId}",
+        "operation_id": "deleteWebhooksVariablesByVariableId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_unset"
+    ]
+  },
+  {
+    "command": "sendmock webhook var regenerate",
+    "usage": "sendmock webhook var regenerate <variableId>",
+    "summary": "Make a new fixed value for a generated-once random variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables/{variableId}/regenerate",
+        "operation_id": "postWebhooksVariablesByVariableIdRegenerate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_regenerate"
+    ]
+  },
+  {
+    "command": "sendmock webhook var preview",
+    "usage": "sendmock webhook var preview",
+    "summary": "What a variable definition resolves to against the sample.",
+    "arguments": [],
+    "flags": [
+      "--kind",
+      "--value"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables/preview",
+        "operation_id": "postWebhooksVariablesPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_preview"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

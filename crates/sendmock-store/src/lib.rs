@@ -16,6 +16,7 @@ mod verify;
 mod webhook_delivery;
 mod webhook_endpoint;
 mod webhook_rule;
+mod webhook_variable;
 
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
 pub use database::Database;
@@ -52,3 +53,4 @@ pub use webhook_endpoint::{
     WebhookEndpointRecord, WebhookEndpointRepository, WebhookSecretRotation,
 };
 pub use webhook_rule::{WebhookRuleRecord, WebhookRuleRepository};
+pub use webhook_variable::{WebhookVariableRecord, WebhookVariableRepository};
