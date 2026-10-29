@@ -1,58 +1,32 @@
 ---
 source: crates/sendmock-mcp/src/tool_definitions_builder.rs
-expression: tool_definitions
+expression: status_tool
 ---
-[
-  {
-    "name": "sendmock_status",
-    "description": "view=health: Liveness check; answers while the server runs. view=info: Version, listen addresses and enabled features.",
-    "inputSchema": {
-      "properties": {
-        "view": {
-          "enum": [
-            "health",
-            "info"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "view"
-      ],
-      "type": "object"
+{
+  "name": "sendmock_status",
+  "description": "view=health: Liveness check; answers while the server runs. view=info: Version, listen addresses and enabled features.",
+  "inputSchema": {
+    "properties": {
+      "view": {
+        "enum": [
+          "health",
+          "info"
+        ],
+        "type": "string"
+      }
     },
-    "annotations": {
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": false
-    },
-    "operationIds": [
-      "getHealth",
-      "getInfo"
-    ]
+    "required": [
+      "view"
+    ],
+    "type": "object"
   },
-  {
-    "name": "sendmock_seed_validate",
-    "description": "Check a seed file without applying it.",
-    "inputSchema": {
-      "properties": {
-        "seed_toml": {
-          "description": "The seed file's text (`sendmock.seed.toml`).",
-          "type": "string"
-        }
-      },
-      "required": [
-        "seed_toml"
-      ],
-      "type": "object"
-    },
-    "annotations": {
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": false
-    },
-    "operationIds": [
-      "postSeedValidate"
-    ]
-  }
-]
+  "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": false
+  },
+  "operationIds": [
+    "getHealth",
+    "getInfo"
+  ]
+}

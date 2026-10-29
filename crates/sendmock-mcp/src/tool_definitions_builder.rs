@@ -128,7 +128,10 @@ mod tests {
     fn health_and_info_share_the_status_tool_told_apart_by_view() {
         let tool_definitions = build_tool_definitions(&sendmock_ops::build_operation_registry());
 
-        insta::assert_json_snapshot!(tool_definitions);
+        let status_tool = tool_definitions
+            .iter()
+            .find(|tool| tool.name == "sendmock_status");
+        insta::assert_json_snapshot!(status_tool);
     }
 
     #[test]
