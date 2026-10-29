@@ -2,3 +2,6 @@
 /target/
 
 .DS_Store
+
+# Python bytecode from the examples
+__pycache__/
