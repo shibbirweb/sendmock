@@ -39,6 +39,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 23 | [Phase 0](23-phase-0.md) | Backend foundations: workstreams in order (workspace, Rust CI, config, SQLite, HTTP server with the embedded UI, operation registry, CLI and parity, seed validate, contract tests, version script, release workflows, Docker `edge`, README and licence), the criteria each one ticks and the new dependencies |
 | 24 | [Stage B coverage](24-stage-b-coverage.md) | Every operation the signed-off UI calls, mapped to the Stage B phase that builds it and the phase its screen goes live; the 2026-10-29 audit and what it changed |
 | 25 | [Phase 1](25-phase-1.md) | Email backend and the first beta: the operation framework, email storage and parsing, email operations, the SMTP server, realtime, logs and settings, the sendmail shim and MCP over stdio, the live UI with auth and CORS, cross-language SMTP tests and beta packaging |
+| 26 | [Phase 2](26-phase-2.md) | SMS and Verify backend: SMS storage with encoding and segments, the native SMS API with MMS, delivery simulation with Twilio's test numbers and status callbacks, numbers and Messaging Services, Twilio and Vonage emulation on the provider port, Twilio Verify, the built-in SMS provider definitions, and the SMS screens going live |
 
 ## Headline decisions
 
