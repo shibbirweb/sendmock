@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use sendmock_ops::{ErasedOperation, OperationAnswer, OperationRegistry};
+use sendmock_ops::{ErasedOperation, OperationAnswer, OperationRegistry, SelectorChoice};
 use serde_json::{Map, Value};
 
 use crate::operation_runner::OperationRunner;
@@ -102,17 +102,26 @@ fn select_operation(
     else {
         return Err("The tool has no way to choose its operation".to_owned());
     };
-    let selected_value = arguments
-        .remove(selector_input.input_name)
-        .and_then(|selector_value| selector_value.as_str().map(str::to_owned))
-        .unwrap_or_default();
+    let is_input_given = arguments
+        .get(selector_input.input_name)
+        .is_some_and(|given_value| !given_value.is_null());
+    let selected_value = match selector_input.choice {
+        SelectorChoice::Value(_) => arguments
+            .remove(selector_input.input_name)
+            .and_then(|selector_value| selector_value.as_str().map(str::to_owned)),
+        SelectorChoice::Presence { .. } => None,
+    };
+    let is_selected = |selector_choice: SelectorChoice| match selector_choice {
+        SelectorChoice::Value(value) => selected_value.as_deref() == Some(value),
+        SelectorChoice::Presence { is_given } => is_given == is_input_given,
+    };
     tool_operations
         .iter()
         .find(|operation| {
             operation
                 .definition()
                 .selector
-                .is_some_and(|selector| selector.value == selected_value)
+                .is_some_and(|selector| is_selected(selector.choice))
         })
         .map(|operation| (Arc::clone(operation), arguments))
         .ok_or_else(|| {
@@ -121,4 +130,68 @@ fn select_operation(
                 selector_input.input_name
             )
         })
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::*;
+
+    fn registered_operations(operation_ids: &[&str]) -> Vec<Arc<dyn ErasedOperation>> {
+        sendmock_ops::build_operation_registry()
+            .operations()
+            .iter()
+            .filter(|operation| operation_ids.contains(&operation.definition().operation_id))
+            .cloned()
+            .collect()
+    }
+
+    fn selected_operation_id(
+        tool_operations: &[Arc<dyn ErasedOperation>],
+        arguments: Value,
+    ) -> Option<&'static str> {
+        let Value::Object(arguments) = arguments else {
+            return None;
+        };
+        select_operation(tool_operations, arguments)
+            .ok()
+            .map(|(operation, _)| operation.definition().operation_id)
+    }
+
+    #[test]
+    fn the_upsert_tool_updates_when_the_id_is_given_and_creates_otherwise() {
+        let upsert_operations = registered_operations(&["postNumbers", "patchNumbersByNumberId"]);
+
+        assert_eq!(
+            selected_operation_id(&upsert_operations, json!({ "number": "+15550001111" })),
+            Some("postNumbers")
+        );
+        assert_eq!(
+            selected_operation_id(&upsert_operations, json!({ "number_id": null })),
+            Some("postNumbers")
+        );
+        assert_eq!(
+            selected_operation_id(&upsert_operations, json!({ "number_id": "01JNUMBER" })),
+            Some("patchNumbersByNumberId")
+        );
+    }
+
+    #[test]
+    fn a_value_selector_picks_by_its_value_and_is_not_passed_on() {
+        let status_operations = registered_operations(&["getHealth", "getInfo"]);
+        let Value::Object(arguments) = json!({ "view": "info" }) else {
+            return;
+        };
+
+        let selection = select_operation(&status_operations, arguments);
+
+        assert_eq!(
+            selection
+                .as_ref()
+                .ok()
+                .map(|(operation, input)| (operation.definition().operation_id, input.len())),
+            Some(("getInfo", 0))
+        );
+    }
 }

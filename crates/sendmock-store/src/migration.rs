@@ -34,4 +34,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 6,
         sql: include_str!("../migrations/0006_sms_outcome_rules.sql"),
     },
+    Migration {
+        schema_version: 7,
+        sql: include_str!("../migrations/0007_numbers.sql"),
+    },
 ];

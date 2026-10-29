@@ -9,10 +9,8 @@ use crate::{
 };
 
 /// The SMS operations share their MCP tools with the email ones, told apart by `channel`.
-pub const SMS_CHANNEL_SELECTOR: Option<OperationSelector> = Some(OperationSelector {
-    input_name: "channel",
-    value: "sms",
-});
+pub const SMS_CHANNEL_SELECTOR: Option<OperationSelector> =
+    Some(OperationSelector::by_value("channel", "sms"));
 /// Who created a rule; the REST API cannot tell the UI, CLI and agents apart yet.
 const CREATED_THROUGH_API: &str = "api";
 

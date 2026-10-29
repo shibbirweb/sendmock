@@ -1,4 +1,4 @@
-use sendmock_ops::OperationRegistry;
+use sendmock_ops::{OperationRegistry, OperationSelector, SelectorChoice};
 use serde::Serialize;
 
 /// One command as `sendmock help --all --json` lists it, shaped like
@@ -22,10 +22,28 @@ pub struct OperationReference {
     pub selector: Option<SelectorReference>,
 }
 
+/// Written as the surface catalogue writes it: `{input, value}` or `{input, isGiven}`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct SelectorReference {
     pub input: String,
-    pub value: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+    #[serde(rename = "isGiven", skip_serializing_if = "Option::is_none")]
+    pub is_given: Option<bool>,
+}
+
+impl From<OperationSelector> for SelectorReference {
+    fn from(selector: OperationSelector) -> Self {
+        let (value, is_given) = match selector.choice {
+            SelectorChoice::Value(value) => (Some(value.to_owned()), None),
+            SelectorChoice::Presence { is_given } => (None, Some(is_given)),
+        };
+        Self {
+            input: selector.input_name.to_owned(),
+            value,
+            is_given,
+        }
+    }
 }
 
 pub fn describe_operation_commands(
@@ -59,10 +77,7 @@ pub fn describe_operation_commands(
                     method: definition.method.as_str().to_owned(),
                     path: definition.path.to_owned(),
                     operation_id: definition.operation_id.to_owned(),
-                    selector: definition.selector.map(|selector| SelectorReference {
-                        input: selector.input_name.to_owned(),
-                        value: selector.value.to_owned(),
-                    }),
+                    selector: definition.selector.map(SelectorReference::from),
                 }],
                 mcp: vec![definition.mcp_tool.to_owned()],
             }

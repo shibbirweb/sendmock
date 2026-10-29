@@ -149,7 +149,7 @@ Workstreams, order and criteria: [25-phase-1.md](25-phase-1.md).
 - Delivery simulation profiles (instant, realistic, manual), failure rate, magic numbers matching Twilio's official test numbers and error codes (plus SendMock after-send extensions, strict Twilio test mode), status history.
 - Per-message status callbacks (Twilio and Vonage formats).
 - Inbound SMS simulation API.
-- Virtual numbers and Messaging Services registry (moved from Phase 4 on 2026-10-29: Messaging Services draw on number pools and the Phase 3 reply webhook reads a number's inbound URL); Numbers screen live, `POST /samples/number`, CLI and MCP `numbers` toolset.
+- Virtual numbers and Messaging Services registry (moved from Phase 4 on 2026-10-29: Messaging Services draw on number pools and the Phase 3 reply webhook reads a number's inbound URL); Numbers screen live, CLI and MCP `numbers` toolset (`POST /samples/number` dropped on 2026-10-29: the signed-off contract and UI have no number sample).
 - The SMS built-in provider definitions (Twilio, Twilio Verify, Vonage) stored and answered from the database, with SMS > Providers live for them: edit, reset, remove, restore, preview ([22](22-configurable-providers.md#13-stage-b), SM-16).
 - Custom outcome numbers (`/outcome-rules/sms`, including the test endpoint).
 - `wait/sms`, OTP extraction from SMS, `POST /samples/sms` and `/samples/verification`.

@@ -28,7 +28,7 @@ UI in U1, backend Phase 2.
 - [ ] SM-03.1 A send with `MessagingServiceSid` and no `From` picks a sender from the service's number pool.
 - [ ] SM-03.2 Unknown service SIDs are auto-created in lenient mode and rejected with error `21701` in strict mode.
 - [ ] SM-03.3 Services can be managed from UI, API, CLI, MCP and the seed file.
-- [ ] SM-03.4 A service has a sender pool and inbound handling (send a webhook with fallback, defer to the sender's webhook, or drop); a number belongs to at most one service, and moving it updates both services.
+- [x] SM-03.4 A service has a sender pool and inbound handling (send a webhook with fallback, defer to the sender's webhook, or drop); a number belongs to at most one service, and moving it updates both services.
 
 ## SM-04 Vonage SMS API
 
@@ -107,9 +107,9 @@ Phase 4.
 
 UI in U1, backend Phase 2 (moved from Phase 4 on 2026-10-29).
 
-- [ ] SM-12.1 Numbers can be created, edited and deleted with label, channels, inbound URL and format, and status callback.
+- [x] SM-12.1 Numbers can be created, edited and deleted with label, channels, inbound URL and format, and status callback.
 - [ ] SM-12.2 An inbound message to a registered number goes to its inbound URL without needing a rule.
-- [ ] SM-12.3 The form and the API reject a number that is not E.164, is already registered, has no channel, or has a URL that is not `http` or `https`.
+- [x] SM-12.3 The form and the API reject a number that is not E.164, is already registered, has no channel, or has a URL that is not `http` or `https`.
 
 ## SM-13 API request log
 

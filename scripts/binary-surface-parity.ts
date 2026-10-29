@@ -15,7 +15,10 @@ import { join } from "node:path";
 
 const repositoryRoot = join(import.meta.dir, "..");
 
-type Selector = { input: string; value: string } | null;
+type Selector =
+  | { input: string; value: string }
+  | { input: string; isGiven: boolean }
+  | null;
 type OperationReference = { operation_id: string; selector?: Selector };
 /** A name as the binary writes it, or an entry of the reference with `name` or `flag`. */
 type NamedEntry = { name?: string; flag?: string } | string;

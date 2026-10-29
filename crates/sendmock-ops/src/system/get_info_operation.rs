@@ -21,10 +21,7 @@ impl Operation for GetInfoOperation {
             is_read_only: true,
             cli_usage: "sendmock status",
             mcp_tool: "sendmock_status",
-            selector: Some(OperationSelector {
-                input_name: "view",
-                value: "info",
-            }),
+            selector: Some(OperationSelector::by_value("view", "info")),
             ..OperationDefinition::DEFAULTS
         }
     }

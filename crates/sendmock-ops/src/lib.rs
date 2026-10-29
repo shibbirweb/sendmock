@@ -8,6 +8,7 @@ mod instance_details;
 mod integrations;
 mod logs;
 mod no_input;
+mod numbers;
 mod operation;
 mod operation_answer;
 mod operation_context;
@@ -38,9 +39,10 @@ pub use logs::{
     SmtpSessionLogEntry, record_api_request,
 };
 pub use no_input::NoInput;
+pub use numbers::{MessagingService, VirtualNumber};
 pub use operation::{
     AnswerKind, CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector,
-    RawBodyInput, SuccessStatus, to_snake_case,
+    RawBodyInput, SelectorChoice, SuccessStatus, to_snake_case,
 };
 pub use operation_answer::{FileAnswer, NoContent, OperationAnswer};
 pub use operation_context::OperationContext;
@@ -80,6 +82,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
+    numbers::register_number_operations(&mut operation_registry);
     logs::register_log_operations(&mut operation_registry);
     settings::register_settings_operations(&mut operation_registry);
     operation_registry.register(CreateSampleOperation);

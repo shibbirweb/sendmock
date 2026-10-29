@@ -19,10 +19,7 @@ impl Operation for GetHealthOperation {
             is_read_only: true,
             cli_usage: "sendmock health",
             mcp_tool: "sendmock_status",
-            selector: Some(OperationSelector {
-                input_name: "view",
-                value: "health",
-            }),
+            selector: Some(OperationSelector::by_value("view", "health")),
             ..OperationDefinition::DEFAULTS
         }
     }

@@ -113,7 +113,73 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
+    samples.extend(prepare_number_samples(app_router).await);
     samples
+}
+
+fn virtual_number_sample(e164_number: &str) -> Value {
+    json!({
+        "number": e164_number, "label": "Support line", "channels": ["sms"],
+        "inbound_url": "http://localhost:3000/sms/inbound", "inbound_method": "POST",
+        "inbound_fallback_url": null, "inbound_template_id": null,
+        "status_callback_url": null, "messaging_service_sid": null,
+    })
+}
+
+fn messaging_service_sample(number_ids: &[&Value]) -> Value {
+    json!({
+        "friendly_name": "Notifications", "number_ids": number_ids,
+        "inbound_mode": "webhook", "inbound_url": "http://localhost:3000/sms/inbound",
+        "inbound_fallback_url": null,
+    })
+}
+
+/// Two numbers and two services: one of each to edit, one of each to delete.
+async fn prepare_number_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let edited_number_id = post_json(
+        app_router,
+        "/api/v1/numbers",
+        &virtual_number_sample("+15550001111"),
+    )
+    .await["id"]
+        .clone();
+    let deleted_number_id = post_json(
+        app_router,
+        "/api/v1/numbers",
+        &virtual_number_sample("+15550002222"),
+    )
+    .await["id"]
+        .clone();
+    let services_path = "/api/v1/messaging-services";
+    let edited_service_sid = post_json(
+        app_router,
+        services_path,
+        &messaging_service_sample(&[&edited_number_id]),
+    )
+    .await["sid"]
+        .clone();
+    let deleted_service_sid =
+        post_json(app_router, services_path, &messaging_service_sample(&[])).await["sid"].clone();
+    let mut number_update = virtual_number_sample("+15550001111");
+    number_update["number_id"] = edited_number_id.clone();
+    let mut service_update = messaging_service_sample(&[&edited_number_id]);
+    service_update["service_sid"] = edited_service_sid;
+    vec![
+        ("getNumbers", vec![json!({})]),
+        ("postNumbers", vec![virtual_number_sample("+15550003333")]),
+        ("patchNumbersByNumberId", vec![number_update]),
+        (
+            "deleteNumbersByNumberId",
+            vec![json!({ "number_id": deleted_number_id })],
+        ),
+        ("getMessagingServices", vec![json!({})]),
+        ("postMessagingServices", vec![messaging_service_sample(&[])]),
+        ("patchMessagingServicesByServiceSid", vec![service_update]),
+        (
+            "deleteMessagingServicesByServiceSid",
+            vec![json!({ "service_sid": deleted_service_sid })],
+        ),
+    ]
 }
 
 fn sms_outcome_rule_sample(pattern: &str) -> Value {

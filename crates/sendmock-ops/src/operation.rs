@@ -27,11 +27,35 @@ impl HttpMethod {
     }
 }
 
-/// Picks one operation when several share an MCP tool: an extra input with a fixed value.
+/// Picks one operation when several share an MCP tool.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OperationSelector {
     pub input_name: &'static str,
-    pub value: &'static str,
+    pub choice: SelectorChoice,
+}
+
+/// An extra input with a fixed value (`channel=sms`), or whether a real input is given
+/// (`number_id` given updates, missing creates).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SelectorChoice {
+    Value(&'static str),
+    Presence { is_given: bool },
+}
+
+impl OperationSelector {
+    pub const fn by_value(input_name: &'static str, value: &'static str) -> Self {
+        Self {
+            input_name,
+            choice: SelectorChoice::Value(value),
+        }
+    }
+
+    pub const fn by_presence(input_name: &'static str, is_given: bool) -> Self {
+        Self {
+            input_name,
+            choice: SelectorChoice::Presence { is_given },
+        }
+    }
 }
 
 /// A `<placeholder>` in a CLI usage and the input it fills; `reads_file` sends the named

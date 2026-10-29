@@ -3,8 +3,9 @@ use std::sync::Arc;
 use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
-    ApiRequestRepository, Database, EmailRepository, SettingsRepository, SmsOutcomeRuleRepository,
-    SmsRepository, SmtpSessionRepository,
+    ApiRequestRepository, Database, EmailRepository, MessagingServiceRepository,
+    SettingsRepository, SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository,
+    VirtualNumberRepository,
 };
 
 use crate::{
@@ -25,6 +26,8 @@ pub struct OperationContext {
     pub api_request_repository: ApiRequestRepository,
     pub sms_repository: SmsRepository,
     pub sms_outcome_rule_repository: SmsOutcomeRuleRepository,
+    pub virtual_number_repository: VirtualNumberRepository,
+    pub messaging_service_repository: MessagingServiceRepository,
     /// Decides random SMS failures; tests pass a seeded one.
     pub random_source: Arc<dyn RandomSource>,
     pub event_bus: EventBus,
@@ -57,11 +60,15 @@ impl OperationContext {
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
         let sms_repository = SmsRepository::new(Arc::clone(&database));
         let sms_outcome_rule_repository = SmsOutcomeRuleRepository::new(Arc::clone(&database));
+        let virtual_number_repository = VirtualNumberRepository::new(Arc::clone(&database));
+        let messaging_service_repository = MessagingServiceRepository::new(Arc::clone(&database));
         Self {
             smtp_session_repository,
             api_request_repository,
             sms_repository,
             sms_outcome_rule_repository,
+            virtual_number_repository,
+            messaging_service_repository,
             random_source: Arc::new(SystemRandomSource),
             database,
             clock,

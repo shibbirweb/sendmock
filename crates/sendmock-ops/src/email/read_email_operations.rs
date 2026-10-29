@@ -204,10 +204,7 @@ impl Operation for CheckListUnsubscribeOperation {
 
     fn definition(&self) -> OperationDefinition {
         OperationDefinition {
-            selector: Some(OperationSelector {
-                input_name: "kind",
-                value: "unsubscribe",
-            }),
+            selector: Some(OperationSelector::by_value("kind", "unsubscribe")),
             ..read_only_get(
                 "getEmailsByEmailIdListUnsubscribe",
                 "/api/v1/emails/{emailId}/list-unsubscribe",

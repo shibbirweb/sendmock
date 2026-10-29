@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use sendmock_ops::{ErasedOperation, HttpMethod, OperationRegistry};
+use sendmock_ops::{ErasedOperation, HttpMethod, OperationRegistry, SelectorChoice};
 use serde_json::{Map, Value, json};
 
 use crate::{McpToolAnnotations, McpToolDefinition, find_toolset};
@@ -51,12 +51,16 @@ fn describe_tool(tool_operations: &[Arc<dyn ErasedOperation>]) -> String {
         .iter()
         .map(|operation| {
             let definition = operation.definition();
-            match definition.selector {
-                Some(selector) => {
-                    format!(
-                        "{}={}: {}",
-                        selector.input_name, selector.value, definition.summary
-                    )
+            match definition
+                .selector
+                .map(|selector| (selector.input_name, selector.choice))
+            {
+                Some((input_name, SelectorChoice::Value(value))) => {
+                    format!("{input_name}={value}: {}", definition.summary)
+                }
+                Some((input_name, SelectorChoice::Presence { is_given })) => {
+                    let presence_word = if is_given { "With" } else { "Without" };
+                    format!("{presence_word} {input_name}: {}", definition.summary)
                 }
                 None => definition.summary.to_owned(),
             }
@@ -65,7 +69,8 @@ fn describe_tool(tool_operations: &[Arc<dyn ErasedOperation>]) -> String {
         .join(" ")
 }
 
-/// The union of the operations' inputs, plus the selector input naming which one runs.
+/// The union of the operations' inputs, plus the selector input naming which one runs when
+/// the operations are told apart by a value.
 fn merge_input_schemas(tool_operations: &[Arc<dyn ErasedOperation>]) -> Value {
     let mut properties = Map::new();
     let mut required_inputs: Vec<Value> = Vec::new();
@@ -85,8 +90,16 @@ fn merge_input_schemas(tool_operations: &[Arc<dyn ErasedOperation>]) -> Value {
         .iter()
         .filter_map(|operation| operation.definition().selector)
         .collect();
-    if let Some(first_selector) = selectors.first() {
-        let selector_values: Vec<&str> = selectors.iter().map(|selector| selector.value).collect();
+    let selector_values: Vec<&str> = selectors
+        .iter()
+        .filter_map(|selector| match selector.choice {
+            SelectorChoice::Value(value) => Some(value),
+            SelectorChoice::Presence { .. } => None,
+        })
+        .collect();
+    if let Some(first_selector) = selectors.first()
+        && !selector_values.is_empty()
+    {
         properties.insert(
             first_selector.input_name.to_owned(),
             json!({ "type": "string", "enum": selector_values }),

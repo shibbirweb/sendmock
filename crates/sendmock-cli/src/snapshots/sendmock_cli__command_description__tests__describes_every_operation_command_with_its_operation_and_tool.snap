@@ -832,6 +832,196 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock numbers list",
+    "usage": "sendmock numbers list",
+    "summary": "Fake numbers your app sends from, with their webhooks.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/numbers",
+        "operation_id": "getNumbers",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_number_list"
+    ]
+  },
+  {
+    "command": "sendmock numbers add",
+    "usage": "sendmock numbers add",
+    "summary": "Add a number.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--inbound-fallback-url",
+      "--inbound-method",
+      "--inbound-template-id",
+      "--inbound-url",
+      "--label",
+      "--messaging-service-sid",
+      "--number",
+      "--status-callback-url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/numbers",
+        "operation_id": "postNumbers",
+        "selector": {
+          "input": "number_id",
+          "isGiven": false
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_number_upsert"
+    ]
+  },
+  {
+    "command": "sendmock numbers update",
+    "usage": "sendmock numbers update <numberId>",
+    "summary": "Change a number.",
+    "arguments": [
+      "numberId"
+    ],
+    "flags": [
+      "--channel",
+      "--inbound-fallback-url",
+      "--inbound-method",
+      "--inbound-template-id",
+      "--inbound-url",
+      "--label",
+      "--messaging-service-sid",
+      "--number",
+      "--status-callback-url"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/numbers/{numberId}",
+        "operation_id": "patchNumbersByNumberId",
+        "selector": {
+          "input": "number_id",
+          "isGiven": true
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_number_upsert"
+    ]
+  },
+  {
+    "command": "sendmock numbers remove",
+    "usage": "sendmock numbers remove <numberId>",
+    "summary": "Delete a number.",
+    "arguments": [
+      "numberId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/numbers/{numberId}",
+        "operation_id": "deleteNumbersByNumberId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_number_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms services list",
+    "usage": "sendmock sms services list",
+    "summary": "Messaging Services that pool numbers.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/messaging-services",
+        "operation_id": "getMessagingServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_list"
+    ]
+  },
+  {
+    "command": "sendmock sms services create",
+    "usage": "sendmock sms services create",
+    "summary": "Add a Messaging Service.",
+    "arguments": [],
+    "flags": [
+      "--friendly-name",
+      "--inbound-fallback-url",
+      "--inbound-mode",
+      "--inbound-url",
+      "--number-id"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/messaging-services",
+        "operation_id": "postMessagingServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_create"
+    ]
+  },
+  {
+    "command": "sendmock sms services update",
+    "usage": "sendmock sms services update <serviceSid>",
+    "summary": "Change a Messaging Service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [
+      "--friendly-name",
+      "--inbound-fallback-url",
+      "--inbound-mode",
+      "--inbound-url",
+      "--number-id"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/messaging-services/{serviceSid}",
+        "operation_id": "patchMessagingServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_update"
+    ]
+  },
+  {
+    "command": "sendmock sms services delete",
+    "usage": "sendmock sms services delete <serviceSid>",
+    "summary": "Delete a Messaging Service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/messaging-services/{serviceSid}",
+        "operation_id": "deleteMessagingServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_delete"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",
