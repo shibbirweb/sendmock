@@ -14,6 +14,7 @@ use support::sendmock_process::{SendmockProcess, sendmock_command};
 const TWILIO_SEND_PATH: &str =
     "/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
 const TWILIO_SEND_FORM: &str = "To=%2B8801700000000&From=%2B15005550006&Body=Hi";
+const VONAGE_SEND_FORM: &str = "from=Acme&to=447700900000&text=Hi";
 
 /// The status line and body of a form POST, without an HTTP client crate.
 fn post_form(
@@ -42,11 +43,16 @@ fn find_free_port() -> io::Result<u16> {
     Ok(TcpListener::bind("127.0.0.1:0")?.local_addr()?.port())
 }
 
-// AC: SM-14.1
-// AC: SM-14.2
-// AC: SM-14.3
-#[test]
-fn provider_apis_answer_at_their_real_paths_on_the_provider_ports() -> io::Result<()> {
+/// A server with the shared provider port and Twilio on its own port, and their addresses.
+struct ProviderPortServer {
+    _server: SendmockProcess,
+    _working_directory: tempfile::TempDir,
+    http_addr: String,
+    provider_addr: String,
+    twilio_addr: String,
+}
+
+fn start_provider_port_server() -> io::Result<ProviderPortServer> {
     let working_directory = tempfile::tempdir()?;
     let twilio_port = find_free_port()?;
     let server = SendmockProcess::start(sendmock_command(working_directory.path()).args([
@@ -62,65 +68,82 @@ fn provider_apis_answer_at_their_real_paths_on_the_provider_ports() -> io::Resul
     ]))?;
     let ready_fields: Value =
         serde_json::from_str(&server.wait_for_line("provider_addr")).map_err(io::Error::other)?;
-    let http_addr = ready_fields["http_addr"]
-        .as_str()
-        .unwrap_or_default()
-        .to_owned();
-    let provider_addr = ready_fields["provider_addr"]
-        .as_str()
-        .unwrap_or_default()
-        .to_owned();
-    let twilio_addr = format!("127.0.0.1:{twilio_port}");
+    let read_address = |field_name: &str| {
+        ready_fields[field_name]
+            .as_str()
+            .unwrap_or_default()
+            .to_owned()
+    };
+    Ok(ProviderPortServer {
+        http_addr: read_address("http_addr"),
+        provider_addr: read_address("provider_addr"),
+        twilio_addr: format!("127.0.0.1:{twilio_port}"),
+        _server: server,
+        _working_directory: working_directory,
+    })
+}
 
-    let (shared_status, shared_body) = post_form(
-        &provider_addr,
+// AC: SM-14.1
+// AC: SM-14.2
+#[test]
+fn the_provider_port_answers_every_provider_at_its_real_paths() -> io::Result<()> {
+    let server = start_provider_port_server()?;
+
+    let (twilio_status, twilio_body) = post_form(
+        &server.provider_addr,
         TWILIO_SEND_PATH,
         "api.twilio.com",
         TWILIO_SEND_FORM,
     )?;
     let (vonage_status, _) = post_form(
-        &provider_addr,
+        &server.provider_addr,
         "/sms/json",
         "rest.nexmo.com",
-        "from=Acme&to=447700900000&text=Hi",
-    )?;
-    let (dedicated_status, _) = post_form(
-        &twilio_addr,
-        TWILIO_SEND_PATH,
-        "localhost",
-        TWILIO_SEND_FORM,
-    )?;
-    let (other_provider_status, _) = post_form(
-        &twilio_addr,
-        "/sms/json",
-        "localhost",
-        "from=Acme&to=447700900000&text=Hi",
+        VONAGE_SEND_FORM,
     )?;
     let (prefixed_status, _) = post_form(
-        &http_addr,
+        &server.http_addr,
         &format!("/providers/twilio{TWILIO_SEND_PATH}"),
         "localhost",
         TWILIO_SEND_FORM,
     )?;
-    let stored_messages = send_http_get(&http_addr, "/api/v1/sms")?;
+    let stored_messages = send_http_get(&server.http_addr, "/api/v1/sms")?;
 
-    let created_message: Value = serde_json::from_str(&shared_body).map_err(io::Error::other)?;
-    assert!(shared_status.contains(" 201 "), "{shared_status}");
+    let created_message: Value = serde_json::from_str(&twilio_body).map_err(io::Error::other)?;
+    assert!(twilio_status.contains(" 201 "), "{twilio_status}");
     assert!(
         created_message["sid"]
             .as_str()
             .is_some_and(|sid| sid.starts_with("SM"))
     );
     assert!(vonage_status.contains(" 200 "), "{vonage_status}");
-    assert!(dedicated_status.contains(" 201 "), "{dedicated_status}");
-    assert!(
-        other_provider_status.contains(" 404 "),
-        "{other_provider_status}"
-    );
     assert!(prefixed_status.contains(" 201 "), "{prefixed_status}");
     assert!(
-        stored_messages.contains("\"total_count\":4"),
+        stored_messages.contains("\"total_count\":3"),
         "{stored_messages}"
     );
+    Ok(())
+}
+
+// AC: SM-14.3
+#[test]
+fn a_dedicated_port_answers_only_its_provider() -> io::Result<()> {
+    let server = start_provider_port_server()?;
+
+    let (twilio_status, _) = post_form(
+        &server.twilio_addr,
+        TWILIO_SEND_PATH,
+        "localhost",
+        TWILIO_SEND_FORM,
+    )?;
+    let (vonage_status, _) = post_form(
+        &server.twilio_addr,
+        "/sms/json",
+        "localhost",
+        VONAGE_SEND_FORM,
+    )?;
+
+    assert!(twilio_status.contains(" 201 "), "{twilio_status}");
+    assert!(vonage_status.contains(" 404 "), "{vonage_status}");
     Ok(())
 }
