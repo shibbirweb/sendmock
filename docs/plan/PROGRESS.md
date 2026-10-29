@@ -9,7 +9,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | | |
 |---|---|
 | **Stage** | Stage B: Backend (Stage A, the UI with mock data, signed off on 2026-10-29) |
-| **Current phase** | **Phase 2: SMS and Verify backend**, next on `feat/phase-0` (#48). Phase 1 (email backend) is complete apart from publishing `0.1.0-beta.1`, which the owner does after merging #48; Phase 0 is complete. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
+| **Current phase** | **Phase 2: SMS and Verify backend**, under way on `feat/phase-0` (#48): W1 to W7 done, next W8. Phase 1 (email backend) is complete apart from publishing `0.1.0-beta.1`, which the owner does after merging #48; Phase 0 is complete. Stage A done: U3 19 / 19 (signed off 2026-10-29), U2 14 / 14, U1 18 / 18, U0 15 / 15 |
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
@@ -22,6 +22,9 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 
 ### Resume here (2026-10-29)
 
+- **Where Phase 2 stands (2026-10-29, end of session):** W1 to W7 of [26](26-phase-2.md) are done on `feat/phase-0` (#48, still a draft); the last commits are `46cd938` (SMTP load test fix) and `598b26e` (W7), and CI is green on `598b26e` (every Rust, web, smoke, parity, SMTP client, release and Docker job). **Next: W8** (CLI and MCP surfaces for `sms`, `verify`, `numbers`, `outcome-rule sms`; the SMS, Verify, Numbers and SMS > Providers screens switched to live data; the live UI suite extended), then **W9** (Twilio SDKs for Node and Python in CI, Testcontainers modules). Read W8 and W9 in the workstream table and the "As built" notes of [26](26-phase-2.md) before starting.
+- **Left open by W7:** the SMS providers item above stays unticked until the SMS > Providers screen is live (W8). No SM-16 criterion is ticked yet: SM-16.5 needs custom providers (Phase 4), SM-16.6 the CLI and MCP surfaces plus the skill's `add-sms-provider` workflow, SM-16.8 the SDK tests (W9). Adding a provider (`POST /api/v1/sms/providers`) comes with custom providers in Phase 4.
+- **Known for next time:** a test that passes on macOS and stalls on Linux can be reproduced locally with the `rust:1.98` Docker image (mount the worktree read-only, use a named volume for `CARGO_TARGET_DIR`, run one test); that is how the SYN cookie stall in the 500-session SMTP test was found. CI job logs need a GitHub token, so read results through the public runs, jobs and check-run annotations APIs.
 - **Phase 0 under way on `feat/phase-0` (2026-10-29):** one branch for the whole phase, a commit per workstream, one pull request; tests run in its CI. W0 settled the ports (1025 / 8025) and the licence (MIT OR Apache-2.0) and deferred the trademark check to before 1.0.
 - **Phase 0 planned, Stage B audited (#47, merged):** [23-phase-0.md](23-phase-0.md) splits Phase 0 into W0 to W12 with branches, deliverables, tests, criteria and dependencies. [24-stage-b-coverage.md](24-stage-b-coverage.md) maps all 221 UI operations to the phase that builds them; the gaps it found are now in the Stage B phases below. Owner decisions from the audit: the binary embeds the live UI build only from Phase 1, with **Not available yet** for operations not built yet (new feature UI-12, `available_operations` in `GET /info`, [07](07-ui.md#not-available-yet-stage-b)); virtual numbers move to Phase 2 (SM-12); UI and API auth lands in Phase 1. Open point in [23](23-phase-0.md#criteria): whether the three-OS smoke job proves DS-01.2 for the host build, or it waits for the release binaries.
 - **Working copy:** this work was done in the worktree `~/prefetch/mail-sms-server`; the main checkout `~/Personal/mail-sms-server` is on `feat/promo-video` with the promo video work uncommitted.
@@ -33,7 +36,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up"; for Phase 0 work, follow the workstream order in docs/plan/23-phase-0.md. Ask me before creating a branch, committing or pushing.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Check the open pull request and its CI with the public GitHub API, tell me where things stand in a few lines, and propose the next step from "Next up"; follow the workstream order of the current phase's plan (Phase 2: docs/plan/26-phase-2.md). Ask me before creating a branch, committing or pushing.
   ```
 
 ## How to update this file
