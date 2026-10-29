@@ -15,9 +15,9 @@ Where it is shown on the website (the landing page's video section above the foo
 | Claims | only what SendMock does, with its real names: provider names, template ids, event names and MCP tool names come from the app's own data. No invented numbers |
 | Production | motion graphics built in Remotion (`video/`), with SendMock's UI parts drawn from the app's dark theme and real data, so every scene can move: requests travel, events fire, prompts type |
 | Sound | no voice-over and no music (owner direction 2026-10-29): the film tells its story in on-screen words and works muted, and each change in the picture makes a short synthesized sound effect (see [Sound effects](#sound-effects-2026-10-29)) |
-| Captions | English WebVTT captions burned into the social cut and as a track on the full video, so it works muted |
+| Captions | none (changed 2026-10-30, owner decision): the trailer has no voice-over and every word is on screen, so it works muted without a captions track |
 | Hosting | YouTube (public); the landing page loads the player only after the play button is pressed (`youtube-nocookie.com`), so the page stays fast and sets no third-party cookies before that |
-| Before the video exists | the landing section shows the poster, a disabled play button with "Video coming soon" and the three benefit points |
+| Before the video exists | the landing section showed the poster, a disabled play button with "Video coming soon" and the three benefit points, until the video was published on 2026-10-30 |
 | Where | the landing page (the section above the footer), the README and social posts for releases |
 | Refresh | when the product's story changes (for example payments or AI agents grow), at the latest for 1.0 |
 
@@ -125,6 +125,7 @@ Owner request: everything needed to publish the trailer on YouTube.
 - **Category:** Science & Technology. Not made for kids, no paid promotion, no altered or synthetic content to declare (motion graphics only).
 - **Chapters** (each at least 10 seconds, as YouTube requires): 0:00 Email webhooks, 0:17 SMS, 0:27 Payments and any API, 0:45 Built in, 0:55 Events and build your own, 1:14 AI ready, 1:32 App tour, 1:44 Install anywhere.
 - **Timing:** the install commands in the film only work once the first release is published, so the video goes public after `0.1.0-beta.1` (or the description says the first beta is coming).
+- **Published** 2026-10-30: https://youtu.be/OHR7pVFGTl4. The landing page's play button loads it from `youtube-nocookie.com` in place of the poster (`website/components/landing/promo-video-player.tsx`).
 
 ### Sound effects (2026-10-29)
 

@@ -458,7 +458,7 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   expect(runningAnimationCount).toBe(0);
 });
 
-test("WS-02.4 the promotional video shows its poster, the three benefits and a disabled play button until the video exists", async ({
+test("WS-02.4 the promotional video shows its poster, the three benefits and a play button", async ({
   page,
 }) => {
   await page.goto("/");
@@ -468,9 +468,8 @@ test("WS-02.4 the promotional video shows its poster, the three benefits and a d
 
   await expect(promoVideo.getByTestId("promo-video-poster")).toBeVisible();
   await expect(
-    promoVideo.getByRole("button", { name: "Play the video (coming soon)" }),
-  ).toBeDisabled();
-  await expect(promoVideo).toContainText("Video coming soon");
+    promoVideo.getByRole("button", { name: "Play the video" }),
+  ).toBeEnabled();
   await expect(
     promoVideo
       .getByRole("list", { name: "Why developers use SendMock" })
@@ -499,6 +498,28 @@ test("WS-02.4 the promotional video loads no third-party player before play is p
     .scrollIntoViewIfNeeded();
 
   expect(thirdPartyRequests).toEqual([]);
+});
+
+test("WS-02.4 pressing play loads the YouTube player in place of the poster", async ({
+  page,
+}) => {
+  await page.route("https://www.youtube-nocookie.com/**", (route) =>
+    route.fulfill({ contentType: "text/html", body: "<html></html>" }),
+  );
+  await page.goto("/");
+  const promoVideo = page.getByRole("region", {
+    name: "Stop testing on real inboxes and phones",
+  });
+
+  await promoVideo.getByRole("button", { name: "Play the video" }).click();
+
+  await expect(promoVideo.getByTestId("promo-video-poster")).toHaveCount(0);
+  await expect(
+    promoVideo.getByTestId("promo-video-player").locator("iframe"),
+  ).toHaveAttribute(
+    "src",
+    "https://www.youtube-nocookie.com/embed/OHR7pVFGTl4?autoplay=1&rel=0",
+  );
 });
 
 test("the footer and header link to docs, feedback forms, security and the repository", async ({

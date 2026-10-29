@@ -53,7 +53,7 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | Numbers | **Number Ticker** | built-in provider APIs, languages with connection guides, REST API operations; each number links to the page that lists what it counts (Supported providers, Connect your app, the API reference), and a unit test keeps the providers page and the count in sync (changed 2026-10-27, U3 feedback F8) |
 | Product shots | **Safari** / **iPhone** mockups, **Hero Video Dialog** | app screenshots and a short tour video |
 | AI section | Animated list | an agent session: `sendmock_status` -> `sendmock_sms_wait` -> OTP |
-| Promotional video | **Safari** mockup as the poster, play button | "Stop testing on real inboxes and phones": the poster in both themes, a play button and three benefit points; replaces the closing call to action, which repeated the hero (changed 2026-10-27, U3 feedback F6). See [Promotional video](#promotional-video-decided-2026-10-27) |
+| Promotional video | **Safari** mockup as the poster, play button | "Stop testing on real inboxes and phones": the poster in both themes, a play button that loads the YouTube player in place (from 2026-10-30, when the video was published) and three benefit points; replaces the closing call to action, which repeated the hero (changed 2026-10-27, U3 feedback F6). See [Promotional video](#promotional-video-decided-2026-10-27) |
 | Footer | none (plain links) | the logo and tagline with a GitHub icon, then Product, Get started and Community link columns, and a bottom bar with the year (changed 2026-10-27, U3 feedback F5) |
 
 Exact component names are checked against the Magic UI registry when the site is built.
