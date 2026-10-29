@@ -4,7 +4,7 @@ mod client;
 mod protocol;
 mod server;
 
-pub use client::LoopbackSmtpClient;
+pub use client::SmtpSubmissionClient;
 pub use protocol::{
     MessageEnvelope, RecipientPolicy, SessionAction, SessionResult, SessionSettings, SmtpAuthMode,
     SmtpAuthModeError, SmtpReply, SmtpSession, cram_md5_digest, encode_base64_text,

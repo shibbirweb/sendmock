@@ -6,10 +6,18 @@ use sendmock_mcp::build_tool_definitions;
 use sendmock_ops::OperationRegistry;
 use serde_json::json;
 
-const BUILT_IN_COMMANDS: [(&str, &str); 3] = [
+const BUILT_IN_COMMANDS: [(&str, &str); 5] = [
     (
         "sendmock serve",
         "Run the servers (the default when no command is given).",
+    ),
+    (
+        "sendmock mcp",
+        "Serve MCP over stdio for AI agents, with tools that call a running SendMock.",
+    ),
+    (
+        "sendmock sendmail",
+        "Hand a message on stdin to the SMTP listener, like sendmail (-t, -f); also works as a `sendmail` symlink.",
     ),
     (
         "sendmock version",

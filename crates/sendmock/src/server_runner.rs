@@ -4,7 +4,7 @@ use std::sync::Arc;
 use sendmock_api::{EmbeddedUiAssets, build_app_router, serve_http};
 use sendmock_core::{Clock, SystemClock, SystemIdGenerator};
 use sendmock_ops::{OperationContext, build_operation_registry};
-use sendmock_smtp::{LoopbackSmtpClient, serve_smtp};
+use sendmock_smtp::{SmtpSubmissionClient, serve_smtp};
 use sendmock_store::Database;
 use tokio::net::TcpListener;
 use tokio::sync::watch;
@@ -22,10 +22,17 @@ use crate::update_check_task::{build_update_checker, run_update_check_task};
 /// Every listener, bound before anything is announced so a busy port stops startup.
 struct BoundListeners {
     http_listener: TcpListener,
-    http_addr: SocketAddr,
     smtp_listener: TcpListener,
-    smtp_addr: SocketAddr,
     smtps_listener: Option<TcpListener>,
+    addresses: ListenerAddresses,
+}
+
+/// Where each listener ended up, port `0` resolved.
+#[derive(Debug, Clone, Copy)]
+struct ListenerAddresses {
+    http_addr: SocketAddr,
+    smtp_addr: SocketAddr,
+    smtps_addr: Option<SocketAddr>,
 }
 
 pub async fn run_server(
@@ -59,12 +66,7 @@ pub async fn run_server(
         operation_context.clone(),
         shutdown_receiver_for_retention,
     ));
-    announce_ready(
-        server_config,
-        &listeners.http_addr,
-        &listeners.smtp_addr,
-        &operation_context,
-    );
+    announce_ready(server_config, &listeners.addresses, &operation_context);
     let http_shutdown = async move {
         shutdown_signal.wait().await;
         let _ = shutdown_sender.send(true);
@@ -72,7 +74,7 @@ pub async fn run_server(
     serve_http(listeners.http_listener, app_router, http_shutdown)
         .await
         .map_err(|source| StartupError::Listen {
-            address: listeners.http_addr,
+            address: listeners.addresses.http_addr,
             source,
         })?;
     while background_tasks.join_next().await.is_some() {}
@@ -115,10 +117,14 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         Arc::new(database),
         clock,
         Arc::new(SystemIdGenerator),
-        build_instance_details(listeners.http_addr, listeners.smtp_addr, started_at_unix_ms),
+        build_instance_details(
+            listeners.addresses.http_addr,
+            listeners.addresses.smtp_addr,
+            started_at_unix_ms,
+        ),
     )
-    .with_sample_email_sender(Arc::new(LoopbackSmtpClient::new(reachable_address(
-        listeners.smtp_addr,
+    .with_sample_email_sender(Arc::new(SmtpSubmissionClient::new(reachable_address(
+        listeners.addresses.smtp_addr,
     ))))
     .with_update_checker(build_update_checker())
 }
@@ -151,31 +157,50 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
                 source,
             })
     };
-    Ok(BoundListeners {
+    let addresses = ListenerAddresses {
         http_addr: local_address(&http_listener, server_config.http_addr)?,
         smtp_addr: local_address(&smtp_listener, server_config.smtp_addr)?,
+        smtps_addr: smtps_listener
+            .as_ref()
+            .and_then(|listener| listener.local_addr().ok()),
+    };
+    Ok(BoundListeners {
         http_listener,
         smtp_listener,
         smtps_listener,
+        addresses,
     })
 }
 
 fn announce_ready(
     server_config: &ServerConfig,
-    http_addr: &SocketAddr,
-    smtp_addr: &SocketAddr,
+    addresses: &ListenerAddresses,
     operation_context: &OperationContext,
 ) {
+    let ListenerAddresses {
+        http_addr,
+        smtp_addr,
+        smtps_addr,
+    } = addresses;
     if !http_addr.ip().is_loopback() {
         tracing::warn!(
             http_addr = %http_addr,
             "SendMock is listening beyond this machine without UI auth; anyone who can reach this port can read what it captured"
         );
     }
+    if server_config.prints_ready_json {
+        let ready_line = serde_json::json!({
+            "http_addr": http_addr.to_string(),
+            "smtp_addr": smtp_addr.to_string(),
+            "smtps_addr": smtps_addr.map(|smtps_addr| smtps_addr.to_string()),
+            "version": env!("CARGO_PKG_VERSION"),
+        });
+        println!("{ready_line}");
+    }
     tracing::info!(
         http_addr = %http_addr,
         smtp_addr = %smtp_addr,
-        smtps_addr = ?server_config.smtp.smtps_addr,
+        smtps_addr = ?smtps_addr,
         database = %operation_context.database.location(),
         config_file = ?server_config.config_file_path,
         "SendMock is ready"

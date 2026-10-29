@@ -1,7 +1,9 @@
+mod mcp_arguments;
 mod serve_arguments;
 
 use clap::{Parser, Subcommand};
 
+pub use mcp_arguments::McpArguments;
 pub use serve_arguments::ServeArguments;
 
 #[derive(Debug, Parser)]
@@ -26,6 +28,9 @@ enum CliCommand {
     /// Run the servers (the default when no command is given).
     Serve(Box<ServeArguments>),
 
+    /// Serve MCP over stdio for AI agents, with tools that call a running SendMock.
+    Mcp(McpArguments),
+
     /// Print the version and release channel of this binary.
     Version {
         /// Print JSON
@@ -48,6 +53,7 @@ enum CliCommand {
 /// The commands the binary handles itself; operation commands are built from the registry.
 pub enum BuiltInCommand<'arguments> {
     Serve(&'arguments ServeArguments),
+    Mcp(&'arguments McpArguments),
     Version {
         json: &'arguments bool,
     },
@@ -61,6 +67,7 @@ impl CliArguments {
     pub fn built_in_command(&self) -> BuiltInCommand<'_> {
         match &self.command {
             Some(CliCommand::Serve(serve_arguments)) => BuiltInCommand::Serve(serve_arguments),
+            Some(CliCommand::Mcp(mcp_arguments)) => BuiltInCommand::Mcp(mcp_arguments),
             Some(CliCommand::Version { json }) => BuiltInCommand::Version { json },
             Some(CliCommand::Help { all, json }) => BuiltInCommand::Help { all, json },
             None => BuiltInCommand::Serve(&self.serve_arguments),

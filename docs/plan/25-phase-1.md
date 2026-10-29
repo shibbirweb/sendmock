@@ -83,6 +83,8 @@ A tower layer records every API request (method, path, status, duration, bodies 
 
 `sendmock sendmail [-t] [-f from] [recipients]` reads stdin and submits it to the SMTP listener; a binary started as `sendmail` behaves the same. `sendmock mcp` serves the tools from W6 of Phase 0 over stdio with `rmcp`, with `--toolsets` and `--read-only`, and never returns a secret. `--ready-json` prints the bound addresses as one JSON line once listening (port `0` allowed).
 
+**As built:** `sendmock-mcp` builds an `McpToolCatalog` from the registry (tools filtered by `ToolFilter`: toolsets and read-only) and serves it with rmcp's `ServerHandler`; a tool behind several operations picks one by its selector argument. Calls go through an `OperationRunner` trait: the binary's `RemoteOperationRunner` uses the CLI's `ApiClient` against `--server` (MCP and the CLI are both transports, so the binary joins them), and `InProcessOperationRunner` is ready for `/mcp` over HTTP in W8. JSON objects come back as structured content, other answers as text, and failures as tool errors. The sendmail shim runs before clap (sendmail options are not clap options) when the binary is started as `sendmail` or with `sendmail` first, and submits with `SmtpSubmissionClient` (the same client the sample email uses), which turns bare LF into CRLF. `--ready-json` moves logs to stderr so stdout carries only the ready line. EM-06.2 and DS-06.1 move to W9, where the other language checks run.
+
 ## W8: Live UI
 
 `GET /info` gains `available_operations`; each surface catalogue entry gains its phase; the UI's shared `useOperationAvailability` hook and `NotAvailableYetState` cover every screen and button ([07](07-ui.md#not-available-yet-stage-b)). The binary embeds the live build. `--ui-auth user:pass` (or an htpasswd file) protects the UI, the API, the WebSocket and MCP over HTTP, with the API token as an alternative; CORS allows the docs playground's origin unless `--cors-origins` changes it.
@@ -98,7 +100,7 @@ A tower layer records every API request (method, path, status, duration, bodies 
 | `mail-parser` | W2 | MIME parsing that copes with broken real-world mail; already in the plan |
 | `zstd` | W2 | raw messages compressed at rest; already in the plan |
 | `rustls`, `tokio-rustls`, `rcgen` | W4 | STARTTLS and SMTPS without OpenSSL; already in the plan |
-| `rmcp` | W7 | the official Rust MCP SDK; already in the plan |
+| `rmcp` | W7 | the official Rust MCP SDK; already in the plan (3.8, `server` and `transport-io` only) |
 | `base64` | W1, W3 | cursors and attachment content |
 | `hmac`, `md-5` | W4 | the CRAM-MD5 AUTH mechanism |
 | axum `ws` feature (`tokio-tungstenite`) | W5 | the WebSocket at `/api/v1/ws` the UI already uses |

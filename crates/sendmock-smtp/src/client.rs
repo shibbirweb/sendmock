@@ -1,3 +1,3 @@
-mod loopback_smtp_client;
+mod smtp_submission_client;
 
-pub use loopback_smtp_client::LoopbackSmtpClient;
+pub use smtp_submission_client::SmtpSubmissionClient;

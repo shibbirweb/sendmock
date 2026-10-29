@@ -71,6 +71,10 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_UPDATE_CHECK", value_name = "MODE")]
     pub update_check: Option<String>,
 
+    /// Print one JSON line with the bound addresses on stdout once listening (logs go to stderr); port 0 picks a free port
+    #[arg(long, env = "SENDMOCK_READY_JSON")]
+    pub ready_json: bool,
+
     /// Database file, or `memory` to keep nothing after exit [default: sendmock.db in the OS data folder]
     #[arg(long = "db", env = "SENDMOCK_DB", value_name = "PATH|memory")]
     pub database_setting: Option<String>,

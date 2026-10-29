@@ -54,7 +54,7 @@ Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
 - [ ] PL-03.1 `wait/email`, `wait/sms`, `wait/http` and `wait/webhook` return as soon as a match arrives and `408` after the timeout.
 - [ ] PL-03.2 `since` prevents matching messages older than the request window.
 - [ ] PL-03.3 `otp` and `links` return the latest values per recipient and channel.
-- [ ] PL-03.4 `--ready-json` with port `0` prints the bound addresses once ready.
+- [x] PL-03.4 `--ready-json` with port `0` prints the bound addresses once ready. (#48)
 - [ ] PL-03.5 `POST /samples/{kind}` creates an email (over SMTP, with its SMTP session logged), an SMS or a verification through the normal path, firing the same events and webhooks as real traffic, with matching CLI and MCP commands.
 
 ## PL-04 Seed file and reset

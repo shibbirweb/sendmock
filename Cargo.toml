@@ -58,6 +58,10 @@ rustls = { version = "0.23", default-features = false, features = [
     "std",
     "tls12",
 ] }
+rmcp = { version = "3.8", default-features = false, features = [
+    "server",
+    "transport-io",
+] }
 rust-embed = { version = "8", features = [
     "mime-guess",
 ] }

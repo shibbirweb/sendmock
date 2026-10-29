@@ -3,7 +3,7 @@ use std::sync::Arc;
 use sendmock_ops::{ErasedOperation, HttpMethod, OperationRegistry};
 use serde_json::{Map, Value, json};
 
-use crate::{McpToolAnnotations, McpToolDefinition};
+use crate::{McpToolAnnotations, McpToolDefinition, find_toolset};
 
 /// One tool per MCP name in the registry, in registration order. Operations that share a
 /// tool are told apart by their selector input, as the surface catalogue defines them.
@@ -35,6 +35,7 @@ fn build_tool_definition(
 ) -> McpToolDefinition {
     McpToolDefinition {
         name: tool_name.to_owned(),
+        toolset: find_toolset(tool_name).to_owned(),
         description: describe_tool(tool_operations),
         input_schema: merge_input_schemas(tool_operations),
         annotations: annotate_tool(tool_operations),

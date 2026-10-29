@@ -6,6 +6,7 @@ use serde_json::Value;
 #[serde(rename_all = "camelCase")]
 pub struct McpToolDefinition {
     pub name: String,
+    pub toolset: String,
     pub description: String,
     pub input_schema: Value,
     pub annotations: McpToolAnnotations,

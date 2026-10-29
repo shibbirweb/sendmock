@@ -21,7 +21,11 @@ pub fn start_server(serve_arguments: &ServeArguments) -> ExitCode {
 
 fn serve(serve_arguments: &ServeArguments) -> Result<(), StartupError> {
     let server_config = ServerConfig::load(serve_arguments)?;
-    logging::initialise_logging(server_config.log_format, server_config.log_level);
+    logging::initialise_logging(
+        server_config.log_format,
+        server_config.log_level,
+        server_config.prints_ready_json,
+    );
     if let Some(seed_file_path) = &server_config.seed_file_path {
         let seed_validation = check_seed_file(seed_file_path)?;
         let item_count: usize = seed_validation

@@ -60,9 +60,9 @@ UI in U1, backend Phase 1.
 
 Phase 1.
 
-- [ ] EM-06.1 `sendmock sendmail -t` reads a message from stdin and it is stored like an SMTP message.
+- [x] EM-06.1 `sendmock sendmail -t` reads a message from stdin and it is stored like an SMTP message. (#48)
 - [ ] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to SendMock.
-- [ ] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender.
+- [x] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender. (#48)
 
 ## EM-07 Native HTTP send API
 

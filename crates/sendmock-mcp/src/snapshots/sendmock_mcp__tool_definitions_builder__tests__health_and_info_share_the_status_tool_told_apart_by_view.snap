@@ -4,6 +4,7 @@ expression: status_tool
 ---
 {
   "name": "sendmock_status",
+  "toolset": "core",
   "description": "view=health: Liveness check; answers while the server runs. view=info: Version, listen addresses and enabled features.",
   "inputSchema": {
     "properties": {

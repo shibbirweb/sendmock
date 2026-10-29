@@ -29,6 +29,8 @@ pub struct ServerConfig {
     pub log_level: LogLevel,
     pub seed_file_path: Option<PathBuf>,
     pub config_file_path: Option<PathBuf>,
+    /// `--ready-json`: the ready line on stdout, logs on stderr.
+    pub prints_ready_json: bool,
 }
 
 impl ServerConfig {
@@ -93,6 +95,7 @@ impl ServerConfig {
                 .unwrap_or_default(),
             seed_file_path: serve_arguments.seed_file_path.clone().or(config_file.seed),
             config_file_path,
+            prints_ready_json: serve_arguments.ready_json,
         })
     }
 

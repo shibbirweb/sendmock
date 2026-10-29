@@ -13,11 +13,11 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 3 / 108 accepted (EM-02, EM-09, PL-02), 115 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
+| **Feature acceptance** | 3 / 108 accepted (EM-02, EM-09, PL-02), 121 / 496 criteria ticked; the eight U3 gate features (UI-05 to UI-10, WS-02, WS-04) are `UI done`, other Stage A features have their UI criteria tested on mock data and reach `Accepted` in Stage B ([acceptance/](acceptance/README.md)) |
 
 **Next up:**
 
-1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W6 are done; next W7 (the `sendmail` shim, MCP over stdio, `--ready-json`), then W8 and W9. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
+1. Every phase is built on `feat/phase-0` in pull request #48 (owner, 2026-10-29), a commit per workstream, CI on each push. Phase 0 is complete (W0 to W12). Now **Phase 1, [25](25-phase-1.md)**: W1 to W7 are done; next W8 (live UI, `available_operations`, UI and API auth, CORS, `/mcp` over HTTP), then W9. The owner reviews and merges #48; the first beta is published after that with Prepare release `bump: minor`.
 2. When the phase is done, mark #48 ready for review and merge it once CI is green.
 
 ### Resume here (2026-10-29)
@@ -216,14 +216,14 @@ Plan: [25-phase-1.md](25-phase-1.md). Built on `feat/phase-0` (owner, 2026-10-29
 - [ ] MIME parsing, storage, retention, FTS search
 - [x] OTP and link extractors (#48)
 - [x] Email REST API and WebSocket events (#48)
-- [ ] `sendmail` shim
+- [x] `sendmail` shim (#48)
 - [x] Native HTTP send API (`POST /api/v1/send`) (#48)
 - [x] `POST /send/raw` and `GET /emails/latest` (#48)
 - [x] SSE `/events` and `GET /events/recent` (#48)
 - [x] SMTP session log and HTTP API request log (#48)
 - [ ] Plus-address tagging, MIME tree, thumbnails, List-Unsubscribe check
-- [ ] `wait/email`, `otp`, `links`, `reset`; `--ready-json`
-- [ ] CLI `email` / `otp` / `links`; MCP `core`, `email`, `extract` toolsets
+- [x] `wait/email`, `otp`, `links`, `reset`; `--ready-json` (#48)
+- [x] CLI `email` / `otp` / `links`; MCP `core`, `email`, `extract` toolsets (#48)
 - [ ] Mail screens switched to live mode; the binary embeds the live UI build and `/info` lists `available_operations`; Not available yet for the rest (UI-12)
 - [ ] UI and API auth (`--ui-auth`, API token; PL-06.2)
 - [x] Settings API (General, Email, Notifications), `/integrations/{stack}`, `POST /samples/email` (#48)
@@ -534,3 +534,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-10-29 | Phase 1 W6 (settings): `GET /settings` and `PATCH /settings` (`sendmock settings get|set`, `sendmock_settings_get|update`) with every key of the contract, stored as one JSON object over the defaults and cached in memory, so changes apply to the next message without a restart; the same field rules as the Settings forms (PL-05.2); the relay password is masked in every answer and kept when sent back masked. `POST /reset` (`sendmock reset --yes`) deletes emails, SMTP sessions and logged requests and restores the default settings. Retention: a background task prunes emails, SMTP sessions and logged requests past `max_emails` and `max_age_days` every 10 seconds, off the ingest path; `--max-emails` and `--max-age` (and `sendmock.toml`) write the limits at startup. Custom OTP patterns and plus-address tagging now come from Settings. |
 | 2026-10-29 | Phase 1 W6 (samples, integrations): `POST /samples/email` (`sendmock sample email`, `sendmock_sample_send`) sends a sample over SMTP to SendMock's own listener through `LoopbackSmtpClient`, so it is stored, fires `email.received` and logs its SMTP session like real mail; other kinds answer 404 until their phase. `GET /integrations/{stack}` (`sendmock integrate`, `sendmock_integration_snippet`) gives the Connection screen's SMTP settings (or the catcher URL with `channel=http`) for the stack, with the host for where the app runs and this instance's ports; SMS snippets come with the SMS API in Phase 2. |
 | 2026-10-29 | Phase 1 W6 (update check): `GET /updates` (`sendmock update check`, `sendmock_update_check`) answers `409 update_check_off` while the mode is Off, and otherwise offers stable installs the newest stable and beta installs the newer of the newest beta and stable, edge and dev nothing, with the release notes and the upgrade command for the install method baked in at build time (`SENDMOCK_INSTALL_METHOD`) and the platform; answers are cached for 24 hours and an unreachable GitHub gives `502 update_source_unreachable` and is asked again next time. The request sends only `User-Agent: sendmock`. Daily mode checks on start and hourly through the cache, and logs a newer version once. `--update-check`, `SENDMOCK_UPDATE_CHECK` and `update_check` in `sendmock.toml` set the mode at startup. HTTPS uses reqwest with rustls on ring (installed as the process default) and the platform's certificate store. PL-05.6 and PL-05.10 to PL-05.13 ticked. Fixed on the way: in-memory writes failed with `SQLITE_LOCKED` while readers polled (read-uncommitted readers now), and a SIGTERM right after the ready line could kill the process before its handlers were installed. |
+| 2026-10-29 | Phase 1 W7: `sendmock mcp` serves MCP over stdio with rmcp 3.8: one tool per registry tool, with input schemas, annotations and the toolset from the same prefix table as `mcp-toolsets.ts`; `--toolsets` (default `core,email,sms,verify,extract,webhooks`, or `all`) and `--read-only` filter them; each call runs its operation over the REST API of the instance at `--server`, so masked secrets stay masked; failures come back as tool errors. `sendmock sendmail` and a binary named `sendmail` read a message from stdin (`-t` reads To, Cc and Bcc and drops the Bcc header, `-f`/`-r` set the envelope sender, other sendmail options are ignored) and submit it over SMTP to `SENDMOCK_SMTP_ADDR`, exiting 75 when SendMock is not there. `--ready-json` prints one JSON line with the bound addresses on stdout (logs move to stderr). EM-06.1, EM-06.3, AI-02.2 to AI-02.4 and PL-03.4 ticked; EM-06.2 (PHP `mail()`) and DS-06.1 (Testcontainers) move to W9 with the other language checks, and AI-02.1 waits for `/mcp` over HTTP in W8. |
