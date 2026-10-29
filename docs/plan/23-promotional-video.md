@@ -111,6 +111,21 @@ Owner request: render for YouTube in 4K at 60 fps.
   bunx remotion render src/index.ts SendMockTrailerMechanicalTyping out/sendmock-trailer-4k60.mp4 --scale=2 --codec=h264 --crf=18
   ```
 
+### YouTube upload (2026-10-29)
+
+Owner request: everything needed to publish the trailer on YouTube.
+
+- **Thumbnail:** the still `SendMockYoutubeThumbnail` (`video/src/thumbnail/youtube-thumbnail.tsx`, 1280 by 720): the logo, "Every webhook. On localhost." in big words, chips for Email, SMS, Payments and Any API, the line "Open source · No SDK needed · AI ready", and the real webhook deliveries page on the right. Render it in `video/`:
+
+  ```bash
+  bunx remotion still src/index.ts SendMockYoutubeThumbnail out/sendmock-youtube-thumbnail.jpg --image-format=jpeg --jpeg-quality=92
+  ```
+
+- **Title:** "SendMock: Test Email, SMS & Payment Webhooks on Localhost".
+- **Category:** Science & Technology. Not made for kids, no paid promotion, no altered or synthetic content to declare (motion graphics only).
+- **Chapters** (each at least 10 seconds, as YouTube requires): 0:00 Email webhooks, 0:17 SMS, 0:27 Payments and any API, 0:45 Built in, 0:55 Events and build your own, 1:14 AI ready, 1:32 App tour, 1:44 Install anywhere.
+- **Timing:** the install commands in the film only work once the first release is published, so the video goes public after `0.1.0-beta.1` (or the description says the first beta is coming).
+
 ### Sound effects (2026-10-29)
 
 Owner direction: no background music. Instead, every change in the picture makes its own short sound: a click when a control is pressed, a swoosh when data is sent, a soft blip when it lands, a success chime or a gentle error tone for the outcome, typing while text is typed, a pop when something appears, a swipe for each page of the app tour, a whoosh for each scene transition and a soft reveal for the logo and the closing line. The earlier composed music (`bun run music`) was removed.
