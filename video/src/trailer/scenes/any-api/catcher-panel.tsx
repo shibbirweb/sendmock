@@ -1,8 +1,7 @@
-import { useCurrentFrame } from "remotion";
-
 import { monoFontFamily } from "../../../brand";
 import { getRiseInStyle } from "../../trailer-motion";
 import { areaColors, trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 export type CaughtCall = {
   catchFrame: number;
@@ -19,7 +18,7 @@ type CatcherPanelProps = {
 
 /** SendMock's HTTP catcher: each call your app makes, caught and previewed. */
 export function CatcherPanel({ caughtCalls }: CatcherPanelProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <div

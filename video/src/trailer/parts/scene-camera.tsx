@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useDesignFrame } from "../trailer-time";
 
 /** How far the camera pushes in and drifts over a scene. */
 export const cameraPushScale = 1.03;
@@ -12,7 +13,7 @@ type SceneCameraProps = {
 
 /** A slow camera push and drift over the whole scene, so no frame is still. */
 export function SceneCamera({ durationFrames, children }: SceneCameraProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const pushScale = interpolate(
     frame,
     [0, durationFrames],

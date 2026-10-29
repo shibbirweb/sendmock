@@ -1,10 +1,11 @@
 import type { CSSProperties } from "react";
-import { interpolate, useCurrentFrame } from "remotion";
+import { interpolate } from "remotion";
 
 import { monoFontFamily } from "../../brand";
 import { getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
 import { AppWindow } from "./app-window";
+import { useDesignFrame } from "../trailer-time";
 
 export type TerminalLine = {
   text: string;
@@ -21,7 +22,7 @@ type AppTerminalProps = {
 
 /** Your app's terminal: each line that receives a webhook glows as it lands. */
 export function AppTerminal({ title, lines, style }: AppTerminalProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <AppWindow

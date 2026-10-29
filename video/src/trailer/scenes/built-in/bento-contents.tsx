@@ -1,9 +1,10 @@
-import { interpolate, useCurrentFrame } from "remotion";
+import { interpolate } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
 import type { BrandedName } from "../../trailer-facts";
 import { getRiseInStyle } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 type BrandedNameListProps = {
   brandedNames: BrandedName[];
@@ -19,7 +20,7 @@ export function BrandedNameList({
   startFrame,
   columnCount,
 }: BrandedNameListProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const spotlightIndex =
     Math.floor((frame - startFrame - 40) / spotlightIntervalFrames) %
     brandedNames.length;
@@ -85,7 +86,7 @@ export function ScrollingNameList({
   startFrame,
   heightPx,
 }: ScrollingNameListProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const scrollOffsetPx = interpolate(
     frame,
     [startFrame, startFrame + 280],
@@ -134,7 +135,7 @@ type CodeLinesProps = {
 
 /** A few short monospace lines, rising in one after another. */
 export function CodeLines({ lines, startFrame }: CodeLinesProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

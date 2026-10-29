@@ -1,6 +1,7 @@
-import { interpolate, useCurrentFrame } from "remotion";
+import { interpolate } from "remotion";
 
 import { trailerPalette } from "../trailer-palette";
+import { useDesignFrame } from "../trailer-time";
 
 export type FlowDirection = "toApp" | "fromApp";
 
@@ -26,7 +27,7 @@ export function FlowLine({
   travelStartFrames,
   travelDurationFrames,
 }: FlowLineProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const fromXPx = direction === "toApp" ? startXPx : endXPx;
   const toXPx = direction === "toApp" ? endXPx : startXPx;
   const dashFlowPx = (direction === "toApp" ? -1 : 1) * frame * 1.4;

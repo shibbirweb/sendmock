@@ -3,6 +3,7 @@ import {
   appTourSceneCues,
   appTourSceneDurationFrames,
 } from "./scenes/app-tour/app-tour-scene";
+import { ClosingScene } from "./scenes/closing-scene";
 import { PlatformsScene } from "./scenes/platforms/platforms-scene";
 import {
   getTrailerDurationFrames,
@@ -52,4 +53,25 @@ export const sendMockTrailerTourDurationFrames =
 /** The SendMock trailer with a glance at the app's real pages. */
 export function SendMockTrailerTour() {
   return <TrailerFilm scenes={tourScenes} />;
+}
+
+function ClosingSceneWithPlatforms() {
+  return <ClosingScene barContent="platforms" />;
+}
+
+/**
+ * The tour cut with a closing bar that names every platform instead of one
+ * install command (docs/plan/23-promotional-video.md, Version with every
+ * platform at the close).
+ */
+export const tourScenesWithPlatforms: TrailerScene[] = tourScenes.map(
+  (trailerScene): TrailerScene =>
+    trailerScene.sceneName === "closing"
+      ? { ...trailerScene, Scene: ClosingSceneWithPlatforms }
+      : trailerScene,
+);
+
+/** A copy of the tour cut whose closing card shows every platform. */
+export function SendMockTrailerTourPlatforms() {
+  return <TrailerFilm scenes={tourScenesWithPlatforms} />;
 }

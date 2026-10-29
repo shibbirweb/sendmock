@@ -5,7 +5,7 @@ import {
   Monitor,
   Terminal,
 } from "lucide-react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
 import { SceneHeadline } from "../../parts/scene-headline";
@@ -13,6 +13,7 @@ import { installCommands, languageNames } from "../../trailer-facts";
 import { getProgress, getRiseInStyle } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
 import type { UiCue } from "../../ui-cues";
+import { useDesignFrame } from "../../trailer-time";
 
 export const platformsSceneDurationFrames = 300;
 
@@ -22,7 +23,7 @@ type PlatformTile = {
   Icon: LucideIcon;
 };
 
-const platformTiles: PlatformTile[] = [
+export const platformTiles: PlatformTile[] = [
   { name: "macOS", details: "Apple silicon · Intel", Icon: Laptop },
   { name: "Linux", details: "x64 · arm64 · .deb · .rpm", Icon: Terminal },
   { name: "Windows", details: "x64 · arm64", Icon: Monitor },
@@ -71,7 +72,7 @@ type PlatformsSceneProps = {
 export function PlatformsScene({
   chapterLabel = "09 · Everywhere",
 }: PlatformsSceneProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const commandFrame = frame - commandsStartFrame;
   const commandIndex =
     Math.max(0, Math.floor(commandFrame / commandHoldFrames)) %

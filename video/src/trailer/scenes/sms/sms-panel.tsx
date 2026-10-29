@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useCurrentFrame } from "remotion";
 
 import { getRiseInStyle, getTypedText } from "../../trailer-motion";
 import { areaColors, trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 export const customerReplyText = "YES";
 export const appAnswerText = "Thanks Maya, see you Thursday.";
@@ -21,7 +21,7 @@ export function SmsPanel({
   replyTypingStartFrame,
   appAnswerFrame,
 }: SmsPanelProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const isDelivered = activeStepIndex >= 0;
   const isReplySent = activeStepIndex >= 1;
 

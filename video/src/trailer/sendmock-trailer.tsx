@@ -70,6 +70,7 @@ import {
   smsSceneCues,
   smsSceneDurationFrames,
 } from "./scenes/sms/sms-scene";
+import { toVideoFrames } from "./trailer-time";
 
 export type TrailerScene = {
   sceneName: string;
@@ -215,7 +216,7 @@ export function TrailerFilm({ scenes }: TrailerFilmProps) {
           const sceneSequence = (
             <TransitionSeries.Sequence
               key={trailerScene.sceneName}
-              durationInFrames={trailerScene.durationFrames}
+              durationInFrames={toVideoFrames(trailerScene.durationFrames)}
             >
               <SceneCamera durationFrames={trailerScene.durationFrames}>
                 <trailerScene.Scene />
@@ -231,8 +232,9 @@ export function TrailerFilm({ scenes }: TrailerFilmProps) {
               key={`${trailerScene.sceneName}-transition`}
               presentation={getScenePresentation(trailerScene.transitionIn)}
               timing={linearTiming({
-                durationInFrames:
+                durationInFrames: toVideoFrames(
                   transitionDurationFrames[trailerScene.transitionIn],
+                ),
                 easing: transitionEasing,
               })}
             />,

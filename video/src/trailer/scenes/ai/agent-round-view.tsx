@@ -1,5 +1,3 @@
-import { useCurrentFrame } from "remotion";
-
 import { monoFontFamily } from "../../../brand";
 import {
   getProgress,
@@ -13,6 +11,7 @@ import {
   getRoundPartFrames,
   toolCallCheckDelayFrames,
 } from "./agent-rounds";
+import { useDesignFrame } from "../../trailer-time";
 
 type AgentRoundViewProps = {
   agentRound: AgentRound;
@@ -20,7 +19,7 @@ type AgentRoundViewProps = {
 
 /** One prompt, the tool calls the agent makes and its one-line answer. */
 export function AgentRoundView({ agentRound }: AgentRoundViewProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const { promptEndFrame, firstToolFrame, answerFrame } =
     getRoundPartFrames(agentRound);
   const typedPrompt = getTypedText(

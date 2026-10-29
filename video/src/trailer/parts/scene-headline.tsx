@@ -1,8 +1,7 @@
-import { useCurrentFrame } from "remotion";
-
 import { fontFamily, monoFontFamily } from "../../brand";
 import { getProgress, getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
+import { useDesignFrame } from "../trailer-time";
 
 type SceneHeadlineProps = {
   chapterLabel: string;
@@ -21,7 +20,7 @@ export function SceneHeadline({
   supportingLine,
   topPx = 72,
 }: SceneHeadlineProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const headlineWords = headline.split(" ");
   const supportingLineFrame = 6 + headlineWords.length * wordStaggerFrames;
   const labelProgress = getProgress(frame, 0, 14);

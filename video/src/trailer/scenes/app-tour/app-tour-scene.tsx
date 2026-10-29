@@ -1,10 +1,4 @@
-import {
-  AbsoluteFill,
-  Img,
-  interpolate,
-  staticFile,
-  useCurrentFrame,
-} from "remotion";
+import { AbsoluteFill, Img, interpolate, staticFile } from "remotion";
 
 import { AppWindow } from "../../parts/app-window";
 import { SceneHeadline } from "../../parts/scene-headline";
@@ -16,6 +10,7 @@ import {
 import { trailerPalette } from "../../trailer-palette";
 import type { UiCue } from "../../ui-cues";
 import { appTourPages } from "./app-tour-pages";
+import { useDesignFrame } from "../../trailer-time";
 
 const firstPageFrame = 20;
 const pageHoldFrames = 42;
@@ -45,7 +40,7 @@ const pageListRowHeightPx = 64;
 
 /** Scene 9 of the tour version: real SendMock pages, one glance each. */
 export function AppTourScene() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const activePageIndex = Math.max(
     0,
     getActiveStepIndex(frame, pageStartFrames),

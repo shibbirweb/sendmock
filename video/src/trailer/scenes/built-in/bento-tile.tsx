@@ -1,8 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
-import { interpolate, useCurrentFrame } from "remotion";
+import { interpolate } from "remotion";
 
 import { getProgress } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 type BentoTileProps = {
   title: string;
@@ -28,7 +29,7 @@ export function BentoTile({
   children,
   style,
 }: BentoTileProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const appearProgress = getProgress(frame, startFrame, 18);
   const countedValue =
     count === undefined

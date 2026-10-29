@@ -1,4 +1,4 @@
-import { AbsoluteFill, Sequence, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
 import { AppWindow } from "../../parts/app-window";
@@ -14,6 +14,7 @@ import {
   getRoundPartFrames,
   toolCallCheckDelayFrames,
 } from "./agent-rounds";
+import { toVideoFrames, useDesignFrame } from "../../trailer-time";
 
 const firstRoundStartFrame = 24;
 const roundFadeFrames = 8;
@@ -71,7 +72,7 @@ export const aiSceneCues: UiCue[] = [
 
 /** Scene 9: everything SendMock does, asked for in plain words to an AI agent. */
 export function AiScene() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <AbsoluteFill>
@@ -105,8 +106,10 @@ export function AiScene() {
           return (
             <Sequence
               key={agentRound.prompt}
-              from={roundStartFrame}
-              durationInFrames={isLastRound ? undefined : roundDurationFrames}
+              from={toVideoFrames(roundStartFrame)}
+              durationInFrames={
+                isLastRound ? undefined : toVideoFrames(roundDurationFrames)
+              }
               layout="none"
             >
               <div style={{ opacity: fadeOpacity }}>

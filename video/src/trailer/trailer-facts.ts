@@ -148,10 +148,10 @@ export const languageNames = [
   ".NET",
 ];
 
+/** The stable install commands, exactly as the docs Install page gives them (website/content/docs/install.md). */
 export const installCommands = [
   "brew install shibbirweb/tap/sendmock",
   "curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh",
-  "winget install shibbirweb.sendmock",
-  "scoop install sendmock",
-  "docker run -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
+  "irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex",
+  "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
 ];

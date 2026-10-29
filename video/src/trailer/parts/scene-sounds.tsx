@@ -1,6 +1,7 @@
 import { Audio, Sequence, staticFile } from "remotion";
 
 import { getKeystrokeFrames, type UiCue, type UiCueKind } from "../ui-cues";
+import { toVideoFrames } from "../trailer-time";
 
 /** How loud each sound plays: soft overall, outcomes a little forward. */
 const cueVolumes: Record<UiCueKind, number> = {
@@ -88,8 +89,8 @@ export function SceneSounds({ cues }: SceneSoundsProps) {
       {getSoundEvents(cues).map((soundEvent, soundIndex) => (
         <Sequence
           key={`${soundEvent.fileName}-${soundEvent.frame}-${soundIndex}`}
-          from={soundEvent.frame}
-          durationInFrames={soundEvent.durationFrames}
+          from={toVideoFrames(soundEvent.frame)}
+          durationInFrames={toVideoFrames(soundEvent.durationFrames)}
           layout="none"
         >
           <Audio

@@ -54,7 +54,7 @@ Owner brief: a promotional trailer that shows the main features (webhooks for em
 | 7 | Events | "32 events. Subscribe to any." | every built-in event as a chip, grouped by area (email, SMS, verify, HTTP, payment, checkout, webhook, test), cascading in by column, then events firing live across the wall | 9 s |
 | 8 | Build your own | "Missing one? Build it." | four builders at work: a webhook template being typed with its live preview, a new email provider from blank, an SMS provider from a built-in, a payment gateway's checkout flow getting its steps (wallet number, OTP, PIN) | 11 s |
 | 9 | AI ready | "AI ready. Everything, by prompt." | an AI agent window: three prompts typed one after another, each followed by the SendMock tool calls it makes and a one-line answer; then the agents it sets up (Claude Code, Codex, Cursor, Gemini CLI, VS Code) and `sendmock ai install` | 19 s |
-| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the install command cycling through Homebrew, the install script, WinGet, Scoop and Docker, and the languages with examples (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) | 10 s |
+| 10 | Everywhere | "Runs everywhere you build." | four tiles (macOS, Linux, Windows, Docker) with their architectures, the stable install commands exactly as the docs Install page gives them, cycling through Homebrew, the install script (macOS and Linux), the PowerShell install script (Windows) and Docker, and the languages with examples (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) | 10 s |
 | 11 | Close | "Your app talks. SendMock talks back." | the logo and name, the install command, the website (`https://shibbirweb.github.io/sendmock/`, shown as `shibbirweb.github.io/sendmock`), `github.com/shibbirweb/sendmock`, and one line of facts: open source, runs on your machine | 7 s |
 
 The example prompts in scene 9:
@@ -78,6 +78,22 @@ Owner request: a copy of the trailer that, after the AI prompts, shows some of t
 | 9 | At a glance | "One app for all of it." | real screenshots of eight SendMock pages in the dark theme, one after another inside one window whose title shows the page's address (`localhost:8025/...`): Overview, Mail, SMS, Webhook deliveries, Webhook templates, Payments, HTTP catcher, Scenarios. Each page slides in from the right, fully opaque, while the last one eases left and dims (two screens never show through each other), then pushes in slowly; a list of the page names beside the window lights the current one | 13 s |
 
 Platforms becomes `10 · Everywhere` in this version. The screenshots are taken from the web app in mock mode (`bun run dev` in `web/`, then `bun run app-pages` in `video/`), at 1440 by 900 and twice the pixel density, with the demo controls hidden, into `video/public/app-pages/`.
+
+### Version with every platform at the close (`SendMockTrailerTourPlatforms`, 2026-10-29)
+
+Owner request: a copy of the tour version whose closing card shows that SendMock runs on Windows, macOS, Linux and Docker instead of only the Homebrew command. `SendMockTrailer` and `SendMockTrailerTour` stay as they are. In the copy, the install bar still carries over from the platforms scene (the match cut); while it settles, the Homebrew command fades out and the four platforms fade in, each with the icon its tile has in the platforms scene. This is the cut uploaded to YouTube.
+
+### Frame rate and render (2026-10-29)
+
+Owner request: render for YouTube in 4K at 60 fps.
+
+- **Design frames.** Every timing in the trailer is written in design frames, 30 to a second (`designFps` in `video/src/brand.ts`), as reviewed in Studio. The video runs at 60 fps (`videoFps`). Scenes read the time with `useDesignFrame()` (`video/src/trailer/trailer-time.ts`), which gives the design frame with fractions between frames, so every animation moves on each of the 60 frames a second; only the places that hand frame counts to Remotion (compositions, scene and transition lengths, sequences, sounds) convert with `toVideoFrames()`. A change to the frame rate is a change to `videoFps` alone.
+- **4K.** The compositions stay 1920 by 1080; the render doubles them (`--scale=2`) to 3840 by 2160, so text and shapes are drawn at full 4K sharpness. The app screenshots are 2880 by 1800, sharp enough at that size.
+- **Render** (in `video/`, `out/` is ignored):
+
+  ```bash
+  bunx remotion render src/index.ts SendMockTrailerTourPlatforms out/sendmock-trailer-tour-platforms-4k60.mp4 --scale=2 --codec=h264 --crf=18
+  ```
 
 ### Sound effects (2026-10-29)
 

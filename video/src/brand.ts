@@ -34,6 +34,9 @@ export const fontFaceCss = `@font-face {
   font-display: block;
 }`;
 
-export const videoFps = 30;
+/** Timings in the trailer are written in design frames, 30 to a second. */
+export const designFps = 30;
+/** The rendered frame rate; each design frame is drawn twice as often. */
+export const videoFps = 60;
 export const videoWidth = 1920;
 export const videoHeight = 1080;

@@ -1,5 +1,3 @@
-import { useCurrentFrame } from "remotion";
-
 import { EventChip } from "../../parts/event-chip";
 import {
   getProgress,
@@ -7,6 +5,7 @@ import {
   getTypedText,
 } from "../../trailer-motion";
 import { areaColors, trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 export const replyText = "Thursday works, thanks!";
 
@@ -24,7 +23,7 @@ export function MailPanel({
   stepStartFrames,
   replyTypingStartFrame,
 }: MailPanelProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const replyStepStartFrame = stepStartFrames[2] ?? 0;
   const isReplySent = activeStepIndex >= 2;
   const isComposerOpen = frame >= replyTypingStartFrame - 10 && !isReplySent;

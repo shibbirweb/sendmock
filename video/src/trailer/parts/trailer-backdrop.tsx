@@ -1,13 +1,14 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
 
 import { fontFaceCss } from "../../brand";
 import { trailerPalette } from "../trailer-palette";
+import { useDesignFrame } from "../trailer-time";
 
 const grainSvg = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>")`;
 
 /** The dark canvas with two slowly drifting soft glows and fine grain. */
 export function TrailerBackdrop() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const driftRadians = frame / 260;
   const tealGlowX = 22 + Math.sin(driftRadians) * 6;
   const tealGlowY = 28 + Math.cos(driftRadians * 0.8) * 5;

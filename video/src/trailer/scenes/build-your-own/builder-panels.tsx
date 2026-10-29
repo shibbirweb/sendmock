@@ -1,5 +1,3 @@
-import { useCurrentFrame } from "remotion";
-
 import { monoFontFamily } from "../../../brand";
 import { getRiseInStyle, getTypedText } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
@@ -18,6 +16,7 @@ import {
   templatePreview,
   upayFlowSteps,
 } from "./builder-script";
+import { useDesignFrame } from "../../trailer-time";
 
 /** The scripted fields of a builder, typed in turn after `workStartFrame`. */
 function ScriptedFields({
@@ -47,7 +46,7 @@ export function TemplateBuilder({
   appearFrame,
   workStartFrame,
 }: BuilderTiming) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const typedBody = getTypedText(
     templateBody,
     frame,
@@ -149,7 +148,7 @@ export function PaymentGatewayBuilder({
   appearFrame,
   workStartFrame,
 }: BuilderTiming) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <BuilderPanel

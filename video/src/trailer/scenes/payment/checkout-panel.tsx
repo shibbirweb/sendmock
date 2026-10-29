@@ -1,8 +1,7 @@
-import { useCurrentFrame } from "remotion";
-
 import { monoFontFamily } from "../../../brand";
 import { getProgress } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 type CheckoutPanelProps = {
   activeStepIndex: number;
@@ -25,7 +24,7 @@ export function CheckoutPanel({
   payPressFrame,
   refundPressFrame,
 }: CheckoutPanelProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const orderStatus = orderStatuses[activeStepIndex + 1] ?? orderStatuses[0];
 
   return (

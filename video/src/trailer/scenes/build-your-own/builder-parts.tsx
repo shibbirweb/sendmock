@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { useCurrentFrame } from "remotion";
 
 import { monoFontFamily } from "../../../brand";
 import { AppWindow } from "../../parts/app-window";
@@ -10,6 +9,7 @@ import {
 } from "../../trailer-motion";
 import { trailerPalette } from "../../trailer-palette";
 import { fieldCharactersPerFrame } from "./builder-script";
+import { useDesignFrame } from "../../trailer-time";
 
 type BuilderPanelProps = {
   title: string;
@@ -23,7 +23,7 @@ export function BuilderPanel({
   appearFrame,
   children,
 }: BuilderPanelProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <AppWindow
@@ -58,7 +58,7 @@ export function TypedField({
   typingStartFrame,
   isMonospace = false,
 }: TypedFieldProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const typedValue = getTypedText(
     value,
     frame,
@@ -111,7 +111,7 @@ export function ChoicePills({
   chosenChoice,
   chooseFrame,
 }: ChoicePillsProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const chosenAmount = getProgress(frame, chooseFrame, 8);
 
   return (

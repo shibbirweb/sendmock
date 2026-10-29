@@ -5,18 +5,13 @@ import {
   Mail,
   MessageSquare,
 } from "lucide-react";
-import {
-  AbsoluteFill,
-  Img,
-  Sequence,
-  staticFile,
-  useCurrentFrame,
-} from "remotion";
+import { AbsoluteFill, Img, Sequence, staticFile } from "remotion";
 
 import { fontFamily } from "../../brand";
 import { getRiseInStyle } from "../trailer-motion";
 import { trailerPalette } from "../trailer-palette";
 import type { UiCue } from "../ui-cues";
+import { toVideoFrames, useDesignFrame } from "../trailer-time";
 
 type ChannelBeat = {
   word: string;
@@ -69,8 +64,8 @@ export function OpeningScene() {
     return (
       <Sequence
         key={channelBeat.word}
-        from={sequenceStart}
-        durationInFrames={channelBeat.durationFrames}
+        from={toVideoFrames(sequenceStart)}
+        durationInFrames={toVideoFrames(channelBeat.durationFrames)}
       >
         <ChannelWord channelBeat={channelBeat} />
       </Sequence>
@@ -81,12 +76,16 @@ export function OpeningScene() {
     <AbsoluteFill style={{ fontFamily, color: trailerPalette.text }}>
       {beatSequences}
       <Sequence
-        from={channelBeatsDurationFrames}
-        durationInFrames={localhostLineDurationFrames}
+        from={toVideoFrames(channelBeatsDurationFrames)}
+        durationInFrames={toVideoFrames(localhostLineDurationFrames)}
       >
         <LocalhostLine />
       </Sequence>
-      <Sequence from={channelBeatsDurationFrames + localhostLineDurationFrames}>
+      <Sequence
+        from={toVideoFrames(
+          channelBeatsDurationFrames + localhostLineDurationFrames,
+        )}
+      >
         <LogoReveal />
       </Sequence>
     </AbsoluteFill>
@@ -94,7 +93,7 @@ export function OpeningScene() {
 }
 
 function ChannelWord({ channelBeat }: { channelBeat: ChannelBeat }) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const driftScale = 1 + frame * 0.002;
 
   return (
@@ -122,7 +121,7 @@ function ChannelWord({ channelBeat }: { channelBeat: ChannelBeat }) {
 }
 
 function LocalhostLine() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <AbsoluteFill
@@ -158,7 +157,7 @@ function LocalhostLine() {
 }
 
 function LogoReveal() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
 
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>

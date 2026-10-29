@@ -1,4 +1,4 @@
-import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, random } from "remotion";
 
 import { EventChip } from "../../parts/event-chip";
 import { SceneHeadline } from "../../parts/scene-headline";
@@ -6,6 +6,7 @@ import type { UiCue } from "../../ui-cues";
 import { eventGroups } from "../../trailer-facts";
 import { getRiseInStyle } from "../../trailer-motion";
 import { areaColors, trailerPalette } from "../../trailer-palette";
+import { useDesignFrame } from "../../trailer-time";
 
 export const eventsSceneDurationFrames = 270;
 
@@ -77,7 +78,7 @@ function getFiringLitAmount(frame: number, eventIndex: number): number {
 
 /** Scene 7: every built-in event, cascading in, then firing live. */
 export function EventsScene() {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const totalEventCount = allEvents.length;
 
   return (

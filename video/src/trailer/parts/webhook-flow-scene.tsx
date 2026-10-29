@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
 
 import {
   getActiveStepIndex,
@@ -12,6 +12,7 @@ import { AppWindow } from "./app-window";
 import { type FlowDirection, FlowLine } from "./flow-line";
 import { RequestCard, type WebhookRequest } from "./request-card";
 import { SceneHeadline } from "./scene-headline";
+import { useDesignFrame } from "../trailer-time";
 
 export type WebhookFlowStep = {
   /** When the event happens in SendMock (or, for "fromApp", in your app). */
@@ -83,7 +84,7 @@ export function WebhookFlowScene({
   steps,
   direction,
 }: WebhookFlowSceneProps) {
-  const frame = useCurrentFrame();
+  const frame = useDesignFrame();
   const stepStartFrames = steps.map((step) => step.startFrame);
   const activeStepIndex = getActiveStepIndex(frame, stepStartFrames);
   const travelStartFrames = stepStartFrames.map(
