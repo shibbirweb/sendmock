@@ -53,28 +53,14 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | Numbers | **Number Ticker** | built-in provider APIs, languages with connection guides, REST API operations; each number links to the page that lists what it counts (Supported providers, Connect your app, the API reference), and a unit test keeps the providers page and the count in sync (changed 2026-10-27, U3 feedback F8) |
 | Product shots | **Safari** / **iPhone** mockups, **Hero Video Dialog** | app screenshots and a short tour video |
 | AI section | Animated list | an agent session: `sendmock_status` -> `sendmock_sms_wait` -> OTP |
-| Promotional video | **Safari** mockup as the poster, play button | "Stop testing on real inboxes and phones": the poster in both themes, a play button and three benefit points; replaces the closing call to action, which repeated the hero (changed 2026-10-27, U3 feedback F6). See [Promotional video](#promotional-video-decided-2026-10-27) |
+| Promotional video | **Safari** mockup as the poster, play button | "Stop testing on real inboxes and phones": the poster in both themes, a play button that loads the YouTube player in place (from 2026-10-30, when the video was published) and three benefit points; replaces the closing call to action, which repeated the hero (changed 2026-10-27, U3 feedback F6). See [Promotional video](#promotional-video-decided-2026-10-27) |
 | Footer | none (plain links) | the logo and tagline with a GitHub icon, then Product, Get started and Community link columns, and a bottom bar with the year (changed 2026-10-27, U3 feedback F5) |
 
 Exact component names are checked against the Magic UI registry when the site is built.
 
 ### Promotional video (decided 2026-10-27)
 
-A short marketing video that sells the idea, not a feature tour: what problem SendMock solves, how much time it saves and why a developer would install it today.
-
-| Item | Decision |
-|------|----------|
-| Goal | a developer who has never heard of SendMock understands the problem, the fix and the payoff, and installs it or opens the demo |
-| Audience | backend and full-stack developers and QA engineers who send email, SMS, payments or webhooks from their app |
-| Length | about 90 seconds (at most 2 minutes), plus a 30-second cut for social media and the README |
-| Story | 1. **The problem** (0:00): testing what your app sends is slow and risky: real messages reach real inboxes and phones, OTPs are copied from a phone, provider sandboxes need accounts and keys, webhooks are hard to trigger and replay, and nobody sees what was really sent. 2. **The fix** (0:25): one binary on your machine; change one host and port and every email, SMS, payment and webhook is caught and answered like the real provider. 3. **The payoff** (0:45): the same tasks shown fast in the real app: read the OTP in a second, preview the email in every client, fire and replay a webhook, run a test checkout, wait for a message from a test with the API. 4. **Fits your work** (1:10): any language, Docker and CI, and AI agents through the CLI and MCP. 5. **Call to action** (1:20): `brew install` (or the demo) and the website |
-| Claims | only what SendMock does; no invented numbers (time saved is shown by doing the task on screen, not by a statistic) |
-| Production | motion graphics for the problem and the call to action, real screen captures of the app (1920 x 1080, demo seed data, light theme) for the fix and the payoff, a professional voice-over from a written script, licensed background music, the brand colours and logo |
-| Captions | English WebVTT captions burned into the social cut and as a track on the full video, so it works muted |
-| Hosting | YouTube (public); the landing page loads the player only after the play button is pressed (`youtube-nocookie.com`), so the page stays fast and sets no third-party cookies before that |
-| Before the video exists | the landing section shows the poster, a disabled play button with "Video coming soon" and the three benefit points |
-| Where | the landing page (the section above the footer), the README and social posts for releases |
-| Refresh | when the product's story changes (for example payments or AI agents grow), at the latest for 1.0 |
+The promotional video has its own plan: [23. Promotional video](23-promotional-video.md) (goal, audience, length, production, captions, hosting, and the film's structure). The landing page's video section is in the table above.
 
 ### API playground
 
