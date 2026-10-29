@@ -1,0 +1,17 @@
+{
+  "name": "sendmock-testcontainers",
+  "version": "0.1.0",
+  "description": "Starts SendMock in Docker from a test and gives its SMTP, HTTP and provider addresses.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "exports": "./src/sendmock-container.ts",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "testcontainers": "12.2.1"
+  }
+}

@@ -143,7 +143,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
 | [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | In progress |
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | In progress |
-| [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 5 (Testcontainers) | 2 | Not started |
+| [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Not started |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | UI done (2026-10-29) |

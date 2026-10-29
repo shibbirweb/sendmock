@@ -5,3 +5,8 @@
 
 # Python bytecode from the examples
 __pycache__/
+
+# Testcontainers module builds
+testcontainers/java/target/
+testcontainers/dotnet/**/bin/
+testcontainers/dotnet/**/obj/

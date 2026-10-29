@@ -56,10 +56,10 @@ Phase 0.
 
 ## DS-06 Test harness integration
 
-Phase 1 (`--ready-json`), Phase 5 (Testcontainers).
+Phase 1 (`--ready-json`), Phase 2 (Testcontainers; moved from Phase 5 on 2026-10-29, see [25](../25-phase-1.md)).
 
-- [ ] DS-06.1 Testcontainers modules for Java, Node, Go, Python and .NET start the image and expose SMTP, HTTP and provider URLs.
-- [ ] DS-06.2 Each module's example test passes in CI.
+- [x] DS-06.1 Testcontainers modules for Java, Node, Go, Python and .NET start the image and expose SMTP, HTTP and provider URLs. (#48)
+- [x] DS-06.2 Each module's example test passes in CI. (#48)
 
 ## DS-07 Performance budgets
 
