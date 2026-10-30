@@ -3,6 +3,7 @@ use serde_json::{Map, Value};
 
 use super::delivery_request_rendering::{RenderedDeliveryRequest, render_delivery_request};
 use super::delivery_template_context::DeliveryContextDetails;
+use super::endpoint_template::read_detached_template;
 use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblemSeverity;
 use crate::{AppEvent, OperationContext, OperationError};
@@ -112,6 +113,7 @@ pub async fn enqueue_webhook_delivery(
     delivery_order: DeliveryOrder,
 ) -> Result<WebhookDeliveryRecord, OperationError> {
     let request_settings = read_request_settings(stored_endpoint)?;
+    let detached_template = read_detached_template(stored_endpoint)?;
     let delivery_id = operation_context.id_generator.generate_id().to_string();
     let request_id = operation_context.id_generator.generate_id().to_string();
     let rendered_delivery = render_delivery_request(
@@ -128,6 +130,7 @@ pub async fn enqueue_webhook_delivery(
             send_time_values: &delivery_order.send_time_values,
         },
         &request_settings,
+        detached_template.as_ref(),
     )
     .await?;
     log_render_warnings(stored_endpoint, &delivery_id, &rendered_delivery);

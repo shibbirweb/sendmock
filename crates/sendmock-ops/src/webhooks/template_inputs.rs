@@ -36,7 +36,7 @@ pub struct TemplateUpdate {
 pub struct TemplateDeleteRequest {
     /// The template's id, from `GET /api/v1/webhooks/templates`.
     pub template_id: String,
-    /// detach: move endpoints that use it to native JSON instead of failing.
+    /// detach: endpoints that use it keep their own copy of it instead of failing.
     pub endpoints: Option<String>,
 }
 

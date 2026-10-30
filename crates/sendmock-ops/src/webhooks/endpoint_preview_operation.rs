@@ -8,10 +8,14 @@ use super::delivery_queue::DeliveryTrigger;
 use super::delivery_request_rendering::render_delivery_request;
 use super::delivery_template_context::DeliveryContextDetails;
 use super::endpoint_inputs::WebhookEndpointInput;
+use super::endpoint_settings::{EndpointBodyMode, EndpointRequestSettings};
+use super::endpoint_template::read_detached_template;
 use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblem;
 use super::secret_value_masking::{load_secret_values, mask_request_secrets};
-use super::template_context::{ChosenMessage, find_template_subject};
+use super::template_context::{ChosenMessage, TemplateSubject, find_template_subject};
+use super::template_store::find_resolved_template;
+use super::template_view::TemplateDraft;
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
 
 /// Body of `POST /api/v1/webhooks/endpoints/preview` (WH-07.15).
@@ -47,33 +51,91 @@ pub struct EndpointPreviewResult {
     pub problems: Vec<RenderProblem>,
 }
 
+struct PreviewedEndpoint {
+    endpoint_input: WebhookEndpointInput,
+    /// The saved endpoint's own copy, while the rendered settings use the same template.
+    detached_template: Option<TemplateDraft>,
+}
+
 /// The settings sent, or the saved endpoint's when only its id is given.
 async fn read_previewed_endpoint(
     operation_context: &OperationContext,
     input: &EndpointPreviewRequest,
-) -> Result<WebhookEndpointInput, OperationError> {
-    if let Some(endpoint_input) = &input.endpoint {
-        return Ok(endpoint_input.clone());
-    }
-    let Some(endpoint_id) = input.endpoint_id.as_deref() else {
-        return Err(OperationError::InvalidInput {
-            message: "Pass the endpoint settings or an endpoint_id".to_owned(),
-            field: Some("endpoint".to_owned()),
-        });
+) -> Result<PreviewedEndpoint, OperationError> {
+    let stored_endpoint = match input.endpoint_id.as_deref() {
+        Some(endpoint_id) => {
+            operation_context
+                .webhook_endpoint_repository
+                .find_endpoint(endpoint_id)
+                .await?
+        }
+        None => None,
     };
-    let stored_endpoint = operation_context
-        .webhook_endpoint_repository
-        .find_endpoint(endpoint_id)
-        .await?
-        .ok_or_else(|| OperationError::NotFound {
-            message: format!("No webhook endpoint with id {endpoint_id}"),
-        })?;
-    Ok(WebhookEndpointInput {
-        request_settings: read_request_settings(&stored_endpoint)?,
-        name: stored_endpoint.name,
-        url: stored_endpoint.url,
-        is_enabled: stored_endpoint.is_enabled,
+    let endpoint_input = match (&input.endpoint, &stored_endpoint) {
+        (Some(endpoint_input), _) => endpoint_input.clone(),
+        (None, Some(stored_endpoint)) => WebhookEndpointInput {
+            request_settings: read_request_settings(stored_endpoint)?,
+            name: stored_endpoint.name.clone(),
+            url: stored_endpoint.url.clone(),
+            is_enabled: stored_endpoint.is_enabled,
+        },
+        (None, None) => {
+            return Err(match input.endpoint_id.as_deref() {
+                Some(endpoint_id) => OperationError::NotFound {
+                    message: format!("No webhook endpoint with id {endpoint_id}"),
+                },
+                None => OperationError::InvalidInput {
+                    message: "Pass the endpoint settings or an endpoint_id".to_owned(),
+                    field: Some("endpoint".to_owned()),
+                },
+            });
+        }
+    };
+    let mut detached_template = None;
+    if let Some(stored_endpoint) = &stored_endpoint
+        && read_request_settings(stored_endpoint)?.template_id
+            == endpoint_input.request_settings.template_id
+    {
+        detached_template = read_detached_template(stored_endpoint)?;
+    }
+    Ok(PreviewedEndpoint {
+        endpoint_input,
+        detached_template,
     })
+}
+
+/// The first event a Template-mode endpoint's template is made for, so the sample fits it.
+async fn find_template_event_type(
+    operation_context: &OperationContext,
+    request_settings: &EndpointRequestSettings,
+) -> Result<Option<String>, OperationError> {
+    if request_settings.body_mode != EndpointBodyMode::Template {
+        return Ok(None);
+    }
+    match find_resolved_template(operation_context, &request_settings.template_id).await {
+        Ok(resolved_template) => Ok(resolved_template.summary.events.first().cloned()),
+        Err(OperationError::NotFound { .. }) => Ok(None),
+        Err(other_error) => Err(other_error),
+    }
+}
+
+/// The chosen message, or the sample that fits the endpoint's template.
+async fn find_preview_subject(
+    operation_context: &OperationContext,
+    input: &EndpointPreviewRequest,
+    request_settings: &EndpointRequestSettings,
+) -> Result<TemplateSubject, OperationError> {
+    let template_event_type = find_template_event_type(operation_context, request_settings).await?;
+    find_template_subject(
+        operation_context,
+        ChosenMessage {
+            email_id: input.email_id.as_deref(),
+            sms_id: input.sms_id.as_deref(),
+            http_request_id: input.http_request_id.as_deref(),
+            sample_event_type: template_event_type.as_deref(),
+        },
+    )
+    .await
 }
 
 pub struct PreviewWebhookEndpointOperation;
@@ -100,17 +162,13 @@ impl Operation for PreviewWebhookEndpointOperation {
         operation_context: &OperationContext,
         input: EndpointPreviewRequest,
     ) -> Result<EndpointPreviewResult, OperationError> {
-        let endpoint_input = read_previewed_endpoint(operation_context, &input).await?;
-        let template_subject = find_template_subject(
-            operation_context,
-            ChosenMessage {
-                email_id: input.email_id.as_deref(),
-                sms_id: input.sms_id.as_deref(),
-                http_request_id: input.http_request_id.as_deref(),
-                sample_event_type: None,
-            },
-        )
-        .await?;
+        let PreviewedEndpoint {
+            endpoint_input,
+            detached_template,
+        } = read_previewed_endpoint(operation_context, &input).await?;
+        let template_subject =
+            find_preview_subject(operation_context, &input, &endpoint_input.request_settings)
+                .await?;
         let send_time_values: Map<String, Value> = input
             .variables
             .unwrap_or_default()
@@ -133,6 +191,7 @@ impl Operation for PreviewWebhookEndpointOperation {
                 send_time_values: &send_time_values,
             },
             &endpoint_input.request_settings,
+            detached_template.as_ref(),
         )
         .await?;
         let shown_request = mask_request_secrets(

@@ -14,8 +14,12 @@ mod endpoint_inputs;
 mod endpoint_operations;
 mod endpoint_preview_operation;
 mod endpoint_request_rendering;
+mod endpoint_save_as_template_operation;
 mod endpoint_secret_operations;
 mod endpoint_settings;
+mod endpoint_template;
+mod endpoint_template_body_rendering;
+mod endpoint_template_overrides;
 mod endpoint_validation;
 mod endpoint_view;
 mod request_part_renderer;
@@ -61,6 +65,7 @@ pub use endpoint_operations::{
     ListWebhookEndpointsOperation, UpdateWebhookEndpointOperation,
 };
 pub use endpoint_preview_operation::{EndpointPreviewResult, PreviewWebhookEndpointOperation};
+pub use endpoint_save_as_template_operation::SaveWebhookEndpointAsTemplateOperation;
 pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
@@ -109,6 +114,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(PreviewWebhookEndpointOperation);
     operation_registry.register(RevealWebhookEndpointSecretOperation);
     operation_registry.register(RotateWebhookEndpointSecretOperation);
+    operation_registry.register(SaveWebhookEndpointAsTemplateOperation);
     operation_registry.register(ListWebhookDeliveriesOperation);
     operation_registry.register(GetWebhookDeliveryOperation);
     operation_registry.register(CancelWebhookDeliveryOperation);

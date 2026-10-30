@@ -383,6 +383,7 @@ async fn deleting_a_template_in_use_needs_detach() {
     assert_eq!(builtin_status, 409);
     assert_eq!(builtin_error["error"]["code"], "read_only_template");
     assert_eq!(detach_status, 204);
-    assert_eq!(moved_endpoint["template_id"], "native");
+    assert_eq!(moved_endpoint["template_id"], template_id);
+    assert_eq!(moved_endpoint["template_mode"], "detached");
     assert_eq!(gone_status, 404);
 }

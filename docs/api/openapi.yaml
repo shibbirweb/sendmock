@@ -6196,7 +6196,7 @@ paths:
         - name: endpoints
           in: query
           required: false
-          description: "detach: move endpoints that use it to native JSON instead of failing."
+          description: "detach: endpoints that use it keep their own copy of it instead of failing."
           schema:
             type: string
           example: detach

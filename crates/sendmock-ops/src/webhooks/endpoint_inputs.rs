@@ -82,3 +82,12 @@ pub struct RotateSecretRequest {
     /// How many hours the old secret keeps signing next to the new one (0 to 168).
     pub overlap_hours: u32,
 }
+
+/// `POST /api/v1/webhooks/endpoints/{endpointId}/save-as-template`.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct EndpointSaveAsTemplateRequest {
+    /// The webhook endpoint's ID, from `GET /api/v1/webhooks/endpoints`.
+    pub endpoint_id: String,
+    /// The name of the new custom template.
+    pub name: String,
+}

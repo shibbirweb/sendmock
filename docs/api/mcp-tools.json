@@ -26868,7 +26868,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "detach: move endpoints that use it to native JSON instead of failing.",
+          "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
           "example": "detach"
         }
       ],
@@ -26884,7 +26884,7 @@
           },
           "endpoints": {
             "type": "string",
-            "description": "detach: move endpoints that use it to native JSON instead of failing.",
+            "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
             "examples": [
               "detach"
             ]

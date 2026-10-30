@@ -31,7 +31,7 @@ pub(super) fn template_definition(
     }
 }
 
-fn read_template_name(template_name: &str) -> Result<String, OperationError> {
+pub(super) fn read_template_name(template_name: &str) -> Result<String, OperationError> {
     let trimmed_name = template_name.trim();
     if trimmed_name.is_empty() {
         return Err(OperationError::InvalidInput {

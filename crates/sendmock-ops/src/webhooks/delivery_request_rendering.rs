@@ -1,9 +1,13 @@
 use sendmock_core::StandardTemplateFunctions;
 
 use super::delivery_template_context::{DeliveryContextDetails, build_delivery_template_context};
-use super::endpoint_request_rendering::{render_endpoint_request, to_template_render_mode};
-use super::endpoint_settings::EndpointRequestSettings;
+use super::endpoint_request_rendering::{
+    EndpointRequestSource, render_endpoint_request, to_template_render_mode,
+};
+use super::endpoint_settings::{EndpointBodyMode, EndpointRequestSettings};
+use super::endpoint_template::resolve_endpoint_template;
 use super::request_part_renderer::{RenderProblem, RenderProblemSeverity, RequestPartRenderer};
+use super::template_view::TemplateDraft;
 use super::webhook_template_functions::WebhookTemplateFunctions;
 use crate::{OperationContext, OperationError, RecordedHttpRequest};
 
@@ -37,11 +41,21 @@ impl RenderedDeliveryRequest {
 }
 
 /// Renders an endpoint's request for one event, as a queued delivery or the preview does.
+/// `detached_template` is the endpoint's own copy of its template, used while detached.
 pub async fn render_delivery_request(
     operation_context: &OperationContext,
     details: &DeliveryContextDetails<'_>,
     request_settings: &EndpointRequestSettings,
+    detached_template: Option<&TemplateDraft>,
 ) -> Result<RenderedDeliveryRequest, OperationError> {
+    let endpoint_template = if request_settings.body_mode == EndpointBodyMode::Template {
+        Some(
+            resolve_endpoint_template(operation_context, request_settings, detached_template)
+                .await?,
+        )
+    } else {
+        None
+    };
     let render_mode = to_template_render_mode(request_settings.render_mode);
     let template_functions = WebhookTemplateFunctions {
         standard_functions: StandardTemplateFunctions::new(
@@ -64,8 +78,11 @@ pub async fn render_delivery_request(
     };
     let request = render_endpoint_request(
         &mut part_renderer,
-        details.endpoint_url,
-        request_settings,
+        &EndpointRequestSource {
+            url_template: details.endpoint_url,
+            request_settings,
+            endpoint_template: endpoint_template.as_ref(),
+        },
         details.app_event,
         operation_context.instance_details.version,
     )?;

@@ -4,6 +4,7 @@ use sendmock_webhooks::WebhookSecret;
 use super::endpoint_inputs::{
     WebhookEndpointInput, WebhookEndpointReference, WebhookEndpointUpdate,
 };
+use super::endpoint_template::{choose_detached_template, write_detached_template};
 use super::endpoint_validation::validate_endpoint_input;
 use super::endpoint_view::{
     WebhookEndpoint, build_endpoint_view, read_request_settings, write_request_settings,
@@ -89,6 +90,8 @@ impl Operation for CreateWebhookEndpointOperation {
         input: WebhookEndpointInput,
     ) -> Result<WebhookEndpoint, OperationError> {
         validate_endpoint_input(&input)?;
+        let detached_template =
+            choose_detached_template(operation_context, &input.request_settings, None).await?;
         let now_unix_ms = operation_context.clock.now_unix_ms();
         let new_endpoint = WebhookEndpointRecord {
             endpoint_id: operation_context.id_generator.generate_id().to_string(),
@@ -96,7 +99,7 @@ impl Operation for CreateWebhookEndpointOperation {
             url: input.url.trim().to_owned(),
             is_enabled: input.is_enabled,
             request_settings_json: write_request_settings(&input.request_settings)?,
-            detached_template_json: None,
+            detached_template_json: write_detached_template(detached_template.as_ref())?,
             signing_secret: WebhookSecret::generate(operation_context.random_source.as_ref())
                 .expose()
                 .to_owned(),
@@ -174,11 +177,18 @@ impl Operation for UpdateWebhookEndpointOperation {
             request_settings: input.apply_to_settings(read_request_settings(&stored_endpoint)?),
         };
         validate_endpoint_input(&changed_input)?;
+        let detached_template = choose_detached_template(
+            operation_context,
+            &changed_input.request_settings,
+            Some(&stored_endpoint),
+        )
+        .await?;
         let changed_endpoint = WebhookEndpointRecord {
             name: changed_input.name.trim().to_owned(),
             url: changed_input.url.trim().to_owned(),
             is_enabled: changed_input.is_enabled,
             request_settings_json: write_request_settings(&changed_input.request_settings)?,
+            detached_template_json: write_detached_template(detached_template.as_ref())?,
             ..stored_endpoint
         };
         operation_context

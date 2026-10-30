@@ -1,12 +1,16 @@
 //! The body of an endpoint request in each body mode (WH-07.6, WH-07.14). Fields always
 //! encode a valid JSON or form body: a value that does not fit its type is an error.
 
+use std::collections::BTreeMap;
+
 use sendmock_core::TemplateEscape;
 use serde_json::{Map, Value};
 
 use super::endpoint_settings::{
     BodyFieldType, EndpointBodyField, EndpointBodyMode, EndpointRequestSettings, FieldsEncoding,
 };
+use super::endpoint_template::EndpointTemplate;
+use super::endpoint_template_body_rendering::render_template_body;
 use super::request_part_renderer::{RenderProblem, RenderProblemSeverity, RequestPartRenderer};
 use crate::{AppEvent, OperationError};
 
@@ -14,6 +18,8 @@ pub struct RenderedBody {
     /// None when the request has no body.
     pub content_type: Option<String>,
     pub body: String,
+    /// A payload template's own headers, in lowercase; the endpoint's headers go over them.
+    pub template_headers: BTreeMap<String, String>,
 }
 
 /// "user.email" = x becomes { "user": { "email": x } }.
@@ -84,6 +90,7 @@ fn render_fields_body(
             content_type: Some("application/x-www-form-urlencoded".to_owned()),
             body: serde_urlencoded::to_string(form_pairs)
                 .map_err(|encode_error| OperationError::Internal(encode_error.to_string()))?,
+            template_headers: BTreeMap::new(),
         });
     }
     let mut json_body = Map::new();
@@ -100,6 +107,7 @@ fn render_fields_body(
         content_type: Some("application/json".to_owned()),
         body: serde_json::to_string(&Value::Object(json_body))
             .map_err(|write_error| OperationError::Internal(write_error.to_string()))?,
+        template_headers: BTreeMap::new(),
     })
 }
 
@@ -128,27 +136,35 @@ fn render_raw_body(
     RenderedBody {
         content_type: Some(request_settings.raw_content_type.clone()),
         body: rendered_body,
+        template_headers: BTreeMap::new(),
     }
 }
 
-/// The body in the endpoint's mode. Template mode sends the native Standard Webhooks
-/// envelope until the payload templates arrive (W5).
+/// The body in the endpoint's mode; Template mode needs the endpoint's template.
 pub fn render_endpoint_body(
     part_renderer: &mut RequestPartRenderer,
     request_settings: &EndpointRequestSettings,
+    endpoint_template: Option<&EndpointTemplate>,
     app_event: &AppEvent,
 ) -> Result<RenderedBody, OperationError> {
     match request_settings.body_mode {
         EndpointBodyMode::None => Ok(RenderedBody {
             content_type: None,
             body: String::new(),
+            template_headers: BTreeMap::new(),
         }),
         EndpointBodyMode::Fields => render_fields_body(part_renderer, request_settings),
         EndpointBodyMode::Raw => Ok(render_raw_body(part_renderer, request_settings)),
-        EndpointBodyMode::Template => Ok(RenderedBody {
-            content_type: Some("application/json".to_owned()),
-            body: serde_json::to_string(app_event)
-                .map_err(|write_error| OperationError::Internal(write_error.to_string()))?,
-        }),
+        EndpointBodyMode::Template => {
+            let endpoint_template = endpoint_template.ok_or_else(|| {
+                OperationError::Internal("Template mode was rendered without a template".to_owned())
+            })?;
+            render_template_body(
+                part_renderer,
+                endpoint_template,
+                &request_settings.extra_fields,
+                app_event,
+            )
+        }
     }
 }

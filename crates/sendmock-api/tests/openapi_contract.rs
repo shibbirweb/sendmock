@@ -327,7 +327,7 @@ fn webhook_endpoint_sample(endpoint_name: &str) -> Value {
     })
 }
 
-/// Two endpoints: one to edit, reveal and rotate, one to delete.
+/// Two endpoints: one to edit, reveal, rotate and save as a template, one to delete.
 async fn prepare_webhook_endpoint_samples(
     app_router: &axum::Router,
 ) -> Vec<(&'static str, Vec<Value>)> {
@@ -357,6 +357,10 @@ async fn prepare_webhook_endpoint_samples(
         (
             "postWebhooksEndpointsByEndpointIdRotateSecret",
             vec![json!({ "endpoint_id": edited_endpoint_id, "overlap_hours": 24 })],
+        ),
+        (
+            "postWebhooksEndpointsByEndpointIdSaveAsTemplate",
+            vec![json!({ "endpoint_id": edited_endpoint_id, "name": "Orders template" })],
         ),
         (
             "deleteWebhooksEndpointsByEndpointId",

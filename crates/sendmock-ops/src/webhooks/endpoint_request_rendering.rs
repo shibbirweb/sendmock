@@ -8,6 +8,7 @@ use sendmock_core::{TemplateEscape, TemplateRenderMode};
 
 use super::endpoint_body_rendering::render_endpoint_body;
 use super::endpoint_settings::{EndpointRequestSettings, RenderMode};
+use super::endpoint_template::EndpointTemplate;
 use super::request_part_renderer::{RenderProblem, RequestPartRenderer};
 use crate::numbers::is_http_url;
 use crate::{AppEvent, OperationError, RecordedHttpRequest};
@@ -79,16 +80,30 @@ fn render_headers(
     headers
 }
 
-/// Renders the whole request; the problems stay on the part renderer.
+/// What an endpoint request is rendered from.
+pub struct EndpointRequestSource<'source> {
+    pub url_template: &'source str,
+    pub request_settings: &'source EndpointRequestSettings,
+    /// The payload template of Template mode; None in the other body modes.
+    pub endpoint_template: Option<&'source EndpointTemplate>,
+}
+
+/// Renders the whole request; the problems stay on the part renderer. Headers layer as the
+/// defaults, then a payload template's headers, then the endpoint's own.
 pub fn render_endpoint_request(
     part_renderer: &mut RequestPartRenderer,
-    url_template: &str,
-    request_settings: &EndpointRequestSettings,
+    request_source: &EndpointRequestSource,
     app_event: &AppEvent,
     sendmock_version: &str,
 ) -> Result<RecordedHttpRequest, OperationError> {
-    let url = render_url(part_renderer, url_template, request_settings)?;
-    let rendered_body = render_endpoint_body(part_renderer, request_settings, app_event)?;
+    let request_settings = request_source.request_settings;
+    let url = render_url(part_renderer, request_source.url_template, request_settings)?;
+    let rendered_body = render_endpoint_body(
+        part_renderer,
+        request_settings,
+        request_source.endpoint_template,
+        app_event,
+    )?;
     let mut default_headers = BTreeMap::from([(
         "user-agent".to_owned(),
         format!("sendmock/{sendmock_version}"),
@@ -96,6 +111,7 @@ pub fn render_endpoint_request(
     if let Some(content_type) = rendered_body.content_type {
         default_headers.insert("content-type".to_owned(), content_type);
     }
+    default_headers.extend(rendered_body.template_headers);
     let headers = render_headers(part_renderer, request_settings, default_headers);
     let method = serde_json::to_value(request_settings.method)
         .ok()

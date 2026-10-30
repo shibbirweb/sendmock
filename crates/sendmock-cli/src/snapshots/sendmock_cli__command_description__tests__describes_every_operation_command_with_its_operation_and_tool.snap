@@ -1551,6 +1551,28 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook endpoint save-as-template",
+    "usage": "sendmock webhook endpoint save-as-template <endpointId>",
+    "summary": "Save the endpoint's request as a custom template.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/save-as-template",
+        "operation_id": "postWebhooksEndpointsByEndpointIdSaveAsTemplate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_save_as_template"
+    ]
+  },
+  {
     "command": "sendmock webhook deliveries list",
     "usage": "sendmock webhook deliveries list",
     "summary": "Every webhook request sent, newest first.",
