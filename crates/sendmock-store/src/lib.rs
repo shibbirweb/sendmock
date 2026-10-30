@@ -8,6 +8,7 @@ mod message_provider;
 mod migration;
 mod numbers;
 mod outcome_rule;
+mod saved_webhook_delivery;
 mod settings;
 mod sms;
 mod smtp_session;
@@ -33,6 +34,7 @@ pub use numbers::{
     VirtualNumberRepository,
 };
 pub use outcome_rule::{RuleMoveDirection, SmsOutcomeRuleRecord, SmsOutcomeRuleRepository};
+pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
     NewSmsRecord, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord,

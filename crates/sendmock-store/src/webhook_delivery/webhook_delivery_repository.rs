@@ -210,6 +210,15 @@ impl WebhookDeliveryRepository {
             })
             .await
     }
+
+    /// Deletes every attempt, as `reset` does with traffic; saved deliveries are kept apart.
+    pub async fn delete_all_deliveries(&self) -> Result<u64, StoreError> {
+        self.database
+            .write(
+                |connection| Ok(connection.execute("DELETE FROM webhook_deliveries", [])? as u64),
+            )
+            .await
+    }
 }
 
 fn insert_delivery_row(

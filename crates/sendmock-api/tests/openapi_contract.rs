@@ -132,6 +132,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
     samples.extend(prepare_webhook_send_samples(app_router).await);
+    samples.extend(prepare_saved_delivery_samples(app_router).await);
     samples.extend(prepare_webhook_rule_samples(app_router).await);
     samples.extend(prepare_webhook_variable_samples(app_router).await);
     samples.extend([webhook_preview_samples()]);
@@ -488,6 +489,60 @@ async fn prepare_webhook_send_samples(
                     "headers": { "X-Replay": "1" },
                 }),
             ],
+        ),
+    ]
+}
+
+/// A saved manual send: listed, saved again, renamed, sent as it was and rendered again,
+/// turned into a template and deleted.
+async fn prepare_saved_delivery_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let endpoint = post_json(
+        app_router,
+        "/api/v1/webhooks/endpoints",
+        &webhook_endpoint_sample("Saved sends"),
+    )
+    .await;
+    let endpoint_id = endpoint["id"].as_str().unwrap_or_default();
+    let manual_delivery = post_json(
+        app_router,
+        &format!("/api/v1/webhooks/endpoints/{endpoint_id}/send"),
+        &json!({}),
+    )
+    .await;
+    let delivery_id = &manual_delivery["id"];
+    let saved_delivery = post_json(
+        app_router,
+        "/api/v1/webhooks/saved",
+        &json!({ "name": "Order webhook", "delivery_id": delivery_id }),
+    )
+    .await;
+    let saved_id = &saved_delivery["id"];
+    vec![
+        ("getWebhooksSaved", vec![json!({})]),
+        (
+            "postWebhooksSaved",
+            vec![json!({ "name": "Failed order webhook", "delivery_id": delivery_id })],
+        ),
+        (
+            "patchWebhooksSavedBySavedId",
+            vec![json!({ "saved_id": saved_id, "name": "Order webhook, missing SKU" })],
+        ),
+        (
+            "postWebhooksSavedBySavedIdSend",
+            vec![
+                json!({ "saved_id": saved_id, "endpoint_id": endpoint_id, "rerender": false }),
+                json!({ "saved_id": saved_id, "endpoint_id": endpoint_id, "rerender": true }),
+            ],
+        ),
+        (
+            "postWebhooksSavedBySavedIdTemplate",
+            vec![json!({ "saved_id": saved_id, "name": "Order webhook" })],
+        ),
+        (
+            "deleteWebhooksSavedBySavedId",
+            vec![json!({ "saved_id": saved_id })],
         ),
     ]
 }

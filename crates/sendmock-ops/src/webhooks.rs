@@ -36,6 +36,11 @@ mod rule_preview_operation;
 mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
+mod saved_delivery_inputs;
+mod saved_delivery_operations;
+mod saved_delivery_send_operation;
+mod saved_delivery_template_operation;
+mod saved_delivery_view;
 mod secret_value_masking;
 mod template_catalogue;
 mod template_context;
@@ -90,6 +95,13 @@ pub use rule_operations::{
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
 pub use rule_view::WebhookRule;
+pub use saved_delivery_operations::{
+    CreateSavedWebhookDeliveryOperation, DeleteSavedWebhookDeliveryOperation,
+    ListSavedWebhookDeliveriesOperation, RenameSavedWebhookDeliveryOperation,
+};
+pub use saved_delivery_send_operation::SendSavedWebhookDeliveryOperation;
+pub use saved_delivery_template_operation::SaveSavedWebhookDeliveryAsTemplateOperation;
+pub use saved_delivery_view::SavedDelivery;
 pub use template_context::{build_event_template_context, build_sample_template_context};
 pub use template_delete_operation::DeleteWebhookTemplateOperation;
 pub use template_edit_operations::{
@@ -137,6 +149,12 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CancelWebhookDeliveryOperation);
     operation_registry.register(ReplayWebhookDeliveryOperation);
     operation_registry.register(WaitForWebhookOperation);
+    operation_registry.register(ListSavedWebhookDeliveriesOperation);
+    operation_registry.register(CreateSavedWebhookDeliveryOperation);
+    operation_registry.register(RenameSavedWebhookDeliveryOperation);
+    operation_registry.register(DeleteSavedWebhookDeliveryOperation);
+    operation_registry.register(SendSavedWebhookDeliveryOperation);
+    operation_registry.register(SaveSavedWebhookDeliveryAsTemplateOperation);
     operation_registry.register(ListWebhookRulesOperation);
     operation_registry.register(CreateWebhookRuleOperation);
     operation_registry.register(GetWebhookRuleOperation);

@@ -29,6 +29,10 @@ const SIGNATURE_HEADER_NAMES: [&str; 4] = [
     "webhook-attempt",
 ];
 
+pub(super) fn is_signature_header(header_name: &str) -> bool {
+    SIGNATURE_HEADER_NAMES.contains(&header_name.to_ascii_lowercase().as_str())
+}
+
 /// `POST /api/v1/webhooks/deliveries/{deliveryId}/replay` (WH-05.2).
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct DeliveryReplayRequest {
@@ -42,11 +46,11 @@ pub struct DeliveryReplayRequest {
     pub headers: Option<BTreeMap<String, String>>,
 }
 
-fn conflict(code: &'static str, message: String) -> OperationError {
+pub(super) fn conflict(code: &'static str, message: String) -> OperationError {
     OperationError::Conflict { code, message }
 }
 
-fn parse_json<Parsed: serde::de::DeserializeOwned>(
+pub(super) fn parse_json<Parsed: serde::de::DeserializeOwned>(
     stored_json: &str,
 ) -> Result<Parsed, OperationError> {
     serde_json::from_str(stored_json)
@@ -74,36 +78,60 @@ fn read_stored_request(
     ))
 }
 
-struct ReplayedEvent {
-    app_event: AppEvent,
+pub(super) struct ReplayedEvent {
+    pub app_event: AppEvent,
     /// Rows queued before events were kept: only the id and type are known.
-    event_json_is_missing: bool,
+    pub event_json_is_missing: bool,
 }
 
-/// The original event under a new id, so the replay is its own message with its own attempts.
-fn read_replayed_event(
-    original_delivery: &WebhookDeliveryRecord,
-    replay_event_id: String,
+/// A kept event under a new id, so the new send is its own message with its own attempts.
+pub(super) fn restore_event_under_new_id(
+    event_json: Option<&str>,
+    event_type: &str,
+    created_at_unix_ms: i64,
+    new_event_id: String,
 ) -> Result<ReplayedEvent, OperationError> {
-    let Some(event_json) = &original_delivery.event_json else {
+    let Some(event_json) = event_json else {
         return Ok(ReplayedEvent {
             app_event: AppEvent {
-                id: replay_event_id,
-                event_type: original_delivery.event_type.clone(),
-                created_at: sendmock_core::format_rfc3339(original_delivery.created_at_unix_ms),
+                id: new_event_id,
+                event_type: event_type.to_owned(),
+                created_at: sendmock_core::format_rfc3339(created_at_unix_ms),
                 data: serde_json::Value::Null,
             },
             event_json_is_missing: true,
         });
     };
-    let original_event: AppEvent = parse_json(event_json)?;
+    let kept_event: AppEvent = parse_json(event_json)?;
     Ok(ReplayedEvent {
         app_event: AppEvent {
-            id: replay_event_id,
-            ..original_event
+            id: new_event_id,
+            ..kept_event
         },
         event_json_is_missing: false,
     })
+}
+
+/// The delivery's event under the replay's id; rendering again needs the whole event.
+fn read_replayed_event(
+    original_delivery: &WebhookDeliveryRecord,
+    replay_event_id: String,
+    should_rerender: bool,
+) -> Result<ReplayedEvent, OperationError> {
+    let replayed_event = restore_event_under_new_id(
+        original_delivery.event_json.as_deref(),
+        &original_delivery.event_type,
+        original_delivery.created_at_unix_ms,
+        replay_event_id,
+    )?;
+    if should_rerender && replayed_event.event_json_is_missing {
+        return Err(conflict(
+            "nothing_to_rerender",
+            "This delivery was queued before events were kept; replay it as it was instead."
+                .to_owned(),
+        ));
+    }
+    Ok(replayed_event)
 }
 
 /// The event's request rendered again with the endpoint's settings and variables as they are
@@ -144,9 +172,7 @@ fn apply_replay_edits(
     if let Some(edited_headers) = input.headers {
         rendered_delivery.request.headers = edited_headers
             .into_iter()
-            .filter(|(header_name, _)| {
-                !SIGNATURE_HEADER_NAMES.contains(&header_name.to_ascii_lowercase().as_str())
-            })
+            .filter(|(header_name, _)| !is_signature_header(header_name))
             .collect();
     }
 }
@@ -181,14 +207,8 @@ impl Operation for ReplayWebhookDeliveryOperation {
         let stored_endpoint =
             find_stored_endpoint(operation_context, &original_delivery.endpoint_id).await?;
         let replay_event_id = format!("evt_{}", operation_context.id_generator.generate_id());
-        let replayed_event = read_replayed_event(&original_delivery, replay_event_id)?;
-        if input.rerender && replayed_event.event_json_is_missing {
-            return Err(conflict(
-                "nothing_to_rerender",
-                "This delivery was queued before events were kept; replay it as it was instead."
-                    .to_owned(),
-            ));
-        }
+        let replayed_event =
+            read_replayed_event(&original_delivery, replay_event_id, input.rerender)?;
         let replay_order = DeliveryOrder {
             app_event: replayed_event.app_event,
             subject_id: original_delivery.subject_id.clone(),

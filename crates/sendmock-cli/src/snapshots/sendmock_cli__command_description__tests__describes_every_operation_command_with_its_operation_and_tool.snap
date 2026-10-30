@@ -1732,6 +1732,132 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook saved list",
+    "usage": "sendmock webhook saved list",
+    "summary": "Bookmarked requests, kept through pruning and reset.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/saved",
+        "operation_id": "getWebhooksSaved",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved create",
+    "usage": "sendmock webhook saved create --delivery <deliveryId>",
+    "summary": "Save a delivery's request under a name.",
+    "arguments": [],
+    "flags": [
+      "--delivery",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved",
+        "operation_id": "postWebhooksSaved",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved rename",
+    "usage": "sendmock webhook saved rename <savedId>",
+    "summary": "Rename a saved delivery.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/saved/{savedId}",
+        "operation_id": "patchWebhooksSavedBySavedId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved delete",
+    "usage": "sendmock webhook saved delete <savedId>",
+    "summary": "Delete a saved delivery.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/saved/{savedId}",
+        "operation_id": "deleteWebhooksSavedBySavedId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved send",
+    "usage": "sendmock webhook saved send <savedId>",
+    "summary": "Send a saved request to its endpoint or another one.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--endpoint-id",
+      "--rerender"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved/{savedId}/send",
+        "operation_id": "postWebhooksSavedBySavedIdSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_send"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved save-as-template",
+    "usage": "sendmock webhook saved save-as-template <savedId>",
+    "summary": "Turn a saved request into a custom template.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved/{savedId}/template",
+        "operation_id": "postWebhooksSavedBySavedIdTemplate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_save_as_template"
+    ]
+  },
+  {
     "command": "sendmock webhook rule list",
     "usage": "sendmock webhook rule list",
     "summary": "Which events go to which endpoint, checked from top to bottom.",

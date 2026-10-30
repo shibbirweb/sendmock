@@ -4,10 +4,11 @@ use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ApiRequestRepository, Database, EmailRepository, MessageProviderRepository,
-    MessagingServiceRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
-    SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
+    MessagingServiceRepository, SavedWebhookDeliveryRepository, SettingsRepository,
+    SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
+    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
+    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
+    WebhookVariableRepository,
 };
 
 use crate::{
@@ -40,6 +41,8 @@ pub struct OperationContext {
     pub webhook_rule_repository: WebhookRuleRepository,
     pub webhook_template_repository: WebhookTemplateRepository,
     pub webhook_variable_repository: WebhookVariableRepository,
+    /// Named copies of deliveries, kept through pruning and `reset`.
+    pub saved_webhook_delivery_repository: SavedWebhookDeliveryRepository,
     /// Wakes the webhook dispatcher when a delivery is queued.
     pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
     /// Sends webhook requests; set by the binary, which owns the HTTP client.
@@ -96,6 +99,9 @@ impl OperationContext {
             webhook_rule_repository: WebhookRuleRepository::new(Arc::clone(&database)),
             webhook_template_repository: WebhookTemplateRepository::new(Arc::clone(&database)),
             webhook_variable_repository: WebhookVariableRepository::new(Arc::clone(&database)),
+            saved_webhook_delivery_repository: SavedWebhookDeliveryRepository::new(Arc::clone(
+                &database,
+            )),
             webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
