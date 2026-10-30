@@ -1,14 +1,14 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use sendmock_ops::{SmtpMessage, record_smtp_session, store_smtp_message};
+use sendmock_ops::{SmtpMessage, find_recipient_refusal, record_smtp_session, store_smtp_message};
 use sendmock_store::SmtpSessionRecord;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 
 use super::message_data_reader::{IDLE_TIMEOUT, MessageData, read_message_data};
 use super::smtp_server::SmtpServer;
-use crate::{SessionAction, SessionResult, SmtpSession};
+use crate::{SessionAction, SessionResult, SmtpReply, SmtpSession};
 
 /// Longer lines are refused; RFC 5321 allows 1000 octets, this leaves room for SMTPUTF8.
 const MAXIMUM_LINE_BYTES: usize = 4096;
@@ -159,18 +159,20 @@ async fn run_phase<Stream: AsyncRead + AsyncWrite + Unpin>(
         let Some(command_line) = read_command_line(&mut reader, session).await else {
             return PhaseEnd::Closed;
         };
-        let action = session.handle_line(&command_line);
-        let reply_text = match &action {
-            SessionAction::Reply(reply)
-            | SessionAction::ReceiveData(reply)
-            | SessionAction::UpgradeToTls(reply)
-            | SessionAction::Close(reply) => reply.to_wire(),
+        let action = match session.handle_line(&command_line) {
+            SessionAction::CheckRecipient(forward_path) => {
+                SessionAction::Reply(check_recipient(server, session, forward_path).await)
+            }
+            other_action => other_action,
+        };
+        let Some(reply_text) = action.reply().map(SmtpReply::to_wire) else {
+            return PhaseEnd::Closed;
         };
         if write_reply(&mut reader, &reply_text).await.is_err() {
             return PhaseEnd::Closed;
         }
         match action {
-            SessionAction::Reply(_) => {}
+            SessionAction::Reply(_) | SessionAction::CheckRecipient(_) => {}
             SessionAction::ReceiveData(_) => {
                 if !receive_message(&mut reader, server, session, session_id).await {
                     return PhaseEnd::Closed;
@@ -180,6 +182,28 @@ async fn run_phase<Stream: AsyncRead + AsyncWrite + Unpin>(
             SessionAction::Close(_) => return PhaseEnd::Closed,
         }
     }
+}
+
+/// Refuses the recipient when a `reject` outcome rule matches it; when the rules cannot be
+/// read, the client is asked to try again later rather than the mail being lost.
+async fn check_recipient(
+    server: &SmtpServer,
+    session: &mut SmtpSession,
+    forward_path: String,
+) -> SmtpReply {
+    let refusal = match find_recipient_refusal(&server.operation_context, &forward_path).await {
+        Ok(refusal) => {
+            refusal.map(|refusal| SmtpReply::new(refusal.reply_code, refusal.reply_text))
+        }
+        Err(rule_error) => {
+            tracing::warn!(error = %rule_error, "could not read the email outcome rules");
+            Some(SmtpReply::new(
+                451,
+                "4.3.0 Could not check the recipient, try again",
+            ))
+        }
+    };
+    session.finish_recipient(forward_path, refusal)
 }
 
 /// One command line without its line ending; `None` when the client is gone or idle too long.

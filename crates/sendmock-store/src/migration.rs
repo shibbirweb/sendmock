@@ -78,4 +78,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 17,
         sql: include_str!("../migrations/0017_saved_webhook_deliveries.sql"),
     },
+    Migration {
+        schema_version: 18,
+        sql: include_str!("../migrations/0018_email_outcome_rules.sql"),
+    },
 ];

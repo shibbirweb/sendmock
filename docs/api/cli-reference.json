@@ -5958,7 +5958,7 @@
       "command": "sendmock outcome-rule email list",
       "slug": "outcome-rule-email-list",
       "usage": "sendmock outcome-rule email list",
-      "summary": "email outcome rules, checked from top to bottom.",
+      "summary": "Email outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
       "operations": [
@@ -5966,7 +5966,7 @@
           "method": "GET",
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "getOutcomeRulesEmail",
-          "summary": "email outcome rules, checked from top to bottom.",
+          "summary": "Email outcome rules, checked from top to bottom.",
           "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",

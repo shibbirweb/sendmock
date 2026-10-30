@@ -40,20 +40,6 @@ impl From<SmsOutcomeRuleRecord> for SmsOutcomeRule {
     }
 }
 
-/// Which source decides an outcome: a custom rule, a magic number, or the profile.
-#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
-pub struct OutcomeTestResult {
-    /// `custom`, `magic` or `profile`.
-    pub source: String,
-    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
-    pub rule_id: Option<String>,
-    /// One-based position of the matching custom rule.
-    #[schemars(required, schema_with = "crate::nullable_schema::<u32>")]
-    pub rule_position: Option<u32>,
-    /// What the testers show, e.g. "Custom rule 2: Accepted, then undelivered, 30007".
-    pub summary: String,
-}
-
 pub fn to_match_field(match_field: OutcomeRuleMatchField) -> MatchField {
     match match_field {
         OutcomeRuleMatchField::To => MatchField::To,

@@ -128,6 +128,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
+    samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
@@ -821,6 +822,67 @@ async fn prepare_outcome_rule_samples(
             vec![
                 json!({ "number": "+15005550001", "match_field": "to" }),
                 json!({ "number": "+1555777000", "match_field": "to" }),
+            ],
+        ),
+    ]
+}
+
+fn email_outcome_rule_sample(pattern: &str) -> Value {
+    json!({
+        "pattern": pattern, "outcome": "hard_bounce", "smtp_code": "550 5.1.1",
+        "diagnostic": "user unknown", "note": "Bounce every QA signup", "is_enabled": true,
+    })
+}
+
+/// Two custom outcome addresses: one to edit and move, one to delete.
+async fn prepare_email_outcome_rule_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let path = "/api/v1/outcome-rules/email";
+    let edited_rule_id = post_json(
+        app_router,
+        path,
+        &email_outcome_rule_sample("*@bounce.qa.test"),
+    )
+    .await["id"]
+        .clone();
+    let deleted_rule_id = post_json(
+        app_router,
+        path,
+        &email_outcome_rule_sample("qa+*@shop.test"),
+    )
+    .await["id"]
+        .clone();
+    vec![
+        ("getOutcomeRulesEmail", vec![json!({})]),
+        (
+            "postOutcomeRulesEmail",
+            vec![
+                email_outcome_rule_sample("vip@shop.test"),
+                json!({
+                    "pattern": "*@blocked.test", "outcome": "reject", "smtp_code": null,
+                    "diagnostic": null, "note": "", "is_enabled": false,
+                }),
+            ],
+        ),
+        (
+            "patchOutcomeRulesEmailByRuleId",
+            vec![json!({ "rule_id": edited_rule_id, "is_enabled": false, "smtp_code": null })],
+        ),
+        (
+            "postOutcomeRulesEmailByRuleIdMove",
+            vec![json!({ "rule_id": edited_rule_id, "direction": "down" })],
+        ),
+        (
+            "deleteOutcomeRulesEmailByRuleId",
+            vec![json!({ "rule_id": deleted_rule_id })],
+        ),
+        (
+            "postOutcomeRulesEmailTest",
+            vec![
+                json!({ "address": "sam@bounce.qa.test" }),
+                json!({ "address": "bounce@shop.test" }),
+                json!({ "address": "sam@shop.test" }),
             ],
         ),
     ]

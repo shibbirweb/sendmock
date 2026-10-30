@@ -10,9 +10,11 @@ mod parsing;
 mod raw_message_codec;
 
 pub use delivery_outcome::{
-    BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome, FOLLOW_UP_DELAY_MS,
-    OutcomeAction, OutcomeSettings, OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome,
-    find_magic_address_outcome, plan_email_outcome,
+    AddressOutcomeSource, BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome,
+    EmailOutcomeRule, EmailRuleOutcome, FOLLOW_UP_DELAY_MS, OutcomeAction, OutcomeSettings,
+    OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome, RecipientRefusal,
+    find_magic_address_outcome, is_valid_address_pattern, is_valid_refusal_code,
+    plan_email_outcome, resolve_address_outcome,
 };
 pub use email_ingest_service::{EmailIngestService, IngestOptions};
 pub use extraction::{

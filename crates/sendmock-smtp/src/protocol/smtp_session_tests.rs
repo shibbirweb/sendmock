@@ -16,19 +16,20 @@ fn settings_with(change: impl FnOnce(&mut SessionSettings)) -> Arc<SessionSettin
     Arc::new(settings)
 }
 
-fn reply_code(action: SessionAction) -> u16 {
-    match action {
-        SessionAction::Reply(reply)
-        | SessionAction::ReceiveData(reply)
-        | SessionAction::UpgradeToTls(reply)
-        | SessionAction::Close(reply) => reply.code,
+/// The reply code for one line; a recipient check is answered as if no rule refused it.
+fn run_line(session: &mut SmtpSession, command_line: &str) -> u16 {
+    match session.handle_line(command_line) {
+        SessionAction::CheckRecipient(forward_path) => {
+            session.finish_recipient(forward_path, None).code
+        }
+        other_action => other_action.reply().map_or(0, |reply| reply.code),
     }
 }
 
 fn run_lines(session: &mut SmtpSession, command_lines: &[&str]) -> Vec<u16> {
     command_lines
         .iter()
-        .map(|command_line| reply_code(session.handle_line(command_line)))
+        .map(|command_line| run_line(session, command_line))
         .collect()
 }
 
@@ -230,4 +231,29 @@ fn a_session_without_mail_is_aborted() {
     run_lines(&mut session, &["EHLO a", "QUIT"]);
 
     assert_eq!(session.result(), SessionResult::Aborted);
+}
+
+// AC: EM-10.5
+#[test]
+fn a_refused_recipient_gets_the_rule_reply_and_is_left_out() {
+    let mut session = SmtpSession::new(settings_with(|_| {}));
+    run_lines(&mut session, &["EHLO a", "MAIL FROM:<x@y.test>"]);
+
+    let SessionAction::CheckRecipient(forward_path) =
+        session.handle_line("RCPT TO:<qa@blocked.test>")
+    else {
+        panic!("a recipient check");
+    };
+    let refusal_reply = session.finish_recipient(
+        forward_path,
+        Some(SmtpReply::new(554, "5.7.1 relay denied")),
+    );
+    let codes = run_lines(&mut session, &["RCPT TO:<sam@app.test>"]);
+
+    assert_eq!(refusal_reply.to_wire(), "554 5.7.1 relay denied\r\n");
+    assert_eq!(codes, [250]);
+    assert_eq!(
+        session.envelope().recipients,
+        vec!["sam@app.test".to_owned()]
+    );
 }

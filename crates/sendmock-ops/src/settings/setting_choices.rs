@@ -14,6 +14,17 @@ pub enum EmailOutcomeProfile {
     Realistic,
 }
 
+impl EmailOutcomeProfile {
+    /// The name Settings and the API use.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Off => "off",
+            Self::AutoDelivered => "auto-delivered",
+            Self::Realistic => "realistic",
+        }
+    }
+}
+
 /// `instant` delivers at once, `realistic` goes queued, sent, then delivered over a few
 /// seconds, `manual` stays sent until a status is picked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]

@@ -2,9 +2,11 @@ use std::sync::Arc;
 
 use rusqlite::{Connection, OptionalExtension, Row, params};
 
+use super::rule_order::{move_rule_in_order, next_position, renumber_rules};
 use super::{RuleMoveDirection, SmsOutcomeRuleRecord};
 use crate::{Database, StoreError};
 
+const RULES_TABLE: &str = "sms_outcome_rules";
 const RULE_COLUMNS: &str = "id, position, match_field, pattern, outcome, error_code, delay_seconds, note, is_enabled, created_by, created_at";
 
 /// Custom outcome numbers, kept in order so the first enabled match is easy to find.
@@ -49,10 +51,8 @@ impl SmsOutcomeRuleRepository {
     ) -> Result<SmsOutcomeRuleRecord, StoreError> {
         self.database
             .write(move |connection| {
-                let rule_count: u32 =
-                    connection.query_row("SELECT COUNT(*) FROM sms_outcome_rules", [], |row| row.get(0))?;
                 let stored_rule = SmsOutcomeRuleRecord {
-                    position: rule_count + 1,
+                    position: next_position(connection, RULES_TABLE)?,
                     ..new_rule
                 };
                 connection.execute(
@@ -109,7 +109,7 @@ impl SmsOutcomeRuleRepository {
                 let transaction = connection.transaction()?;
                 let deleted_count = transaction
                     .execute("DELETE FROM sms_outcome_rules WHERE id = ?1", [rule_id])?;
-                renumber_rules(&transaction)?;
+                renumber_rules(&transaction, RULES_TABLE)?;
                 transaction.commit()?;
                 Ok(deleted_count > 0)
             })
@@ -127,29 +127,10 @@ impl SmsOutcomeRuleRepository {
         self.database
             .write(move |connection| {
                 let transaction = connection.transaction()?;
-                let ordered_ids: Vec<String> = select_rules_in_order(&transaction)?
-                    .into_iter()
-                    .map(|rule| rule.rule_id)
-                    .collect();
-                let Some(rule_index) = ordered_ids
-                    .iter()
-                    .position(|ordered_id| *ordered_id == rule_id)
-                else {
-                    return Ok(false);
-                };
-                let neighbour_index = match move_direction {
-                    RuleMoveDirection::Up => rule_index.checked_sub(1),
-                    RuleMoveDirection::Down => {
-                        Some(rule_index + 1).filter(|index| *index < ordered_ids.len())
-                    }
-                };
-                if let Some(neighbour_index) = neighbour_index {
-                    let mut reordered_ids = ordered_ids;
-                    reordered_ids.swap(rule_index, neighbour_index);
-                    write_positions(&transaction, &reordered_ids)?;
-                }
+                let is_found =
+                    move_rule_in_order(&transaction, RULES_TABLE, &rule_id, move_direction)?;
                 transaction.commit()?;
-                Ok(true)
+                Ok(is_found)
             })
             .await
     }
@@ -160,23 +141,6 @@ fn select_rules_in_order(connection: &Connection) -> rusqlite::Result<Vec<SmsOut
         "SELECT {RULE_COLUMNS} FROM sms_outcome_rules ORDER BY position, created_at"
     ))?;
     statement.query_map([], read_rule_row)?.collect()
-}
-
-fn renumber_rules(connection: &Connection) -> rusqlite::Result<()> {
-    let ordered_ids: Vec<String> = select_rules_in_order(connection)?
-        .into_iter()
-        .map(|rule| rule.rule_id)
-        .collect();
-    write_positions(connection, &ordered_ids)
-}
-
-fn write_positions(connection: &Connection, ordered_ids: &[String]) -> rusqlite::Result<()> {
-    let mut statement =
-        connection.prepare("UPDATE sms_outcome_rules SET position = ?1 WHERE id = ?2")?;
-    for (position, rule_id) in (1_i64..).zip(ordered_ids) {
-        statement.execute(params![position, rule_id])?;
-    }
-    Ok(())
 }
 
 fn read_rule_row(row: &Row<'_>) -> rusqlite::Result<SmsOutcomeRuleRecord> {

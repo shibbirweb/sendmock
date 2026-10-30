@@ -719,6 +719,156 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock outcome-rule email list",
+    "usage": "sendmock outcome-rule email list",
+    "summary": "Email outcome rules, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/outcome-rules/email",
+        "operation_id": "getOutcomeRulesEmail",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email create",
+    "usage": "sendmock outcome-rule email create",
+    "summary": "Add an email outcome rule.",
+    "arguments": [],
+    "flags": [
+      "--diagnostic",
+      "--enabled",
+      "--note",
+      "--outcome",
+      "--pattern",
+      "--smtp-code"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email",
+        "operation_id": "postOutcomeRulesEmail",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email update",
+    "usage": "sendmock outcome-rule email update <ruleId>",
+    "summary": "Change an email outcome rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--diagnostic",
+      "--enabled",
+      "--note",
+      "--outcome",
+      "--pattern",
+      "--smtp-code"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/outcome-rules/email/{ruleId}",
+        "operation_id": "patchOutcomeRulesEmailByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email delete",
+    "usage": "sendmock outcome-rule email delete <ruleId>",
+    "summary": "Delete an email outcome rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/outcome-rules/email/{ruleId}",
+        "operation_id": "deleteOutcomeRulesEmailByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email move",
+    "usage": "sendmock outcome-rule email move <ruleId>",
+    "summary": "Move an email outcome rule up or down.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email/{ruleId}/move",
+        "operation_id": "postOutcomeRulesEmailByRuleIdMove",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email test",
+    "usage": "sendmock outcome-rule email test <address>",
+    "summary": "Which custom rule, magic address or profile decides an address's outcome.",
+    "arguments": [
+      "address"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email/test",
+        "operation_id": "postOutcomeRulesEmailTest",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_test"
+    ]
+  },
+  {
     "command": "sendmock outcome-rule sms list",
     "usage": "sendmock outcome-rule sms list",
     "summary": "SMS outcome rules, checked from top to bottom.",

@@ -142,12 +142,13 @@ function buildOutcomeRuleEndpoints(
 ): AreaEndpoint[] {
   const rulesPath = `/api/v1/outcome-rules/${ruleKind}`;
   const channelLabel = ruleKind === "email" ? "email" : "SMS";
+  const capitalizedChannelLabel = ruleKind === "email" ? "Email" : "SMS";
 
   return [
     {
       method: "GET",
       path: rulesPath,
-      summary: `${channelLabel} outcome rules, checked from top to bottom.`,
+      summary: `${capitalizedChannelLabel} outcome rules, checked from top to bottom.`,
       response: listOf(ruleTypeName),
     },
     {

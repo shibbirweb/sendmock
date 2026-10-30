@@ -5,6 +5,7 @@ use super::delivery_outcome_runner::complete_email_intake;
 use super::email_inputs::RawMessageInput;
 use super::lookups::NativeSendResult;
 use super::native_send_request::{NativeSendRequest, read_bare_address};
+use super::recipient_refusal::refuse_rejected_recipients;
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, RawBodyInput,
     RequestLogSettings, SuccessStatus, read_ingest_options,
@@ -36,13 +37,15 @@ impl Operation for SendEmailOperation {
         }
     }
 
-    /// Builds the message SMTP would have carried and stores it through the same path.
+    /// Builds the message SMTP would have carried and stores it through the same path; a
+    /// recipient a `reject` rule refuses fails the whole send, as SMTP would refuse it.
     async fn execute(
         &self,
         operation_context: &OperationContext,
         input: NativeSendRequest,
     ) -> Result<NativeSendResult, OperationError> {
         let native_message = input.to_native_message()?;
+        refuse_rejected_recipients(operation_context, &input.envelope_recipients()).await?;
         let message_id = format!(
             "{}@sendmock.local",
             operation_context.id_generator.generate_id()
@@ -120,6 +123,7 @@ impl Operation for SendRawEmailOperation {
                 .map(|recipient| recipient.address.clone())
                 .collect(),
         };
+        refuse_rejected_recipients(operation_context, &envelope.recipients).await?;
         let stored_email = operation_context
             .email_ingest_service
             .ingest(

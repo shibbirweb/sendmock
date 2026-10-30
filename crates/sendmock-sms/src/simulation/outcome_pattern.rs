@@ -1,3 +1,5 @@
+use sendmock_core::matches_wildcard_pattern;
+
 const WHATSAPP_PREFIX: &str = "whatsapp:";
 
 /// True when a number matches an outcome rule pattern: exact, or with `*` standing for any
@@ -12,7 +14,7 @@ pub fn matches_outcome_pattern(pattern: &str, number: &str) -> bool {
     } else {
         compared_number
     };
-    matches_wildcard(
+    matches_wildcard_pattern(
         &pattern.trim().to_ascii_lowercase(),
         &compared_number.to_ascii_lowercase(),
     )
@@ -27,28 +29,6 @@ pub fn is_valid_outcome_pattern(pattern: &str) -> bool {
             .chars()
             .all(|character| character.is_ascii_digit() || character == '*')
         && digits.chars().any(|character| character.is_ascii_digit())
-}
-
-/// Glob matching where `*` is the only special character.
-fn matches_wildcard(pattern: &str, value: &str) -> bool {
-    let mut pattern_parts = pattern.split('*');
-    let Some(first_part) = pattern_parts.next() else {
-        return value.is_empty();
-    };
-    let Some(mut remaining_value) = value.strip_prefix(first_part) else {
-        return false;
-    };
-    let middle_and_last_parts: Vec<&str> = pattern_parts.collect();
-    let Some((last_part, middle_parts)) = middle_and_last_parts.split_last() else {
-        return remaining_value.is_empty();
-    };
-    for middle_part in middle_parts {
-        match remaining_value.find(middle_part) {
-            Some(found_at) => remaining_value = &remaining_value[found_at + middle_part.len()..],
-            None => return false,
-        }
-    }
-    remaining_value.ends_with(last_part)
 }
 
 #[cfg(test)]

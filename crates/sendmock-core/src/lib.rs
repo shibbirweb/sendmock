@@ -6,6 +6,7 @@ pub mod id_generator;
 pub mod random_source;
 pub mod template;
 pub mod timestamp;
+pub mod wildcard_pattern;
 
 pub use byte_size::parse_size_bytes;
 pub use clock::{Clock, FixedClock, SystemClock};
@@ -17,3 +18,4 @@ pub use template::{
     render_template, render_template_in_mode,
 };
 pub use timestamp::{format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339};
+pub use wildcard_pattern::matches_wildcard_pattern;

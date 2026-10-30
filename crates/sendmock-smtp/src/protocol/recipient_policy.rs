@@ -1,3 +1,5 @@
+use sendmock_core::matches_wildcard_pattern;
+
 /// Which recipients the server accepts: every one (`*`, the default), or those matching a
 /// glob list such as `*@app.test,qa@*`; the rest get 550 so bounce handling can be tested.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,30 +32,8 @@ impl RecipientPolicy {
         let recipient_address = recipient_address.to_lowercase();
         self.allowed_patterns
             .iter()
-            .any(|pattern| matches_glob(pattern, &recipient_address))
+            .any(|pattern| matches_wildcard_pattern(pattern, &recipient_address))
     }
-}
-
-/// `*` matches any run of characters, everything else matches itself.
-fn matches_glob(pattern: &str, text: &str) -> bool {
-    let mut literal_parts = pattern.split('*');
-    let first_part = literal_parts.next().unwrap_or_default();
-    let Some(mut remaining_text) = text.strip_prefix(first_part) else {
-        return false;
-    };
-    let middle_and_last: Vec<&str> = literal_parts.collect();
-    let Some((last_part, middle_parts)) = middle_and_last.split_last() else {
-        return remaining_text.is_empty();
-    };
-    for middle_part in middle_parts {
-        match remaining_text.find(middle_part) {
-            Some(found_position) => {
-                remaining_text = &remaining_text[found_position + middle_part.len()..]
-            }
-            None => return false,
-        }
-    }
-    remaining_text.ends_with(last_part)
 }
 
 #[cfg(test)]

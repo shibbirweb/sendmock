@@ -1,11 +1,10 @@
 use sendmock_sms::{OutcomeSource, resolve_number_outcome};
-use sendmock_store::RuleMoveDirection;
 
-use super::sms_outcome_rule_inputs::{
-    OutcomeRuleMoveDirection, OutcomeRuleMoveInput, SmsOutcomeTestRequest,
-};
+use super::outcome_rule_inputs::OutcomeRuleMoveInput;
+use super::outcome_test_result::OutcomeTestResult;
+use super::sms_outcome_rule_inputs::SmsOutcomeTestRequest;
 use super::sms_outcome_rule_operations::{SMS_CHANNEL_SELECTOR, find_rule_or_not_found};
-use super::sms_outcome_rule_view::{OutcomeTestResult, SmsOutcomeRule, to_match_field};
+use super::sms_outcome_rule_view::{SmsOutcomeRule, to_match_field};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
     load_custom_outcome_rules, to_simulation_profile,
@@ -36,10 +35,7 @@ impl Operation for MoveSmsOutcomeRuleOperation {
         operation_context: &OperationContext,
         input: OutcomeRuleMoveInput,
     ) -> Result<Vec<SmsOutcomeRule>, OperationError> {
-        let move_direction = match input.direction {
-            OutcomeRuleMoveDirection::Up => RuleMoveDirection::Up,
-            OutcomeRuleMoveDirection::Down => RuleMoveDirection::Down,
-        };
+        let move_direction = input.direction.to_rule_move_direction();
         let outcome_rule_repository = &operation_context.sms_outcome_rule_repository;
         if !outcome_rule_repository
             .move_rule(&input.rule_id, move_direction)
@@ -88,24 +84,11 @@ impl Operation for TestSmsOutcomeOperation {
         let profile_name = to_simulation_profile(app_settings.sms_simulation_profile).as_str();
         let summary = outcome_source.describe(profile_name);
         Ok(match outcome_source {
-            OutcomeSource::Custom(custom_rule) => OutcomeTestResult {
-                source: "custom".to_owned(),
-                rule_id: Some(custom_rule.rule_id.clone()),
-                rule_position: Some(custom_rule.position),
-                summary,
-            },
-            OutcomeSource::Magic(_) => OutcomeTestResult {
-                source: "magic".to_owned(),
-                rule_id: None,
-                rule_position: None,
-                summary,
-            },
-            OutcomeSource::Profile => OutcomeTestResult {
-                source: "profile".to_owned(),
-                rule_id: None,
-                rule_position: None,
-                summary,
-            },
+            OutcomeSource::Custom(custom_rule) => {
+                OutcomeTestResult::custom_rule(&custom_rule.rule_id, custom_rule.position, summary)
+            }
+            OutcomeSource::Magic(_) => OutcomeTestResult::magic(summary),
+            OutcomeSource::Profile => OutcomeTestResult::profile(summary),
         })
     }
 }

@@ -75,10 +75,8 @@ test("UI-12.2 buttons for operations not served yet are disabled and say when th
     page.getByRole("tab", { name: "Checks: Available in Phase 4" }),
   ).toBeDisabled();
   await expect(
-    page.getByRole("button", {
-      name: "Simulate an event: Available in Phase 3",
-    }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: "Simulate an event", exact: true }),
+  ).toBeEnabled();
   await expect(
     page.getByRole("button", { name: "Mark as unread" }),
   ).toBeEnabled();

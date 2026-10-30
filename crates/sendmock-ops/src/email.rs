@@ -15,6 +15,7 @@ mod mime_part;
 mod native_send_request;
 mod out_of_office_reply;
 mod read_email_operations;
+mod recipient_refusal;
 mod send_email_operations;
 mod simulate_outcome_operation;
 
@@ -32,6 +33,7 @@ pub use read_email_operations::{
     CheckListUnsubscribeOperation, GetEmailMimeOperation, GetEmailOperation,
     GetEmailTimelineOperation, GetLatestEmailOperation, ListEmailsOperation,
 };
+pub use recipient_refusal::find_recipient_refusal;
 pub use send_email_operations::{SendEmailOperation, SendRawEmailOperation};
 pub use simulate_outcome_operation::SimulateEmailOutcomeOperation;
 

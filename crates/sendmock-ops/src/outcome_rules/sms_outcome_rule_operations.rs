@@ -1,6 +1,5 @@
-use super::sms_outcome_rule_inputs::{
-    OutcomeRuleReference, SmsOutcomeRuleInput, SmsOutcomeRuleUpdate,
-};
+use super::outcome_rule_inputs::OutcomeRuleReference;
+use super::sms_outcome_rule_inputs::{SmsOutcomeRuleInput, SmsOutcomeRuleUpdate};
 use super::sms_outcome_rule_validation::normalize_and_validate;
 use super::sms_outcome_rule_view::{SmsOutcomeRule, to_match_field, to_outcome_kind};
 use crate::{

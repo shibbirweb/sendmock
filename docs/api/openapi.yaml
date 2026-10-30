@@ -2435,7 +2435,7 @@ paths:
   /api/v1/outcome-rules/email:
     get:
       operationId: getOutcomeRulesEmail
-      summary: email outcome rules, checked from top to bottom.
+      summary: Email outcome rules, checked from top to bottom.
       tags:
         - Outcome rules
       responses:

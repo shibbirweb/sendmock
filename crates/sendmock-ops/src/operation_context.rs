@@ -3,12 +3,12 @@ use std::sync::Arc;
 use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
-    ActivityStatsRepository, ApiRequestRepository, Database, EmailRepository,
-    MessageProviderRepository, MessagingServiceRepository, SavedWebhookDeliveryRepository,
-    SettingsRepository, SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
+    EmailRepository, MessageProviderRepository, MessagingServiceRepository,
+    SavedWebhookDeliveryRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
+    SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -25,6 +25,7 @@ pub struct OperationContext {
     pub instance_details: Arc<InstanceDetails>,
     pub email_repository: EmailRepository,
     pub email_ingest_service: EmailIngestService,
+    pub email_outcome_rule_repository: EmailOutcomeRuleRepository,
     pub smtp_session_repository: SmtpSessionRepository,
     pub api_request_repository: ApiRequestRepository,
     pub sms_repository: SmsRepository,
@@ -85,6 +86,7 @@ impl OperationContext {
         let verification_repository = VerificationRepository::new(Arc::clone(&database));
         let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         Self {
+            email_outcome_rule_repository: EmailOutcomeRuleRepository::new(Arc::clone(&database)),
             smtp_session_repository: SmtpSessionRepository::new(Arc::clone(&database)),
             api_request_repository: ApiRequestRepository::new(Arc::clone(&database)),
             sms_repository,

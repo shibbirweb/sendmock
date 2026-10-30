@@ -1,11 +1,13 @@
 use sendmock_core::RandomSource;
 
-use super::{EmailOutcome, OutcomeStep, find_magic_address_outcome};
+use super::{
+    AddressOutcomeSource, EmailOutcome, EmailOutcomeRule, OutcomeStep, resolve_address_outcome,
+};
 
 /// How long the delivery profile waits before its first report.
 pub const PROFILE_DELAY_MS: u64 = 1_000;
 
-/// The delivery profile from Settings, for emails no magic address decides.
+/// The delivery profile from Settings, for emails no custom rule or magic address decides.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeliveryProfile {
     Off,
@@ -20,15 +22,18 @@ pub enum DeliveryProfile {
 /// What decided an outcome, as the timeline names it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OutcomeSource {
+    CustomRule { position: u32 },
     MagicAddress,
     DeliveryProfile,
 }
 
 impl OutcomeSource {
-    pub fn label(self) -> &'static str {
+    /// `custom rule 2`, `magic address` or `delivery profile`.
+    pub fn label(self) -> String {
         match self {
-            Self::MagicAddress => "magic address",
-            Self::DeliveryProfile => "delivery profile",
+            Self::CustomRule { position } => format!("custom rule {position}"),
+            Self::MagicAddress => "magic address".to_owned(),
+            Self::DeliveryProfile => "delivery profile".to_owned(),
         }
     }
 }
@@ -49,31 +54,52 @@ pub struct OutcomeSettings {
     pub delivery_profile: DeliveryProfile,
 }
 
-/// The first recipient that is a magic address decides at once; otherwise the profile
-/// decides for the first recipient after a short delay; none when the profile is off.
+/// The first recipient a custom rule or magic address decides wins, and plays at once;
+/// otherwise the profile decides for the first recipient after a short delay; none when the
+/// profile is off. Recipients a `reject` rule refused were never delivered to, so they are
+/// skipped.
 pub fn plan_email_outcome(
     recipient_addresses: &[String],
     outcome_settings: OutcomeSettings,
+    custom_rules: &[EmailOutcomeRule],
     random_source: &dyn RandomSource,
 ) -> Option<PlannedOutcome> {
-    let magic_match = outcome_settings
-        .is_magic_addresses_enabled
-        .then(|| {
-            recipient_addresses.iter().find_map(|recipient_address| {
-                find_magic_address_outcome(recipient_address)
-                    .map(|email_outcome| (recipient_address, email_outcome))
-            })
-        })
-        .flatten();
-    if let Some((recipient_address, email_outcome)) = magic_match {
-        return Some(PlannedOutcome {
-            outcome: email_outcome,
-            recipient_address: recipient_address.clone(),
-            source: OutcomeSource::MagicAddress,
-            steps: email_outcome.plan_steps(0),
-        });
+    let mut first_undecided_recipient = None;
+    for recipient_address in recipient_addresses {
+        let outcome_source = resolve_address_outcome(
+            recipient_address,
+            custom_rules,
+            outcome_settings.is_magic_addresses_enabled,
+        );
+        match outcome_source {
+            AddressOutcomeSource::CustomRule(custom_rule) => {
+                if let (Some(email_outcome), Some(steps)) =
+                    (custom_rule.email_outcome(), custom_rule.plan_steps())
+                {
+                    return Some(PlannedOutcome {
+                        outcome: email_outcome,
+                        recipient_address: recipient_address.clone(),
+                        source: OutcomeSource::CustomRule {
+                            position: custom_rule.position,
+                        },
+                        steps,
+                    });
+                }
+            }
+            AddressOutcomeSource::MagicAddress(email_outcome) => {
+                return Some(PlannedOutcome {
+                    outcome: email_outcome,
+                    recipient_address: recipient_address.clone(),
+                    source: OutcomeSource::MagicAddress,
+                    steps: email_outcome.plan_steps(0),
+                });
+            }
+            AddressOutcomeSource::Profile => {
+                first_undecided_recipient = first_undecided_recipient.or(Some(recipient_address));
+            }
+        }
     }
-    let first_recipient = recipient_addresses.first()?;
+    let first_recipient = first_undecided_recipient?;
     let email_outcome = choose_profile_outcome(outcome_settings.delivery_profile, random_source)?;
     Some(PlannedOutcome {
         outcome: email_outcome,
@@ -111,6 +137,7 @@ fn choose_profile_outcome(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::EmailRuleOutcome;
 
     struct FixedRoll(u64);
 
@@ -147,6 +174,7 @@ mod tests {
         let planned = plan_email_outcome(
             &recipients(&["sam@shop.test", "bounce@shop.test"]),
             settings(true, DeliveryProfile::AutoDelivered),
+            &[],
             &FixedRoll(0),
         );
 
@@ -162,6 +190,7 @@ mod tests {
         let planned = plan_email_outcome(
             &recipients(&["bounce@shop.test"]),
             settings(false, DeliveryProfile::AutoDelivered),
+            &[],
             &FixedRoll(0),
         );
 
@@ -176,6 +205,7 @@ mod tests {
         let planned = plan_email_outcome(
             &recipients(&["sam@shop.test"]),
             settings(true, DeliveryProfile::Off),
+            &[],
             &FixedRoll(0),
         );
 
@@ -188,6 +218,7 @@ mod tests {
             plan_email_outcome(
                 &recipients(&["sam@shop.test"]),
                 settings(true, REALISTIC),
+                &[],
                 &FixedRoll(roll),
             )
             .map(|planned| planned.outcome)
@@ -197,5 +228,53 @@ mod tests {
         assert_eq!(outcome_for_roll(10), Some(EmailOutcome::Complaint));
         assert_eq!(outcome_for_roll(14), Some(EmailOutcome::Complaint));
         assert_eq!(outcome_for_roll(115), Some(EmailOutcome::Delivered));
+    }
+
+    fn custom_rule(position: u32, pattern: &str, outcome: EmailRuleOutcome) -> EmailOutcomeRule {
+        EmailOutcomeRule {
+            rule_id: format!("rule-{position}"),
+            position,
+            pattern: pattern.to_owned(),
+            outcome,
+            smtp_code: None,
+            diagnostic: None,
+            is_enabled: true,
+        }
+    }
+
+    // AC: EM-10.5
+    #[test]
+    fn a_custom_rule_decides_at_once_and_wins_over_a_magic_address() {
+        let custom_rules = vec![custom_rule(1, "bounce@*", EmailRuleOutcome::Complaint)];
+
+        let planned = plan_email_outcome(
+            &recipients(&["bounce@shop.test"]),
+            settings(true, DeliveryProfile::Off),
+            &custom_rules,
+            &FixedRoll(0),
+        );
+
+        let planned = planned.unwrap_or_else(|| panic!("the custom rule decides"));
+        assert_eq!(planned.outcome, EmailOutcome::Complaint);
+        assert_eq!(planned.source, OutcomeSource::CustomRule { position: 1 });
+        assert_eq!(planned.source.label(), "custom rule 1");
+        assert_eq!(planned.steps[0].after_ms, 0);
+    }
+
+    // AC: EM-10.5
+    #[test]
+    fn a_rejected_recipient_is_skipped_for_the_next_one() {
+        let custom_rules = vec![custom_rule(1, "*@blocked.test", EmailRuleOutcome::Reject)];
+
+        let planned = plan_email_outcome(
+            &recipients(&["sam@blocked.test", "kim@shop.test"]),
+            settings(true, DeliveryProfile::AutoDelivered),
+            &custom_rules,
+            &FixedRoll(0),
+        );
+
+        let planned = planned.unwrap_or_else(|| panic!("the profile decides for kim"));
+        assert_eq!(planned.recipient_address, "kim@shop.test");
+        assert_eq!(planned.source, OutcomeSource::DeliveryProfile);
     }
 }

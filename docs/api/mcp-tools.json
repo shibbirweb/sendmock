@@ -9886,7 +9886,7 @@
     {
       "name": "sendmock_outcome_rule_list",
       "toolset": "rules",
-      "summary": "email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
+      "summary": "Email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
       "operations": [
@@ -9894,7 +9894,7 @@
           "method": "GET",
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "getOutcomeRulesEmail",
-          "summary": "email outcome rules, checked from top to bottom.",
+          "summary": "Email outcome rules, checked from top to bottom.",
           "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
@@ -9929,7 +9929,7 @@
             "email",
             "sms"
           ],
-          "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+          "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
           "example": "email"
         }
       ],
@@ -9942,7 +9942,7 @@
               "email",
               "sms"
             ],
-            "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+            "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
             "examples": [
               "email"
             ]

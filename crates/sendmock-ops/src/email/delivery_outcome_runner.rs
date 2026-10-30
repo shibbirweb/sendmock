@@ -9,7 +9,8 @@ use sendmock_store::EmailRecord;
 use super::delivery_event_recording::record_delivery_event;
 use super::out_of_office_reply::send_out_of_office_reply;
 use crate::{
-    AppSettings, EmailOutcomeProfile, OperationContext, OperationError, publish_email_received,
+    AppSettings, EmailOutcomeProfile, OperationContext, OperationError, load_email_outcome_rules,
+    publish_email_received,
 };
 
 fn read_outcome_settings(app_settings: &AppSettings) -> OutcomeSettings {
@@ -26,8 +27,9 @@ fn read_outcome_settings(app_settings: &AppSettings) -> OutcomeSettings {
     }
 }
 
-/// Announces a stored email and, for mail your app sent, starts the delivery outcome its
-/// recipients or the delivery profile ask for. Every path that stores an email ends here.
+/// Announces a stored email and, for mail your app sent, starts the delivery outcome a custom
+/// rule, a magic recipient or the delivery profile asks for. Every path that stores an email
+/// ends here.
 pub async fn complete_email_intake(
     operation_context: &OperationContext,
     stored_email: &EmailRecord,
@@ -45,9 +47,11 @@ pub async fn complete_email_intake(
         .collect();
     let outcome_settings =
         read_outcome_settings(&operation_context.settings_store.current().await?);
+    let custom_rules = load_email_outcome_rules(operation_context).await?;
     let Some(planned_outcome) = plan_email_outcome(
         &recipient_addresses,
         outcome_settings,
+        &custom_rules,
         operation_context.random_source.as_ref(),
     ) else {
         return Ok(());

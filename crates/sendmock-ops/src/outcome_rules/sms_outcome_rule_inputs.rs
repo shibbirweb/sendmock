@@ -62,28 +62,6 @@ pub struct SmsOutcomeRuleUpdate {
     pub is_enabled: Option<bool>,
 }
 
-#[derive(Debug, Clone, Deserialize, JsonSchema)]
-pub struct OutcomeRuleReference {
-    /// The rule's ID, from the list of rules of the same kind.
-    pub rule_id: String,
-}
-
-/// `up` moves the rule one place earlier in the order, `down` one place later.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum OutcomeRuleMoveDirection {
-    Up,
-    Down,
-}
-
-/// Body of `POST /api/v1/outcome-rules/sms/{ruleId}/move`.
-#[derive(Debug, Clone, Deserialize, JsonSchema)]
-pub struct OutcomeRuleMoveInput {
-    /// The rule's ID, from the list of rules of the same kind.
-    pub rule_id: String,
-    pub direction: OutcomeRuleMoveDirection,
-}
-
 /// Body of `POST /api/v1/outcome-rules/sms/test`.
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct SmsOutcomeTestRequest {

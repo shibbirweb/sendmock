@@ -32,6 +32,7 @@ mod webhooks;
 
 pub use email::{
     EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData, complete_email_intake,
+    find_recipient_refusal,
 };
 pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
@@ -60,7 +61,9 @@ pub use operation_answer::{FileAnswer, NoContent, OperationAnswer};
 pub use operation_context::OperationContext;
 pub use operation_error::OperationError;
 pub use operation_registry::{ErasedOperation, OperationRegistry};
-pub use outcome_rules::{OutcomeTestResult, SmsOutcomeRule};
+pub use outcome_rules::{
+    EmailOutcomeRule, OutcomeTestResult, SmsOutcomeRule, load_email_outcome_rules,
+};
 pub use page_of::PageOf;
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,

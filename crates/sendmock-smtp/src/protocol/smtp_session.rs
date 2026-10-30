@@ -27,6 +27,22 @@ pub enum SessionAction {
     /// Send the 220 reply, then start TLS on the connection.
     UpgradeToTls(SmtpReply),
     Close(SmtpReply),
+    /// Ask the outcome rules about this `RCPT` recipient, then answer through
+    /// [`SmtpSession::finish_recipient`].
+    CheckRecipient(String),
+}
+
+impl SessionAction {
+    /// The reply to send now; `None` for a recipient check, which is answered once finished.
+    pub fn reply(&self) -> Option<&SmtpReply> {
+        match self {
+            Self::Reply(reply)
+            | Self::ReceiveData(reply)
+            | Self::UpgradeToTls(reply)
+            | Self::Close(reply) => Some(reply),
+            Self::CheckRecipient(_) => None,
+        }
+    }
 }
 
 /// How a session ended, as the session log records it.
@@ -109,7 +125,7 @@ impl SmtpSession {
                 reverse_path,
                 declared_size,
             } => self.start_mail(reverse_path, declared_size),
-            SmtpCommand::Recipient { forward_path } => self.add_recipient(forward_path),
+            SmtpCommand::Recipient { forward_path } => return self.start_recipient(forward_path),
             SmtpCommand::Data if self.recipients.is_empty() => {
                 self.reply(503, "Send RCPT TO before DATA")
             }
@@ -181,12 +197,26 @@ impl SmtpSession {
         self.reply(250, "OK")
     }
 
-    fn add_recipient(&mut self, forward_path: String) -> SmtpReply {
+    fn start_recipient(&mut self, forward_path: String) -> SessionAction {
         if self.mail_from.is_none() {
-            return self.reply(503, "Send MAIL FROM before RCPT TO");
+            return SessionAction::Reply(self.reply(503, "Send MAIL FROM before RCPT TO"));
         }
         if !self.settings.recipient_policy.is_allowed(&forward_path) {
-            return self.reject(550, &format!("No such user: {forward_path}"));
+            return SessionAction::Reply(
+                self.reject(550, &format!("No such user: {forward_path}")),
+            );
+        }
+        SessionAction::CheckRecipient(forward_path)
+    }
+
+    /// Answers a `RCPT` once the outcome rules were asked: the rule's refusal, or accepted.
+    pub fn finish_recipient(
+        &mut self,
+        forward_path: String,
+        refusal: Option<SmtpReply>,
+    ) -> SmtpReply {
+        if let Some(refusal) = refusal {
+            return self.reject(refusal.code, &refusal.lines.join(" "));
         }
         self.recipients.push(forward_path);
         self.reply(250, "OK")

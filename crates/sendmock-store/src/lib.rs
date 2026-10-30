@@ -37,7 +37,10 @@ pub use numbers::{
     MessagingServiceRecord, MessagingServiceRepository, VirtualNumberRecord,
     VirtualNumberRepository,
 };
-pub use outcome_rule::{RuleMoveDirection, SmsOutcomeRuleRecord, SmsOutcomeRuleRepository};
+pub use outcome_rule::{
+    EmailOutcomeRuleRecord, EmailOutcomeRuleRepository, RuleMoveDirection, SmsOutcomeRuleRecord,
+    SmsOutcomeRuleRepository,
+};
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use settings::SettingsRepository;
 pub use sms::{

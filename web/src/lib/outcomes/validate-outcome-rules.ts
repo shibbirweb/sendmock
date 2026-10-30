@@ -11,6 +11,7 @@ export type EmailOutcomeRuleFieldErrors = Partial<
 >;
 
 const maxNoteLength = 120;
+const maxDiagnosticLength = 200;
 const outcomesNeedingCode = new Set(["reject", "undelivered", "failed"]);
 
 /** Rules for a custom outcome number (SM-07.7), shared by the form and the API. */
@@ -60,11 +61,20 @@ export function validateEmailOutcomeRuleInput(
     fieldErrors.pattern =
       "Use an address like qa@app.test, or * wildcards (*@bounce.qa.test)";
   }
+  // A refusing reply: class 4 or 5, the same in the enhanced code.
   if (
     ruleInput.smtp_code !== null &&
-    !/^[245]\d\d( [245]\.\d{1,3}\.\d{1,3})?$/.test(ruleInput.smtp_code)
+    !/^([45])\d\d( \1\.\d{1,3}\.\d{1,3})?$/.test(ruleInput.smtp_code)
   ) {
     fieldErrors.smtp_code = "Use an SMTP reply like 550 or 550 5.1.1";
+  }
+  // The diagnostic goes into an SMTP reply line, so it must stay one short line.
+  if (
+    ruleInput.diagnostic !== null &&
+    (/[\u0000-\u001f\u007f]/.test(ruleInput.diagnostic) ||
+      ruleInput.diagnostic.length > maxDiagnosticLength)
+  ) {
+    fieldErrors.diagnostic = `Use one line of at most ${maxDiagnosticLength} characters`;
   }
   if (ruleInput.note.length > maxNoteLength) {
     fieldErrors.note = `Use at most ${maxNoteLength} characters`;
