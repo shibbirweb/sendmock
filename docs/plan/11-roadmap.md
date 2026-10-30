@@ -170,7 +170,7 @@ Workstreams, order and criteria: [25-phase-1.md](25-phase-1.md).
 - Twilio inbound + status formats with `X-Twilio-Signature`; Vonage inbound/DLR.
 - SMS reply webhook (Twilio style): number and Messaging Service inbound URLs with fallback, TwiML replies recorded in the thread, Twilio error codes, resend ([04-sms.md](04-sms.md#reply-webhook-twilio-style)). Moved from Phase 4.
 - Variables and templating with `minijinja`: all variable kinds, scopes, built-in context, text filters, random functions, Fields and Raw body modes, strict/lenient rendering, `/webhooks/render` (replaces the nunjucks mock preview).
-- Payload templates: schema, native/generic, Twilio, Vonage, Slack, Discord; custom templates (create, clone, save from endpoint, linked/detached).
+- Payload templates: schema, native/generic, Twilio, Vonage, Slack, Discord; custom templates (create, clone, save from endpoint, linked/detached), revision history, import/export and the template reference.
 - Manual send, replay and edit-and-replay.
 - CLI `webhook` commands (`send`, `tail`, endpoints, rules, templates, variables, deliveries); MCP `webhooks`, `templates`, `variables` toolsets.
 - Switch Webhook screens to live mode.
@@ -196,11 +196,12 @@ Workstreams, order and criteria: [25-phase-1.md](25-phase-1.md).
 - Email quality checks: HTML compatibility (caniemail data), link check, optional SpamAssassin spam check.
 - Release to real SMTP relay and auto-forward rules (with recipient allowlist); tag rules.
 - Email inbound formats: SendGrid Inbound Parse, Mailgun routes, Postmark inbound.
+- Multipart Fields bodies with file fields for webhook endpoints (WH-07.16), the encoding those inbound formats use.
 - Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `/emails/inbound`, inbound domains, `email.inbound`, routes with `match_recipient` / `forward` / `store` / `stop` and the `/v3/routes` API ([05-webhooks.md](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style)).
 - Bounce/complaint/delivered provider formats: SendGrid events, Mailgun, Postmark, SES via SNS, Resend.
 - Open event formats: SendGrid Event Webhook `open`, Mailgun `opened`, Postmark Open, Twilio `MessageStatus=read`.
 - Fake data functions (`fake.*`, locales), Postman-style `{{$random...}}` aliases, `SENDMOCK_VAR_*` env variables.
-- Remaining built-in templates (Mailgun, SendGrid, Postmark, SES, Resend, Brevo, Mandrill, SparkPost; Plivo, MessageBird, Telnyx, Sinch, Infobip, Africa's Talking; Teams, Google Chat, Telegram, n8n/Zapier/Make), template import/export, `--templates-dir`, revision history.
+- Remaining built-in templates (Mailgun, SendGrid, Postmark, SES, Resend, Brevo, Mandrill, SparkPost; Plivo, MessageBird, Telnyx, Sinch, Infobip, Africa's Talking; Teams, Google Chat, Telegram, n8n/Zapier/Make), `--templates-dir`.
 - More SMS providers: Plivo, MessageBird, generic configurable GET/POST vendor.
 - WhatsApp via Twilio (`whatsapp:` addresses, channel badge, inbound, `read` status).
 - HTTP catcher: catch path, bins, mock response rules, Slack/Discord/Telegram/FCM presets, `wait/http`.
