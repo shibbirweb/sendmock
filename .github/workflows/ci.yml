@@ -105,6 +105,190 @@ jobs:
       - name: Every shard passed
         run: test "${{ needs.web-e2e.result }}" = "success"
 
+  rust:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      # macOS allows 256 open files by default; the SMTP load test holds 1000 sockets.
+      - name: Tests
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" != "Windows" ]; then
+            ulimit -n 4096
+          fi
+          cargo nextest run --workspace --locked
+
+  rust-coverage:
+    name: Rust coverage and file size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml, with the coverage tools
+        run: |
+          rustup toolchain install
+          rustup component add llvm-tools-preview
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest,cargo-llvm-cov
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: File size (500-line limit, 300-line warning)
+        run: bun scripts/rust-file-lines.ts
+
+      # The SMTP load test holds 1000 sockets, as in the Tests step above.
+      - name: Coverage
+        run: |
+          ulimit -n 4096
+          cargo llvm-cov nextest --workspace --locked --json --summary-only --output-path coverage.json
+
+      - name: Coverage gate (80% overall, 90% operations and domain; table on the job page)
+        run: bun scripts/rust-coverage.ts coverage.json
+
+  # The live UI the binary embeds, built once and shared with every smoke test job.
+  web-dist:
+    name: Web UI build for the binary
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build (live mode, no mock layer)
+        env:
+          VITE_API_MODE: live
+        run: bun run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+          retention-days: 1
+
+  # The Phase 0 done-when check: a release binary serves the API and the embedded UI.
+  binary-smoke:
+    name: Binary smoke test (${{ matrix.os }})
+    needs: web-dist
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Release build with the UI embedded
+        run: cargo build --release --locked -p sendmock
+
+      - name: Start it, check the API and the UI, stop it
+        run: bun scripts/binary-smoke-test.ts target/release/sendmock
+
+      # The live UI suite runs against this binary in the Playwright image.
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: sendmock-linux
+          path: target/release/sendmock
+          retention-days: 1
+
+  # The live UI build against a real binary (UI-12.2): every screen shows its data or
+  # Not available yet, and no screen calls an operation the binary does not serve.
+  web-live:
+    name: Web UI against the binary
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: Install Bun
+        run: npm install -g bun
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Live UI tests
+        env:
+          SENDMOCK_BINARY: ../sendmock-binary/sendmock
+        run: |
+          chmod +x ../sendmock-binary/sendmock
+          bun run test:live
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-live
+          path: web/playwright-report
+          retention-days: 7
+
+  # One check for the rulesets to require, whatever the number of operating systems.
+  rust-result:
+    name: Rust
+    if: always()
+    needs: [rust, rust-coverage, binary-smoke, web-live]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every Rust job passed
+        run: |
+          test "${{ needs.rust.result }}" = "success"
+          test "${{ needs.rust-coverage.result }}" = "success"
+          test "${{ needs.binary-smoke.result }}" = "success"
+          test "${{ needs.web-live.result }}" = "success"
+
   acceptance:
     name: Acceptance traceability
     runs-on: ubuntu-latest
@@ -118,6 +302,9 @@ jobs:
 
       - name: Criteria named by tests exist, accepted features are proven
         run: bun scripts/acceptance.ts
+
+      - name: Every file carries the same version (DS-05.2)
+        run: bun scripts/version.ts check
 
   website:
     name: Website

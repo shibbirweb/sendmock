@@ -55,55 +55,55 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 0 / 108 features, 55 / 496 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 8 / 108 features, 142 / 497 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
-| [EM-01](01-email.md#em-01-smtp-receive) | SMTP receive | Phase 1 | 6 | Not started |
-| [EM-02](01-email.md#em-02-smtp-tls-and-auth) | SMTP TLS and AUTH | Phase 1 | 5 | Not started |
-| [EM-03](01-email.md#em-03-storage-retention-and-search) | Storage, retention and search | Phase 1 | 5 | Not started |
+| [EM-01](01-email.md#em-01-smtp-receive) | SMTP receive | Phase 1 | 6 | Accepted |
+| [EM-02](01-email.md#em-02-smtp-tls-and-auth) | SMTP TLS and AUTH | Phase 1 | 5 | Accepted |
+| [EM-03](01-email.md#em-03-storage-retention-and-search) | Storage, retention and search | Phase 1 | 5 | In progress |
 | [EM-04](01-email.md#em-04-email-viewer) | Email viewer | UI in U1, live in Phase 1 | 8 | In progress |
 | [EM-05](01-email.md#em-05-otp-and-link-extraction) | OTP and link extraction | UI in U1, backend Phase 1 | 5 | In progress |
-| [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Not started |
+| [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Accepted |
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | In progress |
 | [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Not started |
-| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | In progress |
+| [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | Accepted |
 | [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | UI in U1, native events Phase 3, provider formats Phase 4 | 6 | In progress |
 | [EM-11](01-email.md#em-11-email-opened-events) | Email opened events | Phase 3 | 5 | Not started |
-| [EM-12](01-email.md#em-12-tags) | Tags | Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules) | 4 | Not started |
-| [EM-13](01-email.md#em-13-quality-checks) | Quality checks | Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam) | 4 | Not started |
+| [EM-12](01-email.md#em-12-tags) | Tags | Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules) | 4 | In progress |
+| [EM-13](01-email.md#em-13-quality-checks) | Quality checks | Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam) | 4 | In progress |
 | [EM-14](01-email.md#em-14-release-and-auto-forward) | Release and auto-forward | Phase 4 | 4 | Not started |
 | [EM-15](01-email.md#em-15-smtp-chaos) | SMTP chaos | Phase 4 | 3 | Not started |
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | In progress |
 | [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 5 | In progress |
 | [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | In progress |
-| [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Not started |
-| [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Not started |
+| [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
+| [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | In progress |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | In progress |
-| [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Not started |
+| [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Accepted |
 | [SM-05](02-sms-verify.md#sm-05-other-sms-providers-and-generic-vendor) | Other SMS providers and generic vendor | Phase 4 | 2 | Not started |
-| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Not started |
+| [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Accepted |
 | [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | In progress |
-| [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | Not started |
-| [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Not started |
+| [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | In progress |
+| [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | In progress |
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Not started |
 | [SM-11](02-sms-verify.md#sm-11-whatsapp-via-twilio) | WhatsApp via Twilio | Phase 4 | 3 | Not started |
 | [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 2 | 3 | In progress |
-| [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | In progress |
-| [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Not started |
+| [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | Accepted |
+| [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Accepted |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | In progress |
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | In progress |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
-| [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Not started |
-| [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Not started |
-| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | In progress |
+| [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
+| [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
+| [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | Accepted |
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 8 | In progress |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | UI in U2, backend Phase 3 | 9 | In progress |
 | [WH-04](03-webhooks.md#wh-04-standard-webhooks-signing) | Standard Webhooks signing | Phase 3 | 3 | Not started |
 | [WH-05](03-webhooks.md#wh-05-manual-send-and-replay) | Manual send and replay | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-06](03-webhooks.md#wh-06-provider-formats-and-signatures) | Provider formats and signatures | Phase 3 (Twilio, Vonage), Phase 4 (email providers) | 3 | Not started |
-| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env) | 15 | In progress |
+| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart) | 16 | In progress |
 | [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 5 | In progress |
 | [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 9 | In progress |
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | In progress |
@@ -112,16 +112,16 @@ On top of its own criteria, a feature is done only when:
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | In progress |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | In progress |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | In progress |
-| [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 3 | Not started |
-| [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Not started |
-| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Not started |
+| [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 3 | In progress |
+| [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Accepted |
+| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | In progress |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | In progress |
-| [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | Not started |
-| [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Not started |
+| [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | In progress |
+| [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | In progress |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Not started |
-| [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Not started |
-| [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Not started |
+| [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | In progress |
+| [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | In progress |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Not started |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Not started |
 | [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
@@ -137,19 +137,19 @@ On top of its own criteria, a feature is done only when:
 | [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | UI done (2026-10-29) |
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | UI done (2026-10-29) |
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Not started |
-| [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Not started |
+| [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Not started |
-| [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Not started |
+| [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | In progress |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 6 | Not started |
-| [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | Not started |
-| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Not started |
-| [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 5 (Testcontainers) | 2 | Not started |
+| [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | In progress |
+| [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | In progress |
+| [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Not started |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | UI done (2026-10-29) |
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | UI done (2026-10-29) |
-| [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Not started |
+| [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Accepted |
 | [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Not started |
 | [WS-07](07-distribution-website.md#ws-07-cli-and-mcp-reference) | CLI and MCP reference | Phase U3 | 5 | Not started |
 | [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Not started |

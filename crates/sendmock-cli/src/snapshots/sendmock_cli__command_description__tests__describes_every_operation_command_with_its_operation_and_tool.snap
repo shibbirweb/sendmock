@@ -1,0 +1,2874 @@
+---
+source: crates/sendmock-cli/src/command_description.rs
+expression: command_descriptions
+---
+[
+  {
+    "command": "sendmock health",
+    "usage": "sendmock health",
+    "summary": "Liveness check; answers while the server runs.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/health",
+        "operation_id": "getHealth",
+        "selector": {
+          "input": "view",
+          "value": "health"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_status"
+    ]
+  },
+  {
+    "command": "sendmock status",
+    "usage": "sendmock status",
+    "summary": "Version, listen addresses and enabled features.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/info",
+        "operation_id": "getInfo",
+        "selector": {
+          "input": "view",
+          "value": "info"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_status"
+    ]
+  },
+  {
+    "command": "sendmock seed validate",
+    "usage": "sendmock seed validate <file>",
+    "summary": "Check a seed file without applying it.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/seed/validate",
+        "operation_id": "postSeedValidate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_seed_validate"
+    ]
+  },
+  {
+    "command": "sendmock stats",
+    "usage": "sendmock stats",
+    "summary": "Counts and rates shown on the Overview.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/stats",
+        "operation_id": "getStats",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_stats"
+    ]
+  },
+  {
+    "command": "sendmock email list",
+    "usage": "sendmock email list",
+    "summary": "Stored emails, newest first, with search and filters.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--direction",
+      "--from",
+      "--has-attachment",
+      "--unread",
+      "--limit",
+      "--query",
+      "--source",
+      "--tag",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails",
+        "operation_id": "getEmails",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_list"
+    ]
+  },
+  {
+    "command": "sendmock email delete-all",
+    "usage": "sendmock email delete-all",
+    "summary": "Delete every email.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails",
+        "operation_id": "deleteEmails",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock email latest",
+    "usage": "sendmock email latest --to <address>",
+    "summary": "The newest email to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--subject",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/latest",
+        "operation_id": "getEmailsLatest",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_latest"
+    ]
+  },
+  {
+    "command": "sendmock email show",
+    "usage": "sendmock email show <emailId>",
+    "summary": "One email with bodies, headers, attachments and extracted codes.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "getEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_get"
+    ]
+  },
+  {
+    "command": "sendmock email update",
+    "usage": "sendmock email update <emailId>",
+    "summary": "Mark read or unread, or change tags.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--read",
+      "--tag"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "patchEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_update"
+    ]
+  },
+  {
+    "command": "sendmock email delete",
+    "usage": "sendmock email delete <emailId>",
+    "summary": "Delete one email.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails/{emailId}",
+        "operation_id": "deleteEmailsByEmailId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_delete"
+    ]
+  },
+  {
+    "command": "sendmock email timeline",
+    "usage": "sendmock email timeline <emailId>",
+    "summary": "Delivery events: received, delivered, opened, bounced.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/timeline",
+        "operation_id": "getEmailsByEmailIdTimeline",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_timeline"
+    ]
+  },
+  {
+    "command": "sendmock email simulate",
+    "usage": "sendmock email simulate <emailId> <event>",
+    "summary": "Simulate a delivery outcome such as a bounce or complaint.",
+    "arguments": [
+      "emailId",
+      "event"
+    ],
+    "flags": [
+      "--bounce-type"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/simulate",
+        "operation_id": "postEmailsByEmailIdSimulate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_simulate"
+    ]
+  },
+  {
+    "command": "sendmock email check unsubscribe",
+    "usage": "sendmock email check <emailId> unsubscribe",
+    "summary": "List-Unsubscribe and one-click unsubscribe checks.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/list-unsubscribe",
+        "operation_id": "getEmailsByEmailIdListUnsubscribe",
+        "selector": {
+          "input": "kind",
+          "value": "unsubscribe"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_email_check"
+    ]
+  },
+  {
+    "command": "sendmock email mime",
+    "usage": "sendmock email mime <emailId>",
+    "summary": "The MIME tree of the message.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/mime",
+        "operation_id": "getEmailsByEmailIdMime",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_mime"
+    ]
+  },
+  {
+    "command": "sendmock email raw",
+    "usage": "sendmock email raw <emailId>",
+    "summary": "The raw message source.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/raw",
+        "operation_id": "getEmailsByEmailIdRaw",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/raw"
+    ]
+  },
+  {
+    "command": "sendmock email attachments",
+    "usage": "sendmock email attachments <emailId> <attachmentIndex>",
+    "summary": "Download one attachment.",
+    "arguments": [
+      "emailId",
+      "attachmentIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/attachments/{attachmentIndex}",
+        "operation_id": "getEmailsByEmailIdAttachmentsByAttachmentIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/attachments/{attachmentIndex}"
+    ]
+  },
+  {
+    "command": "sendmock email thumbnail",
+    "usage": "sendmock email thumbnail <emailId> <attachmentIndex>",
+    "summary": "A preview image of an attachment.",
+    "arguments": [
+      "emailId",
+      "attachmentIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/parts/{attachmentIndex}/thumbnail",
+        "operation_id": "getEmailsByEmailIdPartsByAttachmentIndexThumbnail",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail"
+    ]
+  },
+  {
+    "command": "sendmock email send",
+    "usage": "sendmock email send",
+    "summary": "Native send: JSON with optional base64 attachments.",
+    "arguments": [],
+    "flags": [
+      "--attachments",
+      "--bcc",
+      "--cc",
+      "--from",
+      "--headers",
+      "--html",
+      "--subject",
+      "--tag",
+      "--text",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/send",
+        "operation_id": "postSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_send"
+    ]
+  },
+  {
+    "command": "sendmock sendmail",
+    "usage": "sendmock sendmail",
+    "summary": "Store a raw message as sent by your app, as the sendmail shim does.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/send/raw",
+        "operation_id": "postSendRaw",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_send_raw"
+    ]
+  },
+  {
+    "command": "sendmock otp",
+    "usage": "sendmock otp --to <recipient>",
+    "summary": "The latest one-time code sent to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--wait",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/otp",
+        "operation_id": "getOtp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_otp_get"
+    ]
+  },
+  {
+    "command": "sendmock links",
+    "usage": "sendmock links --to <recipient>",
+    "summary": "The links of the latest email to a recipient.",
+    "arguments": [],
+    "flags": [
+      "--wait",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/links",
+        "operation_id": "getLinks",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_links_get"
+    ]
+  },
+  {
+    "command": "sendmock email wait",
+    "usage": "sendmock email wait",
+    "summary": "Wait until a matching email arrives; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--since",
+      "--subject",
+      "--timeout",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/email",
+        "operation_id": "getWaitEmail",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_wait"
+    ]
+  },
+  {
+    "command": "sendmock events tail",
+    "usage": "sendmock events tail",
+    "summary": "The latest events, newest first: the polling twin of the live stream.",
+    "arguments": [],
+    "flags": [
+      "--limit",
+      "--since",
+      "--type"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/events/recent",
+        "operation_id": "getEventsRecent",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_events_recent"
+    ]
+  },
+  {
+    "command": "sendmock sms list",
+    "usage": "sendmock sms list",
+    "summary": "SMS and WhatsApp messages, newest first, with filters.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--direction",
+      "--from",
+      "--limit",
+      "--query",
+      "--status",
+      "--thread-id",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms",
+        "operation_id": "getSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_list"
+    ]
+  },
+  {
+    "command": "sendmock sms delete-all",
+    "usage": "sendmock sms delete-all --yes",
+    "summary": "Delete every message.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms",
+        "operation_id": "deleteSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock sms send",
+    "usage": "sendmock sms send",
+    "summary": "Native send, with optional media URLs or inline media.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--from",
+      "--media",
+      "--media-url",
+      "--metadata",
+      "--status-callback",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms",
+        "operation_id": "postSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_send"
+    ]
+  },
+  {
+    "command": "sendmock sms threads",
+    "usage": "sendmock sms threads",
+    "summary": "Conversations, one per contact and your number.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/threads",
+        "operation_id": "getSmsThreads",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_threads"
+    ]
+  },
+  {
+    "command": "sendmock sms show",
+    "usage": "sendmock sms show <smsId>",
+    "summary": "One message with its status history and callbacks.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/{smsId}",
+        "operation_id": "getSmsBySmsId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_get"
+    ]
+  },
+  {
+    "command": "sendmock sms delete",
+    "usage": "sendmock sms delete <smsId>",
+    "summary": "Delete one message.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/{smsId}",
+        "operation_id": "deleteSmsBySmsId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms media",
+    "usage": "sendmock sms media <smsId> <mediaIndex>",
+    "summary": "Download one media item of an MMS or WhatsApp message.",
+    "arguments": [
+      "smsId",
+      "mediaIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/{smsId}/media/{mediaIndex}",
+        "operation_id": "getSmsBySmsIdMediaByMediaIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://sms/{smsId}/media/{mediaIndex}"
+    ]
+  },
+  {
+    "command": "sendmock sms status",
+    "usage": "sendmock sms status <smsId> <status>",
+    "summary": "Set a delivery status by hand and fire its callback.",
+    "arguments": [
+      "smsId",
+      "status"
+    ],
+    "flags": [
+      "--error-code"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/{smsId}/status",
+        "operation_id": "postSmsBySmsIdStatus",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_set_status"
+    ]
+  },
+  {
+    "command": "sendmock sms inbound",
+    "usage": "sendmock sms inbound",
+    "summary": "Simulate a message from a contact to one of your numbers.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--channel",
+      "--from",
+      "--media",
+      "--template-id",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/inbound",
+        "operation_id": "postSmsInbound",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_simulate_inbound"
+    ]
+  },
+  {
+    "command": "sendmock sms wait",
+    "usage": "sendmock sms wait",
+    "summary": "Wait until a matching SMS arrives; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--from",
+      "--since",
+      "--timeout",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/sms",
+        "operation_id": "getWaitSms",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_wait"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email list",
+    "usage": "sendmock outcome-rule email list",
+    "summary": "Email outcome rules, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/outcome-rules/email",
+        "operation_id": "getOutcomeRulesEmail",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email create",
+    "usage": "sendmock outcome-rule email create",
+    "summary": "Add an email outcome rule.",
+    "arguments": [],
+    "flags": [
+      "--diagnostic",
+      "--enabled",
+      "--note",
+      "--outcome",
+      "--pattern",
+      "--smtp-code"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email",
+        "operation_id": "postOutcomeRulesEmail",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email update",
+    "usage": "sendmock outcome-rule email update <ruleId>",
+    "summary": "Change an email outcome rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--diagnostic",
+      "--enabled",
+      "--note",
+      "--outcome",
+      "--pattern",
+      "--smtp-code"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/outcome-rules/email/{ruleId}",
+        "operation_id": "patchOutcomeRulesEmailByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email delete",
+    "usage": "sendmock outcome-rule email delete <ruleId>",
+    "summary": "Delete an email outcome rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/outcome-rules/email/{ruleId}",
+        "operation_id": "deleteOutcomeRulesEmailByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email move",
+    "usage": "sendmock outcome-rule email move <ruleId>",
+    "summary": "Move an email outcome rule up or down.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email/{ruleId}/move",
+        "operation_id": "postOutcomeRulesEmailByRuleIdMove",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule email test",
+    "usage": "sendmock outcome-rule email test <address>",
+    "summary": "Which custom rule, magic address or profile decides an address's outcome.",
+    "arguments": [
+      "address"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/email/test",
+        "operation_id": "postOutcomeRulesEmailTest",
+        "selector": {
+          "input": "channel",
+          "value": "email"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_test"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms list",
+    "usage": "sendmock outcome-rule sms list",
+    "summary": "SMS outcome rules, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/outcome-rules/sms",
+        "operation_id": "getOutcomeRulesSms",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms create",
+    "usage": "sendmock outcome-rule sms create",
+    "summary": "Add an SMS outcome rule.",
+    "arguments": [],
+    "flags": [
+      "--delay-seconds",
+      "--error-code",
+      "--enabled",
+      "--match-field",
+      "--note",
+      "--outcome",
+      "--pattern"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms",
+        "operation_id": "postOutcomeRulesSms",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms update",
+    "usage": "sendmock outcome-rule sms update <ruleId>",
+    "summary": "Change an SMS outcome rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--delay-seconds",
+      "--error-code",
+      "--enabled",
+      "--match-field",
+      "--note",
+      "--outcome",
+      "--pattern"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}",
+        "operation_id": "patchOutcomeRulesSmsByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms delete",
+    "usage": "sendmock outcome-rule sms delete <ruleId>",
+    "summary": "Delete an SMS outcome rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}",
+        "operation_id": "deleteOutcomeRulesSmsByRuleId",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms move",
+    "usage": "sendmock outcome-rule sms move <ruleId>",
+    "summary": "Move an SMS outcome rule up or down.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms/{ruleId}/move",
+        "operation_id": "postOutcomeRulesSmsByRuleIdMove",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock outcome-rule sms test",
+    "usage": "sendmock outcome-rule sms test <number>",
+    "summary": "Which custom rule, magic number or profile decides a number's outcome.",
+    "arguments": [
+      "number"
+    ],
+    "flags": [
+      "--match-field"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/outcome-rules/sms/test",
+        "operation_id": "postOutcomeRulesSmsTest",
+        "selector": {
+          "input": "channel",
+          "value": "sms"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_outcome_rule_test"
+    ]
+  },
+  {
+    "command": "sendmock numbers list",
+    "usage": "sendmock numbers list",
+    "summary": "Fake numbers your app sends from, with their webhooks.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/numbers",
+        "operation_id": "getNumbers",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_number_list"
+    ]
+  },
+  {
+    "command": "sendmock numbers add",
+    "usage": "sendmock numbers add",
+    "summary": "Add a number.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--inbound-fallback-url",
+      "--inbound-method",
+      "--inbound-template-id",
+      "--inbound-url",
+      "--label",
+      "--messaging-service-sid",
+      "--number",
+      "--status-callback-url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/numbers",
+        "operation_id": "postNumbers",
+        "selector": {
+          "input": "number_id",
+          "isGiven": false
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_number_upsert"
+    ]
+  },
+  {
+    "command": "sendmock numbers update",
+    "usage": "sendmock numbers update <numberId>",
+    "summary": "Change a number.",
+    "arguments": [
+      "numberId"
+    ],
+    "flags": [
+      "--channel",
+      "--inbound-fallback-url",
+      "--inbound-method",
+      "--inbound-template-id",
+      "--inbound-url",
+      "--label",
+      "--messaging-service-sid",
+      "--number",
+      "--status-callback-url"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/numbers/{numberId}",
+        "operation_id": "patchNumbersByNumberId",
+        "selector": {
+          "input": "number_id",
+          "isGiven": true
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_number_upsert"
+    ]
+  },
+  {
+    "command": "sendmock numbers remove",
+    "usage": "sendmock numbers remove <numberId>",
+    "summary": "Delete a number.",
+    "arguments": [
+      "numberId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/numbers/{numberId}",
+        "operation_id": "deleteNumbersByNumberId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_number_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms services list",
+    "usage": "sendmock sms services list",
+    "summary": "Messaging Services that pool numbers.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/messaging-services",
+        "operation_id": "getMessagingServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_list"
+    ]
+  },
+  {
+    "command": "sendmock sms services create",
+    "usage": "sendmock sms services create",
+    "summary": "Add a Messaging Service.",
+    "arguments": [],
+    "flags": [
+      "--friendly-name",
+      "--inbound-fallback-url",
+      "--inbound-mode",
+      "--inbound-url",
+      "--number-id"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/messaging-services",
+        "operation_id": "postMessagingServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_create"
+    ]
+  },
+  {
+    "command": "sendmock sms services update",
+    "usage": "sendmock sms services update <serviceSid>",
+    "summary": "Change a Messaging Service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [
+      "--friendly-name",
+      "--inbound-fallback-url",
+      "--inbound-mode",
+      "--inbound-url",
+      "--number-id"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/messaging-services/{serviceSid}",
+        "operation_id": "patchMessagingServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_update"
+    ]
+  },
+  {
+    "command": "sendmock sms services delete",
+    "usage": "sendmock sms services delete <serviceSid>",
+    "summary": "Delete a Messaging Service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/messaging-services/{serviceSid}",
+        "operation_id": "deleteMessagingServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_messaging_service_delete"
+    ]
+  },
+  {
+    "command": "sendmock verify list",
+    "usage": "sendmock verify list",
+    "summary": "Verifications your app started, newest first.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--cursor",
+      "--limit",
+      "--status",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify",
+        "operation_id": "getVerify",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_list"
+    ]
+  },
+  {
+    "command": "sendmock verify show",
+    "usage": "sendmock verify show <verificationSid>",
+    "summary": "One verification with its code, attempts and timeline.",
+    "arguments": [
+      "verificationSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify/{verificationSid}",
+        "operation_id": "getVerifyByVerificationSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_get"
+    ]
+  },
+  {
+    "command": "sendmock verify force",
+    "usage": "sendmock verify force <verificationSid> <status>",
+    "summary": "Force an outcome: approved, expired, canceled or max attempts.",
+    "arguments": [
+      "verificationSid",
+      "status"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/verify/{verificationSid}/force",
+        "operation_id": "postVerifyByVerificationSidForce",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_force"
+    ]
+  },
+  {
+    "command": "sendmock verify services list",
+    "usage": "sendmock verify services list",
+    "summary": "Verify services (code length, fixed code, lifetime).",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/verify/services",
+        "operation_id": "getVerifyServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_list"
+    ]
+  },
+  {
+    "command": "sendmock verify services create",
+    "usage": "sendmock verify services create",
+    "summary": "Add a Verify service.",
+    "arguments": [],
+    "flags": [
+      "--code-length",
+      "--fixed-code",
+      "--friendly-name",
+      "--ttl-seconds"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/verify/services",
+        "operation_id": "postVerifyServices",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_create"
+    ]
+  },
+  {
+    "command": "sendmock verify services update",
+    "usage": "sendmock verify services update <serviceSid>",
+    "summary": "Change a Verify service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [
+      "--code-length",
+      "--fixed-code",
+      "--friendly-name",
+      "--ttl-seconds"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/verify/services/{serviceSid}",
+        "operation_id": "patchVerifyServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_update"
+    ]
+  },
+  {
+    "command": "sendmock verify services delete",
+    "usage": "sendmock verify services delete <serviceSid>",
+    "summary": "Delete a Verify service.",
+    "arguments": [
+      "serviceSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/verify/services/{serviceSid}",
+        "operation_id": "deleteVerifyServicesByServiceSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_service_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms providers list",
+    "usage": "sendmock sms providers list",
+    "summary": "SMS providers, built in and custom, removed ones included.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers",
+        "operation_id": "getSmsProviders",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_list"
+    ]
+  },
+  {
+    "command": "sendmock sms providers show",
+    "usage": "sendmock sms providers show <providerKey>",
+    "summary": "One provider definition; secret credentials masked.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "getSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_get"
+    ]
+  },
+  {
+    "command": "sendmock sms providers update",
+    "usage": "sendmock sms providers update <providerKey>",
+    "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--accent",
+      "--callback-template-key",
+      "--check-credentials",
+      "--credentials",
+      "--error-responses",
+      "--field-mapping",
+      "--host",
+      "--enabled",
+      "--key",
+      "--message-id-template",
+      "--name",
+      "--operations",
+      "--outcome-error-codes",
+      "--status-names",
+      "--success-response",
+      "--validation-rules"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "patchSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_update"
+    ]
+  },
+  {
+    "command": "sendmock sms providers delete",
+    "usage": "sendmock sms providers delete <providerKey>",
+    "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/providers/{providerKey}",
+        "operation_id": "deleteSmsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms providers restore",
+    "usage": "sendmock sms providers restore <providerKey>",
+    "summary": "Bring a removed built-in back as it was.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/restore",
+        "operation_id": "postSmsProvidersByProviderKeyRestore",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_restore"
+    ]
+  },
+  {
+    "command": "sendmock sms providers reset",
+    "usage": "sendmock sms providers reset <providerKey>",
+    "summary": "Put a built-in provider back as shipped.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/reset",
+        "operation_id": "postSmsProvidersByProviderKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_reset"
+    ]
+  },
+  {
+    "command": "sendmock sms providers preview",
+    "usage": "sendmock sms providers preview <providerKey>",
+    "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--provider",
+      "--sample-request"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers/{providerKey}/preview",
+        "operation_id": "postSmsProvidersByProviderKeyPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_preview"
+    ]
+  },
+  {
+    "command": "sendmock sms providers credential",
+    "usage": "sendmock sms providers credential <providerKey> <credentialName> --reveal",
+    "summary": "Reveal one secret credential (asked for after a confirmation).",
+    "arguments": [
+      "providerKey",
+      "credentialName"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
+        "operation_id": "getSmsProvidersByProviderKeyCredentialsByCredentialName",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
+    "command": "sendmock webhook endpoint list",
+    "usage": "sendmock webhook endpoint list",
+    "summary": "Where webhooks go: URL, template, secret and retry policy.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints",
+        "operation_id": "getWebhooksEndpoints",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint create",
+    "usage": "sendmock webhook endpoint create",
+    "summary": "Add an endpoint; its signing secret is generated.",
+    "arguments": [],
+    "flags": [
+      "--body-fields",
+      "--body-mode",
+      "--extra-fields",
+      "--fields-encoding",
+      "--headers",
+      "--enabled",
+      "--method",
+      "--name",
+      "--query-params",
+      "--raw-body",
+      "--raw-content-type",
+      "--render-mode",
+      "--retry-policy",
+      "--template-id",
+      "--template-mode",
+      "--timeout-ms",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints",
+        "operation_id": "postWebhooksEndpoints",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint show",
+    "usage": "sendmock webhook endpoint show <endpointId>",
+    "summary": "One endpoint; its secret masked.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "getWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint update",
+    "usage": "sendmock webhook endpoint update <endpointId>",
+    "summary": "Change an endpoint; send only the changed keys.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--body-fields",
+      "--body-mode",
+      "--extra-fields",
+      "--fields-encoding",
+      "--headers",
+      "--enabled",
+      "--method",
+      "--name",
+      "--query-params",
+      "--raw-body",
+      "--raw-content-type",
+      "--render-mode",
+      "--retry-policy",
+      "--template-id",
+      "--template-mode",
+      "--timeout-ms",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "patchWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint delete",
+    "usage": "sendmock webhook endpoint delete <endpointId>",
+    "summary": "Delete an endpoint and its rules.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}",
+        "operation_id": "deleteWebhooksEndpointsByEndpointId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook render",
+    "usage": "sendmock webhook render",
+    "summary": "Render an unsaved endpoint's request against a message.",
+    "arguments": [],
+    "flags": [
+      "--email-id",
+      "--endpoint",
+      "--endpoint-id",
+      "--http-request-id",
+      "--sms-id",
+      "--variables"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/preview",
+        "operation_id": "postWebhooksEndpointsPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_render"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint secret",
+    "usage": "sendmock webhook endpoint secret <endpointId> --reveal",
+    "summary": "Reveal the signing secret (asked for after a confirmation).",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/secret",
+        "operation_id": "getWebhooksEndpointsByEndpointIdSecret",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
+    "command": "sendmock webhook endpoint rotate-secret",
+    "usage": "sendmock webhook endpoint rotate-secret <endpointId>",
+    "summary": "New signing secret; the old one keeps working for the overlap.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--overlap-hours"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/rotate-secret",
+        "operation_id": "postWebhooksEndpointsByEndpointIdRotateSecret",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_rotate_secret"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint save-as-template",
+    "usage": "sendmock webhook endpoint save-as-template <endpointId>",
+    "summary": "Save the endpoint's request as a custom template.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/save-as-template",
+        "operation_id": "postWebhooksEndpointsByEndpointIdSaveAsTemplate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_save_as_template"
+    ]
+  },
+  {
+    "command": "sendmock webhook endpoint test",
+    "usage": "sendmock webhook endpoint test <endpointId>",
+    "summary": "Send a test.ping delivery.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/test",
+        "operation_id": "postWebhooksEndpointsByEndpointIdTest",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_test"
+    ]
+  },
+  {
+    "command": "sendmock webhook send",
+    "usage": "sendmock webhook send --endpoint <endpointId>",
+    "summary": "Send a webhook for a chosen message or the sample, by hand.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--email-id",
+      "--endpoint",
+      "--http-request-id",
+      "--request",
+      "--sms-id",
+      "--template-id",
+      "--variables"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/send",
+        "operation_id": "postWebhooksEndpointsByEndpointIdSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_send"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries list",
+    "usage": "sendmock webhook deliveries list",
+    "summary": "Every webhook request sent, newest first.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--endpoint-id",
+      "--event-type",
+      "--limit",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/deliveries",
+        "operation_id": "getWebhooksDeliveries",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries show",
+    "usage": "sendmock webhook deliveries show <deliveryId>",
+    "summary": "One delivery: request, response and every attempt.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}",
+        "operation_id": "getWebhooksDeliveriesByDeliveryId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries cancel",
+    "usage": "sendmock webhook deliveries cancel <deliveryId>",
+    "summary": "Stop the remaining retries.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}/cancel",
+        "operation_id": "postWebhooksDeliveriesByDeliveryIdCancel",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_cancel"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries replay",
+    "usage": "sendmock webhook deliveries replay <deliveryId>",
+    "summary": "Send the delivery again, as it was or edited.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [
+      "--body",
+      "--headers",
+      "--rerender"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}/replay",
+        "operation_id": "postWebhooksDeliveriesByDeliveryIdReplay",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_replay"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries wait",
+    "usage": "sendmock webhook deliveries wait",
+    "summary": "Wait until a matching delivery finishes; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--endpoint",
+      "--event",
+      "--since",
+      "--status",
+      "--timeout"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/webhook",
+        "operation_id": "getWaitWebhook",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_wait"
+    ]
+  },
+  {
+    "command": "sendmock webhook metrics",
+    "usage": "sendmock webhook metrics",
+    "summary": "Volume, success rate, latency and failures over a range.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id",
+      "--range"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/metrics",
+        "operation_id": "getWebhooksMetrics",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_metrics"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved list",
+    "usage": "sendmock webhook saved list",
+    "summary": "Bookmarked requests, kept through pruning and reset.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/saved",
+        "operation_id": "getWebhooksSaved",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved create",
+    "usage": "sendmock webhook saved create --delivery <deliveryId>",
+    "summary": "Save a delivery's request under a name.",
+    "arguments": [],
+    "flags": [
+      "--delivery",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved",
+        "operation_id": "postWebhooksSaved",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved rename",
+    "usage": "sendmock webhook saved rename <savedId>",
+    "summary": "Rename a saved delivery.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/saved/{savedId}",
+        "operation_id": "patchWebhooksSavedBySavedId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved delete",
+    "usage": "sendmock webhook saved delete <savedId>",
+    "summary": "Delete a saved delivery.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/saved/{savedId}",
+        "operation_id": "deleteWebhooksSavedBySavedId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved send",
+    "usage": "sendmock webhook saved send <savedId>",
+    "summary": "Send a saved request to its endpoint or another one.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--endpoint-id",
+      "--rerender"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved/{savedId}/send",
+        "operation_id": "postWebhooksSavedBySavedIdSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_send"
+    ]
+  },
+  {
+    "command": "sendmock webhook saved save-as-template",
+    "usage": "sendmock webhook saved save-as-template <savedId>",
+    "summary": "Turn a saved request into a custom template.",
+    "arguments": [
+      "savedId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/saved/{savedId}/template",
+        "operation_id": "postWebhooksSavedBySavedIdTemplate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_saved_save_as_template"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule list",
+    "usage": "sendmock webhook rule list",
+    "summary": "Which events go to which endpoint, checked from top to bottom.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/rules",
+        "operation_id": "getWebhooksRules",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule create",
+    "usage": "sendmock webhook rule create",
+    "summary": "Add a rule.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id",
+      "--event",
+      "--filter",
+      "--enabled",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules",
+        "operation_id": "postWebhooksRules",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule show",
+    "usage": "sendmock webhook rule show <ruleId>",
+    "summary": "One webhook rule with its filter.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "getWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule update",
+    "usage": "sendmock webhook rule update <ruleId>",
+    "summary": "Change a rule; send only the changed keys.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--endpoint-id",
+      "--event",
+      "--filter",
+      "--enabled",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "patchWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule delete",
+    "usage": "sendmock webhook rule delete <ruleId>",
+    "summary": "Delete a rule.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/rules/{ruleId}",
+        "operation_id": "deleteWebhooksRulesByRuleId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule move",
+    "usage": "sendmock webhook rule move <ruleId>",
+    "summary": "Move a rule up or down; answers the reordered list.",
+    "arguments": [
+      "ruleId"
+    ],
+    "flags": [
+      "--direction"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/{ruleId}/move",
+        "operation_id": "postWebhooksRulesByRuleIdMove",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_move"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule preview",
+    "usage": "sendmock webhook rule preview",
+    "summary": "Which recent messages an unsaved rule would match.",
+    "arguments": [],
+    "flags": [
+      "--event",
+      "--filter"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/preview",
+        "operation_id": "postWebhooksRulesPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_preview"
+    ]
+  },
+  {
+    "command": "sendmock webhook var list",
+    "usage": "sendmock webhook var list",
+    "summary": "Global and endpoint variables; secret values are masked.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/variables",
+        "operation_id": "getWebhooksVariables",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook var set",
+    "usage": "sendmock webhook var set <name> <value>",
+    "summary": "Add a variable.",
+    "arguments": [
+      "name",
+      "value"
+    ],
+    "flags": [
+      "--description",
+      "--endpoint-id",
+      "--kind",
+      "--random-mode",
+      "--scope"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables",
+        "operation_id": "postWebhooksVariables",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_set"
+    ]
+  },
+  {
+    "command": "sendmock webhook var update",
+    "usage": "sendmock webhook var update <variableId>",
+    "summary": "Change a variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [
+      "--description",
+      "--endpoint-id",
+      "--kind",
+      "--name",
+      "--random-mode",
+      "--scope",
+      "--value"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/variables/{variableId}",
+        "operation_id": "patchWebhooksVariablesByVariableId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook var unset",
+    "usage": "sendmock webhook var unset <variableId>",
+    "summary": "Delete a variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/variables/{variableId}",
+        "operation_id": "deleteWebhooksVariablesByVariableId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_unset"
+    ]
+  },
+  {
+    "command": "sendmock webhook var regenerate",
+    "usage": "sendmock webhook var regenerate <variableId>",
+    "summary": "Make a new fixed value for a generated-once random variable.",
+    "arguments": [
+      "variableId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables/{variableId}/regenerate",
+        "operation_id": "postWebhooksVariablesByVariableIdRegenerate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_regenerate"
+    ]
+  },
+  {
+    "command": "sendmock webhook var preview",
+    "usage": "sendmock webhook var preview",
+    "summary": "What a variable definition resolves to against the sample.",
+    "arguments": [],
+    "flags": [
+      "--kind",
+      "--value"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/variables/preview",
+        "operation_id": "postWebhooksVariablesPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_variable_preview"
+    ]
+  },
+  {
+    "command": "sendmock webhook template list",
+    "usage": "sendmock webhook template list",
+    "summary": "Built-in and custom payload templates.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates",
+        "operation_id": "getWebhooksTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook template create",
+    "usage": "sendmock webhook template create",
+    "summary": "Add a custom template, starting as native JSON.",
+    "arguments": [],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates",
+        "operation_id": "postWebhooksTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_create"
+    ]
+  },
+  {
+    "command": "sendmock webhook template show",
+    "usage": "sendmock webhook template show <templateId>",
+    "summary": "One template with its method, headers and body template.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "getWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_get"
+    ]
+  },
+  {
+    "command": "sendmock webhook template update",
+    "usage": "sendmock webhook template update <templateId>",
+    "summary": "Edit a template; each save keeps a revision, 422 when it does not render.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--body-template",
+      "--content-type",
+      "--description",
+      "--event",
+      "--header-templates",
+      "--method",
+      "--name",
+      "--required-variable"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "patchWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_update"
+    ]
+  },
+  {
+    "command": "sendmock webhook template delete",
+    "usage": "sendmock webhook template delete <templateId>",
+    "summary": "Delete a custom template; 409 while endpoints use it.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--endpoints"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/templates/{templateId}",
+        "operation_id": "deleteWebhooksTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_delete"
+    ]
+  },
+  {
+    "command": "sendmock webhook template history",
+    "usage": "sendmock webhook template history <templateId>",
+    "summary": "Saved revisions, newest first.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}/revisions",
+        "operation_id": "getWebhooksTemplatesByTemplateIdRevisions",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_revisions"
+    ]
+  },
+  {
+    "command": "sendmock webhook template restore",
+    "usage": "sendmock webhook template restore <templateId> <revision>",
+    "summary": "Restore a revision as a new save.",
+    "arguments": [
+      "templateId",
+      "revision"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/revisions/{revision}/restore",
+        "operation_id": "postWebhooksTemplatesByTemplateIdRevisionsByRevisionRestore",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_restore"
+    ]
+  },
+  {
+    "command": "sendmock webhook template render",
+    "usage": "sendmock webhook template render <templateId>",
+    "summary": "Render against an email, an SMS or the sample, optionally a draft.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--draft",
+      "--email-id",
+      "--http-request-id",
+      "--sms-id"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/render",
+        "operation_id": "postWebhooksTemplatesByTemplateIdRender",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_render"
+    ]
+  },
+  {
+    "command": "sendmock webhook template reset",
+    "usage": "sendmock webhook template reset <templateId>",
+    "summary": "Put an edited built-in template back as shipped.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/reset",
+        "operation_id": "postWebhooksTemplatesByTemplateIdReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_reset"
+    ]
+  },
+  {
+    "command": "sendmock webhook template clone",
+    "usage": "sendmock webhook template clone <templateId>",
+    "summary": "Copy a template into a new custom one.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/{templateId}/clone",
+        "operation_id": "postWebhooksTemplatesByTemplateIdClone",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_clone"
+    ]
+  },
+  {
+    "command": "sendmock webhook template import",
+    "usage": "sendmock webhook template import <file>",
+    "summary": "Import a template file; 409 when the id is taken.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--on-conflict"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/import",
+        "operation_id": "postWebhooksTemplatesImport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_import"
+    ]
+  },
+  {
+    "command": "sendmock webhook template export",
+    "usage": "sendmock webhook template export <templateId>",
+    "summary": "The template as TOML (variable names, never values).",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}/export",
+        "operation_id": "getWebhooksTemplatesByTemplateIdExport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_export"
+    ]
+  },
+  {
+    "command": "sendmock webhook template reference",
+    "usage": "sendmock webhook template reference",
+    "summary": "Every value a template can read for the chosen events.",
+    "arguments": [],
+    "flags": [
+      "--events"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/template-reference",
+        "operation_id": "getWebhooksTemplateReference",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_reference"
+    ]
+  },
+  {
+    "command": "sendmock logs smtp",
+    "usage": "sendmock logs smtp",
+    "summary": "SMTP sessions, newest first, including rejected ones.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--limit",
+      "--query",
+      "--result"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/smtp",
+        "operation_id": "getLogsSmtp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp"
+    ]
+  },
+  {
+    "command": "sendmock logs smtp show",
+    "usage": "sendmock logs smtp show <sessionId>",
+    "summary": "One SMTP session with its transcript.",
+    "arguments": [
+      "sessionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/smtp/{sessionId}",
+        "operation_id": "getLogsSmtpBySessionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp_get"
+    ]
+  },
+  {
+    "command": "sendmock logs http",
+    "usage": "sendmock logs http",
+    "summary": "Requests to the native and provider APIs, newest first.",
+    "arguments": [],
+    "flags": [
+      "--api",
+      "--cursor",
+      "--limit",
+      "--path",
+      "--status-class"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/http",
+        "operation_id": "getLogsHttp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http"
+    ]
+  },
+  {
+    "command": "sendmock logs http show",
+    "usage": "sendmock logs http show <requestId>",
+    "summary": "One API request with its request and response.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/logs/http/{requestId}",
+        "operation_id": "getLogsHttpByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http_get"
+    ]
+  },
+  {
+    "command": "sendmock settings get",
+    "usage": "sendmock settings get",
+    "summary": "Every runtime setting.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/settings",
+        "operation_id": "getSettings",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_settings_get"
+    ]
+  },
+  {
+    "command": "sendmock settings set",
+    "usage": "sendmock settings set",
+    "summary": "Change settings; send only the changed keys.",
+    "arguments": [],
+    "flags": [
+      "--chaos-smtp-command-latency-ms",
+      "--chaos-smtp-reject-code",
+      "--chaos-smtp-reject-next-count",
+      "--chaos-smtp-reject-recipient-pattern",
+      "--email-outcome-bounce-rate-percent",
+      "--email-outcome-complaint-rate-percent",
+      "--email-outcome-profile",
+      "--fire-opened-events-on-view",
+      "--inbound-email-domain",
+      "--chaos-smtp-drop-during-data-enabled",
+      "--magic-addresses-enabled",
+      "--magic-numbers-enabled",
+      "--plus-address-tagging-enabled",
+      "--strict-twilio-test-mode",
+      "--max-age-days",
+      "--max-emails",
+      "--max-sms",
+      "--opened-event-mode",
+      "--otp-pattern",
+      "--payment-default-currency",
+      "--payment-merchant-name",
+      "--payment-outcome-profile",
+      "--payment-random-success-rate-percent",
+      "--relay-recipient-allowlist",
+      "--relay-smtp-url",
+      "--sms-failure-rate-percent",
+      "--sms-simulation-profile",
+      "--spamassassin-address",
+      "--update-check-mode"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/settings",
+        "operation_id": "patchSettings",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_settings_update"
+    ]
+  },
+  {
+    "command": "sendmock reset",
+    "usage": "sendmock reset --yes",
+    "summary": "Delete all traffic and restore the seed configuration.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/reset",
+        "operation_id": "postReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_reset"
+    ]
+  },
+  {
+    "command": "sendmock sample",
+    "usage": "sendmock sample <kind>",
+    "summary": "Create a sample email, SMS, verification or HTTP request through the normal path.",
+    "arguments": [
+      "kind"
+    ],
+    "flags": [
+      "--html",
+      "--subject",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/samples/{kind}",
+        "operation_id": "postSamplesByKind",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sample_send"
+    ]
+  },
+  {
+    "command": "sendmock integrate",
+    "usage": "sendmock integrate <stack>",
+    "summary": "Copy-ready settings for a stack, as Settings > Connection shows them.",
+    "arguments": [
+      "stack"
+    ],
+    "flags": [
+      "--channel",
+      "--host"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations/{stack}",
+        "operation_id": "getIntegrationsByStack",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_integration_snippet"
+    ]
+  },
+  {
+    "command": "sendmock update check",
+    "usage": "sendmock update check",
+    "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/updates",
+        "operation_id": "getUpdates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_update_check"
+    ]
+  }
+]

@@ -6,31 +6,31 @@ Plan: [03-email.md](../03-email.md). Rules for IDs, ticking and tests: [README.m
 
 Phase 1. Docs: [SMTP server](../03-email.md#smtp-server).
 
-- [ ] EM-01.1 A message sent with `EHLO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` to `127.0.0.1:1025` is stored and appears in the UI and `GET /api/v1/emails` within 1 second.
-- [ ] EM-01.2 Mail for any recipient and any domain is accepted (catch-all); nothing is relayed anywhere.
-- [ ] EM-01.3 `PIPELINING`, `8BITMIME`, `SMTPUTF8` and `SIZE` are advertised and work; a message larger than `--smtp-max-size` is rejected with `552`.
-- [ ] EM-01.4 Multiple recipients in one session are stored once with all envelope recipients; envelope recipients missing from `To`/`Cc` are shown as BCC.
-- [ ] EM-01.5 Mail from Laravel, Symfony, Nodemailer, Python smtplib, Django, Go net/smtp, Spring, lettre, Rails and MailKit is received correctly (cross-language CI).
-- [ ] EM-01.6 Malformed commands get the correct SMTP error code and never crash the server; 500 concurrent sessions are handled without errors.
+- [x] EM-01.1 A message sent with `EHLO`, `MAIL FROM`, `RCPT TO`, `DATA`, `QUIT` to `127.0.0.1:1025` is stored and appears in the UI and `GET /api/v1/emails` within 1 second. (#48)
+- [x] EM-01.2 Mail for any recipient and any domain is accepted (catch-all); nothing is relayed anywhere. (#48)
+- [x] EM-01.3 `PIPELINING`, `8BITMIME`, `SMTPUTF8` and `SIZE` are advertised and work; a message larger than `--smtp-max-size` is rejected with `552`. (#48)
+- [x] EM-01.4 Multiple recipients in one session are stored once with all envelope recipients; envelope recipients missing from `To`/`Cc` are shown as BCC. (#48)
+- [x] EM-01.5 Mail from Laravel, Symfony, Nodemailer, Python smtplib, Django, Go net/smtp, Spring, lettre, Rails and MailKit is received correctly (cross-language CI). (#48)
+- [x] EM-01.6 Malformed commands get the correct SMTP error code and never crash the server; 500 concurrent sessions are handled without errors. (#48)
 
 ## EM-02 SMTP TLS and AUTH
 
 Phase 1.
 
-- [ ] EM-02.1 `STARTTLS` works with an auto-generated self-signed certificate on first run, and with a user-provided cert/key.
-- [ ] EM-02.2 Implicit TLS works on the optional SMTPS listener.
-- [ ] EM-02.3 `AUTH PLAIN`, `LOGIN` and `CRAM-MD5` accept any credentials in `accept-any` mode; with `file:<path>` wrong credentials get `535`; with `none` no AUTH is advertised.
-- [ ] EM-02.4 `--smtp-require-tls` rejects `MAIL` before `STARTTLS` with `530`.
-- [ ] EM-02.5 The authenticated username is stored on the email and shown in the UI.
+- [x] EM-02.1 `STARTTLS` works with an auto-generated self-signed certificate on first run, and with a user-provided cert/key. (#48)
+- [x] EM-02.2 Implicit TLS works on the optional SMTPS listener. (#48)
+- [x] EM-02.3 `AUTH PLAIN`, `LOGIN` and `CRAM-MD5` accept any credentials in `accept-any` mode; with `file:<path>` wrong credentials get `535`; with `none` no AUTH is advertised. (#48)
+- [x] EM-02.4 `--smtp-require-tls` rejects `MAIL` before `STARTTLS` with `530`. (#48)
+- [x] EM-02.5 The authenticated username is stored on the email and shown in the UI. (#48)
 
 ## EM-03 Storage, retention and search
 
 Phase 1.
 
-- [ ] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received.
+- [x] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received. (#48)
 - [ ] EM-03.2 With `--max-emails N` the oldest messages are pruned so at most N remain; `--max-age` prunes by age.
-- [ ] EM-03.3 `--db memory` keeps nothing on disk.
-- [ ] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails.
+- [x] EM-03.3 `--db memory` keeps nothing on disk. (#48)
+- [x] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails. (#48)
 - [ ] EM-03.5 Delete one, delete by filter and delete all work from UI, API, CLI and MCP.
 
 ## EM-04 Email viewer
@@ -41,7 +41,7 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 - [x] EM-04.2 Remote images are blocked by default and load after clicking "Load images". (UI on mock data; live in Phase 1)
 - [x] EM-04.3 Desktop, tablet and mobile width toggles resize the preview. (UI on mock data; live in Phase 1)
 - [x] EM-04.4 Text, Source (highlighted), Headers and Attachments tabs show the correct content; CID inline images display in the HTML view. (UI on mock data; live in Phase 1)
-- [ ] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails.
+- [x] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails. (#48)
 - [ ] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded.
 - [ ] EM-04.7 "Screenshot" saves a PNG of the rendered HTML.
 - [ ] EM-04.8 Broken HTML, missing charsets and non-English content (Bangla, Arabic, Japanese) render without errors.
@@ -50,19 +50,19 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 
 UI in U1, backend Phase 1.
 
-- [ ] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies.
+- [x] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies. (#48)
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
 - [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
 - [ ] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code.
-- [ ] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient.
+- [x] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient. (#48)
 
 ## EM-06 sendmail shim
 
 Phase 1.
 
-- [ ] EM-06.1 `sendmock sendmail -t` reads a message from stdin and it is stored like an SMTP message.
-- [ ] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to SendMock.
-- [ ] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender.
+- [x] EM-06.1 `sendmock sendmail -t` reads a message from stdin and it is stored like an SMTP message. (#48)
+- [x] EM-06.2 PHP `mail()` with `sendmail_path` pointing at the shim delivers to SendMock. (#48)
+- [x] EM-06.3 A symlink named `sendmail` behaves the same; `-f` sets the envelope sender. (#48)
 
 ## EM-07 Native HTTP send API
 
@@ -70,9 +70,9 @@ Phase 1.
 
 - [ ] EM-07.1 `POST /api/v1/send` with from, to, cc, bcc, subject, text, html, attachments and headers stores a message equal to the equivalent SMTP message.
 - [ ] EM-07.2 Invalid input returns `400` with a field-level error and is recorded in the HTTP request log.
-- [ ] EM-07.3 The stored email shows source `native_api`.
-- [ ] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message.
-- [ ] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment.
+- [x] EM-07.3 The stored email shows source `native_api`. (#48)
+- [x] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message. (#48)
+- [x] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment. (#48)
 
 ## EM-08 Email provider HTTP send APIs
 
@@ -88,11 +88,11 @@ Phase 4. Docs: [HTTP send APIs](../03-email.md#http-send-apis).
 
 UI in U1, backend Phase 1.
 
-- [ ] EM-09.1 Every SMTP session, including failed ones, is listed with client, EHLO name, TLS, AUTH user, result and duration.
-- [ ] EM-09.2 The transcript shows every command and reply; AUTH passwords are masked; DATA content is linked, not duplicated.
-- [ ] EM-09.3 Each stored email links to its session.
-- [ ] EM-09.4 Failed sessions are highlighted with their reason, and the transcript viewer tells commands from replies and colours reply codes by class.
-- [ ] EM-09.5 The session list loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of sessions.
+- [x] EM-09.1 Every SMTP session, including failed ones, is listed with client, EHLO name, TLS, AUTH user, result and duration. (#48)
+- [x] EM-09.2 The transcript shows every command and reply; AUTH passwords are masked; DATA content is linked, not duplicated. (#48)
+- [x] EM-09.3 Each stored email links to its session. (#48)
+- [x] EM-09.4 Failed sessions are highlighted with their reason, and the transcript viewer tells commands from replies and colours reply codes by class. (#48)
+- [x] EM-09.5 The session list loads 50 rows at a time and loads more on scroll, so it stays fast with thousands of sessions. (#48)
 
 ## EM-10 Delivery outcome simulation
 
@@ -119,8 +119,8 @@ Phase 3. Docs: [Opened events](../05-webhooks.md#opened-events).
 
 Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules).
 
-- [ ] EM-12.1 `X-Tags` header values become tags.
-- [ ] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`.
+- [x] EM-12.1 `X-Tags` header values become tags. (#48)
+- [x] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`. (#48)
 - [ ] EM-12.3 Tag rules add tags to matching new messages.
 - [ ] EM-12.4 Manual tags can be added and removed from UI, API, CLI and MCP.
 
@@ -131,7 +131,7 @@ Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam).
 - [ ] EM-13.1 The HTML check reports per-client support for the CSS/HTML used and points at the offending source lines.
 - [ ] EM-13.2 The link check reports status, redirects and timeouts for every link and image, and runs only when requested.
 - [ ] EM-13.3 With `--spamassassin` configured, the spam score and rules are shown; without it the tab is hidden.
-- [ ] EM-13.4 Invalid `List-Unsubscribe` / `List-Unsubscribe-Post` headers produce warnings.
+- [x] EM-13.4 Invalid `List-Unsubscribe` / `List-Unsubscribe-Post` headers produce warnings. (#48)
 
 ## EM-14 Release and auto-forward
 

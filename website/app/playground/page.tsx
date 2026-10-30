@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { PlaygroundWorkbench } from "@/components/api/playground-workbench";
+import { TargetPicker } from "@/components/api/target-picker";
 import { loadApiReference } from "@/lib/openapi/load-openapi";
 
 export const metadata: Metadata = {
@@ -18,10 +19,12 @@ export default function PlaygroundPage() {
         <h1 className="text-3xl font-bold tracking-tight">API playground</h1>
         <p className="text-fd-muted-foreground">
           Demo mode: every request is answered in your browser by the mock API
-          of the live demo, so nothing needs installing. Snippets point at a
-          SendMock on its default address.
+          of the live demo, so nothing needs installing. Switch to your local
+          SendMock, or any SendMock you can reach, to send real requests.
+          Snippets point at a SendMock on its default address.
         </p>
       </header>
+      <TargetPicker />
       <PlaygroundWorkbench
         operations={operations}
         tagNames={tagNames}

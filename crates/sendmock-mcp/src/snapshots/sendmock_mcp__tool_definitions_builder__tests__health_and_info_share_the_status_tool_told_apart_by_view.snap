@@ -1,0 +1,33 @@
+---
+source: crates/sendmock-mcp/src/tool_definitions_builder.rs
+expression: status_tool
+---
+{
+  "name": "sendmock_status",
+  "toolset": "core",
+  "description": "view=health: Liveness check; answers while the server runs. view=info: Version, listen addresses and enabled features.",
+  "inputSchema": {
+    "properties": {
+      "view": {
+        "enum": [
+          "health",
+          "info"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "view"
+    ],
+    "type": "object"
+  },
+  "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": false
+  },
+  "operationIds": [
+    "getHealth",
+    "getInfo"
+  ]
+}

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { FormField } from "@/components/common/form-field";
 import { FormFieldError } from "@/components/common/form-field-error";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
@@ -149,7 +150,13 @@ export function PaymentsSection({ appSettings }: { appSettings: AppSettings }) {
           </div>
         )}
       </SettingsSectionCard>
-      <PaymentTestValuesCard />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/payments/gateways"
+        featureName="Payment test values"
+        description="Test cards and values for each gateway, method and flow."
+      >
+        <PaymentTestValuesCard />
+      </FeatureAvailabilityGate>
     </div>
   );
 }

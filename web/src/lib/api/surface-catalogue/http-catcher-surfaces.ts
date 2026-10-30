@@ -3,6 +3,7 @@ import { type SurfaceCatalogue } from "./surface-definition";
 /** The HTTP catcher: bins, their responses and captured requests. */
 export const httpCatcherSurfaces: SurfaceCatalogue = {
   "GET /api/v1/http/bins": {
+    phase: "4",
     cli: "sendmock http bin list",
     cliAliases: ["sendmock http bins"],
     mcp: "sendmock_http_bin_list",
@@ -10,61 +11,73 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     ui: "HTTP Catcher > bins",
   },
   "POST /api/v1/http/bins": {
+    phase: "4",
     cli: "sendmock http bin create",
     mcp: "sendmock_http_bin_create",
     ui: "HTTP Catcher > New bin",
   },
   "PATCH /api/v1/http/bins/{binId}": {
+    phase: "4",
     cli: "sendmock http bin update <binId>",
     mcp: "sendmock_http_bin_update",
     ui: "HTTP Catcher > bin > Responses > Edit default reply",
   },
   "DELETE /api/v1/http/bins/{binId}": {
+    phase: "4",
     cli: "sendmock http bin delete <binId>",
     mcp: "sendmock_http_bin_delete",
     ui: "HTTP Catcher > bin > Delete bin",
   },
   "GET /api/v1/http/bins/{binId}/responses": {
+    phase: "4",
     cli: "sendmock http response list <binId>",
     mcp: "sendmock_http_response_list",
     ui: "HTTP Catcher > bin > Responses",
   },
   "PUT /api/v1/http/bins/{binId}/responses": {
+    phase: "4",
     cli: "sendmock http response set <binId>",
     mcp: "sendmock_http_response_set",
     ui: "HTTP Catcher > bin > Responses > Add rule, edit, move, enabled switch",
   },
   "POST /api/v1/http/bins/{binId}/responses/preview": {
+    phase: "4",
     cli: "sendmock http response preview <binId>",
     mcp: "sendmock_http_response_preview",
     ui: "HTTP Catcher > bin > Responses > rule sheet > Preview",
   },
   "GET /api/v1/http/requests": {
+    phase: "4",
     cli: "sendmock http list",
     mcp: "sendmock_http_list",
     ui: "HTTP Catcher > Requests",
   },
   "DELETE /api/v1/http/requests": {
+    phase: "4",
     cli: "sendmock http clear",
     mcp: "sendmock_http_clear",
     ui: "HTTP Catcher > bin > Clear requests",
   },
   "GET /api/v1/http/requests/{requestId}": {
+    phase: "4",
     cli: "sendmock http show <requestId>",
     mcp: "sendmock_http_get",
     ui: "HTTP Catcher > open a request",
   },
   "GET /api/v1/http/requests/{requestId}/files/{fileIndex}": {
+    phase: "4",
     cli: "sendmock http file <requestId> <fileIndex>",
     mcp: "sendmock://http/requests/{requestId}/files/{fileIndex}",
     ui: "HTTP Catcher > request > Body > files",
   },
   "POST /api/v1/http/requests/{requestId}/forward": {
+    phase: "4",
     cli: "sendmock http forward <requestId>",
     mcp: "sendmock_http_forward",
     ui: "HTTP Catcher > request > Forward to URL",
   },
   "GET /catch/{binPath}": {
+    phase: "4",
     cli: "sendmock http send <bin>",
     mcp: "sendmock_http_send",
     ui: "HTTP Catcher > Send a sample request",
@@ -72,6 +85,7 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     cliArguments: { bin: "binPath" },
   },
   "POST /catch/{binPath}": {
+    phase: "4",
     cli: "sendmock http send <bin>",
     mcp: "sendmock_http_send",
     ui: "HTTP Catcher > Send a sample request",
@@ -79,6 +93,7 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     cliArguments: { bin: "binPath" },
   },
   "PUT /catch/{binPath}": {
+    phase: "4",
     cli: "sendmock http send <bin>",
     mcp: "sendmock_http_send",
     ui: "HTTP Catcher > Send a sample request",
@@ -86,6 +101,7 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     cliArguments: { bin: "binPath" },
   },
   "PATCH /catch/{binPath}": {
+    phase: "4",
     cli: "sendmock http send <bin>",
     mcp: "sendmock_http_send",
     ui: "HTTP Catcher > Send a sample request",
@@ -93,6 +109,7 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     cliArguments: { bin: "binPath" },
   },
   "DELETE /catch/{binPath}": {
+    phase: "4",
     cli: "sendmock http send <bin>",
     mcp: "sendmock_http_send",
     ui: "HTTP Catcher > Send a sample request",

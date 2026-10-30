@@ -1,0 +1,142 @@
+# Each crate belongs to one layer (AGENTS.md); scripts/rust-crate-layers.ts fails when a
+# crate depends on its own or a higher layer.
+[workspace]
+resolver = "3"
+members = [
+    "crates/*",
+]
+
+[workspace.package]
+# The version is the source of truth that scripts/version.ts syncs into every other file.
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.98"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/shibbirweb/sendmock"
+homepage = "https://shibbirweb.github.io/sendmock/"
+
+[workspace.dependencies]
+sendmock-api = { path = "crates/sendmock-api" }
+sendmock-cli = { path = "crates/sendmock-cli" }
+sendmock-core = { path = "crates/sendmock-core" }
+sendmock-mail = { path = "crates/sendmock-mail" }
+sendmock-mcp = { path = "crates/sendmock-mcp" }
+sendmock-ops = { path = "crates/sendmock-ops" }
+sendmock-smtp = { path = "crates/sendmock-smtp" }
+sendmock-sms = { path = "crates/sendmock-sms" }
+sendmock-store = { path = "crates/sendmock-store" }
+sendmock-webhooks = { path = "crates/sendmock-webhooks" }
+
+axum = "0.8"
+chrono = { version = "0.4", default-features = false, features = [
+    "alloc",
+] }
+clap = { version = "4", features = [
+    "derive",
+    "env",
+    "string",
+] }
+dirs = "7"
+futures-util = { version = "0.3", default-features = false }
+jsonschema = { version = "0.60", default-features = false }
+mail-parser = "1"
+md5 = { package = "md-5", version = "0.11" }
+mime_guess = "2"
+minijinja = { version = "3", default-features = false, features = [
+    "builtins",
+    "debug",
+    "fuel",
+    "serde",
+] }
+base64 = "0.23"
+hmac = "0.13"
+insta = { version = "1", features = [
+    "json",
+] }
+rand = "0.10"
+rcgen = "0.14"
+regex = "1"
+reqwest = { version = "0.13", default-features = false, features = [
+    "json",
+    "query",
+    "rustls-no-provider",
+] }
+rustls = { version = "0.23", default-features = false, features = [
+    "logging",
+    "ring",
+    "std",
+    "tls12",
+] }
+rmcp = { version = "3.8", default-features = false, features = [
+    "server",
+    "transport-io",
+    "transport-streamable-http-server",
+] }
+rust-embed = { version = "8", features = [
+    "mime-guess",
+] }
+rusqlite = { version = "0.41", features = [
+    "bundled",
+] }
+schemars = "1"
+serde = { version = "1", features = [
+    "derive",
+] }
+serde_json = "1"
+serde_urlencoded = "0.7"
+sha1 = { version = "0.11", default-features = false }
+sha2 = { version = "0.11", default-features = false }
+serde_yaml_ng = "0.10"
+tempfile = "3"
+thiserror = "2"
+tokio = { version = "1", features = [
+    "macros",
+    "net",
+    "rt-multi-thread",
+    "signal",
+    "io-util",
+    "sync",
+    "time",
+] }
+tokio-rustls = { version = "0.26", default-features = false, features = [
+    "logging",
+    "ring",
+    "tls12",
+] }
+tokio-tungstenite = { version = "0.29", default-features = false, features = [
+    "connect",
+] }
+toml = "1"
+tower = { version = "0.5", features = [
+    "util",
+] }
+tower-http = { version = "0.6", default-features = false, features = [
+    "cors",
+] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = [
+    "ansi",
+    "fmt",
+    "json",
+    "std",
+] }
+ulid = "3"
+zstd = "0.14"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+# External input must never panic; clippy.toml still allows both in tests.
+unwrap_used = "deny"
+expect_used = "deny"
+too_many_lines = "deny"
+
+[profile.release]
+# Measured with the UI embedded: 5.2 MB with "z" against 6.5 MB with 3; SendMock waits on
+# I/O far more than on CPU, so the smaller binary wins.
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

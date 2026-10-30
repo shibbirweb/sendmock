@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
+import { OperationMenuItem } from "@/features/availability/operation-button";
 import { useDeleteSms, useOpenSms } from "@/lib/api/hooks/use-sms-queries";
 import type { SmsMessage } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -73,7 +74,8 @@ export function SmsMessageActions({
           <DropdownMenuSeparator />
           {isOutbound && (
             <>
-              <DropdownMenuItem
+              <OperationMenuItem
+                operationKey="POST /api/v1/sms/{smsId}/open"
                 onSelect={() => {
                   openSms.mutate(
                     { smsId: smsMessage.id, openSource: "manual" },
@@ -87,18 +89,19 @@ export function SmsMessageActions({
               >
                 <CheckCheckIcon />
                 Simulate read
-              </DropdownMenuItem>
+              </OperationMenuItem>
               <DropdownMenuSeparator />
             </>
           )}
-          <DropdownMenuItem
+          <OperationMenuItem
+            operationKey="POST /api/v1/webhooks/endpoints/{endpointId}/send"
             onSelect={() => {
               setSendDialogOpen(true);
             }}
           >
             <WebhookIcon />
             Send to webhook
-          </DropdownMenuItem>
+          </OperationMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={() => {

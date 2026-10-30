@@ -1,0 +1,626 @@
+[
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "account_sid",
+        "value": "ACtest00000000000000000000000000",
+        "is_secret": false
+      },
+      {
+        "name": "auth_token",
+        "value": "twilio-test-token",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {
+      "invalid_number": "21211",
+      "cannot_route": "21612",
+      "no_international_permission": "21408",
+      "blocked": "21610",
+      "cannot_receive_sms": "21614",
+      "invalid_from": "21212",
+      "not_sms_capable": "21606",
+      "queue_full": "21611",
+      "unreachable_handset": "30003",
+      "landline": "30006",
+      "carrier_filtered": "30007",
+      "unknown_error": "30008",
+      "missing_to": "21604",
+      "missing_from": "21603",
+      "missing_body": "21602"
+    },
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "twilio",
+    "name": "Twilio",
+    "area": "sms",
+    "accent": "#f22f46",
+    "host": "api.twilio.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/2010-04-01/Accounts/{AccountSid}/Messages.json",
+        "request_format": "form"
+      },
+      {
+        "kind": "fetch",
+        "method": "GET",
+        "path": "/2010-04-01/Accounts/{AccountSid}/Messages/{MessageSid}.json",
+        "request_format": "query"
+      },
+      {
+        "kind": "list",
+        "method": "GET",
+        "path": "/2010-04-01/Accounts/{AccountSid}/Messages.json",
+        "request_format": "query"
+      },
+      {
+        "kind": "cancel",
+        "method": "POST",
+        "path": "/2010-04-01/Accounts/{AccountSid}/Messages/{MessageSid}.json",
+        "request_format": "form"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "From"
+      },
+      {
+        "part": "to",
+        "source": "To"
+      },
+      {
+        "part": "body",
+        "source": "Body"
+      },
+      {
+        "part": "media_urls",
+        "source": "MediaUrl"
+      },
+      {
+        "part": "messaging_service",
+        "source": "MessagingServiceSid"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "StatusCallback"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "e164_number",
+        "max_length": null,
+        "error_kind": "invalid_value"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"sid\": \"{{ message.provider_id }}\", \"account_sid\": \"{{ request.path_params.AccountSid }}\", \"api_version\": \"2010-04-01\", \"messaging_service_sid\": {{ message.messaging_service_sid | json | default(\"null\") }}, \"to\": \"{{ message.to }}\", \"from\": \"{{ message.from }}\", \"body\": \"{{ message.body }}\", \"status\": \"{{ message.status }}\", \"num_segments\": \"{{ message.segments | default(\"1\") }}\", \"num_media\": \"{{ message.num_media | default(\"0\") }}\", \"direction\": \"outbound-api\", \"date_created\": \"{{ message.created_at | default(now_iso()) }}\", \"date_updated\": \"{{ message.updated_at | default(now_iso()) }}\", \"date_sent\": null, \"price\": null, \"price_unit\": \"USD\", \"error_code\": {{ message.error_code | default(\"null\") }}, \"error_message\": null, \"uri\": \"/2010-04-01/Accounts/{{ request.path_params.AccountSid }}/Messages/{{ message.provider_id }}.json\", \"subresource_uris\": {\"media\": \"/2010-04-01/Accounts/{{ request.path_params.AccountSid }}/Messages/{{ message.provider_id }}/Media.json\"}}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": {{ error.code | default(\"21604\") }}, \"message\": \"{{ error.reason | default(\"A 'To' phone number is required.\") }}\", \"more_info\": \"https://www.twilio.com/docs/errors/{{ error.code | default(\"21604\") }}\", \"status\": 400}"
+      },
+      {
+        "kind": "invalid_value",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": {{ error.code | default(\"21211\") }}, \"message\": \"{{ error.reason | default(\"The 'To' number is not a valid phone number.\") }}\", \"more_info\": \"https://www.twilio.com/docs/errors/{{ error.code | default(\"21211\") }}\", \"status\": 400}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": 20003, \"message\": \"Authenticate\", \"more_info\": \"https://www.twilio.com/docs/errors/20003\", \"status\": 401}"
+      },
+      {
+        "kind": "not_found",
+        "status": 404,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": 20404, \"message\": \"The requested resource was not found\", \"more_info\": \"https://www.twilio.com/docs/errors/20404\", \"status\": 404}"
+      }
+    ],
+    "message_id_template": "SM{{ random_hex(32) }}",
+    "callback_template_key": "twilio.status_callback",
+    "status_names": {
+      "queued": "queued",
+      "sent": "sent",
+      "delivered": "delivered",
+      "undelivered": "undelivered",
+      "failed": "failed",
+      "read": "read"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "account_sid",
+        "value": "ACtest00000000000000000000000000",
+        "is_secret": false
+      },
+      {
+        "name": "auth_token",
+        "value": "twilio-test-token",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "twilio_verify",
+    "name": "Twilio Verify",
+    "area": "sms",
+    "accent": "#f22f46",
+    "host": "verify.twilio.com",
+    "operations": [
+      {
+        "kind": "start_verification",
+        "method": "POST",
+        "path": "/v2/Services/{ServiceSid}/Verifications",
+        "request_format": "form"
+      },
+      {
+        "kind": "check_verification",
+        "method": "POST",
+        "path": "/v2/Services/{ServiceSid}/VerificationCheck",
+        "request_format": "form"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "to",
+        "source": "To"
+      },
+      {
+        "part": "body",
+        "source": "Code"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "e164_number",
+        "max_length": null,
+        "error_kind": "invalid_value"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"sid\": \"{{ message.provider_id }}\", \"service_sid\": \"{{ request.path_params.ServiceSid }}\", \"to\": \"{{ message.to }}\", \"channel\": \"sms\", \"status\": \"pending\", \"valid\": false}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": 60200, \"message\": \"Invalid parameter\", \"more_info\": \"https://www.twilio.com/docs/errors/60200\", \"status\": 400}"
+      },
+      {
+        "kind": "not_found",
+        "status": 404,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": 20404, \"message\": \"The requested resource was not found\", \"more_info\": \"https://www.twilio.com/docs/errors/20404\", \"status\": 404}"
+      },
+      {
+        "kind": "rate_limited",
+        "status": 429,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": 60203, \"message\": \"Max send attempts reached\", \"more_info\": \"https://www.twilio.com/docs/errors/60203\", \"status\": 429}"
+      }
+    ],
+    "message_id_template": "VE{{ random_hex(32) }}",
+    "callback_template_key": null,
+    "status_names": {
+      "pending": "pending",
+      "approved": "approved",
+      "canceled": "canceled",
+      "expired": "expired"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "vonage-key",
+        "is_secret": false
+      },
+      {
+        "name": "api_secret",
+        "value": "vonage-secret",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "vonage",
+    "name": "Vonage",
+    "area": "sms",
+    "accent": "#871fff",
+    "host": "rest.nexmo.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/sms/json",
+        "request_format": "form"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "body",
+        "source": "text"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "callback"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"message-count\": \"1\", \"messages\": [{\"to\": \"{{ message.to }}\", \"message-id\": \"{{ message.provider_id }}\", \"status\": \"0\", \"remaining-balance\": \"10.00\", \"message-price\": \"0.0333\", \"network\": \"23410\"}]}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 200,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message-count\": \"1\", \"messages\": [{\"status\": \"2\", \"error-text\": \"Missing {{ error.part }}\"}]}"
+      },
+      {
+        "kind": "invalid_value",
+        "status": 200,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message-count\": \"1\", \"messages\": [{\"status\": \"3\", \"error-text\": \"{{ error.reason | default(\"Invalid Message\") }}\"}]}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 200,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message-count\": \"1\", \"messages\": [{\"status\": \"4\", \"error-text\": \"Bad Credentials\"}]}"
+      }
+    ],
+    "message_id_template": "{{ random_hex(16) }}",
+    "callback_template_key": "vonage.dlr",
+    "status_names": {
+      "delivered": "delivered",
+      "failed": "failed",
+      "undelivered": "rejected",
+      "sent": "accepted"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "auth_id",
+        "value": "MATEST000000000000",
+        "is_secret": false
+      },
+      {
+        "name": "auth_token",
+        "value": "plivo-test-token",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "plivo",
+    "name": "Plivo",
+    "area": "sms",
+    "accent": "#2fd477",
+    "host": "api.plivo.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v1/Account/{auth_id}/Message/",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "src"
+      },
+      {
+        "part": "to",
+        "source": "dst"
+      },
+      {
+        "part": "body",
+        "source": "text"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "url"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "body",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 202,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"message\": \"message(s) queued\", \"message_uuid\": [\"{{ message.provider_id }}\"], \"api_id\": \"{{ uuid() }}\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"api_id\": \"{{ uuid() }}\", \"error\": \"{{ error.part }} parameter is missing\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"api_id\": \"{{ uuid() }}\", \"error\": \"Unauthorized\"}"
+      }
+    ],
+    "message_id_template": "{{ uuid() }}",
+    "callback_template_key": null,
+    "status_names": {
+      "queued": "queued",
+      "sent": "sent",
+      "delivered": "delivered",
+      "undelivered": "undelivered",
+      "failed": "failed"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "access_key",
+        "value": "test_mb_key",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "messagebird",
+    "name": "MessageBird",
+    "area": "sms",
+    "accent": "#2481d7",
+    "host": "rest.messagebird.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/messages",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "originator"
+      },
+      {
+        "part": "to",
+        "source": "recipients"
+      },
+      {
+        "part": "body",
+        "source": "body"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "reportUrl"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "body",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"id\": \"{{ message.provider_id }}\", \"direction\": \"mt\", \"type\": \"sms\", \"originator\": \"{{ message.from }}\", \"body\": \"{{ message.body }}\", \"recipients\": {\"totalCount\": 1, \"totalSentCount\": 1, \"items\": [{\"recipient\": \"{{ message.to }}\", \"status\": \"sent\"}]}}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 422,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"code\": 9, \"description\": \"no ({{ error.part }}) given\", \"parameter\": \"{{ error.part }}\"}]}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"code\": 2, \"description\": \"Request not allowed (incorrect access_key)\", \"parameter\": null}]}"
+      }
+    ],
+    "message_id_template": "{{ random_hex(32) }}",
+    "callback_template_key": null,
+    "status_names": {
+      "sent": "sent",
+      "delivered": "delivered",
+      "failed": "delivery_failed",
+      "undelivered": "expired"
+    }
+  }
+]

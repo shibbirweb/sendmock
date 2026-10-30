@@ -2,12 +2,14 @@ import type { SurfaceCatalogue } from "./surface-definition";
 
 export const systemSurfaces: SurfaceCatalogue = {
   "GET /api/v1/health": {
+    phase: "0",
     cli: "sendmock health",
     mcp: "sendmock_status",
     ui: "Sidebar > live connection dot",
     selector: { input: "view", value: "health" },
   },
   "GET /api/v1/info": {
+    phase: "0",
     cli: "sendmock status",
     cliAliases: ["sendmock version"],
     mcp: "sendmock_status",
@@ -15,21 +17,25 @@ export const systemSurfaces: SurfaceCatalogue = {
     selector: { input: "view", value: "info" },
   },
   "GET /api/v1/stats": {
+    phase: "3",
     cli: "sendmock stats",
     mcp: "sendmock_stats",
     ui: "Overview",
   },
   "GET /api/v1/updates": {
+    phase: "1",
     cli: "sendmock update check",
     mcp: "sendmock_update_check",
     ui: "Settings > About > Check GitHub Releases for updates",
   },
   "GET /api/v1/settings": {
+    phase: "1",
     cli: "sendmock settings get",
     mcp: "sendmock_settings_get",
     ui: "Settings",
   },
   "PATCH /api/v1/settings": {
+    phase: "1",
     cli: "sendmock settings set",
     cliAliases: [
       "sendmock chaos smtp-reject",
@@ -42,11 +48,13 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Settings > Save changes",
   },
   "POST /api/v1/reset": {
+    phase: "1",
     cli: "sendmock reset --yes",
     mcp: "sendmock_reset",
     ui: "Settings > General > Reset to seed",
   },
   "POST /api/v1/samples/{kind}": {
+    phase: "1",
     cli: "sendmock sample <kind>",
     cliAliases: ["sendmock email send-test"],
     mcp: "sendmock_sample_send",
@@ -54,43 +62,51 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Empty screens > Send a sample email, SMS, verification or request",
   },
   "GET /api/v1/seed/status": {
+    phase: "3",
     cli: "sendmock seed status",
     mcp: "sendmock_seed_status",
     ui: "Settings > Seed",
   },
   "GET /api/v1/seed/export": {
+    phase: "3",
     cli: "sendmock seed export",
     mcp: "sendmock_seed_export",
     ui: "Settings > Seed > Export sendmock.seed.toml",
   },
   "POST /api/v1/seed/validate": {
+    phase: "0",
     cli: "sendmock seed validate <file>",
     mcp: "sendmock_seed_validate",
     ui: "Settings > Seed > Validate",
     cliArguments: { file: "seed_toml" },
   },
   "POST /api/v1/seed/apply": {
+    phase: "3",
     cli: "sendmock seed apply <file>",
     mcp: "sendmock_seed_apply",
     ui: "Settings > Seed > Apply a seed file",
     cliArguments: { file: "seed_toml" },
   },
   "GET /api/v1/logs/smtp": {
+    phase: "1",
     cli: "sendmock logs smtp",
     mcp: "sendmock_logs_smtp",
     ui: "Logs > SMTP sessions",
   },
   "GET /api/v1/logs/smtp/{sessionId}": {
+    phase: "1",
     cli: "sendmock logs smtp show <sessionId>",
     mcp: "sendmock_logs_smtp_get",
     ui: "Logs > SMTP sessions > open a session",
   },
   "GET /api/v1/logs/http": {
+    phase: "1",
     cli: "sendmock logs http",
     mcp: "sendmock_logs_http",
     ui: "Logs > API requests",
   },
   "GET /api/v1/logs/http/{requestId}": {
+    phase: "1",
     cli: "sendmock logs http show <requestId>",
     mcp: "sendmock_logs_http_get",
     ui: "Logs > API requests > open a request",

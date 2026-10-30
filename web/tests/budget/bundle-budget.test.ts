@@ -82,7 +82,7 @@ describe("bundle budget", () => {
     expect(bundleMeasurement.distBytes).toBeLessThan(distBudgetBytes);
   });
 
-  test("UI-06.3 the live build ships no mock layer", () => {
+  test("UI-06.3 UI-12.3 the live build ships no mock layer", () => {
     expect(
       bundleMeasurement.initialScriptPaths.some((scriptPath) =>
         scriptPath.includes("mock"),

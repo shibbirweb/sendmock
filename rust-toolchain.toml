@@ -1,0 +1,7 @@
+# One compiler for CI and every contributor.
+[toolchain]
+channel = "1.98"
+components = [
+    "clippy",
+    "rustfmt",
+]

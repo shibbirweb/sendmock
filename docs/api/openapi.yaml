@@ -2435,7 +2435,7 @@ paths:
   /api/v1/outcome-rules/email:
     get:
       operationId: getOutcomeRulesEmail
-      summary: email outcome rules, checked from top to bottom.
+      summary: Email outcome rules, checked from top to bottom.
       tags:
         - Outcome rules
       responses:
@@ -5350,7 +5350,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
-      x-sendmock-cli: sendmock webhook render --endpoint <endpointId>
+      x-sendmock-cli: sendmock webhook render --endpoint-id <endpointId>
       x-sendmock-mcp: sendmock_webhook_render
       x-sendmock-ui: Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview
   /api/v1/webhooks/endpoints/{endpointId}/secret:
@@ -6196,7 +6196,7 @@ paths:
         - name: endpoints
           in: query
           required: false
-          description: "detach: move endpoints that use it to native JSON instead of failing."
+          description: "detach: endpoints that use it keep their own copy of it instead of failing."
           schema:
             type: string
           example: detach
@@ -6843,6 +6843,11 @@ components:
         is_container:
           type: boolean
           description: True when SendMock runs in Docker, so the UI defaults to container hostnames.
+        available_operations:
+          type: array
+          items:
+            type: string
+          description: The `operationId`s this binary serves; the UI shows Not available yet for the rest.
       required:
         - version
         - channel
@@ -6853,6 +6858,7 @@ components:
         - database_path
         - database_size_bytes
         - is_container
+        - available_operations
     AppSettings:
       type: object
       properties:
@@ -8486,10 +8492,10 @@ components:
       properties:
         endpoint:
           $ref: "#/components/schemas/WebhookEndpointInput"
-          description: The endpoint settings to render, saved or not.
+          description: The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
         endpoint_id:
           $ref: "#/components/schemas/Ulid"
-          description: A saved endpoint's own variables are used too.
+          description: A saved endpoint's own variables are used too; alone, its stored settings are rendered.
           examples:
             - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         email_id:
@@ -8514,8 +8520,6 @@ components:
           description: Send-time values by variable name (no `vars.`); they win for this render.
           examples:
             - app_token: test-token
-      required:
-        - endpoint
       description: Body of POST /api/v1/webhooks/endpoints/preview.
     EndpointPreviewResult:
       type: object
@@ -8565,7 +8569,7 @@ components:
       properties:
         failure_code:
           type: string
-          description: HTTP status as text (`"500"`), or `"timeout"` / `"connection"`.
+          description: HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`.
         failure_count:
           type: number
       required:

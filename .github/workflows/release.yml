@@ -1,0 +1,398 @@
+# Builds every target, tests each archive on its own operating system and CPU, and only then
+# publishes (docs/plan/09-distribution.md, Binary tests on every platform; plan 16, Workflows).
+# The publish workflows call it; "Run workflow" rebuilds without publishing unless asked, and
+# pull requests that change the release machinery run it without publishing.
+name: Release build
+
+on:
+  workflow_call:
+    inputs:
+      commit_sha:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      tag_name:
+        type: string
+        required: true
+      channel:
+        type: string
+        required: true
+      publish:
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Release channel baked into the binaries
+        type: choice
+        options: [dev, beta, stable]
+        default: dev
+      publish:
+        description: Upload to the release for the version in the code (off builds and tests only)
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - packaging/**
+      - scripts/release/**
+      - scripts/binary-smoke-test.ts
+
+permissions:
+  contents: write
+
+env:
+  COMMIT_SHA: ${{ inputs.commit_sha || github.sha }}
+  RELEASE_CHANNEL: ${{ inputs.channel || 'dev' }}
+
+jobs:
+  plan:
+    name: Version from the code
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      docker_tags: ${{ steps.version.outputs.docker_tags }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: The version in the code must match the release being built
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          version="$(bun scripts/version.ts show)"
+          if [ -n "$REQUESTED_VERSION" ] && [ "$REQUESTED_VERSION" != "$version" ]; then
+            echo "The code carries $version, not $REQUESTED_VERSION." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          # beta: `beta` and the version; stable: `latest`, the version and major.minor.
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then
+            echo "docker_tags=beta $version" >> "$GITHUB_OUTPUT"
+          else
+            echo "docker_tags=latest $version ${version%.*}" >> "$GITHUB_OUTPUT"
+          fi
+
+  web-dist:
+    name: Web UI build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build the UI the binaries embed (live mode, no mock layer)
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+          retention-days: 1
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: web-dist
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
+          - { target: aarch64-apple-darwin, runner: macos-latest, cross: cargo }
+          - { target: x86_64-apple-darwin, runner: macos-latest, cross: cargo }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
+          - { target: aarch64-pc-windows-msvc, runner: windows-latest, cross: cargo }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+
+      - name: Toolchain and target
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Zig for static Linux builds
+        if: matrix.cross == 'zigbuild'
+        uses: mlugg/setup-zig@v2
+
+      - uses: taiki-e/install-action@v2
+        if: matrix.cross == 'zigbuild'
+        with:
+          tool: cargo-zigbuild
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build
+        shell: bash
+        env:
+          SENDMOCK_RELEASE_CHANNEL: ${{ env.RELEASE_CHANNEL }}
+        run: |
+          if [ "${{ matrix.cross }}" = "zigbuild" ]; then
+            cargo zigbuild --release --locked -p sendmock --target ${{ matrix.target }}
+          else
+            cargo build --release --locked -p sendmock --target ${{ matrix.target }}
+          fi
+
+      - name: Pack the archive and its checksum
+        shell: bash
+        run: |
+          binary="target/${{ matrix.target }}/release/sendmock"
+          if [[ "${{ matrix.target }}" == *windows* ]]; then binary="$binary.exe"; fi
+          bun scripts/release/package-archive.ts ${{ matrix.target }} "$binary" dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist
+          retention-days: 3
+
+  test:
+    name: Test ${{ matrix.target }}
+    needs: [plan, build]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz }
+          - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz, containers: "alpine:3.22 busybox:1.37" }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz, containers: "alpine:3.22" }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip }
+          - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Checksum, layout, version, default listeners, API, UI and a clean stop
+        shell: bash
+        run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
+
+      - name: Starts with no runtime in minimal Linux images
+        if: matrix.containers
+        run: |
+          mkdir extracted
+          tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C extracted
+          for image in ${{ matrix.containers }}; do
+            docker run --rm -v "$PWD/extracted:/sendmock:ro" "$image" /sendmock/sendmock version --json
+          done
+
+  # .deb and .rpm from the tested Linux archives, installed with apt and dnf (DS-03.3).
+  linux-packages:
+    name: .deb and .rpm (${{ matrix.architecture }})
+    needs: [plan, test]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, architecture: amd64, runner: ubuntu-latest, nfpm_platform: x86_64 }
+          - { target: aarch64-unknown-linux-musl, architecture: arm64, runner: ubuntu-24.04-arm, nfpm_platform: arm64 }
+    env:
+      NFPM_VERSION: "2.48.0"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: archives
+
+      - name: Install nfpm
+        run: curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_${{ matrix.nfpm_platform }}.tar.gz" | tar -xz -C "$RUNNER_TEMP" nfpm
+
+      - name: Build the packages and their checksums
+        env:
+          NFPM_ARCH: ${{ matrix.architecture }}
+          SENDMOCK_VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          mkdir extracted packages
+          tar -xzf archives/sendmock-${{ matrix.target }}.tar.gz -C extracted
+          for packager in deb rpm; do
+            "$RUNNER_TEMP/nfpm" package --config packaging/nfpm.yaml --packager "$packager" --target packages/
+          done
+          cd packages
+          for package_file in *; do sha256sum "$package_file" > "$package_file.sha256"; done
+          ls -l
+
+      - name: apt install and dnf install give a working sendmock
+        run: |
+          docker run --rm -v "$PWD/packages:/packages:ro" debian:stable-slim \
+            sh -c 'apt-get install -y -qq /packages/*.deb > /dev/null && sendmock version --json'
+          docker run --rm -v "$PWD/packages:/packages:ro" fedora:42 \
+            sh -c 'dnf install -y -q /packages/*.rpm > /dev/null && sendmock version --json'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive-packages-${{ matrix.architecture }}
+          path: packages
+          retention-days: 3
+
+  checksums:
+    name: SHA256SUMS
+    needs: [test, linux-packages]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: archive-*
+          path: dist
+          merge-multiple: true
+
+      - name: One checksum file for every archive
+        working-directory: dist
+        run: |
+          cat *.sha256 > SHA256SUMS
+          rm *.sha256
+          cat SHA256SUMS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: dist
+          retention-days: 7
+
+  # Real mailers in eight languages against this commit's SMTP server, before publishing.
+  smtp-clients:
+    uses: ./.github/workflows/smtp-clients.yml
+
+  # The official Twilio SDKs send and run a Verify login against this commit, before publishing.
+  sms-clients:
+    uses: ./.github/workflows/sms-clients.yml
+
+  publish:
+    name: Publish ${{ inputs.tag_name }}
+    if: inputs.publish
+    needs: [plan, checksums, smtp-clients, sms-clients]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: The tag and pre-release flag agree with the code
+        run: bun scripts/release/release.ts agreement "${{ inputs.tag_name }}" "${{ env.RELEASE_CHANNEL == 'beta' }}"
+
+      - name: Upload the files and publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+        run: |
+          gh release upload "$TAG_NAME" dist/* --clobber
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then
+            gh release edit "$TAG_NAME" --draft=false --prerelease
+          else
+            gh release edit "$TAG_NAME" --draft=false --latest
+          fi
+
+      - name: Move the rolling beta pre-release to these files
+        if: env.RELEASE_CHANNEL == 'beta'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+        run: |
+          gh release delete beta --cleanup-tag --yes || true
+          gh release create beta dist/* --prerelease --target "$COMMIT_SHA" \
+            --title "Latest beta" \
+            --notes "The newest beta, now $TAG_NAME. These links always give the newest beta; see $TAG_NAME for its notes."
+
+  # The release images on GHCR (and Docker Hub with its token), signed like edge.
+  docker:
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/docker-edge.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ inputs.commit_sha }}
+      image_tags: ${{ needs.plan.outputs.docker_tags }}
+      channel: ${{ inputs.channel }}
+
+  # The formula in the tap, when the owner has set HOMEBREW_TAP_TOKEN (DS-03.1).
+  homebrew:
+    name: Homebrew formula
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    env:
+      HAS_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write the formula from SHA256SUMS
+        run: |
+          bun scripts/release/homebrew-formula.ts "${{ needs.plan.outputs.version }}" "$RELEASE_CHANNEL" dist/SHA256SUMS > formula.rb
+          cat formula.rb
+
+      - name: Push it to shibbirweb/homebrew-tap
+        if: env.HAS_TAP_TOKEN == 'true'
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          formula_name="sendmock"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then formula_name="sendmock-beta"; fi
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/shibbirweb/homebrew-tap.git" tap
+          mkdir -p tap/Formula
+          cp formula.rb "tap/Formula/${formula_name}.rb"
+          cd tap
+          git config user.name "MD. Shibbir Ahmed"
+          git config user.email "shibbirweb@gmail.com"
+          git add Formula
+          git diff --cached --quiet || git commit -m "chore: ${formula_name} ${VERSION}"
+          git push

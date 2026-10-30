@@ -9886,7 +9886,7 @@
     {
       "name": "sendmock_outcome_rule_list",
       "toolset": "rules",
-      "summary": "email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
+      "summary": "Email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
       "operations": [
@@ -9894,7 +9894,7 @@
           "method": "GET",
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "getOutcomeRulesEmail",
-          "summary": "email outcome rules, checked from top to bottom.",
+          "summary": "Email outcome rules, checked from top to bottom.",
           "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
@@ -9929,7 +9929,7 @@
             "email",
             "sms"
           ],
-          "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+          "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
           "example": "email"
         }
       ],
@@ -9942,7 +9942,7 @@
               "email",
               "sms"
             ],
-            "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+            "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
             "examples": [
               "email"
             ]
@@ -23110,7 +23110,7 @@
       ],
       "aliases": [],
       "annotations": {
-        "read_only_hint": true,
+        "read_only_hint": false,
         "destructive_hint": false,
         "idempotent_hint": false
       },
@@ -23891,9 +23891,9 @@
             "location": "body"
           },
           "type": "WebhookEndpointInput",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The endpoint settings to render, saved or not.",
+          "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
           "example": {
             "name": "Orders app",
             "url": "http://localhost:3000/webhooks/sendmock",
@@ -23948,7 +23948,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "A saved endpoint's own variables are used too.",
+          "description": "A saved endpoint's own variables are used too; alone, its stored settings are rendered.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
@@ -24007,7 +24007,7 @@
         "properties": {
           "endpoint": {
             "$ref": "#/$defs/WebhookEndpointInput",
-            "description": "The endpoint settings to render, saved or not.",
+            "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
             "examples": [
               {
                 "name": "Orders app",
@@ -24057,7 +24057,7 @@
           },
           "endpoint_id": {
             "$ref": "#/$defs/Ulid",
-            "description": "A saved endpoint's own variables are used too.",
+            "description": "A saved endpoint's own variables are used too; alone, its stored settings are rendered.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
             ]
@@ -24096,9 +24096,6 @@
             ]
           }
         },
-        "required": [
-          "endpoint"
-        ],
         "$defs": {
           "BodyFieldType": {
             "type": "string",
@@ -24400,55 +24397,10 @@
           }
         }
       },
-      "example_arguments": {
-        "endpoint": {
-          "name": "Orders app",
-          "url": "http://localhost:3000/webhooks/sendmock",
-          "method": "POST",
-          "headers": {
-            "Authorization": "Bearer {{ vars.app_token }}"
-          },
-          "extra_fields": {
-            "environment": "local"
-          },
-          "template_id": "native",
-          "template_mode": "linked",
-          "timeout_ms": 10000,
-          "retry_policy": {
-            "max_attempts": 5,
-            "backoff_seconds": [
-              1,
-              5,
-              30,
-              120,
-              600
-            ],
-            "retry_on_client_errors": false
-          },
-          "is_enabled": true,
-          "query_params": [
-            {
-              "name": "X-Source",
-              "value": "sendmock-{{ event.type }}"
-            }
-          ],
-          "body_mode": "template",
-          "body_fields": [
-            {
-              "name": "user.email",
-              "value_type": "text",
-              "value": "{{ data.to[0].address }}"
-            }
-          ],
-          "fields_encoding": "json",
-          "raw_content_type": "application/json",
-          "raw_body": "{\"text\": \"New email: {{ data.subject }}\"}",
-          "render_mode": "strict"
-        }
-      },
+      "example_arguments": {},
       "output": "EndpointPreviewResult",
       "cli": [
-        "sendmock webhook render --endpoint <endpointId>"
+        "sendmock webhook render --endpoint-id <endpointId>"
       ],
       "ui": [
         "Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview"
@@ -26916,7 +26868,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "detach: move endpoints that use it to native JSON instead of failing.",
+          "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
           "example": "detach"
         }
       ],
@@ -26932,7 +26884,7 @@
           },
           "endpoints": {
             "type": "string",
-            "description": "detach: move endpoints that use it to native JSON instead of failing.",
+            "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
             "examples": [
               "detach"
             ]

@@ -175,11 +175,13 @@ function EmailOutcomeRuleForm({
           <FormField
             label="Diagnostic text (optional)"
             fieldId={`${fieldIdPrefix}-diagnostic`}
+            errorMessage={fieldErrors.diagnostic}
           >
             <Input
               id={`${fieldIdPrefix}-diagnostic`}
               placeholder="User unknown"
               value={ruleInput.diagnostic ?? ""}
+              aria-invalid={fieldErrors.diagnostic !== undefined}
               onChange={(changeEvent) =>
                 updateRuleInput({ diagnostic: changeEvent.target.value })
               }

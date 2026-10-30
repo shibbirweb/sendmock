@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { ChipListInput } from "@/components/common/chip-list-input";
 import { FormField } from "@/components/common/form-field";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
@@ -215,9 +216,27 @@ export function EmailSection({ appSettings }: { appSettings: AppSettings }) {
     <div className="grid gap-4">
       <ReceivingCard appSettings={appSettings} />
       <RelayCard appSettings={appSettings} />
-      <MessageRulesCard ruleKind="tag-rules" />
-      <MessageRulesCard ruleKind="forward-rules" />
-      <EmailOutcomeRulesCard appSettings={appSettings} />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/tag-rules"
+        featureName="Tag rules"
+        description="Tag incoming mail by sender, recipient or subject."
+      >
+        <MessageRulesCard ruleKind="tag-rules" />
+      </FeatureAvailabilityGate>
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/forward-rules"
+        featureName="Auto-forward rules"
+        description="Forward matching mail to a real inbox through the relay."
+      >
+        <MessageRulesCard ruleKind="forward-rules" />
+      </FeatureAvailabilityGate>
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/outcome-rules/email"
+        featureName="Outcome addresses"
+        description="Addresses that bounce, defer or complain, to test how your app reacts."
+      >
+        <EmailOutcomeRulesCard appSettings={appSettings} />
+      </FeatureAvailabilityGate>
       <SettingsSectionCard
         title="Magic addresses"
         description={

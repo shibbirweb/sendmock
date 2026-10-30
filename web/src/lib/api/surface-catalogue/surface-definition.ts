@@ -4,7 +4,12 @@
  * aliases, so the OpenAPI build script can read it.
  */
 
+/** The Stage B phase that builds an operation's backend (docs/plan/24-stage-b-coverage.md). */
+export type StageBPhase = "0" | "1" | "2" | "3" | "3P" | "4";
+
 export type OperationSurfaces = {
+  /** When the binary starts serving it; the live UI shows Not available yet before (UI-12). */
+  phase: StageBPhase;
   /** The CLI command with its positional arguments, e.g. `sendmock email reply <emailId>`. */
   cli: string;
   /** Other commands that run the same operation, e.g. `sendmock chaos smtp-reject`. */

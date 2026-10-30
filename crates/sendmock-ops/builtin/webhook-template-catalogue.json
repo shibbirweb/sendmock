@@ -1,0 +1,251 @@
+[
+  {
+    "id": "native",
+    "name": "Native SendMock JSON",
+    "service": "SendMock",
+    "category": "generic",
+    "events": [
+      "email.received",
+      "sms.sent",
+      "sms.inbound",
+      "sms.status",
+      "http.captured",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "checkout.completed"
+    ],
+    "description": "Native SendMock JSON payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "twilio.inbound_sms",
+    "name": "Twilio: inbound SMS",
+    "service": "Twilio",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound"
+    ],
+    "description": "Twilio: inbound SMS payload, matching the provider's documented format.",
+    "required_variables": [
+      "twilio_auth_token"
+    ]
+  },
+  {
+    "id": "twilio.status_callback",
+    "name": "Twilio: status callback",
+    "service": "Twilio",
+    "category": "sms-provider",
+    "events": [
+      "sms.status",
+      "sms.opened"
+    ],
+    "description": "Twilio: status callback payload, matching the provider's documented format.",
+    "required_variables": [
+      "twilio_auth_token"
+    ]
+  },
+  {
+    "id": "vonage.inbound",
+    "name": "Vonage: inbound SMS",
+    "service": "Vonage",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound"
+    ],
+    "description": "Vonage: inbound SMS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "vonage.dlr",
+    "name": "Vonage: delivery receipt",
+    "service": "Vonage",
+    "category": "sms-provider",
+    "events": [
+      "sms.status"
+    ],
+    "description": "Vonage: delivery receipt payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "plivo.inbound",
+    "name": "Plivo: inbound message",
+    "service": "Plivo",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Plivo: inbound message payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "telnyx.message",
+    "name": "Telnyx: message events",
+    "service": "Telnyx",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Telnyx: message events payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "mailgun.routes",
+    "name": "Mailgun: routes (inbound)",
+    "service": "Mailgun",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Mailgun: routes (inbound) payload, matching the provider's documented format.",
+    "required_variables": [
+      "mailgun_signing_key"
+    ]
+  },
+  {
+    "id": "sendgrid.inbound_parse",
+    "name": "SendGrid: Inbound Parse",
+    "service": "SendGrid",
+    "category": "email-provider",
+    "events": [
+      "email.received"
+    ],
+    "description": "SendGrid: Inbound Parse payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sendgrid.events",
+    "name": "SendGrid: Event Webhook",
+    "service": "SendGrid",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "SendGrid: Event Webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "postmark.inbound",
+    "name": "Postmark: inbound",
+    "service": "Postmark",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Postmark: inbound payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "ses.sns",
+    "name": "Amazon SES via SNS",
+    "service": "Amazon SES",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Amazon SES via SNS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "resend.events",
+    "name": "Resend: webhook events",
+    "service": "Resend",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Resend: webhook events payload, matching the provider's documented format.",
+    "required_variables": [
+      "resend_signing_secret"
+    ]
+  },
+  {
+    "id": "slack.incoming_webhook",
+    "name": "Slack: incoming webhook",
+    "service": "Slack",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "email.bounced",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Slack: incoming webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "discord.webhook",
+    "name": "Discord: webhook embed",
+    "service": "Discord",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Discord: webhook embed payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "teams.adaptive_card",
+    "name": "Microsoft Teams: Adaptive Card",
+    "service": "Microsoft Teams",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "webhook.failed"
+    ],
+    "description": "Microsoft Teams: Adaptive Card payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "telegram.send_message",
+    "name": "Telegram: bot message",
+    "service": "Telegram",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "sms.inbound"
+    ],
+    "description": "Telegram: bot message payload, matching the provider's documented format.",
+    "required_variables": [
+      "telegram_bot_token",
+      "telegram_chat_id"
+    ]
+  },
+  {
+    "id": "n8n.flat_json",
+    "name": "n8n / Zapier / Make: flat JSON",
+    "service": "Automation",
+    "category": "automation",
+    "events": [
+      "email.received",
+      "sms.sent",
+      "sms.inbound"
+    ],
+    "description": "n8n / Zapier / Make: flat JSON payload, matching the provider's documented format.",
+    "required_variables": []
+  }
+]

@@ -193,11 +193,11 @@ export type WebhookEndpointInput = Pick<
 /** Body of POST /api/v1/webhooks/endpoints/preview (WH-07.15). */
 export type EndpointPreviewRequest = {
   /**
-   * The endpoint settings to render, saved or not.
+   * The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
    */
-  endpoint: WebhookEndpointInput;
+  endpoint?: WebhookEndpointInput;
   /**
-   * A saved endpoint's own variables are used too.
+   * A saved endpoint's own variables are used too; alone, its stored settings are rendered.
    * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
    */
   endpoint_id?: Ulid;

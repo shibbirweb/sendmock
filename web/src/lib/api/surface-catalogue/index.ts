@@ -11,7 +11,11 @@ import { webhookDeliverySurfaces } from "./webhook-delivery-surfaces";
 import { webhookSurfaces } from "./webhook-surfaces";
 import { webhookTemplateSurfaces } from "./webhook-template-surfaces";
 
-export type { OperationSurfaces, SurfaceCatalogue } from "./surface-definition";
+export type {
+  OperationSurfaces,
+  StageBPhase,
+  SurfaceCatalogue,
+} from "./surface-definition";
 
 /**
  * Every operation's CLI command, MCP tool and UI place, keyed like the endpoint

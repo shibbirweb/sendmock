@@ -66,7 +66,7 @@ export type ActivityBucket = {
 };
 
 export type FailureCodeCount = {
-  /** HTTP status as text (`"500"`), or `"timeout"` / `"connection"`. */
+  /** HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`. */
   failure_code: string;
   failure_count: number;
 };
@@ -171,6 +171,11 @@ export type AppInfo = {
   database_size_bytes: number;
   /** True when SendMock runs in Docker, so the UI defaults to container hostnames. */
   is_container: boolean;
+  /**
+   * The `operationId`s this binary serves; the UI shows Not available yet for the
+   * rest (UI-12).
+   */
+  available_operations: string[];
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */

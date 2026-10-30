@@ -1,0 +1,157 @@
+{
+  "field_descriptions": {
+    "event": "The event that triggered this delivery.",
+    "event.id": "Event id, the same on every retry (also the webhook-id header).",
+    "event.type": "Event name, e.g. email.received or sms.status.",
+    "event.created_at": "When the event happened, ISO 8601.",
+    "data": "The email, SMS or delivery the event is about; its shape follows the event.",
+    "data.id": "SendMock id of the message.",
+    "data.message_id": "The email's Message-ID header.",
+    "data.from": "Sender of the email.",
+    "data.from.name": "Sender display name, may be empty.",
+    "data.from.address": "Sender email address.",
+    "data.to": "Recipients of the email, a list.",
+    "data.to[]": "One recipient.",
+    "data.to[].name": "Recipient display name, may be empty.",
+    "data.to[].address": "Recipient email address.",
+    "data.cc": "Cc recipients, a list.",
+    "data.subject": "Email subject.",
+    "data.text_body": "Plain text body of the email.",
+    "data.html_body": "HTML body of the email, or empty.",
+    "data.tags": "Tags on the email, a list of text.",
+    "data.extracted": "What the extractor found in the email or SMS.",
+    "data.extracted.otp": "One-time codes found in the message, a list.",
+    "data.extracted.otp[]": "One code, e.g. 739104.",
+    "data.extracted.links": "Links found in the message, a list.",
+    "data.provider_id": "Provider-style message id, e.g. Twilio's SM... SID.",
+    "data.from_number": "Sender number in E.164.",
+    "data.to_number": "Recipient number in E.164.",
+    "data.body": "SMS text.",
+    "data.status": "SMS delivery status: queued, sent, delivered, undelivered, failed or received.",
+    "data.error_code": "Provider error code of a failed SMS, or empty.",
+    "data.endpoint_name": "Endpoint whose delivery failed (webhook.failed).",
+    "data.error_message": "Why the delivery failed (webhook.failed).",
+    "vars": "Variables: this endpoint's, then global ones, then SENDMOCK_VAR_*.",
+    "endpoint": "The endpoint receiving this request.",
+    "endpoint.name": "Endpoint name.",
+    "endpoint.url": "Endpoint URL after rendering.",
+    "delivery": "This delivery attempt.",
+    "delivery.id": "Delivery id.",
+    "delivery.attempt": "Attempt number, 1 for the first try.",
+    "delivery.trigger": "auto, manual or replay.",
+    "rule": "The rule that fired; empty for manual sends.",
+    "rule.id": "Rule id.",
+    "rule.name": "Rule name.",
+    "sendmock": "This SendMock instance.",
+    "sendmock.version": "SendMock version.",
+    "sendmock.http_url": "Base URL of the web UI and API, e.g. to link to the message.",
+    "request_id": "A unique id for this delivery, stable across retries.",
+    "body_fields": "In header templates: the rendered body fields, e.g. for signatures."
+  },
+  "functions": [
+    {
+      "name": "now_unix",
+      "signature": "now_unix()",
+      "description": "The current time as Unix seconds.",
+      "example": "1792914927"
+    },
+    {
+      "name": "random_string",
+      "signature": "random_string(length)",
+      "description": "Random letters and digits, e.g. for a nonce or token.",
+      "example": "q8F2kD9xLm"
+    },
+    {
+      "name": "twilio_signature",
+      "signature": "twilio_signature(url, fields, auth_token)",
+      "description": "The X-Twilio-Signature for the request, as Twilio computes it.",
+      "example": "h2Lw0r3mXk9YqP1cVb7Zs4TnJ8e="
+    },
+    {
+      "name": "mailgun_signature",
+      "signature": "mailgun_signature(signing_key)",
+      "description": "Mailgun's HMAC signature over timestamp and token.",
+      "example": "3f1a9c...e07b"
+    },
+    {
+      "name": "svix_signature",
+      "signature": "svix_signature(signing_secret)",
+      "description": "A Svix signature header, as Resend sends it.",
+      "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQ="
+    },
+    {
+      "name": "uuid",
+      "signature": "uuid()",
+      "description": "A random UUID, e.g. for a transmission id.",
+      "example": "3b241101-e2bb-4255-8caf-4136c566a962"
+    },
+    {
+      "name": "random_hex",
+      "signature": "random_hex(length)",
+      "description": "Random lowercase hex digits, e.g. for a signature.",
+      "example": "9f86d081884c7d65"
+    },
+    {
+      "name": "now_iso",
+      "signature": "now_iso()",
+      "description": "The current time as an ISO 8601 timestamp.",
+      "example": "2026-10-25T09:15:27.000Z"
+    },
+    {
+      "name": "stripe_signature",
+      "signature": "stripe_signature(secret)",
+      "description": "A Stripe-Signature header (t=...,v1=...), as Stripe sends it.",
+      "example": "t=1792914927,v1=5257a869e7ecebeda32a..."
+    }
+  ],
+  "filters": [
+    {
+      "name": "default",
+      "signature": "default(fallback)",
+      "description": "The fallback when the value is missing or empty; no warning is given.",
+      "example": "{{ data.subject | default(\"No subject\") }}"
+    },
+    {
+      "name": "json",
+      "signature": "json",
+      "description": "The value as JSON text, for objects and lists.",
+      "example": "{{ data.to | json }}"
+    },
+    {
+      "name": "urlencode",
+      "signature": "urlencode",
+      "description": "Percent-encodes the value for form bodies and query strings.",
+      "example": "{{ data.body | urlencode }}"
+    },
+    {
+      "name": "lower",
+      "signature": "lower",
+      "description": "Lowercase.",
+      "example": "{{ data.from.address | lower }}"
+    },
+    {
+      "name": "upper",
+      "signature": "upper",
+      "description": "Uppercase.",
+      "example": "{{ vars.tenant_id | upper }}"
+    },
+    {
+      "name": "sendgrid_event",
+      "signature": "sendgrid_event",
+      "description": "An event type as SendGrid names it: email.bounced becomes bounced.",
+      "example": "{{ event.type | sendgrid_event }}"
+    },
+    {
+      "name": "ses_type",
+      "signature": "ses_type",
+      "description": "An event type as Amazon SES names it: email.bounced becomes Bounced.",
+      "example": "{{ event.type | ses_type }}"
+    },
+    {
+      "name": "resend_type",
+      "signature": "resend_type",
+      "description": "An event type as Resend names it: email.bounced stays email.bounced.",
+      "example": "{{ event.type | resend_type }}"
+    }
+  ]
+}

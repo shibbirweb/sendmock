@@ -16,8 +16,8 @@ Phase 0 (build), Phase 5 (all targets).
 
 Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
-- [ ] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`.
-- [ ] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully.
+- [x] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`. (#48)
+- [x] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully. (#48)
 - [ ] DS-02.3 Mounted `/config/sendmock.toml`, `/config/sendmock.seed.toml` and `/templates` are loaded.
 - [ ] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`.
 - [ ] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB.
@@ -39,27 +39,27 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 Phase 0.
 
 - [ ] DS-04.1 Beta release opens a release PR with the next beta version and notes from `[Unreleased]`; merging it publishes a GitHub pre-release and builds all channels' beta artefacts.
-- [ ] DS-04.2 Stable release refuses unless the current beta is published and nothing untried landed after it.
+- [x] DS-04.2 Stable release refuses unless the current beta is published and nothing untried landed after it. (#48)
 - [ ] DS-04.3 Promote stable opens the `develop` to `main` PR; merging it publishes the stable release and all stable channels.
-- [ ] DS-04.4 No release is cut from a commit where CI did not pass; the version in code, tag and pre-release flag always agree.
-- [ ] DS-04.5 Every workflow supports dry run (where documented) and can be re-run safely.
+- [x] DS-04.4 No release is cut from a commit where CI did not pass; the version in code, tag and pre-release flag always agree. (#48)
+- [x] DS-04.5 Every workflow supports dry run (where documented) and can be re-run safely. (#48)
 
 ## DS-05 Version management
 
 Phase 0.
 
-- [ ] DS-05.1 `scripts/version.ts` computes the next version from tags and commits and syncs it into every file that carries it.
-- [ ] DS-05.2 CI fails when version files disagree.
-- [ ] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta.
-- [ ] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas.
+- [x] DS-05.1 `scripts/version.ts` computes the next version from tags and commits and syncs it into every file that carries it. (#48)
+- [x] DS-05.2 CI fails when version files disagree. (#48)
+- [x] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta. (#48)
+- [x] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas. (#48)
 - [ ] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word.
 
 ## DS-06 Test harness integration
 
-Phase 1 (`--ready-json`), Phase 5 (Testcontainers).
+Phase 1 (`--ready-json`), Phase 2 (Testcontainers; moved from Phase 5 on 2026-10-29, see [25](../25-phase-1.md)).
 
-- [ ] DS-06.1 Testcontainers modules for Java, Node, Go, Python and .NET start the image and expose SMTP, HTTP and provider URLs.
-- [ ] DS-06.2 Each module's example test passes in CI.
+- [x] DS-06.1 Testcontainers modules for Java, Node, Go, Python and .NET start the image and expose SMTP, HTTP and provider URLs. (#48)
+- [x] DS-06.2 Each module's example test passes in CI. (#48)
 
 ## DS-07 Performance budgets
 
@@ -115,9 +115,9 @@ Phase U3.
 
 Phase 1.
 
-- [ ] WS-05.1 After clicking Connect, requests reach a local SendMock at the configured URL and responses display.
-- [ ] WS-05.2 Nothing is sent to a local instance until the user clicks Connect.
-- [ ] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation.
+- [x] WS-05.1 After clicking Connect, requests reach a local SendMock at the configured URL and responses display. (#48)
+- [x] WS-05.2 Nothing is sent to a local instance until the user clicks Connect. (#48)
+- [x] WS-05.3 Connection errors (not running, CORS disabled, local network permission denied) show a clear explanation. (#48)
 
 ## WS-06 User guide
 

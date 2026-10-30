@@ -1,0 +1,33 @@
+[package]
+name = "sendmock-smtp"
+description = "The SendMock SMTP listener."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-ops.workspace = true
+sendmock-store.workspace = true
+
+base64.workspace = true
+hmac.workspace = true
+md5.workspace = true
+rcgen.workspace = true
+rustls.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio = { workspace = true, features = [
+    "io-util",
+] }
+
+[lints]
+workspace = true

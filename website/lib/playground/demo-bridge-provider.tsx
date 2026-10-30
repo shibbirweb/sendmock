@@ -20,15 +20,34 @@ import {
   type PlaygroundResponse,
   readBridgeUrl,
 } from "./bridge-messages";
+import {
+  connectToInstance,
+  describeConnectionProblem,
+  type PlaygroundTarget,
+  sendToInstance,
+} from "./local-instance";
+import { useInstanceEvents } from "./use-instance-events";
+
+/** The state of a connection to a real SendMock (Local or Custom URL mode). */
+export type InstanceConnection =
+  | { status: "idle" }
+  | { status: "connecting" }
+  | { status: "connected"; version: string }
+  | { status: "failed"; explanation: string };
 
 type DemoBridge = {
   isReady: boolean;
   sendRequest: (
     playgroundRequest: PlaygroundRequest,
   ) => Promise<PlaygroundResponse>;
-  /** Events the mock API published, newest last. */
+  /** Events the target published, newest last. */
   events: PlaygroundEvent[];
   clearEvents: () => void;
+  target: PlaygroundTarget;
+  instanceConnection: InstanceConnection;
+  /** Asks the SendMock at the URL for /info; nothing is sent to it before this (WS-05.2). */
+  connectInstance: (baseUrl: string, apiToken: string | null) => Promise<void>;
+  selectDemoTarget: () => void;
 };
 
 const DemoBridgeContext = createContext<DemoBridge | null>(null);
@@ -79,7 +98,40 @@ export function DemoBridgeProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("message", handleMessage);
   }, [bridgeUrl]);
 
-  const sendRequest = useCallback(
+  const [target, setTarget] = useState<PlaygroundTarget>({ kind: "demo" });
+  const [instanceConnection, setInstanceConnection] =
+    useState<InstanceConnection>({ status: "idle" });
+  const instanceEvents = useInstanceEvents(
+    target.kind === "instance" && instanceConnection.status === "connected"
+      ? target
+      : null,
+  );
+  const connectInstance = useCallback(
+    async (baseUrl: string, apiToken: string | null) => {
+      setInstanceConnection({ status: "connecting" });
+      const outcome = await connectToInstance(baseUrl, apiToken);
+      if (outcome.kind === "connected") {
+        setTarget({ kind: "instance", baseUrl, apiToken });
+        setInstanceConnection({
+          status: "connected",
+          version: outcome.version,
+        });
+        return;
+      }
+      setTarget({ kind: "demo" });
+      setInstanceConnection({
+        status: "failed",
+        explanation: describeConnectionProblem(outcome.problem, baseUrl),
+      });
+    },
+    [],
+  );
+  const selectDemoTarget = useCallback(() => {
+    setTarget({ kind: "demo" });
+    setInstanceConnection({ status: "idle" });
+  }, []);
+
+  const sendBridgeRequest = useCallback(
     (playgroundRequest: PlaygroundRequest) =>
       new Promise<PlaygroundResponse>((resolve) => {
         const requestId = crypto.randomUUID();
@@ -96,10 +148,39 @@ export function DemoBridgeProvider({ children }: { children: ReactNode }) {
       }),
     [bridgeUrl],
   );
+  const sendRequest = useCallback(
+    (playgroundRequest: PlaygroundRequest) =>
+      target.kind === "instance"
+        ? sendToInstance(target.baseUrl, target.apiToken, playgroundRequest)
+        : sendBridgeRequest(playgroundRequest),
+    [target, sendBridgeRequest],
+  );
   const clearEvents = useCallback(() => setEvents([]), []);
   const demoBridge = useMemo(
-    () => ({ isReady, sendRequest, events, clearEvents }),
-    [isReady, sendRequest, events, clearEvents],
+    () => ({
+      isReady:
+        target.kind === "demo"
+          ? isReady
+          : instanceConnection.status === "connected",
+      sendRequest,
+      events: target.kind === "demo" ? events : instanceEvents,
+      clearEvents,
+      target,
+      instanceConnection,
+      connectInstance,
+      selectDemoTarget,
+    }),
+    [
+      isReady,
+      sendRequest,
+      events,
+      instanceEvents,
+      clearEvents,
+      target,
+      instanceConnection,
+      connectInstance,
+      selectDemoTarget,
+    ],
   );
 
   return (

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>SendMock.Testcontainers</PackageId>
+    <Version>0.1.0</Version>
+    <Description>Starts SendMock in Docker from a test and gives its SMTP, HTTP and provider addresses.</Description>
+    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers" Version="4.16.0" />
+  </ItemGroup>
+
+</Project>

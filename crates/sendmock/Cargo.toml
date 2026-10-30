@@ -1,0 +1,39 @@
+[package]
+name = "sendmock"
+description = "Catch email, SMS, payments and webhooks from any app on your machine."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+readme = "../../README.md"
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-store.workspace = true
+sendmock-ops.workspace = true
+sendmock-smtp.workspace = true
+sendmock-api.workspace = true
+sendmock-cli.workspace = true
+sendmock-mcp.workspace = true
+
+axum.workspace = true
+clap.workspace = true
+dirs.workspace = true
+reqwest.workspace = true
+rustls.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+rusqlite.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

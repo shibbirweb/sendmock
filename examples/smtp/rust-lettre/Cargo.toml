@@ -1,0 +1,14 @@
+# Outside the SendMock workspace: an app's own crate, as it would send mail.
+[workspace]
+
+[package]
+name = "sendmock-example-lettre"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+lettre = { version = "0.11", default-features = false, features = [
+    "builder",
+    "smtp-transport",
+] }

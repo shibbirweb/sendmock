@@ -3,17 +3,11 @@ import { AbsoluteFill, Img, staticFile } from "remotion";
 import { fontFamily } from "../brand";
 import { AppWindow } from "../trailer/parts/app-window";
 import { TrailerBackdrop } from "../trailer/parts/trailer-backdrop";
-import { areaColors, trailerPalette } from "../trailer/trailer-palette";
+import { trailerPalette } from "../trailer/trailer-palette";
+import { ChannelChips } from "./channel-chips";
 
 export const thumbnailWidth = 1280;
 export const thumbnailHeight = 720;
-
-const channelChips = [
-  { label: "Email", color: areaColors.email },
-  { label: "SMS", color: areaColors.sms },
-  { label: "Payments", color: areaColors.payment },
-  { label: "Any API", color: areaColors.http },
-];
 
 /**
  * The YouTube thumbnail (docs/plan/23-promotional-video.md, YouTube upload):
@@ -88,43 +82,7 @@ export function YoutubeThumbnail() {
         <div>Every webhook.</div>
         <div style={{ color: trailerPalette.accent }}>On localhost.</div>
       </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 64,
-          top: 470,
-          display: "flex",
-          gap: 14,
-        }}
-      >
-        {channelChips.map((channelChip) => (
-          <div
-            key={channelChip.label}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 20px",
-              borderRadius: 999,
-              border: `1px solid ${trailerPalette.border}`,
-              backgroundColor: trailerPalette.surface,
-              fontSize: 28,
-              fontWeight: 500,
-            }}
-          >
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: 6,
-                backgroundColor: channelChip.color,
-                boxShadow: `0 0 12px ${channelChip.color}`,
-              }}
-            />
-            {channelChip.label}
-          </div>
-        ))}
-      </div>
+      <ChannelChips leftPx={64} topPx={470} fontSizePx={28} />
       <div
         style={{
           position: "absolute",

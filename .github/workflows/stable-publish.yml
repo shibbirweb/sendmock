@@ -1,0 +1,74 @@
+# Publishes a stable release when main carries an untagged stable version and CI passed on it.
+name: Publish stable
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    name: Is there a stable to publish?
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      should_act: ${{ steps.decision.outputs.should_act }}
+      version: ${{ steps.decision.outputs.version }}
+      tag_name: ${{ steps.decision.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - id: decision
+        run: bun scripts/release/release.ts decide stable-publish
+
+  draft:
+    name: Draft release ${{ needs.decide.outputs.tag_name }}
+    needs: decide
+    if: needs.decide.outputs.should_act == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Draft it with its changelog section as the body
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ needs.decide.outputs.tag_name }}
+          VERSION: ${{ needs.decide.outputs.version }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          bun scripts/version.ts notes "$VERSION" > "$RUNNER_TEMP/release-notes.md"
+          gh release view "$TAG_NAME" > /dev/null 2>&1 || gh release create "$TAG_NAME" --draft \
+            --target "$COMMIT_SHA" --title "SendMock $VERSION" --notes-file "$RUNNER_TEMP/release-notes.md"
+
+  release:
+    needs: [decide, draft]
+    # The Docker tags and the Homebrew tap need these, and the registry and tap secrets.
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ github.event.workflow_run.head_sha }}
+      version: ${{ needs.decide.outputs.version }}
+      tag_name: ${{ needs.decide.outputs.tag_name }}
+      channel: stable
+      publish: true
