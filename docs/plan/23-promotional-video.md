@@ -127,6 +127,18 @@ Owner request: everything needed to publish the trailer on YouTube.
 - **Timing:** the install commands in the film only work once the first release is published, so the video goes public after `0.1.0-beta.1` (or the description says the first beta is coming).
 - **Published** 2026-10-30: https://youtu.be/OHR7pVFGTl4. The landing page's play button loads it from `youtube-nocookie.com` in place of the poster (`website/components/landing/promo-video-player.tsx`).
 
+### GitHub social preview (2026-10-30)
+
+Owner request: a social preview image for the GitHub repository, the picture shown when the repository link is shared. The still `SendMockGithubSocialPreview` (`video/src/thumbnail/github-social-preview.tsx`, 1280 by 640, GitHub's recommended size) matches the YouTube thumbnail: the logo, "Every webhook. On localhost.", "One local server to test email, SMS and payments.", the channel chips (shared with the thumbnail in `channel-chips.tsx`), `github.com/shibbirweb/sendmock` with "Open source · macOS · Linux · Windows · Docker", and the webhook deliveries page on the right. Text keeps a 72 px margin, inside the area sites may crop.
+
+1. Render it in `video/`:
+
+   ```bash
+   bunx remotion still src/index.ts SendMockGithubSocialPreview out/sendmock-github-social-preview.png
+   ```
+
+2. Upload it on GitHub: the repository's **Settings**, **General**, **Social preview**, **Edit**, **Upload an image**. The file is about 410 KB, under GitHub's 1 MB limit.
+
 ### Sound effects (2026-10-29)
 
 Owner direction: no background music. Instead, every change in the picture makes its own short sound: a click when a control is pressed, a swoosh when data is sent, a soft blip when it lands, a success chime or a gentle error tone for the outcome, typing while text is typed, a pop when something appears, a swipe for each page of the app tour, a whoosh for each scene transition and a soft reveal for the logo and the closing line. The earlier composed music (`bun run music`) was removed.

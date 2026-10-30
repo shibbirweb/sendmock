@@ -6,6 +6,11 @@ import {
   sendMockTrailerTourDurationFrames,
 } from "./trailer/sendmock-trailer-tour";
 import {
+  GithubSocialPreview,
+  socialPreviewHeight,
+  socialPreviewWidth,
+} from "./thumbnail/github-social-preview";
+import {
   thumbnailHeight,
   thumbnailWidth,
   YoutubeThumbnail,
@@ -29,6 +34,12 @@ export function RemotionRoot() {
         component={YoutubeThumbnail}
         width={thumbnailWidth}
         height={thumbnailHeight}
+      />
+      <Still
+        id="SendMockGithubSocialPreview"
+        component={GithubSocialPreview}
+        width={socialPreviewWidth}
+        height={socialPreviewHeight}
       />
     </>
   );
