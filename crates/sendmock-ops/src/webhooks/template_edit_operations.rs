@@ -10,7 +10,7 @@ use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, Operat
 
 /// Saves an edit as the next revision: the request shape always, the details only for
 /// custom templates; an edited built-in becomes Modified (WH-09.7 to WH-09.9).
-async fn save_next_version(
+pub(super) async fn save_next_version(
     operation_context: &OperationContext,
     edited_template: ResolvedTemplate,
     revised_template: RevisedTemplate,

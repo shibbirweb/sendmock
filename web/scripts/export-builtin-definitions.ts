@@ -1,5 +1,6 @@
 /**
- * Writes the shipped SMS provider definitions and webhook templates to
+ * Writes the shipped SMS provider definitions, webhook templates and the
+ * template reference (field descriptions, functions, filters) to
  * crates/sendmock-ops/builtin/, where the binary embeds them, so the mock and
  * the runtime answer from one source (docs/plan/22-configurable-providers.md).
  * `bun scripts/export-builtin-definitions.ts` writes them; `--check` fails
@@ -11,6 +12,11 @@ import { join } from "node:path";
 import { buildBuiltinSmsProviders } from "../src/mocks/fixtures/sms-provider-fixtures";
 import { buildWebhookTemplateFixtures } from "../src/mocks/fixtures/template-and-variable-fixtures";
 import { templateDefinitions } from "../src/mocks/fixtures/template-definitions";
+import { templateFieldDescriptions } from "../src/mocks/webhooks/template-field-descriptions";
+import {
+  templateFilterCatalog,
+  templateFunctionCatalog,
+} from "../src/mocks/webhooks/template-helper-catalog";
 
 const builtinDirectory = join(
   import.meta.dir,
@@ -49,6 +55,18 @@ export function buildBuiltinDefinitionFiles(): {
     {
       filePath: join(builtinDirectory, "webhook-template-catalogue.json"),
       content: `${JSON.stringify(buildBuiltinTemplateCatalogue(), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "webhook-template-reference.json"),
+      content: `${JSON.stringify(
+        {
+          field_descriptions: templateFieldDescriptions,
+          functions: templateFunctionCatalog,
+          filters: templateFilterCatalog,
+        },
+        null,
+        2,
+      )}\n`,
     },
   ];
 }

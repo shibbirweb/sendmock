@@ -37,8 +37,12 @@ mod template_catalogue;
 mod template_context;
 mod template_delete_operation;
 mod template_edit_operations;
+mod template_file;
+mod template_file_operations;
 mod template_inputs;
 mod template_operations;
+mod template_reference;
+mod template_reference_operation;
 mod template_rendering;
 mod template_request_rendering;
 mod template_store;
@@ -85,10 +89,14 @@ pub use template_edit_operations::{
     ListWebhookTemplateRevisionsOperation, ResetWebhookTemplateOperation,
     RestoreWebhookTemplateRevisionOperation, UpdateWebhookTemplateOperation,
 };
+pub use template_file_operations::{
+    ExportWebhookTemplateOperation, ImportWebhookTemplateOperation,
+};
 pub use template_operations::{
     CloneWebhookTemplateOperation, CreateWebhookTemplateOperation, GetWebhookTemplateOperation,
     ListWebhookTemplatesOperation, RenderWebhookTemplateOperation,
 };
+pub use template_reference_operation::GetWebhookTemplateReferenceOperation;
 pub use template_rendering::TemplateRenderResult;
 pub use template_view::{TemplateRevision, WebhookTemplateDetail, WebhookTemplateSummary};
 pub use variable_operations::{
@@ -142,4 +150,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(RenderWebhookTemplateOperation);
     operation_registry.register(ResetWebhookTemplateOperation);
     operation_registry.register(CloneWebhookTemplateOperation);
+    operation_registry.register(ImportWebhookTemplateOperation);
+    operation_registry.register(ExportWebhookTemplateOperation);
+    operation_registry.register(GetWebhookTemplateReferenceOperation);
 }

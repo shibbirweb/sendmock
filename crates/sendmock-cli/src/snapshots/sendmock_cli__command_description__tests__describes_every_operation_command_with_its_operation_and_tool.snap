@@ -2165,6 +2165,68 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook template import",
+    "usage": "sendmock webhook template import <file>",
+    "summary": "Import a template file; 409 when the id is taken.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--on-conflict"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/templates/import",
+        "operation_id": "postWebhooksTemplatesImport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_import"
+    ]
+  },
+  {
+    "command": "sendmock webhook template export",
+    "usage": "sendmock webhook template export <templateId>",
+    "summary": "The template as TOML (variable names, never values).",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/templates/{templateId}/export",
+        "operation_id": "getWebhooksTemplatesByTemplateIdExport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_export"
+    ]
+  },
+  {
+    "command": "sendmock webhook template reference",
+    "usage": "sendmock webhook template reference",
+    "summary": "Every value a template can read for the chosen events.",
+    "arguments": [],
+    "flags": [
+      "--events"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/template-reference",
+        "operation_id": "getWebhooksTemplateReference",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_template_reference"
+    ]
+  },
+  {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
     "summary": "SMTP sessions, newest first, including rejected ones.",

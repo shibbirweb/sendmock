@@ -135,6 +135,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_variable_samples(app_router).await);
     samples.extend([webhook_preview_samples()]);
     samples.extend(prepare_webhook_template_samples(app_router).await);
+    samples.extend(webhook_template_file_samples());
     samples
 }
 
@@ -550,6 +551,25 @@ async fn prepare_webhook_template_samples(
         (
             "deleteWebhooksTemplatesByTemplateId",
             vec![json!({ "template_id": deleted_id })],
+        ),
+    ]
+}
+
+/// Export a built-in, import a new file, and the reference for two kinds of event.
+fn webhook_template_file_samples() -> Vec<(&'static str, Vec<Value>)> {
+    let imported_file = "name = \"Imported\"\n[request]\nmethod = \"POST\"\ncontent_type = \"application/json\"\nbody = '{\"subject\": \"{{ data.subject }}\"}'\n";
+    vec![
+        (
+            "getWebhooksTemplatesByTemplateIdExport",
+            vec![json!({ "template_id": "slack.incoming_webhook" })],
+        ),
+        (
+            "postWebhooksTemplatesImport",
+            vec![json!({ "file_text": imported_file })],
+        ),
+        (
+            "getWebhooksTemplateReference",
+            vec![json!({}), json!({ "events": "email.received,sms.inbound" })],
         ),
     ]
 }

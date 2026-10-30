@@ -71,3 +71,32 @@ pub async fn call_api(
         serde_json::from_slice(&body_bytes).unwrap_or(Value::Null),
     )
 }
+
+/// A GET whose answer is not JSON; answers the status, the content type and the body text.
+pub async fn call_api_text(app_router: &axum::Router, path: &str) -> (u16, String, String) {
+    let request = Request::builder()
+        .method("GET")
+        .uri(path)
+        .body(Body::empty())
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    let response = app_router
+        .clone()
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let status = response.status().as_u16();
+    let content_type = response
+        .headers()
+        .get("content-type")
+        .and_then(|header_value| header_value.to_str().ok())
+        .unwrap_or_default()
+        .to_owned();
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_else(|error| panic!("a body: {error}"));
+    (
+        status,
+        content_type,
+        String::from_utf8_lossy(&body_bytes).into_owned(),
+    )
+}
