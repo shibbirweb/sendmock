@@ -14,6 +14,13 @@ const maxNoteLength = 120;
 const maxDiagnosticLength = 200;
 const outcomesNeedingCode = new Set(["reject", "undelivered", "failed"]);
 
+function hasControlCharacter(text: string): boolean {
+  return Array.from(text).some((character) => {
+    const codePoint = character.codePointAt(0) ?? 0;
+    return codePoint < 0x20 || codePoint === 0x7f;
+  });
+}
+
 /** Rules for a custom outcome number (SM-07.7), shared by the form and the API. */
 export function validateSmsOutcomeRuleInput(
   ruleInput: SmsOutcomeRuleInput,
@@ -71,7 +78,7 @@ export function validateEmailOutcomeRuleInput(
   // The diagnostic goes into an SMTP reply line, so it must stay one short line.
   if (
     ruleInput.diagnostic !== null &&
-    (/[\u0000-\u001f\u007f]/.test(ruleInput.diagnostic) ||
+    (hasControlCharacter(ruleInput.diagnostic) ||
       ruleInput.diagnostic.length > maxDiagnosticLength)
   ) {
     fieldErrors.diagnostic = `Use one line of at most ${maxDiagnosticLength} characters`;
