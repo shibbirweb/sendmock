@@ -81,7 +81,10 @@ pub use sms::{
     load_custom_outcome_rules, start_sms_delivery, store_sms, to_simulation_profile,
 };
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
-pub use system::{AppInfo, GetHealthOperation, GetInfoOperation, HealthStatus};
+pub use system::{
+    ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
+    GetStatsOperation, HealthStatus,
+};
 pub use updates::{
     AvailableRelease, GetUpdatesOperation, InstallMethod, PublishedRelease, ReleaseSource,
     UpdateCheckResult, UpdateChecker,
@@ -103,6 +106,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     let mut operation_registry = OperationRegistry::default();
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
+    operation_registry.register(GetStatsOperation);
     operation_registry.register(ValidateSeedOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);

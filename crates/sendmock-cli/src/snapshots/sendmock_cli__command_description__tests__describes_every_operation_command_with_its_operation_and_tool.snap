@@ -46,6 +46,24 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock stats",
+    "usage": "sendmock stats",
+    "summary": "Counts and rates shown on the Overview.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/stats",
+        "operation_id": "getStats",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_stats"
+    ]
+  },
+  {
     "command": "sendmock seed validate",
     "usage": "sendmock seed validate <file>",
     "summary": "Check a seed file without applying it.",
@@ -1729,6 +1747,27 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_webhook_delivery_wait"
+    ]
+  },
+  {
+    "command": "sendmock webhook metrics",
+    "usage": "sendmock webhook metrics",
+    "summary": "Volume, success rate, latency and failures over a range.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id",
+      "--range"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/webhooks/metrics",
+        "operation_id": "getWebhooksMetrics",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_metrics"
     ]
   },
   {

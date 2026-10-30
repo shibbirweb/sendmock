@@ -3,8 +3,10 @@ use std::sync::Arc;
 use rusqlite::{Connection, OptionalExtension, params};
 
 use super::delivery_list_query::{DELIVERY_COLUMNS, list_deliveries, read_delivery_row};
+use super::delivery_outcome_query::list_delivery_outcomes;
 use super::{
-    DeliveryAttemptResult, WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord,
+    DeliveryAttemptResult, DeliveryOutcomeFilter, DeliveryOutcomeRecord, WebhookDeliveryFilter,
+    WebhookDeliveryPage, WebhookDeliveryRecord,
 };
 use crate::{Database, StoreError};
 
@@ -66,6 +68,16 @@ impl WebhookDeliveryRepository {
                     limit,
                 )?)
             })
+            .await
+    }
+
+    /// The status, timing and failure of each attempt the filter takes, oldest first.
+    pub async fn list_delivery_outcomes(
+        &self,
+        filter: DeliveryOutcomeFilter,
+    ) -> Result<Vec<DeliveryOutcomeRecord>, StoreError> {
+        self.database
+            .read(move |connection| Ok(list_delivery_outcomes(connection, &filter)?))
             .await
     }
 

@@ -8569,7 +8569,7 @@ components:
       properties:
         failure_code:
           type: string
-          description: HTTP status as text (`"500"`), or `"timeout"` / `"connection"`.
+          description: HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`.
         failure_count:
           type: number
       required:

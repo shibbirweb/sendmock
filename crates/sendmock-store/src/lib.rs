@@ -1,5 +1,6 @@
 //! SQLite storage: connection setup, migrations and repositories, with queries only and no business rules.
 
+mod activity_stats;
 mod api_request;
 mod database;
 mod database_location;
@@ -20,6 +21,9 @@ mod webhook_rule;
 mod webhook_template;
 mod webhook_variable;
 
+pub use activity_stats::{
+    ActivityStatsRepository, HourlyActivityRecord, HourlyCountRecord, MessageTotalsRecord,
+};
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
 pub use database::Database;
 pub use database_location::DatabaseLocation;
@@ -49,8 +53,8 @@ pub use verify::{
     VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,
 };
 pub use webhook_delivery::{
-    DeliveryAttemptResult, WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord,
-    WebhookDeliveryRepository,
+    DeliveryAttemptResult, DeliveryOutcomeFilter, DeliveryOutcomeRecord, WebhookDeliveryFilter,
+    WebhookDeliveryPage, WebhookDeliveryRecord, WebhookDeliveryRepository,
 };
 pub use webhook_endpoint::{
     WebhookEndpointRecord, WebhookEndpointRepository, WebhookSecretRotation,

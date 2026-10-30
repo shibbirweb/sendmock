@@ -66,7 +66,7 @@ export type ActivityBucket = {
 };
 
 export type FailureCodeCount = {
-  /** HTTP status as text (`"500"`), or `"timeout"` / `"connection"`. */
+  /** HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`. */
   failure_code: string;
   failure_count: number;
 };

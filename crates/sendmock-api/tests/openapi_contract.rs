@@ -74,6 +74,7 @@ fn system_samples() -> Vec<(&'static str, Vec<Value>)> {
     vec![
         ("getHealth", vec![json!({})]),
         ("getInfo", vec![json!({})]),
+        ("getStats", vec![json!({})]),
         (
             "postSeedValidate",
             vec![
@@ -433,6 +434,13 @@ async fn prepare_webhook_delivery_samples(
         (
             "getWebhooksDeliveriesByDeliveryId",
             vec![json!({ "delivery_id": sent_delivery_id })],
+        ),
+        (
+            "getWebhooksMetrics",
+            vec![
+                json!({ "range": "24h" }),
+                json!({ "range": "7d", "endpoint_id": endpoint_id }),
+            ],
         ),
         (
             "postWebhooksDeliveriesByDeliveryIdCancel",

@@ -26,6 +26,10 @@ mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
 mod manual_send_operation;
+mod metrics_inputs;
+mod metrics_loading;
+mod metrics_operation;
+mod metrics_view;
 mod request_part_renderer;
 mod rule_filter_wire;
 mod rule_inputs;
@@ -87,6 +91,10 @@ pub use endpoint_secret_operations::{
 pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub use endpoint_view::WebhookEndpoint;
 pub use manual_send_operation::SendWebhookOperation;
+pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
+pub use metrics_operation::GetWebhookMetricsOperation;
+pub(crate) use metrics_operation::{build_endpoint_metrics, build_recent_failures};
+pub(crate) use metrics_view::{EndpointMetrics, RecentFailedDelivery};
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{
     CreateWebhookRuleOperation, DeleteWebhookRuleOperation, GetWebhookRuleOperation,
@@ -149,6 +157,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CancelWebhookDeliveryOperation);
     operation_registry.register(ReplayWebhookDeliveryOperation);
     operation_registry.register(WaitForWebhookOperation);
+    operation_registry.register(GetWebhookMetricsOperation);
     operation_registry.register(ListSavedWebhookDeliveriesOperation);
     operation_registry.register(CreateSavedWebhookDeliveryOperation);
     operation_registry.register(RenameSavedWebhookDeliveryOperation);
