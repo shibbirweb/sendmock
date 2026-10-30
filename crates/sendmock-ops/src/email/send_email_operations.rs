@@ -1,12 +1,13 @@
 use sendmock_core::format_rfc5322;
 use sendmock_mail::{EmailEnvelope, IncomingEmail, build_raw_message, parse_email};
 
+use super::delivery_outcome_runner::complete_email_intake;
 use super::email_inputs::RawMessageInput;
 use super::lookups::NativeSendResult;
 use super::native_send_request::{NativeSendRequest, read_bare_address};
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, RawBodyInput,
-    RequestLogSettings, SuccessStatus, publish_email_received, read_ingest_options,
+    RequestLogSettings, SuccessStatus, read_ingest_options,
 };
 
 /// Native sends appear in the API request log, linked to the email they created.
@@ -65,7 +66,7 @@ impl Operation for SendEmailOperation {
             )
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
-        publish_email_received(operation_context, &stored_email);
+        complete_email_intake(operation_context, &stored_email).await?;
         Ok(NativeSendResult {
             id: stored_email.email_id,
         })
@@ -127,7 +128,7 @@ impl Operation for SendRawEmailOperation {
             )
             .await
             .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
-        publish_email_received(operation_context, &stored_email);
+        complete_email_intake(operation_context, &stored_email).await?;
         Ok(NativeSendResult {
             id: stored_email.email_id,
         })

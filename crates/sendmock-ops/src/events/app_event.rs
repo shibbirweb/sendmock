@@ -6,6 +6,12 @@ use serde_json::Value;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppEventType {
     EmailReceived,
+    EmailInbound,
+    EmailDelivered,
+    EmailDeferred,
+    EmailBounced,
+    EmailComplained,
+    EmailUnsubscribed,
     EmailDeleted,
     SmsSent,
     SmsInbound,
@@ -22,6 +28,12 @@ impl AppEventType {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::EmailReceived => "email.received",
+            Self::EmailInbound => "email.inbound",
+            Self::EmailDelivered => "email.delivered",
+            Self::EmailDeferred => "email.deferred",
+            Self::EmailBounced => "email.bounced",
+            Self::EmailComplained => "email.complained",
+            Self::EmailUnsubscribed => "email.unsubscribed",
             Self::EmailDeleted => "email.deleted",
             Self::SmsSent => "sms.sent",
             Self::SmsInbound => "sms.inbound",

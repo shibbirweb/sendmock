@@ -123,6 +123,7 @@ async fn prepare_sample_inputs(
 ) -> HashMap<&'static str, Vec<Value>> {
     let mut samples: HashMap<&'static str, Vec<Value>> = system_samples().into_iter().collect();
     samples.extend(prepare_email_samples(app_router).await);
+    samples.extend(prepare_email_outcome_samples(app_router).await);
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
@@ -962,6 +963,20 @@ async fn prepare_log_samples(
             vec![json!({ "request_id": logged_request_id })],
         ),
     ]
+}
+
+/// Simulated delivery outcomes on a sent email: a soft bounce and a delivery.
+async fn prepare_email_outcome_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let email_id = post_json(app_router, "/api/v1/send", &native_send_sample()).await["id"].clone();
+    vec![(
+        "postEmailsByEmailIdSimulate",
+        vec![
+            json!({ "email_id": email_id, "event": "bounced", "bounce_type": "soft" }),
+            json!({ "email_id": email_id, "event": "delivered" }),
+        ],
+    )]
 }
 
 async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {

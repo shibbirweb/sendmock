@@ -3,7 +3,7 @@ use sendmock_mail::{EmailEnvelope, IncomingEmail};
 use sendmock_sms::SendDecision;
 
 use crate::sms::{IncomingSms, decide_outbound_send, start_sms_delivery, store_sms};
-use crate::{OperationContext, OperationError, publish_email_received, read_ingest_options};
+use crate::{OperationContext, OperationError, complete_email_intake, read_ingest_options};
 
 /// The number Verify codes come from, as in the demo data.
 const VERIFY_SENDER_NUMBER: &str = "+15550002222";
@@ -124,7 +124,7 @@ async fn deliver_by_email(
         )
         .await
         .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))?;
-    publish_email_received(operation_context, &stored_email);
+    complete_email_intake(operation_context, &stored_email).await?;
     Ok(DeliveredCode {
         linked_message_id: Some(stored_email.email_id),
         linked_thread_id: None,

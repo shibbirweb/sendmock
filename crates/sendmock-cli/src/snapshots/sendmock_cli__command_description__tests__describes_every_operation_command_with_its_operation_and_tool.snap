@@ -46,24 +46,6 @@ expression: command_descriptions
     ]
   },
   {
-    "command": "sendmock stats",
-    "usage": "sendmock stats",
-    "summary": "Counts and rates shown on the Overview.",
-    "arguments": [],
-    "flags": [],
-    "operations": [
-      {
-        "method": "GET",
-        "path": "/api/v1/stats",
-        "operation_id": "getStats",
-        "selector": null
-      }
-    ],
-    "mcp": [
-      "sendmock_stats"
-    ]
-  },
-  {
     "command": "sendmock seed validate",
     "usage": "sendmock seed validate <file>",
     "summary": "Check a seed file without applying it.",
@@ -81,6 +63,24 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_seed_validate"
+    ]
+  },
+  {
+    "command": "sendmock stats",
+    "usage": "sendmock stats",
+    "summary": "Counts and rates shown on the Overview.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/stats",
+        "operation_id": "getStats",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_stats"
     ]
   },
   {
@@ -232,6 +232,29 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_email_timeline"
+    ]
+  },
+  {
+    "command": "sendmock email simulate",
+    "usage": "sendmock email simulate <emailId> <event>",
+    "summary": "Simulate a delivery outcome such as a bounce or complaint.",
+    "arguments": [
+      "emailId",
+      "event"
+    ],
+    "flags": [
+      "--bounce-type"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/simulate",
+        "operation_id": "postEmailsByEmailIdSimulate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_simulate"
     ]
   },
   {

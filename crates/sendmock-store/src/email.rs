@@ -1,3 +1,4 @@
+mod email_delivery_outcome;
 mod email_list_filter;
 mod email_reader;
 mod email_record;

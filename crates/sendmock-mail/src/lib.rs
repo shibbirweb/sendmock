@@ -1,5 +1,6 @@
 //! The email domain: parsing messages, extracting codes and links, tags, and storing what arrives.
 
+mod delivery_outcome;
 mod email_ingest_service;
 mod extraction;
 mod incoming_email;
@@ -8,6 +9,11 @@ mod native_message;
 mod parsing;
 mod raw_message_codec;
 
+pub use delivery_outcome::{
+    BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome, FOLLOW_UP_DELAY_MS,
+    OutcomeAction, OutcomeSettings, OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome,
+    find_magic_address_outcome, plan_email_outcome,
+};
 pub use email_ingest_service::{EmailIngestService, IngestOptions};
 pub use extraction::{
     DEFAULT_OTP_PATTERNS, OtpExtractor, extract_header_tags, extract_links,

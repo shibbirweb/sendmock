@@ -19,6 +19,10 @@ pub struct EmailRepository {
 }
 
 impl EmailRepository {
+    pub(super) fn database(&self) -> &Database {
+        &self.database
+    }
+
     pub fn new(database: Arc<Database>) -> Self {
         Self { database }
     }

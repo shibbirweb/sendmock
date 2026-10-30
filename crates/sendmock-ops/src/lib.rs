@@ -30,7 +30,9 @@ mod updates;
 mod verify;
 mod webhooks;
 
-pub use email::{EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData};
+pub use email::{
+    EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData, complete_email_intake,
+};
 pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
     RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_received, publish_event,
@@ -71,8 +73,8 @@ pub use seed::{
     validate_seed_toml,
 };
 pub use settings::{
-    AppSettings, AppSettingsStore, AppSettingsUpdate, SmsSimulationProfile, UpdateCheckMode,
-    build_ingest_options, prune_traffic, read_ingest_options,
+    AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
+    UpdateCheckMode, build_ingest_options, prune_traffic, read_ingest_options,
 };
 pub use sms::{
     FetchedMedia, IncomingSms, MediaFetcher, RecordedHttpRequest, RecordedHttpResponse, SmsMessage,
@@ -106,8 +108,8 @@ pub fn build_operation_registry() -> OperationRegistry {
     let mut operation_registry = OperationRegistry::default();
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
-    operation_registry.register(GetStatsOperation);
     operation_registry.register(ValidateSeedOperation);
+    operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
