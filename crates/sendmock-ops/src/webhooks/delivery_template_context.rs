@@ -2,6 +2,8 @@
 //! `rule`, `sendmock`, `request_id` and the resolved `vars`
 //! ([12](docs/plan/12-webhook-variables.md#built-in-dynamic-context)).
 
+use std::collections::BTreeMap;
+
 use sendmock_core::{TemplateFunctions, TemplateRenderMode};
 use serde_json::{Map, Value, json};
 
@@ -31,6 +33,15 @@ pub struct DeliveryTemplateContext {
     pub template_context: Value,
     /// A variable that could not resolve, under the source `vars`.
     pub variable_problems: Vec<RenderProblem>,
+}
+
+/// Values typed for one send, by variable name (no `vars.`), as the context takes them.
+pub fn to_send_time_values(variables: Option<BTreeMap<String, String>>) -> Map<String, Value> {
+    variables
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(variable_name, typed_value)| (variable_name, Value::from(typed_value)))
+        .collect()
 }
 
 async fn read_rule_name(

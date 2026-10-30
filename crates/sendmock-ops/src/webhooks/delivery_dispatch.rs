@@ -135,6 +135,18 @@ async fn send_delivery_attempt(
     Ok(attempt_decision)
 }
 
+/// Sends an `in_flight` attempt and records how it ended; an attempt that could not be sent
+/// at all is recorded with the reason.
+pub async fn send_claimed_delivery(
+    operation_context: &OperationContext,
+    in_flight_delivery: &WebhookDeliveryRecord,
+) -> Result<(), OperationError> {
+    if let Err(send_error) = send_delivery_attempt(operation_context, in_flight_delivery).await {
+        record_unsent_attempt(operation_context, in_flight_delivery, &send_error).await?;
+    }
+    Ok(())
+}
+
 /// One pass over the queue: claims up to `max_concurrent_deliveries` due rows and sends them
 /// at the same time, so no more than that many are ever in flight (WH-03.6). Answers how many
 /// attempts ran.
@@ -155,13 +167,8 @@ pub async fn run_due_deliveries(
             continue;
         };
         let task_context = operation_context.clone();
-        send_tasks.spawn(async move {
-            if let Err(send_error) = send_delivery_attempt(&task_context, &in_flight_delivery).await
-            {
-                record_unsent_attempt(&task_context, &in_flight_delivery, &send_error).await?;
-            }
-            Ok::<(), OperationError>(())
-        });
+        send_tasks
+            .spawn(async move { send_claimed_delivery(&task_context, &in_flight_delivery).await });
     }
     let attempt_count = send_tasks.len();
     while let Some(task_result) = send_tasks.join_next().await {

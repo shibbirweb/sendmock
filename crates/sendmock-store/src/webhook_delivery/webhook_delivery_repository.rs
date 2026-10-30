@@ -217,7 +217,7 @@ fn insert_delivery_row(
     delivery: &WebhookDeliveryRecord,
 ) -> rusqlite::Result<()> {
     connection.execute(
-        &format!("INSERT INTO webhook_deliveries ({DELIVERY_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)"),
+        &format!("INSERT INTO webhook_deliveries ({DELIVERY_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)"),
         params![
             delivery.delivery_id,
             delivery.endpoint_id,
@@ -237,6 +237,7 @@ fn insert_delivery_row(
             delivery.error_message,
             delivery.next_attempt_at_unix_ms,
             delivery.created_at_unix_ms,
+            delivery.event_json,
         ],
     )?;
     Ok(())

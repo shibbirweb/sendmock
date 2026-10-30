@@ -131,6 +131,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
+    samples.extend(prepare_webhook_send_samples(app_router).await);
     samples.extend(prepare_webhook_rule_samples(app_router).await);
     samples.extend(prepare_webhook_variable_samples(app_router).await);
     samples.extend([webhook_preview_samples()]);
@@ -439,6 +440,54 @@ async fn prepare_webhook_delivery_samples(
         (
             "getWaitWebhook",
             vec![json!({ "endpoint": "Deliveries", "event": "email.received", "timeout": "1s" })],
+        ),
+    ]
+}
+
+/// A test send, manual sends (the sample, a template, variables and an edited body) and
+/// replays of a sent manual delivery: as it was, rendered again, and edited.
+async fn prepare_webhook_send_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let endpoint = post_json(
+        app_router,
+        "/api/v1/webhooks/endpoints",
+        &webhook_endpoint_sample("Manual sends"),
+    )
+    .await;
+    let endpoint_id = endpoint["id"].as_str().unwrap_or_default();
+    let manual_delivery = post_json(
+        app_router,
+        &format!("/api/v1/webhooks/endpoints/{endpoint_id}/send"),
+        &json!({}),
+    )
+    .await;
+    let delivery_id = &manual_delivery["id"];
+    vec![
+        (
+            "postWebhooksEndpointsByEndpointIdTest",
+            vec![json!({ "endpoint_id": endpoint_id })],
+        ),
+        (
+            "postWebhooksEndpointsByEndpointIdSend",
+            vec![
+                json!({ "endpoint_id": endpoint_id }),
+                json!({
+                    "endpoint_id": endpoint_id, "template_id": "slack.incoming_webhook",
+                    "variables": { "reason": "manual" }, "body": "{\"text\":\"edited\"}",
+                }),
+            ],
+        ),
+        (
+            "postWebhooksDeliveriesByDeliveryIdReplay",
+            vec![
+                json!({ "delivery_id": delivery_id, "rerender": false }),
+                json!({ "delivery_id": delivery_id, "rerender": true }),
+                json!({
+                    "delivery_id": delivery_id, "rerender": false, "body": "{}",
+                    "headers": { "X-Replay": "1" },
+                }),
+            ],
         ),
     ]
 }

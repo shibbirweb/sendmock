@@ -4,6 +4,8 @@ mod delivery_dispatch;
 mod delivery_inputs;
 mod delivery_operations;
 mod delivery_queue;
+mod delivery_replay_operation;
+mod delivery_request_plan;
 mod delivery_request_rendering;
 mod delivery_signing;
 mod delivery_template_context;
@@ -20,8 +22,10 @@ mod endpoint_settings;
 mod endpoint_template;
 mod endpoint_template_body_rendering;
 mod endpoint_template_overrides;
+mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
+mod manual_send_operation;
 mod request_part_renderer;
 mod rule_filter_wire;
 mod rule_inputs;
@@ -62,6 +66,7 @@ pub use delivery_operations::{
     CancelWebhookDeliveryOperation, GetWebhookDeliveryOperation, ListWebhookDeliveriesOperation,
 };
 pub use delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
+pub use delivery_replay_operation::ReplayWebhookDeliveryOperation;
 pub use delivery_view::WebhookDelivery;
 pub use delivery_wait_operation::WaitForWebhookOperation;
 pub use endpoint_operations::{
@@ -74,7 +79,9 @@ pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
 };
+pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub use endpoint_view::WebhookEndpoint;
+pub use manual_send_operation::SendWebhookOperation;
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{
     CreateWebhookRuleOperation, DeleteWebhookRuleOperation, GetWebhookRuleOperation,
@@ -123,9 +130,12 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(RevealWebhookEndpointSecretOperation);
     operation_registry.register(RotateWebhookEndpointSecretOperation);
     operation_registry.register(SaveWebhookEndpointAsTemplateOperation);
+    operation_registry.register(TestWebhookEndpointOperation);
+    operation_registry.register(SendWebhookOperation);
     operation_registry.register(ListWebhookDeliveriesOperation);
     operation_registry.register(GetWebhookDeliveryOperation);
     operation_registry.register(CancelWebhookDeliveryOperation);
+    operation_registry.register(ReplayWebhookDeliveryOperation);
     operation_registry.register(WaitForWebhookOperation);
     operation_registry.register(ListWebhookRulesOperation);
     operation_registry.register(CreateWebhookRuleOperation);

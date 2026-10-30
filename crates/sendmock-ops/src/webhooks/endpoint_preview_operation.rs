@@ -2,11 +2,10 @@ use std::collections::BTreeMap;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
 
 use super::delivery_queue::DeliveryTrigger;
 use super::delivery_request_rendering::render_delivery_request;
-use super::delivery_template_context::DeliveryContextDetails;
+use super::delivery_template_context::{DeliveryContextDetails, to_send_time_values};
 use super::endpoint_inputs::WebhookEndpointInput;
 use super::endpoint_settings::{EndpointBodyMode, EndpointRequestSettings};
 use super::endpoint_template::read_detached_template;
@@ -120,19 +119,17 @@ async fn find_template_event_type(
 }
 
 /// The chosen message, or the sample that fits the endpoint's template.
-async fn find_preview_subject(
+pub(super) async fn find_send_subject(
     operation_context: &OperationContext,
-    input: &EndpointPreviewRequest,
+    chosen_message: ChosenMessage<'_>,
     request_settings: &EndpointRequestSettings,
 ) -> Result<TemplateSubject, OperationError> {
     let template_event_type = find_template_event_type(operation_context, request_settings).await?;
     find_template_subject(
         operation_context,
         ChosenMessage {
-            email_id: input.email_id.as_deref(),
-            sms_id: input.sms_id.as_deref(),
-            http_request_id: input.http_request_id.as_deref(),
             sample_event_type: template_event_type.as_deref(),
+            ..chosen_message
         },
     )
     .await
@@ -166,15 +163,18 @@ impl Operation for PreviewWebhookEndpointOperation {
             endpoint_input,
             detached_template,
         } = read_previewed_endpoint(operation_context, &input).await?;
-        let template_subject =
-            find_preview_subject(operation_context, &input, &endpoint_input.request_settings)
-                .await?;
-        let send_time_values: Map<String, Value> = input
-            .variables
-            .unwrap_or_default()
-            .into_iter()
-            .map(|(variable_name, typed_value)| (variable_name, Value::from(typed_value)))
-            .collect();
+        let template_subject = find_send_subject(
+            operation_context,
+            ChosenMessage {
+                email_id: input.email_id.as_deref(),
+                sms_id: input.sms_id.as_deref(),
+                http_request_id: input.http_request_id.as_deref(),
+                sample_event_type: None,
+            },
+            &endpoint_input.request_settings,
+        )
+        .await?;
+        let send_time_values = to_send_time_values(input.variables);
         let preview_delivery_id = operation_context.id_generator.generate_id().to_string();
         let preview_request_id = operation_context.id_generator.generate_id().to_string();
         let rendered_delivery = render_delivery_request(

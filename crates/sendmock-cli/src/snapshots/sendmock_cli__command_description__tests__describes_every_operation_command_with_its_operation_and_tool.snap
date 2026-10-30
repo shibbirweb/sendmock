@@ -1573,6 +1573,53 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook endpoint test",
+    "usage": "sendmock webhook endpoint test <endpointId>",
+    "summary": "Send a test.ping delivery.",
+    "arguments": [
+      "endpointId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/test",
+        "operation_id": "postWebhooksEndpointsByEndpointIdTest",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_endpoint_test"
+    ]
+  },
+  {
+    "command": "sendmock webhook send",
+    "usage": "sendmock webhook send --endpoint <endpointId>",
+    "summary": "Send a webhook for a chosen message or the sample, by hand.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--email-id",
+      "--endpoint",
+      "--http-request-id",
+      "--request",
+      "--sms-id",
+      "--template-id",
+      "--variables"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/endpoints/{endpointId}/send",
+        "operation_id": "postWebhooksEndpointsByEndpointIdSend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_send"
+    ]
+  },
+  {
     "command": "sendmock webhook deliveries list",
     "usage": "sendmock webhook deliveries list",
     "summary": "Every webhook request sent, newest first.",
@@ -1634,6 +1681,30 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_webhook_delivery_cancel"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries replay",
+    "usage": "sendmock webhook deliveries replay <deliveryId>",
+    "summary": "Send the delivery again, as it was or edited.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [
+      "--body",
+      "--headers",
+      "--rerender"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}/replay",
+        "operation_id": "postWebhooksDeliveriesByDeliveryIdReplay",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_replay"
     ]
   },
   {

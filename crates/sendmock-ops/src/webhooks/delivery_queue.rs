@@ -1,10 +1,10 @@
 use sendmock_store::{WebhookDeliveryRecord, WebhookEndpointRecord};
 use serde_json::{Map, Value};
 
+use super::delivery_request_plan::DeliveryRequestPlan;
 use super::delivery_request_rendering::{RenderedDeliveryRequest, render_delivery_request};
 use super::delivery_template_context::DeliveryContextDetails;
-use super::endpoint_template::read_detached_template;
-use super::endpoint_view::read_request_settings;
+use super::endpoint_settings::RetryPolicy;
 use super::request_part_renderer::RenderProblemSeverity;
 use crate::{AppEvent, OperationContext, OperationError};
 
@@ -62,11 +62,11 @@ fn log_render_warnings(
 }
 
 /// The first attempt: `pending` and due now, or `render_failed` with the render errors.
-fn build_first_attempt(
+pub fn build_first_attempt(
     stored_endpoint: &WebhookEndpointRecord,
     delivery_order: DeliveryOrder,
     delivery_id: String,
-    retry_policy_json: String,
+    retry_policy: &RetryPolicy,
     rendered_delivery: &RenderedDeliveryRequest,
     now_unix_ms: i64,
 ) -> Result<WebhookDeliveryRecord, OperationError> {
@@ -76,6 +76,7 @@ fn build_first_attempt(
         endpoint_id: stored_endpoint.endpoint_id.clone(),
         endpoint_name: stored_endpoint.name.clone(),
         rule_id: delivery_order.rule_id,
+        event_json: Some(write_json(&delivery_order.app_event)?),
         event_id: delivery_order.app_event.id,
         event_type: delivery_order.app_event.event_type,
         subject_id: delivery_order.subject_id,
@@ -87,7 +88,7 @@ fn build_first_attempt(
             "pending"
         }
         .to_owned(),
-        retry_policy_json,
+        retry_policy_json: write_json(retry_policy)?,
         rendered_request_json: if has_render_errors {
             None
         } else {
@@ -103,6 +104,78 @@ fn build_first_attempt(
     })
 }
 
+/// Renders the planned request for one event, with the edited body in place when there is one.
+pub async fn render_planned_delivery(
+    operation_context: &OperationContext,
+    stored_endpoint: &WebhookEndpointRecord,
+    delivery_order: &DeliveryOrder,
+    request_plan: &DeliveryRequestPlan,
+    delivery_id: &str,
+) -> Result<RenderedDeliveryRequest, OperationError> {
+    let request_id = operation_context.id_generator.generate_id().to_string();
+    let mut rendered_delivery = render_delivery_request(
+        operation_context,
+        &DeliveryContextDetails {
+            app_event: &delivery_order.app_event,
+            endpoint_id: Some(&stored_endpoint.endpoint_id),
+            endpoint_name: &stored_endpoint.name,
+            endpoint_url: &request_plan.url_template,
+            delivery_id,
+            delivery_trigger: delivery_order.delivery_trigger,
+            rule_id: delivery_order.rule_id.as_deref(),
+            request_id: &request_id,
+            send_time_values: &delivery_order.send_time_values,
+        },
+        &request_plan.request_settings,
+        request_plan.detached_template.as_ref(),
+    )
+    .await?;
+    request_plan.apply_edited_body(&mut rendered_delivery);
+    log_render_warnings(stored_endpoint, delivery_id, &rendered_delivery);
+    Ok(rendered_delivery)
+}
+
+/// Stores a first attempt and wakes the dispatcher when it is due.
+pub async fn queue_first_attempt(
+    operation_context: &OperationContext,
+    new_delivery: WebhookDeliveryRecord,
+) -> Result<WebhookDeliveryRecord, OperationError> {
+    operation_context
+        .webhook_delivery_repository
+        .insert_delivery(new_delivery.clone())
+        .await?;
+    if new_delivery.status == "pending" {
+        operation_context.webhook_dispatch_signal.notify_one();
+    }
+    Ok(new_delivery)
+}
+
+/// Renders the planned request and builds its first attempt, not stored yet.
+pub async fn build_planned_attempt(
+    operation_context: &OperationContext,
+    stored_endpoint: &WebhookEndpointRecord,
+    delivery_order: DeliveryOrder,
+    request_plan: &DeliveryRequestPlan,
+) -> Result<WebhookDeliveryRecord, OperationError> {
+    let delivery_id = operation_context.id_generator.generate_id().to_string();
+    let rendered_delivery = render_planned_delivery(
+        operation_context,
+        stored_endpoint,
+        &delivery_order,
+        request_plan,
+        &delivery_id,
+    )
+    .await?;
+    build_first_attempt(
+        stored_endpoint,
+        delivery_order,
+        delivery_id,
+        &request_plan.request_settings.retry_policy,
+        &rendered_delivery,
+        operation_context.clock.now_unix_ms(),
+    )
+}
+
 /// Renders the request and queues the first attempt, due at once, waking the dispatcher.
 /// Never waits for the send, so ingest stays fast (WH-03.1). A strict render error stores the
 /// delivery as `render_failed`, which is never sent or retried (WH-07.5); retries send the
@@ -112,42 +185,13 @@ pub async fn enqueue_webhook_delivery(
     stored_endpoint: &WebhookEndpointRecord,
     delivery_order: DeliveryOrder,
 ) -> Result<WebhookDeliveryRecord, OperationError> {
-    let request_settings = read_request_settings(stored_endpoint)?;
-    let detached_template = read_detached_template(stored_endpoint)?;
-    let delivery_id = operation_context.id_generator.generate_id().to_string();
-    let request_id = operation_context.id_generator.generate_id().to_string();
-    let rendered_delivery = render_delivery_request(
+    let request_plan = DeliveryRequestPlan::from_endpoint(stored_endpoint)?;
+    let new_delivery = build_planned_attempt(
         operation_context,
-        &DeliveryContextDetails {
-            app_event: &delivery_order.app_event,
-            endpoint_id: Some(&stored_endpoint.endpoint_id),
-            endpoint_name: &stored_endpoint.name,
-            endpoint_url: &stored_endpoint.url,
-            delivery_id: &delivery_id,
-            delivery_trigger: delivery_order.delivery_trigger,
-            rule_id: delivery_order.rule_id.as_deref(),
-            request_id: &request_id,
-            send_time_values: &delivery_order.send_time_values,
-        },
-        &request_settings,
-        detached_template.as_ref(),
-    )
-    .await?;
-    log_render_warnings(stored_endpoint, &delivery_id, &rendered_delivery);
-    let new_delivery = build_first_attempt(
         stored_endpoint,
         delivery_order,
-        delivery_id,
-        write_json(&request_settings.retry_policy)?,
-        &rendered_delivery,
-        operation_context.clock.now_unix_ms(),
-    )?;
-    operation_context
-        .webhook_delivery_repository
-        .insert_delivery(new_delivery.clone())
-        .await?;
-    if new_delivery.status == "pending" {
-        operation_context.webhook_dispatch_signal.notify_one();
-    }
-    Ok(new_delivery)
+        &request_plan,
+    )
+    .await?;
+    queue_first_attempt(operation_context, new_delivery).await
 }

@@ -9,6 +9,8 @@ pub struct WebhookDeliveryRecord {
     /// The same for every attempt of one event to one endpoint; it becomes `webhook-id`.
     pub event_id: String,
     pub event_type: String,
+    /// The event as JSON, so a replay can render it again; none on rows from before it was kept.
+    pub event_json: Option<String>,
     /// The email or SMS that caused the event.
     pub subject_id: Option<String>,
     /// `auto`, `manual` or `replay`.

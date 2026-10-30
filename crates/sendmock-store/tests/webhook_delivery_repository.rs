@@ -20,6 +20,7 @@ fn pending_delivery(delivery_id: &str, due_at_unix_ms: i64) -> WebhookDeliveryRe
         rule_id: None,
         event_id: format!("evt_{delivery_id}"),
         event_type: "email.received".to_owned(),
+        event_json: Some(r#"{"type":"email.received"}"#.to_owned()),
         subject_id: None,
         trigger: "auto".to_owned(),
         attempt: 1,
@@ -70,6 +71,18 @@ async fn only_rows_whose_time_has_come_are_due() -> Result<(), StoreError> {
 
     assert_eq!(due_ids(&repository, 2_000).await?, vec!["a".to_owned()]);
     assert_eq!(repository.find_next_due_time().await?, Some(1_000));
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_stored_delivery_reads_back_with_its_event() -> Result<(), StoreError> {
+    let repository = repository()?;
+    let queued_delivery = pending_delivery("a", 1_000);
+    repository.insert_delivery(queued_delivery.clone()).await?;
+
+    let stored_delivery = repository.find_delivery("a").await?;
+
+    assert_eq!(stored_delivery, Some(queued_delivery));
     Ok(())
 }
 
