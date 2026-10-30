@@ -451,6 +451,19 @@ async fn wait_for_requests(webhook_sender: &ScriptedWebhookSender, request_count
     false
 }
 
+/// Waits up to two seconds for `delivery_count` deliveries to be stored as succeeded. The
+/// dispatcher records an outcome only after the fake app has the request, so stopping it as
+/// soon as the request arrives can lose the outcome.
+async fn wait_for_succeeded_deliveries(fixture: &DispatchFixture, delivery_count: usize) -> bool {
+    for _ in 0..200 {
+        if fixture.deliveries("?status=succeeded").await.len() >= delivery_count {
+            return true;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    false
+}
+
 // AC: WH-03.1
 #[tokio::test]
 async fn queuing_returns_at_once_and_the_dispatcher_sends_in_the_background() {
@@ -479,10 +492,10 @@ async fn an_attempt_cut_off_by_a_stop_is_sent_after_the_restart() {
         .unwrap_or_default();
 
     let dispatcher = tokio::spawn(run_webhook_dispatcher(fixture.operation_context.clone(), 8));
-    let was_sent = wait_for_requests(&fixture.webhook_sender, 1).await;
+    let has_succeeded = wait_for_succeeded_deliveries(&fixture, 1).await;
     dispatcher.abort();
 
     assert!(was_claimed);
-    assert!(was_sent);
-    assert_eq!(fixture.deliveries("?status=succeeded").await.len(), 1);
+    assert!(has_succeeded);
+    assert_eq!(fixture.webhook_sender.received_requests().len(), 1);
 }
