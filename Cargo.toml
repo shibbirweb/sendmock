@@ -72,6 +72,7 @@ rmcp = { version = "3.8", default-features = false, features = [
     "transport-io",
     "transport-streamable-http-server",
 ] }
+roxmltree = "0.21"
 rust-embed = { version = "8", features = [
     "mime-guess",
 ] }

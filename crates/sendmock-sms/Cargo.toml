@@ -11,6 +11,7 @@ publish = false
 [dependencies]
 sendmock-core.workspace = true
 sendmock-store.workspace = true
+roxmltree.workspace = true
 
 [lints]
 workspace = true

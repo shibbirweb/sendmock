@@ -154,12 +154,15 @@ async fn a_complaint_address_is_delivered_then_complained() {
     );
 }
 
-/// Waits up to five seconds for the out-of-office reply to arrive.
-async fn wait_for_inbound_email(app_router: &axum::Router) -> Value {
+/// Waits up to five seconds for the out-of-office reply and answers it as listed. The reply is
+/// listed before the original email's `replied` entry is added, so this waits for
+/// `email.inbound`, which is published after both.
+async fn wait_for_out_of_office_reply(app_router: &axum::Router) -> Value {
     for _ in 0..100 {
-        let (_, page) = call_api(app_router, "GET", "/api/v1/emails?direction=inbound", None).await;
-        if let Some(inbound_email) = page["items"].get(0) {
-            return inbound_email.clone();
+        if !recent_events(app_router, "email.inbound").await.is_empty() {
+            let (_, page) =
+                call_api(app_router, "GET", "/api/v1/emails?direction=inbound", None).await;
+            return page["items"][0].clone();
         }
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
@@ -172,7 +175,7 @@ async fn the_ses_out_of_office_address_is_delivered_then_replies() {
     let (app_router, _) = build_test_app();
 
     let email_id = send_email(&app_router, "ooto@simulator.amazonses.com", "Invoice").await;
-    let reply = wait_for_inbound_email(&app_router).await;
+    let reply = wait_for_out_of_office_reply(&app_router).await;
 
     assert_eq!(
         read_delivery_status(&app_router, &email_id).await,
