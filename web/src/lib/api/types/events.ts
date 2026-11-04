@@ -16,6 +16,7 @@ export const appEventTypes = [
   "sms.status",
   "sms.opened",
   "sms.inbound",
+  "sms.reply_webhook",
   "verify.started",
   "verify.checked",
   "verify.expired",

@@ -149,6 +149,18 @@ async fn a_failing_fallback_leaves_the_reply_webhook_failed() {
     assert_eq!(reply_webhook["outcome"], "failed");
     assert_eq!(reply_webhook["error_code"], "11200");
     assert_eq!(reply_webhook["status_code"], 500);
+    let (_, recent_events) = call_api(
+        &fixture.app_router,
+        "GET",
+        "/api/v1/events/recent?type=sms.reply_webhook",
+        None,
+    )
+    .await;
+    assert_eq!(recent_events[0]["data"]["id"], sms_detail["id"]);
+    assert_eq!(
+        recent_events[0]["data"]["reply_webhook"]["outcome"],
+        "failed"
+    );
     assert_eq!(reply_webhook["used_fallback"], false);
     assert_eq!(attempts(&sms_detail).len(), 2);
 }

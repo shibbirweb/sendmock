@@ -162,7 +162,7 @@ export const smsHandlers = [
         "This number has no reply webhook; set an inbound URL in Numbers",
       );
     }
-    publishMockEvent("sms.inbound", { id: smsMessage.id });
+    publishMockEvent("sms.reply_webhook", { id: smsMessage.id });
 
     return HttpResponse.json(smsMessage);
   }),

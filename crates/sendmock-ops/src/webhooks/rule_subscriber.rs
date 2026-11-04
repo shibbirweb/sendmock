@@ -9,8 +9,9 @@ use super::rule_messages::{
 use super::rule_view::{read_rule_events, read_rule_filter};
 use crate::{AppEvent, OperationContext, OperationError};
 
-/// Drives the live deliveries log only; a rule on it would loop.
-const UNRULED_EVENT_TYPE: &str = "webhook.delivered";
+/// Events that drive a live view only: `webhook.delivered` (a rule on it would loop) and
+/// `sms.reply_webhook` (the result already went with `sms.inbound`'s message).
+const UNRULED_EVENT_TYPES: [&str; 2] = ["webhook.delivered", "sms.reply_webhook"];
 
 /// The email or SMS an event is about, with the fields filters read. Events about something
 /// else, or about a message that is gone, have no fields, so only filterless rules fire.
@@ -75,7 +76,7 @@ pub async fn fire_matching_rules(
     operation_context: &OperationContext,
     app_event: &AppEvent,
 ) -> Result<usize, OperationError> {
-    if app_event.event_type == UNRULED_EVENT_TYPE {
+    if UNRULED_EVENT_TYPES.contains(&app_event.event_type.as_str()) {
         return Ok(0);
     }
     let stored_rules = operation_context

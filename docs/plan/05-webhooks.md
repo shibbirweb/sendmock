@@ -21,6 +21,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `sms.status` | simulated delivery status changed |
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated via API (see [Opened events](#opened-events)) |
 | `sms.inbound` | a simulated incoming SMS was created (also sent to the number's reply webhook, see [04-sms.md](04-sms.md#reply-webhook-twilio-style)) |
+| `sms.reply_webhook` | an inbound message's reply webhook finished and its result is on the message; drives the live conversation and cannot be picked in rules, like `webhook.delivered` |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify emulation (see [04-sms.md](04-sms.md#twilio-verify)) |
 | `http.captured` | the HTTP catcher captured a request from your app (see [15-http-catcher.md](15-http-catcher.md)) |
 | `payment.*`, `checkout.*`, `subscription.*` | payment gateway emulation: created, authorized, succeeded, failed, canceled, refunded, disputes, checkout completed/expired, subscriptions (see [17-payments.md](17-payments.md#events)) |

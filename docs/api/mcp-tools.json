@@ -12366,6 +12366,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -12513,6 +12514,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -12767,6 +12769,9 @@
                   "sms.inbound": {
                     "type": "string"
                   },
+                  "sms.reply_webhook": {
+                    "type": "string"
+                  },
                   "verify.started": {
                     "type": "string"
                   },
@@ -12837,6 +12842,7 @@
                   "sms.status",
                   "sms.opened",
                   "sms.inbound",
+                  "sms.reply_webhook",
                   "verify.started",
                   "verify.checked",
                   "verify.expired",
@@ -13409,6 +13415,9 @@
               "sms.inbound": {
                 "type": "string"
               },
+              "sms.reply_webhook": {
+                "type": "string"
+              },
               "verify.started": {
                 "type": "string"
               },
@@ -13479,6 +13488,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -21901,6 +21911,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -21981,6 +21992,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -24640,6 +24652,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -24778,6 +24791,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -25208,6 +25222,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -25308,6 +25323,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -25516,6 +25532,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -25658,6 +25675,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
@@ -27880,6 +27898,7 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
@@ -28082,6 +28101,7 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",

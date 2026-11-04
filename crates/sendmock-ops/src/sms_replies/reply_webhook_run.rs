@@ -10,10 +10,11 @@ use super::reply_webhook_target::{
 };
 use super::twiml_fetch::{TwimlFetch, TwimlFetchRequest, fetch_twiml};
 use super::twiml_reply::{TwimlReplyRequest, send_twiml_reply};
+use crate::sms::SmsMessage;
 use crate::sms::{
     RecordedHttpRequest, ReplyWebhookOutcome, ReplyWebhookTargetName, SmsReplyWebhookResult,
 };
-use crate::{OperationContext, OperationError};
+use crate::{AppEventType, OperationContext, OperationError, publish_event};
 
 /// One inbound message triggers at most this many TwiML fetches, redirects and actions
 /// included, so two handlers redirecting to each other cannot loop.
@@ -79,7 +80,27 @@ pub async fn run_reply_webhook(
         .sms_reply_webhook_repository
         .record_result(&inbound_sms.sms_id, reply_webhook_json)
         .await?;
+    publish_reply_webhook_result(operation_context, &inbound_sms.sms_id).await?;
     Ok(Some(reply_webhook_result))
+}
+
+/// `sms.reply_webhook` with the message as the list shows it, so an open conversation shows
+/// the result line under the bubble without a reload.
+async fn publish_reply_webhook_result(
+    operation_context: &OperationContext,
+    sms_id: &str,
+) -> Result<(), OperationError> {
+    let Some(updated_sms) = operation_context
+        .sms_repository
+        .find_message(sms_id)
+        .await?
+    else {
+        return Ok(());
+    };
+    let event_data = serde_json::to_value(SmsMessage::from(&updated_sms))
+        .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
+    publish_event(operation_context, AppEventType::SmsReplyWebhook, event_data);
+    Ok(())
 }
 
 /// The state of one inbound message's TwiML exchange.

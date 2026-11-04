@@ -14,7 +14,10 @@ const eventAreaLabels: Record<string, string> = {
 };
 
 /** `webhook.delivered` only drives the live log; a rule on it could loop. */
-const unselectableEvents: AppEventType[] = ["webhook.delivered"];
+const unselectableEvents: AppEventType[] = [
+  "webhook.delivered",
+  "sms.reply_webhook",
+];
 
 /** Events grouped by the part before the dot: email, sms, verify, ... */
 function groupEventsByArea(): [areaKey: string, events: AppEventType[]][] {

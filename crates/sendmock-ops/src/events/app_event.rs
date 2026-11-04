@@ -18,6 +18,8 @@ pub enum AppEventType {
     SmsInbound,
     SmsStatus,
     SmsOpened,
+    /// An inbound message's reply webhook finished; drives the live conversation only.
+    SmsReplyWebhook,
     VerifyStarted,
     VerifyChecked,
     VerifyExpired,
@@ -41,6 +43,7 @@ impl AppEventType {
             Self::SmsInbound => "sms.inbound",
             Self::SmsStatus => "sms.status",
             Self::SmsOpened => "sms.opened",
+            Self::SmsReplyWebhook => "sms.reply_webhook",
             Self::VerifyStarted => "verify.started",
             Self::VerifyChecked => "verify.checked",
             Self::VerifyExpired => "verify.expired",

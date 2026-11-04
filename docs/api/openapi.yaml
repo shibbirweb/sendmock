@@ -6861,6 +6861,7 @@ components:
         - sms.status
         - sms.opened
         - sms.inbound
+        - sms.reply_webhook
         - verify.started
         - verify.checked
         - verify.expired
@@ -10935,6 +10936,8 @@ components:
               type: string
             sms.inbound:
               type: string
+            sms.reply_webhook:
+              type: string
             verify.started:
               type: string
             verify.checked:
@@ -10986,6 +10989,7 @@ components:
             - sms.status
             - sms.opened
             - sms.inbound
+            - sms.reply_webhook
             - verify.started
             - verify.checked
             - verify.expired
@@ -11142,6 +11146,8 @@ components:
               type: string
             sms.inbound:
               type: string
+            sms.reply_webhook:
+              type: string
             verify.started:
               type: string
             verify.checked:
@@ -11193,6 +11199,7 @@ components:
             - sms.status
             - sms.opened
             - sms.inbound
+            - sms.reply_webhook
             - verify.started
             - verify.checked
             - verify.expired
