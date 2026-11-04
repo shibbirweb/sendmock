@@ -295,10 +295,14 @@ jobs:
   sms-clients:
     uses: ./.github/workflows/sms-clients.yml
 
+  # An Express handler receives, fails, retries and replays webhooks against this commit.
+  webhook-handler:
+    uses: ./.github/workflows/webhook-handler.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients]
+    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

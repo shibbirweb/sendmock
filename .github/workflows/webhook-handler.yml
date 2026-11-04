@@ -1,0 +1,81 @@
+# The Phase 3 done-when check: a rule forwards every *@inbound.local email to a local Express
+# handler that checks the Standard Webhooks signature; the handler fails at first, the delivery
+# is retried and gives up, and after the handler is fixed a replay succeeds, all against a
+# SendMock release binary. Runs on changes to the webhook code or the example, and from
+# Release build before anything is published.
+name: Webhook handler
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-webhooks/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/src/events/**
+      - crates/sendmock-ops/builtin/**
+      - examples/webhooks/**
+      - .github/workflows/webhook-handler.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-webhooks/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/src/events/**
+      - crates/sendmock-ops/builtin/**
+      - examples/webhooks/**
+      - .github/workflows/webhook-handler.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  express:
+    name: Express handler
+    runs-on: ubuntu-latest
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - name: Start SendMock
+        run: |
+          ./target/release/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fail, retry, fix and replay with the Express handler
+        working-directory: examples/webhooks/express-handler
+        run: bun install && node done-when.js
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
