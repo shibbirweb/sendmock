@@ -222,7 +222,10 @@ async fn mark_unread_keeps_the_open_count_and_first_open_time() {
     assert_eq!(status, 200, "{email}");
     assert_eq!(email["is_read"], false);
     assert_eq!(email["open_count"], 1);
-    assert_eq!(email["opened_at"], "2026-01-01T00:00:00Z");
+    // The update answers the summary, which has no `opened_at`; the detail has it.
+    let email_detail = read_json(&app_router, &email_path).await;
+    assert_eq!(email_detail["open_count"], 1);
+    assert_eq!(email_detail["opened_at"], "2026-01-01T00:00:00Z");
 }
 
 #[tokio::test]
