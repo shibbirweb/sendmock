@@ -13941,6 +13941,12 @@ components:
         - outcome
         - decline_reason
       description: A test account number or voucher code with its outcome.
+    TwimlMethod:
+      type: string
+      enum:
+        - GET
+        - POST
+      description: How a TwiML `action` or `<Redirect>` URL is requested; `POST` by default.
     TwimlVerb:
       anyOf:
         - type: object
@@ -13962,6 +13968,13 @@ components:
               type:
                 - string
                 - "null"
+            action:
+              type:
+                - string
+                - "null"
+              description: Requested once the reply is sent, with `method`.
+            method:
+              $ref: "#/components/schemas/TwimlMethod"
             media_urls:
               type: array
               items:
@@ -13972,6 +13985,8 @@ components:
             - to
             - from
             - status_callback
+            - action
+            - method
             - media_urls
         - type: object
           properties:
@@ -13980,9 +13995,12 @@ components:
               const: Redirect
             url:
               type: string
+            method:
+              $ref: "#/components/schemas/TwimlMethod"
           required:
             - verb
             - url
+            - method
       description: A verb of the TwiML an app answered with.
     Ulid:
       type: string

@@ -68,6 +68,31 @@ impl ReplyWebhookRequestBuilder {
     /// The reply webhook to `url` with `method`, in the chosen format; a format SendMock does
     /// not ship falls back to Twilio's, so the number still gets its message.
     pub fn build_webhook_request(&self, url: &str, method: TwimlMethod) -> RecordedHttpRequest {
+        self.render_chosen_format(url, method, &[])
+    }
+
+    /// The fallback URL's request once the reply webhook failed: the same fields plus
+    /// `ErrorCode` and `ErrorUrl`, as Twilio sends them.
+    pub fn build_fallback_request(
+        &self,
+        fallback_url: &str,
+        method: TwimlMethod,
+        error_code: &str,
+        failed_url: &str,
+    ) -> RecordedHttpRequest {
+        let extra_form_fields = [
+            ("ErrorCode".to_owned(), error_code.to_owned()),
+            ("ErrorUrl".to_owned(), failed_url.to_owned()),
+        ];
+        self.render_chosen_format(fallback_url, method, &extra_form_fields)
+    }
+
+    fn render_chosen_format(
+        &self,
+        url: &str,
+        method: TwimlMethod,
+        extra_form_fields: &[(String, String)],
+    ) -> RecordedHttpRequest {
         let template_id = if find_builtin_webhook_template(&self.template_id).is_some() {
             self.template_id.as_str()
         } else {
@@ -77,7 +102,13 @@ impl ReplyWebhookRequestBuilder {
             );
             TWILIO_INBOUND_TEMPLATE_ID
         };
-        self.render(template_id, url, method, &[], self.template_context.clone())
+        self.render(
+            template_id,
+            url,
+            method,
+            extra_form_fields,
+            self.template_context.clone(),
+        )
     }
 
     /// A `<Redirect>` fetch: the inbound fields again, signed for the new URL.

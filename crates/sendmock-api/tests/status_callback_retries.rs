@@ -29,7 +29,8 @@ struct CallbackFixture {
     callback_sender: Arc<RecordingCallbackSender>,
 }
 
-/// The `manual` profile leaves a message `queued`, so each send makes exactly one callback.
+/// The `manual` profile moves a message to `sent` and holds it there, so each send makes two
+/// callbacks, `queued` then `sent`, sent one after the other in that order.
 async fn build_fixture(scripted_answers: Vec<Option<u16>>) -> CallbackFixture {
     let manual_clock = Arc::new(ManualClock::new(START_UNIX_MS));
     let callback_sender = Arc::new(RecordingCallbackSender::answering(scripted_answers));
@@ -117,6 +118,18 @@ impl CallbackFixture {
         self.read_callback_attempts(sms_id).await
     }
 
+    async fn read_callback_attempts_reporting(
+        &self,
+        sms_id: &str,
+        reported_status: &str,
+    ) -> Vec<Value> {
+        self.read_callback_attempts(sms_id)
+            .await
+            .into_iter()
+            .filter(|callback_attempt| callback_attempt["reported_status"] == reported_status)
+            .collect()
+    }
+
     /// Moves the clock and runs one pass of the retry queue; answers how many attempts ran.
     async fn run_retries_after_ms(&self, elapsed_ms: i64) -> usize {
         self.manual_clock.advance_ms(elapsed_ms);
@@ -131,34 +144,36 @@ impl CallbackFixture {
 async fn a_failed_callback_is_retried_with_the_same_signed_request() {
     let fixture = build_fixture(vec![Some(503)]).await;
     let sms_id = fixture.send_twilio_sms().await;
-    let first_attempts = fixture.wait_for_callback_attempts(&sms_id, 1).await;
+    fixture.wait_for_callback_attempts(&sms_id, 2).await;
 
     let early_attempt_count = fixture.run_retries_after_ms(999).await;
     let retry_attempt_count = fixture.run_retries_after_ms(1).await;
 
-    let callback_attempts = fixture.read_callback_attempts(&sms_id).await;
-    assert_eq!(
-        first_attempts[0]["error_message"],
-        "Your handler answered 503"
-    );
+    let queued_attempts = fixture
+        .read_callback_attempts_reporting(&sms_id, "queued")
+        .await;
     assert_eq!(early_attempt_count, 0, "the first retry waits 1 second");
     assert_eq!(retry_attempt_count, 1);
-    assert_eq!(callback_attempts.len(), 2);
-    assert_eq!(callback_attempts[1]["attempt"], 2);
-    assert_eq!(callback_attempts[1]["reported_status"], "queued");
-    assert_eq!(callback_attempts[1]["response"]["status_code"], 204);
-    assert_eq!(callback_attempts[1]["error_message"], Value::Null);
+    assert_eq!(queued_attempts.len(), 2);
+    assert_eq!(
+        queued_attempts[0]["error_message"],
+        "Your handler answered 503"
+    );
+    assert_eq!(queued_attempts[1]["attempt"], 2);
+    assert_eq!(queued_attempts[1]["response"]["status_code"], 204);
+    assert_eq!(queued_attempts[1]["error_message"], Value::Null);
     let sent_requests = fixture.callback_sender.received_requests();
-    assert_eq!(sent_requests[1], sent_requests[0]);
-    assert!(sent_requests[1].headers.contains_key("X-Twilio-Signature"));
+    assert_eq!(sent_requests.len(), 3);
+    assert_eq!(sent_requests[2], sent_requests[0]);
+    assert!(sent_requests[2].headers.contains_key("X-Twilio-Signature"));
 }
 
 // AC: SM-08.3
 #[tokio::test]
 async fn retries_follow_the_backoff_and_stop_after_five_attempts() {
-    let fixture = build_fixture(vec![None; 5]).await;
+    let fixture = build_fixture(vec![None, Some(204), None, None, None, None]).await;
     let sms_id = fixture.send_native_sms().await;
-    fixture.wait_for_callback_attempts(&sms_id, 1).await;
+    fixture.wait_for_callback_attempts(&sms_id, 2).await;
 
     for backoff_ms in [1_000, 5_000, 30_000, 120_000] {
         assert_eq!(fixture.run_retries_after_ms(backoff_ms - 1).await, 0);
@@ -166,7 +181,9 @@ async fn retries_follow_the_backoff_and_stop_after_five_attempts() {
     }
     let attempts_after_the_last = fixture.run_retries_after_ms(3_600_000).await;
 
-    let callback_attempts = fixture.read_callback_attempts(&sms_id).await;
+    let callback_attempts = fixture
+        .read_callback_attempts_reporting(&sms_id, "queued")
+        .await;
     assert_eq!(attempts_after_the_last, 0);
     assert_eq!(
         callback_attempts
@@ -187,13 +204,17 @@ async fn retries_follow_the_backoff_and_stop_after_five_attempts() {
 async fn a_client_error_answer_is_not_retried() {
     let fixture = build_fixture(vec![Some(404)]).await;
     let sms_id = fixture.send_native_sms().await;
-    fixture.wait_for_callback_attempts(&sms_id, 1).await;
+    fixture.wait_for_callback_attempts(&sms_id, 2).await;
 
     let retry_attempt_count = fixture.run_retries_after_ms(3_600_000).await;
 
+    let queued_attempts = fixture
+        .read_callback_attempts_reporting(&sms_id, "queued")
+        .await;
     assert_eq!(retry_attempt_count, 0);
-    assert_eq!(fixture.read_callback_attempts(&sms_id).await.len(), 1);
-    assert_eq!(fixture.callback_sender.received_requests().len(), 1);
+    assert_eq!(queued_attempts.len(), 1);
+    assert_eq!(queued_attempts[0]["response"]["status_code"], 404);
+    assert_eq!(fixture.callback_sender.received_requests().len(), 2);
 }
 
 // AC: SM-08.3
@@ -201,7 +222,7 @@ async fn a_client_error_answer_is_not_retried() {
 async fn a_callback_cut_off_by_a_restart_is_sent_again() {
     let fixture = build_fixture(Vec::new()).await;
     let sms_id = fixture.send_native_sms().await;
-    let first_attempts = fixture.wait_for_callback_attempts(&sms_id, 1).await;
+    let first_attempts = fixture.wait_for_callback_attempts(&sms_id, 2).await;
     let attempt_repository = &fixture.operation_context.sms_callback_attempt_repository;
     attempt_repository
         .insert_attempt(SmsCallbackAttemptRecord {
@@ -226,9 +247,15 @@ async fn a_callback_cut_off_by_a_restart_is_sent_again() {
         .unwrap_or_else(|error| panic!("a requeue: {error}"));
     let resent_count = fixture.run_retries_after_ms(0).await;
 
-    let callback_attempts = fixture.read_callback_attempts(&sms_id).await;
+    let sent_attempts = fixture
+        .read_callback_attempts_reporting(&sms_id, "sent")
+        .await;
     assert_eq!((requeued_count, resent_count), (1, 1));
-    assert_eq!(callback_attempts.len(), 2);
-    assert_eq!(callback_attempts[1]["reported_status"], "sent");
-    assert_eq!(callback_attempts[1]["response"]["status_code"], 204);
+    assert_eq!(sent_attempts.len(), 2);
+    assert!(
+        sent_attempts
+            .iter()
+            .all(|callback_attempt| callback_attempt["response"]["status_code"] == 204)
+    );
+    assert_eq!(fixture.callback_sender.received_requests().len(), 3);
 }

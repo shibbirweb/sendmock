@@ -52,6 +52,7 @@ fn outbound_sms() -> SmsRecord {
         in_reply_to_sms_id: None,
         created_at_unix_ms: 1_000,
         updated_at_unix_ms: 1_000,
+        reply_webhook_json: None,
         media: Vec::new(),
     }
 }

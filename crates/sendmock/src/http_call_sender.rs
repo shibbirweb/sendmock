@@ -42,7 +42,10 @@ impl HttpCallSender {
         }
         let outcome = match request_builder.send().await {
             Ok(response) => Ok(record_response(response).await),
-            Err(request_error) => Err(request_error.to_string()),
+            Err(request_error) => Err((
+                request_error.to_string(),
+                is_connection_failure(&request_error),
+            )),
         };
         let duration_ms = u64::try_from(started_at.elapsed().as_millis()).unwrap_or(u64::MAX);
         match outcome {
@@ -50,15 +53,43 @@ impl HttpCallSender {
                 error_message: (recorded_response.status_code >= 400)
                     .then(|| format!("Your handler answered {}", recorded_response.status_code)),
                 response: Some(recorded_response),
+                is_connection_failure: false,
                 duration_ms,
             },
-            Err(error_message) => HttpCallResult {
+            Err((error_message, is_connection_failure)) => HttpCallResult {
                 response: None,
                 error_message: Some(error_message),
+                is_connection_failure,
                 duration_ms,
             },
         }
     }
+}
+
+/// A connection that could not be opened (refused, unreachable, unknown host) or was reset or
+/// aborted while waiting for the answer; a timeout is not one.
+fn is_connection_failure(request_error: &reqwest::Error) -> bool {
+    if request_error.is_timeout() {
+        return false;
+    }
+    if request_error.is_connect() {
+        return true;
+    }
+    let mut error_source: Option<&(dyn std::error::Error + 'static)> =
+        std::error::Error::source(request_error);
+    while let Some(source_error) = error_source {
+        if let Some(io_error) = source_error.downcast_ref::<std::io::Error>() {
+            return matches!(
+                io_error.kind(),
+                std::io::ErrorKind::ConnectionRefused
+                    | std::io::ErrorKind::ConnectionReset
+                    | std::io::ErrorKind::ConnectionAborted
+                    | std::io::ErrorKind::BrokenPipe
+            );
+        }
+        error_source = source_error.source();
+    }
+    false
 }
 
 impl StatusCallbackSender for HttpCallSender {

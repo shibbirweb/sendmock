@@ -150,7 +150,7 @@ export const smsHandlers = [
     if (smsMessage.direction !== "inbound") {
       return createErrorResponse(
         409,
-        "conflict",
+        "outbound_sms",
         "Only inbound messages have a reply webhook",
       );
     }

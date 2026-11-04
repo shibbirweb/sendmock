@@ -84,7 +84,7 @@ Phase 2 (inbound), Phase 3 (reply webhook and TwiML; moved from Phase 4 on 2026-
 - [ ] SM-09.3 A TwiML `<Message>` response from the app is recorded as an outbound reply in the same thread.
 - [ ] SM-09.4 The inbound message goes to the Messaging Service request URL, else the number's inbound URL, with the configured method, all of Twilio's inbound fields, `X-Twilio-Signature` and `I-Twilio-Idempotency-Token`.
 - [ ] SM-09.5 TwiML `to`, `from`, `statusCallback`, `action`, `<Media>` and `<Redirect>` behave as documented; several `<Message>` verbs create several replies in order; one inbound message triggers at most 10 TwiML fetches.
-- [ ] SM-09.6 Failures carry Twilio's error codes (11200, 11205, 12100, 12300), the fallback URL is called with `ErrorCode` and `ErrorUrl`, and nothing is retried automatically.
+- [x] SM-09.6 Failures carry Twilio's error codes (11200, 11205, 12100, 12300), the fallback URL is called with `ErrorCode` and `ErrorUrl`, and nothing is retried automatically. (#48)
 - [ ] SM-09.7 Inbound bubbles show the webhook result, TwiML replies carry a "TwiML reply" badge, and the drawer shows the request, response and parsed TwiML with "Resend reply webhook" (also in REST, CLI and MCP).
 
 ## SM-10 SMS opened (read) events

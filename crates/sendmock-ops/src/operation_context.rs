@@ -6,10 +6,10 @@ use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
     EmailRepository, MessageProviderRepository, MessagingServiceRepository,
     SavedWebhookDeliveryRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
-    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
-    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
-    WebhookVariableRepository,
+    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
+    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
+    WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -32,6 +32,8 @@ pub struct OperationContext {
     pub sms_repository: SmsRepository,
     /// Status callback attempts; the rows are also the callback retry queue.
     pub sms_callback_attempt_repository: SmsCallbackAttemptRepository,
+    /// Reply webhook calls of inbound messages and their latest outcome.
+    pub sms_reply_webhook_repository: SmsReplyWebhookRepository,
     pub sms_outcome_rule_repository: SmsOutcomeRuleRepository,
     pub virtual_number_repository: VirtualNumberRepository,
     pub messaging_service_repository: MessagingServiceRepository,
@@ -85,8 +87,6 @@ impl OperationContext {
             Arc::clone(&id_generator),
         );
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
-        let messaging_service_repository = MessagingServiceRepository::new(Arc::clone(&database));
-        let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         Self {
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(Arc::clone(&database)),
             smtp_session_repository: SmtpSessionRepository::new(Arc::clone(&database)),
@@ -95,12 +95,13 @@ impl OperationContext {
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(Arc::clone(
                 &database,
             )),
+            sms_reply_webhook_repository: SmsReplyWebhookRepository::new(Arc::clone(&database)),
             sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(Arc::clone(&database)),
             virtual_number_repository: VirtualNumberRepository::new(Arc::clone(&database)),
-            messaging_service_repository,
+            messaging_service_repository: MessagingServiceRepository::new(Arc::clone(&database)),
             verify_service_repository: VerifyServiceRepository::new(Arc::clone(&database)),
             verification_repository: VerificationRepository::new(Arc::clone(&database)),
-            message_provider_repository,
+            message_provider_repository: MessageProviderRepository::new(Arc::clone(&database)),
             activity_stats_repository: ActivityStatsRepository::new(Arc::clone(&database)),
             webhook_endpoint_repository: WebhookEndpointRepository::new(Arc::clone(&database)),
             webhook_delivery_repository: WebhookDeliveryRepository::new(Arc::clone(&database)),

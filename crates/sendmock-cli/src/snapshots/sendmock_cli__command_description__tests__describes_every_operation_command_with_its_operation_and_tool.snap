@@ -805,6 +805,26 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms resend-reply-webhook",
+    "usage": "sendmock sms resend-reply-webhook <smsId>",
+    "summary": "Send an inbound message's reply webhook again.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/{smsId}/reply-webhook/resend",
+        "operation_id": "postSmsBySmsIdReplyWebhookResend",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_reply_webhook_resend"
+    ]
+  },
+  {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
     "summary": "Email outcome rules, checked from top to bottom.",

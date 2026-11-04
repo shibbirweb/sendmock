@@ -21,7 +21,7 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 
 1. If the number belongs to a **Messaging Service** whose inbound handling is "Send a webhook", the service's request URL is called.
 2. Otherwise the **number's inbound URL** is called, in the format set on the number (Twilio, Vonage, Plivo, ... or native JSON), with `X-Twilio-Signature` for Twilio.
-3. If that call fails, the **fallback URL** is tried.
+3. If that call fails, the **fallback URL** is called with the same request plus `ErrorCode` and `ErrorUrl`, as Twilio does. Nothing is retried after that; use **Resend reply webhook** once your handler is fixed.
 4. A number without an inbound URL sends the message to **rules only** ([Webhooks > Rules](../webhooks/rules.md) on `sms.inbound`). With both set, both receive it.
 
 ## What your app receives
@@ -34,7 +34,7 @@ In Twilio's format (the default), the same "A message comes in" request Twilio s
 
 ## What your app can answer
 
-Answer with TwiML as `text/xml` or `application/xml`:
+Answer with TwiML as `text/xml`, `application/xml` or `text/html`, as Twilio reads them. A `text/plain` answer is sent back to the contact as the reply text.
 
 ```xml
 <Response>
@@ -52,6 +52,17 @@ Answer with TwiML as `text/xml` or `application/xml`:
 | an empty `<Response/>`, an empty body or `204` | no reply |
 
 Several `<Message>` verbs send several replies, in order. URLs can be relative to the URL that answered. One incoming message makes at most 10 TwiML requests, redirects and actions included, so two handlers that redirect to each other stop.
+
+## When the call fails
+
+Failures carry Twilio's error codes, shown on the message and in **Message details > Reply webhook**:
+
+| What happened | Code |
+| --- | --- |
+| an answer other than `2xx`, or none within 15 seconds | 11200 HTTP retrieval failure |
+| the connection was refused or reset | 11205 HTTP connection failure |
+| the body is not a TwiML `<Response>` document | 12100 Document parse failure |
+| any other content type, such as JSON | 12300 Invalid Content-Type |
 
 ## The result, on screen
 

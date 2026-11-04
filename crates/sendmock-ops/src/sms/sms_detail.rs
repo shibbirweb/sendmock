@@ -3,6 +3,7 @@ use sendmock_store::SmsRecord;
 use serde::Serialize;
 use serde_json::Value;
 
+use super::sms_reply_webhook_views::SmsReplyWebhookAttempt;
 use super::sms_views::{SmsCallbackAttempt, SmsMessage, SmsStatusChange};
 use crate::{OperationContext, OperationError};
 
@@ -17,8 +18,8 @@ pub struct SmsMessageDetail {
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub api_request_id: Option<String>,
     pub callback_attempts: Vec<SmsCallbackAttempt>,
-    /// Inbound only, oldest first; every Resend adds attempts. Reply webhooks come in Phase 3.
-    pub reply_webhook_attempts: Vec<Value>,
+    /// Inbound only, oldest first; every resend adds attempts.
+    pub reply_webhook_attempts: Vec<SmsReplyWebhookAttempt>,
 }
 
 pub async fn load_sms_detail(
@@ -30,6 +31,10 @@ pub async fn load_sms_detail(
     let callback_attempts = operation_context
         .sms_callback_attempt_repository
         .list_sent_attempts(&sms.sms_id)
+        .await?;
+    let reply_webhook_attempts = operation_context
+        .sms_reply_webhook_repository
+        .list_attempts(&sms.sms_id)
         .await?;
     Ok(SmsMessageDetail {
         message: SmsMessage::from(&sms),
@@ -46,7 +51,10 @@ pub async fn load_sms_detail(
             .into_iter()
             .map(SmsCallbackAttempt::from)
             .collect(),
-        reply_webhook_attempts: Vec::new(),
+        reply_webhook_attempts: reply_webhook_attempts
+            .into_iter()
+            .map(SmsReplyWebhookAttempt::from)
+            .collect(),
     })
 }
 

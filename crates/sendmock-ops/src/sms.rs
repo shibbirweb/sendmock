@@ -11,6 +11,7 @@ mod sms_lookups;
 mod sms_media_intake;
 mod sms_open_operations;
 mod sms_read_operations;
+mod sms_reply_webhook_views;
 mod sms_send_decision;
 mod sms_send_operations;
 mod sms_views;
@@ -28,13 +29,19 @@ pub use sms_change_operations::{
 };
 pub use sms_delivery_runner::start_sms_delivery;
 pub use sms_detail::SmsMessageDetail;
+pub(crate) use sms_detail::{find_sms_or_not_found, load_sms_detail};
 pub use sms_ingest::{IncomingSms, store_sms};
+pub(crate) use sms_inputs::SmsReference;
 pub use sms_lookups::{describe_sms_code, find_newest_sms_with_code};
 pub use sms_media_intake::{AcceptedMedia, MediaProblem, accept_media};
 pub use sms_open_operations::{ListSmsOpensOperation, RecordSmsOpenOperation};
 pub use sms_read_operations::{
     DownloadSmsMediaOperation, GetSmsOperation, ListSmsOperation, ListSmsThreadsOperation,
     WaitForSmsOperation,
+};
+pub use sms_reply_webhook_views::{
+    ReplyWebhookOutcome, ReplyWebhookTargetName, SmsReplyWebhookAttempt, SmsReplyWebhookResult,
+    TwimlMethodName, TwimlVerbView,
 };
 pub use sms_send_decision::{
     decide_outbound_send, describe_rejection, load_custom_outcome_rules, to_simulation_profile,

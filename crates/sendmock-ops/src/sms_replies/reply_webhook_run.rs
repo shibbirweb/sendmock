@@ -3,11 +3,16 @@ use std::collections::VecDeque;
 use sendmock_sms::{TwimlMessage, TwimlVerb, resolve_twiml_url};
 use sendmock_store::SmsRecord;
 
+use super::reply_webhook_failure::ReplyWebhookFailure;
 use super::reply_webhook_request::ReplyWebhookRequestBuilder;
-use super::reply_webhook_target::{ReplyWebhookTarget, resolve_reply_webhook_target};
-use super::twiml_fetch::fetch_twiml_verbs;
+use super::reply_webhook_target::{
+    ReplyWebhookTarget, ReplyWebhookTargetKind, resolve_reply_webhook_target,
+};
+use super::twiml_fetch::{TwimlFetch, TwimlFetchRequest, fetch_twiml};
 use super::twiml_reply::{TwimlReplyRequest, send_twiml_reply};
-use crate::sms::RecordedHttpRequest;
+use crate::sms::{
+    RecordedHttpRequest, ReplyWebhookOutcome, ReplyWebhookTargetName, SmsReplyWebhookResult,
+};
 use crate::{OperationContext, OperationError};
 
 /// One inbound message triggers at most this many TwiML fetches, redirects and actions
@@ -35,18 +40,20 @@ pub fn start_reply_webhook(
     });
 }
 
-/// Sends an inbound message to its number's reply webhook and acts on the TwiML answer in
-/// order: each `<Message>` becomes a reply in the thread; a `<Redirect>`, or a `<Message>`
-/// with an `action`, fetches new TwiML that replaces the verbs left. Returns the replies.
+/// Sends an inbound message to its number's reply webhook, and to the fallback URL with
+/// `ErrorCode` and `ErrorUrl` when that fails, then acts on the TwiML answer in order: each
+/// `<Message>` becomes a reply in the thread; a `<Redirect>`, or a `<Message>` with an
+/// `action`, fetches new TwiML that replaces the verbs left. Every request is stored, and the
+/// outcome replaces the message's last one. `None` when the number has no reply webhook.
 pub async fn run_reply_webhook(
     operation_context: &OperationContext,
     inbound_sms: &SmsRecord,
     template_override: Option<&str>,
-) -> Result<Vec<SmsRecord>, OperationError> {
+) -> Result<Option<SmsReplyWebhookResult>, OperationError> {
     let Some(target) =
         resolve_reply_webhook_target(operation_context, &inbound_sms.to_number).await?
     else {
-        return Ok(Vec::new());
+        return Ok(None);
     };
     let request_builder =
         ReplyWebhookRequestBuilder::new(operation_context, inbound_sms, &target, template_override)
@@ -58,14 +65,21 @@ pub async fn run_reply_webhook(
         request_builder,
         fetch_count: 0,
         document_url: target.url.clone(),
+        last_fetch: None,
+        primary_failure: None,
+        used_fallback: false,
         replies: Vec::new(),
     };
-    let first_request = conversation
-        .request_builder
-        .build_webhook_request(&target.url, target.method);
-    let first_verbs = conversation.fetch(target.url.clone(), &first_request).await;
+    let first_verbs = conversation.fetch_first_document().await?;
     conversation.follow(first_verbs).await?;
-    Ok(conversation.replies)
+    let reply_webhook_result = conversation.summarize();
+    let reply_webhook_json = serde_json::to_string(&reply_webhook_result)
+        .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
+    operation_context
+        .sms_reply_webhook_repository
+        .record_result(&inbound_sms.sms_id, reply_webhook_json)
+        .await?;
+    Ok(Some(reply_webhook_result))
 }
 
 /// The state of one inbound message's TwiML exchange.
@@ -77,6 +91,10 @@ struct TwimlConversation<'run> {
     fetch_count: usize,
     /// The URL the verbs being followed came from.
     document_url: String,
+    last_fetch: Option<TwimlFetch>,
+    /// Why the reply webhook's first request failed, kept after the fallback answered.
+    primary_failure: Option<ReplyWebhookFailure>,
+    used_fallback: bool,
     replies: Vec<SmsRecord>,
 }
 
@@ -85,12 +103,52 @@ impl TwimlConversation<'_> {
         &mut self,
         url: String,
         webhook_request: &RecordedHttpRequest,
-    ) -> VecDeque<TwimlVerb> {
+        is_fallback: bool,
+    ) -> Result<VecDeque<TwimlVerb>, OperationError> {
         self.fetch_count += 1;
         self.document_url = url;
-        fetch_twiml_verbs(self.operation_context, webhook_request)
+        let twiml_fetch = fetch_twiml(
+            self.operation_context,
+            &TwimlFetchRequest {
+                inbound_sms_id: &self.inbound_sms.sms_id,
+                webhook_request,
+                is_fallback,
+            },
+        )
+        .await?;
+        let verbs = twiml_fetch.verbs.clone().into();
+        self.last_fetch = Some(twiml_fetch);
+        Ok(verbs)
+    }
+
+    /// The reply webhook; when it fails and a fallback URL is set, the fallback with the
+    /// failure's code. Nothing is retried, as Twilio does not retry reply webhooks.
+    async fn fetch_first_document(&mut self) -> Result<VecDeque<TwimlVerb>, OperationError> {
+        let target = self.target;
+        let first_request = self
+            .request_builder
+            .build_webhook_request(&target.url, target.method);
+        let first_verbs = self
+            .fetch(target.url.clone(), &first_request, false)
+            .await?;
+        self.primary_failure = self
+            .last_fetch
+            .as_ref()
+            .and_then(|fetch| fetch.failure.clone());
+        let (Some(primary_failure), Some(fallback_url)) =
+            (&self.primary_failure, &target.fallback_url)
+        else {
+            return Ok(first_verbs);
+        };
+        let fallback_request = self.request_builder.build_fallback_request(
+            fallback_url,
+            target.method,
+            primary_failure.error_code(),
+            &target.url,
+        );
+        self.used_fallback = true;
+        self.fetch(fallback_url.clone(), &fallback_request, true)
             .await
-            .into()
     }
 
     fn has_fetches_left(&self) -> bool {
@@ -123,7 +181,7 @@ impl TwimlConversation<'_> {
                 if !self.has_fetches_left() {
                     break;
                 }
-                pending_verbs = self.fetch(url, &next_request).await;
+                pending_verbs = self.fetch(url, &next_request, false).await?;
             }
         }
         Ok(())
@@ -153,5 +211,32 @@ impl TwimlConversation<'_> {
         });
         self.replies.push(reply);
         Ok(action_request)
+    }
+
+    /// The outcome shown under the bubble: the last request decides success, and the
+    /// primary URL's failure is kept even when the fallback answered.
+    fn summarize(&self) -> SmsReplyWebhookResult {
+        let last_fetch = self.last_fetch.as_ref();
+        let is_succeeded = last_fetch.is_some_and(|fetch| fetch.failure.is_none());
+        SmsReplyWebhookResult {
+            target: match self.target.kind {
+                ReplyWebhookTargetKind::MessagingService => {
+                    ReplyWebhookTargetName::MessagingService
+                }
+                ReplyWebhookTargetKind::Number => ReplyWebhookTargetName::Number,
+            },
+            outcome: if is_succeeded {
+                ReplyWebhookOutcome::Succeeded
+            } else {
+                ReplyWebhookOutcome::Failed
+            },
+            status_code: last_fetch.and_then(|fetch| fetch.status_code),
+            error_code: self
+                .primary_failure
+                .as_ref()
+                .map(|failure| failure.error_code().to_owned()),
+            used_fallback: self.used_fallback && is_succeeded,
+            reply_count: u32::try_from(self.replies.len()).unwrap_or(u32::MAX),
+        }
     }
 }

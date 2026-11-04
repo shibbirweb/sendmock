@@ -36,6 +36,8 @@ pub struct SmsRecord {
     pub in_reply_to_sms_id: Option<String>,
     pub created_at_unix_ms: i64,
     pub updated_at_unix_ms: i64,
+    /// Inbound only: the latest reply webhook run's outcome, as JSON.
+    pub reply_webhook_json: Option<String>,
     pub media: Vec<SmsMediaRecord>,
 }
 

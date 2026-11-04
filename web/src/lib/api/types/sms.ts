@@ -94,9 +94,15 @@ export type TwimlVerb =
       to: string | null;
       from: string | null;
       status_callback: string | null;
+      /** Requested once the reply is sent, with `method`. */
+      action: string | null;
+      method: TwimlMethod;
       media_urls: string[];
     }
-  | { verb: "Redirect"; url: string };
+  | { verb: "Redirect"; url: string; method: TwimlMethod };
+
+/** How a TwiML `action` or `<Redirect>` URL is requested; `POST` by default. */
+export type TwimlMethod = "GET" | "POST";
 
 /** The outcome of an inbound message's reply webhook, for the bubble (SM-09.7). */
 export type SmsReplyWebhookResult = {

@@ -84,11 +84,12 @@ pub use settings::{
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,
-    RecordedHttpResponse, ReplyWebhookSender, SmsMessage, SmsMessageDetail, SmsThread,
-    StatusCallbackSender, apply_status_change, decide_outbound_send, describe_rejection,
-    describe_sms_code, find_newest_sms_with_code, load_custom_outcome_rules,
-    run_due_status_callbacks, run_status_callback_dispatcher, start_sms_delivery, store_sms,
-    to_simulation_profile,
+    RecordedHttpResponse, ReplyWebhookOutcome, ReplyWebhookSender, ReplyWebhookTargetName,
+    SmsMessage, SmsMessageDetail, SmsReplyWebhookAttempt, SmsReplyWebhookResult, SmsThread,
+    StatusCallbackSender, TwimlMethodName, TwimlVerbView, apply_status_change,
+    decide_outbound_send, describe_rejection, describe_sms_code, find_newest_sms_with_code,
+    load_custom_outcome_rules, run_due_status_callbacks, run_status_callback_dispatcher,
+    start_sms_delivery, store_sms, to_simulation_profile,
 };
 pub use sms_replies::{
     MAXIMUM_TWIML_FETCHES, ReplyWebhookTarget, ReplyWebhookTargetKind, TWILIO_INBOUND_TEMPLATE_ID,
@@ -125,6 +126,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
+    sms_replies::register_sms_reply_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);

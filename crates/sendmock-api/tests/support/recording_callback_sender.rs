@@ -28,11 +28,13 @@ fn answer_with(scripted_answer: Option<u16>) -> HttpCallResult {
             }),
             error_message: (status_code >= 400)
                 .then(|| format!("Your handler answered {status_code}")),
+            is_connection_failure: false,
             duration_ms: 3,
         },
         None => HttpCallResult {
             response: None,
             error_message: Some("connection refused".to_owned()),
+            is_connection_failure: true,
             duration_ms: 1,
         },
     }

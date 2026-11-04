@@ -90,4 +90,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 20,
         sql: include_str!("../migrations/0020_sms_callback_queue.sql"),
     },
+    Migration {
+        schema_version: 21,
+        sql: include_str!("../migrations/0021_sms_reply_webhooks.sql"),
+    },
 ];

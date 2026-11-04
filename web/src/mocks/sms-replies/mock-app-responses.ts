@@ -1,8 +1,9 @@
 /**
  * How the demo's pretend app answers reply webhooks (Stage A only; the real
  * server makes real requests). The fixtures' app runs at localhost:8000:
- * its `/sms/inbound` handler auto-replies with TwiML, its other handlers
- * answer an empty `<Response/>`, and paths ending in `/error` answer 500.
+ * its `/sms/inbound` handler auto-replies with TwiML, `/sms/text-reply`
+ * answers plain text, its other handlers answer an empty `<Response/>`, and
+ * paths ending in `/error` answer 500.
  * Any other host refuses the connection, so a fallback URL can be tried.
  */
 export type MockAppAnswer =
@@ -45,6 +46,16 @@ export function answerMockAppRequest(requestUrl: string): MockAppAnswer {
       contentType: "text/html",
       body: "<h1>Server Error</h1>",
       durationMs: 42,
+    };
+  }
+
+  if (parsedUrl.pathname.endsWith("/sms/text-reply")) {
+    return {
+      kind: "response",
+      statusCode: 200,
+      contentType: "text/plain; charset=utf-8",
+      body: "Thanks! We got your message.",
+      durationMs: 31,
     };
   }
 

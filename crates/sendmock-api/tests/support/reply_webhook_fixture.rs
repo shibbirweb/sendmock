@@ -83,6 +83,24 @@ impl ReplyWebhookFixture {
         .await
     }
 
+    /// Polls until the reply webhook of `inbound_sms_id` recorded its outcome; answers the
+    /// message's detail.
+    pub async fn wait_for_reply_webhook(&self, inbound_sms_id: &Value) -> Value {
+        let detail_path = format!(
+            "/api/v1/sms/{}",
+            inbound_sms_id.as_str().unwrap_or_default()
+        );
+        let mut sms_detail = Value::Null;
+        for _ in 0..200 {
+            (_, sms_detail) = call_api(&self.app_router, "GET", &detail_path, None).await;
+            if !sms_detail["reply_webhook"].is_null() {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(25)).await;
+        }
+        sms_detail
+    }
+
     /// Polls until `count` TwiML replies to `inbound_sms_id` are stored; answers them oldest
     /// first.
     pub async fn wait_for_replies(&self, inbound_sms_id: &Value, count: usize) -> Vec<Value> {

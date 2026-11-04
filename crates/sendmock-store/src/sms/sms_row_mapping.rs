@@ -5,7 +5,7 @@ use super::{SmsMediaRecord, SmsRecord};
 pub const SMS_COLUMNS: &str = "id, provider_id, direction, channel, api, from_number, from_raw, to_number, to_raw, \
      thread_id, app_number, contact_number, body, encoding, segments, status, error_code, status_callback_url, \
      messaging_service_sid, account, otp_codes, links, metadata, request_body, api_request_id, opened_at, \
-     open_count, is_read, in_reply_to_sms_id, created_at, updated_at";
+     open_count, is_read, in_reply_to_sms_id, created_at, updated_at, reply_webhook";
 
 /// A row in `SMS_COLUMNS` order, without its media (see `attach_media`).
 pub fn read_sms_row(row: &Row<'_>) -> rusqlite::Result<SmsRecord> {
@@ -44,6 +44,7 @@ pub fn read_sms_row(row: &Row<'_>) -> rusqlite::Result<SmsRecord> {
         in_reply_to_sms_id: row.get(28)?,
         created_at_unix_ms: row.get(29)?,
         updated_at_unix_ms: row.get(30)?,
+        reply_webhook_json: row.get(31)?,
         media: Vec::new(),
     })
 }
@@ -74,7 +75,7 @@ pub fn insert_sms_row(connection: &Connection, sms: &SmsRecord) -> rusqlite::Res
     connection.execute(
         &format!(
             "INSERT INTO sms_messages ({SMS_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, \
-             ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29, ?30, ?31)"
+             ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29, ?30, ?31, ?32)"
         ),
         params![
             sms.sms_id,
@@ -108,6 +109,7 @@ pub fn insert_sms_row(connection: &Connection, sms: &SmsRecord) -> rusqlite::Res
             sms.in_reply_to_sms_id,
             sms.created_at_unix_ms,
             sms.updated_at_unix_ms,
+            sms.reply_webhook_json,
         ],
     )?;
     Ok(())

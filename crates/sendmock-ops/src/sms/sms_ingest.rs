@@ -148,6 +148,7 @@ fn build_sms_record(
         in_reply_to_sms_id: incoming_sms.in_reply_to_sms_id,
         created_at_unix_ms: now_unix_ms,
         updated_at_unix_ms: now_unix_ms,
+        reply_webhook_json: None,
         media: incoming_sms.media.media,
         body: incoming_sms.body,
         sms_id,

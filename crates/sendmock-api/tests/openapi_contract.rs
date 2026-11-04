@@ -128,6 +128,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
+    samples.extend(prepare_sms_reply_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -895,6 +896,22 @@ fn mms_sample() -> Value {
         "status_callback": "http://127.0.0.1:9/status", "metadata": { "user_id": 42 },
         "media": [{ "filename": "logo.png", "content": ONE_PIXEL_PNG_BASE64 }],
     })
+}
+
+/// An inbound message to the number whose reply webhook the number samples set up before the
+/// samples run; this build has no HTTP sender, so the resend records a connection failure.
+async fn prepare_sms_reply_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let inbound_sms_id = post_json(
+        app_router,
+        "/api/v1/sms/inbound",
+        &json!({ "from": "+8801700000000", "to": "+15550001111", "body": "YES" }),
+    )
+    .await["id"]
+        .clone();
+    vec![(
+        "postSmsBySmsIdReplyWebhookResend",
+        vec![json!({ "sms_id": inbound_sms_id })],
+    )]
 }
 
 /// Two messages, one with media, created through `POST /sms`.

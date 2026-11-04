@@ -41,12 +41,16 @@ function TwimlVerbList({ twimlVerbs }: { twimlVerbs: TwimlVerb[] }) {
                 {twimlVerb.from !== null && `from ${twimlVerb.from} `}
                 {twimlVerb.status_callback !== null &&
                   `statusCallback ${twimlVerb.status_callback} `}
+                {twimlVerb.action !== null &&
+                  `action ${twimlVerb.method} ${twimlVerb.action} `}
                 {twimlVerb.media_urls.length > 0 &&
                   `${twimlVerb.media_urls.length} media`}
               </span>
             </>
           ) : (
-            <span className="font-mono">{twimlVerb.url}</span>
+            <span className="font-mono">
+              {twimlVerb.method} {twimlVerb.url}
+            </span>
           )}
         </li>
       ))}

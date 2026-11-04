@@ -1,14 +1,13 @@
 use std::collections::BTreeMap;
 
+use super::sms_reply_webhook_views::SmsReplyWebhookResult;
+use crate::email::ExtractedData;
 use schemars::JsonSchema;
 use sendmock_core::format_rfc3339;
 use sendmock_store::{
     SmsCallbackAttemptRecord, SmsMediaRecord, SmsRecord, SmsStatusChangeRecord, SmsThreadRecord,
 };
 use serde::Serialize;
-use serde_json::Value;
-
-use crate::email::ExtractedData;
 
 /// One MMS or WhatsApp media file stored with a message.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
@@ -53,9 +52,12 @@ pub struct SmsMessage {
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub opened_at: Option<String>,
     pub open_count: u64,
-    /// Inbound only: what the number's reply webhook answered; null until Phase 3.
-    #[schemars(required, schema_with = "crate::nullable_schema::<Value>")]
-    pub reply_webhook: Option<Value>,
+    /// Inbound only: what the number's reply webhook answered last; null when none ran.
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<SmsReplyWebhookResult>"
+    )]
+    pub reply_webhook: Option<SmsReplyWebhookResult>,
     /// A TwiML reply: the inbound message it answers.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub in_reply_to_sms_id: Option<String>,
@@ -92,7 +94,10 @@ impl From<&SmsRecord> for SmsMessage {
             },
             opened_at: sms.opened_at_unix_ms.map(format_rfc3339),
             open_count: sms.open_count,
-            reply_webhook: None,
+            reply_webhook: sms
+                .reply_webhook_json
+                .as_deref()
+                .and_then(|reply_webhook_json| serde_json::from_str(reply_webhook_json).ok()),
             in_reply_to_sms_id: sms.in_reply_to_sms_id.clone(),
             created_at: format_rfc3339(sms.created_at_unix_ms),
             updated_at: format_rfc3339(sms.updated_at_unix_ms),
@@ -156,6 +161,18 @@ pub struct RecordedHttpRequest {
     pub body: String,
 }
 
+impl RecordedHttpRequest {
+    /// Stands in for a stored request that can no longer be read.
+    pub fn empty_post() -> Self {
+        Self {
+            method: "POST".to_owned(),
+            url: String::new(),
+            headers: BTreeMap::new(),
+            body: String::new(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, serde::Deserialize, JsonSchema)]
 pub struct RecordedHttpResponse {
     pub status_code: u16,
@@ -170,14 +187,8 @@ impl From<SmsCallbackAttemptRecord> for SmsCallbackAttempt {
             id: callback_attempt.attempt_id,
             reported_status: callback_attempt.reported_status,
             attempt: callback_attempt.attempt,
-            request: serde_json::from_str(&callback_attempt.request_json).unwrap_or_else(|_| {
-                RecordedHttpRequest {
-                    method: "POST".to_owned(),
-                    url: String::new(),
-                    headers: BTreeMap::new(),
-                    body: String::new(),
-                }
-            }),
+            request: serde_json::from_str(&callback_attempt.request_json)
+                .unwrap_or_else(|_| RecordedHttpRequest::empty_post()),
             response: callback_attempt
                 .response_json
                 .and_then(|response_json| serde_json::from_str(&response_json).ok()),

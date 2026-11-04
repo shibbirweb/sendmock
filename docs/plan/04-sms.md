@@ -237,7 +237,7 @@ Exactly what Twilio sends, so the handler you run in production works unchanged:
 
 ### The reply (TwiML)
 
-SendMock reads the response body as TwiML when it is `text/xml` or `application/xml`:
+SendMock reads the response body as TwiML when it is `text/xml`, `application/xml` or `text/html`, as Twilio does; a `text/plain` body is sent back to the sender as the reply text:
 
 ```xml
 <Response>
@@ -265,7 +265,7 @@ Failures use Twilio's error codes and are shown on the inbound message (drawer a
 | non-2xx response, or no answer within 15 seconds | 11200 HTTP retrieval failure |
 | connection refused or reset | 11205 HTTP connection failure |
 | body is not valid TwiML | 12100 Document parse failure |
-| unsupported `Content-Type` | 12300 Invalid Content-Type |
+| any other `Content-Type` (JSON, for example) | 12300 Invalid Content-Type |
 
 When the primary URL fails and a fallback URL is set, SendMock calls the fallback with the same request plus `ErrorCode` and `ErrorUrl`, as Twilio does. Reply webhooks are not retried (Twilio does not retry them either); use **Resend reply webhook** in the message drawer after fixing the handler.
 
