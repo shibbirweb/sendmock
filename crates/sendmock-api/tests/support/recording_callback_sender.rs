@@ -5,7 +5,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use sendmock_ops::{
-    RecordedHttpRequest, RecordedHttpResponse, StatusCallbackResult, StatusCallbackSender,
+    HttpCallResult, RecordedHttpRequest, RecordedHttpResponse, StatusCallbackSender,
 };
 use serde_json::Value;
 
@@ -17,9 +17,9 @@ pub struct RecordingCallbackSender {
     scripted_answers: Mutex<VecDeque<Option<u16>>>,
 }
 
-fn answer_with(scripted_answer: Option<u16>) -> StatusCallbackResult {
+fn answer_with(scripted_answer: Option<u16>) -> HttpCallResult {
     match scripted_answer {
-        Some(status_code) => StatusCallbackResult {
+        Some(status_code) => HttpCallResult {
             response: Some(RecordedHttpResponse {
                 status_code,
                 headers: BTreeMap::new(),
@@ -30,7 +30,7 @@ fn answer_with(scripted_answer: Option<u16>) -> StatusCallbackResult {
                 .then(|| format!("Your handler answered {status_code}")),
             duration_ms: 3,
         },
-        None => StatusCallbackResult {
+        None => HttpCallResult {
             response: None,
             error_message: Some("connection refused".to_owned()),
             duration_ms: 1,
@@ -71,7 +71,7 @@ impl StatusCallbackSender for RecordingCallbackSender {
     fn send_status_callback<'sender>(
         &'sender self,
         callback_request: &'sender RecordedHttpRequest,
-    ) -> Pin<Box<dyn Future<Output = StatusCallbackResult> + Send + 'sender>> {
+    ) -> Pin<Box<dyn Future<Output = HttpCallResult> + Send + 'sender>> {
         Box::pin(async move {
             if let Ok(mut received_requests) = self.received_requests.lock() {
                 received_requests.push(callback_request.clone());

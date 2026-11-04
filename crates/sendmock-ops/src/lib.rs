@@ -25,6 +25,7 @@ mod samples;
 mod seed;
 mod settings;
 mod sms;
+mod sms_replies;
 mod smtp_delivery;
 mod system;
 mod updates;
@@ -82,11 +83,16 @@ pub use settings::{
     UpdateCheckMode, build_ingest_options, prune_traffic, read_ingest_options,
 };
 pub use sms::{
-    FetchedMedia, IncomingSms, MediaFetcher, RecordedHttpRequest, RecordedHttpResponse, SmsMessage,
-    SmsMessageDetail, SmsThread, StatusCallbackResult, StatusCallbackSender, apply_status_change,
-    decide_outbound_send, describe_rejection, describe_sms_code, find_newest_sms_with_code,
-    load_custom_outcome_rules, run_due_status_callbacks, run_status_callback_dispatcher,
-    start_sms_delivery, store_sms, to_simulation_profile,
+    FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,
+    RecordedHttpResponse, ReplyWebhookSender, SmsMessage, SmsMessageDetail, SmsThread,
+    StatusCallbackSender, apply_status_change, decide_outbound_send, describe_rejection,
+    describe_sms_code, find_newest_sms_with_code, load_custom_outcome_rules,
+    run_due_status_callbacks, run_status_callback_dispatcher, start_sms_delivery, store_sms,
+    to_simulation_profile,
+};
+pub use sms_replies::{
+    MAXIMUM_TWIML_FETCHES, ReplyWebhookTarget, ReplyWebhookTargetKind, TWILIO_INBOUND_TEMPLATE_ID,
+    resolve_reply_webhook_target, run_reply_webhook, start_reply_webhook,
 };
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{

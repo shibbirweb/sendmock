@@ -216,6 +216,7 @@ async fn store_provider_sms(
             account: provider_call.path_params.get("AccountSid").cloned(),
             metadata_json: None,
             request_body_json: Some(provider_call.describe_request_without_secrets()),
+            in_reply_to_sms_id: None,
             provider_id: Some(provider_id).filter(|provider_id| !provider_id.is_empty()),
             media,
         },

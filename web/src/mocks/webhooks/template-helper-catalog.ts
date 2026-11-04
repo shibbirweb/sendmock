@@ -94,6 +94,12 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     example: "{{ vars.tenant_id | upper }}",
   },
   {
+    name: "length",
+    signature: "length",
+    description: "The number of items in a list, or characters in text.",
+    example: "{{ data.media | length }}",
+  },
+  {
     name: "replace",
     signature: "replace(old, new)",
     description: "Replaces every occurrence of old with new.",

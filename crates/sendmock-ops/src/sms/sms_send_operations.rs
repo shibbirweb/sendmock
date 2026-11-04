@@ -1,11 +1,13 @@
 use sendmock_sms::SendDecision;
 
+use super::message_sid::generate_message_sid;
 use super::sms_delivery_runner::start_sms_delivery;
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
 use super::sms_ingest::{IncomingSms, store_sms};
 use super::sms_inputs::{InboundSmsRequest, NativeSmsRequest};
 use super::sms_media_intake::{MediaProblem, accept_media};
 use super::sms_send_decision::{decide_outbound_send, describe_rejection};
+use crate::sms_replies::start_reply_webhook;
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
     RequestLogSettings, SuccessStatus,
@@ -119,6 +121,7 @@ async fn build_native_sms(
             .metadata
             .map(|metadata| serde_json::Value::Object(metadata).to_string()),
         request_body_json,
+        in_reply_to_sms_id: None,
         provider_id: None,
         media,
     })
@@ -143,7 +146,8 @@ impl Operation for SimulateInboundSmsOperation {
         }
     }
 
-    /// Stores it as `received` and publishes `sms.inbound`; the reply webhook comes in Phase 3.
+    /// Stores it as `received` with a Twilio-style `SM` SID, publishes `sms.inbound` and sends
+    /// it to the number's reply webhook in the background.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -189,11 +193,13 @@ impl Operation for SimulateInboundSmsOperation {
                 request_body_json: Some(
                     serde_json::json!({ "template_id": input.template_id }).to_string(),
                 ),
-                provider_id: None,
+                in_reply_to_sms_id: None,
+                provider_id: Some(generate_message_sid(operation_context)),
                 media,
             },
         )
         .await?;
+        start_reply_webhook(operation_context, sms.clone(), input.template_id);
         load_sms_detail(operation_context, sms).await
     }
 }

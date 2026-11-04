@@ -31,6 +31,12 @@ const nativeDefinition: TemplateDefinition = {
 
 const twilioAccountSid = `{{ vars.twilio_account_sid | default("AC00000000000000000000000000000000") }}`;
 const twilioMessagingService = `{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}`;
+/** Twilio writes WhatsApp numbers as `whatsapp:+1...`, URL-encoded in a form body. */
+const twilioWhatsAppPrefix = `{% if data.channel == "whatsapp" %}whatsapp%3A{% endif %}`;
+/** WhatsApp messages add the sender's profile name, unknown here, and WhatsApp ID. */
+const twilioWhatsAppProfile = `{% if data.channel == "whatsapp" %}ProfileName=WhatsApp%20user&WaId={{ data.from_number | replace("+", "") }}&{% endif %}`;
+/** Each file's type and a link to SendMock's copy, numbered from 0. */
+const twilioMediaFields = `{% for media_item in data.media %}&MediaContentType{{ loop.index0 }}={{ media_item.content_type | urlencode }}&MediaUrl{{ loop.index0 }}={{ sendmock.http_url | urlencode }}{{ media_item.url | urlencode }}{% endfor %}`;
 const vonageApiKey = `{{ vars.vonage_api_key | default("vonage-key") }}`;
 const vonageTimestamp = `{{ event.created_at | date("%Y-%m-%d %H:%M:%S") }}`;
 
@@ -43,8 +49,10 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     header_templates: {
       "X-Twilio-Signature":
         "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
+      "I-Twilio-Idempotency-Token": "{{ uuid() }}",
+      "User-Agent": "TwilioProxy/1.1",
     },
-    body_template: `SmsMessageSid={{ data.provider_id }}&NumMedia=0&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
+    body_template: `${twilioWhatsAppProfile}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}${twilioMediaFields}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To=${twilioWhatsAppPrefix}{{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From=${twilioWhatsAppPrefix}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
     doc_url: "https://www.twilio.com/docs/messaging/guides/webhook-request",
     verified_on: smsFormatsVerifiedOn,
   },

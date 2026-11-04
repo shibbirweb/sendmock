@@ -19,7 +19,7 @@ You do not need numbers to send SMS: any `From` is accepted. Numbers matter when
 
 | Gets from | Sends to |
 | --- | --- |
-| replies typed in an [SMS](./sms/index.md) conversation (`sms.inbound`) | the number's (or its service's) inbound webhook, logged in [Deliveries](./webhooks/deliveries.md); TwiML answers come back into the conversation |
+| replies typed in an [SMS](./sms/index.md) conversation (`sms.inbound`) | the number's (or its service's) inbound webhook, shown in the message details; TwiML answers come back into the conversation |
 | your app's sends with `MessagingServiceSid` | the number the service picks, shown on the message |
 | | each number's default status callback for messages it sends |
 

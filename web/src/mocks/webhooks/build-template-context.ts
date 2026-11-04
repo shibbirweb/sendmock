@@ -34,11 +34,16 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
   return {
     id: smsMessage.id,
     provider_id: smsMessage.provider_id,
+    channel: smsMessage.channel,
     from_number: smsMessage.from_number,
     to_number: smsMessage.to_number,
     body: smsMessage.body,
+    encoding: smsMessage.encoding,
+    segments: smsMessage.segments,
+    media: smsMessage.media,
     status: smsMessage.status,
     error_code: smsMessage.error_code,
+    messaging_service_sid: smsMessage.messaging_service_sid,
     extracted: smsMessage.extracted,
   };
 }
@@ -75,11 +80,13 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       label: "Built-in sample",
       data: {
         provider_id: "SM00000000000000000000000000000001",
+        channel: "sms",
         from_number: "+15550001111",
         to_number: "+14155550100",
         body: "Your Acme code is 482913",
         encoding: "GSM-7",
         segments: 1,
+        media: [],
         status: "delivered",
         error_code: null,
         messaging_service_sid: null,

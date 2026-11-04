@@ -1,9 +1,11 @@
-//! The SMS domain: numbers, encoding and segments, conversations and delivery simulation.
+//! The SMS domain: numbers, encoding and segments, conversations, delivery simulation and
+//! the TwiML an app answers a reply webhook with.
 
 mod encoding;
 mod phone_number;
 mod simulation;
 mod sms_thread;
+mod twiml;
 mod verify;
 
 pub use encoding::{SegmentCount, SmsEncoding, count_segments};
@@ -15,6 +17,10 @@ pub use simulation::{
     matches_outcome_pattern, outcome_name_for_error_code, plan_send, resolve_number_outcome,
 };
 pub use sms_thread::build_thread_id;
+pub use twiml::{
+    TwimlMessage, TwimlMethod, TwimlParseError, TwimlRedirect, TwimlVerb, parse_twiml,
+    resolve_twiml_url,
+};
 pub use verify::{
     CheckOutcome, MAXIMUM_CHECK_ATTEMPTS, MAXIMUM_SEND_ATTEMPTS, VerificationProgress,
     check_verification_code, generate_verification_code,

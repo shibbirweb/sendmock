@@ -1,8 +1,8 @@
 use sendmock_store::{CallbackAttemptResult, SmsCallbackAttemptRecord};
 use sendmock_webhooks::{AttemptDecision, AttemptOutcome, RetrySchedule};
 
+use super::http_call_result::HttpCallResult;
 use super::sms_views::RecordedHttpRequest;
-use super::status_callback_sender::StatusCallbackResult;
 use crate::{OperationContext, OperationError};
 
 const NO_SENDER_MESSAGE: &str = "This build cannot make HTTP calls, so the callback was not sent";
@@ -17,7 +17,7 @@ fn status_callback_retry_schedule() -> RetrySchedule {
     }
 }
 
-fn to_attempt_outcome(callback_result: &StatusCallbackResult) -> AttemptOutcome {
+fn to_attempt_outcome(callback_result: &HttpCallResult) -> AttemptOutcome {
     match &callback_result.response {
         Some(response) => AttemptOutcome::Answered {
             status_code: response.status_code,
@@ -41,7 +41,7 @@ fn describe_decision(attempt_decision: AttemptDecision) -> (&'static str, Option
 fn build_sent_result(
     operation_context: &OperationContext,
     attempt: u32,
-    callback_result: StatusCallbackResult,
+    callback_result: HttpCallResult,
 ) -> CallbackAttemptResult {
     let attempt_decision = status_callback_retry_schedule().decide_after_attempt(
         attempt,

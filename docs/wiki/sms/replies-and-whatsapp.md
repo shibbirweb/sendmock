@@ -24,6 +24,35 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 3. If that call fails, the **fallback URL** is tried.
 4. A number without an inbound URL sends the message to **rules only** ([Webhooks > Rules](../webhooks/rules.md) on `sms.inbound`). With both set, both receive it.
 
+## What your app receives
+
+In Twilio's format (the default), the same "A message comes in" request Twilio sends, so the handler you run in production works unchanged:
+
+- `POST` as `application/x-www-form-urlencoded`, or `GET` with the fields in the query string when the number's method is `GET`. A Messaging Service always uses `POST`.
+- Fields: `MessageSid`, `SmsSid`, `SmsMessageSid`, `AccountSid`, `MessagingServiceSid` (when the number is in a service), `From`, `To`, `Body`, `NumMedia`, `NumSegments`, `SmsStatus`, `ApiVersion`, plus `MediaUrl{N}` and `MediaContentType{N}` for each file (links to SendMock's copy) and `ProfileName` and `WaId` on WhatsApp.
+- Headers: `X-Twilio-Signature` (signed with the auth token in **Settings > SMS providers > Twilio**), `I-Twilio-Idempotency-Token` and `User-Agent: TwilioProxy/1.1`.
+
+## What your app can answer
+
+Answer with TwiML as `text/xml` or `application/xml`:
+
+```xml
+<Response>
+  <Message statusCallback="/sms/status">Thanks, your booking is confirmed.</Message>
+</Response>
+```
+
+| TwiML | What happens |
+| --- | --- |
+| `<Message>` with text, or `<Body>` and `<Media>` | a reply in the same conversation, from the number that was texted to the contact, delivered like any sent message |
+| `to` and `from` | send the reply to or from another number |
+| `statusCallback` | status callbacks for the reply, in Twilio's format |
+| `action` (and `method`) | called once the reply is sent, with `MessageStatus`; its TwiML replaces the verbs left in the document |
+| `<Redirect>` (and `method`) | fetches TwiML from another URL; the verbs after it are skipped |
+| an empty `<Response/>`, an empty body or `204` | no reply |
+
+Several `<Message>` verbs send several replies, in order. URLs can be relative to the URL that answered. One incoming message makes at most 10 TwiML requests, redirects and actions included, so two handlers that redirect to each other stop.
+
 ## The result, on screen
 
 - Under the incoming bubble: "Reply webhook 200", "Reply webhook 200, 1 TwiML reply", "Reply webhook failed: 11205 HTTP connection failure", "Fallback 200 after 11205", or "Rules only".

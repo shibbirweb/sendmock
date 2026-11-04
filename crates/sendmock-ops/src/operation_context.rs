@@ -13,8 +13,8 @@ use sendmock_store::{
 };
 
 use crate::{
-    AppSettingsStore, EventBus, InstanceDetails, MediaFetcher, SampleEmailSender,
-    StatusCallbackSender, UpdateChecker, WebhookSender,
+    AppSettingsStore, EventBus, InstanceDetails, MediaFetcher, ReplyWebhookSender,
+    SampleEmailSender, StatusCallbackSender, UpdateChecker, WebhookSender,
 };
 
 /// The dependencies operations run with, passed in rather than reached through globals.
@@ -66,6 +66,8 @@ pub struct OperationContext {
     pub media_fetcher: Option<Arc<dyn MediaFetcher>>,
     /// Calls status callback URLs; set by the binary, which owns the HTTP client.
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
+    /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
+    pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
 }
 
 impl OperationContext {
@@ -124,6 +126,7 @@ impl OperationContext {
             update_checker: UpdateChecker::default(),
             media_fetcher: None,
             status_callback_sender: None,
+            reply_webhook_sender: None,
         }
     }
 
@@ -137,6 +140,14 @@ impl OperationContext {
         status_callback_sender: Arc<dyn StatusCallbackSender>,
     ) -> Self {
         self.status_callback_sender = Some(status_callback_sender);
+        self
+    }
+
+    pub fn with_reply_webhook_sender(
+        mut self,
+        reply_webhook_sender: Arc<dyn ReplyWebhookSender>,
+    ) -> Self {
+        self.reply_webhook_sender = Some(reply_webhook_sender);
         self
     }
 

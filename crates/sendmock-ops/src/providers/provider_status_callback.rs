@@ -1,13 +1,14 @@
-use std::collections::BTreeMap;
-
-use sendmock_core::{StandardTemplateFunctions, TemplateEscape, format_rfc3339, render_template};
+use sendmock_core::format_rfc3339;
 use sendmock_store::{SmsRecord, SmsStatusChangeRecord};
-use serde_json::{Map, Value, json};
+use serde_json::{Value, json};
 
-use super::builtin_webhook_templates::{WebhookTemplateDefinition, find_builtin_webhook_template};
-use super::callback_template_functions::CallbackTemplateFunctions;
+use super::builtin_webhook_templates::find_builtin_webhook_template;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::provider_runtime::load_sms_provider_definitions;
+use super::provider_webhook_request::{
+    ProviderWebhookTarget, build_callback_template_functions, collect_provider_credential_vars,
+    render_provider_webhook_request,
+};
 use crate::sms::RecordedHttpRequest;
 use crate::{OperationContext, OperationError};
 
@@ -47,71 +48,19 @@ pub async fn render_provider_status_callback(
     {
         return Ok(ProviderCallback::NotReported);
     }
-    let template_functions = CallbackTemplateFunctions {
-        standard_functions: StandardTemplateFunctions::new(
-            operation_context.clock.clone(),
-            operation_context.random_source.clone(),
-        ),
-    };
+    let template_functions = build_callback_template_functions(operation_context);
     let mut template_context = json!({
         "event": { "type": "sms.status", "created_at": format_rfc3339(status_change.at_unix_ms) },
         "data": describe_status_change(provider, sms, status_change),
         "vars": collect_template_vars(provider, sms),
         "endpoint": { "url": callback_url },
     });
-    Ok(ProviderCallback::Rendered(render_callback_request(
+    Ok(ProviderCallback::Rendered(render_provider_webhook_request(
         &callback_template,
-        callback_url,
+        &ProviderWebhookTarget::to_url(callback_url),
         &mut template_context,
         &template_functions,
     )))
-}
-
-fn render_callback_request(
-    callback_template: &WebhookTemplateDefinition,
-    callback_url: &str,
-    template_context: &mut Value,
-    template_functions: &CallbackTemplateFunctions,
-) -> RecordedHttpRequest {
-    let is_json = callback_template.content_type.contains("json");
-    let body_escape = if is_json {
-        TemplateEscape::JsonString
-    } else {
-        TemplateEscape::None
-    };
-    let body = render_template(
-        &callback_template.body_template,
-        template_context,
-        template_functions,
-        body_escape,
-    )
-    .text;
-    if !is_json {
-        template_context["body_fields"] = read_form_fields(&body);
-    }
-    let mut headers = BTreeMap::from([
-        (
-            "Content-Type".to_owned(),
-            callback_template.content_type.clone(),
-        ),
-        ("User-Agent".to_owned(), "SendMock".to_owned()),
-    ]);
-    for (header_name, header_template) in &callback_template.header_templates {
-        let header_value = render_template(
-            header_template,
-            template_context,
-            template_functions,
-            TemplateEscape::None,
-        )
-        .text;
-        headers.insert(header_name.clone(), header_value);
-    }
-    RecordedHttpRequest {
-        method: callback_template.method.clone(),
-        url: callback_url.to_owned(),
-        headers,
-        body,
-    }
 }
 
 /// The event data callback templates read, with the provider's names for the status and the
@@ -140,16 +89,7 @@ fn describe_status_change(
 }
 
 fn collect_template_vars(provider: &MessageProviderDefinition, sms: &SmsRecord) -> Value {
-    let mut template_vars: Map<String, Value> = provider
-        .credentials
-        .iter()
-        .map(|credential| {
-            (
-                format!("{}_{}", provider.key, credential.name),
-                Value::from(credential.value.clone()),
-            )
-        })
-        .collect();
+    let mut template_vars = collect_provider_credential_vars(std::slice::from_ref(provider));
     if let Some(account) = &sms.account {
         template_vars.insert(
             format!("{}_account_sid", provider.key),
@@ -157,13 +97,4 @@ fn collect_template_vars(provider: &MessageProviderDefinition, sms: &SmsRecord) 
         );
     }
     Value::Object(template_vars)
-}
-
-fn read_form_fields(form_body: &str) -> Value {
-    let pairs: Vec<(String, String)> = serde_urlencoded::from_str(form_body).unwrap_or_default();
-    let mut form_fields = Map::new();
-    for (field_name, field_value) in pairs {
-        form_fields.insert(field_name, Value::from(field_value));
-    }
-    Value::Object(form_fields)
 }

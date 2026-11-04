@@ -51,11 +51,11 @@
       },
       "From": {
         "type": "string",
-        "pattern": "^\\+[1-9][0-9]{6,14}$"
+        "pattern": "^(whatsapp:)?\\+[1-9][0-9]{6,14}$"
       },
       "To": {
         "type": "string",
-        "pattern": "^\\+[1-9][0-9]{6,14}$"
+        "pattern": "^(whatsapp:)?\\+[1-9][0-9]{6,14}$"
       },
       "Body": {
         "type": "string",
@@ -98,6 +98,13 @@
       },
       "ToCountry": {
         "type": "string"
+      },
+      "ProfileName": {
+        "type": "string"
+      },
+      "WaId": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{6,14}$"
       }
     },
     "patternProperties": {

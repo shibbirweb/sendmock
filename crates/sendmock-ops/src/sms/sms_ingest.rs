@@ -23,6 +23,8 @@ pub struct IncomingSms {
     pub request_body_json: Option<String>,
     /// The provider's id format; `None` uses the message id.
     pub provider_id: Option<String>,
+    /// For a TwiML reply: the inbound message it answers.
+    pub in_reply_to_sms_id: Option<String>,
     pub media: AcceptedMedia,
 }
 
@@ -143,7 +145,7 @@ fn build_sms_record(
         opened_at_unix_ms: None,
         open_count: 0,
         is_read: !incoming_sms.is_inbound,
-        in_reply_to_sms_id: None,
+        in_reply_to_sms_id: incoming_sms.in_reply_to_sms_id,
         created_at_unix_ms: now_unix_ms,
         updated_at_unix_ms: now_unix_ms,
         media: incoming_sms.media.media,

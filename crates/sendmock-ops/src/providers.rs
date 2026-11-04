@@ -9,6 +9,7 @@ mod provider_catalog;
 mod provider_http;
 mod provider_runtime;
 mod provider_status_callback;
+mod provider_webhook_request;
 mod read_operation_kinds;
 mod request_checks;
 mod request_reader;
@@ -20,6 +21,7 @@ mod twilio_verify_services;
 mod twilio_verify_verifications;
 
 pub use builtin_providers::builtin_sms_providers;
+pub(crate) use builtin_webhook_templates::find_builtin_webhook_template;
 pub use callback_template_functions::sign_twilio_request;
 pub use message_provider_definition::{
     MessageProviderDefinition, ProviderCredential, ProviderErrorResponse, ProviderFieldMapping,
@@ -37,5 +39,9 @@ pub use provider_runtime::{
     ProviderOutcome, answer_provider_request, load_sms_provider_definitions,
 };
 pub use provider_status_callback::{ProviderCallback, render_provider_status_callback};
+pub(crate) use provider_webhook_request::{
+    ProviderWebhookTarget, build_callback_template_functions, collect_provider_credential_vars,
+    render_provider_webhook_request,
+};
 pub(crate) use request_checks::{ProviderFailure, find_rule_failure, has_valid_credentials};
 pub(crate) use request_reader::read_request_fields;

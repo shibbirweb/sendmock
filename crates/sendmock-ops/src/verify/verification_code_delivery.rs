@@ -77,6 +77,7 @@ async fn deliver_by_sms(
             account: None,
             metadata_json: None,
             request_body_json: None,
+            in_reply_to_sms_id: None,
             provider_id: None,
             media: Default::default(),
         },

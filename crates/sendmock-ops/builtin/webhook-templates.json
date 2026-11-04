@@ -11,9 +11,11 @@
     "method": "POST",
     "content_type": "application/x-www-form-urlencoded",
     "header_templates": {
-      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
+      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
+      "I-Twilio-Idempotency-Token": "{{ uuid() }}",
+      "User-Agent": "TwilioProxy/1.1"
     },
-    "body_template": "SmsMessageSid={{ data.provider_id }}&NumMedia=0&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&NumSegments={{ data.segments | default(\"1\") }}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01",
+    "body_template": "{% if data.channel == \"whatsapp\" %}ProfileName=WhatsApp%20user&WaId={{ data.from_number | replace(\"+\", \"\") }}&{% endif %}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}{% for media_item in data.media %}&MediaContentType{{ loop.index0 }}={{ media_item.content_type | urlencode }}&MediaUrl{{ loop.index0 }}={{ sendmock.http_url | urlencode }}{{ media_item.url | urlencode }}{% endfor %}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={% if data.channel == \"whatsapp\" %}whatsapp%3A{% endif %}{{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&NumSegments={{ data.segments | default(\"1\") }}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={% if data.channel == \"whatsapp\" %}whatsapp%3A{% endif %}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01",
     "doc_url": "https://www.twilio.com/docs/messaging/guides/webhook-request",
     "verified_on": "2026-11-05"
   },

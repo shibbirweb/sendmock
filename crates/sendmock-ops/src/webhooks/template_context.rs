@@ -36,11 +36,13 @@ fn build_sample_sms_data() -> Value {
     json!({
         "id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E",
         "provider_id": "SM00000000000000000000000000000001",
+        "channel": "sms",
         "from_number": "+15550001111",
         "to_number": "+14155550100",
         "body": "Your Acme code is 482913",
         "encoding": "GSM-7",
         "segments": 1,
+        "media": [],
         "status": "delivered",
         "error_code": null,
         "messaging_service_sid": null,

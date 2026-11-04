@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker/locale/en";
 
 import { resolveTemplateConditions } from "@/mocks/webhooks/render-template-conditions";
+import { resolveTemplateLoops } from "@/mocks/webhooks/render-template-loops";
 import { argumentFilters } from "@/mocks/webhooks/template-argument-filters";
 
 /** Values a template can read: `event`, `data`, `vars`, `endpoint`, ... */
@@ -140,6 +141,10 @@ function stripEmailPrefix(eventType: string): string {
 const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
   json: (filterInput) => JSON.stringify(filterInput, null, 2),
   urlencode: (filterInput) => encodeURIComponent(String(filterInput)),
+  length: (filterInput) =>
+    Array.isArray(filterInput) || typeof filterInput === "string"
+      ? filterInput.length
+      : Object.keys(filterInput ?? {}).length,
   lower: (filterInput) => String(filterInput).toLowerCase(),
   upper: (filterInput) => String(filterInput).toUpperCase(),
   sendgrid_event: (filterInput) => stripEmailPrefix(String(filterInput)),
@@ -297,7 +302,7 @@ function evaluateExpression(
 }
 
 /**
- * Renders `{% if %}` blocks, then `{{ ... }}` expressions leniently, as the preview does: an
+ * Renders `{% for %}` and `{% if %}` blocks, then `{{ ... }}` expressions leniently, as the preview does: an
  * undefined value renders empty and is reported as a warning (WH-08.4);
  * unknown names and unbalanced braces are errors (WH-09.7).
  * A small stand-in for the backend's template engine.
@@ -306,12 +311,13 @@ export function renderTemplateText(
   conditionalTemplateText: string,
   templateContext: TemplateContext,
 ): RenderOutcome {
+  const readContextValue = (pathText: string) => {
+    const contextValue = readPath(templateContext, pathText);
+    return contextValue === missingValue ? undefined : contextValue;
+  };
   const templateText = resolveTemplateConditions(
-    conditionalTemplateText,
-    (pathText) => {
-      const conditionValue = readPath(templateContext, pathText);
-      return conditionValue === missingValue ? undefined : conditionValue;
-    },
+    resolveTemplateLoops(conditionalTemplateText, readContextValue),
+    readContextValue,
   );
   const renderProblems: RenderProblems = {
     warnings: [],

@@ -14,8 +14,8 @@ use tokio::sync::watch;
 use tokio::task::JoinSet;
 
 use crate::config::ServerConfig;
+use crate::http_call_sender::{HttpCallSender, REPLY_WEBHOOK_TIMEOUT, STATUS_CALLBACK_TIMEOUT};
 use crate::http_media_fetcher::HttpMediaFetcher;
-use crate::http_status_callback_sender::HttpStatusCallbackSender;
 use crate::http_webhook_sender::HttpWebhookSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
@@ -193,9 +193,15 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),
         None => operation_context,
     };
-    let operation_context = match HttpStatusCallbackSender::new() {
+    let operation_context = match HttpCallSender::new(STATUS_CALLBACK_TIMEOUT) {
         Some(callback_sender) => {
             operation_context.with_status_callback_sender(Arc::new(callback_sender))
+        }
+        None => operation_context,
+    };
+    let operation_context = match HttpCallSender::new(REPLY_WEBHOOK_TIMEOUT) {
+        Some(reply_webhook_sender) => {
+            operation_context.with_reply_webhook_sender(Arc::new(reply_webhook_sender))
         }
         None => operation_context,
     };

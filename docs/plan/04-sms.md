@@ -250,11 +250,11 @@ SendMock reads the response body as TwiML when it is `text/xml` or `application/
 | `<Message>` text, or `<Body>` and `<Media>` children | stored as an outbound reply in the same thread, linked to the inbound message (`in_reply_to_sms_id`), sent through the normal delivery simulation |
 | `to` and `from` attributes | override the reply's recipient and sender (default: back to the sender, from the number that was texted) |
 | `statusCallback` | status callbacks for the reply, as for any sent message |
-| `action` and `method` | called once the reply is sent, with `MessageStatus`; its TwiML response is processed the same way |
-| `<Redirect>` | fetches TwiML from another URL and processes it |
+| `action` and `method` | called once the reply is sent (`method` defaults to `POST`) with the inbound fields, the reply's SID as `MessageSid` and `SmsSid`, `MessageStatus` (`sent` once delivered, `failed`) and `ErrorCode` when it failed; its TwiML replaces the verbs left in the document, as Twilio documents |
+| `<Redirect>` and `method` | fetches TwiML from another URL with the inbound fields (`method` defaults to `POST`); the verbs after it are skipped |
 | empty `<Response/>` or `204` | no reply, success |
 
-Several `<Message>` verbs create several replies, in order. To stop loops, one inbound message can trigger at most 10 TwiML fetches (redirects and actions included).
+Several `<Message>` verbs create several replies, in order. URLs in TwiML (`action`, `<Redirect>`, `<Media>`, `statusCallback`) may be relative to the URL whose TwiML holds them. To stop loops, one inbound message can trigger at most 10 TwiML fetches (redirects and actions included).
 
 ### Errors
 
