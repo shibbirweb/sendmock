@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use schemars::JsonSchema;
+use sendmock_sms::outcome_name_for_error_code;
 use serde::{Deserialize, Serialize};
 
 /// An email or SMS provider as data: the requests it answers, how it reads them and what it
@@ -127,5 +128,14 @@ impl MessageProviderDefinition {
         self.status_names
             .get(sendmock_status)
             .map_or(sendmock_status, String::as_str)
+    }
+
+    /// The provider's code for a SendMock error code (Twilio's codes), through the outcome the
+    /// code stands for; the code itself when the provider maps none.
+    pub fn provider_error_code(&self, sendmock_error_code: &str) -> String {
+        outcome_name_for_error_code(sendmock_error_code)
+            .and_then(|outcome_name| self.outcome_error_codes.get(outcome_name))
+            .cloned()
+            .unwrap_or_else(|| sendmock_error_code.to_owned())
     }
 }

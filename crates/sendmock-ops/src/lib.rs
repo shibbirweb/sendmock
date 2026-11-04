@@ -85,7 +85,8 @@ pub use sms::{
     FetchedMedia, IncomingSms, MediaFetcher, RecordedHttpRequest, RecordedHttpResponse, SmsMessage,
     SmsMessageDetail, SmsThread, StatusCallbackResult, StatusCallbackSender, apply_status_change,
     decide_outbound_send, describe_rejection, describe_sms_code, find_newest_sms_with_code,
-    load_custom_outcome_rules, start_sms_delivery, store_sms, to_simulation_profile,
+    load_custom_outcome_rules, run_due_status_callbacks, run_status_callback_dispatcher,
+    start_sms_delivery, store_sms, to_simulation_profile,
 };
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{

@@ -13,9 +13,9 @@
     "header_templates": {
       "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
     },
-    "body_template": "MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&Body={{ data.body | urlencode }}&NumMedia=0",
+    "body_template": "SmsMessageSid={{ data.provider_id }}&NumMedia=0&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&NumSegments={{ data.segments | default(\"1\") }}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01",
     "doc_url": "https://www.twilio.com/docs/messaging/guides/webhook-request",
-    "verified_on": "2026-09-30"
+    "verified_on": "2026-11-05"
   },
   "twilio.status_callback": {
     "method": "POST",
@@ -23,25 +23,25 @@
     "header_templates": {
       "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
     },
-    "body_template": "MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&MessageStatus={{ data.status }}&ErrorCode={{ data.error_code | default(\"\") }}",
+    "body_template": "SmsSid={{ data.provider_id }}&SmsStatus={{ data.status }}&MessageStatus={{ data.status }}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}",
     "doc_url": "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
-    "verified_on": "2026-09-30"
+    "verified_on": "2026-11-05"
   },
   "vonage.inbound": {
     "method": "POST",
     "content_type": "application/json",
     "header_templates": {},
-    "body_template": "{\n  \"msisdn\": \"{{ data.from_number }}\",\n  \"to\": \"{{ data.to_number }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"text\": \"{{ data.body }}\",\n  \"type\": \"text\"\n}",
+    "body_template": "{\n  \"msisdn\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n  \"to\": \"{{ data.to_number | replace(\"+\", \"\") }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"text\": \"{{ data.body }}\",\n  \"type\": \"{% if data.encoding == \"UCS-2\" %}unicode{% else %}text{% endif %}\",\n  \"keyword\": \"{{ data.body | regex_extract(\"^[^ ]+\") | upper }}\",\n  \"api-key\": \"{{ vars.vonage_api_key | default(\"vonage-key\") }}\",\n  \"message-timestamp\": \"{{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") }}\"\n}",
     "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/inbound-sms",
-    "verified_on": "2026-09-30"
+    "verified_on": "2026-11-05"
   },
   "vonage.dlr": {
     "method": "POST",
     "content_type": "application/json",
     "header_templates": {},
-    "body_template": "{\n  \"msisdn\": \"{{ data.to_number }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"status\": \"{{ data.status }}\",\n  \"err-code\": \"{{ data.error_code | default(\"0\") }}\"\n}",
+    "body_template": "{\n  \"msisdn\": \"{{ data.to_number | replace(\"+\", \"\") }}\",\n  \"to\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n  \"network-code\": \"23410\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"price\": \"0.03330000\",\n  \"status\": \"{{ data.status }}\",\n  \"scts\": \"{{ event.created_at | date(\"%y%m%d%H%M\") }}\",\n  \"err-code\": \"{{ data.error_code | default(\"0\") }}\",\n  \"api-key\": \"{{ vars.vonage_api_key | default(\"vonage-key\") }}\",\n  \"message-timestamp\": \"{{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") }}\"\n}",
     "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts",
-    "verified_on": "2026-09-30"
+    "verified_on": "2026-11-05"
   },
   "plivo.inbound": {
     "method": "POST",

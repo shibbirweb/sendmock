@@ -1,4 +1,4 @@
-use sendmock_sms::{SendDecision, describe_error_code, outcome_name_for_error_code};
+use sendmock_sms::{SendDecision, describe_error_code};
 use sendmock_store::SmsRecord;
 
 use super::messaging_service_sender::pick_pool_sender;
@@ -165,10 +165,7 @@ fn describe_rejection(
     error_code: &str,
     reason: &str,
 ) -> ProviderFailure {
-    let provider_code = outcome_name_for_error_code(error_code)
-        .and_then(|outcome_name| provider_call.provider.outcome_error_codes.get(outcome_name))
-        .cloned()
-        .unwrap_or_else(|| error_code.to_owned());
+    let provider_code = provider_call.provider.provider_error_code(error_code);
     let provider_message = describe_error_code(error_code)
         .map_or_else(|| format!("Rejected by {reason}"), str::to_owned);
     ProviderFailure {

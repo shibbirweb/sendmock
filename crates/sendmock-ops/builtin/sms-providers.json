@@ -301,7 +301,12 @@
         "is_secret": true
       }
     ],
-    "outcome_error_codes": {},
+    "outcome_error_codes": {
+      "unreachable_handset": "2",
+      "landline": "12",
+      "carrier_filtered": "6",
+      "unknown_error": "1"
+    },
     "is_builtin": true,
     "is_removed": false,
     "key": "vonage",

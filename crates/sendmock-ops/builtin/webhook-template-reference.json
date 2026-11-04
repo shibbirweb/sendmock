@@ -136,6 +136,24 @@
       "example": "{{ vars.tenant_id | upper }}"
     },
     {
+      "name": "replace",
+      "signature": "replace(old, new)",
+      "description": "Replaces every occurrence of old with new.",
+      "example": "{{ data.to_number | replace(\"+\", \"\") }}"
+    },
+    {
+      "name": "regex_extract",
+      "signature": "regex_extract(pattern)",
+      "description": "The first match of the regular expression, or empty.",
+      "example": "{{ data.body | regex_extract(\"[0-9]{6}\") }}"
+    },
+    {
+      "name": "date",
+      "signature": "date(format)",
+      "description": "Formats a time with strftime codes, in UTC.",
+      "example": "{{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") }}"
+    },
+    {
       "name": "sendgrid_event",
       "signature": "sendgrid_event",
       "description": "An event type as SendGrid names it: email.bounced becomes bounced.",

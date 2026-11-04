@@ -22,7 +22,7 @@ Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, group
 | Gets from | Sends to |
 | --- | --- |
 | your app over `POST /api/v1/sms`, the Twilio Messages API or the Vonage SMS API | `sms.sent`, `sms.status`, `sms.opened` and `sms.inbound` events to [Webhooks > Rules](../webhooks/rules.md) |
-| [Settings > SMS](../settings.md#sms): profile, failure rate, magic and custom outcome numbers | each message's status callback, logged in [Deliveries](../webhooks/deliveries.md) |
+| [Settings > SMS](../settings.md#sms): profile, failure rate, magic and custom outcome numbers | each message's status callback, with every attempt in **Message details** |
 | replies you type in a conversation | the number's reply webhook, set in [Numbers](../numbers.md), and TwiML answers back into the conversation |
 | [Verify](./verify.md): codes go out as SMS | the API request to [Logs > API requests](../logs.md) |
 | [Settings > OTP patterns](../settings.md#otp-patterns) | **Send to webhook**: one message to any endpoint, by hand |

@@ -27,7 +27,10 @@ pub async fn load_sms_detail(
 ) -> Result<SmsMessageDetail, OperationError> {
     let sms_repository = &operation_context.sms_repository;
     let status_history = sms_repository.list_status_history(&sms.sms_id).await?;
-    let callback_attempts = sms_repository.list_callback_attempts(&sms.sms_id).await?;
+    let callback_attempts = operation_context
+        .sms_callback_attempt_repository
+        .list_sent_attempts(&sms.sms_id)
+        .await?;
     Ok(SmsMessageDetail {
         message: SmsMessage::from(&sms),
         status_history: status_history

@@ -6,8 +6,7 @@ use rusqlite::{OptionalExtension, params};
 use super::sms_reader;
 use super::sms_row_mapping::{SMS_COLUMNS, attach_media, insert_sms_row, read_sms_row};
 use super::{
-    NewSmsRecord, SmsCallbackAttemptRecord, SmsListFilter, SmsPage, SmsRecord,
-    SmsStatusChangeRecord, SmsThreadRecord,
+    NewSmsRecord, SmsListFilter, SmsPage, SmsRecord, SmsStatusChangeRecord, SmsThreadRecord,
 };
 use crate::{Database, StoreError};
 
@@ -170,64 +169,6 @@ impl SmsRepository {
             return Ok(None);
         }
         self.find_message(&changed_id).await
-    }
-
-    pub async fn add_callback_attempt(
-        &self,
-        callback_attempt: SmsCallbackAttemptRecord,
-    ) -> Result<(), StoreError> {
-        self.database
-            .write(move |connection| {
-                connection.execute(
-                    "INSERT INTO sms_callback_attempts (id, sms_id, reported_status, attempt, request, response, duration_ms, error_message, created_at) \
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
-                    params![
-                        callback_attempt.attempt_id,
-                        callback_attempt.sms_id,
-                        callback_attempt.reported_status,
-                        callback_attempt.attempt,
-                        callback_attempt.request_json,
-                        callback_attempt.response_json,
-                        callback_attempt.duration_ms.map(|duration_ms| i64::try_from(duration_ms).unwrap_or(i64::MAX)),
-                        callback_attempt.error_message,
-                        callback_attempt.created_at_unix_ms,
-                    ],
-                )?;
-                Ok(())
-            })
-            .await
-    }
-
-    pub async fn list_callback_attempts(
-        &self,
-        sms_id: &str,
-    ) -> Result<Vec<SmsCallbackAttemptRecord>, StoreError> {
-        let sms_id = sms_id.to_owned();
-        self.database
-            .read(move |connection| {
-                let mut statement = connection.prepare(
-                    "SELECT id, sms_id, reported_status, attempt, request, response, duration_ms, error_message, created_at \
-                     FROM sms_callback_attempts WHERE sms_id = ?1 ORDER BY created_at, id",
-                )?;
-                let attempts = statement
-                    .query_map([sms_id], |row| {
-                        let duration_ms: Option<i64> = row.get(6)?;
-                        Ok(SmsCallbackAttemptRecord {
-                            attempt_id: row.get(0)?,
-                            sms_id: row.get(1)?,
-                            reported_status: row.get(2)?,
-                            attempt: row.get(3)?,
-                            request_json: row.get(4)?,
-                            response_json: row.get(5)?,
-                            duration_ms: duration_ms.map(|duration_ms| u64::try_from(duration_ms).unwrap_or_default()),
-                            error_message: row.get(7)?,
-                            created_at_unix_ms: row.get(8)?,
-                        })
-                    })?
-                    .collect::<rusqlite::Result<Vec<_>>>()?;
-                Ok(attempts)
-            })
-            .await
     }
 
     pub async fn read_media_content(

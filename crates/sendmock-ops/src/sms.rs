@@ -12,6 +12,8 @@ mod sms_send_decision;
 mod sms_send_operations;
 mod sms_views;
 mod status_callback;
+mod status_callback_attempt;
+mod status_callback_dispatch;
 mod status_callback_sender;
 
 pub use media_fetcher::{FetchedMedia, MediaFetcher};
@@ -33,6 +35,7 @@ pub use sms_send_decision::{
 };
 pub use sms_send_operations::{SendSmsOperation, SimulateInboundSmsOperation};
 pub use sms_views::{RecordedHttpRequest, RecordedHttpResponse, SmsMessage, SmsThread};
+pub use status_callback_dispatch::{run_due_status_callbacks, run_status_callback_dispatcher};
 pub use status_callback_sender::{StatusCallbackResult, StatusCallbackSender};
 
 use crate::OperationRegistry;

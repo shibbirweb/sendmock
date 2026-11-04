@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Mutex;
@@ -9,13 +9,44 @@ use sendmock_ops::{
 };
 use serde_json::Value;
 
-/// Records every callback and answers 204, so tests see what a handler would receive.
+/// Records every callback and answers 204, or the scripted answers in order, so tests see
+/// what a handler would receive. A `None` answer is a refused connection.
 #[derive(Default)]
 pub struct RecordingCallbackSender {
     received_requests: Mutex<Vec<RecordedHttpRequest>>,
+    scripted_answers: Mutex<VecDeque<Option<u16>>>,
+}
+
+fn answer_with(scripted_answer: Option<u16>) -> StatusCallbackResult {
+    match scripted_answer {
+        Some(status_code) => StatusCallbackResult {
+            response: Some(RecordedHttpResponse {
+                status_code,
+                headers: BTreeMap::new(),
+                body: String::new(),
+                is_body_truncated: false,
+            }),
+            error_message: (status_code >= 400)
+                .then(|| format!("Your handler answered {status_code}")),
+            duration_ms: 3,
+        },
+        None => StatusCallbackResult {
+            response: None,
+            error_message: Some("connection refused".to_owned()),
+            duration_ms: 1,
+        },
+    }
 }
 
 impl RecordingCallbackSender {
+    /// Answers with these first, then 204 for every later callback.
+    pub fn answering(scripted_answers: impl IntoIterator<Item = Option<u16>>) -> Self {
+        Self {
+            received_requests: Mutex::default(),
+            scripted_answers: Mutex::new(scripted_answers.into_iter().collect()),
+        }
+    }
+
     pub fn received_statuses(&self) -> Vec<String> {
         self.received_requests
             .lock()
@@ -45,16 +76,13 @@ impl StatusCallbackSender for RecordingCallbackSender {
             if let Ok(mut received_requests) = self.received_requests.lock() {
                 received_requests.push(callback_request.clone());
             }
-            StatusCallbackResult {
-                response: Some(RecordedHttpResponse {
-                    status_code: 204,
-                    headers: BTreeMap::new(),
-                    body: String::new(),
-                    is_body_truncated: false,
-                }),
-                error_message: None,
-                duration_ms: 3,
-            }
+            let scripted_answer = self
+                .scripted_answers
+                .lock()
+                .ok()
+                .and_then(|mut scripted_answers| scripted_answers.pop_front())
+                .unwrap_or(Some(204));
+            answer_with(scripted_answer)
         })
     }
 }

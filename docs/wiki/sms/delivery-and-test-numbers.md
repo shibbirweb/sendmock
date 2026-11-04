@@ -16,7 +16,7 @@ description: How SMS move from queued to delivered or failed, Twilio's official 
 Outbound messages move through **queued**, **sent** and **delivered**, or end **undelivered** or **failed** with an error code. Each change:
 
 1. is added to the message's status history (in **Message details**);
-2. calls the message's status callback (`StatusCallback` on Twilio, or `status_callback` on the native API) in the provider's format, logged as a delivery;
+2. calls the message's status callback (`StatusCallback` on Twilio, or `status_callback` on the native API) in the provider's format, with every attempt listed in **Message details**. A callback that fails with a `5xx`, a timeout or a connection error is sent again with the same request and signature: 5 attempts in total, after 1 s, 5 s, 30 s, 2 min and 10 min. A `4xx` is not retried;
 3. fires `sms.status` for your [rules](../webhooks/rules.md).
 
 How fast, and whether it fails, is set in [Settings > SMS](../settings.md#sms):

@@ -78,8 +78,11 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
         from_number: "+15550001111",
         to_number: "+14155550100",
         body: "Your Acme code is 482913",
+        encoding: "GSM-7",
+        segments: 1,
         status: "delivered",
         error_code: null,
+        messaging_service_sid: null,
         extracted: { otp: ["482913"], links: [] },
       },
     };

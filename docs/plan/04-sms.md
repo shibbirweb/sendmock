@@ -200,7 +200,7 @@ Each status change:
 
 - Appends to `sms_status_history`.
 - Publishes `sms.status` on the bus.
-- Calls the per-message status callback (if provided) in the provider's format, and also flows through webhook rules.
+- Calls the per-message status callback (if provided) in the provider's format, and also flows through webhook rules. A callback that fails with a `5xx`, a timeout or a connection error is retried with the same request and signature, like a webhook (5 attempts in total, after 1s, 5s, 30s, 2m and 10m); a `4xx` is not retried. Every attempt shows in the message detail.
 
 ## Simulating inbound SMS
 

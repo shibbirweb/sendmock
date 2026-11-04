@@ -114,7 +114,8 @@ fn render_callback_request(
     }
 }
 
-/// The event data callback templates read, with the provider's names for the status.
+/// The event data callback templates read, with the provider's names for the status and the
+/// error code.
 fn describe_status_change(
     provider: &MessageProviderDefinition,
     sms: &SmsRecord,
@@ -127,9 +128,14 @@ fn describe_status_change(
         "to_number": sms.to_number,
         "body": sms.body,
         "status": provider.status_name(&status_change.status),
-        "error_code": status_change.error_code,
+        "error_code": status_change
+            .error_code
+            .as_deref()
+            .map(|error_code| provider.provider_error_code(error_code)),
         "channel": sms.channel,
+        "encoding": sms.encoding,
         "segments": sms.segments,
+        "messaging_service_sid": sms.messaging_service_sid,
     })
 }
 

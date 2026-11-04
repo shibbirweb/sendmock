@@ -1,5 +1,8 @@
 import { faker } from "@faker-js/faker/locale/en";
 
+import { resolveTemplateConditions } from "@/mocks/webhooks/render-template-conditions";
+import { argumentFilters } from "@/mocks/webhooks/template-argument-filters";
+
 /** Values a template can read: `event`, `data`, `vars`, `endpoint`, ... */
 export type TemplateContext = Record<string, unknown>;
 
@@ -152,6 +155,7 @@ const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
 export const supportedFunctionNames = Object.keys(templateFunctions);
 export const supportedFilterNames = [
   ...Object.keys(templateFilters),
+  ...Object.keys(argumentFilters),
   "default",
 ];
 
@@ -243,6 +247,25 @@ function evaluateExpression(
       continue;
     }
 
+    const argumentFilterMatch = /^([a-z_]+)\((.*)\)$/.exec(filterText);
+    const argumentFilter = argumentFilters[argumentFilterMatch?.[1] ?? ""];
+    if (argumentFilterMatch !== null && argumentFilter !== undefined) {
+      const filterArguments = splitTopLevel(argumentFilterMatch[2] ?? "", ",")
+        .map((argumentText) =>
+          evaluateOperand(argumentText.trim(), templateContext, renderProblems),
+        )
+        .map((argumentValue) =>
+          typeof argumentValue === "symbol" ? "" : String(argumentValue),
+        );
+      if (
+        currentValue !== missingValue &&
+        currentValue !== reportedMissingValue
+      ) {
+        currentValue = argumentFilter(currentValue, filterArguments);
+      }
+      continue;
+    }
+
     const templateFilter = templateFilters[filterText];
     if (templateFilter === undefined) {
       reportProblem(renderProblems, "error", `Unknown filter: ${filterText}`);
@@ -274,15 +297,22 @@ function evaluateExpression(
 }
 
 /**
- * Renders `{{ ... }}` expressions leniently, as the preview does: an
+ * Renders `{% if %}` blocks, then `{{ ... }}` expressions leniently, as the preview does: an
  * undefined value renders empty and is reported as a warning (WH-08.4);
  * unknown names and unbalanced braces are errors (WH-09.7).
  * A small stand-in for the backend's template engine.
  */
 export function renderTemplateText(
-  templateText: string,
+  conditionalTemplateText: string,
   templateContext: TemplateContext,
 ): RenderOutcome {
+  const templateText = resolveTemplateConditions(
+    conditionalTemplateText,
+    (pathText) => {
+      const conditionValue = readPath(templateContext, pathText);
+      return conditionValue === missingValue ? undefined : conditionValue;
+    },
+  );
   const renderProblems: RenderProblems = {
     warnings: [],
     errors: [],

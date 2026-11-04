@@ -5,10 +5,11 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
     EmailRepository, MessageProviderRepository, MessagingServiceRepository,
-    SavedWebhookDeliveryRepository, SettingsRepository, SmsOutcomeRuleRepository, SmsRepository,
-    SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
+    SavedWebhookDeliveryRepository, SettingsRepository, SmsCallbackAttemptRepository,
+    SmsOutcomeRuleRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
+    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
+    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
+    WebhookVariableRepository,
 };
 
 use crate::{
@@ -29,6 +30,8 @@ pub struct OperationContext {
     pub smtp_session_repository: SmtpSessionRepository,
     pub api_request_repository: ApiRequestRepository,
     pub sms_repository: SmsRepository,
+    /// Status callback attempts; the rows are also the callback retry queue.
+    pub sms_callback_attempt_repository: SmsCallbackAttemptRepository,
     pub sms_outcome_rule_repository: SmsOutcomeRuleRepository,
     pub virtual_number_repository: VirtualNumberRepository,
     pub messaging_service_repository: MessagingServiceRepository,
@@ -48,6 +51,8 @@ pub struct OperationContext {
     pub saved_webhook_delivery_repository: SavedWebhookDeliveryRepository,
     /// Wakes the webhook dispatcher when a delivery is queued.
     pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
+    /// Wakes the status callback dispatcher when a retry is scheduled.
+    pub status_callback_dispatch_signal: Arc<tokio::sync::Notify>,
     /// Sends webhook requests; set by the binary, which owns the HTTP client.
     pub webhook_sender: Option<Arc<dyn WebhookSender>>,
     /// Decides random SMS failures; tests pass a seeded one.
@@ -78,23 +83,21 @@ impl OperationContext {
             Arc::clone(&id_generator),
         );
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
-        let sms_repository = SmsRepository::new(Arc::clone(&database));
-        let sms_outcome_rule_repository = SmsOutcomeRuleRepository::new(Arc::clone(&database));
-        let virtual_number_repository = VirtualNumberRepository::new(Arc::clone(&database));
         let messaging_service_repository = MessagingServiceRepository::new(Arc::clone(&database));
-        let verify_service_repository = VerifyServiceRepository::new(Arc::clone(&database));
-        let verification_repository = VerificationRepository::new(Arc::clone(&database));
         let message_provider_repository = MessageProviderRepository::new(Arc::clone(&database));
         Self {
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(Arc::clone(&database)),
             smtp_session_repository: SmtpSessionRepository::new(Arc::clone(&database)),
             api_request_repository: ApiRequestRepository::new(Arc::clone(&database)),
-            sms_repository,
-            sms_outcome_rule_repository,
-            virtual_number_repository,
+            sms_repository: SmsRepository::new(Arc::clone(&database)),
+            sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(Arc::clone(
+                &database,
+            )),
+            sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(Arc::clone(&database)),
+            virtual_number_repository: VirtualNumberRepository::new(Arc::clone(&database)),
             messaging_service_repository,
-            verify_service_repository,
-            verification_repository,
+            verify_service_repository: VerifyServiceRepository::new(Arc::clone(&database)),
+            verification_repository: VerificationRepository::new(Arc::clone(&database)),
             message_provider_repository,
             activity_stats_repository: ActivityStatsRepository::new(Arc::clone(&database)),
             webhook_endpoint_repository: WebhookEndpointRepository::new(Arc::clone(&database)),
@@ -106,6 +109,7 @@ impl OperationContext {
                 &database,
             )),
             webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
+            status_callback_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
             database,

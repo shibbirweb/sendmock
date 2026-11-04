@@ -63,20 +63,6 @@ pub struct SmsStatusChangeRecord {
     pub at_unix_ms: i64,
 }
 
-/// One call to a message's status callback URL; request and response are JSON documents.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SmsCallbackAttemptRecord {
-    pub attempt_id: String,
-    pub sms_id: String,
-    pub reported_status: String,
-    pub attempt: u32,
-    pub request_json: String,
-    pub response_json: Option<String>,
-    pub duration_ms: Option<u64>,
-    pub error_message: Option<String>,
-    pub created_at_unix_ms: i64,
-}
-
 /// Which messages to list; every field narrows the list.
 #[derive(Debug, Clone, Default)]
 pub struct SmsListFilter {

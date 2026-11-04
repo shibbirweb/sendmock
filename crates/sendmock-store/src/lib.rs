@@ -13,6 +13,7 @@ mod outcome_rule;
 mod saved_webhook_delivery;
 mod settings;
 mod sms;
+mod sms_callback_attempt;
 mod smtp_session;
 mod store_error;
 mod verify;
@@ -46,8 +47,11 @@ pub use outcome_rule::{
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
-    NewSmsRecord, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord,
-    SmsPage, SmsRecord, SmsRepository, SmsStatusChangeRecord, SmsThreadRecord,
+    NewSmsRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord, SmsPage, SmsRecord,
+    SmsRepository, SmsStatusChangeRecord, SmsThreadRecord,
+};
+pub use sms_callback_attempt::{
+    CallbackAttemptResult, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository,
 };
 pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,

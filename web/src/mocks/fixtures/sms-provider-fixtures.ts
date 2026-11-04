@@ -256,6 +256,13 @@ function buildVonageProvider(): MessageProviderRecord {
       undelivered: "rejected",
       sent: "accepted",
     },
+    // A failed delivery receipt's err-code, from Vonage's DLR error code table.
+    outcome_error_codes: {
+      unreachable_handset: "2",
+      landline: "12",
+      carrier_filtered: "6",
+      unknown_error: "1",
+    },
   });
 }
 

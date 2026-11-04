@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use sendmock_store::{
     Database, DatabaseLocation, EMBEDDED_MIGRATIONS, MessageOpenRecord, NewSmsRecord,
-    OpenRecording, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaRecord, SmsRecord,
-    SmsRepository, SmsStatusChangeRecord, StoreError,
+    OpenRecording, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository, SmsListFilter,
+    SmsMediaRecord, SmsRecord, SmsRepository, SmsStatusChangeRecord, StoreError,
 };
 
 fn repository() -> Result<SmsRepository, StoreError> {
@@ -192,22 +192,29 @@ async fn lists_with_filters_and_groups_conversations() -> Result<(), StoreError>
 
 #[tokio::test]
 async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreError> {
-    let repository = repository()?;
+    let database = Arc::new(Database::open(
+        DatabaseLocation::InMemory,
+        EMBEDDED_MIGRATIONS,
+    )?);
+    let repository = SmsRepository::new(Arc::clone(&database));
+    let callback_attempt_repository = SmsCallbackAttemptRepository::new(database);
     for sms_id in ["01A", "01B", "01C"] {
         repository
             .insert_message(plain(sms(sms_id, "outbound", "Hi")))
             .await?;
     }
-    repository
-        .add_callback_attempt(SmsCallbackAttemptRecord {
+    callback_attempt_repository
+        .insert_attempt(SmsCallbackAttemptRecord {
             attempt_id: "01CB".to_owned(),
             sms_id: "01C".to_owned(),
             reported_status: "sent".to_owned(),
             attempt: 1,
+            status: "failed".to_owned(),
             request_json: "{}".to_owned(),
             response_json: None,
             duration_ms: Some(4),
             error_message: Some("connection refused".to_owned()),
+            next_attempt_at_unix_ms: None,
             created_at_unix_ms: 1_500,
         })
         .await?;
@@ -216,8 +223,20 @@ async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreEr
 
     assert_eq!(pruned_count, 1);
     assert_eq!(repository.find_message("01A").await?, None);
-    assert_eq!(repository.list_callback_attempts("01C").await?.len(), 1);
+    assert_eq!(
+        callback_attempt_repository
+            .list_sent_attempts("01C")
+            .await?
+            .len(),
+        1
+    );
     assert!(repository.delete_message("01C").await?);
+    assert!(
+        callback_attempt_repository
+            .list_sent_attempts("01C")
+            .await?
+            .is_empty()
+    );
     assert_eq!(repository.delete_all_messages().await?, 1);
     Ok(())
 }

@@ -13,6 +13,8 @@ export type TemplateDefinition = {
 const jsonType = "application/json";
 const formType = "application/x-www-form-urlencoded";
 const verifiedOn = "2026-09-30";
+/** The Twilio and Vonage SMS formats, checked again against the docs and Vonage's SDK types. */
+const smsFormatsVerifiedOn = "2026-11-05";
 
 const nativeDefinition: TemplateDefinition = {
   method: "POST",
@@ -27,7 +29,10 @@ const nativeDefinition: TemplateDefinition = {
   verified_on: null,
 };
 
-const twilioMessageFields = `MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default("AC00000000000000000000000000000000") }}&From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}`;
+const twilioAccountSid = `{{ vars.twilio_account_sid | default("AC00000000000000000000000000000000") }}`;
+const twilioMessagingService = `{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}`;
+const vonageApiKey = `{{ vars.vonage_api_key | default("vonage-key") }}`;
+const vonageTimestamp = `{{ event.created_at | date("%Y-%m-%d %H:%M:%S") }}`;
 
 /** Request shapes by template id; unknown ids fall back to native JSON. */
 export const templateDefinitions: Record<string, TemplateDefinition> = {
@@ -39,9 +44,9 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "X-Twilio-Signature":
         "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
     },
-    body_template: `${twilioMessageFields}&Body={{ data.body | urlencode }}&NumMedia=0`,
+    body_template: `SmsMessageSid={{ data.provider_id }}&NumMedia=0&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
     doc_url: "https://www.twilio.com/docs/messaging/guides/webhook-request",
-    verified_on: verifiedOn,
+    verified_on: smsFormatsVerifiedOn,
   },
   "twilio.status_callback": {
     method: "POST",
@@ -50,38 +55,47 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "X-Twilio-Signature":
         "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
     },
-    body_template: `${twilioMessageFields}&MessageStatus={{ data.status }}&ErrorCode={{ data.error_code | default("") }}`,
+    body_template: `SmsSid={{ data.provider_id }}&SmsStatus={{ data.status }}&MessageStatus={{ data.status }}&To={{ data.to_number | urlencode }}${twilioMessagingService}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}`,
     doc_url:
       "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
-    verified_on: verifiedOn,
+    verified_on: smsFormatsVerifiedOn,
   },
   "vonage.inbound": {
     method: "POST",
     content_type: jsonType,
     header_templates: {},
     body_template: `{
-  "msisdn": "{{ data.from_number }}",
-  "to": "{{ data.to_number }}",
+  "msisdn": "{{ data.from_number | replace("+", "") }}",
+  "to": "{{ data.to_number | replace("+", "") }}",
   "messageId": "{{ data.provider_id }}",
   "text": "{{ data.body }}",
-  "type": "text"
+  "type": "{% if data.encoding == "UCS-2" %}unicode{% else %}text{% endif %}",
+  "keyword": "{{ data.body | regex_extract("^[^ ]+") | upper }}",
+  "api-key": "${vonageApiKey}",
+  "message-timestamp": "${vonageTimestamp}"
 }`,
     doc_url: "https://developer.vonage.com/en/messaging/sms/guides/inbound-sms",
-    verified_on: verifiedOn,
+    verified_on: smsFormatsVerifiedOn,
   },
   "vonage.dlr": {
     method: "POST",
     content_type: jsonType,
     header_templates: {},
     body_template: `{
-  "msisdn": "{{ data.to_number }}",
+  "msisdn": "{{ data.to_number | replace("+", "") }}",
+  "to": "{{ data.from_number | replace("+", "") }}",
+  "network-code": "23410",
   "messageId": "{{ data.provider_id }}",
+  "price": "0.03330000",
   "status": "{{ data.status }}",
-  "err-code": "{{ data.error_code | default("0") }}"
+  "scts": "{{ event.created_at | date("%y%m%d%H%M") }}",
+  "err-code": "{{ data.error_code | default("0") }}",
+  "api-key": "${vonageApiKey}",
+  "message-timestamp": "${vonageTimestamp}"
 }`,
     doc_url:
       "https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts",
-    verified_on: verifiedOn,
+    verified_on: smsFormatsVerifiedOn,
   },
   "plivo.inbound": {
     method: "POST",
