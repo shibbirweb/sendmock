@@ -1,6 +1,6 @@
-use serde_json::Value;
-
-use crate::seed::seed_section_adapter::{SeedItem, impl_seed_section_adapter};
+use crate::seed::seed_section_adapter::{
+    SeedItem, impl_seed_section_adapter, write_changed_fields,
+};
 use crate::seed::seed_sections::SETTINGS_SECTION;
 use crate::settings::validate_settings_update;
 use crate::{AppSettings, AppSettingsUpdate, OperationContext, OperationError};
@@ -64,24 +64,11 @@ fn write_changed_settings(current_settings: &AppSettings) -> Result<toml::Table,
         serde_json::to_value(settings)
             .map_err(|write_error| OperationError::Internal(write_error.to_string()))
     };
-    let (Value::Object(current_fields), Value::Object(default_fields)) = (
+    write_changed_fields(
         to_fields(current_settings)?,
-        to_fields(&AppSettings::default())?,
-    ) else {
-        return Ok(toml::Table::new());
-    };
-    let mut settings_table = toml::Table::new();
-    for (setting_name, setting_value) in current_fields {
-        let is_default = default_fields.get(&setting_name) == Some(&setting_value);
-        if is_default || setting_value.is_null() || SECRET_SETTINGS.contains(&setting_name.as_str())
-        {
-            continue;
-        }
-        let toml_value = toml::Value::try_from(setting_value)
-            .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
-        settings_table.insert(setting_name, toml_value);
-    }
-    Ok(settings_table)
+        &to_fields(&AppSettings::default())?,
+        &SECRET_SETTINGS,
+    )
 }
 
 impl_seed_section_adapter!(SettingsSeedAdapter, SETTINGS_SECTION);

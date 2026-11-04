@@ -50,7 +50,7 @@ pub(super) async fn find_stored_variable(
 }
 
 /// A new value from a Fixed random variable's generator, against the sample.
-pub(super) async fn generate_fixed_value(
+pub(crate) async fn generate_fixed_value(
     operation_context: &OperationContext,
     generator_text: &str,
 ) -> Result<String, OperationError> {

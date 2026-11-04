@@ -12,6 +12,7 @@ mod template_reference;
 
 pub use credential_masking::mask_secret_value;
 pub use provider_inputs::{MessageProviderInput, ProviderSampleRequest};
+pub(crate) use provider_inputs::{ProviderReference, ProviderUpdate};
 pub use provider_views::{MessageProviderPreview, MessageProviderView, ProviderCredentialReveal};
 pub use sms_provider_change_operations::{
     DeleteSmsProviderOperation, ResetSmsProviderOperation, RestoreSmsProviderOperation,

@@ -80,6 +80,40 @@ pub fn to_api_input<ApiInput: DeserializeOwned>(
     })
 }
 
+/// The `${NAME_SECRET}` reference an export writes in place of a secret, from the item's name:
+/// "Laravel inbound mail" gives `${LARAVEL_INBOUND_MAIL_SECRET}`.
+pub fn to_secret_reference(item_name: &str) -> String {
+    let variable_words: Vec<String> = item_name
+        .to_ascii_uppercase()
+        .split(|character: char| !character.is_ascii_alphanumeric())
+        .filter(|word| !word.is_empty())
+        .map(str::to_owned)
+        .collect();
+    format!("${{{}_SECRET}}", variable_words.join("_"))
+}
+
+/// Settings that differ from `default_fields`, as TOML values; `skipped_names` are left out.
+pub fn write_changed_fields(
+    current_fields: serde_json::Value,
+    default_fields: &serde_json::Value,
+    skipped_names: &[&str],
+) -> Result<toml::Table, OperationError> {
+    let mut changed_table = toml::Table::new();
+    let serde_json::Value::Object(current_fields) = current_fields else {
+        return Ok(changed_table);
+    };
+    for (field_name, field_value) in current_fields {
+        let is_default = default_fields.get(&field_name) == Some(&field_value);
+        if is_default || field_value.is_null() || skipped_names.contains(&field_name.as_str()) {
+            continue;
+        }
+        let toml_value = toml::Value::try_from(field_value)
+            .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
+        changed_table.insert(field_name, toml_value);
+    }
+    Ok(changed_table)
+}
+
 /// Implements `SeedSectionAdapter` for an adapter whose inherent async functions `export`,
 /// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section.
 macro_rules! impl_seed_section_adapter {
@@ -119,3 +153,20 @@ macro_rules! impl_seed_section_adapter {
 }
 
 pub(crate) use impl_seed_section_adapter;
+
+#[cfg(test)]
+mod reference_tests {
+    use super::to_secret_reference;
+
+    #[test]
+    fn names_the_reference_after_the_item() {
+        assert_eq!(
+            to_secret_reference("Laravel inbound mail"),
+            "${LARAVEL_INBOUND_MAIL_SECRET}"
+        );
+        assert_eq!(
+            to_secret_reference("twilio auth-token"),
+            "${TWILIO_AUTH_TOKEN_SECRET}"
+        );
+    }
+}

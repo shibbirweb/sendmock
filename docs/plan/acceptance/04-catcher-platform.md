@@ -61,10 +61,10 @@ Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
 
 UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage).
 
-- [ ] PL-04.1 A seed file creates every supported item type; starting twice with the same seed changes nothing (idempotent).
-- [ ] PL-04.2 `${ENV_VAR}` references resolve; literal secrets are never written by export.
-- [ ] PL-04.3 `reset` wipes all traffic and restores exactly the seed state.
-- [ ] PL-04.4 `seed export` then `seed apply` on a fresh instance reproduces the same configuration.
+- [x] PL-04.1 A seed file creates every supported item type; starting twice with the same seed changes nothing (idempotent). (#48)
+- [x] PL-04.2 `${ENV_VAR}` references resolve; literal secrets are never written by export. (#48)
+- [x] PL-04.3 `reset` wipes all traffic and restores exactly the seed state. (#48)
+- [x] PL-04.4 `seed export` then `seed apply` on a fresh instance reproduces the same configuration. (#48)
 - [x] PL-04.5 `seed validate` reports errors with file line numbers and changes nothing. (#48)
 - [ ] PL-04.6 Settings > Seed shows the seed status, exports the file, and validates then applies an uploaded or pasted file after a confirmation.
 

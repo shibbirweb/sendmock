@@ -126,6 +126,25 @@ impl WebhookEndpointRepository {
             .await
     }
 
+    /// Sets the secret outright, as a seed file does, ending any rotation overlap. False when
+    /// the endpoint is gone.
+    pub async fn replace_signing_secret(
+        &self,
+        endpoint_id: &str,
+        signing_secret: String,
+    ) -> Result<bool, StoreError> {
+        let endpoint_id = endpoint_id.to_owned();
+        self.database
+            .write(move |connection| {
+                let changed_count = connection.execute(
+                    "UPDATE webhook_endpoints SET signing_secret = ?2, previous_signing_secret = NULL, previous_secret_expires_at = NULL WHERE id = ?1",
+                    params![endpoint_id, signing_secret],
+                )?;
+                Ok(changed_count > 0)
+            })
+            .await
+    }
+
     pub async fn delete_endpoint(&self, endpoint_id: &str) -> Result<bool, StoreError> {
         let endpoint_id = endpoint_id.to_owned();
         self.database

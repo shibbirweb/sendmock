@@ -127,8 +127,13 @@ async fn apply_seed_document(
     let mut applied_keys = AppliedKeys::new();
     for section_adapter in &section_adapters {
         let seed_section = section_adapter.section();
-        let item_keys =
-            apply_section(operation_context, section_adapter.as_ref(), &seed_document).await?;
+        let item_keys = apply_section(
+            operation_context,
+            section_adapter.as_ref(),
+            &seed_document,
+            &missing_variables,
+        )
+        .await?;
         applied_keys.insert(seed_section.section_path, item_keys);
     }
     Ok(applied_keys)
@@ -138,6 +143,7 @@ async fn apply_section(
     operation_context: &OperationContext,
     section_adapter: &dyn SeedSectionAdapter,
     seed_document: &toml::Table,
+    missing_variables: &[String],
 ) -> Result<Vec<String>, OperationError> {
     let seed_section = section_adapter.section();
     let mut item_keys = Vec::new();
@@ -153,12 +159,27 @@ async fn apply_section(
                     format_section_header(seed_section.section_path, seed_section.is_item_list);
                 OperationError::Unprocessable {
                     code: "invalid_seed",
-                    message: format!("{section_header} item {}: {apply_error}", item_index + 1),
+                    message: format!(
+                        "{section_header} item {}: {apply_error}{}",
+                        item_index + 1,
+                        describe_missing_variables(missing_variables)
+                    ),
                 }
             })?;
         item_keys.push(item_key);
     }
     Ok(item_keys)
+}
+
+/// Names the unset environment variables, as an empty value is often why an item is refused.
+fn describe_missing_variables(missing_variables: &[String]) -> String {
+    if missing_variables.is_empty() {
+        return String::new();
+    }
+    format!(
+        " (not set in the environment: {})",
+        missing_variables.join(", ")
+    )
 }
 
 fn warn_about_unsupported_sections(

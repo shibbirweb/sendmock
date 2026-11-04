@@ -210,9 +210,22 @@ pub async fn create_custom_template(
     service: String,
     draft: TemplateDraft,
 ) -> Result<WebhookTemplateSummary, OperationError> {
+    let template_id = build_custom_template_id(operation_context, &metadata.name).await?;
+    create_custom_template_with_id(operation_context, template_id, metadata, service, draft).await
+}
+
+/// A new custom template under an id the caller chose and checked is free, as a seed file
+/// keeps the ids its endpoints refer to.
+pub async fn create_custom_template_with_id(
+    operation_context: &OperationContext,
+    template_id: String,
+    metadata: TemplateMetadata,
+    service: String,
+    draft: TemplateDraft,
+) -> Result<WebhookTemplateSummary, OperationError> {
     let custom_template = ResolvedTemplate {
         summary: WebhookTemplateSummary {
-            id: build_custom_template_id(operation_context, &metadata.name).await?,
+            id: template_id,
             name: metadata.name,
             service,
             category: TemplateCategory::Custom,

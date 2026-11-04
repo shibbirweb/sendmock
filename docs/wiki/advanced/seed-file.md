@@ -3,7 +3,7 @@ title: Seed file
 description: Keep your SendMock setup in your repository. Export, commit, validate, apply, reset before tests, and keep secrets out.
 ---
 
-> In your install today: settings, Verify services, Messaging Services, numbers and custom outcome numbers and addresses are applied, exported and restored. Webhook endpoints, rules, templates, variables, saved deliveries and SMS providers follow later in Phase 3; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
+> In your install today: settings, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, Messaging Services, numbers, custom outcome numbers and addresses, and edited or removed SMS providers are applied, exported and restored. HTTP bins, tag and forward rules, email providers and custom SMS providers come with their features; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
 
 `sendmock.seed.toml` is the configuration SendMock starts from and resets to. Commit it next to your app's code, and everyone (teammates, CI, an AI agent) gets the same endpoints, rules, templates, variables, numbers, Messaging Services, Verify services, outcome rules, bins, saved deliveries, payment setup and settings.
 
@@ -19,13 +19,15 @@ SendMock loads `--seed <file>`, or `./sendmock.seed.toml` in the folder it start
 
 Command-line flags and `SENDMOCK_*` environment variables still win over the file's `[settings]`.
 
+Endpoints are matched by name; rules, variables and saved deliveries refer to their endpoint by that name. Templates are matched by their id (`custom.<name>`, or a built-in's id for an edited built-in) and use the template file format from **Webhooks > Templates > Export**.
+
 ## Apply a changed file
 
 In **Settings > Seed**, **Apply a seed file**: upload or paste it, press **Validate** (errors come with line numbers, and a summary lists what would change), then apply and confirm. Or `sendmock seed validate` and `sendmock seed apply`.
 
 ## Reset before every test run
 
-**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments), puts the settings back to their defaults and restores the seed applied last: items you edited get the file's values again, and items the file does not hold are deleted. Without a seed, reset keeps your configuration.
+**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments), puts the settings back to their defaults and restores the seed applied last: items you edited get the file's values again, and items the file does not hold are deleted (saved deliveries are kept, as they are without a seed). Without a seed, reset keeps your configuration.
 
 ```bash
 sendmock reset --yes
@@ -35,7 +37,7 @@ curl -X POST http://127.0.0.1:8025/api/v1/reset
 
 ## Secrets
 
-Secrets are never written in plain text. Export writes references, which are read from the environment when the file is loaded (a variable that is not set reads as empty, and the log names it). The relay SMTP URL is never exported, as it holds a password. Any string can use a reference, such as a URL with `http://${APP_HOST}/sms/inbound`:
+Secrets are never written in plain text: endpoint secrets, secret variables and secret provider credentials are exported as references, which are read from the environment when the file is loaded. A variable that is not set reads as empty: an endpoint then keeps or generates its secret, and an item that needs the value is refused with the variable named, so set it and apply again. The relay SMTP URL is never exported, as it holds a password. Any string can use a reference, such as a URL with `http://${APP_HOST}/sms/inbound`:
 
 ```toml
 [[webhook.endpoints]]

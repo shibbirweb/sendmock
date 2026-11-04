@@ -135,6 +135,38 @@ async fn rotating_keeps_the_old_secret_as_the_previous_one() -> Result<(), Store
 }
 
 #[tokio::test]
+async fn replacing_the_secret_ends_any_rotation_overlap() -> Result<(), StoreError> {
+    let repository = repository()?;
+    repository.insert_endpoint(endpoint("a", 1_000)).await?;
+    repository
+        .rotate_signing_secret(
+            "a",
+            WebhookSecretRotation {
+                new_signing_secret: "whsec_second".to_owned(),
+                previous_secret_expires_at_unix_ms: 90_000,
+            },
+        )
+        .await?;
+
+    let was_replaced = repository
+        .replace_signing_secret("a", "whsec_seeded".to_owned())
+        .await?;
+
+    let stored_endpoint = repository.find_endpoint("a").await?;
+    assert!(was_replaced);
+    assert_eq!(
+        stored_endpoint.map(|stored| (stored.signing_secret, stored.previous_signing_secret)),
+        Some(("whsec_seeded".to_owned(), None))
+    );
+    assert!(
+        !repository
+            .replace_signing_secret("missing", "whsec_x".to_owned())
+            .await?
+    );
+    Ok(())
+}
+
+#[tokio::test]
 async fn changes_to_a_missing_endpoint_report_false() -> Result<(), StoreError> {
     let repository = repository()?;
 

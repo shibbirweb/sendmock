@@ -78,6 +78,7 @@ pub use delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_deliver
 pub use delivery_replay_operation::ReplayWebhookDeliveryOperation;
 pub use delivery_view::WebhookDelivery;
 pub use delivery_wait_operation::WaitForWebhookOperation;
+pub(crate) use endpoint_inputs::{WebhookEndpointInput, WebhookEndpointReference};
 pub use endpoint_operations::{
     CreateWebhookEndpointOperation, DeleteWebhookEndpointOperation, GetWebhookEndpointOperation,
     ListWebhookEndpointsOperation, UpdateWebhookEndpointOperation,
@@ -88,13 +89,18 @@ pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
 };
+pub(crate) use endpoint_settings::EndpointRequestSettings;
+pub(crate) use endpoint_template::{choose_detached_template, write_detached_template};
 pub use endpoint_test_operation::TestWebhookEndpointOperation;
+pub(crate) use endpoint_validation::validate_endpoint_input;
 pub use endpoint_view::WebhookEndpoint;
+pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
 pub use manual_send_operation::SendWebhookOperation;
 pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
 pub use metrics_operation::GetWebhookMetricsOperation;
 pub(crate) use metrics_operation::{build_endpoint_metrics, build_recent_failures};
 pub(crate) use metrics_view::{EndpointMetrics, RecentFailedDelivery};
+pub(crate) use rule_filter_wire::RuleFilter;
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{
     CreateWebhookRuleOperation, DeleteWebhookRuleOperation, GetWebhookRuleOperation,
@@ -102,6 +108,7 @@ pub use rule_operations::{
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
+pub(crate) use rule_validation::validate_rule;
 pub use rule_view::WebhookRule;
 pub use saved_delivery_operations::{
     CreateSavedWebhookDeliveryOperation, DeleteSavedWebhookDeliveryOperation,
@@ -110,27 +117,36 @@ pub use saved_delivery_operations::{
 pub use saved_delivery_send_operation::SendSavedWebhookDeliveryOperation;
 pub use saved_delivery_template_operation::SaveSavedWebhookDeliveryAsTemplateOperation;
 pub use saved_delivery_view::SavedDelivery;
+pub(crate) use template_catalogue::find_builtin_template;
 pub use template_context::{build_event_template_context, build_sample_template_context};
 pub use template_delete_operation::DeleteWebhookTemplateOperation;
 pub use template_edit_operations::{
     ListWebhookTemplateRevisionsOperation, ResetWebhookTemplateOperation,
     RestoreWebhookTemplateRevisionOperation, UpdateWebhookTemplateOperation,
 };
+pub(crate) use template_file::{TemplateFile, parse_template_file, write_template_toml};
 pub use template_file_operations::{
     ExportWebhookTemplateOperation, ImportWebhookTemplateOperation,
 };
+pub(crate) use template_inputs::{ImportConflictChoice, TemplateImportRequest};
 pub use template_operations::{
     CloneWebhookTemplateOperation, CreateWebhookTemplateOperation, GetWebhookTemplateOperation,
     ListWebhookTemplatesOperation, RenderWebhookTemplateOperation,
 };
 pub use template_reference_operation::GetWebhookTemplateReferenceOperation;
 pub use template_rendering::TemplateRenderResult;
+pub(crate) use template_rendering::check_draft_can_be_saved;
+pub(crate) use template_store::{create_custom_template_with_id, list_resolved_templates};
+pub(crate) use template_view::{TemplateMetadata, TemplateSource};
 pub use template_view::{TemplateRevision, WebhookTemplateDetail, WebhookTemplateSummary};
+pub(crate) use variable_inputs::WebhookVariableInput;
+pub(crate) use variable_operations::generate_fixed_value;
 pub use variable_operations::{
     CreateWebhookVariableOperation, DeleteWebhookVariableOperation, ListWebhookVariablesOperation,
     UpdateWebhookVariableOperation,
 };
 pub use variable_resolution::{ResolvedVariables, resolve_template_variables};
+pub(crate) use variable_validation::validate_variable;
 pub use variable_value_operations::{
     PreviewWebhookVariableOperation, RegenerateWebhookVariableOperation, VariablePreviewResult,
 };
