@@ -50,6 +50,12 @@ export const smsSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_sms_open",
     ui: "SMS > message menu > Simulate read",
   },
+  "GET /api/v1/sms/{smsId}/opens": {
+    phase: "3",
+    cli: "sendmock sms opens <smsId>",
+    mcp: "sendmock_sms_opens",
+    ui: "SMS > message ticks (read)",
+  },
   "POST /api/v1/sms/{smsId}/reply-webhook/resend": {
     phase: "3",
     cli: "sendmock sms resend-reply-webhook <smsId>",

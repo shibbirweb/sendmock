@@ -5,6 +5,7 @@ mod email_access;
 mod email_detail;
 mod email_file_operations;
 mod email_inputs;
+mod email_open_operations;
 mod email_search_query;
 mod email_summary;
 mod email_timeline_entry;
@@ -27,6 +28,7 @@ pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
 pub use email_file_operations::{
     DownloadAttachmentOperation, DownloadRawEmailOperation, GetAttachmentThumbnailOperation,
 };
+pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
 pub use email_summary::{EmailAddress, EmailSummary};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
 pub use read_email_operations::{
@@ -49,6 +51,8 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteEmailOperation);
     operation_registry.register(GetEmailTimelineOperation);
     operation_registry.register(SimulateEmailOutcomeOperation);
+    operation_registry.register(RecordEmailOpenOperation);
+    operation_registry.register(ListEmailOpensOperation);
     operation_registry.register(CheckListUnsubscribeOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);

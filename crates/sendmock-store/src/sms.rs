@@ -1,4 +1,5 @@
 mod sms_maintenance;
+mod sms_open;
 mod sms_reader;
 mod sms_record;
 mod sms_repository;

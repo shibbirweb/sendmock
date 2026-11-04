@@ -3,7 +3,9 @@ use sendmock_webhooks::{FilterExpression, RuleMessage};
 use tokio::sync::broadcast::error::RecvError;
 
 use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
-use super::rule_messages::{build_email_rule_message, build_sms_rule_message};
+use super::rule_messages::{
+    build_email_rule_message, build_sms_rule_message, with_open_event_fields,
+};
 use super::rule_view::{read_rule_events, read_rule_filter};
 use crate::{AppEvent, OperationContext, OperationError};
 
@@ -86,7 +88,8 @@ pub async fn fire_matching_rules(
     {
         return Ok(0);
     }
-    let (subject_id, rule_message) = load_event_subject(operation_context, app_event).await?;
+    let (subject_id, stored_message) = load_event_subject(operation_context, app_event).await?;
+    let rule_message = with_open_event_fields(stored_message, app_event);
     let mut queued_count = 0;
     for stored_rule in stored_rules {
         if !does_rule_fire(&stored_rule, &app_event.event_type, &rule_message)? {

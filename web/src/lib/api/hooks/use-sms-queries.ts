@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
+import { buildOpenEventRequest } from "@/lib/api/open-event-request";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   InboundSmsRequest,
@@ -96,7 +97,7 @@ export function useOpenSms() {
     ({ smsId, openSource }: { smsId: string; openSource: OpenSource }) =>
       requestApi<void>(`/sms/${smsId}/open`, {
         method: "POST",
-        requestBody: { source: openSource },
+        requestBody: buildOpenEventRequest(openSource),
       }),
   );
 }

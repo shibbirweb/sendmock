@@ -4,7 +4,6 @@ import type {
   EmailDetail,
   EmailSummary,
   EmailUpdate,
-  OpenEventRequest,
   SimulatedEmailOutcome,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
@@ -14,6 +13,12 @@ import {
   includesText,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
+import {
+  describeMockOpen,
+  openTimelineDetails,
+  readOpenEventRequest,
+  recordMockOpen,
+} from "@/mocks/opens/record-mock-open";
 import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 
@@ -147,16 +152,32 @@ export const emailHandlers = [
       return createNotFoundResponse("Email");
     }
 
-    const { source } = (await request.json()) as OpenEventRequest;
-    email.open_count += 1;
-    email.opened_at = email.opened_at ?? new Date().toISOString();
-    publishMockEvent("email.opened", {
-      id: email.id,
-      source: source ?? "api",
-      open_count: email.open_count,
-    });
+    const recordedOpen = recordMockOpen(
+      email,
+      await readOpenEventRequest(request),
+      mockDatabase.settings,
+      mockDatabase.messageOpens,
+    );
+    if (recordedOpen) {
+      mockDatabase.emailTimelines.get(email.id)?.push({
+        kind: "opened",
+        at: recordedOpen.openRecord.opened_at,
+        detail: openTimelineDetails[recordedOpen.openRecord.source],
+      });
+      publishMockEvent("email.opened", describeMockOpen(email, recordedOpen));
+    }
 
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get("*/api/v1/emails/:emailId/opens", async ({ params }) => {
+    await applyMockConditions();
+    const email = findEmail(params.emailId);
+    if (!email) {
+      return createNotFoundResponse("Email");
+    }
+
+    return HttpResponse.json(mockDatabase.messageOpens.get(email.id) ?? []);
   }),
 
   http.post(

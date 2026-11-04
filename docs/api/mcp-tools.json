@@ -1517,6 +1517,18 @@
           ],
           "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
           "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
         }
       ],
       "input_schema": {
@@ -1534,6 +1546,13 @@
             "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
             "examples": [
               "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
           }
         },
@@ -1553,7 +1572,8 @@
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "source": "api"
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
       },
       "output": null,
       "cli": [
@@ -1561,6 +1581,68 @@
       ],
       "ui": [
         "Mail > open email (opening it fires the open)"
+      ]
+    },
+    {
+      "name": "sendmock_email_opens",
+      "toolset": "email",
+      "summary": "Every recorded open of the email, oldest first.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/opens",
+          "operation_id": "getEmailsByEmailIdOpens",
+          "summary": "Every recorded open of the email, oldest first.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "email_id"
+        ]
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "OpenRecord[]",
+      "cli": [
+        "sendmock email opens <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > Timeline (opened entries)"
       ]
     },
     {
@@ -17004,6 +17086,18 @@
           ],
           "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
           "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
         }
       ],
       "input_schema": {
@@ -17021,6 +17115,13 @@
             "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
             "examples": [
               "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
           }
         },
@@ -17040,7 +17141,8 @@
       },
       "example_arguments": {
         "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "source": "api"
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
       },
       "output": null,
       "cli": [
@@ -17048,6 +17150,68 @@
       ],
       "ui": [
         "SMS > message menu > Simulate read"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opens",
+      "toolset": "sms",
+      "summary": "Every recorded read of an outbound message, oldest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/{smsId}/opens",
+          "operation_id": "getSmsBySmsIdOpens",
+          "summary": "Every recorded read of an outbound message, oldest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "sms_id",
+          "input": {
+            "name": "smsId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The SMS's ID, from `GET /api/v1/sms`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sms_id": {
+            "type": "string",
+            "description": "The SMS's ID, from `GET /api/v1/sms`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "sms_id"
+        ]
+      },
+      "example_arguments": {
+        "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "OpenRecord[]",
+      "cli": [
+        "sendmock sms opens <smsId>"
+      ],
+      "ui": [
+        "SMS > message ticks (read)"
       ]
     },
     {

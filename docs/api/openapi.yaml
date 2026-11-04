@@ -1503,6 +1503,36 @@ paths:
       x-sendmock-cli: sendmock email open <emailId>
       x-sendmock-mcp: sendmock_email_open
       x-sendmock-ui: Mail > open email (opening it fires the open)
+  /api/v1/emails/{emailId}/opens:
+    get:
+      operationId: getEmailsByEmailIdOpens
+      summary: Every recorded open of the email, oldest first.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email opens <emailId>
+      x-sendmock-mcp: sendmock_email_opens
+      x-sendmock-ui: Mail > open email > Timeline (opened entries)
   /api/v1/emails/{emailId}/release:
     post:
       operationId: postEmailsByEmailIdRelease
@@ -2342,6 +2372,36 @@ paths:
       x-sendmock-cli: sendmock sms open <smsId>
       x-sendmock-mcp: sendmock_sms_open
       x-sendmock-ui: SMS > message menu > Simulate read
+  /api/v1/sms/{smsId}/opens:
+    get:
+      operationId: getSmsBySmsIdOpens
+      summary: Every recorded read of an outbound message, oldest first.
+      tags:
+        - SMS
+      parameters:
+        - name: smsId
+          in: path
+          required: true
+          description: The SMS's ID, from `GET /api/v1/sms`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opens <smsId>
+      x-sendmock-mcp: sendmock_sms_opens
+      x-sendmock-ui: SMS > message ticks (read)
   /api/v1/sms/{smsId}/reply-webhook/resend:
     post:
       operationId: postSmsBySmsIdReplyWebhookResend
@@ -10171,7 +10231,28 @@ components:
           description: "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`."
           examples:
             - api
+        user_agent:
+          type: string
+          description: The browser or client that opened it, kept in the open history. The UI sends its own.
+          examples:
+            - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
+    OpenRecord:
+      type: object
+      properties:
+        opened_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        source:
+          $ref: "#/components/schemas/OpenSource"
+        user_agent:
+          type:
+            - string
+            - "null"
+      required:
+        - opened_at
+        - source
+        - user_agent
+      description: One open of an email or SMS, oldest first in `GET /emails/{emailId}/opens` and `GET /sms/{smsId}/opens`.
     OpenSource:
       type: string
       enum:

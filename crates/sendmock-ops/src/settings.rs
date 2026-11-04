@@ -11,7 +11,9 @@ pub use app_settings::AppSettings;
 pub use app_settings_store::AppSettingsStore;
 pub use app_settings_update::AppSettingsUpdate;
 pub use reset_operation::ResetOperation;
-pub use setting_choices::{EmailOutcomeProfile, SmsSimulationProfile, UpdateCheckMode};
+pub use setting_choices::{
+    EmailOutcomeProfile, OpenedEventMode, SmsSimulationProfile, UpdateCheckMode,
+};
 pub use settings_operations::{GetSettingsOperation, UpdateSettingsOperation};
 pub use traffic_retention::{build_ingest_options, prune_traffic, read_ingest_options};
 

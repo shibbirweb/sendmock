@@ -109,6 +109,13 @@ const smsEndpoints = tagEndpoints("SMS", [
     errorStatuses: [404, 409],
   },
   {
+    method: "GET",
+    path: "/api/v1/sms/{smsId}/opens",
+    summary: "Every recorded read of an outbound message, oldest first.",
+    response: listOf("OpenRecord"),
+    errorStatuses: [404],
+  },
+  {
     method: "POST",
     path: "/api/v1/sms/{smsId}/reply-webhook/resend",
     summary: "Send an inbound message's reply webhook again.",

@@ -36,6 +36,13 @@ Above the tabs, one-time codes and links found in the email are listed, each wit
 
 Opening an email in the UI counts as the recipient opening it: SendMock fires `email.opened`, which your open tracking can receive through a rule. The header shows "Opened N times" with the history. Turn this off, or fire only on the first open, in [Settings > Opened events](../settings.md#opened-events).
 
+- **First open only** (the default): only the first view counts. Viewing the email again changes nothing: no event, and the open count stays the same.
+- **Every open:** each view fires `email.opened` with `first_open: false` and a higher `open_count`.
+- **Simulate open, the API, CLI and MCP** always fire, whatever the setting.
+- **Mark unread** keeps the open count and the first open time.
+
+Each open is kept with its time, its source (`ui`, `manual` or `api`) and the user agent that sent it, if any.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
@@ -50,6 +57,7 @@ Opening an email in the UI counts as the recipient opening it: SendMock fires `e
 | unsubscribe check | [`sendmock email check <emailId> unsubscribe`](/cli/email/#email-check-unsubscribe) | [`GET /api/v1/emails/{emailId}/list-unsubscribe`](/api/email/#getEmailsByEmailIdListUnsubscribe) | [`sendmock_email_check`](/mcp/email/#sendmock_email_check) |
 | timeline | [`sendmock email timeline <emailId>`](/cli/email/#email-timeline) | [`GET /api/v1/emails/{emailId}/timeline`](/api/email/#getEmailsByEmailIdTimeline) | [`sendmock_email_timeline`](/mcp/email/#sendmock_email_timeline) |
 | simulate an open | [`sendmock email open <emailId>`](/cli/email/#email-open) | [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen) | [`sendmock_email_open`](/mcp/email/#sendmock_email_open) |
+| open history | [`sendmock email opens <emailId>`](/cli/email/#email-opens) | [`GET /api/v1/emails/{emailId}/opens`](/api/email/#getEmailsByEmailIdOpens) | [`sendmock_email_opens`](/mcp/email/#sendmock_email_opens) |
 
 ## Related
 

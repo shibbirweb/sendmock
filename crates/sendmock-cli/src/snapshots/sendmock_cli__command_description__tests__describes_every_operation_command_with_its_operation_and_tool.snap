@@ -258,6 +258,49 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email open",
+    "usage": "sendmock email open <emailId>",
+    "summary": "Record an open and fire email.opened.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--source",
+      "--user-agent"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/open",
+        "operation_id": "postEmailsByEmailIdOpen",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_open"
+    ]
+  },
+  {
+    "command": "sendmock email opens",
+    "usage": "sendmock email opens <emailId>",
+    "summary": "Every recorded open of the email, oldest first.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/opens",
+        "operation_id": "getEmailsByEmailIdOpens",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_opens"
+    ]
+  },
+  {
     "command": "sendmock email check unsubscribe",
     "usage": "sendmock email check <emailId> unsubscribe",
     "summary": "List-Unsubscribe and one-click unsubscribe checks.",
@@ -668,6 +711,49 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_sms_set_status"
+    ]
+  },
+  {
+    "command": "sendmock sms open",
+    "usage": "sendmock sms open <smsId>",
+    "summary": "Record a read and fire sms.opened.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [
+      "--source",
+      "--user-agent"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/{smsId}/open",
+        "operation_id": "postSmsBySmsIdOpen",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_open"
+    ]
+  },
+  {
+    "command": "sendmock sms opens",
+    "usage": "sendmock sms opens <smsId>",
+    "summary": "Every recorded read of an outbound message, oldest first.",
+    "arguments": [
+      "smsId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/{smsId}/opens",
+        "operation_id": "getSmsBySmsIdOpens",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opens"
     ]
   },
   {

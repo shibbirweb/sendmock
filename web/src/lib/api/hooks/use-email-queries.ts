@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
+import { buildOpenEventRequest } from "@/lib/api/open-event-request";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   EmailDetail,
@@ -103,7 +104,7 @@ export function useOpenEmail() {
     ({ emailId, openSource }: { emailId: string; openSource: OpenSource }) =>
       requestApi<void>(`/emails/${emailId}/open`, {
         method: "POST",
-        requestBody: { source: openSource },
+        requestBody: buildOpenEventRequest(openSource),
       }),
   );
 }

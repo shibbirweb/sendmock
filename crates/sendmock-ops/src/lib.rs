@@ -11,6 +11,7 @@ mod message_providers;
 mod no_input;
 mod nullable_schema;
 mod numbers;
+mod opens;
 mod operation;
 mod operation_answer;
 mod operation_context;
@@ -53,6 +54,7 @@ pub use message_providers::{
 pub use no_input::NoInput;
 pub(crate) use nullable_schema::nullable_schema;
 pub use numbers::{MessagingService, VirtualNumber};
+pub use opens::{OpenRecord, OpenSource};
 pub use operation::{
     AnswerKind, CliArgument, HttpMethod, Operation, OperationDefinition, OperationSelector,
     RawBodyInput, SelectorChoice, SuccessStatus, to_snake_case,

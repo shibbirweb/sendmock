@@ -14,6 +14,11 @@ import {
   includesText,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
+import {
+  describeMockOpen,
+  readOpenEventRequest,
+  recordMockOpen,
+} from "@/mocks/opens/record-mock-open";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { applySmsStatus } from "@/mocks/realtime/simulate-sms-delivery";
 import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
@@ -162,7 +167,7 @@ export const smsHandlers = [
     return HttpResponse.json(smsMessage);
   }),
 
-  http.post("*/api/v1/sms/:smsId/open", async ({ params }) => {
+  http.post("*/api/v1/sms/:smsId/open", async ({ params, request }) => {
     await applyMockConditions();
     const smsMessage = findSms(params.smsId);
     if (!smsMessage) {
@@ -171,16 +176,37 @@ export const smsHandlers = [
     if (smsMessage.direction === "inbound") {
       return createErrorResponse(
         409,
-        "conflict",
-        "Inbound SMS cannot be opened",
+        "inbound_sms",
+        "Inbound SMS cannot be opened; only messages your app sent are read",
       );
     }
 
-    smsMessage.open_count += 1;
-    smsMessage.opened_at = smsMessage.opened_at ?? new Date().toISOString();
-    publishMockEvent("sms.opened", { id: smsMessage.id });
+    const recordedOpen = recordMockOpen(
+      smsMessage,
+      await readOpenEventRequest(request),
+      mockDatabase.settings,
+      mockDatabase.messageOpens,
+    );
+    if (recordedOpen) {
+      publishMockEvent(
+        "sms.opened",
+        describeMockOpen(smsMessage, recordedOpen),
+      );
+    }
 
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get("*/api/v1/sms/:smsId/opens", async ({ params }) => {
+    await applyMockConditions();
+    const smsMessage = findSms(params.smsId);
+    if (!smsMessage) {
+      return createNotFoundResponse("SMS");
+    }
+
+    return HttpResponse.json(
+      mockDatabase.messageOpens.get(smsMessage.id) ?? [],
+    );
   }),
 
   http.delete("*/api/v1/sms/:smsId", async ({ params }) => {

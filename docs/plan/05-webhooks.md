@@ -43,10 +43,12 @@ Every attempt is logged with full request and response, and can be replayed.
 
 Rules:
 
-- **First open vs every open:** by default UI views fire only on the first open (`first_open: true`). A setting switches to "every open" (re-opens send `first_open: false` with an incremented `open_count`). Manual and API opens always fire.
+- **First open vs every open:** by default UI views fire only on the first open (`first_open: true`); a later view is ignored completely: no event, no new entry in the open history, and `open_count` stays as it is (owner, 2026-11-05). A setting switches to "every open" (re-opens send `first_open: false` with an incremented `open_count`). Manual and API opens always fire, and count.
 - **Auto-fire toggle:** Settings has "Fire opened events when I view messages" (default on). Turn it off to browse messages without triggering webhooks; manual and API opens still work.
 - **Only for the right direction:** `sms.opened` applies to outbound SMS (sent by your app to a user). Viewing a simulated inbound SMS does not fire it.
 - **Mark unread** does not reset `open_count` or `opened_at`; it only changes the read flag in the UI.
+- **Open history:** each counted open is kept with its time, `source` and `user_agent` (`GET /emails/{emailId}/opens`, `GET /sms/{smsId}/opens`). The UI sends the browser's user agent in the open body; scripts may send their own. `opened_at` on the message is the first open.
+- **Rule filters** on `first_open`, `open_count` and `source` read the open the event carries, not the stored message.
 - **Tracking pixels:** SendMock blocks remote images by default. When you click "Load images", the browser requests your app's own tracking pixel directly, so your existing pixel-based tracking also works. `email.opened` is independent of that and fires either way.
 
 ### Native payload

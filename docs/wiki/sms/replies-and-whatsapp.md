@@ -34,7 +34,7 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 
 - Send to or from `whatsapp:+8801700000000` through the Twilio API and the conversation shows the WhatsApp badge and styling.
 - Media (`MediaUrl` on Twilio, `media_urls` or inline `media` on the native API) shows as thumbnails and file chips in the bubble, with an MMS or Media badge and a media list in **Message details**.
-- **Simulate read** on an outgoing message fires `sms.opened` and turns the ticks blue, for read receipts.
+- **Simulate read** on an outgoing message fires `sms.opened` and turns the ticks blue, for read receipts. Only outgoing messages can be read: opening a message your app received answers `409`.
 
 Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
@@ -45,6 +45,7 @@ Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 | reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
 | resend the reply webhook | [`sendmock sms resend-reply-webhook <smsId>`](/cli/sms/#sms-resend-reply-webhook) | [`POST /api/v1/sms/{smsId}/reply-webhook/resend`](/api/sms/#postSmsBySmsIdReplyWebhookResend) | [`sendmock_sms_reply_webhook_resend`](/mcp/sms/#sendmock_sms_reply_webhook_resend) |
 | simulate a read | [`sendmock sms open <smsId>`](/cli/sms/#sms-open) | [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen) | [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open) |
+| read history | [`sendmock sms opens <smsId>`](/cli/sms/#sms-opens) | [`GET /api/v1/sms/{smsId}/opens`](/api/sms/#getSmsBySmsIdOpens) | [`sendmock_sms_opens`](/mcp/sms/#sendmock_sms_opens) |
 | a media file | [`sendmock sms media <smsId> <mediaIndex>`](/cli/sms/#sms-media) | [`GET /api/v1/sms/{smsId}/media/{mediaIndex}`](/api/sms/#getSmsBySmsIdMediaByMediaIndex) | [`sendmock://sms/{smsId}/media/{mediaIndex}`](/mcp/sms/#resource-sms-smsid-media-mediaindex) |
 
 ## Related

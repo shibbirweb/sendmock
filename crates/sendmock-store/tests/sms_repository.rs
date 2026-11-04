@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
 use sendmock_store::{
-    Database, DatabaseLocation, EMBEDDED_MIGRATIONS, NewSmsRecord, SmsCallbackAttemptRecord,
-    SmsListFilter, SmsMediaRecord, SmsRecord, SmsRepository, SmsStatusChangeRecord, StoreError,
+    Database, DatabaseLocation, EMBEDDED_MIGRATIONS, MessageOpenRecord, NewSmsRecord,
+    OpenRecording, SmsCallbackAttemptRecord, SmsListFilter, SmsMediaRecord, SmsRecord,
+    SmsRepository, SmsStatusChangeRecord, StoreError,
 };
 
 fn repository() -> Result<SmsRepository, StoreError> {
@@ -218,5 +219,81 @@ async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreEr
     assert_eq!(repository.list_callback_attempts("01C").await?.len(), 1);
     assert!(repository.delete_message("01C").await?);
     assert_eq!(repository.delete_all_messages().await?, 1);
+    Ok(())
+}
+
+fn open_at(opened_at_unix_ms: i64, source: &str) -> MessageOpenRecord {
+    MessageOpenRecord {
+        opened_at_unix_ms,
+        source: source.to_owned(),
+        user_agent: Some("curl/8.7.1".to_owned()),
+    }
+}
+
+#[tokio::test]
+async fn counts_each_open_and_keeps_the_first_open_time() -> Result<(), StoreError> {
+    let repository = repository()?;
+    repository
+        .insert_message(plain(sms("01A", "outbound", "Your code")))
+        .await?;
+
+    let first_count = repository
+        .record_open("01A", open_at(2_000, "api"), OpenRecording::Always)
+        .await?;
+    let second_count = repository
+        .record_open("01A", open_at(3_000, "manual"), OpenRecording::Always)
+        .await?;
+
+    assert_eq!((first_count, second_count), (Some(1), Some(2)));
+    let stored_sms = repository.find_message("01A").await?;
+    assert_eq!(
+        stored_sms.map(|sms| (sms.open_count, sms.opened_at_unix_ms)),
+        Some((2, Some(2_000)))
+    );
+    assert_eq!(
+        repository.list_opens("01A").await?,
+        [open_at(2_000, "api"), open_at(3_000, "manual")]
+    );
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_first_open_only_recording_skips_an_opened_message() -> Result<(), StoreError> {
+    let repository = repository()?;
+    repository
+        .insert_message(plain(sms("01A", "outbound", "Your code")))
+        .await?;
+
+    let first_count = repository
+        .record_open("01A", open_at(2_000, "ui"), OpenRecording::OnlyIfUnopened)
+        .await?;
+    let repeated_count = repository
+        .record_open("01A", open_at(3_000, "ui"), OpenRecording::OnlyIfUnopened)
+        .await?;
+    let missing_count = repository
+        .record_open("01Z", open_at(3_000, "api"), OpenRecording::Always)
+        .await?;
+
+    assert_eq!(
+        (first_count, repeated_count, missing_count),
+        (Some(1), None, None)
+    );
+    assert_eq!(repository.list_opens("01A").await?.len(), 1);
+    Ok(())
+}
+
+#[tokio::test]
+async fn deleting_a_message_deletes_its_opens() -> Result<(), StoreError> {
+    let repository = repository()?;
+    repository
+        .insert_message(plain(sms("01A", "outbound", "Your code")))
+        .await?;
+    repository
+        .record_open("01A", open_at(2_000, "api"), OpenRecording::Always)
+        .await?;
+
+    repository.delete_message("01A").await?;
+
+    assert_eq!(repository.list_opens("01A").await?, []);
     Ok(())
 }

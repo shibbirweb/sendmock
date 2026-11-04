@@ -5,6 +5,7 @@ import type {
   EmailDetail,
   EmailTimelineEntry,
   HttpBin,
+  OpenRecord,
   HttpResponseRule,
   PaymentDetail,
   MessagingService,
@@ -59,6 +60,7 @@ import {
   buildStandardEmailFixtures,
 } from "@/mocks/fixtures/email-fixtures";
 import { seedFixtureRandomness } from "@/mocks/fixtures/fixture-helpers";
+import { buildOpenRecordFixtures } from "@/mocks/fixtures/open-record-fixtures";
 import { buildStandardSmsFixtures } from "@/mocks/fixtures/sms-fixtures";
 import { buildSmtpSessionFixtures } from "@/mocks/fixtures/smtp-session-fixtures";
 import {
@@ -102,6 +104,8 @@ export type MockDatabase = {
   seedAppliedAt: string;
   emails: EmailDetail[];
   emailTimelines: Map<string, EmailTimelineEntry[]>;
+  /** Each email's and SMS's open history, oldest first, by message id. */
+  messageOpens: Map<string, OpenRecord[]>;
   /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
   attachmentContents: Map<string, Uint8Array>;
   /** Bytes of SMS media sent inline, keyed `smsId/index`. */
@@ -211,6 +215,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ...configuration,
       emails: [],
       emailTimelines: new Map(),
+      messageOpens: new Map(),
       attachmentContents: new Map(),
       smsMediaContents: new Map(),
       smsMessages: [],
@@ -278,6 +283,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ]),
     ),
     smsMessages,
+    messageOpens: buildOpenRecordFixtures([...emails, ...smsMessages]),
     verifications: linkVerificationMessages(
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,

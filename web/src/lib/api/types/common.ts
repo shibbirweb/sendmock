@@ -51,8 +51,14 @@ export type OpenEventRequest = {
    * @example "api"
    */
   source?: OpenSource;
+  /**
+   * The browser or client that opened it, kept in the open history. The UI sends its own.
+   * @example "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+   */
+  user_agent?: string;
 };
 
+/** One open of an email or SMS, oldest first in `GET /emails/{emailId}/opens` and `GET /sms/{smsId}/opens`. */
 export type OpenRecord = {
   opened_at: IsoTimestamp;
   source: OpenSource;

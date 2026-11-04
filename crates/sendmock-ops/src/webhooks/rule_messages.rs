@@ -1,5 +1,11 @@
 use sendmock_store::{EmailRecord, SmsRecord};
 use sendmock_webhooks::RuleMessage;
+use serde_json::Value;
+
+use crate::AppEvent;
+
+/// The fields an opened event carries about the open itself.
+const OPEN_EVENT_FIELDS: [&str; 3] = ["first_open", "open_count", "source"];
 
 /// HTML without its tags, for emails that have no text part.
 fn strip_html_tags(html_body: &str) -> String {
@@ -70,9 +76,71 @@ pub fn build_sms_rule_message(stored_sms: &SmsRecord) -> RuleMessage {
         .with_field("first_open", vec![(stored_sms.open_count == 1).to_string()])
 }
 
+/// An opened event's own `first_open`, `open_count` and `source` win over the stored
+/// message's: a later open may have changed the count, and an email's stored `source` says
+/// how it arrived, not who opened it.
+pub fn with_open_event_fields(rule_message: RuleMessage, app_event: &AppEvent) -> RuleMessage {
+    if !app_event.event_type.ends_with(".opened") {
+        return rule_message;
+    }
+    OPEN_EVENT_FIELDS
+        .into_iter()
+        .fold(rule_message, |open_message, field_key| {
+            match &app_event.data[field_key] {
+                Value::Null => open_message,
+                Value::String(field_text) => {
+                    open_message.with_field(field_key, vec![field_text.clone()])
+                }
+                field_value => open_message.with_field(field_key, vec![field_value.to_string()]),
+            }
+        })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
+
+    fn opened_event(event_type: &str) -> AppEvent {
+        AppEvent {
+            id: "evt_01".to_owned(),
+            event_type: event_type.to_owned(),
+            created_at: "2026-11-05T10:00:00Z".to_owned(),
+            data: json!({ "id": "01A", "first_open": false, "open_count": 3, "source": "manual" }),
+        }
+    }
+
+    #[test]
+    fn opened_events_are_filtered_on_the_open_they_carry() {
+        let stored_fields = RuleMessage::default()
+            .with_field("open_count", vec!["4".to_owned()])
+            .with_field("source", vec!["smtp".to_owned()]);
+
+        let open_message = with_open_event_fields(stored_fields, &opened_event("email.opened"));
+
+        assert_eq!(
+            open_message.read_field("first_open"),
+            Some(vec!["false".to_owned()])
+        );
+        assert_eq!(
+            open_message.read_field("open_count"),
+            Some(vec!["3".to_owned()])
+        );
+        assert_eq!(
+            open_message.read_field("source"),
+            Some(vec!["manual".to_owned()])
+        );
+    }
+
+    #[test]
+    fn other_events_keep_the_stored_fields() {
+        let stored_fields = RuleMessage::default().with_field("source", vec!["smtp".to_owned()]);
+
+        let event_message =
+            with_open_event_fields(stored_fields.clone(), &opened_event("email.received"));
+
+        assert_eq!(event_message, stored_fields);
+    }
 
     #[test]
     fn html_bodies_are_read_as_text() {

@@ -124,6 +124,7 @@ async fn prepare_sample_inputs(
     let mut samples: HashMap<&'static str, Vec<Value>> = system_samples().into_iter().collect();
     samples.extend(prepare_email_samples(app_router).await);
     samples.extend(prepare_email_outcome_samples(app_router).await);
+    samples.extend(prepare_open_samples(app_router).await);
     samples.extend(prepare_log_samples(operation_context).await);
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
@@ -1039,6 +1040,38 @@ async fn prepare_email_outcome_samples(
             json!({ "email_id": email_id, "event": "delivered" }),
         ],
     )]
+}
+
+/// Opens of a sent email and an outbound SMS, from the UI with a user agent and from a script.
+async fn prepare_open_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let email_id = post_json(app_router, "/api/v1/send", &native_send_sample()).await["id"].clone();
+    let sms_id = post_json(
+        app_router,
+        "/api/v1/sms",
+        &json!({ "from": "+15550001111", "to": "+8801700000000", "body": "Your code is 482913" }),
+    )
+    .await["id"]
+        .clone();
+    let browser_open = json!({ "source": "ui", "user_agent": "Mozilla/5.0 (Macintosh)" });
+    let mut email_view = browser_open.clone();
+    email_view["email_id"] = email_id.clone();
+    let mut sms_view = browser_open;
+    sms_view["sms_id"] = sms_id.clone();
+    vec![
+        (
+            "postEmailsByEmailIdOpen",
+            vec![email_view, json!({ "email_id": email_id })],
+        ),
+        (
+            "getEmailsByEmailIdOpens",
+            vec![json!({ "email_id": email_id })],
+        ),
+        (
+            "postSmsBySmsIdOpen",
+            vec![sms_view, json!({ "sms_id": sms_id, "source": "manual" })],
+        ),
+        ("getSmsBySmsIdOpens", vec![json!({ "sms_id": sms_id })]),
+    ]
 }
 
 async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {

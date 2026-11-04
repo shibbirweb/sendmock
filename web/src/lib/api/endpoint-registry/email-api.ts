@@ -193,6 +193,13 @@ const emailEndpoints = tagEndpoints("Email", [
     errorStatuses: [404],
   },
   {
+    method: "GET",
+    path: "/api/v1/emails/{emailId}/opens",
+    summary: "Every recorded open of the email, oldest first.",
+    response: listOf("OpenRecord"),
+    errorStatuses: [404],
+  },
+  {
     method: "POST",
     path: "/api/v1/emails/{emailId}/release",
     summary: "Send the email on through the allowlisted relay.",

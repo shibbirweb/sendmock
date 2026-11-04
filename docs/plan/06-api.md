@@ -24,8 +24,8 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/emails/{emailId}/html` | sanitised HTML for preview iframe |
 | GET | `/emails/{emailId}/attachments/{attachmentIndex}` | download attachment |
 | PATCH | `/emails/{emailId}` | mark read/unread, set tags |
-| POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api" }` (default `api`) |
-| GET | `/emails/{emailId}/opens` | open history |
+| POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api", "user_agent"? }` (default `api`); a `ui` open the opened-events settings leave out records nothing and still answers 204 |
+| GET | `/emails/{emailId}/opens` | open history, oldest first: `opened_at`, `source`, `user_agent` |
 | DELETE | `/emails/{emailId}` | delete one |
 | DELETE | `/emails` | delete all (or by filter) |
 | GET | `/emails/latest` | newest message, optionally filtered by `to` |
@@ -61,8 +61,8 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/sms/{smsId}/media/{mediaIndex}` | one stored media file (MMS or WhatsApp), with its content type |
 | GET | `/sms/threads` | conversations grouped by number pair |
 | POST | `/sms/{smsId}/status` | manually set status (manual profile) |
-| POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 for inbound) |
-| GET | `/sms/{smsId}/opens` | open history |
+| POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 `inbound_sms` for inbound); same body and settings as the email open |
+| GET | `/sms/{smsId}/opens` | read history, oldest first |
 | POST | `/sms/inbound` | simulate incoming SMS |
 | POST | `/sms/{smsId}/reply-webhook/resend` | send an inbound message's reply webhook again (Twilio-style request URL, fallback and TwiML replies) |
 | DELETE | `/sms/{smsId}`, `/sms` | delete one / all |

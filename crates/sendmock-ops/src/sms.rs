@@ -6,6 +6,7 @@ mod sms_ingest;
 mod sms_inputs;
 mod sms_lookups;
 mod sms_media_intake;
+mod sms_open_operations;
 mod sms_read_operations;
 mod sms_send_decision;
 mod sms_send_operations;
@@ -22,6 +23,7 @@ pub use sms_detail::SmsMessageDetail;
 pub use sms_ingest::{IncomingSms, store_sms};
 pub use sms_lookups::{describe_sms_code, find_newest_sms_with_code};
 pub use sms_media_intake::{MediaProblem, accept_media};
+pub use sms_open_operations::{ListSmsOpensOperation, RecordSmsOpenOperation};
 pub use sms_read_operations::{
     DownloadSmsMediaOperation, GetSmsOperation, ListSmsOperation, ListSmsThreadsOperation,
     WaitForSmsOperation,
@@ -45,6 +47,8 @@ pub fn register_sms_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteSmsOperation);
     operation_registry.register(DownloadSmsMediaOperation);
     operation_registry.register(SetSmsStatusOperation);
+    operation_registry.register(RecordSmsOpenOperation);
+    operation_registry.register(ListSmsOpensOperation);
     operation_registry.register(SimulateInboundSmsOperation);
     operation_registry.register(WaitForSmsOperation);
 }
