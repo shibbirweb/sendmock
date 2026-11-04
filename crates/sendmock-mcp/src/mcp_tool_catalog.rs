@@ -64,11 +64,13 @@ impl McpToolCatalog {
     /// Runs the tool's operation; a tool behind several operations picks one by its selector
     /// argument, which is not passed on.
     pub async fn call_tool(&self, tool_name: &str, arguments: Map<String, Value>) -> ToolOutcome {
-        let Some((_, tool_operations)) = self
-            .tools
-            .iter()
-            .find(|(tool_definition, _)| tool_definition.name == tool_name)
-        else {
+        let Some((_, tool_operations)) = self.tools.iter().find(|(tool_definition, _)| {
+            tool_definition.name == tool_name
+                || tool_definition
+                    .aliases
+                    .iter()
+                    .any(|alias| alias == tool_name)
+        }) else {
             return ToolOutcome::Failure(format!("No tool named {tool_name}"));
         };
         let (selected_operation, input) = match select_operation(tool_operations, arguments) {
@@ -157,6 +159,43 @@ mod tests {
         select_operation(tool_operations, arguments)
             .ok()
             .map(|(operation, _)| operation.definition().operation_id)
+    }
+
+    /// Answers with the operation it was asked to run.
+    struct NamingRunner;
+
+    impl OperationRunner for NamingRunner {
+        fn run_operation(
+            &self,
+            operation: Arc<dyn ErasedOperation>,
+            _input: Value,
+        ) -> crate::operation_runner::RunFuture<'_> {
+            let operation_id = operation.definition().operation_id;
+            Box::pin(async move { Ok(OperationAnswer::Json(json!(operation_id))) })
+        }
+    }
+
+    #[tokio::test]
+    async fn an_older_tool_name_calls_its_tool_but_is_not_listed() {
+        let tool_catalog = McpToolCatalog::new(
+            &sendmock_ops::build_operation_registry(),
+            &ToolFilter::from_settings(Some("all"), false),
+            Arc::new(NamingRunner),
+        );
+
+        let outcome = tool_catalog
+            .call_tool("sendmock_email_search", Map::new())
+            .await;
+
+        assert_eq!(
+            outcome,
+            ToolOutcome::Answer(OperationAnswer::Json(json!("getEmails")))
+        );
+        assert!(
+            tool_catalog
+                .tool_definitions()
+                .all(|tool_definition| tool_definition.name != "sendmock_email_search")
+        );
     }
 
     #[test]

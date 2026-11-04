@@ -40,13 +40,16 @@ impl Operation for ListEmailsOperation {
     type Output = PageOf<EmailSummary>;
 
     fn definition(&self) -> OperationDefinition {
-        read_only_get(
-            "getEmails",
-            "/api/v1/emails",
-            "Stored emails, newest first, with search and filters.",
-            "sendmock email list",
-            "sendmock_email_list",
-        )
+        OperationDefinition {
+            mcp_aliases: &["sendmock_email_search"],
+            ..read_only_get(
+                "getEmails",
+                "/api/v1/emails",
+                "Stored emails, newest first, with search and filters.",
+                "sendmock email list",
+                "sendmock_email_list",
+            )
+        }
     }
 
     async fn execute(
@@ -81,13 +84,16 @@ impl Operation for GetEmailOperation {
     type Output = EmailDetail;
 
     fn definition(&self) -> OperationDefinition {
-        read_only_get(
-            "getEmailsByEmailId",
-            "/api/v1/emails/{emailId}",
-            "One email with bodies, headers, attachments and extracted codes.",
-            "sendmock email show <emailId>",
-            "sendmock_email_get",
-        )
+        OperationDefinition {
+            cli_aliases: &["sendmock email html <emailId>"],
+            ..read_only_get(
+                "getEmailsByEmailId",
+                "/api/v1/emails/{emailId}",
+                "One email with bodies, headers, attachments and extracted codes.",
+                "sendmock email show <emailId>",
+                "sendmock_email_get",
+            )
+        }
     }
 
     async fn execute(

@@ -94,33 +94,48 @@ pub fn command_words(cli_usage: &'static str) -> Vec<&'static str> {
         .collect()
 }
 
+/// One command per operation usage and per alias, so `sendmock webhook tail` runs what
+/// `sendmock events tail` runs.
 fn build_command_tree(operation_registry: &OperationRegistry) -> CommandNode {
     let mut root_node = CommandNode::default();
     for operation in operation_registry.operations() {
-        let segments = usage_segments(operation.definition().cli_usage);
-        let last_word_position = segments
-            .iter()
-            .rposition(|segment| matches!(segment, UsageSegment::CommandWord(_)));
-        let mut command_node = &mut root_node;
-        for (segment_position, segment) in segments.iter().enumerate() {
-            match segment {
-                UsageSegment::CommandWord(command_word) => {
-                    command_node = command_node.children.entry(command_word).or_default();
-                }
-                UsageSegment::Placeholder(placeholder) => {
-                    let is_before_a_command_word =
-                        last_word_position.is_some_and(|position| segment_position < position);
-                    if is_before_a_command_word
-                        && !command_node.level_placeholders.contains(placeholder)
-                    {
-                        command_node.level_placeholders.push(placeholder);
-                    }
+        let definition = operation.definition();
+        for cli_usage in
+            std::iter::once(definition.cli_usage).chain(definition.cli_aliases.iter().copied())
+        {
+            insert_command(&mut root_node, cli_usage, operation);
+        }
+    }
+    root_node
+}
+
+fn insert_command(
+    root_node: &mut CommandNode,
+    cli_usage: &'static str,
+    operation: &Arc<dyn ErasedOperation>,
+) {
+    let segments = usage_segments(cli_usage);
+    let last_word_position = segments
+        .iter()
+        .rposition(|segment| matches!(segment, UsageSegment::CommandWord(_)));
+    let mut command_node = root_node;
+    for (segment_position, segment) in segments.iter().enumerate() {
+        match segment {
+            UsageSegment::CommandWord(command_word) => {
+                command_node = command_node.children.entry(command_word).or_default();
+            }
+            UsageSegment::Placeholder(placeholder) => {
+                let is_before_a_command_word =
+                    last_word_position.is_some_and(|position| segment_position < position);
+                if is_before_a_command_word
+                    && !command_node.level_placeholders.contains(placeholder)
+                {
+                    command_node.level_placeholders.push(placeholder);
                 }
             }
         }
-        command_node.operation = Some(Arc::clone(operation));
     }
-    root_node
+    command_node.operation = Some(Arc::clone(operation));
 }
 
 fn build_clap_command(command_name: &'static str, command_node: CommandNode) -> Command {
@@ -156,6 +171,26 @@ mod tests {
             Command::new(BINARY_NAME).subcommands(build_operation_commands(&operation_registry));
         let root_matches = root_command.try_get_matches_from(arguments).ok()?;
         find_matched_operation(&operation_registry, &root_matches)
+    }
+
+    #[test]
+    fn an_alias_runs_the_same_operation() {
+        let tail_operation = |arguments: &[&str]| {
+            parse(arguments).map(|matched| matched.operation.definition().operation_id)
+        };
+
+        assert_eq!(
+            tail_operation(&["sendmock", "webhook", "tail"]),
+            Some("getEventsRecent")
+        );
+        assert_eq!(
+            tail_operation(&["sendmock", "events", "tail"]),
+            Some("getEventsRecent")
+        );
+        assert_eq!(
+            tail_operation(&["sendmock", "http", "tail"]),
+            Some("getEventsRecent")
+        );
     }
 
     #[test]

@@ -33,6 +33,7 @@ impl Operation for GetRecentEventsOperation {
             summary: "The latest events, newest first: the polling twin of the live stream.",
             is_read_only: true,
             cli_usage: "sendmock events tail",
+            cli_aliases: &["sendmock http tail", "sendmock webhook tail"],
             mcp_tool: "sendmock_events_recent",
             ..OperationDefinition::DEFAULTS
         }

@@ -43,6 +43,11 @@ fn build_tool_definition(
             .iter()
             .map(|operation| operation.definition().operation_id.to_owned())
             .collect(),
+        aliases: tool_operations
+            .iter()
+            .flat_map(|operation| operation.definition().mcp_aliases.iter())
+            .map(|mcp_alias| (*mcp_alias).to_owned())
+            .collect(),
     }
 }
 

@@ -63,6 +63,7 @@ fn describe_all_commands(operation_registry: &OperationRegistry) -> Vec<CommandD
         .map(|(command, summary)| CommandDescription {
             command: (*command).to_owned(),
             usage: (*command).to_owned(),
+            aliases: Vec::new(),
             summary: (*summary).to_owned(),
             arguments: Vec::new(),
             flags: Vec::new(),

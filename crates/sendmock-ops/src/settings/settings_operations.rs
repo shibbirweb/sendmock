@@ -50,6 +50,7 @@ impl Operation for UpdateSettingsOperation {
             path: "/api/v1/settings",
             summary: "Change settings; send only the changed keys.",
             cli_usage: "sendmock settings set",
+            mcp_aliases: &["sendmock_chaos_set"],
             mcp_tool: "sendmock_settings_update",
             ..OperationDefinition::DEFAULTS
         }

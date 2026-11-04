@@ -32,6 +32,28 @@ fn status_prints_json_when_the_output_is_not_a_terminal() {
     assert_eq!(app_info["channel"], "dev");
 }
 
+// AC: AI-01.1
+#[test]
+fn webhook_tail_runs_the_recent_events_operation() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let (_sendmock, server_url) = start_server(working_directory.path());
+    let run = |arguments: &[&str]| {
+        run_until_exit(
+            sendmock_command(working_directory.path())
+                .args(arguments)
+                .args(["--server", &server_url]),
+        )
+        .expect("the command runs")
+    };
+
+    let tail_output = run(&["webhook", "tail"]);
+
+    let recent_events: serde_json::Value =
+        serde_json::from_slice(&tail_output.stdout).expect("stdout is JSON");
+    assert_eq!(tail_output.status.code(), Some(0));
+    assert!(recent_events.is_array(), "{recent_events}");
+}
+
 // AC: AI-01.3
 #[test]
 fn health_exits_zero_while_the_server_runs() {

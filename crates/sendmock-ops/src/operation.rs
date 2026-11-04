@@ -113,7 +113,11 @@ pub struct OperationDefinition {
     pub is_destructive: bool,
     /// The CLI command with its positional arguments, e.g. `sendmock seed validate <file>`.
     pub cli_usage: &'static str,
+    /// Older or shorter commands that run this operation too, e.g. `sendmock webhook tail`.
+    pub cli_aliases: &'static [&'static str],
     pub mcp_tool: &'static str,
+    /// Older tool names that still call this operation; tool lists show only `mcp_tool`.
+    pub mcp_aliases: &'static [&'static str],
     pub selector: Option<OperationSelector>,
     pub cli_arguments: &'static [CliArgument],
     /// Flags the naming rules get wrong, by input, e.g. `("timeout", "wait")` for `--wait`.
@@ -144,7 +148,9 @@ impl OperationDefinition {
         is_read_only: false,
         is_destructive: false,
         cli_usage: "",
+        cli_aliases: &[],
         mcp_tool: "",
+        mcp_aliases: &[],
         selector: None,
         cli_arguments: &[],
         cli_flag_names: &[],

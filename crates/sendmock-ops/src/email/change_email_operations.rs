@@ -18,7 +18,9 @@ impl Operation for UpdateEmailOperation {
             path: "/api/v1/emails/{emailId}",
             summary: "Mark read or unread, or change tags.",
             cli_usage: "sendmock email update <emailId>",
+            cli_aliases: &["sendmock email tag <emailId>"],
             mcp_tool: "sendmock_email_update",
+            mcp_aliases: &["sendmock_email_tag"],
             ..OperationDefinition::DEFAULTS
         }
     }

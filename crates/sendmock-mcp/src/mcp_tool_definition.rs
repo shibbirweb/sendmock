@@ -11,6 +11,8 @@ pub struct McpToolDefinition {
     pub input_schema: Value,
     pub annotations: McpToolAnnotations,
     pub operation_ids: Vec<String>,
+    /// Older names that still call this tool; tool lists show only `name`.
+    pub aliases: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]

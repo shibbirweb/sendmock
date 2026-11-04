@@ -10,6 +10,8 @@ const REVEAL_FLAG: &str = "--reveal";
 pub struct CommandDescription {
     pub command: String,
     pub usage: String,
+    /// Other commands that run the same operation.
+    pub aliases: Vec<String>,
     pub summary: String,
     pub arguments: Vec<String>,
     pub flags: Vec<String>,
@@ -65,6 +67,11 @@ pub fn describe_operation_commands(
                     crate::operation_commands::command_words(definition.cli_usage).join(" ")
                 ),
                 usage: definition.cli_usage.to_owned(),
+                aliases: definition
+                    .cli_aliases
+                    .iter()
+                    .map(|cli_alias| (*cli_alias).to_owned())
+                    .collect(),
                 summary: definition.summary.to_owned(),
                 arguments: command_inputs
                     .positional_inputs

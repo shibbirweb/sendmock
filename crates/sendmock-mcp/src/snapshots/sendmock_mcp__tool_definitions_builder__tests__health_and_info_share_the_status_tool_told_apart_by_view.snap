@@ -29,5 +29,6 @@ expression: status_tool
   "operationIds": [
     "getHealth",
     "getInfo"
-  ]
+  ],
+  "aliases": []
 }

@@ -6,6 +6,7 @@ expression: command_descriptions
   {
     "command": "sendmock health",
     "usage": "sendmock health",
+    "aliases": [],
     "summary": "Liveness check; answers while the server runs.",
     "arguments": [],
     "flags": [],
@@ -27,6 +28,7 @@ expression: command_descriptions
   {
     "command": "sendmock status",
     "usage": "sendmock status",
+    "aliases": [],
     "summary": "Version, listen addresses and enabled features.",
     "arguments": [],
     "flags": [],
@@ -48,6 +50,7 @@ expression: command_descriptions
   {
     "command": "sendmock seed status",
     "usage": "sendmock seed status",
+    "aliases": [],
     "summary": "Whether a seed file is loaded and when it was applied.",
     "arguments": [],
     "flags": [],
@@ -66,6 +69,7 @@ expression: command_descriptions
   {
     "command": "sendmock seed export",
     "usage": "sendmock seed export",
+    "aliases": [],
     "summary": "The current configuration as sendmock.seed.toml.",
     "arguments": [],
     "flags": [],
@@ -84,6 +88,7 @@ expression: command_descriptions
   {
     "command": "sendmock seed validate",
     "usage": "sendmock seed validate <file>",
+    "aliases": [],
     "summary": "Check a seed file without applying it.",
     "arguments": [
       "file"
@@ -104,6 +109,7 @@ expression: command_descriptions
   {
     "command": "sendmock seed apply",
     "usage": "sendmock seed apply <file>",
+    "aliases": [],
     "summary": "Apply a seed file; 422 with the errors when it is invalid.",
     "arguments": [
       "file"
@@ -124,6 +130,7 @@ expression: command_descriptions
   {
     "command": "sendmock stats",
     "usage": "sendmock stats",
+    "aliases": [],
     "summary": "Counts and rates shown on the Overview.",
     "arguments": [],
     "flags": [],
@@ -142,6 +149,7 @@ expression: command_descriptions
   {
     "command": "sendmock email list",
     "usage": "sendmock email list",
+    "aliases": [],
     "summary": "Stored emails, newest first, with search and filters.",
     "arguments": [],
     "flags": [
@@ -171,6 +179,7 @@ expression: command_descriptions
   {
     "command": "sendmock email delete-all",
     "usage": "sendmock email delete-all",
+    "aliases": [],
     "summary": "Delete every email.",
     "arguments": [],
     "flags": [],
@@ -189,6 +198,7 @@ expression: command_descriptions
   {
     "command": "sendmock email latest",
     "usage": "sendmock email latest --to <address>",
+    "aliases": [],
     "summary": "The newest email to a recipient.",
     "arguments": [],
     "flags": [
@@ -210,6 +220,9 @@ expression: command_descriptions
   {
     "command": "sendmock email show",
     "usage": "sendmock email show <emailId>",
+    "aliases": [
+      "sendmock email html <emailId>"
+    ],
     "summary": "One email with bodies, headers, attachments and extracted codes.",
     "arguments": [
       "emailId"
@@ -230,6 +243,9 @@ expression: command_descriptions
   {
     "command": "sendmock email update",
     "usage": "sendmock email update <emailId>",
+    "aliases": [
+      "sendmock email tag <emailId>"
+    ],
     "summary": "Mark read or unread, or change tags.",
     "arguments": [
       "emailId"
@@ -253,6 +269,7 @@ expression: command_descriptions
   {
     "command": "sendmock email delete",
     "usage": "sendmock email delete <emailId>",
+    "aliases": [],
     "summary": "Delete one email.",
     "arguments": [
       "emailId"
@@ -273,6 +290,7 @@ expression: command_descriptions
   {
     "command": "sendmock email timeline",
     "usage": "sendmock email timeline <emailId>",
+    "aliases": [],
     "summary": "Delivery events: received, delivered, opened, bounced.",
     "arguments": [
       "emailId"
@@ -293,6 +311,7 @@ expression: command_descriptions
   {
     "command": "sendmock email simulate",
     "usage": "sendmock email simulate <emailId> <event>",
+    "aliases": [],
     "summary": "Simulate a delivery outcome such as a bounce or complaint.",
     "arguments": [
       "emailId",
@@ -316,6 +335,7 @@ expression: command_descriptions
   {
     "command": "sendmock email open",
     "usage": "sendmock email open <emailId>",
+    "aliases": [],
     "summary": "Record an open and fire email.opened.",
     "arguments": [
       "emailId"
@@ -339,6 +359,7 @@ expression: command_descriptions
   {
     "command": "sendmock email opens",
     "usage": "sendmock email opens <emailId>",
+    "aliases": [],
     "summary": "Every recorded open of the email, oldest first.",
     "arguments": [
       "emailId"
@@ -359,6 +380,7 @@ expression: command_descriptions
   {
     "command": "sendmock email check unsubscribe",
     "usage": "sendmock email check <emailId> unsubscribe",
+    "aliases": [],
     "summary": "List-Unsubscribe and one-click unsubscribe checks.",
     "arguments": [
       "emailId"
@@ -382,6 +404,7 @@ expression: command_descriptions
   {
     "command": "sendmock email mime",
     "usage": "sendmock email mime <emailId>",
+    "aliases": [],
     "summary": "The MIME tree of the message.",
     "arguments": [
       "emailId"
@@ -402,6 +425,7 @@ expression: command_descriptions
   {
     "command": "sendmock email raw",
     "usage": "sendmock email raw <emailId>",
+    "aliases": [],
     "summary": "The raw message source.",
     "arguments": [
       "emailId"
@@ -422,6 +446,7 @@ expression: command_descriptions
   {
     "command": "sendmock email attachments",
     "usage": "sendmock email attachments <emailId> <attachmentIndex>",
+    "aliases": [],
     "summary": "Download one attachment.",
     "arguments": [
       "emailId",
@@ -443,6 +468,7 @@ expression: command_descriptions
   {
     "command": "sendmock email thumbnail",
     "usage": "sendmock email thumbnail <emailId> <attachmentIndex>",
+    "aliases": [],
     "summary": "A preview image of an attachment.",
     "arguments": [
       "emailId",
@@ -464,6 +490,7 @@ expression: command_descriptions
   {
     "command": "sendmock email send",
     "usage": "sendmock email send",
+    "aliases": [],
     "summary": "Native send: JSON with optional base64 attachments.",
     "arguments": [],
     "flags": [
@@ -493,6 +520,7 @@ expression: command_descriptions
   {
     "command": "sendmock sendmail",
     "usage": "sendmock sendmail",
+    "aliases": [],
     "summary": "Store a raw message as sent by your app, as the sendmail shim does.",
     "arguments": [],
     "flags": [],
@@ -511,6 +539,7 @@ expression: command_descriptions
   {
     "command": "sendmock otp",
     "usage": "sendmock otp --to <recipient>",
+    "aliases": [],
     "summary": "The latest one-time code sent to a recipient.",
     "arguments": [],
     "flags": [
@@ -533,6 +562,7 @@ expression: command_descriptions
   {
     "command": "sendmock links",
     "usage": "sendmock links --to <recipient>",
+    "aliases": [],
     "summary": "The links of the latest email to a recipient.",
     "arguments": [],
     "flags": [
@@ -554,6 +584,7 @@ expression: command_descriptions
   {
     "command": "sendmock email wait",
     "usage": "sendmock email wait",
+    "aliases": [],
     "summary": "Wait until a matching email arrives; 408 on timeout.",
     "arguments": [],
     "flags": [
@@ -577,6 +608,10 @@ expression: command_descriptions
   {
     "command": "sendmock events tail",
     "usage": "sendmock events tail",
+    "aliases": [
+      "sendmock http tail",
+      "sendmock webhook tail"
+    ],
     "summary": "The latest events, newest first: the polling twin of the live stream.",
     "arguments": [],
     "flags": [
@@ -599,6 +634,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms list",
     "usage": "sendmock sms list",
+    "aliases": [],
     "summary": "SMS and WhatsApp messages, newest first, with filters.",
     "arguments": [],
     "flags": [
@@ -626,6 +662,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms delete-all",
     "usage": "sendmock sms delete-all --yes",
+    "aliases": [],
     "summary": "Delete every message.",
     "arguments": [],
     "flags": [],
@@ -644,6 +681,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms send",
     "usage": "sendmock sms send",
+    "aliases": [],
     "summary": "Native send, with optional media URLs or inline media.",
     "arguments": [],
     "flags": [
@@ -670,6 +708,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms threads",
     "usage": "sendmock sms threads",
+    "aliases": [],
     "summary": "Conversations, one per contact and your number.",
     "arguments": [],
     "flags": [],
@@ -688,6 +727,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms show",
     "usage": "sendmock sms show <smsId>",
+    "aliases": [],
     "summary": "One message with its status history and callbacks.",
     "arguments": [
       "smsId"
@@ -708,6 +748,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms delete",
     "usage": "sendmock sms delete <smsId>",
+    "aliases": [],
     "summary": "Delete one message.",
     "arguments": [
       "smsId"
@@ -728,6 +769,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms media",
     "usage": "sendmock sms media <smsId> <mediaIndex>",
+    "aliases": [],
     "summary": "Download one media item of an MMS or WhatsApp message.",
     "arguments": [
       "smsId",
@@ -749,6 +791,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms status",
     "usage": "sendmock sms status <smsId> <status>",
+    "aliases": [],
     "summary": "Set a delivery status by hand and fire its callback.",
     "arguments": [
       "smsId",
@@ -772,6 +815,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms open",
     "usage": "sendmock sms open <smsId>",
+    "aliases": [],
     "summary": "Record a read and fire sms.opened.",
     "arguments": [
       "smsId"
@@ -795,6 +839,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms opens",
     "usage": "sendmock sms opens <smsId>",
+    "aliases": [],
     "summary": "Every recorded read of an outbound message, oldest first.",
     "arguments": [
       "smsId"
@@ -815,6 +860,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms inbound",
     "usage": "sendmock sms inbound",
+    "aliases": [],
     "summary": "Simulate a message from a contact to one of your numbers.",
     "arguments": [],
     "flags": [
@@ -840,6 +886,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms wait",
     "usage": "sendmock sms wait",
+    "aliases": [],
     "summary": "Wait until a matching SMS arrives; 408 on timeout.",
     "arguments": [],
     "flags": [
@@ -863,6 +910,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms resend-reply-webhook",
     "usage": "sendmock sms resend-reply-webhook <smsId>",
+    "aliases": [],
     "summary": "Send an inbound message's reply webhook again.",
     "arguments": [
       "smsId"
@@ -883,6 +931,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
+    "aliases": [],
     "summary": "Email outcome rules, checked from top to bottom.",
     "arguments": [],
     "flags": [],
@@ -904,6 +953,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email create",
     "usage": "sendmock outcome-rule email create",
+    "aliases": [],
     "summary": "Add an email outcome rule.",
     "arguments": [],
     "flags": [
@@ -932,6 +982,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email update",
     "usage": "sendmock outcome-rule email update <ruleId>",
+    "aliases": [],
     "summary": "Change an email outcome rule; send only the changed keys.",
     "arguments": [
       "ruleId"
@@ -962,6 +1013,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email delete",
     "usage": "sendmock outcome-rule email delete <ruleId>",
+    "aliases": [],
     "summary": "Delete an email outcome rule.",
     "arguments": [
       "ruleId"
@@ -985,6 +1037,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email move",
     "usage": "sendmock outcome-rule email move <ruleId>",
+    "aliases": [],
     "summary": "Move an email outcome rule up or down.",
     "arguments": [
       "ruleId"
@@ -1010,6 +1063,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule email test",
     "usage": "sendmock outcome-rule email test <address>",
+    "aliases": [],
     "summary": "Which custom rule, magic address or profile decides an address's outcome.",
     "arguments": [
       "address"
@@ -1033,6 +1087,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms list",
     "usage": "sendmock outcome-rule sms list",
+    "aliases": [],
     "summary": "SMS outcome rules, checked from top to bottom.",
     "arguments": [],
     "flags": [],
@@ -1054,6 +1109,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms create",
     "usage": "sendmock outcome-rule sms create",
+    "aliases": [],
     "summary": "Add an SMS outcome rule.",
     "arguments": [],
     "flags": [
@@ -1083,6 +1139,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms update",
     "usage": "sendmock outcome-rule sms update <ruleId>",
+    "aliases": [],
     "summary": "Change an SMS outcome rule; send only the changed keys.",
     "arguments": [
       "ruleId"
@@ -1114,6 +1171,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms delete",
     "usage": "sendmock outcome-rule sms delete <ruleId>",
+    "aliases": [],
     "summary": "Delete an SMS outcome rule.",
     "arguments": [
       "ruleId"
@@ -1137,6 +1195,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms move",
     "usage": "sendmock outcome-rule sms move <ruleId>",
+    "aliases": [],
     "summary": "Move an SMS outcome rule up or down.",
     "arguments": [
       "ruleId"
@@ -1162,6 +1221,7 @@ expression: command_descriptions
   {
     "command": "sendmock outcome-rule sms test",
     "usage": "sendmock outcome-rule sms test <number>",
+    "aliases": [],
     "summary": "Which custom rule, magic number or profile decides a number's outcome.",
     "arguments": [
       "number"
@@ -1187,6 +1247,7 @@ expression: command_descriptions
   {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
+    "aliases": [],
     "summary": "Fake numbers your app sends from, with their webhooks.",
     "arguments": [],
     "flags": [],
@@ -1205,6 +1266,7 @@ expression: command_descriptions
   {
     "command": "sendmock numbers add",
     "usage": "sendmock numbers add",
+    "aliases": [],
     "summary": "Add a number.",
     "arguments": [],
     "flags": [
@@ -1236,6 +1298,7 @@ expression: command_descriptions
   {
     "command": "sendmock numbers update",
     "usage": "sendmock numbers update <numberId>",
+    "aliases": [],
     "summary": "Change a number.",
     "arguments": [
       "numberId"
@@ -1269,6 +1332,7 @@ expression: command_descriptions
   {
     "command": "sendmock numbers remove",
     "usage": "sendmock numbers remove <numberId>",
+    "aliases": [],
     "summary": "Delete a number.",
     "arguments": [
       "numberId"
@@ -1289,6 +1353,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms services list",
     "usage": "sendmock sms services list",
+    "aliases": [],
     "summary": "Messaging Services that pool numbers.",
     "arguments": [],
     "flags": [],
@@ -1307,6 +1372,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms services create",
     "usage": "sendmock sms services create",
+    "aliases": [],
     "summary": "Add a Messaging Service.",
     "arguments": [],
     "flags": [
@@ -1331,6 +1397,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms services update",
     "usage": "sendmock sms services update <serviceSid>",
+    "aliases": [],
     "summary": "Change a Messaging Service.",
     "arguments": [
       "serviceSid"
@@ -1357,6 +1424,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms services delete",
     "usage": "sendmock sms services delete <serviceSid>",
+    "aliases": [],
     "summary": "Delete a Messaging Service.",
     "arguments": [
       "serviceSid"
@@ -1377,6 +1445,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify list",
     "usage": "sendmock verify list",
+    "aliases": [],
     "summary": "Verifications your app started, newest first.",
     "arguments": [],
     "flags": [
@@ -1401,6 +1470,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify show",
     "usage": "sendmock verify show <verificationSid>",
+    "aliases": [],
     "summary": "One verification with its code, attempts and timeline.",
     "arguments": [
       "verificationSid"
@@ -1421,6 +1491,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify force",
     "usage": "sendmock verify force <verificationSid> <status>",
+    "aliases": [],
     "summary": "Force an outcome: approved, expired, canceled or max attempts.",
     "arguments": [
       "verificationSid",
@@ -1442,6 +1513,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify services list",
     "usage": "sendmock verify services list",
+    "aliases": [],
     "summary": "Verify services (code length, fixed code, lifetime).",
     "arguments": [],
     "flags": [],
@@ -1460,6 +1532,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify services create",
     "usage": "sendmock verify services create",
+    "aliases": [],
     "summary": "Add a Verify service.",
     "arguments": [],
     "flags": [
@@ -1483,6 +1556,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify services update",
     "usage": "sendmock verify services update <serviceSid>",
+    "aliases": [],
     "summary": "Change a Verify service.",
     "arguments": [
       "serviceSid"
@@ -1508,6 +1582,7 @@ expression: command_descriptions
   {
     "command": "sendmock verify services delete",
     "usage": "sendmock verify services delete <serviceSid>",
+    "aliases": [],
     "summary": "Delete a Verify service.",
     "arguments": [
       "serviceSid"
@@ -1528,6 +1603,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers list",
     "usage": "sendmock sms providers list",
+    "aliases": [],
     "summary": "SMS providers, built in and custom, removed ones included.",
     "arguments": [],
     "flags": [],
@@ -1546,6 +1622,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers show",
     "usage": "sendmock sms providers show <providerKey>",
+    "aliases": [],
     "summary": "One provider definition; secret credentials masked.",
     "arguments": [
       "providerKey"
@@ -1566,6 +1643,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers update",
     "usage": "sendmock sms providers update <providerKey>",
+    "aliases": [],
     "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
     "arguments": [
       "providerKey"
@@ -1603,6 +1681,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers delete",
     "usage": "sendmock sms providers delete <providerKey>",
+    "aliases": [],
     "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
     "arguments": [
       "providerKey"
@@ -1623,6 +1702,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers restore",
     "usage": "sendmock sms providers restore <providerKey>",
+    "aliases": [],
     "summary": "Bring a removed built-in back as it was.",
     "arguments": [
       "providerKey"
@@ -1643,6 +1723,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers reset",
     "usage": "sendmock sms providers reset <providerKey>",
+    "aliases": [],
     "summary": "Put a built-in provider back as shipped.",
     "arguments": [
       "providerKey"
@@ -1663,6 +1744,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers preview",
     "usage": "sendmock sms providers preview <providerKey>",
+    "aliases": [],
     "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
     "arguments": [
       "providerKey"
@@ -1686,6 +1768,7 @@ expression: command_descriptions
   {
     "command": "sendmock sms providers credential",
     "usage": "sendmock sms providers credential <providerKey> <credentialName> --reveal",
+    "aliases": [],
     "summary": "Reveal one secret credential (asked for after a confirmation).",
     "arguments": [
       "providerKey",
@@ -1707,6 +1790,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint list",
     "usage": "sendmock webhook endpoint list",
+    "aliases": [],
     "summary": "Where webhooks go: URL, template, secret and retry policy.",
     "arguments": [],
     "flags": [],
@@ -1725,6 +1809,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint create",
     "usage": "sendmock webhook endpoint create",
+    "aliases": [],
     "summary": "Add an endpoint; its signing secret is generated.",
     "arguments": [],
     "flags": [
@@ -1761,6 +1846,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint show",
     "usage": "sendmock webhook endpoint show <endpointId>",
+    "aliases": [],
     "summary": "One endpoint; its secret masked.",
     "arguments": [
       "endpointId"
@@ -1781,6 +1867,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint update",
     "usage": "sendmock webhook endpoint update <endpointId>",
+    "aliases": [],
     "summary": "Change an endpoint; send only the changed keys.",
     "arguments": [
       "endpointId"
@@ -1819,6 +1906,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint delete",
     "usage": "sendmock webhook endpoint delete <endpointId>",
+    "aliases": [],
     "summary": "Delete an endpoint and its rules.",
     "arguments": [
       "endpointId"
@@ -1839,6 +1927,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook render",
     "usage": "sendmock webhook render",
+    "aliases": [],
     "summary": "Render an unsaved endpoint's request against a message.",
     "arguments": [],
     "flags": [
@@ -1864,6 +1953,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint secret",
     "usage": "sendmock webhook endpoint secret <endpointId> --reveal",
+    "aliases": [],
     "summary": "Reveal the signing secret (asked for after a confirmation).",
     "arguments": [
       "endpointId"
@@ -1884,6 +1974,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint rotate-secret",
     "usage": "sendmock webhook endpoint rotate-secret <endpointId>",
+    "aliases": [],
     "summary": "New signing secret; the old one keeps working for the overlap.",
     "arguments": [
       "endpointId"
@@ -1906,6 +1997,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint save-as-template",
     "usage": "sendmock webhook endpoint save-as-template <endpointId>",
+    "aliases": [],
     "summary": "Save the endpoint's request as a custom template.",
     "arguments": [
       "endpointId"
@@ -1928,6 +2020,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook endpoint test",
     "usage": "sendmock webhook endpoint test <endpointId>",
+    "aliases": [],
     "summary": "Send a test.ping delivery.",
     "arguments": [
       "endpointId"
@@ -1948,6 +2041,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook send",
     "usage": "sendmock webhook send --endpoint <endpointId>",
+    "aliases": [],
     "summary": "Send a webhook for a chosen message or the sample, by hand.",
     "arguments": [],
     "flags": [
@@ -1975,6 +2069,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook deliveries list",
     "usage": "sendmock webhook deliveries list",
+    "aliases": [],
     "summary": "Every webhook request sent, newest first.",
     "arguments": [],
     "flags": [
@@ -1999,6 +2094,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook deliveries show",
     "usage": "sendmock webhook deliveries show <deliveryId>",
+    "aliases": [],
     "summary": "One delivery: request, response and every attempt.",
     "arguments": [
       "deliveryId"
@@ -2019,6 +2115,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook deliveries cancel",
     "usage": "sendmock webhook deliveries cancel <deliveryId>",
+    "aliases": [],
     "summary": "Stop the remaining retries.",
     "arguments": [
       "deliveryId"
@@ -2039,6 +2136,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook deliveries replay",
     "usage": "sendmock webhook deliveries replay <deliveryId>",
+    "aliases": [],
     "summary": "Send the delivery again, as it was or edited.",
     "arguments": [
       "deliveryId"
@@ -2063,6 +2161,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook deliveries wait",
     "usage": "sendmock webhook deliveries wait",
+    "aliases": [],
     "summary": "Wait until a matching delivery finishes; 408 on timeout.",
     "arguments": [],
     "flags": [
@@ -2087,6 +2186,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook metrics",
     "usage": "sendmock webhook metrics",
+    "aliases": [],
     "summary": "Volume, success rate, latency and failures over a range.",
     "arguments": [],
     "flags": [
@@ -2108,6 +2208,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved list",
     "usage": "sendmock webhook saved list",
+    "aliases": [],
     "summary": "Bookmarked requests, kept through pruning and reset.",
     "arguments": [],
     "flags": [],
@@ -2126,6 +2227,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved create",
     "usage": "sendmock webhook saved create --delivery <deliveryId>",
+    "aliases": [],
     "summary": "Save a delivery's request under a name.",
     "arguments": [],
     "flags": [
@@ -2147,6 +2249,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved rename",
     "usage": "sendmock webhook saved rename <savedId>",
+    "aliases": [],
     "summary": "Rename a saved delivery.",
     "arguments": [
       "savedId"
@@ -2169,6 +2272,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved delete",
     "usage": "sendmock webhook saved delete <savedId>",
+    "aliases": [],
     "summary": "Delete a saved delivery.",
     "arguments": [
       "savedId"
@@ -2189,6 +2293,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved send",
     "usage": "sendmock webhook saved send <savedId>",
+    "aliases": [],
     "summary": "Send a saved request to its endpoint or another one.",
     "arguments": [
       "savedId"
@@ -2212,6 +2317,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook saved save-as-template",
     "usage": "sendmock webhook saved save-as-template <savedId>",
+    "aliases": [],
     "summary": "Turn a saved request into a custom template.",
     "arguments": [
       "savedId"
@@ -2234,6 +2340,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule list",
     "usage": "sendmock webhook rule list",
+    "aliases": [],
     "summary": "Which events go to which endpoint, checked from top to bottom.",
     "arguments": [],
     "flags": [],
@@ -2252,6 +2359,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule create",
     "usage": "sendmock webhook rule create",
+    "aliases": [],
     "summary": "Add a rule.",
     "arguments": [],
     "flags": [
@@ -2276,6 +2384,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule show",
     "usage": "sendmock webhook rule show <ruleId>",
+    "aliases": [],
     "summary": "One webhook rule with its filter.",
     "arguments": [
       "ruleId"
@@ -2296,6 +2405,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule update",
     "usage": "sendmock webhook rule update <ruleId>",
+    "aliases": [],
     "summary": "Change a rule; send only the changed keys.",
     "arguments": [
       "ruleId"
@@ -2322,6 +2432,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule delete",
     "usage": "sendmock webhook rule delete <ruleId>",
+    "aliases": [],
     "summary": "Delete a rule.",
     "arguments": [
       "ruleId"
@@ -2342,6 +2453,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule move",
     "usage": "sendmock webhook rule move <ruleId>",
+    "aliases": [],
     "summary": "Move a rule up or down; answers the reordered list.",
     "arguments": [
       "ruleId"
@@ -2364,6 +2476,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook rule preview",
     "usage": "sendmock webhook rule preview",
+    "aliases": [],
     "summary": "Which recent messages an unsaved rule would match.",
     "arguments": [],
     "flags": [
@@ -2385,6 +2498,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var list",
     "usage": "sendmock webhook var list",
+    "aliases": [],
     "summary": "Global and endpoint variables; secret values are masked.",
     "arguments": [],
     "flags": [
@@ -2405,6 +2519,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var set",
     "usage": "sendmock webhook var set <name> <value>",
+    "aliases": [],
     "summary": "Add a variable.",
     "arguments": [
       "name",
@@ -2432,6 +2547,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var update",
     "usage": "sendmock webhook var update <variableId>",
+    "aliases": [],
     "summary": "Change a variable.",
     "arguments": [
       "variableId"
@@ -2460,6 +2576,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var unset",
     "usage": "sendmock webhook var unset <variableId>",
+    "aliases": [],
     "summary": "Delete a variable.",
     "arguments": [
       "variableId"
@@ -2480,6 +2597,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var regenerate",
     "usage": "sendmock webhook var regenerate <variableId>",
+    "aliases": [],
     "summary": "Make a new fixed value for a generated-once random variable.",
     "arguments": [
       "variableId"
@@ -2500,6 +2618,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook var preview",
     "usage": "sendmock webhook var preview",
+    "aliases": [],
     "summary": "What a variable definition resolves to against the sample.",
     "arguments": [],
     "flags": [
@@ -2521,6 +2640,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template list",
     "usage": "sendmock webhook template list",
+    "aliases": [],
     "summary": "Built-in and custom payload templates.",
     "arguments": [],
     "flags": [],
@@ -2539,6 +2659,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template create",
     "usage": "sendmock webhook template create",
+    "aliases": [],
     "summary": "Add a custom template, starting as native JSON.",
     "arguments": [],
     "flags": [
@@ -2559,6 +2680,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template show",
     "usage": "sendmock webhook template show <templateId>",
+    "aliases": [],
     "summary": "One template with its method, headers and body template.",
     "arguments": [
       "templateId"
@@ -2579,6 +2701,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template update",
     "usage": "sendmock webhook template update <templateId>",
+    "aliases": [],
     "summary": "Edit a template; each save keeps a revision, 422 when it does not render.",
     "arguments": [
       "templateId"
@@ -2608,6 +2731,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template delete",
     "usage": "sendmock webhook template delete <templateId>",
+    "aliases": [],
     "summary": "Delete a custom template; 409 while endpoints use it.",
     "arguments": [
       "templateId"
@@ -2630,6 +2754,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template history",
     "usage": "sendmock webhook template history <templateId>",
+    "aliases": [],
     "summary": "Saved revisions, newest first.",
     "arguments": [
       "templateId"
@@ -2650,6 +2775,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template restore",
     "usage": "sendmock webhook template restore <templateId> <revision>",
+    "aliases": [],
     "summary": "Restore a revision as a new save.",
     "arguments": [
       "templateId",
@@ -2671,6 +2797,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template render",
     "usage": "sendmock webhook template render <templateId>",
+    "aliases": [],
     "summary": "Render against an email, an SMS or the sample, optionally a draft.",
     "arguments": [
       "templateId"
@@ -2696,6 +2823,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template reset",
     "usage": "sendmock webhook template reset <templateId>",
+    "aliases": [],
     "summary": "Put an edited built-in template back as shipped.",
     "arguments": [
       "templateId"
@@ -2716,6 +2844,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template clone",
     "usage": "sendmock webhook template clone <templateId>",
+    "aliases": [],
     "summary": "Copy a template into a new custom one.",
     "arguments": [
       "templateId"
@@ -2738,6 +2867,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template import",
     "usage": "sendmock webhook template import <file>",
+    "aliases": [],
     "summary": "Import a template file; 409 when the id is taken.",
     "arguments": [
       "file"
@@ -2760,6 +2890,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template export",
     "usage": "sendmock webhook template export <templateId>",
+    "aliases": [],
     "summary": "The template as TOML (variable names, never values).",
     "arguments": [
       "templateId"
@@ -2780,6 +2911,7 @@ expression: command_descriptions
   {
     "command": "sendmock webhook template reference",
     "usage": "sendmock webhook template reference",
+    "aliases": [],
     "summary": "Every value a template can read for the chosen events.",
     "arguments": [],
     "flags": [
@@ -2800,6 +2932,7 @@ expression: command_descriptions
   {
     "command": "sendmock logs smtp",
     "usage": "sendmock logs smtp",
+    "aliases": [],
     "summary": "SMTP sessions, newest first, including rejected ones.",
     "arguments": [],
     "flags": [
@@ -2823,6 +2956,7 @@ expression: command_descriptions
   {
     "command": "sendmock logs smtp show",
     "usage": "sendmock logs smtp show <sessionId>",
+    "aliases": [],
     "summary": "One SMTP session with its transcript.",
     "arguments": [
       "sessionId"
@@ -2843,6 +2977,7 @@ expression: command_descriptions
   {
     "command": "sendmock logs http",
     "usage": "sendmock logs http",
+    "aliases": [],
     "summary": "Requests to the native and provider APIs, newest first.",
     "arguments": [],
     "flags": [
@@ -2867,6 +3002,7 @@ expression: command_descriptions
   {
     "command": "sendmock logs http show",
     "usage": "sendmock logs http show <requestId>",
+    "aliases": [],
     "summary": "One API request with its request and response.",
     "arguments": [
       "requestId"
@@ -2887,6 +3023,7 @@ expression: command_descriptions
   {
     "command": "sendmock settings get",
     "usage": "sendmock settings get",
+    "aliases": [],
     "summary": "Every runtime setting.",
     "arguments": [],
     "flags": [],
@@ -2905,6 +3042,7 @@ expression: command_descriptions
   {
     "command": "sendmock settings set",
     "usage": "sendmock settings set",
+    "aliases": [],
     "summary": "Change settings; send only the changed keys.",
     "arguments": [],
     "flags": [
@@ -2953,6 +3091,7 @@ expression: command_descriptions
   {
     "command": "sendmock reset",
     "usage": "sendmock reset --yes",
+    "aliases": [],
     "summary": "Delete all traffic and restore the seed configuration.",
     "arguments": [],
     "flags": [],
@@ -2971,6 +3110,7 @@ expression: command_descriptions
   {
     "command": "sendmock sample",
     "usage": "sendmock sample <kind>",
+    "aliases": [],
     "summary": "Create a sample email, SMS, verification or HTTP request through the normal path.",
     "arguments": [
       "kind"
@@ -2995,6 +3135,7 @@ expression: command_descriptions
   {
     "command": "sendmock integrate",
     "usage": "sendmock integrate <stack>",
+    "aliases": [],
     "summary": "Copy-ready settings for a stack, as Settings > Connection shows them.",
     "arguments": [
       "stack"
@@ -3018,6 +3159,7 @@ expression: command_descriptions
   {
     "command": "sendmock update check",
     "usage": "sendmock update check",
+    "aliases": [],
     "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
     "arguments": [],
     "flags": [],
