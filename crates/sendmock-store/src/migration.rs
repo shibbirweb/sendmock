@@ -94,4 +94,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 21,
         sql: include_str!("../migrations/0021_sms_reply_webhooks.sql"),
     },
+    Migration {
+        schema_version: 22,
+        sql: include_str!("../migrations/0022_seed_state.sql"),
+    },
 ];

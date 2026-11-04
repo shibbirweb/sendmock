@@ -23,6 +23,7 @@ use crate::provider_listeners::{
     ProviderListener, bind_provider_listeners, start_provider_listeners,
 };
 use crate::retention_task::{apply_startup_settings, run_retention_task};
+use crate::seed_file_check::apply_seed_file;
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
@@ -74,6 +75,9 @@ pub async fn run_server(
         &operation_context,
         &shutdown_receiver_for_providers,
     );
+    if let Some(seed_file_path) = &server_config.seed_file_path {
+        apply_seed_file(seed_file_path, &operation_context).await?;
+    }
     apply_startup_settings(server_config, &operation_context).await;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
     spawn_background_tasks(

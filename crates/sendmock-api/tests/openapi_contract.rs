@@ -75,6 +75,12 @@ fn system_samples() -> Vec<(&'static str, Vec<Value>)> {
         ("getHealth", vec![json!({})]),
         ("getInfo", vec![json!({})]),
         ("getStats", vec![json!({})]),
+        ("getSeedStatus", vec![json!({})]),
+        ("getSeedExport", vec![json!({})]),
+        (
+            "postSeedApply",
+            vec![json!({ "seed_toml": "[settings]\nsms_failure_rate_percent = 0\n" })],
+        ),
         (
             "postSeedValidate",
             vec![

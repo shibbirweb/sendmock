@@ -64,7 +64,7 @@ mod tests {
 
         assert_eq!(
             &operation_ids[..3],
-            ["getHealth", "getInfo", "postSeedValidate"]
+            ["getHealth", "getInfo", "getSeedStatus"]
         );
         assert!(operation_ids.contains(&"getEmails"));
         assert!(

@@ -19,7 +19,7 @@ fn field_error(field_name: &str, message: String) -> OperationError {
 }
 
 /// The service as it will be stored, checked as the form checks it.
-fn build_verify_service(
+pub(crate) fn build_verify_service(
     input: VerifyServiceInput,
     existing_service: VerifyServiceRecord,
 ) -> Result<VerifyServiceRecord, OperationError> {

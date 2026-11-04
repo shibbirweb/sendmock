@@ -3,7 +3,7 @@ title: Seed file
 description: Keep your SendMock setup in your repository. Export, commit, validate, apply, reset before tests, and keep secrets out.
 ---
 
-> Works in your install from Phase 0 (loading), growing with each phase until Phase 3 covers every item. Try it in the [demo](/demo/settings?section=seed) today.
+> In your install today: settings, Verify services, Messaging Services, numbers and custom outcome numbers and addresses are applied, exported and restored. Webhook endpoints, rules, templates, variables, saved deliveries and SMS providers follow later in Phase 3; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
 
 `sendmock.seed.toml` is the configuration SendMock starts from and resets to. Commit it next to your app's code, and everyone (teammates, CI, an AI agent) gets the same endpoints, rules, templates, variables, numbers, Messaging Services, Verify services, outcome rules, bins, saved deliveries, payment setup and settings.
 
@@ -15,7 +15,9 @@ description: Keep your SendMock setup in your repository. Export, commit, valida
 
 ## Load it
 
-SendMock loads `--seed <file>`, or `./sendmock.seed.toml` in the folder it starts in, or `/config/sendmock.seed.toml` in Docker. Items are matched by name or SID, so restarting with the same file changes nothing.
+SendMock loads `--seed <file>`, or `./sendmock.seed.toml` in the folder it starts in, or `/config/sendmock.seed.toml` in Docker, before it answers its first request. Items are matched by SID, number or pattern, so restarting with the same file changes nothing. Items the file creates are marked as made by the seed. A file with an error, or an item SendMock refuses (a number that is not E.164, for example), stops startup with the reason.
+
+Command-line flags and `SENDMOCK_*` environment variables still win over the file's `[settings]`.
 
 ## Apply a changed file
 
@@ -23,7 +25,7 @@ In **Settings > Seed**, **Apply a seed file**: upload or paste it, press **Valid
 
 ## Reset before every test run
 
-**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments) and restores the file's configuration:
+**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments), puts the settings back to their defaults and restores the seed applied last: items you edited get the file's values again, and items the file does not hold are deleted. Without a seed, reset keeps your configuration.
 
 ```bash
 sendmock reset --yes
@@ -33,7 +35,7 @@ curl -X POST http://127.0.0.1:8025/api/v1/reset
 
 ## Secrets
 
-Secrets are never written in plain text. Export writes references, which are read from the environment when the file is loaded:
+Secrets are never written in plain text. Export writes references, which are read from the environment when the file is loaded (a variable that is not set reads as empty, and the log names it). The relay SMTP URL is never exported, as it holds a password. Any string can use a reference, such as a URL with `http://${APP_HOST}/sms/inbound`:
 
 ```toml
 [[webhook.endpoints]]
@@ -57,11 +59,33 @@ code_length = 6
 fixed_code = "123456"
 ttl_seconds = 600
 
+[[messaging_services]]
+sid = "MG00000000000000000000000000000001"
+name = "Notifications"
+inbound_mode = "defer_to_sender"
+
+[[numbers]]
+number = "+15550001111"
+label = "Support line"
+channels = ["sms", "whatsapp"]
+inbound_url = "http://localhost:8000/sms/inbound"
+inbound_method = "POST"
+inbound_template = "twilio.inbound_sms"
+messaging_service = "MG00000000000000000000000000000001"
+
+[[sms.outcome_rules]]
+match = "to"
+pattern = "+1555777*"
+outcome = "undelivered"
+error_code = "30003"
+
 [[email.outcome_rules]]
 pattern = "*@bounce.qa.test"
 outcome = "hard_bounce"
 enabled = true
 ```
+
+`[settings]` takes the same keys as **Settings** and `PATCH /api/v1/settings`. Export writes only the settings you changed from the defaults.
 
 ## Related
 

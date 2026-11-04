@@ -6,13 +6,15 @@ mod registry_fields;
 mod virtual_number_builder;
 mod virtual_number_operations;
 
-pub(crate) use messaging_service_builder::generate_service_sid;
+pub(crate) use messaging_service_builder::{build_messaging_service, generate_service_sid};
 pub use messaging_service_operations::{
     CreateMessagingServiceOperation, DeleteMessagingServiceOperation,
     ListMessagingServicesOperation, UpdateMessagingServiceOperation,
 };
+pub(crate) use number_inputs::{MessagingServiceInput, VirtualNumberInput};
 pub use number_views::{MessagingService, VirtualNumber};
 pub(crate) use registry_fields::is_http_url;
+pub(crate) use virtual_number_builder::build_virtual_number;
 pub use virtual_number_operations::{
     CreateVirtualNumberOperation, DeleteVirtualNumberOperation, ListVirtualNumbersOperation,
     UpdateVirtualNumberOperation,

@@ -14,28 +14,47 @@ const fn item_list(section_path: &'static str, item_kind: &'static str) -> SeedS
     }
 }
 
+pub const SETTINGS_SECTION: SeedSection = SeedSection {
+    section_path: "settings",
+    item_kind: "Settings",
+    is_item_list: false,
+};
+pub const WEBHOOK_ENDPOINTS_SECTION: SeedSection =
+    item_list("webhook.endpoints", "Webhook endpoint");
+pub const WEBHOOK_RULES_SECTION: SeedSection = item_list("webhook.rules", "Webhook rule");
+pub const WEBHOOK_TEMPLATES_SECTION: SeedSection =
+    item_list("webhook.templates", "Webhook template");
+pub const WEBHOOK_VARIABLES_SECTION: SeedSection =
+    item_list("webhook.variables", "Webhook variable");
+pub const SAVED_DELIVERIES_SECTION: SeedSection = item_list("webhook.saved", "Saved delivery");
+pub const VERIFY_SERVICES_SECTION: SeedSection = item_list("verify.services", "Verify service");
+pub const NUMBERS_SECTION: SeedSection = item_list("numbers", "Virtual number");
+pub const MESSAGING_SERVICES_SECTION: SeedSection =
+    item_list("messaging_services", "Messaging Service");
+pub const SMS_OUTCOME_RULES_SECTION: SeedSection =
+    item_list("sms.outcome_rules", "Custom outcome number");
+pub const EMAIL_OUTCOME_RULES_SECTION: SeedSection =
+    item_list("email.outcome_rules", "Custom outcome address");
+pub const SMS_PROVIDERS_SECTION: SeedSection = item_list("sms.providers", "SMS provider");
+
 /// Every section a seed file may hold, in the order the summary lists them.
 pub const SEED_SECTIONS: [SeedSection; 16] = [
-    SeedSection {
-        section_path: "settings",
-        item_kind: "Settings",
-        is_item_list: false,
-    },
-    item_list("webhook.endpoints", "Webhook endpoint"),
-    item_list("webhook.rules", "Webhook rule"),
-    item_list("webhook.templates", "Webhook template"),
-    item_list("webhook.variables", "Webhook variable"),
-    item_list("webhook.saved", "Saved delivery"),
-    item_list("verify.services", "Verify service"),
-    item_list("numbers", "Virtual number"),
-    item_list("messaging_services", "Messaging Service"),
+    SETTINGS_SECTION,
+    WEBHOOK_ENDPOINTS_SECTION,
+    WEBHOOK_RULES_SECTION,
+    WEBHOOK_TEMPLATES_SECTION,
+    WEBHOOK_VARIABLES_SECTION,
+    SAVED_DELIVERIES_SECTION,
+    VERIFY_SERVICES_SECTION,
+    NUMBERS_SECTION,
+    MESSAGING_SERVICES_SECTION,
     item_list("http.bins", "HTTP bin"),
     item_list("email.tag_rules", "Tag rule"),
     item_list("email.forward_rules", "Forward rule"),
-    item_list("sms.outcome_rules", "Custom outcome number"),
-    item_list("email.outcome_rules", "Custom outcome address"),
+    SMS_OUTCOME_RULES_SECTION,
+    EMAIL_OUTCOME_RULES_SECTION,
     item_list("email.providers", "Email provider"),
-    item_list("sms.providers", "SMS provider"),
+    SMS_PROVIDERS_SECTION,
 ];
 
 pub fn find_seed_section(section_path: &str) -> Option<&'static SeedSection> {

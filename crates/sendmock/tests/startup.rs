@@ -186,24 +186,43 @@ fn an_invalid_seed_file_stops_startup_with_its_line_numbers() {
     assert!(error_output.contains("line 1: Unknown section [[mystery]]"));
 }
 
+// AC: PL-04.1
 #[test]
-fn a_valid_seed_file_lets_the_server_start() {
+fn a_valid_seed_file_is_applied_before_the_server_answers() {
     let working_directory = tempfile::tempdir().expect("temporary folder");
     fs::write(
         working_directory.path().join("sendmock.seed.toml"),
-        "[[numbers]]\nnumber = \"+15550001111\"\n",
+        "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\"\n",
     )
     .expect("the seed file is written");
 
-    let sendmock = SendmockProcess::start(
-        sendmock_command(working_directory.path()).args(FREE_PORT_ARGUMENTS),
-    )
-    .expect("sendmock starts");
+    let sendmock =
+        SendmockProcess::start_with_free_port(working_directory.path()).expect("sendmock starts");
+    let http_addr = sendmock.wait_for_http_addr();
+    let numbers_response = send_http_get(&http_addr, "/api/v1/numbers").expect("numbers answer");
 
+    assert!(numbers_response.contains(r#""number":"+15550001111""#));
+    assert!(numbers_response.contains(r#""created_by":"seed""#));
+}
+
+#[test]
+fn a_seed_item_the_api_refuses_stops_startup() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    fs::write(
+        working_directory.path().join("sendmock.seed.toml"),
+        "[[numbers]]\nnumber = \"555\"\nlabel = \"Bad\"\n",
+    )
+    .expect("the seed file is written");
+
+    let output =
+        run_until_exit(sendmock_command(working_directory.path()).args(FREE_PORT_ARGUMENTS))
+            .expect("sendmock runs");
+
+    let error_output = String::from_utf8_lossy(&output.stderr);
+    assert_eq!(output.status.code(), Some(2));
     assert!(
-        sendmock
-            .wait_for_line("Seed file is valid")
-            .contains("sendmock.seed.toml")
+        error_output.contains("[[numbers]] item 1"),
+        "{error_output}"
     );
 }
 

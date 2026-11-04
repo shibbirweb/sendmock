@@ -46,6 +46,42 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock seed status",
+    "usage": "sendmock seed status",
+    "summary": "Whether a seed file is loaded and when it was applied.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/seed/status",
+        "operation_id": "getSeedStatus",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_seed_status"
+    ]
+  },
+  {
+    "command": "sendmock seed export",
+    "usage": "sendmock seed export",
+    "summary": "The current configuration as sendmock.seed.toml.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/seed/export",
+        "operation_id": "getSeedExport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_seed_export"
+    ]
+  },
+  {
     "command": "sendmock seed validate",
     "usage": "sendmock seed validate <file>",
     "summary": "Check a seed file without applying it.",
@@ -63,6 +99,26 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_seed_validate"
+    ]
+  },
+  {
+    "command": "sendmock seed apply",
+    "usage": "sendmock seed apply <file>",
+    "summary": "Apply a seed file; 422 with the errors when it is invalid.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/seed/apply",
+        "operation_id": "postSeedApply",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_seed_apply"
     ]
   },
   {

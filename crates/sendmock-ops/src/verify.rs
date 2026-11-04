@@ -15,6 +15,8 @@ pub use verification_operations::{
     ForceVerificationOperation, GetVerificationOperation, ListVerificationsOperation,
 };
 pub use verification_outcomes::{expire_overdue_verifications, finish_verification};
+pub(crate) use verify_inputs::VerifyServiceInput;
+pub(crate) use verify_service_operations::build_verify_service;
 pub use verify_service_operations::{
     CreateVerifyServiceOperation, DeleteVerifyServiceOperation, ListVerifyServicesOperation,
     UpdateVerifyServiceOperation, new_verify_service,

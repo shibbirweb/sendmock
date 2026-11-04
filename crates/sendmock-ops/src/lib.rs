@@ -75,8 +75,10 @@ pub use providers::{
 };
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
-    SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError, ValidateSeedOperation,
-    validate_seed_toml,
+    ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,
+    GetSeedStatusOperation, ProcessEnvironment, SeedChangedItem, SeedFileRequest, SeedItemChange,
+    SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, ValidateSeedOperation,
+    apply_seed_toml, restore_seed_state, validate_seed_toml,
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
@@ -121,7 +123,10 @@ pub fn build_operation_registry() -> OperationRegistry {
     let mut operation_registry = OperationRegistry::default();
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
+    operation_registry.register(GetSeedStatusOperation);
+    operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
+    operation_registry.register(ApplySeedOperation);
     operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);

@@ -5,16 +5,17 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
     EmailRepository, MessageProviderRepository, MessagingServiceRepository,
-    SavedWebhookDeliveryRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
+    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
-    AppSettingsStore, EventBus, InstanceDetails, MediaFetcher, ReplyWebhookSender,
-    SampleEmailSender, StatusCallbackSender, UpdateChecker, WebhookSender,
+    AppSettingsStore, EnvironmentReader, EventBus, InstanceDetails, MediaFetcher,
+    ProcessEnvironment, ReplyWebhookSender, SampleEmailSender, StatusCallbackSender, UpdateChecker,
+    WebhookSender,
 };
 
 /// The dependencies operations run with, passed in rather than reached through globals.
@@ -70,6 +71,10 @@ pub struct OperationContext {
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
     /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
     pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
+    /// The seed file applied last, for reset and seed status.
+    pub seed_state_repository: SeedStateRepository,
+    /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
+    pub environment_reader: Arc<dyn EnvironmentReader>,
 }
 
 impl OperationContext {
@@ -81,17 +86,15 @@ impl OperationContext {
         instance_details: InstanceDetails,
     ) -> Self {
         let email_repository = EmailRepository::new(Arc::clone(&database));
-        let email_ingest_service = EmailIngestService::new(
-            email_repository.clone(),
-            Arc::clone(&clock),
-            Arc::clone(&id_generator),
-        );
+        let email_ingest_service =
+            build_email_ingest_service(&email_repository, &clock, &id_generator);
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
         Self {
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(Arc::clone(&database)),
             smtp_session_repository: SmtpSessionRepository::new(Arc::clone(&database)),
             api_request_repository: ApiRequestRepository::new(Arc::clone(&database)),
             sms_repository: SmsRepository::new(Arc::clone(&database)),
+            seed_state_repository: SeedStateRepository::new(Arc::clone(&database)),
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(Arc::clone(
                 &database,
             )),
@@ -128,7 +131,16 @@ impl OperationContext {
             media_fetcher: None,
             status_callback_sender: None,
             reply_webhook_sender: None,
+            environment_reader: Arc::new(ProcessEnvironment),
         }
+    }
+
+    pub fn with_environment_reader(
+        mut self,
+        environment_reader: Arc<dyn EnvironmentReader>,
+    ) -> Self {
+        self.environment_reader = environment_reader;
+        self
     }
 
     pub fn with_random_source(mut self, random_source: Arc<dyn RandomSource>) -> Self {
@@ -174,4 +186,16 @@ impl OperationContext {
         self.sample_email_sender = Some(sample_email_sender);
         self
     }
+}
+
+fn build_email_ingest_service(
+    email_repository: &EmailRepository,
+    clock: &Arc<dyn Clock>,
+    id_generator: &Arc<dyn IdGenerator>,
+) -> EmailIngestService {
+    EmailIngestService::new(
+        email_repository.clone(),
+        Arc::clone(clock),
+        Arc::clone(id_generator),
+    )
 }

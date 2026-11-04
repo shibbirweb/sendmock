@@ -1,7 +1,7 @@
 use super::app_settings::AppSettings;
 use crate::{
     HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
-    OperationError, SuccessStatus, publish_email_deleted,
+    OperationError, SuccessStatus, publish_email_deleted, restore_seed_state,
 };
 
 pub struct ResetOperation;
@@ -25,9 +25,9 @@ impl Operation for ResetOperation {
     }
 
     /// Deletes every email, SMS, verification, SMTP session, logged request and webhook
-    /// delivery and puts the settings back to their defaults; configuration such as numbers,
-    /// services, outcome rules and saved deliveries stays. Applying the seed file again comes
-    /// with seed apply in Phase 3.
+    /// delivery, puts the settings back to their defaults, then restores the seed applied last:
+    /// its items as the file has them, and the configuration it does not hold deleted. Without
+    /// a seed, configuration such as numbers, services and outcome rules stays.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -64,6 +64,7 @@ impl Operation for ResetOperation {
                 operation_context.clock.now_unix_ms(),
             )
             .await?;
+        restore_seed_state(operation_context).await?;
         if deleted_email_count > 0 {
             publish_email_deleted(operation_context, None, deleted_email_count);
         }

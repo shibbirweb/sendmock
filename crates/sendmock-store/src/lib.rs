@@ -11,6 +11,7 @@ mod migration;
 mod numbers;
 mod outcome_rule;
 mod saved_webhook_delivery;
+mod seed_state;
 mod settings;
 mod sms;
 mod sms_callback_attempt;
@@ -46,6 +47,7 @@ pub use outcome_rule::{
     SmsOutcomeRuleRepository,
 };
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
+pub use seed_state::{SeedStateRecord, SeedStateRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
     NewSmsRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord, SmsPage, SmsRecord,

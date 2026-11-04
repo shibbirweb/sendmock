@@ -63,8 +63,11 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         label: virtualNumber.label,
         channels: virtualNumber.channels,
         inbound_url: virtualNumber.inbound_url,
+        inbound_method: virtualNumber.inbound_method,
+        inbound_fallback_url: virtualNumber.inbound_fallback_url,
         inbound_template: virtualNumber.inbound_template_id,
         status_callback: virtualNumber.status_callback_url,
+        messaging_service: virtualNumber.messaging_service_sid,
       }),
     ),
     ...mockDatabase.messagingServices.map((messagingService) =>
@@ -73,6 +76,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         name: messagingService.friendly_name,
         inbound_mode: messagingService.inbound_mode,
         inbound_url: messagingService.inbound_url,
+        inbound_fallback_url: messagingService.inbound_fallback_url,
       }),
     ),
     ...mockDatabase.smsOutcomeRules.map((outcomeRule) =>

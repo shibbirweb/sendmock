@@ -20,6 +20,7 @@ pub use email_outcome_rule_operations::{
 pub use email_outcome_rule_order_operations::{
     MoveEmailOutcomeRuleOperation, TestEmailOutcomeOperation,
 };
+pub(crate) use email_outcome_rule_validation::normalize_and_validate as validate_email_outcome_rule;
 pub use email_outcome_rule_view::EmailOutcomeRule;
 pub use outcome_test_result::OutcomeTestResult;
 pub use sms_outcome_rule_operations::{
@@ -27,6 +28,7 @@ pub use sms_outcome_rule_operations::{
     UpdateSmsOutcomeRuleOperation,
 };
 pub use sms_outcome_rule_order_operations::{MoveSmsOutcomeRuleOperation, TestSmsOutcomeOperation};
+pub(crate) use sms_outcome_rule_validation::normalize_and_validate as validate_sms_outcome_rule;
 pub use sms_outcome_rule_view::SmsOutcomeRule;
 
 use crate::OperationRegistry;
