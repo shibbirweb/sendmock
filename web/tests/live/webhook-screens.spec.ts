@@ -120,7 +120,7 @@ test("PL-04.6 Settings > Seed shows the applied seed, exports it, and validates 
   );
 
   const seedField = page.getByLabel("Seed file (TOML)");
-  await seedField.fill('[[numbers]]\nnumber = "+15550007777"\nlabel = "Sales"');
+  await seedField.fill('[[numbers]]\nnumber = "+15550008800"\nlabel = "Sales"');
   await page.getByRole("button", { name: "Validate" }).click();
   await expect(page.getByRole("list", { name: "Seed summary" })).toContainText(
     "Virtual number",
@@ -137,7 +137,7 @@ test("PL-04.6 Settings > Seed shows the applied seed, exports it, and validates 
     created_by: string;
   }[];
   expect(numbers).toContainEqual(
-    expect.objectContaining({ number: "+15550007777", created_by: "seed" }),
+    expect.objectContaining({ number: "+15550008800", created_by: "seed" }),
   );
   expect(failedApiCalls).toEqual([]);
 });
