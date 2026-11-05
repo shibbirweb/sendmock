@@ -96,7 +96,9 @@ export function describeSslcommerzTransaction(
     amount,
     store_amount: amount,
     currency: paymentDetail.currency,
-    bank_tran_id: deriveBankTranId(paymentDetail),
+    bank_tran_id:
+      paymentDetail.provider_ids.bank_tran_id ??
+      deriveBankTranId(paymentDetail),
     card_type: cardType ?? "",
     card_no: cardNo ?? "",
     card_issuer: cardIssuer ?? "",

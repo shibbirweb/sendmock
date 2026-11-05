@@ -39,8 +39,17 @@ pub fn read_provider_id(payment: &PaymentDetail, id_name: &str) -> String {
         .unwrap_or_default()
 }
 
-/// The bank's own transaction id, made from the payment's, as refunds name the transaction.
-pub fn derive_bank_tran_id(payment: &PaymentDetail) -> String {
+/// The bank's own transaction id, which refunds name the transaction by; payments made before
+/// it was kept get one made from the payment's id.
+pub fn read_bank_tran_id(payment: &PaymentDetail) -> String {
+    payment
+        .provider_ids
+        .get("bank_tran_id")
+        .cloned()
+        .unwrap_or_else(|| derive_bank_tran_id(payment))
+}
+
+fn derive_bank_tran_id(payment: &PaymentDetail) -> String {
     let compact_date: String = format_dhaka_time(&payment.summary.created_at)
         .chars()
         .filter(char::is_ascii_digit)
@@ -126,7 +135,7 @@ pub fn describe_sslcommerz_transaction(
         ("amount", amount.clone()),
         ("store_amount", amount.clone()),
         ("currency", summary.currency.clone()),
-        ("bank_tran_id", derive_bank_tran_id(payment)),
+        ("bank_tran_id", read_bank_tran_id(payment)),
         ("card_type", card_type),
         ("card_no", card_no),
         ("card_issuer", card_issuer),

@@ -24,6 +24,7 @@ pub fn build_provider_ids(provider: &str, suffix: &str) -> BTreeMap<String, Stri
         "sslcommerz" => vec![
             ("tran_id", format!("TXN{suffix}")),
             ("val_id", format!("VAL{suffix}")),
+            ("bank_tran_id", format!("BTX{suffix}")),
         ],
         "bkash" => vec![
             ("payment_id", format!("TR00{suffix}")),

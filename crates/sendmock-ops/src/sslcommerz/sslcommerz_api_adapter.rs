@@ -3,7 +3,9 @@ use std::collections::BTreeMap;
 use serde_json::{Value, json};
 
 use super::sslcommerz_call::{SSLCOMMERZ_PROVIDER_KEY, SslcommerzCall};
+use super::sslcommerz_refunds::{query_refund, refund_transaction};
 use super::sslcommerz_session::init_session;
+use super::sslcommerz_transaction_query::{query_by_session_key, query_by_tran_id};
 use super::sslcommerz_validation::validate_order;
 use crate::payments::find_payment_gateway;
 use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome, ProviderRoute};
@@ -46,6 +48,29 @@ fn read_request_fields(request: &ProviderHttpRequest) -> BTreeMap<String, String
         .collect()
 }
 
+/// `merchantTransIDvalidationAPI.php` serves refunds and transaction queries, told apart by
+/// the fields sent, as SSLCommerz tells them apart.
+async fn answer_merchant_api(
+    sslcommerz_call: &SslcommerzCall<'_>,
+) -> Result<Value, OperationError> {
+    if !sslcommerz_call.has_store_credentials() {
+        return Ok(json!({"APIConnect": "FAILED"}));
+    }
+    if let Some(refund_ref_id) = sslcommerz_call.read_field("refund_ref_id") {
+        return query_refund(sslcommerz_call, refund_ref_id).await;
+    }
+    if sslcommerz_call.read_field("bank_tran_id").is_some() {
+        return refund_transaction(sslcommerz_call).await;
+    }
+    if let Some(session_key) = sslcommerz_call.read_field("sessionkey") {
+        return query_by_session_key(sslcommerz_call, session_key).await;
+    }
+    if let Some(tran_id) = sslcommerz_call.read_field("tran_id") {
+        return query_by_tran_id(sslcommerz_call, tran_id).await;
+    }
+    Ok(json!({"APIConnect": "INVALID_REQUEST"}))
+}
+
 async fn route_sslcommerz_request(
     sslcommerz_call: &SslcommerzCall<'_>,
     path: &str,
@@ -58,6 +83,9 @@ async fn route_sslcommerz_request(
         ["gwprocess", "v4", "api.php"] => Ok((200, init_session(sslcommerz_call).await?)),
         ["validator", "api", "validationserverAPI.php"] => {
             Ok((200, validate_order(sslcommerz_call).await?))
+        }
+        ["validator", "api", "merchantTransIDvalidationAPI.php"] => {
+            Ok((200, answer_merchant_api(sslcommerz_call).await?))
         }
         _ => Ok((
             404,

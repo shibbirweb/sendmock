@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-use crate::OperationContext;
-use crate::payments::PaymentGatewayFields;
+use crate::payments::{PaymentDetail, PaymentGatewayFields, read_payment_document};
+use crate::{OperationContext, OperationError};
 
 pub const SSLCOMMERZ_PROVIDER_KEY: &str = "sslcommerz";
 
@@ -35,5 +35,25 @@ impl SslcommerzCall<'_> {
             self.read_field(credential_name)
                 .is_some_and(|sent_value| self.read_credential(credential_name) == Some(sent_value))
         })
+    }
+
+    /// The SSLCommerz payment whose `id_name` (`val_id`, `sessionkey`, `bank_tran_id`, ...) is
+    /// `id_value`, the newest when several are.
+    pub async fn find_payment(
+        &self,
+        id_name: &str,
+        id_value: &str,
+    ) -> Result<Option<PaymentDetail>, OperationError> {
+        let stored_payment = self
+            .operation_context
+            .payment_repository
+            .find_payment_by_provider_id(SSLCOMMERZ_PROVIDER_KEY, id_value)
+            .await?;
+        let payment = stored_payment
+            .map(|stored_payment| read_payment_document(&stored_payment))
+            .transpose()?;
+        Ok(payment.filter(|payment| {
+            payment.provider_ids.get(id_name).map(String::as_str) == Some(id_value)
+        }))
     }
 }

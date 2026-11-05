@@ -338,7 +338,11 @@ export function buildProviderIds(
       payment_intent: `pi_${suffix}`,
     },
     paypal: { order: suffix.slice(0, 10).toUpperCase() },
-    sslcommerz: { tran_id: `TXN${suffix}`, val_id: `VAL${suffix}` },
+    sslcommerz: {
+      tran_id: `TXN${suffix}`,
+      val_id: `VAL${suffix}`,
+      bank_tran_id: `BTX${suffix}`,
+    },
     bkash: { payment_id: `TR00${suffix}`, trx_id: `TRX${suffix.slice(0, 8)}` },
     native: { payment: `pay_${suffix}` },
   };
