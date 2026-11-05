@@ -124,6 +124,46 @@ fn to_sms_subject(stored_sms: &SmsRecord) -> TemplateSubject {
     }
 }
 
+/// A captured request as an `http.captured` event, shaped as the built-in sample.
+async fn find_http_subject(
+    operation_context: &OperationContext,
+    http_request_id: &str,
+) -> Result<TemplateSubject, OperationError> {
+    let captured_request = operation_context
+        .http_catcher_stores
+        .requests
+        .find_request(http_request_id)
+        .await?
+        .ok_or_else(|| {
+            not_found(format!(
+                "No captured HTTP request with id {http_request_id}"
+            ))
+        })?;
+    let read_map = |stored_json: &str| {
+        serde_json::from_str::<Value>(stored_json).unwrap_or_else(|_| json!({}))
+    };
+    let rendered_against = format!("{} {}", captured_request.method, captured_request.path);
+    Ok(TemplateSubject {
+        app_event: AppEvent {
+            id: format!("evt_{}", captured_request.request_id),
+            event_type: "http.captured".to_owned(),
+            created_at: sendmock_core::format_rfc3339(captured_request.created_at_unix_ms),
+            data: json!({
+                "id": captured_request.request_id,
+                "bin": captured_request.bin_name,
+                "method": captured_request.method,
+                "url": captured_request.url,
+                "path": captured_request.path,
+                "query": read_map(&captured_request.query_json),
+                "headers": read_map(&captured_request.headers_json),
+                "json": serde_json::from_str::<Value>(&captured_request.body).unwrap_or(Value::Null),
+                "body": captured_request.body,
+            }),
+        },
+        rendered_against,
+    })
+}
+
 async fn find_payment_subject(
     operation_context: &OperationContext,
     payment_id: &str,
@@ -139,8 +179,8 @@ fn not_found(message: String) -> OperationError {
     OperationError::NotFound { message }
 }
 
-/// The chosen email or SMS; with neither, the latest email, or the built-in sample when no
-/// email is stored yet. Captured HTTP requests arrive with the HTTP catcher (Phase 5).
+/// The chosen email, SMS, payment or captured request; with none, the latest email, or the
+/// built-in sample when no email is stored yet.
 pub async fn find_template_subject(
     operation_context: &OperationContext,
     chosen_message: ChosenMessage<'_>,
@@ -174,9 +214,7 @@ pub async fn find_template_subject(
         return find_payment_subject(operation_context, payment_id).await;
     }
     if let Some(http_request_id) = http_request_id {
-        return Err(not_found(format!(
-            "No captured HTTP request with id {http_request_id}"
-        )));
+        return find_http_subject(operation_context, http_request_id).await;
     }
     let sample_event_type = sample_event_type.unwrap_or("email.received");
     if sample_event_type != "email.received" {

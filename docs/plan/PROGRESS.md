@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W9c (Send to webhook in the request detail, HC-01.7; each preset's official client library in a CI workflow, HC-03.1), then W7d (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W9c (each preset's official client library in a CI workflow, HC-03.1), then W7d (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file

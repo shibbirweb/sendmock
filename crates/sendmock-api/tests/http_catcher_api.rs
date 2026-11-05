@@ -416,3 +416,66 @@ async fn the_http_sample_is_captured_in_the_slack_bin_like_real_traffic() {
         1
     );
 }
+
+/// An endpoint that sends the native event once, without retries.
+async fn create_native_endpoint(app_router: &axum::Router) -> String {
+    let (_, endpoint) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/webhooks/endpoints",
+        Some(&json!({
+            "name": "Orders app", "url": "http://localhost:3000/hooks", "method": "POST",
+            "headers": {}, "extra_fields": {}, "template_id": "native", "template_mode": "linked",
+            "timeout_ms": 10_000, "retry_policy": { "max_attempts": 1, "backoff_seconds": [], "retry_on_client_errors": false },
+            "is_enabled": true, "query_params": [], "body_mode": "template", "body_fields": [],
+            "fields_encoding": "json", "raw_content_type": "application/json", "raw_body": "",
+            "render_mode": "strict",
+        })),
+    )
+    .await;
+    endpoint["id"].as_str().unwrap_or_default().to_owned()
+}
+
+// AC: HC-01.7
+#[tokio::test]
+async fn a_captured_request_is_sent_to_a_webhook_endpoint_as_an_http_captured_event() {
+    let webhook_sender = std::sync::Arc::new(
+        support::scripted_webhook_sender::ScriptedWebhookSender::answering(&[
+            support::scripted_webhook_sender::ScriptedAnswer::Status(200),
+        ]),
+    );
+    let (app_router, operation_context) =
+        support::test_app::build_test_app_with(|operation_context| {
+            operation_context.with_webhook_sender(webhook_sender.clone())
+        });
+    send_provider_request(
+        &app_router,
+        "/catch/orders",
+        "application/json",
+        br#"{"order":7}"#.to_vec(),
+    )
+    .await;
+    let request_id = list_requests(&app_router).await["items"][0]["id"]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+    let endpoint_id = create_native_endpoint(&app_router).await;
+
+    let (status, delivery) = call_api(
+        &app_router,
+        "POST",
+        &format!("/api/v1/webhooks/endpoints/{endpoint_id}/send"),
+        Some(&json!({ "http_request_id": request_id })),
+    )
+    .await;
+    sendmock_ops::run_due_deliveries(&operation_context, 1)
+        .await
+        .unwrap_or_else(|error| panic!("the pass runs: {error}"));
+
+    assert_eq!(status, 201, "{delivery}");
+    assert_eq!(delivery["event_type"], "http.captured");
+    let sent_body: Value =
+        serde_json::from_str(&webhook_sender.received_requests()[0].body).unwrap_or(Value::Null);
+    assert_eq!(sent_body["data"]["bin"], "orders", "{sent_body}");
+    assert_eq!(sent_body["data"]["json"]["order"], 7);
+}
