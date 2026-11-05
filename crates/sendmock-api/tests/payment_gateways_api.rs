@@ -49,7 +49,14 @@ async fn lists_the_built_in_gateways_with_secrets_masked() {
         .unwrap_or_default();
     assert_eq!(
         gateway_keys,
-        ["stripe", "paypal", "sslcommerz", "bkash", "native"]
+        [
+            "stripe",
+            "paypal",
+            "sslcommerz",
+            "bkash",
+            "razorpay",
+            "native"
+        ]
     );
     for payment_gateway in payment_gateways.as_array().into_iter().flatten() {
         for credential in payment_gateway["credentials"]

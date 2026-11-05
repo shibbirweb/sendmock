@@ -365,6 +365,77 @@
     "notification_endpoint_id": null
   },
   {
+    "key": "razorpay",
+    "name": "Razorpay",
+    "accent": "#3395ff",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [
+      {
+        "name": "key_id",
+        "value": "rzp_test_SendMock0001",
+        "is_secret": false
+      },
+      {
+        "name": "key_secret",
+        "value": "sendmockRazorpayKeySecret01",
+        "is_secret": true
+      },
+      {
+        "name": "webhook_secret",
+        "value": "sendmock_razorpay_webhook_secret",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "POST",
+    "redirect_fields": [
+      {
+        "name": "razorpay_payment_id",
+        "template": "{{ event.object.razorpay_payment_id }}",
+        "send_on": "success"
+      },
+      {
+        "name": "razorpay_order_id",
+        "template": "{{ event.object.razorpay_order_id }}",
+        "send_on": "success"
+      },
+      {
+        "name": "razorpay_signature",
+        "template": "{{ event.object.razorpay_signature }}",
+        "send_on": "success"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "",
+      "payment.authorized": "payment.authorized",
+      "payment.succeeded": "payment.captured",
+      "payment.failed": "payment.failed",
+      "payment.canceled": "",
+      "payment.refunded": "refund.processed",
+      "payment.partially_refunded": "refund.processed",
+      "payment.dispute_opened": "payment.dispute.created",
+      "payment.dispute_closed": "payment.dispute.closed",
+      "checkout.completed": "order.paid",
+      "checkout.expired": ""
+    },
+    "notification_body": "{\n  \"entity\": \"event\",\n  \"account_id\": \"acc_SendMock000001\",\n  \"event\": \"{{ event.name }}\",\n  \"contains\": {{ event.object.contains | json }},\n  \"payload\": {{ event.object.payload | json }},\n  \"created_at\": {{ event.created }}\n}",
+    "notification_headers": [
+      {
+        "name": "x-razorpay-signature",
+        "template": "{{ razorpay_signature(merchant.webhook_secret) }}"
+      },
+      {
+        "name": "x-razorpay-event-id",
+        "template": "{{ event.id }}"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
     "key": "native",
     "name": "Native",
     "accent": "#0d9488",

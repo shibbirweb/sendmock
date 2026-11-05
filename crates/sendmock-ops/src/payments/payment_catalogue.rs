@@ -33,6 +33,10 @@ pub fn build_provider_ids(provider: &str, suffix: &str) -> BTreeMap<String, Stri
                 format!("TRX{}", suffix.chars().take(8).collect::<String>()),
             ),
         ],
+        "razorpay" => vec![
+            ("order", format!("order_{suffix}")),
+            ("payment", format!("pay_{suffix}")),
+        ],
         "native" => vec![("payment", format!("pay_{suffix}"))],
         custom_provider => vec![(
             "reference",
@@ -60,6 +64,7 @@ pub fn read_provider_reference(
         "paypal" => "order",
         "sslcommerz" => "tran_id",
         "bkash" => "payment_id",
+        "razorpay" => "order",
         "native" => "payment",
         _ => "reference",
     };

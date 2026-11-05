@@ -17,6 +17,7 @@ use super::twilio_verify_api::answer_twilio_verify_request;
 use crate::bkash::answer_bkash_request;
 use crate::custom_gateways::answer_custom_gateway_request;
 use crate::paypal::answer_paypal_request;
+use crate::razorpay::answer_razorpay_request;
 use crate::sslcommerz::answer_sslcommerz_request;
 use crate::stripe::answer_stripe_request;
 use crate::{OperationContext, OperationError};
@@ -109,7 +110,7 @@ pub async fn answer_provider_request(
     })
 }
 
-/// The APIs served in code beside the definitions: Stripe's, PayPal's, SSLCommerz's, bKash's, custom
+/// The APIs served in code beside the definitions: Razorpay's, Stripe's, PayPal's, SSLCommerz's, bKash's, custom
 /// gateways', and Twilio's Messaging Services and Verify.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
@@ -117,6 +118,11 @@ async fn answer_code_served_api(
     provider_route: ProviderRoute<'_>,
     request: &ProviderHttpRequest,
 ) -> Result<Option<ProviderOutcome>, OperationError> {
+    if let Some(razorpay_outcome) =
+        answer_razorpay_request(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(razorpay_outcome));
+    }
     if let Some(stripe_outcome) =
         answer_stripe_request(operation_context, provider_route, request).await?
     {

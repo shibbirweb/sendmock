@@ -4,7 +4,7 @@ import type { TemplateReference } from "@/lib/api/types/webhooks";
 
 /** The gateways SendMock ships; custom gateways have their own keys. */
 export type BuiltinPaymentProvider =
-  "stripe" | "paypal" | "sslcommerz" | "bkash" | "native";
+  "stripe" | "paypal" | "sslcommerz" | "bkash" | "razorpay" | "native";
 
 /** A native event a payment notification can carry. */
 export type PaymentEventType =

@@ -34,6 +34,7 @@ const providerNames: Record<BuiltinPaymentProvider, string> = {
   paypal: "PayPal",
   sslcommerz: "SSLCommerz",
   bkash: "bKash",
+  razorpay: "Razorpay",
   native: "Native",
 };
 const visa4242: PaymentMethod = {
@@ -344,6 +345,7 @@ export function buildProviderIds(
       bank_tran_id: `BTX${suffix}`,
     },
     bkash: { payment_id: `TR00${suffix}`, trx_id: `TRX${suffix.slice(0, 8)}` },
+    razorpay: { order: `order_${suffix}`, payment: `pay_${suffix}` },
     native: { payment: `pay_${suffix}` },
   };
 

@@ -32,6 +32,7 @@ test("PY-12.2 the live table lists every built-in gateway with the methods it of
     "PayPal",
     "SSLCommerz",
     "bKash",
+    "Razorpay",
     "Native",
   ]) {
     await expect(gatewayRow(page, gatewayName)).toBeVisible();

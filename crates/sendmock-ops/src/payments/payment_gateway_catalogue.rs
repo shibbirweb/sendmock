@@ -127,7 +127,14 @@ mod tests {
             .collect();
         assert_eq!(
             gateway_keys,
-            ["stripe", "paypal", "sslcommerz", "bkash", "native"]
+            [
+                "stripe",
+                "paypal",
+                "sslcommerz",
+                "bkash",
+                "razorpay",
+                "native"
+            ]
         );
         assert!(blank_gateway().is_some());
     }

@@ -163,7 +163,7 @@ async fn build_render_options(
         .unwrap_or_default();
     let event_object = build_provider_event_object(
         operation_context,
-        &gateway_fields.key,
+        gateway_fields,
         payment,
         &event_name,
         kept_provider_objects,

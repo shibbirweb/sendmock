@@ -44,7 +44,7 @@ pub fn build_payment_redirect(
                 timestamp_seconds: now_unix_ms / 1000,
                 should_mask_secrets: false,
                 event_object: build_provider_redirect_object(
-                    &gateway_fields.key,
+                    gateway_fields,
                     payment,
                     &redirect_status,
                 ),

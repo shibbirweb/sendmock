@@ -124,6 +124,22 @@ const bkashBody = `{
   "currency": "{{ payment.currency }}"
 }`;
 
+/** Razorpay's webhook: the entities nest under `payload`, named by `contains`. */
+const razorpayBody = `{
+  "entity": "event",
+  "account_id": "acc_SendMock000001",
+  "event": "{{ event.name }}",
+  "contains": {{ event.object.contains | json }},
+  "payload": {{ event.object.payload | json }},
+  "created_at": {{ event.created }}
+}`;
+
+const razorpayCheckoutFields = [
+  "razorpay_payment_id",
+  "razorpay_order_id",
+  "razorpay_signature",
+];
+
 const nativeBody = `{
   "type": "{{ event.type }}",
   "data": {
@@ -298,6 +314,50 @@ const shippedGateways: ShippedGateway[] = [
     notification_headers: [],
   },
   {
+    key: "razorpay",
+    name: "Razorpay",
+    accent: "#3395ff",
+    method_keys: ["card"],
+    credentials: [
+      { name: "key_id", value: "rzp_test_SendMock0001", is_secret: false },
+      {
+        name: "key_secret",
+        value: "sendmockRazorpayKeySecret01",
+        is_secret: true,
+      },
+      {
+        name: "webhook_secret",
+        value: "sendmock_razorpay_webhook_secret",
+        is_secret: true,
+      },
+    ],
+    redirect_method: "POST",
+    redirect_fields: razorpayCheckoutFields.map((fieldName) => ({
+      name: fieldName,
+      template: `{{ event.object.${fieldName} }}`,
+      send_on: "success" as const,
+    })),
+    notification_content_type: "json",
+    event_names: nameEvents({
+      "payment.authorized": "payment.authorized",
+      "payment.succeeded": "payment.captured",
+      "payment.failed": "payment.failed",
+      "payment.refunded": "refund.processed",
+      "payment.partially_refunded": "refund.processed",
+      "payment.dispute_opened": "payment.dispute.created",
+      "payment.dispute_closed": "payment.dispute.closed",
+      "checkout.completed": "order.paid",
+    }),
+    notification_body: razorpayBody,
+    notification_headers: [
+      {
+        name: "x-razorpay-signature",
+        template: "{{ razorpay_signature(merchant.webhook_secret) }}",
+      },
+      { name: "x-razorpay-event-id", template: "{{ event.id }}" },
+    ],
+  },
+  {
     key: "native",
     name: "Native",
     accent: "#0d9488",
@@ -341,5 +401,6 @@ export const builtinPaymentProviders: BuiltinPaymentProvider[] = [
   "paypal",
   "sslcommerz",
   "bkash",
+  "razorpay",
   "native",
 ];

@@ -50,7 +50,7 @@ Served on the provider port at the real paths (same mechanism as SMS and email p
 | **PayPal** | Orders v2 (create, approve via checkout page, capture), Refunds | Webhooks (`CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED`, ...) with verify-webhook-signature endpoint; classic IPN form post with `_notify-validate` postback | 3P |
 | **SSLCommerz** | Session init (`gwprocess/v4/api.php`), order validation API, refund API, transaction query | IPN POST with `val_id`, `status` (`VALID`, `FAILED`, `CANCELLED`), `verify_sign`, `verify_key`; success/fail/cancel POST redirects | 3P |
 | **bKash** (tokenized checkout) | grant token, create payment, execute payment, query, refund | callback redirect with `paymentID` and `status` (`success`, `failure`, `cancel`) | 4 |
-| **Razorpay** | Orders, payments capture, refunds; checkout handler signature (`razorpay_signature`) | Webhooks (`payment.captured`, `payment.failed`, `refund.processed`) with `X-Razorpay-Signature` | 4 |
+| **Razorpay** | Orders, payments capture, refunds; checkout handler signature (`razorpay_signature`); Checkout's `callback_url` comes from the order's `notes.callback_url` | Webhooks (`payment.captured`, `payment.failed`, `refund.processed`) with `X-Razorpay-Signature` | 4 |
 | **Paddle** (Billing) | transactions, subscriptions (basic) | Webhooks with `Paddle-Signature` | 4 |
 | Nagad, ShurjoPay, aamarPay, Paystack, Flutterwave, Mollie, Square, Lemon Squeezy | init + callback + IPN shapes | provider formats | later |
 | **Native** | `POST /api/v1/payments` (simple JSON) and `POST /api/v1/payments/checkout` (hosted page) | native `payment.*` events | 3P |

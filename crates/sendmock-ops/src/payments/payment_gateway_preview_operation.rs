@@ -261,7 +261,7 @@ impl Operation for PreviewPaymentGatewayOperation {
             .unwrap_or_default();
         let event_object = build_provider_event_object(
             operation_context,
-            &input.gateway_key,
+            &gateway_fields,
             &payment,
             &event_name,
             &[],

@@ -28,6 +28,7 @@ mod payments;
 mod paypal;
 mod present_value;
 mod providers;
+mod razorpay;
 mod samples;
 mod scenarios;
 mod seed;

@@ -7,6 +7,10 @@ import {
 } from "@/mocks/payments/stripe/stripe-charge-object";
 import { describeCheckoutSession } from "@/mocks/payments/stripe/stripe-checkout-session-object";
 import { describePaymentIntent } from "@/mocks/payments/stripe/stripe-payment-intent-object";
+import {
+  buildRazorpayEventObject,
+  buildRazorpayRedirectObject,
+} from "@/mocks/payments/razorpay/build-razorpay-event-object";
 
 /**
  * The object a Stripe event is about, chosen by the event's name as the
@@ -41,12 +45,16 @@ export function buildProviderRedirectObject(
   paymentDetail: PaymentDetail,
   redirectStatus: string,
 ): Record<string, unknown> | null {
+  if (gatewayKey === "razorpay") {
+    return buildRazorpayRedirectObject(paymentDetail);
+  }
+
   return gatewayKey === "sslcommerz"
     ? describeSslcommerzTransaction(paymentDetail, redirectStatus)
     : null;
 }
 
-/** The gateway's own object for `event.object`; Stripe, PayPal and SSLCommerz have one. */
+/** The gateway's own object for `event.object`; Stripe, PayPal, SSLCommerz and Razorpay have one. */
 export function buildProviderEventObject(
   gatewayKey: string,
   paymentDetail: PaymentDetail,
@@ -57,6 +65,9 @@ export function buildProviderEventObject(
   }
   if (gatewayKey === "paypal") {
     return buildPayPalEventObject(paymentDetail, eventName);
+  }
+  if (gatewayKey === "razorpay") {
+    return buildRazorpayEventObject(paymentDetail, eventName);
   }
 
   return buildProviderRedirectObject(gatewayKey, paymentDetail, eventName);
