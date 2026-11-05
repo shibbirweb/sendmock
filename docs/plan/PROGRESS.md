@@ -295,14 +295,14 @@ Plan: [27-phase-3.md](27-phase-3.md). Built on `feat/phase-0` in #48, W1 to W11 
 
 Plan: [28-phase-3p.md](28-phase-3p.md). Built on `feat/phase-0` in #48, W1 to W12 in order.
 
-- [ ] Native payments API and hosted checkout flow
-- [ ] Gateway, method and flow configuration (edit, reset, delete, add custom, step types, flow variables, previews, credential reveal; PY-12)
-- [ ] Test cards and the real-card safety rule
-- [ ] Stripe emulation with `Stripe-Signature` webhooks
-- [ ] PayPal emulation (Orders v2, webhooks, IPN postback)
-- [ ] SSLCommerz emulation (init, IPN, validation, refund, query)
-- [ ] Capture, void, full and partial refunds; `payment.*` and `checkout.*` events; payment templates; `wait/payment`
-- [ ] CLI `payments`; MCP `payments` toolset; Payments screens switched to live mode
+- [ ] Native payments API and hosted checkout flow (the hosted checkout is done; the direct `POST /payments` charge and the currency checks, PY-02.1 and PY-02.3, were never built and are Phase 4 W15d)
+- [x] Gateway, method and flow configuration (edit, reset, delete, add custom, step types, flow variables, previews, credential reveal; PY-12) (#48)
+- [x] Test cards and the real-card safety rule (#48)
+- [x] Stripe emulation with `Stripe-Signature` webhooks (#48)
+- [x] PayPal emulation (Orders v2, webhooks, IPN postback) (#48)
+- [x] SSLCommerz emulation (init, IPN, validation, refund, query) (#48)
+- [x] Capture, void, full and partial refunds; `payment.*` and `checkout.*` events; payment templates; `wait/payment` (#48)
+- [x] CLI `payments`; MCP `payments` toolset; Payments screens switched to live mode (#48)
 - [ ] Done-when check: Stripe, PayPal and SSLCommerz flows end to end offline; beta released
 
 ### Phase 4: Integrations, fidelity and AI
@@ -310,7 +310,7 @@ Plan: [28-phase-3p.md](28-phase-3p.md). Built on `feat/phase-0` in #48, W1 to W1
 Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 in order.
 
 - [x] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo) (#48)
-- [ ] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16)
+- [x] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16) (#48)
 - [x] HTML compatibility, link check, SpamAssassin check (#48)
 - [x] Release to real SMTP, auto-forward, tag rules (#48)
 - [x] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark) (#48)
@@ -390,7 +390,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 |----------|----------------|--------|
 | Trademark check for "SendMock" | search USPTO, EUIPO, WIPO before branding | Deferred to before 1.0 (2026-10-29) |
 | Provider emulation priority | Twilio, Vonage, then others; any other vendor is added as a custom provider, which replaced the Generic HTTP adapter ([22](22-configurable-providers.md)) | Open (using recommendation) |
-| SDK redirection per SDK | verify in Phase 4 | Open |
+| SDK redirection per SDK | verify in Phase 4 | Done: the Email provider SDKs, SMS clients, Payment apps and HTTP presets workflows and the recipe examples run each SDK against a release binary (2026-11-06) |
 | Attachment storage | inside SQLite | Open (using recommendation) |
 | Telemetry | none, opt-in update check | Open (using recommendation) |
 | Mailpit API aliases | after 1.0 if demanded | Open |

@@ -189,7 +189,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/payments` | create a payment (native) |
+| POST | `/payments` | create and pay a payment with a test card, as an app's server does without a checkout page (`provider`, `amount_minor`, `currency`, `card_number`, optional `customer_email`, `line_items`, `capture_method`); answers `201` with the payment and the card's outcome, or `422` for a card the test table does not list |
 | POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included; `capture_method: manual` authorizes it and waits for a capture or void |
 | GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
 | POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `answer_dispute` (`dispute_evidence`, while the dispute needs a response), `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |

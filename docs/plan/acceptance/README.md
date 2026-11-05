@@ -157,7 +157,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B) | 4 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Not started |
-| [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | In progress |
+| [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | Accepted |
 | [PY-04](08-payments.md#py-04-stripe-emulation) | Stripe emulation | Phase 3P | 4 | Accepted |
 | [PY-05](08-payments.md#py-05-paypal-emulation) | PayPal emulation | Phase 3P | 3 | Accepted |
 | [PY-06](08-payments.md#py-06-sslcommerz-emulation) | SSLCommerz emulation | Phase 3P | 5 | Accepted |
