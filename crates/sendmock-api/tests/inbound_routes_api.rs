@@ -337,15 +337,18 @@ async fn attachments_are_file_parts_from_sendmock_and_a_mime_url_gets_body_mime(
     .await;
     let email_id = received["id"].as_str().unwrap_or_default();
 
-    let deliveries = wait_for_deliveries(&fixture.app_router, 2).await;
+    wait_for_deliveries(&fixture.app_router, 2).await;
+    run_due_deliveries(&fixture.operation_context, 2)
+        .await
+        .unwrap_or_else(|error| panic!("the pass runs: {error}"));
 
+    let sent_requests = fixture.webhook_sender.received_requests();
     let body_for = |url: &str| {
-        deliveries
+        sent_requests
             .iter()
-            .find(|delivery| delivery["request"]["url"] == url)
-            .and_then(|delivery| delivery["request"]["body"].as_str())
+            .find(|sent_request| sent_request.url == url)
+            .map(|sent_request| sent_request.body.clone())
             .unwrap_or_default()
-            .to_owned()
     };
     let parsed_body = body_for("http://localhost:8000/mail");
     assert!(
