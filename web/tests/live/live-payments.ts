@@ -169,8 +169,16 @@ export async function chooseSimulateAction(
   ...menuPath: string[]
 ) {
   await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
-  for (const menuLabel of menuPath) {
-    await page.getByRole("menuitem", { name: menuLabel, exact: true }).click();
+  // The keyboard reaches each item even while a toast from the last action covers it.
+  for (const [menuIndex, menuLabel] of menuPath.entries()) {
+    const menuItem = page.getByRole("menuitem", {
+      name: menuLabel,
+      exact: true,
+    });
+    await menuItem.focus();
+    await menuItem.press(
+      menuIndex < menuPath.length - 1 ? "ArrowRight" : "Enter",
+    );
   }
 }
 

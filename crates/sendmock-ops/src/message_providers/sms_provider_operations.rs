@@ -61,7 +61,7 @@ impl Operation for CreateSmsProviderOperation {
                 "postSmsProviders",
                 HttpMethod::Post,
                 "/api/v1/sms/providers",
-                "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+                "Add an SMS provider, blank or copied from another.",
                 "sendmock sms providers create",
                 "sendmock_sms_provider_create",
             )

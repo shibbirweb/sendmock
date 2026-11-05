@@ -61,7 +61,7 @@ impl Operation for CreateEmailProviderOperation {
                 "postEmailsProviders",
                 HttpMethod::Post,
                 "/api/v1/emails/providers",
-                "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+                "Add an email provider, blank or copied from another.",
                 "sendmock email providers create",
                 "sendmock_email_provider_create",
             )
