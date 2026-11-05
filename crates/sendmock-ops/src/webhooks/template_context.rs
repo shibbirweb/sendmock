@@ -6,6 +6,7 @@ use serde_json::{Map, Value, json};
 
 use crate::email::EmailSummary;
 use crate::events::AppEvent;
+use crate::payments::{build_sample_payment_event_data, load_payment_event};
 use crate::{OperationContext, OperationError, SmsMessage};
 
 /// `event`, `data`, and `email` or `sms` when the event is about one.
@@ -79,6 +80,7 @@ pub struct ChosenMessage<'message> {
     pub email_id: Option<&'message str>,
     pub sms_id: Option<&'message str>,
     pub http_request_id: Option<&'message str>,
+    pub payment_id: Option<&'message str>,
     pub sample_event_type: Option<&'message str>,
 }
 
@@ -122,6 +124,17 @@ fn to_sms_subject(stored_sms: &SmsRecord) -> TemplateSubject {
     }
 }
 
+async fn find_payment_subject(
+    operation_context: &OperationContext,
+    payment_id: &str,
+) -> Result<TemplateSubject, OperationError> {
+    let (app_event, rendered_against) = load_payment_event(operation_context, payment_id).await?;
+    Ok(TemplateSubject {
+        app_event,
+        rendered_against,
+    })
+}
+
 fn not_found(message: String) -> OperationError {
     OperationError::NotFound { message }
 }
@@ -136,6 +149,7 @@ pub async fn find_template_subject(
         email_id,
         sms_id,
         http_request_id,
+        payment_id,
         sample_event_type,
     } = chosen_message;
     if let Some(email_id) = email_id {
@@ -155,6 +169,9 @@ pub async fn find_template_subject(
         return stored_sms
             .map(|stored_sms| to_sms_subject(&stored_sms))
             .ok_or_else(|| not_found(format!("No SMS with id {sms_id}")));
+    }
+    if let Some(payment_id) = payment_id {
+        return find_payment_subject(operation_context, payment_id).await;
     }
     if let Some(http_request_id) = http_request_id {
         return Err(not_found(format!(
@@ -190,6 +207,8 @@ pub fn build_sample_subject(event_type: &str) -> TemplateSubject {
             "body": "{\"text\":\"Deploy finished\"}",
             "json": { "text": "Deploy finished" },
         })
+    } else if event_type.starts_with("payment.") || event_type.starts_with("checkout.") {
+        build_sample_payment_event_data()
     } else if event_type.starts_with("webhook.") {
         json!({ "endpoint_name": "Laravel inbound mail", "error_message": "HTTP 500" })
     } else {

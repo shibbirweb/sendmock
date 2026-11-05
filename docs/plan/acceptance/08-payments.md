@@ -69,7 +69,7 @@ Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions).
 Phase 3P.
 
 - [ ] PY-08.1 Every native `payment.*`, `checkout.*` and `subscription.*` event fires at the right moment and can trigger webhook rules.
-- [ ] PY-08.2 Built-in payment templates (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook) render against a real payment and match provider fixtures.
+- [x] PY-08.2 Built-in payment templates (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook) render against a real payment and match provider fixtures.
 - [x] PY-08.3 IPN and webhook deliveries appear in the webhook delivery log with retries, replay and "resend IPN" from the payment detail.
 
 ## PY-09 Payments UI

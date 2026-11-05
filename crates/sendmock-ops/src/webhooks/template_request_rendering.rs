@@ -1,5 +1,6 @@
 //! The request a payload template renders: the body first, then the headers, which can read
-//! the form body's fields as `body_fields` (Twilio signs them, WH-06).
+//! the form body's fields as `body_fields` (Twilio signs them, WH-06) and sign the body with
+//! the Stripe, Razorpay and Paddle signature functions.
 
 use std::collections::BTreeMap;
 
@@ -7,6 +8,7 @@ use sendmock_core::{TemplateEscape, TemplateFunctions, TemplateRenderMode};
 use serde_json::{Map, Value};
 
 use super::request_part_renderer::{RenderProblem, RequestPartRenderer};
+use super::signed_body_functions::SignedBodyFunctions;
 use super::template_view::TemplateDraft;
 
 pub struct RenderedTemplateRequest {
@@ -69,9 +71,13 @@ pub fn render_template_request(
         Value::Object(Map::new())
     };
     let header_context = with_body_fields(template_context, body_fields);
+    let header_functions = SignedBodyFunctions {
+        template_functions: template_functions.to_shared(),
+        signed_body: body.clone(),
+    };
     let mut header_renderer = RequestPartRenderer {
         template_context: &header_context,
-        template_functions,
+        template_functions: &header_functions,
         render_mode,
         problems: body_renderer.problems,
     };

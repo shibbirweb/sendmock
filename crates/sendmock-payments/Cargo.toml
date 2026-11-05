@@ -9,6 +9,9 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+hmac.workspace = true
+md5.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

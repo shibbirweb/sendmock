@@ -171,5 +171,75 @@
     "body_template": "Delivery to {{ data.endpoint_name }} failed: {{ data.error_message }}",
     "doc_url": null,
     "verified_on": null
+  },
+  "stripe.event": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "Stripe-Signature": "{{ stripe_signature(vars.stripe_webhook_secret) }}",
+      "User-Agent": "Stripe/1.0 (+https://stripe.com/docs/webhooks)"
+    },
+    "body_template": "{\n  \"id\": \"evt_{{ random_string(24) }}\",\n  \"object\": \"event\",\n  \"api_version\": \"2024-06-20\",\n  \"created\": {{ event.created_at | date(\"%s\") }},\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{ data.provider_ids.payment_intent | default(data.provider_reference) }}\",\n      \"object\": \"payment_intent\",\n      \"amount\": {{ data.amount_minor }},\n      \"amount_received\": {{ data.captured_minor | default(\"0\") }},\n      \"currency\": \"{{ data.currency | lower }}\",\n      \"last_payment_error\": {% if data.failure_code %}{\"type\": \"card_error\", \"code\": \"card_declined\", \"decline_code\": \"{{ data.failure_code }}\"}{% else %}null{% endif %},\n      \"livemode\": false,\n      \"metadata\": {{ data.metadata | json }},\n      \"receipt_email\": {% if data.customer_email %}\"{{ data.customer_email }}\"{% else %}null{% endif %},\n      \"status\": \"{{ event.type | payment_event(\"stripe_status\") }}\"\n    }\n  },\n  \"livemode\": false,\n  \"pending_webhooks\": 1,\n  \"request\": {\n    \"id\": null,\n    \"idempotency_key\": null\n  },\n  \"type\": \"{{ event.type | payment_event(\"stripe\") }}\"\n}",
+    "doc_url": "https://docs.stripe.com/api/events/object",
+    "verified_on": "2026-11-05"
+  },
+  "paypal.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "PAYPAL-TRANSMISSION-ID": "{{ uuid() }}",
+      "PAYPAL-TRANSMISSION-TIME": "{{ now_iso() }}",
+      "PAYPAL-TRANSMISSION-SIG": "{{ random_string(88) }}",
+      "PAYPAL-CERT-URL": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77",
+      "PAYPAL-AUTH-ALGO": "SHA256withRSA"
+    },
+    "body_template": "{\n  \"id\": \"WH-{{ random_string(17) | upper }}\",\n  \"event_version\": \"1.0\",\n  \"create_time\": \"{{ event.created_at }}\",\n  \"resource_type\": \"capture\",\n  \"resource_version\": \"2.0\",\n  \"event_type\": \"{{ event.type | payment_event(\"paypal\") }}\",\n  \"summary\": \"Payment {{ event.type | payment_event(\"paypal_status\") | lower }}: {{ data.amount_major }} {{ data.currency }}\",\n  \"resource\": {\n    \"id\": \"{{ data.provider_ids.capture | default(data.provider_reference) }}\",\n    \"status\": \"{{ event.type | payment_event(\"paypal_status\") }}\",\n    \"amount\": {\n      \"currency_code\": \"{{ data.currency }}\",\n      \"value\": \"{{ data.amount_major }}\"\n    },\n    \"final_capture\": true,\n    \"supplementary_data\": {\n      \"related_ids\": {\n        \"order_id\": \"{{ data.provider_ids.order | default(data.provider_reference) }}\"\n      }\n    },\n    \"create_time\": \"{{ data.created_at }}\",\n    \"update_time\": \"{{ event.created_at }}\"\n  }\n}",
+    "doc_url": "https://developer.paypal.com/api/rest/webhooks/event-names/",
+    "verified_on": "2026-11-05"
+  },
+  "paypal.ipn": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "mc_gross={{ data.amount_major }}&protection_eligibility=Eligible&payment_date={{ event.created_at | date(\"%H:%M:%S %b %d, %Y UTC\") | urlencode }}&payment_status={{ event.type | payment_event(\"paypal_ipn\") }}&charset=UTF-8&mc_fee=0.00&notify_version=3.9&payer_status=verified&business={{ vars.paypal_business_email | default(\"merchant@example.com\") | urlencode }}&quantity=1&payer_email={{ data.customer_email | default(\"buyer@example.com\") | urlencode }}&txn_id={{ data.provider_reference }}&payment_type=instant&receiver_email={{ vars.paypal_business_email | default(\"merchant@example.com\") | urlencode }}&txn_type=web_accept&item_name={{ data.provider_name | urlencode }}%20test%20order&mc_currency={{ data.currency }}&test_ipn=1&custom={{ data.id }}&payer_id={{ random_string(13) | upper }}&verify_sign={{ random_string(56) }}&ipn_track_id={{ random_hex(13) }}",
+    "doc_url": "https://developer.paypal.com/api/nvp-soap/ipn/IPNandPDTVariables/",
+    "verified_on": "2026-11-05"
+  },
+  "sslcommerz.ipn": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "status={{ event.type | payment_event(\"sslcommerz\") }}&tran_date={{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") | urlencode }}&tran_id={{ data.provider_ids.tran_id | default(data.provider_reference) | urlencode }}&val_id={{ data.provider_ids.val_id | default(\"\") | urlencode }}&amount={{ data.amount_major }}&store_amount={{ data.amount_major }}&currency={{ data.currency }}&bank_tran_id={{ random_hex(16) }}&card_type={{ data.method_key | default(\"\") | upper }}&currency_type={{ data.currency }}&currency_amount={{ data.amount_major }}&currency_rate=1.0000&risk_level=0&risk_title=Safe&verify_sign={{ sslcommerz_verify_sign(vars.sslcommerz_store_password, {\"amount\": data.amount_major, \"currency\": data.currency, \"status\": event.type | payment_event(\"sslcommerz\"), \"tran_id\": data.provider_ids.tran_id | default(data.provider_reference), \"val_id\": data.provider_ids.val_id | default(\"\")}) }}&verify_key=amount%2Ccurrency%2Cstatus%2Ctran_id%2Cval_id",
+    "doc_url": "https://developer.sslcommerz.com/doc/v4/#ipn",
+    "verified_on": "2026-11-05"
+  },
+  "bkash.callback": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "paymentID={{ data.provider_ids.payment_id | default(data.provider_reference) | urlencode }}&status={{ event.type | payment_event(\"bkash\") }}&signature={{ random_hex(32) }}&apiVersion=1.2.0-beta",
+    "doc_url": "https://developer.bka.sh/docs/create-payment-2",
+    "verified_on": "2026-11-05"
+  },
+  "razorpay.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Razorpay-Signature": "{{ razorpay_signature(vars.razorpay_webhook_secret) }}",
+      "X-Razorpay-Event-Id": "{{ event.id }}"
+    },
+    "body_template": "{\n  \"entity\": \"event\",\n  \"account_id\": \"acc_{{ random_string(14) }}\",\n  \"event\": \"{{ event.type | payment_event(\"razorpay\") }}\",\n  \"contains\": [\"payment\"],\n  \"payload\": {\n    \"payment\": {\n      \"entity\": {\n        \"id\": \"{{ data.provider_ids.payment | default(data.provider_reference) }}\",\n        \"entity\": \"payment\",\n        \"amount\": {{ data.amount_minor }},\n        \"currency\": \"{{ data.currency }}\",\n        \"status\": \"{{ event.type | payment_event(\"razorpay_status\") }}\",\n        \"order_id\": {% if data.provider_ids.order %}\"{{ data.provider_ids.order }}\"{% else %}null{% endif %},\n        \"method\": \"{{ data.method_key | default(\"card\") }}\",\n        \"captured\": {% if event.type == \"payment.succeeded\" %}true{% else %}false{% endif %},\n        \"email\": \"{{ data.customer_email | default(\"\") }}\",\n        \"error_code\": {% if data.failure_code %}\"BAD_REQUEST_ERROR\"{% else %}null{% endif %},\n        \"error_reason\": {% if data.failure_code %}\"{{ data.failure_code }}\"{% else %}null{% endif %},\n        \"created_at\": {{ data.created_at | date(\"%s\") }}\n      }\n    }\n  },\n  \"created_at\": {{ event.created_at | date(\"%s\") }}\n}",
+    "doc_url": "https://razorpay.com/docs/webhooks/payloads/payments/",
+    "verified_on": "2026-11-05"
+  },
+  "paddle.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "Paddle-Signature": "{{ paddle_signature(vars.paddle_webhook_secret) }}"
+    },
+    "body_template": "{\n  \"event_id\": \"evt_{{ random_string(26) | lower }}\",\n  \"event_type\": \"{{ event.type | payment_event(\"paddle\") }}\",\n  \"occurred_at\": \"{{ event.created_at }}\",\n  \"notification_id\": \"ntf_{{ random_string(26) | lower }}\",\n  \"data\": {\n    \"id\": \"{{ data.provider_ids.transaction | default(data.provider_reference) }}\",\n    \"status\": \"{{ event.type | payment_event(\"paddle_status\") }}\",\n    \"origin\": \"web\",\n    \"currency_code\": \"{{ data.currency }}\",\n    \"created_at\": \"{{ data.created_at }}\",\n    \"custom_data\": {{ data.metadata | json }},\n    \"details\": {\n      \"totals\": {\n        \"total\": \"{{ data.amount_minor }}\",\n        \"currency_code\": \"{{ data.currency }}\"\n      }\n    }\n  }\n}",
+    "doc_url": "https://developer.paddle.com/webhooks/transactions/transaction-completed",
+    "verified_on": "2026-11-05"
   }
 }

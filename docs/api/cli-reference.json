@@ -17587,6 +17587,21 @@
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
+          "flag": "--payment-id",
+          "input": {
+            "name": "payment_id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<payment-id>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A payment, as the data of the event its latest state stands for.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
           "flag": "--draft",
           "input": {
             "name": "draft",

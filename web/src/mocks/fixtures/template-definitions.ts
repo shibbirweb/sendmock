@@ -1,4 +1,5 @@
 import type { HttpMethod } from "@/lib/api/types";
+import { paymentTemplateDefinitions } from "@/mocks/fixtures/payment-template-definitions";
 
 /** The request a template renders: what the gallery detail and previews show. */
 export type TemplateDefinition = {
@@ -297,6 +298,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     doc_url: null,
     verified_on: null,
   },
+  ...paymentTemplateDefinitions,
 };
 
 /** The definition for a template, native JSON when it has none of its own. */

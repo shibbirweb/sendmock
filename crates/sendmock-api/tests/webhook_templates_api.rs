@@ -60,6 +60,13 @@ async fn every_builtin_template_renders_against_its_sample_and_a_real_message() 
     let (app_router, _) = build_test_app();
     let email_id = send_email(&app_router, "ann@example.com", "Welcome").await;
     let sms_id = send_sms(&app_router).await;
+    let (_, payment) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/payments/checkout",
+        Some(&json!({ "provider": "stripe", "amount_minor": 1200 })),
+    )
+    .await;
     let (_, listed_templates) = call_api(&app_router, "GET", TEMPLATES_PATH, None).await;
     let builtin_templates: Vec<Value> = listed_templates
         .as_array()
@@ -69,12 +76,14 @@ async fn every_builtin_template_renders_against_its_sample_and_a_real_message() 
         .filter(|listed_template| listed_template["source"] == "builtin")
         .collect();
 
-    assert_eq!(builtin_templates.len(), 18);
+    assert_eq!(builtin_templates.len(), 25);
     for builtin_template in builtin_templates {
         let template_id = builtin_template["id"].as_str().unwrap_or_default();
         let first_event = builtin_template["events"][0].as_str().unwrap_or_default();
         let real_message = if first_event.starts_with("sms.") {
             json!({ "sms_id": sms_id })
+        } else if first_event.starts_with("payment.") {
+            json!({ "payment_id": payment["id"] })
         } else {
             json!({ "email_id": email_id })
         };

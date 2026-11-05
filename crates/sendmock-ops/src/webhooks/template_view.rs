@@ -10,6 +10,7 @@ use super::endpoint_settings::WebhookHttpMethod;
 pub enum TemplateCategory {
     EmailProvider,
     SmsProvider,
+    PaymentProvider,
     Chat,
     Automation,
     Generic,

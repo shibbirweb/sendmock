@@ -27245,6 +27245,18 @@
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
+          "name": "payment_id",
+          "input": {
+            "name": "payment_id",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A payment, as the data of the event its latest state stands for.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
           "name": "draft",
           "input": {
             "name": "draft",
@@ -27291,6 +27303,13 @@
           "http_request_id": {
             "$ref": "#/$defs/Ulid",
             "description": "A captured HTTP request, as the data of an `http.captured` event.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "payment_id": {
+            "$ref": "#/$defs/Ulid",
+            "description": "A payment, as the data of the event its latest state stands for.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
             ]

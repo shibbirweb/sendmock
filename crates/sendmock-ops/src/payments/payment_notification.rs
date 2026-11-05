@@ -6,6 +6,7 @@ use super::gateway_template_rendering::{
     GatewayPartRenderer, GatewayRenderOptions, RedirectOutcome, build_gateway_context,
 };
 use super::payment_catalogue::add_timeline_event;
+use super::payment_event_data::build_payment_event_data;
 use super::payment_gateway_preview_views::GatewayTemplateProblem;
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_views::{PaymentDetail, PaymentNotification};
@@ -113,7 +114,7 @@ fn build_delivery_order(
             id: event_id,
             event_type: event_type.to_owned(),
             created_at: format_rfc3339(now_unix_ms),
-            data: serde_json::to_value(&payment.summary).unwrap_or(Value::Null),
+            data: build_payment_event_data(payment),
         },
         subject_id: Some(payment.summary.id.clone()),
         rule_id: None,

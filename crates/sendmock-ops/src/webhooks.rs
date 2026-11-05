@@ -46,6 +46,7 @@ mod saved_delivery_send_operation;
 mod saved_delivery_template_operation;
 mod saved_delivery_view;
 mod secret_value_masking;
+mod signed_body_functions;
 mod template_catalogue;
 mod template_context;
 mod template_delete_operation;

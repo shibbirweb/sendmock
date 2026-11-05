@@ -2,11 +2,16 @@ import type {
   AppEventType,
   CapturedHttpRequest,
   EmailDetail,
+  PaymentStatus,
   SmsMessage,
   TemplateRenderRequest,
   WebhookTemplateSummary,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
+import {
+  samplePaymentEventData,
+  toPaymentEventData,
+} from "@/mocks/payments/payment-event-data";
 import type { TemplateContext } from "@/mocks/webhooks/render-template-text";
 
 type ContextSubject = {
@@ -110,6 +115,13 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       },
     };
   }
+  if (eventType.startsWith("payment.") || eventType.startsWith("checkout.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: samplePaymentEventData,
+    };
+  }
   if (eventType === "webhook.failed") {
     return {
       eventType,
@@ -136,6 +148,21 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       extracted: { otp: ["739104"], links: [] },
     },
   };
+}
+
+/** The event a payment's latest state stands for, for a preview against it. */
+function readPaymentEventType(paymentStatus: PaymentStatus): AppEventType {
+  const eventTypes: Partial<Record<PaymentStatus, AppEventType>> = {
+    authorized: "payment.authorized",
+    succeeded: "payment.succeeded",
+    failed: "payment.failed",
+    canceled: "payment.canceled",
+    refunded: "payment.refunded",
+    partially_refunded: "payment.partially_refunded",
+    disputed: "payment.dispute_opened",
+  };
+
+  return eventTypes[paymentStatus] ?? "payment.created";
 }
 
 function findContextSubject(
@@ -179,6 +206,19 @@ function findContextSubject(
           eventType: "http.captured",
           data: toHttpRequestData(capturedRequest),
           label: `${capturedRequest.method} ${capturedRequest.path}`,
+        };
+  }
+
+  if (renderRequest.payment_id !== undefined) {
+    const paymentDetail = mockDatabase.payments.find(
+      (existingPayment) => existingPayment.id === renderRequest.payment_id,
+    );
+    return paymentDetail === undefined
+      ? null
+      : {
+          eventType: readPaymentEventType(paymentDetail.status),
+          data: toPaymentEventData(paymentDetail),
+          label: `${paymentDetail.provider_name} ${paymentDetail.provider_reference}`,
         };
   }
 

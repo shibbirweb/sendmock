@@ -1,23 +1,57 @@
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use sendmock_core::{StandardTemplateFunctions, TemplateFunctions};
+use sendmock_payments::sign_sslcommerz_fields;
 use serde_json::Value;
 
 use crate::sign_twilio_request;
 
+/// `sslcommerz_verify_sign(store_password, {"amount": ..., ...})`: the fields as SSLCommerz
+/// signs them, values written as text.
+fn sign_sslcommerz_arguments(arguments: &[Value]) -> String {
+    let store_password = arguments
+        .first()
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let signed_fields: BTreeMap<String, String> = arguments
+        .get(1)
+        .and_then(Value::as_object)
+        .map(|field_values| {
+            field_values
+                .iter()
+                .map(|(field_name, field_value)| {
+                    let field_text = match field_value {
+                        Value::String(text_value) => text_value.clone(),
+                        Value::Null => String::new(),
+                        other_value => other_value.to_string(),
+                    };
+                    (field_name.clone(), field_text)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    sign_sslcommerz_fields(store_password, &signed_fields)
+}
+
 /// The standard functions plus the provider helpers the built-in templates call. Twilio's
-/// signature is real; Mailgun, Svix and Stripe signatures have the provider's shape and are
-/// signed for real with the email providers (Phase 4, WH-06.2).
+/// signature and SSLCommerz's `verify_sign` are real; Mailgun and Svix signatures have the
+/// provider's shape and are signed for real with the email providers (Phase 4, WH-06.2).
+/// The Stripe, Razorpay and Paddle signatures cover the rendered body, so header templates
+/// get real ones from `SignedBodyFunctions`; anywhere else they have the right shape only.
 #[derive(Clone)]
 pub struct WebhookTemplateFunctions {
     pub standard_functions: StandardTemplateFunctions,
 }
 
-const PROVIDER_HELPER_NAMES: [&str; 4] = [
+const PROVIDER_HELPER_NAMES: [&str; 7] = [
     "twilio_signature",
     "mailgun_signature",
     "svix_signature",
     "stripe_signature",
+    "razorpay_signature",
+    "paddle_signature",
+    "sslcommerz_verify_sign",
 ];
 
 impl WebhookTemplateFunctions {
@@ -63,6 +97,13 @@ impl TemplateFunctions for WebhookTemplateFunctions {
                 self.call_standard_text("now_unix", &[]),
                 random_hex()
             ),
+            "razorpay_signature" => random_hex(),
+            "paddle_signature" => format!(
+                "ts={};h1={}",
+                self.call_standard_text("now_unix", &[]),
+                random_hex()
+            ),
+            "sslcommerz_verify_sign" => sign_sslcommerz_arguments(arguments),
             _ => {
                 return self
                     .standard_functions

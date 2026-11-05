@@ -2,7 +2,8 @@
  * Writes the shipped SMS provider definitions, webhook templates and the
  * template reference (field descriptions, functions, filters), and the payment
  * flows, methods, step types and label variables to
- * crates/sendmock-ops/builtin/, where the binary embeds them, so the mock and
+ * crates/sendmock-ops/builtin/ (and the payment event names the `payment_event`
+ * filter reads to crates/sendmock-core/), where the binary embeds them, so the mock and
  * the runtime answer from one source (docs/plan/22-configurable-providers.md).
  * `bun scripts/export-builtin-definitions.ts` writes them; `--check` fails
  * when a committed file differs from a fresh export.
@@ -11,6 +12,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { flowLabelVariables } from "../src/lib/payments/flow-label-variables";
+import { paymentProviderEventNames } from "../src/lib/payments/payment-provider-event-names";
 import { paymentStepCatalogue } from "../src/lib/payments/payment-step-catalogue";
 import { buildBuiltinPaymentFlows } from "../src/mocks/fixtures/payment-flow-fixtures";
 import { buildBuiltinPaymentGateways } from "../src/mocks/fixtures/payment-gateway-fixtures";
@@ -27,6 +29,11 @@ import {
 const builtinDirectory = join(
   import.meta.dir,
   "../../crates/sendmock-ops/builtin",
+);
+/** The template engine lives in the core crate, so its event name table is written there. */
+const coreTemplateDirectory = join(
+  import.meta.dir,
+  "../../crates/sendmock-core/src/template",
 );
 
 /** The gallery entries of the shipped templates, without the state the binary keeps. */
@@ -90,6 +97,10 @@ export function buildBuiltinDefinitionFiles(): {
         null,
         2,
       )}\n`,
+    },
+    {
+      filePath: join(coreTemplateDirectory, "payment-event-names.json"),
+      content: `${JSON.stringify(paymentProviderEventNames, null, 2)}\n`,
     },
     {
       filePath: join(builtinDirectory, "webhook-template-reference.json"),

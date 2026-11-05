@@ -1,8 +1,25 @@
+import { readPaymentProviderEventName } from "@/lib/payments/payment-provider-event-names";
+
 /** Filters that take arguments, as `name("a", "b")` after a pipe. */
 type ArgumentFilter = (
   filterInput: unknown,
   filterArguments: string[],
 ) => unknown;
+
+const shortMonthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 function padTwoDigits(datePart: number): string {
   return String(datePart).padStart(2, "0");
@@ -22,10 +39,12 @@ function formatUtcDate(dateInput: unknown, formatText: string): string {
     H: padTwoDigits(parsedDate.getUTCHours()),
     M: padTwoDigits(parsedDate.getUTCMinutes()),
     S: padTwoDigits(parsedDate.getUTCSeconds()),
+    b: shortMonthNames[parsedDate.getUTCMonth()] ?? "",
+    s: String(Math.floor(parsedDate.getTime() / 1000)),
   };
 
   return formatText.replace(
-    /%([YymdHMS%])/g,
+    /%([YymdHMSsb%])/g,
     (_, formatCode: string) => dateParts[formatCode] ?? "%",
   );
 }
@@ -37,4 +56,6 @@ export const argumentFilters: Record<string, ArgumentFilter> = {
     new RegExp(patternText).exec(String(filterInput))?.[0] ?? "",
   date: (filterInput, [formatText = "%Y-%m-%dT%H:%M:%SZ"]) =>
     formatUtcDate(filterInput, formatText),
+  payment_event: (filterInput, [provider = ""]) =>
+    readPaymentProviderEventName(String(filterInput), provider),
 };

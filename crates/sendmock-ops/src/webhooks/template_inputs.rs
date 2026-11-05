@@ -69,6 +69,8 @@ pub struct TemplateRenderRequest {
     pub sms_id: Option<String>,
     /// A captured HTTP request, as the data of an `http.captured` event.
     pub http_request_id: Option<String>,
+    /// A payment, as the data of the event its latest state stands for.
+    pub payment_id: Option<String>,
     /// Unsaved edits to preview instead of the stored template (WH-09.7).
     pub draft: Option<TemplateDraft>,
 }

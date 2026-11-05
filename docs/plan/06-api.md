@@ -122,7 +122,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
 | GET | `/webhooks/deliveries` | delivery log, newest first and paged: `status` (comma-separated), `endpoint_id`, `event_type` |
 | GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
-| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables, or with `body` and `headers` to send an edited request; returns the new delivery |
+| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables (`409 gateway_notification` for a payment gateway's notification, which is resent from the payment), or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |
 | GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables; values are checked per kind and secrets are always returned masked (an empty value on `PATCH` keeps the stored secret); a Fixed random variable carries its `fixed_value` |
 | POST | `/webhooks/variables/preview` | what a variable resolves to against the sample message: `{ "kind": ..., "value": ... }`, returns the value, warnings and errors |
@@ -131,7 +131,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | GET | `/webhooks/template-reference` | context fields (path, type, description, example, children) for `?events=`, plus functions and filters, for the reference panel and `{{` suggestions |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
 | GET | `/webhooks/templates/{templateId}` | one template: request shape (method, content type, header and body templates), required variables, doc link and verified date |
-| POST | `/webhooks/templates/{templateId}/render` | render against `{ "email_id": ... }`, `{ "sms_id": ... }` or `{}` for the built-in sample, optionally with an unsaved `draft`; returns headers, body, warnings and errors |
+| POST | `/webhooks/templates/{templateId}/render` | render against `{ "email_id": ... }`, `{ "sms_id": ... }`, `{ "payment_id": ... }` (as the event its latest state stands for, e.g. `payment.succeeded`) or `{}` for the built-in sample, optionally with an unsaved `draft`; returns headers, body, warnings and errors |
 | PATCH | `/webhooks/templates/{templateId}` | edit `method`, `content_type`, `header_templates`, `body_template` (built-in and custom; file templates are read-only), and for custom templates `name`, `description`, `events`, `required_variables`; each save keeps a revision; `422` with the errors when it does not render; an edited built-in gets `is_modified` |
 | POST | `/webhooks/templates/{templateId}/reset` | restore a modified built-in to the shipped default |
 | POST | `/webhooks/templates/{templateId}/clone` | custom copy: `{ "name": ... }` |

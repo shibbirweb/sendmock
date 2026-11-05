@@ -10,6 +10,7 @@ mod template_expression_evaluation;
 mod template_functions;
 mod template_hash_filters;
 mod template_names;
+mod template_payment_event_filter;
 mod template_phone;
 mod template_problems;
 mod template_random_values;

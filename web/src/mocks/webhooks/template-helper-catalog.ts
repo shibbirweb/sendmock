@@ -55,8 +55,29 @@ export const templateFunctionCatalog: TemplateReferenceHelper[] = [
     name: "stripe_signature",
     signature: "stripe_signature(secret)",
     description:
-      "A Stripe-Signature header (t=...,v1=...), as Stripe sends it.",
+      "A Stripe-Signature header (t=...,v1=...) over the rendered body, as Stripe sends it.",
     example: "t=1792914927,v1=5257a869e7ecebeda32a...",
+  },
+  {
+    name: "razorpay_signature",
+    signature: "razorpay_signature(secret)",
+    description:
+      "An X-Razorpay-Signature header: the HMAC-SHA256 of the rendered body.",
+    example: "0ea09d611215f3d22f53207c37444d39...",
+  },
+  {
+    name: "paddle_signature",
+    signature: "paddle_signature(secret)",
+    description:
+      "A Paddle-Signature header (ts=...;h1=...) over the rendered body.",
+    example: "ts=1792914927;h1=b2911e60fc933435...",
+  },
+  {
+    name: "sslcommerz_verify_sign",
+    signature: "sslcommerz_verify_sign(store_password, fields)",
+    description:
+      "SSLCommerz's verify_sign: the MD5 of the named fields and the store password.",
+    example: "44fd62c8ac77ea7f03a9526172a3dec7",
   },
 ];
 
@@ -137,5 +158,12 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     description:
       "An event type as Resend names it: email.bounced stays email.bounced.",
     example: "{{ event.type | resend_type }}",
+  },
+  {
+    name: "payment_event",
+    signature: "payment_event(provider)",
+    description:
+      "A payment event as the provider names it: payment.succeeded becomes payment_intent.succeeded for stripe.",
+    example: '{{ event.type | payment_event("stripe") }}',
   },
 ];

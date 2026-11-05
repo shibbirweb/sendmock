@@ -13,8 +13,9 @@ use crate::{AppEvent, OperationContext, OperationError};
 /// `sms.reply_webhook` (the result already went with `sms.inbound`'s message).
 const UNRULED_EVENT_TYPES: [&str; 2] = ["webhook.delivered", "sms.reply_webhook"];
 
-/// The email or SMS an event is about, with the fields filters read. Events about something
-/// else, or about a message that is gone, have no fields, so only filterless rules fire.
+/// The email or SMS an event is about, with the fields filters read. A payment event is about
+/// its payment, which has no filter fields yet; events about something else, or about a
+/// message that is gone, have no fields, so only filterless rules fire.
 async fn load_event_subject(
     operation_context: &OperationContext,
     app_event: &AppEvent,
@@ -47,6 +48,10 @@ async fn load_event_subject(
                 .map(build_sms_rule_message)
                 .unwrap_or_default(),
         ));
+    }
+    if app_event.event_type.starts_with("payment.") || app_event.event_type.starts_with("checkout.")
+    {
+        return Ok((Some(subject_id), RuleMessage::default()));
     }
     Ok((None, RuleMessage::default()))
 }

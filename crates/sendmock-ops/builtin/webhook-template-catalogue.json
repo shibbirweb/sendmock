@@ -247,5 +247,134 @@
     ],
     "description": "n8n / Zapier / Make: flat JSON payload, matching the provider's documented format.",
     "required_variables": []
+  },
+  {
+    "id": "stripe.event",
+    "name": "Stripe: webhook event",
+    "service": "Stripe",
+    "category": "payment-provider",
+    "events": [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed",
+      "checkout.completed",
+      "checkout.expired"
+    ],
+    "description": "Stripe: webhook event payload, matching the provider's documented format.",
+    "required_variables": [
+      "stripe_webhook_secret"
+    ]
+  },
+  {
+    "id": "paypal.webhook",
+    "name": "PayPal: webhook event",
+    "service": "PayPal",
+    "category": "payment-provider",
+    "events": [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed",
+      "checkout.completed",
+      "checkout.expired"
+    ],
+    "description": "PayPal: webhook event payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "paypal.ipn",
+    "name": "PayPal: IPN",
+    "service": "PayPal",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed"
+    ],
+    "description": "PayPal: IPN payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sslcommerz.ipn",
+    "name": "SSLCommerz: IPN",
+    "service": "SSLCommerz",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "checkout.expired"
+    ],
+    "description": "SSLCommerz: IPN payload, matching the provider's documented format.",
+    "required_variables": [
+      "sslcommerz_store_password"
+    ]
+  },
+  {
+    "id": "bkash.callback",
+    "name": "bKash: callback",
+    "service": "bKash",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled"
+    ],
+    "description": "bKash: callback payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "razorpay.webhook",
+    "name": "Razorpay: webhook",
+    "service": "Razorpay",
+    "category": "payment-provider",
+    "events": [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed",
+      "checkout.completed"
+    ],
+    "description": "Razorpay: webhook payload, matching the provider's documented format.",
+    "required_variables": [
+      "razorpay_webhook_secret"
+    ]
+  },
+  {
+    "id": "paddle.webhook",
+    "name": "Paddle: webhook",
+    "service": "Paddle",
+    "category": "payment-provider",
+    "events": [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "checkout.completed"
+    ],
+    "description": "Paddle: webhook payload, matching the provider's documented format.",
+    "required_variables": [
+      "paddle_webhook_secret"
+    ]
   }
 ]

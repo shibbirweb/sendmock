@@ -8,6 +8,7 @@ import type {
 export type TemplateCategory =
   | "email-provider"
   | "sms-provider"
+  | "payment-provider"
   | "chat"
   | "automation"
   | "generic"
@@ -162,6 +163,11 @@ export type TemplateRenderRequest = {
    * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
    */
   http_request_id?: Ulid;
+  /**
+   * A payment, as the data of the event its latest state stands for.
+   * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+   */
+  payment_id?: Ulid;
   /**
    * Unsaved edits to preview instead of the stored template (WH-09.7).
    */

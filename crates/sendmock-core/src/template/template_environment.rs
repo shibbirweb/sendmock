@@ -19,6 +19,7 @@ use super::template_functions::TemplateFunctions;
 use super::template_hash_filters::{
     hmac_sha1_filter, hmac_sha256_filter, md5_filter, sha1_filter, sha256_filter, sha512_filter,
 };
+use super::template_payment_event_filter::payment_event_filter;
 use super::template_phone::{find_phone_country, format_e164, read_national_number};
 use super::template_text_filters::{
     capitalize_filter, contains_filter, default_filter, number_format_filter, pad_left_filter,
@@ -113,6 +114,7 @@ fn add_encoding_filters(environment: &mut Environment<'static>) {
     environment.add_filter("sendgrid_event", sendgrid_event_filter);
     environment.add_filter("ses_type", ses_type_filter);
     environment.add_filter("resend_type", resend_type_filter);
+    environment.add_filter("payment_event", payment_event_filter);
 }
 
 /// Each function of `template_functions` as a global, with keyword arguments passed as a

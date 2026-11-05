@@ -104,7 +104,7 @@ impl Operation for SendWebhookOperation {
             email_id: input.email_id.as_deref(),
             sms_id: input.sms_id.as_deref(),
             http_request_id: input.http_request_id.as_deref(),
-            sample_event_type: None,
+            ..ChosenMessage::default()
         };
         let mut template_subject = find_send_subject(
             operation_context,

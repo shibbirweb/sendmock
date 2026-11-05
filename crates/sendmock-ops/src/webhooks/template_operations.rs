@@ -232,6 +232,7 @@ impl Operation for RenderWebhookTemplateOperation {
                 email_id: input.email_id.as_deref(),
                 sms_id: input.sms_id.as_deref(),
                 http_request_id: input.http_request_id.as_deref(),
+                payment_id: input.payment_id.as_deref(),
                 sample_event_type: resolved_template.summary.events.first().map(String::as_str),
             },
         )

@@ -13442,6 +13442,7 @@ components:
       enum:
         - email-provider
         - sms-provider
+        - payment-provider
         - chat
         - automation
         - generic
@@ -13607,6 +13608,11 @@ components:
         http_request_id:
           $ref: "#/components/schemas/Ulid"
           description: A captured HTTP request, as the data of an `http.captured` event.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        payment_id:
+          $ref: "#/components/schemas/Ulid"
+          description: A payment, as the data of the event its latest state stands for.
           examples:
             - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         draft:

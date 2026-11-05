@@ -24,6 +24,111 @@ const emailOutcomeEvents: AppEventType[] = [
   "email.complained",
 ];
 
+const allPaymentEvents: AppEventType[] = [
+  "payment.created",
+  "payment.authorized",
+  "payment.succeeded",
+  "payment.failed",
+  "payment.canceled",
+  "payment.refunded",
+  "payment.partially_refunded",
+  "payment.dispute_opened",
+  "payment.dispute_closed",
+  "checkout.completed",
+  "checkout.expired",
+];
+
+/** The payment gateways' notifications, each with the events its provider sends. */
+const paymentTemplateSpecs: TemplateSpec[] = [
+  [
+    "stripe.event",
+    "Stripe: webhook event",
+    "Stripe",
+    "payment-provider",
+    allPaymentEvents,
+    ["stripe_webhook_secret"],
+  ],
+  [
+    "paypal.webhook",
+    "PayPal: webhook event",
+    "PayPal",
+    "payment-provider",
+    allPaymentEvents.filter((eventType) => eventType !== "payment.created"),
+    [],
+  ],
+  [
+    "paypal.ipn",
+    "PayPal: IPN",
+    "PayPal",
+    "payment-provider",
+    [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed",
+    ],
+    [],
+  ],
+  [
+    "sslcommerz.ipn",
+    "SSLCommerz: IPN",
+    "SSLCommerz",
+    "payment-provider",
+    [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "checkout.expired",
+    ],
+    ["sslcommerz_store_password"],
+  ],
+  [
+    "bkash.callback",
+    "bKash: callback",
+    "bKash",
+    "payment-provider",
+    ["payment.succeeded", "payment.failed", "payment.canceled"],
+    [],
+  ],
+  [
+    "razorpay.webhook",
+    "Razorpay: webhook",
+    "Razorpay",
+    "payment-provider",
+    [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_closed",
+      "checkout.completed",
+    ],
+    ["razorpay_webhook_secret"],
+  ],
+  [
+    "paddle.webhook",
+    "Paddle: webhook",
+    "Paddle",
+    "payment-provider",
+    [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "checkout.completed",
+    ],
+    ["paddle_webhook_secret"],
+  ],
+];
+
 /** The built-in catalogue from docs/plan/13-webhook-templates.md. */
 const builtinTemplateSpecs: TemplateSpec[] = [
   [
@@ -180,6 +285,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     ["email.received", "sms.sent", "sms.inbound"],
     [],
   ],
+  ...paymentTemplateSpecs,
 ];
 
 export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {

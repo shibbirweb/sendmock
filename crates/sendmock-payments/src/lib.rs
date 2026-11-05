@@ -1,10 +1,12 @@
-//! Payment domain: the checkout flow steps, the label variables and the rules a flow follows.
+//! Payment domain: the checkout flow steps, the label variables, the rules a flow follows and
+//! the providers' notification signatures.
 
 mod checkout;
 mod flow;
 mod gateway;
 mod method;
 mod money;
+mod signing;
 
 pub use checkout::{
     CardEntry, CheckoutEntries, FlowOutcome, FlowRun, MethodTestValues, PaidWith, TestValue,
@@ -21,3 +23,6 @@ pub use method::{
     is_test_card_range, passes_luhn_check, to_card_digits, to_test_number,
 };
 pub use money::{currency_exponent, format_major_amount, is_currency_code};
+pub use signing::{
+    sign_paddle_payload, sign_razorpay_payload, sign_sslcommerz_fields, sign_stripe_payload,
+};

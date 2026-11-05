@@ -89,6 +89,7 @@ pub const SENDMOCK_FILTER_NAMES: &[&str] = &[
     "sendgrid_event",
     "ses_type",
     "resend_type",
+    "payment_event",
 ];
 
 /// The `minijinja` global functions templates may call.

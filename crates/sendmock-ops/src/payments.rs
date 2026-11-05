@@ -8,6 +8,7 @@ mod gateway_template_rendering;
 mod payment_catalogue;
 mod payment_change;
 mod payment_definition_store;
+mod payment_event_data;
 mod payment_flow_catalogue;
 mod payment_flow_operations;
 mod payment_flow_step_operations;
@@ -29,6 +30,7 @@ mod payment_views;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
 pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
+pub(crate) use payment_event_data::{build_sample_payment_event_data, load_payment_event};
 pub use payment_flow_operations::{
     CreatePaymentFlowOperation, DeletePaymentFlowOperation, GetPaymentFlowOperation,
     ListPaymentFlowsOperation, ResetPaymentFlowOperation, UpdatePaymentFlowOperation,

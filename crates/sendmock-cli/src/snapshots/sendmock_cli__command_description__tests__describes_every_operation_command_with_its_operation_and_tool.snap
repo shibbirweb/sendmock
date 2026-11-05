@@ -3543,6 +3543,7 @@ expression: command_descriptions
       "--draft",
       "--email-id",
       "--http-request-id",
+      "--payment-id",
       "--sms-id"
     ],
     "operations": [

@@ -2,6 +2,7 @@ use sendmock_payments::format_major_amount;
 
 use super::gateway_template_rendering::RedirectOutcome;
 use super::payment_catalogue::{add_timeline_event, find_payment, save_payment};
+use super::payment_event_data::build_payment_event_data;
 use super::payment_gateway_catalogue::find_payment_gateway;
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_notification::queue_payment_notification;
@@ -202,7 +203,7 @@ impl<'context> PaymentChange<'context> {
     }
 
     /// Queues the gateway's notification for each event, stores the payment, then publishes
-    /// its events in order, each carrying its summary.
+    /// its events in order, each carrying the payment.
     pub async fn save(mut self) -> Result<PaymentDetail, OperationError> {
         let operation_context = self.operation_context;
         if let Some(gateway_fields) = &self.gateway_fields {
@@ -222,8 +223,7 @@ impl<'context> PaymentChange<'context> {
             operation_context.clock.now_unix_ms(),
         )
         .await?;
-        let event_data = serde_json::to_value(&self.payment.summary)
-            .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
+        let event_data = build_payment_event_data(&self.payment);
         for event_type in self.fired_events {
             publish_event(operation_context, event_type, event_data.clone());
         }
