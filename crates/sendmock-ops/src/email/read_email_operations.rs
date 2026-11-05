@@ -3,6 +3,7 @@ use sendmock_store::EmailRecord;
 use super::email_access::find_email_or_not_found;
 use super::email_detail::EmailDetail;
 use super::email_inputs::{EmailListQuery, EmailReference, LatestEmailQuery};
+use super::email_response_links::attach_response_links;
 use super::email_search_query::build_email_list_filter;
 use super::email_summary::EmailSummary;
 use super::email_timeline_entry::EmailTimelineEntry;
@@ -125,6 +126,7 @@ pub(crate) async fn load_email_detail(
             .unwrap_or_else(|| serde_json::json!({}));
         Some(serde_json::json!({ "template_id": template_id, "template_data": template_data }))
     });
+    attach_response_links(operation_context, &mut email_detail).await?;
     Ok(email_detail)
 }
 

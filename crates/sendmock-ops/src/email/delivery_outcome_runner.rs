@@ -11,7 +11,7 @@ use super::out_of_office_reply::send_out_of_office_reply;
 use crate::message_rules::{apply_tag_rules, start_forward_rules};
 use crate::{
     AppSettings, EmailOutcomeProfile, OperationContext, OperationError, load_email_outcome_rules,
-    publish_email_received,
+    publish_email_inbound, publish_email_received,
 };
 
 fn read_outcome_settings(app_settings: &AppSettings) -> OutcomeSettings {
@@ -35,6 +35,10 @@ pub async fn complete_email_intake(
     operation_context: &OperationContext,
     stored_email: &EmailRecord,
 ) -> Result<(), OperationError> {
+    if stored_email.direction == "inbound" {
+        publish_email_inbound(operation_context, stored_email);
+        return Ok(());
+    }
     let tagged_email = apply_tag_rules(operation_context, stored_email).await?;
     let stored_email = tagged_email.as_ref().unwrap_or(stored_email);
     publish_email_received(operation_context, stored_email);

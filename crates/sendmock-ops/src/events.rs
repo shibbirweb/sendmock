@@ -5,7 +5,9 @@ mod get_recent_events_operation;
 
 pub use app_event::{AppEvent, AppEventType, RecordedEvent};
 pub use event_bus::{EventBus, RecentEventFilter};
-pub use event_publishing::{publish_email_deleted, publish_email_received, publish_event};
+pub use event_publishing::{
+    publish_email_deleted, publish_email_inbound, publish_email_received, publish_event,
+};
 pub use get_recent_events_operation::{GetRecentEventsOperation, RecentEventsInput};
 
 use crate::OperationRegistry;

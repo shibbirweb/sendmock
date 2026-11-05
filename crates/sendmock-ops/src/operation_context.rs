@@ -5,9 +5,9 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailLocalTemplateRepository,
     EmailOutcomeRuleRepository, EmailProviderSendRepository, EmailRepository,
-    MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
-    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    EmailResponseRepository, MessageProviderRepository, MessageRuleKind, MessageRuleRepository,
+    MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
+    PaymentRepository, SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
     SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
     SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
@@ -89,13 +89,16 @@ pub struct OperationContext {
 }
 
 /// What emails keep beside the messages: each send as its provider knows it, the seed file's
-/// local stand-ins for provider templates, and the tag and forward rules run on arrival.
+/// local stand-ins for provider templates, the tag and forward rules run on arrival, and the
+/// links between simulated replies and their originals.
 #[derive(Clone)]
 pub struct EmailStores {
     pub sends: EmailProviderSendRepository,
     pub local_templates: EmailLocalTemplateRepository,
     pub tag_rules: MessageRuleRepository,
     pub forward_rules: MessageRuleRepository,
+    /// Which emails are simulated replies or forwards, and of what.
+    pub responses: EmailResponseRepository,
 }
 
 impl EmailStores {
@@ -108,6 +111,7 @@ impl EmailStores {
                 Arc::clone(database),
                 MessageRuleKind::Forward,
             ),
+            responses: EmailResponseRepository::new(Arc::clone(database)),
         }
     }
 }

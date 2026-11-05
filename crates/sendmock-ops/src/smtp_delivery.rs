@@ -18,6 +18,16 @@ pub async fn store_smtp_message(
     operation_context: &OperationContext,
     smtp_message: SmtpMessage,
 ) -> Result<String, OperationError> {
+    let inbound_domains = operation_context
+        .settings_store
+        .current()
+        .await?
+        .inbound_email_domains;
+    let direction = if is_for_inbound_domains(&smtp_message.recipients, &inbound_domains) {
+        "inbound"
+    } else {
+        "outbound"
+    };
     let incoming_email = IncomingEmail {
         raw_message: smtp_message.raw_message,
         envelope: EmailEnvelope {
@@ -25,7 +35,7 @@ pub async fn store_smtp_message(
             recipients: smtp_message.recipients,
         },
         source: "smtp".to_owned(),
-        direction: "outbound".to_owned(),
+        direction: direction.to_owned(),
         smtp_session_id: Some(smtp_message.smtp_session_id),
         smtp_auth_user: smtp_message.auth_user,
         extra_tags: Vec::new(),
@@ -42,6 +52,22 @@ pub async fn store_smtp_message(
     Ok(stored_email.email_id)
 }
 
+/// Mail whose every recipient is at an inbound domain is mail coming in to your app
+/// (EM-17.2); domains match without case.
+fn is_for_inbound_domains(recipients: &[String], inbound_domains: &[String]) -> bool {
+    !recipients.is_empty()
+        && !inbound_domains.is_empty()
+        && recipients.iter().all(|recipient| {
+            recipient
+                .rsplit_once('@')
+                .is_some_and(|(_, recipient_domain)| {
+                    inbound_domains
+                        .iter()
+                        .any(|inbound_domain| inbound_domain.eq_ignore_ascii_case(recipient_domain))
+                })
+        })
+}
+
 pub async fn record_smtp_session(
     operation_context: &OperationContext,
     session: SmtpSessionRecord,
@@ -50,4 +76,34 @@ pub async fn record_smtp_session(
         .smtp_session_repository
         .insert_session(session)
         .await?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // AC: EM-17.2
+    #[test]
+    fn mail_counts_as_incoming_only_when_every_recipient_is_at_an_inbound_domain() {
+        let inbound_domains = vec!["Reply.App.test".to_owned()];
+        let recipients = |addresses: &[&str]| -> Vec<String> {
+            addresses
+                .iter()
+                .map(|address| (*address).to_owned())
+                .collect()
+        };
+
+        assert!(is_for_inbound_domains(
+            &recipients(&["support@reply.app.test"]),
+            &inbound_domains
+        ));
+        assert!(!is_for_inbound_domains(
+            &recipients(&["support@reply.app.test", "sam@example.test"]),
+            &inbound_domains
+        ));
+        assert!(!is_for_inbound_domains(
+            &recipients(&["support@reply.app.test"]),
+            &[]
+        ));
+    }
 }

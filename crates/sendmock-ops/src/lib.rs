@@ -45,7 +45,8 @@ pub use email::{
 };
 pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
-    RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_received, publish_event,
+    RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_inbound,
+    publish_email_received, publish_event,
 };
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, accepts_null, describe_input_shape};

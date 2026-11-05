@@ -1510,7 +1510,7 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
     let by_email = json!({ "email_id": email_id });
     let by_attachment = json!({ "email_id": email_id, "attachment_index": 0 });
     let raw_message = "From: app@shop.test\r\nTo: sam@example.test\r\nSubject: Raw\r\n\r\nHello";
-    let mut samples = build_email_check_samples(&by_email);
+    let mut samples = build_email_follow_up_samples(&by_email);
     samples.extend([
         (
             "getEmails",
@@ -1554,8 +1554,25 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
     samples
 }
 
-fn build_email_check_samples(by_email: &Value) -> Vec<(&'static str, Vec<Value>)> {
+/// The checks, release, replies and forwards of one email, and an incoming email.
+fn build_email_follow_up_samples(by_email: &Value) -> Vec<(&'static str, Vec<Value>)> {
+    let email_id = &by_email["email_id"];
     vec![
+        (
+            "postEmailsByEmailIdReply",
+            vec![json!({ "email_id": email_id, "body": "Thanks!", "reply_all": true })],
+        ),
+        (
+            "postEmailsByEmailIdForward",
+            vec![json!({ "email_id": email_id, "to": "support@inbound.app.test" })],
+        ),
+        (
+            "postEmailsInbound",
+            vec![
+                json!({ "from": "sam@example.test", "to": ["support@inbound.app.test"], "subject": "Help", "text": "Hi" }),
+                json!({ "raw": "From: sam@example.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello" }),
+            ],
+        ),
         ("getEmailsByEmailIdHtmlCheck", vec![by_email.clone()]),
         ("postEmailsByEmailIdLinkCheck", vec![by_email.clone()]),
         ("postEmailsByEmailIdSpamCheck", vec![by_email.clone()]),

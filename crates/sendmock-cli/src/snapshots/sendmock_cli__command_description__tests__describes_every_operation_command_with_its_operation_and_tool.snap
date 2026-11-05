@@ -497,6 +497,87 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email reply",
+    "usage": "sendmock email reply <emailId>",
+    "aliases": [],
+    "summary": "Reply as the recipient; the reply arrives as inbound email.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--body",
+      "--from",
+      "--include-original",
+      "--reply-all",
+      "--subject"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/reply",
+        "operation_id": "postEmailsByEmailIdReply",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_reply"
+    ]
+  },
+  {
+    "command": "sendmock email forward",
+    "usage": "sendmock email forward <emailId>",
+    "aliases": [],
+    "summary": "Forward as the recipient; the copy arrives as inbound email.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--body",
+      "--from",
+      "--include-attachments",
+      "--include-original",
+      "--subject",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/forward",
+        "operation_id": "postEmailsByEmailIdForward",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_forward"
+    ]
+  },
+  {
+    "command": "sendmock email inbound",
+    "usage": "sendmock email inbound",
+    "aliases": [],
+    "summary": "Create an incoming email from fields or raw MIME; fires email.inbound.",
+    "arguments": [],
+    "flags": [
+      "--from",
+      "--html",
+      "--raw",
+      "--subject",
+      "--text",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/inbound",
+        "operation_id": "postEmailsInbound",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_inbound"
+    ]
+  },
+  {
     "command": "sendmock email mime",
     "usage": "sendmock email mime <emailId>",
     "aliases": [],
@@ -2732,7 +2813,7 @@ expression: command_descriptions
     "command": "sendmock sms providers create",
     "usage": "sendmock sms providers create",
     "aliases": [],
-    "summary": "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+    "summary": "Add an SMS provider, blank or copied from another.",
     "arguments": [],
     "flags": [
       "--key",
@@ -2942,7 +3023,7 @@ expression: command_descriptions
     "command": "sendmock email providers create",
     "usage": "sendmock email providers create",
     "aliases": [],
-    "summary": "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+    "summary": "Add an email provider, blank or copied from another.",
     "arguments": [],
     "flags": [
       "--key",

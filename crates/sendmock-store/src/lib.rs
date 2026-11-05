@@ -6,6 +6,7 @@ mod database;
 mod database_location;
 mod email;
 mod email_provider_send;
+mod email_response;
 mod message_open;
 mod message_provider;
 mod message_rule;
@@ -44,6 +45,7 @@ pub use email_provider_send::{
     EmailLocalTemplateRecord, EmailLocalTemplateRepository, EmailProviderSendRecord,
     EmailProviderSendRepository,
 };
+pub use email_response::{EmailResponseRecord, EmailResponseRepository};
 pub use message_open::{MessageOpenRecord, OpenRecording};
 pub use message_provider::{MessageProviderRecord, MessageProviderRepository};
 pub use message_rule::{MessageRuleKind, MessageRuleRecord, MessageRuleRepository};

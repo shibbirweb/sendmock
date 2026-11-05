@@ -49,7 +49,7 @@ test("UI-12.2 an email opens with every tab and no failing calls", async ({
   expect(failedApiCalls).toEqual([]);
 });
 
-test("UI-12.2 buttons for operations not served yet are disabled and say when they arrive", async ({
+test("UI-12.2 served buttons are enabled and a feature not served yet says when it arrives", async ({
   page,
   request,
 }) => {
@@ -64,22 +64,22 @@ test("UI-12.2 buttons for operations not served yet are disabled and say when th
   const { id: emailId } = (await sendResponse.json()) as { id: string };
 
   await page.goto(`/mail/${emailId}`);
-  const replyButton = page.getByRole("button", {
-    name: "Reply: Available in Phase 4",
-  });
-  await replyButton.hover({ force: true });
 
-  await expect(replyButton).toBeDisabled();
-  await expect(page.getByRole("tooltip")).toHaveText("Available in Phase 4");
+  for (const actionName of ["Reply", "Forward", "Simulate an event"]) {
+    await expect(
+      page.getByRole("button", { name: actionName, exact: true }),
+    ).toBeEnabled();
+  }
   await expect(
     page.getByRole("tab", { name: "Checks", exact: true }),
   ).toBeEnabled();
   await expect(
-    page.getByRole("button", { name: "Simulate an event", exact: true }),
-  ).toBeEnabled();
-  await expect(
     page.getByRole("button", { name: "Mark as unread" }),
   ).toBeEnabled();
+  await page.goto("/settings?section=connection");
+  await expect(
+    page.getByRole("heading", { name: "AI agent setup arrives in Phase 4" }),
+  ).toBeVisible();
 });
 
 test("EM-12.4 a live email's tags are added and removed in the detail", async ({
