@@ -25,7 +25,7 @@
     "header_templates": {
       "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
     },
-    "body_template": "SmsSid={{ data.provider_id }}&SmsStatus={{ data.status }}&MessageStatus={{ data.status }}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}",
+    "body_template": "SmsSid={{ data.provider_id }}&SmsStatus={% if event.type == \"sms.opened\" %}read{% else %}{{ data.status }}{% endif %}&MessageStatus={% if event.type == \"sms.opened\" %}read{% else %}{{ data.status }}{% endif %}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}",
     "doc_url": "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
     "verified_on": "2026-11-05"
   },

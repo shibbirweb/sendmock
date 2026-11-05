@@ -339,3 +339,63 @@ async fn a_rule_filters_opened_events_on_the_open_source() {
         .collect();
     assert_eq!(delivered_events, ["email.opened"]);
 }
+
+/// An endpoint that sends Twilio's status callback for the events its rule names.
+async fn create_twilio_status_endpoint(app_router: &axum::Router) -> String {
+    let endpoint_id = create_endpoint(app_router, "Twilio read receipts").await;
+    let (status, updated) = call_api(
+        app_router,
+        "PATCH",
+        &format!("/api/v1/webhooks/endpoints/{endpoint_id}"),
+        Some(&json!({
+            "template_id": "twilio.status_callback", "template_mode": "linked",
+            "body_mode": "template",
+        })),
+    )
+    .await;
+    assert_eq!(status, 200, "{updated}");
+    endpoint_id
+}
+
+// AC: SM-10.3
+#[tokio::test]
+async fn an_opened_sms_sends_twilios_read_status() {
+    let (app_router, operation_context) =
+        build_test_app_with(|operation_context| operation_context);
+    let subscriber = tokio::spawn(run_webhook_rule_subscriber(operation_context.clone()));
+    tokio::task::yield_now().await;
+    let endpoint_id = create_twilio_status_endpoint(&app_router).await;
+    create_rule(
+        &app_router,
+        &json!({
+            "name": "Read receipts", "endpoint_id": endpoint_id,
+            "events": ["sms.opened"], "is_enabled": true,
+        }),
+    )
+    .await;
+    let sms_id = send_outbound_sms(&app_router).await;
+
+    open_message(
+        &app_router,
+        &format!("/api/v1/sms/{sms_id}/open"),
+        json!({ "source": "api" }),
+    )
+    .await;
+    tokio::time::sleep(Duration::from_millis(200)).await;
+    subscriber.abort();
+
+    let deliveries = read_json(&app_router, "/api/v1/webhooks/deliveries").await;
+    let read_receipt = deliveries["items"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .find(|delivery| delivery["event_type"] == "sms.opened")
+        .cloned()
+        .unwrap_or(Value::Null);
+    let callback_body = read_receipt["request"]["body"].as_str().unwrap_or_default();
+    assert!(
+        callback_body.contains("MessageStatus=read"),
+        "{read_receipt}"
+    );
+    assert!(callback_body.contains("SmsStatus=read"), "{read_receipt}");
+}

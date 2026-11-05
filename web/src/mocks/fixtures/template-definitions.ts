@@ -64,7 +64,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "X-Twilio-Signature":
         "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
     },
-    body_template: `SmsSid={{ data.provider_id }}&SmsStatus={{ data.status }}&MessageStatus={{ data.status }}&To={{ data.to_number | urlencode }}${twilioMessagingService}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}`,
+    body_template: `SmsSid={{ data.provider_id }}&SmsStatus={% if event.type == "sms.opened" %}read{% else %}{{ data.status }}{% endif %}&MessageStatus={% if event.type == "sms.opened" %}read{% else %}{{ data.status }}{% endif %}&To={{ data.to_number | urlencode }}${twilioMessagingService}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}`,
     doc_url:
       "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
     verified_on: smsFormatsVerifiedOn,
