@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W9c (each preset's official client library in a CI workflow, HC-03.1), then W10b (scenarios) (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W11 (payments: bKash, Razorpay, Paddle, subscriptions and disputes), then W12 (the published OpenAPI and API docs page), W13 (AI: MCP resources and prompts, the skill with its example scenarios in CI, AI-04.3), W14 (examples in 8 languages, with each HTTP preset's official client library, HC-03.1) and W15 (done-when), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -690,3 +690,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W9c (part): a captured request can be forwarded to another URL, `POST /samples/http` captures a Slack sample, and the HTTP screens join the live UI suite; HC-01.5 and HC-01.6 ticked. The catch-all port stays in Phase 5. |
 | 2026-11-06 | Phase 4 W7d: email webhooks render against the stored email in full (bodies, headers, attachments with download URLs and small files inline); SendGrid Inbound Parse posts multipart with its files and Postmark inbound lists Attachments; WH-06 accepted. |
 | 2026-11-06 | Phase 4 W10a: the SMTP listener follows Settings > Chaos (reject the next N messages with a chosen code, refuse a recipient pattern with 550, slow every reply, drop connections during DATA); EM-15 accepted. |
+| 2026-11-06 | Phase 4 W10b: scenario files run against the real server (`sendmock scenario validate` and `run`, the REST endpoints, the MCP tools and the Scenarios screen); AI-04.1 and AI-04.2 ticked, AI-04.3 waits for the skill in W13. |

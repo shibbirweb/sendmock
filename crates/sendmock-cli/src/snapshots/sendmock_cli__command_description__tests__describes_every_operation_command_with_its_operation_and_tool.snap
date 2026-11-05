@@ -2831,6 +2831,48 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock scenario validate",
+    "usage": "sendmock scenario validate <file>",
+    "aliases": [],
+    "summary": "Check a scenario file without running it.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/scenarios/validate",
+        "operation_id": "postScenariosValidate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_validate"
+    ]
+  },
+  {
+    "command": "sendmock scenario run",
+    "usage": "sendmock scenario run <file>",
+    "aliases": [],
+    "summary": "Run a scenario file step by step and report each step.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/scenarios/run",
+        "operation_id": "postScenariosRun",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_run"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

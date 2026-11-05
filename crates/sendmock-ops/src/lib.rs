@@ -28,6 +28,7 @@ mod paypal;
 mod present_value;
 mod providers;
 mod samples;
+mod scenarios;
 mod seed;
 mod settings;
 mod sms;
@@ -160,6 +161,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     message_rules::register_message_rule_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
+    scenarios::register_scenario_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

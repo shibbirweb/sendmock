@@ -160,6 +160,7 @@ async fn prepare_sample_inputs(
     samples.extend([webhook_preview_samples()]);
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
+    samples.extend(scenario_samples());
     samples
 }
 
@@ -2169,4 +2170,22 @@ async fn serves_a_valid_openapi_document() {
             "{schema_name} is not a valid JSON Schema"
         );
     }
+}
+
+fn scenario_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "postScenariosValidate",
+            vec![
+                json!({ "scenario": "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }\n" }),
+                json!({ "scenario": "[[steps]]\nrun = \"rocket.launch\"\n" }),
+            ],
+        ),
+        (
+            "postScenariosRun",
+            vec![
+                json!({ "scenario": "name = \"sample\"\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }\nsave = \"sample\"\n[[steps]]\nrun = \"assert\"\nwith = { that = \"1 == 2\" }\n" }),
+            ],
+        ),
+    ]
 }
