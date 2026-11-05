@@ -1347,6 +1347,20 @@ async fn prepare_payment_gateway_samples(
     ]
 }
 
+/// Payments paid with a test card through the API: one paid, one declined in yen and authorized
+/// only.
+fn direct_payment_sample() -> (&'static str, Vec<Value>) {
+    (
+        "postPayments",
+        vec![
+            json!({ "provider": "stripe", "amount_minor": 1999, "currency": "USD", "card_number": "4242424242424242" }),
+            json!({ "provider": "stripe", "amount_minor": 1500, "currency": "jpy", "card_number": "4000000000009995",
+                    "customer_email": "sam@example.test", "capture_method": "manual",
+                    "line_items": [{ "name": "Tea", "quantity": 1, "unit_amount_minor": 1500 }] }),
+        ],
+    )
+}
+
 /// A checkout waiting on its page, read back as a payment and as its session.
 async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
     let checkout = json!({
@@ -1357,6 +1371,7 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
     let payment_id =
         post_json(app_router, "/api/v1/payments/checkout", &checkout).await["id"].clone();
     let mut samples = prepare_checkout_action_samples(app_router, &payment_id).await;
+    samples.push(direct_payment_sample());
     samples.extend(vec![
         (
             "getPayments",

@@ -1727,6 +1727,33 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments create",
+    "usage": "sendmock payments create",
+    "aliases": [],
+    "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+    "arguments": [],
+    "flags": [
+      "--amount-minor",
+      "--capture-method",
+      "--card-number",
+      "--currency",
+      "--customer-email",
+      "--line-items",
+      "--provider"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments",
+        "operation_id": "postPayments",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_create"
+    ]
+  },
+  {
     "command": "sendmock payments checkout create",
     "usage": "sendmock payments checkout create",
     "aliases": [],

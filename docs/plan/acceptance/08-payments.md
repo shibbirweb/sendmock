@@ -15,9 +15,9 @@ Phase 3P.
 
 Phase 3P.
 
-- [ ] PY-02.1 `POST /api/v1/payments` with a test card returns the outcome from the test card table and stores the payment.
+- [x] PY-02.1 `POST /api/v1/payments` with a test card returns the outcome from the test card table and stores the payment. (#48)
 - [x] PY-02.2 `POST /api/v1/payments/checkout` returns a checkout URL; completing the checkout page redirects to the success, fail or cancel URL and fires the matching native event.
-- [ ] PY-02.3 Amounts are stored in minor units with an ISO currency code; BDT, INR, USD, EUR and zero-decimal currencies (JPY) are handled correctly.
+- [x] PY-02.3 Amounts are stored in minor units with an ISO currency code; BDT, INR, USD, EUR and zero-decimal currencies (JPY) are handled correctly. (#48)
 
 ## PY-03 Hosted test checkout page
 

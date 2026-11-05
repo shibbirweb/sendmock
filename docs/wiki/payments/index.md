@@ -21,7 +21,7 @@ SendMock is a fake payment gateway. Your app creates a payment through the gatew
 
 | Gets from | Sends to |
 | --- | --- |
-| your app over a gateway API (Stripe, PayPal, SSLCommerz, bKash) on port `8026`, or `POST /api/v1/payments/checkout` | the [test checkout page](./checkout-page.md), which drives the outcome |
+| your app over a gateway API (Stripe, PayPal, SSLCommerz, bKash) on port `8026`, `POST /api/v1/payments/checkout`, or `POST /api/v1/payments` with a test card | the [test checkout page](./checkout-page.md), which drives the outcome |
 | [Gateways](./gateways.md), which offer [Methods](./methods.md), which run [Flows](./flows.md) | the browser back to your app's success, fail or cancel URL |
 | [Settings > Payments](../settings.md#payments): merchant name, currency, automatic outcomes | the notification through the gateway's endpoint, logged in [Deliveries](../webhooks/deliveries.md) |
 | | `payment.*` and `checkout.*` events to [Rules](../webhooks/rules.md); the API request to [Logs](../logs.md) |
@@ -45,6 +45,10 @@ Gateway (Stripe, SSLCommerz, your own)
 ### The list
 
 Amount in the currency's own format, provider, status, customer and time, newest first, 50 at a time, new and changed payments appearing live. Status chips (All, Succeeded, Pending, Failed, Refunded, Disputed), a provider picker and a currency picker narrow it; filters and the open payment are kept in the URL.
+
+### New payment
+
+**New payment** pays a payment at once with a test card, as your app's server does when it charges without a checkout page (`POST /api/v1/payments`). Pick the gateway, the amount and currency, a test card from [Methods](./methods.md) (for example `4000 0000 0000 9995` declines with insufficient funds) and whether to capture at once or only authorize. The card's outcome decides the payment; a card that asks for 3-D Secure fails, as there is no page to approve it on, and a real card number is refused and kept nowhere.
 
 ### The payment drawer
 
@@ -270,6 +274,7 @@ public class PaymentsTests
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
+| pay with a test card | [`sendmock payments create`](/cli/payments/#payments-create) | [`POST /api/v1/payments`](/api/payments/#postPayments) | [`sendmock_payment_create`](/mcp/payments/#sendmock_payment_create) |
 | create a checkout | [`sendmock payments checkout create`](/cli/payments/#payments-checkout-create) | [`POST /api/v1/payments/checkout`](/api/payments/#postPaymentsCheckout) | [`sendmock_payment_create_checkout`](/mcp/payments/#sendmock_payment_create_checkout) |
 | list | [`sendmock payments list`](/cli/payments/#payments-list) | [`GET /api/v1/payments`](/api/payments/#getPayments) | [`sendmock_payment_list`](/mcp/payments/#sendmock_payment_list) |
 | one payment | [`sendmock payments show <paymentId>`](/cli/payments/#payments-show) | [`GET /api/v1/payments/{paymentId}`](/api/payments/#getPaymentsByPaymentId) | [`sendmock_payment_get`](/mcp/payments/#sendmock_payment_get) |
