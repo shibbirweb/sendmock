@@ -131,6 +131,15 @@ async fn answer_code_served_api(
     {
         return Ok(Some(sslcommerz_outcome));
     }
+    if let Some(mailgun_routes_outcome) = crate::inbound_routes::answer_mailgun_routes_request(
+        operation_context,
+        provider_route,
+        request,
+    )
+    .await?
+    {
+        return Ok(Some(mailgun_routes_outcome));
+    }
     if let Some(custom_gateway_outcome) =
         answer_custom_gateway_request(operation_context, provider_route, request).await?
     {
