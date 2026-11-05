@@ -216,7 +216,7 @@ pub async fn answer_paypal_request(
         return Ok(Some(ProviderOutcome {
             response: build_ipn_response(is_verified),
             provider_key: Some(PAYPAL_PROVIDER_KEY.to_owned()),
-            created_sms_id: None,
+            created_message: None,
             secret_values: Vec::new(),
         }));
     }
@@ -239,7 +239,7 @@ pub async fn answer_paypal_request(
     Ok(Some(ProviderOutcome {
         response,
         provider_key: Some(PAYPAL_PROVIDER_KEY.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values,
     }))
 }

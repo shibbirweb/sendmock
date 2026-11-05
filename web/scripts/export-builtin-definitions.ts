@@ -1,5 +1,5 @@
 /**
- * Writes the shipped SMS provider definitions, webhook templates and the
+ * Writes the shipped email and SMS provider definitions, webhook templates and the
  * template reference (field descriptions, functions, filters), and the payment
  * flows, methods, step types and label variables to
  * crates/sendmock-ops/builtin/ (and the payment event names the `payment_event`
@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { flowLabelVariables } from "../src/lib/payments/flow-label-variables";
 import { paymentProviderEventNames } from "../src/lib/payments/payment-provider-event-names";
 import { paymentStepCatalogue } from "../src/lib/payments/payment-step-catalogue";
+import { buildBuiltinEmailProviders } from "../src/mocks/fixtures/email-provider-fixtures";
 import { buildBuiltinPaymentFlows } from "../src/mocks/fixtures/payment-flow-fixtures";
 import { buildBuiltinPaymentGateways } from "../src/mocks/fixtures/payment-gateway-fixtures";
 import { buildBuiltinPaymentMethods } from "../src/mocks/fixtures/payment-method-fixtures";
@@ -57,6 +58,10 @@ export function buildBuiltinDefinitionFiles(): {
   content: string;
 }[] {
   return [
+    {
+      filePath: join(builtinDirectory, "email-providers.json"),
+      content: `${JSON.stringify(buildBuiltinEmailProviders(), null, 2)}\n`,
+    },
     {
       filePath: join(builtinDirectory, "sms-providers.json"),
       content: `${JSON.stringify(buildBuiltinSmsProviders(), null, 2)}\n`,

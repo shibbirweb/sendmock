@@ -205,7 +205,7 @@ pub async fn answer_stripe_request(
     Ok(Some(ProviderOutcome {
         response: build_stripe_response(operation_context, request, stripe_answer),
         provider_key: Some(STRIPE_PROVIDER_KEY.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values,
     }))
 }

@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use sendmock_store::ApiRequestRecord;
 use serde_json::Value;
 
+use crate::providers::CreatedMessage;
 use crate::{OperationContext, OperationError};
 
 /// Request bodies and responses longer than this are cut, so one huge upload cannot fill the log.
@@ -66,12 +67,12 @@ pub async fn record_api_request(
     .await
 }
 
-/// A provider request as the log keeps it: the provider's key as the API, the SMS it created,
+/// A provider request as the log keeps it: the provider's key as the API, the message it created,
 /// and the provider's secrets, masked wherever they appear in the body.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProviderRequestLogEntry {
     pub provider_key: String,
-    pub created_sms_id: Option<String>,
+    pub created_message: Option<CreatedMessage>,
     pub secret_values: Vec<String>,
 }
 
@@ -84,9 +85,12 @@ pub async fn record_provider_request(
         operation_context,
         LoggedRequest {
             api: log_entry.provider_key,
-            linked_message: log_entry
-                .created_sms_id
-                .map(|sms_id| ("sms".to_owned(), sms_id)),
+            linked_message: log_entry.created_message.map(|created_message| {
+                (
+                    created_message.message_kind.to_owned(),
+                    created_message.message_id,
+                )
+            }),
             secret_values: log_entry.secret_values,
         },
         completed_request,

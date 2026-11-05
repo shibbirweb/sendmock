@@ -1,16 +1,19 @@
 use sendmock_store::MessageProviderRecord;
 
-use super::builtin_providers::builtin_sms_providers;
+use super::builtin_providers::{builtin_email_providers, builtin_sms_providers};
 use super::message_provider_definition::MessageProviderDefinition;
 use crate::{OperationContext, OperationError};
 
 /// The area SMS providers are stored under.
 pub const SMS_PROVIDER_AREA: &str = "sms";
+/// The area email providers are stored under.
+pub const EMAIL_PROVIDER_AREA: &str = "email";
 
 /// The providers SendMock ships for an area, as their definitions say.
 pub fn list_shipped_providers(area: &str) -> Vec<MessageProviderDefinition> {
     match area {
         SMS_PROVIDER_AREA => builtin_sms_providers(),
+        EMAIL_PROVIDER_AREA => builtin_email_providers(),
         _ => Vec::new(),
     }
 }

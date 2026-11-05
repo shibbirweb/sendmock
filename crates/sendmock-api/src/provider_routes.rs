@@ -125,7 +125,7 @@ async fn record_outcome(
             .provider_key
             .clone()
             .unwrap_or_else(|| "unknown".to_owned()),
-        created_sms_id: provider_outcome.created_sms_id.clone(),
+        created_message: provider_outcome.created_message.clone(),
         secret_values: provider_outcome.secret_values.clone(),
     };
     if let Err(record_error) =

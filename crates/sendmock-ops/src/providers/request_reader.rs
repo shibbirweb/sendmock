@@ -1,5 +1,7 @@
-use serde_json::{Map, Value};
+use base64::Engine;
+use serde_json::{Map, Value, json};
 
+use super::provider_form_fields::{read_provider_form_fields, read_provider_form_files};
 use super::provider_http::ProviderHttpRequest;
 
 /// The request's fields as one value: the query string, overlaid by a JSON or form body. The
@@ -31,7 +33,17 @@ pub fn read_request_fields(request: &ProviderHttpRequest, request_format: &str) 
             other_body => Some(other_body),
         };
     }
-    request_fields.extend(read_form_fields(&request.body));
+    for (field_name, field_value) in read_provider_form_fields(request) {
+        insert_repeated(&mut request_fields, field_name, Value::from(field_value));
+    }
+    for form_file in read_provider_form_files(request) {
+        let file_value = json!({
+            "filename": form_file.file_name,
+            "content": base64::engine::general_purpose::STANDARD.encode(&form_file.content),
+            "content_type": form_file.content_type,
+        });
+        insert_repeated(&mut request_fields, form_file.field_name, file_value);
+    }
     Some(Value::Object(request_fields))
 }
 
@@ -40,18 +52,23 @@ fn read_form_fields(form_bytes: &[u8]) -> Map<String, Value> {
     let mut form_fields = Map::new();
     let pairs: Vec<(String, String)> = serde_urlencoded::from_bytes(form_bytes).unwrap_or_default();
     for (field_name, field_value) in pairs {
-        match form_fields.get_mut(&field_name) {
-            Some(Value::Array(existing_values)) => existing_values.push(Value::from(field_value)),
-            Some(existing_value) => {
-                let first_value = existing_value.take();
-                *existing_value = Value::Array(vec![first_value, Value::from(field_value)]);
-            }
-            None => {
-                form_fields.insert(field_name, Value::from(field_value));
-            }
-        }
+        insert_repeated(&mut form_fields, field_name, Value::from(field_value));
     }
     form_fields
+}
+
+/// A field sent more than once becomes a list of its values, in order.
+fn insert_repeated(form_fields: &mut Map<String, Value>, field_name: String, field_value: Value) {
+    match form_fields.get_mut(&field_name) {
+        Some(Value::Array(existing_values)) => existing_values.push(field_value),
+        Some(existing_value) => {
+            let first_value = existing_value.take();
+            *existing_value = Value::Array(vec![first_value, field_value]);
+        }
+        None => {
+            form_fields.insert(field_name, field_value);
+        }
+    }
 }
 
 /// Every non-empty value a mapping source reads: `a.b[0].c`, `a[*]`, `content[type=text/plain]`,

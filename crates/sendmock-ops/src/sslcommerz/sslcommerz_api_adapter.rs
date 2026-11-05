@@ -138,7 +138,7 @@ pub async fn answer_sslcommerz_request(
             body: body.to_string(),
         },
         provider_key: Some(SSLCOMMERZ_PROVIDER_KEY.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values: collect_secret_values(&sslcommerz_call),
     }))
 }

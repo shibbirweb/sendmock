@@ -1,9 +1,11 @@
 use sendmock_core::StandardTemplateFunctions;
 
+use super::created_message::CreatedMessage;
+use super::email_send_operation_kind::answer_email_send;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::operation_matcher::{ProviderRoute, match_operation};
 use super::provider_call::ProviderCall;
-use super::provider_catalog::{SMS_PROVIDER_AREA, load_area_providers};
+use super::provider_catalog::{EMAIL_PROVIDER_AREA, SMS_PROVIDER_AREA, load_area_providers};
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::read_operation_kinds::{answer_fetch, answer_list};
 use super::request_checks::{ProviderFailure, has_valid_credentials};
@@ -28,7 +30,7 @@ pub struct ProviderOutcome {
     pub response: ProviderHttpResponse,
     /// `None` when no provider answers the path.
     pub provider_key: Option<String>,
-    pub created_sms_id: Option<String>,
+    pub created_message: Option<CreatedMessage>,
     /// Masked wherever they appear in the logged request.
     pub secret_values: Vec<String>,
 }
@@ -40,6 +42,15 @@ pub async fn load_sms_provider_definitions(
     load_area_providers(operation_context, SMS_PROVIDER_AREA).await
 }
 
+/// Every SMS and email provider as it is now, SMS first, as requests are matched against them.
+async fn load_message_provider_definitions(
+    operation_context: &OperationContext,
+) -> Result<Vec<MessageProviderDefinition>, OperationError> {
+    let mut providers = load_sms_provider_definitions(operation_context).await?;
+    providers.extend(load_area_providers(operation_context, EMAIL_PROVIDER_AREA).await?);
+    Ok(providers)
+}
+
 /// Answers a request at a provider path from the provider's current definition: the matching
 /// operation, the credential check, then the operation kind. Paths no provider answers get
 /// SendMock's native `404`.
@@ -48,7 +59,7 @@ pub async fn answer_provider_request(
     provider_route: ProviderRoute<'_>,
     request: &ProviderHttpRequest,
 ) -> Result<ProviderOutcome, OperationError> {
-    let providers = load_sms_provider_definitions(operation_context).await?;
+    let providers = load_message_provider_definitions(operation_context).await?;
     if let Some(code_served_outcome) =
         answer_code_served_api(operation_context, &providers, provider_route, request).await?
     {
@@ -91,7 +102,7 @@ pub async fn answer_provider_request(
     Ok(ProviderOutcome {
         response: provider_answer.response,
         provider_key: Some(provider.key.clone()),
-        created_sms_id: provider_answer.created_sms_id,
+        created_message: provider_answer.created_message,
         secret_values: list_secret_values(provider),
     })
 }
@@ -155,7 +166,7 @@ async fn answer_twilio_services(
     Ok(services_response.map(|response| ProviderOutcome {
         response,
         provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values: list_secret_values(twilio_provider),
     }))
 }
@@ -183,7 +194,7 @@ async fn answer_twilio_verify(
     Ok(verify_response.map(|response| ProviderOutcome {
         response,
         provider_key: Some(TWILIO_VERIFY_PROVIDER_KEY.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values: list_secret_values(verify_provider),
     }))
 }
@@ -198,7 +209,7 @@ fn answer_unmatched(provider_route: ProviderRoute<'_>) -> ProviderOutcome {
             ProviderRoute::Prefixed(provider_key) => Some(provider_key.to_owned()),
             ProviderRoute::ProviderPort => None,
         },
-        created_sms_id: None,
+        created_message: None,
         secret_values: Vec::new(),
     }
 }
@@ -231,15 +242,25 @@ async fn run_operation_kind(
     operation_context: &OperationContext,
     provider_call: &ProviderCall<'_>,
 ) -> Result<ProviderAnswer, OperationError> {
+    let is_email_provider = provider_call.provider.area == EMAIL_PROVIDER_AREA;
     match provider_call.operation.kind.as_str() {
+        "send" if is_email_provider => answer_email_send(operation_context, provider_call).await,
+        _ if is_email_provider => Ok(refuse_unavailable_kind(provider_call)),
         "send" => answer_send(operation_context, provider_call).await,
         "fetch" | "cancel" => answer_fetch(operation_context, provider_call).await,
         "list" => answer_list(operation_context, provider_call).await,
-        other_kind => Ok(refuse(
-            provider_call,
-            "not_found",
-            "path",
-            &format!("The {other_kind} operation is not available in this version yet"),
-        )),
+        _ => Ok(refuse_unavailable_kind(provider_call)),
     }
+}
+
+fn refuse_unavailable_kind(provider_call: &ProviderCall<'_>) -> ProviderAnswer {
+    refuse(
+        provider_call,
+        "not_found",
+        "path",
+        &format!(
+            "The {} operation is not available in this version yet",
+            provider_call.operation.kind
+        ),
+    )
 }

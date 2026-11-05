@@ -78,9 +78,9 @@ Phase 1.
 
 Phase 4. Docs: [HTTP send APIs](../03-email.md#http-send-apis).
 
-- [ ] EM-08.1 SendGrid `v3/mail/send`, Mailgun `messages`, Postmark `email` / `batch` / `withTemplate`, Resend `emails` / `batch`, SES v2 and Brevo requests are accepted at the real provider paths on the provider port and under `/providers/<name>/`.
-- [ ] EM-08.2 Each returns the provider's success response shape and status code.
-- [ ] EM-08.3 Missing required fields and invalid addresses return the provider's error shape and status code.
+- [x] EM-08.1 SendGrid `v3/mail/send`, Mailgun `messages`, Postmark `email` / `batch` / `withTemplate`, Resend `emails` / `batch`, SES v2 and Brevo requests are accepted at the real provider paths on the provider port and under `/providers/<name>/`.
+- [x] EM-08.2 Each returns the provider's success response shape and status code.
+- [x] EM-08.3 Missing required fields and invalid addresses return the provider's error shape and status code.
 - [ ] EM-08.4 Template sends store the template ID and data and show them in the Template data tab; a local template registered under the same ID is rendered.
 - [ ] EM-08.5 The official SDK for each provider (where one exists) can send to SendMock using the documented redirection recipe.
 

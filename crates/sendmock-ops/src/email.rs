@@ -31,6 +31,7 @@ pub use email_file_operations::{
 pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
 pub use email_summary::{EmailAddress, EmailSummary};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
+pub(crate) use native_send_request::{NativeSendAttachment, NativeSendRequest, read_bare_address};
 pub use read_email_operations::{
     CheckListUnsubscribeOperation, GetEmailMimeOperation, GetEmailOperation,
     GetEmailTimelineOperation, GetLatestEmailOperation, ListEmailsOperation,

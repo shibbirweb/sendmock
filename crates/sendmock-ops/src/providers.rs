@@ -1,6 +1,8 @@
 mod builtin_providers;
 mod builtin_webhook_templates;
 mod callback_template_functions;
+mod created_message;
+mod email_send_operation_kind;
 mod message_provider_definition;
 mod messaging_service_sender;
 mod operation_matcher;
@@ -24,6 +26,7 @@ mod twilio_verify_verifications;
 pub use builtin_providers::builtin_sms_providers;
 pub(crate) use builtin_webhook_templates::find_builtin_webhook_template;
 pub use callback_template_functions::sign_twilio_request;
+pub use created_message::CreatedMessage;
 pub use message_provider_definition::{
     MessageProviderDefinition, ProviderCredential, ProviderErrorResponse, ProviderFieldMapping,
     ProviderOperation, ProviderResponseTemplate, ProviderValidationRule,

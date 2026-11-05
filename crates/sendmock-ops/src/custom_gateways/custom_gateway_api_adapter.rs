@@ -87,7 +87,7 @@ pub async fn answer_custom_gateway_request(
             body: answer.body,
         },
         provider_key: Some(gateway_key.to_owned()),
-        created_sms_id: None,
+        created_message: None,
         secret_values: list_secret_values(gateway_fields),
     }))
 }

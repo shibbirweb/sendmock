@@ -1,6 +1,7 @@
 use sendmock_sms::{SendDecision, describe_error_code};
 use sendmock_store::SmsRecord;
 
+use super::created_message::CreatedMessage;
 use super::messaging_service_sender::pick_pool_sender;
 use super::provider_call::{ProviderCall, describe_message};
 use super::provider_http::ProviderHttpResponse;
@@ -15,18 +16,18 @@ const SERVICE_ACCEPTED_STATUS: &str = "accepted";
 /// Twilio's code for a media link that cannot be fetched; the message is stored `failed`.
 const MEDIA_UNFETCHABLE_ERROR_CODE: &str = "11200";
 
-/// What a provider request got, and the SMS it created, for the request log.
+/// What a provider request got, and the message it created, for the request log.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProviderAnswer {
     pub response: ProviderHttpResponse,
-    pub created_sms_id: Option<String>,
+    pub created_message: Option<CreatedMessage>,
 }
 
 impl ProviderAnswer {
     pub fn without_message(response: ProviderHttpResponse) -> Self {
         Self {
             response,
-            created_sms_id: None,
+            created_message: None,
         }
     }
 }
@@ -75,13 +76,13 @@ pub async fn answer_send(
         answered_message["status"] = serde_json::Value::from(SERVICE_ACCEPTED_STATUS);
     }
     let response = provider_call.render_success(&answered_message);
-    let created_sms_id = Some(sms.sms_id.clone());
+    let created_message = Some(CreatedMessage::sms(sms.sms_id.clone()));
     if sms.status == "queued" {
         start_sms_delivery(operation_context, sms, delivery_steps).await?;
     }
     Ok(ProviderAnswer {
         response,
-        created_sms_id,
+        created_message,
     })
 }
 
