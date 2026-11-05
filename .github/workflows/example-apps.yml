@@ -221,6 +221,14 @@ jobs:
             folder: .
           - language: cli
             folder: .
+          - language: rust
+            folder: .
+          - language: java
+            folder: .
+          - language: csharp
+            folder: .
+          - language: php
+            folder: .
     steps:
       - uses: actions/checkout@v5
 
@@ -256,6 +264,47 @@ jobs:
       - if: matrix.language == 'ruby'
         run: gem install rspec
 
+      - if: matrix.language == 'java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: JUnit 5 and Jackson for the Java examples
+        if: matrix.language == 'java'
+        run: |
+          mkdir -p "$RUNNER_TEMP/java-jars" && cd "$RUNNER_TEMP/java-jars"
+          for jar_path in \
+            org/junit/platform/junit-platform-console-standalone/1.11.3/junit-platform-console-standalone-1.11.3.jar \
+            com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar \
+            com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar \
+            com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar; do
+            curl -fsSLO "https://repo1.maven.org/maven2/$jar_path"
+          done
+          echo "JUNIT_CONSOLE_JAR=$PWD/junit-platform-console-standalone-1.11.3.jar" >> "$GITHUB_ENV"
+          echo "JAVA_TEST_CLASSPATH=$(ls "$PWD"/*.jar | paste -sd: -)" >> "$GITHUB_ENV"
+
+      - if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - if: matrix.language == 'php'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - name: A Laravel app with Pest for the PHP examples
+        if: matrix.language == 'php'
+        run: |
+          composer create-project laravel/laravel "$RUNNER_TEMP/laravel-app" --no-interaction --prefer-dist --quiet
+          cd "$RUNNER_TEMP/laravel-app"
+          composer require pestphp/pest pestphp/pest-plugin-laravel --dev --with-all-dependencies --no-interaction --quiet
+          printf '<?php\n\nuses(Tests\\TestCase::class)->in('"'"'Feature'"'"');\n' > tests/Pest.php
+          cp "$GITHUB_WORKSPACE/examples/recipes/php/stand-in-routes.php" routes/web.php
+          echo "LARAVEL_APP_FOLDER=$PWD" >> "$GITHUB_ENV"
+
       - name: Start SendMock with the recipes' seed and the stand-in app
         run: |
           chmod +x sendmock-binary/sendmock
@@ -271,6 +320,8 @@ jobs:
 
       - name: Every recipe's example runs against SendMock
         working-directory: examples/recipes/${{ matrix.folder }}
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/recipe-target
         run: |
           if [ -f package.json ]; then bun install; fi
           node "$GITHUB_WORKSPACE/examples/recipes/run-recipes.mjs" ${{ matrix.language }}

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { recipeLanguages } from "../examples/recipes/recipe-languages.mjs";
 import { existsSync, readFileSync } from "node:fs";
 
 type MatrixEntry = { language: string; folder: string; run: string };
@@ -66,7 +67,7 @@ describe("Example apps workflow", () => {
     );
     expect(
       recipesJob.strategy.matrix.include.map((entry) => entry.language),
-    ).toEqual(["javascript", "python", "go", "ruby", "cli"]);
+    ).toEqual(Object.keys(recipeLanguages));
     expect(existsSync("examples/recipes/node/package.json")).toBe(true);
     expect(
       recipesJob.steps.some((step) =>

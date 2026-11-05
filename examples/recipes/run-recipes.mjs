@@ -83,9 +83,12 @@ function writeRecipeFile(recipeFolder, relativePath, fileText) {
   return filePath;
 }
 
-/** Each recipe runs in its own folder with its own copy of the helper. */
+/** Each recipe runs in its own folder with its own copy of the helper, or in the language's
+ * shared project. */
 function writeRecipeFolder(recipeLanguage, recipeSlug, recipeCode, testHelper) {
-  const recipeFolder = join(process.cwd(), "generated", recipeSlug);
+  const recipeFolder =
+    recipeLanguage.readSharedFolder?.() ??
+    join(process.cwd(), "generated", recipeSlug);
   if (testHelper !== null) {
     writeRecipeFile(
       recipeFolder,
