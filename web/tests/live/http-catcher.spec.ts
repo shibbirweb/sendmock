@@ -7,7 +7,8 @@ const capturedRows = (page: Page) => page.getByTestId("captured-request");
 async function openBin(page: Page, binName: string) {
   await page
     .getByRole("navigation", { name: "Bin list" })
-    .getByRole("button", { name: new RegExp(`^${binName}`) })
+    // The name, then a space: another bin's name can start with this one's.
+    .getByRole("button", { name: new RegExp(`^${binName} `) })
     .click();
   await expect(page.getByRole("heading", { name: binName })).toBeVisible();
 }

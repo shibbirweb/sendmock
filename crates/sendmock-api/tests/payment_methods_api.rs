@@ -54,7 +54,7 @@ async fn lists_the_built_in_methods_with_the_gateways_offering_them() {
     assert_eq!(card["test_cards"][0]["number"], "4242424242424242");
     assert_eq!(
         card["gateway_keys"],
-        json!(["stripe", "sslcommerz", "native"])
+        json!(["stripe", "sslcommerz", "razorpay", "paddle", "native"])
     );
     assert_eq!(card["is_modified"], false);
     let (_, wallet_flow) =

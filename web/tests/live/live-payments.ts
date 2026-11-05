@@ -180,11 +180,14 @@ async function openSimulateMenuPath(
   await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
   for (const [menuIndex, menuLabel] of menuPath.slice(0, -1).entries()) {
     const submenuTrigger = findMenuItem(page, menuLabel);
+    const nextMenuItem = findMenuItem(page, menuPath[menuIndex + 1] ?? "");
     await submenuTrigger.focus({ timeout: 2_000 });
     await submenuTrigger.press("ArrowRight", { timeout: 2_000 });
-    await expect(findMenuItem(page, menuPath[menuIndex + 1] ?? "")).toBeVisible(
-      { timeout: 2_000 },
-    );
+    if (!(await nextMenuItem.isVisible())) {
+      // The pointer opens a submenu too, when the keyboard did not.
+      await submenuTrigger.hover({ force: true, timeout: 2_000 });
+    }
+    await expect(nextMenuItem).toBeVisible({ timeout: 2_000 });
   }
   await expect(findMenuItem(page, menuPath.at(-1) ?? "")).toBeVisible({
     timeout: 2_000,
