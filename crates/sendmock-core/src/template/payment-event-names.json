@@ -50,6 +50,26 @@
     "checkout.completed": "COMPLETED",
     "checkout.expired": "FAILED"
   },
+  "paypal_resource_type": {
+    "payment.succeeded": "capture",
+    "payment.failed": "capture",
+    "payment.refunded": "refund",
+    "payment.partially_refunded": "refund",
+    "payment.dispute_opened": "dispute",
+    "payment.dispute_closed": "dispute",
+    "checkout.completed": "checkout-order",
+    "checkout.expired": "checkout-order"
+  },
+  "paypal_summary": {
+    "payment.succeeded": "Payment completed",
+    "payment.failed": "Payment denied",
+    "payment.refunded": "A capture payment was refunded",
+    "payment.partially_refunded": "A capture payment was refunded",
+    "payment.dispute_opened": "A new dispute opened",
+    "payment.dispute_closed": "A dispute was resolved",
+    "checkout.completed": "An order has been approved by buyer",
+    "checkout.expired": "An order has been voided"
+  },
   "paypal_ipn": {
     "payment.created": "Pending",
     "payment.authorized": "Pending",

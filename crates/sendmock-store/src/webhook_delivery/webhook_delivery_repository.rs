@@ -101,6 +101,31 @@ impl WebhookDeliveryRepository {
             .await
     }
 
+    /// First attempts whose rendered request contains `request_text`, newest first, at most
+    /// `limit`: how a provider's check finds whether SendMock sent a message.
+    pub async fn list_first_attempts_containing(
+        &self,
+        request_text: &str,
+        limit: u32,
+    ) -> Result<Vec<WebhookDeliveryRecord>, StoreError> {
+        let escaped_text = request_text
+            .replace('\\', "\\\\")
+            .replace('%', "\\%")
+            .replace('_', "\\_");
+        let like_pattern = format!("%{escaped_text}%");
+        self.database
+            .read(move |connection| {
+                let mut statement = connection.prepare(&format!(
+                    "SELECT {DELIVERY_COLUMNS} FROM webhook_deliveries WHERE attempt = 1 AND rendered_request LIKE ?1 ESCAPE '\\' ORDER BY id DESC LIMIT ?2"
+                ))?;
+                let first_attempts = statement
+                    .query_map(params![like_pattern, limit], read_delivery_row)?
+                    .collect::<rusqlite::Result<Vec<_>>>()?;
+                Ok(first_attempts)
+            })
+            .await
+    }
+
     /// Rows due at `now_unix_ms`, the longest waiting first, then in the order they were queued.
     pub async fn list_due_deliveries(
         &self,

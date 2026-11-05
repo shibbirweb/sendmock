@@ -20,6 +20,7 @@ mod operation_registry;
 mod outcome_rules;
 mod page_of;
 mod payments;
+mod paypal;
 mod present_value;
 mod providers;
 mod samples;

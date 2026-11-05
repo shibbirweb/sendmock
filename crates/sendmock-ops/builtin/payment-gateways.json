@@ -86,10 +86,10 @@
     "notification_content_type": "json",
     "event_names": {
       "payment.created": "",
-      "payment.authorized": "PAYMENT.AUTHORIZATION.CREATED",
+      "payment.authorized": "",
       "payment.succeeded": "PAYMENT.CAPTURE.COMPLETED",
       "payment.failed": "PAYMENT.CAPTURE.DENIED",
-      "payment.canceled": "PAYMENT.AUTHORIZATION.VOIDED",
+      "payment.canceled": "",
       "payment.refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.partially_refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.dispute_opened": "CUSTOMER.DISPUTE.CREATED",
@@ -97,7 +97,7 @@
       "checkout.completed": "CHECKOUT.ORDER.APPROVED",
       "checkout.expired": "CHECKOUT.ORDER.VOIDED"
     },
-    "notification_body": "{\n  \"id\": \"WH-{{ random_string(17) | upper }}\",\n  \"event_type\": \"{{ event.name }}\",\n  \"resource\": {\n    \"id\": \"{{ payment.reference }}\",\n    \"amount\": {\n      \"currency_code\": \"{{ payment.currency }}\",\n      \"value\": \"{{ payment.amount_major }}\"\n    },\n    \"status\": \"{{ payment.status | upper }}\"\n  }\n}",
+    "notification_body": "{\n  \"id\": \"WH-{{ event.id | replace(\"evt_\", \"\") | upper }}\",\n  \"event_version\": \"1.0\",\n  \"create_time\": \"{{ now_iso() }}\",\n  \"resource_type\": \"{{ event.type | payment_event(\"paypal_resource_type\") }}\",\n  \"resource_version\": \"2.0\",\n  \"event_type\": \"{{ event.name }}\",\n  \"summary\": \"{{ event.type | payment_event(\"paypal_summary\") }}\",\n  \"resource\": {{ event.object | json }}\n}",
     "notification_headers": [
       {
         "name": "paypal-transmission-id",
@@ -109,7 +109,11 @@
       },
       {
         "name": "paypal-transmission-sig",
-        "template": "{{ random_string(88) }}"
+        "template": "{{ random_string(344) }}"
+      },
+      {
+        "name": "paypal-cert-url",
+        "template": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77"
       },
       {
         "name": "paypal-auth-algo",

@@ -41,9 +41,9 @@ Phase 3P.
 
 Phase 3P.
 
-- [ ] PY-05.1 Orders v2 create, approve (checkout page) and capture, and refunds, return PayPal-shaped responses and errors.
-- [ ] PY-05.2 Webhooks are sent with PayPal transmission headers, and `verify-webhook-signature` on SendMock returns `SUCCESS` for genuine deliveries and `FAILURE` for altered ones.
-- [ ] PY-05.3 Classic IPN is posted as a form; the `_notify-validate` postback returns `VERIFIED` for genuine messages and `INVALID` for altered ones.
+- [x] PY-05.1 Orders v2 create, approve (checkout page) and capture, and refunds, return PayPal-shaped responses and errors.
+- [x] PY-05.2 Webhooks are sent with PayPal transmission headers, and `verify-webhook-signature` on SendMock returns `SUCCESS` for genuine deliveries and `FAILURE` for altered ones.
+- [x] PY-05.3 Classic IPN is posted as a form; the `_notify-validate` postback returns `VERIFIED` for genuine messages and `INVALID` for altered ones.
 
 ## PY-06 SSLCommerz emulation
 

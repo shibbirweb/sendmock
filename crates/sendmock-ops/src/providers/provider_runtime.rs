@@ -11,6 +11,7 @@ use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
+use crate::paypal::answer_paypal_request;
 use crate::stripe::answer_stripe_request;
 use crate::{OperationContext, OperationError};
 
@@ -93,7 +94,7 @@ pub async fn answer_provider_request(
     })
 }
 
-/// The APIs served in code beside the definitions: Stripe's, and Twilio's Messaging
+/// The APIs served in code beside the definitions: Stripe's, PayPal's, and Twilio's Messaging
 /// Services and Verify.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
@@ -105,6 +106,11 @@ async fn answer_code_served_api(
         answer_stripe_request(operation_context, provider_route, request).await?
     {
         return Ok(Some(stripe_outcome));
+    }
+    if let Some(paypal_outcome) =
+        answer_paypal_request(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(paypal_outcome));
     }
     if let Some(services_outcome) =
         answer_twilio_services(operation_context, providers, provider_route, request).await?

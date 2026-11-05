@@ -107,8 +107,11 @@ describe("completeCheckout", () => {
       redirect: { outcome: "cancel" },
     });
     expect(
-      canceled.paymentDetail.notifications.at(-1)?.provider_event_name,
-    ).toBe("PAYMENT.AUTHORIZATION.VOIDED");
+      canceled.paymentDetail.notifications.some(
+        (paymentNotification) =>
+          paymentNotification.event_type === "payment.canceled",
+      ),
+    ).toBe(false);
 
     const delayed = setUp("Nadia Islam");
     completeCheckout(delayed.mockDatabase, delayed.paymentDetail, {

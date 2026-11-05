@@ -3,13 +3,17 @@ import type { PaymentEventType } from "@/lib/api/types";
 /**
  * The tables the `payment_event` template filter knows: each provider's
  * event names, and the status its payload object has after the event
- * (`stripe_status`, `paypal_status`, `razorpay_status`, `paddle_status`).
+ * (`stripe_status`, `paypal_status`, `razorpay_status`, `paddle_status`),
+ * and the `resource_type` and `summary` of PayPal's webhook event
+ * (`paypal_resource_type`, `paypal_summary`).
  */
 export type PaymentEventProvider =
   | "stripe"
   | "stripe_status"
   | "paypal"
   | "paypal_status"
+  | "paypal_resource_type"
+  | "paypal_summary"
   | "paypal_ipn"
   | "sslcommerz"
   | "bkash"
@@ -78,6 +82,26 @@ export const paymentProviderEventNames: Record<
     "payment.dispute_closed": "COMPLETED",
     "checkout.completed": "COMPLETED",
     "checkout.expired": "FAILED",
+  },
+  paypal_resource_type: {
+    "payment.succeeded": "capture",
+    "payment.failed": "capture",
+    "payment.refunded": "refund",
+    "payment.partially_refunded": "refund",
+    "payment.dispute_opened": "dispute",
+    "payment.dispute_closed": "dispute",
+    "checkout.completed": "checkout-order",
+    "checkout.expired": "checkout-order",
+  },
+  paypal_summary: {
+    "payment.succeeded": "Payment completed",
+    "payment.failed": "Payment denied",
+    "payment.refunded": "A capture payment was refunded",
+    "payment.partially_refunded": "A capture payment was refunded",
+    "payment.dispute_opened": "A new dispute opened",
+    "payment.dispute_closed": "A dispute was resolved",
+    "checkout.completed": "An order has been approved by buyer",
+    "checkout.expired": "An order has been voided",
   },
   paypal_ipn: {
     "payment.created": "Pending",

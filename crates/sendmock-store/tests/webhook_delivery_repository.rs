@@ -237,3 +237,39 @@ async fn the_list_filters_by_status_and_pages_newest_first() -> Result<(), Store
     assert_eq!(failed_page.total_count, 1);
     Ok(())
 }
+
+#[tokio::test]
+async fn first_attempts_are_found_by_their_request_text_newest_first() -> Result<(), StoreError> {
+    let repository = repository()?;
+    let requests = [
+        ("01A", r#"{"headers":{"paypal-transmission-id":"tx-1"}}"#),
+        ("01B", r#"{"headers":{"paypal-transmission-id":"tx-1"}}"#),
+        ("01C", r#"{"headers":{"paypal-transmission-id":"tx-2"}}"#),
+        ("01D", r#"{"body":"100% off_all"}"#),
+    ];
+    for (delivery_id, rendered_request) in requests {
+        let mut stored_delivery = pending_delivery(delivery_id, 1_000);
+        stored_delivery.rendered_request_json = Some(rendered_request.to_owned());
+        repository.insert_delivery(stored_delivery).await?;
+    }
+
+    let found_ids = |found_deliveries: Vec<WebhookDeliveryRecord>| {
+        found_deliveries
+            .into_iter()
+            .map(|found_delivery| found_delivery.delivery_id)
+            .collect::<Vec<_>>()
+    };
+    let transmission_matches = repository
+        .list_first_attempts_containing("tx-1", 10)
+        .await?;
+    assert_eq!(found_ids(transmission_matches), ["01B", "01A"]);
+    let wildcard_matches = repository
+        .list_first_attempts_containing("0% o", 10)
+        .await?;
+    assert_eq!(found_ids(wildcard_matches), ["01D"]);
+    let underscore_matches = repository
+        .list_first_attempts_containing("tx_1", 10)
+        .await?;
+    assert!(underscore_matches.is_empty());
+    Ok(())
+}

@@ -31,12 +31,13 @@ mod payment_simulate_operation;
 mod payment_simulate_views;
 mod payment_views;
 mod provider_event_object;
+mod provider_object_store;
 mod provider_payment;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
 pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
 pub(crate) use checkout_payment_run::pay_with_test_card;
-pub(crate) use payment_catalogue::read_payment_document;
+pub(crate) use payment_catalogue::{find_payment, read_payment_document};
 pub(crate) use payment_change::PaymentChange;
 pub(crate) use payment_event_data::{build_sample_payment_event_data, load_payment_event};
 pub use payment_flow_operations::{
@@ -75,6 +76,10 @@ pub use payment_views::{
 };
 #[cfg(test)]
 pub(crate) use payment_views::{PaymentDispute, PaymentTimelineEvent};
+pub(crate) use provider_object_store::{
+    ProviderObjectKey, find_provider_object, keep_provider_object, list_kept_or_stored_objects,
+    read_kept_or_stored_object, save_provider_object,
+};
 pub(crate) use provider_payment::{
     ProviderCheckoutUrls, ProviderPaymentRequest, apply_checkout_outcome_profile,
     start_provider_payment,

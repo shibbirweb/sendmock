@@ -2,6 +2,7 @@ use sendmock_store::PaymentProviderObjectRecord;
 use serde_json::Value;
 
 use super::payment_views::PaymentDetail;
+use crate::paypal::{PAYPAL_PROVIDER_KEY, describe_paypal_event_object};
 use crate::stripe::{STRIPE_PROVIDER_KEY, describe_stripe_event_object};
 use crate::{OperationContext, OperationError};
 
@@ -16,6 +17,15 @@ pub async fn build_provider_event_object(
 ) -> Result<Value, OperationError> {
     if gateway_key == STRIPE_PROVIDER_KEY {
         return describe_stripe_event_object(
+            operation_context,
+            payment,
+            event_name,
+            kept_provider_objects,
+        )
+        .await;
+    }
+    if gateway_key == PAYPAL_PROVIDER_KEY {
+        return describe_paypal_event_object(
             operation_context,
             payment,
             event_name,

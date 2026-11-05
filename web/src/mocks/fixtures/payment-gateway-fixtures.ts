@@ -54,16 +54,14 @@ const stripeBody = `{
 }`;
 
 const paypalBody = `{
-  "id": "WH-{{ random_string(17) | upper }}",
+  "id": "WH-{{ event.id | replace("evt_", "") | upper }}",
+  "event_version": "1.0",
+  "create_time": "{{ now_iso() }}",
+  "resource_type": "{{ event.type | payment_event("paypal_resource_type") }}",
+  "resource_version": "2.0",
   "event_type": "{{ event.name }}",
-  "resource": {
-    "id": "{{ payment.reference }}",
-    "amount": {
-      "currency_code": "{{ payment.currency }}",
-      "value": "{{ payment.amount_major }}"
-    },
-    "status": "{{ payment.status | upper }}"
-  }
+  "summary": "{{ event.type | payment_event("paypal_summary") }}",
+  "resource": {{ event.object | json }}
 }`;
 
 const sslcommerzBody = [
@@ -172,10 +170,8 @@ const shippedGateways: ShippedGateway[] = [
     ],
     notification_content_type: "json",
     event_names: nameEvents({
-      "payment.authorized": "PAYMENT.AUTHORIZATION.CREATED",
       "payment.succeeded": "PAYMENT.CAPTURE.COMPLETED",
       "payment.failed": "PAYMENT.CAPTURE.DENIED",
-      "payment.canceled": "PAYMENT.AUTHORIZATION.VOIDED",
       "payment.refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.partially_refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.dispute_opened": "CUSTOMER.DISPUTE.CREATED",
@@ -187,7 +183,12 @@ const shippedGateways: ShippedGateway[] = [
     notification_headers: [
       { name: "paypal-transmission-id", template: "{{ uuid() }}" },
       { name: "paypal-transmission-time", template: "{{ now_iso() }}" },
-      { name: "paypal-transmission-sig", template: "{{ random_string(88) }}" },
+      { name: "paypal-transmission-sig", template: "{{ random_string(344) }}" },
+      {
+        name: "paypal-cert-url",
+        template:
+          "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77",
+      },
       { name: "paypal-auth-algo", template: "SHA256withRSA" },
     ],
   },

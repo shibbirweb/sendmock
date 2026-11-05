@@ -3,7 +3,10 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 
 use super::stripe_error::StripeError;
-use crate::payments::PaymentChange;
+use crate::payments::{
+    PaymentChange, ProviderObjectKey, find_provider_object, keep_provider_object,
+    read_kept_or_stored_object as read_kept_or_stored_provider_object, save_provider_object,
+};
 use crate::{OperationContext, OperationError};
 
 pub const STRIPE_PROVIDER_KEY: &str = "stripe";
@@ -27,11 +30,12 @@ impl StripeObjectKind {
     }
 }
 
-fn read_document<T: DeserializeOwned>(
-    stored_object: &PaymentProviderObjectRecord,
-) -> Result<T, StripeError> {
-    serde_json::from_str(&stored_object.document_json)
-        .map_err(|read_error| OperationError::Internal(read_error.to_string()).into())
+fn stripe_object_key(object_kind: StripeObjectKind, object_id: &str) -> ProviderObjectKey<'_> {
+    ProviderObjectKey {
+        provider: STRIPE_PROVIDER_KEY,
+        object_kind: object_kind.as_str(),
+        object_id,
+    }
 }
 
 /// The stored object, or `None` when Stripe has none with this id.
@@ -40,16 +44,7 @@ pub async fn find_stripe_object<T: DeserializeOwned>(
     object_kind: StripeObjectKind,
     object_id: &str,
 ) -> Result<Option<(String, T)>, StripeError> {
-    let stored_object = operation_context
-        .payment_provider_object_repository
-        .find_object(STRIPE_PROVIDER_KEY, object_kind.as_str(), object_id)
-        .await
-        .map_err(OperationError::from)?;
-    stored_object
-        .map(|stored_object| {
-            read_document(&stored_object).map(|document| (stored_object.payment_id, document))
-        })
-        .transpose()
+    Ok(find_provider_object(operation_context, stripe_object_key(object_kind, object_id)).await?)
 }
 
 /// The object's document, or its default when nothing was kept for it yet.
@@ -66,28 +61,6 @@ pub async fn load_stripe_object<T: DeserializeOwned + Default>(
     )
 }
 
-/// The object as the row it is stored in.
-pub fn build_stripe_object_record<T: Serialize>(
-    operation_context: &OperationContext,
-    object_kind: StripeObjectKind,
-    object_id: &str,
-    payment_id: &str,
-    document: &T,
-) -> Result<PaymentProviderObjectRecord, StripeError> {
-    let document_json = serde_json::to_string(document)
-        .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
-    let now_unix_ms = operation_context.clock.now_unix_ms();
-    Ok(PaymentProviderObjectRecord {
-        object_id: object_id.to_owned(),
-        provider: STRIPE_PROVIDER_KEY.to_owned(),
-        object_kind: object_kind.as_str().to_owned(),
-        payment_id: payment_id.to_owned(),
-        document_json,
-        created_at_unix_ms: now_unix_ms,
-        updated_at_unix_ms: now_unix_ms,
-    })
-}
-
 pub async fn save_stripe_object<T: Serialize>(
     operation_context: &OperationContext,
     object_kind: StripeObjectKind,
@@ -95,19 +68,13 @@ pub async fn save_stripe_object<T: Serialize>(
     payment_id: &str,
     document: &T,
 ) -> Result<(), StripeError> {
-    let stored_object = build_stripe_object_record(
+    Ok(save_provider_object(
         operation_context,
-        object_kind,
-        object_id,
+        stripe_object_key(object_kind, object_id),
         payment_id,
         document,
-    )?;
-    operation_context
-        .payment_provider_object_repository
-        .save_object(stored_object)
-        .await
-        .map_err(OperationError::from)?;
-    Ok(())
+    )
+    .await?)
 }
 
 /// Keeps the object with the payment change, so it is stored with the payment and the
@@ -118,17 +85,11 @@ pub fn keep_stripe_object<T: Serialize>(
     object_id: &str,
     document: &T,
 ) -> Result<(), StripeError> {
-    let operation_context = payment_change.operation_context();
-    let payment_id = payment_change.payment.summary.id.clone();
-    let kept_object = build_stripe_object_record(
-        operation_context,
-        object_kind,
-        object_id,
-        &payment_id,
+    Ok(keep_provider_object(
+        payment_change,
+        stripe_object_key(object_kind, object_id),
         document,
-    )?;
-    payment_change.keep_provider_object(kept_object);
-    Ok(())
+    )?)
 }
 
 /// The object's document: the one kept with a change, else the stored one, else its default.
@@ -138,23 +99,10 @@ pub async fn read_kept_or_stored_object<T: DeserializeOwned + Default>(
     object_kind: StripeObjectKind,
     object_id: &str,
 ) -> Result<T, OperationError> {
-    let kept_object = kept_objects.iter().rev().find(|kept_object| {
-        kept_object.provider == STRIPE_PROVIDER_KEY
-            && kept_object.object_kind == object_kind.as_str()
-            && kept_object.object_id == object_id
-    });
-    let stored_object = match kept_object {
-        Some(kept_object) => Some(kept_object.clone()),
-        None => {
-            operation_context
-                .payment_provider_object_repository
-                .find_object(STRIPE_PROVIDER_KEY, object_kind.as_str(), object_id)
-                .await?
-        }
-    };
-    let Some(stored_object) = stored_object else {
-        return Ok(T::default());
-    };
-    serde_json::from_str(&stored_object.document_json)
-        .map_err(|read_error| OperationError::Internal(read_error.to_string()))
+    read_kept_or_stored_provider_object(
+        operation_context,
+        kept_objects,
+        stripe_object_key(object_kind, object_id),
+    )
+    .await
 }

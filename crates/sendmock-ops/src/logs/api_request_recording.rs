@@ -100,19 +100,30 @@ struct LoggedRequest {
     secret_values: Vec<String>,
 }
 
+/// Masks each secret wherever it shows, in what was sent and in what was answered (a token
+/// a provider issued).
+fn mask_secret_values(logged_text: String, secret_values: &[String]) -> String {
+    secret_values
+        .iter()
+        .filter(|secret_value| !secret_value.is_empty())
+        .fold(logged_text, |masked_text, secret_value| {
+            masked_text.replace(secret_value.as_str(), MASKED_VALUE)
+        })
+}
+
 async fn insert_logged_request(
     operation_context: &OperationContext,
     logged_request: LoggedRequest,
     completed_request: CompletedApiRequest,
 ) -> Result<(), OperationError> {
-    let mut request_body = read_logged_body(&completed_request.request_body);
-    for secret_value in logged_request
-        .secret_values
-        .iter()
-        .filter(|secret_value| !secret_value.is_empty())
-    {
-        request_body = request_body.replace(secret_value.as_str(), MASKED_VALUE);
-    }
+    let request_body = mask_secret_values(
+        read_logged_body(&completed_request.request_body),
+        &logged_request.secret_values,
+    );
+    let response_body = mask_secret_values(
+        read_logged_body(&completed_request.response_body),
+        &logged_request.secret_values,
+    );
     let api_request = ApiRequestRecord {
         request_id: operation_context.id_generator.generate_id().to_string(),
         api: logged_request.api,
@@ -121,7 +132,7 @@ async fn insert_logged_request(
         request_headers: mask_credential_headers(completed_request.request_headers),
         request_body,
         response_status: completed_request.response_status,
-        response_body: read_logged_body(&completed_request.response_body),
+        response_body,
         duration_ms: completed_request.duration_ms,
         linked_message: logged_request.linked_message,
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
