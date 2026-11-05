@@ -110,7 +110,6 @@ pub struct ProviderCreateRequest {
     /// 2 to 32 lowercase letters, digits or `_`, starting with a letter; unique in its area.
     pub key: String,
     /// The provider of the same area to copy, or `null` to start blank.
-    #[serde(default)]
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub start_from: Option<String>,
 }
