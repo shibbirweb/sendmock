@@ -24,6 +24,10 @@ Endpoints, rules, templates, variables, numbers, Messaging Services, Verify serv
 
 Secrets are never written to an export in plain text.
 
+## Template files: `--templates-dir`
+
+Keep webhook templates in your repository as files. Point `--templates-dir` (or `SENDMOCK_TEMPLATES_DIR`) at a folder of `.toml` template files, in the format **Export** writes from Webhooks > Templates. SendMock loads them at startup and again within two seconds whenever a file is added, changed or removed. They show in the gallery as **File** templates, and endpoints can use them like any other; to change one, edit its file (SendMock refuses edits and deletes with `409`). A file without an `id` gets `file.<file name>`; a file that does not parse is skipped and named in the log.
+
 ## Runtime settings
 
 Retention, email and SMS options, opened events, chaos toggles and OTP patterns change at once from **Settings**, without a restart. Each section is explained in [Settings](./settings.md); the seed file in depth is [Advanced: seed file](./advanced/seed-file.md).

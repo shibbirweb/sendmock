@@ -25,6 +25,7 @@ mod endpoint_template_overrides;
 mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
+mod file_template_library;
 mod manual_send_operation;
 mod metrics_inputs;
 mod metrics_loading;
@@ -98,6 +99,9 @@ pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub(crate) use endpoint_validation::validate_endpoint_input;
 pub use endpoint_view::WebhookEndpoint;
 pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
+pub use file_template_library::{
+    FileTemplateLibrary, LoadedTemplateDirectory, load_template_directory,
+};
 pub use manual_send_operation::SendWebhookOperation;
 pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
 pub use metrics_operation::GetWebhookMetricsOperation;

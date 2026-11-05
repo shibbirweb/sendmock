@@ -91,7 +91,32 @@ pub async fn list_resolved_templates(
     for stored_template in stored_templates {
         resolved_templates.push(resolve_stored_template(stored_template)?);
     }
+    for file_template in operation_context.file_templates.list_templates() {
+        let is_shadowed = resolved_templates
+            .iter()
+            .any(|resolved_template| resolved_template.summary.id == file_template.summary.id);
+        if !is_shadowed {
+            resolved_templates.push(file_template);
+        }
+    }
     Ok(resolved_templates)
+}
+
+/// Templates from `--templates-dir` are edited in their files, never through SendMock.
+pub fn refuse_file_template(
+    operation_context: &OperationContext,
+    template_id: &str,
+) -> Result<(), OperationError> {
+    match operation_context.file_templates.find_template(template_id) {
+        Some(file_template) => Err(OperationError::Conflict {
+            code: "file_template",
+            message: format!(
+                "{} comes from --templates-dir; edit its file instead",
+                file_template.summary.name
+            ),
+        }),
+        None => Ok(()),
+    }
 }
 
 pub async fn find_resolved_template(
@@ -104,9 +129,11 @@ pub async fn find_resolved_template(
         .await?;
     match stored_template {
         Some(stored_template) => resolve_stored_template(stored_template),
-        None => find_builtin_template(template_id).ok_or_else(|| OperationError::NotFound {
-            message: format!("No webhook template with id {template_id}"),
-        }),
+        None => find_builtin_template(template_id)
+            .or_else(|| operation_context.file_templates.find_template(template_id))
+            .ok_or_else(|| OperationError::NotFound {
+                message: format!("No webhook template with id {template_id}"),
+            }),
     }
 }
 

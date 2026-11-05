@@ -3,7 +3,7 @@ use super::endpoint_template::write_detached_template;
 use super::endpoint_view::{read_request_settings, write_request_settings};
 use super::template_inputs::TemplateDeleteRequest;
 use super::template_operations::template_definition;
-use super::template_store::{count_using_endpoints, find_resolved_template};
+use super::template_store::{count_using_endpoints, find_resolved_template, refuse_file_template};
 use super::template_view::{TemplateDraft, TemplateSource};
 use crate::{
     HttpMethod, NoContent, Operation, OperationContext, OperationDefinition, OperationError,
@@ -65,6 +65,7 @@ impl Operation for DeleteWebhookTemplateOperation {
         input: TemplateDeleteRequest,
     ) -> Result<NoContent, OperationError> {
         let template_id = &input.template_id;
+        refuse_file_template(operation_context, template_id)?;
         let resolved_template = find_resolved_template(operation_context, template_id).await?;
         if resolved_template.summary.source != TemplateSource::Custom {
             return Err(OperationError::Conflict {

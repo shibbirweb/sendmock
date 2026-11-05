@@ -22,6 +22,7 @@ mod server_startup;
 mod shutdown_signal;
 mod smtp_startup;
 mod startup_error;
+mod template_directory_task;
 mod tls_provider;
 mod update_check_task;
 mod version_output;

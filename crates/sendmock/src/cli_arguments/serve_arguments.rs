@@ -110,6 +110,15 @@ pub struct ServeArguments {
     )]
     pub api_token: Option<String>,
 
+    /// A directory of webhook template files (TOML, as exported), loaded at startup and
+    /// reloaded when a file changes; they are read-only in SendMock.
+    #[arg(
+        long = "templates-dir",
+        env = "SENDMOCK_TEMPLATES_DIR",
+        value_name = "DIRECTORY"
+    )]
+    pub templates_directory: Option<PathBuf>,
+
     /// Browser origins allowed to call the API, comma-separated; empty turns CORS off [default: https://shibbirweb.github.io]
     #[arg(long, env = "SENDMOCK_CORS_ORIGINS", value_name = "ORIGINS")]
     pub cors_origins: Option<String>,

@@ -27,6 +27,7 @@ use crate::seed_file_check::apply_seed_file;
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
+use crate::template_directory_task::{load_file_templates, run_template_directory_task};
 use crate::update_check_task::{build_update_checker, run_update_check_task};
 use crate::webhook_dispatch_task::run_webhook_dispatch_task;
 
@@ -84,6 +85,7 @@ pub async fn run_server(
         &mut background_tasks,
         &operation_context,
         &shutdown_receiver_for_tasks,
+        server_config.templates_directory.as_deref(),
     );
     announce_ready(server_config, &listeners.addresses, &operation_context);
     let http_shutdown = async move {
@@ -154,12 +156,22 @@ fn build_http_router(
     apply_access_control(app_router, server_config.access_control.clone())
 }
 
-/// The update check, the retention trim and the webhook dispatcher, each stopping on shutdown.
+/// The update check, the retention trim, the webhook dispatcher and the `--templates-dir`
+/// reload (after a first load), each stopping on shutdown.
 fn spawn_background_tasks(
     background_tasks: &mut JoinSet<()>,
     operation_context: &OperationContext,
     shutdown_receiver: &watch::Receiver<bool>,
+    templates_directory: Option<&std::path::Path>,
 ) {
+    if let Some(templates_directory) = templates_directory {
+        load_file_templates(templates_directory, operation_context);
+        background_tasks.spawn(run_template_directory_task(
+            templates_directory.to_path_buf(),
+            operation_context.clone(),
+            shutdown_receiver.clone(),
+        ));
+    }
     background_tasks.spawn(run_update_check_task(
         operation_context.clone(),
         shutdown_receiver.clone(),

@@ -71,21 +71,21 @@ Phase 3 (Twilio, Vonage), Phase 4 (email providers).
 
 UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart).
 
-- [ ] WH-07.1 Every variable kind (Text, Number, Boolean, JSON, Secret, Dynamic, Random, Computed, Prompt) resolves correctly.
+- [x] WH-07.1 Every variable kind (Text, Number, Boolean, JSON, Secret, Dynamic, Random, Computed, Prompt) resolves correctly.
 - [x] WH-07.2 Scope precedence is send-time, then endpoint, then global, then `SENDMOCK_VAR_*`.
 - [x] WH-07.3 Every documented function and filter returns the documented output (table-driven tests).
-- [ ] WH-07.4 Random values stay the same across retries of one delivery and change on re-render; Fixed values change only on Regenerate.
+- [x] WH-07.4 Random values stay the same across retries of one delivery and change on re-render; Fixed values change only on Regenerate.
 - [x] WH-07.5 Strict mode stops a delivery with `render_failed` and a clear error; lenient mode renders empty values and logs a warning.
-- [ ] WH-07.6 Fields mode always produces valid JSON or form bodies.
+- [x] WH-07.6 Fields mode always produces valid JSON or form bodies.
 - [x] WH-07.7 Templates cannot read files, network or environment, and a runaway template is stopped by the fuel/time limit.
-- [ ] WH-07.8 The live preview matches what is actually sent for the same message.
-- [ ] WH-07.9 The reference panel lists every context field for the chosen events, the variables, functions and filters with type, description and example, and clicking one inserts it at the cursor.
-- [ ] WH-07.10 Typing inside `{{ }}` suggests matching keys, the children after a dot, filters after `|` and functions with their signature; the keyboard picks and inserts one.
-- [ ] WH-07.11 The Variables screen lists global and endpoint variables with kind, value (secrets masked) and scope, and narrows them by scope, kind and name.
-- [ ] WH-07.12 Each kind has its own editor fields, checked the same way by the UI and the API (number, boolean, valid JSON, expressions that render), with a "Resolves to" preview against the sample; a secret is never shown again after saving.
-- [ ] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
-- [ ] WH-07.14 The request editor sets query params, headers and a body as Template, Fields, Raw or None, plus Strict or Lenient rendering; Fields always encode a valid JSON or form body, and Raw uses the code editor with highlighting, `{{` completion, hover values and an Insert menu.
-- [ ] WH-07.15 The live preview renders the method, URL, headers and body against the sample or a chosen message as you type, and each error or warning shows under the part it comes from and, in the code editor, at its line and column.
+- [x] WH-07.8 The live preview matches what is actually sent for the same message.
+- [x] WH-07.9 The reference panel lists every context field for the chosen events, the variables, functions and filters with type, description and example, and clicking one inserts it at the cursor.
+- [x] WH-07.10 Typing inside `{{ }}` suggests matching keys, the children after a dot, filters after `|` and functions with their signature; the keyboard picks and inserts one.
+- [x] WH-07.11 The Variables screen lists global and endpoint variables with kind, value (secrets masked) and scope, and narrows them by scope, kind and name.
+- [x] WH-07.12 Each kind has its own editor fields, checked the same way by the UI and the API (number, boolean, valid JSON, expressions that render), with a "Resolves to" preview against the sample; a secret is never shown again after saving.
+- [x] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
+- [x] WH-07.14 The request editor sets query params, headers and a body as Template, Fields, Raw or None, plus Strict or Lenient rendering; Fields always encode a valid JSON or form body, and Raw uses the code editor with highlighting, `{{` completion, hover values and an Insert menu.
+- [x] WH-07.15 The live preview renders the method, URL, headers and body against the sample or a chosen message as you type, and each error or warning shows under the part it comes from and, in the code editor, at its line and column.
 - [ ] WH-07.16 Fields mode can also send `multipart/form-data`, with file fields streamed from a URL. (Split from WH-07.6 on 2026-10-30: the contract and request editor built in Stage A have only JSON and form encodings, and multipart arrives in Phase 4 with the SendGrid Inbound Parse and Mailgun routes formats that use it.)
 
 ## WH-08 Built-in payload templates
@@ -102,15 +102,15 @@ UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the
 
 UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions).
 
-- [ ] WH-09.1 Templates can be created, cloned from built-ins and saved from an endpoint.
-- [ ] WH-09.2 Linked endpoints pick up template changes; detached ones do not.
-- [ ] WH-09.3 Export then import produces an identical template; secrets are never exported.
-- [ ] WH-09.4 `--templates-dir` loads templates at startup and reloads them on change.
-- [ ] WH-09.5 Revisions keep the last 20 versions with diff and restore; invalid templates cannot be saved.
-- [ ] WH-09.6 Deleting a template in use requires choosing detach or cancel.
-- [ ] WH-09.7 Built-in and custom templates can be edited (method, content type, header and body templates) with the preview following the draft; errors block saving, undefined variables are warnings, and file templates stay read-only.
-- [ ] WH-09.8 An edited built-in shows a Modified badge and is used by every endpoint that links it; Reset to default asks first and restores the shipped template.
-- [ ] WH-09.9 A new blank template can be created, and a custom template's name, description, events and required variables can be edited; built-in templates keep their own.
+- [x] WH-09.1 Templates can be created, cloned from built-ins and saved from an endpoint.
+- [x] WH-09.2 Linked endpoints pick up template changes; detached ones do not.
+- [x] WH-09.3 Export then import produces an identical template; secrets are never exported.
+- [x] WH-09.4 `--templates-dir` loads templates at startup and reloads them on change.
+- [x] WH-09.5 Revisions keep the last 20 versions with diff and restore; invalid templates cannot be saved.
+- [x] WH-09.6 Deleting a template in use requires choosing detach or cancel.
+- [x] WH-09.7 Built-in and custom templates can be edited (method, content type, header and body templates) with the preview following the draft; errors block saving, undefined variables are warnings, and file templates stay read-only.
+- [x] WH-09.8 An edited built-in shows a Modified badge and is used by every endpoint that links it; Reset to default asks first and restores the shipped template.
+- [x] WH-09.9 A new blank template can be created, and a custom template's name, description, events and required variables can be edited; built-in templates keep their own.
 
 ## WH-10 Saved deliveries
 

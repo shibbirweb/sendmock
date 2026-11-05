@@ -67,6 +67,8 @@ pub struct OperationContext {
     /// Set once the SMTP listener runs, so samples can go through it.
     pub sample_email_sender: Option<Arc<dyn SampleEmailSender>>,
     pub update_checker: UpdateChecker,
+    /// Templates from `--templates-dir`, replaced when the directory changes.
+    pub file_templates: crate::webhooks::FileTemplateLibrary,
     /// Downloads `MediaUrl` links; set by the binary, which owns the HTTP client.
     pub media_fetcher: Option<Arc<dyn MediaFetcher>>,
     /// Calls status callback URLs; set by the binary, which owns the HTTP client.
@@ -110,11 +112,10 @@ impl OperationContext {
         id_generator: Arc<dyn IdGenerator>,
         instance_details: InstanceDetails,
     ) -> Self {
-        let email_repository = EmailRepository::new(Arc::clone(&database));
-        let email_ingest_service =
-            build_email_ingest_service(&email_repository, &clock, &id_generator);
+        let email_ingest_service = build_email_ingest_service(&database, &clock, &id_generator);
         let share_database = || Arc::clone(&database);
         Self {
+            email_repository: EmailRepository::new(share_database()),
             settings_store: AppSettingsStore::new(SettingsRepository::new(share_database())),
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(share_database()),
             smtp_session_repository: SmtpSessionRepository::new(share_database()),
@@ -150,11 +151,11 @@ impl OperationContext {
             clock,
             id_generator,
             instance_details: Arc::new(instance_details),
-            email_repository,
             email_ingest_service,
             event_bus: EventBus::default(),
             sample_email_sender: None,
             update_checker: UpdateChecker::default(),
+            file_templates: crate::webhooks::FileTemplateLibrary::default(),
             media_fetcher: None,
             status_callback_sender: None,
             reply_webhook_sender: None,
@@ -216,12 +217,12 @@ impl OperationContext {
 }
 
 fn build_email_ingest_service(
-    email_repository: &EmailRepository,
+    database: &Arc<Database>,
     clock: &Arc<dyn Clock>,
     id_generator: &Arc<dyn IdGenerator>,
 ) -> EmailIngestService {
     EmailIngestService::new(
-        email_repository.clone(),
+        EmailRepository::new(Arc::clone(database)),
         Arc::clone(clock),
         Arc::clone(id_generator),
     )

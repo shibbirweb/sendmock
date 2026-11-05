@@ -1,7 +1,7 @@
 use super::template_inputs::{TemplateRevisionReference, TemplateUpdate, WebhookTemplateReference};
 use super::template_operations::{load_template_detail, template_definition};
 use super::template_rendering::check_draft_can_be_saved;
-use super::template_store::{find_resolved_template, store_template_version};
+use super::template_store::{find_resolved_template, refuse_file_template, store_template_version};
 use super::template_view::{
     ResolvedTemplate, RevisedTemplate, TemplateMetadata, TemplateRevision, TemplateSource,
     WebhookTemplateDetail, WebhookTemplateSummary,
@@ -69,6 +69,7 @@ impl Operation for UpdateWebhookTemplateOperation {
         operation_context: &OperationContext,
         input: TemplateUpdate,
     ) -> Result<WebhookTemplateDetail, OperationError> {
+        refuse_file_template(operation_context, &input.template_id)?;
         let edited_template = find_resolved_template(operation_context, &input.template_id).await?;
         let stored_metadata = edited_template.metadata();
         let name = match input.name {
@@ -118,6 +119,7 @@ impl Operation for ResetWebhookTemplateOperation {
         operation_context: &OperationContext,
         input: WebhookTemplateReference,
     ) -> Result<WebhookTemplateDetail, OperationError> {
+        refuse_file_template(operation_context, &input.template_id)?;
         let edited_template = find_resolved_template(operation_context, &input.template_id).await?;
         if !edited_template.summary.is_modified {
             return Err(OperationError::Conflict {
@@ -206,6 +208,7 @@ impl Operation for RestoreWebhookTemplateRevisionOperation {
         operation_context: &OperationContext,
         input: TemplateRevisionReference,
     ) -> Result<WebhookTemplateDetail, OperationError> {
+        refuse_file_template(operation_context, &input.template_id)?;
         let restored_revision = list_template_revisions(operation_context, &input.template_id)
             .await?
             .into_iter()
@@ -216,6 +219,7 @@ impl Operation for RestoreWebhookTemplateRevisionOperation {
                     input.revision, input.template_id
                 ),
             })?;
+        refuse_file_template(operation_context, &input.template_id)?;
         let edited_template = find_resolved_template(operation_context, &input.template_id).await?;
         save_next_version(
             operation_context,

@@ -33,6 +33,8 @@ pub struct ServerConfig {
     pub log_format: LogFormat,
     pub log_level: LogLevel,
     pub seed_file_path: Option<PathBuf>,
+    /// `--templates-dir`: webhook template files loaded at startup and on change.
+    pub templates_directory: Option<PathBuf>,
     pub config_file_path: Option<PathBuf>,
     /// `--ready-json`: the ready line on stdout, logs on stderr.
     pub prints_ready_json: bool,
@@ -107,6 +109,7 @@ impl ServerConfig {
                 .or(config_file.log_level)
                 .unwrap_or_default(),
             seed_file_path: serve_arguments.seed_file_path.clone().or(config_file.seed),
+            templates_directory: serve_arguments.templates_directory.clone(),
             config_file_path,
             prints_ready_json: serve_arguments.ready_json,
         })
