@@ -86,7 +86,7 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 - [x] WH-07.13 A Random variable is Per send or Fixed; a Fixed one shows its current value and Regenerate replaces it.
 - [x] WH-07.14 The request editor sets query params, headers and a body as Template, Fields, Raw or None, plus Strict or Lenient rendering; Fields always encode a valid JSON or form body, and Raw uses the code editor with highlighting, `{{` completion, hover values and an Insert menu.
 - [x] WH-07.15 The live preview renders the method, URL, headers and body against the sample or a chosen message as you type, and each error or warning shows under the part it comes from and, in the code editor, at its line and column.
-- [ ] WH-07.16 Fields mode can also send `multipart/form-data`, with file fields streamed from a URL. (Split from WH-07.6 on 2026-10-30: the contract and request editor built in Stage A have only JSON and form encodings, and multipart arrives in Phase 4 with the SendGrid Inbound Parse and Mailgun routes formats that use it.)
+- [x] WH-07.16 Fields mode can also send `multipart/form-data`, with file fields streamed from a URL. (Split from WH-07.6 on 2026-10-30: the contract and request editor built in Stage A have only JSON and form encodings, and multipart arrives in Phase 4 with the SendGrid Inbound Parse and Mailgun routes formats that use it.) (#48)
 
 ## WH-08 Built-in payload templates
 
@@ -134,7 +134,7 @@ UI in U1/U2, backend Phase 3.
 UI in U2, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhooks.md#email-replies-and-inbound-routes-mailgun-style).
 
 - [x] WH-12.1 Routes support `match_recipient` (named groups usable as `\g<name>` in actions), `match_header` and `catch_all`, run in priority order, and stop after `stop()`. (#48)
-- [ ] WH-12.2 `forward(url)` posts Mailgun's multipart fields, attachments included, with a `signature` that verifies with Mailgun's documented algorithm; a URL ending in `mime` gets `body-mime`.
+- [x] WH-12.2 `forward(url)` posts Mailgun's multipart fields, attachments included, with a `signature` that verifies with Mailgun's documented algorithm; a URL ending in `mime` gets `body-mime`. (#48)
 - [x] WH-12.3 `stripped-text` and `stripped-signature` leave out the quoted original and the signature block. (#48)
 - [x] WH-12.4 A `406` response is not retried, other non-2xx responses follow the endpoint's retry policy, and every forward appears in the delivery log and the email timeline. (#48)
 - [x] WH-12.5 `forward(email)` only sends to addresses on the release allowlist; `store(notify)` posts a `message-url`, and `GET` on it returns the message. (#48)

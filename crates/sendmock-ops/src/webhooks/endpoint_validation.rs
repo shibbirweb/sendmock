@@ -1,7 +1,9 @@
 use std::collections::BTreeSet;
 
 use super::endpoint_inputs::WebhookEndpointInput;
-use super::endpoint_settings::{BodyFieldType, EndpointBodyField, EndpointBodyMode};
+use super::endpoint_settings::{
+    BodyFieldType, EndpointBodyField, EndpointBodyMode, EndpointRequestSettings, FieldsEncoding,
+};
 use crate::OperationError;
 use crate::numbers::is_http_url;
 
@@ -49,18 +51,7 @@ pub fn validate_endpoint_input(
             "Enter an http:// or https:// URL".to_owned(),
         ));
     }
-    if request_settings.body_mode == EndpointBodyMode::Fields {
-        find_body_fields_error(&request_settings.body_fields)
-            .map_or(Ok(()), |message| Err(field_error("body_fields", message)))?;
-    }
-    if request_settings.body_mode == EndpointBodyMode::Raw
-        && request_settings.raw_content_type.trim().is_empty()
-    {
-        return Err(field_error(
-            "raw_content_type",
-            "Enter a content type".to_owned(),
-        ));
-    }
+    validate_body(request_settings)?;
     if !is_within(request_settings.timeout_ms, TIMEOUT_LIMITS_MS) {
         return Err(field_error("timeout_ms", "Use 1 to 60 seconds".to_owned()));
     }
@@ -89,9 +80,42 @@ pub fn validate_endpoint_input(
     Ok(())
 }
 
+/// Fields bodies encode their values validly, and a raw body names its content type.
+fn validate_body(request_settings: &EndpointRequestSettings) -> Result<(), OperationError> {
+    if request_settings.body_mode == EndpointBodyMode::Fields {
+        find_body_fields_error(
+            &request_settings.body_fields,
+            request_settings.fields_encoding,
+        )
+        .map_or(Ok(()), |message| Err(field_error("body_fields", message)))?;
+    }
+    if request_settings.body_mode == EndpointBodyMode::Raw
+        && request_settings.raw_content_type.trim().is_empty()
+    {
+        return Err(field_error(
+            "raw_content_type",
+            "Enter a content type".to_owned(),
+        ));
+    }
+    Ok(())
+}
+
 /// Fields mode always encodes a valid body: named, unique fields whose fixed values fit their
 /// type (WH-07.14).
-fn find_body_fields_error(body_fields: &[EndpointBodyField]) -> Option<String> {
+fn find_body_fields_error(
+    body_fields: &[EndpointBodyField],
+    fields_encoding: FieldsEncoding,
+) -> Option<String> {
+    if let Some(file_field) = body_fields
+        .iter()
+        .find(|body_field| body_field.value_type == BodyFieldType::File)
+        .filter(|_| fields_encoding != FieldsEncoding::Multipart)
+    {
+        return Some(format!(
+            "{} is a file: use the Multipart encoding",
+            file_field.name
+        ));
+    }
     if body_fields
         .iter()
         .any(|body_field| body_field.name.is_empty())
@@ -120,12 +144,19 @@ fn find_fixed_value_error(body_field: &EndpointBodyField) -> Option<String> {
         BodyFieldType::Number => field_value.parse::<f64>().is_ok_and(f64::is_finite),
         BodyFieldType::Boolean => field_value == "true" || field_value == "false",
         BodyFieldType::Json => serde_json::from_str::<serde_json::Value>(field_value).is_ok(),
+        BodyFieldType::File => {
+            ["http://", "https://"]
+                .iter()
+                .any(|scheme| field_value.to_ascii_lowercase().starts_with(scheme))
+                && !field_value.contains(char::is_whitespace)
+        }
     };
     let type_description = match body_field.value_type {
         BodyFieldType::Text => return None,
         BodyFieldType::Number => "a number",
         BodyFieldType::Boolean => "true or false",
         BodyFieldType::Json => "valid JSON",
+        BodyFieldType::File => "an http or https URL to the file",
     };
     (!fits_its_type).then(|| format!("{} must be {type_description}", body_field.name))
 }

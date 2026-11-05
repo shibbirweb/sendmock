@@ -311,3 +311,54 @@ async fn routes_are_checked_like_the_editor_and_the_test_reports_captured_groups
     assert_eq!(test_result["checked_count"], 1);
     assert_eq!(test_result["matches"][0]["captured_groups"]["ticket"], "7");
 }
+
+// AC: WH-12.2
+#[tokio::test]
+async fn attachments_are_file_parts_from_sendmock_and_a_mime_url_gets_body_mime() {
+    let fixture = build_fixture(&[]);
+    create_route(
+        &fixture.app_router,
+        json!({
+            "priority": 0, "description": "Files", "filter": { "kind": "catch_all" },
+            "actions": [
+                { "kind": "forward_url", "url": "http://localhost:8000/mail" },
+                { "kind": "forward_url", "url": "http://localhost:8000/mail/mime" },
+            ],
+        }),
+    )
+    .await;
+    let raw_message = "From: sam@example.test\r\nTo: support@inbound.app.test\r\nSubject: Files\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=\"m\"\r\n\r\n--m\r\nContent-Type: text/plain\r\n\r\nSee attached\r\n--m\r\nContent-Type: text/plain\r\nContent-Disposition: attachment; filename=\"notes.txt\"\r\n\r\nhello\r\n--m--\r\n";
+    let (_, received) = call_api(
+        &fixture.app_router,
+        "POST",
+        "/api/v1/emails/inbound",
+        Some(&json!({ "raw": raw_message })),
+    )
+    .await;
+    let email_id = received["id"].as_str().unwrap_or_default();
+
+    let deliveries = wait_for_deliveries(&fixture.app_router, 2).await;
+
+    let body_for = |url: &str| {
+        deliveries
+            .iter()
+            .find(|delivery| delivery["request"]["url"] == url)
+            .and_then(|delivery| delivery["request"]["body"].as_str())
+            .unwrap_or_default()
+            .to_owned()
+    };
+    let parsed_body = body_for("http://localhost:8000/mail");
+    assert!(
+        parsed_body.contains(
+            "name=\"attachment-1\"; filename=\"notes.txt\"\r\nX-Sendmock-File-Url: http://"
+        ),
+        "{parsed_body}"
+    );
+    assert!(
+        parsed_body.contains(&format!("/api/v1/emails/{email_id}/attachments/0")),
+        "{parsed_body}"
+    );
+    let mime_body = body_for("http://localhost:8000/mail/mime");
+    assert!(mime_body.contains("name=\"body-mime\""), "{mime_body}");
+    assert!(!mime_body.contains("attachment-1"), "{mime_body}");
+}

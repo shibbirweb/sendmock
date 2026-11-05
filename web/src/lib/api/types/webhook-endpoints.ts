@@ -25,7 +25,7 @@ export type TemplateMode = "linked" | "detached";
 
 /** How an endpoint builds its body (WH-07.14). */
 export type EndpointBodyMode = "template" | "fields" | "raw" | "none";
-export type BodyFieldType = "text" | "number" | "boolean" | "json";
+export type BodyFieldType = "text" | "number" | "boolean" | "json" | "file";
 export type RenderMode = "strict" | "lenient";
 
 /** A query param or header: a name and a template value. */
@@ -50,7 +50,8 @@ export type EndpointBodyField = {
    */
   name: string;
   /**
-   * How the rendered value is encoded: `text`, `number`, `boolean` or `json`.
+   * How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL
+   * fetched when the request is sent, for `multipart` only).
    * @example "text"
    */
   value_type: BodyFieldType;
@@ -140,10 +141,11 @@ export type WebhookEndpoint = {
    */
   body_fields: EndpointBodyField[];
   /**
-   * How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).
+   * How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart`
+   * (`multipart/form-data`, where `file` fields are fetched from their URL when sent).
    * @example "json"
    */
-  fields_encoding: "json" | "form";
+  fields_encoding: "json" | "form" | "multipart";
   /**
    * The content type of `raw` mode.
    * @example "application/json"

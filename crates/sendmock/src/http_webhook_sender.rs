@@ -1,10 +1,17 @@
+use std::collections::BTreeMap;
 use std::future::Future;
 use std::pin::Pin;
 use std::time::{Duration, Instant};
 
 use sendmock_ops::{RecordedHttpRequest, WebhookSendFailure, WebhookSendResult, WebhookSender};
+use sendmock_webhooks::{FetchedFile, assemble_multipart_bytes, list_file_urls};
 
 use crate::http_response_recording::record_response;
+
+/// A file field's URL gets this long to answer.
+const FILE_FETCH_TIMEOUT: Duration = Duration::from_secs(30);
+/// Larger files are left out rather than held in memory.
+const MAXIMUM_FILE_BYTES: usize = 25 * 1024 * 1024;
 
 /// Sends webhook deliveries over HTTP or HTTPS, with each endpoint's own timeout.
 pub struct HttpWebhookSender {
@@ -19,6 +26,46 @@ impl HttpWebhookSender {
             .build()
             .ok()?;
         Some(Self { http_client })
+    }
+
+    /// The body as sent: a multipart body's file placeholders become the files their URLs
+    /// answer, fetched now, so every attempt sends the current file (WH-07.16).
+    async fn read_body_bytes(&self, webhook_request: &RecordedHttpRequest) -> Vec<u8> {
+        let file_urls = list_file_urls(&webhook_request.body);
+        if file_urls.is_empty() {
+            return webhook_request.body.clone().into_bytes();
+        }
+        let mut fetched_files: BTreeMap<String, FetchedFile> = BTreeMap::new();
+        for file_url in file_urls {
+            if let Some(fetched_file) = self.fetch_file(&file_url).await {
+                fetched_files.insert(file_url, fetched_file);
+            }
+        }
+        assemble_multipart_bytes(&webhook_request.body, &|file_url| {
+            fetched_files.get(file_url).cloned()
+        })
+    }
+
+    async fn fetch_file(&self, file_url: &str) -> Option<FetchedFile> {
+        let response = self
+            .http_client
+            .get(file_url)
+            .timeout(FILE_FETCH_TIMEOUT)
+            .send()
+            .await
+            .ok()?
+            .error_for_status()
+            .ok()?;
+        let content_type = response
+            .headers()
+            .get(reqwest::header::CONTENT_TYPE)
+            .and_then(|content_type| content_type.to_str().ok())
+            .map(str::to_owned);
+        let content = response.bytes().await.ok()?;
+        (content.len() <= MAXIMUM_FILE_BYTES).then(|| FetchedFile {
+            content_type,
+            content: content.to_vec(),
+        })
     }
 
     async fn send(
@@ -39,7 +86,7 @@ impl HttpWebhookSender {
             .http_client
             .request(method, &webhook_request.url)
             .timeout(Duration::from_millis(u64::from(timeout_ms)))
-            .body(webhook_request.body.clone());
+            .body(self.read_body_bytes(webhook_request).await);
         for (header_name, header_value) in &webhook_request.headers {
             request_builder = request_builder.header(header_name, header_value);
         }

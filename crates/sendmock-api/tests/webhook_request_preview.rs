@@ -240,3 +240,72 @@ async fn an_unknown_email_is_not_found() {
 
     assert_eq!(status, 404, "{error_answer}");
 }
+
+// AC: WH-07.16
+#[tokio::test]
+async fn fields_mode_encodes_multipart_with_a_file_part_fetched_when_sent() {
+    let (app_router, _) = build_test_app();
+    let multipart_fields = json!([
+        { "name": "subject", "value_type": "text", "value": "{{ data.subject }}" },
+        { "name": "invoice", "value_type": "file", "value": "https://files.app.test/invoices/42.pdf" },
+    ]);
+
+    let preview_result = preview_request(
+        &app_router,
+        json!({ "endpoint": endpoint_with(json!({
+            "body_mode": "fields", "body_fields": multipart_fields, "fields_encoding": "multipart",
+        })) }),
+    )
+    .await;
+
+    assert_eq!(
+        preview_result["headers"]["content-type"],
+        "multipart/form-data; boundary=sendmock-fields-boundary"
+    );
+    let body = preview_result["body"].as_str().unwrap_or_default();
+    assert!(
+        body.contains("name=\"subject\"\r\n\r\nYour Acme sign-in code\r\n"),
+        "{body}"
+    );
+    assert!(
+        body.contains("name=\"invoice\"; filename=\"42.pdf\"\r\nX-Sendmock-File-Url: https://files.app.test/invoices/42.pdf\r\n"),
+        "{body}"
+    );
+}
+
+// AC: WH-07.16
+#[tokio::test]
+async fn a_file_field_needs_the_multipart_encoding_and_a_url() {
+    let (app_router, _) = build_test_app();
+    let file_field = json!({ "name": "invoice", "value_type": "file", "value": "https://files.app.test/42.pdf" });
+    let create = |fields_encoding: &'static str, body_field: Value| {
+        let app_router = app_router.clone();
+        async move {
+            call_api(
+                &app_router,
+                "POST",
+                "/api/v1/webhooks/endpoints",
+                Some(&endpoint_with(json!({
+                    "body_mode": "fields", "body_fields": [body_field], "fields_encoding": fields_encoding,
+                }))),
+            )
+            .await
+        }
+    };
+
+    let (json_status, json_refusal) = create("json", file_field.clone()).await;
+    let (no_url_status, _) = create(
+        "multipart",
+        json!({ "name": "invoice", "value_type": "file", "value": "42.pdf" }),
+    )
+    .await;
+    let (multipart_status, _) = create("multipart", file_field).await;
+
+    assert_eq!(json_status, 400);
+    assert_eq!(
+        json_refusal["error"]["message"],
+        "invoice is a file: use the Multipart encoding"
+    );
+    assert_eq!(no_url_status, 400);
+    assert_eq!(multipart_status, 201);
+}

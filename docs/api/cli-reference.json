@@ -14850,9 +14850,10 @@
           "takes_json": false,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {
@@ -15576,9 +15577,10 @@
           "takes_json": false,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {

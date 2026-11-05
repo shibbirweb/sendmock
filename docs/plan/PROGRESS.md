@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W7c (binary multipart bodies for WH-07.16 and route attachments, `body-mime`, the inbound formats, Webhooks > Inbound routes in the live UI suite) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W8 (more SMS providers and WhatsApp via Twilio; check the inbound formats item of the Phase 4 checklist first) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -317,9 +317,9 @@ Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Bounce/complaint/delivered and open provider formats
 - [ ] Fake data functions, Postman aliases, `SENDMOCK_VAR_*`
 - [ ] Remaining built-in templates, `--templates-dir`
-- [ ] Multipart Fields bodies with file fields (WH-07.16)
+- [x] Multipart Fields bodies with file fields (WH-07.16) (#48)
 - [ ] More SMS providers (Plivo, MessageBird, generic GET/POST)
-- [ ] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API
+- [x] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API (#48)
 - [ ] WhatsApp via Twilio
 - [ ] HTTP catcher backend (bins, mock responses, core presets, `wait/http`)
 - [ ] HTTP Catcher and Scenarios switched to live mode; `POST /samples/http`; CLI and MCP `http`, `rules`, `scenario` toolsets
@@ -682,3 +682,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W7a: incoming email (`POST /emails/inbound`, SMTP for inbound domains) and the recipient's Reply, Reply all and Forward arrive as inbound mail linked to the original and fire `email.inbound`; EM-17 accepted. |
 | 2026-11-06 | Phase 4 W7b: Mailgun-style inbound routes run on incoming email (`match_recipient` with named groups, `match_header`, `catch_all`, `stop()`); `forward(url)` posts Mailgun's signed multipart fields through the delivery engine, `forward(email)` goes through the release allowlist; WH-12.1, WH-12.3 and WH-12.4 ticked. |
 | 2026-11-06 | Phase 4 W7c (part): Mailgun's Routes API (`/v3/routes`) and stored messages on the provider port share the UI's routes; WH-12.5 and WH-12.6 ticked. |
+| 2026-11-06 | Phase 4 W7c: multipart Fields bodies with file fields fetched from a URL when sent (contract, mock, editor and binary), and inbound routes send attachments the same way; WH-07 and WH-12 accepted. |

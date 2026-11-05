@@ -2165,6 +2165,7 @@ dependencies = [
  "sendmock-ops",
  "sendmock-smtp",
  "sendmock-store",
+ "sendmock-webhooks",
  "serde",
  "serde_json",
  "tempfile",

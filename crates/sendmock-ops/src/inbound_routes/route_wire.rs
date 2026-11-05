@@ -48,7 +48,6 @@ pub enum InboundRouteAction {
     ForwardEmail { address: String },
     /// Keeps the message and can POST a notification with its `message-url`.
     Store {
-        #[serde(default)]
         #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
         notify_url: Option<String>,
     },

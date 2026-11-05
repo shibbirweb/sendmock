@@ -22333,9 +22333,10 @@
           "is_required": true,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {
@@ -22513,9 +22514,10 @@
             "type": "string",
             "enum": [
               "json",
-              "form"
+              "form",
+              "multipart"
             ],
-            "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+            "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
             "examples": [
               "json"
             ]
@@ -22568,7 +22570,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -22583,7 +22586,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -23383,9 +23386,10 @@
           "is_required": false,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {
@@ -23570,9 +23574,10 @@
             "type": "string",
             "enum": [
               "json",
-              "form"
+              "form",
+              "multipart"
             ],
-            "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+            "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
             "examples": [
               "json"
             ]
@@ -23609,7 +23614,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -23624,7 +23630,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -24092,7 +24098,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -24107,7 +24114,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -24334,9 +24341,10 @@
                 "type": "string",
                 "enum": [
                   "json",
-                  "form"
+                  "form",
+                  "multipart"
                 ],
-                "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
                 "examples": [
                   "json"
                 ]
@@ -26368,7 +26376,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -26383,7 +26392,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -26610,9 +26619,10 @@
                 "type": "string",
                 "enum": [
                   "json",
-                  "form"
+                  "form",
+                  "multipart"
                 ],
-                "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
                 "examples": [
                   "json"
                 ]

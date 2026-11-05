@@ -103,12 +103,12 @@ On top of its own criteria, a feature is done only when:
 | [WH-04](03-webhooks.md#wh-04-standard-webhooks-signing) | Standard Webhooks signing | Phase 3 | 3 | Not started |
 | [WH-05](03-webhooks.md#wh-05-manual-send-and-replay) | Manual send and replay | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-06](03-webhooks.md#wh-06-provider-formats-and-signatures) | Provider formats and signatures | Phase 3 (Twilio, Vonage), Phase 4 (email providers) | 3 | In progress |
-| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart) | 16 | In progress |
+| [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart) | 16 | Accepted |
 | [WH-08](03-webhooks.md#wh-08-built-in-payload-templates) | Built-in payload templates | UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest) | 5 | In progress |
 | [WH-09](03-webhooks.md#wh-09-custom-templates) | Custom templates | UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/export, directory, revisions) | 9 | Accepted |
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | In progress |
 | [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 3 | In progress |
-| [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | In progress |
+| [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | In progress |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | In progress |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | In progress |

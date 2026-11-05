@@ -69,6 +69,10 @@ pub async fn queue_route_delivery(
                 .then(|| build_message_url(operation_context, &stored_email.email_id)),
             raw_message: &routed_email.raw_message,
             attachments: &routed_email.attachments,
+            attachment_url_base: format!(
+                "http://{}/api/v1/emails/{}/attachments",
+                operation_context.instance_details.http_address, stored_email.email_id
+            ),
         },
     );
     let route_delivery =

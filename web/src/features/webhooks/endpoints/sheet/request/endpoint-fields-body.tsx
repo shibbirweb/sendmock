@@ -37,9 +37,22 @@ const bodyFieldTypes: { value: BodyFieldType; label: string }[] = [
   },
 ];
 
+/** Multipart parts are text or a file fetched from a URL when the request is sent. */
+const multipartFieldTypes: { value: BodyFieldType; label: string }[] = [
+  {
+    value: "text",
+    label: "Text",
+  },
+  {
+    value: "file",
+    label: "File (URL)",
+  },
+];
+
 /**
  * Fields body mode: typed name and value rows that SendMock encodes as
- * JSON or a form, so the body is always valid (WH-07.14).
+ * JSON, a form or multipart, so the body is always valid (WH-07.14,
+ * WH-07.16).
  */
 export function EndpointFieldsBody({
   formValues,
@@ -65,9 +78,9 @@ export function EndpointFieldsBody({
 
   return (
     <div className="grid gap-4">
-      <RadioCardGroup<"json" | "form">
+      <RadioCardGroup<"json" | "form" | "multipart">
         legend="Encoding"
-        className="sm:grid-cols-2"
+        className="sm:grid-cols-3"
         selectedValue={formValues.fieldsEncoding}
         options={[
           {
@@ -79,6 +92,11 @@ export function EndpointFieldsBody({
             value: "form",
             label: "Form",
             description: "application/x-www-form-urlencoded, all text.",
+          },
+          {
+            value: "multipart",
+            label: "Multipart",
+            description: "multipart/form-data; file fields come from a URL.",
           },
         ]}
         onSelect={(fieldsEncoding) => {
@@ -124,7 +142,10 @@ export function EndpointFieldsBody({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {bodyFieldTypes.map((bodyFieldType) => (
+                {(formValues.fieldsEncoding === "multipart"
+                  ? multipartFieldTypes
+                  : bodyFieldTypes
+                ).map((bodyFieldType) => (
                   <SelectItem
                     key={bodyFieldType.value}
                     value={bodyFieldType.value}

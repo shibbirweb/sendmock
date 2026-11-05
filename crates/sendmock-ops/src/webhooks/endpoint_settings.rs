@@ -38,6 +38,8 @@ pub enum BodyFieldType {
     Number,
     Boolean,
     Json,
+    /// A URL fetched when the request is sent, for `multipart` only.
+    File,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -45,6 +47,7 @@ pub enum BodyFieldType {
 pub enum FieldsEncoding {
     Json,
     Form,
+    Multipart,
 }
 
 /// `strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning.
@@ -108,7 +111,8 @@ pub struct EndpointRequestSettings {
     pub body_mode: EndpointBodyMode,
     /// The rows of `fields` mode.
     pub body_fields: Vec<EndpointBodyField>,
-    /// How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).
+    /// How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart`
+    /// (`multipart/form-data`, where `file` fields are fetched from their URL when sent).
     pub fields_encoding: FieldsEncoding,
     /// The content type of `raw` mode.
     pub raw_content_type: String,

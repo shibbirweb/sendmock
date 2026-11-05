@@ -148,6 +148,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window (`{ "overlap_hours": 24 }`); the response carries the new masked secret and `previous_secret_expires_at` |
 | GET | `/webhooks/endpoints/{endpointId}/secret` | reveal the plain secret (the reveal is written to the API request log); everywhere else secrets are masked |
 
+Fields bodies (Phase 4, WH-07.16): `fields_encoding` also takes `multipart` (`multipart/form-data`), and a body field's `value_type` also takes `file`, whose value is a URL template. The stored request writes a file field as a part with an `X-Sendmock-File-Url` header and no content; the sender fetches the URL when it sends the request (each attempt), names the part after the URL's last path segment, takes the content type from the answer, and sends the bytes. Inbound routes use the same placeholder for an email's attachments, pointing at `GET /api/v1/emails/{emailId}/attachments/{attachmentIndex}`.
+
 Manual send and replay accept `"variables": { ... }` overrides and `"rerender": true|false`. Details in [12-webhook-variables.md](12-webhook-variables.md).
 
 ## Test-automation helpers

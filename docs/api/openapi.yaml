@@ -7414,6 +7414,7 @@ components:
         - number
         - boolean
         - json
+        - file
     CapturedHttpFile:
       type: object
       properties:
@@ -8495,7 +8496,7 @@ components:
             - user.email
         value_type:
           $ref: "#/components/schemas/BodyFieldType"
-          description: "How the rendered value is encoded: `text`, `number`, `boolean` or `json`."
+          description: "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only)."
           examples:
             - text
         value:
@@ -14607,7 +14608,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:
@@ -14744,7 +14746,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:
@@ -14856,7 +14859,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:

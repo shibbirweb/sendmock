@@ -4,6 +4,7 @@
 use std::collections::BTreeMap;
 
 use sendmock_core::TemplateEscape;
+use sendmock_webhooks::{MultipartPart, read_file_name, write_multipart_body};
 use serde_json::{Map, Value};
 
 use super::endpoint_settings::{
@@ -46,7 +47,7 @@ fn set_nested_value(target_object: &mut Map<String, Value>, dotted_name: &str, f
 fn to_typed_value(body_field: &EndpointBodyField, rendered_value: &str) -> Result<Value, String> {
     let field_name = &body_field.name;
     match body_field.value_type {
-        BodyFieldType::Text => Ok(Value::from(rendered_value)),
+        BodyFieldType::Text | BodyFieldType::File => Ok(Value::from(rendered_value)),
         BodyFieldType::Number => serde_json::from_str::<serde_json::Number>(rendered_value.trim())
             .map(Value::Number)
             .map_err(|_| {
@@ -61,6 +62,38 @@ fn to_typed_value(body_field: &EndpointBodyField, rendered_value: &str) -> Resul
         },
         BodyFieldType::Json => serde_json::from_str(rendered_value)
             .map_err(|_| format!("{field_name} does not render valid JSON")),
+    }
+}
+
+/// Same boundary as the mock, so a preview reads the same in both.
+const MULTIPART_BOUNDARY: &str = "sendmock-fields-boundary";
+
+/// Text parts as rendered and file parts as placeholders the sender fills (WH-07.16).
+fn build_multipart_fields_body(
+    rendered_fields: &[(&EndpointBodyField, String, String)],
+) -> RenderedBody {
+    let parts: Vec<MultipartPart> = rendered_fields
+        .iter()
+        .map(
+            |(body_field, rendered_value, _)| match body_field.value_type {
+                BodyFieldType::File => MultipartPart::FileFromUrl {
+                    name: body_field.name.clone(),
+                    file_name: read_file_name(rendered_value),
+                    url: rendered_value.trim().to_owned(),
+                },
+                _ => MultipartPart::Text {
+                    name: body_field.name.clone(),
+                    value: rendered_value.clone(),
+                },
+            },
+        )
+        .collect();
+    RenderedBody {
+        content_type: Some(format!(
+            "multipart/form-data; boundary={MULTIPART_BOUNDARY}"
+        )),
+        body: write_multipart_body(MULTIPART_BOUNDARY, &parts),
+        template_headers: BTreeMap::new(),
     }
 }
 
@@ -79,6 +112,9 @@ fn render_fields_body(
             (body_field, rendered_value, source)
         })
         .collect();
+    if request_settings.fields_encoding == FieldsEncoding::Multipart {
+        return Ok(build_multipart_fields_body(&rendered_fields));
+    }
     if request_settings.fields_encoding == FieldsEncoding::Form {
         let form_pairs: Vec<(&str, &str)> = rendered_fields
             .iter()

@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 
 use sendmock_mail::{ParsedAttachment, strip_reply_text};
 use sendmock_store::EmailRecord;
-use sendmock_webhooks::sign_mailgun_token;
+use sendmock_webhooks::{MultipartPart, sign_mailgun_token, write_multipart_body};
 
 use crate::sms::RecordedHttpRequest;
 
@@ -24,6 +24,9 @@ pub struct MailgunRouteDetails<'details> {
     pub message_url: Option<String>,
     pub raw_message: &'details [u8],
     pub attachments: &'details [ParsedAttachment],
+    /// SendMock's own download URL for the email's attachments, without the index; the
+    /// sender fetches each one when the request is sent.
+    pub attachment_url_base: String,
 }
 
 fn format_address(stored_email: &EmailRecord) -> String {
@@ -110,28 +113,20 @@ fn build_content_id_map(attachments: &[ParsedAttachment]) -> String {
     serde_json::to_string(&content_ids).unwrap_or_default()
 }
 
-fn write_multipart_body(
-    boundary: &str,
-    fields: &[(String, String)],
-    attachments: &[ParsedAttachment],
-) -> String {
-    let mut body = String::new();
-    for (field_name, field_value) in fields {
-        body.push_str(&format!(
-            "--{boundary}\r\nContent-Disposition: form-data; name=\"{field_name}\"\r\n\r\n{field_value}\r\n"
-        ));
-    }
-    for (attachment_index, attachment) in attachments.iter().enumerate() {
-        body.push_str(&format!(
-            "--{boundary}\r\nContent-Disposition: form-data; name=\"attachment-{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n{}\r\n",
-            attachment_index + 1,
-            attachment.filename.replace('"', "'"),
-            attachment.content_type,
-            String::from_utf8_lossy(&attachment.content)
-        ));
-    }
-    body.push_str(&format!("--{boundary}--\r\n"));
-    body
+/// Each attachment as `attachment-N`, fetched from SendMock's own download URL when sent.
+fn build_attachment_parts(details: &MailgunRouteDetails<'_>) -> Vec<MultipartPart> {
+    details
+        .attachments
+        .iter()
+        .enumerate()
+        .map(
+            |(attachment_index, attachment)| MultipartPart::FileFromUrl {
+                name: format!("attachment-{}", attachment_index + 1),
+                file_name: attachment.filename.clone(),
+                url: format!("{}/{attachment_index}", details.attachment_url_base),
+            },
+        )
+        .collect()
 }
 
 /// The multipart request, with `timestamp`, `token` and `signature` last as Mailgun sends them.
@@ -158,12 +153,14 @@ pub fn build_mailgun_route_request(
         ("token".to_owned(), token),
     ]);
     let carries_files = !details.url.trim_end_matches('/').ends_with("mime");
-    let attachments = if carries_files {
-        details.attachments
-    } else {
-        &[]
-    };
-    let body = write_multipart_body(&boundary, &fields, attachments);
+    let mut parts: Vec<MultipartPart> = fields
+        .into_iter()
+        .map(|(name, value)| MultipartPart::Text { name, value })
+        .collect();
+    if carries_files {
+        parts.extend(build_attachment_parts(details));
+    }
+    let body = write_multipart_body(&boundary, &parts);
     RecordedHttpRequest {
         method: "POST".to_owned(),
         url: details.url.to_owned(),
