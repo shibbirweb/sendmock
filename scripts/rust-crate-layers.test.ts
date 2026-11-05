@@ -61,10 +61,10 @@ describe("findLayerViolations", () => {
 
   test("names a crate that has no layer", () => {
     const violations = findLayerViolations([
-      { crateName: "sendmock-payments", dependencyNames: [] },
+      { crateName: "sendmock-unlayered", dependencyNames: [] },
     ]);
 
-    expect(violations[0]).toContain("sendmock-payments has no layer");
+    expect(violations[0]).toContain("sendmock-unlayered has no layer");
   });
 });
 

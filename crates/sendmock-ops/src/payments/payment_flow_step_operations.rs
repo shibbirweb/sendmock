@@ -173,14 +173,18 @@ impl Operation for RemovePaymentFlowStepOperation {
     type Output = PaymentFlowDefinition;
 
     fn definition(&self) -> OperationDefinition {
-        step_definition(
+        let step_definition = step_definition(
             "deletePaymentsFlowsByFlowKeyStepsByStepIndex",
             HttpMethod::Delete,
             "/api/v1/payments/flows/{flowKey}/steps/{stepIndex}",
             "Remove one step of a flow.",
             "sendmock payments flows steps remove <flowKey> <stepIndex>",
             "sendmock_payment_flow_step_remove",
-        )
+        );
+        OperationDefinition {
+            is_destructive: true,
+            ..step_definition
+        }
     }
 
     async fn execute(
