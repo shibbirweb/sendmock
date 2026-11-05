@@ -10468,6 +10468,12 @@ components:
         - items
         - next_cursor
         - total_count
+    PaymentCaptureMethod:
+      type: string
+      enum:
+        - automatic
+        - manual
+      description: "`manual` holds the money as `authorized` until it is captured or voided."
     PaymentCheckoutCreateRequest:
       type: object
       properties:
@@ -10511,6 +10517,11 @@ components:
             - - name: T-shirt
                 quantity: 1
                 unit_amount_minor: 1999
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
+          description: "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out."
+          examples:
+            - manual
       required:
         - provider
         - amount_minor
@@ -10561,6 +10572,8 @@ components:
             - type: "null"
         captured_minor:
           type: number
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
         method_key:
           type:
             - string
@@ -10616,6 +10629,7 @@ components:
       required:
         - amount_minor
         - cancel_url
+        - capture_method
         - captured_minor
         - checkout_url
         - created_at

@@ -89,10 +89,7 @@ fn build_checkout_payment(
     let line_items = input
         .line_items
         .unwrap_or_else(|| default_line_items(input.amount_minor));
-    let order_suffix: String = payment_id
-        .chars()
-        .skip(payment_id.len().saturating_sub(6))
-        .collect();
+    let order_suffix = &suffix[suffix.len().saturating_sub(6)..];
     PaymentDetail {
         summary: PaymentSummary {
             provider_reference: read_provider_reference(&input.provider, &provider_ids)
@@ -124,6 +121,7 @@ fn build_checkout_payment(
         checkout_url: Some(format!("http://{http_address}/pay/{payment_id}")),
         redirect: None,
         captured_minor: 0,
+        capture_method: input.capture_method.unwrap_or_default(),
         method_key: None,
         dispute: None,
         timeline: Vec::new(),

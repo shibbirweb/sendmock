@@ -7,6 +7,7 @@ mod gateway;
 mod method;
 mod money;
 mod signing;
+mod stripe;
 
 pub use checkout::{
     CardEntry, CheckoutEntries, FlowOutcome, FlowRun, MethodTestValues, PaidWith, TestValue,
@@ -26,3 +27,4 @@ pub use money::{currency_exponent, format_major_amount, is_currency_code};
 pub use signing::{
     sign_paddle_payload, sign_razorpay_payload, sign_sslcommerz_fields, sign_stripe_payload,
 };
+pub use stripe::{StripeCardDecline, describe_stripe_card_decline, find_stripe_test_card_number};

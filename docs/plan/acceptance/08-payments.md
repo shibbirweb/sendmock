@@ -32,8 +32,8 @@ UI in U2, live in Phase 3P.
 
 Phase 3P.
 
-- [ ] PY-04.1 Checkout Sessions, PaymentIntents (create, confirm, capture, cancel) and Refunds return Stripe-shaped objects and errors at the real paths on the provider port.
-- [ ] PY-04.2 Every test card in the table produces Stripe's documented status and decline code.
+- [x] PY-04.1 Checkout Sessions, PaymentIntents (create, confirm, capture, cancel) and Refunds return Stripe-shaped objects and errors at the real paths on the provider port.
+- [x] PY-04.2 Every test card in the table produces Stripe's documented status and decline code.
 - [ ] PY-04.3 Webhook events carry a `Stripe-Signature` that the official `stripe` SDKs (Node, PHP, Python) verify with `constructEvent`.
 - [ ] PY-04.4 An app using the official Stripe SDK completes checkout, receives `checkout.session.completed` and `payment_intent.succeeded`, and handles a decline.
 
@@ -59,7 +59,7 @@ Phase 3P.
 
 Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions).
 
-- [ ] PY-07.1 Manual capture: authorize, then capture or void, with matching events.
+- [x] PY-07.1 Manual capture: authorize, then capture or void, with matching events.
 - [x] PY-07.2 Full and partial refunds update the payment and fire the provider's refund event; refunding more than captured is rejected.
 - [ ] PY-07.3 Disputes can be opened, answered, won and lost, each with the provider's events.
 - [ ] PY-07.4 Subscriptions: create, renew on simulated clock advance, payment failure and cancel, each with events.

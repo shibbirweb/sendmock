@@ -17,6 +17,9 @@ export type PaymentStatus =
   | "partially_refunded"
   | "disputed";
 
+/** `manual` holds the money as `authorized` until it is captured or voided (PY-07.1). */
+export type PaymentCaptureMethod = "automatic" | "manual";
+
 export type DeclineReason =
   | "insufficient_funds"
   | "expired_card"
@@ -245,6 +248,7 @@ export type PaymentDetail = PaymentSummary & {
   checkout_url: string | null;
   redirect: PaymentRedirect | null;
   captured_minor: number;
+  capture_method: PaymentCaptureMethod;
   /** The payment method used, once paid. */
   method_key: string | null;
   dispute: PaymentDispute | null;

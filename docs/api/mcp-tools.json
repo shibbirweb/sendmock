@@ -10729,6 +10729,21 @@
               "unit_amount_minor": 1999
             }
           ]
+        },
+        {
+          "name": "capture_method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "manual"
         }
       ],
       "input_schema": {
@@ -10793,12 +10808,29 @@
                 }
               ]
             ]
+          },
+          "capture_method": {
+            "$ref": "#/$defs/PaymentCaptureMethod",
+            "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+            "examples": [
+              "manual"
+            ]
           }
         },
         "required": [
           "provider",
           "amount_minor"
-        ]
+        ],
+        "$defs": {
+          "PaymentCaptureMethod": {
+            "type": "string",
+            "enum": [
+              "automatic",
+              "manual"
+            ],
+            "description": "`manual` holds the money as `authorized` until it is captured or voided."
+          }
+        }
       },
       "example_arguments": {
         "provider": "stripe",

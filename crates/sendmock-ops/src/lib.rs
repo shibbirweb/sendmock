@@ -28,6 +28,7 @@ mod settings;
 mod sms;
 mod sms_replies;
 mod smtp_delivery;
+mod stripe;
 mod system;
 mod updates;
 mod verify;

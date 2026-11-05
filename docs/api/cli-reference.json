@@ -7126,6 +7126,24 @@
               "unit_amount_minor": 1999
             }
           ]
+        },
+        {
+          "flag": "--capture-method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<capture-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "manual"
         }
       ],
       "example": "sendmock payments checkout create --provider stripe --amount-minor 1999 --currency USD --customer-email user@example.test",

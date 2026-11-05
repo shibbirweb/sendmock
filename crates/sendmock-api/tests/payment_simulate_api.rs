@@ -49,6 +49,24 @@ async fn create_checkout(app_router: &axum::Router) -> String {
     payment["id"].as_str().unwrap_or_default().to_owned()
 }
 
+async fn create_manual_checkout(app_router: &axum::Router) -> String {
+    let (status, payment) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/payments/checkout",
+        Some(&json!({
+            "provider": "stripe",
+            "amount_minor": 2000,
+            "currency": "USD",
+            "capture_method": "manual",
+        })),
+    )
+    .await;
+    assert_eq!(status, 201, "{payment}");
+    assert_eq!(payment["capture_method"], "manual");
+    payment["id"].as_str().unwrap_or_default().to_owned()
+}
+
 async fn simulate(app_router: &axum::Router, payment_id: &str, request: Value) -> (u16, Value) {
     call_api(
         app_router,
@@ -65,29 +83,6 @@ fn last_provider_event_name(payment: &Value) -> Value {
         .and_then(|notifications| notifications.last())
         .map(|notification| notification["provider_event_name"].clone())
         .unwrap_or(Value::Null)
-}
-
-/// Stores the payment as authorized, as a manual-capture checkout leaves it.
-async fn mark_authorized(operation_context: &OperationContext, payment_id: &str) {
-    let payment_repository = &operation_context.payment_repository;
-    let Some(mut stored_payment) = payment_repository
-        .find_payment(payment_id)
-        .await
-        .ok()
-        .flatten()
-    else {
-        panic!("the payment {payment_id} is stored");
-    };
-    let mut payment_document: Value =
-        serde_json::from_str(&stored_payment.document_json).unwrap_or_default();
-    payment_document["status"] = json!("authorized");
-    payment_document["checkout_url"] = Value::Null;
-    stored_payment.status = "authorized".to_owned();
-    stored_payment.document_json = payment_document.to_string();
-    payment_repository
-        .save_payment(stored_payment)
-        .await
-        .unwrap_or_else(|error| panic!("the payment is saved: {error}"));
 }
 
 // AC: PY-07.2, PY-09.3
@@ -175,18 +170,24 @@ async fn a_dispute_opens_and_is_won_or_lost_with_the_providers_events() {
 
 // AC: PY-07.1, PY-09.3
 #[tokio::test]
-async fn an_authorized_payment_is_captured_or_voided() {
-    let (app_router, operation_context) = build_paid_app().await;
-    let captured_id = create_checkout(&app_router).await;
-    let voided_id = create_checkout(&app_router).await;
-    mark_authorized(&operation_context, &captured_id).await;
-    mark_authorized(&operation_context, &voided_id).await;
+async fn a_manual_capture_payment_is_authorized_then_captured_or_voided() {
+    let (app_router, _) = build_paid_app().await;
+    let captured_id = create_manual_checkout(&app_router).await;
+    let voided_id = create_manual_checkout(&app_router).await;
 
+    let (_, authorized) = simulate(&app_router, &captured_id, json!({ "action": "succeed" })).await;
+    simulate(&app_router, &voided_id, json!({ "action": "succeed" })).await;
     let (refund_status, _) =
         simulate(&app_router, &captured_id, json!({ "action": "refund" })).await;
     let (_, captured) = simulate(&app_router, &captured_id, json!({ "action": "capture" })).await;
     let (_, voided) = simulate(&app_router, &voided_id, json!({ "action": "void" })).await;
 
+    assert_eq!(authorized["status"], "authorized");
+    assert_eq!(authorized["captured_minor"], 0);
+    assert_eq!(
+        last_provider_event_name(&authorized),
+        "payment_intent.amount_capturable_updated"
+    );
     assert_eq!(refund_status, 409);
     assert_eq!(captured["status"], "succeeded");
     assert_eq!(captured["captured_minor"], 2000);

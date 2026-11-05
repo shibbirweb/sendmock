@@ -5,12 +5,12 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
     EmailRepository, MessageProviderRepository, MessagingServiceRepository,
-    PaymentDefinitionRepository, PaymentRepository, SavedWebhookDeliveryRepository,
-    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
+    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
+    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -77,6 +77,8 @@ pub struct OperationContext {
     /// Edited built-in and custom payment flows, methods and gateways.
     pub payment_definition_repository: PaymentDefinitionRepository,
     pub payment_repository: PaymentRepository,
+    /// Provider adapters' own objects beside payments, such as Stripe refunds.
+    pub payment_provider_object_repository: PaymentProviderObjectRepository,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
 }
@@ -93,33 +95,33 @@ impl OperationContext {
         let email_ingest_service =
             build_email_ingest_service(&email_repository, &clock, &id_generator);
         let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
+        let share_database = || Arc::clone(&database);
         Self {
-            email_outcome_rule_repository: EmailOutcomeRuleRepository::new(Arc::clone(&database)),
-            smtp_session_repository: SmtpSessionRepository::new(Arc::clone(&database)),
-            api_request_repository: ApiRequestRepository::new(Arc::clone(&database)),
-            sms_repository: SmsRepository::new(Arc::clone(&database)),
-            seed_state_repository: SeedStateRepository::new(Arc::clone(&database)),
-            payment_definition_repository: PaymentDefinitionRepository::new(Arc::clone(&database)),
-            payment_repository: PaymentRepository::new(Arc::clone(&database)),
-            sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(Arc::clone(
-                &database,
-            )),
-            sms_reply_webhook_repository: SmsReplyWebhookRepository::new(Arc::clone(&database)),
-            sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(Arc::clone(&database)),
-            virtual_number_repository: VirtualNumberRepository::new(Arc::clone(&database)),
-            messaging_service_repository: MessagingServiceRepository::new(Arc::clone(&database)),
-            verify_service_repository: VerifyServiceRepository::new(Arc::clone(&database)),
-            verification_repository: VerificationRepository::new(Arc::clone(&database)),
-            message_provider_repository: MessageProviderRepository::new(Arc::clone(&database)),
-            activity_stats_repository: ActivityStatsRepository::new(Arc::clone(&database)),
-            webhook_endpoint_repository: WebhookEndpointRepository::new(Arc::clone(&database)),
-            webhook_delivery_repository: WebhookDeliveryRepository::new(Arc::clone(&database)),
-            webhook_rule_repository: WebhookRuleRepository::new(Arc::clone(&database)),
-            webhook_template_repository: WebhookTemplateRepository::new(Arc::clone(&database)),
-            webhook_variable_repository: WebhookVariableRepository::new(Arc::clone(&database)),
-            saved_webhook_delivery_repository: SavedWebhookDeliveryRepository::new(Arc::clone(
-                &database,
-            )),
+            email_outcome_rule_repository: EmailOutcomeRuleRepository::new(share_database()),
+            smtp_session_repository: SmtpSessionRepository::new(share_database()),
+            api_request_repository: ApiRequestRepository::new(share_database()),
+            sms_repository: SmsRepository::new(share_database()),
+            seed_state_repository: SeedStateRepository::new(share_database()),
+            payment_definition_repository: PaymentDefinitionRepository::new(share_database()),
+            payment_repository: PaymentRepository::new(share_database()),
+            payment_provider_object_repository: PaymentProviderObjectRepository::new(
+                share_database(),
+            ),
+            sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(share_database()),
+            sms_reply_webhook_repository: SmsReplyWebhookRepository::new(share_database()),
+            sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(share_database()),
+            virtual_number_repository: VirtualNumberRepository::new(share_database()),
+            messaging_service_repository: MessagingServiceRepository::new(share_database()),
+            verify_service_repository: VerifyServiceRepository::new(share_database()),
+            verification_repository: VerificationRepository::new(share_database()),
+            message_provider_repository: MessageProviderRepository::new(share_database()),
+            activity_stats_repository: ActivityStatsRepository::new(share_database()),
+            webhook_endpoint_repository: WebhookEndpointRepository::new(share_database()),
+            webhook_delivery_repository: WebhookDeliveryRepository::new(share_database()),
+            webhook_rule_repository: WebhookRuleRepository::new(share_database()),
+            webhook_template_repository: WebhookTemplateRepository::new(share_database()),
+            webhook_variable_repository: WebhookVariableRepository::new(share_database()),
+            saved_webhook_delivery_repository: SavedWebhookDeliveryRepository::new(share_database()),
             webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             status_callback_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
             webhook_sender: None,

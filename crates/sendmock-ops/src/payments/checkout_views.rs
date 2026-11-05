@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::payment_flow_views::PaymentFlowDefinition;
 use super::payment_method_views::PaymentMethodDefinition;
-use super::payment_views::{PaymentLineItem, PaymentRedirect};
+use super::payment_views::{PaymentCaptureMethod, PaymentLineItem, PaymentRedirect};
 
 /// Body of `POST /api/v1/payments/checkout`.
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -17,6 +17,8 @@ pub struct PaymentCheckoutCreateRequest {
     pub customer_email: Option<String>,
     /// One "Test order" line for the amount when left out.
     pub line_items: Option<Vec<PaymentLineItem>>,
+    /// `manual` authorizes the payment and waits for a capture or void.
+    pub capture_method: Option<PaymentCaptureMethod>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, JsonSchema)]

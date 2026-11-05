@@ -49,8 +49,13 @@ pub fn read_provider_reference(
     provider: &str,
     provider_ids: &BTreeMap<String, String>,
 ) -> Option<String> {
+    if provider == "stripe" {
+        return provider_ids
+            .get("checkout_session")
+            .or_else(|| provider_ids.get("payment_intent"))
+            .cloned();
+    }
     let first_id_name = match provider {
-        "stripe" => "checkout_session",
         "paypal" => "order",
         "sslcommerz" => "tran_id",
         "bkash" => "payment_id",
@@ -60,11 +65,20 @@ pub fn read_provider_reference(
     provider_ids.get(first_id_name).cloned()
 }
 
+/// Payments stored before manual capture existed read as captured automatically.
 pub fn read_payment_document(
     stored_payment: &PaymentRecord,
 ) -> Result<PaymentDetail, OperationError> {
-    serde_json::from_str(&stored_payment.document_json)
-        .map_err(|read_error| OperationError::Internal(read_error.to_string()))
+    let to_internal_error =
+        |read_error: serde_json::Error| OperationError::Internal(read_error.to_string());
+    let mut payment_document: serde_json::Value =
+        serde_json::from_str(&stored_payment.document_json).map_err(to_internal_error)?;
+    if let Some(payment_fields) = payment_document.as_object_mut() {
+        payment_fields
+            .entry("capture_method")
+            .or_insert_with(|| serde_json::json!("automatic"));
+    }
+    serde_json::from_value(payment_document).map_err(to_internal_error)
 }
 
 pub async fn find_payment(

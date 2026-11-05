@@ -11,6 +11,7 @@ use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
+use crate::stripe::answer_stripe_request;
 use crate::{OperationContext, OperationError};
 
 /// Messaging Services are Twilio's; their API is served under its key.
@@ -92,13 +93,19 @@ pub async fn answer_provider_request(
     })
 }
 
-/// The APIs served in code beside the definitions: Twilio's Messaging Services and Verify.
+/// The APIs served in code beside the definitions: Stripe's, and Twilio's Messaging
+/// Services and Verify.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
     providers: &[MessageProviderDefinition],
     provider_route: ProviderRoute<'_>,
     request: &ProviderHttpRequest,
 ) -> Result<Option<ProviderOutcome>, OperationError> {
+    if let Some(stripe_outcome) =
+        answer_stripe_request(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(stripe_outcome));
+    }
     if let Some(services_outcome) =
         answer_twilio_services(operation_context, providers, provider_route, request).await?
     {

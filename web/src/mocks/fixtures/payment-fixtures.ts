@@ -389,6 +389,7 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
     failure_code: null,
     refunded_minor: 0,
     captured_minor: 0,
+    capture_method: startStatus === "authorized" ? "manual" : "automatic",
     method: paymentSpec.method ?? null,
     method_key: readFixtureMethodKey(paymentSpec.method),
     line_items: paymentSpec.lineItems,

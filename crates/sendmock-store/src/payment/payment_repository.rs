@@ -133,6 +133,31 @@ impl PaymentRepository {
             .await
     }
 
+    /// The provider's payment that the provider knows by `provider_id`, e.g. a Stripe
+    /// PaymentIntent's `pi_...`, read from the payment's `provider_ids`.
+    pub async fn find_payment_by_provider_id(
+        &self,
+        provider: &str,
+        provider_id: &str,
+    ) -> Result<Option<PaymentRecord>, StoreError> {
+        let query_values = [provider, provider_id].map(str::to_owned);
+        self.database
+            .read(move |connection| {
+                Ok(connection
+                    .query_row(
+                        &format!(
+                            "SELECT {PAYMENT_COLUMNS} FROM payments WHERE provider = ?1 AND EXISTS \
+                             (SELECT 1 FROM json_each(document, '$.provider_ids') WHERE value = ?2) \
+                             ORDER BY id DESC LIMIT 1"
+                        ),
+                        params![query_values[0], query_values[1]],
+                        read_payment_row,
+                    )
+                    .optional()?)
+            })
+            .await
+    }
+
     /// Newest first; `cursor` is the id of the last payment of the previous page.
     pub async fn list_payments(
         &self,

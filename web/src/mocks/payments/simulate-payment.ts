@@ -83,6 +83,27 @@ function readDefaultTestMethod(paymentDetail: PaymentDetail): PaymentMethod {
       };
 }
 
+/** A manual-capture payment is paid: the money is held until a capture or void. */
+function authorizeStep(
+  mockDatabase: PaymentDatabase,
+  paymentDetail: PaymentDetail,
+  hadCheckout: boolean,
+  createdAt: string,
+): PaymentEventType[] {
+  paymentDetail.status = "authorized";
+  addTimeline(
+    paymentDetail,
+    "authorized",
+    `Authorized ${money(paymentDetail, paymentDetail.amount_minor)}`,
+    createdAt,
+  );
+  finishCheckout(mockDatabase, paymentDetail, "success", createdAt);
+
+  return hadCheckout
+    ? ["checkout.completed", "payment.authorized"]
+    : ["payment.authorized"];
+}
+
 const succeedStep: SimulationStep = (
   mockDatabase,
   paymentDetail,
@@ -96,6 +117,9 @@ const succeedStep: SimulationStep = (
       paymentDetail.provider === "bkash" ? "bkash" : "card";
   }
   const isCapture = simulateRequest.action === "capture";
+  if (!isCapture && paymentDetail.capture_method === "manual") {
+    return authorizeStep(mockDatabase, paymentDetail, hadCheckout, createdAt);
+  }
   paymentDetail.status = "succeeded";
   paymentDetail.captured_minor = paymentDetail.amount_minor;
   addTimeline(

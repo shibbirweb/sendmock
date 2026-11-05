@@ -39,7 +39,10 @@ fn apply_simulate_action(
 ) -> Result<(), OperationError> {
     match input.action {
         PaymentSimulateAction::Succeed => payment_change.succeed(),
-        PaymentSimulateAction::Capture => payment_change.capture(),
+        PaymentSimulateAction::Capture => {
+            let amount_minor = payment_change.payment.summary.amount_minor;
+            payment_change.capture(amount_minor);
+        }
         PaymentSimulateAction::Decline => payment_change.decline(&to_wire_name(
             input
                 .decline_reason

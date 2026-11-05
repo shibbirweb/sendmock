@@ -1,4 +1,5 @@
 import type { Ulid } from "@/lib/api/types/common";
+import type { PaymentCaptureMethod } from "@/lib/api/types/payments";
 import type { TemplateReference } from "@/lib/api/types/webhooks";
 
 /** The gateways SendMock ships; custom gateways have their own keys. */
@@ -244,4 +245,9 @@ export type PaymentCheckoutCreateRequest = {
    * @example [{"name": "T-shirt", "quantity": 1, "unit_amount_minor": 1999}]
    */
   line_items?: { name: string; quantity: number; unit_amount_minor: number }[];
+  /**
+   * `manual` authorizes the payment and waits for a capture or void; `automatic` when left out.
+   * @example "manual"
+   */
+  capture_method?: PaymentCaptureMethod;
 };

@@ -1558,6 +1558,7 @@ expression: command_descriptions
     "arguments": [],
     "flags": [
       "--amount-minor",
+      "--capture-method",
       "--currency",
       "--customer-email",
       "--line-items",

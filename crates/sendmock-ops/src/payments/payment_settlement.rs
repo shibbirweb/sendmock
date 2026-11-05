@@ -32,13 +32,13 @@ pub fn read_refundable_minor(payment: &PaymentDetail) -> u64 {
 
 /// The steps after the checkout: capture, void, refund, expiry and the dispute's end.
 impl PaymentChange<'_> {
-    /// An authorized payment captured in full.
-    pub fn capture(&mut self) {
+    /// An authorized payment captured in whole or in part; the rest is released.
+    pub fn capture(&mut self, capture_minor: u64) {
         self.payment.summary.status = PaymentStatus::Succeeded;
-        self.payment.captured_minor = self.payment.summary.amount_minor;
+        self.payment.captured_minor = capture_minor.min(self.payment.summary.amount_minor);
         let captured_text = format!(
             "Captured {}",
-            self.format_money(self.payment.summary.amount_minor)
+            self.format_money(self.payment.captured_minor)
         );
         self.add_timeline("captured", captured_text);
         self.fire_event(AppEventType::PaymentSucceeded);
@@ -47,6 +47,14 @@ impl PaymentChange<'_> {
     pub fn void_authorization(&mut self) {
         self.payment.summary.status = PaymentStatus::Canceled;
         self.add_timeline("canceled", "Authorization voided");
+        self.fire_event(AppEventType::PaymentCanceled);
+    }
+
+    /// The merchant cancels a payment that is not paid yet; its page closes.
+    pub fn cancel_by_merchant(&mut self) {
+        self.payment.summary.status = PaymentStatus::Canceled;
+        self.payment.checkout_url = None;
+        self.add_timeline("canceled", "Canceled by the merchant");
         self.fire_event(AppEventType::PaymentCanceled);
     }
 

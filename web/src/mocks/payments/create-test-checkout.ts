@@ -86,6 +86,7 @@ export function createTestCheckout(
     failure_code: null,
     refunded_minor: 0,
     captured_minor: 0,
+    capture_method: checkoutRequest.capture_method ?? "automatic",
     method: null,
     method_key: null,
     line_items: lineItems,

@@ -6,13 +6,17 @@ use sendmock_payments::{
 };
 use serde::Serialize;
 
-use super::checkout_completion_views::CheckoutCompleteRequest;
+use super::checkout_completion_views::{CheckoutAction, CheckoutCard, CheckoutCompleteRequest};
 use super::payment_change::PaymentChange;
 use super::payment_flow_catalogue::load_payment_flows;
 use super::payment_method_catalogue::load_payment_methods;
 use super::payment_method_views::PaymentMethodFields;
 use super::payment_views::PaymentInstrument;
 use crate::{OperationContext, OperationError};
+
+/// The expiry Stripe's test PaymentMethods carry.
+const TEST_CARD_EXPIRY_MONTH: u32 = 12;
+const TEST_CARD_EXPIRY_YEAR: u32 = 2034;
 
 fn refuse_payment(message: impl Into<String>) -> OperationError {
     OperationError::Unprocessable {
@@ -190,4 +194,26 @@ pub async fn pay_checkout(
         FlowOutcome::Decline(decline_reason) => payment_change.decline(&decline_reason),
     }
     Ok(())
+}
+
+/// Pays with a test card the app named through a provider's API, as if it was typed on the
+/// checkout page; a card the method's table does not list is refused and kept nowhere.
+pub async fn pay_with_test_card(
+    payment_change: &mut PaymentChange<'_>,
+    operation_context: &OperationContext,
+    card_number: &str,
+) -> Result<(), OperationError> {
+    let checkout_request = CheckoutCompleteRequest {
+        session_id: payment_change.payment.summary.id.clone(),
+        action: CheckoutAction::Pay,
+        method_key: None,
+        card: Some(CheckoutCard {
+            number: card_number.to_owned(),
+            exp_month: TEST_CARD_EXPIRY_MONTH,
+            exp_year: TEST_CARD_EXPIRY_YEAR,
+        }),
+        entries: None,
+        decline_reason: None,
+    };
+    pay_checkout(payment_change, operation_context, &checkout_request).await
 }

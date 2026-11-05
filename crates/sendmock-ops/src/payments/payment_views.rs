@@ -33,6 +33,15 @@ impl PaymentStatus {
     }
 }
 
+/// `Manual` holds the money as `authorized` until it is captured or voided.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PaymentCaptureMethod {
+    #[default]
+    Automatic,
+    Manual,
+}
+
 /// What the customer paid with, reduced to what is safe to keep: never a full card number or
 /// a CVC.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -149,6 +158,7 @@ pub struct PaymentDetail {
     #[schemars(required, schema_with = "crate::nullable_schema::<PaymentRedirect>")]
     pub redirect: Option<PaymentRedirect>,
     pub captured_minor: u64,
+    pub capture_method: PaymentCaptureMethod,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub method_key: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<PaymentDispute>")]

@@ -30,9 +30,13 @@ mod payment_settlement;
 mod payment_simulate_operation;
 mod payment_simulate_views;
 mod payment_views;
+mod provider_payment;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
 pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
+pub(crate) use checkout_payment_run::pay_with_test_card;
+pub(crate) use payment_catalogue::read_payment_document;
+pub(crate) use payment_change::PaymentChange;
 pub(crate) use payment_event_data::{build_sample_payment_event_data, load_payment_event};
 pub use payment_flow_operations::{
     CreatePaymentFlowOperation, DeletePaymentFlowOperation, GetPaymentFlowOperation,
@@ -43,6 +47,7 @@ pub use payment_flow_step_operations::{
     RemovePaymentFlowStepOperation, UpdatePaymentFlowStepOperation,
 };
 pub use payment_flow_views::{PaymentFlowDefinition, PaymentFlowStep};
+pub(crate) use payment_gateway_catalogue::find_payment_gateway;
 pub use payment_gateway_maintenance_operations::{
     DeletePaymentGatewayOperation, ResetPaymentGatewayOperation, RevealGatewayCredentialOperation,
 };
@@ -61,8 +66,16 @@ pub use payment_notify_operation::NotifyPaymentOperation;
 pub use payment_operations::{
     GetPaymentOperation, ListPaymentTestValuesOperation, ListPaymentsOperation,
 };
+pub(crate) use payment_settlement::read_refundable_minor;
 pub use payment_simulate_operation::SimulatePaymentOperation;
-pub use payment_views::{PaymentDetail, PaymentSummary};
+pub use payment_views::{
+    PaymentCaptureMethod, PaymentDetail, PaymentInstrument, PaymentLineItem, PaymentStatus,
+    PaymentSummary,
+};
+pub(crate) use provider_payment::{
+    ProviderCheckoutUrls, ProviderPaymentRequest, apply_checkout_outcome_profile,
+    start_provider_payment,
+};
 
 use crate::OperationRegistry;
 

@@ -7,7 +7,9 @@ use super::payment_gateway_catalogue::find_payment_gateway;
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_notification::queue_payment_notification;
 use super::payment_redirect::build_payment_redirect;
-use super::payment_views::{PaymentDetail, PaymentDispute, PaymentInstrument, PaymentStatus};
+use super::payment_views::{
+    PaymentCaptureMethod, PaymentDetail, PaymentDispute, PaymentInstrument, PaymentStatus,
+};
 use crate::settings::PaymentOutcomeProfile;
 use crate::{AppEventType, OperationContext, OperationError, publish_event};
 
@@ -68,24 +70,30 @@ impl<'context> PaymentChange<'context> {
         format!("{} {currency}", format_major_amount(amount_minor, currency))
     }
 
-    /// Paid in full; a checkout still open is completed and the customer sent to success.
+    /// Paid in full, or only authorized when the payment is captured by hand; a checkout
+    /// still open is completed and the customer sent to success.
     pub fn succeed(&mut self) {
         let had_checkout = self.payment.checkout_url.is_some();
         if self.payment.method.is_none() {
             self.use_default_test_method();
         }
-        self.payment.summary.status = PaymentStatus::Succeeded;
-        self.payment.captured_minor = self.payment.summary.amount_minor;
-        let paid_text = format!(
-            "Paid {}",
-            self.format_money(self.payment.summary.amount_minor)
-        );
-        self.add_timeline("succeeded", paid_text);
+        self.payment.summary.failure_code = None;
+        let amount_text = self.format_money(self.payment.summary.amount_minor);
+        let paid_event = if self.payment.capture_method == PaymentCaptureMethod::Manual {
+            self.payment.summary.status = PaymentStatus::Authorized;
+            self.add_timeline("authorized", format!("Authorized {amount_text}"));
+            AppEventType::PaymentAuthorized
+        } else {
+            self.payment.summary.status = PaymentStatus::Succeeded;
+            self.payment.captured_minor = self.payment.summary.amount_minor;
+            self.add_timeline("succeeded", format!("Paid {amount_text}"));
+            AppEventType::PaymentSucceeded
+        };
         self.finish_checkout(RedirectOutcome::Success);
         if had_checkout {
             self.fired_events.push(AppEventType::CheckoutCompleted);
         }
-        self.fired_events.push(AppEventType::PaymentSucceeded);
+        self.fired_events.push(paid_event);
     }
 
     /// The test method a payment settled without its checkout page is recorded with.

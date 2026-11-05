@@ -30,11 +30,11 @@ This lets developers build and test the whole payment flow, including IPN handle
 
 ### 2. Direct API (server-side) payments
 
-Payment intents / orders created and confirmed via API with **test cards or test wallets**, e.g. Stripe `POST /v1/payment_intents` + `confirm` with `pm_card_visa` or a test card number; the outcome follows the test card table below.
+Payment intents / orders created and confirmed via API with **test cards or test wallets**, e.g. Stripe `POST /v1/payment_intents` + `confirm` with a test PaymentMethod such as `pm_card_visa` or `tok_chargeDeclined`, which stands for a card of the test card table below and gets that card's outcome. A raw card number sent to Stripe's API is refused, as Stripe refuses it, and kept nowhere.
 
 ### 3. After-payment operations
 
-- **Authorize then capture** (manual capture), **void / cancel**.
+- **Authorize then capture** (manual capture), **void / cancel**: a payment with `capture_method: manual` (Stripe's `capture_method=manual`, or `capture_method` on `POST /payments/checkout`) is `authorized` once paid, fires `payment.authorized`, and is then captured in whole or in part, or voided.
 - **Refunds**: full and partial, instant or pending then succeeded/failed.
 - **Disputes / chargebacks**: open, needs response, won, lost.
 - **Subscriptions** (Stripe-style): create, trial, renew (simulated clock advance), payment failure and dunning, cancel. (Phase 4+)
@@ -190,7 +190,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/payments` | create a payment (native) |
-| POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included |
+| POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included; `capture_method: manual` authorizes it and waits for a capture or void |
 | GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
 | POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
