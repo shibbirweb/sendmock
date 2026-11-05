@@ -173,7 +173,9 @@ const docsScenes: Scene[] = [
         ["lee@example.test", "4000000000009995"],
       ]) {
         await page.getByRole("button", { name: "New subscription" }).click();
-        const newDialog = page.getByRole("dialog", { name: "New subscription" });
+        const newDialog = page.getByRole("dialog", {
+          name: "New subscription",
+        });
         await newDialog.getByLabel("Customer email").fill(customerEmail ?? "");
         await newDialog.getByLabel("Test card").fill(cardNumber ?? "");
         await newDialog
