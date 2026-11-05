@@ -35,6 +35,7 @@ pub const SMS_OUTCOME_RULES_SECTION: SeedSection =
     item_list("sms.outcome_rules", "Custom outcome number");
 pub const EMAIL_OUTCOME_RULES_SECTION: SeedSection =
     item_list("email.outcome_rules", "Custom outcome address");
+pub const EMAIL_PROVIDERS_SECTION: SeedSection = item_list("email.providers", "Email provider");
 pub const EMAIL_TEMPLATES_SECTION: SeedSection = item_list("email.templates", "Email template");
 pub const SMS_PROVIDERS_SECTION: SeedSection = item_list("sms.providers", "SMS provider");
 pub const PAYMENT_FLOWS_SECTION: SeedSection = item_list("payments.flows", "Payment flow");
@@ -57,7 +58,7 @@ pub const SEED_SECTIONS: [SeedSection; 20] = [
     item_list("email.forward_rules", "Forward rule"),
     SMS_OUTCOME_RULES_SECTION,
     EMAIL_OUTCOME_RULES_SECTION,
-    item_list("email.providers", "Email provider"),
+    EMAIL_PROVIDERS_SECTION,
     EMAIL_TEMPLATES_SECTION,
     SMS_PROVIDERS_SECTION,
     PAYMENT_FLOWS_SECTION,

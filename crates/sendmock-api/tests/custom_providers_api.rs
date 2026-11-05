@@ -6,7 +6,7 @@ mod support {
 
 use serde_json::{Value, json};
 use support::email_provider_requests::{read_newest_email, send_json};
-use support::test_app::{build_test_app, call_api};
+use support::test_app::{build_test_app, call_api, call_api_text};
 
 const EMAIL_PROVIDERS_PATH: &str = "/api/v1/emails/providers";
 const SMS_PROVIDERS_PATH: &str = "/api/v1/sms/providers";
@@ -22,6 +22,17 @@ async fn create_mapped_email_provider(app_router: &axum::Router) -> Value {
     .await;
     assert_eq!(status, 201, "{created}");
     let mut changed = created.clone();
+    if let Some(fields) = changed.as_object_mut() {
+        for read_only_field in [
+            "area",
+            "is_builtin",
+            "is_modified",
+            "is_removed",
+            "message_count_24h",
+        ] {
+            fields.remove(read_only_field);
+        }
+    }
     changed["operations"] = json!([{ "kind": "send", "method": "POST", "path": "/acme/send", "request_format": "json" }]);
     changed["field_mapping"] = json!([
         { "part": "from", "source": "sender" },
@@ -131,4 +142,58 @@ async fn a_custom_sms_provider_copied_from_twilio_gets_its_own_host_and_keeps_it
         .collect();
     assert!(provider_keys.contains(&"twilio_eu"), "{provider_keys:?}");
     assert!(provider_keys.contains(&"twilio"), "{provider_keys:?}");
+}
+
+async fn export_seed(app_router: &axum::Router) -> String {
+    let (status, _, seed_toml) = call_api_text(app_router, "/api/v1/seed/export").await;
+    assert_eq!(status, 200, "{seed_toml}");
+    seed_toml
+}
+
+// AC: EM-18.7
+#[tokio::test]
+async fn a_custom_email_provider_and_a_removed_built_in_travel_through_the_seed_file() {
+    let first_app = build_test_app().0;
+    create_mapped_email_provider(&first_app).await;
+    call_api(
+        &first_app,
+        "DELETE",
+        &format!("{EMAIL_PROVIDERS_PATH}/brevo"),
+        None,
+    )
+    .await;
+    let exported_seed = export_seed(&first_app).await;
+
+    let fresh_app = build_test_app().0;
+    let (apply_status, applied) = call_api(
+        &fresh_app,
+        "POST",
+        "/api/v1/seed/apply",
+        Some(&json!({ "seed_toml": exported_seed })),
+    )
+    .await;
+
+    assert_eq!(apply_status, 200, "{applied}");
+    assert!(
+        exported_seed.contains("[[email.providers]]"),
+        "{exported_seed}"
+    );
+    let (_, acme_mail) = call_api(
+        &fresh_app,
+        "GET",
+        &format!("{EMAIL_PROVIDERS_PATH}/acme_mail"),
+        None,
+    )
+    .await;
+    assert_eq!(acme_mail["operations"][0]["path"], "/acme/send");
+    assert_eq!(acme_mail["is_builtin"], false);
+    let (_, brevo) = call_api(
+        &fresh_app,
+        "GET",
+        &format!("{EMAIL_PROVIDERS_PATH}/brevo"),
+        None,
+    )
+    .await;
+    assert_eq!(brevo["is_removed"], true);
+    assert_eq!(export_seed(&fresh_app).await, exported_seed);
 }

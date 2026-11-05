@@ -19,8 +19,12 @@ pub use email_provider_operations::{
     RestoreEmailProviderOperation, RevealEmailProviderCredentialOperation,
     UpdateEmailProviderOperation,
 };
+pub(crate) use provider_area_actions::{
+    create_area_provider, delete_area_provider, reset_area_provider, restore_area_provider,
+    update_area_provider,
+};
 pub use provider_inputs::{MessageProviderInput, ProviderSampleRequest};
-pub(crate) use provider_inputs::{ProviderReference, ProviderUpdate};
+pub(crate) use provider_inputs::{ProviderCreateRequest, ProviderUpdate};
 pub use provider_views::{MessageProviderPreview, MessageProviderView, ProviderCredentialReveal};
 pub use sms_provider_operations::{
     CreateSmsProviderOperation, DeleteSmsProviderOperation, GetSmsProviderOperation,
