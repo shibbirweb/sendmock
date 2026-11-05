@@ -146,9 +146,9 @@ Phase 4. Docs: [Release and forwarding](../03-email.md#release-and-forwarding-to
 
 Phase 4.
 
-- [ ] EM-15.1 "Reject next N" returns the chosen code for exactly N messages.
-- [ ] EM-15.2 Recipient patterns are rejected with `550`.
-- [ ] EM-15.3 Command latency and dropped connections mid-DATA happen as configured, and clients see the failure.
+- [x] EM-15.1 "Reject next N" returns the chosen code for exactly N messages. (#48)
+- [x] EM-15.2 Recipient patterns are rejected with `550`. (#48)
+- [x] EM-15.3 Command latency and dropped connections mid-DATA happen as configured, and clients see the failure. (#48)
 
 ## EM-16 Browser notifications
 

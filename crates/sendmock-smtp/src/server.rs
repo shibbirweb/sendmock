@@ -1,3 +1,4 @@
+mod chaos_steps;
 mod connection_handler;
 mod message_data_reader;
 mod smtp_server;

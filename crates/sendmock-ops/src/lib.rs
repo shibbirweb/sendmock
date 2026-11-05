@@ -32,6 +32,7 @@ mod seed;
 mod settings;
 mod sms;
 mod sms_replies;
+mod smtp_chaos;
 mod smtp_delivery;
 mod sslcommerz;
 mod stripe;
@@ -117,6 +118,7 @@ pub use sms_replies::{
     MAXIMUM_TWIML_FETCHES, ReplyWebhookTarget, ReplyWebhookTargetKind, TWILIO_INBOUND_TEMPLATE_ID,
     resolve_reply_webhook_target, run_reply_webhook, start_reply_webhook,
 };
+pub use smtp_chaos::{SmtpChaos, read_smtp_chaos, take_chaos_rejection};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{
     ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,

@@ -44,6 +44,13 @@ impl SmtpSession {
         }
     }
 
+    /// Refuses a message as "Reject next N" asks, without storing it (EM-15.1).
+    pub fn reject_message_by_chaos(&mut self, size_bytes: usize, reject_code: u16) -> SmtpReply {
+        self.reset_transaction();
+        self.transcript.record_message_content(size_bytes, None);
+        self.reject(reject_code, "Rejected by SendMock chaos (Reject next N)")
+    }
+
     pub fn reject_oversized_message(&mut self, size_bytes: usize) -> SmtpReply {
         self.reset_transaction();
         self.transcript.record_message_content(size_bytes, None);

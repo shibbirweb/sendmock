@@ -6,6 +6,7 @@ use sendmock_store::SmtpSessionRecord;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 
+use super::chaos_steps::{DataChaos, apply_data_chaos, find_chaos_refusal, wait_chaos_latency};
 use super::message_data_reader::{IDLE_TIMEOUT, MessageData, read_message_data};
 use super::smtp_server::SmtpServer;
 use crate::{SessionAction, SessionResult, SmtpReply, SmtpSession};
@@ -168,6 +169,7 @@ async fn run_phase<Stream: AsyncRead + AsyncWrite + Unpin>(
         let Some(reply_text) = action.reply().map(SmtpReply::to_wire) else {
             return PhaseEnd::Closed;
         };
+        wait_chaos_latency(server).await;
         if write_reply(&mut reader, &reply_text).await.is_err() {
             return PhaseEnd::Closed;
         }
@@ -191,6 +193,9 @@ async fn check_recipient(
     session: &mut SmtpSession,
     forward_path: String,
 ) -> SmtpReply {
+    if let Some(chaos_refusal) = find_chaos_refusal(server, &forward_path).await {
+        return session.finish_recipient(forward_path, Some(chaos_refusal));
+    }
     let refusal = match find_recipient_refusal(&server.operation_context, &forward_path).await {
         Ok(refusal) => {
             refusal.map(|refusal| SmtpReply::new(refusal.reply_code, refusal.reply_text))
@@ -252,6 +257,13 @@ async fn receive_message<Stream: AsyncRead + AsyncWrite + Unpin>(
 ) -> bool {
     let reply = match read_message_data(reader, session.max_size_bytes()).await {
         MessageData::Complete(raw_message) => {
+            match apply_data_chaos(server, session, raw_message.len()).await {
+                DataChaos::Drop => return false,
+                DataChaos::Reply(chaos_reply) => {
+                    return write_reply(reader, &chaos_reply.to_wire()).await.is_ok();
+                }
+                DataChaos::None => {}
+            }
             let envelope = session.envelope();
             let size_bytes = raw_message.len();
             let smtp_message = SmtpMessage {
