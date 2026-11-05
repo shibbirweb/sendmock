@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W7b (inbound routes) and W7c (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W7c (binary multipart bodies for WH-07.16 and route attachments, `body-mime`, the Mailgun `/v3/routes` and stored-message API on the provider port, the inbound formats, Webhooks > Inbound routes in the live UI suite) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -680,3 +680,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Mail: the email detail edits an email's tags (a pencil beside them opens the tag list); EM-12.4 ticked, EM-12 accepted. |
 | 2026-11-06 | EM-18.8 and SM-16.8 ticked: the built-in email and SMS definitions pass the provider fixture tests and the Email provider SDKs, SMS clients and Payment apps workflows. EM-18.6 and SM-16.6 wait for the skill's `add-email-provider` and `add-sms-provider` workflows (W13). |
 | 2026-11-06 | Phase 4 W7a: incoming email (`POST /emails/inbound`, SMTP for inbound domains) and the recipient's Reply, Reply all and Forward arrive as inbound mail linked to the original and fire `email.inbound`; EM-17 accepted. |
+| 2026-11-06 | Phase 4 W7b: Mailgun-style inbound routes run on incoming email (`match_recipient` with named groups, `match_header`, `catch_all`, `stop()`); `forward(url)` posts Mailgun's signed multipart fields through the delivery engine, `forward(email)` goes through the release allowlist; WH-12.1, WH-12.3 and WH-12.4 ticked. |

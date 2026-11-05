@@ -5,13 +5,14 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailLocalTemplateRepository,
     EmailOutcomeRuleRepository, EmailProviderSendRepository, EmailRepository,
-    EmailResponseRepository, MessageProviderRepository, MessageRuleKind, MessageRuleRepository,
-    MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
-    PaymentRepository, SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
-    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
-    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
+    EmailResponseRepository, InboundRouteRepository, MessageProviderRepository, MessageRuleKind,
+    MessageRuleRepository, MessagingServiceRepository, PaymentDefinitionRepository,
+    PaymentProviderObjectRepository, PaymentRepository, SavedWebhookDeliveryRepository,
+    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
+    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
+    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
+    WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -99,6 +100,7 @@ pub struct EmailStores {
     pub forward_rules: MessageRuleRepository,
     /// Which emails are simulated replies or forwards, and of what.
     pub responses: EmailResponseRepository,
+    pub inbound_routes: InboundRouteRepository,
 }
 
 impl EmailStores {
@@ -112,6 +114,7 @@ impl EmailStores {
                 MessageRuleKind::Forward,
             ),
             responses: EmailResponseRepository::new(Arc::clone(database)),
+            inbound_routes: InboundRouteRepository::new(Arc::clone(database)),
         }
     }
 }

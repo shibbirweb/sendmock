@@ -133,10 +133,10 @@ UI in U1/U2, backend Phase 3.
 
 UI in U2, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhooks.md#email-replies-and-inbound-routes-mailgun-style).
 
-- [ ] WH-12.1 Routes support `match_recipient` (named groups usable as `\g<name>` in actions), `match_header` and `catch_all`, run in priority order, and stop after `stop()`.
+- [x] WH-12.1 Routes support `match_recipient` (named groups usable as `\g<name>` in actions), `match_header` and `catch_all`, run in priority order, and stop after `stop()`. (#48)
 - [ ] WH-12.2 `forward(url)` posts Mailgun's multipart fields, attachments included, with a `signature` that verifies with Mailgun's documented algorithm; a URL ending in `mime` gets `body-mime`.
-- [ ] WH-12.3 `stripped-text` and `stripped-signature` leave out the quoted original and the signature block.
-- [ ] WH-12.4 A `406` response is not retried, other non-2xx responses follow the endpoint's retry policy, and every forward appears in the delivery log and the email timeline.
+- [x] WH-12.3 `stripped-text` and `stripped-signature` leave out the quoted original and the signature block. (#48)
+- [x] WH-12.4 A `406` response is not retried, other non-2xx responses follow the endpoint's retry policy, and every forward appears in the delivery log and the email timeline. (#48)
 - [ ] WH-12.5 `forward(email)` only sends to addresses on the release allowlist; `store(notify)` posts a `message-url`, and `GET` on it returns the message.
 - [ ] WH-12.6 Routes created through the Mailgun Routes API (`/v3/routes`) on the provider port behave like routes created in the UI.
 - [ ] WH-12.7 Webhooks > Inbound routes lists routes by priority with their expression and actions; the editor builds the filter and actions in Mailgun syntax with a live "matches N of the last 50 incoming emails" preview showing captured groups and regex errors; routes can be reordered and deleted, and an incoming email runs the matching routes in order until `stop()`, each forward shown in its timeline and the delivery log.

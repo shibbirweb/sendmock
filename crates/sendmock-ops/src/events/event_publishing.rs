@@ -36,9 +36,12 @@ pub fn publish_email_received(operation_context: &OperationContext, stored_email
 }
 
 /// `email.inbound` for mail coming in to your app, never `email.received` (EM-17.3).
-pub fn publish_email_inbound(operation_context: &OperationContext, stored_email: &EmailRecord) {
+pub fn publish_email_inbound(
+    operation_context: &OperationContext,
+    stored_email: &EmailRecord,
+) -> RecordedEvent {
     let email_summary = serde_json::to_value(EmailSummary::from(stored_email)).unwrap_or_default();
-    publish_event(operation_context, AppEventType::EmailInbound, email_summary);
+    publish_event(operation_context, AppEventType::EmailInbound, email_summary)
 }
 
 /// `email.deleted`, with the email's id, or none when every email was deleted.

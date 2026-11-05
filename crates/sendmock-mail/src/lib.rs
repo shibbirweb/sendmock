@@ -4,6 +4,7 @@ mod delivery_outcome;
 mod email_ingest_service;
 mod extraction;
 mod html_compatibility;
+mod inbound_routing;
 mod incoming_email;
 mod mail_error;
 mod native_message;
@@ -25,6 +26,10 @@ pub use extraction::{
 };
 pub use html_compatibility::{
     ClientSupport, CompatibilityWarning, HtmlCompatibilityReport, check_html_compatibility,
+};
+pub use inbound_routing::{
+    RoutableEmail, RouteFilterMatch, RouteFilterRule, compile_route_pattern, fill_captured_groups,
+    find_route_pattern_error, match_route_filter, strip_reply_text,
 };
 pub use incoming_email::{EmailEnvelope, IncomingEmail};
 pub use mail_error::MailError;

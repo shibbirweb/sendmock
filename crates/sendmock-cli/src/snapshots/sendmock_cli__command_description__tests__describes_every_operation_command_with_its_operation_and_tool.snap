@@ -2435,6 +2435,117 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock route list",
+    "usage": "sendmock route list",
+    "aliases": [],
+    "summary": "Routes for incoming email, in priority order.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/inbound-routes",
+        "operation_id": "getInboundRoutes",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_list"
+    ]
+  },
+  {
+    "command": "sendmock route create",
+    "usage": "sendmock route create",
+    "aliases": [],
+    "summary": "Add a route.",
+    "arguments": [],
+    "flags": [
+      "--actions",
+      "--description",
+      "--filter",
+      "--priority"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/inbound-routes",
+        "operation_id": "postInboundRoutes",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_create"
+    ]
+  },
+  {
+    "command": "sendmock route update",
+    "usage": "sendmock route update <routeId>",
+    "aliases": [],
+    "summary": "Change a route.",
+    "arguments": [
+      "routeId"
+    ],
+    "flags": [
+      "--actions",
+      "--description",
+      "--filter",
+      "--priority"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/inbound-routes/{routeId}",
+        "operation_id": "patchInboundRoutesByRouteId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_update"
+    ]
+  },
+  {
+    "command": "sendmock route delete",
+    "usage": "sendmock route delete <routeId>",
+    "aliases": [],
+    "summary": "Delete a route.",
+    "arguments": [
+      "routeId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/inbound-routes/{routeId}",
+        "operation_id": "deleteInboundRoutesByRouteId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_delete"
+    ]
+  },
+  {
+    "command": "sendmock route test",
+    "usage": "sendmock route test",
+    "aliases": [],
+    "summary": "Which routes a recipient or header would match, and what runs.",
+    "arguments": [],
+    "flags": [
+      "--filter"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/inbound-routes/test",
+        "operation_id": "postInboundRoutesTest",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_test"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

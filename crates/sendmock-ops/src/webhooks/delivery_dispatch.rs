@@ -13,6 +13,9 @@ use crate::{OperationContext, OperationError, RecordedHttpRequest};
 /// How long an idle dispatcher sleeps before looking again, in case a wake-up was missed.
 const IDLE_WAIT_MS: i64 = 30_000;
 
+/// The endpoints' own default, for requests sent without an endpoint.
+const DEFAULT_TIMEOUT_MS: u32 = 10_000;
+
 fn internal_error(message: impl ToString) -> OperationError {
     OperationError::Internal(message.to_string())
 }
@@ -98,11 +101,14 @@ async fn send_delivery_attempt(
     in_flight_delivery: &WebhookDeliveryRecord,
 ) -> Result<AttemptDecision, OperationError> {
     let started_at_unix_ms = operation_context.clock.now_unix_ms();
+    // Inbound route requests have no endpoint: they go unsigned with the default timeout.
     let stored_endpoint = operation_context
         .webhook_endpoint_repository
         .find_endpoint(&in_flight_delivery.endpoint_id)
-        .await?
-        .ok_or_else(|| internal_error("The endpoint was deleted"))?;
+        .await?;
+    if stored_endpoint.is_none() && in_flight_delivery.is_signed {
+        return Err(internal_error("The endpoint was deleted"));
+    }
     let rendered_request: RecordedHttpRequest = in_flight_delivery
         .rendered_request_json
         .as_deref()
@@ -110,18 +116,22 @@ async fn send_delivery_attempt(
         .transpose()
         .map_err(internal_error)?
         .ok_or_else(|| internal_error("The delivery has no rendered request"))?;
-    let sent_request = if in_flight_delivery.is_signed {
-        sign_delivery_request(
-            &rendered_request,
-            &stored_endpoint,
-            &in_flight_delivery.event_id,
-            in_flight_delivery.attempt,
-            started_at_unix_ms,
-        )?
-    } else {
-        rendered_request
+    let sent_request =
+        if let (true, Some(stored_endpoint)) = (in_flight_delivery.is_signed, &stored_endpoint) {
+            sign_delivery_request(
+                &rendered_request,
+                stored_endpoint,
+                &in_flight_delivery.event_id,
+                in_flight_delivery.attempt,
+                started_at_unix_ms,
+            )?
+        } else {
+            rendered_request
+        };
+    let timeout_ms = match &stored_endpoint {
+        Some(stored_endpoint) => read_request_settings(stored_endpoint)?.timeout_ms,
+        None => DEFAULT_TIMEOUT_MS,
     };
-    let timeout_ms = read_request_settings(&stored_endpoint)?.timeout_ms;
     let send_result = send_signed_request(operation_context, &sent_request, timeout_ms).await;
     let attempt_decision = read_retry_schedule(in_flight_delivery)?.decide_after_attempt(
         in_flight_delivery.attempt,

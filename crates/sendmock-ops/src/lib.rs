@@ -3,6 +3,7 @@
 mod custom_gateways;
 mod email;
 mod events;
+mod inbound_routes;
 mod input_coercion;
 mod input_shape;
 mod instance_details;
@@ -48,6 +49,7 @@ pub use events::{
     RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_inbound,
     publish_email_received, publish_event,
 };
+pub use inbound_routes::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, accepts_null, describe_input_shape};
 pub use instance_details::{InstanceDetails, ReleaseChannel};
@@ -149,6 +151,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);
+    inbound_routes::register_inbound_route_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

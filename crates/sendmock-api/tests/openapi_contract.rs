@@ -143,6 +143,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_message_rule_samples(app_router).await);
+    samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
@@ -158,6 +159,42 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
     samples
+}
+
+/// One route, which the update and delete samples change.
+async fn prepare_inbound_route_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let route_input = json!({
+        "priority": 1,
+        "description": "Ticket replies",
+        "filter": { "kind": "match_recipient", "pattern": "reply\\+(?P<ticket>\\d+)@reply\\.app\\.test" },
+        "actions": [
+            { "kind": "forward_url", "url": "http://localhost:8000/tickets/\\g<ticket>" },
+            { "kind": "store", "notify_url": null },
+            { "kind": "stop" },
+        ],
+    });
+    let route_id =
+        post_json(app_router, "/api/v1/inbound-routes", &route_input).await["id"].clone();
+    let mut route_update = route_input.clone();
+    route_update["route_id"] = route_id.clone();
+    route_update["priority"] = json!(2);
+    vec![
+        ("getInboundRoutes", vec![json!({})]),
+        ("postInboundRoutes", vec![route_input]),
+        ("patchInboundRoutesByRouteId", vec![route_update]),
+        (
+            "deleteInboundRoutesByRouteId",
+            vec![json!({ "route_id": route_id })],
+        ),
+        (
+            "postInboundRoutesTest",
+            vec![
+                json!({ "filter": { "kind": "match_header", "header_name": "subject", "pattern": ".*help" } }),
+            ],
+        ),
+    ]
 }
 
 /// One tag rule and one forward rule, which the update, move and delete samples change.

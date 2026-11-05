@@ -8,6 +8,7 @@ use sendmock_store::EmailRecord;
 
 use super::delivery_event_recording::record_delivery_event;
 use super::out_of_office_reply::send_out_of_office_reply;
+use crate::inbound_routes::start_inbound_routes;
 use crate::message_rules::{apply_tag_rules, start_forward_rules};
 use crate::{
     AppSettings, EmailOutcomeProfile, OperationContext, OperationError, load_email_outcome_rules,
@@ -36,7 +37,8 @@ pub async fn complete_email_intake(
     stored_email: &EmailRecord,
 ) -> Result<(), OperationError> {
     if stored_email.direction == "inbound" {
-        publish_email_inbound(operation_context, stored_email);
+        let inbound_event = publish_email_inbound(operation_context, stored_email);
+        start_inbound_routes(operation_context, stored_email, inbound_event.app_event);
         return Ok(());
     }
     let tagged_email = apply_tag_rules(operation_context, stored_email).await?;
