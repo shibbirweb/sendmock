@@ -94,8 +94,13 @@ fn read_headers(header_texts: &[String], reply_to: Option<String>) -> BTreeMap<S
                         .collect::<Vec<_>>(),
                 );
             }
-            let (header_name, header_value) = header_text.split_once(':')?;
-            let header_name = header_name.trim().trim_start_matches("h:").to_owned();
+            // Mailgun names a header `h:X-Name`, so its own colon comes after the prefix.
+            let unprefixed_text = header_text.trim_start();
+            let unprefixed_text = unprefixed_text
+                .strip_prefix("h:")
+                .unwrap_or(unprefixed_text);
+            let (header_name, header_value) = unprefixed_text.split_once(':')?;
+            let header_name = header_name.trim().to_owned();
             Some(vec![(header_name, header_value.trim().to_owned())])
         })
         .flatten()
