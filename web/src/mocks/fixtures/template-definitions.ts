@@ -214,7 +214,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     "recipient": "{{ data.to[0].address }}",
     "message": {
       "headers": {
-        "message-id": "{{ data.message_id }}",
+        "message-id": "{{ data.message_id | default(data.id) }}",
         "from": "{{ data.from.address }}",
         "to": "{{ data.to[0].address }}",
         "subject": "{{ data.subject }}"
@@ -233,7 +233,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     body_template: `{
   "RecordType": "{{ event.type | postmark_record_type }}",
   "MessageStream": "outbound",
-  "MessageID": "{{ data.message_id }}",
+  "MessageID": "{{ data.message_id | default(data.id) }}",
   "Recipient": "{{ data.to[0].address }}",
   "Email": "{{ data.to[0].address }}",
   "Tag": "",
@@ -257,7 +257,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "id": 26224,
   "date": "{{ event.created_at }}",
   "ts": {{ event.created_at | unix }},
-  "message-id": "{{ data.message_id }}",
+  "message-id": "{{ data.message_id | default(data.id) }}",
   "ts_event": {{ event.created_at | unix }},
   "subject": "{{ data.subject }}",
   "tag": ""
@@ -275,7 +275,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "message_event": {
         "type": "{{ event.type | sendgrid_event }}",
         "event_id": "{{ event.id }}",
-        "message_id": "{{ data.message_id }}",
+        "message_id": "{{ data.message_id | default(data.id) }}",
         "rcpt_to": "{{ data.to[0].address }}",
         "friendly_from": "{{ data.from.address }}",
         "subject": "{{ data.subject }}",
@@ -309,11 +309,11 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   {
     "email": "{{ data.to[0].address }}",
     "timestamp": {{ event.created_at | unix }},
-    "smtp-id": "<{{ data.message_id }}>",
+    "smtp-id": "<{{ data.message_id | default(data.id) }}>",
     "event": "{{ event.type | sendgrid_event }}",
     "category": [],
     "sg_event_id": "{{ event.id }}",
-    "sg_message_id": "{{ data.message_id }}.filter0001.1-1"
+    "sg_message_id": "{{ data.message_id | default(data.id) }}.filter0001.1-1"
   }
 ]`,
     doc_url:
@@ -330,7 +330,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "To": "{{ data.to[0].address }}",
   "Subject": "{{ data.subject }}",
   "TextBody": "{{ data.text_body }}",
-  "MessageID": "{{ data.message_id }}"
+  "MessageID": "{{ data.message_id | default(data.id) }}"
 }`,
     doc_url: "https://postmarkapp.com/developer/webhooks/inbound-webhook",
     verified_on: verifiedOn,
@@ -347,7 +347,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "Type": "Notification",
   "MessageId": "{{ event.id }}",
   "TopicArn": "arn:aws:sns:us-east-1:123456789012:sendmock-ses",
-  "Message": "{\\"notificationType\\":\\"{{ event.type | ses_type }}\\",\\"mail\\":{\\"timestamp\\":\\"{{ event.created_at }}\\",\\"messageId\\":\\"{{ data.message_id }}\\",\\"source\\":\\"{{ data.from.address }}\\",\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}",
+  "Message": "{\\"notificationType\\":\\"{{ event.type | ses_type }}\\",\\"mail\\":{\\"timestamp\\":\\"{{ event.created_at }}\\",\\"messageId\\":\\"{{ data.message_id | default(data.id) }}\\",\\"source\\":\\"{{ data.from.address }}\\",\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}",
   "Timestamp": "{{ event.created_at }}",
   "SignatureVersion": "1",
   "Signature": "{{ random_string(344) }}",
@@ -372,7 +372,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "created_at": "{{ event.created_at }}",
   "data": {
     "created_at": "{{ event.created_at }}",
-    "email_id": "{{ data.message_id }}",
+    "email_id": "{{ data.message_id | default(data.id) }}",
     "from": "{{ data.from.address }}",
     "to": ["{{ data.to[0].address }}"],
     "subject": "{{ data.subject }}"
