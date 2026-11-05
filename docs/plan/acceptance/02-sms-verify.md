@@ -152,7 +152,7 @@ UI in U3 (W16), runtime in Phase 2 (built-ins) and 4 (custom). Plan: [22-configu
 - [x] SM-16.5 Requests at a provider's paths, on the provider port and under `/providers/<key>/`, are answered from its current definition, so a change applies to the next request; a custom provider's sends appear in SMS with its name, and a removed provider's paths answer SendMock's native `404`.
 - [ ] SM-16.6 REST, CLI and MCP list, get, create, update, delete or remove, restore, reset and preview SMS providers with the same validation as the UI; secrets are masked in every answer, the CLI and UI reveal one after a confirmation, and MCP never reveals them; the skill's `add-sms-provider` workflow takes an agent from the provider's API docs to a working provider (definition, preview, test send, seed export).
 - [x] SM-16.7 The seed file exports changed built-ins and custom providers under `[[sms.providers]]` with secrets as `${ENV}` references, and applying it recreates them. (UI and mock API; the live runtime in Phases 2 and 4)
-- [ ] SM-16.8 The shipped built-ins pass the existing provider fixture and SDK tests (SM-02, SM-04, SM-05 and VF-03) unchanged, so the defaults still match the real providers; Twilio's test numbers and error codes stay exact.
+- [x] SM-16.8 The shipped built-ins pass the existing provider fixture and SDK tests (SM-02, SM-04, SM-05 and VF-03) unchanged, so the defaults still match the real providers; Twilio's test numbers and error codes stay exact. (#48)
 
 ## VF-01 Verify services
 

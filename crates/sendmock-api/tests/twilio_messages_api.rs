@@ -69,7 +69,7 @@ fn is_twilio_message_sid(sid: &Value) -> bool {
     })
 }
 
-// AC: SM-02.1
+// AC: SM-02.1 SM-16.8
 #[tokio::test]
 async fn create_fetch_and_list_answer_twilio_shaped_messages() {
     let (app_router, _) = build_test_app();
@@ -229,7 +229,7 @@ async fn any_credentials_are_accepted_by_default() {
     assert_eq!(status, 201);
 }
 
-// AC: SM-13.1
+// AC: SM-13.1 SM-16.8
 // AC: SM-13.2
 #[tokio::test]
 async fn provider_requests_are_logged_with_the_exact_response_and_masked_credentials() {

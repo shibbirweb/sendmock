@@ -10,7 +10,7 @@ use support::email_provider_requests::{
 };
 use support::test_app::build_test_app;
 
-// AC: EM-08.1 EM-08.2
+// AC: EM-08.1 EM-08.2 EM-18.8
 #[tokio::test]
 async fn sendgrid_mail_send_stores_the_message_and_answers_202_with_x_message_id() {
     let (app_router, _) = build_test_app();
@@ -196,7 +196,7 @@ async fn resend_emails_answer_an_id_and_need_a_subject() {
     );
 }
 
-// AC: EM-08.1 EM-08.2
+// AC: EM-08.1 EM-08.2 EM-18.8
 #[tokio::test]
 async fn ses_v2_and_brevo_sends_answer_their_message_ids() {
     let (app_router, _) = build_test_app();

@@ -29,7 +29,7 @@ async fn send_vonage(app_router: &axum::Router, content_type: &str, body: &str) 
     )
 }
 
-// AC: SM-04.1
+// AC: SM-04.1 SM-16.8
 #[tokio::test]
 async fn a_form_or_json_send_answers_vonages_shape() {
     let (app_router, _) = build_test_app();

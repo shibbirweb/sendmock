@@ -120,7 +120,7 @@ async fn a_service_is_created_and_fetched_in_twilios_shape() {
 }
 
 // AC: VF-02.1
-// AC: VF-03.1
+// AC: VF-03.1 SM-16.8
 // AC: VF-03.4
 #[tokio::test]
 async fn an_otp_login_starts_pending_and_is_approved_by_the_right_code() {
