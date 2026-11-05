@@ -31,6 +31,11 @@ describe("Stripe SDKs workflow", () => {
     expect(existsSync("examples/payments/stripe-python/verify.py")).toBe(true);
   });
 
+  test("SSLCommerz's Node package pays, checks the IPN, validates, declines and refunds", () => {
+    expect(findExampleStep("sslcommerz-node")?.run).toContain("node done-when.js");
+    expect(existsSync("examples/payments/sslcommerz-node/done-when.js")).toBe(true);
+  });
+
   test("Release build runs the Stripe SDKs before it publishes", () => {
     const releaseWorkflow = readFileSync(".github/workflows/release.yml", "utf8");
 

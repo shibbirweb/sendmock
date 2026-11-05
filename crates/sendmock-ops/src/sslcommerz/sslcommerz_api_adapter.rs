@@ -8,7 +8,10 @@ use super::sslcommerz_session::init_session;
 use super::sslcommerz_transaction_query::{query_by_session_key, query_by_tran_id};
 use super::sslcommerz_validation::validate_order;
 use crate::payments::find_payment_gateway;
-use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome, ProviderRoute};
+use crate::providers::{
+    ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome, ProviderRoute,
+    read_provider_form_fields,
+};
 use crate::{OperationContext, OperationError};
 
 const SSLCOMMERZ_HOSTS: [&str; 2] = ["sandbox.sslcommerz.com", "securepay.sslcommerz.com"];
@@ -29,22 +32,15 @@ fn is_sslcommerz_request(provider_route: ProviderRoute<'_>, request: &ProviderHt
     }
 }
 
-fn read_form_fields(form_text: &[u8]) -> Vec<(String, String)> {
-    serde_urlencoded::from_bytes(form_text).unwrap_or_default()
-}
-
-/// The query's fields, then the form body's, which win on a clash.
+/// The query's fields, then the form body's (URL-encoded, or multipart as SSLCommerz's own
+/// Node package sends it), which win on a clash.
 fn read_request_fields(request: &ProviderHttpRequest) -> BTreeMap<String, String> {
-    let query_fields = read_form_fields(
-        request
-            .query_string
-            .as_deref()
-            .unwrap_or_default()
-            .as_bytes(),
-    );
+    let query_fields: Vec<(String, String)> =
+        serde_urlencoded::from_str(request.query_string.as_deref().unwrap_or_default())
+            .unwrap_or_default();
     query_fields
         .into_iter()
-        .chain(read_form_fields(&request.body))
+        .chain(read_provider_form_fields(request))
         .collect()
 }
 

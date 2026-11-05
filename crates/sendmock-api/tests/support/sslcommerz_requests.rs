@@ -42,6 +42,28 @@ pub fn build_form_request(uri: &str, form_fields: &[(&str, &str)]) -> Request<Bo
         .unwrap_or_else(|error| panic!("a valid request: {error}"))
 }
 
+/// A form posted as `multipart/form-data`, as the `form-data` package of SSLCommerz's Node
+/// library writes it.
+pub fn build_multipart_request(uri: &str, form_fields: &[(&str, &str)]) -> Request<Body> {
+    let boundary = "--------------------------515890814546601021194782";
+    let mut multipart_body = String::new();
+    for (field_name, field_value) in form_fields {
+        multipart_body.push_str(&format!(
+            "--{boundary}\r\nContent-Disposition: form-data; name=\"{field_name}\"\r\n\r\n{field_value}\r\n"
+        ));
+    }
+    multipart_body.push_str(&format!("--{boundary}--\r\n"));
+    Request::builder()
+        .method("POST")
+        .uri(uri)
+        .header(
+            "content-type",
+            format!("multipart/form-data; boundary={boundary}"),
+        )
+        .body(Body::from(multipart_body))
+        .unwrap_or_else(|error| panic!("a valid request: {error}"))
+}
+
 /// A session as SSLCommerz's PHP library starts one, with the given fields changed.
 pub async fn init_session(app_router: &axum::Router, changed_fields: &[(&str, &str)]) -> Value {
     let mut session_fields = vec![

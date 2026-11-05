@@ -9,9 +9,10 @@ mod support {
 
 use serde_json::json;
 use support::sslcommerz_requests::{
-    CANCEL_URL, FAIL_URL, STORE_ID, STORE_PASSWORD, SUCCESS_URL, build_form_request,
-    build_sslcommerz_fixture, complete_checkout, has_valid_sign, init_session, pay_with_card,
-    read_last_ipn, read_payment_id, read_redirect_fields, send_request, validate_order,
+    CANCEL_URL, FAIL_URL, SSLCOMMERZ_PATH, STORE_ID, STORE_PASSWORD, SUCCESS_URL,
+    build_form_request, build_multipart_request, build_sslcommerz_fixture, complete_checkout,
+    has_valid_sign, init_session, pay_with_card, read_last_ipn, read_payment_id,
+    read_redirect_fields, send_request, validate_order,
 };
 use support::test_app::call_api;
 
@@ -101,6 +102,36 @@ async fn the_provider_port_serves_sslcommerz_at_its_real_paths() {
 
     assert_eq!(status, 200, "{session}");
     assert_eq!(session["status"], "SUCCESS");
+}
+
+// AC: PY-06.1
+#[tokio::test]
+async fn session_init_reads_a_multipart_form_as_sslcommerz_lts_posts_it() {
+    let fixture = build_sslcommerz_fixture().await;
+    let session_request = build_multipart_request(
+        &format!("{SSLCOMMERZ_PATH}/gwprocess/v4/api.php"),
+        &[
+            ("store_id", STORE_ID),
+            ("store_passwd", STORE_PASSWORD),
+            ("productcategory", "Mugs"),
+            ("tran_id", "NODE-ORDER-1"),
+            ("total_amount", "450"),
+            ("currency", "BDT"),
+            ("success_url", SUCCESS_URL),
+            ("fail_url", FAIL_URL),
+            ("cancel_url", CANCEL_URL),
+            ("ipn_url", ""),
+            ("multi_card_name", ""),
+        ],
+    );
+
+    let (status, session) = send_request(fixture.app_router.clone(), session_request).await;
+
+    assert_eq!(status, 200, "{session}");
+    assert_eq!(session["status"], "SUCCESS", "{session}");
+    let payment = fixture.read_payment(&read_payment_id(&session)).await;
+    assert_eq!(payment["provider_reference"], "NODE-ORDER-1");
+    assert_eq!(payment["amount_minor"], 45_000);
 }
 
 // AC: PY-06.2

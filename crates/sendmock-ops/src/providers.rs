@@ -6,6 +6,7 @@ mod messaging_service_sender;
 mod operation_matcher;
 mod provider_call;
 mod provider_catalog;
+mod provider_form_fields;
 mod provider_http;
 mod provider_runtime;
 mod provider_status_callback;
@@ -34,6 +35,7 @@ pub use provider_catalog::{
     SMS_PROVIDER_AREA, find_area_provider, find_shipped_provider, is_modified, load_area_providers,
     save_area_provider,
 };
+pub(crate) use provider_form_fields::read_provider_form_fields;
 pub use provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 pub use provider_runtime::{
     ProviderOutcome, answer_provider_request, load_sms_provider_definitions,
