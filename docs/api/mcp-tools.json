@@ -10644,6 +10644,232 @@
       ]
     },
     {
+      "name": "sendmock_payment_create",
+      "toolset": "payments",
+      "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments",
+          "operation_id": "postPayments",
+          "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The gateway key, e.g. `stripe` or `sslcommerz`.",
+          "example": "stripe"
+        },
+        {
+          "name": "amount_minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.",
+          "example": 1999
+        },
+        {
+          "name": "currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Three letters, stored in capitals; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "name": "card_number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.",
+          "example": "4242424242424242"
+        },
+        {
+          "name": "customer_email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The customer's email.",
+          "example": "user@example.test"
+        },
+        {
+          "name": "line_items",
+          "input": {
+            "name": "line_items",
+            "location": "body"
+          },
+          "type": "object[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "What is being bought.",
+          "example": [
+            {
+              "name": "T-shirt",
+              "quantity": 1,
+              "unit_amount_minor": 1999
+            }
+          ]
+        },
+        {
+          "name": "capture_method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "automatic"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The gateway key, e.g. `stripe` or `sslcommerz`.",
+            "examples": [
+              "stripe"
+            ]
+          },
+          "amount_minor": {
+            "type": "number",
+            "description": "The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.",
+            "examples": [
+              1999
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "Three letters, stored in capitals; Settings > Payments' default currency when left out.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "card_number": {
+            "type": "string",
+            "description": "A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.",
+            "examples": [
+              "4242424242424242"
+            ]
+          },
+          "customer_email": {
+            "type": "string",
+            "description": "The customer's email.",
+            "examples": [
+              "user@example.test"
+            ]
+          },
+          "line_items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unit_amount_minor": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "quantity",
+                "unit_amount_minor"
+              ]
+            },
+            "description": "What is being bought.",
+            "examples": [
+              [
+                {
+                  "name": "T-shirt",
+                  "quantity": 1,
+                  "unit_amount_minor": 1999
+                }
+              ]
+            ]
+          },
+          "capture_method": {
+            "$ref": "#/$defs/PaymentCaptureMethod",
+            "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+            "examples": [
+              "automatic"
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "amount_minor",
+          "card_number"
+        ],
+        "$defs": {
+          "PaymentCaptureMethod": {
+            "type": "string",
+            "enum": [
+              "automatic",
+              "manual"
+            ],
+            "description": "`manual` holds the money as `authorized` until it is captured or voided."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider": "stripe",
+        "amount_minor": 1999,
+        "card_number": "4242424242424242",
+        "currency": "USD",
+        "customer_email": "user@example.test"
+      },
+      "output": "PaymentDetail",
+      "cli": [
+        "sendmock payments create"
+      ],
+      "ui": [
+        "Payments > New payment"
+      ]
+    },
+    {
       "name": "sendmock_payment_create_checkout",
       "toolset": "payments",
       "summary": "Start a hosted checkout on a gateway and get its payment page URL.",

@@ -11,6 +11,12 @@ export const paymentSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_payment_list",
     ui: "Payments",
   },
+  "POST /api/v1/payments": {
+    phase: "4",
+    cli: "sendmock payments create",
+    mcp: "sendmock_payment_create",
+    ui: "Payments > New payment",
+  },
   "GET /api/v1/payments/test-cards": {
     phase: "3P",
     cli: "sendmock payments test-cards",

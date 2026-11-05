@@ -7209,6 +7209,156 @@
       ]
     },
     {
+      "command": "sendmock payments create",
+      "slug": "payments-create",
+      "usage": "sendmock payments create [flags]",
+      "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments",
+          "operation_id": "postPayments",
+          "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The gateway key, e.g. `stripe` or `sslcommerz`.",
+          "example": "stripe"
+        },
+        {
+          "flag": "--amount-minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<amount-minor>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.",
+          "example": 1999
+        },
+        {
+          "flag": "--currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<currency>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Three letters, stored in capitals; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "flag": "--card-number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<card-number>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.",
+          "example": "4242424242424242"
+        },
+        {
+          "flag": "--customer-email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<customer-email>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The customer's email.",
+          "example": "user@example.test"
+        },
+        {
+          "flag": "--line-items",
+          "input": {
+            "name": "line_items",
+            "location": "body"
+          },
+          "type": "object[]",
+          "value_label": "<line-items>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "What is being bought.",
+          "example": [
+            {
+              "name": "T-shirt",
+              "quantity": 1,
+              "unit_amount_minor": 1999
+            }
+          ]
+        },
+        {
+          "flag": "--capture-method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<capture-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "automatic"
+        }
+      ],
+      "example": "sendmock payments create --provider stripe --amount-minor 1999 --card-number 4242424242424242 --currency USD --customer-email user@example.test",
+      "output": "PaymentDetail",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_payment_create"
+      ],
+      "ui": [
+        "Payments > New payment"
+      ]
+    },
+    {
       "command": "sendmock payments flows create",
       "slug": "payments-flows-create",
       "usage": "sendmock payments flows create [flags]",

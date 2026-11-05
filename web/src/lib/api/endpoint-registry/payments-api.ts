@@ -36,6 +36,16 @@ const paymentEndpoints = tagEndpoints("Payments", [
     response: pageOf("PaymentSummary"),
   },
   {
+    method: "POST",
+    path: "/api/v1/payments",
+    summary:
+      "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+    requestBody: typeRef("PaymentCreateRequest"),
+    response: typeRef("PaymentDetail"),
+    successStatus: 201,
+    errorStatuses: [400, 404, 422],
+  },
+  {
     method: "GET",
     path: "/api/v1/payments/test-cards",
     summary: "The test values of every enabled payment method.",

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import { apiEndpoints } from "@/lib/api/endpoint-registry";
 import openApiDocument from "@/mocks/generated/openapi-document.json";
 import {
   buildCurlCommand,
@@ -24,7 +25,7 @@ describe("API reference", () => {
         referenceOperation.operationId === "getPaymentsSubscriptions",
     );
 
-    expect(referenceOperations).toHaveLength(228);
+    expect(referenceOperations).toHaveLength(apiEndpoints.length);
     expect(simulateOperation).toMatchObject({
       method: "POST",
       tag: "Payments",

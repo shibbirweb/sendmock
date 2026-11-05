@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 
 import type {
+  PaymentCreateRequest,
   PaymentDetail,
   PaymentSimulateRequest,
   PaymentSummary,
@@ -12,6 +13,7 @@ import {
   createNotFoundResponse,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
+import { createDirectPayment } from "@/mocks/payments/create-direct-payment";
 import { isPaymentEventType } from "@/mocks/payments/payment-event-types";
 import { readGatewayName } from "@/mocks/payments/payment-gateway-record";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
@@ -47,6 +49,12 @@ function toPaymentSummary(paymentDetail: PaymentDetail): PaymentSummary {
   };
 }
 
+const refusalCodes: Record<number, string> = {
+  400: "validation_failed",
+  404: "not_found",
+  422: "not_a_test_card",
+};
+
 /** Tells live screens a payment and the delivery log changed. */
 function publishPaymentChange(paymentDetail: PaymentDetail) {
   const lastNotification = paymentDetail.notifications.at(-1);
@@ -75,6 +83,24 @@ export const paymentHandlers = [
     return HttpResponse.json(
       paginateItems(matchingPayments.map(toPaymentSummary), requestUrl),
     );
+  }),
+
+  http.post("*/api/v1/payments", async ({ request }) => {
+    await applyMockConditions();
+    const createRequest = (await request.json()) as PaymentCreateRequest;
+    const createResult = createDirectPayment(mockDatabase, createRequest);
+    if (!createResult.isApplied) {
+      return createErrorResponse(
+        createResult.statusCode,
+        refusalCodes[createResult.statusCode] ?? "validation_failed",
+        createResult.message,
+      );
+    }
+    publishPaymentChange(createResult.payment);
+
+    return HttpResponse.json(presentPayment(createResult.payment), {
+      status: 201,
+    });
   }),
 
   http.get("*/api/v1/payments/:paymentId", async ({ params }) => {

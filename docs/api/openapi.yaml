@@ -4338,6 +4338,35 @@ paths:
       x-sendmock-cli: sendmock payments list
       x-sendmock-mcp: sendmock_payment_list
       x-sendmock-ui: Payments
+    post:
+      operationId: postPayments
+      summary: Create a payment and pay it with a test card, as an app's server does without a checkout page.
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments create
+      x-sendmock-mcp: sendmock_payment_create
+      x-sendmock-ui: Payments > New payment
   /api/v1/payments/test-cards:
     get:
       operationId: getPaymentsTestCards
@@ -10675,6 +10704,64 @@ components:
         - provider
         - amount_minor
       description: "Body of POST /api/v1/payments/checkout: a hosted test checkout."
+    PaymentCreateRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: The gateway key, e.g. `stripe` or `sslcommerz`.
+          examples:
+            - stripe
+        amount_minor:
+          type: number
+          description: The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.
+          examples:
+            - 1999
+        currency:
+          type: string
+          description: Three letters, stored in capitals; Settings > Payments' default currency when left out.
+          examples:
+            - USD
+        card_number:
+          type: string
+          description: A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.
+          examples:
+            - "4242424242424242"
+        customer_email:
+          type: string
+          description: The customer's email.
+          examples:
+            - user@example.test
+        line_items:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              quantity:
+                type: number
+              unit_amount_minor:
+                type: number
+            required:
+              - name
+              - quantity
+              - unit_amount_minor
+          description: What is being bought.
+          examples:
+            - - name: T-shirt
+                quantity: 1
+                unit_amount_minor: 1999
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
+          description: "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out."
+          examples:
+            - automatic
+      required:
+        - provider
+        - amount_minor
+        - card_number
+      description: "Body of POST /api/v1/payments: a payment the app's server pays with a test card."
     PaymentDetail:
       type: object
       properties:
