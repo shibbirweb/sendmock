@@ -96,7 +96,10 @@ mod tests {
 
     #[test]
     fn longer_prefixes_win() {
-        assert_eq!(find_toolset("sendmock_webhook_template_create"), "templates");
+        assert_eq!(
+            find_toolset("sendmock_webhook_template_create"),
+            "templates"
+        );
         assert_eq!(find_toolset("sendmock_webhook_send"), "webhooks");
         assert_eq!(find_toolset("sendmock_otp_get"), "extract");
         assert_eq!(find_toolset("sendmock_status"), "core");

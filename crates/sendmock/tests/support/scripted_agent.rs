@@ -25,8 +25,9 @@ impl ScriptedAgent {
         }
     }
 
-    /// Calls a tool the skill names and answers its structured result; a tool the skill does
-    /// not name, or an error result, fails the session.
+    /// Calls a tool the skill names and answers its result: the structured content, or the JSON
+    /// in its text for answers that are not objects (lists). A tool the skill does not name, or
+    /// an error result, fails the session.
     pub fn call_skill_tool(&mut self, tool_name: &str, arguments: Value) -> io::Result<Value> {
         if !self.skill_text.contains(&format!("`{tool_name}`")) {
             return Err(io::Error::other(format!(
@@ -38,7 +39,13 @@ impl ScriptedAgent {
         if tool_result["isError"] == true {
             return Err(io::Error::other(format!("{tool_name}: {tool_result}")));
         }
-        Ok(tool_result["structuredContent"].clone())
+        if !tool_result["structuredContent"].is_null() {
+            return Ok(tool_result["structuredContent"].clone());
+        }
+        let answer_text = tool_result["content"][0]["text"]
+            .as_str()
+            .unwrap_or_default();
+        Ok(serde_json::from_str(answer_text).unwrap_or_else(|_| Value::from(answer_text)))
     }
 
     /// Calls the tool until its result passes the check, as an agent checks again after a wait.
