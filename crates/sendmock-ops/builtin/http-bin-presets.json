@@ -1,0 +1,99 @@
+{
+  "plain_default_response": {
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"ok\":true}"
+  },
+  "presets": [
+    {
+      "preset": "slack",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "body": "ok"
+      }
+    },
+    {
+      "preset": "discord",
+      "default_response": {
+        "status_code": 204,
+        "headers": {},
+        "body": ""
+      }
+    },
+    {
+      "preset": "teams",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "body": "1"
+      }
+    },
+    {
+      "preset": "google_chat",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"name\":\"spaces/AAAA/messages/{{ random_string(12) }}\"}"
+      }
+    },
+    {
+      "preset": "telegram",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"ok\":true,\"result\":{\"message_id\":{{ now_unix() }},\"date\":{{ now_unix() }}}}"
+      }
+    },
+    {
+      "preset": "fcm",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"name\":\"projects/demo/messages/0:{{ now_unix() }}\"}"
+      }
+    },
+    {
+      "preset": "expo",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"data\":[{\"status\":\"ok\",\"id\":\"{{ random_string(36) }}\"}]}"
+      }
+    },
+    {
+      "preset": "onesignal",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"id\":\"{{ random_string(36) }}\",\"recipients\":1}"
+      }
+    },
+    {
+      "preset": "generic",
+      "default_response": {
+        "status_code": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"id\":\"{{ random_string(16) }}\",\"received\":true}"
+      }
+    }
+  ]
+}

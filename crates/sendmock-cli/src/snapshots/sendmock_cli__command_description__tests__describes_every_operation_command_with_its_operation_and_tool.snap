@@ -2546,6 +2546,202 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock http bin list",
+    "usage": "sendmock http bin list",
+    "aliases": [],
+    "summary": "Bins, each a capture URL with its own responses.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/http/bins",
+        "operation_id": "getHttpBins",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_bin_list"
+    ]
+  },
+  {
+    "command": "sendmock http bin create",
+    "usage": "sendmock http bin create",
+    "aliases": [],
+    "summary": "Add a bin; 409 when the name is taken.",
+    "arguments": [],
+    "flags": [
+      "--name",
+      "--preset"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/http/bins",
+        "operation_id": "postHttpBins",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_bin_create"
+    ]
+  },
+  {
+    "command": "sendmock http bin update",
+    "usage": "sendmock http bin update <binId>",
+    "aliases": [],
+    "summary": "Change a bin's default response.",
+    "arguments": [
+      "binId"
+    ],
+    "flags": [
+      "--default-response"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/http/bins/{binId}",
+        "operation_id": "patchHttpBinsByBinId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_bin_update"
+    ]
+  },
+  {
+    "command": "sendmock http bin delete",
+    "usage": "sendmock http bin delete <binId>",
+    "aliases": [],
+    "summary": "Delete a bin and its requests.",
+    "arguments": [
+      "binId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/http/bins/{binId}",
+        "operation_id": "deleteHttpBinsByBinId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_bin_delete"
+    ]
+  },
+  {
+    "command": "sendmock http list",
+    "usage": "sendmock http list",
+    "aliases": [],
+    "summary": "Captured requests, newest first.",
+    "arguments": [],
+    "flags": [
+      "--bin-id",
+      "--cursor",
+      "--limit"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/http/requests",
+        "operation_id": "getHttpRequests",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_list"
+    ]
+  },
+  {
+    "command": "sendmock http clear",
+    "usage": "sendmock http clear",
+    "aliases": [],
+    "summary": "Delete captured requests, all or one bin's.",
+    "arguments": [],
+    "flags": [
+      "--bin-id"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/http/requests",
+        "operation_id": "deleteHttpRequests",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_clear"
+    ]
+  },
+  {
+    "command": "sendmock http show",
+    "usage": "sendmock http show <requestId>",
+    "aliases": [],
+    "summary": "One captured request and what SendMock answered.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/http/requests/{requestId}",
+        "operation_id": "getHttpRequestsByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_get"
+    ]
+  },
+  {
+    "command": "sendmock http file",
+    "usage": "sendmock http file <requestId> <fileIndex>",
+    "aliases": [],
+    "summary": "Download a file uploaded in a captured request.",
+    "arguments": [
+      "requestId",
+      "fileIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/http/requests/{requestId}/files/{fileIndex}",
+        "operation_id": "getHttpRequestsByRequestIdFilesByFileIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://http/requests/{requestId}/files/{fileIndex}"
+    ]
+  },
+  {
+    "command": "sendmock http wait",
+    "usage": "sendmock http wait",
+    "aliases": [],
+    "summary": "Wait until the catcher records a matching request; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--bin",
+      "--method",
+      "--since",
+      "--timeout"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/http",
+        "operation_id": "getWaitHttp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_wait"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

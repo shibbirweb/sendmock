@@ -144,6 +144,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_message_rule_samples(app_router).await);
     samples.extend(prepare_inbound_route_samples(app_router).await);
+    samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
@@ -159,6 +160,66 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
     samples
+}
+
+/// Uploads a file to the `sample-uploads` bin, as an app would.
+async fn capture_sample_upload(app_router: &axum::Router) {
+    let multipart_body = "--b\r\nContent-Disposition: form-data; name=\"invoice\"; filename=\"42.txt\"\r\nContent-Type: text/plain\r\n\r\nINVOICE 42\r\n--b--\r\n";
+    let capture_request = Request::builder()
+        .method("POST")
+        .uri("/catch/sample-uploads/hooks")
+        .header("content-type", "multipart/form-data; boundary=b")
+        .body(Body::from(multipart_body))
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    app_router
+        .clone()
+        .oneshot(capture_request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+}
+
+/// A bin with one captured multipart request holding a file.
+async fn prepare_http_catcher_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let bin = post_json(
+        app_router,
+        "/api/v1/http/bins",
+        &json!({ "name": "sample-uploads", "preset": null }),
+    )
+    .await;
+    capture_sample_upload(app_router).await;
+    let requests = send_json(app_router, "GET", "/api/v1/http/requests", &json!({})).await;
+    let request_id = requests["items"][0]["id"].clone();
+    let by_bin = json!({ "bin_id": bin["id"] });
+    vec![
+        ("getHttpBins", vec![json!({})]),
+        (
+            "postHttpBins",
+            vec![json!({ "name": "sample-alerts", "preset": "slack" })],
+        ),
+        (
+            "patchHttpBinsByBinId",
+            vec![
+                json!({ "bin_id": bin["id"], "default_response": { "status_code": 202, "headers": {}, "body": "queued" } }),
+            ],
+        ),
+        ("deleteHttpBinsByBinId", vec![by_bin.clone()]),
+        ("getHttpRequests", vec![json!({}), by_bin.clone()]),
+        ("deleteHttpRequests", vec![by_bin]),
+        (
+            "getHttpRequestsByRequestId",
+            vec![json!({ "request_id": request_id })],
+        ),
+        (
+            "getHttpRequestsByRequestIdFilesByFileIndex",
+            vec![json!({ "request_id": request_id, "file_index": 0 })],
+        ),
+        (
+            "getWaitHttp",
+            vec![json!({ "bin": "sample-uploads", "timeout": "1s" })],
+        ),
+    ]
 }
 
 /// One route, which the update and delete samples change.

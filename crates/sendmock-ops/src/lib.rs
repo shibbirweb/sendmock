@@ -3,6 +3,7 @@
 mod custom_gateways;
 mod email;
 mod events;
+mod http_catcher;
 mod inbound_routes;
 mod input_coercion;
 mod input_shape;
@@ -48,6 +49,10 @@ pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
     RecentEventsInput, RecordedEvent, publish_email_deleted, publish_email_inbound,
     publish_email_received, publish_event,
+};
+pub use http_catcher::{
+    CapturedHttpRequest, CatchAnswer, HttpBin, HttpMockResponse, IncomingHttpRequest,
+    capture_http_request,
 };
 pub use inbound_routes::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 pub use input_coercion::build_input_from_text;
@@ -152,6 +157,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
+    http_catcher::register_http_catcher_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

@@ -103,7 +103,8 @@ pub async fn send_callback_attempt(
         .await?;
     if has_retry_due {
         operation_context
-            .status_callback_dispatch_signal
+            .dispatch_signals
+            .status_callbacks
             .notify_one();
     }
     Ok(())

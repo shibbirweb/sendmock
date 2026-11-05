@@ -4,6 +4,7 @@ mod access_control;
 mod api_error_response;
 mod api_request_logging;
 mod app_router;
+mod catch_routes;
 mod http_server;
 mod openapi_document;
 mod provider_routes;

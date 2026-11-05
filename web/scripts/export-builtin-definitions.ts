@@ -11,6 +11,10 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import {
+  httpBinPresets,
+  plainDefaultResponse,
+} from "../src/lib/http/http-bin-presets";
 import { flowLabelVariables } from "../src/lib/payments/flow-label-variables";
 import { paymentProviderEventNames } from "../src/lib/payments/payment-provider-event-names";
 import { paymentStepCatalogue } from "../src/lib/payments/payment-step-catalogue";
@@ -106,6 +110,20 @@ export function buildBuiltinDefinitionFiles(): {
     {
       filePath: join(coreTemplateDirectory, "payment-event-names.json"),
       content: `${JSON.stringify(paymentProviderEventNames, null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "http-bin-presets.json"),
+      content: `${JSON.stringify(
+        {
+          plain_default_response: plainDefaultResponse,
+          presets: httpBinPresets.map(({ preset, defaultResponse }) => ({
+            preset,
+            default_response: defaultResponse,
+          })),
+        },
+        null,
+        2,
+      )}\n`,
     },
     {
       filePath: join(builtinDirectory, "webhook-template-reference.json"),

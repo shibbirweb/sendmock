@@ -6,9 +6,9 @@ Plan: [15-http-catcher.md](../15-http-catcher.md), [02-architecture.md](../02-ar
 
 UI in U2, backend Phase 4.
 
-- [ ] HC-01.1 Any method and path under `/catch/<bin>/...` is captured with method, URL, query, headers, body and timing; the bin is created on first use.
-- [ ] HC-01.2 JSON, form and multipart bodies are parsed and shown pretty; uploaded files are downloadable.
-- [ ] HC-01.3 `http.captured` fires and the request appears in the UI live.
+- [x] HC-01.1 Any method and path under `/catch/<bin>/...` is captured with method, URL, query, headers, body and timing; the bin is created on first use. (#48)
+- [x] HC-01.2 JSON, form and multipart bodies are parsed and shown pretty; uploaded files are downloadable. (#48)
+- [x] HC-01.3 `http.captured` fires and the request appears in the UI live. (#48)
 - [ ] HC-01.4 The optional catch-all port captures requests at any path.
 - [ ] HC-01.5 "Forward to URL" resends a captured request; "Copy as cURL" reproduces it.
 - [ ] HC-01.6 The HTTP screen lists bins with preset, request count and last request, and a bin's requests newest first (method, path, status returned, time); a bin can be added from a preset, its catch URL copied, its requests cleared and the bin deleted.

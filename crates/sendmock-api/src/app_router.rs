@@ -5,6 +5,7 @@ use axum::routing::get;
 use axum::{Json, Router};
 use sendmock_ops::{OperationContext, OperationRegistry};
 
+use crate::catch_routes::build_catch_router;
 use crate::openapi_document::build_openapi_document;
 use crate::provider_routes::build_provider_router;
 use crate::realtime::build_realtime_router;
@@ -29,6 +30,7 @@ pub fn build_app_router(
     build_rest_router(operation_registry, operation_context)
         .merge(build_realtime_router(operation_context))
         .merge(build_provider_router(operation_context))
+        .merge(build_catch_router(operation_context))
         .route(
             OPENAPI_DOCUMENT_PATH,
             get(move || async move { Json(openapi_document.as_ref().clone()) }),

@@ -39,6 +39,7 @@ pub use change_email_operations::{
     DeleteAllEmailsOperation, DeleteEmailOperation, UpdateEmailOperation,
 };
 pub use delivery_outcome_runner::complete_email_intake;
+pub(crate) use email_access::read_wait_duration;
 pub use email_check_operations::CheckEmailHtmlOperation;
 pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
 pub use email_file_operations::{

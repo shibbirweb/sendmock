@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W9 (HTTP catcher backend: catch path, bins, mock responses, presets, `wait/http`), then W7d (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W9b (HTTP catcher response rules and presets), W9c, then W7d (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -685,3 +685,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W7c: multipart Fields bodies with file fields fetched from a URL when sent (contract, mock, editor and binary), and inbound routes send attachments the same way; WH-07 and WH-12 accepted. |
 | 2026-11-06 | WH-08.2 gets its test (choosing a template asks for its required variables), so WH-08 is accepted; the Phase 4 checklist ticks the email send APIs (EM-08), the provider event formats, the templating additions and the remaining templates. Open from W3: WH-06.3 (inbound formats with attachments), which needs attachments in the email event data of both engines. |
 | 2026-11-06 | Phase 4 W8: Plivo, MessageBird and a generic GET vendor (a custom provider) are proven against their shapes, and WhatsApp through Twilio is proven for sends, inbound and `read`; SM-05 and SM-11 accepted. |
+| 2026-11-06 | Phase 4 W9a: the HTTP catcher captures any request under `/catch/<bin>/...` (bins created on first use, bodies and uploaded files kept, `http.captured` fired), with the bins, requests and `wait/http` operations; HC-01.1 to HC-01.3 ticked. |

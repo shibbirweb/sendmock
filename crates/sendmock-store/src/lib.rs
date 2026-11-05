@@ -7,6 +7,7 @@ mod database_location;
 mod email;
 mod email_provider_send;
 mod email_response;
+mod http_catcher;
 mod inbound_route;
 mod message_open;
 mod message_provider;
@@ -47,6 +48,10 @@ pub use email_provider_send::{
     EmailProviderSendRepository,
 };
 pub use email_response::{EmailResponseRecord, EmailResponseRepository};
+pub use http_catcher::{
+    CapturedFileRecord, CapturedRequestRecord, CapturedRequestRepository, HttpBinRecord,
+    HttpBinRepository,
+};
 pub use inbound_route::{InboundRouteRecord, InboundRouteRepository};
 pub use message_open::{MessageOpenRecord, OpenRecording};
 pub use message_provider::{MessageProviderRecord, MessageProviderRepository};

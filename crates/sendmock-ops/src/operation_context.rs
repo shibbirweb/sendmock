@@ -3,16 +3,16 @@ use std::sync::Arc;
 use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
-    ActivityStatsRepository, ApiRequestRepository, Database, EmailLocalTemplateRepository,
-    EmailOutcomeRuleRepository, EmailProviderSendRepository, EmailRepository,
-    EmailResponseRepository, InboundRouteRepository, MessageProviderRepository, MessageRuleKind,
-    MessageRuleRepository, MessagingServiceRepository, PaymentDefinitionRepository,
-    PaymentProviderObjectRepository, PaymentRepository, SavedWebhookDeliveryRepository,
-    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    ActivityStatsRepository, ApiRequestRepository, CapturedRequestRepository, Database,
+    EmailLocalTemplateRepository, EmailOutcomeRuleRepository, EmailProviderSendRepository,
+    EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
+    MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
+    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
+    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
+    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -55,10 +55,8 @@ pub struct OperationContext {
     pub webhook_variable_repository: WebhookVariableRepository,
     /// Named copies of deliveries, kept through pruning and `reset`.
     pub saved_webhook_delivery_repository: SavedWebhookDeliveryRepository,
-    /// Wakes the webhook dispatcher when a delivery is queued.
-    pub webhook_dispatch_signal: Arc<tokio::sync::Notify>,
-    /// Wakes the status callback dispatcher when a retry is scheduled.
-    pub status_callback_dispatch_signal: Arc<tokio::sync::Notify>,
+    pub dispatch_signals: DispatchSignals,
+    pub http_catcher_stores: HttpCatcherStores,
     /// Sends webhook requests; set by the binary, which owns the HTTP client.
     pub webhook_sender: Option<Arc<dyn WebhookSender>>,
     /// Decides random SMS failures; tests pass a seeded one.
@@ -87,6 +85,31 @@ pub struct OperationContext {
     pub email_stores: EmailStores,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
+}
+
+/// Wake the background dispatchers when work is queued.
+#[derive(Clone, Default)]
+pub struct DispatchSignals {
+    /// A webhook delivery was queued.
+    pub webhooks: Arc<tokio::sync::Notify>,
+    /// A status callback retry was scheduled.
+    pub status_callbacks: Arc<tokio::sync::Notify>,
+}
+
+/// The HTTP catcher's bins and the requests captured in them.
+#[derive(Clone)]
+pub struct HttpCatcherStores {
+    pub bins: HttpBinRepository,
+    pub requests: CapturedRequestRepository,
+}
+
+impl HttpCatcherStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            bins: HttpBinRepository::new(Arc::clone(database)),
+            requests: CapturedRequestRepository::new(Arc::clone(database)),
+        }
+    }
 }
 
 /// What emails keep beside the messages: each send as its provider knows it, the seed file's
@@ -158,8 +181,8 @@ impl OperationContext {
             webhook_template_repository: WebhookTemplateRepository::new(share_database()),
             webhook_variable_repository: WebhookVariableRepository::new(share_database()),
             saved_webhook_delivery_repository: SavedWebhookDeliveryRepository::new(share_database()),
-            webhook_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
-            status_callback_dispatch_signal: Arc::new(tokio::sync::Notify::new()),
+            dispatch_signals: DispatchSignals::default(),
+            http_catcher_stores: HttpCatcherStores::new(&database),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
             database,

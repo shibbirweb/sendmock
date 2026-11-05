@@ -147,7 +147,7 @@ pub async fn queue_first_attempt(
         .insert_delivery(new_delivery.clone())
         .await?;
     if new_delivery.status == "pending" {
-        operation_context.webhook_dispatch_signal.notify_one();
+        operation_context.dispatch_signals.webhooks.notify_one();
     }
     Ok(new_delivery)
 }

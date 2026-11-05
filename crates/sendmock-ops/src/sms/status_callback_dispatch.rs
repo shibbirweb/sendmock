@@ -102,7 +102,7 @@ pub async fn run_status_callback_dispatcher(
             _ => IDLE_WAIT_MS,
         };
         tokio::select! {
-            () = operation_context.status_callback_dispatch_signal.notified() => {}
+            () = operation_context.dispatch_signals.status_callbacks.notified() => {}
             () = tokio::time::sleep(Duration::from_millis(u64::try_from(wait_ms).unwrap_or(0))) => {}
         }
     }

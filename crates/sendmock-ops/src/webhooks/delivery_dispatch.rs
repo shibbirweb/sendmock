@@ -221,7 +221,7 @@ pub async fn run_webhook_dispatcher(
             _ => IDLE_WAIT_MS,
         };
         tokio::select! {
-            () = operation_context.webhook_dispatch_signal.notified() => {}
+            () = operation_context.dispatch_signals.webhooks.notified() => {}
             () = tokio::time::sleep(Duration::from_millis(u64::try_from(wait_ms).unwrap_or(0))) => {}
         }
     }
