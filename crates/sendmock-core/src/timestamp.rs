@@ -102,6 +102,27 @@ fn split_offset(time_text: &str) -> Option<(&str, i64)> {
     Some((clock_text, sign * offset_ms))
 }
 
+const DAY_MS: i64 = 86_400_000;
+
+/// Whole calendar months later, at the same time of day, on the month's last day when it is
+/// shorter (31 January plus one month is 28 or 29 February), as billing anchors move.
+pub fn add_calendar_months(unix_ms: i64, month_count: i64) -> i64 {
+    let days_since_epoch = unix_ms.div_euclid(DAY_MS);
+    let time_of_day_ms = unix_ms.rem_euclid(DAY_MS);
+    let (year, month, day) = civil_from_days(days_since_epoch);
+    let month_number = year * 12 + (month - 1) + month_count;
+    let (next_year, next_month) = (month_number.div_euclid(12), month_number.rem_euclid(12) + 1);
+    let next_month_start = days_from_civil(next_year, next_month, 1);
+    let following_month_start = days_from_civil(
+        (month_number + 1).div_euclid(12),
+        (month_number + 1).rem_euclid(12) + 1,
+        1,
+    );
+    let last_day = following_month_start - next_month_start;
+    let next_day = day.min(last_day);
+    (next_month_start + next_day - 1) * DAY_MS + time_of_day_ms
+}
+
 fn civil_from_days(days_since_epoch: i64) -> (i64, i64, i64) {
     let shifted_days = days_since_epoch + 719_468;
     let era = shifted_days.div_euclid(146_097);
@@ -133,6 +154,25 @@ fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn calendar_months_end_on_the_last_day_of_a_shorter_month() {
+        let january_31 = parse_rfc3339("2026-01-31T10:00:00Z").unwrap_or_default();
+        let december_15 = parse_rfc3339("2026-12-15T08:30:00Z").unwrap_or_default();
+
+        assert_eq!(
+            format_rfc3339(add_calendar_months(january_31, 1)),
+            "2026-02-28T10:00:00Z"
+        );
+        assert_eq!(
+            format_rfc3339(add_calendar_months(january_31, 12)),
+            "2027-01-31T10:00:00Z"
+        );
+        assert_eq!(
+            format_rfc3339(add_calendar_months(december_15, 1)),
+            "2027-01-15T08:30:00Z"
+        );
+    }
 
     // AC: PL-01.2
     #[test]

@@ -2874,6 +2874,118 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments subscriptions list",
+    "usage": "sendmock payments subscriptions list",
+    "aliases": [],
+    "summary": "Subscriptions, newest first.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/subscriptions",
+        "operation_id": "getPaymentsSubscriptions",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_list"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions create",
+    "usage": "sendmock payments subscriptions create",
+    "aliases": [],
+    "summary": "Start a subscription on a gateway, with an optional trial.",
+    "arguments": [],
+    "flags": [
+      "--amount-minor",
+      "--card-number",
+      "--currency",
+      "--customer-email",
+      "--interval",
+      "--plan-name",
+      "--provider",
+      "--trial-days"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/subscriptions",
+        "operation_id": "postPaymentsSubscriptions",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_create"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions show",
+    "usage": "sendmock payments subscriptions show <subscriptionId>",
+    "aliases": [],
+    "summary": "One subscription with its timeline and renewal payments.",
+    "arguments": [
+      "subscriptionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+        "operation_id": "getPaymentsSubscriptionsBySubscriptionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_get"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions advance",
+    "usage": "sendmock payments subscriptions advance <subscriptionId>",
+    "aliases": [],
+    "summary": "Move the subscription's clock to its next renewal and charge it.",
+    "arguments": [
+      "subscriptionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+        "operation_id": "postPaymentsSubscriptionsBySubscriptionIdAdvance",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_advance"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions cancel",
+    "usage": "sendmock payments subscriptions cancel <subscriptionId>",
+    "aliases": [],
+    "summary": "Cancel the subscription now or at the end of its period.",
+    "arguments": [
+      "subscriptionId"
+    ],
+    "flags": [
+      "--at-period-end"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+        "operation_id": "postPaymentsSubscriptionsBySubscriptionIdCancel",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_cancel"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

@@ -62,6 +62,11 @@ impl Operation for ResetOperation {
             .delete_all_payments()
             .await?;
         operation_context
+            .payment_stores
+            .subscriptions
+            .delete_all_subscriptions()
+            .await?;
+        operation_context
             .settings_store
             .save(
                 AppSettings::default(),

@@ -40,6 +40,7 @@ mod smtp_chaos;
 mod smtp_delivery;
 mod sslcommerz;
 mod stripe;
+mod subscriptions;
 mod system;
 mod updates;
 mod verify;
@@ -165,6 +166,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);
+    subscriptions::register_subscription_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

@@ -253,7 +253,8 @@ impl<'context> PaymentChange<'context> {
         .await?;
         for provider_object in self.kept_provider_objects {
             operation_context
-                .payment_provider_object_repository
+                .payment_stores
+                .provider_objects
                 .save_object(provider_object)
                 .await?;
         }

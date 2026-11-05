@@ -5,7 +5,7 @@ use crate::{OperationContext, OperationError};
 
 /// The events a rule may listen to; `webhook.delivered` drives the live log only, so a rule on
 /// it could loop.
-pub const RULE_EVENT_TYPES: [&str; 32] = [
+pub const RULE_EVENT_TYPES: [&str; 36] = [
     "email.received",
     "email.inbound",
     "email.opened",
@@ -36,6 +36,10 @@ pub const RULE_EVENT_TYPES: [&str; 32] = [
     "payment.dispute_closed",
     "checkout.completed",
     "checkout.expired",
+    "subscription.created",
+    "subscription.renewed",
+    "subscription.payment_failed",
+    "subscription.canceled",
     "webhook.failed",
     "test.ping",
 ];

@@ -62,13 +62,13 @@ Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions).
 - [x] PY-07.1 Manual capture: authorize, then capture or void, with matching events.
 - [x] PY-07.2 Full and partial refunds update the payment and fire the provider's refund event; refunding more than captured is rejected.
 - [x] PY-07.3 Disputes can be opened, answered, won and lost, each with the provider's events.
-- [ ] PY-07.4 Subscriptions: create, renew on simulated clock advance, payment failure and cancel, each with events.
+- [x] PY-07.4 Subscriptions: create, renew on simulated clock advance, payment failure and cancel, each with events.
 
 ## PY-08 Events, templates and delivery
 
 Phase 3P.
 
-- [ ] PY-08.1 Every native `payment.*`, `checkout.*` and `subscription.*` event fires at the right moment and can trigger webhook rules.
+- [x] PY-08.1 Every native `payment.*`, `checkout.*` and `subscription.*` event fires at the right moment and can trigger webhook rules.
 - [x] PY-08.2 Built-in payment templates (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook) render against a real payment and match provider fixtures.
 - [x] PY-08.3 IPN and webhook deliveries appear in the webhook delivery log with retries, replay and "resend IPN" from the payment detail.
 

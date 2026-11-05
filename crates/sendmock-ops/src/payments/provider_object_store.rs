@@ -55,7 +55,8 @@ pub async fn find_provider_object<T: DeserializeOwned>(
     object_key: ProviderObjectKey<'_>,
 ) -> Result<Option<(String, T)>, OperationError> {
     let stored_object = operation_context
-        .payment_provider_object_repository
+        .payment_stores
+        .provider_objects
         .find_object(
             object_key.provider,
             object_key.object_kind,
@@ -78,7 +79,8 @@ pub async fn save_provider_object<T: Serialize>(
     let stored_object =
         build_provider_object_record(operation_context, object_key, payment_id, document)?;
     operation_context
-        .payment_provider_object_repository
+        .payment_stores
+        .provider_objects
         .save_object(stored_object)
         .await?;
     Ok(())
@@ -128,7 +130,8 @@ pub async fn list_payment_provider_objects<T: DeserializeOwned>(
     object_kind: &str,
 ) -> Result<Vec<(String, T)>, OperationError> {
     operation_context
-        .payment_provider_object_repository
+        .payment_stores
+        .provider_objects
         .list_payment_objects(payment_id, object_kind)
         .await?
         .iter()

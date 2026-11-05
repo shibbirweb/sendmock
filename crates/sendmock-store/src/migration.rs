@@ -138,4 +138,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 32,
         sql: include_str!("../migrations/0032_http_catcher.sql"),
     },
+    Migration {
+        schema_version: 33,
+        sql: include_str!("../migrations/0033_payment_subscriptions.sql"),
+    },
 ];

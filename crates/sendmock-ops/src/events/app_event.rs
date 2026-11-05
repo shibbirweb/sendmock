@@ -39,6 +39,10 @@ pub enum AppEventType {
     PaymentDisputeClosed,
     CheckoutCompleted,
     CheckoutExpired,
+    SubscriptionCreated,
+    SubscriptionRenewed,
+    SubscriptionPaymentFailed,
+    SubscriptionCanceled,
 }
 
 impl AppEventType {
@@ -77,6 +81,10 @@ impl AppEventType {
             Self::PaymentDisputeClosed => "payment.dispute_closed",
             Self::CheckoutCompleted => "checkout.completed",
             Self::CheckoutExpired => "checkout.expired",
+            Self::SubscriptionCreated => "subscription.created",
+            Self::SubscriptionRenewed => "subscription.renewed",
+            Self::SubscriptionPaymentFailed => "subscription.payment_failed",
+            Self::SubscriptionCanceled => "subscription.canceled",
         }
     }
 }

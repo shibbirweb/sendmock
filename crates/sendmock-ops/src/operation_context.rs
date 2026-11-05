@@ -8,11 +8,12 @@ use sendmock_store::{
     EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
     MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
-    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
-    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
+    PaymentSubscriptionRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
+    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
+    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
+    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
+    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
+    WebhookVariableRepository,
 };
 
 use crate::{
@@ -80,8 +81,7 @@ pub struct OperationContext {
     /// Edited built-in and custom payment flows, methods and gateways.
     pub payment_definition_repository: PaymentDefinitionRepository,
     pub payment_repository: PaymentRepository,
-    /// Provider adapters' own objects beside payments, such as Stripe refunds.
-    pub payment_provider_object_repository: PaymentProviderObjectRepository,
+    pub payment_stores: PaymentStores,
     pub email_stores: EmailStores,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
@@ -94,6 +94,23 @@ pub struct DispatchSignals {
     pub webhooks: Arc<tokio::sync::Notify>,
     /// A status callback retry was scheduled.
     pub status_callbacks: Arc<tokio::sync::Notify>,
+}
+
+/// What payments keep beside the payments themselves.
+#[derive(Clone)]
+pub struct PaymentStores {
+    /// Provider adapters' own objects beside payments, such as Stripe refunds.
+    pub provider_objects: PaymentProviderObjectRepository,
+    pub subscriptions: PaymentSubscriptionRepository,
+}
+
+impl PaymentStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            provider_objects: PaymentProviderObjectRepository::new(Arc::clone(database)),
+            subscriptions: PaymentSubscriptionRepository::new(Arc::clone(database)),
+        }
+    }
 }
 
 /// The HTTP catcher's bins and the requests captured in them.
@@ -162,9 +179,7 @@ impl OperationContext {
             seed_state_repository: SeedStateRepository::new(share_database()),
             payment_definition_repository: PaymentDefinitionRepository::new(share_database()),
             payment_repository: PaymentRepository::new(share_database()),
-            payment_provider_object_repository: PaymentProviderObjectRepository::new(
-                share_database(),
-            ),
+            payment_stores: PaymentStores::new(&database),
             email_stores: EmailStores::new(&database),
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(share_database()),
             sms_reply_webhook_repository: SmsReplyWebhookRepository::new(share_database()),

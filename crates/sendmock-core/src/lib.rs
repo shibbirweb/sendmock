@@ -17,5 +17,7 @@ pub use template::{
     TemplateProblem, TemplateProblemSeverity, TemplateRenderMode, evaluate_template_expression,
     render_template, render_template_in_mode,
 };
-pub use timestamp::{format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339};
+pub use timestamp::{
+    add_calendar_months, format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339,
+};
 pub use wildcard_pattern::matches_wildcard_pattern;

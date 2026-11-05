@@ -141,6 +141,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_payment_method_samples(app_router).await);
     samples.extend(prepare_payment_gateway_samples(app_router).await);
     samples.extend(prepare_payment_samples(app_router).await);
+    samples.extend(prepare_subscription_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_message_rule_samples(app_router).await);
@@ -2186,6 +2187,35 @@ fn scenario_samples() -> Vec<(&'static str, Vec<Value>)> {
             vec![
                 json!({ "scenario": "name = \"sample\"\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }\nsave = \"sample\"\n[[steps]]\nrun = \"assert\"\nwith = { that = \"1 == 2\" }\n" }),
             ],
+        ),
+    ]
+}
+
+/// Two subscriptions: one is advanced and the other cancelled, so neither sample meets the
+/// other's change.
+async fn prepare_subscription_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let create_body = json!({
+        "provider": "stripe", "customer_email": "sam@example.test", "plan_name": "Pro",
+        "amount_minor": 1500, "currency": "USD", "interval": "month", "trial_days": 7,
+    });
+    let advanced = post_json(app_router, "/api/v1/payments/subscriptions", &create_body).await;
+    let canceled = post_json(app_router, "/api/v1/payments/subscriptions", &create_body).await;
+    vec![
+        ("getPaymentsSubscriptions", vec![json!({})]),
+        ("postPaymentsSubscriptions", vec![create_body.clone()]),
+        (
+            "getPaymentsSubscriptionsBySubscriptionId",
+            vec![json!({ "subscription_id": advanced["id"] })],
+        ),
+        (
+            "postPaymentsSubscriptionsBySubscriptionIdAdvance",
+            vec![json!({ "subscription_id": advanced["id"] })],
+        ),
+        (
+            "postPaymentsSubscriptionsBySubscriptionIdCancel",
+            vec![json!({ "subscription_id": canceled["id"], "at_period_end": true })],
         ),
     ]
 }
