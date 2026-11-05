@@ -263,10 +263,21 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "ses.sns": {
     method: "POST",
     content_type: "text/plain; charset=UTF-8",
-    header_templates: { "x-amz-sns-message-type": "Notification" },
+    header_templates: {
+      "x-amz-sns-message-type": "Notification",
+      "x-amz-sns-message-id": "{{ event.id }}",
+      "x-amz-sns-topic-arn": "arn:aws:sns:us-east-1:123456789012:sendmock-ses",
+    },
     body_template: `{
   "Type": "Notification",
-  "Message": "{\\"notificationType\\":\\"{{ event.type | ses_type }}\\",\\"mail\\":{\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}"
+  "MessageId": "{{ event.id }}",
+  "TopicArn": "arn:aws:sns:us-east-1:123456789012:sendmock-ses",
+  "Message": "{\\"notificationType\\":\\"{{ event.type | ses_type }}\\",\\"mail\\":{\\"timestamp\\":\\"{{ event.created_at }}\\",\\"messageId\\":\\"{{ data.message_id }}\\",\\"source\\":\\"{{ data.from.address }}\\",\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}",
+  "Timestamp": "{{ event.created_at }}",
+  "SignatureVersion": "1",
+  "Signature": "{{ random_string(344) }}",
+  "SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-sendmock.pem",
+  "UnsubscribeURL": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:123456789012:sendmock-ses"
 }`,
     doc_url:
       "https://docs.aws.amazon.com/ses/latest/dg/notification-contents.html",

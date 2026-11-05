@@ -200,3 +200,28 @@ async fn mailgun_event_webhooks_match_the_docs_with_a_real_signature() {
         )
     );
 }
+
+const SES_SNS_NOTIFICATION: &str =
+    include_str!("fixtures/provider_webhooks/ses_sns_notification.json");
+
+// AC: WH-06.1
+#[tokio::test]
+async fn ses_notifications_arrive_in_snss_envelope_with_the_ses_message_inside() {
+    let (app_router, _) = build_test_app();
+
+    let (headers, body) = render(&app_router, "ses.sns").await;
+
+    let notification: Value = serde_json::from_str(&body).unwrap_or(Value::Null);
+    check_against_fixture(SES_SNS_NOTIFICATION, &notification);
+    let ses_message: Value =
+        serde_json::from_str(notification["Message"].as_str().unwrap_or_default())
+            .unwrap_or(Value::Null);
+    assert!(
+        ses_message["mail"]["destination"].is_array(),
+        "{ses_message}"
+    );
+    assert_eq!(
+        headers.get("x-amz-sns-message-type").map(String::as_str),
+        Some("Notification")
+    );
+}
