@@ -186,7 +186,7 @@ test("UI-12.2 SMS > Providers lists the built-ins served by the live binary", as
     ).toContainText("Built-in");
   }
   await expect(
-    page.getByRole("button", { name: "Add provider: Available in Phase 4" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: "Add provider", exact: true }),
+  ).toBeEnabled();
   expect(failedApiCalls).toEqual([]);
 });
