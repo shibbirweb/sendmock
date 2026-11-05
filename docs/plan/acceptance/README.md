@@ -66,7 +66,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-05](01-email.md#em-05-otp-and-link-extraction) | OTP and link extraction | UI in U1, backend Phase 1 | 5 | In progress |
 | [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Accepted |
 | [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | In progress |
-| [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | In progress |
+| [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Accepted |
 | [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | Accepted |
 | [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | UI in U1, native events Phase 3, provider formats Phase 4 | 6 | In progress |
 | [EM-11](01-email.md#em-11-email-opened-events) | Email opened events | Phase 3 | 5 | Not started |

@@ -303,10 +303,14 @@ jobs:
   payment-apps:
     uses: ./.github/workflows/payment-apps.yml
 
+  # The email providers' official SDKs send to this commit offline.
+  email-provider-sdks:
+    uses: ./.github/workflows/email-provider-sdks.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps]
+    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

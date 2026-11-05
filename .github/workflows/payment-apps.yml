@@ -21,6 +21,7 @@ on:
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
       - examples/payments/**
+      - .github/actions/**
       - .github/workflows/payment-apps.yml
   push:
     branches:
@@ -36,6 +37,7 @@ on:
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
       - examples/payments/**
+      - .github/actions/**
       - .github/workflows/payment-apps.yml
   workflow_dispatch:
   workflow_call:
@@ -51,7 +53,6 @@ jobs:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
       STRIPE_DELIVERIES_PATH: ${{ github.workspace }}/stripe-deliveries.json
-      OFFLINE_USER: sendmock-offline
     steps:
       - uses: actions/checkout@v5
 
@@ -73,34 +74,7 @@ jobs:
       - name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - name: A user whose traffic beyond this machine is rejected
-        run: |
-          sudo install -m 0755 target/release/sendmock /usr/local/bin/sendmock
-          sudo useradd --system --create-home --home-dir "/var/lib/$OFFLINE_USER" "$OFFLINE_USER"
-          for firewall in iptables ip6tables; do
-            sudo "$firewall" -A OUTPUT -m owner --uid-owner "$OFFLINE_USER" ! -o lo -j REJECT
-          done
-          # The rule must work: the user cannot reach the internet, but the runner can.
-          if sudo -u "$OFFLINE_USER" curl -sS --max-time 10 https://api.stripe.com > /dev/null 2>&1; then
-            echo "::error::The offline user reached api.stripe.com"
-            exit 1
-          fi
-          curl -sS --max-time 10 -o /dev/null https://api.github.com
-          for firewall in iptables ip6tables; do
-            sudo "$firewall" -Z OUTPUT
-          done
-
-      - name: Start SendMock offline with the provider port
-        run: |
-          (cd / && sudo -u "$OFFLINE_USER" env HOME="/var/lib/$OFFLINE_USER" \
-            /usr/local/bin/sendmock --db memory --provider-addr 127.0.0.1:8026) \
-            > sendmock.log 2>&1 &
-          for _ in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
-            sleep 1
-          done
-          cat sendmock.log
-          exit 1
+      - uses: ./.github/actions/start-sendmock-offline
 
       - uses: actions/setup-node@v4
         with:
@@ -135,16 +109,7 @@ jobs:
         working-directory: examples/payments/sslcommerz-node
         run: bun install && node done-when.js
 
-      - name: SendMock opened no connection beyond this machine
-        run: |
-          for firewall in iptables ip6tables; do
-            sudo "$firewall" -L OUTPUT -v -n -x
-            rejected_packets=$(sudo "$firewall" -L OUTPUT -v -n -x | awk '/owner UID match/ { total += $1 } END { print total + 0 }')
-            if [ "$rejected_packets" -ne 0 ]; then
-              echo "::error::$firewall rejected $rejected_packets packets SendMock sent beyond this machine"
-              exit 1
-            fi
-          done
+      - uses: ./.github/actions/check-sendmock-offline
 
       - name: SendMock log
         if: failure()

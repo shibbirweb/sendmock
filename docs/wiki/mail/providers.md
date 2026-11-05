@@ -29,6 +29,21 @@ An email provider is one API SendMock answers like the real one: SendGrid, Mailg
 2. Open **Preview**: the sample send is stored with `ana@example.test` as recipient, and SendGrid answers `202`.
 3. Clear the sample body to `{}`: nothing is stored, and the answer is SendGrid's own `400` error.
 
+## Point your provider's SDK at SendMock
+
+Each official SDK has a setting for the address it calls. Point it at the provider port, `http://127.0.0.1:8026`, and keep your code as it is. CI sends with every one of these SDKs on each change (`examples/email-providers/node/`).
+
+| SDK | Setting |
+| --- | --- |
+| SendGrid (`@sendgrid/mail`) | `client.setDefaultRequest("baseUrl", "http://127.0.0.1:8026")` on `@sendgrid/client`, then `sgMail.setClient(client)` |
+| Mailgun (`mailgun.js`) | `url: "http://127.0.0.1:8026"` in `mailgun.client({...})` |
+| Postmark (`postmark`) | `new ServerClient(token, { useHttps: false, requestHost: "127.0.0.1:8026" })` |
+| Resend (`resend`) | `new Resend(key, { baseUrl: "http://127.0.0.1:8026" })` |
+| Amazon SES v2 (`@aws-sdk/client-sesv2`) | `endpoint: "http://127.0.0.1:8026"` in `new SESv2Client({...})` |
+| Brevo (`@getbrevo/brevo`) | `baseUrl: "http://127.0.0.1:8026/v3"` in `new BrevoClient({...})` |
+
+Any API key works unless **Check credentials** is on for the provider.
+
 ## Everything on this screen
 
 ### The table

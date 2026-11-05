@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 
-type WorkflowStep = { name?: string; "working-directory"?: string; run?: string };
+type WorkflowStep = {
+  name?: string;
+  uses?: string;
+  "working-directory"?: string;
+  run?: string;
+};
 type PaymentAppsWorkflow = {
   jobs: { apps: { steps: WorkflowStep[] } };
 };
@@ -17,14 +22,12 @@ function findExampleStep(exampleFolder: string) {
   );
 }
 
-function findStepIndex(stepName: string) {
-  return steps.findIndex((step) => step.name === stepName);
-}
-
 describe("Payment apps workflow", () => {
   test("the Stripe, PayPal and SSLCommerz apps run against a release binary", () => {
     expect(steps.some((step) => step.run?.includes("cargo build --release"))).toBe(true);
-    expect(steps.some((step) => step.run?.includes("--provider-addr 127.0.0.1:8026"))).toBe(true);
+    expect(
+      readFileSync(".github/actions/start-sendmock-offline/action.yml", "utf8"),
+    ).toContain("--provider-addr 127.0.0.1:8026");
     for (const exampleFolder of ["stripe-node", "paypal-node", "sslcommerz-node"]) {
       expect(findExampleStep(exampleFolder)?.run).toContain("node done-when.js");
       expect(existsSync(`examples/payments/${exampleFolder}/done-when.js`)).toBe(true);
@@ -34,16 +37,22 @@ describe("Payment apps workflow", () => {
   });
 
   test("PY-01.3 SendMock runs as a user whose traffic beyond loopback is rejected, and no packet was", () => {
-    const firewallStep = steps[findStepIndex("A user whose traffic beyond this machine is rejected")];
-    const startStep = steps[findStepIndex("Start SendMock offline with the provider port")];
-    const checkIndex = findStepIndex("SendMock opened no connection beyond this machine");
+    const startAction = readFileSync(".github/actions/start-sendmock-offline/action.yml", "utf8");
+    const checkAction = readFileSync(".github/actions/check-sendmock-offline/action.yml", "utf8");
+    const startIndex = steps.findIndex(
+      (step) => step.uses === "./.github/actions/start-sendmock-offline",
+    );
+    const checkIndex = steps.findIndex(
+      (step) => step.uses === "./.github/actions/check-sendmock-offline",
+    );
 
-    expect(firewallStep?.run).toContain("--uid-owner");
-    expect(firewallStep?.run).toContain("! -o lo -j REJECT");
-    expect(firewallStep?.run).toContain("ip6tables");
-    expect(startStep?.run).toContain('sudo -u "$OFFLINE_USER"');
+    expect(startAction).toContain("--uid-owner");
+    expect(startAction).toContain("! -o lo -j REJECT");
+    expect(startAction).toContain("ip6tables");
+    expect(startAction).toContain('sudo -u "$OFFLINE_USER"');
+    expect(checkAction).toContain("rejected_packets");
+    expect(startIndex).toBeGreaterThan(-1);
     expect(checkIndex).toBeGreaterThan(steps.indexOf(findExampleStep("sslcommerz-node") ?? {}));
-    expect(steps[checkIndex]?.run).toContain("rejected_packets");
   });
 
   test("Release build runs the payment apps before it publishes", () => {
