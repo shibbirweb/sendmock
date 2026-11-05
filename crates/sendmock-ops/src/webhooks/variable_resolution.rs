@@ -13,6 +13,7 @@ use sendmock_store::WebhookVariableRecord;
 use serde_json::{Map, Value};
 
 use super::variable_inputs::{RandomMode, VariableKind};
+use crate::seed::EnvironmentReader;
 
 /// One variable's definition, as stored or as a preview tries it.
 pub struct VariableDefinition<'definition> {
@@ -118,10 +119,32 @@ fn with_vars(base_context: &Value, resolved_values: &Map<String, Value>) -> Valu
     Value::Object(template_context)
 }
 
+/// Only variables with this prefix are read from the environment, so other secrets there are
+/// never reachable from a template.
+const ENVIRONMENT_VARIABLE_PREFIX: &str = "SENDMOCK_VAR_";
+
+/// `SENDMOCK_VAR_<NAME>` from the environment as `<name>` (lowercased), the lowest scope.
+pub fn read_environment_variables(
+    environment_reader: &dyn EnvironmentReader,
+) -> Map<String, Value> {
+    environment_reader
+        .read_prefixed_variables(ENVIRONMENT_VARIABLE_PREFIX)
+        .into_iter()
+        .filter_map(|(variable_name, variable_value)| {
+            let short_name = variable_name
+                .strip_prefix(ENVIRONMENT_VARIABLE_PREFIX)?
+                .to_ascii_lowercase();
+            (!short_name.is_empty()).then(|| (short_name, Value::from(variable_value)))
+        })
+        .collect()
+}
+
 /// Resolves global and endpoint variables (an endpoint's own definition replaces a global one
-/// of the same name) with the send-time values on top.
+/// of the same name) over the environment's `SENDMOCK_VAR_*` values, with the send-time values
+/// on top.
 pub fn resolve_template_variables(
     stored_variables: &[WebhookVariableRecord],
+    environment_values: &Map<String, Value>,
     send_time_values: &Map<String, Value>,
     base_context: &Value,
     template_functions: &dyn TemplateFunctions,
@@ -141,7 +164,7 @@ pub fn resolve_template_variables(
     // Computed templates go last, so they can read every other value.
     effective_variables.sort_by_key(|stored_variable| stored_variable.kind == "computed");
     let mut resolved = ResolvedVariables {
-        values: Map::new(),
+        values: environment_values.clone(),
         problems: Vec::new(),
     };
     for stored_variable in effective_variables {

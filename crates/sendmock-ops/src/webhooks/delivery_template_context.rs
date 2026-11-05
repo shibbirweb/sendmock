@@ -10,7 +10,7 @@ use serde_json::{Map, Value, json};
 use super::delivery_queue::DeliveryTrigger;
 use super::request_part_renderer::RenderProblem;
 use super::template_context::build_event_template_context;
-use super::variable_resolution::resolve_template_variables;
+use super::variable_resolution::{read_environment_variables, resolve_template_variables};
 use crate::{AppEvent, OperationContext, OperationError};
 
 /// Who a delivery goes to and why, for the context.
@@ -116,6 +116,7 @@ pub async fn build_delivery_template_context(
     };
     let resolved_variables = resolve_template_variables(
         &stored_variables,
+        &read_environment_variables(operation_context.environment_reader.as_ref()),
         details.send_time_values,
         &Value::Object(template_context.clone()),
         template_functions,

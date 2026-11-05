@@ -149,7 +149,9 @@ pub use variable_operations::{
     CreateWebhookVariableOperation, DeleteWebhookVariableOperation, ListWebhookVariablesOperation,
     UpdateWebhookVariableOperation,
 };
-pub use variable_resolution::{ResolvedVariables, resolve_template_variables};
+pub use variable_resolution::{
+    ResolvedVariables, read_environment_variables, resolve_template_variables,
+};
 pub(crate) use variable_validation::validate_variable;
 pub use variable_value_operations::{
     PreviewWebhookVariableOperation, RegenerateWebhookVariableOperation, VariablePreviewResult,

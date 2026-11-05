@@ -12,7 +12,8 @@ use super::variable_inputs::{
 };
 use super::variable_operations::{find_stored_variable, generate_fixed_value, variable_definition};
 use super::variable_resolution::{
-    VariableDefinition, resolve_template_variables, resolve_variable_value,
+    VariableDefinition, read_environment_variables, resolve_template_variables,
+    resolve_variable_value,
 };
 use super::variable_validation::find_value_problem;
 use super::variable_view::{WebhookVariable, build_variable_view};
@@ -176,6 +177,7 @@ async fn build_preview_context(
         .collect();
     let resolved_variables = resolve_template_variables(
         &global_variables,
+        &read_environment_variables(operation_context.environment_reader.as_ref()),
         &Map::new(),
         &Value::Object(preview_context.clone()),
         template_functions,

@@ -123,8 +123,8 @@ pub use webhooks::{
     WebhookSendFailure, WebhookSendResult, WebhookSender, WebhookTemplateDetail,
     WebhookTemplateSummary, WebhookVariable, build_event_template_context,
     build_sample_template_context, enqueue_webhook_delivery, fire_matching_rules,
-    resolve_template_variables, run_due_deliveries, run_webhook_dispatcher,
-    run_webhook_rule_subscriber,
+    read_environment_variables, resolve_template_variables, run_due_deliveries,
+    run_webhook_dispatcher, run_webhook_rule_subscriber,
 };
 
 /// Every operation this build of SendMock serves.

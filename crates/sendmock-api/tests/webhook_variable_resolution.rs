@@ -4,7 +4,8 @@ use sendmock_core::{
     FixedClock, SeededRandomSource, StandardTemplateFunctions, TemplateRenderMode,
 };
 use sendmock_ops::{
-    AppEvent, ResolvedVariables, build_event_template_context, resolve_template_variables,
+    AppEvent, FixedEnvironment, ResolvedVariables, build_event_template_context,
+    read_environment_variables, resolve_template_variables,
 };
 use sendmock_store::WebhookVariableRecord;
 use serde_json::{Map, Value, json};
@@ -36,6 +37,15 @@ fn resolve(
     send_time_values: Value,
     render_mode: TemplateRenderMode,
 ) -> ResolvedVariables {
+    resolve_with_environment(stored_variables, &Map::new(), send_time_values, render_mode)
+}
+
+fn resolve_with_environment(
+    stored_variables: &[WebhookVariableRecord],
+    environment_values: &Map<String, Value>,
+    send_time_values: Value,
+    render_mode: TemplateRenderMode,
+) -> ResolvedVariables {
     let template_functions = StandardTemplateFunctions::new(
         Arc::new(FixedClock::new(1_767_225_600_000)),
         Arc::new(SeededRandomSource::new(4)),
@@ -51,6 +61,7 @@ fn resolve(
         send_time_values.as_object().cloned().unwrap_or_default();
     resolve_template_variables(
         stored_variables,
+        environment_values,
         &send_time_values,
         &base_context,
         &template_functions,
@@ -124,6 +135,34 @@ fn send_time_values_beat_endpoint_variables_which_beat_global_ones() {
     assert_eq!(manual_send.values["tenant_id"], "typed-tenant");
     assert_eq!(manual_send.values["reason"], "checking retries");
     assert_eq!(manual_send.values["extra"], 1);
+}
+
+// AC: WH-07.2
+#[test]
+fn sendmock_var_environment_variables_are_the_lowest_scope_and_lowercased() {
+    let environment = FixedEnvironment::default()
+        .with_variable("SENDMOCK_VAR_TENANT_ID", "from-env")
+        .with_variable("SENDMOCK_VAR_REGION", "eu-west")
+        .with_variable("SENDMOCK_VAR_API_KEY", "env-key")
+        .with_variable("OTHER_SECRET", "never-read");
+    let environment_values = read_environment_variables(&environment);
+    let stored_variables = vec![
+        stored_variable("tenant_id", "text", "global-tenant"),
+        endpoint_variable("api_key", "endpoint-key"),
+    ];
+
+    let resolved = resolve_with_environment(
+        &stored_variables,
+        &environment_values,
+        json!({ "api_key": "send-time-key" }),
+        TemplateRenderMode::Strict,
+    );
+
+    assert_eq!(resolved.values["region"], "eu-west");
+    assert_eq!(resolved.values["tenant_id"], "global-tenant");
+    assert_eq!(resolved.values["api_key"], "send-time-key");
+    assert!(!resolved.values.contains_key("other_secret"));
+    assert_eq!(environment_values.len(), 3);
 }
 
 // AC: WH-07.5
