@@ -1,7 +1,8 @@
 # Stripe's official SDKs against a SendMock release binary: an app on the Node SDK completes a
 # Checkout Session, receives checkout.session.completed and payment_intent.succeeded verified
 # with constructEvent, and handles a declined card; the PHP and Python SDKs then verify the same
-# deliveries. An app on SSLCommerz's Node package pays, checks the IPN's verify_sign, validates
+# deliveries. An app on PayPal's Node SDK captures an order, checks its webhooks with
+# verify-webhook-signature, handles a decline and refunds; an app on SSLCommerz's Node package pays, checks the IPN's verify_sign, validates
 # the order, handles a decline and refunds. Runs on changes to the payment code or the
 # examples, and from Release build before anything is published.
 name: Stripe SDKs
@@ -13,6 +14,7 @@ on:
       - crates/sendmock-ops/src/payments/**
       - crates/sendmock-ops/src/stripe/**
       - crates/sendmock-ops/src/sslcommerz/**
+      - crates/sendmock-ops/src/paypal/**
       - crates/sendmock-ops/src/providers/**
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
@@ -27,6 +29,7 @@ on:
       - crates/sendmock-ops/src/payments/**
       - crates/sendmock-ops/src/stripe/**
       - crates/sendmock-ops/src/sslcommerz/**
+      - crates/sendmock-ops/src/paypal/**
       - crates/sendmock-ops/src/providers/**
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
@@ -101,6 +104,10 @@ jobs:
       - name: Verify the deliveries with the Python SDK
         working-directory: examples/payments/stripe-python
         run: pip install --quiet -r requirements.txt && python verify.py
+
+      - name: Capture, check the webhooks, decline and refund with PayPal's Node SDK
+        working-directory: examples/payments/paypal-node
+        run: bun install && node done-when.js
 
       - name: Pay, check the IPN, validate, decline and refund with SSLCommerz's Node package
         working-directory: examples/payments/sslcommerz-node

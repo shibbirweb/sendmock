@@ -31,6 +31,11 @@ describe("Stripe SDKs workflow", () => {
     expect(existsSync("examples/payments/stripe-python/verify.py")).toBe(true);
   });
 
+  test("PayPal's Node SDK captures, checks the webhooks, declines and refunds", () => {
+    expect(findExampleStep("paypal-node")?.run).toContain("node done-when.js");
+    expect(existsSync("examples/payments/paypal-node/done-when.js")).toBe(true);
+  });
+
   test("SSLCommerz's Node package pays, checks the IPN, validates, declines and refunds", () => {
     expect(findExampleStep("sslcommerz-node")?.run).toContain("node done-when.js");
     expect(existsSync("examples/payments/sslcommerz-node/done-when.js")).toBe(true);

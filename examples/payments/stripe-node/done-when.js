@@ -3,8 +3,9 @@
 // Checkout Session, the customer pays on the checkout page, and the app receives
 // `checkout.session.completed` and `payment_intent.succeeded`, each verified with
 // `stripe.webhooks.constructEvent`; then a confirm with a declined card throws the SDK's
-// `StripeCardError` and `payment_intent.payment_failed` arrives. Every delivery is written to
-// a file the PHP and Python SDKs verify next.
+// `StripeCardError` and `payment_intent.payment_failed` arrives, and the paid PaymentIntent is
+// refunded, sending `charge.refunded`. Every delivery is written to a file the PHP and Python
+// SDKs verify next.
 import { writeFileSync } from "node:fs";
 
 import Stripe from "stripe";
@@ -117,6 +118,17 @@ async function payCheckoutSession(receivedEvents) {
   expectEqual(succeededEvent.data.object.id, completedSession.payment_intent, "The paid intent");
   const retrievedSession = await stripe.checkout.sessions.retrieve(checkoutSession.id);
   expectEqual(retrievedSession.status, "complete", "The retrieved session's status");
+  return completedSession.payment_intent;
+}
+
+async function refundPayment(receivedEvents, paymentIntentId) {
+  const refund = await stripe.refunds.create({ payment_intent: paymentIntentId });
+  expectEqual(refund.status, "succeeded", "The refund's status");
+  const refundedEvent = await waitForEvent(receivedEvents, "charge.refunded");
+  const refundedCharge = refundedEvent.data.object;
+  expectEqual(refundedCharge.payment_intent, paymentIntentId, "The refunded charge's intent");
+  expectEqual(refundedCharge.refunded, true, "Whether the charge is refunded in full");
+  expectEqual(refundedCharge.amount_refunded, 1500, "The refunded amount");
 }
 
 async function handleDeclinedCard(receivedEvents) {
@@ -143,8 +155,9 @@ async function main() {
   const receiver = await startStripeWebhookReceiver(stripe, webhookSecret);
   await connectReceiver(receiver.receiverUrl);
 
-  await payCheckoutSession(receiver.receivedEvents);
+  const paymentIntentId = await payCheckoutSession(receiver.receivedEvents);
   await handleDeclinedCard(receiver.receivedEvents);
+  await refundPayment(receiver.receivedEvents, paymentIntentId);
 
   writeFileSync(
     deliveriesPath,

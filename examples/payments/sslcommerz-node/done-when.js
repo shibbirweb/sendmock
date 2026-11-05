@@ -1,3 +1,4 @@
+// AC: PY-06.1 PY-06.2 PY-06.3 PY-06.5
 // An app using SSLCommerz's official Node package (`sslcommerz-lts`) against a running
 // SendMock: it starts a session, the customer pays on the checkout page, the IPN arrives with a
 // `verify_sign` the app checks, and the order is validated (`VALID`, then `VALIDATED`); a
