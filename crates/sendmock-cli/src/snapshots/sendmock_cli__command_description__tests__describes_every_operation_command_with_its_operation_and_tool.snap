@@ -1592,6 +1592,33 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments checkout complete",
+    "usage": "sendmock payments checkout complete <sessionId> <action>",
+    "aliases": [],
+    "summary": "Pay, decline or cancel from the checkout page.",
+    "arguments": [
+      "sessionId",
+      "action"
+    ],
+    "flags": [
+      "--card",
+      "--decline-reason",
+      "--entries",
+      "--method-key"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/checkout-sessions/{sessionId}/complete",
+        "operation_id": "postCheckoutSessionsBySessionIdComplete",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_checkout_complete"
+    ]
+  },
+  {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
     "aliases": [],

@@ -1102,7 +1102,21 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
     });
     let payment_id =
         post_json(app_router, "/api/v1/payments/checkout", &checkout).await["id"].clone();
+    let card_payment_id = post_json(
+        app_router,
+        "/api/v1/payments/checkout",
+        &json!({ "provider": "stripe", "amount_minor": 500 }),
+    )
+    .await["id"]
+        .clone();
     vec![
+        (
+            "postCheckoutSessionsBySessionIdComplete",
+            vec![
+                json!({ "session_id": card_payment_id, "action": "pay", "method_key": "card", "card": { "number": "4242424242424242", "exp_month": 12, "exp_year": 2030, "cvc": "123", "holder_name": "Sam Tester" } }),
+                json!({ "session_id": payment_id, "action": "require_three_ds" }),
+            ],
+        ),
         (
             "getPayments",
             vec![

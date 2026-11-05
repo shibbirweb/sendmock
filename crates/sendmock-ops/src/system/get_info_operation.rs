@@ -127,7 +127,7 @@ mod tests {
             !app_info
                 .available_operations
                 .iter()
-                .any(|operation_id| operation_id == "getPayments")
+                .any(|operation_id| operation_id == "postPaymentsByPaymentIdSimulate")
         );
         Ok(())
     }

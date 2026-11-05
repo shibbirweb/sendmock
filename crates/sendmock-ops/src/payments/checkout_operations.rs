@@ -7,8 +7,9 @@ use super::checkout_views::{
     CheckoutSession, CheckoutSessionReference, CheckoutState, PaymentCheckoutCreateRequest,
 };
 use super::payment_catalogue::{
-    add_timeline_event, build_provider_ids, find_payment, read_provider_reference, save_payment,
+    add_timeline_event, build_provider_ids, find_payment, read_provider_reference,
 };
+use super::payment_change::PaymentChange;
 use super::payment_flow_catalogue::{
     load_method_flow_keys, load_payment_flows, present_with_usage,
 };
@@ -18,7 +19,7 @@ use super::payment_method_views::PaymentMethodDefinition;
 use super::payment_views::{PaymentDetail, PaymentLineItem, PaymentStatus, PaymentSummary};
 use crate::{
     AppEventType, HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
-    SuccessStatus, publish_event,
+    SuccessStatus,
 };
 
 /// The app's pages a test checkout sends the customer back to.
@@ -181,16 +182,17 @@ impl Operation for CreatePaymentCheckoutOperation {
             "created",
             "Test checkout session created",
         );
-        save_payment(
+        let mut payment_change = PaymentChange::start(
             operation_context,
-            &payment,
-            operation_context.clock.now_unix_ms(),
+            payment,
+            vec![AppEventType::PaymentCreated],
         )
-        .await?;
-        let event_data = serde_json::to_value(&payment.summary)
-            .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
-        publish_event(operation_context, AppEventType::PaymentCreated, event_data);
-        Ok(payment)
+        .await;
+        payment_change.apply_outcome_profile(
+            app_settings.payment_outcome_profile,
+            app_settings.payment_random_success_rate_percent,
+        );
+        payment_change.save().await
     }
 }
 

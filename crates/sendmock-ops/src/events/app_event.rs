@@ -26,6 +26,11 @@ pub enum AppEventType {
     WebhookDelivered,
     WebhookFailed,
     PaymentCreated,
+    PaymentSucceeded,
+    PaymentFailed,
+    PaymentCanceled,
+    PaymentDisputeOpened,
+    CheckoutCompleted,
 }
 
 impl AppEventType {
@@ -51,6 +56,11 @@ impl AppEventType {
             Self::WebhookDelivered => "webhook.delivered",
             Self::WebhookFailed => "webhook.failed",
             Self::PaymentCreated => "payment.created",
+            Self::PaymentSucceeded => "payment.succeeded",
+            Self::PaymentFailed => "payment.failed",
+            Self::PaymentCanceled => "payment.canceled",
+            Self::PaymentDisputeOpened => "payment.dispute_opened",
+            Self::CheckoutCompleted => "checkout.completed",
         }
     }
 }

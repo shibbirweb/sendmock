@@ -1,6 +1,11 @@
+mod checkout_completion_operation;
+mod checkout_completion_views;
 mod checkout_operations;
+mod checkout_payment_run;
 mod checkout_views;
+mod gateway_redirect_rendering;
 mod payment_catalogue;
+mod payment_change;
 mod payment_definition_store;
 mod payment_flow_catalogue;
 mod payment_flow_operations;
@@ -16,6 +21,7 @@ mod payment_method_views;
 mod payment_operations;
 mod payment_views;
 
+pub use checkout_completion_operation::CompleteCheckoutOperation;
 pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
 pub use payment_flow_operations::{
     CreatePaymentFlowOperation, DeletePaymentFlowOperation, GetPaymentFlowOperation,
@@ -76,4 +82,5 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CreatePaymentCheckoutOperation);
     operation_registry.register(GetPaymentOperation);
     operation_registry.register(GetCheckoutSessionOperation);
+    operation_registry.register(CompleteCheckoutOperation);
 }

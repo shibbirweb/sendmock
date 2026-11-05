@@ -90,7 +90,7 @@ const checkoutEndpoints = tagEndpoints("Checkout", [
     summary: "Pay, decline or cancel from the checkout page.",
     requestBody: typeRef("CheckoutCompleteRequest"),
     response: typeRef("CheckoutSession"),
-    errorStatuses: [400, 404, 409],
+    errorStatuses: [400, 404, 409, 422],
   },
 ]);
 

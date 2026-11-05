@@ -12,7 +12,8 @@ pub use app_settings_store::AppSettingsStore;
 pub use app_settings_update::AppSettingsUpdate;
 pub use reset_operation::ResetOperation;
 pub use setting_choices::{
-    EmailOutcomeProfile, OpenedEventMode, SmsSimulationProfile, UpdateCheckMode,
+    EmailOutcomeProfile, OpenedEventMode, PaymentOutcomeProfile, SmsSimulationProfile,
+    UpdateCheckMode,
 };
 pub use settings_operations::{GetSettingsOperation, UpdateSettingsOperation};
 pub(crate) use settings_validation::validate_settings_update;
