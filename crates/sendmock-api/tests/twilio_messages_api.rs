@@ -340,3 +340,22 @@ async fn media_urls_are_copied_and_an_unreachable_one_fails_with_11200() {
     assert_eq!(failed_mms["status"], "failed");
     assert_eq!(failed_mms["error_code"], 11200);
 }
+
+// AC: SM-11.1
+#[tokio::test]
+async fn a_send_to_a_whatsapp_address_is_stored_on_the_whatsapp_channel() {
+    let (app_router, _) = build_test_app();
+
+    let (status, created_message) = send_twilio(
+        &app_router,
+        "To=whatsapp%3A%2B15550001111&From=whatsapp%3A%2B14155238886&Body=Your+order+shipped",
+    )
+    .await;
+
+    assert_eq!(status, 201, "{created_message}");
+    let (_, sms_list) = call_api(&app_router, "GET", "/api/v1/sms", None).await;
+    let stored_sms = &sms_list["items"][0];
+    assert_eq!(stored_sms["channel"], "whatsapp", "{sms_list}");
+    assert_eq!(stored_sms["to_number"], "+15550001111");
+    assert_eq!(stored_sms["body"], "Your order shipped");
+}

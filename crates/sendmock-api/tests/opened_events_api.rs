@@ -357,7 +357,7 @@ async fn create_twilio_status_endpoint(app_router: &axum::Router) -> String {
     endpoint_id
 }
 
-// AC: SM-10.3
+// AC: SM-10.3 SM-11.3
 #[tokio::test]
 async fn an_opened_sms_sends_twilios_read_status() {
     let (app_router, operation_context) =

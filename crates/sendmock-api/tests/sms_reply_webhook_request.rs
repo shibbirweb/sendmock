@@ -155,7 +155,7 @@ async fn a_service_that_defers_uses_the_numbers_url_and_one_that_drops_sends_not
     assert!(dropping.twiml_app.received_requests().is_empty());
 }
 
-// AC: SM-09.4
+// AC: SM-09.4 SM-11.2
 #[tokio::test]
 async fn media_and_whatsapp_messages_carry_twilios_media_and_whatsapp_fields() {
     let fixture = ReplyWebhookFixture::new(ScriptedTwimlApp::default()).await;

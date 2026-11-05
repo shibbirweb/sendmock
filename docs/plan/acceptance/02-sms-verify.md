@@ -42,8 +42,8 @@ Phase 2.
 
 Phase 4.
 
-- [ ] SM-05.1 Plivo and MessageBird send endpoints accept requests and return their provider's response and error shapes.
-- [ ] SM-05.2 A generic GET/POST vendor with configurable parameter names (`to`, `msg`, `api_key`, ...) captures SMS from regional vendor clients.
+- [x] SM-05.1 Plivo and MessageBird send endpoints accept requests and return their provider's response and error shapes. (#48)
+- [x] SM-05.2 A generic GET/POST vendor with configurable parameter names (`to`, `msg`, `api_key`, ...) captures SMS from regional vendor clients. (#48)
 
 ## SM-06 Encoding and segments
 
@@ -99,9 +99,9 @@ Phase 3.
 
 Phase 4.
 
-- [ ] SM-11.1 Sends with `whatsapp:+...` addresses are stored with channel `whatsapp` and shown with WhatsApp styling.
-- [ ] SM-11.2 Inbound WhatsApp messages are delivered in Twilio's format.
-- [ ] SM-11.3 The `read` status is supported in callbacks.
+- [x] SM-11.1 Sends with `whatsapp:+...` addresses are stored with channel `whatsapp` and shown with WhatsApp styling. (#48)
+- [x] SM-11.2 Inbound WhatsApp messages are delivered in Twilio's format. (#48)
+- [x] SM-11.3 The `read` status is supported in callbacks. (#48)
 
 ## SM-12 Virtual numbers
 
