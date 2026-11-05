@@ -3,6 +3,7 @@ use sendmock_store::PaymentListFilter;
 use super::payment_catalogue::{find_payment, read_payment_document};
 use super::payment_method_catalogue::list_presented_methods;
 use super::payment_method_views::PaymentMethodDefinition;
+use super::payment_notification::refresh_notification_statuses;
 use super::payment_views::{PaymentDetail, PaymentListQuery, PaymentReference, PaymentSummary};
 use crate::{
     HttpMethod, NoInput, Operation, OperationContext, OperationDefinition, OperationError, PageOf,
@@ -109,7 +110,9 @@ impl Operation for GetPaymentOperation {
         operation_context: &OperationContext,
         input: PaymentReference,
     ) -> Result<PaymentDetail, OperationError> {
-        find_payment(operation_context, &input.payment_id).await
+        let mut payment = find_payment(operation_context, &input.payment_id).await?;
+        refresh_notification_statuses(operation_context, &mut payment).await?;
+        Ok(payment)
     }
 }
 

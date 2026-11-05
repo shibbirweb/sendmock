@@ -21,6 +21,8 @@ mod payment_gateway_views;
 mod payment_method_catalogue;
 mod payment_method_operations;
 mod payment_method_views;
+mod payment_notification;
+mod payment_notify_operation;
 mod payment_operations;
 mod payment_redirect;
 mod payment_views;
@@ -50,6 +52,7 @@ pub use payment_method_operations::{
     ListPaymentMethodsOperation, ResetPaymentMethodOperation, UpdatePaymentMethodOperation,
 };
 pub use payment_method_views::PaymentMethodDefinition;
+pub use payment_notify_operation::NotifyPaymentOperation;
 pub use payment_operations::{
     GetPaymentOperation, ListPaymentTestValuesOperation, ListPaymentsOperation,
 };
@@ -87,6 +90,7 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ListPaymentTestValuesOperation);
     operation_registry.register(CreatePaymentCheckoutOperation);
     operation_registry.register(GetPaymentOperation);
+    operation_registry.register(NotifyPaymentOperation);
     operation_registry.register(GetCheckoutSessionOperation);
     operation_registry.register(CompleteCheckoutOperation);
 }

@@ -4,6 +4,7 @@ use super::gateway_template_rendering::RedirectOutcome;
 use super::payment_catalogue::{add_timeline_event, find_payment, save_payment};
 use super::payment_gateway_catalogue::find_payment_gateway;
 use super::payment_gateway_views::PaymentGatewayFields;
+use super::payment_notification::queue_payment_notification;
 use super::payment_redirect::build_payment_redirect;
 use super::payment_views::{PaymentDetail, PaymentDispute, PaymentInstrument, PaymentStatus};
 use crate::settings::PaymentOutcomeProfile;
@@ -183,9 +184,38 @@ impl<'context> PaymentChange<'context> {
         }
     }
 
-    /// Stores the payment, then publishes its events in order, each carrying its summary.
-    pub async fn save(self) -> Result<PaymentDetail, OperationError> {
+    /// Queues the gateway's notification for `event_type` again, under a new event id;
+    /// false when the gateway is gone, has no notification endpoint or names no such event.
+    pub async fn resend_notification(&mut self, event_type: &str) -> Result<bool, OperationError> {
+        let Some(gateway_fields) = &self.gateway_fields else {
+            return Ok(false);
+        };
+        let notification_count = self.payment.notifications.len();
+        queue_payment_notification(
+            self.operation_context,
+            gateway_fields,
+            &mut self.payment,
+            event_type,
+        )
+        .await?;
+        Ok(self.payment.notifications.len() > notification_count)
+    }
+
+    /// Queues the gateway's notification for each event, stores the payment, then publishes
+    /// its events in order, each carrying its summary.
+    pub async fn save(mut self) -> Result<PaymentDetail, OperationError> {
         let operation_context = self.operation_context;
+        if let Some(gateway_fields) = &self.gateway_fields {
+            for event_type in &self.fired_events {
+                queue_payment_notification(
+                    operation_context,
+                    gateway_fields,
+                    &mut self.payment,
+                    event_type.as_str(),
+                )
+                .await?;
+            }
+        }
         save_payment(
             operation_context,
             &self.payment,

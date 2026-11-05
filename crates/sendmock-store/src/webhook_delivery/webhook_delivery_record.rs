@@ -30,6 +30,9 @@ pub struct WebhookDeliveryRecord {
     /// When this row is due: a `pending` row's send time, a `failed` row's retry time.
     pub next_attempt_at_unix_ms: Option<i64>,
     pub created_at_unix_ms: i64,
+    /// Whether each attempt gets the endpoint's Standard Webhooks headers; a payment
+    /// gateway's notification carries its provider's own signature instead.
+    pub is_signed: bool,
 }
 
 /// How an attempt ended.

@@ -5,6 +5,7 @@ use super::delivery_request_plan::DeliveryRequestPlan;
 use super::delivery_request_rendering::{RenderedDeliveryRequest, render_delivery_request};
 use super::delivery_template_context::DeliveryContextDetails;
 use super::endpoint_settings::RetryPolicy;
+use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblemSeverity;
 use crate::{AppEvent, OperationContext, OperationError};
 
@@ -101,6 +102,7 @@ pub fn build_first_attempt(
             .then(|| rendered_delivery.describe_problems(RenderProblemSeverity::Error)),
         next_attempt_at_unix_ms: (!has_render_errors).then_some(now_unix_ms),
         created_at_unix_ms: now_unix_ms,
+        is_signed: true,
     })
 }
 
@@ -193,5 +195,28 @@ pub async fn enqueue_webhook_delivery(
         &request_plan,
     )
     .await?;
+    queue_first_attempt(operation_context, new_delivery).await
+}
+
+/// A request rendered outside the endpoint, such as a payment gateway's notification, queued
+/// to the endpoint with its retry policy. Unsigned, it is sent without the endpoint's
+/// Standard Webhooks headers, as a provider sends its own notification.
+pub async fn enqueue_rendered_delivery(
+    operation_context: &OperationContext,
+    stored_endpoint: &WebhookEndpointRecord,
+    delivery_order: DeliveryOrder,
+    rendered_delivery: &RenderedDeliveryRequest,
+    is_signed: bool,
+) -> Result<WebhookDeliveryRecord, OperationError> {
+    let retry_policy = read_request_settings(stored_endpoint)?.retry_policy;
+    let mut new_delivery = build_first_attempt(
+        stored_endpoint,
+        delivery_order,
+        operation_context.id_generator.generate_id().to_string(),
+        &retry_policy,
+        rendered_delivery,
+        operation_context.clock.now_unix_ms(),
+    )?;
+    new_delivery.is_signed = is_signed;
     queue_first_attempt(operation_context, new_delivery).await
 }

@@ -1597,6 +1597,27 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments notify",
+    "usage": "sendmock payments notify <paymentId>",
+    "aliases": [],
+    "summary": "Send the payment's notification (IPN or webhook) again.",
+    "arguments": [
+      "paymentId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/{paymentId}/notify",
+        "operation_id": "postPaymentsByPaymentIdNotify",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_notify"
+    ]
+  },
+  {
     "command": "sendmock payments checkout show",
     "usage": "sendmock payments checkout show <sessionId>",
     "aliases": [],

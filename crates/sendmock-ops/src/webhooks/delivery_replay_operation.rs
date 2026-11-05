@@ -204,6 +204,12 @@ impl Operation for ReplayWebhookDeliveryOperation {
     ) -> Result<WebhookDelivery, OperationError> {
         let original_delivery =
             find_delivery_or_not_found(operation_context, &input.delivery_id).await?;
+        if input.rerender && !original_delivery.is_signed {
+            return Err(conflict(
+                "gateway_notification",
+                "A payment gateway's notification renders from the gateway: resend it from the payment instead.".to_owned(),
+            ));
+        }
         let stored_endpoint =
             find_stored_endpoint(operation_context, &original_delivery.endpoint_id).await?;
         let replay_event_id = format!("evt_{}", operation_context.id_generator.generate_id());
@@ -240,6 +246,7 @@ impl Operation for ReplayWebhookDeliveryOperation {
         if replayed_event.event_json_is_missing {
             replay_delivery.event_json = None;
         }
+        replay_delivery.is_signed = original_delivery.is_signed;
         let queued_delivery = queue_first_attempt(operation_context, replay_delivery).await?;
         Ok(WebhookDelivery::from(queued_delivery))
     }

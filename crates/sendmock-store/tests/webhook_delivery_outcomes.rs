@@ -39,6 +39,7 @@ fn finished_delivery(
         error_message: None,
         next_attempt_at_unix_ms: None,
         created_at_unix_ms,
+        is_signed: true,
     }
 }
 

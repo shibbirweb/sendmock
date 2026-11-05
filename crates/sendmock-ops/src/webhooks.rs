@@ -74,8 +74,10 @@ pub use delivery_dispatch::{run_due_deliveries, run_webhook_dispatcher};
 pub use delivery_operations::{
     CancelWebhookDeliveryOperation, GetWebhookDeliveryOperation, ListWebhookDeliveriesOperation,
 };
+pub(crate) use delivery_queue::enqueue_rendered_delivery;
 pub use delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
 pub use delivery_replay_operation::ReplayWebhookDeliveryOperation;
+pub(crate) use delivery_request_rendering::RenderedDeliveryRequest;
 pub use delivery_view::WebhookDelivery;
 pub use delivery_wait_operation::WaitForWebhookOperation;
 pub(crate) use endpoint_inputs::{WebhookEndpointInput, WebhookEndpointReference};
@@ -100,6 +102,7 @@ pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
 pub use metrics_operation::GetWebhookMetricsOperation;
 pub(crate) use metrics_operation::{build_endpoint_metrics, build_recent_failures};
 pub(crate) use metrics_view::{EndpointMetrics, RecentFailedDelivery};
+pub(crate) use request_part_renderer::{RenderProblem, RenderProblemSeverity};
 pub(crate) use rule_filter_wire::RuleFilter;
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{

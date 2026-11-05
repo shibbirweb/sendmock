@@ -110,13 +110,17 @@ async fn send_delivery_attempt(
         .transpose()
         .map_err(internal_error)?
         .ok_or_else(|| internal_error("The delivery has no rendered request"))?;
-    let sent_request = sign_delivery_request(
-        &rendered_request,
-        &stored_endpoint,
-        &in_flight_delivery.event_id,
-        in_flight_delivery.attempt,
-        started_at_unix_ms,
-    )?;
+    let sent_request = if in_flight_delivery.is_signed {
+        sign_delivery_request(
+            &rendered_request,
+            &stored_endpoint,
+            &in_flight_delivery.event_id,
+            in_flight_delivery.attempt,
+            started_at_unix_ms,
+        )?
+    } else {
+        rendered_request
+    };
     let timeout_ms = read_request_settings(&stored_endpoint)?.timeout_ms;
     let send_result = send_signed_request(operation_context, &sent_request, timeout_ms).await;
     let attempt_decision = read_retry_schedule(in_flight_delivery)?.decide_after_attempt(

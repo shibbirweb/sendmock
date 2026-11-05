@@ -1132,10 +1132,33 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
 }
 
 /// A completed card checkout and a gateway preview, on a fresh Stripe payment and `payment_id`.
+/// A native checkout whose gateway notifies an endpoint, so it has a notification to resend.
+async fn prepare_notified_payment(app_router: &axum::Router) -> Value {
+    let endpoint_id = post_json(
+        app_router,
+        "/api/v1/webhooks/endpoints",
+        &webhook_endpoint_sample("Shop payments"),
+    )
+    .await["id"]
+        .clone();
+    let gateway_path = "/api/v1/payments/gateways/native";
+    let mut native_gateway = send_json(app_router, "GET", gateway_path, &Value::Null).await;
+    native_gateway["notification_endpoint_id"] = endpoint_id;
+    send_json(app_router, "PATCH", gateway_path, &native_gateway).await;
+    post_json(
+        app_router,
+        "/api/v1/payments/checkout",
+        &json!({ "provider": "native", "amount_minor": 900 }),
+    )
+    .await["id"]
+        .clone()
+}
+
 async fn prepare_checkout_action_samples(
     app_router: &axum::Router,
     payment_id: &Value,
 ) -> Vec<(&'static str, Vec<Value>)> {
+    let notified_payment_id = prepare_notified_payment(app_router).await;
     let card_payment_id = post_json(
         app_router,
         "/api/v1/payments/checkout",
@@ -1157,6 +1180,10 @@ async fn prepare_checkout_action_samples(
                 json!({ "gateway_key": "stripe", "gateway": stripe_gateway, "event_type": "payment.succeeded", "redirect_outcome": "success" }),
                 json!({ "gateway_key": "stripe", "gateway": stripe_gateway, "payment_id": payment_id, "event_type": "payment.created", "redirect_outcome": "cancel" }),
             ],
+        ),
+        (
+            "postPaymentsByPaymentIdNotify",
+            vec![json!({ "payment_id": notified_payment_id })],
         ),
         (
             "postCheckoutSessionsBySessionIdComplete",

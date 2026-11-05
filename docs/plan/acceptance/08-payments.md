@@ -23,7 +23,7 @@ Phase 3P.
 
 UI in U2, live in Phase 3P.
 
-- [ ] PY-03.1 Pay, Decline (each reason), Cancel, 3-D Secure (approve, fail) and Delay produce the documented outcome, redirect and notification.
+- [x] PY-03.1 Pay, Decline (each reason), Cancel, 3-D Secure (approve, fail) and Delay produce the documented outcome, redirect and notification.
 - [x] PY-03.2 The page renders the provider theme being emulated (card form, PayPal approve, SSLCommerz method picker, bKash wallet, OTP and PIN steps).
 - [ ] PY-03.3 Expired or already completed sessions show a clear message and cannot be paid twice.
 - [x] PY-03.4 The page is keyboard accessible and meets the UI accessibility criteria.
@@ -70,7 +70,7 @@ Phase 3P.
 
 - [ ] PY-08.1 Every native `payment.*`, `checkout.*` and `subscription.*` event fires at the right moment and can trigger webhook rules.
 - [ ] PY-08.2 Built-in payment templates (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook) render against a real payment and match provider fixtures.
-- [ ] PY-08.3 IPN and webhook deliveries appear in the webhook delivery log with retries, replay and "resend IPN" from the payment detail.
+- [x] PY-08.3 IPN and webhook deliveries appear in the webhook delivery log with retries, replay and "resend IPN" from the payment detail.
 
 ## PY-09 Payments UI
 

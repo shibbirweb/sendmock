@@ -47,6 +47,7 @@ fn sent_delivery(delivery_id: &str) -> WebhookDeliveryRecord {
         error_message: None,
         next_attempt_at_unix_ms: None,
         created_at_unix_ms: 1_000,
+        is_signed: true,
     }
 }
 
