@@ -98,22 +98,22 @@ UI in U1, backend Phase 1.
 
 Native events Phase 3, provider formats Phase 4. Docs: [Delivery outcome simulation](../03-email.md#delivery-outcome-simulation).
 
-- [ ] EM-10.1 Sending to each SES mailbox simulator address and each SendMock alias (`delivered@`, `bounce@`, `bounce+soft@`, `complaint@`, ...) produces the documented events.
-- [ ] EM-10.2 Delivery profiles `off`, `auto-delivered` and `realistic` behave as documented.
-- [ ] EM-10.3 Manual "Simulate" actions fire the chosen event; the API and CLI do the same.
-- [ ] EM-10.4 Events appear on the email timeline and are delivered by matching webhook rules in native and provider formats.
-- [ ] EM-10.5 Custom outcome addresses can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file; the first enabled match wins over the magic addresses.
-- [ ] EM-10.6 With the Magic addresses switch off, magic addresses behave like any other address; "Test an address" shows which rule, magic address or profile applies.
+- [x] EM-10.1 Sending to each SES mailbox simulator address and each SendMock alias (`delivered@`, `bounce@`, `bounce+soft@`, `complaint@`, ...) produces the documented events.
+- [x] EM-10.2 Delivery profiles `off`, `auto-delivered` and `realistic` behave as documented.
+- [x] EM-10.3 Manual "Simulate" actions fire the chosen event; the API and CLI do the same.
+- [x] EM-10.4 Events appear on the email timeline and are delivered by matching webhook rules in native and provider formats.
+- [x] EM-10.5 Custom outcome addresses can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file; the first enabled match wins over the magic addresses.
+- [x] EM-10.6 With the Magic addresses switch off, magic addresses behave like any other address; "Test an address" shows which rule, magic address or profile applies.
 
 ## EM-11 Email opened events
 
 Phase 3. Docs: [Opened events](../05-webhooks.md#opened-events).
 
-- [ ] EM-11.1 Opening an email detail in the UI fires `email.opened` once with `first_open: true` (default setting).
-- [ ] EM-11.2 With "every open", re-opens fire with `first_open: false` and an incremented `open_count`.
-- [ ] EM-11.3 "Simulate open" and `POST /emails/{emailId}/open` always fire.
-- [ ] EM-11.4 With auto-fire turned off, viewing does not fire; manual and API opens still do.
-- [ ] EM-11.5 Mark unread does not reset `open_count` or `opened_at`.
+- [x] EM-11.1 Opening an email detail in the UI fires `email.opened` once with `first_open: true` (default setting).
+- [x] EM-11.2 With "every open", re-opens fire with `first_open: false` and an incremented `open_count`.
+- [x] EM-11.3 "Simulate open" and `POST /emails/{emailId}/open` always fire.
+- [x] EM-11.4 With auto-fire turned off, viewing does not fire; manual and API opens still do.
+- [x] EM-11.5 Mark unread does not reset `open_count` or `opened_at`.
 
 ## EM-12 Tags
 

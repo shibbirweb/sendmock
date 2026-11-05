@@ -63,8 +63,8 @@ UI in U2, backend Phase 3.
 
 Phase 3 (Twilio, Vonage), Phase 4 (email providers).
 
-- [ ] WH-06.1 Each provider format matches the fixtures built from that provider's docs (fields, content type, encoding).
-- [ ] WH-06.2 Provider signatures (Twilio, Mailgun, SendGrid, Slack) verify with that provider's official SDK helper.
+- [x] WH-06.1 Each provider format matches the fixtures built from that provider's docs (fields, content type, encoding).
+- [x] WH-06.2 Provider signatures (Twilio, Mailgun, SendGrid, Slack) verify with that provider's official SDK helper.
 - [ ] WH-06.3 Inbound email formats include attachments as the provider sends them.
 
 ## WH-07 Variables and templating
@@ -92,11 +92,11 @@ UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, 
 
 UI in U2, backend Phase 3 (Twilio, Vonage, Slack, Discord, native), Phase 4 (the rest).
 
-- [ ] WH-08.1 Every built-in template in the catalogue renders against its sample and against a real event of each declared type.
+- [x] WH-08.1 Every built-in template in the catalogue renders against its sample and against a real event of each declared type.
 - [ ] WH-08.2 Choosing a template asks for its required variables.
-- [ ] WH-08.3 The gallery filters by category, service and event.
-- [ ] WH-08.4 A template's detail shows its description, events, required variables, request shape and provider doc link with the verified date, and previews the rendered request against a chosen recent message or the built-in sample, listing undefined variables as warnings.
-- [ ] WH-08.5 "Use in new endpoint" opens the endpoint sheet with the template chosen.
+- [x] WH-08.3 The gallery filters by category, service and event.
+- [x] WH-08.4 A template's detail shows its description, events, required variables, request shape and provider doc link with the verified date, and previews the rendered request against a chosen recent message or the built-in sample, listing undefined variables as warnings.
+- [x] WH-08.5 "Use in new endpoint" opens the endpoint sheet with the template chosen.
 
 ## WH-09 Custom templates
 

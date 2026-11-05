@@ -91,9 +91,9 @@ Phase 2 (inbound), Phase 3 (reply webhook and TwiML; moved from Phase 4 on 2026-
 
 Phase 3.
 
-- [ ] SM-10.1 An outbound SMS bubble scrolled into view fires `sms.opened` once (first-open setting) and shows the Read tick.
-- [ ] SM-10.2 Inbound SMS never fire `sms.opened`; the API returns `409` for them.
-- [ ] SM-10.3 "Simulate read" and `POST /sms/{smsId}/open` always fire.
+- [x] SM-10.1 An outbound SMS bubble scrolled into view fires `sms.opened` once (first-open setting) and shows the Read tick.
+- [x] SM-10.2 Inbound SMS never fire `sms.opened`; the API returns `409` for them.
+- [x] SM-10.3 "Simulate read" and `POST /sms/{smsId}/open` always fire.
 
 ## SM-11 WhatsApp via Twilio
 
