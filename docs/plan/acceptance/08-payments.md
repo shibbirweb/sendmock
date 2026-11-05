@@ -8,8 +8,8 @@ Phase 3P.
 
 - [x] PY-01.1 A card number that passes the Luhn check but is not a documented test card is rejected with a "use a test card" error and appears in no table, log, event or response.
 - [x] PY-01.2 Stored payment methods contain only brand, last 4 and expiry; no full card number or CVC is stored anywhere.
-- [ ] PY-01.3 SendMock never opens a network connection to a real payment provider or card network (tested by running every flow with outbound traffic blocked).
-- [ ] PY-01.4 Every hosted checkout page shows the TEST MODE banner.
+- [x] PY-01.3 SendMock never opens a network connection to a real payment provider or card network (tested by running every flow with outbound traffic blocked).
+- [x] PY-01.4 Every hosted checkout page shows the TEST MODE banner.
 
 ## PY-02 Native payments API
 

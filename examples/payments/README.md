@@ -1,6 +1,6 @@
 # Payment gateway examples
 
-Each folder uses a gateway's official SDK the way an app does, pointed at SendMock's provider port. CI runs them against a release binary (`.github/workflows/stripe-sdks.yml`).
+Each folder uses a gateway's official SDK the way an app does, pointed at SendMock's provider port. CI runs them against a release binary that is cut off from the network (`.github/workflows/payment-apps.yml`): SendMock runs as its own system user, the firewall rejects anything it sends beyond loopback, and the run fails if a single packet was rejected.
 
 - `stripe-node/`: the `stripe` Node SDK creates a Checkout Session, the customer pays on SendMock's checkout page, and the app receives `checkout.session.completed` and `payment_intent.succeeded`, each checked with `stripe.webhooks.constructEvent`. A confirm with `pm_card_chargeDeclined` then throws the SDK's `StripeCardError`, and `payment_intent.payment_failed` arrives. Last, the paid PaymentIntent is refunded and `charge.refunded` arrives. It writes every delivery it received to `../stripe-deliveries.json`.
 - `stripe-php/` and `stripe-python/`: the PHP and Python SDKs verify the same deliveries with `\Stripe\Webhook::constructEvent` and `stripe.Webhook.construct_event`.

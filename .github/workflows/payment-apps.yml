@@ -1,11 +1,13 @@
-# Stripe's official SDKs against a SendMock release binary: an app on the Node SDK completes a
-# Checkout Session, receives checkout.session.completed and payment_intent.succeeded verified
-# with constructEvent, and handles a declined card; the PHP and Python SDKs then verify the same
-# deliveries. An app on PayPal's Node SDK captures an order, checks its webhooks with
-# verify-webhook-signature, handles a decline and refunds; an app on SSLCommerz's Node package pays, checks the IPN's verify_sign, validates
-# the order, handles a decline and refunds. Runs on changes to the payment code or the
-# examples, and from Release build before anything is published.
-name: Stripe SDKs
+# The Phase 3P done-when check: apps on each gateway's official library run against a SendMock
+# release binary that cannot reach the network. The Stripe Node SDK pays a Checkout Session,
+# verifies the webhooks with constructEvent, handles a declined card and refunds (the PHP and
+# Python SDKs then verify the same deliveries); PayPal's Node SDK captures an order, checks its
+# webhooks with verify-webhook-signature, handles a decline and refunds; SSLCommerz's Node
+# package pays, checks the IPN's verify_sign, validates the order, handles a decline and
+# refunds. SendMock runs as its own system user whose traffic beyond loopback is rejected, and
+# the last step fails if a single packet was (PY-01.3). Runs on changes to the payment code or
+# the examples, and from Release build before anything is published.
+name: Payment apps
 
 on:
   pull_request:
@@ -19,7 +21,7 @@ on:
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
       - examples/payments/**
-      - .github/workflows/stripe-sdks.yml
+      - .github/workflows/payment-apps.yml
   push:
     branches:
       - develop
@@ -34,7 +36,7 @@ on:
       - crates/sendmock-ops/src/webhooks/**
       - crates/sendmock-ops/builtin/**
       - examples/payments/**
-      - .github/workflows/stripe-sdks.yml
+      - .github/workflows/payment-apps.yml
   workflow_dispatch:
   workflow_call:
 
@@ -42,13 +44,14 @@ permissions:
   contents: read
 
 jobs:
-  stripe:
-    name: Node, PHP and Python SDKs
+  apps:
+    name: Stripe, PayPal and SSLCommerz apps offline
     runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
       STRIPE_DELIVERIES_PATH: ${{ github.workspace }}/stripe-deliveries.json
+      OFFLINE_USER: sendmock-offline
     steps:
       - uses: actions/checkout@v5
 
@@ -70,9 +73,28 @@ jobs:
       - name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - name: Start SendMock with the provider port
+      - name: A user whose traffic beyond this machine is rejected
         run: |
-          ./target/release/sendmock --db memory --provider-addr 127.0.0.1:8026 > sendmock.log 2>&1 &
+          sudo install -m 0755 target/release/sendmock /usr/local/bin/sendmock
+          sudo useradd --system --create-home --home-dir "/var/lib/$OFFLINE_USER" "$OFFLINE_USER"
+          for firewall in iptables ip6tables; do
+            sudo "$firewall" -A OUTPUT -m owner --uid-owner "$OFFLINE_USER" ! -o lo -j REJECT
+          done
+          # The rule must work: the user cannot reach the internet, but the runner can.
+          if sudo -u "$OFFLINE_USER" curl -sS --max-time 10 https://api.stripe.com > /dev/null 2>&1; then
+            echo "::error::The offline user reached api.stripe.com"
+            exit 1
+          fi
+          curl -sS --max-time 10 -o /dev/null https://api.github.com
+          for firewall in iptables ip6tables; do
+            sudo "$firewall" -Z OUTPUT
+          done
+
+      - name: Start SendMock offline with the provider port
+        run: |
+          (cd / && sudo -u "$OFFLINE_USER" env HOME="/var/lib/$OFFLINE_USER" \
+            /usr/local/bin/sendmock --db memory --provider-addr 127.0.0.1:8026) \
+            > sendmock.log 2>&1 &
           for _ in $(seq 1 30); do
             curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
             sleep 1
@@ -84,7 +106,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Checkout, webhooks and a decline with the Node SDK
+      - name: Checkout, webhooks, a decline and a refund with Stripe's Node SDK
         working-directory: examples/payments/stripe-node
         run: bun install && node done-when.js
 
@@ -112,6 +134,17 @@ jobs:
       - name: Pay, check the IPN, validate, decline and refund with SSLCommerz's Node package
         working-directory: examples/payments/sslcommerz-node
         run: bun install && node done-when.js
+
+      - name: SendMock opened no connection beyond this machine
+        run: |
+          for firewall in iptables ip6tables; do
+            sudo "$firewall" -L OUTPUT -v -n -x
+            rejected_packets=$(sudo "$firewall" -L OUTPUT -v -n -x | awk '/owner UID match/ { total += $1 } END { print total + 0 }')
+            if [ "$rejected_packets" -ne 0 ]; then
+              echo "::error::$firewall rejected $rejected_packets packets SendMock sent beyond this machine"
+              exit 1
+            fi
+          done
 
       - name: SendMock log
         if: failure()
