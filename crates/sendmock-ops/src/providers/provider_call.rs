@@ -32,13 +32,18 @@ pub struct ProviderCall<'call> {
 impl ProviderCall<'_> {
     /// Every message part the field mapping reads, by part name.
     pub fn read_part_values(&self) -> BTreeMap<String, Vec<String>> {
+        self.read_part_values_from(&self.request_fields)
+    }
+
+    /// The parts read from one message's fields, such as one item of a batch.
+    pub fn read_part_values_from(&self, message_fields: &Value) -> BTreeMap<String, Vec<String>> {
         self.provider
             .field_mapping
             .iter()
             .map(|field_mapping| {
                 (
                     field_mapping.part.clone(),
-                    read_source_values(&self.request_fields, &field_mapping.source),
+                    read_source_values(message_fields, &field_mapping.source),
                 )
             })
             .filter(|(_, values)| !values.is_empty())

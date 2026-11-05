@@ -5,6 +5,7 @@ mod api_request;
 mod database;
 mod database_location;
 mod email;
+mod email_provider_send;
 mod message_open;
 mod message_provider;
 mod migration;
@@ -38,6 +39,7 @@ pub use email::{
     AttachmentRecord, EmailListFilter, EmailPage, EmailRecord, EmailRepository,
     NewAttachmentRecord, NewEmailRecord, StoredEmailAddress, TimelineRecord,
 };
+pub use email_provider_send::{EmailProviderSendRecord, EmailProviderSendRepository};
 pub use message_open::{MessageOpenRecord, OpenRecording};
 pub use message_provider::{MessageProviderRecord, MessageProviderRepository};
 pub use migration::{EMBEDDED_MIGRATIONS, Migration};

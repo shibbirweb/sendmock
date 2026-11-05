@@ -1,6 +1,7 @@
 use sendmock_core::StandardTemplateFunctions;
 
 use super::created_message::CreatedMessage;
+use super::email_batch_operation_kind::answer_email_batch;
 use super::email_send_operation_kind::answer_email_send;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::operation_matcher::{ProviderRoute, match_operation};
@@ -244,7 +245,12 @@ async fn run_operation_kind(
 ) -> Result<ProviderAnswer, OperationError> {
     let is_email_provider = provider_call.provider.area == EMAIL_PROVIDER_AREA;
     match provider_call.operation.kind.as_str() {
-        "send" if is_email_provider => answer_email_send(operation_context, provider_call).await,
+        "send" | "send_with_template" if is_email_provider => {
+            answer_email_send(operation_context, provider_call).await
+        }
+        "send_batch" if is_email_provider => {
+            answer_email_batch(operation_context, provider_call).await
+        }
         _ if is_email_provider => Ok(refuse_unavailable_kind(provider_call)),
         "send" => answer_send(operation_context, provider_call).await,
         "fetch" | "cancel" => answer_fetch(operation_context, provider_call).await,

@@ -4,9 +4,9 @@ use sendmock_core::{Clock, IdGenerator, RandomSource, SystemRandomSource};
 use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
-    EmailRepository, MessageProviderRepository, MessagingServiceRepository,
-    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    EmailProviderSendRepository, EmailRepository, MessageProviderRepository,
+    MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
+    PaymentRepository, SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
     SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
     SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
@@ -79,6 +79,7 @@ pub struct OperationContext {
     pub payment_repository: PaymentRepository,
     /// Provider adapters' own objects beside payments, such as Stripe refunds.
     pub payment_provider_object_repository: PaymentProviderObjectRepository,
+    pub email_provider_send_repository: EmailProviderSendRepository,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
 }
@@ -94,9 +95,9 @@ impl OperationContext {
         let email_repository = EmailRepository::new(Arc::clone(&database));
         let email_ingest_service =
             build_email_ingest_service(&email_repository, &clock, &id_generator);
-        let settings_store = AppSettingsStore::new(SettingsRepository::new(Arc::clone(&database)));
         let share_database = || Arc::clone(&database);
         Self {
+            settings_store: AppSettingsStore::new(SettingsRepository::new(share_database())),
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(share_database()),
             smtp_session_repository: SmtpSessionRepository::new(share_database()),
             api_request_repository: ApiRequestRepository::new(share_database()),
@@ -107,6 +108,7 @@ impl OperationContext {
             payment_provider_object_repository: PaymentProviderObjectRepository::new(
                 share_database(),
             ),
+            email_provider_send_repository: EmailProviderSendRepository::new(share_database()),
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(share_database()),
             sms_reply_webhook_repository: SmsReplyWebhookRepository::new(share_database()),
             sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(share_database()),
@@ -133,7 +135,6 @@ impl OperationContext {
             email_repository,
             email_ingest_service,
             event_bus: EventBus::default(),
-            settings_store,
             sample_email_sender: None,
             update_checker: UpdateChecker::default(),
             media_fetcher: None,

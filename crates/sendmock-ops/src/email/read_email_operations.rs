@@ -101,10 +101,30 @@ impl Operation for GetEmailOperation {
         operation_context: &OperationContext,
         input: EmailReference,
     ) -> Result<EmailDetail, OperationError> {
-        Ok(EmailDetail::from(
-            &find_email_or_not_found(operation_context, &input.email_id).await?,
-        ))
+        let email = find_email_or_not_found(operation_context, &input.email_id).await?;
+        load_email_detail(operation_context, &email).await
     }
+}
+
+/// The email's detail with what its provider was sent: a template send's id and data.
+pub(crate) async fn load_email_detail(
+    operation_context: &OperationContext,
+    email: &EmailRecord,
+) -> Result<EmailDetail, OperationError> {
+    let mut email_detail = EmailDetail::from(email);
+    let provider_send = operation_context
+        .email_provider_send_repository
+        .find_send(&email.email_id)
+        .await?;
+    email_detail.template = provider_send.and_then(|provider_send| {
+        let template_id = provider_send.template_id?;
+        let template_data = provider_send
+            .template_data_json
+            .and_then(|template_data_json| serde_json::from_str(&template_data_json).ok())
+            .unwrap_or_else(|| serde_json::json!({}));
+        Some(serde_json::json!({ "template_id": template_id, "template_data": template_data }))
+    });
+    Ok(email_detail)
 }
 
 pub struct GetLatestEmailOperation;
@@ -137,12 +157,12 @@ impl Operation for GetLatestEmailOperation {
             .email_repository
             .list_emails(filter, None, 1)
             .await?;
-        let newest_email: Option<&EmailRecord> = page.emails.first();
-        newest_email
-            .map(EmailDetail::from)
-            .ok_or_else(|| OperationError::NotFound {
+        let Some(newest_email) = page.emails.first() else {
+            return Err(OperationError::NotFound {
                 message: format!("No email to {} yet", input.to),
-            })
+            });
+        };
+        load_email_detail(operation_context, newest_email).await
     }
 }
 
