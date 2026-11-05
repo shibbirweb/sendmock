@@ -3,7 +3,7 @@ use std::sync::Arc;
 use rusqlite::types::Value as SqlValue;
 use rusqlite::{Connection, OptionalExtension, Row, params, params_from_iter};
 
-use super::{PaymentListFilter, PaymentPage, PaymentRecord};
+use super::{PaymentListFilter, PaymentPage, PaymentRecord, PaymentTotalsRecord};
 use crate::{Database, StoreError};
 
 const PAYMENT_COLUMNS: &str =
@@ -83,6 +83,40 @@ fn list_payment_page(
             .flatten(),
         payments,
         total_count: u64::try_from(total_count).unwrap_or_default(),
+    })
+}
+
+fn count_rows(count: i64) -> u64 {
+    u64::try_from(count).unwrap_or_default()
+}
+
+fn read_payment_totals_since(
+    connection: &Connection,
+    since_unix_ms: i64,
+) -> rusqlite::Result<PaymentTotalsRecord> {
+    let (payment_count, payments_since): (i64, i64) = connection.query_row(
+        "SELECT count(*), coalesce(sum(created_at >= ?1), 0) FROM payments",
+        [since_unix_ms],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    let count_by_status = connection
+        .prepare("SELECT status, count(*) FROM payments GROUP BY status ORDER BY status")?
+        .query_map([], |row| Ok((row.get(0)?, count_rows(row.get(1)?))))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let net_minor_by_currency = connection
+        .prepare(
+            "SELECT currency, sum(net_minor) AS total_minor FROM (SELECT currency, \
+             coalesce(json_extract(document, '$.captured_minor'), 0) \
+             - coalesce(json_extract(document, '$.refunded_minor'), 0) AS net_minor FROM payments) \
+             WHERE net_minor > 0 GROUP BY currency ORDER BY total_minor DESC, currency",
+        )?
+        .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    Ok(PaymentTotalsRecord {
+        payment_count: count_rows(payment_count),
+        payments_since: count_rows(payments_since),
+        count_by_status,
+        net_minor_by_currency,
     })
 }
 
@@ -196,6 +230,16 @@ impl PaymentRepository {
                     .collect::<rusqlite::Result<Vec<_>>>()?;
                 Ok(counts)
             })
+            .await
+    }
+
+    /// The Overview's payment totals; `since_unix_ms` is where "today" starts.
+    pub async fn read_payment_totals(
+        &self,
+        since_unix_ms: i64,
+    ) -> Result<PaymentTotalsRecord, StoreError> {
+        self.database
+            .read(move |connection| Ok(read_payment_totals_since(connection, since_unix_ms)?))
             .await
     }
 

@@ -51,6 +51,7 @@ pub use outcome_rule::{
 };
 pub use payment::{
     PaymentCountColumn, PaymentListFilter, PaymentPage, PaymentRecord, PaymentRepository,
+    PaymentTotalsRecord,
 };
 pub use payment_definition::{PaymentDefinitionRecord, PaymentDefinitionRepository};
 pub use payment_provider_object::{PaymentProviderObjectRecord, PaymentProviderObjectRepository};

@@ -28,3 +28,15 @@ pub struct PaymentPage {
     pub next_cursor: Option<String>,
     pub total_count: u64,
 }
+
+/// Every payment counted for the Overview, in one read.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PaymentTotalsRecord {
+    pub payment_count: u64,
+    /// Payments made at or after the time asked for.
+    pub payments_since: u64,
+    /// How many payments are in each status.
+    pub count_by_status: Vec<(String, u64)>,
+    /// Captured minus refunded per currency, over payments with money left, largest first.
+    pub net_minor_by_currency: Vec<(String, i64)>,
+}

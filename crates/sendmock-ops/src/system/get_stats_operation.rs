@@ -3,6 +3,7 @@ use sendmock_webhooks::{DeliverySample, DeliverySummary, MeteredEndpoint, Metric
 
 use super::activity_timeline::build_activity_buckets;
 use super::app_stats::AppStats;
+use super::payment_stats::{PaymentStats, build_payment_stats};
 use crate::webhooks::{
     build_endpoint_metrics, build_recent_failures, load_delivery_samples, load_metered_endpoints,
 };
@@ -52,9 +53,14 @@ impl Operation for GetStatsOperation {
         let delivery_samples =
             load_delivery_samples(operation_context, DeliveryOutcomeFilter::default()).await?;
         let metered_endpoints = load_metered_endpoints(operation_context, None).await?;
+        let payment_totals = operation_context
+            .payment_repository
+            .read_payment_totals(start_of_today_unix_ms)
+            .await?;
         Ok(build_app_stats(
             now_unix_ms,
             message_totals,
+            build_payment_stats(payment_totals),
             &hourly_activity,
             &delivery_samples,
             metered_endpoints,
@@ -65,6 +71,7 @@ impl Operation for GetStatsOperation {
 fn build_app_stats(
     now_unix_ms: i64,
     message_totals: MessageTotalsRecord,
+    payment_stats: PaymentStats,
     hourly_activity: &HourlyActivityRecord,
     delivery_samples: &[DeliverySample],
     metered_endpoints: Vec<MeteredEndpoint>,
@@ -90,10 +97,10 @@ fn build_app_stats(
         webhook_delivery_count: delivery_summary.delivery_count,
         webhook_success_rate: delivery_summary.success_rate,
         webhook_p95_latency_ms: delivery_summary.p95_latency_ms,
-        payment_count: 0,
-        payments_today: 0,
-        payment_success_rate: None,
-        payment_revenue: Vec::new(),
+        payment_count: payment_stats.payment_count,
+        payments_today: payment_stats.payments_today,
+        payment_success_rate: payment_stats.payment_success_rate,
+        payment_revenue: payment_stats.payment_revenue,
         activity: build_activity_buckets(
             &MetricsRange::LastDay.bucket_starts(now_unix_ms),
             hourly_activity,

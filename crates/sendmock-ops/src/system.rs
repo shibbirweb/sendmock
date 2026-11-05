@@ -5,6 +5,7 @@ mod get_health_operation;
 mod get_info_operation;
 mod get_stats_operation;
 mod health_status;
+mod payment_stats;
 
 pub use app_info::AppInfo;
 pub use app_stats::{ActivityBucket, AppStats, CurrencyAmount};

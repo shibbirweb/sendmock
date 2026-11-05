@@ -93,3 +93,88 @@ async fn stats_count_messages_in_total_today_and_unread_with_hourly_activity() {
         .sum();
     assert_eq!(hourly_emails, 0);
 }
+
+async fn create_checkout(app_router: &axum::Router, amount_minor: u64, currency: &str) -> String {
+    let (status, payment) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/payments/checkout",
+        Some(&json!({ "provider": "stripe", "amount_minor": amount_minor, "currency": currency })),
+    )
+    .await;
+    assert_eq!(status, 201, "{payment}");
+    payment["id"].as_str().unwrap_or_default().to_owned()
+}
+
+async fn simulate_payment(app_router: &axum::Router, payment_id: &str, request_body: Value) {
+    post(
+        app_router,
+        &format!("/api/v1/payments/{payment_id}/simulate"),
+        &request_body,
+    )
+    .await;
+}
+
+/// One USD payment paid before midnight; after it, a USD payment refunded in part, a BDT one
+/// paid, a declined one and one still open.
+async fn make_payments_across_midnight(app_router: &axum::Router, manual_clock: &ManualClock) {
+    let yesterday_payment_id = create_checkout(app_router, 2_000, "USD").await;
+    simulate_payment(
+        app_router,
+        &yesterday_payment_id,
+        json!({ "action": "succeed" }),
+    )
+    .await;
+    manual_clock.advance_ms(2 * HOUR_MS);
+    let refunded_payment_id = create_checkout(app_router, 2_000, "USD").await;
+    simulate_payment(
+        app_router,
+        &refunded_payment_id,
+        json!({ "action": "succeed" }),
+    )
+    .await;
+    simulate_payment(
+        app_router,
+        &refunded_payment_id,
+        json!({ "action": "refund", "refund_amount_minor": 500 }),
+    )
+    .await;
+    let taka_payment_id = create_checkout(app_router, 120_000, "BDT").await;
+    simulate_payment(app_router, &taka_payment_id, json!({ "action": "succeed" })).await;
+    let declined_payment_id = create_checkout(app_router, 900, "USD").await;
+    simulate_payment(
+        app_router,
+        &declined_payment_id,
+        json!({ "action": "decline" }),
+    )
+    .await;
+    create_checkout(app_router, 700, "USD").await;
+}
+
+// AC: PY-09.5
+#[tokio::test]
+async fn stats_count_payments_today_with_the_success_rate_and_net_revenue_per_currency() {
+    let start_of_today_unix_ms = EMAIL_RECEIVED_UNIX_MS + 24 * HOUR_MS;
+    let manual_clock = Arc::new(ManualClock::new(start_of_today_unix_ms - HOUR_MS));
+    let (app_router, _) = build_test_app_with(|mut operation_context| {
+        operation_context.clock = manual_clock.clone();
+        operation_context
+    });
+    make_payments_across_midnight(&app_router, &manual_clock).await;
+
+    let (status, stats) = call_api(&app_router, "GET", "/api/v1/stats", None).await;
+
+    assert_eq!(status, 200, "{stats}");
+    assert_eq!(
+        (&stats["payment_count"], &stats["payments_today"]),
+        (&json!(5), &json!(4))
+    );
+    assert_eq!(stats["payment_success_rate"], json!(0.75));
+    assert_eq!(
+        stats["payment_revenue"],
+        json!([
+            { "currency": "BDT", "amount_minor": 120_000 },
+            { "currency": "USD", "amount_minor": 3_500 },
+        ])
+    );
+}
