@@ -30,6 +30,7 @@ mod payment_settlement;
 mod payment_simulate_operation;
 mod payment_simulate_views;
 mod payment_views;
+mod provider_event_object;
 mod provider_payment;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
@@ -72,6 +73,8 @@ pub use payment_views::{
     PaymentCaptureMethod, PaymentDetail, PaymentInstrument, PaymentLineItem, PaymentStatus,
     PaymentSummary,
 };
+#[cfg(test)]
+pub(crate) use payment_views::{PaymentDispute, PaymentTimelineEvent};
 pub(crate) use provider_payment::{
     ProviderCheckoutUrls, ProviderPaymentRequest, apply_checkout_outcome_profile,
     start_provider_payment,

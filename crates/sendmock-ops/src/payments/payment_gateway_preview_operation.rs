@@ -16,6 +16,7 @@ use super::payment_gateway_preview_views::{
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_redirect::read_redirect_url;
 use super::payment_views::PaymentDetail;
+use super::provider_event_object::build_provider_event_object;
 use crate::message_providers::{TemplateHelperEntry, build_template_reference, merge_credentials};
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
 
@@ -89,6 +90,10 @@ const GATEWAY_FIELD_DESCRIPTIONS: &[(&str, &str)] = &[
         "This gateway's name for the event, from Event names.",
     ),
     ("event.created", "When it happened, Unix seconds."),
+    (
+        "event.object",
+        "The gateway's own object the event is about, as its webhook carries it: for Stripe the Checkout Session, PaymentIntent, Charge or Dispute; null for other gateways.",
+    ),
     ("redirect", "Where the checkout ended, for redirect fields."),
     ("redirect.outcome", "success, fail or cancel."),
     (
@@ -249,12 +254,26 @@ impl Operation for PreviewPaymentGatewayOperation {
         let Some(payment) = preview_payment else {
             return Ok(build_empty_preview(&gateway_fields));
         };
+        let event_name = gateway_fields
+            .event_names
+            .get(&input.event_type)
+            .cloned()
+            .unwrap_or_default();
+        let event_object = build_provider_event_object(
+            operation_context,
+            &input.gateway_key,
+            &payment,
+            &event_name,
+            &[],
+        )
+        .await?;
         let render_options = GatewayRenderOptions {
             event_type: input.event_type,
             redirect_outcome: input.redirect_outcome,
             event_id: PREVIEW_EVENT_ID.to_owned(),
             timestamp_seconds: operation_context.clock.now_unix_ms() / 1000,
             should_mask_secrets: true,
+            event_object,
         };
         Ok(render_preview(
             operation_context,

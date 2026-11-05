@@ -1,5 +1,5 @@
 use sendmock_core::format_rfc3339;
-use sendmock_store::{WebhookDeliveryRecord, WebhookEndpointRecord};
+use sendmock_store::{PaymentProviderObjectRecord, WebhookDeliveryRecord, WebhookEndpointRecord};
 use serde_json::Value;
 
 use super::gateway_template_rendering::{
@@ -10,6 +10,7 @@ use super::payment_event_data::build_payment_event_data;
 use super::payment_gateway_preview_views::GatewayTemplateProblem;
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_views::{PaymentDetail, PaymentNotification};
+use super::provider_event_object::build_provider_event_object;
 use crate::webhooks::{
     DeliveryOrder, DeliveryTrigger, RenderProblem, RenderProblemSeverity, RenderedDeliveryRequest,
     enqueue_rendered_delivery,
@@ -147,6 +148,37 @@ fn note_notification(
     );
 }
 
+/// A delivery's render under a new `evt_` id, with the gateway's own object for the event.
+async fn build_render_options(
+    operation_context: &OperationContext,
+    gateway_fields: &PaymentGatewayFields,
+    payment: &PaymentDetail,
+    event_type: &str,
+    kept_provider_objects: &[PaymentProviderObjectRecord],
+) -> Result<GatewayRenderOptions, OperationError> {
+    let event_name = gateway_fields
+        .event_names
+        .get(event_type)
+        .cloned()
+        .unwrap_or_default();
+    let event_object = build_provider_event_object(
+        operation_context,
+        &gateway_fields.key,
+        payment,
+        &event_name,
+        kept_provider_objects,
+    )
+    .await?;
+    Ok(GatewayRenderOptions {
+        event_type: event_type.to_owned(),
+        redirect_outcome: read_redirect_outcome(event_type),
+        event_id: format!("evt_{}", operation_context.id_generator.generate_id()),
+        timestamp_seconds: operation_context.clock.now_unix_ms().div_euclid(1_000),
+        should_mask_secrets: false,
+        event_object,
+    })
+}
+
 /// Queues the gateway's notification for one event to its notification endpoint as a
 /// webhook delivery (so it is retried, logged and replayable) and notes it on the payment.
 /// Nothing is queued when the gateway has no endpoint or names no event for this one.
@@ -155,6 +187,7 @@ pub async fn queue_payment_notification(
     gateway_fields: &PaymentGatewayFields,
     payment: &mut PaymentDetail,
     event_type: &str,
+    kept_provider_objects: &[PaymentProviderObjectRecord],
 ) -> Result<(), OperationError> {
     let Some(stored_endpoint) =
         find_notification_endpoint(operation_context, gateway_fields).await?
@@ -162,13 +195,14 @@ pub async fn queue_payment_notification(
         return Ok(());
     };
     let now_unix_ms = operation_context.clock.now_unix_ms();
-    let render_options = GatewayRenderOptions {
-        event_type: event_type.to_owned(),
-        redirect_outcome: read_redirect_outcome(event_type),
-        event_id: format!("evt_{}", operation_context.id_generator.generate_id()),
-        timestamp_seconds: now_unix_ms.div_euclid(1_000),
-        should_mask_secrets: false,
-    };
+    let render_options = build_render_options(
+        operation_context,
+        gateway_fields,
+        payment,
+        event_type,
+        kept_provider_objects,
+    )
+    .await?;
     let Some(notification) = render_gateway_notification(
         operation_context,
         gateway_fields,

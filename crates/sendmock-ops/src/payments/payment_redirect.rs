@@ -37,6 +37,7 @@ pub fn build_payment_redirect(
                 event_id: String::new(),
                 timestamp_seconds: now_unix_ms / 1000,
                 should_mask_secrets: false,
+                event_object: serde_json::Value::Null,
             };
             let template_context = build_gateway_context(gateway_fields, payment, &render_options);
             let mut part_renderer = GatewayPartRenderer::new(

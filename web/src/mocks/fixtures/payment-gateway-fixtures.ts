@@ -37,18 +37,20 @@ function nameEvents(
 }
 
 const stripeBody = `{
-  "id": "evt_{{ random_string(24) }}",
+  "id": "{{ event.id }}",
   "object": "event",
-  "type": "{{ event.name }}",
+  "api_version": "2025-03-31.basil",
   "created": {{ event.created }},
   "data": {
-    "object": {
-      "id": "{{ payment.reference }}",
-      "amount": {{ payment.amount_minor }},
-      "currency": "{{ payment.currency | lower }}",
-      "status": "{{ payment.status }}"
-    }
-  }
+    "object": {{ event.object | json }}
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "{{ event.name }}"
 }`;
 
 const paypalBody = `{

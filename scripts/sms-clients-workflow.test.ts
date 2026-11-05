@@ -35,7 +35,7 @@ describe("SMS clients workflow", () => {
       "uses: ./.github/workflows/sms-clients.yml",
     );
     expect(releaseWorkflow).toContain(
-      "needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler]",
+      "needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, stripe-sdks]",
     );
   });
 });

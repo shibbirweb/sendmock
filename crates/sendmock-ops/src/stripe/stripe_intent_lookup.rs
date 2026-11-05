@@ -1,7 +1,7 @@
 use super::stripe_call::StripeCall;
 use super::stripe_error::StripeError;
 use super::stripe_object_store::{
-    STRIPE_PROVIDER_KEY, StripeObjectKind, load_stripe_object, save_stripe_object,
+    STRIPE_PROVIDER_KEY, StripeObjectKind, keep_stripe_object, load_stripe_object,
 };
 use super::stripe_payment_intent_object::{StripeIntentState, describe_payment_intent};
 use crate::OperationError;
@@ -51,19 +51,18 @@ pub async fn load_payment_intent<'call>(
 /// Stores the change and the intent's own state, and answers the PaymentIntent.
 pub async fn save_payment_intent(
     stripe_call: &StripeCall<'_>,
-    payment_change: PaymentChange<'_>,
+    mut payment_change: PaymentChange<'_>,
     intent_state: &StripeIntentState,
 ) -> Result<(PaymentDetail, serde_json::Value), StripeError> {
-    let payment = payment_change.save().await?;
-    let payment_intent_id = super::stripe_payment_intent_object::read_payment_intent_id(&payment);
-    save_stripe_object(
-        stripe_call.operation_context,
+    let payment_intent_id =
+        super::stripe_payment_intent_object::read_payment_intent_id(&payment_change.payment);
+    keep_stripe_object(
+        &mut payment_change,
         StripeObjectKind::PaymentIntent,
         &payment_intent_id,
-        &payment.summary.id,
         intent_state,
-    )
-    .await?;
+    )?;
+    let payment = payment_change.save().await?;
     let payment_intent =
         describe_payment_intent(&payment, intent_state, stripe_call.http_address());
     Ok((payment, payment_intent))

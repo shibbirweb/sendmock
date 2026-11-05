@@ -44,12 +44,15 @@ describe("gateway templates", () => {
       /^t=\d+,v1=[0-9a-f]{64}$/,
     );
     expect(JSON.parse(notification?.body ?? "")).toMatchObject({
+      id: "evt_test",
       object: "event",
       type: "payment_intent.succeeded",
       created: 1792914927,
+      livemode: false,
       data: {
         object: {
-          id: paymentDetail.provider_reference,
+          id: paymentDetail.provider_ids.payment_intent,
+          object: "payment_intent",
           amount: paymentDetail.amount_minor,
           currency: paymentDetail.currency.toLowerCase(),
         },

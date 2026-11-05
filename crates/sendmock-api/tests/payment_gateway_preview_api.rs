@@ -76,10 +76,13 @@ async fn the_preview_renders_the_redirect_and_a_signed_notification_for_a_paymen
     let body: Value =
         serde_json::from_str(notification["body"].as_str().unwrap_or_default()).unwrap_or_default();
     assert_eq!(body["type"], "payment_intent.succeeded");
+    assert_eq!(body["id"], "evt_01JB7T9Q2RPREVIEW0000000");
+    assert_eq!(body["data"]["object"]["object"], "payment_intent");
     assert_eq!(body["data"]["object"]["amount"], 1200);
-    assert_eq!(
-        body["data"]["object"]["id"],
-        preview["redirect"]["fields"]["session_id"]
+    assert!(
+        body["data"]["object"]["id"]
+            .as_str()
+            .is_some_and(|intent_id| intent_id.starts_with("pi_"))
     );
     assert!(
         preview["reference"]["functions"]

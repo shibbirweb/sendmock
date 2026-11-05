@@ -7,7 +7,7 @@ use super::stripe_checkout_session_object::{
 use super::stripe_error::StripeError;
 use super::stripe_intent_lookup::find_stripe_payment;
 use super::stripe_object_store::{
-    STRIPE_PROVIDER_KEY, StripeObjectKind, load_stripe_object, save_stripe_object,
+    STRIPE_PROVIDER_KEY, StripeObjectKind, keep_stripe_object, load_stripe_object,
 };
 use super::stripe_payment_intent_object::{StripeIntentState, read_payment_intent_id};
 use super::stripe_payment_intents::read_capture_method;
@@ -54,19 +54,17 @@ fn build_session_request(
 }
 
 async fn save_session(
-    stripe_call: &StripeCall<'_>,
-    payment_change: PaymentChange<'_>,
+    mut payment_change: PaymentChange<'_>,
     session_state: &StripeSessionState,
 ) -> StripeAnswer {
-    let payment = payment_change.save().await?;
-    save_stripe_object(
-        stripe_call.operation_context,
+    let session_id = read_session_id(&payment_change.payment);
+    keep_stripe_object(
+        &mut payment_change,
         StripeObjectKind::CheckoutSession,
-        &read_session_id(&payment),
-        &payment.summary.id,
+        &session_id,
         session_state,
-    )
-    .await?;
+    )?;
+    let payment = payment_change.save().await?;
     Ok(describe_checkout_session(&payment, session_state))
 }
 
@@ -87,23 +85,19 @@ pub async fn create_checkout_session(stripe_call: &StripeCall<'_>) -> StripeAnsw
         ..StripeIntentState::default()
     };
     let payment_intent_id = read_payment_intent_id(&payment_change.payment);
-    let payment_id = payment_change.payment.summary.id.clone();
+    keep_stripe_object(
+        &mut payment_change,
+        StripeObjectKind::PaymentIntent,
+        &payment_intent_id,
+        &intent_state,
+    )?;
     let session_state = StripeSessionState {
         client_reference_id: stripe_fields.text(&["client_reference_id"]),
         expires_at: stripe_fields
             .text(&["expires_at"])
             .and_then(|expires_at| expires_at.parse().ok()),
     };
-    let checkout_session = save_session(stripe_call, payment_change, &session_state).await?;
-    save_stripe_object(
-        operation_context,
-        StripeObjectKind::PaymentIntent,
-        &payment_intent_id,
-        &payment_id,
-        &intent_state,
-    )
-    .await?;
-    Ok(checkout_session)
+    save_session(payment_change, &session_state).await
 }
 
 async fn load_session(
@@ -154,5 +148,5 @@ pub async fn expire_checkout_session(
     let mut payment_change =
         PaymentChange::start(stripe_call.operation_context, payment, Vec::new()).await;
     payment_change.expire_checkout();
-    save_session(stripe_call, payment_change, &session_state).await
+    save_session(payment_change, &session_state).await
 }

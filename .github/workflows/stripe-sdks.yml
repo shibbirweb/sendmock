@@ -1,0 +1,102 @@
+# Stripe's official SDKs against a SendMock release binary: an app on the Node SDK completes a
+# Checkout Session, receives checkout.session.completed and payment_intent.succeeded verified
+# with constructEvent, and handles a declined card; the PHP and Python SDKs then verify the same
+# deliveries. Runs on changes to the payment code or the examples, and from Release build
+# before anything is published.
+name: Stripe SDKs
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-payments/**
+      - crates/sendmock-ops/src/payments/**
+      - crates/sendmock-ops/src/stripe/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/builtin/**
+      - examples/payments/**
+      - .github/workflows/stripe-sdks.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-payments/**
+      - crates/sendmock-ops/src/payments/**
+      - crates/sendmock-ops/src/stripe/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/builtin/**
+      - examples/payments/**
+      - .github/workflows/stripe-sdks.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  stripe:
+    name: Node, PHP and Python SDKs
+    runs-on: ubuntu-latest
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+      SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
+      STRIPE_DELIVERIES_PATH: ${{ github.workspace }}/stripe-deliveries.json
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - name: Start SendMock with the provider port
+        run: |
+          ./target/release/sendmock --db memory --provider-addr 127.0.0.1:8026 > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Checkout, webhooks and a decline with the Node SDK
+        working-directory: examples/payments/stripe-node
+        run: bun install && node done-when.js
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - name: Verify the deliveries with the PHP SDK
+        working-directory: examples/payments/stripe-php
+        run: composer install --no-interaction --no-progress && php verify.php
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Verify the deliveries with the Python SDK
+        working-directory: examples/payments/stripe-python
+        run: pip install --quiet -r requirements.txt && python verify.py
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log

@@ -299,10 +299,14 @@ jobs:
   webhook-handler:
     uses: ./.github/workflows/webhook-handler.yml
 
+  # Stripe's Node, PHP and Python SDKs check checkout, webhooks and a decline against this commit.
+  stripe-sdks:
+    uses: ./.github/workflows/stripe-sdks.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler]
+    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, stripe-sdks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

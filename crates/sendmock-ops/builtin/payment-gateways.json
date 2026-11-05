@@ -40,7 +40,7 @@
       "checkout.completed": "checkout.session.completed",
       "checkout.expired": "checkout.session.expired"
     },
-    "notification_body": "{\n  \"id\": \"evt_{{ random_string(24) }}\",\n  \"object\": \"event\",\n  \"type\": \"{{ event.name }}\",\n  \"created\": {{ event.created }},\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{ payment.reference }}\",\n      \"amount\": {{ payment.amount_minor }},\n      \"currency\": \"{{ payment.currency | lower }}\",\n      \"status\": \"{{ payment.status }}\"\n    }\n  }\n}",
+    "notification_body": "{\n  \"id\": \"{{ event.id }}\",\n  \"object\": \"event\",\n  \"api_version\": \"2025-03-31.basil\",\n  \"created\": {{ event.created }},\n  \"data\": {\n    \"object\": {{ event.object | json }}\n  },\n  \"livemode\": false,\n  \"pending_webhooks\": 1,\n  \"request\": {\n    \"id\": null,\n    \"idempotency_key\": null\n  },\n  \"type\": \"{{ event.name }}\"\n}",
     "notification_headers": [
       {
         "name": "stripe-signature",

@@ -1,4 +1,5 @@
 use sendmock_payments::format_major_amount;
+use sendmock_store::PaymentProviderObjectRecord;
 
 use super::gateway_template_rendering::RedirectOutcome;
 use super::payment_catalogue::{add_timeline_event, find_payment, save_payment};
@@ -21,6 +22,8 @@ pub struct PaymentChange<'context> {
     gateway_fields: Option<PaymentGatewayFields>,
     pub payment: PaymentDetail,
     fired_events: Vec<AppEventType>,
+    /// A provider adapter's own objects, stored with the payment once it is saved.
+    kept_provider_objects: Vec<PaymentProviderObjectRecord>,
 }
 
 impl<'context> PaymentChange<'context> {
@@ -38,7 +41,17 @@ impl<'context> PaymentChange<'context> {
             gateway_fields,
             payment,
             fired_events,
+            kept_provider_objects: Vec::new(),
         }
+    }
+
+    pub fn operation_context(&self) -> &'context OperationContext {
+        self.operation_context
+    }
+
+    /// Stores the object with the payment; the notifications this change sends read it.
+    pub fn keep_provider_object(&mut self, provider_object: PaymentProviderObjectRecord) {
+        self.kept_provider_objects.push(provider_object);
     }
 
     pub async fn load(
@@ -209,6 +222,7 @@ impl<'context> PaymentChange<'context> {
             gateway_fields,
             &mut self.payment,
             event_type,
+            &self.kept_provider_objects,
         )
         .await?;
         Ok(self.payment.notifications.len() > notification_count)
@@ -225,6 +239,7 @@ impl<'context> PaymentChange<'context> {
                     gateway_fields,
                     &mut self.payment,
                     event_type.as_str(),
+                    &self.kept_provider_objects,
                 )
                 .await?;
             }
@@ -235,6 +250,12 @@ impl<'context> PaymentChange<'context> {
             operation_context.clock.now_unix_ms(),
         )
         .await?;
+        for provider_object in self.kept_provider_objects {
+            operation_context
+                .payment_provider_object_repository
+                .save_object(provider_object)
+                .await?;
+        }
         let event_data = build_payment_event_data(&self.payment);
         for event_type in self.fired_events {
             publish_event(operation_context, event_type, event_data.clone());

@@ -34,8 +34,8 @@ Phase 3P.
 
 - [x] PY-04.1 Checkout Sessions, PaymentIntents (create, confirm, capture, cancel) and Refunds return Stripe-shaped objects and errors at the real paths on the provider port.
 - [x] PY-04.2 Every test card in the table produces Stripe's documented status and decline code.
-- [ ] PY-04.3 Webhook events carry a `Stripe-Signature` that the official `stripe` SDKs (Node, PHP, Python) verify with `constructEvent`.
-- [ ] PY-04.4 An app using the official Stripe SDK completes checkout, receives `checkout.session.completed` and `payment_intent.succeeded`, and handles a decline.
+- [x] PY-04.3 Webhook events carry a `Stripe-Signature` that the official `stripe` SDKs (Node, PHP, Python) verify with `constructEvent`.
+- [x] PY-04.4 An app using the official Stripe SDK completes checkout, receives `checkout.session.completed` and `payment_intent.succeeded`, and handles a decline.
 
 ## PY-05 PayPal emulation
 

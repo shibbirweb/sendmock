@@ -52,6 +52,27 @@ pub struct GatewayRenderOptions {
     pub timestamp_seconds: i64,
     /// Previews mask secret credentials; real redirects and deliveries use them.
     pub should_mask_secrets: bool,
+    /// The provider's own object the event is about, read as `event.object`.
+    pub event_object: Value,
+}
+
+/// The merchant credentials by name, secrets masked when asked.
+fn build_merchant_values(
+    gateway_fields: &PaymentGatewayFields,
+    should_mask_secrets: bool,
+) -> Map<String, Value> {
+    gateway_fields
+        .credentials
+        .iter()
+        .map(|credential| {
+            let shown_value = if should_mask_secrets && credential.is_secret {
+                mask_secret_value(&credential.value)
+            } else {
+                credential.value.clone()
+            };
+            (credential.name.clone(), Value::from(shown_value))
+        })
+        .collect()
 }
 
 /// What a gateway's templates read: `payment`, `event`, `redirect` and `merchant`.
@@ -67,18 +88,7 @@ pub fn build_gateway_context(
             .cloned()
             .unwrap_or_default()
     };
-    let merchant: Map<String, Value> = gateway_fields
-        .credentials
-        .iter()
-        .map(|credential| {
-            let shown_value = if render_options.should_mask_secrets && credential.is_secret {
-                mask_secret_value(&credential.value)
-            } else {
-                credential.value.clone()
-            };
-            (credential.name.clone(), Value::from(shown_value))
-        })
-        .collect();
+    let merchant = build_merchant_values(gateway_fields, render_options.should_mask_secrets);
     let summary = &payment.summary;
     json!({
         "payment": {
@@ -103,6 +113,7 @@ pub fn build_gateway_context(
             "type": render_options.event_type,
             "name": read_event_name(&render_options.event_type),
             "created": render_options.timestamp_seconds,
+            "object": render_options.event_object,
         },
         "redirect": {
             "outcome": render_options.redirect_outcome.as_str(),

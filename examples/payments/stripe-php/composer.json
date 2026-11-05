@@ -1,0 +1,10 @@
+{
+    "name": "sendmock/example-payments-stripe-php",
+    "description": "Verifies SendMock's Stripe webhook deliveries with the official Stripe PHP SDK.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "stripe/stripe-php": "17.0.0"
+    }
+}

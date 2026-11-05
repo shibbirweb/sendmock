@@ -22,6 +22,8 @@ export const gatewayFieldDescriptions: Record<string, string> = {
   "event.type": "SendMock's event name, e.g. payment.succeeded.",
   "event.name": "This gateway's name for the event, from Event names.",
   "event.created": "When it happened, Unix seconds.",
+  "event.object":
+    "The gateway's own object the event is about, as its webhook carries it: for Stripe the Checkout Session, PaymentIntent, Charge or Dispute; null for other gateways.",
   redirect: "Where the checkout ended, for redirect fields.",
   "redirect.outcome": "success, fail or cancel.",
   "redirect.status":
