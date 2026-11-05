@@ -11,6 +11,7 @@ mod delivery_signing;
 mod delivery_template_context;
 mod delivery_view;
 mod delivery_wait_operation;
+mod email_template_data;
 mod endpoint_body_rendering;
 mod endpoint_inputs;
 mod endpoint_operations;

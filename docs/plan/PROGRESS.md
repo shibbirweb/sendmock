@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W9c (each preset's official client library in a CI workflow, HC-03.1), then W7d (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W9c (each preset's official client library in a CI workflow, HC-03.1), then W10 (chaos and scenarios) (inbound formats with attachments, WH-06.3) (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -313,7 +313,7 @@ Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16)
 - [x] HTML compatibility, link check, SpamAssassin check (#48)
 - [x] Release to real SMTP, auto-forward, tag rules (#48)
-- [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
+- [x] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark) (#48)
 - [x] Bounce/complaint/delivered and open provider formats (#48)
 - [x] Fake data functions, Postman aliases, `SENDMOCK_VAR_*` (#48)
 - [x] Remaining built-in templates, `--templates-dir` (#48)
@@ -688,3 +688,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W9a: the HTTP catcher captures any request under `/catch/<bin>/...` (bins created on first use, bodies and uploaded files kept, `http.captured` fired), with the bins, requests and `wait/http` operations; HC-01.1 to HC-01.3 ticked. |
 | 2026-11-06 | Phase 4 W9b: bins answer with their response rules (method, path glob, header and body conditions, templated replies that echo the request, delay, failure rate) and the preview explains a match; HC-02 accepted. |
 | 2026-11-06 | Phase 4 W9c (part): a captured request can be forwarded to another URL, `POST /samples/http` captures a Slack sample, and the HTTP screens join the live UI suite; HC-01.5 and HC-01.6 ticked. The catch-all port stays in Phase 5. |
+| 2026-11-06 | Phase 4 W7d: email webhooks render against the stored email in full (bodies, headers, attachments with download URLs and small files inline); SendGrid Inbound Parse posts multipart with its files and Postmark inbound lists Attachments; WH-06 accepted. |

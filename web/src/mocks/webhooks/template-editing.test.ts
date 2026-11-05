@@ -24,8 +24,14 @@ describe("foldEndpointOverrides", () => {
     expect(foldedDefinition.body_template).toMatch(
       /,\n {2}"environment": "staging"\n\}$/,
     );
+    // Loops render nothing, other tags vanish and every value reads as 0: the rest is JSON.
     expect(() =>
-      JSON.parse(foldedDefinition.body_template.replace(/\{\{[^}]*\}\}/g, "x")),
+      JSON.parse(
+        foldedDefinition.body_template
+          .replace(/\{% for [\s\S]*?\{% endfor %\}/g, "")
+          .replace(/\{%[^%]*%\}/g, "")
+          .replace(/\{\{[^}]*\}\}/g, "0"),
+      ),
     ).not.toThrow();
   });
 

@@ -226,3 +226,87 @@ async fn ses_notifications_arrive_in_snss_envelope_with_the_ses_message_inside()
         Some("Notification")
     );
 }
+
+/// An email with a small text attachment, as an app sends it.
+async fn send_email_with_attachment(app_router: &axum::Router) -> String {
+    let (status, sent) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/send",
+        Some(&json!({
+            "from": "Sam <sam@example.test>", "to": ["support@inbound.app.test"],
+            "subject": "Receipt attached", "text": "See the file",
+            "attachments": [{ "filename": "receipt.txt", "content": "aGVsbG8=" }],
+        })),
+    )
+    .await;
+    assert_eq!(status, 201, "{sent}");
+    sent["id"].as_str().unwrap_or_default().to_owned()
+}
+
+async fn render_for_email(
+    app_router: &axum::Router,
+    template_id: &str,
+    email_id: &str,
+) -> (BTreeMap<String, String>, String) {
+    let (status, rendered) = call_api(
+        app_router,
+        "POST",
+        &format!("/api/v1/webhooks/templates/{template_id}/render"),
+        Some(&json!({ "email_id": email_id })),
+    )
+    .await;
+    assert_eq!(status, 200, "{template_id}: {rendered}");
+    assert_eq!(rendered["errors"], json!([]), "{template_id}: {rendered}");
+    let headers = serde_json::from_value(rendered["headers"].clone()).unwrap_or_default();
+    (
+        headers,
+        rendered["body"].as_str().unwrap_or_default().to_owned(),
+    )
+}
+
+// AC: WH-06.3
+#[tokio::test]
+async fn postmark_inbound_carries_each_attachment_with_its_base64_content() {
+    let (app_router, _) = build_test_app();
+    let email_id = send_email_with_attachment(&app_router).await;
+
+    let (_, body) = render_for_email(&app_router, "postmark.inbound", &email_id).await;
+
+    let inbound: Value = serde_json::from_str(&body).unwrap_or(Value::Null);
+    assert_eq!(inbound["TextBody"], "See the file", "{body}");
+    assert_eq!(inbound["Attachments"][0]["Name"], "receipt.txt", "{body}");
+    assert_eq!(inbound["Attachments"][0]["Content"], "aGVsbG8=");
+    assert_eq!(inbound["Attachments"][0]["ContentLength"], 5);
+}
+
+// AC: WH-06.3
+#[tokio::test]
+async fn sendgrid_inbound_parse_posts_multipart_with_each_file_fetched_from_sendmock() {
+    let (app_router, _) = build_test_app();
+    let email_id = send_email_with_attachment(&app_router).await;
+
+    let (headers, body) = render_for_email(&app_router, "sendgrid.inbound_parse", &email_id).await;
+
+    assert!(
+        headers
+            .get("Content-Type")
+            .or_else(|| headers.get("content-type"))
+            .is_some_and(
+                |content_type| content_type.starts_with("multipart/form-data; boundary=xYzZY")
+            ),
+        "{headers:?}"
+    );
+    assert!(body.contains("name=\"attachments\"\r\n\r\n1\r\n"), "{body}");
+    assert!(
+        body.contains(
+            "name=\"attachment1\"; filename=\"receipt.txt\"\r\nX-Sendmock-File-Url: http://"
+        ),
+        "{body}"
+    );
+    assert!(
+        body.contains(&format!("/api/v1/emails/{email_id}/attachments/0")),
+        "{body}"
+    );
+    assert!(body.contains("name=\"text\"\r\n\r\nSee the file"), "{body}");
+}

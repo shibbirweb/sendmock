@@ -8,6 +8,7 @@ use sendmock_core::{TemplateFunctions, TemplateRenderMode};
 use serde_json::{Map, Value, json};
 
 use super::delivery_queue::DeliveryTrigger;
+use super::email_template_data::read_email_event_data;
 use super::request_part_renderer::RenderProblem;
 use super::template_context::build_event_template_context;
 use super::variable_resolution::{read_environment_variables, resolve_template_variables};
@@ -64,6 +65,16 @@ async fn build_base_context(
 ) -> Result<Map<String, Value>, OperationError> {
     let instance_details = &operation_context.instance_details;
     let mut template_context = build_event_template_context(details.app_event);
+    if let Some(email_data) = read_email_event_data(
+        operation_context,
+        &details.app_event.event_type,
+        &details.app_event.data,
+    )
+    .await?
+    {
+        template_context.insert("data".to_owned(), email_data.clone());
+        template_context.insert("email".to_owned(), email_data);
+    }
     let rule_name = read_rule_name(operation_context, details.rule_id).await?;
     template_context.insert(
         "endpoint".to_owned(),

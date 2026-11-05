@@ -32,6 +32,17 @@ function toEmailData(email: EmailDetail): Record<string, unknown> {
     html_body: email.html_body,
     tags: email.tags,
     extracted: email.extracted,
+    headers: email.headers,
+    // The mock keeps no file bytes, so content is empty; the binary inlines files up to 1 MB.
+    attachments: email.attachments.map((attachment) => ({
+      index: attachment.index,
+      filename: attachment.filename,
+      content_type: attachment.content_type,
+      size_bytes: attachment.size_bytes,
+      content_id: attachment.content_id,
+      url: `http://127.0.0.1:8025${attachment.download_url}`,
+      content_base64: "",
+    })),
   };
 }
 

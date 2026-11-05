@@ -65,7 +65,7 @@ Phase 3 (Twilio, Vonage), Phase 4 (email providers).
 
 - [x] WH-06.1 Each provider format matches the fixtures built from that provider's docs (fields, content type, encoding).
 - [x] WH-06.2 Provider signatures (Twilio, Mailgun, SendGrid, Slack) verify with that provider's official SDK helper.
-- [ ] WH-06.3 Inbound email formats include attachments as the provider sends them.
+- [x] WH-06.3 Inbound email formats include attachments as the provider sends them. (#48)
 
 ## WH-07 Variables and templating
 
