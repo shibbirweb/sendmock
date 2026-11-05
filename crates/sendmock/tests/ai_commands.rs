@@ -79,3 +79,143 @@ fn the_skills_example_scenarios_pass_against_the_binary() {
         );
     }
 }
+
+/// `sendmock ai install` in a project folder whose home folder is a second temporary one.
+fn run_install(
+    project_directory: &Path,
+    home_directory: &Path,
+    arguments: &[&str],
+) -> std::process::Output {
+    run_until_exit(
+        sendmock_command(project_directory)
+            .env("HOME", home_directory)
+            .args(["ai", "install"])
+            .args(arguments)
+            .stdin(std::process::Stdio::null()),
+    )
+    .unwrap_or_else(|run_error| panic!("the command runs: {run_error}"))
+}
+
+fn read_text(file_path: &Path) -> String {
+    std::fs::read_to_string(file_path).unwrap_or_default()
+}
+
+fn make_directory() -> tempfile::TempDir {
+    tempfile::tempdir().unwrap_or_else(|folder_error| panic!("temporary folder: {folder_error}"))
+}
+
+// AC: AI-05.2
+#[test]
+fn ai_install_shows_the_diff_and_writes_nothing_without_yes() {
+    let (project_directory, home_directory) = (make_directory(), make_directory());
+
+    let output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "cursor"],
+    );
+
+    let shown_diff = String::from_utf8_lossy(&output.stderr);
+    assert_eq!(output.status.code(), Some(1), "{shown_diff}");
+    assert!(shown_diff.contains("+++ .cursor/mcp.json"), "{shown_diff}");
+    assert!(
+        shown_diff.contains("+++ .cursor/rules/sendmock.mdc"),
+        "{shown_diff}"
+    );
+    assert!(shown_diff.contains("--yes"), "{shown_diff}");
+    assert!(!project_directory.path().join(".cursor").exists());
+}
+
+// AC: AI-05.2
+#[test]
+fn ai_install_for_cursor_keeps_other_servers_and_writes_the_rule() {
+    let (project_directory, home_directory) = (make_directory(), make_directory());
+    let mcp_path = project_directory.path().join(".cursor/mcp.json");
+    std::fs::create_dir_all(project_directory.path().join(".cursor"))
+        .unwrap_or_else(|error| panic!("{error}"));
+    std::fs::write(
+        &mcp_path,
+        r#"{"mcpServers": {"other": {"command": "other-mcp"}}}"#,
+    )
+    .unwrap_or_else(|error| panic!("{error}"));
+
+    let output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "cursor", "--yes"],
+    );
+    let again = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "cursor", "--yes"],
+    );
+
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let mcp_config: serde_json::Value =
+        serde_json::from_str(&read_text(&mcp_path)).unwrap_or_default();
+    assert_eq!(mcp_config["mcpServers"]["other"]["command"], "other-mcp");
+    assert_eq!(mcp_config["mcpServers"]["sendmock"]["args"][0], "mcp");
+    let rule_text = read_text(&project_directory.path().join(".cursor/rules/sendmock.mdc"));
+    assert!(rule_text.starts_with("---\ndescription:"), "{rule_text}");
+    assert!(rule_text.contains("## Workflows"));
+    assert!(String::from_utf8_lossy(&again.stdout).contains("already set up"));
+}
+
+// AC: AI-05.2
+#[test]
+fn ai_install_for_claude_code_and_codex_writes_their_files() {
+    let (project_directory, home_directory) = (make_directory(), make_directory());
+    std::fs::write(
+        project_directory.path().join("AGENTS.md"),
+        "# Team rules\n\nBe kind.\n",
+    )
+    .unwrap_or_else(|error| panic!("{error}"));
+
+    let claude_output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "claude-code", "--yes"],
+    );
+    let codex_output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "codex", "--yes"],
+    );
+
+    assert_eq!(
+        claude_output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&claude_output.stderr)
+    );
+    assert_eq!(
+        codex_output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&codex_output.stderr)
+    );
+    let skill_directory = project_directory.path().join(".claude/skills/sendmock");
+    assert!(
+        read_text(&skill_directory.join("SKILL.md")).contains(&format!(
+            "Written for SendMock {}.",
+            env!("CARGO_PKG_VERSION")
+        ))
+    );
+    assert!(skill_directory.join("examples/otp-from-sms.toml").exists());
+    assert!(read_text(&project_directory.path().join(".mcp.json")).contains("\"sendmock\""));
+    assert!(
+        read_text(&home_directory.path().join(".codex/config.toml"))
+            .contains("[mcp_servers.sendmock]")
+    );
+    let agents_text = read_text(&project_directory.path().join("AGENTS.md"));
+    assert!(
+        agents_text.starts_with("# Team rules\n\nBe kind.\n"),
+        "{agents_text}"
+    );
+    assert!(agents_text.contains("<!-- sendmock:start -->"));
+}
