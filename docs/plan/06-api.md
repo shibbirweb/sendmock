@@ -99,7 +99,7 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 
 ## Payments
 
-Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
+Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute` with `dispute_evidence`, the dispute's `under_review` status and `evidence`, and the `payment.dispute_updated` event), resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
 
 ## Logs
 

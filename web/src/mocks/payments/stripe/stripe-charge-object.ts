@@ -99,9 +99,9 @@ export function describeDispute(
     currency: paymentDetail.currency.toLowerCase(),
     evidence_details: {
       due_by: isOpen ? openedSeconds + evidenceWindowSeconds : null,
-      has_evidence: false,
+      has_evidence: paymentDispute.evidence !== null,
       past_due: false,
-      submission_count: 0,
+      submission_count: paymentDispute.evidence === null ? 0 : 1,
     },
     is_charge_refundable: false,
     livemode: false,

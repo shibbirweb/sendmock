@@ -92,7 +92,11 @@ describe("PayPal event objects", () => {
     const disputedPayment: PaymentDetail = {
       ...buildPaidPayPalPayment(),
       status: "disputed",
-      dispute: { status: "needs_response", reason: "fraudulent" },
+      dispute: {
+        status: "needs_response",
+        reason: "fraudulent",
+        evidence: null,
+      },
     };
     const openDispute = buildPayPalEventObject(
       disputedPayment,

@@ -93,6 +93,9 @@ export function PaymentOverview({
             {paymentDetail.dispute.reason})
           </FactRow>
         )}
+        {paymentDetail.dispute?.evidence != null && (
+          <FactRow label="Evidence">{paymentDetail.dispute.evidence}</FactRow>
+        )}
         {paymentDetail.checkout_url !== null && (
           <FactRow label="Checkout">
             {/* Same tab: in mock mode a new tab would start with fresh demo data. */}

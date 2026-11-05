@@ -6,7 +6,7 @@ use crate::AppEventType;
 /// What Simulate allows a payment in its status, as the Simulate menu offers it (PY-09.3).
 pub fn list_simulate_actions(payment: &PaymentDetail) -> &'static [PaymentSimulateAction] {
     use PaymentSimulateAction::{
-        Capture, Decline, Dispute, Expire, Refund, ResolveDispute, Succeed, Void,
+        AnswerDispute, Capture, Decline, Dispute, Expire, Refund, ResolveDispute, Succeed, Void,
     };
     match payment.summary.status {
         PaymentStatus::RequiresPayment | PaymentStatus::RequiresAction => {
@@ -18,7 +18,17 @@ pub fn list_simulate_actions(payment: &PaymentDetail) -> &'static [PaymentSimula
         }
         PaymentStatus::Authorized => &[Capture, Void],
         PaymentStatus::Succeeded | PaymentStatus::PartiallyRefunded => &[Refund, Dispute],
-        PaymentStatus::Disputed => &[ResolveDispute],
+        PaymentStatus::Disputed => {
+            let needs_response = payment
+                .dispute
+                .as_ref()
+                .is_some_and(|dispute| dispute.status == "needs_response");
+            if needs_response {
+                &[AnswerDispute, ResolveDispute]
+            } else {
+                &[ResolveDispute]
+            }
+        }
         PaymentStatus::Failed | PaymentStatus::Canceled | PaymentStatus::Refunded => &[],
     }
 }
@@ -85,6 +95,22 @@ impl PaymentChange<'_> {
         });
     }
 
+    /// The merchant's evidence puts the dispute under review (PY-07.3).
+    pub fn answer_dispute(&mut self, dispute_evidence: &str) {
+        let dispute_reason = self
+            .payment
+            .dispute
+            .as_ref()
+            .map_or_else(|| "fraudulent".to_owned(), |dispute| dispute.reason.clone());
+        self.payment.dispute = Some(PaymentDispute {
+            status: "under_review".to_owned(),
+            reason: dispute_reason,
+            evidence: Some(dispute_evidence.to_owned()),
+        });
+        self.add_timeline("dispute_answered", "Dispute answered with evidence");
+        self.fire_event(AppEventType::PaymentDisputeUpdated);
+    }
+
     /// A won dispute keeps the money; a lost one returns all of it to the customer.
     pub fn resolve_dispute(&mut self, dispute_outcome: DisputeOutcome) {
         let is_won = dispute_outcome == DisputeOutcome::Won;
@@ -93,9 +119,15 @@ impl PaymentChange<'_> {
             .dispute
             .as_ref()
             .map_or_else(|| "fraudulent".to_owned(), |dispute| dispute.reason.clone());
+        let dispute_evidence = self
+            .payment
+            .dispute
+            .as_ref()
+            .and_then(|dispute| dispute.evidence.clone());
         self.payment.dispute = Some(PaymentDispute {
             status: if is_won { "won" } else { "lost" }.to_owned(),
             reason: dispute_reason,
+            evidence: dispute_evidence,
         });
         self.payment.summary.status = if !is_won {
             self.payment.summary.refunded_minor = self.payment.captured_minor;

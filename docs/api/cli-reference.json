@@ -8352,6 +8352,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired"
@@ -9649,12 +9650,13 @@
             "decline",
             "refund",
             "dispute",
+            "answer_dispute",
             "resolve_dispute",
             "expire",
             "capture",
             "void"
           ],
-          "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
+          "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
           "example": "refund",
           "reads_file": false
         }
@@ -9714,6 +9716,21 @@
           ],
           "description": "For `resolve_dispute`: `won` or `lost`.",
           "example": "won"
+        },
+        {
+          "flag": "--dispute-evidence",
+          "input": {
+            "name": "dispute_evidence",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<dispute-evidence>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `answer_dispute`: the evidence sent to the bank.",
+          "example": "Signed delivery receipt attached."
         }
       ],
       "example": "sendmock payments simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D refund --decline-reason insufficient_funds --refund-amount-minor 500",
@@ -14303,6 +14320,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
@@ -15975,6 +15993,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
@@ -16260,6 +16279,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
@@ -16458,6 +16478,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
@@ -17917,6 +17938,7 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",

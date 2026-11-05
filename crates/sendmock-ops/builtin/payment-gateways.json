@@ -36,6 +36,7 @@
       "payment.refunded": "charge.refunded",
       "payment.partially_refunded": "charge.refunded",
       "payment.dispute_opened": "charge.dispute.created",
+      "payment.dispute_updated": "charge.dispute.updated",
       "payment.dispute_closed": "charge.dispute.closed",
       "checkout.completed": "checkout.session.completed",
       "checkout.expired": "checkout.session.expired"
@@ -93,6 +94,7 @@
       "payment.refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.partially_refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.dispute_opened": "CUSTOMER.DISPUTE.CREATED",
+      "payment.dispute_updated": "CUSTOMER.DISPUTE.UPDATED",
       "payment.dispute_closed": "CUSTOMER.DISPUTE.RESOLVED",
       "checkout.completed": "CHECKOUT.ORDER.APPROVED",
       "checkout.expired": "CHECKOUT.ORDER.VOIDED"
@@ -292,6 +294,7 @@
       "payment.refunded": "REFUNDED",
       "payment.partially_refunded": "REFUNDED",
       "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
       "payment.dispute_closed": "",
       "checkout.completed": "",
       "checkout.expired": "EXPIRED"
@@ -354,6 +357,7 @@
       "payment.refunded": "refunded",
       "payment.partially_refunded": "refunded",
       "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
       "payment.dispute_closed": "",
       "checkout.completed": "",
       "checkout.expired": "cancel"
@@ -416,6 +420,7 @@
       "payment.refunded": "refund.processed",
       "payment.partially_refunded": "refund.processed",
       "payment.dispute_opened": "payment.dispute.created",
+      "payment.dispute_updated": "payment.dispute.under_review",
       "payment.dispute_closed": "payment.dispute.closed",
       "checkout.completed": "order.paid",
       "checkout.expired": ""
@@ -472,6 +477,7 @@
       "payment.refunded": "adjustment.created",
       "payment.partially_refunded": "adjustment.created",
       "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
       "payment.dispute_closed": "",
       "checkout.completed": "transaction.paid",
       "checkout.expired": ""
@@ -518,6 +524,7 @@
       "payment.refunded": "payment.refunded",
       "payment.partially_refunded": "payment.partially_refunded",
       "payment.dispute_opened": "payment.dispute_opened",
+      "payment.dispute_updated": "payment.dispute_updated",
       "payment.dispute_closed": "payment.dispute_closed",
       "checkout.completed": "checkout.completed",
       "checkout.expired": "checkout.expired"

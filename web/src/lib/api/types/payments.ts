@@ -57,6 +57,7 @@ export type PaymentTimelineKind =
   | "expired"
   | "refunded"
   | "dispute_opened"
+  | "dispute_answered"
   | "dispute_closed"
   | "redirected"
   | "delayed"
@@ -89,8 +90,10 @@ export type PaymentNotification = {
 };
 
 export type PaymentDispute = {
-  status: "needs_response" | "won" | "lost";
+  status: "needs_response" | "under_review" | "won" | "lost";
   reason: string;
+  /** What the merchant answered with; null until the dispute is answered. */
+  evidence: string | null;
 };
 
 export type CardTestOutcome =
@@ -268,6 +271,7 @@ export type PaymentSimulateAction =
   | "decline"
   | "refund"
   | "dispute"
+  | "answer_dispute"
   | "resolve_dispute"
   | "expire"
   | "capture"
@@ -276,7 +280,7 @@ export type PaymentSimulateAction =
 /** Body of POST /api/v1/payments/{paymentId}/simulate (PY-09.3). */
 export type PaymentSimulateRequest = {
   /**
-   * What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`.
+   * What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`.
    * @example "refund"
    */
   action: PaymentSimulateAction;
@@ -295,6 +299,11 @@ export type PaymentSimulateRequest = {
    * @example "won"
    */
   dispute_outcome?: "won" | "lost";
+  /**
+   * For `answer_dispute`: the evidence sent to the bank.
+   * @example "Signed delivery receipt attached."
+   */
+  dispute_evidence?: string;
 };
 
 /** Where a test checkout stands, from the customer's side (PY-03). */

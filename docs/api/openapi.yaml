@@ -6880,6 +6880,7 @@ components:
         - payment.refunded
         - payment.partially_refunded
         - payment.dispute_opened
+        - payment.dispute_updated
         - payment.dispute_closed
         - checkout.completed
         - checkout.expired
@@ -10664,13 +10665,20 @@ components:
           type: string
           enum:
             - needs_response
+            - under_review
             - won
             - lost
         reason:
           type: string
+        evidence:
+          type:
+            - string
+            - "null"
+          description: What the merchant answered with; null until the dispute is answered.
       required:
         - status
         - reason
+        - evidence
     PaymentEventType:
       type: string
       enum:
@@ -10682,6 +10690,7 @@ components:
         - payment.refunded
         - payment.partially_refunded
         - payment.dispute_opened
+        - payment.dispute_updated
         - payment.dispute_closed
         - checkout.completed
         - checkout.expired
@@ -10957,6 +10966,8 @@ components:
               type: string
             payment.dispute_opened:
               type: string
+            payment.dispute_updated:
+              type: string
             payment.dispute_closed:
               type: string
             checkout.completed:
@@ -10972,6 +10983,7 @@ components:
             - payment.refunded
             - payment.partially_refunded
             - payment.dispute_opened
+            - payment.dispute_updated
             - payment.dispute_closed
             - checkout.completed
             - checkout.expired
@@ -11101,6 +11113,8 @@ components:
               type: string
             payment.dispute_opened:
               type: string
+            payment.dispute_updated:
+              type: string
             payment.dispute_closed:
               type: string
             checkout.completed:
@@ -11116,6 +11130,7 @@ components:
             - payment.refunded
             - payment.partially_refunded
             - payment.dispute_opened
+            - payment.dispute_updated
             - payment.dispute_closed
             - checkout.completed
             - checkout.expired
@@ -11543,6 +11558,7 @@ components:
         - decline
         - refund
         - dispute
+        - answer_dispute
         - resolve_dispute
         - expire
         - capture
@@ -11552,7 +11568,7 @@ components:
       properties:
         action:
           $ref: "#/components/schemas/PaymentSimulateAction"
-          description: "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`."
+          description: "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`."
           examples:
             - refund
         decline_reason:
@@ -11573,6 +11589,11 @@ components:
           description: "For `resolve_dispute`: `won` or `lost`."
           examples:
             - won
+        dispute_evidence:
+          type: string
+          description: "For `answer_dispute`: the evidence sent to the bank."
+          examples:
+            - Signed delivery receipt attached.
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -11734,6 +11755,7 @@ components:
         - expired
         - refunded
         - dispute_opened
+        - dispute_answered
         - dispute_closed
         - redirected
         - delayed

@@ -109,7 +109,11 @@ describe("Stripe event objects", () => {
     const disputedPayment: PaymentDetail = {
       ...buildPaidStripePayment(),
       status: "disputed",
-      dispute: { status: "needs_response", reason: "fraudulent" },
+      dispute: {
+        status: "needs_response",
+        reason: "fraudulent",
+        evidence: null,
+      },
       timeline: [
         {
           kind: "dispute_opened",

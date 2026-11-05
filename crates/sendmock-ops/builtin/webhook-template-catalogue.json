@@ -373,6 +373,7 @@
       "payment.refunded",
       "payment.partially_refunded",
       "payment.dispute_opened",
+      "payment.dispute_updated",
       "payment.dispute_closed",
       "checkout.completed",
       "checkout.expired"
@@ -395,6 +396,7 @@
       "payment.refunded",
       "payment.partially_refunded",
       "payment.dispute_opened",
+      "payment.dispute_updated",
       "payment.dispute_closed",
       "checkout.completed",
       "checkout.expired"
@@ -414,6 +416,7 @@
       "payment.refunded",
       "payment.partially_refunded",
       "payment.dispute_opened",
+      "payment.dispute_updated",
       "payment.dispute_closed"
     ],
     "description": "PayPal: IPN payload, matching the provider's documented format.",
@@ -460,6 +463,7 @@
       "payment.refunded",
       "payment.partially_refunded",
       "payment.dispute_opened",
+      "payment.dispute_updated",
       "payment.dispute_closed",
       "checkout.completed"
     ],

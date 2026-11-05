@@ -36,7 +36,7 @@ Payment intents / orders created and confirmed via API with **test cards or test
 
 - **Authorize then capture** (manual capture), **void / cancel**: a payment with `capture_method: manual` (Stripe's `capture_method=manual`, or `capture_method` on `POST /payments/checkout`) is `authorized` once paid, fires `payment.authorized`, and is then captured in whole or in part, or voided.
 - **Refunds**: full and partial, instant or pending then succeeded/failed.
-- **Disputes / chargebacks**: open, needs response, won, lost.
+- **Disputes / chargebacks**: open (`needs_response`), answered with evidence (`under_review`), then won or lost. Answering fires `payment.dispute_updated`, which each gateway names in its own words (Stripe `charge.dispute.updated`, PayPal `CUSTOMER.DISPUTE.UPDATED`, Razorpay `payment.dispute.under_review`).
 - **Subscriptions** (Stripe-style): create, trial, renew (simulated clock advance), payment failure and dunning, cancel. (Phase 4+)
 - All available from the UI ("Simulate" menu on a payment), REST API, CLI and MCP.
 
@@ -149,7 +149,7 @@ Gateways and payment methods are data, not code, so a developer can emulate a ga
 
 Native events (also usable in webhook rules and the realtime stream):
 
-`payment.created`, `payment.authorized`, `payment.succeeded`, `payment.failed`, `payment.canceled`, `payment.refunded`, `payment.partially_refunded`, `payment.dispute_opened`, `payment.dispute_closed`, `checkout.completed`, `checkout.expired`, `subscription.created`, `subscription.renewed`, `subscription.payment_failed`, `subscription.canceled`.
+`payment.created`, `payment.authorized`, `payment.succeeded`, `payment.failed`, `payment.canceled`, `payment.refunded`, `payment.partially_refunded`, `payment.dispute_opened`, `payment.dispute_updated`, `payment.dispute_closed`, `checkout.completed`, `checkout.expired`, `subscription.created`, `subscription.renewed`, `subscription.payment_failed`, `subscription.canceled`.
 
 Provider deliveries use the provider's own event names and payloads through built-in **payment templates** (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook), see [13-webhook-templates.md](13-webhook-templates.md).
 
@@ -192,7 +192,7 @@ Provider deliveries use the provider's own event names and payloads through buil
 | POST | `/payments` | create a payment (native) |
 | POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included; `capture_method: manual` authorizes it and waits for a capture or void |
 | GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
-| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
+| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `answer_dispute` (`dispute_evidence`, while the dispute needs a response), `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
 | GET/POST/PATCH/DELETE | `/payments/gateways` | gateways; `POST` takes `{ "name", "key", "start_from" }`; built-ins cannot be deleted |

@@ -7,6 +7,7 @@ use super::stripe_checkout_sessions::{
     create_checkout_session, expire_checkout_session, list_checkout_session_line_items,
     retrieve_checkout_session,
 };
+use super::stripe_disputes::{close_dispute, retrieve_dispute, update_dispute};
 use super::stripe_error::StripeError;
 use super::stripe_fields::StripeFields;
 use super::stripe_form_decoder::decode_stripe_form;
@@ -22,10 +23,11 @@ use crate::{OperationContext, OperationError};
 
 const STRIPE_API_HOST: &str = "api.stripe.com";
 /// The resources served; on a shared provider port, other `/v1/...` paths belong to others.
-const STRIPE_RESOURCE_PATHS: [&str; 3] = [
+const STRIPE_RESOURCE_PATHS: [&str; 4] = [
     "/v1/payment_intents",
     "/v1/checkout/sessions",
     "/v1/refunds",
+    "/v1/disputes",
 ];
 
 fn is_stripe_request(provider_route: ProviderRoute<'_>, request: &ProviderHttpRequest) -> bool {
@@ -124,6 +126,9 @@ async fn route_stripe_request(
         }
         ("POST", ["refunds"]) => create_refund(stripe_call).await,
         ("GET", ["refunds", refund_id]) => retrieve_refund(stripe_call, refund_id).await,
+        ("GET", ["disputes", dispute_id]) => retrieve_dispute(stripe_call, dispute_id).await,
+        ("POST", ["disputes", dispute_id]) => update_dispute(stripe_call, dispute_id).await,
+        ("POST", ["disputes", dispute_id, "close"]) => close_dispute(stripe_call, dispute_id).await,
         _ => Err(StripeError::unrecognized_url(method, path)),
     }
 }

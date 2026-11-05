@@ -14,6 +14,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AnswerDisputeDialog } from "@/features/payments/detail/answer-dispute-dialog";
 import { RefundPaymentDialog } from "@/features/payments/detail/refund-payment-dialog";
 import { ApiError } from "@/lib/api/api-client";
 import {
@@ -43,6 +44,7 @@ export function PaymentSimulateMenu({
   const simulatePayment = useSimulatePayment();
   const resendNotification = useResendPaymentNotification();
   const [isRefundOpen, setRefundOpen] = React.useState(false);
+  const [isAnswerOpen, setAnswerOpen] = React.useState(false);
   const availableActions = listSimulateActions(paymentDetail);
   const reportError = (requestError: Error) => {
     toast.error(
@@ -131,6 +133,16 @@ export function PaymentSimulateMenu({
                 </DropdownMenuSub>
               );
             }
+            if (simulateAction === "answer_dispute") {
+              return (
+                <DropdownMenuItem
+                  key={simulateAction}
+                  onSelect={() => setAnswerOpen(true)}
+                >
+                  Answer dispute...
+                </DropdownMenuItem>
+              );
+            }
             if (simulateAction === "refund") {
               return (
                 <DropdownMenuItem
@@ -188,6 +200,20 @@ export function PaymentSimulateMenu({
             );
           }}
           onClose={() => setRefundOpen(false)}
+        />
+      )}
+      {isAnswerOpen && (
+        <AnswerDisputeDialog
+          isAnswering={simulatePayment.isPending}
+          onAnswer={(disputeEvidence) => {
+            runAction(
+              { action: "answer_dispute", dispute_evidence: disputeEvidence },
+              () => {
+                setAnswerOpen(false);
+              },
+            );
+          }}
+          onClose={() => setAnswerOpen(false)}
         />
       )}
     </div>

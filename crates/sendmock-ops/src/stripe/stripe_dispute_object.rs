@@ -10,7 +10,7 @@ use crate::payments::PaymentDetail;
 const EVIDENCE_WINDOW_SECONDS: i64 = 7 * 24 * 60 * 60;
 
 /// Every evidence field Stripe lists on a dispute; none is filled until the merchant answers.
-const EVIDENCE_FIELD_NAMES: [&str; 27] = [
+pub const EVIDENCE_FIELD_NAMES: [&str; 27] = [
     "access_activity_log",
     "billing_address",
     "cancellation_policy",
@@ -58,10 +58,16 @@ pub fn describe_dispute(payment: &PaymentDetail) -> Option<Value> {
     let payment_dispute = payment.dispute.as_ref()?;
     let payment_intent_id = read_payment_intent_id(payment);
     let opened_seconds = read_opened_seconds(payment);
-    let evidence: Map<String, Value> = EVIDENCE_FIELD_NAMES
+    let mut evidence: Map<String, Value> = EVIDENCE_FIELD_NAMES
         .iter()
         .map(|field_name| ((*field_name).to_owned(), Value::Null))
         .collect();
+    if let Some(evidence_text) = &payment_dispute.evidence {
+        evidence.insert(
+            "uncategorized_text".to_owned(),
+            Value::from(evidence_text.clone()),
+        );
+    }
     let is_open = payment_dispute.status == "needs_response";
     Some(json!({
         "id": derive_related_id(&payment_intent_id, "dp"),
@@ -74,9 +80,9 @@ pub fn describe_dispute(payment: &PaymentDetail) -> Option<Value> {
         "evidence": evidence,
         "evidence_details": {
             "due_by": is_open.then_some(opened_seconds + EVIDENCE_WINDOW_SECONDS),
-            "has_evidence": false,
+            "has_evidence": payment_dispute.evidence.is_some(),
             "past_due": false,
-            "submission_count": 0,
+            "submission_count": u8::from(payment_dispute.evidence.is_some()),
         },
         "is_charge_refundable": false,
         "livemode": false,
@@ -99,6 +105,7 @@ mod tests {
         payment.dispute = Some(PaymentDispute {
             status: "needs_response".to_owned(),
             reason: "fraudulent".to_owned(),
+            evidence: None,
         });
         payment.timeline.push(PaymentTimelineEvent {
             kind: "dispute_opened".to_owned(),
@@ -126,6 +133,7 @@ mod tests {
         payment.dispute = Some(PaymentDispute {
             status: "lost".to_owned(),
             reason: "fraudulent".to_owned(),
+            evidence: None,
         });
 
         let dispute = describe_dispute(&payment).unwrap_or_default();

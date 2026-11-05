@@ -61,7 +61,7 @@ Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions).
 
 - [x] PY-07.1 Manual capture: authorize, then capture or void, with matching events.
 - [x] PY-07.2 Full and partial refunds update the payment and fire the provider's refund event; refunding more than captured is rejected.
-- [ ] PY-07.3 Disputes can be opened, answered, won and lost, each with the provider's events.
+- [x] PY-07.3 Disputes can be opened, answered, won and lost, each with the provider's events.
 - [ ] PY-07.4 Subscriptions: create, renew on simulated clock advance, payment failure and cancel, each with events.
 
 ## PY-08 Events, templates and delivery

@@ -56,6 +56,15 @@ fn apply_simulate_action(
             payment_change.refund(refund_minor);
         }
         PaymentSimulateAction::Dispute => payment_change.open_dispute(),
+        PaymentSimulateAction::AnswerDispute => {
+            let dispute_evidence = input
+                .dispute_evidence
+                .as_deref()
+                .map(str::trim)
+                .filter(|evidence| !evidence.is_empty())
+                .unwrap_or("Evidence sent");
+            payment_change.answer_dispute(dispute_evidence);
+        }
         PaymentSimulateAction::ResolveDispute => {
             payment_change.resolve_dispute(input.dispute_outcome.unwrap_or(DisputeOutcome::Won));
         }

@@ -105,9 +105,12 @@ pub struct PaymentNotification {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct PaymentDispute {
-    /// `needs_response`, `won` or `lost`.
+    /// `needs_response`, `under_review`, `won` or `lost`.
     pub status: String,
     pub reason: String,
+    /// What the merchant answered with; none until the dispute is answered.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub evidence: Option<String>,
 }
 
 /// A payment as the list shows it.

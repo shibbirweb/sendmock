@@ -76,6 +76,7 @@ pub use payment_operations::{
 };
 pub(crate) use payment_settlement::read_refundable_minor;
 pub use payment_simulate_operation::SimulatePaymentOperation;
+pub(crate) use payment_simulate_views::DisputeOutcome;
 pub use payment_views::{
     PaymentCaptureMethod, PaymentDetail, PaymentInstrument, PaymentLineItem, PaymentStatus,
     PaymentSummary,

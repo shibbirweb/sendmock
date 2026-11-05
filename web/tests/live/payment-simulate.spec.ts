@@ -117,6 +117,32 @@ test("PY-09.3 a live dispute can be won, keeping the payment", async ({
   await expect(paymentOverview(paymentDrawer)).toContainText("won");
 });
 
+test("PY-07.3 a live dispute is answered with evidence, goes under review and is then won", async ({
+  page,
+  request,
+}) => {
+  const paymentId = await createCheckout(
+    request,
+    buildCustomerEmail("simulate-dispute-answer"),
+  );
+  await simulatePayment(request, paymentId, { action: "succeed" });
+  await simulatePayment(request, paymentId, { action: "dispute" });
+  const paymentDrawer = await openPaymentDrawer(page, paymentId);
+
+  await chooseSimulateAction(page, paymentDrawer, "Answer dispute...");
+  const answerDialog = page.getByRole("dialog", { name: "Answer dispute" });
+  await answerDialog.getByLabel("Evidence").fill("Signed delivery receipt.");
+  await answerDialog.getByRole("button", { name: "Send answer" }).click();
+
+  await expect(answerDialog).toBeHidden();
+  await expect(paymentOverview(paymentDrawer)).toContainText("under review");
+  await expect(paymentOverview(paymentDrawer)).toContainText(
+    "Signed delivery receipt.",
+  );
+  await chooseSimulateAction(page, paymentDrawer, "Resolve dispute", "Won");
+  await expect(paymentOverview(paymentDrawer)).toContainText("won");
+});
+
 test("PY-09.3 a live authorization is captured or voided, and a notification can be resent", async ({
   page,
   request,

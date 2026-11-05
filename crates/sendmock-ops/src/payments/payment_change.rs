@@ -156,6 +156,7 @@ impl<'context> PaymentChange<'context> {
         self.payment.dispute = Some(PaymentDispute {
             status: "needs_response".to_owned(),
             reason: "fraudulent".to_owned(),
+            evidence: None,
         });
         self.add_timeline("dispute_opened", "Dispute opened: fraudulent");
         self.fired_events.push(AppEventType::PaymentDisputeOpened);

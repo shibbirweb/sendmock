@@ -5,6 +5,7 @@ mod stripe_checkout_line_items;
 mod stripe_checkout_session_object;
 mod stripe_checkout_sessions;
 mod stripe_dispute_object;
+mod stripe_disputes;
 mod stripe_error;
 mod stripe_event_object;
 mod stripe_fields;

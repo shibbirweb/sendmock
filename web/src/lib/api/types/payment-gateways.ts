@@ -22,6 +22,7 @@ export type PaymentEventType =
   | "payment.refunded"
   | "payment.partially_refunded"
   | "payment.dispute_opened"
+  | "payment.dispute_updated"
   | "payment.dispute_closed"
   | "checkout.completed"
   | "checkout.expired";

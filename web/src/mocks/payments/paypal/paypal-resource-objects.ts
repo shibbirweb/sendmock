@@ -160,18 +160,22 @@ export function describePayPalDispute(
     return null;
   }
   const captureId = derivePayPalId(paymentDetail, "C");
-  const isOpen = paymentDispute.status === "needs_response";
+  const isResolved = ["won", "lost"].includes(paymentDispute.status);
+  const paypalStatuses: Record<string, string> = {
+    needs_response: "OPEN",
+    under_review: "UNDER_REVIEW",
+  };
 
   return {
     dispute_id: `PP-D-${captureId}`,
     disputed_transactions: [{ seller_transaction_id: captureId }],
     reason: disputeReasons[paymentDispute.reason] ?? "OTHER",
-    status: isOpen ? "OPEN" : "RESOLVED",
+    status: paypalStatuses[paymentDispute.status] ?? "RESOLVED",
     dispute_amount: describePayPalAmount(
       paymentDetail.captured_minor,
       paymentDetail.currency,
     ),
-    ...(isOpen
+    ...(!isResolved
       ? {}
       : {
           dispute_outcome: {

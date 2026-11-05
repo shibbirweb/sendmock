@@ -51,7 +51,26 @@ describe("simulate actions", () => {
       listSimulateActions({ status: "succeeded", checkout_url: null }),
     ).toEqual(["refund", "dispute"]);
     expect(
-      listSimulateActions({ status: "disputed", checkout_url: null }),
+      listSimulateActions({
+        status: "disputed",
+        checkout_url: null,
+        dispute: {
+          status: "needs_response",
+          reason: "fraudulent",
+          evidence: null,
+        },
+      }),
+    ).toEqual(["answer_dispute", "resolve_dispute"]);
+    expect(
+      listSimulateActions({
+        status: "disputed",
+        checkout_url: null,
+        dispute: {
+          status: "under_review",
+          reason: "fraudulent",
+          evidence: "Receipt",
+        },
+      }),
     ).toEqual(["resolve_dispute"]);
     expect(
       listSimulateActions({ status: "refunded", checkout_url: null }),

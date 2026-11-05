@@ -43,7 +43,11 @@ pub fn describe_paypal_dispute(
     let dispute_id = format!("PP-D-{capture_id}");
     let (opened_at, updated_at) = read_dispute_times(payment);
     let currency = &payment.summary.currency;
-    let is_open = payment_dispute.status == "needs_response";
+    let paypal_status = match payment_dispute.status.as_str() {
+        "needs_response" => "OPEN",
+        "under_review" => "UNDER_REVIEW",
+        _ => "RESOLVED",
+    };
     let mut dispute = json!({
         "dispute_id": dispute_id,
         "create_time": opened_at,
@@ -53,7 +57,7 @@ pub fn describe_paypal_dispute(
             "seller": {"merchant_id": "SENDMOCKMERCHANT"},
         }],
         "reason": read_paypal_dispute_reason(&payment_dispute.reason),
-        "status": if is_open { "OPEN" } else { "RESOLVED" },
+        "status": paypal_status,
         "dispute_amount": describe_amount(payment.captured_minor, currency),
         "dispute_life_cycle_stage": "CHARGEBACK",
         "dispute_channel": "EXTERNAL",
@@ -61,7 +65,7 @@ pub fn describe_paypal_dispute(
             {"href": format!("{api_base_url}/v1/customer/disputes/{dispute_id}"), "rel": "self", "method": "GET"},
         ],
     });
-    if !is_open {
+    if paypal_status == "RESOLVED" {
         let is_won = payment_dispute.status == "won";
         dispute["dispute_outcome"] = json!({
             "outcome_code": if is_won { "RESOLVED_SELLER_FAVOUR" } else { "RESOLVED_BUYER_FAVOUR" },
