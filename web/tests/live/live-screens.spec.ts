@@ -49,7 +49,7 @@ test("UI-12.2 an email opens with every tab and no failing calls", async ({
   expect(failedApiCalls).toEqual([]);
 });
 
-test("UI-12.2 served buttons are enabled and a feature not served yet says when it arrives", async ({
+test("UI-12.2 served buttons are enabled, and the AI agents card shows the binary's setups", async ({
   page,
   request,
 }) => {
@@ -78,7 +78,7 @@ test("UI-12.2 served buttons are enabled and a feature not served yet says when 
   ).toBeEnabled();
   await page.goto("/settings?section=connection");
   await expect(
-    page.getByRole("heading", { name: "AI agent setup arrives in Phase 4" }),
+    page.getByText("sendmock ai install --target claude-code"),
   ).toBeVisible();
 });
 

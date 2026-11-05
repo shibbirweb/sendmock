@@ -14,10 +14,12 @@ import { Textarea } from "@/components/ui/textarea";
 
 /** The evidence the merchant sends the bank, which puts the dispute under review (PY-07.3). */
 export function AnswerDisputeDialog({
+  isOpen,
   isAnswering,
   onAnswer,
   onClose,
 }: {
+  isOpen: boolean;
   isAnswering: boolean;
   onAnswer: (disputeEvidence: string) => void;
   onClose: () => void;
@@ -28,7 +30,7 @@ export function AnswerDisputeDialog({
 
   return (
     <Dialog
-      open
+      open={isOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           onClose();

@@ -43,8 +43,15 @@ export function PaymentSimulateMenu({
 }) {
   const simulatePayment = useSimulatePayment();
   const resendNotification = useResendPaymentNotification();
+  // The dialogs stay mounted and close through `open`: unmounting an open dialog could
+  // leave the page locked. A new key each opening starts them fresh.
   const [isRefundOpen, setRefundOpen] = React.useState(false);
   const [isAnswerOpen, setAnswerOpen] = React.useState(false);
+  const [dialogOpeningCount, setDialogOpeningCount] = React.useState(0);
+  const openDialog = (setDialogOpen: (isOpen: boolean) => void) => {
+    setDialogOpeningCount((openingCount) => openingCount + 1);
+    setDialogOpen(true);
+  };
   const availableActions = listSimulateActions(paymentDetail);
   const reportError = (requestError: Error) => {
     toast.error(
@@ -139,7 +146,7 @@ export function PaymentSimulateMenu({
               return (
                 <DropdownMenuItem
                   key={simulateAction}
-                  onSelect={() => setAnswerOpen(true)}
+                  onSelect={() => openDialog(setAnswerOpen)}
                 >
                   Answer dispute...
                 </DropdownMenuItem>
@@ -149,7 +156,7 @@ export function PaymentSimulateMenu({
               return (
                 <DropdownMenuItem
                   key={simulateAction}
-                  onSelect={() => setRefundOpen(true)}
+                  onSelect={() => openDialog(setRefundOpen)}
                 >
                   Refund...
                 </DropdownMenuItem>
@@ -189,8 +196,10 @@ export function PaymentSimulateMenu({
         <SendIcon />
         Resend notification
       </Button>
-      {isRefundOpen && (
+      {dialogOpeningCount > 0 && (
         <RefundPaymentDialog
+          key={`refund-${dialogOpeningCount}`}
+          isOpen={isRefundOpen}
           paymentDetail={paymentDetail}
           isRefunding={simulatePayment.isPending}
           onRefund={(refundAmountMinor) => {
@@ -204,8 +213,10 @@ export function PaymentSimulateMenu({
           onClose={() => setRefundOpen(false)}
         />
       )}
-      {isAnswerOpen && (
+      {dialogOpeningCount > 0 && (
         <AnswerDisputeDialog
+          key={`answer-${dialogOpeningCount}`}
+          isOpen={isAnswerOpen}
           isAnswering={simulatePayment.isPending}
           onAnswer={(disputeEvidence) => {
             runAction(
