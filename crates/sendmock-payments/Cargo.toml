@@ -1,0 +1,14 @@
+[package]
+name = "sendmock-payments"
+description = "Payment domain for SendMock: checkout flows, payment methods and their rules."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+
+[lints]
+workspace = true

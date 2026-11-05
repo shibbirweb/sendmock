@@ -5,11 +5,12 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailOutcomeRuleRepository,
     EmailRepository, MessageProviderRepository, MessagingServiceRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
-    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
-    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
-    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
-    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
+    PaymentDefinitionRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
+    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
+    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
+    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
+    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
+    WebhookVariableRepository,
 };
 
 use crate::{
@@ -73,6 +74,8 @@ pub struct OperationContext {
     pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
     /// The seed file applied last, for reset and seed status.
     pub seed_state_repository: SeedStateRepository,
+    /// Edited built-in and custom payment flows, methods and gateways.
+    pub payment_definition_repository: PaymentDefinitionRepository,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
 }
@@ -95,6 +98,7 @@ impl OperationContext {
             api_request_repository: ApiRequestRepository::new(Arc::clone(&database)),
             sms_repository: SmsRepository::new(Arc::clone(&database)),
             seed_state_repository: SeedStateRepository::new(Arc::clone(&database)),
+            payment_definition_repository: PaymentDefinitionRepository::new(Arc::clone(&database)),
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(Arc::clone(
                 &database,
             )),

@@ -19,6 +19,7 @@ mod operation_error;
 mod operation_registry;
 mod outcome_rules;
 mod page_of;
+mod payments;
 mod present_value;
 mod providers;
 mod samples;
@@ -68,6 +69,7 @@ pub use outcome_rules::{
     EmailOutcomeRule, OutcomeTestResult, SmsOutcomeRule, load_email_outcome_rules,
 };
 pub use page_of::PageOf;
+pub use payments::{PaymentFlowDefinition, PaymentFlowStep, PaymentMethodDefinition};
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_sms_providers, load_sms_provider_definitions,
@@ -132,6 +134,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
     sms_replies::register_sms_reply_operations(&mut operation_registry);
+    payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);

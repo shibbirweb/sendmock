@@ -13,6 +13,7 @@ sendmock-core.workspace = true
 sendmock-mail.workspace = true
 sendmock-store.workspace = true
 sendmock-sms.workspace = true
+sendmock-payments.workspace = true
 sendmock-webhooks.workspace = true
 
 base64.workspace = true

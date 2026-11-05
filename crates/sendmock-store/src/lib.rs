@@ -10,6 +10,7 @@ mod message_provider;
 mod migration;
 mod numbers;
 mod outcome_rule;
+mod payment_definition;
 mod saved_webhook_delivery;
 mod seed_state;
 mod settings;
@@ -46,6 +47,7 @@ pub use outcome_rule::{
     EmailOutcomeRuleRecord, EmailOutcomeRuleRepository, RuleMoveDirection, SmsOutcomeRuleRecord,
     SmsOutcomeRuleRepository,
 };
+pub use payment_definition::{PaymentDefinitionRecord, PaymentDefinitionRepository};
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use seed_state::{SeedStateRecord, SeedStateRepository};
 pub use settings::SettingsRepository;

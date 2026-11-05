@@ -929,6 +929,396 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments flows step-types",
+    "usage": "sendmock payments flows step-types",
+    "aliases": [],
+    "summary": "The step types a flow can use, with their fields.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/step-types",
+        "operation_id": "getPaymentsStepTypes",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_step_type_list"
+    ]
+  },
+  {
+    "command": "sendmock payments flows variables",
+    "usage": "sendmock payments flows variables",
+    "aliases": [],
+    "summary": "The variables a step label can use.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/flow-variables",
+        "operation_id": "getPaymentsFlowVariables",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_variable_list"
+    ]
+  },
+  {
+    "command": "sendmock payments flows list",
+    "usage": "sendmock payments flows list",
+    "aliases": [],
+    "summary": "Flows: the steps a checkout page runs for a method.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/flows",
+        "operation_id": "getPaymentsFlows",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_list"
+    ]
+  },
+  {
+    "command": "sendmock payments flows create",
+    "usage": "sendmock payments flows create",
+    "aliases": [],
+    "summary": "Add a flow.",
+    "arguments": [],
+    "flags": [
+      "--key",
+      "--name",
+      "--picker-tab",
+      "--steps"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/flows",
+        "operation_id": "postPaymentsFlows",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_create"
+    ]
+  },
+  {
+    "command": "sendmock payments flows show",
+    "usage": "sendmock payments flows show <flowKey>",
+    "aliases": [],
+    "summary": "One payment flow with its steps.",
+    "arguments": [
+      "flowKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/flows/{flowKey}",
+        "operation_id": "getPaymentsFlowsByFlowKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_get"
+    ]
+  },
+  {
+    "command": "sendmock payments flows update",
+    "usage": "sendmock payments flows update <flowKey>",
+    "aliases": [],
+    "summary": "Change a flow.",
+    "arguments": [
+      "flowKey"
+    ],
+    "flags": [
+      "--key",
+      "--name",
+      "--picker-tab",
+      "--steps"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/payments/flows/{flowKey}",
+        "operation_id": "patchPaymentsFlowsByFlowKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_update"
+    ]
+  },
+  {
+    "command": "sendmock payments flows delete",
+    "usage": "sendmock payments flows delete <flowKey>",
+    "aliases": [],
+    "summary": "Delete a custom flow; 409 while a method uses it.",
+    "arguments": [
+      "flowKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/flows/{flowKey}",
+        "operation_id": "deletePaymentsFlowsByFlowKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_delete"
+    ]
+  },
+  {
+    "command": "sendmock payments flows reset",
+    "usage": "sendmock payments flows reset <flowKey>",
+    "aliases": [],
+    "summary": "Put a built-in flow back as shipped.",
+    "arguments": [
+      "flowKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/flows/{flowKey}/reset",
+        "operation_id": "postPaymentsFlowsByFlowKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_reset"
+    ]
+  },
+  {
+    "command": "sendmock payments flows steps add",
+    "usage": "sendmock payments flows steps add <flowKey>",
+    "aliases": [],
+    "summary": "Add a step to a flow.",
+    "arguments": [
+      "flowKey"
+    ],
+    "flags": [
+      "--position",
+      "--step"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/flows/{flowKey}/steps",
+        "operation_id": "postPaymentsFlowsByFlowKeySteps",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_step_add"
+    ]
+  },
+  {
+    "command": "sendmock payments flows steps update",
+    "usage": "sendmock payments flows steps update <flowKey> <stepIndex>",
+    "aliases": [],
+    "summary": "Change one step of a flow.",
+    "arguments": [
+      "flowKey",
+      "stepIndex"
+    ],
+    "flags": [
+      "--button-label",
+      "--field-label",
+      "--hint",
+      "--position",
+      "--title"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/payments/flows/{flowKey}/steps/{stepIndex}",
+        "operation_id": "patchPaymentsFlowsByFlowKeyStepsByStepIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_step_update"
+    ]
+  },
+  {
+    "command": "sendmock payments flows steps remove",
+    "usage": "sendmock payments flows steps remove <flowKey> <stepIndex>",
+    "aliases": [],
+    "summary": "Remove one step of a flow.",
+    "arguments": [
+      "flowKey",
+      "stepIndex"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/flows/{flowKey}/steps/{stepIndex}",
+        "operation_id": "deletePaymentsFlowsByFlowKeyStepsByStepIndex",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_flow_step_remove"
+    ]
+  },
+  {
+    "command": "sendmock payments methods list",
+    "usage": "sendmock payments methods list",
+    "aliases": [],
+    "summary": "Methods customers pay with, and their test values.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/methods",
+        "operation_id": "getPaymentsMethods",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_list"
+    ]
+  },
+  {
+    "command": "sendmock payments methods create",
+    "usage": "sendmock payments methods create",
+    "aliases": [],
+    "summary": "Add a custom method.",
+    "arguments": [],
+    "flags": [
+      "--accent",
+      "--default-outcome",
+      "--flow",
+      "--enabled",
+      "--key",
+      "--name",
+      "--otp",
+      "--pin",
+      "--test-account",
+      "--test-cards",
+      "--test-numbers"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/methods",
+        "operation_id": "postPaymentsMethods",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_create"
+    ]
+  },
+  {
+    "command": "sendmock payments methods show",
+    "usage": "sendmock payments methods show <methodKey>",
+    "aliases": [],
+    "summary": "One payment method with its test values.",
+    "arguments": [
+      "methodKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/methods/{methodKey}",
+        "operation_id": "getPaymentsMethodsByMethodKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_get"
+    ]
+  },
+  {
+    "command": "sendmock payments methods update",
+    "usage": "sendmock payments methods update <methodKey>",
+    "aliases": [],
+    "summary": "Change a method.",
+    "arguments": [
+      "methodKey"
+    ],
+    "flags": [
+      "--accent",
+      "--default-outcome",
+      "--flow",
+      "--enabled",
+      "--key",
+      "--name",
+      "--otp",
+      "--pin",
+      "--test-account",
+      "--test-cards",
+      "--test-numbers"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/payments/methods/{methodKey}",
+        "operation_id": "patchPaymentsMethodsByMethodKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_update"
+    ]
+  },
+  {
+    "command": "sendmock payments methods delete",
+    "usage": "sendmock payments methods delete <methodKey>",
+    "aliases": [],
+    "summary": "Delete a custom method; 409 while a gateway offers it.",
+    "arguments": [
+      "methodKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/methods/{methodKey}",
+        "operation_id": "deletePaymentsMethodsByMethodKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_delete"
+    ]
+  },
+  {
+    "command": "sendmock payments methods reset",
+    "usage": "sendmock payments methods reset <methodKey>",
+    "aliases": [],
+    "summary": "Put a built-in method back as shipped.",
+    "arguments": [
+      "methodKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/methods/{methodKey}/reset",
+        "operation_id": "postPaymentsMethodsByMethodKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_method_reset"
+    ]
+  },
+  {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
     "aliases": [],

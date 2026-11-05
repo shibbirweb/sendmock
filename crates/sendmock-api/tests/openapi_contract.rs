@@ -135,6 +135,8 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_update_samples(operation_context).await);
     samples.extend(prepare_sms_samples(app_router).await);
     samples.extend(prepare_sms_reply_samples(app_router).await);
+    samples.extend(prepare_payment_flow_samples(app_router).await);
+    samples.extend(prepare_payment_method_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -918,6 +920,107 @@ async fn prepare_sms_reply_samples(app_router: &axum::Router) -> Vec<(&'static s
         "postSmsBySmsIdReplyWebhookResend",
         vec![json!({ "sms_id": inbound_sms_id })],
     )]
+}
+
+fn payment_flow_sample(flow_key: &str) -> Value {
+    json!({
+        "key": flow_key, "name": "QR wallet", "picker_tab": "Mobile banking",
+        "steps": [
+            { "type": "qr_code", "title": "Scan to pay", "field_label": "", "hint": "Open {method}.", "button_label": "I have paid" },
+            { "type": "pin", "title": "", "field_label": "PIN", "hint": "", "button_label": "Pay {amount}" },
+        ],
+    })
+}
+
+/// Two custom flows: one to edit step by step, one to delete.
+async fn prepare_payment_flow_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    for flow_key in ["qr_wallet", "deleted_flow"] {
+        post_json(
+            app_router,
+            "/api/v1/payments/flows",
+            &payment_flow_sample(flow_key),
+        )
+        .await;
+    }
+    let mut renamed_flow = payment_flow_sample("qr_wallet");
+    renamed_flow["flow_key"] = json!("qr_wallet");
+    vec![
+        ("getPaymentsStepTypes", vec![json!({})]),
+        ("getPaymentsFlowVariables", vec![json!({})]),
+        ("getPaymentsFlows", vec![json!({})]),
+        ("postPaymentsFlows", vec![payment_flow_sample("voucher_qr")]),
+        (
+            "getPaymentsFlowsByFlowKey",
+            vec![json!({ "flow_key": "wallet" })],
+        ),
+        ("patchPaymentsFlowsByFlowKey", vec![renamed_flow]),
+        (
+            "postPaymentsFlowsByFlowKeyReset",
+            vec![json!({ "flow_key": "wallet" })],
+        ),
+        (
+            "postPaymentsFlowsByFlowKeySteps",
+            vec![
+                json!({ "flow_key": "qr_wallet", "step": { "type": "otp", "title": "", "field_label": "Code", "hint": "", "button_label": "Confirm" } }),
+            ],
+        ),
+        (
+            "patchPaymentsFlowsByFlowKeyStepsByStepIndex",
+            vec![json!({ "flow_key": "qr_wallet", "step_index": 0, "button_label": "Paid" })],
+        ),
+        (
+            "deletePaymentsFlowsByFlowKeyStepsByStepIndex",
+            vec![json!({ "flow_key": "qr_wallet", "step_index": 1 })],
+        ),
+        (
+            "deletePaymentsFlowsByFlowKey",
+            vec![json!({ "flow_key": "deleted_flow" })],
+        ),
+    ]
+}
+
+fn payment_method_sample(method_key: &str) -> Value {
+    json!({
+        "key": method_key, "name": "Upay", "flow": "wallet", "accent": "#0a7cff", "is_enabled": true,
+        "test_cards": [],
+        "test_numbers": [{ "number": "01770000001", "outcome": "succeed", "decline_reason": null }],
+        "otp": "123456", "pin": "12121", "default_outcome": "succeed", "test_account": "",
+    })
+}
+
+/// A custom method to edit and one to delete; the built-in bKash to reset.
+async fn prepare_payment_method_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    for method_key in ["upay", "deleted_method"] {
+        post_json(
+            app_router,
+            "/api/v1/payments/methods",
+            &payment_method_sample(method_key),
+        )
+        .await;
+    }
+    let mut renamed_method = payment_method_sample("upay");
+    renamed_method["method_key"] = json!("upay");
+    vec![
+        ("getPaymentsMethods", vec![json!({})]),
+        ("postPaymentsMethods", vec![payment_method_sample("tap")]),
+        (
+            "getPaymentsMethodsByMethodKey",
+            vec![json!({ "method_key": "card" })],
+        ),
+        ("patchPaymentsMethodsByMethodKey", vec![renamed_method]),
+        (
+            "postPaymentsMethodsByMethodKeyReset",
+            vec![json!({ "method_key": "bkash" })],
+        ),
+        (
+            "deletePaymentsMethodsByMethodKey",
+            vec![json!({ "method_key": "deleted_method" })],
+        ),
+    ]
 }
 
 /// Two messages, one with media, created through `POST /sms`.

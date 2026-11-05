@@ -24,6 +24,7 @@ sendmock-mcp = { path = "crates/sendmock-mcp" }
 sendmock-ops = { path = "crates/sendmock-ops" }
 sendmock-smtp = { path = "crates/sendmock-smtp" }
 sendmock-sms = { path = "crates/sendmock-sms" }
+sendmock-payments = { path = "crates/sendmock-payments" }
 sendmock-store = { path = "crates/sendmock-store" }
 sendmock-webhooks = { path = "crates/sendmock-webhooks" }
 

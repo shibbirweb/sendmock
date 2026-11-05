@@ -1,6 +1,7 @@
 /**
  * Writes the shipped SMS provider definitions, webhook templates and the
- * template reference (field descriptions, functions, filters) to
+ * template reference (field descriptions, functions, filters), and the payment
+ * flows, methods, step types and label variables to
  * crates/sendmock-ops/builtin/, where the binary embeds them, so the mock and
  * the runtime answer from one source (docs/plan/22-configurable-providers.md).
  * `bun scripts/export-builtin-definitions.ts` writes them; `--check` fails
@@ -9,6 +10,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { flowLabelVariables } from "../src/lib/payments/flow-label-variables";
+import { paymentStepCatalogue } from "../src/lib/payments/payment-step-catalogue";
+import { buildBuiltinPaymentFlows } from "../src/mocks/fixtures/payment-flow-fixtures";
+import { buildBuiltinPaymentGateways } from "../src/mocks/fixtures/payment-gateway-fixtures";
+import { buildBuiltinPaymentMethods } from "../src/mocks/fixtures/payment-method-fixtures";
 import { buildBuiltinSmsProviders } from "../src/mocks/fixtures/sms-provider-fixtures";
 import { buildWebhookTemplateFixtures } from "../src/mocks/fixtures/template-and-variable-fixtures";
 import { templateDefinitions } from "../src/mocks/fixtures/template-definitions";
@@ -55,6 +61,35 @@ export function buildBuiltinDefinitionFiles(): {
     {
       filePath: join(builtinDirectory, "webhook-template-catalogue.json"),
       content: `${JSON.stringify(buildBuiltinTemplateCatalogue(), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "payment-flows.json"),
+      content: `${JSON.stringify(buildBuiltinPaymentFlows(), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "payment-methods.json"),
+      content: `${JSON.stringify(buildBuiltinPaymentMethods(), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "payment-gateways.json"),
+      content: `${JSON.stringify(buildBuiltinPaymentGateways(null), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "payment-step-types.json"),
+      content: `${JSON.stringify(Object.values(paymentStepCatalogue), null, 2)}\n`,
+    },
+    {
+      filePath: join(builtinDirectory, "payment-flow-variables.json"),
+      content: `${JSON.stringify(
+        flowLabelVariables.map(({ name, token, description, example }) => ({
+          name,
+          token,
+          description,
+          example,
+        })),
+        null,
+        2,
+      )}\n`,
     },
     {
       filePath: join(builtinDirectory, "webhook-template-reference.json"),
