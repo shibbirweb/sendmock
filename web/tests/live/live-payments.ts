@@ -163,23 +163,47 @@ export async function openPaymentDrawer(
   return paymentDrawer;
 }
 
+function findMenuItem(page: Page, menuLabel: string): Locator {
+  return page.getByRole("menuitem", { name: menuLabel, exact: true });
+}
+
+/** Opens the Simulate menu and its submenus until the last item shows. */
+async function openSimulateMenuPath(
+  page: Page,
+  paymentDrawer: Locator,
+  menuPath: string[],
+) {
+  // Escape closes an open menu; with none open it would close the drawer.
+  while ((await page.getByRole("menu").count()) > 0) {
+    await page.keyboard.press("Escape");
+  }
+  await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
+  for (const [menuIndex, menuLabel] of menuPath.slice(0, -1).entries()) {
+    const submenuTrigger = findMenuItem(page, menuLabel);
+    await submenuTrigger.focus({ timeout: 2_000 });
+    await submenuTrigger.press("ArrowRight", { timeout: 2_000 });
+    await expect(findMenuItem(page, menuPath[menuIndex + 1] ?? "")).toBeVisible(
+      { timeout: 2_000 },
+    );
+  }
+  await expect(findMenuItem(page, menuPath.at(-1) ?? "")).toBeVisible({
+    timeout: 2_000,
+  });
+}
+
 export async function chooseSimulateAction(
   page: Page,
   paymentDrawer: Locator,
   ...menuPath: string[]
 ) {
-  await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
-  // The keyboard reaches each item even while a toast from the last action covers it.
-  for (const [menuIndex, menuLabel] of menuPath.entries()) {
-    const menuItem = page.getByRole("menuitem", {
-      name: menuLabel,
-      exact: true,
-    });
-    await menuItem.focus();
-    await menuItem.press(
-      menuIndex < menuPath.length - 1 ? "ArrowRight" : "Enter",
-    );
-  }
+  // A live update can re-render the drawer and close the menu, so the path is opened again
+  // until it stays open. The keyboard reaches each item even while a toast covers it.
+  await expect(async () => {
+    await openSimulateMenuPath(page, paymentDrawer, menuPath);
+  }).toPass({ timeout: 15_000 });
+  const lastMenuItem = findMenuItem(page, menuPath.at(-1) ?? "");
+  await lastMenuItem.focus();
+  await lastMenuItem.press("Enter");
 }
 
 /** A name no other retry uses, since a retry finds the custom items the last try added. */
