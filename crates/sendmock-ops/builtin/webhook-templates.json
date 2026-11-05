@@ -125,14 +125,6 @@
     "doc_url": "https://developers.sparkpost.com/api/webhooks/",
     "verified_on": "2026-09-30"
   },
-  "sendgrid.inbound_parse": {
-    "method": "POST",
-    "content_type": "multipart/form-data; boundary=xYzZY",
-    "header_templates": {},
-    "body_template": "--xYzZY\r\nContent-Disposition: form-data; name=\"from\"\r\n\r\n{{ data.from.address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"to\"\r\n\r\n{{ data.to[0].address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"subject\"\r\n\r\n{{ data.subject }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\n{{ data.text_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"html\"\r\n\r\n{{ data.html_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"envelope\"\r\n\r\n{\"to\":[\"{{ data.to[0].address }}\"],\"from\":\"{{ data.from.address }}\"}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"attachments\"\r\n\r\n{{ data.attachments | length }}\r\n{% for attachment in data.attachments %}--xYzZY\r\nContent-Disposition: form-data; name=\"attachment{{ loop.index }}\"; filename=\"{{ attachment.filename }}\"\r\nX-Sendmock-File-Url: {{ attachment.url }}\r\n\r\n{% endfor %}--xYzZY--\r\n",
-    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook",
-    "verified_on": "2026-09-30"
-  },
   "sendgrid.events": {
     "method": "POST",
     "content_type": "application/json",
@@ -142,14 +134,6 @@
     },
     "body_template": "[\n  {\n    \"email\": \"{{ data.to[0].address }}\",\n    \"timestamp\": {{ event.created_at | unix }},\n    \"smtp-id\": \"<{{ data.message_id | default(data.id) }}>\",\n    \"event\": \"{{ event.type | sendgrid_event }}\",\n    \"category\": [],\n    \"sg_event_id\": \"{{ event.id }}\",\n    \"sg_message_id\": \"{{ data.message_id | default(data.id) }}.filter0001.1-1\"\n  }\n]",
     "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
-    "verified_on": "2026-09-30"
-  },
-  "postmark.inbound": {
-    "method": "POST",
-    "content_type": "application/json",
-    "header_templates": {},
-    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"FromName\": \"{{ data.from.name }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\",\n  \"MessageID\": \"{{ data.message_id | default(data.id) }}\",\n  \"Attachments\": [{% for attachment in data.attachments %}{\"Name\": \"{{ attachment.filename }}\", \"Content\": \"{{ attachment.content_base64 | default('') }}\", \"ContentType\": \"{{ attachment.content_type }}\", \"ContentLength\": {{ attachment.size_bytes }}, \"ContentID\": \"{{ attachment.content_id | default('') }}\"}{% if not loop.last %}, {% endif %}{% endfor %}]\n}",
-    "doc_url": "https://postmarkapp.com/developer/webhooks/inbound-webhook",
     "verified_on": "2026-09-30"
   },
   "ses.sns": {
@@ -241,6 +225,22 @@
     "body_template": "Delivery to {{ data.endpoint_name }} failed: {{ data.error_message }}",
     "doc_url": null,
     "verified_on": null
+  },
+  "sendgrid.inbound_parse": {
+    "method": "POST",
+    "content_type": "multipart/form-data; boundary=xYzZY",
+    "header_templates": {},
+    "body_template": "--xYzZY\r\nContent-Disposition: form-data; name=\"from\"\r\n\r\n{{ data.from.address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"to\"\r\n\r\n{{ data.to[0].address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"subject\"\r\n\r\n{{ data.subject }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\n{{ data.text_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"html\"\r\n\r\n{{ data.html_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"envelope\"\r\n\r\n{\"to\":[\"{{ data.to[0].address }}\"],\"from\":\"{{ data.from.address }}\"}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"attachments\"\r\n\r\n{{ data.attachments | length }}\r\n{% for attachment in data.attachments %}--xYzZY\r\nContent-Disposition: form-data; name=\"attachment{{ loop.index }}\"; filename=\"{{ attachment.filename }}\"\r\nX-Sendmock-File-Url: {{ attachment.url }}\r\n\r\n{% endfor %}--xYzZY--\r\n",
+    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "postmark.inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"FromName\": \"{{ data.from.name }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\",\n  \"MessageID\": \"{{ data.message_id | default(data.id) }}\",\n  \"Attachments\": [{% for attachment in data.attachments %}{\"Name\": \"{{ attachment.filename }}\", \"Content\": \"{{ attachment.content_base64 | default('') }}\", \"ContentType\": \"{{ attachment.content_type }}\", \"ContentLength\": {{ attachment.size_bytes }}, \"ContentID\": \"{{ attachment.content_id | default('') }}\"}{% if not loop.last %}, {% endif %}{% endfor %}]\n}",
+    "doc_url": "https://postmarkapp.com/developer/webhooks/inbound-webhook",
+    "verified_on": "2026-09-30"
   },
   "stripe.event": {
     "method": "POST",
