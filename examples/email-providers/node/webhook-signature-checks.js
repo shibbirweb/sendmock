@@ -56,6 +56,14 @@ const providerTemplates = {
   mailgun: "mailgun.events",
 };
 
+// Rules filter emails by what they hold (`source` is a filter field of opened events only),
+// so each provider's rule matches the subject its SDK send uses.
+const providerSubjects = {
+  sendgrid: "SendGrid SDK",
+  resend: "Resend SDK",
+  mailgun: "Mailgun SDK",
+};
+
 /** Receives each provider's webhook at /<provider> and keeps whether its signature verified. */
 export async function startSignatureReceiver() {
   const verifiedProviders = new Map();
@@ -119,7 +127,7 @@ export async function routeProviderWebhooks(callSendMock, receiverOrigin) {
       endpoint_id: endpoint.id,
       events: ["email.delivered"],
       is_enabled: true,
-      filter: { field: "source", operator: "equals", value: providerKey },
+      filter: { field: "subject", operator: "equals", value: providerSubjects[providerKey] },
     });
   }
 }
