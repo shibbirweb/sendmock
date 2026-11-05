@@ -2,10 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 
 type MatrixEntry = { language: string; folder: string; run: string };
+type WorkflowStep = { "working-directory"?: string; run?: string };
 type ExampleAppsWorkflow = {
   jobs: {
-    binary: { steps: { run?: string }[] };
+    binary: { steps: WorkflowStep[] };
     app: { strategy: { matrix: { include: MatrixEntry[] } } };
+    presets: { needs: string; steps: WorkflowStep[] };
   };
 };
 
@@ -37,9 +39,24 @@ describe("Example apps workflow", () => {
     }
   });
 
-  test("Release build runs the example apps before it publishes", () => {
-    const releaseWorkflow = readFileSync(".github/workflows/release.yml", "utf8");
+  test("HC-03.1 the presets' official libraries run against the release binary", () => {
+    const presetsStep = exampleAppsWorkflow.jobs.presets.steps.find(
+      (step) => step["working-directory"] === "examples/http-presets/node",
+    );
 
-    expect(releaseWorkflow).toContain("uses: ./.github/workflows/example-apps.yml");
+    expect(exampleAppsWorkflow.jobs.presets.needs).toBe("binary");
+    expect(presetsStep?.run).toContain("node done-when.js");
+    expect(existsSync("examples/http-presets/node/done-when.js")).toBe(true);
+  });
+
+  test("Release build runs the example apps before it publishes", () => {
+    const releaseWorkflow = readFileSync(
+      ".github/workflows/release.yml",
+      "utf8",
+    );
+
+    expect(releaseWorkflow).toContain(
+      "uses: ./.github/workflows/example-apps.yml",
+    );
   });
 });

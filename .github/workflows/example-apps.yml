@@ -9,6 +9,7 @@ on:
     paths:
       - crates/**
       - examples/apps/**
+      - examples/http-presets/**
       - .github/workflows/example-apps.yml
   push:
     branches:
@@ -17,6 +18,7 @@ on:
     paths:
       - crates/**
       - examples/apps/**
+      - examples/http-presets/**
       - .github/workflows/example-apps.yml
   workflow_dispatch:
   workflow_call:
@@ -153,6 +155,43 @@ jobs:
       - name: The ${{ matrix.language }} app's test
         working-directory: examples/apps/${{ matrix.folder }}
         run: ${{ matrix.run }}
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
+
+  presets:
+    name: HTTP presets and their official libraries
+    needs: binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Start SendMock with its default settings
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - name: Slack, Expo, OneSignal and FCM's official libraries accept the presets' replies
+        working-directory: examples/http-presets/node
+        run: bun install && node done-when.js
 
       - name: SendMock log
         if: failure()

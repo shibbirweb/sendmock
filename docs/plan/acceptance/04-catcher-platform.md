@@ -27,7 +27,7 @@ UI in U2, backend Phase 4.
 
 Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal).
 
-- [ ] HC-03.1 Each preset returns a reply the official client library accepts without error.
+- [x] HC-03.1 Each preset returns a reply the official client library accepts without error. (#48)
 - [x] HC-03.2 Slack Block Kit, Discord embeds and push notifications are rendered as previews. (#48)
 
 ---
