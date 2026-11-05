@@ -261,3 +261,44 @@ async fn the_provider_port_answers_email_providers_at_their_real_paths() {
     assert_eq!(email["subject"], "Through the provider port");
     assert_eq!(email["source"], "resend");
 }
+
+// AC: EM-08.1
+#[tokio::test]
+async fn ses_v2_raw_content_is_stored_as_sent_with_the_sender_and_recipients_from_its_headers() {
+    use base64::Engine;
+    let (app_router, _) = build_test_app();
+    let raw_message = "From: Shop <shop@example.test>\r\nTo: sam@example.test\r\nSubject: Raw from SES\r\nMessage-ID: <raw-1@shop.test>\r\nContent-Type: text/html\r\n\r\n<p>Your order shipped</p>";
+    let ses_raw_email = json!({
+        "Destination": {"BccAddresses": ["audit@example.test"]},
+        "Content": {"Raw": {"Data": base64::engine::general_purpose::STANDARD.encode(raw_message)}},
+    });
+    let not_base64 = json!({
+        "FromEmailAddress": "shop@example.test",
+        "Destination": {"ToAddresses": ["sam@example.test"]},
+        "Content": {"Raw": {"Data": "not base64!"}},
+    });
+
+    let reply = send_json(
+        &app_router,
+        "/providers/ses/v2/email/outbound-emails",
+        &ses_raw_email,
+    )
+    .await;
+    let refused = send_json(
+        &app_router,
+        "/providers/ses/v2/email/outbound-emails",
+        &not_base64,
+    )
+    .await;
+
+    assert_eq!(reply.status, 200, "{}", reply.body_text);
+    let email = read_newest_email(&app_router).await;
+    assert_eq!(email["source"], "ses");
+    assert_eq!(email["subject"], "Raw from SES");
+    assert_eq!(email["from"]["address"], "shop@example.test");
+    assert_eq!(email["message_id"], "raw-1@shop.test");
+    assert_eq!(email["html_body"], "<p>Your order shipped</p>");
+    assert_eq!(read_addresses(&email["bcc"]), vec!["audit@example.test"]);
+    assert_eq!(refused.status, 400, "{}", refused.body_text);
+    assert_eq!(count_emails(&app_router).await, 1);
+}

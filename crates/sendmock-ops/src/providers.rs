@@ -15,6 +15,7 @@ mod provider_http;
 mod provider_runtime;
 mod provider_status_callback;
 mod provider_webhook_request;
+mod raw_message_part;
 mod read_operation_kinds;
 mod request_checks;
 mod request_reader;

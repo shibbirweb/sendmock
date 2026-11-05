@@ -622,6 +622,10 @@
       {
         "part": "html",
         "source": "Content.Simple.Body.Html.Data"
+      },
+      {
+        "part": "raw",
+        "source": "Content.Raw.Data"
       }
     ],
     "validation_rules": [

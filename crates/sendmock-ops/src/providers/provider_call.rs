@@ -10,6 +10,7 @@ use super::message_provider_definition::{
     MessageProviderDefinition, ProviderOperation, ProviderResponseTemplate,
 };
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
+use super::raw_message_part::fill_parts_from_raw_message;
 use super::request_checks::ProviderFailure;
 use super::request_reader::read_source_values;
 
@@ -37,7 +38,8 @@ impl ProviderCall<'_> {
 
     /// The parts read from one message's fields, such as one item of a batch.
     pub fn read_part_values_from(&self, message_fields: &Value) -> BTreeMap<String, Vec<String>> {
-        self.provider
+        let mut part_values: BTreeMap<String, Vec<String>> = self
+            .provider
             .field_mapping
             .iter()
             .map(|field_mapping| {
@@ -47,7 +49,9 @@ impl ProviderCall<'_> {
                 )
             })
             .filter(|(_, values)| !values.is_empty())
-            .collect()
+            .collect();
+        fill_parts_from_raw_message(&mut part_values);
+        part_values
     }
 
     /// The request fields without the provider's secret credentials, as stored on a message.

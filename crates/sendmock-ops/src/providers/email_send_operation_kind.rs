@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use sendmock_core::{TemplateEscape, format_rfc5322, render_template};
 use sendmock_mail::{EmailEnvelope, IncomingEmail, build_raw_message};
 use sendmock_store::EmailProviderSendRecord;
@@ -6,6 +8,7 @@ use serde_json::{Value, json};
 use super::created_message::CreatedMessage;
 use super::email_send_parts::build_send_request;
 use super::provider_call::ProviderCall;
+use super::raw_message_part::decode_raw_part;
 use super::request_checks::{ProviderFailure, find_rule_failure};
 use super::send_operation_kind::ProviderAnswer;
 use crate::email::{NativeSendRequest, complete_email_intake, read_bare_address};
@@ -48,28 +51,31 @@ pub async fn send_one_email(
     message_fields: &Value,
 ) -> Result<Result<SentEmail, ProviderFailure>, OperationError> {
     let part_values = provider_call.read_part_values_from(message_fields);
+    let raw_message = match decode_raw_part(&part_values).transpose() {
+        Ok(raw_message) => raw_message,
+        Err(failure) => return Ok(Err(failure)),
+    };
     if let Some(failure) = find_rule_failure(provider_call.provider, &part_values) {
         return Ok(Err(failure));
     }
     let mut send_request = build_send_request(&part_values);
-    apply_local_template(
-        operation_context,
-        provider_call,
-        &part_values,
-        &mut send_request,
-    )
-    .await?;
-    let native_message = match build_native_message(&send_request)? {
-        Ok(native_message) => native_message,
-        Err(failure) => return Ok(Err(failure)),
+    let stored_email = match raw_message {
+        Some(raw_message) => {
+            ingest_provider_email(operation_context, provider_call, &send_request, raw_message)
+                .await?
+        }
+        None => match store_built_email(
+            operation_context,
+            provider_call,
+            &part_values,
+            &mut send_request,
+        )
+        .await?
+        {
+            Ok(stored_email) => stored_email,
+            Err(failure) => return Ok(Err(failure)),
+        },
     };
-    let stored_email = store_provider_email(
-        operation_context,
-        provider_call,
-        &send_request,
-        native_message,
-    )
-    .await?;
     let provider_message_id = render_provider_message_id(provider_call);
     save_provider_send(
         operation_context,
@@ -110,13 +116,19 @@ fn build_native_message(
     }
 }
 
-/// Builds the message as the native send does and stores it as sent through the provider.
-async fn store_provider_email(
+/// Builds the message as the native send does (with a local template's bodies) and stores
+/// it; a part the native send refuses is the provider's to answer.
+async fn store_built_email(
     operation_context: &OperationContext,
     provider_call: &ProviderCall<'_>,
-    send_request: &NativeSendRequest,
-    native_message: sendmock_mail::NativeMessage,
-) -> Result<sendmock_store::EmailRecord, OperationError> {
+    part_values: &BTreeMap<String, Vec<String>>,
+    send_request: &mut NativeSendRequest,
+) -> Result<Result<sendmock_store::EmailRecord, ProviderFailure>, OperationError> {
+    apply_local_template(operation_context, provider_call, part_values, send_request).await?;
+    let native_message = match build_native_message(send_request)? {
+        Ok(native_message) => native_message,
+        Err(failure) => return Ok(Err(failure)),
+    };
     let message_id = format!(
         "{}@sendmock.local",
         operation_context.id_generator.generate_id()
@@ -126,6 +138,18 @@ async fn store_provider_email(
         &message_id,
         &format_rfc5322(operation_context.clock.now_unix_ms()),
     );
+    ingest_provider_email(operation_context, provider_call, send_request, raw_message)
+        .await
+        .map(Ok)
+}
+
+/// Stores a message as sent through the provider, to the recipients the request names.
+async fn ingest_provider_email(
+    operation_context: &OperationContext,
+    provider_call: &ProviderCall<'_>,
+    send_request: &NativeSendRequest,
+    raw_message: Vec<u8>,
+) -> Result<sendmock_store::EmailRecord, OperationError> {
     let envelope = EmailEnvelope {
         mail_from: read_bare_address(&send_request.from),
         recipients: send_request.envelope_recipients(),
@@ -148,7 +172,7 @@ async fn store_provider_email(
 async fn apply_local_template(
     operation_context: &OperationContext,
     provider_call: &ProviderCall<'_>,
-    part_values: &std::collections::BTreeMap<String, Vec<String>>,
+    part_values: &BTreeMap<String, Vec<String>>,
     send_request: &mut NativeSendRequest,
 ) -> Result<(), OperationError> {
     let read_first = |part: &str| part_values.get(part).and_then(|values| values.first());
@@ -198,7 +222,7 @@ fn render_provider_message_id(provider_call: &ProviderCall<'_>) -> String {
 async fn save_provider_send(
     operation_context: &OperationContext,
     provider_call: &ProviderCall<'_>,
-    part_values: &std::collections::BTreeMap<String, Vec<String>>,
+    part_values: &BTreeMap<String, Vec<String>>,
     email_id: &str,
     provider_message_id: &str,
 ) -> Result<(), OperationError> {

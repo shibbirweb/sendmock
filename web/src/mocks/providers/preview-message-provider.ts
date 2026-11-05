@@ -16,6 +16,7 @@ import {
   hasValidCredentials,
   type ProviderFailure,
 } from "@/mocks/providers/check-provider-request";
+import { fillPartsFromRawMessage } from "@/mocks/providers/fill-raw-message-parts";
 import { findProviderRecord } from "@/mocks/providers/message-provider-record";
 import {
   matchOperation,
@@ -115,6 +116,7 @@ export function previewMessageProvider(
       readSourceValues(parsedBody, fieldMapping.source),
     ]),
   );
+  fillPartsFromRawMessage(partValues);
   const readPart = (part: ProviderMessagePart) =>
     (partValues.get(part) ?? []).join(", ");
   const failure: ProviderFailure | undefined =

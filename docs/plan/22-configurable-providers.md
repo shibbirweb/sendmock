@@ -49,7 +49,7 @@ One type serves both areas, `MessageProviderDefinition` (`web/src/lib/api/types/
 | `outcome_error_codes` | map (SMS) | the provider's error code for each delivery outcome, so the magic test numbers fail with its own codes |
 | `is_builtin`, `is_modified`, `is_removed`, `message_count_24h` | read only | shown on the list and the sheet |
 
-**Message parts** a mapping or rule can name: email `from`, `to`, `cc`, `bcc`, `reply_to`, `subject`, `text`, `html`, `attachments`, `headers`, `tags`, `template_id`, `template_data`; SMS `from`, `to`, `body`, `media_urls`, `messaging_service`, `status_callback_url`.
+**Message parts** a mapping or rule can name: email `from`, `to`, `cc`, `bcc`, `reply_to`, `subject`, `text`, `html`, `attachments`, `headers`, `tags`, `template_id`, `template_data`, `raw` (a whole MIME message in base64, such as SES v2's `Content.Raw.Data`: it is stored as sent, and the parts the request leaves out are read from its headers and body); SMS `from`, `to`, `body`, `media_urls`, `messaging_service`, `status_callback_url`.
 
 **Templates** (bodies, headers, the message id) use the webhook template engine with its filters, and read:
 

@@ -308,6 +308,7 @@ function buildSesProvider(): MessageProviderRecord {
       { part: "subject", source: "Content.Simple.Subject.Data" },
       { part: "text", source: "Content.Simple.Body.Text.Data" },
       { part: "html", source: "Content.Simple.Body.Html.Data" },
+      { part: "raw", source: "Content.Raw.Data" },
     ],
     validation_rules: requireParts(["from", "to"]),
     success_response: respondWithJson(
