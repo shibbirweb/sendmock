@@ -15,6 +15,8 @@ RUN apk add --no-cache gcc musl-dev ca-certificates
 WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
 COPY crates crates
+# The agent skill the binary embeds.
+COPY skill skill
 COPY --from=web-build /src/web/dist web/dist
 ARG SENDMOCK_RELEASE_CHANNEL=edge
 RUN SENDMOCK_RELEASE_CHANNEL="$SENDMOCK_RELEASE_CHANNEL" cargo build --release --locked -p sendmock \
