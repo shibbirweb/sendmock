@@ -7,6 +7,8 @@ import { mockHandlers } from "@/mocks/handlers";
 /** The capture route matches any method and path, so it is written as a wildcard. */
 const captureHandlerPath = "*/catch/*";
 const captureRegistryPath = "/catch/{binPath}";
+/** The OpenAPI document itself is served beside the API, not as one of its endpoints. */
+const openApiDocumentPath = "*/api/openapi.json";
 
 /** "GET /api/v1/emails/:emailId", from a handler, with the host wildcard dropped. */
 function listHandledEndpoints(): string[] {
@@ -16,6 +18,9 @@ function listHandledEndpoints(): string[] {
     .flatMap((httpHandler) => {
       const handlerPath = String(httpHandler.info.path);
       const handlerMethod = String(httpHandler.info.method);
+      if (handlerPath === openApiDocumentPath) {
+        return [];
+      }
       if (handlerPath === captureHandlerPath) {
         return apiEndpoints
           .filter((apiEndpoint) => apiEndpoint.path === captureRegistryPath)

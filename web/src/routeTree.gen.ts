@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiReferenceRouteImport } from './routes/api-reference'
 import { Route as HttpRouteImport } from './routes/http'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as MailRouteImport } from './routes/mail'
@@ -43,6 +44,11 @@ import { Route as SmsConversationsThreadIdRouteImport } from './routes/sms/_conv
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReferenceRoute = ApiReferenceRouteImport.update({
+  id: '/api-reference',
+  path: '/api-reference',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HttpRoute = HttpRouteImport.update({
@@ -194,6 +200,7 @@ const SmsConversationsThreadIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/numbers': typeof NumbersRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/mail'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/numbers'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/mail'
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiReferenceRoute: typeof ApiReferenceRoute
   HttpRoute: typeof HttpRoute
   LogsRoute: typeof LogsRoute
   MailRoute: typeof MailRouteWithChildren
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-reference': {
+      id: '/api-reference'
+      path: '/api-reference'
+      fullPath: '/api-reference'
+      preLoaderRoute: typeof ApiReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/http': {
@@ -655,6 +675,7 @@ const SmsConversationsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiReferenceRoute: ApiReferenceRoute,
   HttpRoute: HttpRoute,
   LogsRoute: LogsRoute,
   MailRoute: MailRouteWithChildren,

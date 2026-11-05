@@ -33,6 +33,7 @@ export const appScreens = [
   // Loads nothing when it opens: the API is called by Validate and Run.
   { path: "/scenarios", title: "Scenarios · SendMock", loadsDataOnOpen: false },
   { path: "/logs", title: "Logs · SendMock" },
+  { path: "/api-reference", title: "API reference · SendMock" },
   { path: "/settings", title: "General · Settings · SendMock" },
 ];
 

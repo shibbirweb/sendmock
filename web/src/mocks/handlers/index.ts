@@ -16,6 +16,7 @@ import { nativeSendHandlers } from "@/mocks/handlers/native-send-handlers";
 import { numbersHandlers } from "@/mocks/handlers/numbers-handlers";
 import { outcomeRulesHandlers } from "@/mocks/handlers/outcome-rules-handlers";
 import { checkoutHandlers } from "@/mocks/handlers/checkout-handlers";
+import { openApiHandlers } from "@/mocks/handlers/openapi-handlers";
 import { paymentHandlers } from "@/mocks/handlers/payment-handlers";
 import { paymentSubscriptionHandlers } from "@/mocks/handlers/payment-subscription-handlers";
 import { inboundRouteHandlers } from "@/mocks/handlers/inbound-route-handlers";
@@ -70,6 +71,7 @@ export const mockHandlers = [
   ...paymentFlowHandlers,
   ...paymentGatewayHandlers,
   ...paymentMethodHandlers,
+  ...openApiHandlers,
   ...paymentSubscriptionHandlers,
   ...paymentHandlers,
   ...checkoutHandlers,
