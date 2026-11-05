@@ -1,5 +1,6 @@
 import type { PaymentDetail } from "@/lib/api/types";
 import { buildPayPalEventObject } from "@/mocks/payments/paypal/build-paypal-event-object";
+import { describeSslcommerzTransaction } from "@/mocks/payments/sslcommerz/sslcommerz-transaction";
 import {
   describeCharge,
   describeDispute,
@@ -31,7 +32,21 @@ export function buildStripeEventObject(
   return null;
 }
 
-/** The gateway's own object for `event.object`; Stripe and PayPal have one. */
+/**
+ * The gateway's own object its redirect fields read as `event.object`, with
+ * `redirectStatus` the gateway's name for the outcome; SSLCommerz has one.
+ */
+export function buildProviderRedirectObject(
+  gatewayKey: string,
+  paymentDetail: PaymentDetail,
+  redirectStatus: string,
+): Record<string, unknown> | null {
+  return gatewayKey === "sslcommerz"
+    ? describeSslcommerzTransaction(paymentDetail, redirectStatus)
+    : null;
+}
+
+/** The gateway's own object for `event.object`; Stripe, PayPal and SSLCommerz have one. */
 export function buildProviderEventObject(
   gatewayKey: string,
   paymentDetail: PaymentDetail,
@@ -40,8 +55,9 @@ export function buildProviderEventObject(
   if (gatewayKey === "stripe") {
     return buildStripeEventObject(paymentDetail, eventName);
   }
+  if (gatewayKey === "paypal") {
+    return buildPayPalEventObject(paymentDetail, eventName);
+  }
 
-  return gatewayKey === "paypal"
-    ? buildPayPalEventObject(paymentDetail, eventName)
-    : null;
+  return buildProviderRedirectObject(gatewayKey, paymentDetail, eventName);
 }

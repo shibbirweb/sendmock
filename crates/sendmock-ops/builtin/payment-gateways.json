@@ -152,28 +152,133 @@
     "redirect_method": "POST",
     "redirect_fields": [
       {
+        "name": "status",
+        "template": "{{ event.object.status }}",
+        "send_on": "always"
+      },
+      {
+        "name": "tran_date",
+        "template": "{{ event.object.tran_date }}",
+        "send_on": "always"
+      },
+      {
         "name": "tran_id",
-        "template": "{{ payment.reference }}",
+        "template": "{{ event.object.tran_id }}",
         "send_on": "always"
       },
       {
         "name": "val_id",
-        "template": "{{ payment.provider_ids.val_id | default(\"\") }}",
+        "template": "{{ event.object.val_id }}",
         "send_on": "always"
       },
       {
         "name": "amount",
-        "template": "{{ payment.amount_major }}",
+        "template": "{{ event.object.amount }}",
+        "send_on": "always"
+      },
+      {
+        "name": "store_amount",
+        "template": "{{ event.object.store_amount }}",
         "send_on": "always"
       },
       {
         "name": "currency",
-        "template": "{{ payment.currency }}",
+        "template": "{{ event.object.currency }}",
         "send_on": "always"
       },
       {
-        "name": "status",
-        "template": "{{ redirect.status }}",
+        "name": "bank_tran_id",
+        "template": "{{ event.object.bank_tran_id }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_type",
+        "template": "{{ event.object.card_type }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_no",
+        "template": "{{ event.object.card_no }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer",
+        "template": "{{ event.object.card_issuer }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_brand",
+        "template": "{{ event.object.card_brand }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer_country",
+        "template": "{{ event.object.card_issuer_country }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer_country_code",
+        "template": "{{ event.object.card_issuer_country_code }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_type",
+        "template": "{{ event.object.currency_type }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_amount",
+        "template": "{{ event.object.currency_amount }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_rate",
+        "template": "{{ event.object.currency_rate }}",
+        "send_on": "always"
+      },
+      {
+        "name": "base_fair",
+        "template": "{{ event.object.base_fair }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_a",
+        "template": "{{ event.object.value_a }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_b",
+        "template": "{{ event.object.value_b }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_c",
+        "template": "{{ event.object.value_c }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_d",
+        "template": "{{ event.object.value_d }}",
+        "send_on": "always"
+      },
+      {
+        "name": "risk_level",
+        "template": "{{ event.object.risk_level }}",
+        "send_on": "always"
+      },
+      {
+        "name": "risk_title",
+        "template": "{{ event.object.risk_title }}",
+        "send_on": "always"
+      },
+      {
+        "name": "verify_key",
+        "template": "{{ event.object.verify_key }}",
+        "send_on": "always"
+      },
+      {
+        "name": "verify_sign",
+        "template": "{{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}",
         "send_on": "always"
       }
     ],
@@ -191,7 +296,7 @@
       "checkout.completed": "",
       "checkout.expired": "EXPIRED"
     },
-    "notification_body": "tran_id={{ payment.reference | urlencode }}&val_id={{ payment.provider_ids.val_id | default(\"\") | urlencode }}&amount={{ payment.amount_major }}&currency={{ payment.currency }}&status={{ event.name }}&verify_key=amount%2Ccurrency%2Cstatus%2Ctran_id%2Cval_id&verify_sign={{ random_hex(32) }}",
+    "notification_body": "status={{ event.object.status | urlencode }}&tran_date={{ event.object.tran_date | urlencode }}&tran_id={{ event.object.tran_id | urlencode }}&val_id={{ event.object.val_id | urlencode }}&amount={{ event.object.amount | urlencode }}&store_amount={{ event.object.store_amount | urlencode }}&currency={{ event.object.currency | urlencode }}&bank_tran_id={{ event.object.bank_tran_id | urlencode }}&card_type={{ event.object.card_type | urlencode }}&card_no={{ event.object.card_no | urlencode }}&card_issuer={{ event.object.card_issuer | urlencode }}&card_brand={{ event.object.card_brand | urlencode }}&card_issuer_country={{ event.object.card_issuer_country | urlencode }}&card_issuer_country_code={{ event.object.card_issuer_country_code | urlencode }}&currency_type={{ event.object.currency_type | urlencode }}&currency_amount={{ event.object.currency_amount | urlencode }}&currency_rate={{ event.object.currency_rate | urlencode }}&base_fair={{ event.object.base_fair | urlencode }}&value_a={{ event.object.value_a | urlencode }}&value_b={{ event.object.value_b | urlencode }}&value_c={{ event.object.value_c | urlencode }}&value_d={{ event.object.value_d | urlencode }}&risk_level={{ event.object.risk_level | urlencode }}&risk_title={{ event.object.risk_title | urlencode }}&verify_key={{ event.object.verify_key | urlencode }}&verify_sign={{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}",
     "notification_headers": [],
     "is_enabled": true,
     "is_builtin": true,

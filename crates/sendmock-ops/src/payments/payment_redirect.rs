@@ -6,6 +6,7 @@ use super::gateway_template_rendering::{
 };
 use super::payment_gateway_views::{PaymentGatewayFields, RedirectMethod};
 use super::payment_views::{PaymentDetail, PaymentRedirect};
+use super::provider_event_object::build_provider_redirect_object;
 use crate::OperationContext;
 
 pub fn read_redirect_url(
@@ -31,13 +32,22 @@ pub fn build_payment_redirect(
     let now_unix_ms = operation_context.clock.now_unix_ms();
     let (redirect_method, fields) = match gateway_fields {
         Some(gateway_fields) => {
+            let redirect_status = gateway_fields
+                .event_names
+                .get(redirect_outcome.event_type())
+                .cloned()
+                .unwrap_or_default();
             let render_options = GatewayRenderOptions {
                 event_type: "payment.succeeded".to_owned(),
                 redirect_outcome,
                 event_id: String::new(),
                 timestamp_seconds: now_unix_ms / 1000,
                 should_mask_secrets: false,
-                event_object: serde_json::Value::Null,
+                event_object: build_provider_redirect_object(
+                    &gateway_fields.key,
+                    payment,
+                    &redirect_status,
+                ),
             };
             let template_context = build_gateway_context(gateway_fields, payment, &render_options);
             let mut part_renderer = GatewayPartRenderer::new(

@@ -23,7 +23,7 @@ pub use method::{
     MethodProblem, PaymentMethodDraft, TEST_CARD_PREFIXES, TestNumberDraft, check_payment_method,
     is_test_card_range, passes_luhn_check, to_card_digits, to_test_number,
 };
-pub use money::{currency_exponent, format_major_amount, is_currency_code};
+pub use money::{currency_exponent, format_major_amount, is_currency_code, parse_major_amount};
 pub use signing::{
     sign_paddle_payload, sign_razorpay_payload, sign_sslcommerz_fields, sign_stripe_payload,
 };

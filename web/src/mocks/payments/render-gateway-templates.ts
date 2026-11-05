@@ -9,7 +9,10 @@ import {
   renderTemplateText,
   type TemplateContext,
 } from "@/mocks/webhooks/render-template-text";
-import { buildProviderEventObject } from "@/mocks/payments/stripe/build-stripe-event-object";
+import {
+  buildProviderEventObject,
+  buildProviderRedirectObject,
+} from "@/mocks/payments/stripe/build-stripe-event-object";
 
 type RedirectOutcome = PaymentRedirect["outcome"];
 
@@ -131,11 +134,26 @@ export function renderGatewayRedirect(
   paymentDetail: PaymentDetail,
   renderOptions: GatewayRenderOptions,
 ): RenderedRedirect {
-  const templateContext = buildGatewayContext(
+  const gatewayContext = buildGatewayContext(
     paymentGateway,
     paymentDetail,
     renderOptions,
   );
+  const redirectStatus =
+    paymentGateway.event_names[
+      redirectOutcomeEvents[renderOptions.redirectOutcome]
+    ] ?? "";
+  const templateContext: TemplateContext = {
+    ...gatewayContext,
+    event: {
+      ...(gatewayContext.event as Record<string, unknown>),
+      object: buildProviderRedirectObject(
+        paymentGateway.key,
+        paymentDetail,
+        redirectStatus,
+      ),
+    },
+  };
   const problems: GatewayTemplateProblem[] = [];
   const fields = Object.fromEntries(
     paymentGateway.redirect_fields

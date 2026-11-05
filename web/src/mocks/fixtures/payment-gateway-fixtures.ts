@@ -64,15 +64,57 @@ const paypalBody = `{
   "resource": {{ event.object | json }}
 }`;
 
+/** The fields SSLCommerz posts in its IPN and its redirects, in its order. */
+const sslcommerzTransactionFields = [
+  "status",
+  "tran_date",
+  "tran_id",
+  "val_id",
+  "amount",
+  "store_amount",
+  "currency",
+  "bank_tran_id",
+  "card_type",
+  "card_no",
+  "card_issuer",
+  "card_brand",
+  "card_issuer_country",
+  "card_issuer_country_code",
+  "currency_type",
+  "currency_amount",
+  "currency_rate",
+  "base_fair",
+  "value_a",
+  "value_b",
+  "value_c",
+  "value_d",
+  "risk_level",
+  "risk_title",
+  "verify_key",
+];
+
+const sslcommerzVerifySign =
+  "{{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}";
+
 const sslcommerzBody = [
-  "tran_id={{ payment.reference | urlencode }}",
-  'val_id={{ payment.provider_ids.val_id | default("") | urlencode }}',
-  "amount={{ payment.amount_major }}",
-  "currency={{ payment.currency }}",
-  "status={{ event.name }}",
-  "verify_key=amount%2Ccurrency%2Cstatus%2Ctran_id%2Cval_id",
-  "verify_sign={{ random_hex(32) }}",
+  ...sslcommerzTransactionFields.map(
+    (fieldName) => `${fieldName}={{ event.object.${fieldName} | urlencode }}`,
+  ),
+  `verify_sign=${sslcommerzVerifySign}`,
 ].join("&");
+
+const sslcommerzRedirectFields: ShippedGateway["redirect_fields"] = [
+  ...sslcommerzTransactionFields.map((fieldName) => ({
+    name: fieldName,
+    template: `{{ event.object.${fieldName} }}`,
+    send_on: "always" as const,
+  })),
+  {
+    name: "verify_sign",
+    template: sslcommerzVerifySign,
+    send_on: "always",
+  },
+];
 
 const bkashBody = `{
   "paymentID": "{{ payment.reference }}",
@@ -202,29 +244,7 @@ const shippedGateways: ShippedGateway[] = [
       { name: "store_passwd", value: "sendm0000000001@ssl", is_secret: true },
     ],
     redirect_method: "POST",
-    redirect_fields: [
-      {
-        name: "tran_id",
-        template: "{{ payment.reference }}",
-        send_on: "always",
-      },
-      {
-        name: "val_id",
-        template: '{{ payment.provider_ids.val_id | default("") }}',
-        send_on: "always",
-      },
-      {
-        name: "amount",
-        template: "{{ payment.amount_major }}",
-        send_on: "always",
-      },
-      {
-        name: "currency",
-        template: "{{ payment.currency }}",
-        send_on: "always",
-      },
-      { name: "status", template: "{{ redirect.status }}", send_on: "always" },
-    ],
+    redirect_fields: sslcommerzRedirectFields,
     notification_content_type: "form",
     event_names: nameEvents({
       "payment.succeeded": "VALID",

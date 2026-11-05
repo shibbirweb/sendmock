@@ -8,8 +8,9 @@ use serde_json::Value;
 use crate::sign_twilio_request;
 
 /// `sslcommerz_verify_sign(store_password, {"amount": ..., ...})`: the fields as SSLCommerz
-/// signs them, values written as text.
-fn sign_sslcommerz_arguments(arguments: &[Value]) -> String {
+/// signs them, values written as text; only those its `verify_key` names when it has one, as
+/// an app's check reads them.
+pub(crate) fn sign_sslcommerz_arguments(arguments: &[Value]) -> String {
     let store_password = arguments
         .first()
         .and_then(Value::as_str)
@@ -31,7 +32,18 @@ fn sign_sslcommerz_arguments(arguments: &[Value]) -> String {
                 .collect()
         })
         .unwrap_or_default();
-    sign_sslcommerz_fields(store_password, &signed_fields)
+    sign_sslcommerz_fields(store_password, &keep_verify_key_fields(signed_fields))
+}
+
+fn keep_verify_key_fields(field_texts: BTreeMap<String, String>) -> BTreeMap<String, String> {
+    let Some(verify_key) = field_texts.get("verify_key").cloned() else {
+        return field_texts;
+    };
+    let named_fields: Vec<&str> = verify_key.split(',').map(str::trim).collect();
+    field_texts
+        .into_iter()
+        .filter(|(field_name, _)| named_fields.contains(&field_name.as_str()))
+        .collect()
 }
 
 /// The standard functions plus the provider helpers the built-in templates call. Twilio's
@@ -121,5 +133,27 @@ impl TemplateFunctions for WebhookTemplateFunctions {
 
     fn to_shared(&self) -> Arc<dyn TemplateFunctions> {
         Arc::new(self.clone())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::*;
+
+    #[test]
+    fn verify_sign_covers_only_the_fields_its_verify_key_names() {
+        let named_fields = json!({"amount": "10.00", "status": "VALID"});
+        let with_verify_key = json!({
+            "amount": "10.00", "status": "VALID", "risk_title": "Safe",
+            "verify_key": "amount,status",
+        });
+
+        let plain_sign = sign_sslcommerz_arguments(&[json!("testbox@ssl"), named_fields]);
+        let keyed_sign = sign_sslcommerz_arguments(&[json!("testbox@ssl"), with_verify_key]);
+
+        assert_eq!(keyed_sign, plain_sign);
+        assert_eq!(keyed_sign.len(), 32);
     }
 }

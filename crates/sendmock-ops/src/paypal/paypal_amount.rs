@@ -1,4 +1,4 @@
-use sendmock_payments::{currency_exponent, format_major_amount, is_currency_code};
+use sendmock_payments::{format_major_amount, is_currency_code, parse_major_amount};
 use serde_json::{Value, json};
 
 use super::paypal_error::{PayPalApi, PayPalError};
@@ -33,22 +33,6 @@ fn read_currency(
     Ok(currency.to_owned())
 }
 
-/// `"12.30"` in minor units, refusing more decimals than the currency has.
-fn parse_value_minor(value_text: &str, currency: &str) -> Option<u64> {
-    let decimal_count = usize::try_from(currency_exponent(currency)).unwrap_or(2);
-    let (whole_text, fraction_text) = value_text.split_once('.').unwrap_or((value_text, ""));
-    let is_well_formed = !whole_text.is_empty()
-        && whole_text.chars().all(|digit| digit.is_ascii_digit())
-        && fraction_text.chars().all(|digit| digit.is_ascii_digit())
-        && fraction_text.len() <= decimal_count
-        && !(value_text.contains('.') && fraction_text.is_empty());
-    if !is_well_formed {
-        return None;
-    }
-    let padded_fraction = format!("{fraction_text:0<decimal_count$}");
-    format!("{whole_text}{padded_fraction}").parse().ok()
-}
-
 /// An amount object's value in minor units and its currency; `field` is its JSON pointer.
 pub fn parse_amount(
     amount: &Value,
@@ -64,7 +48,7 @@ pub fn parse_amount(
         .get("value")
         .and_then(Value::as_str)
         .ok_or_else(|| PayPalError::missing_field(paypal_api, &value_field))?;
-    let amount_minor = parse_value_minor(value_text, &currency).ok_or_else(|| {
+    let amount_minor = parse_major_amount(value_text, &currency).ok_or_else(|| {
         PayPalError::invalid_request(
             paypal_api,
             &value_field,

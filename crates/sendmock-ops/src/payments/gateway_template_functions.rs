@@ -4,8 +4,10 @@ use sendmock_core::{StandardTemplateFunctions, TemplateFunctions};
 use sendmock_payments::sign_stripe_payload;
 use serde_json::Value;
 
+use crate::webhooks::sign_sslcommerz_arguments;
+
 /// The standard functions plus `stripe_signature`, which signs the notification body already
-/// rendered (empty for redirect fields) at the event's time.
+/// rendered (empty for redirect fields) at the event's time, and `sslcommerz_verify_sign`.
 #[derive(Clone)]
 pub struct GatewayTemplateFunctions {
     pub standard_functions: StandardTemplateFunctions,
@@ -27,6 +29,7 @@ impl TemplateFunctions for GatewayTemplateFunctions {
                     &self.signed_body,
                 )))
             }
+            "sslcommerz_verify_sign" => Some(Value::from(sign_sslcommerz_arguments(arguments))),
             _ => self
                 .standard_functions
                 .call_function(function_name, arguments),
@@ -36,6 +39,7 @@ impl TemplateFunctions for GatewayTemplateFunctions {
     fn function_names(&self) -> Vec<&'static str> {
         let mut function_names = self.standard_functions.function_names();
         function_names.push("stripe_signature");
+        function_names.push("sslcommerz_verify_sign");
         function_names
     }
 

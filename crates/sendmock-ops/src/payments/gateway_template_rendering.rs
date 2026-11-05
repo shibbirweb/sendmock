@@ -35,7 +35,7 @@ impl RedirectOutcome {
     }
 
     /// The native event the outcome stands for, read by `redirect.status`.
-    fn event_type(self) -> &'static str {
+    pub fn event_type(self) -> &'static str {
         match self {
             Self::Success => "payment.succeeded",
             Self::Fail => "payment.failed",

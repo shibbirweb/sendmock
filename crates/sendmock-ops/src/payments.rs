@@ -59,6 +59,7 @@ pub use payment_gateway_operations::{
 };
 pub use payment_gateway_preview_operation::PreviewPaymentGatewayOperation;
 pub use payment_gateway_views::PaymentGatewayDefinition;
+pub(crate) use payment_gateway_views::PaymentGatewayFields;
 pub use payment_method_operations::{
     CreatePaymentMethodOperation, DeletePaymentMethodOperation, GetPaymentMethodOperation,
     ListPaymentMethodsOperation, ResetPaymentMethodOperation, UpdatePaymentMethodOperation,

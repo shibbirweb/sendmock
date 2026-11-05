@@ -3,6 +3,7 @@ use serde_json::Value;
 
 use super::payment_views::PaymentDetail;
 use crate::paypal::{PAYPAL_PROVIDER_KEY, describe_paypal_event_object};
+use crate::sslcommerz::{SSLCOMMERZ_PROVIDER_KEY, describe_sslcommerz_transaction};
 use crate::stripe::{STRIPE_PROVIDER_KEY, describe_stripe_event_object};
 use crate::{OperationContext, OperationError};
 
@@ -33,5 +34,22 @@ pub async fn build_provider_event_object(
         )
         .await;
     }
-    Ok(Value::Null)
+    Ok(build_provider_redirect_object(
+        gateway_key,
+        payment,
+        event_name,
+    ))
+}
+
+/// The gateway's own object its redirect fields read as `event.object`, with
+/// `redirect_status` the gateway's name for the outcome; `null` for a gateway that has none.
+pub fn build_provider_redirect_object(
+    gateway_key: &str,
+    payment: &PaymentDetail,
+    redirect_status: &str,
+) -> Value {
+    if gateway_key == SSLCOMMERZ_PROVIDER_KEY {
+        return Value::Object(describe_sslcommerz_transaction(payment, redirect_status));
+    }
+    Value::Null
 }

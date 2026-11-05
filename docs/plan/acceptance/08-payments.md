@@ -49,10 +49,10 @@ Phase 3P.
 
 Phase 3P.
 
-- [ ] PY-06.1 Session init returns `GatewayPageURL` and `sessionkey`; invalid store credentials return SSLCommerz's failure response.
-- [ ] PY-06.2 The IPN POST carries `tran_id`, `val_id`, `amount`, `status` (`VALID`, `FAILED`, `CANCELLED`), `verify_sign` and `verify_key`, and the signature verifies with the store password as SSLCommerz documents.
-- [ ] PY-06.3 The order validation API answers for `val_id` with data consistent with the IPN; unknown or tampered `val_id` values are rejected.
-- [ ] PY-06.4 Success, fail and cancel redirects POST the documented fields to the app's URLs.
+- [x] PY-06.1 Session init returns `GatewayPageURL` and `sessionkey`; invalid store credentials return SSLCommerz's failure response.
+- [x] PY-06.2 The IPN POST carries `tran_id`, `val_id`, `amount`, `status` (`VALID`, `FAILED`, `CANCELLED`), `verify_sign` and `verify_key`, and the signature verifies with the store password as SSLCommerz documents.
+- [x] PY-06.3 The order validation API answers for `val_id` with data consistent with the IPN; unknown or tampered `val_id` values are rejected.
+- [x] PY-06.4 Success, fail and cancel redirects POST the documented fields to the app's URLs.
 - [ ] PY-06.5 The refund and transaction query APIs return SSLCommerz-shaped responses.
 
 ## PY-07 After-payment operations
