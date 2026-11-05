@@ -2,6 +2,7 @@ mod change_email_operations;
 mod delivery_event_recording;
 mod delivery_outcome_runner;
 mod email_access;
+mod email_check_operations;
 mod email_detail;
 mod email_file_operations;
 mod email_inputs;
@@ -24,6 +25,7 @@ pub use change_email_operations::{
     DeleteAllEmailsOperation, DeleteEmailOperation, UpdateEmailOperation,
 };
 pub use delivery_outcome_runner::complete_email_intake;
+pub use email_check_operations::CheckEmailHtmlOperation;
 pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
 pub use email_file_operations::{
     DownloadAttachmentOperation, DownloadRawEmailOperation, GetAttachmentThumbnailOperation,
@@ -55,6 +57,7 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(RecordEmailOpenOperation);
     operation_registry.register(ListEmailOpensOperation);
     operation_registry.register(CheckListUnsubscribeOperation);
+    operation_registry.register(CheckEmailHtmlOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);
     operation_registry.register(DownloadAttachmentOperation);

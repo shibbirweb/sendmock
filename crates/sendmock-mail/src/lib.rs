@@ -3,6 +3,7 @@
 mod delivery_outcome;
 mod email_ingest_service;
 mod extraction;
+mod html_compatibility;
 mod incoming_email;
 mod mail_error;
 mod native_message;
@@ -20,6 +21,9 @@ pub use email_ingest_service::{EmailIngestService, IngestOptions};
 pub use extraction::{
     DEFAULT_OTP_PATTERNS, OtpExtractor, extract_header_tags, extract_links,
     extract_plus_address_tags,
+};
+pub use html_compatibility::{
+    ClientSupport, CompatibilityWarning, HtmlCompatibilityReport, check_html_compatibility,
 };
 pub use incoming_email::{EmailEnvelope, IncomingEmail};
 pub use mail_error::MailError;
