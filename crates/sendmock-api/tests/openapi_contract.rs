@@ -2219,3 +2219,44 @@ async fn prepare_subscription_samples(
         ),
     ]
 }
+
+/// The catch routes answer every method under `/catch/` from the router, not the registry.
+const ROUTER_OPERATION_IDS: [&str; 5] = [
+    "getCatchByBinPath",
+    "postCatchByBinPath",
+    "putCatchByBinPath",
+    "patchCatchByBinPath",
+    "deleteCatchByBinPath",
+];
+/// The agent skill and AI setups the AI workstream serves; none may be added without a reason.
+const NOT_YET_SERVED_OPERATION_IDS: [&str; 2] = ["getAiAgents", "getAiSkill"];
+
+// AC: PL-01.1
+#[test]
+fn every_operation_of_the_contract_is_served() {
+    let frozen_contract = read_frozen_contract();
+    let operation_registry = build_operation_registry();
+    let served_ids: Vec<String> = served_operations(&operation_registry)
+        .into_iter()
+        .map(|served_operation| served_operation.operation_id)
+        .collect();
+
+    let unserved_ids: Vec<String> = frozen_contract["paths"]
+        .as_object()
+        .into_iter()
+        .flat_map(|path_items| path_items.values())
+        .flat_map(|path_item| {
+            path_item
+                .as_object()
+                .into_iter()
+                .flat_map(|methods| methods.values())
+        })
+        .filter_map(|operation| operation["operationId"].as_str().map(str::to_owned))
+        .filter(|operation_id| {
+            !served_ids.contains(operation_id)
+                && !ROUTER_OPERATION_IDS.contains(&operation_id.as_str())
+        })
+        .collect();
+
+    assert_eq!(unserved_ids, NOT_YET_SERVED_OPERATION_IDS);
+}

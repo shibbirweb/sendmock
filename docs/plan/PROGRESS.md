@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W12 (the published OpenAPI and API docs page), W13 (AI: MCP resources and prompts, the skill with its example scenarios in CI, AI-04.3), W14 (examples in 8 languages, with each HTTP preset's official client library, HC-03.1) and W15 (done-when), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W12b (the API reference in the UI), W13 (AI: MCP resources and prompts, the skill with its example scenarios in CI, AI-04.3), W14 (examples in 8 languages, with each HTTP preset's official client library, HC-03.1) and W15 (done-when), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -697,3 +697,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W11d: disputes can be answered with evidence (Simulate's `answer_dispute`, the `under_review` status, `payment.dispute_updated`), with Stripe's `charge.dispute.updated` and Dispute API (submit evidence, close) and PayPal's `CUSTOMER.DISPUTE.UPDATED`; PY-07.3 ticked. |
 | 2026-11-06 | Phase 4 W11e: subscriptions join the contract (`/payments/subscriptions` with advance and cancel, the `subscription.*` events) and Payments > Subscriptions runs them on the mock; the binary follows in W11f. |
 | 2026-11-06 | Phase 4 W11f: the binary runs subscriptions (migration `0033`, renewals charged through the gateway with the test card, the `subscription.*` events in webhook rules); PY-07.4 and PY-08.1 ticked, PY-07 and PY-08 accepted. **W11 done.** |
+| 2026-11-06 | Phase 4 W12a: each release attaches `openapi.yaml`, the site serves `/openapi.yaml` with a download link, and a contract test checks every contract operation is served (the two AI operations wait for W13); PL-01.5 ticked. |

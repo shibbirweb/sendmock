@@ -328,6 +328,9 @@ jobs:
       - name: The tag and pre-release flag agree with the code
         run: bun scripts/release/release.ts agreement "${{ inputs.tag_name }}" "${{ env.RELEASE_CHANNEL == 'beta' }}"
 
+      - name: The API contract goes with the binaries
+        run: cp docs/api/openapi.yaml dist/openapi.yaml
+
       - name: Upload the files and publish the release
         env:
           GH_TOKEN: ${{ github.token }}
