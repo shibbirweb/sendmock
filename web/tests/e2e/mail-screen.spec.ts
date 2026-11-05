@@ -121,3 +121,27 @@ test("EM-16.2 notification permission is requested only when turned on", async (
     .click();
   await expect.poll(readRequestCount).toBe(1);
 });
+
+test("EM-12.4 tags are added and removed in the email detail", async ({
+  page,
+}) => {
+  await page
+    .locator(emailList)
+    .getByText("Your verification code")
+    .first()
+    .click();
+  const header = page
+    .locator("header")
+    .filter({ has: page.getByRole("heading", { level: 2 }) });
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByLabel("Tags", { exact: true }).fill("Needs-Review");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect(header.getByText("needs-review", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByRole("button", { name: "Remove needs-review" }).click();
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect(header.getByText("needs-review", { exact: true })).toBeHidden();
+});

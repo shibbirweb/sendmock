@@ -9,6 +9,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmailTagsEditor } from "@/features/mail/detail/email-tags-editor";
 import { MailDetailActions } from "@/features/mail/detail/mail-detail-actions";
 import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
 import { EmailResponseLinks } from "@/features/mail/detail/response/email-response-links";
@@ -111,6 +112,7 @@ export function MailDetailHeader({
             {tagName}
           </Badge>
         ))}
+        <EmailTagsEditor email={email} />
         <EmailOutcomeBadge deliveryStatus={email.delivery_status} />
         {email.open_count > 0 && email.opened_at !== null && (
           <span className="flex items-center gap-1 text-xs text-muted-foreground">

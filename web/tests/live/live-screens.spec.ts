@@ -81,3 +81,42 @@ test("UI-12.2 buttons for operations not served yet are disabled and say when th
     page.getByRole("button", { name: "Mark as unread" }),
   ).toBeEnabled();
 });
+
+test("EM-12.4 a live email's tags are added and removed in the detail", async ({
+  page,
+  request,
+}) => {
+  const sendResponse = await request.post("/api/v1/send", {
+    data: {
+      from: "app@shop.test",
+      to: ["sam@example.test"],
+      subject: "Tag me",
+      text: "Hello",
+    },
+  });
+  const { id: emailId } = (await sendResponse.json()) as { id: string };
+  const failedApiCalls = watchFailedApiCalls(page);
+  await page.goto(`/mail/${emailId}`);
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByLabel("Tags", { exact: true }).fill("Live-QA");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect
+    .poll(async () => {
+      const emailResponse = await request.get(`/api/v1/emails/${emailId}`);
+      return ((await emailResponse.json()) as { tags: string[] }).tags;
+    })
+    .toEqual(["live-qa"]);
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByRole("button", { name: "Remove live-qa" }).click();
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect
+    .poll(async () => {
+      const emailResponse = await request.get(`/api/v1/emails/${emailId}`);
+      return ((await emailResponse.json()) as { tags: string[] }).tags;
+    })
+    .toEqual([]);
+  expect(failedApiCalls).toEqual([]);
+});

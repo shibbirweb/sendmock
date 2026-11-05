@@ -139,7 +139,16 @@ export const emailHandlers = [
     const emailUpdate = (await request.json()) as EmailUpdate;
     Object.assign(email, {
       is_read: emailUpdate.is_read ?? email.is_read,
-      tags: emailUpdate.tags ?? email.tags,
+      tags:
+        emailUpdate.tags === undefined
+          ? email.tags
+          : [
+              ...new Set(
+                emailUpdate.tags
+                  .map((tagName) => tagName.trim().toLowerCase())
+                  .filter((tagName) => tagName !== ""),
+              ),
+            ],
     });
 
     return HttpResponse.json(toEmailSummary(email));

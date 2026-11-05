@@ -122,7 +122,7 @@ Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules).
 - [x] EM-12.1 `X-Tags` header values become tags. (#48)
 - [x] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`. (#48)
 - [x] EM-12.3 Tag rules add tags to matching new messages. (#48)
-- [ ] EM-12.4 Manual tags can be added and removed from UI, API, CLI and MCP.
+- [x] EM-12.4 Manual tags can be added and removed from UI, API, CLI and MCP. (#48)
 
 ## EM-13 Quality checks
 
