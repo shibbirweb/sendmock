@@ -27661,7 +27661,7 @@
     },
     {
       "name": "sendmock_webhook_template_list",
-      "toolset": "templates",
+      "toolset": "webhooks",
       "summary": "Built-in and custom payload templates.",
       "area": "Webhook templates",
       "area_slug": "webhook-templates",

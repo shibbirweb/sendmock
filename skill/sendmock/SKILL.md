@@ -12,6 +12,7 @@ Written for SendMock {{sendmock_version}}. SendMock catches what an app sends (e
 1. Check it runs: the MCP tool `sendmock_status`, or `sendmock status --json`.
 2. If it does not run, start it in the background with `sendmock serve`, or ask the user to start it.
 3. Prefer the MCP tools. Without them, use the CLI with `--json`; every tool has a command (`sendmock help --all --json` lists them).
+4. The MCP server starts with the toolsets `core`, `email`, `sms`, `verify`, `extract` and `webhooks`, enough to connect an app, read codes and links, and receive webhooks. The other workflows need another toolset: `logs` (SMTP and HTTP logs), `payments`, `http`, `scenario`, `rules`, `numbers`, `templates` (writing templates), `variables` or `admin` (seed and settings). When a tool is missing, run its CLI command instead, or ask the user to add the toolset to the server's arguments (`sendmock mcp --toolsets all`, or a list).
 
 ## Workflows
 

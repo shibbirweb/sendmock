@@ -95,11 +95,27 @@ fn parse_json_body(request_body: &[u8]) -> Result<Map<String, Value>, ApiErrorRe
     }
     match serde_json::from_slice(request_body) {
         Ok(Value::Object(body_fields)) => Ok(body_fields),
+        // PHP encodes an empty array as `[]`, so Laravel's `Http::post($url)` and Guzzle's
+        // `'json' => []` send it for a request without fields.
+        Ok(Value::Array(body_items)) if body_items.is_empty() => Ok(Map::new()),
         Ok(_) => Err(ApiErrorResponse::invalid_json_body(
             "expected a JSON object",
         )),
         Err(parse_error) => Err(ApiErrorResponse::invalid_json_body(
             &parse_error.to_string(),
         )),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn an_empty_json_array_from_php_counts_as_no_fields() {
+        let parsed_fields = parse_json_body(b"[]").ok();
+
+        assert_eq!(parsed_fields, Some(Map::new()));
+        assert!(parse_json_body(b"[1]").is_err());
     }
 }

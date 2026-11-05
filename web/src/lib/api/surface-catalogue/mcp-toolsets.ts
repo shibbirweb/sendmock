@@ -3,6 +3,8 @@
  * MCP server). The first matching prefix wins, so longer prefixes come first.
  */
 const toolsetPrefixes: [string, string][] = [
+  // Creating an endpoint needs a template id, so listing them comes with the endpoints.
+  ["sendmock_webhook_template_list", "webhooks"],
   ["sendmock_webhook_template_", "templates"],
   ["sendmock_webhook_variable_", "variables"],
   ["sendmock_webhook_", "webhooks"],

@@ -3,7 +3,9 @@ pub const DEFAULT_TOOLSETS: [&str; 6] = ["core", "email", "sms", "verify", "extr
 
 /// The toolset of each tool, by name prefix, as `mcp-toolsets.ts` gives them; the first
 /// matching prefix wins, so longer prefixes come first.
-const TOOLSET_PREFIXES: [(&str, &str); 26] = [
+const TOOLSET_PREFIXES: [(&str, &str); 27] = [
+    // Creating an endpoint needs a template id, so listing them comes with the endpoints.
+    ("sendmock_webhook_template_list", "webhooks"),
     ("sendmock_webhook_template_", "templates"),
     ("sendmock_webhook_variable_", "variables"),
     ("sendmock_webhook_", "webhooks"),
@@ -94,10 +96,16 @@ mod tests {
 
     #[test]
     fn longer_prefixes_win() {
-        assert_eq!(find_toolset("sendmock_webhook_template_list"), "templates");
+        assert_eq!(find_toolset("sendmock_webhook_template_create"), "templates");
         assert_eq!(find_toolset("sendmock_webhook_send"), "webhooks");
         assert_eq!(find_toolset("sendmock_otp_get"), "extract");
         assert_eq!(find_toolset("sendmock_status"), "core");
+    }
+
+    #[test]
+    fn listing_templates_comes_with_the_default_webhooks_toolset() {
+        assert_eq!(find_toolset("sendmock_webhook_template_list"), "webhooks");
+        assert!(DEFAULT_TOOLSETS.contains(&"webhooks"));
     }
 
     // AC: AI-02.3
