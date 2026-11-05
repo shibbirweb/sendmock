@@ -127,7 +127,7 @@ mod tests {
             !app_info
                 .available_operations
                 .iter()
-                .any(|operation_id| operation_id == "postPaymentsByPaymentIdSimulate")
+                .any(|operation_id| operation_id == "getHttpBins")
         );
         Ok(())
     }

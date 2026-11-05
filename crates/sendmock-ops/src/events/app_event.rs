@@ -29,8 +29,12 @@ pub enum AppEventType {
     PaymentSucceeded,
     PaymentFailed,
     PaymentCanceled,
+    PaymentRefunded,
+    PaymentPartiallyRefunded,
     PaymentDisputeOpened,
+    PaymentDisputeClosed,
     CheckoutCompleted,
+    CheckoutExpired,
 }
 
 impl AppEventType {
@@ -59,8 +63,12 @@ impl AppEventType {
             Self::PaymentSucceeded => "payment.succeeded",
             Self::PaymentFailed => "payment.failed",
             Self::PaymentCanceled => "payment.canceled",
+            Self::PaymentRefunded => "payment.refunded",
+            Self::PaymentPartiallyRefunded => "payment.partially_refunded",
             Self::PaymentDisputeOpened => "payment.dispute_opened",
+            Self::PaymentDisputeClosed => "payment.dispute_closed",
             Self::CheckoutCompleted => "checkout.completed",
+            Self::CheckoutExpired => "checkout.expired",
         }
     }
 }

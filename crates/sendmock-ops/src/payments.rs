@@ -26,6 +26,9 @@ mod payment_notification;
 mod payment_notify_operation;
 mod payment_operations;
 mod payment_redirect;
+mod payment_settlement;
+mod payment_simulate_operation;
+mod payment_simulate_views;
 mod payment_views;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
@@ -58,6 +61,7 @@ pub use payment_notify_operation::NotifyPaymentOperation;
 pub use payment_operations::{
     GetPaymentOperation, ListPaymentTestValuesOperation, ListPaymentsOperation,
 };
+pub use payment_simulate_operation::SimulatePaymentOperation;
 pub use payment_views::{PaymentDetail, PaymentSummary};
 
 use crate::OperationRegistry;
@@ -93,6 +97,7 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CreatePaymentCheckoutOperation);
     operation_registry.register(GetPaymentOperation);
     operation_registry.register(NotifyPaymentOperation);
+    operation_registry.register(SimulatePaymentOperation);
     operation_registry.register(GetCheckoutSessionOperation);
     operation_registry.register(CompleteCheckoutOperation);
 }

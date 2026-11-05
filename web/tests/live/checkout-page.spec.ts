@@ -267,3 +267,23 @@ test("PY-03.4 the live card form works from the keyboard", async ({
 
   await expect(checkoutResult(page)).toContainText("Payment successful");
 });
+
+test("PY-03.3 an expired checkout says so and offers no way to pay", async ({
+  page,
+  request,
+}) => {
+  const createdCheckout = await createCheckout(request, "stripe");
+  const expireResponse = await request.post(
+    `/api/v1/payments/${createdCheckout.id}/simulate`,
+    { data: { action: "expire" } },
+  );
+  expect(expireResponse.status()).toBe(200);
+
+  await openCheckout(page, createdCheckout);
+
+  await expect(checkoutResult(page)).toContainText("This checkout expired");
+  await expect(page.getByRole("button", { name: /^Pay / })).toHaveCount(0);
+  await expect(
+    page.getByRole("complementary", { name: "Test controls" }),
+  ).toHaveCount(0);
+});

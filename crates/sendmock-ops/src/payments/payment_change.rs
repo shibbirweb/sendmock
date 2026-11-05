@@ -55,11 +55,15 @@ impl<'context> PaymentChange<'context> {
             .unwrap_or_default()
     }
 
+    pub(super) fn fire_event(&mut self, event_type: AppEventType) {
+        self.fired_events.push(event_type);
+    }
+
     pub fn add_timeline(&mut self, kind: &str, description: impl Into<String>) {
         add_timeline_event(self.operation_context, &mut self.payment, kind, description);
     }
 
-    fn format_money(&self, amount_minor: u64) -> String {
+    pub(super) fn format_money(&self, amount_minor: u64) -> String {
         let currency = &self.payment.summary.currency;
         format!("{} {currency}", format_major_amount(amount_minor, currency))
     }

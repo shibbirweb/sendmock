@@ -25,7 +25,7 @@ UI in U2, live in Phase 3P.
 
 - [x] PY-03.1 Pay, Decline (each reason), Cancel, 3-D Secure (approve, fail) and Delay produce the documented outcome, redirect and notification.
 - [x] PY-03.2 The page renders the provider theme being emulated (card form, PayPal approve, SSLCommerz method picker, bKash wallet, OTP and PIN steps).
-- [ ] PY-03.3 Expired or already completed sessions show a clear message and cannot be paid twice.
+- [x] PY-03.3 Expired or already completed sessions show a clear message and cannot be paid twice.
 - [x] PY-03.4 The page is keyboard accessible and meets the UI accessibility criteria.
 
 ## PY-04 Stripe emulation
@@ -60,7 +60,7 @@ Phase 3P.
 Phase 3P (capture, void, refund), Phase 4 (disputes, subscriptions).
 
 - [ ] PY-07.1 Manual capture: authorize, then capture or void, with matching events.
-- [ ] PY-07.2 Full and partial refunds update the payment and fire the provider's refund event; refunding more than captured is rejected.
+- [x] PY-07.2 Full and partial refunds update the payment and fire the provider's refund event; refunding more than captured is rejected.
 - [ ] PY-07.3 Disputes can be opened, answered, won and lost, each with the provider's events.
 - [ ] PY-07.4 Subscriptions: create, renew on simulated clock advance, payment failure and cancel, each with events.
 

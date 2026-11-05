@@ -1618,6 +1618,32 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments simulate",
+    "usage": "sendmock payments simulate <paymentId> <action>",
+    "aliases": [],
+    "summary": "Move the payment on: capture, refund, dispute, fail.",
+    "arguments": [
+      "paymentId",
+      "action"
+    ],
+    "flags": [
+      "--decline-reason",
+      "--dispute-outcome",
+      "--refund-amount-minor"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/{paymentId}/simulate",
+        "operation_id": "postPaymentsByPaymentIdSimulate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_simulate"
+    ]
+  },
+  {
     "command": "sendmock payments checkout show",
     "usage": "sendmock payments checkout show <sessionId>",
     "aliases": [],

@@ -1182,6 +1182,13 @@ async fn prepare_checkout_action_samples(
             ],
         ),
         (
+            "postPaymentsByPaymentIdSimulate",
+            vec![
+                json!({ "payment_id": notified_payment_id, "action": "succeed" }),
+                json!({ "payment_id": notified_payment_id, "action": "refund", "refund_amount_minor": 100 }),
+            ],
+        ),
+        (
             "postPaymentsByPaymentIdNotify",
             vec![json!({ "payment_id": notified_payment_id })],
         ),

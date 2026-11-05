@@ -62,7 +62,7 @@ const paymentEndpoints = tagEndpoints("Payments", [
     summary: "Move the payment on: capture, refund, dispute, fail.",
     requestBody: typeRef("PaymentSimulateRequest"),
     response: typeRef("PaymentDetail"),
-    errorStatuses: [404, 409],
+    errorStatuses: [400, 404, 409, 422],
   },
   {
     method: "POST",
