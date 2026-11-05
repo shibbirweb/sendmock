@@ -321,14 +321,14 @@ Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [x] More SMS providers (Plivo, MessageBird, generic GET/POST) (#48)
 - [x] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API (#48)
 - [x] WhatsApp via Twilio (#48)
-- [ ] HTTP catcher backend (bins, mock responses, core presets, `wait/http`)
-- [ ] HTTP Catcher and Scenarios switched to live mode; `POST /samples/http`; CLI and MCP `http`, `rules`, `scenario` toolsets
-- [ ] Payments: bKash, Razorpay and Paddle; subscriptions; disputes (PY-07, PY-10)
+- [x] HTTP catcher backend (bins, mock responses, core presets, `wait/http`) (#48)
+- [x] HTTP Catcher and Scenarios switched to live mode; `POST /samples/http`; CLI and MCP `http`, `rules`, `scenario` toolsets (#48)
+- [x] Payments: bKash, Razorpay and Paddle; subscriptions; disputes (PY-07, PY-10) (#48)
 - [x] Chaos toggles (#48)
 - [ ] SDK redirection recipes verified per SDK
 - [ ] `examples/` apps for 8 languages with CI smoke tests
 - [x] OpenAPI published, API docs page in UI
-- [ ] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `sendmock ai install`, `llms.txt`
+- [x] AI: scenarios, MCP resources/prompts, streamable HTTP, agent skill, `sendmock ai install`, `llms.txt` (#48)
 - [ ] Done-when check: example apps pass; agent session works in Claude Code and Codex
 - [ ] Beta released
 
@@ -709,3 +709,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W14c1: every recipe's JavaScript example, read from its guide page, runs under Vitest against a release binary started with `examples/recipes/sendmock.seed.toml`, with `examples/recipes/stand-in-app.mjs` doing the app's part (the `recipes` job in Example apps). Python, Go, Ruby and the CLI tab follow in W14c2. |
 | 2026-11-06 | Phase 4 W14c2: the recipe examples also run in Python (pytest), Go (`go test`), Ruby (RSpec) and the CLI tab, each recipe in its own folder with its language's helper from the Connect page; the CLI tab's `# In your app:` notes are swapped for calls to the stand-in app (`examples/recipes/cli-app-steps.mjs`). |
 | 2026-11-06 | Phase 4 W14c3: the recipe examples also run in Rust (`cargo test`, one target folder shared by the recipes), Java (JUnit 5 console launcher with Jackson jars from Maven Central), C# (xUnit under `dotnet test`) and PHP (Pest feature tests in a fresh Laravel app whose catch-all route, `examples/recipes/php/stand-in-routes.php`, hands each request to the stand-in app), so all nine tabs run against a release binary. |
+| 2026-11-06 | Phase 4 W15a: the skill's example session is scripted as Claude Code and as Codex (`crates/sendmock/tests/agent_session.rs`): `sendmock ai install --target claude-code` and `--target codex` write the agent's files, the MCP server starts from the arguments they wrote, and the agent calls only tools its skill names to connect an app (the Laravel snippet's `MAIL_PORT`), capture an OTP and set up a Postmark inbound webhook with a rule (AI-05.3; AI-05 accepted). The Phase 4 checklist's catcher, live mode, payments and AI items are ticked. |
