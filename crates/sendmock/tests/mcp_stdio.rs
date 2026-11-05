@@ -179,6 +179,81 @@ fn the_sms_and_verify_tools_send_an_sms_and_keep_provider_secrets_masked() -> io
     Ok(())
 }
 
+/// Reading tools are read-only and the ones that make or change a payment are not; the
+/// toolset holds payment tools only.
+fn assert_payment_annotations(tools: &[Value]) {
+    let read_only_hint = |tool_name: &str| {
+        find_tool(tools, tool_name).map(|tool| tool["annotations"]["readOnlyHint"].clone())
+    };
+
+    for read_only_tool in [
+        "sendmock_payment_list",
+        "sendmock_payment_get",
+        "sendmock_payment_wait",
+    ] {
+        assert_eq!(
+            read_only_hint(read_only_tool),
+            Some(json!(true)),
+            "{read_only_tool}"
+        );
+    }
+    for changing_tool in [
+        "sendmock_payment_create_checkout",
+        "sendmock_payment_simulate",
+        "sendmock_payment_notify",
+    ] {
+        assert_eq!(
+            read_only_hint(changing_tool),
+            Some(json!(false)),
+            "{changing_tool}"
+        );
+    }
+    assert!(tools.iter().all(|tool| {
+        tool["name"].as_str().is_some_and(|name| {
+            name.starts_with("sendmock_payment_") || name.starts_with("sendmock_checkout_")
+        })
+    }));
+}
+
+// AC: PY-11.2
+#[test]
+fn the_payments_toolset_makes_settles_waits_for_and_reads_a_payment() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let mut mcp_session = McpSession::start(
+        working_directory.path(),
+        &sendmock.wait_for_http_addr(),
+        &["--toolsets", "payments"],
+    )?;
+
+    let tools = mcp_session.list_tools()?;
+    let checkout_result = mcp_session.call_tool(
+        "sendmock_payment_create_checkout",
+        json!({ "provider": "stripe", "amount_minor": 1999, "currency": "USD" }),
+    )?;
+    let payment_id = checkout_result["structuredContent"]["id"].clone();
+    let simulate_result = mcp_session.call_tool(
+        "sendmock_payment_simulate",
+        json!({ "payment_id": payment_id, "action": "succeed" }),
+    )?;
+    let wait_result = mcp_session.call_tool(
+        "sendmock_payment_wait",
+        json!({ "provider": "stripe", "status": "succeeded", "timeout": "5s" }),
+    )?;
+    let get_result =
+        mcp_session.call_tool("sendmock_payment_get", json!({ "payment_id": payment_id }))?;
+    let notify_result = mcp_session.call_tool(
+        "sendmock_payment_notify",
+        json!({ "payment_id": payment_id }),
+    )?;
+    assert_payment_annotations(&tools);
+    assert_eq!(simulate_result["structuredContent"]["status"], "succeeded");
+    assert_eq!(wait_result["structuredContent"]["id"], payment_id);
+    assert_eq!(get_result["structuredContent"]["status"], "succeeded");
+    assert_eq!(notify_result["isError"], json!(true));
+    Ok(())
+}
+
 // AC: AI-02.3
 #[test]
 fn toolsets_and_read_only_limit_what_an_agent_sees() -> io::Result<()> {

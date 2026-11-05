@@ -94,9 +94,9 @@ Phase 4 (bKash, Razorpay, Paddle), later (others).
 
 Phase 3P.
 
-- [ ] PY-11.1 `sendmock payments list|show|simulate|notify|test-cards` work with `--json`.
-- [ ] PY-11.2 The MCP `payments` toolset exposes create checkout, simulate, notify, list, get and wait, with correct annotations.
-- [ ] PY-11.3 `GET /api/v1/wait/payment` returns when a matching payment reaches the requested status, or `408`.
+- [x] PY-11.1 `sendmock payments list|show|simulate|notify|test-cards` work with `--json`.
+- [x] PY-11.2 The MCP `payments` toolset exposes create checkout, simulate, notify, list, get and wait, with correct annotations.
+- [x] PY-11.3 `GET /api/v1/wait/payment` returns when a matching payment reaches the requested status, or `408`.
 
 ## PY-12 Gateway, method and flow configuration
 

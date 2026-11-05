@@ -203,6 +203,24 @@ mod tests {
         assert_eq!(command_words("sendmock otp --to <recipient>"), ["otp"]);
     }
 
+    #[test]
+    fn a_json_body_stands_in_for_the_required_flags() {
+        let with_data = parse(&[
+            "sendmock",
+            "webhook",
+            "endpoint",
+            "create",
+            "--data",
+            r#"{"name": "Shop"}"#,
+        ]);
+        let without_body = parse(&["sendmock", "webhook", "endpoint", "create"]);
+        let without_argument = parse(&["sendmock", "payments", "show", "--data", "{}"]);
+
+        assert!(with_data.is_some());
+        assert!(without_body.is_none());
+        assert!(without_argument.is_none());
+    }
+
     // AC: AI-01.1
     #[test]
     fn every_registered_operation_has_a_command() {

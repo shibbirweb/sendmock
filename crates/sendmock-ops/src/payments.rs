@@ -30,6 +30,7 @@ mod payment_settlement;
 mod payment_simulate_operation;
 mod payment_simulate_views;
 mod payment_views;
+mod payment_wait_operation;
 mod provider_event_object;
 mod provider_object_store;
 mod provider_payment;
@@ -77,6 +78,7 @@ pub use payment_views::{
 };
 #[cfg(test)]
 pub(crate) use payment_views::{PaymentDispute, PaymentTimelineEvent};
+pub use payment_wait_operation::WaitForPaymentOperation;
 pub(crate) use provider_object_store::{
     ProviderObjectKey, find_provider_object, keep_provider_object, list_kept_or_stored_objects,
     read_kept_or_stored_object, save_provider_object,
@@ -119,6 +121,7 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CreatePaymentCheckoutOperation);
     operation_registry.register(GetPaymentOperation);
     operation_registry.register(NotifyPaymentOperation);
+    operation_registry.register(WaitForPaymentOperation);
     operation_registry.register(SimulatePaymentOperation);
     operation_registry.register(GetCheckoutSessionOperation);
     operation_registry.register(CompleteCheckoutOperation);

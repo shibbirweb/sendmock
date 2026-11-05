@@ -1113,6 +1113,12 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
         ),
         ("getPaymentsTestCards", vec![json!({})]),
         (
+            "getWaitPayment",
+            vec![
+                json!({ "provider": "sslcommerz", "status": "requires_payment", "timeout": "1s" }),
+            ],
+        ),
+        (
             "postPaymentsCheckout",
             vec![
                 checkout,

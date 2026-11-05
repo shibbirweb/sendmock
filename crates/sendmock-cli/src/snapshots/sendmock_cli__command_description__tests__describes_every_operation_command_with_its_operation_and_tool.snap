@@ -1619,6 +1619,30 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments wait",
+    "usage": "sendmock payments wait",
+    "aliases": [],
+    "summary": "Wait until a payment reaches a status; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--provider",
+      "--since",
+      "--status",
+      "--timeout"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/payment",
+        "operation_id": "getWaitPayment",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_wait"
+    ]
+  },
+  {
     "command": "sendmock payments simulate",
     "usage": "sendmock payments simulate <paymentId> <action>",
     "aliases": [],

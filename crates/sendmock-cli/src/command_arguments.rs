@@ -175,6 +175,24 @@ fn add_confirmation_flags(
     command
 }
 
+/// A body from `--data` or `--file` already carries the required fields, so their flags are
+/// required only without one; positional arguments stay required.
+fn let_body_stand_in_for_required_flags(mut command: Command) -> Command {
+    let required_flag_ids: Vec<String> = command
+        .get_arguments()
+        .filter(|argument| argument.is_required_set() && argument.get_long().is_some())
+        .map(|argument| argument.get_id().to_string())
+        .collect();
+    for flag_id in required_flag_ids {
+        command = command.mut_arg(flag_id, |argument| {
+            argument
+                .required(false)
+                .required_unless_present_any(["data", "file"])
+        });
+    }
+    command
+}
+
 /// `--data` and `--file` for JSON bodies, `--output` for files.
 fn add_body_and_answer_flags(
     mut command: Command,
@@ -200,6 +218,7 @@ fn add_body_and_answer_flags(
                     .value_name("PATH")
                     .help("Read the request body from a JSON file, or stdin with -"),
             );
+        command = let_body_stand_in_for_required_flags(command);
     }
     if definition.raw_body_input.is_some() {
         command = command.arg(
