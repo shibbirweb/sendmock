@@ -2770,9 +2770,7 @@ expression: command_descriptions
     "arguments": [
       "binId"
     ],
-    "flags": [
-      "--rules"
-    ],
+    "flags": [],
     "operations": [
       {
         "method": "PUT",

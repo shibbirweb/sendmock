@@ -55,7 +55,7 @@ fn read_initial_input(
     command_matches: &ArgMatches,
 ) -> Result<Map<String, Value>, CliError> {
     let Some(raw_body_input) = operation.definition().raw_body_input else {
-        return read_whole_body(command_matches);
+        return read_whole_body(command_matches, operation.definition().array_body_input);
     };
     let body_path = command_matches
         .try_get_one::<String>("file")
@@ -96,7 +96,11 @@ fn read_flag_values(flag_input: &FlagInput, command_matches: &ArgMatches) -> Vec
     }
 }
 
-fn read_whole_body(command_matches: &ArgMatches) -> Result<Map<String, Value>, CliError> {
+/// `--data` or the `--file` JSON: an object, or a list for operations that take one.
+fn read_whole_body(
+    command_matches: &ArgMatches,
+    array_body_input: Option<&str>,
+) -> Result<Map<String, Value>, CliError> {
     let body_text = match (
         command_matches.try_get_one::<String>("data").ok().flatten(),
         command_matches.try_get_one::<String>("file").ok().flatten(),
@@ -107,6 +111,10 @@ fn read_whole_body(command_matches: &ArgMatches) -> Result<Map<String, Value>, C
     };
     match serde_json::from_str(&body_text) {
         Ok(Value::Object(body_fields)) => Ok(body_fields),
+        Ok(Value::Array(body_items)) if array_body_input.is_some() => Ok(Map::from_iter([(
+            array_body_input.unwrap_or_default().to_owned(),
+            Value::Array(body_items),
+        )])),
         Ok(_) => Err(CliError::InvalidInput(
             "--data and --file take a JSON object".to_owned(),
         )),

@@ -107,7 +107,14 @@ impl ApiClient {
                                 .map(to_text)
                                 .unwrap_or_default(),
                         ),
-                    None => request.json(&Value::Object(remaining_input)),
+                    None => match definition.array_body_input {
+                        Some(array_input_name) => request.json(
+                            remaining_input
+                                .get(array_input_name)
+                                .unwrap_or(&Value::Array(Vec::new())),
+                        ),
+                        None => request.json(&Value::Object(remaining_input)),
+                    },
                 }
             }
         }

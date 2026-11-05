@@ -51,6 +51,7 @@ pub fn describe_command_inputs(operation: &dyn ErasedOperation) -> CommandInputs
         .flatten()
         .filter(|(input_name, _)| {
             Some(input_name.as_str()) != raw_body_name
+                && Some(input_name.as_str()) != definition.array_body_input
                 && !positional_inputs
                     .iter()
                     .any(|positional| &positional.input_name == *input_name)
