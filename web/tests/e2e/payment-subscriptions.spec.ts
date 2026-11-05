@@ -24,6 +24,7 @@ async function chooseRowAction(
   customerEmail: string,
   actionName: string,
 ) {
+  await expect(page.getByRole("menu")).toHaveCount(0);
   await page.getByRole("button", { name: `More for ${customerEmail}` }).click();
   await page.getByRole("menuitem", { name: actionName }).click();
 }

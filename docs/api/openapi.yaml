@@ -11918,10 +11918,12 @@ components:
             - stripe
         customer_email:
           type: string
+          description: Who pays.
           examples:
             - sam@example.test
         plan_name:
           type: string
+          description: The plan's name, shown on each renewal's payment.
           examples:
             - Pro monthly
         amount_minor:
@@ -11936,6 +11938,7 @@ components:
             - USD
         interval:
           $ref: "#/components/schemas/SubscriptionInterval"
+          description: "How often it renews: `day`, `week`, `month` or `year`."
           examples:
             - month
         trial_days:

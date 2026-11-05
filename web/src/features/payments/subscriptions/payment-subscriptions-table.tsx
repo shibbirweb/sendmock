@@ -100,7 +100,7 @@ export function PaymentSubscriptionsTable({
               {subscription.renewal_count}
             </TableCell>
             <TableCell>
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"

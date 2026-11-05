@@ -20328,7 +20328,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "",
+          "description": "Who pays.",
           "example": "sam@example.test"
         },
         {
@@ -20340,7 +20340,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "",
+          "description": "The plan's name, shown on each renewal's payment.",
           "example": "Pro monthly"
         },
         {
@@ -20381,7 +20381,7 @@
             "month",
             "year"
           ],
-          "description": "How often a subscription renews.",
+          "description": "How often it renews: `day`, `week`, `month` or `year`.",
           "example": "month"
         },
         {
@@ -20421,17 +20421,17 @@
           },
           "customer_email": {
             "type": "string",
+            "description": "Who pays.",
             "examples": [
               "sam@example.test"
-            ],
-            "description": ""
+            ]
           },
           "plan_name": {
             "type": "string",
+            "description": "The plan's name, shown on each renewal's payment.",
             "examples": [
               "Pro monthly"
-            ],
-            "description": ""
+            ]
           },
           "amount_minor": {
             "type": "number",
@@ -20449,10 +20449,10 @@
           },
           "interval": {
             "$ref": "#/$defs/SubscriptionInterval",
+            "description": "How often it renews: `day`, `week`, `month` or `year`.",
             "examples": [
               "month"
-            ],
-            "description": "How often a subscription renews."
+            ]
           },
           "trial_days": {
             "type": "number",

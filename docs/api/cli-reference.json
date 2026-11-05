@@ -9907,7 +9907,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
+          "description": "Who pays.",
           "example": "sam@example.test"
         },
         {
@@ -9922,7 +9922,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
+          "description": "The plan's name, shown on each renewal's payment.",
           "example": "Pro monthly"
         },
         {
@@ -9972,7 +9972,7 @@
             "month",
             "year"
           ],
-          "description": "How often a subscription renews.",
+          "description": "How often it renews: `day`, `week`, `month` or `year`.",
           "example": "month"
         },
         {

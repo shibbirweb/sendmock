@@ -70,7 +70,9 @@ export function PaymentSimulateMenu({
 
   return (
     <div className="flex flex-wrap gap-2">
-      <DropdownMenu>
+      {/* Not modal: a live update re-renders the drawer as the menu closes, and a modal
+          menu could leave the page locked for the next one. */}
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button size="sm" disabled={availableActions.length === 0}>
             <FlaskConicalIcon />

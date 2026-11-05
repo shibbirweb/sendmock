@@ -49,9 +49,15 @@ export type PaymentSubscriptionCreateRequest = {
    * @example "stripe"
    */
   provider: string;
-  /** @example "sam@example.test" */
+  /**
+   * Who pays.
+   * @example "sam@example.test"
+   */
   customer_email: string;
-  /** @example "Pro monthly" */
+  /**
+   * The plan's name, shown on each renewal's payment.
+   * @example "Pro monthly"
+   */
   plan_name: string;
   /**
    * The amount of each renewal in minor units.
@@ -63,7 +69,10 @@ export type PaymentSubscriptionCreateRequest = {
    * @example "USD"
    */
   currency?: string;
-  /** @example "month" */
+  /**
+   * How often it renews: `day`, `week`, `month` or `year`.
+   * @example "month"
+   */
   interval: SubscriptionInterval;
   /**
    * Days before the first charge; none charges at once.

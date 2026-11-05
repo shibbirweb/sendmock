@@ -63,12 +63,15 @@ pub struct PaymentSubscription {
 pub struct PaymentSubscriptionCreateRequest {
     /// The gateway's key.
     pub provider: String,
+    /// Who pays.
     pub customer_email: String,
+    /// The plan's name, shown on each renewal's payment.
     pub plan_name: String,
     /// The amount of each renewal in minor units.
     pub amount_minor: u64,
     /// ISO 4217 code; Settings > Payments' default currency when left out.
     pub currency: Option<String>,
+    /// How often it renews: `day`, `week`, `month` or `year`.
     pub interval: SubscriptionInterval,
     /// Days before the first charge; none charges at once.
     pub trial_days: Option<u32>,
