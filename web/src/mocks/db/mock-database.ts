@@ -66,8 +66,8 @@ import { buildSmtpSessionFixtures } from "@/mocks/fixtures/smtp-session-fixtures
 import {
   buildSavedDeliveryFixtures,
   buildWebhookTemplateFixtures,
-  buildWebhookVariableFixtures,
 } from "@/mocks/fixtures/template-and-variable-fixtures";
+import { buildWebhookVariableFixtures } from "@/mocks/fixtures/webhook-variable-fixtures";
 import {
   buildVerificationFixtures,
   linkVerificationMessages,

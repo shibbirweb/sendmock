@@ -72,8 +72,8 @@ test("UI-12.2 buttons for operations not served yet are disabled and say when th
   await expect(replyButton).toBeDisabled();
   await expect(page.getByRole("tooltip")).toHaveText("Available in Phase 4");
   await expect(
-    page.getByRole("tab", { name: "Checks: Available in Phase 4" }),
-  ).toBeDisabled();
+    page.getByRole("tab", { name: "Checks", exact: true }),
+  ).toBeEnabled();
   await expect(
     page.getByRole("button", { name: "Simulate an event", exact: true }),
   ).toBeEnabled();

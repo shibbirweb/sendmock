@@ -139,6 +139,14 @@ jobs:
           fi
           cargo nextest run --workspace --locked
 
+      - uses: oven-sh/setup-bun@v2
+        if: failure()
+
+      - name: Failed tests as annotations
+        if: failure()
+        shell: bash
+        run: bun scripts/nextest-failures.ts target/nextest/default/junit.xml
+
   rust-coverage:
     name: Rust coverage and file size
     runs-on: ubuntu-latest
@@ -166,6 +174,10 @@ jobs:
         run: |
           ulimit -n 4096
           cargo llvm-cov nextest --workspace --locked --json --summary-only --output-path coverage.json
+
+      - name: Failed tests as annotations
+        if: failure()
+        run: bun scripts/nextest-failures.ts "$(find target -name junit.xml -path '*nextest*' | head -n 1)"
 
       - name: Coverage gate (80% overall, 90% operations and domain; table on the job page)
         run: bun scripts/rust-coverage.ts coverage.json

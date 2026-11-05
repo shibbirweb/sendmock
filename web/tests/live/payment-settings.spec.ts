@@ -141,8 +141,9 @@ test("PY-09.4 a live custom gateway and custom method show in the test values", 
   const giftRow = page
     .getByRole("table", { name: "Test numbers and codes" })
     .getByRole("row")
-    .filter({ hasText: methodName });
-  await expect(giftRow).toContainText("GIFT0001");
+    .filter({ hasText: methodName })
+    .filter({ hasText: "GIFT0001" });
+  await expect(giftRow).toHaveCount(1);
   await expect(giftRow).toContainText(gatewayName);
   await expect(giftRow).not.toContainText("OTP");
 });

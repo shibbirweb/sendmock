@@ -59,6 +59,10 @@ test("EM-18.2 a live provider is added as a copy of a built-in and deleted", asy
   await addDialog.getByRole("button", { name: "Add provider" }).click();
 
   await expect(addDialog).toBeHidden();
+  const providerSheet = page.getByRole("dialog", { name: providerName });
+  await expect(providerSheet).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(providerSheet).toBeHidden();
   await expect(providerRow(page, providerName)).toContainText("Custom");
 
   await chooseRowAction(page, providerName, "Delete");
