@@ -2160,6 +2160,7 @@ dependencies = [
  "sendmock-api",
  "sendmock-cli",
  "sendmock-core",
+ "sendmock-mail",
  "sendmock-mcp",
  "sendmock-ops",
  "sendmock-smtp",

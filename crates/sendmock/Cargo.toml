@@ -11,6 +11,7 @@ readme = "../../README.md"
 
 [dependencies]
 sendmock-core.workspace = true
+sendmock-mail.workspace = true
 sendmock-store.workspace = true
 sendmock-ops.workspace = true
 sendmock-smtp.workspace = true

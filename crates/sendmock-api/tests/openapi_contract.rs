@@ -1463,7 +1463,8 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
     let by_email = json!({ "email_id": email_id });
     let by_attachment = json!({ "email_id": email_id, "attachment_index": 0 });
     let raw_message = "From: app@shop.test\r\nTo: sam@example.test\r\nSubject: Raw\r\n\r\nHello";
-    vec![
+    let mut samples = build_email_check_samples(&by_email);
+    samples.extend([
         (
             "getEmails",
             vec![
@@ -1479,8 +1480,6 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
         ),
         ("getEmailsByEmailIdTimeline", vec![by_email.clone()]),
         ("getEmailsByEmailIdListUnsubscribe", vec![by_email.clone()]),
-        ("getEmailsByEmailIdHtmlCheck", vec![by_email.clone()]),
-        ("postEmailsByEmailIdLinkCheck", vec![by_email.clone()]),
         ("getEmailsByEmailIdMime", vec![by_email.clone()]),
         ("getEmailsByEmailIdRaw", vec![by_email]),
         (
@@ -1504,6 +1503,15 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
             vec![json!({ "email_id": deleted_email_id })],
         ),
         ("deleteEmails", vec![json!({})]),
+    ]);
+    samples
+}
+
+fn build_email_check_samples(by_email: &Value) -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        ("getEmailsByEmailIdHtmlCheck", vec![by_email.clone()]),
+        ("postEmailsByEmailIdLinkCheck", vec![by_email.clone()]),
+        ("postEmailsByEmailIdSpamCheck", vec![by_email.clone()]),
     ]
 }
 

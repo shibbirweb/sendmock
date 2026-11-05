@@ -88,6 +88,10 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_UPDATE_CHECK", value_name = "MODE")]
     pub update_check: Option<String>,
 
+    /// A running SpamAssassin `spamd` to score emails in the Checks tab [default: off]
+    #[arg(long, env = "SENDMOCK_SPAMASSASSIN", value_name = "HOST:PORT")]
+    pub spamassassin: Option<String>,
+
     /// Print one JSON line with the bound addresses on stdout once listening (logs go to stderr); port 0 picks a free port
     #[arg(long, env = "SENDMOCK_READY_JSON")]
     pub ready_json: bool,

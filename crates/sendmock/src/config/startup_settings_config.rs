@@ -10,6 +10,8 @@ pub struct StartupSettingsConfig {
     pub max_emails: Option<u64>,
     pub max_age_days: Option<u32>,
     pub update_check_mode: Option<UpdateCheckMode>,
+    /// `host:port` of a spamd, from `--spamassassin`.
+    pub spamassassin_address: Option<String>,
 }
 
 impl StartupSettingsConfig {
@@ -49,8 +51,32 @@ impl StartupSettingsConfig {
             max_emails: serve_arguments.max_emails.or(config_file.max_emails),
             max_age_days,
             update_check_mode,
+            spamassassin_address: resolve_spamassassin_address(serve_arguments, config_file)?,
         })
     }
+}
+
+fn resolve_spamassassin_address(
+    serve_arguments: &ServeArguments,
+    config_file: &ConfigFile,
+) -> Result<Option<String>, ConfigError> {
+    let Some(spamd_address) = serve_arguments
+        .spamassassin
+        .as_ref()
+        .or(config_file.spamassassin.as_ref())
+    else {
+        return Ok(None);
+    };
+    let has_port = spamd_address
+        .rsplit_once(':')
+        .is_some_and(|(host, port_text)| !host.is_empty() && port_text.parse::<u16>().is_ok());
+    if !has_port {
+        return Err(ConfigError::InvalidSetting {
+            setting_name: "spamassassin",
+            reason: format!("{spamd_address} is not host:port, such as 127.0.0.1:783"),
+        });
+    }
+    Ok(Some(spamd_address.trim().to_owned()))
 }
 
 fn parse_update_check_mode(mode_setting: &str) -> Option<UpdateCheckMode> {
@@ -105,6 +131,7 @@ mod tests {
                 max_emails: Some(50),
                 max_age_days: Some(3),
                 update_check_mode: None,
+                spamassassin_address: None,
             })
         );
     }
@@ -130,5 +157,29 @@ mod tests {
             Some(UpdateCheckMode::Daily)
         );
         assert!(StartupSettingsConfig::resolve(&ServeArguments::default(), &invalid_file).is_err());
+    }
+
+    // AC: EM-13.3
+    #[test]
+    fn the_spamassassin_flag_needs_a_host_and_port() {
+        let with_flag = ServeArguments {
+            spamassassin: Some("127.0.0.1:783".to_owned()),
+            ..ServeArguments::default()
+        };
+        let without_port = ServeArguments {
+            spamassassin: Some("spamd".to_owned()),
+            ..ServeArguments::default()
+        };
+
+        let resolved = StartupSettingsConfig::resolve(&with_flag, &ConfigFile::default());
+        let refused = StartupSettingsConfig::resolve(&without_port, &ConfigFile::default());
+
+        assert_eq!(
+            resolved
+                .ok()
+                .and_then(|settings| settings.spamassassin_address),
+            Some("127.0.0.1:783".to_owned())
+        );
+        assert!(refused.is_err());
     }
 }

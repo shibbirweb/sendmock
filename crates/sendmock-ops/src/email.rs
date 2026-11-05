@@ -3,6 +3,7 @@ mod delivery_event_recording;
 mod delivery_outcome_runner;
 mod email_access;
 mod email_check_operations;
+mod email_checkers;
 mod email_detail;
 mod email_file_operations;
 mod email_inputs;
@@ -22,12 +23,15 @@ mod read_email_operations;
 mod recipient_refusal;
 mod send_email_operations;
 mod simulate_outcome_operation;
+mod spam_check_operation;
+mod spam_checker;
 
 pub use change_email_operations::{
     DeleteAllEmailsOperation, DeleteEmailOperation, UpdateEmailOperation,
 };
 pub use delivery_outcome_runner::complete_email_intake;
 pub use email_check_operations::CheckEmailHtmlOperation;
+pub use email_checkers::EmailCheckers;
 pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
 pub use email_file_operations::{
     DownloadAttachmentOperation, DownloadRawEmailOperation, GetAttachmentThumbnailOperation,
@@ -35,7 +39,7 @@ pub use email_file_operations::{
 pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
 pub use email_summary::{EmailAddress, EmailSummary};
 pub use link_check_operation::CheckEmailLinksOperation;
-pub use link_checker::{EmailCheckers, LinkChecker, LinkProbe};
+pub use link_checker::{LinkChecker, LinkProbe};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
 pub(crate) use native_send_request::{NativeSendAttachment, NativeSendRequest, read_bare_address};
 pub use read_email_operations::{
@@ -45,6 +49,8 @@ pub use read_email_operations::{
 pub use recipient_refusal::find_recipient_refusal;
 pub use send_email_operations::{SendEmailOperation, SendRawEmailOperation};
 pub use simulate_outcome_operation::SimulateEmailOutcomeOperation;
+pub use spam_check_operation::CheckEmailSpamOperation;
+pub use spam_checker::{SpamChecker, SpamdReport, SpamdRule};
 
 use crate::OperationRegistry;
 
@@ -63,6 +69,7 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(CheckListUnsubscribeOperation);
     operation_registry.register(CheckEmailHtmlOperation);
     operation_registry.register(CheckEmailLinksOperation);
+    operation_registry.register(CheckEmailSpamOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);
     operation_registry.register(DownloadAttachmentOperation);

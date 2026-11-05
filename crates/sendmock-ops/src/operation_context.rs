@@ -204,6 +204,11 @@ impl OperationContext {
         self
     }
 
+    pub fn with_spam_checker(mut self, spam_checker: Arc<dyn crate::email::SpamChecker>) -> Self {
+        self.email_checkers.spam_checker = Some(spam_checker);
+        self
+    }
+
     pub fn with_media_fetcher(mut self, media_fetcher: Arc<dyn MediaFetcher>) -> Self {
         self.media_fetcher = Some(media_fetcher);
         self

@@ -128,9 +128,9 @@ Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules).
 
 Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam).
 
-- [x] EM-13.1 The HTML check reports per-client support for the CSS/HTML used and points at the offending source lines.
+- [x] EM-13.1 The HTML check reports per-client support for the CSS/HTML used and points at the offending source lines. (#48)
 - [x] EM-13.2 The link check reports status, redirects and timeouts for every link and image, and runs only when requested. (#48)
-- [ ] EM-13.3 With `--spamassassin` configured, the spam score and rules are shown; without it the tab is hidden.
+- [x] EM-13.3 With `--spamassassin` configured, the spam score and rules are shown; without it the tab is hidden. (#48)
 - [x] EM-13.4 Invalid `List-Unsubscribe` / `List-Unsubscribe-Post` headers produce warnings. (#48)
 
 ## EM-14 Release and auto-forward

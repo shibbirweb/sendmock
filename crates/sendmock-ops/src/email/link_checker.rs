@@ -1,6 +1,5 @@
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::Arc;
 
 /// What one request to a link answered.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -19,11 +18,4 @@ pub trait LinkChecker: Send + Sync {
         &'checker self,
         link_url: &'checker str,
     ) -> Pin<Box<dyn Future<Output = LinkProbe> + Send + 'checker>>;
-}
-
-/// The checks that reach outside SendMock, which the binary provides and tests replace.
-#[derive(Clone, Default)]
-pub struct EmailCheckers {
-    /// `None` where no HTTP client exists; each link then reports why.
-    pub link_checker: Option<Arc<dyn LinkChecker>>,
 }

@@ -8,7 +8,7 @@ use crate::config::{ServerConfig, StartupSettingsConfig};
 /// Often enough that a burst of mail is trimmed within seconds, rarely enough to cost nothing.
 const PRUNE_INTERVAL: Duration = Duration::from_secs(10);
 
-/// Writes `--max-emails`, `--max-age` and `--update-check` into the settings, so the UI
+/// Writes `--max-emails`, `--max-age`, `--update-check` and `--spamassassin` into the settings, so the UI
 /// shows the values in force.
 pub async fn apply_startup_settings(
     server_config: &ServerConfig,
@@ -22,6 +22,7 @@ pub async fn apply_startup_settings(
         max_emails: startup_settings.max_emails,
         max_age_days: startup_settings.max_age_days.map(Some),
         update_check_mode: startup_settings.update_check_mode,
+        spamassassin_address: startup_settings.spamassassin_address.clone().map(Some),
         ..AppSettingsUpdate::default()
     };
     let saved = match operation_context.settings_store.current().await {

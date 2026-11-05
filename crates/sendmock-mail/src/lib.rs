@@ -9,6 +9,7 @@ mod mail_error;
 mod native_message;
 mod parsing;
 mod raw_message_codec;
+mod spamd_protocol;
 
 pub use delivery_outcome::{
     AddressOutcomeSource, BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome,
@@ -30,3 +31,6 @@ pub use mail_error::MailError;
 pub use native_message::{NativeAttachment, NativeMessage, build_raw_message, guess_content_type};
 pub use parsing::{MimeTreeNode, ParsedAttachment, ParsedEmail, parse_email};
 pub use raw_message_codec::{compress_raw_message, decompress_raw_message};
+pub use spamd_protocol::{
+    SpamdReplyError, SpamdReport, SpamdRule, build_spamd_report_request, parse_spamd_reply,
+};
