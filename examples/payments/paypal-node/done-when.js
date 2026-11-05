@@ -27,6 +27,8 @@ const paypalApi = {
   clientSecret: "sendmock-example-secret",
 };
 const waitTimeoutMs = 60_000;
+/** What the app is doing, so a failure in CI names the step. */
+let currentStep = "starting";
 
 const paypalClient = new Client({
   clientCredentialsAuthCredentials: {
@@ -110,6 +112,7 @@ async function connectReceiver(receiver) {
 
 /** Creates an order and has the buyer approve or decline it on the checkout page. */
 async function createOrderOnPage(shopOrderId, checkoutAction) {
+  currentStep = `create order ${shopOrderId}`;
   const { result: order } = await ordersController.createOrder({
     body: {
       intent: CheckoutPaymentIntent.Capture,
@@ -130,6 +133,7 @@ async function createOrderOnPage(shopOrderId, checkoutAction) {
   expectEqual(order.status, "PAYER_ACTION_REQUIRED", "The new order's status");
   const approvalLink = order.links.find((link) => ["payer-action", "approve"].includes(link.rel));
   const paymentId = new URL(approvalLink.href).pathname.split("/").pop();
+  currentStep = `${checkoutAction} order ${shopOrderId} on the checkout page`;
   await callSendMock("POST", `/checkout-sessions/${paymentId}/complete`, {
     action: checkoutAction,
     method_key: "paypal_account",
@@ -139,9 +143,11 @@ async function createOrderOnPage(shopOrderId, checkoutAction) {
 
 async function payAndCapture(receivedEvents) {
   const orderId = await createOrderOnPage("order-2001", "pay");
+  currentStep = "get the approved order";
   const { result: approvedOrder } = await ordersController.getOrder({ id: orderId });
   expectEqual(approvedOrder.status, "APPROVED", "The approved order's status");
 
+  currentStep = "capture the approved order";
   const { result: capturedOrder } = await ordersController.captureOrder({
     id: orderId,
     prefer: "return=representation",
@@ -150,12 +156,14 @@ async function payAndCapture(receivedEvents) {
   expectEqual(capturedOrder.status, "COMPLETED", "The captured order's status");
   const capture = capturedOrder.purchaseUnits[0].payments.captures[0];
   expectEqual(capture.status, "COMPLETED", "The capture's status");
+  currentStep = "receive PAYMENT.CAPTURE.COMPLETED";
   await waitForEvent(receivedEvents, "PAYMENT.CAPTURE.COMPLETED", capture.id);
   return capture.id;
 }
 
 async function handleDecline() {
   const orderId = await createOrderOnPage("order-2002", "decline");
+  currentStep = "capture the declined order";
   try {
     await ordersController.captureOrder({ id: orderId, body: {} });
     throw new Error("A declined order was captured");
@@ -170,14 +178,17 @@ async function handleDecline() {
 }
 
 async function refundCapture(receivedEvents, captureId) {
+  currentStep = "refund the capture";
   const { result: refund } = await paymentsController.refundCapturedPayment({
     captureId,
     prefer: "return=representation",
     body: {},
   });
   expectEqual(refund.status, "COMPLETED", "The refund's status");
+  currentStep = "get the refunded capture";
   const { result: refundedCapture } = await paymentsController.getCapturedPayment({ captureId });
   expectEqual(refundedCapture.status, "REFUNDED", "The refunded capture's status");
+  currentStep = "receive PAYMENT.CAPTURE.REFUNDED";
   await waitForEvent(receivedEvents, "PAYMENT.CAPTURE.REFUNDED", refund.id);
 }
 
@@ -194,10 +205,33 @@ async function main() {
   receiver.receiverServer.close();
 }
 
-main().catch((error) => {
+/** The provider requests SendMock logged last: method, path, status and header names. */
+async function describeLoggedRequests() {
+  const loggedRequests = await callSendMock("GET", "/logs/http?api=paypal&limit=4").catch(() => null);
+  return (loggedRequests?.items ?? [])
+    .map((loggedRequest) => {
+      const headerNames = Object.keys(loggedRequest.request_headers ?? {}).join(",");
+      return `${loggedRequest.method} ${loggedRequest.path} ${loggedRequest.response_status} [${headerNames}]`;
+    })
+    .join("; ");
+}
+
+main().catch(async (error) => {
   console.error(error);
   // CI job logs need a token to read; an annotation shows the reason on the run itself.
-  const reason = [error.message, error.body].filter(Boolean).join(" ");
+  const sentRequest = error.request
+    ? `${error.request.method} ${error.request.url} [${Object.keys(error.request.headers ?? {})}]`
+    : "";
+  const reason = [
+    `step: ${currentStep}`,
+    error.message,
+    error.statusCode,
+    sentRequest,
+    error.body,
+    `logged: ${await describeLoggedRequests()}`,
+  ]
+    .filter(Boolean)
+    .join(" | ");
   console.log(`::error title=PayPal app::${reason.replace(/\r?\n/g, " ")}`);
   process.exit(1);
 });
