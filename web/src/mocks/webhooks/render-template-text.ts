@@ -3,6 +3,10 @@ import { faker } from "@faker-js/faker/locale/en";
 import { resolveTemplateConditions } from "@/mocks/webhooks/render-template-conditions";
 import { resolveTemplateLoops } from "@/mocks/webhooks/render-template-loops";
 import { argumentFilters } from "@/mocks/webhooks/template-argument-filters";
+import {
+  fakeTemplateFunctions,
+  rewritePostmanAliases,
+} from "@/mocks/webhooks/template-fake-functions";
 
 /** Values a template can read: `event`, `data`, `vars`, `endpoint`, ... */
 export type TemplateContext = Record<string, unknown>;
@@ -138,6 +142,7 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
     `ts=${Math.floor(Date.now() / 1000)};h1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
   sslcommerz_verify_sign: () =>
     faker.string.hexadecimal({ length: 32, prefix: "" }).toLowerCase(),
+  ...fakeTemplateFunctions,
 };
 
 function stripEmailPrefix(eventType: string): string {
@@ -208,7 +213,7 @@ function evaluateOperand(
     return stringMatch[1] ?? "";
   }
 
-  const callMatch = /^([a-z_]+)\((.*)\)$/i.exec(operandText);
+  const callMatch = /^([a-z_]+(?:\.[a-z_]+)?)\((.*)\)$/i.exec(operandText);
   if (callMatch !== null) {
     const functionName = callMatch[1] ?? "";
     const templateFunction = templateFunctions[functionName];
@@ -322,7 +327,10 @@ export function renderTemplateText(
     return contextValue === missingValue ? undefined : contextValue;
   };
   const templateText = resolveTemplateConditions(
-    resolveTemplateLoops(conditionalTemplateText, readContextValue),
+    resolveTemplateLoops(
+      rewritePostmanAliases(conditionalTemplateText),
+      readContextValue,
+    ),
     readContextValue,
   );
   const renderProblems: RenderProblems = {

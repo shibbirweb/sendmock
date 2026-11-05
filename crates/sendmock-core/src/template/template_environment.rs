@@ -15,6 +15,7 @@ use super::template_encoding_filters::{
 use super::template_event_name_filters::{
     resend_type_filter, sendgrid_event_filter, ses_type_filter,
 };
+use super::template_fake_namespace::FakeNamespace;
 use super::template_functions::TemplateFunctions;
 use super::template_hash_filters::{
     hmac_sha1_filter, hmac_sha256_filter, md5_filter, sha1_filter, sha256_filter, sha512_filter,
@@ -54,6 +55,7 @@ pub fn build_template_environment(
     add_text_filters(&mut environment);
     add_encoding_filters(&mut environment);
     add_function_globals(&mut environment, &template_functions);
+    environment.add_global("fake", FakeNamespace::new_value(template_functions));
     environment
 }
 

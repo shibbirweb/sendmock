@@ -120,6 +120,102 @@
       "signature": "sslcommerz_verify_sign(store_password, fields)",
       "description": "SSLCommerz's verify_sign: the MD5 of the named fields and the store password.",
       "example": "44fd62c8ac77ea7f03a9526172a3dec7"
+    },
+    {
+      "name": "fake.name",
+      "signature": "fake.name()",
+      "description": "A fake full name.",
+      "example": "Maya Novak"
+    },
+    {
+      "name": "fake.first_name",
+      "signature": "fake.first_name()",
+      "description": "A fake first name.",
+      "example": "Maya"
+    },
+    {
+      "name": "fake.last_name",
+      "signature": "fake.last_name()",
+      "description": "A fake last name.",
+      "example": "Novak"
+    },
+    {
+      "name": "fake.email",
+      "signature": "fake.email()",
+      "description": "A fake email address at a test domain.",
+      "example": "maya.novak42@example.com"
+    },
+    {
+      "name": "fake.username",
+      "signature": "fake.username()",
+      "description": "A fake username.",
+      "example": "maya.novak42"
+    },
+    {
+      "name": "fake.company",
+      "signature": "fake.company()",
+      "description": "A fake company name.",
+      "example": "Northwind Labs"
+    },
+    {
+      "name": "fake.sentence",
+      "signature": "fake.sentence()",
+      "description": "A lorem sentence.",
+      "example": "Lorem ipsum dolor sit amet."
+    },
+    {
+      "name": "fake.paragraph",
+      "signature": "fake.paragraph()",
+      "description": "A few lorem sentences.",
+      "example": "Lorem ipsum dolor sit amet. Sed do eiusmod tempor."
+    },
+    {
+      "name": "fake.word",
+      "signature": "fake.word()",
+      "description": "One lorem word.",
+      "example": "dolor"
+    },
+    {
+      "name": "fake.address",
+      "signature": "fake.address()",
+      "description": "A fake street address and city.",
+      "example": "12 Lake Road, Lisbon"
+    },
+    {
+      "name": "fake.city",
+      "signature": "fake.city()",
+      "description": "A fake city.",
+      "example": "Oslo"
+    },
+    {
+      "name": "fake.country_code",
+      "signature": "fake.country_code()",
+      "description": "A two-letter country code.",
+      "example": "BD"
+    },
+    {
+      "name": "fake.ip",
+      "signature": "fake.ip()",
+      "description": "An IPv4 address from the documentation range.",
+      "example": "203.0.113.7"
+    },
+    {
+      "name": "fake.user_agent",
+      "signature": "fake.user_agent()",
+      "description": "A browser user agent.",
+      "example": "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0"
+    },
+    {
+      "name": "fake.url",
+      "signature": "fake.url()",
+      "description": "A URL at a test domain.",
+      "example": "https://example.org/ipsum"
+    },
+    {
+      "name": "lorem",
+      "signature": "lorem(words)",
+      "description": "Placeholder text of the given number of words.",
+      "example": "lorem ipsum dolor"
     }
   ],
   "filters": [

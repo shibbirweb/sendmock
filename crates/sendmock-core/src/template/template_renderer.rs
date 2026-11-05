@@ -4,6 +4,7 @@ use serde_json::Value;
 
 use super::template_environment::build_template_environment;
 use super::template_functions::TemplateFunctions;
+use super::template_postman_aliases::rewrite_postman_aliases;
 use super::template_problems::{build_problem, find_template_problems};
 
 /// The largest text one render may produce (1 MB), so a bad template cannot fill memory.
@@ -80,6 +81,7 @@ pub fn render_template_in_mode(
     escape: TemplateEscape,
     render_mode: TemplateRenderMode,
 ) -> RenderedTemplate {
+    let template_text: &str = &rewrite_postman_aliases(template_text);
     let function_names = template_functions.function_names();
     let mut problems = find_template_problems(
         template_text,

@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use serde_json::{Map, Value};
 
+use super::template_fake_data::{generate_fake_value, generate_lorem};
 use super::template_phone::generate_random_phone;
 use super::template_random_values::{
     generate_random_float, generate_random_hex, generate_random_int, generate_random_text,
@@ -40,7 +41,12 @@ const STANDARD_FUNCTION_NAMES: &[&str] = &[
     "random_otp",
     "random_choice",
     "random_phone",
+    "lorem",
 ];
+
+/// `fake.<method>()` arrives as the function name `fake.<method>`.
+const FAKE_FUNCTION_PREFIX: &str = "fake.";
+const DEFAULT_LOREM_WORDS: usize = 8;
 
 /// The time and random functions of [12](docs/plan/12-webhook-variables.md), over the clock
 /// and random source so tests are deterministic.
@@ -147,7 +153,14 @@ impl StandardTemplateFunctions {
                 random_source,
                 arguments.read_text(0, "country").unwrap_or("US"),
             )),
-            _ => return None,
+            "lorem" => Value::from(generate_lorem(
+                random_source,
+                arguments.read_length(0, "words", DEFAULT_LOREM_WORDS),
+            )),
+            _ => {
+                let fake_method = function_name.strip_prefix(FAKE_FUNCTION_PREFIX)?;
+                Value::from(generate_fake_value(random_source, fake_method)?)
+            }
         };
         Some(random_value)
     }

@@ -34,6 +34,20 @@ A template is the shape of a webhook request. When no built-in matches what your
 
 Name, description, the **events** it fits (the gallery and endpoint picker only offer it for those), its **required variables** (endpoints show them as **Missing** until set), method, content type, headers, query and body, and the body mode (Fields, Raw or None). Inside `{{ }}`, suggestions list every value, function and filter; the reference panel explains each.
 
+## Fake data and Postman aliases
+
+Besides the context, variables and `uuid()`, `random_int()` and the other generated values, templates can call fake data:
+
+| Function | Gives |
+| --- | --- |
+| `fake.name()`, `fake.first_name()`, `fake.last_name()` | a person's name |
+| `fake.email()`, `fake.username()`, `fake.company()` | an address at a test domain, a username, a company |
+| `fake.address()`, `fake.city()`, `fake.country_code()` | a street address, a city, a two-letter country code |
+| `fake.ip()`, `fake.user_agent()`, `fake.url()` | an address from the documentation range, a browser user agent, a URL at a test domain |
+| `fake.word()`, `fake.sentence()`, `fake.paragraph()`, `lorem(words)` | placeholder text |
+
+Requests brought over from Postman keep working: `{{$randomUUID}}`, `{{$guid}}`, `{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$randomInt}}`, `{{$randomEmail}}`, `{{$randomFirstName}}`, `{{$randomFullName}}`, `{{$randomCompanyName}}`, `{{$randomCity}}`, `{{$randomIP}}`, `{{$randomUrl}}`, `{{$randomLoremSentence}}` and the like become the matching function before rendering.
+
 ## Revisions
 
 Every save of a custom or edited template keeps a revision (the last 20). **History** shows each with a diff against the current version and **Restore** (which saves it as a new revision).

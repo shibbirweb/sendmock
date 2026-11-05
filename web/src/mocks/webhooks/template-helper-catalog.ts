@@ -1,4 +1,5 @@
 import type { TemplateReferenceHelper } from "@/lib/api/types";
+import { fakeFunctionCatalog } from "@/mocks/webhooks/template-fake-functions";
 
 /** Functions templates can call, documented for the reference panel (WH-07.9). */
 export const templateFunctionCatalog: TemplateReferenceHelper[] = [
@@ -79,6 +80,7 @@ export const templateFunctionCatalog: TemplateReferenceHelper[] = [
       "SSLCommerz's verify_sign: the MD5 of the named fields and the store password.",
     example: "44fd62c8ac77ea7f03a9526172a3dec7",
   },
+  ...fakeFunctionCatalog,
 ];
 
 /** Filters, applied with `| name`, documented for the reference panel (WH-07.9). */

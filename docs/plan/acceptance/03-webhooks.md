@@ -72,8 +72,8 @@ Phase 3 (Twilio, Vonage), Phase 4 (email providers).
 UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart).
 
 - [ ] WH-07.1 Every variable kind (Text, Number, Boolean, JSON, Secret, Dynamic, Random, Computed, Prompt) resolves correctly.
-- [ ] WH-07.2 Scope precedence is send-time, then endpoint, then global, then `SENDMOCK_VAR_*`.
-- [ ] WH-07.3 Every documented function and filter returns the documented output (table-driven tests).
+- [x] WH-07.2 Scope precedence is send-time, then endpoint, then global, then `SENDMOCK_VAR_*`.
+- [x] WH-07.3 Every documented function and filter returns the documented output (table-driven tests).
 - [ ] WH-07.4 Random values stay the same across retries of one delivery and change on re-render; Fixed values change only on Regenerate.
 - [x] WH-07.5 Strict mode stops a delivery with `render_failed` and a clear error; lenient mode renders empty values and logs a warning.
 - [ ] WH-07.6 Fields mode always produces valid JSON or form bodies.
