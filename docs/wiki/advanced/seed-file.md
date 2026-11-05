@@ -89,6 +89,20 @@ enabled = true
 
 `[settings]` takes the same keys as **Settings** and `PATCH /api/v1/settings`. Export writes only the settings you changed from the defaults.
 
+## Email templates
+
+Apps that send through SendGrid dynamic templates, Postmark templates or Brevo templates only send a template id and its data; the provider holds the template. SendMock keeps the id and the data on the email (the **Template data** tab). To also see the email the provider would have sent, give SendMock a local stand-in under the same id:
+
+```toml
+[[email.templates]]
+id = "d-4f1c2b9a7e6d"
+subject = "Welcome, {{ first_name }}"
+text = "Hi {{ first_name }}, your {{ plan }} plan is ready."
+html = "<p>Hi {{ first_name }}, your <b>{{ plan }}</b> plan is ready.</p>"
+```
+
+A template send whose id matches is stored with this subject (unless the send names its own) and these bodies, rendered from the send's template data with the same template language as webhook templates. A template needs a `text` or an `html` body.
+
 ## Payment flows, methods and gateways
 
 Custom payment flows, methods and gateways, and the built-ins you edited, are exported under `[[payments.flows]]`, `[[payments.methods]]` and `[[payments.gateways]]`. Each item names its `key` and holds its `definition` as JSON, the same fields the API takes. A gateway names its notification endpoint by name, and its secret credentials are exported as references:

@@ -113,7 +113,8 @@ pub(crate) async fn load_email_detail(
 ) -> Result<EmailDetail, OperationError> {
     let mut email_detail = EmailDetail::from(email);
     let provider_send = operation_context
-        .email_provider_send_repository
+        .email_provider_stores
+        .sends
         .find_send(&email.email_id)
         .await?;
     email_detail.template = provider_send.and_then(|provider_send| {

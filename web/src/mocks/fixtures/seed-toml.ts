@@ -168,6 +168,7 @@ const knownSeedSections: Record<string, string> = {
   "[[sms.outcome_rules]]": "Custom outcome number",
   "[[email.outcome_rules]]": "Custom outcome address",
   "[[email.providers]]": "Email provider",
+  "[[email.templates]]": "Email template",
   "[[sms.providers]]": "SMS provider",
   "[[payments.flows]]": "Payment flow",
   "[[payments.methods]]": "Payment method",

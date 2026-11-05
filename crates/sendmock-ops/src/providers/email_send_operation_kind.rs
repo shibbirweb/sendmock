@@ -51,18 +51,17 @@ pub async fn send_one_email(
     if let Some(failure) = find_rule_failure(provider_call.provider, &part_values) {
         return Ok(Err(failure));
     }
-    let send_request = build_send_request(&part_values);
-    let native_message = match send_request.to_native_message() {
+    let mut send_request = build_send_request(&part_values);
+    apply_local_template(
+        operation_context,
+        provider_call,
+        &part_values,
+        &mut send_request,
+    )
+    .await?;
+    let native_message = match build_native_message(&send_request)? {
         Ok(native_message) => native_message,
-        Err(OperationError::InvalidInput { message, field }) => {
-            let failed_part = field.unwrap_or_else(|| "body".to_owned());
-            return Ok(Err(ProviderFailure::new(
-                "invalid_value",
-                &failed_part,
-                message,
-            )));
-        }
-        Err(other_error) => return Err(other_error),
+        Err(failure) => return Ok(Err(failure)),
     };
     let stored_email = store_provider_email(
         operation_context,
@@ -90,6 +89,25 @@ pub async fn send_one_email(
         ),
         email_id: stored_email.email_id,
     }))
+}
+
+/// The message as the native send builds it; a field it refuses is the provider's
+/// `invalid_value` for that part.
+fn build_native_message(
+    send_request: &NativeSendRequest,
+) -> Result<Result<sendmock_mail::NativeMessage, ProviderFailure>, OperationError> {
+    match send_request.to_native_message() {
+        Ok(native_message) => Ok(Ok(native_message)),
+        Err(OperationError::InvalidInput { message, field }) => {
+            let failed_part = field.unwrap_or_else(|| "body".to_owned());
+            Ok(Err(ProviderFailure::new(
+                "invalid_value",
+                &failed_part,
+                message,
+            )))
+        }
+        Err(other_error) => Err(other_error),
+    }
 }
 
 /// Builds the message as the native send does and stores it as sent through the provider.
@@ -125,6 +143,46 @@ async fn store_provider_email(
         .map_err(|mail_error| OperationError::Internal(mail_error.to_string()))
 }
 
+/// A template send whose id has a local template from the seed file gets that template's
+/// subject and bodies, rendered from the send's template data as the provider would.
+async fn apply_local_template(
+    operation_context: &OperationContext,
+    provider_call: &ProviderCall<'_>,
+    part_values: &std::collections::BTreeMap<String, Vec<String>>,
+    send_request: &mut NativeSendRequest,
+) -> Result<(), OperationError> {
+    let read_first = |part: &str| part_values.get(part).and_then(|values| values.first());
+    let Some(template_id) = read_first("template_id") else {
+        return Ok(());
+    };
+    let Some(local_template) = operation_context
+        .email_provider_stores
+        .local_templates
+        .find_template(template_id)
+        .await?
+    else {
+        return Ok(());
+    };
+    let template_data = read_first("template_data")
+        .and_then(|template_data_json| serde_json::from_str::<Value>(template_data_json).ok())
+        .unwrap_or_else(|| json!({}));
+    let render = |template_text: &str| {
+        render_template(
+            template_text,
+            &template_data,
+            provider_call.template_functions,
+            TemplateEscape::None,
+        )
+        .text
+    };
+    if send_request.subject.is_empty() {
+        send_request.subject = render(&local_template.subject);
+    }
+    send_request.text = local_template.text_body.as_deref().map(render);
+    send_request.html = local_template.html_body.as_deref().map(render);
+    Ok(())
+}
+
 fn render_provider_message_id(provider_call: &ProviderCall<'_>) -> String {
     let id_context = provider_call.build_template_context(&json!({}), None);
     render_template(
@@ -151,7 +209,8 @@ async fn save_provider_send(
             .cloned()
     };
     operation_context
-        .email_provider_send_repository
+        .email_provider_stores
+        .sends
         .save_send(EmailProviderSendRecord {
             email_id: email_id.to_owned(),
             provider_key: provider_call.provider.key.clone(),

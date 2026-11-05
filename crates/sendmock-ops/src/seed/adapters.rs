@@ -1,4 +1,5 @@
 mod email_outcome_rule_seed_adapter;
+mod email_template_seed_adapter;
 mod endpoint_names;
 mod messaging_service_seed_adapter;
 mod payment_definition_seed;
@@ -17,6 +18,7 @@ mod webhook_template_seed_adapter;
 mod webhook_variable_seed_adapter;
 
 use email_outcome_rule_seed_adapter::EmailOutcomeRuleSeedAdapter;
+use email_template_seed_adapter::EmailTemplateSeedAdapter;
 use messaging_service_seed_adapter::MessagingServiceSeedAdapter;
 use payment_flow_seed_adapter::PaymentFlowSeedAdapter;
 use payment_gateway_seed_adapter::PaymentGatewaySeedAdapter;
@@ -48,6 +50,7 @@ pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
         Box::new(VirtualNumberSeedAdapter),
         Box::new(SmsOutcomeRuleSeedAdapter),
         Box::new(EmailOutcomeRuleSeedAdapter),
+        Box::new(EmailTemplateSeedAdapter),
         Box::new(SmsProviderSeedAdapter),
         Box::new(WebhookTemplateSeedAdapter),
         Box::new(WebhookEndpointSeedAdapter),

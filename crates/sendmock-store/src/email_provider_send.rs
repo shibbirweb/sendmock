@@ -1,5 +1,9 @@
+mod email_local_template_record;
+mod email_local_template_repository;
 mod email_provider_send_record;
 mod email_provider_send_repository;
 
+pub use email_local_template_record::EmailLocalTemplateRecord;
+pub use email_local_template_repository::EmailLocalTemplateRepository;
 pub use email_provider_send_record::EmailProviderSendRecord;
 pub use email_provider_send_repository::EmailProviderSendRepository;
