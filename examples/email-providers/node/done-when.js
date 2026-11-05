@@ -163,10 +163,29 @@ async function main() {
   console.log("Done: SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs sent to SendMock.");
 }
 
-main().catch((error) => {
+/** The provider requests SendMock logged last: provider, method, path, status and answer. */
+async function describeLoggedRequests() {
+  const response = await fetch(`${sendmockUrl}/api/v1/logs/http?limit=3`).catch(() => null);
+  const loggedRequests = response?.ok ? await response.json() : { items: [] };
+  return (loggedRequests.items ?? [])
+    .map((loggedRequest) => {
+      const headerNames = Object.keys(loggedRequest.request_headers ?? {}).join(",");
+      const answer = String(loggedRequest.response_body ?? "").slice(0, 200);
+      return `${loggedRequest.api} ${loggedRequest.method} ${loggedRequest.path} ${loggedRequest.response_status} [${headerNames}] ${answer}`;
+    })
+    .join("; ");
+}
+
+main().catch(async (error) => {
   console.error(error);
   // CI job logs need a token to read; an annotation shows the reason on the run itself.
-  const reason = [`step: ${currentStep}`, error.message, error.code, JSON.stringify(error.response?.body ?? null)]
+  const reason = [
+    `step: ${currentStep}`,
+    error.message,
+    error.code,
+    JSON.stringify(error.response?.body ?? null),
+    `logged: ${await describeLoggedRequests()}`,
+  ]
     .filter(Boolean)
     .join(" | ");
   console.log(`::error title=Email provider SDKs::${reason.replace(/\r?\n/g, " ")}`);
