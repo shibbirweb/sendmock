@@ -2319,6 +2319,7 @@ dependencies = [
  "md-5",
  "rcgen",
  "rustls",
+ "rustls-platform-verifier",
  "sendmock-core",
  "sendmock-ops",
  "sendmock-store",

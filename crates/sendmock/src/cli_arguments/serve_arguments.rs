@@ -88,6 +88,19 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_UPDATE_CHECK", value_name = "MODE")]
     pub update_check: Option<String>,
 
+    /// A real SMTP server that Release and auto-forward rules send through, such as smtp://user:password@smtp.example.com:587 [default: off]
+    #[arg(
+        long,
+        env = "SENDMOCK_RELAY_SMTP",
+        hide_env_values = true,
+        value_name = "URL"
+    )]
+    pub relay_smtp: Option<String>,
+
+    /// Recipients Release and auto-forward may send to, as comma-separated globs such as *@yourcompany.com; nothing leaves without one [default: none]
+    #[arg(long, env = "SENDMOCK_RELAY_ALLOWLIST", value_name = "GLOBS")]
+    pub relay_allowlist: Option<String>,
+
     /// A running SpamAssassin `spamd` to score emails in the Checks tab [default: off]
     #[arg(long, env = "SENDMOCK_SPAMASSASSIN", value_name = "HOST:PORT")]
     pub spamassassin: Option<String>,

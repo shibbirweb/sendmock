@@ -1512,6 +1512,8 @@ fn build_email_check_samples(by_email: &Value) -> Vec<(&'static str, Vec<Value>)
         ("getEmailsByEmailIdHtmlCheck", vec![by_email.clone()]),
         ("postEmailsByEmailIdLinkCheck", vec![by_email.clone()]),
         ("postEmailsByEmailIdSpamCheck", vec![by_email.clone()]),
+        // Release needs a relay, which this app has none of; email_release_api.rs covers it.
+        ("postEmailsByEmailIdRelease", vec![]),
     ]
 }
 

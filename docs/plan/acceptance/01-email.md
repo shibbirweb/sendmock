@@ -138,7 +138,7 @@ Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam).
 Phase 4. Docs: [Release and forwarding](../03-email.md#release-and-forwarding-to-real-smtp).
 
 - [ ] EM-14.1 Release and auto-forward are impossible until a relay and a recipient allowlist are configured.
-- [ ] EM-14.2 Release sends the message through the relay to the original or chosen recipients; recipients outside the allowlist are refused.
+- [x] EM-14.2 Release sends the message through the relay to the original or chosen recipients; recipients outside the allowlist are refused. (#48)
 - [ ] EM-14.3 Auto-forward rules forward matching messages automatically.
 - [ ] EM-14.4 Every release and forward is logged on the email timeline with its result and fires `email.released`.
 

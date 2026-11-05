@@ -69,7 +69,7 @@ impl Operation for CheckEmailLinksOperation {
             operation_id: "postEmailsByEmailIdLinkCheck",
             method: HttpMethod::Post,
             path: "/api/v1/emails/{emailId}/link-check",
-            summary: "Request every link and image of the email; runs only when asked.",
+            summary: "Check every link in the message.",
             cli_usage: "sendmock email check <emailId> links",
             mcp_tool: "sendmock_email_check",
             is_read_only: true,
@@ -88,7 +88,7 @@ impl Operation for CheckEmailLinksOperation {
             list_checked_urls(&email.links, email.html_body.as_deref().unwrap_or_default());
         let mut results = Vec::with_capacity(checked_urls.len());
         for (url, kind) in checked_urls {
-            let probe = match &operation_context.email_checkers.link_checker {
+            let probe = match &operation_context.email_network_clients.link_checker {
                 Some(link_checker) => link_checker.probe_link(&url).await,
                 None => LinkProbe {
                     error_message: Some("Link checks are not available in this build".to_owned()),

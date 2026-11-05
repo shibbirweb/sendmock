@@ -195,7 +195,7 @@ For final checks in real mail clients (Gmail, Outlook, Apple Mail):
 
 - **Release (manual):** "Release" button on an email (or `POST /api/v1/emails/{emailId}/release`) sends it through a configured relay SMTP server to the original or a chosen recipient.
 - **Auto-forward:** rules (same filter builder) that automatically forward matching messages to fixed real addresses, e.g. "everything to `*@qa.app.test` -> `qa-team@company.com`".
-- **Relay config:** `--relay-smtp smtp://user:pass@smtp.example.com:587` or Settings; STARTTLS/implicit TLS; optional `Return-Path` override.
+- **Relay config:** `--relay-smtp smtp://user:pass@smtp.example.com:587` and `--relay-allowlist '*@yourcompany.com'`, or Settings; STARTTLS/implicit TLS; optional `Return-Path` override (later).
 - **Safety:** off by default; a recipient allowlist (glob patterns) is required before anything can be sent out; every release/forward is logged with result and visible in the email timeline.
 
 ## Replies and inbound email

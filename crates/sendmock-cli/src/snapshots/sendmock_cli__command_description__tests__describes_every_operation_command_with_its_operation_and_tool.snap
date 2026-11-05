@@ -405,7 +405,7 @@ expression: command_descriptions
     "command": "sendmock email check html",
     "usage": "sendmock email check <emailId> html",
     "aliases": [],
-    "summary": "Each email client's support for the HTML and CSS the email uses.",
+    "summary": "HTML and CSS support across email clients.",
     "arguments": [
       "emailId"
     ],
@@ -429,7 +429,7 @@ expression: command_descriptions
     "command": "sendmock email check links",
     "usage": "sendmock email check <emailId> links",
     "aliases": [],
-    "summary": "Request every link and image of the email; runs only when asked.",
+    "summary": "Check every link in the message.",
     "arguments": [
       "emailId"
     ],
@@ -453,7 +453,7 @@ expression: command_descriptions
     "command": "sendmock email check spam",
     "usage": "sendmock email check <emailId> spam",
     "aliases": [],
-    "summary": "Score the message with SpamAssassin, when a spamd address is set.",
+    "summary": "Score the message with the spam rules.",
     "arguments": [
       "emailId"
     ],
@@ -471,6 +471,29 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_email_check"
+    ]
+  },
+  {
+    "command": "sendmock email release",
+    "usage": "sendmock email release <emailId>",
+    "aliases": [],
+    "summary": "Send the email on through the allowlisted relay.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/release",
+        "operation_id": "postEmailsByEmailIdRelease",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_release"
     ]
   },
   {

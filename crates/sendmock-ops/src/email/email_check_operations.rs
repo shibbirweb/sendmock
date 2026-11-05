@@ -44,7 +44,7 @@ impl Operation for CheckEmailHtmlOperation {
             operation_id: "getEmailsByEmailIdHtmlCheck",
             method: HttpMethod::Get,
             path: "/api/v1/emails/{emailId}/html-check",
-            summary: "Each email client's support for the HTML and CSS the email uses.",
+            summary: "HTML and CSS support across email clients.",
             cli_usage: "sendmock email check <emailId> html",
             mcp_tool: "sendmock_email_check",
             is_read_only: true,

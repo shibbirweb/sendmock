@@ -29,6 +29,8 @@ pub struct ConfigFile {
     pub max_age: Option<String>,
     pub update_check: Option<String>,
     pub spamassassin: Option<String>,
+    pub relay_smtp: Option<String>,
+    pub relay_allowlist: Option<String>,
     pub ui_auth: Option<String>,
     pub api_token: Option<String>,
     pub cors_origins: Option<String>,

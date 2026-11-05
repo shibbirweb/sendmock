@@ -14,8 +14,8 @@ use tokio::sync::watch;
 use tokio::task::JoinSet;
 
 use crate::config::ServerConfig;
+use crate::email_network_clients::with_email_network_clients;
 use crate::http_call_sender::{HttpCallSender, REPLY_WEBHOOK_TIMEOUT, STATUS_CALLBACK_TIMEOUT};
-use crate::http_link_checker::with_http_link_checker;
 use crate::http_media_fetcher::HttpMediaFetcher;
 use crate::http_webhook_sender::HttpWebhookSender;
 use crate::instance_details_builder::build_instance_details;
@@ -27,7 +27,6 @@ use crate::retention_task::{apply_startup_settings, run_retention_task};
 use crate::seed_file_check::apply_seed_file;
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
-use crate::spamd_client::with_spamd_client;
 use crate::startup_error::StartupError;
 use crate::template_directory_task::{load_file_templates, run_template_directory_task};
 use crate::update_check_task::{build_update_checker, run_update_check_task};
@@ -207,7 +206,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         listeners.addresses.smtp_addr,
     ))))
     .with_update_checker(build_update_checker());
-    let operation_context = with_spamd_client(with_http_link_checker(operation_context));
+    let operation_context = with_email_network_clients(operation_context);
     let operation_context = match HttpMediaFetcher::new() {
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),
         None => operation_context,

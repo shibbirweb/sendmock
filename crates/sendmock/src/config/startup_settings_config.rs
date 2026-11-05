@@ -12,6 +12,10 @@ pub struct StartupSettingsConfig {
     pub update_check_mode: Option<UpdateCheckMode>,
     /// `host:port` of a spamd, from `--spamassassin`.
     pub spamassassin_address: Option<String>,
+    /// From `--relay-smtp`.
+    pub relay_smtp_url: Option<String>,
+    /// From `--relay-allowlist`, one glob per entry.
+    pub relay_recipient_allowlist: Option<Vec<String>>,
 }
 
 impl StartupSettingsConfig {
@@ -52,6 +56,12 @@ impl StartupSettingsConfig {
             max_age_days,
             update_check_mode,
             spamassassin_address: resolve_spamassassin_address(serve_arguments, config_file)?,
+            relay_smtp_url: resolve_relay_smtp_url(serve_arguments, config_file)?,
+            relay_recipient_allowlist: serve_arguments
+                .relay_allowlist
+                .as_ref()
+                .or(config_file.relay_allowlist.as_ref())
+                .map(|allowlist_text| split_allowlist(allowlist_text)),
         })
     }
 }
@@ -77,6 +87,38 @@ fn resolve_spamassassin_address(
         });
     }
     Ok(Some(spamd_address.trim().to_owned()))
+}
+
+fn resolve_relay_smtp_url(
+    serve_arguments: &ServeArguments,
+    config_file: &ConfigFile,
+) -> Result<Option<String>, ConfigError> {
+    let Some(relay_url) = serve_arguments
+        .relay_smtp
+        .as_ref()
+        .or(config_file.relay_smtp.as_ref())
+    else {
+        return Ok(None);
+    };
+    let relay_url = relay_url.trim();
+    if !(relay_url.starts_with("smtp://") || relay_url.starts_with("smtps://")) {
+        return Err(ConfigError::InvalidSetting {
+            setting_name: "relay_smtp",
+            reason: "use smtp:// or smtps://, such as smtp://user:password@smtp.example.com:587"
+                .to_owned(),
+        });
+    }
+    Ok(Some(relay_url.to_owned()))
+}
+
+/// `*@a.test, qa@b.test` as its patterns, without blanks.
+fn split_allowlist(allowlist_text: &str) -> Vec<String> {
+    allowlist_text
+        .split(',')
+        .map(str::trim)
+        .filter(|allowed_pattern| !allowed_pattern.is_empty())
+        .map(str::to_owned)
+        .collect()
 }
 
 fn parse_update_check_mode(mode_setting: &str) -> Option<UpdateCheckMode> {
@@ -132,6 +174,8 @@ mod tests {
                 max_age_days: Some(3),
                 update_check_mode: None,
                 spamassassin_address: None,
+                relay_smtp_url: None,
+                relay_recipient_allowlist: None,
             })
         );
     }
@@ -179,6 +223,37 @@ mod tests {
                 .ok()
                 .and_then(|settings| settings.spamassassin_address),
             Some("127.0.0.1:783".to_owned())
+        );
+        assert!(refused.is_err());
+    }
+
+    // AC: EM-14.1
+    #[test]
+    fn the_relay_flags_need_an_smtp_url_and_split_the_allowlist() {
+        let with_relay = ServeArguments {
+            relay_smtp: Some("smtps://mailer:pw@smtp.example.test".to_owned()),
+            relay_allowlist: Some("*@qa.example.test, lead@example.test,".to_owned()),
+            ..ServeArguments::default()
+        };
+        let with_web_url = ServeArguments {
+            relay_smtp: Some("https://smtp.example.test".to_owned()),
+            ..ServeArguments::default()
+        };
+
+        let resolved = StartupSettingsConfig::resolve(&with_relay, &ConfigFile::default());
+        let refused = StartupSettingsConfig::resolve(&with_web_url, &ConfigFile::default());
+
+        let resolved = resolved.ok().unwrap_or_default();
+        assert_eq!(
+            resolved.relay_smtp_url.as_deref(),
+            Some("smtps://mailer:pw@smtp.example.test")
+        );
+        assert_eq!(
+            resolved.relay_recipient_allowlist,
+            Some(vec![
+                "*@qa.example.test".to_owned(),
+                "lead@example.test".to_owned()
+            ])
         );
         assert!(refused.is_err());
     }

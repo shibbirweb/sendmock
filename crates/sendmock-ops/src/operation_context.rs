@@ -71,7 +71,7 @@ pub struct OperationContext {
     pub file_templates: crate::webhooks::FileTemplateLibrary,
     /// Downloads `MediaUrl` links; set by the binary, which owns the HTTP client.
     pub media_fetcher: Option<Arc<dyn MediaFetcher>>,
-    pub email_checkers: crate::email::EmailCheckers,
+    pub email_network_clients: crate::email::EmailNetworkClients,
     /// Calls status callback URLs; set by the binary, which owns the HTTP client.
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
     /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
@@ -158,7 +158,7 @@ impl OperationContext {
             update_checker: UpdateChecker::default(),
             file_templates: crate::webhooks::FileTemplateLibrary::default(),
             media_fetcher: None,
-            email_checkers: crate::email::EmailCheckers::default(),
+            email_network_clients: crate::email::EmailNetworkClients::default(),
             status_callback_sender: None,
             reply_webhook_sender: None,
             environment_reader: Arc::new(ProcessEnvironment),
@@ -200,12 +200,17 @@ impl OperationContext {
     }
 
     pub fn with_link_checker(mut self, link_checker: Arc<dyn crate::email::LinkChecker>) -> Self {
-        self.email_checkers.link_checker = Some(link_checker);
+        self.email_network_clients.link_checker = Some(link_checker);
+        self
+    }
+
+    pub fn with_email_relay(mut self, email_relay: Arc<dyn crate::email::EmailRelay>) -> Self {
+        self.email_network_clients.relay = Some(email_relay);
         self
     }
 
     pub fn with_spam_checker(mut self, spam_checker: Arc<dyn crate::email::SpamChecker>) -> Self {
-        self.email_checkers.spam_checker = Some(spam_checker);
+        self.email_network_clients.spam_checker = Some(spam_checker);
         self
     }
 

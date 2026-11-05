@@ -70,6 +70,8 @@ rustls = { version = "0.23", default-features = false, features = [
     "std",
     "tls12",
 ] }
+# Already in the binary through reqwest; verifies relay SMTP servers with the system roots.
+rustls-platform-verifier = "0.7"
 rmcp = { version = "3.8", default-features = false, features = [
     "server",
     "transport-io",

@@ -7,7 +7,7 @@ mod settings_operations;
 mod settings_validation;
 mod traffic_retention;
 
-pub use app_settings::AppSettings;
+pub use app_settings::{AppSettings, mask_url_password};
 pub use app_settings_store::AppSettingsStore;
 pub use app_settings_update::AppSettingsUpdate;
 pub use reset_operation::ResetOperation;

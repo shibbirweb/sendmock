@@ -38,9 +38,9 @@ mod verify;
 mod webhooks;
 
 pub use email::{
-    EmailAddress, EmailAttachment, EmailCheckers, EmailDetail, EmailSummary, ExtractedData,
-    LinkChecker, LinkProbe, SpamChecker, SpamdReport, SpamdRule, complete_email_intake,
-    find_recipient_refusal,
+    EmailAddress, EmailAttachment, EmailDetail, EmailNetworkClients, EmailRelay, EmailSummary,
+    ExtractedData, LinkChecker, LinkProbe, RelayMessage, SpamChecker, SpamdReport, SpamdRule,
+    complete_email_intake, find_recipient_refusal,
 };
 pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,

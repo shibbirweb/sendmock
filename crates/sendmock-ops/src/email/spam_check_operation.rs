@@ -68,7 +68,7 @@ impl Operation for CheckEmailSpamOperation {
             operation_id: "postEmailsByEmailIdSpamCheck",
             method: HttpMethod::Post,
             path: "/api/v1/emails/{emailId}/spam-check",
-            summary: "Score the message with SpamAssassin, when a spamd address is set.",
+            summary: "Score the message with the spam rules.",
             cli_usage: "sendmock email check <emailId> spam",
             mcp_tool: "sendmock_email_check",
             is_read_only: true,
@@ -92,7 +92,7 @@ impl Operation for CheckEmailSpamOperation {
         let app_settings = operation_context.settings_store.current().await?;
         let (Some(spamd_address), Some(spam_checker)) = (
             app_settings.spamassassin_address,
-            &operation_context.email_checkers.spam_checker,
+            &operation_context.email_network_clients.spam_checker,
         ) else {
             return Ok(SpamCheckReport::unavailable());
         };

@@ -18,6 +18,7 @@ hmac.workspace = true
 md5.workspace = true
 rcgen.workspace = true
 rustls.workspace = true
+rustls-platform-verifier.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
 tokio-rustls.workspace = true

@@ -3,6 +3,7 @@
 mod cli_arguments;
 mod client_command;
 mod config;
+mod email_network_clients;
 mod github_release_source;
 mod help_output;
 mod http_call_sender;
