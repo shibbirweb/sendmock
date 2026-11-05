@@ -10,6 +10,8 @@ mod email_open_operations;
 mod email_search_query;
 mod email_summary;
 mod email_timeline_entry;
+mod link_check_operation;
+mod link_checker;
 mod list_unsubscribe_report;
 mod lookup_operations;
 mod lookups;
@@ -32,6 +34,8 @@ pub use email_file_operations::{
 };
 pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
 pub use email_summary::{EmailAddress, EmailSummary};
+pub use link_check_operation::CheckEmailLinksOperation;
+pub use link_checker::{EmailCheckers, LinkChecker, LinkProbe};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
 pub(crate) use native_send_request::{NativeSendAttachment, NativeSendRequest, read_bare_address};
 pub use read_email_operations::{
@@ -58,6 +62,7 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ListEmailOpensOperation);
     operation_registry.register(CheckListUnsubscribeOperation);
     operation_registry.register(CheckEmailHtmlOperation);
+    operation_registry.register(CheckEmailLinksOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);
     operation_registry.register(DownloadAttachmentOperation);

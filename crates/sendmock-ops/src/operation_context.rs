@@ -71,6 +71,7 @@ pub struct OperationContext {
     pub file_templates: crate::webhooks::FileTemplateLibrary,
     /// Downloads `MediaUrl` links; set by the binary, which owns the HTTP client.
     pub media_fetcher: Option<Arc<dyn MediaFetcher>>,
+    pub email_checkers: crate::email::EmailCheckers,
     /// Calls status callback URLs; set by the binary, which owns the HTTP client.
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
     /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
@@ -157,6 +158,7 @@ impl OperationContext {
             update_checker: UpdateChecker::default(),
             file_templates: crate::webhooks::FileTemplateLibrary::default(),
             media_fetcher: None,
+            email_checkers: crate::email::EmailCheckers::default(),
             status_callback_sender: None,
             reply_webhook_sender: None,
             environment_reader: Arc::new(ProcessEnvironment),
@@ -194,6 +196,11 @@ impl OperationContext {
 
     pub fn with_webhook_sender(mut self, webhook_sender: Arc<dyn WebhookSender>) -> Self {
         self.webhook_sender = Some(webhook_sender);
+        self
+    }
+
+    pub fn with_link_checker(mut self, link_checker: Arc<dyn crate::email::LinkChecker>) -> Self {
+        self.email_checkers.link_checker = Some(link_checker);
         self
     }
 

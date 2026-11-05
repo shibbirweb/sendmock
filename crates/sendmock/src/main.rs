@@ -6,6 +6,7 @@ mod config;
 mod github_release_source;
 mod help_output;
 mod http_call_sender;
+mod http_link_checker;
 mod http_media_fetcher;
 mod http_response_recording;
 mod http_webhook_sender;

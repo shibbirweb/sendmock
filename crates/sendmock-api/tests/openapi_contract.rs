@@ -1480,6 +1480,7 @@ async fn prepare_email_samples(app_router: &axum::Router) -> Vec<(&'static str, 
         ("getEmailsByEmailIdTimeline", vec![by_email.clone()]),
         ("getEmailsByEmailIdListUnsubscribe", vec![by_email.clone()]),
         ("getEmailsByEmailIdHtmlCheck", vec![by_email.clone()]),
+        ("postEmailsByEmailIdLinkCheck", vec![by_email.clone()]),
         ("getEmailsByEmailIdMime", vec![by_email.clone()]),
         ("getEmailsByEmailIdRaw", vec![by_email]),
         (

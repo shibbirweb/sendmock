@@ -426,6 +426,30 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email check links",
+    "usage": "sendmock email check <emailId> links",
+    "aliases": [],
+    "summary": "Request every link and image of the email; runs only when asked.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/link-check",
+        "operation_id": "postEmailsByEmailIdLinkCheck",
+        "selector": {
+          "input": "kind",
+          "value": "links"
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_email_check"
+    ]
+  },
+  {
     "command": "sendmock email mime",
     "usage": "sendmock email mime <emailId>",
     "aliases": [],

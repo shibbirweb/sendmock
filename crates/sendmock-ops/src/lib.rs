@@ -38,8 +38,8 @@ mod verify;
 mod webhooks;
 
 pub use email::{
-    EmailAddress, EmailAttachment, EmailDetail, EmailSummary, ExtractedData, complete_email_intake,
-    find_recipient_refusal,
+    EmailAddress, EmailAttachment, EmailCheckers, EmailDetail, EmailSummary, ExtractedData,
+    LinkChecker, LinkProbe, complete_email_intake, find_recipient_refusal,
 };
 pub use events::{
     AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,

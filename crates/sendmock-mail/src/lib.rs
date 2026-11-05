@@ -20,7 +20,7 @@ pub use delivery_outcome::{
 pub use email_ingest_service::{EmailIngestService, IngestOptions};
 pub use extraction::{
     DEFAULT_OTP_PATTERNS, OtpExtractor, extract_header_tags, extract_links,
-    extract_plus_address_tags,
+    extract_plus_address_tags, extract_remote_image_urls,
 };
 pub use html_compatibility::{
     ClientSupport, CompatibilityWarning, HtmlCompatibilityReport, check_html_compatibility,

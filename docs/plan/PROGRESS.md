@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W4b ([[email.providers]] in the seed file, Mail > Providers and custom SMS providers in the live UI suite, SES v2 raw content), following the W4 design note in docs/plan/29-phase-4.md and docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W5c (the optional SpamAssassin check behind `--spamassassin host:port`, EM-13.3), then the W4b leftovers (SES v2 raw content, custom SMS providers in the live UI suite) and W6, following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -672,3 +672,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-05 | Plan: Phase 4 W4 splits into W4a and W4b. Phase 4 W4a: email providers get the full API, CLI and MCP surface (`/api/v1/emails/providers`), and custom email and SMS providers can be created, copied or blank, answered from their definitions at once; EM-18.5 and SM-16.5 ticked. |
 | 2026-11-05 | Phase 4 W4b (first part): the seed file holds email providers and custom providers of both areas; Mail > Providers joins the live UI suite; EM-18.7 ticked. |
 | 2026-11-05 | Phase 4 W5a: the email's HTML check scores each client's support from caniemail's data for the features the body uses, with the lines to fix; EM-13.1 ticked. |
+| 2026-11-05 | Phase 4 W5b: the link check requests every link and remote image of an email only when asked, and reports each one's status, first redirect, time or timeout; EM-13.2 ticked. |
