@@ -138,6 +138,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_payment_flow_samples(app_router).await);
     samples.extend(prepare_payment_method_samples(app_router).await);
     samples.extend(prepare_payment_gateway_samples(app_router).await);
+    samples.extend(prepare_payment_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -1088,6 +1089,42 @@ async fn prepare_payment_gateway_samples(
         (
             "deletePaymentsGatewaysByGatewayKey",
             vec![json!({ "gateway_key": "deleted_gateway" })],
+        ),
+    ]
+}
+
+/// A checkout waiting on its page, read back as a payment and as its session.
+async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let checkout = json!({
+        "provider": "sslcommerz", "amount_minor": 120_000, "currency": "BDT",
+        "customer_email": "ruma@example.com",
+        "line_items": [{ "name": "Tea", "quantity": 2, "unit_amount_minor": 60_000 }],
+    });
+    let payment_id =
+        post_json(app_router, "/api/v1/payments/checkout", &checkout).await["id"].clone();
+    vec![
+        (
+            "getPayments",
+            vec![
+                json!({}),
+                json!({ "status": "requires_payment,succeeded", "provider": "sslcommerz", "currency": "BDT", "limit": 5 }),
+            ],
+        ),
+        ("getPaymentsTestCards", vec![json!({})]),
+        (
+            "postPaymentsCheckout",
+            vec![
+                checkout,
+                json!({ "provider": "stripe", "amount_minor": 500 }),
+            ],
+        ),
+        (
+            "getPaymentsByPaymentId",
+            vec![json!({ "payment_id": payment_id })],
+        ),
+        (
+            "getCheckoutSessionsBySessionId",
+            vec![json!({ "session_id": payment_id })],
         ),
     ]
 }

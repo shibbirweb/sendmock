@@ -1,7 +1,11 @@
 use sendmock_payments::PaymentStepType;
 
+use sendmock_store::PaymentCountColumn;
+
+use super::payment_catalogue::count_payments;
 use super::payment_definition_store::{METHOD_DEFINITION_KIND, load_definitions, save_definition};
 use super::payment_flow_catalogue::load_payment_flows;
+use super::payment_gateway_catalogue::load_gateway_method_keys;
 use super::payment_method_views::{PaymentMethodDefinition, PaymentMethodRecord};
 use crate::{OperationContext, OperationError};
 
@@ -61,10 +65,11 @@ pub async fn find_flow_step_types(
 }
 
 /// A method with whether it differs from its shipped version, the gateways offering it and how
-/// many payments used it (payments come with W3, so none yet).
+/// many payments used it.
 pub fn present_payment_method(
     payment_method: PaymentMethodRecord,
     gateway_method_keys: &[(String, Vec<String>)],
+    payment_counts: &std::collections::BTreeMap<String, u32>,
 ) -> PaymentMethodDefinition {
     let method_key = payment_method.fields.key.clone();
     let is_modified = payment_method.is_builtin
@@ -76,7 +81,7 @@ pub fn present_payment_method(
             .filter(|(_, method_keys)| method_keys.contains(&method_key))
             .map(|(gateway_key, _)| gateway_key.clone())
             .collect(),
-        payment_count: 0,
+        payment_count: payment_counts.get(&method_key).copied().unwrap_or_default(),
         is_modified,
         is_builtin: payment_method.is_builtin,
         fields: payment_method.fields,
@@ -88,6 +93,34 @@ pub async fn save_payment_method(
     payment_method: &PaymentMethodRecord,
 ) -> Result<(), OperationError> {
     save_definition(operation_context, METHOD_DEFINITION_KIND, payment_method).await
+}
+
+pub async fn present_method(
+    operation_context: &OperationContext,
+    payment_method: PaymentMethodRecord,
+) -> Result<PaymentMethodDefinition, OperationError> {
+    let gateway_method_keys = load_gateway_method_keys(operation_context).await?;
+    let payment_counts = count_payments(operation_context, PaymentCountColumn::MethodKey).await?;
+    Ok(present_payment_method(
+        payment_method,
+        &gateway_method_keys,
+        &payment_counts,
+    ))
+}
+
+/// Every method as the Methods screen lists it.
+pub async fn list_presented_methods(
+    operation_context: &OperationContext,
+) -> Result<Vec<PaymentMethodDefinition>, OperationError> {
+    let gateway_method_keys = load_gateway_method_keys(operation_context).await?;
+    let payment_counts = count_payments(operation_context, PaymentCountColumn::MethodKey).await?;
+    Ok(load_payment_methods(operation_context)
+        .await?
+        .into_iter()
+        .map(|payment_method| {
+            present_payment_method(payment_method, &gateway_method_keys, &payment_counts)
+        })
+        .collect())
 }
 
 #[cfg(test)]

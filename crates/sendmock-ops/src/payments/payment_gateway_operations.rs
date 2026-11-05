@@ -1,8 +1,11 @@
 use sendmock_payments::{check_new_gateway, check_payment_gateway};
 
+use sendmock_store::PaymentCountColumn;
+
+use super::payment_catalogue::count_payments;
 use super::payment_gateway_catalogue::{
-    blank_gateway, find_payment_gateway, load_payment_gateways, present_payment_gateway,
-    save_payment_gateway,
+    blank_gateway, find_payment_gateway, load_payment_gateways, present_gateway,
+    present_payment_gateway, save_payment_gateway,
 };
 use super::payment_gateway_views::{
     PaymentGatewayCreateRequest, PaymentGatewayDefinition, PaymentGatewayFields,
@@ -89,10 +92,12 @@ impl Operation for ListPaymentGatewaysOperation {
         operation_context: &OperationContext,
         _input: NoInput,
     ) -> Result<Vec<PaymentGatewayDefinition>, OperationError> {
+        let payment_counts =
+            count_payments(operation_context, PaymentCountColumn::Provider).await?;
         Ok(load_payment_gateways(operation_context)
             .await?
             .into_iter()
-            .map(present_payment_gateway)
+            .map(|payment_gateway| present_payment_gateway(payment_gateway, &payment_counts))
             .collect())
     }
 }
@@ -119,9 +124,8 @@ impl Operation for GetPaymentGatewayOperation {
         operation_context: &OperationContext,
         input: PaymentGatewayReference,
     ) -> Result<PaymentGatewayDefinition, OperationError> {
-        Ok(present_payment_gateway(
-            find_payment_gateway(operation_context, &input.gateway_key).await?,
-        ))
+        let payment_gateway = find_payment_gateway(operation_context, &input.gateway_key).await?;
+        present_gateway(operation_context, payment_gateway).await
     }
 }
 
@@ -180,7 +184,7 @@ impl Operation for CreatePaymentGatewayOperation {
             is_builtin: false,
         };
         save_payment_gateway(operation_context, &new_gateway).await?;
-        Ok(present_payment_gateway(new_gateway))
+        present_gateway(operation_context, new_gateway).await
     }
 }
 
@@ -222,6 +226,6 @@ impl Operation for UpdatePaymentGatewayOperation {
             ..stored_gateway
         };
         save_payment_gateway(operation_context, &changed_gateway).await?;
-        Ok(present_payment_gateway(changed_gateway))
+        present_gateway(operation_context, changed_gateway).await
     }
 }

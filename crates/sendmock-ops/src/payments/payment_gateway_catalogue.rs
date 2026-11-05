@@ -1,5 +1,8 @@
 use super::payment_definition_store::{GATEWAY_DEFINITION_KIND, load_definitions, save_definition};
 use super::payment_gateway_views::{PaymentGatewayDefinition, PaymentGatewayRecord};
+use sendmock_store::PaymentCountColumn;
+
+use super::payment_catalogue::count_payments;
 use crate::message_providers::mask_secret_credentials;
 use crate::{OperationContext, OperationError};
 
@@ -74,19 +77,35 @@ pub async fn load_gateway_method_keys(
 }
 
 /// A gateway with secrets masked, whether it differs from its shipped version, and how many
-/// payments used it (payments come with W3, so none yet).
-pub fn present_payment_gateway(payment_gateway: PaymentGatewayRecord) -> PaymentGatewayDefinition {
+/// payments went through it.
+pub fn present_payment_gateway(
+    payment_gateway: PaymentGatewayRecord,
+    payment_counts: &std::collections::BTreeMap<String, u32>,
+) -> PaymentGatewayDefinition {
     let is_modified = payment_gateway.is_builtin
         && find_shipped_gateway(&payment_gateway.fields.key)
             .is_some_and(|shipped_gateway| shipped_gateway.fields != payment_gateway.fields);
+    let payment_count = payment_counts
+        .get(&payment_gateway.fields.key)
+        .copied()
+        .unwrap_or_default();
     let mut fields = payment_gateway.fields;
     fields.credentials = mask_secret_credentials(&fields.credentials);
     PaymentGatewayDefinition {
         fields,
         is_builtin: payment_gateway.is_builtin,
         is_modified,
-        payment_count: 0,
+        payment_count,
     }
+}
+
+/// `present_payment_gateway` with the payment counts read now.
+pub async fn present_gateway(
+    operation_context: &OperationContext,
+    payment_gateway: PaymentGatewayRecord,
+) -> Result<PaymentGatewayDefinition, OperationError> {
+    let payment_counts = count_payments(operation_context, PaymentCountColumn::Provider).await?;
+    Ok(present_payment_gateway(payment_gateway, &payment_counts))
 }
 
 pub async fn save_payment_gateway(

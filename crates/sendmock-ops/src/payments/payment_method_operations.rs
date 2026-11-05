@@ -1,10 +1,9 @@
 use sendmock_payments::check_payment_method;
 
 use super::payment_definition_store::{METHOD_DEFINITION_KIND, delete_definition};
-use super::payment_gateway_catalogue::load_gateway_method_keys;
 use super::payment_method_catalogue::{
-    find_flow_step_types, find_payment_method, find_shipped_method, load_payment_methods,
-    present_payment_method, save_payment_method,
+    find_flow_step_types, find_payment_method, find_shipped_method, list_presented_methods,
+    load_payment_methods, present_method, save_payment_method,
 };
 use super::payment_method_views::{
     PaymentMethodDefinition, PaymentMethodFields, PaymentMethodRecord, PaymentMethodReference,
@@ -59,14 +58,6 @@ async fn check_method_fields(
     })
 }
 
-async fn present_method(
-    operation_context: &OperationContext,
-    payment_method: PaymentMethodRecord,
-) -> Result<PaymentMethodDefinition, OperationError> {
-    let gateway_method_keys = load_gateway_method_keys(operation_context).await?;
-    Ok(present_payment_method(payment_method, &gateway_method_keys))
-}
-
 pub struct ListPaymentMethodsOperation;
 
 impl Operation for ListPaymentMethodsOperation {
@@ -89,12 +80,7 @@ impl Operation for ListPaymentMethodsOperation {
         operation_context: &OperationContext,
         _input: NoInput,
     ) -> Result<Vec<PaymentMethodDefinition>, OperationError> {
-        let gateway_method_keys = load_gateway_method_keys(operation_context).await?;
-        Ok(load_payment_methods(operation_context)
-            .await?
-            .into_iter()
-            .map(|payment_method| present_payment_method(payment_method, &gateway_method_keys))
-            .collect())
+        list_presented_methods(operation_context).await
     }
 }
 
@@ -231,6 +217,15 @@ impl Operation for DeletePaymentMethodOperation {
             return Err(OperationError::Conflict {
                 code: "builtin_method",
                 message: "Built-in methods cannot be deleted; disable it instead".to_owned(),
+            });
+        }
+        if presented_method.payment_count > 0 {
+            return Err(OperationError::Conflict {
+                code: "method_in_use",
+                message: format!(
+                    "{} payments used {}; disable it instead",
+                    presented_method.payment_count, presented_method.fields.name
+                ),
             });
         }
         if !presented_method.gateway_keys.is_empty() {

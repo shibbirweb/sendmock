@@ -24,8 +24,8 @@ impl Operation for ResetOperation {
         }
     }
 
-    /// Deletes every email, SMS, verification, SMTP session, logged request and webhook
-    /// delivery, puts the settings back to their defaults, then restores the seed applied last:
+    /// Deletes every email, SMS, verification, SMTP session, logged request, webhook delivery and
+    /// payment, puts the settings back to their defaults, then restores the seed applied last:
     /// its items as the file has them, and the configuration it does not hold deleted. Without
     /// a seed, configuration such as numbers, services and outcome rules stays.
     async fn execute(
@@ -56,6 +56,10 @@ impl Operation for ResetOperation {
         operation_context
             .webhook_delivery_repository
             .delete_all_deliveries()
+            .await?;
+        operation_context
+            .payment_repository
+            .delete_all_payments()
             .await?;
         operation_context
             .settings_store

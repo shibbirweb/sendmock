@@ -1481,6 +1481,117 @@ expression: command_descriptions
     "mcp": []
   },
   {
+    "command": "sendmock payments list",
+    "usage": "sendmock payments list",
+    "aliases": [],
+    "summary": "Test payments, newest first, with filters.",
+    "arguments": [],
+    "flags": [
+      "--currency",
+      "--cursor",
+      "--limit",
+      "--provider",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments",
+        "operation_id": "getPayments",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_list"
+    ]
+  },
+  {
+    "command": "sendmock payments test-cards",
+    "usage": "sendmock payments test-cards",
+    "aliases": [],
+    "summary": "The test values of every enabled payment method.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/test-cards",
+        "operation_id": "getPaymentsTestCards",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_test_cards"
+    ]
+  },
+  {
+    "command": "sendmock payments checkout create",
+    "usage": "sendmock payments checkout create",
+    "aliases": [],
+    "summary": "Start a hosted checkout on a gateway and get its payment page URL.",
+    "arguments": [],
+    "flags": [
+      "--amount-minor",
+      "--currency",
+      "--customer-email",
+      "--line-items",
+      "--provider"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/checkout",
+        "operation_id": "postPaymentsCheckout",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_create_checkout"
+    ]
+  },
+  {
+    "command": "sendmock payments show",
+    "usage": "sendmock payments show <paymentId>",
+    "aliases": [],
+    "summary": "One payment with line items, timeline, redirects and notifications.",
+    "arguments": [
+      "paymentId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/{paymentId}",
+        "operation_id": "getPaymentsByPaymentId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_get"
+    ]
+  },
+  {
+    "command": "sendmock payments checkout show",
+    "usage": "sendmock payments checkout show <sessionId>",
+    "aliases": [],
+    "summary": "What a test checkout page shows: order, methods and flows.",
+    "arguments": [
+      "sessionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/checkout-sessions/{sessionId}",
+        "operation_id": "getCheckoutSessionsBySessionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_checkout_get"
+    ]
+  },
+  {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
     "aliases": [],

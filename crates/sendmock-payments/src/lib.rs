@@ -3,6 +3,7 @@
 mod flow;
 mod gateway;
 mod method;
+mod money;
 
 pub use flow::{
     FLOW_LABEL_VARIABLE_NAMES, FlowProblem, FlowStep, MAXIMUM_FLOW_STEPS, PaymentFlowDraft,
@@ -14,3 +15,4 @@ pub use method::{
     MethodProblem, PaymentMethodDraft, TEST_CARD_PREFIXES, TestNumberDraft, check_payment_method,
     is_test_card_range, passes_luhn_check, to_card_digits, to_test_number,
 };
+pub use money::{currency_exponent, format_major_amount, is_currency_code};

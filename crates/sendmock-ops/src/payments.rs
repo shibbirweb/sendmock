@@ -1,3 +1,6 @@
+mod checkout_operations;
+mod checkout_views;
+mod payment_catalogue;
 mod payment_definition_store;
 mod payment_flow_catalogue;
 mod payment_flow_operations;
@@ -10,7 +13,10 @@ mod payment_gateway_views;
 mod payment_method_catalogue;
 mod payment_method_operations;
 mod payment_method_views;
+mod payment_operations;
+mod payment_views;
 
+pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
 pub use payment_flow_operations::{
     CreatePaymentFlowOperation, DeletePaymentFlowOperation, GetPaymentFlowOperation,
     ListPaymentFlowsOperation, ResetPaymentFlowOperation, UpdatePaymentFlowOperation,
@@ -33,6 +39,10 @@ pub use payment_method_operations::{
     ListPaymentMethodsOperation, ResetPaymentMethodOperation, UpdatePaymentMethodOperation,
 };
 pub use payment_method_views::PaymentMethodDefinition;
+pub use payment_operations::{
+    GetPaymentOperation, ListPaymentTestValuesOperation, ListPaymentsOperation,
+};
+pub use payment_views::{PaymentDetail, PaymentSummary};
 
 use crate::OperationRegistry;
 
@@ -61,4 +71,9 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeletePaymentGatewayOperation);
     operation_registry.register(ResetPaymentGatewayOperation);
     operation_registry.register(RevealGatewayCredentialOperation);
+    operation_registry.register(ListPaymentsOperation);
+    operation_registry.register(ListPaymentTestValuesOperation);
+    operation_registry.register(CreatePaymentCheckoutOperation);
+    operation_registry.register(GetPaymentOperation);
+    operation_registry.register(GetCheckoutSessionOperation);
 }

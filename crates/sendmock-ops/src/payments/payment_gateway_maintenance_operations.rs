@@ -1,6 +1,6 @@
 use super::payment_definition_store::{GATEWAY_DEFINITION_KIND, delete_definition};
 use super::payment_gateway_catalogue::{
-    find_payment_gateway, find_shipped_gateway, present_payment_gateway,
+    find_payment_gateway, find_shipped_gateway, present_gateway,
 };
 use super::payment_gateway_operations::gateway_definition;
 use super::payment_gateway_views::{
@@ -38,9 +38,11 @@ impl Operation for DeletePaymentGatewayOperation {
         operation_context: &OperationContext,
         input: PaymentGatewayReference,
     ) -> Result<NoContent, OperationError> {
-        let presented_gateway = present_payment_gateway(
+        let presented_gateway = present_gateway(
+            operation_context,
             find_payment_gateway(operation_context, &input.gateway_key).await?,
-        );
+        )
+        .await?;
         if presented_gateway.is_builtin {
             return Err(OperationError::Conflict {
                 code: "builtin_gateway",
@@ -101,7 +103,7 @@ impl Operation for ResetPaymentGatewayOperation {
             &input.gateway_key,
         )
         .await?;
-        Ok(present_payment_gateway(shipped_gateway))
+        present_gateway(operation_context, shipped_gateway).await
     }
 }
 

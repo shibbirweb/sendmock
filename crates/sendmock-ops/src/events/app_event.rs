@@ -25,6 +25,7 @@ pub enum AppEventType {
     VerifyExpired,
     WebhookDelivered,
     WebhookFailed,
+    PaymentCreated,
 }
 
 impl AppEventType {
@@ -49,6 +50,7 @@ impl AppEventType {
             Self::VerifyExpired => "verify.expired",
             Self::WebhookDelivered => "webhook.delivered",
             Self::WebhookFailed => "webhook.failed",
+            Self::PaymentCreated => "payment.created",
         }
     }
 }

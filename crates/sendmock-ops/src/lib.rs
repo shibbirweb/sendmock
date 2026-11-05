@@ -70,7 +70,8 @@ pub use outcome_rules::{
 };
 pub use page_of::PageOf;
 pub use payments::{
-    PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition, PaymentMethodDefinition,
+    PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
+    PaymentMethodDefinition, PaymentSummary,
 };
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
