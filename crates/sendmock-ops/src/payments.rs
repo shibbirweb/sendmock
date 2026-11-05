@@ -85,7 +85,7 @@ pub(crate) use payment_views::{PaymentDispute, PaymentTimelineEvent};
 pub use payment_wait_operation::WaitForPaymentOperation;
 pub(crate) use provider_object_store::{
     ProviderObjectKey, find_provider_object, keep_provider_object, list_kept_or_stored_objects,
-    read_kept_or_stored_object, save_provider_object,
+    list_payment_provider_objects, read_kept_or_stored_object, save_provider_object,
 };
 pub(crate) use provider_payment::{
     ProviderCheckoutUrls, ProviderPaymentRequest, apply_checkout_outcome_profile,

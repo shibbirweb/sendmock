@@ -14,6 +14,7 @@ use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
+use crate::bkash::answer_bkash_request;
 use crate::custom_gateways::answer_custom_gateway_request;
 use crate::paypal::answer_paypal_request;
 use crate::sslcommerz::answer_sslcommerz_request;
@@ -108,7 +109,7 @@ pub async fn answer_provider_request(
     })
 }
 
-/// The APIs served in code beside the definitions: Stripe's, PayPal's, SSLCommerz's, custom
+/// The APIs served in code beside the definitions: Stripe's, PayPal's, SSLCommerz's, bKash's, custom
 /// gateways', and Twilio's Messaging Services and Verify.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
@@ -130,6 +131,11 @@ async fn answer_code_served_api(
         answer_sslcommerz_request(operation_context, provider_route, request).await?
     {
         return Ok(Some(sslcommerz_outcome));
+    }
+    if let Some(bkash_outcome) =
+        answer_bkash_request(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(bkash_outcome));
     }
     if let Some(mailgun_routes_outcome) = crate::inbound_routes::answer_mailgun_routes_request(
         operation_context,
