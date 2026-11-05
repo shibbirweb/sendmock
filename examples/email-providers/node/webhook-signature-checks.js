@@ -91,6 +91,7 @@ export async function routeProviderWebhooks(callSendMock, receiverOrigin) {
       kind: "secret",
       scope: "global",
       value: secret,
+      description: "Signs SendMock's event webhooks for the SDK check",
     });
   }
   for (const [providerKey, templateId] of Object.entries(providerTemplates)) {

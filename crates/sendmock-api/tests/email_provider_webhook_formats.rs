@@ -44,6 +44,7 @@ async fn add_secret_variable(app_router: &axum::Router, variable_name: &str, sec
         "/api/v1/webhooks/variables",
         Some(&json!({
             "name": variable_name, "kind": "secret", "scope": "global", "value": secret,
+            "description": "",
         })),
     )
     .await;
