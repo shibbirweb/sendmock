@@ -190,6 +190,21 @@ test("WS-09.3 llms.txt says what SendMock is, how an agent installs it, and link
   }
 });
 
+test("AI-06.1 llms-full.txt holds llms.txt and every docs page in full", async ({
+  request,
+}) => {
+  const fullResponse = await request.get("/llms-full.txt");
+  const fullText = await fullResponse.text();
+
+  expect(fullResponse.ok()).toBe(true);
+  expect(fullText.startsWith("# SendMock\n\n> ")).toBe(true);
+  expect(fullText).toContain("# Subscriptions (payments/subscriptions.md)");
+  expect(fullText).toContain("## What it solves");
+  expect(fullText.split("\n---\n").length).toBeGreaterThan(
+    listWikiPagePaths().length,
+  );
+});
+
 test("hovering a docs sidebar icon shows its label", async ({ page }) => {
   await page.goto("/docs/install/");
   const bugReportLink = page

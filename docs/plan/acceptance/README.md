@@ -125,7 +125,7 @@ On top of its own criteria, a feature is done only when:
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
 | [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | In progress |
-| [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Not started |
+| [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Accepted |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
 | [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | In progress |
