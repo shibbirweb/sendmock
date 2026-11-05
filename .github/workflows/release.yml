@@ -307,10 +307,14 @@ jobs:
   email-provider-sdks:
     uses: ./.github/workflows/email-provider-sdks.yml
 
+  # An app in each of eight languages uses the API against this commit.
+  example-apps:
+    uses: ./.github/workflows/example-apps.yml
+
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks]
+    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, example-apps]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

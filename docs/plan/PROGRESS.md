@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W14 (examples in 8 languages, with each HTTP preset's official client library, HC-03.1) and W15 (done-when), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with the rest of W14 (W14b each HTTP preset's official client library, HC-03.1; W14c the recipe examples against the binary, WS-08.5) and W15 (done-when), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -704,3 +704,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W13c: the MCP server serves resources (the skill, emails, raw sources, attachments, SMS, deliveries, templates), resource subscriptions for new emails, SMS and deliveries, and ten prompts; long answers come back as resource links; AI-03 accepted. |
 | 2026-11-06 | Phase 4 W13d: the binary serves `/llms.txt` and `/llms-full.txt` from its registry, and the website adds `/llms-full.txt` with every docs page; AI-06 accepted. |
 | 2026-11-06 | Phase 4 W13e: items record whether the UI, the API, the CLI or an agent through MCP made them, and the UI badges what the CLI and agents made; AI-05.4 ticked. **W13 done** (AI-05.3 waits for W15's agent session). |
+| 2026-11-06 | Phase 4 W14a: an app's test in each of eight languages (PHP, Node, Python, Go, Java, Rust, Ruby, .NET) sends an email and reads its code, sends an SMS and captures an HTTP call against a release binary in the new Example apps workflow. |

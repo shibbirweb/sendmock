@@ -1,0 +1,159 @@
+# An app's test in each of eight languages uses SendMock's API with the language's own HTTP
+# client: it sends an email and reads its code, sends an SMS and waits for it, and captures an
+# outgoing HTTP call, against a release binary (the Phase 4 done-when check). Runs on changes
+# to the API or the examples, and from Release build before anything is published.
+name: Example apps
+
+on:
+  pull_request:
+    paths:
+      - crates/**
+      - examples/apps/**
+      - .github/workflows/example-apps.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/**
+      - examples/apps/**
+      - .github/workflows/example-apps.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  binary:
+    name: Release binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sendmock-for-example-apps
+          path: target/release/sendmock
+          retention-days: 1
+
+  app:
+    name: ${{ matrix.language }}
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: PHP
+            folder: php
+            setup: php
+            run: php smoke.php
+          - language: Node
+            folder: node
+            setup: node
+            run: node smoke.mjs
+          - language: Python
+            folder: python
+            setup: python
+            run: python smoke.py
+          - language: Go
+            folder: go
+            setup: go
+            run: go run .
+          - language: Java
+            folder: java
+            setup: java
+            run: java SmokeTest.java
+          - language: Rust
+            folder: rust
+            setup: rust
+            run: cargo run --quiet
+          - language: Ruby
+            folder: ruby
+            setup: ruby
+            run: ruby smoke.rb
+          - language: .NET
+            folder: dotnet
+            setup: dotnet
+            run: dotnet run
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - name: Start SendMock with its default settings
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: shivammathur/setup-php@v2
+        if: matrix.setup == 'php'
+        with:
+          php-version: "8.3"
+
+      - uses: actions/setup-node@v4
+        if: matrix.setup == 'node'
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        if: matrix.setup == 'python'
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-go@v5
+        if: matrix.setup == 'go'
+        with:
+          go-version: "1.23"
+
+      - uses: actions/setup-java@v4
+        if: matrix.setup == 'java'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: ruby/setup-ruby@v1
+        if: matrix.setup == 'ruby'
+        with:
+          ruby-version: "3.3"
+
+      - uses: actions/setup-dotnet@v4
+        if: matrix.setup == 'dotnet'
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: The ${{ matrix.language }} app's test
+        working-directory: examples/apps/${{ matrix.folder }}
+        run: ${{ matrix.run }}
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
