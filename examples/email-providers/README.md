@@ -1,6 +1,6 @@
 # Email provider examples
 
-`node/` sends one email with each email provider's official Node SDK (SendGrid, Mailgun, Postmark, Resend, Amazon SES v2 and Brevo), each pointed at SendMock's provider port by the SDK's own base URL setting, then reads every message back through `GET /api/v1/emails` and checks Resend refuses a send without a subject. CI runs it against a release binary cut off from the network (`.github/workflows/email-provider-sdks.yml`).
+`node/` sends one email with each email provider's official Node SDK (SendGrid, Mailgun, Postmark, Resend, Amazon SES v2 and Brevo), each pointed at SendMock's provider port by the SDK's own base URL setting, then reads every message back through `GET /api/v1/emails` and checks Resend refuses a send without a subject. Then SendMock's SendGrid, Resend and Mailgun event webhooks for those emails are verified the way an app verifies them: with `@sendgrid/eventwebhook`, the Resend SDK's `webhooks.verify`, and Mailgun's documented HMAC. CI runs it against a release binary cut off from the network (`.github/workflows/email-provider-sdks.yml`).
 
 To run it by hand:
 

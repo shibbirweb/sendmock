@@ -1,4 +1,4 @@
-// AC: EM-08.5
+// AC: EM-08.5 WH-06.2
 // Each email provider's official Node SDK sends to a running SendMock, pointed at the provider
 // port by the SDK's own base URL setting, as the recipes in the docs show; then the app reads
 // every message back through SendMock's API and checks a refused send gets the provider's error.
@@ -10,11 +10,49 @@ import Mailgun from "mailgun.js";
 import { ServerClient } from "postmark";
 import { Resend } from "resend";
 
+import {
+  routeProviderWebhooks,
+  signedProviders,
+  startSignatureReceiver,
+} from "./webhook-signature-checks.js";
+
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
 const providerUrl = new URL(process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026");
 const recipient = "sam@example.test";
 /** What the app is doing, so a failure in CI names the step. */
 let currentStep = "starting";
+
+async function callSendMock(method, path, requestBody) {
+  const response = await fetch(`${sendmockUrl}/api/v1${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: requestBody === undefined ? undefined : JSON.stringify(requestBody),
+  });
+  const answerText = await response.text();
+  if (!response.ok) {
+    throw new Error(`${method} ${path} answered ${response.status}: ${answerText}`);
+  }
+  return answerText === "" ? null : JSON.parse(answerText);
+}
+
+/** Marks each signed provider's email delivered and waits for its verified webhook. */
+async function checkWebhookSignatures(verifiedProviders) {
+  for (const providerKey of signedProviders) {
+    currentStep = `${providerKey} webhook signature`;
+    const [providerEmail] = await readEmailsFrom(providerKey);
+    await callSendMock("POST", `/emails/${providerEmail.id}/simulate`, { event: "delivered" });
+    const deadline = Date.now() + 30_000;
+    while (!verifiedProviders.has(providerKey)) {
+      if (Date.now() > deadline) {
+        throw new Error(`No ${providerKey} webhook arrived`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (verifiedProviders.get(providerKey) !== true) {
+      throw new Error(`The ${providerKey} webhook signature did not verify`);
+    }
+  }
+}
 
 async function readEmailsFrom(source) {
   const response = await fetch(`${sendmockUrl}/api/v1/emails?limit=50`);
@@ -155,12 +193,16 @@ async function sendWithBrevo() {
 }
 
 async function main() {
+  const receiver = await startSignatureReceiver();
+  await routeProviderWebhooks(callSendMock, receiver.receiverOrigin);
   await sendWithSendgrid();
   await sendWithMailgun();
   await sendWithPostmark();
   await sendWithResend();
   await sendWithSes();
   await sendWithBrevo();
+  await checkWebhookSignatures(receiver.verifiedProviders);
+  receiver.receiverServer.close();
   console.log("Done: SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs sent to SendMock.");
 }
 
