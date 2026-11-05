@@ -173,9 +173,14 @@ async function openSimulateMenuPath(
   paymentDrawer: Locator,
   menuPath: string[],
 ) {
-  // Escape closes an open menu; with none open it would close the drawer.
-  while ((await page.getByRole("menu").count()) > 0) {
-    await page.keyboard.press("Escape");
+  // A click inside the drawer dismisses a menu left open by the last try. Escape would close
+  // the drawer itself when pressed once more while the menu is still animating closed.
+  if ((await page.getByRole("menu").count()) > 0) {
+    await paymentDrawer
+      .getByRole("heading")
+      .first()
+      .click({ force: true, timeout: 2_000 });
+    await expect(page.getByRole("menu")).toHaveCount(0, { timeout: 2_000 });
   }
   await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
   for (const [menuIndex, menuLabel] of menuPath.slice(0, -1).entries()) {
