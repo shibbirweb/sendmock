@@ -10,7 +10,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { recipeLanguages } from "./recipe-languages.mjs";
 
@@ -54,8 +54,11 @@ function readRecipeCode(recipeSlug, tabName) {
   return tabBlock?.code ?? null;
 }
 
-/** The language's `call` helper, saved under the name its Connect page gives it. */
-function writeTestHelper(recipeLanguage, generatedFolder) {
+/** The language's `call` helper and the name its Connect page saves it under, if it has one. */
+function readTestHelper(recipeLanguage) {
+  if (recipeLanguage.helperPage === null) {
+    return null;
+  }
   const pageText = readFileSync(
     join(wikiFolder, recipeLanguage.helperPage),
     "utf8",
@@ -67,12 +70,41 @@ function writeTestHelper(recipeLanguage, generatedFolder) {
       `${recipeLanguage.helperPage} has no Test helper block with a title`,
     );
   }
-  const helperPath = join(
-    generatedFolder,
-    recipeLanguage.helperFilePath(helperFileName),
+
+  return { helperFileName, code: helperBlock.code };
+}
+
+/** Writes a file inside a recipe's folder, making the folders on its path. */
+function writeRecipeFile(recipeFolder, relativePath, fileText) {
+  const filePath = join(recipeFolder, relativePath);
+  mkdirSync(dirname(filePath), { recursive: true });
+  writeFileSync(filePath, fileText);
+
+  return filePath;
+}
+
+/** Each recipe runs in its own folder with its own copy of the helper. */
+function writeRecipeFolder(recipeLanguage, recipeSlug, recipeCode, testHelper) {
+  const recipeFolder = join(process.cwd(), "generated", recipeSlug);
+  if (testHelper !== null) {
+    writeRecipeFile(
+      recipeFolder,
+      recipeLanguage.helperFilePath(testHelper.helperFileName),
+      testHelper.code,
+    );
+  }
+  for (const [relativePath, fileText] of Object.entries(
+    recipeLanguage.extraFiles ?? {},
+  )) {
+    writeRecipeFile(recipeFolder, relativePath, fileText);
+  }
+  const recipeFilePath = writeRecipeFile(
+    recipeFolder,
+    recipeLanguage.recipeFilePath(recipeSlug),
+    recipeLanguage.prepareCode?.(recipeCode) ?? recipeCode,
   );
-  mkdirSync(join(helperPath, ".."), { recursive: true });
-  writeFileSync(helperPath, helperBlock.code);
+
+  return { recipeFolder, recipeFilePath };
 }
 
 function readRecipeSlugs() {
@@ -126,10 +158,8 @@ async function makeFailedDelivery() {
 }
 
 async function runRecipes(recipeLanguage) {
-  const generatedFolder = join(process.cwd(), "generated");
-  rmSync(generatedFolder, { recursive: true, force: true });
-  mkdirSync(generatedFolder, { recursive: true });
-  writeTestHelper(recipeLanguage, generatedFolder);
+  rmSync(join(process.cwd(), "generated"), { recursive: true, force: true });
+  const testHelper = readTestHelper(recipeLanguage);
   await makeFailedDelivery();
   const failedRecipeSlugs = [];
   for (const recipeSlug of readRecipeSlugs()) {
@@ -140,15 +170,19 @@ async function runRecipes(recipeLanguage) {
       );
       continue;
     }
-    const recipeFilePath = join(
-      generatedFolder,
-      recipeLanguage.recipeFilePath(recipeSlug),
+    const { recipeFolder, recipeFilePath } = writeRecipeFolder(
+      recipeLanguage,
+      recipeSlug,
+      recipeCode,
+      testHelper,
     );
-    writeFileSync(recipeFilePath, recipeCode);
     console.log(`\n=== ${recipeSlug}`);
-    const [command, commandArguments] =
-      recipeLanguage.buildCommand(recipeFilePath);
-    const testRun = spawnSync(command, commandArguments, { stdio: "inherit" });
+    const [command, commandArguments, commandFolder] =
+      recipeLanguage.buildCommand(recipeFolder, recipeFilePath);
+    const testRun = spawnSync(command, commandArguments, {
+      cwd: commandFolder ?? recipeFolder,
+      stdio: "inherit",
+    });
     if (testRun.status !== 0) {
       failedRecipeSlugs.push(recipeSlug);
       console.log(

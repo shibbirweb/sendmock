@@ -64,9 +64,10 @@ describe("Example apps workflow", () => {
     expect(startStep?.run).toContain(
       "--seed examples/recipes/sendmock.seed.toml",
     );
-    for (const { folder } of recipesJob.strategy.matrix.include) {
-      expect(existsSync(`examples/recipes/${folder}/package.json`)).toBe(true);
-    }
+    expect(
+      recipesJob.strategy.matrix.include.map((entry) => entry.language),
+    ).toEqual(["javascript", "python", "go", "ruby", "cli"]);
+    expect(existsSync("examples/recipes/node/package.json")).toBe(true);
     expect(
       recipesJob.steps.some((step) =>
         (step.run ?? "").includes("run-recipes.mjs"),

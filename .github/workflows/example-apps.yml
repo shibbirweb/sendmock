@@ -213,6 +213,14 @@ jobs:
         include:
           - language: javascript
             folder: node
+          - language: python
+            folder: .
+          - language: go
+            folder: .
+          - language: ruby
+            folder: .
+          - language: cli
+            folder: .
     steps:
       - uses: actions/checkout@v5
 
@@ -227,9 +235,31 @@ jobs:
         with:
           node-version: "22"
 
+      - if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - if: matrix.language == 'python'
+        run: pip install pytest requests
+
+      - if: matrix.language == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - if: matrix.language == 'ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - if: matrix.language == 'ruby'
+        run: gem install rspec
+
       - name: Start SendMock with the recipes' seed and the stand-in app
         run: |
           chmod +x sendmock-binary/sendmock
+          echo "$PWD/sendmock-binary" >> "$GITHUB_PATH"
           ./sendmock-binary/sendmock --db memory --provider-addr 127.0.0.1:8026 --seed examples/recipes/sendmock.seed.toml > sendmock.log 2>&1 &
           node examples/recipes/stand-in-app.mjs > stand-in-app.log 2>&1 &
           for _ in $(seq 1 30); do
@@ -241,7 +271,9 @@ jobs:
 
       - name: Every recipe's example runs against SendMock
         working-directory: examples/recipes/${{ matrix.folder }}
-        run: bun install && node ../run-recipes.mjs ${{ matrix.language }}
+        run: |
+          if [ -f package.json ]; then bun install; fi
+          node "$GITHUB_WORKSPACE/examples/recipes/run-recipes.mjs" ${{ matrix.language }}
 
       - name: SendMock and stand-in app logs
         if: failure()
