@@ -13,8 +13,11 @@ import Stripe from "stripe";
 import { startStripeWebhookReceiver } from "./stripe-webhook-receiver.js";
 
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
-const providerUrl = new URL(process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026");
-const deliveriesPath = process.env.STRIPE_DELIVERIES_PATH ?? "../stripe-deliveries.json";
+const providerUrl = new URL(
+  process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026",
+);
+const deliveriesPath =
+  process.env.STRIPE_DELIVERIES_PATH ?? "../stripe-deliveries.json";
 const webhookSecret = "whsec_sendmock0000000000000";
 const waitTimeoutMs = 60_000;
 
@@ -32,7 +35,9 @@ async function callSendMock(method, path, requestBody) {
   });
   const answerText = await response.text();
   if (!response.ok) {
-    throw new Error(`${method} ${path} answered ${response.status}: ${answerText}`);
+    throw new Error(
+      `${method} ${path} answered ${response.status}: ${answerText}`,
+    );
   }
   return answerText === "" ? null : JSON.parse(answerText);
 }
@@ -40,13 +45,19 @@ async function callSendMock(method, path, requestBody) {
 async function waitForEvent(receivedEvents, eventType) {
   const deadline = Date.now() + waitTimeoutMs;
   for (;;) {
-    const stripeEvent = receivedEvents.find((receivedEvent) => receivedEvent.type === eventType);
+    const stripeEvent = receivedEvents.find(
+      (receivedEvent) => receivedEvent.type === eventType,
+    );
     if (stripeEvent) {
       return stripeEvent;
     }
     if (Date.now() > deadline) {
-      const receivedTypes = receivedEvents.map((receivedEvent) => receivedEvent.type);
-      throw new Error(`Timed out waiting for ${eventType}; received ${receivedTypes.join(", ")}`);
+      const receivedTypes = receivedEvents.map(
+        (receivedEvent) => receivedEvent.type,
+      );
+      throw new Error(
+        `Timed out waiting for ${eventType}; received ${receivedTypes.join(", ")}`,
+      );
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
@@ -54,7 +65,9 @@ async function waitForEvent(receivedEvents, eventType) {
 
 function expectEqual(actualValue, expectedValue, description) {
   if (actualValue !== expectedValue) {
-    throw new Error(`${description}: expected ${expectedValue}, got ${actualValue}`);
+    throw new Error(
+      `${description}: expected ${expectedValue}, got ${actualValue}`,
+    );
   }
 }
 
@@ -70,7 +83,11 @@ async function connectReceiver(receiverUrl) {
     template_id: "native",
     template_mode: "linked",
     timeout_ms: 10_000,
-    retry_policy: { max_attempts: 2, backoff_seconds: [1], retry_on_client_errors: false },
+    retry_policy: {
+      max_attempts: 2,
+      backoff_seconds: [1],
+      retry_on_client_errors: false,
+    },
     query_params: [],
     body_mode: "template",
     body_fields: [],
@@ -84,7 +101,9 @@ async function connectReceiver(receiverUrl) {
     ...stripeGateway,
     notification_endpoint_id: endpoint.id,
     credentials: stripeGateway.credentials.map((credential) =>
-      credential.name === "webhook_secret" ? { ...credential, value: webhookSecret } : credential,
+      credential.name === "webhook_secret"
+        ? { ...credential, value: webhookSecret }
+        : credential,
     ),
   });
 }
@@ -98,7 +117,11 @@ async function payCheckoutSession(receivedEvents) {
     line_items: [
       {
         quantity: 1,
-        price_data: { currency: "usd", unit_amount: 1500, product_data: { name: "T-shirt" } },
+        price_data: {
+          currency: "usd",
+          unit_amount: 1500,
+          product_data: { name: "T-shirt" },
+        },
       },
     ],
   });
@@ -109,25 +132,59 @@ async function payCheckoutSession(receivedEvents) {
     card: { number: "4242424242424242", exp_month: 12, exp_year: 2034 },
   });
 
-  const completedEvent = await waitForEvent(receivedEvents, "checkout.session.completed");
-  const succeededEvent = await waitForEvent(receivedEvents, "payment_intent.succeeded");
+  const completedEvent = await waitForEvent(
+    receivedEvents,
+    "checkout.session.completed",
+  );
+  const succeededEvent = await waitForEvent(
+    receivedEvents,
+    "payment_intent.succeeded",
+  );
   const completedSession = completedEvent.data.object;
   expectEqual(completedSession.id, checkoutSession.id, "The completed session");
-  expectEqual(completedSession.payment_status, "paid", "The session's payment status");
-  expectEqual(completedSession.client_reference_id, "order-1001", "The client reference");
-  expectEqual(succeededEvent.data.object.id, completedSession.payment_intent, "The paid intent");
-  const retrievedSession = await stripe.checkout.sessions.retrieve(checkoutSession.id);
-  expectEqual(retrievedSession.status, "complete", "The retrieved session's status");
+  expectEqual(
+    completedSession.payment_status,
+    "paid",
+    "The session's payment status",
+  );
+  expectEqual(
+    completedSession.client_reference_id,
+    "order-1001",
+    "The client reference",
+  );
+  expectEqual(
+    succeededEvent.data.object.id,
+    completedSession.payment_intent,
+    "The paid intent",
+  );
+  const retrievedSession = await stripe.checkout.sessions.retrieve(
+    checkoutSession.id,
+  );
+  expectEqual(
+    retrievedSession.status,
+    "complete",
+    "The retrieved session's status",
+  );
   return completedSession.payment_intent;
 }
 
 async function refundPayment(receivedEvents, paymentIntentId) {
-  const refund = await stripe.refunds.create({ payment_intent: paymentIntentId });
+  const refund = await stripe.refunds.create({
+    payment_intent: paymentIntentId,
+  });
   expectEqual(refund.status, "succeeded", "The refund's status");
   const refundedEvent = await waitForEvent(receivedEvents, "charge.refunded");
   const refundedCharge = refundedEvent.data.object;
-  expectEqual(refundedCharge.payment_intent, paymentIntentId, "The refunded charge's intent");
-  expectEqual(refundedCharge.refunded, true, "Whether the charge is refunded in full");
+  expectEqual(
+    refundedCharge.payment_intent,
+    paymentIntentId,
+    "The refunded charge's intent",
+  );
+  expectEqual(
+    refundedCharge.refunded,
+    true,
+    "Whether the charge is refunded in full",
+  );
   expectEqual(refundedCharge.amount_refunded, 1500, "The refunded amount");
 }
 
@@ -145,10 +202,21 @@ async function handleDeclinedCard(receivedEvents) {
       throw stripeError;
     }
     expectEqual(stripeError.code, "card_declined", "The decline's code");
-    expectEqual(stripeError.decline_code, "generic_decline", "The decline code");
+    expectEqual(
+      stripeError.decline_code,
+      "generic_decline",
+      "The decline code",
+    );
   }
-  const failedEvent = await waitForEvent(receivedEvents, "payment_intent.payment_failed");
-  expectEqual(failedEvent.data.object.status, "requires_payment_method", "The failed intent");
+  const failedEvent = await waitForEvent(
+    receivedEvents,
+    "payment_intent.payment_failed",
+  );
+  expectEqual(
+    failedEvent.data.object.status,
+    "requires_payment_method",
+    "The failed intent",
+  );
 }
 
 async function main() {
@@ -161,10 +229,17 @@ async function main() {
 
   writeFileSync(
     deliveriesPath,
-    JSON.stringify({ webhook_secret: webhookSecret, deliveries: receiver.receivedDeliveries }),
+    JSON.stringify({
+      webhook_secret: webhookSecret,
+      deliveries: receiver.receivedDeliveries,
+    }),
   );
-  const receivedTypes = receiver.receivedEvents.map((receivedEvent) => receivedEvent.type);
-  console.log(`Done: verified ${receivedTypes.length} Stripe events (${receivedTypes.join(", ")}).`);
+  const receivedTypes = receiver.receivedEvents.map(
+    (receivedEvent) => receivedEvent.type,
+  );
+  console.log(
+    `Done: verified ${receivedTypes.length} Stripe events (${receivedTypes.join(", ")}).`,
+  );
   receiver.receiverServer.close();
 }
 

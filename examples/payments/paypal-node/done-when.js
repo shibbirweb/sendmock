@@ -22,7 +22,9 @@ import {
 import { startPayPalWebhookReceiver } from "./paypal-webhook-receiver.js";
 
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
-const providerUrl = new URL(process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026");
+const providerUrl = new URL(
+  process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026",
+);
 const paypalApi = {
   providerUrl: providerUrl.origin,
   clientId: "sendmock-example-client",
@@ -63,14 +65,18 @@ async function callSendMock(method, path, requestBody) {
   });
   const answerText = await response.text();
   if (!response.ok) {
-    throw new Error(`${method} ${path} answered ${response.status}: ${answerText}`);
+    throw new Error(
+      `${method} ${path} answered ${response.status}: ${answerText}`,
+    );
   }
   return answerText === "" ? null : JSON.parse(answerText);
 }
 
 function expectEqual(actualValue, expectedValue, description) {
   if (actualValue !== expectedValue) {
-    throw new Error(`${description}: expected ${expectedValue}, got ${actualValue}`);
+    throw new Error(
+      `${description}: expected ${expectedValue}, got ${actualValue}`,
+    );
   }
 }
 
@@ -79,14 +85,19 @@ async function waitForEvent(receivedEvents, eventType, resourceId) {
   for (;;) {
     const webhookEvent = receivedEvents.find(
       (receivedEvent) =>
-        receivedEvent.event_type === eventType && receivedEvent.resource?.id === resourceId,
+        receivedEvent.event_type === eventType &&
+        receivedEvent.resource?.id === resourceId,
     );
     if (webhookEvent) {
       return webhookEvent;
     }
     if (Date.now() > deadline) {
-      const receivedTypes = receivedEvents.map((receivedEvent) => receivedEvent.event_type);
-      throw new Error(`Timed out waiting for ${eventType}; received ${receivedTypes.join(", ")}`);
+      const receivedTypes = receivedEvents.map(
+        (receivedEvent) => receivedEvent.event_type,
+      );
+      throw new Error(
+        `Timed out waiting for ${eventType}; received ${receivedTypes.join(", ")}`,
+      );
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
@@ -104,7 +115,11 @@ async function connectReceiver(receiver) {
     template_id: "native",
     template_mode: "linked",
     timeout_ms: 10_000,
-    retry_policy: { max_attempts: 2, backoff_seconds: [1], retry_on_client_errors: false },
+    retry_policy: {
+      max_attempts: 2,
+      backoff_seconds: [1],
+      retry_on_client_errors: false,
+    },
     query_params: [],
     body_mode: "template",
     body_fields: [],
@@ -128,7 +143,10 @@ async function createOrderOnPage(shopOrderId, checkoutAction) {
     body: {
       intent: CheckoutPaymentIntent.Capture,
       purchaseUnits: [
-        { referenceId: shopOrderId, amount: { currencyCode: "USD", value: "25.00" } },
+        {
+          referenceId: shopOrderId,
+          amount: { currencyCode: "USD", value: "25.00" },
+        },
       ],
       paymentSource: {
         paypal: {
@@ -142,7 +160,9 @@ async function createOrderOnPage(shopOrderId, checkoutAction) {
     prefer: "return=representation",
   });
   expectEqual(order.status, "PAYER_ACTION_REQUIRED", "The new order's status");
-  const approvalLink = order.links.find((link) => ["payer-action", "approve"].includes(link.rel));
+  const approvalLink = order.links.find((link) =>
+    ["payer-action", "approve"].includes(link.rel),
+  );
   const paymentId = new URL(approvalLink.href).pathname.split("/").pop();
   currentStep = `${checkoutAction} order ${shopOrderId} on the checkout page`;
   await callSendMock("POST", `/checkout-sessions/${paymentId}/complete`, {
@@ -155,7 +175,9 @@ async function createOrderOnPage(shopOrderId, checkoutAction) {
 async function payAndCapture(receivedEvents) {
   const orderId = await createOrderOnPage("order-2001", "pay");
   currentStep = "get the approved order";
-  const { result: approvedOrder } = await ordersController.getOrder({ id: orderId });
+  const { result: approvedOrder } = await ordersController.getOrder({
+    id: orderId,
+  });
   expectEqual(approvedOrder.status, "APPROVED", "The approved order's status");
 
   currentStep = "capture the approved order";
@@ -182,9 +204,17 @@ async function handleDecline() {
     if (!(captureError instanceof ApiError)) {
       throw captureError;
     }
-    expectEqual(captureError.statusCode, 422, "The declined capture's status code");
+    expectEqual(
+      captureError.statusCode,
+      422,
+      "The declined capture's status code",
+    );
     const errorBody = JSON.parse(captureError.body);
-    expectEqual(errorBody.details[0].issue, "INSTRUMENT_DECLINED", "The declined capture's issue");
+    expectEqual(
+      errorBody.details[0].issue,
+      "INSTRUMENT_DECLINED",
+      "The declined capture's issue",
+    );
   }
 }
 
@@ -197,8 +227,13 @@ async function refundCapture(receivedEvents, captureId) {
   });
   expectEqual(refund.status, "COMPLETED", "The refund's status");
   currentStep = "get the refunded capture";
-  const { result: refundedCapture } = await paymentsController.getCapturedPayment({ captureId });
-  expectEqual(refundedCapture.status, "REFUNDED", "The refunded capture's status");
+  const { result: refundedCapture } =
+    await paymentsController.getCapturedPayment({ captureId });
+  expectEqual(
+    refundedCapture.status,
+    "REFUNDED",
+    "The refunded capture's status",
+  );
   currentStep = "receive PAYMENT.CAPTURE.REFUNDED";
   await waitForEvent(receivedEvents, "PAYMENT.CAPTURE.REFUNDED", refund.id);
 }
@@ -211,17 +246,26 @@ async function main() {
   await handleDecline();
   await refundCapture(receiver.receivedEvents, captureId);
 
-  const receivedTypes = receiver.receivedEvents.map((receivedEvent) => receivedEvent.event_type);
-  console.log(`Done: verified ${receivedTypes.length} PayPal events (${receivedTypes.join(", ")}).`);
+  const receivedTypes = receiver.receivedEvents.map(
+    (receivedEvent) => receivedEvent.event_type,
+  );
+  console.log(
+    `Done: verified ${receivedTypes.length} PayPal events (${receivedTypes.join(", ")}).`,
+  );
   receiver.receiverServer.close();
 }
 
 /** The provider requests SendMock logged last: method, path, status and header names. */
 async function describeLoggedRequests() {
-  const loggedRequests = await callSendMock("GET", "/logs/http?api=paypal&limit=4").catch(() => null);
+  const loggedRequests = await callSendMock(
+    "GET",
+    "/logs/http?api=paypal&limit=4",
+  ).catch(() => null);
   return (loggedRequests?.items ?? [])
     .map((loggedRequest) => {
-      const headerNames = Object.keys(loggedRequest.request_headers ?? {}).join(",");
+      const headerNames = Object.keys(loggedRequest.request_headers ?? {}).join(
+        ",",
+      );
       return `${loggedRequest.method} ${loggedRequest.path} ${loggedRequest.response_status} [${headerNames}]`;
     })
     .join("; ");

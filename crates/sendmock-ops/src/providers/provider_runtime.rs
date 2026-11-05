@@ -5,6 +5,7 @@ use super::email_batch_operation_kind::answer_email_batch;
 use super::email_send_operation_kind::answer_email_send;
 use super::message_provider_definition::MessageProviderDefinition;
 use super::operation_matcher::{ProviderRoute, match_operation};
+use super::payment_gateway_apis::answer_payment_gateway_api;
 use super::provider_call::ProviderCall;
 use super::provider_catalog::{EMAIL_PROVIDER_AREA, SMS_PROVIDER_AREA, load_area_providers};
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
@@ -14,12 +15,7 @@ use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
-use crate::bkash::answer_bkash_request;
 use crate::custom_gateways::answer_custom_gateway_request;
-use crate::paypal::answer_paypal_request;
-use crate::razorpay::answer_razorpay_request;
-use crate::sslcommerz::answer_sslcommerz_request;
-use crate::stripe::answer_stripe_request;
 use crate::{OperationContext, OperationError};
 
 /// Messaging Services are Twilio's; their API is served under its key.
@@ -110,38 +106,18 @@ pub async fn answer_provider_request(
     })
 }
 
-/// The APIs served in code beside the definitions: Razorpay's, Stripe's, PayPal's, SSLCommerz's, bKash's, custom
-/// gateways', and Twilio's Messaging Services and Verify.
+/// The APIs served in code beside the definitions: the payment gateways', Mailgun's routes,
+/// custom gateways', and Twilio's Messaging Services and Verify.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
     providers: &[MessageProviderDefinition],
     provider_route: ProviderRoute<'_>,
     request: &ProviderHttpRequest,
 ) -> Result<Option<ProviderOutcome>, OperationError> {
-    if let Some(razorpay_outcome) =
-        answer_razorpay_request(operation_context, provider_route, request).await?
+    if let Some(gateway_outcome) =
+        answer_payment_gateway_api(operation_context, provider_route, request).await?
     {
-        return Ok(Some(razorpay_outcome));
-    }
-    if let Some(stripe_outcome) =
-        answer_stripe_request(operation_context, provider_route, request).await?
-    {
-        return Ok(Some(stripe_outcome));
-    }
-    if let Some(paypal_outcome) =
-        answer_paypal_request(operation_context, provider_route, request).await?
-    {
-        return Ok(Some(paypal_outcome));
-    }
-    if let Some(sslcommerz_outcome) =
-        answer_sslcommerz_request(operation_context, provider_route, request).await?
-    {
-        return Ok(Some(sslcommerz_outcome));
-    }
-    if let Some(bkash_outcome) =
-        answer_bkash_request(operation_context, provider_route, request).await?
-    {
-        return Ok(Some(bkash_outcome));
+        return Ok(Some(gateway_outcome));
     }
     if let Some(mailgun_routes_outcome) = crate::inbound_routes::answer_mailgun_routes_request(
         operation_context,

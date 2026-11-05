@@ -8,6 +8,7 @@ const builtinGatewayKeys = [
   "sslcommerz",
   "bkash",
   "razorpay",
+  "paddle",
   "native",
 ];
 

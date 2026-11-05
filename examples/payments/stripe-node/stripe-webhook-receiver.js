@@ -14,7 +14,11 @@ export async function startStripeWebhookReceiver(stripe, webhookSecret) {
       const rawBody = Buffer.concat(bodyChunks).toString("utf8");
       const signature = request.headers["stripe-signature"] ?? "";
       try {
-        const stripeEvent = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+        const stripeEvent = stripe.webhooks.constructEvent(
+          rawBody,
+          signature,
+          webhookSecret,
+        );
         receivedEvents.push(stripeEvent);
         receivedDeliveries.push({ payload: rawBody, signature });
         response.writeHead(200, { "Content-Type": "application/json" });

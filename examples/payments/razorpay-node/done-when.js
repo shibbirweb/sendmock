@@ -27,6 +27,11 @@ const waitTimeoutMs = 60_000;
 let currentStep = "starting";
 
 const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+if (razorpay.api?.rq?.defaults === undefined) {
+  throw new Error(
+    "This razorpay version keeps its HTTP client elsewhere; point it at SendMock",
+  );
+}
 razorpay.api.rq.defaults.baseURL = providerUrl.origin;
 
 async function callSendMock(method, path, requestBody) {

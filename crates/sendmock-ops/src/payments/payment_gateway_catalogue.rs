@@ -133,6 +133,7 @@ mod tests {
                 "sslcommerz",
                 "bkash",
                 "razorpay",
+                "paddle",
                 "native"
             ]
         );

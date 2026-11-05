@@ -24,7 +24,7 @@ function findExampleStep(exampleFolder: string) {
 }
 
 describe("Payment apps workflow", () => {
-  test("PY-10.2 the Stripe, PayPal, SSLCommerz and Razorpay apps run against a release binary", () => {
+  test("PY-10.2 PY-10.3 the Stripe, PayPal, SSLCommerz, Razorpay and Paddle apps run against a release binary", () => {
     expect(
       steps.some((step) => step.run?.includes("cargo build --release")),
     ).toBe(true);
@@ -36,6 +36,7 @@ describe("Payment apps workflow", () => {
       "paypal-node",
       "sslcommerz-node",
       "razorpay-node",
+      "paddle-node",
     ]) {
       expect(findExampleStep(exampleFolder)?.run).toContain(
         "node done-when.js",
@@ -71,7 +72,7 @@ describe("Payment apps workflow", () => {
     expect(checkAction).toContain("rejected_packets");
     expect(startIndex).toBeGreaterThan(-1);
     expect(checkIndex).toBeGreaterThan(
-      steps.indexOf(findExampleStep("razorpay-node") ?? {}),
+      steps.indexOf(findExampleStep("paddle-node") ?? {}),
     );
   });
 

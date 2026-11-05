@@ -55,6 +55,7 @@ async fn lists_the_built_in_gateways_with_secrets_masked() {
             "sslcommerz",
             "bkash",
             "razorpay",
+            "paddle",
             "native"
         ]
     );

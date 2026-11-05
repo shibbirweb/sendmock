@@ -140,6 +140,15 @@ const razorpayCheckoutFields = [
   "razorpay_signature",
 ];
 
+/** Paddle's notification: the transaction or adjustment as `data`. */
+const paddleBody = `{
+  "event_id": "{{ event.id }}",
+  "event_type": "{{ event.name }}",
+  "occurred_at": "{{ event.object.occurred_at }}",
+  "notification_id": "{{ event.id | replace("evt_", "ntf_") }}",
+  "data": {{ event.object.data | json }}
+}`;
+
 const nativeBody = `{
   "type": "{{ event.type }}",
   "data": {
@@ -358,6 +367,45 @@ const shippedGateways: ShippedGateway[] = [
     ],
   },
   {
+    key: "paddle",
+    name: "Paddle",
+    accent: "#fddd35",
+    method_keys: ["card"],
+    credentials: [
+      {
+        name: "api_key",
+        value: "pdl_sdbx_apikey_sendmock_SendMockPaddleKey01",
+        is_secret: true,
+      },
+      {
+        name: "notification_secret",
+        value: "pdl_ntfset_sendmock_SendMockPaddleSecret01",
+        is_secret: true,
+      },
+    ],
+    redirect_method: "GET",
+    redirect_fields: [
+      { name: "_ptxn", template: "{{ payment.reference }}", send_on: "always" },
+    ],
+    notification_content_type: "json",
+    event_names: nameEvents({
+      "payment.created": "transaction.created",
+      "payment.succeeded": "transaction.completed",
+      "payment.failed": "transaction.payment_failed",
+      "payment.canceled": "transaction.canceled",
+      "payment.refunded": "adjustment.created",
+      "payment.partially_refunded": "adjustment.created",
+      "checkout.completed": "transaction.paid",
+    }),
+    notification_body: paddleBody,
+    notification_headers: [
+      {
+        name: "paddle-signature",
+        template: "{{ paddle_signature(merchant.notification_secret) }}",
+      },
+    ],
+  },
+  {
     key: "native",
     name: "Native",
     accent: "#0d9488",
@@ -402,5 +450,6 @@ export const builtinPaymentProviders: BuiltinPaymentProvider[] = [
   "sslcommerz",
   "bkash",
   "razorpay",
+  "paddle",
   "native",
 ];

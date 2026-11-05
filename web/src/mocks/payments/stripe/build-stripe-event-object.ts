@@ -7,6 +7,7 @@ import {
 } from "@/mocks/payments/stripe/stripe-charge-object";
 import { describeCheckoutSession } from "@/mocks/payments/stripe/stripe-checkout-session-object";
 import { describePaymentIntent } from "@/mocks/payments/stripe/stripe-payment-intent-object";
+import { buildPaddleEventObject } from "@/mocks/payments/paddle/build-paddle-event-object";
 import {
   buildRazorpayEventObject,
   buildRazorpayRedirectObject,
@@ -54,7 +55,7 @@ export function buildProviderRedirectObject(
     : null;
 }
 
-/** The gateway's own object for `event.object`; Stripe, PayPal, SSLCommerz and Razorpay have one. */
+/** The gateway's own object for `event.object`; Stripe, PayPal, SSLCommerz, Razorpay and Paddle have one. */
 export function buildProviderEventObject(
   gatewayKey: string,
   paymentDetail: PaymentDetail,
@@ -68,6 +69,9 @@ export function buildProviderEventObject(
   }
   if (gatewayKey === "razorpay") {
     return buildRazorpayEventObject(paymentDetail, eventName);
+  }
+  if (gatewayKey === "paddle") {
+    return buildPaddleEventObject(paymentDetail, eventName);
   }
 
   return buildProviderRedirectObject(gatewayKey, paymentDetail, eventName);

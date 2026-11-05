@@ -299,7 +299,7 @@ jobs:
   webhook-handler:
     uses: ./.github/workflows/webhook-handler.yml
 
-  # Stripe, PayPal, SSLCommerz and Razorpay apps pay, verify, decline and refund against this commit offline.
+  # Stripe, PayPal, SSLCommerz, Razorpay and Paddle apps pay, verify, decline and refund against this commit offline.
   payment-apps:
     uses: ./.github/workflows/payment-apps.yml
 

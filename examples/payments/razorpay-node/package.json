@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "razorpay": "2.9.4"
+    "razorpay": "2.9.8"
   }
 }

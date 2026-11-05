@@ -88,7 +88,7 @@ Phase 4 (bKash, Razorpay, Paddle), later (others).
 
 - [x] PY-10.1 bKash tokenized checkout (grant token, create, execute, query, refund) and callbacks work with test wallets.
 - [x] PY-10.2 Razorpay orders, capture, refunds, `razorpay_signature` and `X-Razorpay-Signature` webhooks verify with Razorpay's SDK helpers.
-- [ ] PY-10.3 Paddle transactions and `Paddle-Signature` webhooks verify with Paddle's SDK.
+- [x] PY-10.3 Paddle transactions and `Paddle-Signature` webhooks verify with Paddle's SDK.
 
 ## PY-11 CLI, MCP and test helpers
 

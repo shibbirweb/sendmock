@@ -23,6 +23,7 @@ mod operation_context;
 mod operation_error;
 mod operation_registry;
 mod outcome_rules;
+mod paddle;
 mod page_of;
 mod payments;
 mod paypal;

@@ -3,6 +3,7 @@ use serde_json::Value;
 
 use super::payment_gateway_views::PaymentGatewayFields;
 use super::payment_views::PaymentDetail;
+use crate::paddle::{PADDLE_PROVIDER_KEY, describe_paddle_event_object};
 use crate::paypal::{PAYPAL_PROVIDER_KEY, describe_paypal_event_object};
 use crate::razorpay::{
     RAZORPAY_PROVIDER_KEY, describe_razorpay_event_object, describe_razorpay_redirect_object,
@@ -21,6 +22,15 @@ pub async fn build_provider_event_object(
     kept_provider_objects: &[PaymentProviderObjectRecord],
 ) -> Result<Value, OperationError> {
     let gateway_key = gateway_fields.key.as_str();
+    if gateway_key == PADDLE_PROVIDER_KEY {
+        return describe_paddle_event_object(
+            operation_context,
+            payment,
+            event_name,
+            kept_provider_objects,
+        )
+        .await;
+    }
     if gateway_key == RAZORPAY_PROVIDER_KEY {
         return describe_razorpay_event_object(
             operation_context,

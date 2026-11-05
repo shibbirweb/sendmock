@@ -47,7 +47,7 @@ permissions:
 
 jobs:
   apps:
-    name: Stripe, PayPal, SSLCommerz and Razorpay apps offline
+    name: Stripe, PayPal, SSLCommerz, Razorpay and Paddle apps offline
     runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
@@ -111,6 +111,10 @@ jobs:
 
       - name: Pay, check both signatures, decline and refund with Razorpay's Node SDK
         working-directory: examples/payments/razorpay-node
+        run: bun install && node done-when.js
+
+      - name: Pay, decline and refund, each notification unmarshalled by Paddle's Node SDK
+        working-directory: examples/payments/paddle-node
         run: bun install && node done-when.js
 
       - uses: ./.github/actions/check-sendmock-offline

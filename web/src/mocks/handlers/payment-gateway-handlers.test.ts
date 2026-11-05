@@ -42,7 +42,7 @@ beforeEach(() => {
 });
 
 describe("payment gateway API", () => {
-  test("PY-12.2 lists the six built-ins with secrets masked; a secret is revealed on request", async () => {
+  test("PY-12.2 lists the seven built-ins with secrets masked; a secret is revealed on request", async () => {
     const gateways = await readJson<PaymentGatewayDefinition[]>(
       await callApi("GET", "/payments/gateways"),
     );
@@ -52,6 +52,7 @@ describe("payment gateway API", () => {
       "SSLCommerz",
       "bKash",
       "Razorpay",
+      "Paddle",
       "Native",
     ]);
     expect(JSON.stringify(gateways)).not.toContain("sendm0000000001@ssl");

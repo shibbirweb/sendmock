@@ -436,6 +436,58 @@
     "notification_endpoint_id": null
   },
   {
+    "key": "paddle",
+    "name": "Paddle",
+    "accent": "#fddd35",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "pdl_sdbx_apikey_sendmock_SendMockPaddleKey01",
+        "is_secret": true
+      },
+      {
+        "name": "notification_secret",
+        "value": "pdl_ntfset_sendmock_SendMockPaddleSecret01",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "_ptxn",
+        "template": "{{ payment.reference }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "transaction.created",
+      "payment.authorized": "",
+      "payment.succeeded": "transaction.completed",
+      "payment.failed": "transaction.payment_failed",
+      "payment.canceled": "transaction.canceled",
+      "payment.refunded": "adjustment.created",
+      "payment.partially_refunded": "adjustment.created",
+      "payment.dispute_opened": "",
+      "payment.dispute_closed": "",
+      "checkout.completed": "transaction.paid",
+      "checkout.expired": ""
+    },
+    "notification_body": "{\n  \"event_id\": \"{{ event.id }}\",\n  \"event_type\": \"{{ event.name }}\",\n  \"occurred_at\": \"{{ event.object.occurred_at }}\",\n  \"notification_id\": \"{{ event.id | replace(\"evt_\", \"ntf_\") }}\",\n  \"data\": {{ event.object.data | json }}\n}",
+    "notification_headers": [
+      {
+        "name": "paddle-signature",
+        "template": "{{ paddle_signature(merchant.notification_secret) }}"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
     "key": "native",
     "name": "Native",
     "accent": "#0d9488",

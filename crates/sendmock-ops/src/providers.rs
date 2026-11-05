@@ -8,6 +8,7 @@ mod email_send_parts;
 mod message_provider_definition;
 mod messaging_service_sender;
 mod operation_matcher;
+mod payment_gateway_apis;
 mod provider_call;
 mod provider_catalog;
 mod provider_form_fields;

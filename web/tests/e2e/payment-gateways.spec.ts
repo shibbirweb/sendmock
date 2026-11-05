@@ -31,7 +31,7 @@ test.beforeEach(async ({ page }) => {
 test("PY-12.2 the table lists every gateway with its methods and notification endpoint", async ({
   page,
 }) => {
-  await expect(page.getByTestId("payment-gateway-row")).toHaveCount(6);
+  await expect(page.getByTestId("payment-gateway-row")).toHaveCount(7);
   await expect(gatewayRow(page, "SSLCommerz")).toContainText(
     "Card, bKash, Nagad, Rocket, DBBL Nexus, City Touch, BRAC iBanking",
   );

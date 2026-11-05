@@ -4,7 +4,12 @@
 import { once } from "node:events";
 import { createServer } from "node:http";
 
-async function verifyWebhookSignature(paypalApi, requestHeaders, webhookEvent, webhookId) {
+async function verifyWebhookSignature(
+  paypalApi,
+  requestHeaders,
+  webhookEvent,
+  webhookId,
+) {
   const verificationResponse = await fetch(
     `${paypalApi.providerUrl}/v1/notifications/verify-webhook-signature`,
     {
@@ -34,7 +39,9 @@ export async function startPayPalWebhookReceiver(paypalApi) {
     const bodyChunks = [];
     request.on("data", (bodyChunk) => bodyChunks.push(bodyChunk));
     request.on("end", async () => {
-      const webhookEvent = JSON.parse(Buffer.concat(bodyChunks).toString("utf8"));
+      const webhookEvent = JSON.parse(
+        Buffer.concat(bodyChunks).toString("utf8"),
+      );
       const isFromPayPal = await verifyWebhookSignature(
         paypalApi,
         request.headers,
