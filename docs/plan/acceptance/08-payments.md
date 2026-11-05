@@ -76,9 +76,9 @@ Phase 3P.
 
 UI in U2, live in Phase 3P.
 
-- [ ] PY-09.1 The Payments list filters by status, provider and currency and updates live.
-- [ ] PY-09.2 Payment detail shows the timeline, method, line items, redirects and linked notification deliveries.
-- [ ] PY-09.3 The Simulate menu performs every documented action, and the result shows immediately.
+- [x] PY-09.1 The Payments list filters by status, provider and currency and updates live.
+- [x] PY-09.2 Payment detail shows the timeline, method, line items, redirects and linked notification deliveries.
+- [x] PY-09.3 The Simulate menu performs every documented action, and the result shows immediately.
 - [ ] PY-09.4 Settings > Payments edits the merchant name, default currency and automatic outcome profile (each used by the next checkout), shows the test values of the enabled methods (custom ones included) as their flows ask for them, each with the gateways offering it, and links to Gateways (merchant credentials, per gateway since PY-12.2) and Methods.
 - [x] PY-09.5 The Overview shows a Payments tile with the payment count, today's count, the success rate and test revenue per currency, linking to Payments.
 
