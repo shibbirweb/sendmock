@@ -6,6 +6,7 @@ mod http_bin_presets;
 mod http_capture;
 mod http_catcher_views;
 mod http_catcher_wire;
+mod http_forward_operation;
 mod http_response_rules;
 mod http_rule_operations;
 mod http_wait_operation;
@@ -19,6 +20,7 @@ pub use http_bin_operations::{
 };
 pub use http_capture::{CatchAnswer, IncomingHttpRequest, capture_http_request};
 pub use http_catcher_wire::{CapturedHttpRequest, HttpBin, HttpMockResponse};
+pub use http_forward_operation::ForwardHttpRequestOperation;
 pub use http_rule_operations::{
     ListHttpResponseRulesOperation, PreviewHttpResponseRuleOperation,
     ReplaceHttpResponseRulesOperation,
@@ -40,4 +42,5 @@ pub fn register_http_catcher_operations(operation_registry: &mut OperationRegist
     operation_registry.register(ListHttpResponseRulesOperation);
     operation_registry.register(ReplaceHttpResponseRulesOperation);
     operation_registry.register(PreviewHttpResponseRuleOperation);
+    operation_registry.register(ForwardHttpRequestOperation);
 }

@@ -102,6 +102,7 @@ fn system_samples() -> Vec<(&'static str, Vec<Value>)> {
             vec![
                 json!({ "kind": "email", "to": "sam@example.test", "subject": "Sample" }),
                 json!({ "kind": "verification" }),
+                json!({ "kind": "http" }),
             ],
         ),
         (
@@ -236,6 +237,9 @@ async fn prepare_http_catcher_samples(
 /// A bin's rules: list, replace, and a preview against its captured request.
 fn build_http_rule_samples(bin_id: &Value, request_id: &Value) -> Vec<(&'static str, Vec<Value>)> {
     vec![
+        // Forwarding needs an app that answers, which this app has none of; the catcher tests
+        // cover it.
+        ("postHttpRequestsByRequestIdForward", vec![]),
         (
             "getHttpBinsByBinIdResponses",
             vec![json!({ "bin_id": bin_id })],

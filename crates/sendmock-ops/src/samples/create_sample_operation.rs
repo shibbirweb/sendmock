@@ -4,6 +4,7 @@ use sendmock_mail::{NativeMessage, build_raw_message};
 use serde::{Deserialize, Serialize};
 
 use super::sample_email_sender::SampleEmail;
+use super::sample_http_request::create_sample_http_request;
 use super::sample_verification::create_sample_verification;
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, SuccessStatus,
@@ -62,6 +63,9 @@ impl Operation for CreateSampleOperation {
         }
         if input.kind == "verification" {
             return create_sample_verification(operation_context, input.to).await;
+        }
+        if input.kind == "http" {
+            return create_sample_http_request(operation_context).await;
         }
         if input.kind != "email" {
             return Err(OperationError::NotFound {

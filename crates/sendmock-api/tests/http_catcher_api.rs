@@ -1,6 +1,7 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
     pub mod email_provider_requests;
+    pub mod scripted_webhook_sender;
     pub mod test_app;
 }
 
@@ -331,4 +332,87 @@ async fn rules_are_checked_like_the_editor_and_the_preview_explains_a_mismatch()
     assert_eq!(preview["is_match"], false);
     assert_eq!(preview["mismatch_reason"], "Method is GET, not POST");
     assert_eq!(preview["response"]["body"], "default");
+}
+
+// AC: HC-01.5
+#[tokio::test]
+async fn forward_sends_a_captured_request_on_and_answers_what_the_app_said() {
+    let webhook_sender = std::sync::Arc::new(
+        support::scripted_webhook_sender::ScriptedWebhookSender::answering(&[
+            support::scripted_webhook_sender::ScriptedAnswer::Status(202),
+        ]),
+    );
+    let (app_router, _) = support::test_app::build_test_app_with(|operation_context| {
+        operation_context.with_webhook_sender(webhook_sender.clone())
+    });
+    send_provider_request(
+        &app_router,
+        "/catch/orders",
+        "application/json",
+        br#"{"order":7}"#.to_vec(),
+    )
+    .await;
+    let request_id = list_requests(&app_router).await["items"][0]["id"].clone();
+
+    let (status, forwarded) = call_api(
+        &app_router,
+        "POST",
+        &format!(
+            "/api/v1/http/requests/{}/forward",
+            request_id.as_str().unwrap_or_default()
+        ),
+        Some(&json!({ "url": "http://localhost:8000/hooks" })),
+    )
+    .await;
+
+    assert_eq!(status, 200, "{forwarded}");
+    assert_eq!(forwarded["status_code"], 202);
+    let sent_requests = webhook_sender.received_requests();
+    assert_eq!(sent_requests[0].url, "http://localhost:8000/hooks");
+    assert_eq!(sent_requests[0].method, "POST");
+    assert_eq!(sent_requests[0].body, r#"{"order":7}"#);
+    assert!(!sent_requests[0].headers.contains_key("host"));
+}
+
+// AC: PL-03.5
+#[tokio::test]
+async fn the_http_sample_is_captured_in_the_slack_bin_like_real_traffic() {
+    let (app_router, operation_context) = build_test_app();
+
+    let (status, created) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/samples/http",
+        Some(&json!({})),
+    )
+    .await;
+
+    assert_eq!(status, 201, "{created}");
+    let (_, captured) = call_api(
+        &app_router,
+        "GET",
+        &format!(
+            "/api/v1/http/requests/{}",
+            created["id"].as_str().unwrap_or_default()
+        ),
+        None,
+    )
+    .await;
+    assert_eq!(captured["bin_name"], "slack");
+    assert!(
+        captured["body"]
+            .as_str()
+            .is_some_and(|body| body.contains("New signup"))
+    );
+    assert_eq!(
+        operation_context
+            .event_bus
+            .recent_events(&RecentEventFilter {
+                created_after_unix_ms: None,
+                event_type: Some("http.captured".to_owned()),
+                limit: 5
+            })
+            .len(),
+        1
+    );
 }

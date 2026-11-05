@@ -2810,6 +2810,29 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock http forward",
+    "usage": "sendmock http forward <requestId>",
+    "aliases": [],
+    "summary": "Send a captured request on to another URL.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/http/requests/{requestId}/forward",
+        "operation_id": "postHttpRequestsByRequestIdForward",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_forward"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],
