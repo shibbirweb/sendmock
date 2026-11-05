@@ -1102,21 +1102,8 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
     });
     let payment_id =
         post_json(app_router, "/api/v1/payments/checkout", &checkout).await["id"].clone();
-    let card_payment_id = post_json(
-        app_router,
-        "/api/v1/payments/checkout",
-        &json!({ "provider": "stripe", "amount_minor": 500 }),
-    )
-    .await["id"]
-        .clone();
-    vec![
-        (
-            "postCheckoutSessionsBySessionIdComplete",
-            vec![
-                json!({ "session_id": card_payment_id, "action": "pay", "method_key": "card", "card": { "number": "4242424242424242", "exp_month": 12, "exp_year": 2030, "cvc": "123", "holder_name": "Sam Tester" } }),
-                json!({ "session_id": payment_id, "action": "require_three_ds" }),
-            ],
-        ),
+    let mut samples = prepare_checkout_action_samples(app_router, &payment_id).await;
+    samples.extend(vec![
         (
             "getPayments",
             vec![
@@ -1139,6 +1126,44 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
         (
             "getCheckoutSessionsBySessionId",
             vec![json!({ "session_id": payment_id })],
+        ),
+    ]);
+    samples
+}
+
+/// A completed card checkout and a gateway preview, on a fresh Stripe payment and `payment_id`.
+async fn prepare_checkout_action_samples(
+    app_router: &axum::Router,
+    payment_id: &Value,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let card_payment_id = post_json(
+        app_router,
+        "/api/v1/payments/checkout",
+        &json!({ "provider": "stripe", "amount_minor": 500 }),
+    )
+    .await["id"]
+        .clone();
+    let stripe_gateway = send_json(
+        app_router,
+        "GET",
+        "/api/v1/payments/gateways/stripe",
+        &Value::Null,
+    )
+    .await;
+    vec![
+        (
+            "postPaymentsGatewaysByGatewayKeyPreview",
+            vec![
+                json!({ "gateway_key": "stripe", "gateway": stripe_gateway, "event_type": "payment.succeeded", "redirect_outcome": "success" }),
+                json!({ "gateway_key": "stripe", "gateway": stripe_gateway, "payment_id": payment_id, "event_type": "payment.created", "redirect_outcome": "cancel" }),
+            ],
+        ),
+        (
+            "postCheckoutSessionsBySessionIdComplete",
+            vec![
+                json!({ "session_id": card_payment_id, "action": "pay", "method_key": "card", "card": { "number": "4242424242424242", "exp_month": 12, "exp_year": 2030, "cvc": "123", "holder_name": "Sam Tester" } }),
+                json!({ "session_id": payment_id, "action": "require_three_ds" }),
+            ],
         ),
     ]
 }

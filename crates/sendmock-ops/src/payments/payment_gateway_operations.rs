@@ -2,6 +2,7 @@ use sendmock_payments::{check_new_gateway, check_payment_gateway};
 
 use sendmock_store::PaymentCountColumn;
 
+use super::gateway_template_rendering::find_gateway_template_errors;
 use super::payment_catalogue::count_payments;
 use super::payment_gateway_catalogue::{
     blank_gateway, find_payment_gateway, load_payment_gateways, present_gateway,
@@ -45,7 +46,7 @@ fn invalid_field(field: String, message: String) -> OperationError {
     }
 }
 
-/// The gateway's rules, and every method it offers must exist.
+/// The gateway's rules, every method it offers must exist, and its templates must render.
 async fn check_gateway_fields(
     operation_context: &OperationContext,
     gateway_fields: &PaymentGatewayFields,
@@ -66,6 +67,15 @@ async fn check_gateway_fields(
             "method_keys".to_owned(),
             format!("There is no method with the key {unknown_key}"),
         ));
+    }
+    if let Some(template_error) = find_gateway_template_errors(operation_context, gateway_fields)
+        .into_iter()
+        .next()
+    {
+        return Err(OperationError::InvalidInput {
+            message: format!("{}: {}", template_error.part, template_error.message),
+            field: None,
+        });
     }
     Ok(())
 }

@@ -1,9 +1,10 @@
 use sendmock_payments::format_major_amount;
 
-use super::gateway_redirect_rendering::{RedirectOutcome, build_payment_redirect};
+use super::gateway_template_rendering::RedirectOutcome;
 use super::payment_catalogue::{add_timeline_event, find_payment, save_payment};
 use super::payment_gateway_catalogue::find_payment_gateway;
 use super::payment_gateway_views::PaymentGatewayFields;
+use super::payment_redirect::build_payment_redirect;
 use super::payment_views::{PaymentDetail, PaymentDispute, PaymentInstrument, PaymentStatus};
 use crate::settings::PaymentOutcomeProfile;
 use crate::{AppEventType, OperationContext, OperationError, publish_event};

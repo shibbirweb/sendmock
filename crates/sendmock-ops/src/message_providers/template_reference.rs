@@ -83,7 +83,7 @@ const PROVIDER_FIELD_DESCRIPTIONS: &[(&str, &str)] = &[
 ];
 
 /// The functions the template engine knows, as `sendmock-core` implements them.
-const TEMPLATE_FUNCTIONS: &[(&str, &str, &str, &str)] = &[
+const TEMPLATE_FUNCTIONS: &[TemplateHelperEntry] = &[
     (
         "uuid",
         "uuid()",
@@ -116,7 +116,7 @@ const TEMPLATE_FUNCTIONS: &[(&str, &str, &str, &str)] = &[
     ),
 ];
 
-const TEMPLATE_FILTERS: &[(&str, &str, &str, &str)] = &[
+const TEMPLATE_FILTERS: &[TemplateHelperEntry] = &[
     (
         "default",
         "default(fallback)",
@@ -147,23 +147,40 @@ const TEMPLATE_FILTERS: &[(&str, &str, &str, &str)] = &[
 /// The reference for a provider template context: its fields from the sample values, with
 /// their meaning, and the engine's functions and filters.
 pub fn build_provider_template_reference(template_context: &Value) -> TemplateReference {
+    build_template_reference(template_context, PROVIDER_FIELD_DESCRIPTIONS, &[])
+}
+
+/// A function a kind of template adds to the engine's: name, signature, description, example.
+pub type TemplateHelperEntry = (&'static str, &'static str, &'static str, &'static str);
+
+/// The reference for any template context, given what each path means and the functions
+/// added to the engine's own.
+pub fn build_template_reference(
+    template_context: &Value,
+    field_descriptions: &[(&str, &str)],
+    added_functions: &[TemplateHelperEntry],
+) -> TemplateReference {
     let fields = template_context
         .as_object()
         .map(|context_fields| {
             context_fields
                 .iter()
-                .map(|(field_name, sample_value)| build_field(field_name, field_name, sample_value))
+                .map(|(field_name, sample_value)| {
+                    build_field(field_descriptions, field_name, field_name, sample_value)
+                })
                 .collect()
         })
         .unwrap_or_default();
+    let mut functions = build_helpers(TEMPLATE_FUNCTIONS);
+    functions.extend(build_helpers(added_functions));
     TemplateReference {
         fields,
-        functions: build_helpers(TEMPLATE_FUNCTIONS),
+        functions,
         filters: build_helpers(TEMPLATE_FILTERS),
     }
 }
 
-fn build_helpers(catalog: &[(&str, &str, &str, &str)]) -> Vec<TemplateReferenceHelper> {
+fn build_helpers(catalog: &[TemplateHelperEntry]) -> Vec<TemplateReferenceHelper> {
     catalog
         .iter()
         .map(
@@ -178,12 +195,18 @@ fn build_helpers(catalog: &[(&str, &str, &str, &str)]) -> Vec<TemplateReferenceH
 }
 
 /// A field and its children; a list shows its first item as `[0]`.
-fn build_field(field_path: &str, field_name: &str, sample_value: &Value) -> TemplateReferenceField {
+fn build_field(
+    field_descriptions: &[(&str, &str)],
+    field_path: &str,
+    field_name: &str,
+    sample_value: &Value,
+) -> TemplateReferenceField {
     let children = match sample_value {
         Value::Object(child_values) => child_values
             .iter()
             .map(|(child_name, child_value)| {
                 build_field(
+                    field_descriptions,
                     &format!("{field_path}.{child_name}"),
                     child_name,
                     child_value,
@@ -192,7 +215,14 @@ fn build_field(field_path: &str, field_name: &str, sample_value: &Value) -> Temp
             .collect(),
         Value::Array(items) => items
             .first()
-            .map(|first_item| vec![build_field(&format!("{field_path}[0]"), "[0]", first_item)])
+            .map(|first_item| {
+                vec![build_field(
+                    field_descriptions,
+                    &format!("{field_path}[0]"),
+                    "[0]",
+                    first_item,
+                )]
+            })
             .unwrap_or_default(),
         _ => Vec::new(),
     };
@@ -200,7 +230,7 @@ fn build_field(field_path: &str, field_name: &str, sample_value: &Value) -> Temp
         path: field_path.to_owned(),
         name: field_name.to_owned(),
         value_type: describe_value_type(sample_value).to_owned(),
-        description: PROVIDER_FIELD_DESCRIPTIONS
+        description: field_descriptions
             .iter()
             .find(|(described_path, _)| *described_path == field_path)
             .map(|(_, description)| (*description).to_owned())

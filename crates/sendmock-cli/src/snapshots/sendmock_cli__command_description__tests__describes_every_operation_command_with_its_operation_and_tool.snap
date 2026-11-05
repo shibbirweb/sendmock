@@ -1481,6 +1481,32 @@ expression: command_descriptions
     "mcp": []
   },
   {
+    "command": "sendmock payments gateways preview",
+    "usage": "sendmock payments gateways preview <gatewayKey>",
+    "aliases": [],
+    "summary": "Render a gateway's redirect and notification for a payment.",
+    "arguments": [
+      "gatewayKey"
+    ],
+    "flags": [
+      "--event-type",
+      "--gateway",
+      "--payment-id",
+      "--redirect-outcome"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/gateways/{gatewayKey}/preview",
+        "operation_id": "postPaymentsGatewaysByGatewayKeyPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_preview"
+    ]
+  },
+  {
     "command": "sendmock payments list",
     "usage": "sendmock payments list",
     "aliases": [],

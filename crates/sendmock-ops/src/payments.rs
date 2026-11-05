@@ -3,7 +3,8 @@ mod checkout_completion_views;
 mod checkout_operations;
 mod checkout_payment_run;
 mod checkout_views;
-mod gateway_redirect_rendering;
+mod gateway_template_functions;
+mod gateway_template_rendering;
 mod payment_catalogue;
 mod payment_change;
 mod payment_definition_store;
@@ -14,11 +15,14 @@ mod payment_flow_views;
 mod payment_gateway_catalogue;
 mod payment_gateway_maintenance_operations;
 mod payment_gateway_operations;
+mod payment_gateway_preview_operation;
+mod payment_gateway_preview_views;
 mod payment_gateway_views;
 mod payment_method_catalogue;
 mod payment_method_operations;
 mod payment_method_views;
 mod payment_operations;
+mod payment_redirect;
 mod payment_views;
 
 pub use checkout_completion_operation::CompleteCheckoutOperation;
@@ -39,6 +43,7 @@ pub use payment_gateway_operations::{
     CreatePaymentGatewayOperation, GetPaymentGatewayOperation, ListPaymentGatewaysOperation,
     UpdatePaymentGatewayOperation,
 };
+pub use payment_gateway_preview_operation::PreviewPaymentGatewayOperation;
 pub use payment_gateway_views::PaymentGatewayDefinition;
 pub use payment_method_operations::{
     CreatePaymentMethodOperation, DeletePaymentMethodOperation, GetPaymentMethodOperation,
@@ -77,6 +82,7 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeletePaymentGatewayOperation);
     operation_registry.register(ResetPaymentGatewayOperation);
     operation_registry.register(RevealGatewayCredentialOperation);
+    operation_registry.register(PreviewPaymentGatewayOperation);
     operation_registry.register(ListPaymentsOperation);
     operation_registry.register(ListPaymentTestValuesOperation);
     operation_registry.register(CreatePaymentCheckoutOperation);

@@ -23,6 +23,9 @@ pub use sms_provider_read_operations::{
     GetSmsProviderOperation, ListSmsProvidersOperation, PreviewSmsProviderOperation,
     RevealSmsProviderCredentialOperation,
 };
+pub(crate) use template_reference::{
+    TemplateHelperEntry, TemplateReference, build_template_reference,
+};
 
 use crate::OperationRegistry;
 
