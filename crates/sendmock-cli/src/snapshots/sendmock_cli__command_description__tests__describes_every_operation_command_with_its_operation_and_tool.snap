@@ -1319,6 +1319,168 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock payments gateways list",
+    "usage": "sendmock payments gateways list",
+    "aliases": [],
+    "summary": "Gateways with their checkout, redirect and notification setup.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/gateways",
+        "operation_id": "getPaymentsGateways",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_list"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways create",
+    "usage": "sendmock payments gateways create",
+    "aliases": [],
+    "summary": "Add a custom gateway.",
+    "arguments": [],
+    "flags": [
+      "--key",
+      "--name",
+      "--start-from"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/gateways",
+        "operation_id": "postPaymentsGateways",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_create"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways show",
+    "usage": "sendmock payments gateways show <gatewayKey>",
+    "aliases": [],
+    "summary": "One gateway definition; secret credentials masked.",
+    "arguments": [
+      "gatewayKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/gateways/{gatewayKey}",
+        "operation_id": "getPaymentsGatewaysByGatewayKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_get"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways update",
+    "usage": "sendmock payments gateways update <gatewayKey>",
+    "aliases": [],
+    "summary": "Change a gateway; secret credentials stay masked.",
+    "arguments": [
+      "gatewayKey"
+    ],
+    "flags": [
+      "--accent",
+      "--credentials",
+      "--event-names",
+      "--enabled",
+      "--key",
+      "--method-key",
+      "--name",
+      "--notification-body",
+      "--notification-content-type",
+      "--notification-endpoint-id",
+      "--notification-headers",
+      "--redirect-fields",
+      "--redirect-method"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/payments/gateways/{gatewayKey}",
+        "operation_id": "patchPaymentsGatewaysByGatewayKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_update"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways delete",
+    "usage": "sendmock payments gateways delete <gatewayKey>",
+    "aliases": [],
+    "summary": "Delete a custom gateway; 409 while payments use it.",
+    "arguments": [
+      "gatewayKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/gateways/{gatewayKey}",
+        "operation_id": "deletePaymentsGatewaysByGatewayKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_delete"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways reset",
+    "usage": "sendmock payments gateways reset <gatewayKey>",
+    "aliases": [],
+    "summary": "Put a built-in gateway back as shipped.",
+    "arguments": [
+      "gatewayKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/gateways/{gatewayKey}/reset",
+        "operation_id": "postPaymentsGatewaysByGatewayKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_gateway_reset"
+    ]
+  },
+  {
+    "command": "sendmock payments gateways credential",
+    "usage": "sendmock payments gateways credential <gatewayKey> <credentialName> --reveal",
+    "aliases": [],
+    "summary": "Reveal one secret credential (asked for after a confirmation).",
+    "arguments": [
+      "gatewayKey",
+      "credentialName"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}",
+        "operation_id": "getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
     "command": "sendmock outcome-rule email list",
     "usage": "sendmock outcome-rule email list",
     "aliases": [],

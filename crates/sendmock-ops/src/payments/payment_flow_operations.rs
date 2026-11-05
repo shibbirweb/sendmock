@@ -1,8 +1,9 @@
 use sendmock_payments::check_payment_flow;
 
+use super::payment_definition_store::{FLOW_DEFINITION_KIND, delete_definition};
 use super::payment_flow_catalogue::{
-    FLOW_DEFINITION_KIND, find_payment_flow, find_shipped_flow, load_method_flow_keys,
-    load_payment_flows, present_payment_flow, present_with_usage, save_payment_flow,
+    find_payment_flow, find_shipped_flow, load_method_flow_keys, load_payment_flows,
+    present_payment_flow, present_with_usage, save_payment_flow,
 };
 use super::payment_flow_views::{
     PaymentFlowDefinition, PaymentFlowInput, PaymentFlowRecord, PaymentFlowReference,
@@ -227,10 +228,7 @@ impl Operation for DeletePaymentFlowOperation {
                 ),
             });
         }
-        operation_context
-            .payment_definition_repository
-            .delete_definition(FLOW_DEFINITION_KIND, &input.flow_key)
-            .await?;
+        delete_definition(operation_context, FLOW_DEFINITION_KIND, &input.flow_key).await?;
         Ok(NoContent)
     }
 }
@@ -264,10 +262,7 @@ impl Operation for ResetPaymentFlowOperation {
                 message: "Only built-in flows have a default to go back to".to_owned(),
             });
         };
-        operation_context
-            .payment_definition_repository
-            .delete_definition(FLOW_DEFINITION_KIND, &input.flow_key)
-            .await?;
+        delete_definition(operation_context, FLOW_DEFINITION_KIND, &input.flow_key).await?;
         present_payment_flow(operation_context, shipped_flow).await
     }
 }

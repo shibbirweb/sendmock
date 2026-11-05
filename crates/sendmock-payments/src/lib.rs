@@ -1,6 +1,7 @@
 //! Payment domain: the checkout flow steps, the label variables and the rules a flow follows.
 
 mod flow;
+mod gateway;
 mod method;
 
 pub use flow::{
@@ -8,6 +9,7 @@ pub use flow::{
     PaymentStepType, add_flow_step, check_payment_flow, find_unknown_variables, move_flow_step,
     remove_flow_step,
 };
+pub use gateway::{GatewayProblem, PaymentGatewayDraft, check_new_gateway, check_payment_gateway};
 pub use method::{
     MethodProblem, PaymentMethodDraft, TEST_CARD_PREFIXES, TestNumberDraft, check_payment_method,
     is_test_card_range, passes_luhn_check, to_card_digits, to_test_number,

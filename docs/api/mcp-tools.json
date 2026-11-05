@@ -12352,25 +12352,6 @@
           "type": "string",
           "is_required": true,
           "allowed_values": [
-            "email.received",
-            "email.inbound",
-            "email.opened",
-            "email.delivered",
-            "email.deferred",
-            "email.bounced",
-            "email.complained",
-            "email.unsubscribed",
-            "email.released",
-            "email.deleted",
-            "sms.sent",
-            "sms.status",
-            "sms.opened",
-            "sms.inbound",
-            "sms.reply_webhook",
-            "verify.started",
-            "verify.checked",
-            "verify.expired",
-            "http.captured",
             "payment.created",
             "payment.authorized",
             "payment.succeeded",
@@ -12381,10 +12362,7 @@
             "payment.dispute_opened",
             "payment.dispute_closed",
             "checkout.completed",
-            "checkout.expired",
-            "webhook.delivered",
-            "webhook.failed",
-            "test.ping"
+            "checkout.expired"
           ],
           "description": "The native event to render the notification for.",
           "example": "payment.succeeded"
@@ -12497,44 +12475,6 @@
           "redirect_outcome"
         ],
         "$defs": {
-          "AppEventType": {
-            "type": "string",
-            "enum": [
-              "email.received",
-              "email.inbound",
-              "email.opened",
-              "email.delivered",
-              "email.deferred",
-              "email.bounced",
-              "email.complained",
-              "email.unsubscribed",
-              "email.released",
-              "email.deleted",
-              "sms.sent",
-              "sms.status",
-              "sms.opened",
-              "sms.inbound",
-              "sms.reply_webhook",
-              "verify.started",
-              "verify.checked",
-              "verify.expired",
-              "http.captured",
-              "payment.created",
-              "payment.authorized",
-              "payment.succeeded",
-              "payment.failed",
-              "payment.canceled",
-              "payment.refunded",
-              "payment.partially_refunded",
-              "payment.dispute_opened",
-              "payment.dispute_closed",
-              "checkout.completed",
-              "checkout.expired",
-              "webhook.delivered",
-              "webhook.failed",
-              "test.ping"
-            ]
-          },
           "GatewayCredential": {
             "type": "object",
             "properties": {
@@ -12627,7 +12567,20 @@
             "description": "A field sent back to the app on redirect, from a template."
           },
           "PaymentEventType": {
-            "$ref": "#/$defs/AppEventType",
+            "type": "string",
+            "enum": [
+              "payment.created",
+              "payment.authorized",
+              "payment.succeeded",
+              "payment.failed",
+              "payment.canceled",
+              "payment.refunded",
+              "payment.partially_refunded",
+              "payment.dispute_opened",
+              "payment.dispute_closed",
+              "checkout.completed",
+              "checkout.expired"
+            ],
             "description": "A native event a payment notification can carry."
           },
           "PaymentGatewayInput": {
@@ -12727,63 +12680,6 @@
               "event_names": {
                 "type": "object",
                 "properties": {
-                  "email.received": {
-                    "type": "string"
-                  },
-                  "email.inbound": {
-                    "type": "string"
-                  },
-                  "email.opened": {
-                    "type": "string"
-                  },
-                  "email.delivered": {
-                    "type": "string"
-                  },
-                  "email.deferred": {
-                    "type": "string"
-                  },
-                  "email.bounced": {
-                    "type": "string"
-                  },
-                  "email.complained": {
-                    "type": "string"
-                  },
-                  "email.unsubscribed": {
-                    "type": "string"
-                  },
-                  "email.released": {
-                    "type": "string"
-                  },
-                  "email.deleted": {
-                    "type": "string"
-                  },
-                  "sms.sent": {
-                    "type": "string"
-                  },
-                  "sms.status": {
-                    "type": "string"
-                  },
-                  "sms.opened": {
-                    "type": "string"
-                  },
-                  "sms.inbound": {
-                    "type": "string"
-                  },
-                  "sms.reply_webhook": {
-                    "type": "string"
-                  },
-                  "verify.started": {
-                    "type": "string"
-                  },
-                  "verify.checked": {
-                    "type": "string"
-                  },
-                  "verify.expired": {
-                    "type": "string"
-                  },
-                  "http.captured": {
-                    "type": "string"
-                  },
                   "payment.created": {
                     "type": "string"
                   },
@@ -12816,37 +12712,9 @@
                   },
                   "checkout.expired": {
                     "type": "string"
-                  },
-                  "webhook.delivered": {
-                    "type": "string"
-                  },
-                  "webhook.failed": {
-                    "type": "string"
-                  },
-                  "test.ping": {
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "email.received",
-                  "email.inbound",
-                  "email.opened",
-                  "email.delivered",
-                  "email.deferred",
-                  "email.bounced",
-                  "email.complained",
-                  "email.unsubscribed",
-                  "email.released",
-                  "email.deleted",
-                  "sms.sent",
-                  "sms.status",
-                  "sms.opened",
-                  "sms.inbound",
-                  "sms.reply_webhook",
-                  "verify.started",
-                  "verify.checked",
-                  "verify.expired",
-                  "http.captured",
                   "payment.created",
                   "payment.authorized",
                   "payment.succeeded",
@@ -12857,10 +12725,7 @@
                   "payment.dispute_opened",
                   "payment.dispute_closed",
                   "checkout.completed",
-                  "checkout.expired",
-                  "webhook.delivered",
-                  "webhook.failed",
-                  "test.ping"
+                  "checkout.expired"
                 ],
                 "description": "The gateway's name for each native event; blank sends nothing.",
                 "examples": [
@@ -13373,63 +13238,6 @@
           "event_names": {
             "type": "object",
             "properties": {
-              "email.received": {
-                "type": "string"
-              },
-              "email.inbound": {
-                "type": "string"
-              },
-              "email.opened": {
-                "type": "string"
-              },
-              "email.delivered": {
-                "type": "string"
-              },
-              "email.deferred": {
-                "type": "string"
-              },
-              "email.bounced": {
-                "type": "string"
-              },
-              "email.complained": {
-                "type": "string"
-              },
-              "email.unsubscribed": {
-                "type": "string"
-              },
-              "email.released": {
-                "type": "string"
-              },
-              "email.deleted": {
-                "type": "string"
-              },
-              "sms.sent": {
-                "type": "string"
-              },
-              "sms.status": {
-                "type": "string"
-              },
-              "sms.opened": {
-                "type": "string"
-              },
-              "sms.inbound": {
-                "type": "string"
-              },
-              "sms.reply_webhook": {
-                "type": "string"
-              },
-              "verify.started": {
-                "type": "string"
-              },
-              "verify.checked": {
-                "type": "string"
-              },
-              "verify.expired": {
-                "type": "string"
-              },
-              "http.captured": {
-                "type": "string"
-              },
               "payment.created": {
                 "type": "string"
               },
@@ -13462,37 +13270,9 @@
               },
               "checkout.expired": {
                 "type": "string"
-              },
-              "webhook.delivered": {
-                "type": "string"
-              },
-              "webhook.failed": {
-                "type": "string"
-              },
-              "test.ping": {
-                "type": "string"
               }
             },
             "required": [
-              "email.received",
-              "email.inbound",
-              "email.opened",
-              "email.delivered",
-              "email.deferred",
-              "email.bounced",
-              "email.complained",
-              "email.unsubscribed",
-              "email.released",
-              "email.deleted",
-              "sms.sent",
-              "sms.status",
-              "sms.opened",
-              "sms.inbound",
-              "sms.reply_webhook",
-              "verify.started",
-              "verify.checked",
-              "verify.expired",
-              "http.captured",
               "payment.created",
               "payment.authorized",
               "payment.succeeded",
@@ -13503,10 +13283,7 @@
               "payment.dispute_opened",
               "payment.dispute_closed",
               "checkout.completed",
-              "checkout.expired",
-              "webhook.delivered",
-              "webhook.failed",
-              "test.ping"
+              "checkout.expired"
             ],
             "description": "The gateway's name for each native event; blank sends nothing.",
             "examples": [

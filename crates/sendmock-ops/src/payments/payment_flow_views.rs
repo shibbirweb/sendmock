@@ -41,6 +41,16 @@ pub struct PaymentFlowRecord {
     pub is_builtin: bool,
 }
 
+impl super::payment_definition_store::PaymentDefinition for PaymentFlowRecord {
+    fn definition_key(&self) -> &str {
+        &self.key
+    }
+
+    fn is_builtin(&self) -> bool {
+        self.is_builtin
+    }
+}
+
 impl PaymentFlowRecord {
     pub fn to_draft(&self) -> PaymentFlowDraft {
         PaymentFlowDraft {

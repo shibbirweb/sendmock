@@ -110,6 +110,16 @@ pub struct PaymentMethodRecord {
     pub is_builtin: bool,
 }
 
+impl super::payment_definition_store::PaymentDefinition for PaymentMethodRecord {
+    fn definition_key(&self) -> &str {
+        &self.fields.key
+    }
+
+    fn is_builtin(&self) -> bool {
+        self.is_builtin
+    }
+}
+
 /// What a customer pays with on a checkout page, and the test values its flow asks for.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 pub struct PaymentMethodDefinition {

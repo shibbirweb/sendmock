@@ -1,5 +1,4 @@
-use sendmock_store::PaymentDefinitionRecord;
-
+use super::payment_definition_store::{FLOW_DEFINITION_KIND, load_definitions, save_definition};
 use super::payment_flow_views::{
     PaymentFlowDefinition, PaymentFlowRecord, PaymentFlowVariable, PaymentStepTypeInfo,
 };
@@ -11,8 +10,6 @@ use crate::{OperationContext, OperationError};
 const BUILTIN_FLOWS_JSON: &str = include_str!("../../builtin/payment-flows.json");
 const STEP_TYPES_JSON: &str = include_str!("../../builtin/payment-step-types.json");
 const FLOW_VARIABLES_JSON: &str = include_str!("../../builtin/payment-flow-variables.json");
-
-pub const FLOW_DEFINITION_KIND: &str = "flow";
 
 pub fn builtin_payment_flows() -> Vec<PaymentFlowRecord> {
     serde_json::from_str(BUILTIN_FLOWS_JSON).unwrap_or_default()
@@ -32,41 +29,17 @@ pub fn payment_flow_variables() -> Vec<PaymentFlowVariable> {
     serde_json::from_str(FLOW_VARIABLES_JSON).unwrap_or_default()
 }
 
-fn read_stored_flow(
-    stored_definition: &PaymentDefinitionRecord,
-) -> Result<PaymentFlowRecord, OperationError> {
-    serde_json::from_str(&stored_definition.definition_json)
-        .map_err(|read_error| OperationError::Internal(read_error.to_string()))
-}
-
 /// Every flow as checkouts see it: the built-ins with their stored edits, then custom flows in
 /// the order they were added.
 pub async fn load_payment_flows(
     operation_context: &OperationContext,
 ) -> Result<Vec<PaymentFlowRecord>, OperationError> {
-    let stored_flows = operation_context
-        .payment_definition_repository
-        .list_definitions(FLOW_DEFINITION_KIND)
-        .await?
-        .iter()
-        .map(read_stored_flow)
-        .collect::<Result<Vec<_>, _>>()?;
-    let mut payment_flows: Vec<PaymentFlowRecord> = builtin_payment_flows()
-        .into_iter()
-        .map(|shipped_flow| {
-            stored_flows
-                .iter()
-                .find(|stored_flow| stored_flow.key == shipped_flow.key)
-                .cloned()
-                .unwrap_or(shipped_flow)
-        })
-        .collect();
-    payment_flows.extend(
-        stored_flows
-            .into_iter()
-            .filter(|stored_flow| !stored_flow.is_builtin),
-    );
-    Ok(payment_flows)
+    load_definitions(
+        operation_context,
+        FLOW_DEFINITION_KIND,
+        builtin_payment_flows(),
+    )
+    .await
 }
 
 pub async fn find_payment_flow(
@@ -133,23 +106,11 @@ pub fn present_with_usage(
     }
 }
 
-/// Stores the flow; for a built-in, the stored row is its edit.
 pub async fn save_payment_flow(
     operation_context: &OperationContext,
     payment_flow: &PaymentFlowRecord,
 ) -> Result<(), OperationError> {
-    let definition_json = serde_json::to_string(payment_flow)
-        .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
-    operation_context
-        .payment_definition_repository
-        .save_definition(PaymentDefinitionRecord {
-            kind: FLOW_DEFINITION_KIND.to_owned(),
-            definition_key: payment_flow.key.clone(),
-            definition_json,
-            updated_at_unix_ms: operation_context.clock.now_unix_ms(),
-        })
-        .await?;
-    Ok(())
+    save_definition(operation_context, FLOW_DEFINITION_KIND, payment_flow).await
 }
 
 #[cfg(test)]

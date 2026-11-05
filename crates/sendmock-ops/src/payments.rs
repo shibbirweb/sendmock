@@ -1,7 +1,12 @@
+mod payment_definition_store;
 mod payment_flow_catalogue;
 mod payment_flow_operations;
 mod payment_flow_step_operations;
 mod payment_flow_views;
+mod payment_gateway_catalogue;
+mod payment_gateway_maintenance_operations;
+mod payment_gateway_operations;
+mod payment_gateway_views;
 mod payment_method_catalogue;
 mod payment_method_operations;
 mod payment_method_views;
@@ -15,6 +20,14 @@ pub use payment_flow_step_operations::{
     RemovePaymentFlowStepOperation, UpdatePaymentFlowStepOperation,
 };
 pub use payment_flow_views::{PaymentFlowDefinition, PaymentFlowStep};
+pub use payment_gateway_maintenance_operations::{
+    DeletePaymentGatewayOperation, ResetPaymentGatewayOperation, RevealGatewayCredentialOperation,
+};
+pub use payment_gateway_operations::{
+    CreatePaymentGatewayOperation, GetPaymentGatewayOperation, ListPaymentGatewaysOperation,
+    UpdatePaymentGatewayOperation,
+};
+pub use payment_gateway_views::PaymentGatewayDefinition;
 pub use payment_method_operations::{
     CreatePaymentMethodOperation, DeletePaymentMethodOperation, GetPaymentMethodOperation,
     ListPaymentMethodsOperation, ResetPaymentMethodOperation, UpdatePaymentMethodOperation,
@@ -41,4 +54,11 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(UpdatePaymentMethodOperation);
     operation_registry.register(DeletePaymentMethodOperation);
     operation_registry.register(ResetPaymentMethodOperation);
+    operation_registry.register(ListPaymentGatewaysOperation);
+    operation_registry.register(CreatePaymentGatewayOperation);
+    operation_registry.register(GetPaymentGatewayOperation);
+    operation_registry.register(UpdatePaymentGatewayOperation);
+    operation_registry.register(DeletePaymentGatewayOperation);
+    operation_registry.register(ResetPaymentGatewayOperation);
+    operation_registry.register(RevealGatewayCredentialOperation);
 }

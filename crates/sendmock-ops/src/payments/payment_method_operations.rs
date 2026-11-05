@@ -1,8 +1,10 @@
 use sendmock_payments::check_payment_method;
 
+use super::payment_definition_store::{METHOD_DEFINITION_KIND, delete_definition};
+use super::payment_gateway_catalogue::load_gateway_method_keys;
 use super::payment_method_catalogue::{
-    METHOD_DEFINITION_KIND, find_flow_step_types, find_payment_method, find_shipped_method,
-    load_gateway_method_keys, load_payment_methods, present_payment_method, save_payment_method,
+    find_flow_step_types, find_payment_method, find_shipped_method, load_payment_methods,
+    present_payment_method, save_payment_method,
 };
 use super::payment_method_views::{
     PaymentMethodDefinition, PaymentMethodFields, PaymentMethodRecord, PaymentMethodReference,
@@ -241,10 +243,7 @@ impl Operation for DeletePaymentMethodOperation {
                 ),
             });
         }
-        operation_context
-            .payment_definition_repository
-            .delete_definition(METHOD_DEFINITION_KIND, &input.method_key)
-            .await?;
+        delete_definition(operation_context, METHOD_DEFINITION_KIND, &input.method_key).await?;
         Ok(NoContent)
     }
 }
@@ -278,10 +277,7 @@ impl Operation for ResetPaymentMethodOperation {
                 message: "Only built-in methods have a default to go back to".to_owned(),
             });
         };
-        operation_context
-            .payment_definition_repository
-            .delete_definition(METHOD_DEFINITION_KIND, &input.method_key)
-            .await?;
+        delete_definition(operation_context, METHOD_DEFINITION_KIND, &input.method_key).await?;
         present_method(operation_context, shipped_method).await
     }
 }

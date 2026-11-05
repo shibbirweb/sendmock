@@ -1,5 +1,4 @@
 import type { Ulid } from "@/lib/api/types/common";
-import type { AppEventType } from "@/lib/api/types/events";
 import type { TemplateReference } from "@/lib/api/types/webhooks";
 
 /** The gateways SendMock ships; custom gateways have their own keys. */
@@ -7,10 +6,18 @@ export type BuiltinPaymentProvider =
   "stripe" | "paypal" | "sslcommerz" | "bkash" | "native";
 
 /** A native event a payment notification can carry. */
-export type PaymentEventType = Extract<
-  AppEventType,
-  `payment.${string}` | `checkout.${string}`
->;
+export type PaymentEventType =
+  | "payment.created"
+  | "payment.authorized"
+  | "payment.succeeded"
+  | "payment.failed"
+  | "payment.canceled"
+  | "payment.refunded"
+  | "payment.partially_refunded"
+  | "payment.dispute_opened"
+  | "payment.dispute_closed"
+  | "checkout.completed"
+  | "checkout.expired";
 
 /** A merchant credential; a secret's value comes back masked (`••••` and the last 4). */
 export type GatewayCredential = {

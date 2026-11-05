@@ -69,7 +69,9 @@ pub use outcome_rules::{
     EmailOutcomeRule, OutcomeTestResult, SmsOutcomeRule, load_email_outcome_rules,
 };
 pub use page_of::PageOf;
-pub use payments::{PaymentFlowDefinition, PaymentFlowStep, PaymentMethodDefinition};
+pub use payments::{
+    PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition, PaymentMethodDefinition,
+};
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_sms_providers, load_sms_provider_definitions,

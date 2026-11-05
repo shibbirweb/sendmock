@@ -137,6 +137,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_sms_reply_samples(app_router).await);
     samples.extend(prepare_payment_flow_samples(app_router).await);
     samples.extend(prepare_payment_method_samples(app_router).await);
+    samples.extend(prepare_payment_gateway_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -1019,6 +1020,74 @@ async fn prepare_payment_method_samples(
         (
             "deletePaymentsMethodsByMethodKey",
             vec![json!({ "method_key": "deleted_method" })],
+        ),
+    ]
+}
+
+/// A gateway's answer as the body of a change to it.
+async fn read_gateway_change(app_router: &axum::Router, gateway_key: &str) -> Value {
+    let gateway_path = format!("/api/v1/payments/gateways/{gateway_key}");
+    let mut gateway_change = send_json(app_router, "GET", &gateway_path, &json!({})).await;
+    if let Some(fields) = gateway_change.as_object_mut() {
+        for read_only_field in ["is_builtin", "is_modified", "payment_count"] {
+            fields.remove(read_only_field);
+        }
+    }
+    gateway_change["gateway_key"] = json!(gateway_key);
+    gateway_change
+}
+
+/// The name of the gateway's first secret credential.
+async fn find_secret_credential_name(app_router: &axum::Router, gateway_key: &str) -> Value {
+    let gateway_path = format!("/api/v1/payments/gateways/{gateway_key}");
+    let payment_gateway = send_json(app_router, "GET", &gateway_path, &json!({})).await;
+    payment_gateway["credentials"]
+        .as_array()
+        .and_then(|credentials| {
+            credentials
+                .iter()
+                .find(|credential| credential["is_secret"] == true)
+        })
+        .map(|credential| credential["name"].clone())
+        .unwrap_or(Value::Null)
+}
+
+/// Two custom gateways (one to edit, one to delete); the built-in Stripe to reset and reveal.
+async fn prepare_payment_gateway_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    for gateway_key in ["nagad", "deleted_gateway"] {
+        post_json(
+            app_router,
+            "/api/v1/payments/gateways",
+            &json!({ "name": "Nagad", "key": gateway_key, "start_from": "sslcommerz" }),
+        )
+        .await;
+    }
+    let nagad = read_gateway_change(app_router, "nagad").await;
+    let secret_name = find_secret_credential_name(app_router, "stripe").await;
+    vec![
+        ("getPaymentsGateways", vec![json!({})]),
+        (
+            "postPaymentsGateways",
+            vec![json!({ "name": "Upay", "key": "upay", "start_from": null })],
+        ),
+        (
+            "getPaymentsGatewaysByGatewayKey",
+            vec![json!({ "gateway_key": "stripe" })],
+        ),
+        ("patchPaymentsGatewaysByGatewayKey", vec![nagad]),
+        (
+            "postPaymentsGatewaysByGatewayKeyReset",
+            vec![json!({ "gateway_key": "stripe" })],
+        ),
+        (
+            "getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName",
+            vec![json!({ "gateway_key": "stripe", "credential_name": secret_name })],
+        ),
+        (
+            "deletePaymentsGatewaysByGatewayKey",
+            vec![json!({ "gateway_key": "deleted_gateway" })],
         ),
     ]
 }
