@@ -1,13 +1,16 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod scripted_webhook_sender;
     pub mod test_app;
     pub mod webhook_samples;
 }
 
+use std::sync::Arc;
 use std::time::Duration;
 
-use sendmock_ops::run_webhook_rule_subscriber;
+use sendmock_ops::{run_due_deliveries, run_webhook_rule_subscriber};
 use serde_json::{Value, json};
+use support::scripted_webhook_sender::ScriptedWebhookSender;
 use support::test_app::{build_test_app, build_test_app_with, call_api};
 use support::webhook_samples::{create_endpoint, create_rule, send_email};
 
@@ -360,8 +363,10 @@ async fn create_twilio_status_endpoint(app_router: &axum::Router) -> String {
 // AC: SM-10.3 SM-11.3
 #[tokio::test]
 async fn an_opened_sms_sends_twilios_read_status() {
-    let (app_router, operation_context) =
-        build_test_app_with(|operation_context| operation_context);
+    let webhook_sender = Arc::new(ScriptedWebhookSender::default());
+    let (app_router, operation_context) = build_test_app_with(|operation_context| {
+        operation_context.with_webhook_sender(webhook_sender.clone())
+    });
     let subscriber = tokio::spawn(run_webhook_rule_subscriber(operation_context.clone()));
     tokio::task::yield_now().await;
     let endpoint_id = create_twilio_status_endpoint(&app_router).await;
@@ -383,19 +388,23 @@ async fn an_opened_sms_sends_twilios_read_status() {
     .await;
     tokio::time::sleep(Duration::from_millis(200)).await;
     subscriber.abort();
+    run_due_deliveries(&operation_context, 10)
+        .await
+        .unwrap_or_else(|error| panic!("the pass runs: {error}"));
 
-    let deliveries = read_json(&app_router, "/api/v1/webhooks/deliveries").await;
-    let read_receipt = deliveries["items"]
-        .as_array()
+    let sent_bodies: Vec<String> = webhook_sender
+        .received_requests()
         .into_iter()
-        .flatten()
-        .find(|delivery| delivery["event_type"] == "sms.opened")
+        .map(|sent_request| sent_request.body)
+        .collect();
+    let read_receipt_body = sent_bodies
+        .iter()
+        .find(|sent_body| sent_body.contains("MessageStatus=read"))
         .cloned()
-        .unwrap_or(Value::Null);
-    let callback_body = read_receipt["request"]["body"].as_str().unwrap_or_default();
+        .unwrap_or_default();
+    assert!(!read_receipt_body.is_empty(), "{sent_bodies:?}");
     assert!(
-        callback_body.contains("MessageStatus=read"),
-        "{read_receipt}"
+        read_receipt_body.contains("SmsStatus=read"),
+        "{read_receipt_body}"
     );
-    assert!(callback_body.contains("SmsStatus=read"), "{read_receipt}");
 }
