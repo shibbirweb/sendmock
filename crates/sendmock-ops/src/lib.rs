@@ -31,6 +31,7 @@ mod paypal;
 mod present_value;
 mod providers;
 mod razorpay;
+mod request_client;
 mod samples;
 mod scenarios;
 mod seed;
@@ -100,6 +101,7 @@ pub use providers::{
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
     load_sms_provider_definitions, sign_twilio_request,
 };
+pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,

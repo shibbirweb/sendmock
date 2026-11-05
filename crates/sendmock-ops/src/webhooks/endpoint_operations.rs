@@ -14,9 +14,6 @@ use crate::{
     OperationError, SuccessStatus,
 };
 
-/// The REST API cannot tell the UI, CLI and agents apart yet.
-const CREATED_THROUGH_API: &str = "api";
-
 pub(super) async fn find_stored_endpoint(
     operation_context: &OperationContext,
     endpoint_id: &str,
@@ -105,7 +102,7 @@ impl Operation for CreateWebhookEndpointOperation {
                 .to_owned(),
             previous_signing_secret: None,
             previous_secret_expires_at_unix_ms: None,
-            created_by: CREATED_THROUGH_API.to_owned(),
+            created_by: operation_context.request_client.as_str().to_owned(),
             created_at_unix_ms: now_unix_ms,
         };
         operation_context

@@ -242,3 +242,22 @@ test("WH-01.8 rotating the secret shows the new secret and the overlap end", asy
     endpointSheet.getByTestId("previous-secret-expiry"),
   ).toContainText("The previous secret also signs until");
 });
+
+test("AI-05.4 an endpoint an AI agent made carries the MCP badge", async ({
+  page,
+}) => {
+  await page.goto("/webhooks/endpoints");
+
+  const agentEndpointRow = page
+    .getByRole("row")
+    .filter({ hasText: "Team Slack alerts" });
+  await expect(
+    agentEndpointRow.getByText("MCP", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "SMS status callbacks" })
+      .getByText("MCP", { exact: true }),
+  ).toHaveCount(0);
+});

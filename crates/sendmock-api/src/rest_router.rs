@@ -12,7 +12,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, on};
 use sendmock_ops::{
     ErasedOperation, HttpMethod, OperationAnswer, OperationContext, OperationRegistry,
-    to_snake_case,
+    REQUEST_CLIENT_HEADER, RequestClient, to_snake_case,
 };
 
 use serde_json::Value;
@@ -114,8 +114,17 @@ fn build_operation_route(
                 body,
                 reads_body,
             };
+            let request_context = match headers
+                .get(REQUEST_CLIENT_HEADER)
+                .and_then(|header_value| header_value.to_str().ok())
+            {
+                Some(client_name) => operation_context
+                    .clone()
+                    .with_request_client(RequestClient::from_header_value(client_name)),
+                None => operation_context.clone(),
+            };
             match assemble_input(operation.as_ref(), &input_schema, request_parts) {
-                Ok(input) => run_operation(operation.as_ref(), &operation_context, input).await,
+                Ok(input) => run_operation(operation.as_ref(), &request_context, input).await,
                 Err(error_response) => error_response.into_response(),
             }
         },

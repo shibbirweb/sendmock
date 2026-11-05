@@ -219,3 +219,41 @@ fn ai_install_for_claude_code_and_codex_writes_their_files() {
     );
     assert!(agents_text.contains("<!-- sendmock:start -->"));
 }
+
+// AC: AI-05.4
+#[test]
+fn an_endpoint_created_with_the_cli_records_cli() {
+    let working_directory = make_directory();
+    let (_sendmock, server_url) = start_server(working_directory.path());
+    let endpoint_body = serde_json::json!({
+        "name": "Made with the CLI", "url": "http://localhost:3000/hooks", "method": "POST",
+        "headers": {}, "extra_fields": {}, "template_id": "native", "template_mode": "linked",
+        "timeout_ms": 10_000,
+        "retry_policy": { "max_attempts": 2, "backoff_seconds": [1], "retry_on_client_errors": false },
+        "is_enabled": true, "query_params": [], "body_mode": "template", "body_fields": [],
+        "fields_encoding": "json", "raw_content_type": "application/json", "raw_body": "",
+        "render_mode": "strict",
+    });
+
+    let output = run_until_exit(sendmock_command(working_directory.path()).args([
+        "webhook",
+        "endpoint",
+        "create",
+        "--data",
+        &endpoint_body.to_string(),
+        "--server",
+        &server_url,
+        "--json",
+    ]))
+    .unwrap_or_else(|run_error| panic!("the command runs: {run_error}"));
+
+    let created_endpoint: serde_json::Value =
+        serde_json::from_slice(&output.stdout).unwrap_or_default();
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(created_endpoint["created_by"], "cli", "{created_endpoint}");
+}

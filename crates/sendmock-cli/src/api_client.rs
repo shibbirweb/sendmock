@@ -41,6 +41,8 @@ pub struct ApiClient {
     http_client: reqwest::Client,
     server_url: String,
     token: Option<String>,
+    /// `cli`, or `mcp` for the MCP server's calls, sent so new items record who made them.
+    client_name: &'static str,
 }
 
 impl ApiClient {
@@ -49,7 +51,14 @@ impl ApiClient {
             http_client: build_http_client(),
             server_url,
             token,
+            client_name: "cli",
         }
+    }
+
+    /// The same client, naming itself as the MCP server.
+    pub fn for_mcp(mut self) -> Self {
+        self.client_name = "mcp";
+        self
     }
 
     /// Puts path values in the URL, the other inputs in the query string or the body.
@@ -58,7 +67,9 @@ impl ApiClient {
         definition: &OperationDefinition,
         input: &Value,
     ) -> Result<ApiAnswer, CliError> {
-        let mut request = self.build_request(definition, input);
+        let mut request = self
+            .build_request(definition, input)
+            .header(sendmock_ops::REQUEST_CLIENT_HEADER, self.client_name);
         if let Some(token) = &self.token {
             request = request.bearer_auth(token);
         }

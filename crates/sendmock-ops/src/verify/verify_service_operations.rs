@@ -85,7 +85,7 @@ pub fn new_verify_service(operation_context: &OperationContext) -> VerifyService
         code_length: 6,
         fixed_code: None,
         ttl_seconds: 600,
-        created_by: "api".to_owned(),
+        created_by: operation_context.request_client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }
 }

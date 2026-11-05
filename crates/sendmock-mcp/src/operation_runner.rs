@@ -20,8 +20,12 @@ pub struct InProcessOperationRunner {
 }
 
 impl InProcessOperationRunner {
+    /// Items the tools create record `mcp` as their creator.
     pub fn new(operation_context: OperationContext) -> Self {
-        Self { operation_context }
+        Self {
+            operation_context: operation_context
+                .with_request_client(sendmock_ops::RequestClient::Mcp),
+        }
     }
 }
 

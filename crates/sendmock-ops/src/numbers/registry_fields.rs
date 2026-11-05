@@ -1,9 +1,6 @@
 use crate::OperationError;
 
 const HTTP_URL_MESSAGE: &str = "Enter an http:// or https:// URL";
-/// The REST API cannot tell the UI, CLI and agents apart yet.
-pub const CREATED_THROUGH_API: &str = "api";
-
 pub fn field_error(field_name: &str, message: &str) -> OperationError {
     OperationError::InvalidInput {
         message: message.to_owned(),

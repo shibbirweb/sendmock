@@ -10,9 +10,6 @@ use crate::{
 /// The email operations share their MCP tools with the SMS ones, told apart by `channel`.
 pub const EMAIL_CHANNEL_SELECTOR: Option<OperationSelector> =
     Some(OperationSelector::by_value("channel", "email"));
-/// Who created a rule; the REST API cannot tell the UI, CLI and agents apart yet.
-const CREATED_THROUGH_API: &str = "api";
-
 pub async fn find_email_rule_or_not_found(
     operation_context: &OperationContext,
     rule_id: &str,
@@ -97,7 +94,7 @@ impl Operation for CreateEmailOutcomeRuleOperation {
             diagnostic: input.diagnostic,
             note: input.note,
             is_enabled: input.is_enabled,
-            created_by: CREATED_THROUGH_API.to_owned(),
+            created_by: operation_context.request_client.as_str().to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         })?;
         let stored_rule = operation_context

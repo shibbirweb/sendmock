@@ -14,9 +14,6 @@ use crate::{
     SuccessStatus,
 };
 
-/// The REST API cannot tell the UI, CLI and agents apart yet.
-const CREATED_THROUGH_API: &str = "api";
-
 pub(super) fn variable_definition(
     operation_id: &'static str,
     method: HttpMethod,
@@ -158,7 +155,7 @@ impl Operation for CreateWebhookVariableOperation {
                 .map(|mode| mode.as_str().to_owned()),
             fixed_value,
             description: input.description.trim().to_owned(),
-            created_by: CREATED_THROUGH_API.to_owned(),
+            created_by: operation_context.request_client.as_str().to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         };
         operation_context

@@ -8,9 +8,6 @@ use crate::{
     OperationError, SuccessStatus,
 };
 
-/// The REST API cannot tell the UI, CLI and agents apart yet.
-const CREATED_THROUGH_API: &str = "api";
-
 fn write_json(value: &impl serde::Serialize) -> Result<String, OperationError> {
     serde_json::to_string(value)
         .map_err(|write_error| OperationError::Internal(write_error.to_string()))
@@ -132,7 +129,7 @@ impl Operation for CreateWebhookRuleOperation {
                 events_json: write_json(&input.events)?,
                 filter_json: input.filter.as_ref().map(write_json).transpose()?,
                 is_enabled: input.is_enabled,
-                created_by: CREATED_THROUGH_API.to_owned(),
+                created_by: operation_context.request_client.as_str().to_owned(),
                 created_at_unix_ms: operation_context.clock.now_unix_ms(),
             })
             .await?;

@@ -1,7 +1,7 @@
 use sendmock_store::MessagingServiceRecord;
 
 use super::number_inputs::{MessagingServiceInboundMode, MessagingServiceInput};
-use super::registry_fields::{CREATED_THROUGH_API, field_error, read_optional_url};
+use super::registry_fields::{field_error, read_optional_url};
 use crate::{OperationContext, OperationError};
 
 /// The service as it will be stored: a name, a request URL when inbound messages go to a
@@ -28,7 +28,7 @@ pub async fn build_messaging_service(
         ),
         None => (
             generate_service_sid(operation_context),
-            CREATED_THROUGH_API.to_owned(),
+            operation_context.request_client.as_str().to_owned(),
             operation_context.clock.now_unix_ms(),
         ),
     };

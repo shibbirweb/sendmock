@@ -1,9 +1,7 @@
 use sendmock_store::VirtualNumberRecord;
 
 use super::number_inputs::{NumberChannel, VirtualNumberInput};
-use super::registry_fields::{
-    CREATED_THROUGH_API, field_error, is_e164, read_optional_text, read_optional_url,
-};
+use super::registry_fields::{field_error, is_e164, read_optional_text, read_optional_url};
 use crate::{OperationContext, OperationError};
 
 /// The number as it will be stored, checked as the form checks it: E.164, not registered by
@@ -109,7 +107,7 @@ fn new_number_record(operation_context: &OperationContext) -> VirtualNumberRecor
         inbound_template_id: None,
         status_callback_url: None,
         messaging_service_sid: None,
-        created_by: CREATED_THROUGH_API.to_owned(),
+        created_by: operation_context.request_client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }
 }

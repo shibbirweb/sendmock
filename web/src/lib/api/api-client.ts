@@ -42,6 +42,8 @@ function buildRequestInit(requestOptions: ApiRequestOptions): RequestInit {
     method: requestOptions.method ?? "GET",
     headers: {
       ...(contentType === undefined ? {} : { "Content-Type": contentType }),
+      // New items record that the UI made them (AI-05.4).
+      "X-Sendmock-Client": "ui",
       ...requestOptions.headers,
     },
     body:

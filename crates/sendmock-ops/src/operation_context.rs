@@ -85,6 +85,8 @@ pub struct OperationContext {
     pub email_stores: EmailStores,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
+    /// Who made this request, recorded as `created_by` on what it creates.
+    pub request_client: crate::RequestClient,
 }
 
 /// Wake the background dispatchers when work is queued.
@@ -214,7 +216,14 @@ impl OperationContext {
             status_callback_sender: None,
             reply_webhook_sender: None,
             environment_reader: Arc::new(ProcessEnvironment),
+            request_client: crate::RequestClient::default(),
         }
+    }
+
+    /// The same context for one request from this client.
+    pub fn with_request_client(mut self, request_client: crate::RequestClient) -> Self {
+        self.request_client = request_client;
+        self
     }
 
     pub fn with_environment_reader(

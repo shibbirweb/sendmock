@@ -50,7 +50,7 @@ pub fn run_mcp_command(mcp_arguments: &McpArguments) -> ExitCode {
         std::env::var("SENDMOCK_HTTP_ADDR").ok().as_deref(),
     );
     let operation_runner = RemoteOperationRunner {
-        api_client: ApiClient::new(server_url, mcp_arguments.token.clone()),
+        api_client: ApiClient::new(server_url, mcp_arguments.token.clone()).for_mcp(),
     };
     let tool_catalog = McpToolCatalog::new(
         &build_operation_registry(),
