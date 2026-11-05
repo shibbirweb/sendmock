@@ -309,14 +309,14 @@ Plan: [28-phase-3p.md](28-phase-3p.md). Built on `feat/phase-0` in #48, W1 to W1
 
 Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 in order.
 
-- [ ] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo)
+- [x] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo) (#48)
 - [ ] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16)
 - [x] HTML compatibility, link check, SpamAssassin check (#48)
 - [x] Release to real SMTP, auto-forward, tag rules (#48)
 - [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
-- [ ] Bounce/complaint/delivered and open provider formats
-- [ ] Fake data functions, Postman aliases, `SENDMOCK_VAR_*`
-- [ ] Remaining built-in templates, `--templates-dir`
+- [x] Bounce/complaint/delivered and open provider formats (#48)
+- [x] Fake data functions, Postman aliases, `SENDMOCK_VAR_*` (#48)
+- [x] Remaining built-in templates, `--templates-dir` (#48)
 - [x] Multipart Fields bodies with file fields (WH-07.16) (#48)
 - [ ] More SMS providers (Plivo, MessageBird, generic GET/POST)
 - [x] Email replies and inbound routes (Mailgun style): reply, reply all and forward as recipient, `email.inbound`, inbound domains, routes, `/v3/routes` API (#48)
@@ -683,3 +683,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-06 | Phase 4 W7b: Mailgun-style inbound routes run on incoming email (`match_recipient` with named groups, `match_header`, `catch_all`, `stop()`); `forward(url)` posts Mailgun's signed multipart fields through the delivery engine, `forward(email)` goes through the release allowlist; WH-12.1, WH-12.3 and WH-12.4 ticked. |
 | 2026-11-06 | Phase 4 W7c (part): Mailgun's Routes API (`/v3/routes`) and stored messages on the provider port share the UI's routes; WH-12.5 and WH-12.6 ticked. |
 | 2026-11-06 | Phase 4 W7c: multipart Fields bodies with file fields fetched from a URL when sent (contract, mock, editor and binary), and inbound routes send attachments the same way; WH-07 and WH-12 accepted. |
+| 2026-11-06 | WH-08.2 gets its test (choosing a template asks for its required variables), so WH-08 is accepted; the Phase 4 checklist ticks the email send APIs (EM-08), the provider event formats, the templating additions and the remaining templates. Open from W3: WH-06.3 (inbound formats with attachments), which needs attachments in the email event data of both engines. |

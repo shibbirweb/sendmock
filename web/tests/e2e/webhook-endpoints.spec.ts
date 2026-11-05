@@ -183,6 +183,23 @@ test("WH-01.6 a global variable satisfies a template's need", async ({
   );
 });
 
+test("WH-08.2 choosing a template asks for its required variables", async ({
+  page,
+}) => {
+  const endpointSheet = await openEndpointSheet(page, "Laravel inbound mail");
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
+  await endpointSheet.getByRole("combobox", { name: "Template" }).click();
+  await page.getByRole("option", { name: "Twilio: inbound SMS" }).click();
+  await endpointSheet.getByRole("tab", { name: "Variables" }).click();
+
+  const requiredVariable = endpointSheet.getByTestId("required-variable");
+  await expect(requiredVariable).toContainText("twilio_auth_token");
+  await expect(requiredVariable).toContainText("Missing");
+  await expect(
+    endpointSheet.getByLabel("Value for twilio_auth_token"),
+  ).toBeVisible();
+});
+
 test("WH-01.7 the table shows success sparklines and the switch applies at once", async ({
   page,
 }) => {
