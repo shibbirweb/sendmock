@@ -1,8 +1,11 @@
-//! The MCP server, with one tool per operation.
+//! The MCP server: one tool per operation, the resources and the prompts.
 
+mod mcp_prompts;
+mod mcp_resources;
 mod mcp_tool_catalog;
 mod mcp_tool_definition;
 mod operation_runner;
+mod resource_subscriptions;
 mod sendmock_mcp_server;
 mod tool_definitions_builder;
 mod toolsets;

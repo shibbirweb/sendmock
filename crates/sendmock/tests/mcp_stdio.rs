@@ -1,105 +1,14 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod mcp_session;
     pub mod sendmock_process;
 }
 
-use std::io::{self, BufRead, BufReader, Write};
-use std::process::{Child, ChildStdin, ChildStdout, Stdio};
+use std::io;
 
 use serde_json::{Value, json};
-use support::sendmock_process::{SendmockProcess, sendmock_command};
-
-/// A `sendmock mcp` process spoken to in JSON-RPC lines, killed on drop.
-struct McpSession {
-    child: Child,
-    stdin: ChildStdin,
-    stdout: BufReader<ChildStdout>,
-    next_request_id: u64,
-}
-
-impl McpSession {
-    fn start(
-        working_directory: &std::path::Path,
-        http_addr: &str,
-        extra_arguments: &[&str],
-    ) -> io::Result<Self> {
-        let mut child = sendmock_command(working_directory)
-            .args(["mcp", "--server", &format!("http://{http_addr}")])
-            .args(extra_arguments)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .spawn()?;
-        let stdin = child
-            .stdin
-            .take()
-            .ok_or_else(|| io::Error::other("stdin is not piped"))?;
-        let stdout = BufReader::new(
-            child
-                .stdout
-                .take()
-                .ok_or_else(|| io::Error::other("stdout is not piped"))?,
-        );
-        let mut mcp_session = Self {
-            child,
-            stdin,
-            stdout,
-            next_request_id: 1,
-        };
-        mcp_session.request(
-            "initialize",
-            json!({ "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": { "name": "sendmock-test", "version": "1" } }),
-        )?;
-        mcp_session
-            .send_line(&json!({ "jsonrpc": "2.0", "method": "notifications/initialized" }))?;
-        Ok(mcp_session)
-    }
-
-    fn send_line(&mut self, message: &Value) -> io::Result<()> {
-        writeln!(self.stdin, "{message}")?;
-        self.stdin.flush()
-    }
-
-    /// Sends a request and answers its `result`, skipping notifications.
-    fn request(&mut self, method: &str, params: Value) -> io::Result<Value> {
-        let request_id = self.next_request_id;
-        self.next_request_id += 1;
-        self.send_line(
-            &json!({ "jsonrpc": "2.0", "id": request_id, "method": method, "params": params }),
-        )?;
-        loop {
-            let mut response_line = String::new();
-            if self.stdout.read_line(&mut response_line)? == 0 {
-                return Err(io::Error::other("sendmock mcp closed stdout"));
-            }
-            let response: Value = serde_json::from_str(&response_line).map_err(io::Error::other)?;
-            if response["id"] == request_id {
-                return Ok(response["result"].clone());
-            }
-        }
-    }
-
-    fn call_tool(&mut self, tool_name: &str, arguments: Value) -> io::Result<Value> {
-        self.request(
-            "tools/call",
-            json!({ "name": tool_name, "arguments": arguments }),
-        )
-    }
-
-    fn list_tools(&mut self) -> io::Result<Vec<Value>> {
-        Ok(self.request("tools/list", json!({}))?["tools"]
-            .as_array()
-            .cloned()
-            .unwrap_or_default())
-    }
-}
-
-impl Drop for McpSession {
-    fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
-    }
-}
+use support::mcp_session::McpSession;
+use support::sendmock_process::SendmockProcess;
 
 fn find_tool<'tools>(tools: &'tools [Value], tool_name: &str) -> Option<&'tools Value> {
     tools.iter().find(|tool| tool["name"] == tool_name)

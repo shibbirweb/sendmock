@@ -2259,6 +2259,7 @@ dependencies = [
 name = "sendmock-mcp"
 version = "0.0.0"
 dependencies = [
+ "base64 0.23.1",
  "insta",
  "rmcp",
  "sendmock-core",

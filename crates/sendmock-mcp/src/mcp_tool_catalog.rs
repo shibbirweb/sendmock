@@ -17,6 +17,8 @@ pub enum ToolOutcome {
 /// The tools one server exposes and the operations behind each.
 pub struct McpToolCatalog {
     tools: Vec<(McpToolDefinition, Vec<Arc<dyn ErasedOperation>>)>,
+    /// Every operation, for the resources, whichever toolsets are on.
+    all_operations: Vec<Arc<dyn ErasedOperation>>,
     operation_runner: Arc<dyn OperationRunner>,
 }
 
@@ -51,8 +53,46 @@ impl McpToolCatalog {
             .collect();
         Self {
             tools,
+            all_operations: operation_registry.operations().to_vec(),
             operation_runner,
         }
+    }
+
+    /// Runs one operation by its id, as a resource read does.
+    pub async fn run_operation_by_id(
+        &self,
+        operation_id: &str,
+        input: Map<String, Value>,
+    ) -> Result<OperationAnswer, String> {
+        let Some(operation) = self
+            .all_operations
+            .iter()
+            .find(|operation| operation.definition().operation_id == operation_id)
+        else {
+            return Err(format!("No operation {operation_id}"));
+        };
+        self.operation_runner
+            .run_operation(Arc::clone(operation), Value::Object(input))
+            .await
+    }
+
+    /// The operation ids a tool runs, to find the resource its large answers live at.
+    pub fn read_tool_operation_ids(&self, tool_name: &str) -> Vec<&'static str> {
+        self.tools
+            .iter()
+            .filter(|(tool_definition, _)| {
+                tool_definition.name == tool_name
+                    || tool_definition
+                        .aliases
+                        .iter()
+                        .any(|alias| alias == tool_name)
+            })
+            .flat_map(|(_, tool_operations)| {
+                tool_operations
+                    .iter()
+                    .map(|operation| operation.definition().operation_id)
+            })
+            .collect()
     }
 
     pub fn tool_definitions(&self) -> impl Iterator<Item = &McpToolDefinition> {
