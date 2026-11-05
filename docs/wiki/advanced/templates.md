@@ -48,6 +48,14 @@ Besides the context, variables and `uuid()`, `random_int()` and the other genera
 
 Requests brought over from Postman keep working: `{{$randomUUID}}`, `{{$guid}}`, `{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$randomInt}}`, `{{$randomEmail}}`, `{{$randomFirstName}}`, `{{$randomFullName}}`, `{{$randomCompanyName}}`, `{{$randomCity}}`, `{{$randomIP}}`, `{{$randomUrl}}`, `{{$randomLoremSentence}}` and the like become the matching function before rendering.
 
+## Provider signatures
+
+The built-in provider templates sign their requests as the providers do, so your app's check passes unchanged: Twilio's `X-Twilio-Signature`, Mailgun's `signature` block (with your `mailgun_signing_key` variable), Resend's Svix headers (with your `resend_signing_secret`, a `whsec_` key), and Stripe, Razorpay, Paddle and SSLCommerz signatures. SendGrid signs its event webhook with a key pair it keeps; SendMock signs with a published test key pair, so set your app's SendGrid verification key to:
+
+```text
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEdZuCtJsfc9vqpbyG5Cknr4QqZWrFTIOUqVuAy9/FtZ3CdY7v0Xd+IwjfbPzxo6nvA60JYfvGMr5ifaJ0Hd5OAA==
+```
+
 ## Revisions
 
 Every save of a custom or edited template keeps a revision (the last 20). **History** shows each with a diff against the current version and **Restore** (which saves it as a new revision).
