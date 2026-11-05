@@ -39,6 +39,8 @@ Phase 0 onwards.
 - [ ] PL-01.1 Every endpoint in [06-api.md](../06-api.md) exists and matches `docs/api/openapi.yaml` (contract tests).
 - [x] PL-01.2 Errors use `{ "error": { "code", "message" } }` with the right HTTP status; times are RFC 3339 UTC; pagination uses `next_cursor`. (#48)
 - [x] PL-01.3 `/api/openapi.json` is served and valid. (#48)
+- [ ] PL-01.4 The UI's API reference lists every operation of the instance's `/api/openapi.json` by tag, with search, each operation's parameters, request body and answer, and a `curl` command for that instance.
+- [ ] PL-01.5 Each release attaches `openapi.yaml`, and the website serves `/openapi.yaml` with a download link on its API reference.
 
 ## PL-02 Realtime
 
