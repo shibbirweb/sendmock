@@ -38,11 +38,17 @@ function readElementText(testcaseXml: string, elementName: string): string {
 
 /** Each test case with a `<failure>` or `<error>`, with the end of what it printed. */
 export function readFailedTests(junitXml: string): FailedTest[] {
+  // A passing test is often a self-closing `<testcase ... />`, so the body is optional.
   const testcasePattern =
-    /<testcase\b[^>]*\bname="([^"]*)"[^>]*\bclassname="([^"]*)"[^>]*>([\s\S]*?)<\/testcase>/g;
+    /<testcase\b([^>]*?)(?:\/>|>([\s\S]*?)<\/testcase>)/g;
   return [...junitXml.matchAll(testcasePattern)]
-    .filter(([, , , testcaseXml]) => /<(failure|error)\b/.test(testcaseXml ?? ""))
-    .map(([, testName, className, testcaseXml]) => {
+    .map(([, testcaseAttributes, testcaseXml]) => [
+      testcaseAttributes?.match(/\bname="([^"]*)"/)?.[1] ?? "",
+      testcaseAttributes?.match(/\bclassname="([^"]*)"/)?.[1] ?? "",
+      testcaseXml ?? "",
+    ])
+    .filter(([, , testcaseXml]) => /<(failure|error)\b/.test(testcaseXml ?? ""))
+    .map(([testName, className, testcaseXml]) => {
       const output = [
         readElementText(testcaseXml ?? "", "failure"),
         readElementText(testcaseXml ?? "", "system-out"),
@@ -55,6 +61,13 @@ export function readFailedTests(junitXml: string): FailedTest[] {
         output: output.slice(-maximumOutputCharacters),
       };
     });
+}
+
+/** A workflow command property, such as the title, with `:` and `,` escaped too. */
+export function escapeWorkflowProperty(propertyValue: string): string {
+  return escapeWorkflowData(propertyValue)
+    .replace(/:/g, "%3A")
+    .replace(/,/g, "%2C");
 }
 
 /** A workflow command's data with `%`, CR and LF escaped as GitHub reads them. */
@@ -73,7 +86,7 @@ if (import.meta.main) {
   }
   for (const failedTest of readFailedTests(readFileSync(junitPath, "utf8"))) {
     console.log(
-      `::error title=${escapeWorkflowData(failedTest.testName)}::${escapeWorkflowData(failedTest.output)}`,
+      `::error title=${escapeWorkflowProperty(failedTest.testName)}::${escapeWorkflowData(failedTest.output)}`,
     );
   }
 }

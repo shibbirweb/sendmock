@@ -34,24 +34,24 @@ pub struct LinkCheckResult {
     pub error_message: Option<String>,
 }
 
-/// The email's links, then its remote images, each once.
+/// The email's links, then its remote images, each once; a URL that is an image source is an
+/// image even when the link list holds it too.
 fn list_checked_urls(links: &[String], html_body: &str) -> Vec<(String, LinkKind)> {
-    let mut checked_urls: Vec<(String, LinkKind)> = Vec::new();
     let image_urls = extract_remote_image_urls(html_body);
-    let candidates = links
-        .iter()
-        .map(|link_url| (link_url.clone(), LinkKind::Link))
-        .chain(
-            image_urls
-                .into_iter()
-                .map(|image_url| (image_url, LinkKind::Image)),
-        );
-    for (url, kind) in candidates {
+    let read_kind = |url: &String| {
+        if image_urls.contains(url) {
+            LinkKind::Image
+        } else {
+            LinkKind::Link
+        }
+    };
+    let mut checked_urls: Vec<(String, LinkKind)> = Vec::new();
+    for url in links.iter().chain(&image_urls) {
         if !checked_urls
             .iter()
-            .any(|(checked_url, _)| *checked_url == url)
+            .any(|(checked_url, _)| checked_url == url)
         {
-            checked_urls.push((url, kind));
+            checked_urls.push((url.clone(), read_kind(url)));
         }
     }
     checked_urls.truncate(MAXIMUM_CHECKED_URLS);
@@ -111,6 +111,19 @@ impl Operation for CheckEmailLinksOperation {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_image_source_in_the_link_list_is_checked_as_an_image() {
+        let links = vec!["https://cdn.shop.test/logo.png".to_owned()];
+        let html_body = r#"<img src="https://cdn.shop.test/logo.png">"#;
+
+        let checked_urls = list_checked_urls(&links, html_body);
+
+        assert_eq!(
+            checked_urls,
+            vec![("https://cdn.shop.test/logo.png".to_owned(), LinkKind::Image)]
+        );
+    }
 
     #[test]
     fn links_then_remote_images_are_checked_once_each() {
