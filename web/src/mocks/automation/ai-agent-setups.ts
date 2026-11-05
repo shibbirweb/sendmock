@@ -1,3 +1,4 @@
+import skillTemplate from "../../../../skill/sendmock/SKILL.md?raw";
 import type { AiAgentSetup } from "@/lib/api/types";
 
 const mcpServerJson = JSON.stringify(
@@ -58,18 +59,8 @@ export const aiAgentSetups: AiAgentSetup[] = [
   },
 ];
 
-/** The agent skill, as `sendmock ai skill --print` prints it (outline from docs/plan/14-ai-integration.md). */
-export const agentSkillMarkdown = `---
-name: sendmock
-description: Test and debug email, SMS, payments and webhooks locally with SendMock.
----
-
-# SendMock
-
-Use SendMock when testing or debugging anything that sends email or SMS, takes payments, or receives provider webhooks locally.
-
-1. Check it runs: \`sendmock status --json\` (MCP: \`sendmock_status\`). If not, start \`sendmock serve\` or ask the user.
-2. Prefer the MCP tools; otherwise use the CLI with \`--json\`.
-3. Workflows: connect an app, read an OTP, set up inbound webhooks with the right template, simulate outcomes, debug failed deliveries (check Logs first), complete Twilio Verify flows, add a payment gateway or flow, capture Slack and push calls with the HTTP catcher, write a scenario, export the setup with \`sendmock seed export\`.
-4. Safety: never reset or delete everything without asking; never print secrets; keep webhooks on local URLs unless asked.
-`;
+/** The skill the binary serves (skill/sendmock/SKILL.md), for the demo's version. */
+export const agentSkillMarkdown = skillTemplate.replace(
+  "{{sendmock_version}}",
+  "0.0.0-dev",
+);

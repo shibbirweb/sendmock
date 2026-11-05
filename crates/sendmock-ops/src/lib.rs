@@ -1,5 +1,6 @@
 //! The operation registry: each feature is one operation that REST, the CLI and MCP all call.
 
+pub mod ai;
 mod bkash;
 mod custom_gateways;
 mod email;
@@ -167,6 +168,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     http_catcher::register_http_catcher_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);
     subscriptions::register_subscription_operations(&mut operation_registry);
+    ai::register_ai_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

@@ -162,6 +162,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
     samples.extend(scenario_samples());
+    samples.extend(ai_samples());
     samples
 }
 
@@ -2228,8 +2229,6 @@ const ROUTER_OPERATION_IDS: [&str; 5] = [
     "patchCatchByBinPath",
     "deleteCatchByBinPath",
 ];
-/// The agent skill and AI setups the AI workstream serves; none may be added without a reason.
-const NOT_YET_SERVED_OPERATION_IDS: [&str; 2] = ["getAiAgents", "getAiSkill"];
 
 // AC: PL-01.1
 #[test]
@@ -2258,5 +2257,15 @@ fn every_operation_of_the_contract_is_served() {
         })
         .collect();
 
-    assert_eq!(unserved_ids, NOT_YET_SERVED_OPERATION_IDS);
+    assert_eq!(unserved_ids, Vec::<String>::new());
+}
+
+fn ai_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        ("getAiSkill", vec![json!({})]),
+        (
+            "getAiAgents",
+            vec![json!({}), json!({ "target": "cursor" })],
+        ),
+    ]
 }

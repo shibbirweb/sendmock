@@ -76,7 +76,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-15](01-email.md#em-15-smtp-chaos) | SMTP chaos | Phase 4 | 3 | Accepted |
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | In progress |
 | [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 5 | Accepted |
-| [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | In progress |
+| [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | Accepted |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | In progress |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |
@@ -92,7 +92,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | Accepted |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Accepted |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | In progress |
-| [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | In progress |
+| [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | In progress |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
@@ -112,7 +112,7 @@ On top of its own criteria, a feature is done only when:
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | In progress |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | In progress |
-| [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 5 | In progress |
+| [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 5 | Accepted |
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Accepted |
 | [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | In progress |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
@@ -123,8 +123,8 @@ On top of its own criteria, a feature is done only when:
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | In progress |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | In progress |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Not started |
-| [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | In progress |
-| [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | Not started |
+| [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
+| [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 4 | In progress |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Not started |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
@@ -166,4 +166,4 @@ On top of its own criteria, a feature is done only when:
 | [PY-09](08-payments.md#py-09-payments-ui) | Payments UI | UI in U2, live in Phase 3P | 5 | Accepted |
 | [PY-10](08-payments.md#py-10-more-gateways) | More gateways | Phase 4 (bKash, Razorpay, Paddle), later (others) | 3 | Accepted |
 | [PY-11](08-payments.md#py-11-cli-mcp-and-test-helpers) | CLI, MCP and test helpers | Phase 3P | 3 | Accepted |
-| [PY-12](08-payments.md#py-12-gateway-method-and-flow-configuration) | Gateway, method and flow configuration | UI in U2, backend, CLI, MCP and skill in Phase 3P | 7 | In progress |
+| [PY-12](08-payments.md#py-12-gateway-method-and-flow-configuration) | Gateway, method and flow configuration | UI in U2, backend, CLI, MCP and skill in Phase 3P | 7 | Accepted |

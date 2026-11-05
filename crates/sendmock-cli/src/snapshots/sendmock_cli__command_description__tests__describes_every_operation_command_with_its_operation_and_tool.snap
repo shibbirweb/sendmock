@@ -2986,6 +2986,46 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock ai install",
+    "usage": "sendmock ai install --target <agent>",
+    "aliases": [],
+    "summary": "For each AI agent, the install command and its MCP configuration.",
+    "arguments": [],
+    "flags": [
+      "--target"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/ai/agents",
+        "operation_id": "getAiAgents",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_ai_agents"
+    ]
+  },
+  {
+    "command": "sendmock ai skill",
+    "usage": "sendmock ai skill",
+    "aliases": [],
+    "summary": "The SendMock agent skill as Markdown.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/ai/skill",
+        "operation_id": "getAiSkill",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://docs/skill"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

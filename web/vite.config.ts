@@ -11,16 +11,20 @@ const isMockBuild = process.env.VITE_API_MODE !== "live";
 export default defineConfig({
   base: basePath,
   // `VITE_API_MODE=live bun run dev` talks to a local `cargo run`, with hot reload.
-  server: isMockBuild
-    ? undefined
-    : {
-        proxy: {
+  server: {
+    // The mock answers GET /ai/skill with the repository's skill/sendmock/SKILL.md.
+    fs: {
+      allow: [import.meta.dirname, resolve(import.meta.dirname, "../skill")],
+    },
+    proxy: isMockBuild
+      ? undefined
+      : {
           "/api": {
             target: "http://127.0.0.1:8025",
             ws: true,
           },
         },
-      },
+  },
   plugins: [
     tanstackRouter({
       target: "react",

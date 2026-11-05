@@ -123,12 +123,6 @@ mod tests {
             .map(|operation| operation.definition().operation_id.to_owned())
             .collect();
         assert_eq!(app_info.available_operations, served_operation_ids);
-        assert!(
-            !app_info
-                .available_operations
-                .iter()
-                .any(|operation_id| operation_id == "getAiSkill")
-        );
         Ok(())
     }
 
