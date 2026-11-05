@@ -128,6 +128,8 @@ pub struct OperationDefinition {
     pub answer_kind: AnswerKind,
     /// Takes the request body as text into an input field, for non-JSON bodies.
     pub raw_body_input: Option<RawBodyInput>,
+    /// Takes a JSON array body into this input field, for endpoints that replace a list.
+    pub array_body_input: Option<&'static str>,
     /// Records each call in the API request log (native and provider send APIs).
     pub request_log: Option<RequestLogSettings>,
     /// A `GET` path that runs the same operation from the query string, for vendors whose
@@ -158,6 +160,7 @@ impl OperationDefinition {
         success_status: SuccessStatus::Ok,
         answer_kind: AnswerKind::Json,
         raw_body_input: None,
+        array_body_input: None,
         request_log: None,
         get_alias_path: None,
         revealed_secret_field: None,

@@ -44,7 +44,10 @@ pub fn assemble_input(
             text_values.extend(parse_form_body(&request_parts.body)?);
             Map::new()
         }
-        None if reads_body => parse_json_body(&request_parts.body)?,
+        None if reads_body => match definition.array_body_input {
+            Some(input_name) => parse_json_array_body(&request_parts.body, input_name)?,
+            None => parse_json_body(&request_parts.body)?,
+        },
         _ => Map::new(),
     };
     text_values.extend(request_parts.query_parameters);
@@ -66,6 +69,23 @@ fn parse_form_body(request_body: &[u8]) -> Result<Vec<(String, String)>, ApiErro
     serde_urlencoded::from_bytes(request_body).map_err(|parse_error| {
         ApiErrorResponse::invalid_json_body(&format!("the form body is not valid: {parse_error}"))
     })
+}
+
+/// A JSON array body as the one input field it fills.
+fn parse_json_array_body(
+    request_body: &[u8],
+    input_name: &str,
+) -> Result<Map<String, Value>, ApiErrorResponse> {
+    match serde_json::from_slice(request_body) {
+        Ok(Value::Array(body_items)) => Ok(Map::from_iter([(
+            input_name.to_owned(),
+            Value::Array(body_items),
+        )])),
+        Ok(_) => Err(ApiErrorResponse::invalid_json_body("expected a JSON array")),
+        Err(parse_error) => Err(ApiErrorResponse::invalid_json_body(
+            &parse_error.to_string(),
+        )),
+    }
 }
 
 /// An empty body counts as `{}`, so operations with only optional fields need no body.

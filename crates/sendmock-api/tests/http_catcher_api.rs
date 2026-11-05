@@ -197,3 +197,138 @@ async fn wait_for_http_answers_a_matching_request_and_408_without_one() {
     assert_eq!(other_bin_status, 408);
     assert_eq!(old_status, 408);
 }
+
+fn response_rule(rule_name: &str, overrides: Value) -> Value {
+    let mut response_rule = json!({
+        "id": format!("rule-{rule_name}"), "name": rule_name, "is_enabled": true, "method": null,
+        "path_glob": "", "filter": null,
+        "response": { "status_code": 200, "headers": {}, "body": "default" },
+        "delay_min_ms": 0, "delay_max_ms": 0, "failure_rate_percent": 0, "failure_status_code": 503,
+    });
+    if let (Some(rule_fields), Some(override_fields)) =
+        (response_rule.as_object_mut(), overrides.as_object())
+    {
+        rule_fields.extend(override_fields.clone());
+    }
+    response_rule
+}
+
+async fn create_bin_with_rules(app_router: &axum::Router, rules: Value) -> (String, u16, Value) {
+    let (_, bin) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/http/bins",
+        Some(&json!({ "name": "shop", "preset": null })),
+    )
+    .await;
+    let bin_id = bin["id"].as_str().unwrap_or_default().to_owned();
+    let response = app_router
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("PUT")
+                .uri(format!("/api/v1/http/bins/{bin_id}/responses"))
+                .header("content-type", "application/json")
+                .body(Body::from(rules.to_string()))
+                .unwrap_or_else(|error| panic!("a valid request: {error}")),
+        )
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let status = response.status().as_u16();
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_default();
+    (
+        bin_id,
+        status,
+        serde_json::from_slice(&body_bytes).unwrap_or(Value::Null),
+    )
+}
+
+// AC: HC-02.1 HC-02.2
+#[tokio::test]
+async fn rules_match_in_order_on_method_path_and_conditions_and_echo_the_request() {
+    let (app_router, _) = build_test_app();
+    let (_, put_status, _) = create_bin_with_rules(
+        &app_router,
+        json!([
+            response_rule("Refunds", json!({
+                "method": "POST", "path_glob": "/v1/refunds*",
+                "filter": { "field": "header:x-trace", "operator": "equals", "value": "abc" },
+                "response": { "status_code": 201, "headers": { "x-refund": "{{ request.query.id }}" }, "body": "{\"refunded\": \"{{ request.query.id }}\"}" },
+            })),
+            response_rule("Any POST", json!({ "method": "POST" })),
+        ]),
+    )
+    .await;
+
+    let (refund_status, refund_body) =
+        catch(&app_router, "POST", "/catch/shop/v1/refunds?id=re_9").await;
+    let (any_post_status, any_post_body) =
+        catch(&app_router, "POST", "/catch/shop/v1/orders").await;
+    let (get_status, get_body) = catch(&app_router, "GET", "/catch/shop/v1/refunds").await;
+
+    assert_eq!(put_status, 200);
+    assert_eq!(
+        (refund_status, refund_body.as_str()),
+        (201, r#"{"refunded": "re_9"}"#)
+    );
+    assert_eq!((any_post_status, any_post_body.as_str()), (200, "default"));
+    assert_eq!((get_status, get_body.as_str()), (200, r#"{"ok":true}"#));
+    let newest_requests = list_requests(&app_router).await;
+    assert_eq!(newest_requests["items"][2]["matched_rule_name"], "Refunds");
+    assert_eq!(
+        newest_requests["items"][2]["response_headers"]["x-refund"],
+        "re_9"
+    );
+}
+
+// AC: HC-02.3
+#[tokio::test]
+async fn a_full_failure_rate_answers_its_status_and_the_delay_holds_the_answer() {
+    let (app_router, _) = build_test_app();
+    create_bin_with_rules(
+        &app_router,
+        json!([response_rule("Flaky", json!({ "failure_rate_percent": 100, "failure_status_code": 503, "delay_min_ms": 60, "delay_max_ms": 60 }))]),
+    )
+    .await;
+
+    let started_at = std::time::Instant::now();
+    let (status, body) = catch(&app_router, "POST", "/catch/shop").await;
+
+    assert!(started_at.elapsed() >= std::time::Duration::from_millis(60));
+    assert_eq!(
+        (status, body.as_str()),
+        (503, r#"{"error":"Simulated failure"}"#)
+    );
+    let captured = &list_requests(&app_router).await["items"][0];
+    assert_eq!(captured["is_simulated_failure"], true);
+    assert_eq!(captured["duration_ms"], 61);
+}
+
+// AC: HC-02.4
+#[tokio::test]
+async fn rules_are_checked_like_the_editor_and_the_preview_explains_a_mismatch() {
+    let (app_router, _) = build_test_app();
+    let (bin_id, refused_status, refusal) = create_bin_with_rules(
+        &app_router,
+        json!([response_rule("Bad path", json!({ "path_glob": "v1/*" }))]),
+    )
+    .await;
+    catch(&app_router, "GET", "/catch/shop/v1/orders").await;
+    let request_id = list_requests(&app_router).await["items"][0]["id"].clone();
+
+    let (preview_status, preview) = call_api(
+        &app_router,
+        "POST",
+        &format!("/api/v1/http/bins/{bin_id}/responses/preview"),
+        Some(&json!({ "rule": response_rule("Posts", json!({ "method": "POST" })), "request_id": request_id })),
+    )
+    .await;
+
+    assert_eq!(refused_status, 400, "{refusal}");
+    assert_eq!(preview_status, 200, "{preview}");
+    assert_eq!(preview["is_match"], false);
+    assert_eq!(preview["mismatch_reason"], "Method is GET, not POST");
+    assert_eq!(preview["response"]["body"], "default");
+}

@@ -18,17 +18,17 @@ UI in U2, backend Phase 4.
 
 UI in U2, backend Phase 4.
 
-- [ ] HC-02.1 Response rules match in order on method, path and filters; the default reply is `200 {"ok":true}`.
-- [ ] HC-02.2 Status, headers and templated bodies (including echoed request data) are returned as configured.
-- [ ] HC-02.3 Delay and failure rate behave as configured.
-- [ ] HC-02.4 The Responses tab orders, toggles, edits and deletes a bin's rules and edits its default reply; the rule editor sets method, path glob, header and body conditions, status, headers, templated body, delay and failure rate, and previews against a captured request whether the rule matches and what it returns.
+- [x] HC-02.1 Response rules match in order on method, path and filters; the default reply is `200 {"ok":true}`. (#48)
+- [x] HC-02.2 Status, headers and templated bodies (including echoed request data) are returned as configured. (#48)
+- [x] HC-02.3 Delay and failure rate behave as configured. (#48)
+- [x] HC-02.4 The Responses tab orders, toggles, edits and deletes a bin's rules and edits its default reply; the rule editor sets method, path glob, header and body conditions, status, headers, templated body, delay and failure rate, and previews against a captured request whether the rule matches and what it returns. (#48)
 
 ## HC-03 Presets
 
 Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal).
 
 - [ ] HC-03.1 Each preset returns a reply the official client library accepts without error.
-- [ ] HC-03.2 Slack Block Kit, Discord embeds and push notifications are rendered as previews.
+- [x] HC-03.2 Slack Block Kit, Discord embeds and push notifications are rendered as previews. (#48)
 
 ---
 

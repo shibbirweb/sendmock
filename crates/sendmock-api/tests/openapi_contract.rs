@@ -162,6 +162,15 @@ async fn prepare_sample_inputs(
     samples
 }
 
+fn sample_response_rule() -> Value {
+    json!({
+        "id": "rule-orders", "name": "Orders", "is_enabled": true, "method": "POST",
+        "path_glob": "/hooks*", "filter": null,
+        "response": { "status_code": 201, "headers": { "content-type": "application/json" }, "body": "{\"id\": \"{{ request.query.id }}\"}" },
+        "delay_min_ms": 0, "delay_max_ms": 0, "failure_rate_percent": 0, "failure_status_code": 503,
+    })
+}
+
 /// Uploads a file to the `sample-uploads` bin, as an app would.
 async fn capture_sample_upload(app_router: &axum::Router) {
     let multipart_body = "--b\r\nContent-Disposition: form-data; name=\"invoice\"; filename=\"42.txt\"\r\nContent-Type: text/plain\r\n\r\nINVOICE 42\r\n--b--\r\n";
@@ -192,7 +201,7 @@ async fn prepare_http_catcher_samples(
     let requests = send_json(app_router, "GET", "/api/v1/http/requests", &json!({})).await;
     let request_id = requests["items"][0]["id"].clone();
     let by_bin = json!({ "bin_id": bin["id"] });
-    vec![
+    let mut samples = vec![
         ("getHttpBins", vec![json!({})]),
         (
             "postHttpBins",
@@ -218,6 +227,28 @@ async fn prepare_http_catcher_samples(
         (
             "getWaitHttp",
             vec![json!({ "bin": "sample-uploads", "timeout": "1s" })],
+        ),
+    ];
+    samples.extend(build_http_rule_samples(&bin["id"], &request_id));
+    samples
+}
+
+/// A bin's rules: list, replace, and a preview against its captured request.
+fn build_http_rule_samples(bin_id: &Value, request_id: &Value) -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "getHttpBinsByBinIdResponses",
+            vec![json!({ "bin_id": bin_id })],
+        ),
+        (
+            "putHttpBinsByBinIdResponses",
+            vec![json!({ "bin_id": bin_id, "rules": [sample_response_rule()] })],
+        ),
+        (
+            "postHttpBinsByBinIdResponsesPreview",
+            vec![
+                json!({ "bin_id": bin_id, "rule": sample_response_rule(), "request_id": request_id }),
+            ],
         ),
     ]
 }
@@ -1805,6 +1836,7 @@ struct ServedOperation {
     success_code: String,
     is_json_answer: bool,
     raw_body_input: Option<String>,
+    array_body_input: Option<String>,
     path_inputs: Vec<(String, String)>,
     is_destructive: bool,
 }
@@ -1825,6 +1857,7 @@ fn served_operations(operation_registry: &OperationRegistry) -> Vec<ServedOperat
                 raw_body_input: definition
                     .raw_body_input
                     .map(|raw_body| raw_body.input_name.to_owned()),
+                array_body_input: definition.array_body_input.map(str::to_owned),
                 path_inputs: definition.path_parameter_names(),
                 is_destructive: definition.is_destructive,
             }
@@ -1962,7 +1995,10 @@ fn build_operation_request(served_operation: &ServedOperation, input: &Value) ->
                 .unwrap_or_default()
                 .to_owned(),
         ),
-        (None, true) => Body::from(Value::Object(remaining_input).to_string()),
+        (None, true) => match &served_operation.array_body_input {
+            Some(array_input_name) => Body::from(remaining_input[array_input_name].to_string()),
+            None => Body::from(Value::Object(remaining_input).to_string()),
+        },
         (None, false) => Body::empty(),
     };
     Request::builder()
@@ -2000,6 +2036,9 @@ async fn send_operation_request(
 }
 
 fn without_path_inputs(served_operation: &ServedOperation, input: &Value) -> Value {
+    if let Some(array_input_name) = &served_operation.array_body_input {
+        return input[array_input_name].clone();
+    }
     let mut body_input = input.as_object().cloned().unwrap_or_default();
     for (_, input_name) in &served_operation.path_inputs {
         body_input.remove(input_name);

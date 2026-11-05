@@ -2742,6 +2742,74 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock http response list",
+    "usage": "sendmock http response list <binId>",
+    "aliases": [],
+    "summary": "A bin's response rules, checked from top to bottom.",
+    "arguments": [
+      "binId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/http/bins/{binId}/responses",
+        "operation_id": "getHttpBinsByBinIdResponses",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_response_list"
+    ]
+  },
+  {
+    "command": "sendmock http response set",
+    "usage": "sendmock http response set <binId>",
+    "aliases": [],
+    "summary": "Replace a bin's response rules.",
+    "arguments": [
+      "binId"
+    ],
+    "flags": [
+      "--rules"
+    ],
+    "operations": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/http/bins/{binId}/responses",
+        "operation_id": "putHttpBinsByBinIdResponses",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_response_set"
+    ]
+  },
+  {
+    "command": "sendmock http response preview",
+    "usage": "sendmock http response preview <binId>",
+    "aliases": [],
+    "summary": "Which rule a captured request would match, and its answer.",
+    "arguments": [
+      "binId"
+    ],
+    "flags": [
+      "--request-id",
+      "--rule"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/http/bins/{binId}/responses/preview",
+        "operation_id": "postHttpBinsByBinIdResponsesPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_response_preview"
+    ]
+  },
+  {
     "command": "sendmock numbers list",
     "usage": "sendmock numbers list",
     "aliases": [],

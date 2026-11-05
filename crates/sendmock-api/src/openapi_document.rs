@@ -64,6 +64,9 @@ fn build_operation_object(
             Some(raw_body_input) => {
                 json!({ raw_body_input.content_type: { "schema": { "type": "string" } } })
             }
+            None if definition.array_body_input.is_some() => json_content(
+                &input_schema["properties"][definition.array_body_input.unwrap_or_default()],
+            ),
             None if path_input_names.is_empty() => json_content(&input_reference),
             None => json_content(&without_properties(&input_schema, &path_input_names)),
         };

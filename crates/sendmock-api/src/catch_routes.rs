@@ -62,7 +62,15 @@ async fn capture_request(
         client_ip,
     };
     match capture_http_request(&operation_context, incoming_request).await {
-        Ok(catch_answer) => build_catch_response(&catch_answer.response),
+        Ok(catch_answer) => {
+            if catch_answer.delay_ms > 0 {
+                tokio::time::sleep(std::time::Duration::from_millis(u64::from(
+                    catch_answer.delay_ms,
+                )))
+                .await;
+            }
+            build_catch_response(&catch_answer.response)
+        }
         Err(operation_error) => ApiErrorResponse::from(operation_error).into_response(),
     }
 }
