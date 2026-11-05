@@ -32,9 +32,10 @@ async function expectStored(source, subject) {
 
 async function sendWithSendgrid() {
   currentStep = "SendGrid";
-  sendgridClient.setDefaultRequest("baseUrl", providerUrl.origin);
   sendgridMail.setClient(sendgridClient);
   sendgridMail.setApiKey("SG.sendmock-example");
+  // setApiKey puts SendGrid's own host back, so the base URL is set after the key.
+  sendgridClient.setDefaultRequest("baseUrl", providerUrl.origin);
   const [response] = await sendgridMail.send({
     to: recipient,
     from: "shop@example.test",

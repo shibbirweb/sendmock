@@ -35,7 +35,7 @@ Each official SDK has a setting for the address it calls. Point it at the provid
 
 | SDK | Setting |
 | --- | --- |
-| SendGrid (`@sendgrid/mail`) | `client.setDefaultRequest("baseUrl", "http://127.0.0.1:8026")` on `@sendgrid/client`, then `sgMail.setClient(client)` |
+| SendGrid (`@sendgrid/mail`) | `sgMail.setClient(client)` and `sgMail.setApiKey(key)`, then `client.setDefaultRequest("baseUrl", "http://127.0.0.1:8026")` on `@sendgrid/client` (after the key, which resets it) |
 | Mailgun (`mailgun.js`) | `url: "http://127.0.0.1:8026"` in `mailgun.client({...})` |
 | Postmark (`postmark`) | `new ServerClient(token, { useHttps: false, requestHost: "127.0.0.1:8026" })` |
 | Resend (`resend`) | `new Resend(key, { baseUrl: "http://127.0.0.1:8026" })` |
