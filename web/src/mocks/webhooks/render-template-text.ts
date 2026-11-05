@@ -147,20 +147,62 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   ...fakeTemplateFunctions,
 };
 
-/** SendMock's outcome, then SendGrid's, SES's and Resend's names for it. */
-const providerEventNames: Record<string, [string, string, string]> = {
-  received: ["processed", "Send", "email.sent"],
-  delivered: ["delivered", "Delivery", "email.delivered"],
-  deferred: ["deferred", "DeliveryDelay", "email.delivery_delayed"],
-  bounced: ["bounce", "Bounce", "email.bounced"],
-  complained: ["spamreport", "Complaint", "email.complained"],
-  opened: ["open", "Open", "email.opened"],
-  unsubscribed: ["unsubscribe", "Subscription", "email.unsubscribed"],
+/** SendMock's outcome, then SendGrid's, SES's, Resend's, Mailgun's, Postmark's and Brevo's names. */
+const providerEventNames: Record<string, string[]> = {
+  received: [
+    "processed",
+    "Send",
+    "email.sent",
+    "accepted",
+    "Delivery",
+    "request",
+  ],
+  delivered: [
+    "delivered",
+    "Delivery",
+    "email.delivered",
+    "delivered",
+    "Delivery",
+    "delivered",
+  ],
+  deferred: [
+    "deferred",
+    "DeliveryDelay",
+    "email.delivery_delayed",
+    "failed",
+    "Bounce",
+    "deferred",
+  ],
+  bounced: [
+    "bounce",
+    "Bounce",
+    "email.bounced",
+    "failed",
+    "Bounce",
+    "hard_bounce",
+  ],
+  complained: [
+    "spamreport",
+    "Complaint",
+    "email.complained",
+    "complained",
+    "SpamComplaint",
+    "spam",
+  ],
+  opened: ["open", "Open", "email.opened", "opened", "Open", "opened"],
+  unsubscribed: [
+    "unsubscribe",
+    "Subscription",
+    "email.unsubscribed",
+    "unsubscribed",
+    "SubscriptionChange",
+    "unsubscribed",
+  ],
 };
 
 function nameForProvider(eventType: string, providerIndex: number): string {
   const providerNames = providerEventNames[eventType.replace(/^email\./, "")];
-  return providerNames === undefined ? eventType : providerNames[providerIndex];
+  return providerNames?.[providerIndex] ?? eventType;
 }
 
 const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
@@ -177,6 +219,10 @@ const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
   sendgrid_event: (filterInput) => nameForProvider(String(filterInput), 0),
   ses_type: (filterInput) => nameForProvider(String(filterInput), 1),
   resend_type: (filterInput) => nameForProvider(String(filterInput), 2),
+  mailgun_event: (filterInput) => nameForProvider(String(filterInput), 3),
+  postmark_record_type: (filterInput) =>
+    nameForProvider(String(filterInput), 4),
+  brevo_event: (filterInput) => nameForProvider(String(filterInput), 5),
 };
 
 /** Names the renderer understands; the reference lists exactly these. */

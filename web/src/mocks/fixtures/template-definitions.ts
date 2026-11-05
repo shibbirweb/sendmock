@@ -144,6 +144,74 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
     verified_on: verifiedOn,
   },
+  "mailgun.events": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}{
+  "signature": {
+    "timestamp": "{{ mailgun_timestamp }}",
+    "token": "{{ mailgun_token }}",
+    "signature": "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}"
+  },
+  "event-data": {
+    "id": "{{ event.id }}",
+    "timestamp": {{ mailgun_timestamp }},
+    "event": "{{ event.type | mailgun_event }}",
+    "recipient": "{{ data.to[0].address }}",
+    "message": {
+      "headers": {
+        "message-id": "{{ data.message_id }}",
+        "from": "{{ data.from.address }}",
+        "to": "{{ data.to[0].address }}",
+        "subject": "{{ data.subject }}"
+      }
+    }
+  }
+}`,
+    doc_url:
+      "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
+    verified_on: verifiedOn,
+  },
+  "postmark.webhooks": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{
+  "RecordType": "{{ event.type | postmark_record_type }}",
+  "MessageStream": "outbound",
+  "MessageID": "{{ data.message_id }}",
+  "Recipient": "{{ data.to[0].address }}",
+  "Email": "{{ data.to[0].address }}",
+  "Tag": "",
+  "DeliveredAt": "{{ event.created_at }}",
+  "BouncedAt": "{{ event.created_at }}",
+  "ReceivedAt": "{{ event.created_at }}",
+  "Details": "",
+  "Metadata": {},
+  "ServerID": 23
+}`,
+    doc_url: "https://postmarkapp.com/developer/webhooks/webhooks-overview",
+    verified_on: verifiedOn,
+  },
+  "brevo.events": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{
+  "event": "{{ event.type | brevo_event }}",
+  "email": "{{ data.to[0].address }}",
+  "id": 26224,
+  "date": "{{ event.created_at }}",
+  "ts": {{ event.created_at | unix }},
+  "message-id": "{{ data.message_id }}",
+  "ts_event": {{ event.created_at | unix }},
+  "subject": "{{ data.subject }}",
+  "tag": ""
+}`,
+    doc_url: "https://developers.brevo.com/docs/transactional-webhooks",
+    verified_on: verifiedOn,
+  },
   "sendgrid.inbound_parse": {
     method: "POST",
     content_type: formType,

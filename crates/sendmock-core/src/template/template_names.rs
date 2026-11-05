@@ -89,6 +89,9 @@ pub const SENDMOCK_FILTER_NAMES: &[&str] = &[
     "sendgrid_event",
     "ses_type",
     "resend_type",
+    "mailgun_event",
+    "postmark_record_type",
+    "brevo_event",
     "payment_event",
 ];
 

@@ -114,6 +114,27 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     example: "{{ data.body | urlencode }}",
   },
   {
+    name: "mailgun_event",
+    signature: "mailgun_event",
+    description:
+      "The event type in Mailgun's words (accepted, delivered, failed, opened).",
+    example: "{{ event.type | mailgun_event }}",
+  },
+  {
+    name: "postmark_record_type",
+    signature: "postmark_record_type",
+    description:
+      "The event type as Postmark's RecordType (Delivery, Bounce, SpamComplaint, Open).",
+    example: "{{ event.type | postmark_record_type }}",
+  },
+  {
+    name: "brevo_event",
+    signature: "brevo_event",
+    description:
+      "The event type in Brevo's words (delivered, hard_bounce, spam).",
+    example: "{{ event.type | brevo_event }}",
+  },
+  {
     name: "unix",
     signature: "unix",
     description: "A date or ISO timestamp as Unix seconds.",

@@ -69,6 +69,30 @@
     "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
     "verified_on": "2026-09-30"
   },
+  "mailgun.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}{\n  \"signature\": {\n    \"timestamp\": \"{{ mailgun_timestamp }}\",\n    \"token\": \"{{ mailgun_token }}\",\n    \"signature\": \"{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}\"\n  },\n  \"event-data\": {\n    \"id\": \"{{ event.id }}\",\n    \"timestamp\": {{ mailgun_timestamp }},\n    \"event\": \"{{ event.type | mailgun_event }}\",\n    \"recipient\": \"{{ data.to[0].address }}\",\n    \"message\": {\n      \"headers\": {\n        \"message-id\": \"{{ data.message_id }}\",\n        \"from\": \"{{ data.from.address }}\",\n        \"to\": \"{{ data.to[0].address }}\",\n        \"subject\": \"{{ data.subject }}\"\n      }\n    }\n  }\n}",
+    "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
+    "verified_on": "2026-09-30"
+  },
+  "postmark.webhooks": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"RecordType\": \"{{ event.type | postmark_record_type }}\",\n  \"MessageStream\": \"outbound\",\n  \"MessageID\": \"{{ data.message_id }}\",\n  \"Recipient\": \"{{ data.to[0].address }}\",\n  \"Email\": \"{{ data.to[0].address }}\",\n  \"Tag\": \"\",\n  \"DeliveredAt\": \"{{ event.created_at }}\",\n  \"BouncedAt\": \"{{ event.created_at }}\",\n  \"ReceivedAt\": \"{{ event.created_at }}\",\n  \"Details\": \"\",\n  \"Metadata\": {},\n  \"ServerID\": 23\n}",
+    "doc_url": "https://postmarkapp.com/developer/webhooks/webhooks-overview",
+    "verified_on": "2026-09-30"
+  },
+  "brevo.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"event\": \"{{ event.type | brevo_event }}\",\n  \"email\": \"{{ data.to[0].address }}\",\n  \"id\": 26224,\n  \"date\": \"{{ event.created_at }}\",\n  \"ts\": {{ event.created_at | unix }},\n  \"message-id\": \"{{ data.message_id }}\",\n  \"ts_event\": {{ event.created_at | unix }},\n  \"subject\": \"{{ data.subject }}\",\n  \"tag\": \"\"\n}",
+    "doc_url": "https://developers.brevo.com/docs/transactional-webhooks",
+    "verified_on": "2026-09-30"
+  },
   "sendgrid.inbound_parse": {
     "method": "POST",
     "content_type": "application/x-www-form-urlencoded",

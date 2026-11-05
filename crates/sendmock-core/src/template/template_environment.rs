@@ -13,7 +13,8 @@ use super::template_encoding_filters::{
     tojson_filter, urlencode_filter,
 };
 use super::template_event_name_filters::{
-    resend_type_filter, sendgrid_event_filter, ses_type_filter,
+    brevo_event_filter, mailgun_event_filter, postmark_record_type_filter, resend_type_filter,
+    sendgrid_event_filter, ses_type_filter,
 };
 use super::template_fake_namespace::FakeNamespace;
 use super::template_functions::TemplateFunctions;
@@ -116,6 +117,9 @@ fn add_encoding_filters(environment: &mut Environment<'static>) {
     environment.add_filter("sendgrid_event", sendgrid_event_filter);
     environment.add_filter("ses_type", ses_type_filter);
     environment.add_filter("resend_type", resend_type_filter);
+    environment.add_filter("mailgun_event", mailgun_event_filter);
+    environment.add_filter("postmark_record_type", postmark_record_type_filter);
+    environment.add_filter("brevo_event", brevo_event_filter);
     environment.add_filter("payment_event", payment_event_filter);
 }
 

@@ -109,6 +109,53 @@
     ]
   },
   {
+    "id": "mailgun.events",
+    "name": "Mailgun: event webhooks",
+    "service": "Mailgun",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Mailgun: event webhooks payload, matching the provider's documented format.",
+    "required_variables": [
+      "mailgun_signing_key"
+    ]
+  },
+  {
+    "id": "postmark.webhooks",
+    "name": "Postmark: delivery, bounce, spam and open webhooks",
+    "service": "Postmark",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Postmark: delivery, bounce, spam and open webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "brevo.events",
+    "name": "Brevo: transactional webhooks",
+    "service": "Brevo",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Brevo: transactional webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
     "id": "sendgrid.inbound_parse",
     "name": "SendGrid: Inbound Parse",
     "service": "SendGrid",

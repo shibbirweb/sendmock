@@ -153,3 +153,50 @@ async fn mailgun_forwards_match_the_docs_with_a_real_signature() {
         ))
     );
 }
+
+const POSTMARK_WEBHOOK: &str = include_str!("fixtures/provider_webhooks/postmark_webhook.json");
+const MAILGUN_EVENT_WEBHOOK: &str =
+    include_str!("fixtures/provider_webhooks/mailgun_event_webhook.json");
+const BREVO_WEBHOOK: &str = include_str!("fixtures/provider_webhooks/brevo_webhook.json");
+
+// AC: WH-06.1
+#[tokio::test]
+async fn postmark_and_brevo_webhooks_match_their_docs() {
+    let (app_router, _) = build_test_app();
+
+    let (_, postmark_body) = render(&app_router, "postmark.webhooks").await;
+    let (_, brevo_body) = render(&app_router, "brevo.events").await;
+
+    check_against_fixture(
+        POSTMARK_WEBHOOK,
+        &serde_json::from_str(&postmark_body).unwrap_or(Value::Null),
+    );
+    check_against_fixture(
+        BREVO_WEBHOOK,
+        &serde_json::from_str(&brevo_body).unwrap_or(Value::Null),
+    );
+}
+
+// AC: WH-06.1 WH-06.2
+#[tokio::test]
+async fn mailgun_event_webhooks_match_the_docs_with_a_real_signature() {
+    let (app_router, _) = build_test_app();
+    add_secret_variable(&app_router, "mailgun_signing_key", MAILGUN_SIGNING_KEY).await;
+
+    let (_, body) = render(&app_router, "mailgun.events").await;
+
+    let event_webhook: Value = serde_json::from_str(&body).unwrap_or(Value::Null);
+    check_against_fixture(MAILGUN_EVENT_WEBHOOK, &event_webhook);
+    let signature = &event_webhook["signature"];
+    assert_eq!(
+        signature["signature"].as_str(),
+        Some(
+            sign_mailgun_token(
+                MAILGUN_SIGNING_KEY,
+                signature["timestamp"].as_str().unwrap_or_default(),
+                signature["token"].as_str().unwrap_or_default()
+            )
+            .as_str()
+        )
+    );
+}
