@@ -145,6 +145,7 @@ async function payAndCapture(receivedEvents) {
   const { result: capturedOrder } = await ordersController.captureOrder({
     id: orderId,
     prefer: "return=representation",
+    body: {},
   });
   expectEqual(capturedOrder.status, "COMPLETED", "The captured order's status");
   const capture = capturedOrder.purchaseUnits[0].payments.captures[0];
@@ -156,7 +157,7 @@ async function payAndCapture(receivedEvents) {
 async function handleDecline() {
   const orderId = await createOrderOnPage("order-2002", "decline");
   try {
-    await ordersController.captureOrder({ id: orderId });
+    await ordersController.captureOrder({ id: orderId, body: {} });
     throw new Error("A declined order was captured");
   } catch (captureError) {
     if (!(captureError instanceof ApiError)) {
@@ -172,6 +173,7 @@ async function refundCapture(receivedEvents, captureId) {
   const { result: refund } = await paymentsController.refundCapturedPayment({
     captureId,
     prefer: "return=representation",
+    body: {},
   });
   expectEqual(refund.status, "COMPLETED", "The refund's status");
   const { result: refundedCapture } = await paymentsController.getCapturedPayment({ captureId });
@@ -194,5 +196,8 @@ async function main() {
 
 main().catch((error) => {
   console.error(error);
+  // CI job logs need a token to read; an annotation shows the reason on the run itself.
+  const reason = [error.message, error.body].filter(Boolean).join(" ");
+  console.log(`::error title=PayPal app::${reason.replace(/\r?\n/g, " ")}`);
   process.exit(1);
 });

@@ -170,5 +170,8 @@ async function main() {
 
 main().catch((error) => {
   console.error(error);
+  // CI job logs need a token to read; an annotation shows the reason on the run itself.
+  const reason = [error.message, error.body].filter(Boolean).join(" ");
+  console.log(`::error title=Stripe app::${reason.replace(/\r?\n/g, " ")}`);
   process.exit(1);
 });
