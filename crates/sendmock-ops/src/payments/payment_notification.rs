@@ -28,7 +28,7 @@ struct GatewayNotification {
 }
 
 /// The redirect a notification describes: `redirect.status` reads the outcome's event name.
-fn read_redirect_outcome(event_type: &str) -> RedirectOutcome {
+pub fn read_redirect_outcome(event_type: &str) -> RedirectOutcome {
     match event_type {
         "payment.failed" => RedirectOutcome::Fail,
         "payment.canceled" | "checkout.expired" => RedirectOutcome::Cancel,

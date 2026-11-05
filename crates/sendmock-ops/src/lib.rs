@@ -1,5 +1,6 @@
 //! The operation registry: each feature is one operation that REST, the CLI and MCP all call.
 
+mod custom_gateways;
 mod email;
 mod events;
 mod input_coercion;

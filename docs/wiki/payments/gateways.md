@@ -20,7 +20,7 @@ A gateway is one emulated payment provider: Stripe, PayPal, SSLCommerz, bKash, N
 | Gets from | Sends to |
 | --- | --- |
 | [Methods](./methods.md): the ones it offers at checkout, in order | the [checkout page](./checkout-page.md): which methods and steps it shows |
-| your app's API calls at `/providers/<key>/...` on port `8026` | redirects to your app, with the fields set on the **Redirect** tab |
+| your app's API calls at `/providers/<key>/...` on port `8026` (a custom gateway answers [session init and validation](../advanced/payment-gateway.md#6-point-your-app-at-it)) | redirects to your app, with the fields set on the **Redirect** tab |
 | [Settings > Payments](../settings.md#payments): merchant name and currency | notifications to its **notification endpoint** (a [webhooks endpoint](../webhooks/endpoints.md)), logged in [Deliveries](../webhooks/deliveries.md) |
 
 ## Use it

@@ -69,7 +69,27 @@ The result says "Payment successful" and lists the redirect with your `payment_r
 
 ## 6. Point your app at it
 
-Your app's Upay client calls `http://127.0.0.1:8026/providers/upay/...` with the credentials you set. Session creation answers with the checkout URL, and the validation call answers from the payment. Send the customer to that URL, as you would to Upay.
+A custom gateway has no provider docs SendMock could copy, so every custom gateway answers the same two calls under `http://127.0.0.1:8026/providers/<key>/`. Point your app's Upay client at them.
+
+1. Start a session. The body is JSON or a form; `amount` is in major units and the rest is optional:
+
+   ```bash
+   curl -X POST http://127.0.0.1:8026/providers/upay/checkout \
+     -H 'Content-Type: application/json' \
+     -d '{"amount": "1250.50", "currency": "BDT", "reference": "ORDER-9", "success_url": "http://localhost:3000/upay/success", "fail_url": "http://localhost:3000/upay/fail", "cancel_url": "http://localhost:3000/upay/cancel", "merchant_id": "UPAY-MERCHANT-1"}'
+   ```
+
+   It answers `201` with `payment_id`, `reference`, `status`, `amount`, `currency` and `checkout_url`. Send the customer to `checkout_url`, as you would to Upay. `reference` is your order id and becomes `payment.reference` in the gateway's templates. `customer_email`, `customer_name`, `description` and `metadata` are also taken.
+
+2. Validate the payment by its `payment_id` or your `reference`:
+
+   ```bash
+   curl http://127.0.0.1:8026/providers/upay/payments/ORDER-9
+   ```
+
+   It answers with the **Notification** body rendered for the payment as it is now (`"status": "COMPLETED"` once paid, empty while it is open), so validation says what the notification says.
+
+Credentials are not required, because providers send them in different ways, but any credential the request names (a field or a header with the credential's name, such as `merchant_id`) must match, or the call is `401`. Errors are JSON: `{"error": {"code", "message", "field"}}`.
 
 ## 7. Keep it
 

@@ -38,6 +38,9 @@ mod provider_payment;
 pub use checkout_completion_operation::CompleteCheckoutOperation;
 pub use checkout_operations::{CreatePaymentCheckoutOperation, GetCheckoutSessionOperation};
 pub(crate) use checkout_payment_run::pay_with_test_card;
+pub(crate) use gateway_template_rendering::{
+    GatewayPartRenderer, GatewayRenderOptions, build_gateway_context,
+};
 pub(crate) use payment_catalogue::{find_payment, read_payment_document};
 pub(crate) use payment_change::PaymentChange;
 pub(crate) use payment_event_data::{build_sample_payment_event_data, load_payment_event};
@@ -66,6 +69,7 @@ pub use payment_method_operations::{
     ListPaymentMethodsOperation, ResetPaymentMethodOperation, UpdatePaymentMethodOperation,
 };
 pub use payment_method_views::PaymentMethodDefinition;
+pub(crate) use payment_notification::read_redirect_outcome;
 pub use payment_notify_operation::NotifyPaymentOperation;
 pub use payment_operations::{
     GetPaymentOperation, ListPaymentTestValuesOperation, ListPaymentsOperation,
