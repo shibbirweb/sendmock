@@ -47,7 +47,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 - **To pick up in a fresh session,** paste this prompt:
 
   ```text
-  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4 with W6b (auto-forward rules) and W6c (tag rules) as the W6 design note in docs/plan/29-phase-4.md says; tick EM-18.8 and SM-16.8 once the SDK workflows pass (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
+  Read AGENTS.md, then docs/plan/PROGRESS.md (Current position and "Resume here"). Work in ~/Personal/mail-sms-server on feat/phase-0. Confirm CI is green on the latest pushed commit of PR #48 with the public GitHub API (at most one check every 5 minutes) and fix anything that fails, then continue Phase 4: the email detail's tag editor for EM-12.4 (mock first, then live), tick EM-18.8 and SM-16.8 (the SDK workflows pass), then W7 (multipart Fields bodies, replies and inbound routes) (release to a real SMTP relay, auto-forward and tag rules), following docs/plan/29-phase-4.md and "Resume here". Commit and push each workstream on feat/phase-0 without asking; ask me before creating a branch.
   ```
 
 ## How to update this file
@@ -312,7 +312,7 @@ Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Email provider send APIs (SendGrid, Mailgun, Postmark, Resend, SES v2, Brevo)
 - [ ] Email provider definitions and custom email and SMS providers; Mail > Providers live (EM-18, SM-16)
 - [x] HTML compatibility, link check, SpamAssassin check (#48)
-- [ ] Release to real SMTP, auto-forward, tag rules
+- [x] Release to real SMTP, auto-forward, tag rules (#48)
 - [ ] Inbound email formats (SendGrid Parse, Mailgun routes, Postmark)
 - [ ] Bounce/complaint/delivered and open provider formats
 - [ ] Fake data functions, Postman aliases, `SENDMOCK_VAR_*`
@@ -676,3 +676,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-05 | Phase 4 W5c: `--spamassassin host:port` scores an email with a running spamd (`REPORT`) and shows the score, threshold and rules; without it the spam check says it is not available and the Checks tab hides it. EM-13.3 ticked, EM-13 accepted; W5 is done. |
 | 2026-11-06 | Phase 4 W4b: SES v2's raw content (`Content.Raw.Data`) is stored as sent through a new `raw` message part, which fills the sender, recipients, subject and bodies the request leaves out. |
 | 2026-11-06 | Phase 4 W6a: Release sends a captured email through a real SMTP relay (`--relay-smtp`, STARTTLS or SMTPS, a login) to allowlisted recipients only (`--relay-allowlist`), logs the result on the timeline and fires `email.released`; EM-14.2 ticked. |
+| 2026-11-06 | Phase 4 W6b and W6c: tag rules tag arriving emails before `email.received`, and auto-forward rules release matching emails to allowlisted addresses in the background, each logged on the timeline; EM-12.3 ticked, EM-14 accepted. Manual tags are proven for REST, CLI and MCP; the email detail's tag editor is next. |

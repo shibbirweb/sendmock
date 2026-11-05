@@ -199,3 +199,29 @@ fn an_in_memory_database_leaves_nothing_on_disk() {
 
     assert!(files_left.is_empty(), "files left: {files_left:?}");
 }
+
+// AC: EM-12.4
+#[test]
+fn tags_are_added_and_removed_from_the_cli() {
+    let working_directory =
+        tempfile::tempdir().unwrap_or_else(|io_error| panic!("a temporary folder: {io_error}"));
+    let (_sendmock, http_addr) = start_server(working_directory.path());
+    let email_id = send_code_email(working_directory.path(), &http_addr);
+
+    let tagged = run_command(
+        working_directory.path(),
+        &http_addr,
+        &["email", "tag", &email_id, "--tag", "QA", "--tag", "urgent"],
+    );
+    let untagged = run_command(
+        working_directory.path(),
+        &http_addr,
+        &["email", "update", &email_id, "--tag", "qa"],
+    );
+
+    assert_eq!(
+        stdout_json(&tagged)["tags"],
+        serde_json::json!(["qa", "urgent"])
+    );
+    assert_eq!(stdout_json(&untagged)["tags"], serde_json::json!(["qa"]));
+}

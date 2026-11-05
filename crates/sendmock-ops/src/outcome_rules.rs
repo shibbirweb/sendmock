@@ -22,6 +22,7 @@ pub use email_outcome_rule_order_operations::{
 };
 pub(crate) use email_outcome_rule_validation::normalize_and_validate as validate_email_outcome_rule;
 pub use email_outcome_rule_view::EmailOutcomeRule;
+pub(crate) use outcome_rule_inputs::OutcomeRuleMoveDirection;
 pub use outcome_test_result::OutcomeTestResult;
 pub use sms_outcome_rule_operations::{
     CreateSmsOutcomeRuleOperation, DeleteSmsOutcomeRuleOperation, ListSmsOutcomeRulesOperation,

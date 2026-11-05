@@ -121,7 +121,7 @@ Phase 1 (X-Tags, plus addressing), Phase 4 (tag rules).
 
 - [x] EM-12.1 `X-Tags` header values become tags. (#48)
 - [x] EM-12.2 With plus addressing on, `user+invoice@x.test` gets tag `invoice`. (#48)
-- [ ] EM-12.3 Tag rules add tags to matching new messages.
+- [x] EM-12.3 Tag rules add tags to matching new messages. (#48)
 - [ ] EM-12.4 Manual tags can be added and removed from UI, API, CLI and MCP.
 
 ## EM-13 Quality checks
@@ -137,10 +137,10 @@ Phase 1 (List-Unsubscribe), Phase 4 (HTML, link, spam).
 
 Phase 4. Docs: [Release and forwarding](../03-email.md#release-and-forwarding-to-real-smtp).
 
-- [ ] EM-14.1 Release and auto-forward are impossible until a relay and a recipient allowlist are configured.
+- [x] EM-14.1 Release and auto-forward are impossible until a relay and a recipient allowlist are configured. (#48)
 - [x] EM-14.2 Release sends the message through the relay to the original or chosen recipients; recipients outside the allowlist are refused. (#48)
-- [ ] EM-14.3 Auto-forward rules forward matching messages automatically.
-- [ ] EM-14.4 Every release and forward is logged on the email timeline with its result and fires `email.released`.
+- [x] EM-14.3 Auto-forward rules forward matching messages automatically. (#48)
+- [x] EM-14.4 Every release and forward is logged on the email timeline with its result and fires `email.released`. (#48)
 
 ## EM-15 SMTP chaos
 

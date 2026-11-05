@@ -109,6 +109,7 @@ pub(crate) use metrics_operation::{build_endpoint_metrics, build_recent_failures
 pub(crate) use metrics_view::{EndpointMetrics, RecentFailedDelivery};
 pub(crate) use request_part_renderer::{RenderProblem, RenderProblemSeverity};
 pub(crate) use rule_filter_wire::RuleFilter;
+pub(crate) use rule_messages::build_email_rule_message;
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{
     CreateWebhookRuleOperation, DeleteWebhookRuleOperation, GetWebhookRuleOperation,
@@ -116,7 +117,7 @@ pub use rule_operations::{
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
-pub(crate) use rule_validation::validate_rule;
+pub(crate) use rule_validation::{validate_rule, validate_rule_filter};
 pub use rule_view::WebhookRule;
 pub use saved_delivery_operations::{
     CreateSavedWebhookDeliveryOperation, DeleteSavedWebhookDeliveryOperation,

@@ -41,6 +41,7 @@ pub use email_file_operations::{
 pub use email_network_clients::EmailNetworkClients;
 pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
 pub use email_relay::{EmailRelay, RelayMessage};
+pub(crate) use email_release::{is_on_allowlist, release_email};
 pub use email_summary::{EmailAddress, EmailSummary};
 pub use link_check_operation::CheckEmailLinksOperation;
 pub use link_checker::{LinkChecker, LinkProbe};

@@ -142,6 +142,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_payment_samples(app_router).await);
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
+    samples.extend(prepare_message_rule_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
@@ -157,6 +158,52 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
     samples
+}
+
+/// One tag rule and one forward rule, which the update, move and delete samples change.
+async fn prepare_message_rule_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let filter = json!({ "field": "subject", "operator": "contains", "value": "Invoice" });
+    let tag_rule_input =
+        json!({ "name": "Billing mail", "filter": filter, "tag": "billing", "is_enabled": true });
+    let forward_rule_input = json!({
+        "name": "QA inbox", "filter": null, "to": ["qa-team@example.test"], "is_enabled": false,
+    });
+    let tag_rule_id =
+        post_json(app_router, "/api/v1/tag-rules", &tag_rule_input).await["id"].clone();
+    let forward_rule_id =
+        post_json(app_router, "/api/v1/forward-rules", &forward_rule_input).await["id"].clone();
+    vec![
+        ("getTagRules", vec![json!({})]),
+        ("postTagRules", vec![tag_rule_input]),
+        (
+            "patchTagRulesByRuleId",
+            vec![json!({ "rule_id": tag_rule_id, "is_enabled": false, "filter": null })],
+        ),
+        (
+            "postTagRulesByRuleIdMove",
+            vec![json!({ "rule_id": tag_rule_id, "direction": "down" })],
+        ),
+        (
+            "deleteTagRulesByRuleId",
+            vec![json!({ "rule_id": tag_rule_id })],
+        ),
+        ("getForwardRules", vec![json!({})]),
+        ("postForwardRules", vec![forward_rule_input]),
+        (
+            "patchForwardRulesByRuleId",
+            vec![json!({ "rule_id": forward_rule_id, "to": ["lead@example.test"] })],
+        ),
+        (
+            "postForwardRulesByRuleIdMove",
+            vec![json!({ "rule_id": forward_rule_id, "direction": "up" })],
+        ),
+        (
+            "deleteForwardRulesByRuleId",
+            vec![json!({ "rule_id": forward_rule_id })],
+        ),
+    ]
 }
 
 /// A shipped SMS provider's settings, as `PATCH` and the preview take them.

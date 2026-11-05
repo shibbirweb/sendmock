@@ -341,3 +341,33 @@ fn a_failing_call_is_a_tool_error_the_agent_can_read() -> io::Result<()> {
     assert!(missing_email.to_string().contains("No email"));
     Ok(())
 }
+
+// AC: EM-12.4
+#[test]
+fn tags_are_added_and_removed_through_mcp() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let mut mcp_session = McpSession::start(
+        working_directory.path(),
+        &sendmock.wait_for_http_addr(),
+        &[],
+    )?;
+    let send_result = mcp_session.call_tool(
+        "sendmock_email_send",
+        json!({ "from": "app@shop.test", "to": ["sam@example.test"], "subject": "Tags", "text": "Hello" }),
+    )?;
+    let email_id = send_result["structuredContent"]["id"].clone();
+
+    let tagged = mcp_session.call_tool(
+        "sendmock_email_update",
+        json!({ "email_id": email_id, "tags": ["signup", "qa"] }),
+    )?;
+    let cleared = mcp_session.call_tool(
+        "sendmock_email_update",
+        json!({ "email_id": email_id, "tags": [] }),
+    )?;
+
+    assert_eq!(tagged["structuredContent"]["tags"], json!(["signup", "qa"]));
+    assert_eq!(cleared["structuredContent"]["tags"], json!([]));
+    Ok(())
+}

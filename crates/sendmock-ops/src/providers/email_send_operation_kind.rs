@@ -180,7 +180,7 @@ async fn apply_local_template(
         return Ok(());
     };
     let Some(local_template) = operation_context
-        .email_provider_stores
+        .email_stores
         .local_templates
         .find_template(template_id)
         .await?
@@ -233,7 +233,7 @@ async fn save_provider_send(
             .cloned()
     };
     operation_context
-        .email_provider_stores
+        .email_stores
         .sends
         .save_send(EmailProviderSendRecord {
             email_id: email_id.to_owned(),

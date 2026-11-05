@@ -9,6 +9,7 @@ mod instance_details;
 mod integrations;
 mod logs;
 mod message_providers;
+mod message_rules;
 mod no_input;
 mod nullable_schema;
 mod numbers;
@@ -58,6 +59,7 @@ pub use message_providers::{
     MessageProviderInput, MessageProviderPreview, MessageProviderView, ProviderCredentialReveal,
     ProviderSampleRequest, mask_secret_value,
 };
+pub use message_rules::{ForwardRule, TagRule};
 pub use no_input::NoInput;
 pub(crate) use nullable_schema::nullable_schema;
 pub use numbers::{MessagingService, VirtualNumber};
@@ -145,6 +147,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     sms_replies::register_sms_reply_operations(&mut operation_registry);
     payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
+    message_rules::register_message_rule_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);

@@ -1,66 +1,15 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod fake_email_relay;
     pub mod test_app;
 }
 
-use std::future::Future;
-use std::pin::Pin;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
-use sendmock_ops::{EmailRelay, RecentEventFilter, RelayMessage};
+use sendmock_ops::RecentEventFilter;
 use serde_json::{Value, json};
+use support::fake_email_relay::FakeRelay;
 use support::test_app::{build_test_app_with, call_api};
-
-/// What the fake relay was handed for one message.
-#[derive(Debug, Clone, PartialEq)]
-struct RelayedMessage {
-    relay_url: String,
-    mail_from: String,
-    recipients: Vec<String>,
-    raw_message: String,
-}
-
-/// Takes every message, except one for `refused@qa.example.test`, as a relay that refuses it.
-#[derive(Default)]
-struct FakeRelay {
-    relayed_messages: Mutex<Vec<RelayedMessage>>,
-}
-
-impl FakeRelay {
-    fn read_relayed_messages(&self) -> Vec<RelayedMessage> {
-        self.relayed_messages
-            .lock()
-            .map(|relayed_messages| relayed_messages.clone())
-            .unwrap_or_default()
-    }
-}
-
-impl EmailRelay for FakeRelay {
-    fn relay_message<'relay>(
-        &'relay self,
-        relay_message: RelayMessage<'relay>,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + 'relay>> {
-        if let Ok(mut relayed_messages) = self.relayed_messages.lock() {
-            relayed_messages.push(RelayedMessage {
-                relay_url: relay_message.relay_url.to_owned(),
-                mail_from: relay_message.mail_from.to_owned(),
-                recipients: relay_message.recipients.to_vec(),
-                raw_message: String::from_utf8_lossy(relay_message.raw_message).into_owned(),
-            });
-        }
-        let is_refused = relay_message
-            .recipients
-            .iter()
-            .any(|recipient| recipient == "refused@qa.example.test");
-        Box::pin(async move {
-            if is_refused {
-                Err("550 5.1.1 mailbox unavailable".to_owned())
-            } else {
-                Ok("250 2.0.0 queued".to_owned())
-            }
-        })
-    }
-}
 
 fn build_app_with_relay() -> (axum::Router, sendmock_ops::OperationContext, Arc<FakeRelay>) {
     let fake_relay = Arc::new(FakeRelay::default());

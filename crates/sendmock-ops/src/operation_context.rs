@@ -5,13 +5,13 @@ use sendmock_mail::EmailIngestService;
 use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, Database, EmailLocalTemplateRepository,
     EmailOutcomeRuleRepository, EmailProviderSendRepository, EmailRepository,
-    MessageProviderRepository, MessagingServiceRepository, PaymentDefinitionRepository,
-    PaymentProviderObjectRepository, PaymentRepository, SavedWebhookDeliveryRepository,
-    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
+    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
+    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
+    SmsRepository, SmtpSessionRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -83,24 +83,31 @@ pub struct OperationContext {
     pub payment_repository: PaymentRepository,
     /// Provider adapters' own objects beside payments, such as Stripe refunds.
     pub payment_provider_object_repository: PaymentProviderObjectRepository,
-    pub email_provider_stores: EmailProviderStores,
+    pub email_stores: EmailStores,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
 }
 
-/// What email providers' HTTP APIs keep beside the emails: each send as the provider knows it,
-/// and the seed file's local stand-ins for provider templates.
+/// What emails keep beside the messages: each send as its provider knows it, the seed file's
+/// local stand-ins for provider templates, and the tag and forward rules run on arrival.
 #[derive(Clone)]
-pub struct EmailProviderStores {
+pub struct EmailStores {
     pub sends: EmailProviderSendRepository,
     pub local_templates: EmailLocalTemplateRepository,
+    pub tag_rules: MessageRuleRepository,
+    pub forward_rules: MessageRuleRepository,
 }
 
-impl EmailProviderStores {
+impl EmailStores {
     fn new(database: &Arc<Database>) -> Self {
         Self {
             sends: EmailProviderSendRepository::new(Arc::clone(database)),
             local_templates: EmailLocalTemplateRepository::new(Arc::clone(database)),
+            tag_rules: MessageRuleRepository::new(Arc::clone(database), MessageRuleKind::Tag),
+            forward_rules: MessageRuleRepository::new(
+                Arc::clone(database),
+                MessageRuleKind::Forward,
+            ),
         }
     }
 }
@@ -128,7 +135,7 @@ impl OperationContext {
             payment_provider_object_repository: PaymentProviderObjectRepository::new(
                 share_database(),
             ),
-            email_provider_stores: EmailProviderStores::new(&database),
+            email_stores: EmailStores::new(&database),
             sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(share_database()),
             sms_reply_webhook_repository: SmsReplyWebhookRepository::new(share_database()),
             sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(share_database()),

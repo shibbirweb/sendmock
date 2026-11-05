@@ -56,7 +56,7 @@ impl EmailTemplateSeedAdapter {
         let local_template = read_local_template(read_seed_table(item_table)?)?;
         let item_key = local_template.template_id.clone();
         operation_context
-            .email_provider_stores
+            .email_stores
             .local_templates
             .save_template(local_template)
             .await?;
@@ -65,7 +65,7 @@ impl EmailTemplateSeedAdapter {
 
     async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
         let local_templates = operation_context
-            .email_provider_stores
+            .email_stores
             .local_templates
             .list_templates()
             .await?;
@@ -90,7 +90,7 @@ impl EmailTemplateSeedAdapter {
         operation_context: &OperationContext,
         kept_item_keys: &[String],
     ) -> Result<(), OperationError> {
-        let local_templates = &operation_context.email_provider_stores.local_templates;
+        let local_templates = &operation_context.email_stores.local_templates;
         for local_template in local_templates.list_templates().await? {
             if !kept_item_keys.contains(&local_template.template_id) {
                 local_templates
