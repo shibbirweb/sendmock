@@ -5,9 +5,11 @@
 // order the buyer's card declines fails at capture with `INSTRUMENT_DECLINED`; and the capture
 // is refunded, with `PAYMENT.CAPTURE.REFUNDED` received and checked the same way.
 //
-// The SDK only knows PayPal's own hosts, so its HTTP client goes through SendMock's provider
-// port as a plain HTTP proxy: the SDK still asks for https://api-m.sandbox.paypal.com/..., and
-// SendMock answers at PayPal's real paths without anything leaving the machine.
+// The SDK only knows PayPal's own hosts and has no base URL setting, so the app gives the
+// SDK's HTTP client (axios) an adapter that sends PayPal's sandbox host to SendMock's provider
+// port instead: the SDK still asks for https://api-m.sandbox.paypal.com/v2/..., and SendMock
+// answers at PayPal's real paths without anything leaving the machine.
+import axios from "axios";
 import {
   ApiError,
   CheckoutPaymentIntent,
@@ -30,6 +32,17 @@ const waitTimeoutMs = 60_000;
 /** What the app is doing, so a failure in CI names the step. */
 let currentStep = "starting";
 
+const paypalSandboxOrigin = "https://api-m.sandbox.paypal.com";
+const sendHttpRequest = axios.getAdapter("http");
+
+/** Sends what the SDK addresses to PayPal's sandbox to the provider port instead. */
+function sendToSendMock(requestConfig) {
+  return sendHttpRequest({
+    ...requestConfig,
+    url: requestConfig.url.replace(paypalSandboxOrigin, providerUrl.origin),
+  });
+}
+
 const paypalClient = new Client({
   clientCredentialsAuthCredentials: {
     oAuthClientId: paypalApi.clientId,
@@ -37,9 +50,7 @@ const paypalClient = new Client({
   },
   environment: Environment.Sandbox,
   timeout: 10_000,
-  unstable_httpClientOptions: {
-    proxy: { protocol: "http", host: providerUrl.hostname, port: Number(providerUrl.port) },
-  },
+  unstable_httpClientOptions: { adapter: sendToSendMock },
 });
 const ordersController = new OrdersController(paypalClient);
 const paymentsController = new PaymentsController(paypalClient);
