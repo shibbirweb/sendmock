@@ -69,15 +69,21 @@
     },
     {
       "name": "mailgun_signature",
-      "signature": "mailgun_signature(signing_key)",
+      "signature": "mailgun_signature(signing_key, timestamp, token)",
       "description": "Mailgun's HMAC signature over timestamp and token.",
       "example": "3f1a9c...e07b"
     },
     {
       "name": "svix_signature",
-      "signature": "svix_signature(signing_secret)",
-      "description": "A Svix signature header, as Resend sends it.",
+      "signature": "svix_signature(signing_secret, svix_id, svix_timestamp)",
+      "description": "A Svix signature header over the rendered body, as Resend sends it.",
       "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQ="
+    },
+    {
+      "name": "sendgrid_signature",
+      "signature": "sendgrid_signature(timestamp)",
+      "description": "SendGrid's ECDSA event webhook signature over the timestamp and the rendered body, with SendMock's published test key.",
+      "example": "MEUCIQCtIHJeH93Y+qpYeWrySphQgpNGNr/U+UyUlBkU6n7RAwIgJTz2C+8a8xonZGi6BpSzoQsbVRamr2nlxFDWYNH3j/0="
     },
     {
       "name": "uuid",
@@ -236,6 +242,12 @@
       "signature": "urlencode",
       "description": "Percent-encodes the value for form bodies and query strings.",
       "example": "{{ data.body | urlencode }}"
+    },
+    {
+      "name": "unix",
+      "signature": "unix",
+      "description": "A date or ISO timestamp as Unix seconds.",
+      "example": "{{ event.created_at | unix }}"
     },
     {
       "name": "lower",

@@ -1,6 +1,7 @@
 //! The webhook domain: endpoints, rules, templates, rendering and the delivery queue.
 
 mod delivery_metrics;
+mod provider_signatures;
 mod retry_schedule;
 mod rule_filter;
 mod standard_webhooks;
@@ -10,6 +11,9 @@ pub use delivery_metrics::{
     DeliveryOutcome, DeliverySample, DeliverySummary, EndpointHealth, FailureCodeCount,
     MeteredEndpoint, MetricsRange, OutcomeBucket, build_outcome_buckets, calculate_percentile,
     count_top_failure_codes, select_recent_failures, summarize_endpoint_health,
+};
+pub use provider_signatures::{
+    SENDGRID_TEST_VERIFICATION_KEY, sign_mailgun_token, sign_sendgrid_event,
 };
 pub use retry_schedule::{AttemptDecision, AttemptOutcome, RetrySchedule};
 pub use rule_filter::{

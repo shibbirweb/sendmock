@@ -139,7 +139,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     content_type: formType,
     header_templates: {},
     body_template:
-      "sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ now_unix() }}&token={{ random_string(50) }}&signature={{ mailgun_signature(vars.mailgun_signing_key) }}",
+      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
     doc_url:
       "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
     verified_on: verifiedOn,
@@ -157,13 +157,20 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "sendgrid.events": {
     method: "POST",
     content_type: jsonType,
-    header_templates: {},
+    header_templates: {
+      "X-Twilio-Email-Event-Webhook-Timestamp": "{{ event.created_at | unix }}",
+      "X-Twilio-Email-Event-Webhook-Signature":
+        "{{ sendgrid_signature(event.created_at | unix) }}",
+    },
     body_template: `[
   {
     "email": "{{ data.to[0].address }}",
+    "timestamp": {{ event.created_at | unix }},
+    "smtp-id": "<{{ data.message_id }}>",
     "event": "{{ event.type | sendgrid_event }}",
-    "sg_message_id": "{{ data.message_id }}",
-    "timestamp": {{ now_unix() }}
+    "category": [],
+    "sg_event_id": "{{ event.id }}",
+    "sg_message_id": "{{ data.message_id }}.filter0001.1-1"
   }
 ]`,
     doc_url:
@@ -202,12 +209,20 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     content_type: jsonType,
     header_templates: {
       "svix-id": "{{ event.id }}",
-      "svix-signature": "{{ svix_signature(vars.resend_signing_secret) }}",
+      "svix-timestamp": "{{ event.created_at | unix }}",
+      "svix-signature":
+        "{{ svix_signature(vars.resend_signing_secret, event.id, event.created_at | unix) }}",
     },
     body_template: `{
   "type": "{{ event.type | resend_type }}",
   "created_at": "{{ event.created_at }}",
-  "data": { "to": ["{{ data.to[0].address }}"], "subject": "{{ data.subject }}" }
+  "data": {
+    "created_at": "{{ event.created_at }}",
+    "email_id": "{{ data.message_id }}",
+    "from": "{{ data.from.address }}",
+    "to": ["{{ data.to[0].address }}"],
+    "subject": "{{ data.subject }}"
+  }
 }`,
     doc_url: "https://resend.com/docs/dashboard/webhooks/event-types",
     verified_on: verifiedOn,

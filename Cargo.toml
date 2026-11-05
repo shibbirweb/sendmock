@@ -51,6 +51,8 @@ minijinja = { version = "3", default-features = false, features = [
 ] }
 base64 = "0.23"
 hmac = "0.13"
+# Already in the binary through rustls; signs SendGrid's ECDSA event webhooks.
+ring = "0.17"
 insta = { version = "1", features = [
     "json",
 ] }

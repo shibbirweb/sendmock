@@ -31,6 +31,7 @@ tracing.workspace = true
 jsonschema.workspace = true
 serde_yaml_ng.workspace = true
 sendmock-payments.workspace = true
+ring.workspace = true
 tempfile.workspace = true
 sendmock-store.workspace = true
 sendmock-webhooks.workspace = true

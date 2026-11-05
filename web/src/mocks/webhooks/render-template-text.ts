@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker/locale/en";
 
 import { resolveTemplateConditions } from "@/mocks/webhooks/render-template-conditions";
 import { resolveTemplateLoops } from "@/mocks/webhooks/render-template-loops";
+import { extractTemplateSets } from "@/mocks/webhooks/render-template-sets";
 import { argumentFilters } from "@/mocks/webhooks/template-argument-filters";
 import {
   fakeTemplateFunctions,
@@ -128,6 +129,7 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   mailgun_signature: () =>
     faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase(),
   svix_signature: () => `v1,${faker.string.alphanumeric(43)}=`,
+  sendgrid_signature: () => btoa(faker.string.alphanumeric(70)),
   uuid: () => faker.string.uuid(),
   random_hex: ([lengthText]) =>
     faker.string
@@ -145,8 +147,20 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   ...fakeTemplateFunctions,
 };
 
-function stripEmailPrefix(eventType: string): string {
-  return eventType.replace(/^email\./, "");
+/** SendMock's outcome, then SendGrid's, SES's and Resend's names for it. */
+const providerEventNames: Record<string, [string, string, string]> = {
+  received: ["processed", "Send", "email.sent"],
+  delivered: ["delivered", "Delivery", "email.delivered"],
+  deferred: ["deferred", "DeliveryDelay", "email.delivery_delayed"],
+  bounced: ["bounce", "Bounce", "email.bounced"],
+  complained: ["spamreport", "Complaint", "email.complained"],
+  opened: ["open", "Open", "email.opened"],
+  unsubscribed: ["unsubscribe", "Subscription", "email.unsubscribed"],
+};
+
+function nameForProvider(eventType: string, providerIndex: number): string {
+  const providerNames = providerEventNames[eventType.replace(/^email\./, "")];
+  return providerNames === undefined ? eventType : providerNames[providerIndex];
 }
 
 const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
@@ -157,14 +171,12 @@ const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
       ? filterInput.length
       : Object.keys(filterInput ?? {}).length,
   lower: (filterInput) => String(filterInput).toLowerCase(),
+  unix: (filterInput) =>
+    Math.floor(Date.parse(String(filterInput)) / 1000) || 0,
   upper: (filterInput) => String(filterInput).toUpperCase(),
-  sendgrid_event: (filterInput) => stripEmailPrefix(String(filterInput)),
-  ses_type: (filterInput) => {
-    const outcome = stripEmailPrefix(String(filterInput));
-    return outcome.charAt(0).toUpperCase() + outcome.slice(1);
-  },
-  resend_type: (filterInput) =>
-    `email.${stripEmailPrefix(String(filterInput))}`,
+  sendgrid_event: (filterInput) => nameForProvider(String(filterInput), 0),
+  ses_type: (filterInput) => nameForProvider(String(filterInput), 1),
+  resend_type: (filterInput) => nameForProvider(String(filterInput), 2),
 };
 
 /** Names the renderer understands; the reference lists exactly these. */
@@ -320,17 +332,24 @@ function evaluateExpression(
  */
 export function renderTemplateText(
   conditionalTemplateText: string,
-  templateContext: TemplateContext,
+  givenContext: TemplateContext,
 ): RenderOutcome {
+  const { remainingText, assignments } = extractTemplateSets(
+    rewritePostmanAliases(conditionalTemplateText),
+  );
+  const templateContext: TemplateContext = { ...givenContext };
+  for (const { variableName, expressionText } of assignments) {
+    templateContext[variableName] = renderTemplateText(
+      `{{ ${expressionText} }}`,
+      templateContext,
+    ).renderedText;
+  }
   const readContextValue = (pathText: string) => {
     const contextValue = readPath(templateContext, pathText);
     return contextValue === missingValue ? undefined : contextValue;
   };
   const templateText = resolveTemplateConditions(
-    resolveTemplateLoops(
-      rewritePostmanAliases(conditionalTemplateText),
-      readContextValue,
-    ),
+    resolveTemplateLoops(remainingText, readContextValue),
     readContextValue,
   );
   const renderProblems: RenderProblems = {

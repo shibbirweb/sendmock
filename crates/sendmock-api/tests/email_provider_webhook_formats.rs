@@ -1,0 +1,155 @@
+#[allow(dead_code, reason = "each test file uses part of the shared support")]
+mod support {
+    pub mod test_app;
+}
+
+use std::collections::BTreeMap;
+
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
+use ring::signature::{ECDSA_P256_SHA256_ASN1, UnparsedPublicKey};
+use sendmock_webhooks::{
+    SENDGRID_TEST_VERIFICATION_KEY, WebhookSecret, sign_mailgun_token, sign_payload,
+};
+use serde_json::{Value, json};
+use support::test_app::{build_test_app, call_api};
+
+const SENDGRID_EVENT_WEBHOOK: &str =
+    include_str!("fixtures/provider_webhooks/sendgrid_event_webhook.json");
+const RESEND_WEBHOOK: &str = include_str!("fixtures/provider_webhooks/resend_webhook.json");
+const MAILGUN_ROUTE_FORWARD: &str =
+    include_str!("fixtures/provider_webhooks/mailgun_route_forward.json");
+const RESEND_SIGNING_SECRET: &str = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
+const MAILGUN_SIGNING_KEY: &str = "key-sendmock-test";
+
+/// The provider's documented example and the rendered body must both pass its schema.
+fn check_against_fixture(fixture_json: &str, rendered_payload: &Value) {
+    let fixture: Value = serde_json::from_str(fixture_json)
+        .unwrap_or_else(|error| panic!("a readable fixture: {error}"));
+    let validator = jsonschema::draft202012::new(&fixture["schema"])
+        .unwrap_or_else(|error| panic!("the fixture schema compiles: {error}"));
+    for payload in [&fixture["documented_example"], rendered_payload] {
+        let schema_errors: Vec<String> = validator
+            .iter_errors(payload)
+            .map(|validation_error| validation_error.to_string())
+            .collect();
+        assert!(schema_errors.is_empty(), "{schema_errors:?} in {payload}");
+    }
+}
+
+async fn add_secret_variable(app_router: &axum::Router, variable_name: &str, secret: &str) {
+    let (status, created) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/webhooks/variables",
+        Some(&json!({
+            "name": variable_name, "kind": "secret", "scope": "global", "value": secret,
+        })),
+    )
+    .await;
+    assert_eq!(status, 201, "{created}");
+}
+
+/// Renders a built-in template against the sample: its headers and body.
+async fn render(
+    app_router: &axum::Router,
+    template_id: &str,
+) -> (BTreeMap<String, String>, String) {
+    let (status, rendered) = call_api(
+        app_router,
+        "POST",
+        &format!("/api/v1/webhooks/templates/{template_id}/render"),
+        Some(&json!({})),
+    )
+    .await;
+    assert_eq!(status, 200, "{template_id}: {rendered}");
+    assert_eq!(rendered["errors"], json!([]), "{template_id}: {rendered}");
+    let headers = serde_json::from_value(rendered["headers"].clone()).unwrap_or_default();
+    (
+        headers,
+        rendered["body"].as_str().unwrap_or_default().to_owned(),
+    )
+}
+
+// AC: WH-06.1 WH-06.2
+#[tokio::test]
+async fn sendgrid_events_match_the_docs_and_verify_with_the_published_key() {
+    let (app_router, _) = build_test_app();
+
+    let (headers, body) = render(&app_router, "sendgrid.events").await;
+
+    check_against_fixture(
+        SENDGRID_EVENT_WEBHOOK,
+        &serde_json::from_str(&body).unwrap_or(Value::Null),
+    );
+    let timestamp = headers
+        .get("X-Twilio-Email-Event-Webhook-Timestamp")
+        .cloned()
+        .unwrap_or_default();
+    let signature = STANDARD
+        .decode(
+            headers
+                .get("X-Twilio-Email-Event-Webhook-Signature")
+                .cloned()
+                .unwrap_or_default(),
+        )
+        .unwrap_or_default();
+    let public_key_info = STANDARD
+        .decode(SENDGRID_TEST_VERIFICATION_KEY)
+        .unwrap_or_default();
+    let public_point = &public_key_info[public_key_info.len() - 65..];
+    let verification = UnparsedPublicKey::new(&ECDSA_P256_SHA256_ASN1, public_point)
+        .verify(format!("{timestamp}{body}").as_bytes(), &signature);
+    assert!(verification.is_ok(), "{headers:?}");
+}
+
+// AC: WH-06.1 WH-06.2
+#[tokio::test]
+async fn resend_events_match_the_docs_and_carry_a_real_svix_signature() {
+    let (app_router, _) = build_test_app();
+    add_secret_variable(&app_router, "resend_signing_secret", RESEND_SIGNING_SECRET).await;
+
+    let (headers, body) = render(&app_router, "resend.events").await;
+
+    check_against_fixture(
+        RESEND_WEBHOOK,
+        &serde_json::from_str(&body).unwrap_or(Value::Null),
+    );
+    let svix_id = headers.get("svix-id").cloned().unwrap_or_default();
+    let svix_timestamp: i64 = headers
+        .get("svix-timestamp")
+        .and_then(|timestamp| timestamp.parse().ok())
+        .unwrap_or_default();
+    let signing_secret = WebhookSecret::parse(RESEND_SIGNING_SECRET)
+        .unwrap_or_else(|error| panic!("a valid secret: {error}"));
+    assert_eq!(
+        headers.get("svix-signature"),
+        Some(&sign_payload(
+            &signing_secret,
+            &svix_id,
+            svix_timestamp,
+            &body
+        ))
+    );
+}
+
+// AC: WH-06.1 WH-06.2
+#[tokio::test]
+async fn mailgun_forwards_match_the_docs_with_a_real_signature() {
+    let (app_router, _) = build_test_app();
+    add_secret_variable(&app_router, "mailgun_signing_key", MAILGUN_SIGNING_KEY).await;
+
+    let (_, body) = render(&app_router, "mailgun.routes").await;
+
+    let form_fields: BTreeMap<String, String> =
+        serde_urlencoded::from_str(&body).unwrap_or_default();
+    check_against_fixture(MAILGUN_ROUTE_FORWARD, &json!(form_fields));
+    assert_eq!(
+        form_fields.get("signature"),
+        Some(&sign_mailgun_token(
+            MAILGUN_SIGNING_KEY,
+            &form_fields["timestamp"],
+            &form_fields["token"]
+        ))
+    );
+}

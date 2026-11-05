@@ -65,7 +65,7 @@
     "method": "POST",
     "content_type": "application/x-www-form-urlencoded",
     "header_templates": {},
-    "body_template": "sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ now_unix() }}&token={{ random_string(50) }}&signature={{ mailgun_signature(vars.mailgun_signing_key) }}",
+    "body_template": "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
     "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
     "verified_on": "2026-09-30"
   },
@@ -80,8 +80,11 @@
   "sendgrid.events": {
     "method": "POST",
     "content_type": "application/json",
-    "header_templates": {},
-    "body_template": "[\n  {\n    \"email\": \"{{ data.to[0].address }}\",\n    \"event\": \"{{ event.type | sendgrid_event }}\",\n    \"sg_message_id\": \"{{ data.message_id }}\",\n    \"timestamp\": {{ now_unix() }}\n  }\n]",
+    "header_templates": {
+      "X-Twilio-Email-Event-Webhook-Timestamp": "{{ event.created_at | unix }}",
+      "X-Twilio-Email-Event-Webhook-Signature": "{{ sendgrid_signature(event.created_at | unix) }}"
+    },
+    "body_template": "[\n  {\n    \"email\": \"{{ data.to[0].address }}\",\n    \"timestamp\": {{ event.created_at | unix }},\n    \"smtp-id\": \"<{{ data.message_id }}>\",\n    \"event\": \"{{ event.type | sendgrid_event }}\",\n    \"category\": [],\n    \"sg_event_id\": \"{{ event.id }}\",\n    \"sg_message_id\": \"{{ data.message_id }}.filter0001.1-1\"\n  }\n]",
     "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
     "verified_on": "2026-09-30"
   },
@@ -108,9 +111,10 @@
     "content_type": "application/json",
     "header_templates": {
       "svix-id": "{{ event.id }}",
-      "svix-signature": "{{ svix_signature(vars.resend_signing_secret) }}"
+      "svix-timestamp": "{{ event.created_at | unix }}",
+      "svix-signature": "{{ svix_signature(vars.resend_signing_secret, event.id, event.created_at | unix) }}"
     },
-    "body_template": "{\n  \"type\": \"{{ event.type | resend_type }}\",\n  \"created_at\": \"{{ event.created_at }}\",\n  \"data\": { \"to\": [\"{{ data.to[0].address }}\"], \"subject\": \"{{ data.subject }}\" }\n}",
+    "body_template": "{\n  \"type\": \"{{ event.type | resend_type }}\",\n  \"created_at\": \"{{ event.created_at }}\",\n  \"data\": {\n    \"created_at\": \"{{ event.created_at }}\",\n    \"email_id\": \"{{ data.message_id }}\",\n    \"from\": \"{{ data.from.address }}\",\n    \"to\": [\"{{ data.to[0].address }}\"],\n    \"subject\": \"{{ data.subject }}\"\n  }\n}",
     "doc_url": "https://resend.com/docs/dashboard/webhooks/event-types",
     "verified_on": "2026-09-30"
   },

@@ -1,8 +1,12 @@
 use std::collections::BTreeMap;
+
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use std::sync::Arc;
 
 use sendmock_core::{StandardTemplateFunctions, TemplateFunctions};
 use sendmock_payments::sign_sslcommerz_fields;
+use sendmock_webhooks::sign_mailgun_token;
 use serde_json::Value;
 
 use crate::sign_twilio_request;
@@ -46,18 +50,18 @@ fn keep_verify_key_fields(field_texts: BTreeMap<String, String>) -> BTreeMap<Str
         .collect()
 }
 
-/// The standard functions plus the provider helpers the built-in templates call. Twilio's
-/// signature and SSLCommerz's `verify_sign` are real; Mailgun and Svix signatures have the
-/// provider's shape and are signed for real with the email providers (Phase 4, WH-06.2).
-/// The Stripe, Razorpay and Paddle signatures cover the rendered body, so header templates
-/// get real ones from `SignedBodyFunctions`; anywhere else they have the right shape only.
+/// The standard functions plus the provider helpers the built-in templates call. Twilio's and
+/// Mailgun's signatures and SSLCommerz's `verify_sign` are real. The Stripe, Razorpay, Paddle,
+/// Svix and SendGrid signatures cover the rendered body, so header templates get real ones
+/// from `SignedBodyFunctions`; anywhere else they have the right shape only.
 #[derive(Clone)]
 pub struct WebhookTemplateFunctions {
     pub standard_functions: StandardTemplateFunctions,
 }
 
-const PROVIDER_HELPER_NAMES: [&str; 7] = [
+const PROVIDER_HELPER_NAMES: [&str; 8] = [
     "twilio_signature",
+    "sendgrid_signature",
     "mailgun_signature",
     "svix_signature",
     "stripe_signature",
@@ -99,7 +103,16 @@ impl TemplateFunctions for WebhookTemplateFunctions {
         let random_hex = || self.call_standard_text("random_hex", &[Value::from(64)]);
         let helper_text = match function_name {
             "twilio_signature" => Self::sign_twilio(arguments),
-            "mailgun_signature" => random_hex(),
+            "mailgun_signature" => {
+                let read_text = |position: usize| -> String {
+                    match arguments.get(position) {
+                        Some(Value::String(text)) => text.clone(),
+                        Some(Value::Null) | None => String::new(),
+                        Some(other_value) => other_value.to_string(),
+                    }
+                };
+                sign_mailgun_token(&read_text(0), &read_text(1), &read_text(2))
+            }
             "svix_signature" => format!(
                 "v1,{}=",
                 self.call_standard_text("random_string", &[Value::from(43)])
@@ -110,6 +123,9 @@ impl TemplateFunctions for WebhookTemplateFunctions {
                 random_hex()
             ),
             "razorpay_signature" => random_hex(),
+            "sendgrid_signature" => {
+                STANDARD.encode(self.call_standard_text("random_string", &[Value::from(70)]))
+            }
             "paddle_signature" => format!(
                 "ts={};h1={}",
                 self.call_standard_text("now_unix", &[]),
