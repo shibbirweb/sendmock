@@ -163,6 +163,35 @@ const docsScenes: Scene[] = [
     "Methods · Payments · SendMock",
   ),
   listScene("payment-flows", "/payments/flows", "Flows · Payments · SendMock"),
+  {
+    name: "payment-subscriptions",
+    isLandingShot: false,
+    open: async (page) => {
+      await navigateInApp(page, "/payments/subscriptions");
+      for (const [customerEmail, cardNumber] of [
+        ["sam@example.test", "4242424242424242"],
+        ["lee@example.test", "4000000000009995"],
+      ]) {
+        await page.getByRole("button", { name: "New subscription" }).click();
+        const newDialog = page.getByRole("dialog", { name: "New subscription" });
+        await newDialog.getByLabel("Customer email").fill(customerEmail ?? "");
+        await newDialog.getByLabel("Test card").fill(cardNumber ?? "");
+        await newDialog
+          .getByRole("button", { name: "Start subscription" })
+          .click();
+        await newDialog.waitFor({ state: "hidden" });
+      }
+      await page
+        .getByRole("button", { name: "More for sam@example.test" })
+        .click();
+      await page.getByRole("menuitem", { name: "Advance to renewal" }).click();
+      await page
+        .getByTestId("subscription-row")
+        .filter({ hasText: "sam@example.test" })
+        .getByText("2", { exact: true })
+        .waitFor();
+    },
+  },
   listScene("numbers", "/numbers", "Numbers · SendMock"),
   {
     name: "scenarios",
