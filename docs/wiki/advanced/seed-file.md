@@ -3,7 +3,7 @@ title: Seed file
 description: Keep your SendMock setup in your repository. Export, commit, validate, apply, reset before tests, and keep secrets out.
 ---
 
-> In your install today: settings, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, Messaging Services, numbers, custom outcome numbers and addresses, and edited or removed SMS providers are applied, exported and restored. HTTP bins, tag and forward rules, email providers and custom SMS providers come with their features; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
+> In your install today: settings, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, Messaging Services, numbers, custom outcome numbers and addresses, edited or removed SMS providers, and payment flows, methods and gateways (custom ones and edited built-ins) are applied, exported and restored. HTTP bins, tag and forward rules, email providers and custom SMS providers come with their features; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
 
 `sendmock.seed.toml` is the configuration SendMock starts from and resets to. Commit it next to your app's code, and everyone (teammates, CI, an AI agent) gets the same endpoints, rules, templates, variables, numbers, Messaging Services, Verify services, outcome rules, bins, saved deliveries, payment setup and settings.
 
@@ -88,6 +88,21 @@ enabled = true
 ```
 
 `[settings]` takes the same keys as **Settings** and `PATCH /api/v1/settings`. Export writes only the settings you changed from the defaults.
+
+## Payment flows, methods and gateways
+
+Custom payment flows, methods and gateways, and the built-ins you edited, are exported under `[[payments.flows]]`, `[[payments.methods]]` and `[[payments.gateways]]`. Each item names its `key` and holds its `definition` as JSON, the same fields the API takes. A gateway names its notification endpoint by name, and its secret credentials are exported as references:
+
+```toml
+[[payments.gateways]]
+key = "upay_gateway"
+name = "Upay"
+edits_builtin = false
+notification_endpoint = "Shop payments"
+definition = '{"name":"Upay","accent":"#0a7cff","is_enabled":true,"method_keys":["upay"],"credentials":[{"name":"api_secret","value":"${UPAY_GATEWAY_API_SECRET_SECRET}","is_secret":true}], ...}'
+```
+
+Flows are applied before the methods that run them, and methods before the gateways that offer them. A built-in you did not edit is not exported; a reset puts any built-in the file does not hold back as shipped and deletes custom ones it does not hold, unless a payment or another definition still uses them.
 
 ## Related
 

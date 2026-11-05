@@ -36,9 +36,12 @@ pub const SMS_OUTCOME_RULES_SECTION: SeedSection =
 pub const EMAIL_OUTCOME_RULES_SECTION: SeedSection =
     item_list("email.outcome_rules", "Custom outcome address");
 pub const SMS_PROVIDERS_SECTION: SeedSection = item_list("sms.providers", "SMS provider");
+pub const PAYMENT_FLOWS_SECTION: SeedSection = item_list("payments.flows", "Payment flow");
+pub const PAYMENT_METHODS_SECTION: SeedSection = item_list("payments.methods", "Payment method");
+pub const PAYMENT_GATEWAYS_SECTION: SeedSection = item_list("payments.gateways", "Payment gateway");
 
 /// Every section a seed file may hold, in the order the summary lists them.
-pub const SEED_SECTIONS: [SeedSection; 16] = [
+pub const SEED_SECTIONS: [SeedSection; 19] = [
     SETTINGS_SECTION,
     WEBHOOK_ENDPOINTS_SECTION,
     WEBHOOK_RULES_SECTION,
@@ -55,6 +58,9 @@ pub const SEED_SECTIONS: [SeedSection; 16] = [
     EMAIL_OUTCOME_RULES_SECTION,
     item_list("email.providers", "Email provider"),
     SMS_PROVIDERS_SECTION,
+    PAYMENT_FLOWS_SECTION,
+    PAYMENT_METHODS_SECTION,
+    PAYMENT_GATEWAYS_SECTION,
 ];
 
 pub fn find_seed_section(section_path: &str) -> Option<&'static SeedSection> {

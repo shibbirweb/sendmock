@@ -169,6 +169,9 @@ const knownSeedSections: Record<string, string> = {
   "[[email.outcome_rules]]": "Custom outcome address",
   "[[email.providers]]": "Email provider",
   "[[sms.providers]]": "SMS provider",
+  "[[payments.flows]]": "Payment flow",
+  "[[payments.methods]]": "Payment method",
+  "[[payments.gateways]]": "Payment gateway",
 };
 
 const keyValuePattern = /^[A-Za-z0-9_.-]+\s*=\s*(.+)$/;
