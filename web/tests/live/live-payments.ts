@@ -173,3 +173,32 @@ export async function chooseSimulateAction(
     await page.getByRole("menuitem", { name: menuLabel, exact: true }).click();
   }
 }
+
+/** A name no other retry uses, since a retry finds the custom items the last try added. */
+export function buildLiveName(baseName: string): string {
+  return `${baseName} ${test.info().retry + 1}`;
+}
+
+/**
+ * Puts a built-in flow, method or gateway back to its default through the API, so a test
+ * that failed half way leaves nothing edited for the next one. Resetting an unedited
+ * built-in is harmless, so the answer is not checked.
+ */
+export async function resetPaymentDefinition(
+  request: APIRequestContext,
+  definitionKind: "flows" | "methods" | "gateways",
+  definitionKey: string,
+) {
+  await request.post(
+    `/api/v1/payments/${definitionKind}/${definitionKey}/reset`,
+  );
+}
+
+/** Opens a new checkout's page, as the shop's customer does. */
+export async function openCheckoutPage(page: Page, paymentId: string) {
+  await page.goto(`/pay/${paymentId}`);
+  await expect(page.getByRole("note", { name: "Test mode" })).toBeVisible();
+}
+
+export const checkoutResult = (page: Page) =>
+  page.getByRole("region", { name: "Checkout result" });
