@@ -53,6 +53,30 @@
     "doc_url": "https://www.plivo.com/docs/messaging/concepts/receive-sms",
     "verified_on": "2026-09-30"
   },
+  "africastalking.sms": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "{% if event.type == \"sms.inbound\" %}from={{ data.from_number | urlencode }}&to={{ data.to_number | urlencode }}&text={{ data.body | urlencode }}&date={{ event.created_at | urlencode }}&id={{ data.provider_id }}&linkId={{ event.id }}{% else %}id={{ data.provider_id }}&status={% if data.status == \"delivered\" %}Success{% else %}{% if data.status == \"failed\" %}Failed{% else %}{% if data.status == \"undelivered\" %}Rejected{% else %}Sent{% endif %}{% endif %}{% endif %}&phoneNumber={{ data.to_number | urlencode }}&networkCode=62120&retryCount=0{% endif %}",
+    "doc_url": "https://developers.africastalking.com/docs/sms/notifications",
+    "verified_on": "2026-09-30"
+  },
+  "sinch.sms": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{% if event.type == \"sms.inbound\" %}{\n  \"type\": \"mo_text\",\n  \"id\": \"{{ data.provider_id }}\",\n  \"from\": \"{{ data.from_number }}\",\n  \"to\": \"{{ data.to_number }}\",\n  \"body\": \"{{ data.body }}\",\n  \"received_at\": \"{{ event.created_at }}\"\n}{% else %}{\n  \"type\": \"recipient_delivery_report_sms\",\n  \"batch_id\": \"{{ data.provider_id }}\",\n  \"recipient\": \"{{ data.to_number }}\",\n  \"code\": 0,\n  \"status\": \"{% if data.status == \"delivered\" %}Delivered{% else %}{% if data.status == \"failed\" %}Failed{% else %}{% if data.status == \"undelivered\" %}Rejected{% else %}Dispatched{% endif %}{% endif %}{% endif %}\",\n  \"at\": \"{{ event.created_at }}\"\n}{% endif %}",
+    "doc_url": "https://developers.sinch.com/docs/sms/api-reference/sms/tag/Webhooks/",
+    "verified_on": "2026-09-30"
+  },
+  "infobip.dlr": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"results\": [\n    {\n      \"messageId\": \"{{ data.provider_id }}\",\n      \"to\": \"{{ data.to_number }}\",\n      \"sentAt\": \"{{ event.created_at }}\",\n      \"doneAt\": \"{{ event.created_at }}\",\n      \"smsCount\": 1,\n      \"status\": { \"groupId\": 3, \"groupName\": \"{% if data.status == \"delivered\" %}DELIVERED{% else %}{% if data.status == \"failed\" %}UNDELIVERABLE{% else %}{% if data.status == \"undelivered\" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}\", \"id\": 5, \"name\": \"{% if data.status == \"delivered\" %}DELIVERED{% else %}{% if data.status == \"failed\" %}UNDELIVERABLE{% else %}{% if data.status == \"undelivered\" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}\", \"description\": \"Message status from SendMock\" },\n      \"error\": { \"groupId\": 0, \"groupName\": \"OK\", \"id\": 0, \"name\": \"NO_ERROR\", \"description\": \"No Error\", \"permanent\": false }\n    }\n  ]\n}",
+    "doc_url": "https://www.infobip.com/docs/api/channels/sms/sms-messaging/logs-and-status-reports/receive-outbound-sms-message-report",
+    "verified_on": "2026-09-30"
+  },
   "telnyx.message": {
     "method": "POST",
     "content_type": "application/json",
@@ -91,6 +115,14 @@
     "header_templates": {},
     "body_template": "{\n  \"event\": \"{{ event.type | brevo_event }}\",\n  \"email\": \"{{ data.to[0].address }}\",\n  \"id\": 26224,\n  \"date\": \"{{ event.created_at }}\",\n  \"ts\": {{ event.created_at | unix }},\n  \"message-id\": \"{{ data.message_id }}\",\n  \"ts_event\": {{ event.created_at | unix }},\n  \"subject\": \"{{ data.subject }}\",\n  \"tag\": \"\"\n}",
     "doc_url": "https://developers.brevo.com/docs/transactional-webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "sparkpost.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "[\n  {\n    \"msys\": {\n      \"message_event\": {\n        \"type\": \"{{ event.type | sendgrid_event }}\",\n        \"event_id\": \"{{ event.id }}\",\n        \"message_id\": \"{{ data.message_id }}\",\n        \"rcpt_to\": \"{{ data.to[0].address }}\",\n        \"friendly_from\": \"{{ data.from.address }}\",\n        \"subject\": \"{{ data.subject }}\",\n        \"timestamp\": \"{{ event.created_at | unix }}\"\n      }\n    }\n  }\n]",
+    "doc_url": "https://developers.sparkpost.com/api/webhooks/",
     "verified_on": "2026-09-30"
   },
   "sendgrid.inbound_parse": {
@@ -174,6 +206,14 @@
     "header_templates": {},
     "body_template": "{\n  \"chat_id\": \"{{ vars.telegram_chat_id }}\",\n  \"text\": \"{{ data.subject | default(data.body) }}\"\n}",
     "doc_url": "https://core.telegram.org/bots/api#sendmessage",
+    "verified_on": "2026-09-30"
+  },
+  "google_chat.message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"text\": \"New {{ event.type }}: {{ data.subject | default(data.body) }}\"\n}",
+    "doc_url": "https://developers.google.com/workspace/chat/quickstart/webhooks",
     "verified_on": "2026-09-30"
   },
   "n8n.flat_json": {

@@ -115,6 +115,59 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     doc_url: "https://www.plivo.com/docs/messaging/concepts/receive-sms",
     verified_on: verifiedOn,
   },
+  "africastalking.sms": {
+    method: "POST",
+    content_type: formType,
+    header_templates: {},
+    body_template:
+      '{% if event.type == "sms.inbound" %}from={{ data.from_number | urlencode }}&to={{ data.to_number | urlencode }}&text={{ data.body | urlencode }}&date={{ event.created_at | urlencode }}&id={{ data.provider_id }}&linkId={{ event.id }}{% else %}id={{ data.provider_id }}&status={% if data.status == "delivered" %}Success{% else %}{% if data.status == "failed" %}Failed{% else %}{% if data.status == "undelivered" %}Rejected{% else %}Sent{% endif %}{% endif %}{% endif %}&phoneNumber={{ data.to_number | urlencode }}&networkCode=62120&retryCount=0{% endif %}',
+    doc_url: "https://developers.africastalking.com/docs/sms/notifications",
+    verified_on: verifiedOn,
+  },
+  "sinch.sms": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{% if event.type == "sms.inbound" %}{
+  "type": "mo_text",
+  "id": "{{ data.provider_id }}",
+  "from": "{{ data.from_number }}",
+  "to": "{{ data.to_number }}",
+  "body": "{{ data.body }}",
+  "received_at": "{{ event.created_at }}"
+}{% else %}{
+  "type": "recipient_delivery_report_sms",
+  "batch_id": "{{ data.provider_id }}",
+  "recipient": "{{ data.to_number }}",
+  "code": 0,
+  "status": "{% if data.status == "delivered" %}Delivered{% else %}{% if data.status == "failed" %}Failed{% else %}{% if data.status == "undelivered" %}Rejected{% else %}Dispatched{% endif %}{% endif %}{% endif %}",
+  "at": "{{ event.created_at }}"
+}{% endif %}`,
+    doc_url:
+      "https://developers.sinch.com/docs/sms/api-reference/sms/tag/Webhooks/",
+    verified_on: verifiedOn,
+  },
+  "infobip.dlr": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{
+  "results": [
+    {
+      "messageId": "{{ data.provider_id }}",
+      "to": "{{ data.to_number }}",
+      "sentAt": "{{ event.created_at }}",
+      "doneAt": "{{ event.created_at }}",
+      "smsCount": 1,
+      "status": { "groupId": 3, "groupName": "{% if data.status == "delivered" %}DELIVERED{% else %}{% if data.status == "failed" %}UNDELIVERABLE{% else %}{% if data.status == "undelivered" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}", "id": 5, "name": "{% if data.status == "delivered" %}DELIVERED{% else %}{% if data.status == "failed" %}UNDELIVERABLE{% else %}{% if data.status == "undelivered" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}", "description": "Message status from SendMock" },
+      "error": { "groupId": 0, "groupName": "OK", "id": 0, "name": "NO_ERROR", "description": "No Error", "permanent": false }
+    }
+  ]
+}`,
+    doc_url:
+      "https://www.infobip.com/docs/api/channels/sms/sms-messaging/logs-and-status-reports/receive-outbound-sms-message-report",
+    verified_on: verifiedOn,
+  },
   "telnyx.message": {
     method: "POST",
     content_type: jsonType,
@@ -210,6 +263,28 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "tag": ""
 }`,
     doc_url: "https://developers.brevo.com/docs/transactional-webhooks",
+    verified_on: verifiedOn,
+  },
+  "sparkpost.events": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `[
+  {
+    "msys": {
+      "message_event": {
+        "type": "{{ event.type | sendgrid_event }}",
+        "event_id": "{{ event.id }}",
+        "message_id": "{{ data.message_id }}",
+        "rcpt_to": "{{ data.to[0].address }}",
+        "friendly_from": "{{ data.from.address }}",
+        "subject": "{{ data.subject }}",
+        "timestamp": "{{ event.created_at | unix }}"
+      }
+    }
+  }
+]`,
+    doc_url: "https://developers.sparkpost.com/api/webhooks/",
     verified_on: verifiedOn,
   },
   "sendgrid.inbound_parse": {
@@ -354,6 +429,16 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "text": "{{ data.subject | default(data.body) }}"
 }`,
     doc_url: "https://core.telegram.org/bots/api#sendmessage",
+    verified_on: verifiedOn,
+  },
+  "google_chat.message": {
+    method: "POST",
+    content_type: jsonType,
+    header_templates: {},
+    body_template: `{
+  "text": "New {{ event.type }}: {{ data.subject | default(data.body) }}"
+}`,
+    doc_url: "https://developers.google.com/workspace/chat/quickstart/webhooks",
     verified_on: verifiedOn,
   },
   "n8n.flat_json": {

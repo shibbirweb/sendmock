@@ -283,6 +283,70 @@
     ]
   },
   {
+    "id": "africastalking.sms",
+    "name": "Africa's Talking: SMS notifications",
+    "service": "Africa's Talking",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Africa's Talking: SMS notifications payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sinch.sms",
+    "name": "Sinch: delivery reports and inbound SMS",
+    "service": "Sinch",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Sinch: delivery reports and inbound SMS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "infobip.dlr",
+    "name": "Infobip: delivery reports",
+    "service": "Infobip",
+    "category": "sms-provider",
+    "events": [
+      "sms.status"
+    ],
+    "description": "Infobip: delivery reports payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sparkpost.events",
+    "name": "SparkPost: event webhooks",
+    "service": "SparkPost",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "SparkPost: event webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "google_chat.message",
+    "name": "Google Chat: incoming webhook",
+    "service": "Google Chat",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "email.bounced",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Google Chat: incoming webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
     "id": "n8n.flat_json",
     "name": "n8n / Zapier / Make: flat JSON",
     "service": "Automation",
