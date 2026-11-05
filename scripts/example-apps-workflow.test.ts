@@ -8,6 +8,11 @@ type ExampleAppsWorkflow = {
     binary: { steps: WorkflowStep[] };
     app: { strategy: { matrix: { include: MatrixEntry[] } } };
     presets: { needs: string; steps: WorkflowStep[] };
+    recipes: {
+      needs: string;
+      strategy: { matrix: { include: { language: string; folder: string }[] } };
+      steps: WorkflowStep[];
+    };
   };
 };
 
@@ -47,6 +52,26 @@ describe("Example apps workflow", () => {
     expect(exampleAppsWorkflow.jobs.presets.needs).toBe("binary");
     expect(presetsStep?.run).toContain("node done-when.js");
     expect(existsSync("examples/http-presets/node/done-when.js")).toBe(true);
+  });
+
+  test("WS-08.5 the recipe examples run from the guide pages against the release binary", () => {
+    const recipesJob = exampleAppsWorkflow.jobs.recipes;
+    const startStep = recipesJob.steps.find((step) =>
+      (step.run ?? "").includes("stand-in-app.mjs"),
+    );
+
+    expect(recipesJob.needs).toBe("binary");
+    expect(startStep?.run).toContain(
+      "--seed examples/recipes/sendmock.seed.toml",
+    );
+    for (const { folder } of recipesJob.strategy.matrix.include) {
+      expect(existsSync(`examples/recipes/${folder}/package.json`)).toBe(true);
+    }
+    expect(
+      recipesJob.steps.some((step) =>
+        (step.run ?? "").includes("run-recipes.mjs"),
+      ),
+    ).toBe(true);
   });
 
   test("Release build runs the example apps before it publishes", () => {

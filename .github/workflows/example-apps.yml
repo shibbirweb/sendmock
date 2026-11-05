@@ -10,6 +10,9 @@ on:
       - crates/**
       - examples/apps/**
       - examples/http-presets/**
+      - examples/recipes/**
+      - docs/wiki/recipes/**
+      - docs/wiki/connect/**
       - .github/workflows/example-apps.yml
   push:
     branches:
@@ -19,6 +22,9 @@ on:
       - crates/**
       - examples/apps/**
       - examples/http-presets/**
+      - examples/recipes/**
+      - docs/wiki/recipes/**
+      - docs/wiki/connect/**
       - .github/workflows/example-apps.yml
   workflow_dispatch:
   workflow_call:
@@ -196,3 +202,47 @@ jobs:
       - name: SendMock log
         if: failure()
         run: cat sendmock.log
+
+  recipes:
+    name: Recipe examples (${{ matrix.language }})
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript
+            folder: node
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Start SendMock with the recipes' seed and the stand-in app
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory --provider-addr 127.0.0.1:8026 --seed examples/recipes/sendmock.seed.toml > sendmock.log 2>&1 &
+          node examples/recipes/stand-in-app.mjs > stand-in-app.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && curl -fsS -o /dev/null -X POST http://localhost:3000/reset-password -H "content-type: application/json" -d '{"link":"/reset-password?token=ready"}' && exit 0
+            sleep 1
+          done
+          cat sendmock.log stand-in-app.log
+          exit 1
+
+      - name: Every recipe's example runs against SendMock
+        working-directory: examples/recipes/${{ matrix.folder }}
+        run: bun install && node ../run-recipes.mjs ${{ matrix.language }}
+
+      - name: SendMock and stand-in app logs
+        if: failure()
+        run: cat sendmock.log stand-in-app.log
