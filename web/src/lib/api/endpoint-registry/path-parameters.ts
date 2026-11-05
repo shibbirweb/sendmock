@@ -128,6 +128,11 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "Position of the step in the flow, starting at 0.",
     example: 0,
   },
+  subscriptionId: {
+    description:
+      "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+    example: exampleUlid,
+  },
   templateId: {
     description:
       "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",

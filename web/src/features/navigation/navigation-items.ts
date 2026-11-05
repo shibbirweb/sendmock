@@ -25,6 +25,7 @@ import {
   VariableIcon,
   LandmarkIcon,
   WalletCardsIcon,
+  RepeatIcon,
   WorkflowIcon,
   WebhookIcon,
 } from "lucide-react";
@@ -274,6 +275,15 @@ export const navigationItems: NavigationItem[] = [
         upcomingDescription:
           "Step by step checkout flows such as 3-D Secure and redirects.",
         icon: WorkflowIcon,
+      },
+      {
+        title: "Subscriptions",
+        path: "/payments/subscriptions",
+        docsPath: "payments/subscriptions/",
+        listOperationKey: "GET /api/v1/payments/subscriptions",
+        upcomingDescription:
+          "Recurring payments that renew, fail and cancel on their own clock.",
+        icon: RepeatIcon,
       },
     ],
   },

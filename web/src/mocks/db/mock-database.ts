@@ -97,6 +97,7 @@ import {
 } from "@/mocks/fixtures/sms-provider-fixtures";
 import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
+import type { PaymentSubscriptionRecord } from "@/mocks/payments/subscriptions/payment-subscriptions";
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
@@ -132,6 +133,7 @@ export type MockDatabase = {
   paymentMethods: PaymentMethodRecord[];
   paymentFlows: PaymentFlowRecord[];
   paymentGateways: PaymentGatewayRecord[];
+  paymentSubscriptions: PaymentSubscriptionRecord[];
   /** Email and SMS providers, built in and custom (docs/plan/22). */
   messageProviders: MessageProviderRecord[];
   inboundRoutes: InboundRouteRecord[];
@@ -180,6 +182,7 @@ function buildConfiguration() {
     httpBins,
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
+    paymentSubscriptions: [],
     inboundRoutes: buildInboundRouteFixtures(),
     messageProviders: [
       ...buildBuiltinEmailProviders(),

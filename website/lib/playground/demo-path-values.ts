@@ -90,6 +90,11 @@ const pathValueSources: PathValueSource[] = [
     field: "key",
   },
   {
+    parameterName: "subscriptionId",
+    listPath: "/api/v1/payments/subscriptions",
+    field: "id",
+  },
+  {
     parameterName: "endpointId",
     listPath: "/api/v1/webhooks/endpoints",
     field: "id",

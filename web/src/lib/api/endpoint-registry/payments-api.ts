@@ -76,6 +76,46 @@ const paymentEndpoints = tagEndpoints("Payments", [
   },
 ]);
 
+const subscriptionEndpoints = tagEndpoints("Payments", [
+  {
+    method: "GET",
+    path: "/api/v1/payments/subscriptions",
+    summary: "Subscriptions, newest first.",
+    response: listOf("PaymentSubscription"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions",
+    summary: "Start a subscription on a gateway, with an optional trial.",
+    requestBody: typeRef("PaymentSubscriptionCreateRequest"),
+    response: typeRef("PaymentSubscription"),
+    successStatus: 201,
+    errorStatuses: [400, 404, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}",
+    summary: "One subscription with its timeline and renewal payments.",
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+    summary: "Move the subscription's clock to its next renewal and charge it.",
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404, 409],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+    summary: "Cancel the subscription now or at the end of its period.",
+    requestBody: typeRef("PaymentSubscriptionCancelRequest"),
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404, 409],
+  },
+]);
+
 const checkoutEndpoints = tagEndpoints("Checkout", [
   {
     method: "GET",
@@ -96,5 +136,6 @@ const checkoutEndpoints = tagEndpoints("Checkout", [
 
 export const paymentsApi: ApiEndpoint[] = [
   ...paymentEndpoints,
+  ...subscriptionEndpoints,
   ...checkoutEndpoints,
 ];

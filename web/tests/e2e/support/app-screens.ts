@@ -25,6 +25,10 @@ export const appScreens = [
   { path: "/payments/gateways", title: "Gateways · Payments · SendMock" },
   { path: "/payments/methods", title: "Methods · Payments · SendMock" },
   { path: "/payments/flows", title: "Flows · Payments · SendMock" },
+  {
+    path: "/payments/subscriptions",
+    title: "Subscriptions · Payments · SendMock",
+  },
   { path: "/numbers", title: "Numbers · SendMock" },
   // Loads nothing when it opens: the API is called by Validate and Run.
   { path: "/scenarios", title: "Scenarios · SendMock", loadsDataOnOpen: false },

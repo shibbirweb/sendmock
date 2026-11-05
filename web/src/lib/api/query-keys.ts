@@ -97,6 +97,7 @@ export const queryKeys = {
     methods: ["payments", "methods"] as const,
     flows: ["payments", "flows"] as const,
     gateways: ["payments", "gateways"] as const,
+    subscriptions: ["payments", "subscriptions"] as const,
     gatewayPreview: (previewRequest: PaymentGatewayPreviewRequest) =>
       ["payments", "gateway-preview", previewRequest] as const,
   },

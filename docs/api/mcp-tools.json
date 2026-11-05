@@ -20141,6 +20141,470 @@
       ]
     },
     {
+      "name": "sendmock_subscription_advance",
+      "toolset": "core",
+      "summary": "Move the subscription's clock to its next renewal and charge it.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdAdvance",
+          "summary": "Move the subscription's clock to its next renewal and charge it.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions advance <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Advance to renewal"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_cancel",
+      "toolset": "core",
+      "summary": "Cancel the subscription now or at the end of its period.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdCancel",
+          "summary": "Cancel the subscription now or at the end of its period.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "at_period_end",
+          "input": {
+            "name": "at_period_end",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "End at the next advance instead of now.",
+          "example": false
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "at_period_end": {
+            "type": "boolean",
+            "description": "End at the next advance instead of now.",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "at_period_end": false
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions cancel <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Cancel"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_create",
+      "toolset": "core",
+      "summary": "Start a subscription on a gateway, with an optional trial.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "postPaymentsSubscriptions",
+          "summary": "Start a subscription on a gateway, with an optional trial.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The gateway's key.",
+          "example": "stripe"
+        },
+        {
+          "name": "customer_email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "",
+          "example": "sam@example.test"
+        },
+        {
+          "name": "plan_name",
+          "input": {
+            "name": "plan_name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "",
+          "example": "Pro monthly"
+        },
+        {
+          "name": "amount_minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The amount of each renewal in minor units.",
+          "example": 1500
+        },
+        {
+          "name": "currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "ISO 4217 code; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "name": "interval",
+          "input": {
+            "name": "interval",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "description": "How often a subscription renews.",
+          "example": "month"
+        },
+        {
+          "name": "trial_days",
+          "input": {
+            "name": "trial_days",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Days before the first charge; none charges at once.",
+          "example": 7
+        },
+        {
+          "name": "card_number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The test card that pays each renewal; `4242424242424242` when left out.",
+          "example": "4000000000009995"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The gateway's key.",
+            "examples": [
+              "stripe"
+            ]
+          },
+          "customer_email": {
+            "type": "string",
+            "examples": [
+              "sam@example.test"
+            ],
+            "description": ""
+          },
+          "plan_name": {
+            "type": "string",
+            "examples": [
+              "Pro monthly"
+            ],
+            "description": ""
+          },
+          "amount_minor": {
+            "type": "number",
+            "description": "The amount of each renewal in minor units.",
+            "examples": [
+              1500
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 code; Settings > Payments' default currency when left out.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "interval": {
+            "$ref": "#/$defs/SubscriptionInterval",
+            "examples": [
+              "month"
+            ],
+            "description": "How often a subscription renews."
+          },
+          "trial_days": {
+            "type": "number",
+            "description": "Days before the first charge; none charges at once.",
+            "examples": [
+              7
+            ]
+          },
+          "card_number": {
+            "type": "string",
+            "description": "The test card that pays each renewal; `4242424242424242` when left out.",
+            "examples": [
+              "4000000000009995"
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "customer_email",
+          "plan_name",
+          "amount_minor",
+          "interval"
+        ],
+        "$defs": {
+          "SubscriptionInterval": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "description": "How often a subscription renews."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider": "stripe",
+        "customer_email": "sam@example.test",
+        "plan_name": "Pro monthly",
+        "amount_minor": 1500,
+        "interval": "month",
+        "currency": "USD",
+        "trial_days": 7
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions create"
+      ],
+      "ui": [
+        "Payments > Subscriptions > New subscription"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_get",
+      "toolset": "core",
+      "summary": "One subscription with its timeline and renewal payments.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+          "operation_id": "getPaymentsSubscriptionsBySubscriptionId",
+          "summary": "One subscription with its timeline and renewal payments.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions show <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > open subscription"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_list",
+      "toolset": "core",
+      "summary": "Subscriptions, newest first.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "getPaymentsSubscriptions",
+          "summary": "Subscriptions, newest first.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "PaymentSubscription[]",
+      "cli": [
+        "sendmock payments subscriptions list"
+      ],
+      "ui": [
+        "Payments > Subscriptions"
+      ]
+    },
+    {
       "name": "sendmock_tag_rule_create",
       "toolset": "rules",
       "summary": "Add a tag rule at the end of the list.",
@@ -21772,6 +22236,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -21854,6 +22322,10 @@
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -24523,6 +24995,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -24663,6 +25139,10 @@
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -25095,6 +25575,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -25197,6 +25681,10 @@
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -25407,6 +25895,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -25551,6 +26043,10 @@
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -27796,6 +28292,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -28000,6 +28500,10 @@
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"

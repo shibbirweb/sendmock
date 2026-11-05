@@ -9749,6 +9749,361 @@
       ]
     },
     {
+      "command": "sendmock payments subscriptions advance",
+      "slug": "payments-subscriptions-advance",
+      "usage": "sendmock payments subscriptions advance <subscriptionId>",
+      "summary": "Move the subscription's clock to its next renewal and charge it.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdAdvance",
+          "summary": "Move the subscription's clock to its next renewal and charge it.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "subscriptionId",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock payments subscriptions advance 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "output": "PaymentSubscription",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_subscription_advance"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Advance to renewal"
+      ]
+    },
+    {
+      "command": "sendmock payments subscriptions cancel",
+      "slug": "payments-subscriptions-cancel",
+      "usage": "sendmock payments subscriptions cancel <subscriptionId> [flags]",
+      "summary": "Cancel the subscription now or at the end of its period.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdCancel",
+          "summary": "Cancel the subscription now or at the end of its period.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "subscriptionId",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--at-period-end",
+          "input": {
+            "name": "at_period_end",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "End at the next advance instead of now.",
+          "example": false
+        }
+      ],
+      "example": "sendmock payments subscriptions cancel 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --no-at-period-end",
+      "output": "PaymentSubscription",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_subscription_cancel"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Cancel"
+      ]
+    },
+    {
+      "command": "sendmock payments subscriptions create",
+      "slug": "payments-subscriptions-create",
+      "usage": "sendmock payments subscriptions create [flags]",
+      "summary": "Start a subscription on a gateway, with an optional trial.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "postPaymentsSubscriptions",
+          "summary": "Start a subscription on a gateway, with an optional trial.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The gateway's key.",
+          "example": "stripe"
+        },
+        {
+          "flag": "--customer-email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<customer-email>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": "sam@example.test"
+        },
+        {
+          "flag": "--plan-name",
+          "input": {
+            "name": "plan_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<plan-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": "Pro monthly"
+        },
+        {
+          "flag": "--amount-minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<amount-minor>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The amount of each renewal in minor units.",
+          "example": 1500
+        },
+        {
+          "flag": "--currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<currency>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "ISO 4217 code; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "flag": "--interval",
+          "input": {
+            "name": "interval",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<interval>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "description": "How often a subscription renews.",
+          "example": "month"
+        },
+        {
+          "flag": "--trial-days",
+          "input": {
+            "name": "trial_days",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<trial-days>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Days before the first charge; none charges at once.",
+          "example": 7
+        },
+        {
+          "flag": "--card-number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<card-number>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The test card that pays each renewal; `4242424242424242` when left out.",
+          "example": "4000000000009995"
+        }
+      ],
+      "example": "sendmock payments subscriptions create --provider stripe --customer-email sam@example.test --plan-name 'Pro monthly' --amount-minor 1500 --interval month --currency USD --trial-days 7",
+      "output": "PaymentSubscription",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_subscription_create"
+      ],
+      "ui": [
+        "Payments > Subscriptions > New subscription"
+      ]
+    },
+    {
+      "command": "sendmock payments subscriptions list",
+      "slug": "payments-subscriptions-list",
+      "usage": "sendmock payments subscriptions list",
+      "summary": "Subscriptions, newest first.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "getPaymentsSubscriptions",
+          "summary": "Subscriptions, newest first.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock payments subscriptions list",
+      "output": "PaymentSubscription[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_subscription_list"
+      ],
+      "ui": [
+        "Payments > Subscriptions"
+      ]
+    },
+    {
+      "command": "sendmock payments subscriptions show",
+      "slug": "payments-subscriptions-show",
+      "usage": "sendmock payments subscriptions show <subscriptionId>",
+      "summary": "One subscription with its timeline and renewal payments.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+          "operation_id": "getPaymentsSubscriptionsBySubscriptionId",
+          "summary": "One subscription with its timeline and renewal payments.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "subscriptionId",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock payments subscriptions show 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "output": "PaymentSubscription",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_subscription_get"
+      ],
+      "ui": [
+        "Payments > Subscriptions > open subscription"
+      ]
+    },
+    {
       "command": "sendmock payments test-cards",
       "slug": "payments-test-cards",
       "usage": "sendmock payments test-cards",
@@ -14324,6 +14679,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -15997,6 +16356,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -16283,6 +16646,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -16482,6 +16849,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -17942,6 +18313,10 @@
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"

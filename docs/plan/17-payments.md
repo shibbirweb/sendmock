@@ -37,7 +37,7 @@ Payment intents / orders created and confirmed via API with **test cards or test
 - **Authorize then capture** (manual capture), **void / cancel**: a payment with `capture_method: manual` (Stripe's `capture_method=manual`, or `capture_method` on `POST /payments/checkout`) is `authorized` once paid, fires `payment.authorized`, and is then captured in whole or in part, or voided.
 - **Refunds**: full and partial, instant or pending then succeeded/failed.
 - **Disputes / chargebacks**: open (`needs_response`), answered with evidence (`under_review`), then won or lost. Answering fires `payment.dispute_updated`, which each gateway names in its own words (Stripe `charge.dispute.updated`, PayPal `CUSTOMER.DISPUTE.UPDATED`, Razorpay `payment.dispute.under_review`).
-- **Subscriptions** (Stripe-style): create, trial, renew (simulated clock advance), payment failure and dunning, cancel. (Phase 4+)
+- **Subscriptions** (Stripe-style): create (with an optional trial), renew when the subscription's own clock is advanced (the test card is charged as a payment through the gateway), payment failure (`past_due`), cancel now or at the period end. Statuses: `trialing`, `active`, `past_due`, `canceled`. The Payments > Subscriptions screen lists them with Advance to renewal and Cancel. (Phase 4)
 - All available from the UI ("Simulate" menu on a payment), REST API, CLI and MCP.
 
 ## Provider emulation
@@ -208,6 +208,10 @@ Provider deliveries use the provider's own event names and payloads through buil
 | GET | `/payments/flow-variables` | the variables step labels can use, with what each becomes and an example |
 | GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
+| GET/POST | `/payments/subscriptions` | subscriptions, newest first; `POST` takes the gateway, customer, plan name, amount, currency, interval (`day`, `week`, `month`, `year`), trial days and the test card that pays each renewal (Phase 4) |
+| GET | `/payments/subscriptions/{subscriptionId}` | one subscription with its timeline and renewal payments |
+| POST | `/payments/subscriptions/{subscriptionId}/advance` | the subscription's own clock moves to the next renewal: the card is charged as a payment through the gateway (`subscription.renewed`, or `subscription.payment_failed` and `past_due`); one cancelled at period end ends (`subscription.canceled`); `409` once canceled |
+| POST | `/payments/subscriptions/{subscriptionId}/cancel` | now (`subscription.canceled`), or `at_period_end` |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
 
 CLI and MCP: every payment operation has a command and a tool, listed in [14-ai-integration.md](14-ai-integration.md#command-tree) from the [surface catalogue](20-surface-parity.md); for example `sendmock payments simulate` and `sendmock_payment_simulate`, and `sendmock payments checkout complete` and `sendmock_checkout_complete` to finish a test checkout from a script or an agent.

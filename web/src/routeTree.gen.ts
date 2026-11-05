@@ -24,6 +24,7 @@ import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
 import { Route as PaymentsFlowsRouteImport } from './routes/payments/flows'
 import { Route as PaymentsGatewaysRouteImport } from './routes/payments/gateways'
 import { Route as PaymentsMethodsRouteImport } from './routes/payments/methods'
+import { Route as PaymentsSubscriptionsRouteImport } from './routes/payments/subscriptions'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsProvidersRouteImport } from './routes/sms/providers'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
@@ -114,6 +115,11 @@ const PaymentsMethodsRoute = PaymentsMethodsRouteImport.update({
   path: '/payments/methods',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentsSubscriptionsRoute = PaymentsSubscriptionsRouteImport.update({
+  id: '/payments/subscriptions',
+  path: '/payments/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SmsConversationsRoute = SmsConversationsRouteImport.update({
   id: '/sms/_conversations',
   path: '/sms',
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms'
     | '/sms/providers'
     | '/sms/verify'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms/providers'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms/_conversations'
     | '/sms/providers'
     | '/sms/verify'
@@ -385,6 +397,7 @@ export interface RootRouteChildren {
   PaymentsFlowsRoute: typeof PaymentsFlowsRoute
   PaymentsGatewaysRoute: typeof PaymentsGatewaysRoute
   PaymentsMethodsRoute: typeof PaymentsMethodsRoute
+  PaymentsSubscriptionsRoute: typeof PaymentsSubscriptionsRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsProvidersRoute: typeof SmsProvidersRoute
   SmsVerifyRoute: typeof SmsVerifyRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       path: '/payments/methods'
       fullPath: '/payments/methods'
       preLoaderRoute: typeof PaymentsMethodsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/subscriptions': {
+      id: '/payments/subscriptions'
+      path: '/payments/subscriptions'
+      fullPath: '/payments/subscriptions'
+      preLoaderRoute: typeof PaymentsSubscriptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sms/_conversations': {
@@ -646,6 +666,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentsFlowsRoute: PaymentsFlowsRoute,
   PaymentsGatewaysRoute: PaymentsGatewaysRoute,
   PaymentsMethodsRoute: PaymentsMethodsRoute,
+  PaymentsSubscriptionsRoute: PaymentsSubscriptionsRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsProvidersRoute: SmsProvidersRoute,
   SmsVerifyRoute: SmsVerifyRoute,

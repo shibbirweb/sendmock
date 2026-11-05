@@ -37,6 +37,7 @@ const guidePageByMenuPath: Record<string, string> = {
   "/payments/gateways": "payments/gateways.md",
   "/payments/methods": "payments/methods.md",
   "/payments/flows": "payments/flows.md",
+  "/payments/subscriptions": "payments/subscriptions.md",
   "/numbers": "numbers.md",
   "/scenarios": "scenarios.md",
   "/logs": "logs.md",

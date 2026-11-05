@@ -4482,6 +4482,149 @@ paths:
       x-sendmock-cli: sendmock payments checkout create
       x-sendmock-mcp: sendmock_payment_create_checkout
       x-sendmock-ui: Payments > Gateways > gateway > Checkout > Open a test checkout
+  /api/v1/payments/subscriptions:
+    get:
+      operationId: getPaymentsSubscriptions
+      summary: Subscriptions, newest first.
+      tags:
+        - Payments
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentSubscription"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions list
+      x-sendmock-mcp: sendmock_subscription_list
+      x-sendmock-ui: Payments > Subscriptions
+    post:
+      operationId: postPaymentsSubscriptions
+      summary: Start a subscription on a gateway, with an optional trial.
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSubscriptionCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions create
+      x-sendmock-mcp: sendmock_subscription_create
+      x-sendmock-ui: Payments > Subscriptions > New subscription
+  /api/v1/payments/subscriptions/{subscriptionId}:
+    get:
+      operationId: getPaymentsSubscriptionsBySubscriptionId
+      summary: One subscription with its timeline and renewal payments.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions show <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_get
+      x-sendmock-ui: Payments > Subscriptions > open subscription
+  /api/v1/payments/subscriptions/{subscriptionId}/advance:
+    post:
+      operationId: postPaymentsSubscriptionsBySubscriptionIdAdvance
+      summary: Move the subscription's clock to its next renewal and charge it.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions advance <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_advance
+      x-sendmock-ui: Payments > Subscriptions > Advance to renewal
+  /api/v1/payments/subscriptions/{subscriptionId}/cancel:
+    post:
+      operationId: postPaymentsSubscriptionsBySubscriptionIdCancel
+      summary: Cancel the subscription now or at the end of its period.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSubscriptionCancelRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions cancel <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_cancel
+      x-sendmock-ui: Payments > Subscriptions > Cancel
   /api/v1/checkout-sessions/{sessionId}:
     get:
       operationId: getCheckoutSessionsBySessionId
@@ -6884,6 +7027,10 @@ components:
         - payment.dispute_closed
         - checkout.completed
         - checkout.expired
+        - subscription.created
+        - subscription.renewed
+        - subscription.payment_failed
+        - subscription.canceled
         - webhook.delivered
         - webhook.failed
         - test.ping
@@ -11678,6 +11825,136 @@ components:
         - method_values
         - default_labels
       description: "GET /api/v1/payments/step-types: one entry of the step catalogue."
+    PaymentSubscription:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Ulid"
+        provider:
+          type: string
+          description: The gateway's key.
+        provider_name:
+          type: string
+        customer_email:
+          type: string
+        plan_name:
+          type: string
+        amount_minor:
+          type: number
+        currency:
+          type: string
+        interval:
+          $ref: "#/components/schemas/SubscriptionInterval"
+        status:
+          $ref: "#/components/schemas/SubscriptionStatus"
+        card_last4:
+          type: string
+          description: The last four digits of the test card that pays each renewal.
+        trial_end:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        current_period_start:
+          $ref: "#/components/schemas/IsoTimestamp"
+        current_period_end:
+          $ref: "#/components/schemas/IsoTimestamp"
+        cancel_at_period_end:
+          type: boolean
+          description: True when it ends at the next advance instead of renewing.
+        canceled_at:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        renewal_count:
+          type: number
+        payment_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: The payments charged for it, oldest first.
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubscriptionTimelineEvent"
+      required:
+        - id
+        - provider
+        - provider_name
+        - customer_email
+        - plan_name
+        - amount_minor
+        - currency
+        - interval
+        - status
+        - card_last4
+        - trial_end
+        - current_period_start
+        - current_period_end
+        - cancel_at_period_end
+        - canceled_at
+        - renewal_count
+        - payment_ids
+        - created_at
+        - timeline
+      description: A subscription and its own clock, renewed when advanced.
+    PaymentSubscriptionCancelRequest:
+      type: object
+      properties:
+        at_period_end:
+          type: boolean
+          description: End at the next advance instead of now.
+          examples:
+            - false
+      description: Body of POST /api/v1/payments/subscriptions/{subscriptionId}/cancel.
+    PaymentSubscriptionCreateRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: The gateway's key.
+          examples:
+            - stripe
+        customer_email:
+          type: string
+          examples:
+            - sam@example.test
+        plan_name:
+          type: string
+          examples:
+            - Pro monthly
+        amount_minor:
+          type: number
+          description: The amount of each renewal in minor units.
+          examples:
+            - 1500
+        currency:
+          type: string
+          description: ISO 4217 code; Settings > Payments' default currency when left out.
+          examples:
+            - USD
+        interval:
+          $ref: "#/components/schemas/SubscriptionInterval"
+          examples:
+            - month
+        trial_days:
+          type: number
+          description: Days before the first charge; none charges at once.
+          examples:
+            - 7
+        card_number:
+          type: string
+          description: The test card that pays each renewal; `4242424242424242` when left out.
+          examples:
+            - "4000000000009995"
+      required:
+        - provider
+        - customer_email
+        - plan_name
+        - amount_minor
+        - interval
+      description: Body of POST /api/v1/payments/subscriptions.
     PaymentSummary:
       type: object
       properties:
@@ -13391,6 +13668,42 @@ components:
         - name
         - score
         - description
+    SubscriptionInterval:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+        - year
+      description: How often a subscription renews.
+    SubscriptionStatus:
+      type: string
+      enum:
+        - trialing
+        - active
+        - past_due
+        - canceled
+    SubscriptionTimelineEvent:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/SubscriptionTimelineKind"
+        description:
+          type: string
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - kind
+        - description
+        - created_at
+    SubscriptionTimelineKind:
+      type: string
+      enum:
+        - created
+        - renewed
+        - payment_failed
+        - cancel_scheduled
+        - canceled
     TagRule:
       type: object
       properties:

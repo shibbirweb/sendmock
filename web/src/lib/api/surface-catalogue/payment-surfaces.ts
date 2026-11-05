@@ -41,6 +41,36 @@ export const paymentSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_payment_create_checkout",
     ui: "Payments > Gateways > gateway > Checkout > Open a test checkout",
   },
+  "GET /api/v1/payments/subscriptions": {
+    phase: "4",
+    cli: "sendmock payments subscriptions list",
+    mcp: "sendmock_subscription_list",
+    ui: "Payments > Subscriptions",
+  },
+  "POST /api/v1/payments/subscriptions": {
+    phase: "4",
+    cli: "sendmock payments subscriptions create",
+    mcp: "sendmock_subscription_create",
+    ui: "Payments > Subscriptions > New subscription",
+  },
+  "GET /api/v1/payments/subscriptions/{subscriptionId}": {
+    phase: "4",
+    cli: "sendmock payments subscriptions show <subscriptionId>",
+    mcp: "sendmock_subscription_get",
+    ui: "Payments > Subscriptions > open subscription",
+  },
+  "POST /api/v1/payments/subscriptions/{subscriptionId}/advance": {
+    phase: "4",
+    cli: "sendmock payments subscriptions advance <subscriptionId>",
+    mcp: "sendmock_subscription_advance",
+    ui: "Payments > Subscriptions > Advance to renewal",
+  },
+  "POST /api/v1/payments/subscriptions/{subscriptionId}/cancel": {
+    phase: "4",
+    cli: "sendmock payments subscriptions cancel <subscriptionId>",
+    mcp: "sendmock_subscription_cancel",
+    ui: "Payments > Subscriptions > Cancel",
+  },
   "GET /api/v1/checkout-sessions/{sessionId}": {
     phase: "3P",
     cli: "sendmock payments checkout show <sessionId>",
