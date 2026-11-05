@@ -102,6 +102,18 @@ impl MessageProviderInput {
     }
 }
 
+/// Body of `POST /api/v1/{sms|emails}/providers`: a custom provider, copied or blank.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct ProviderCreateRequest {
+    /// The display name, e.g. "SSL Wireless".
+    pub name: String,
+    /// 2 to 32 lowercase letters, digits or `_`, starting with a letter; unique in its area.
+    pub key: String,
+    /// The provider of the same area to copy, or `null` to start blank.
+    #[serde(default)]
+    pub start_from: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct ProviderReference {
     /// The provider's key, e.g. `twilio`, from its providers list.

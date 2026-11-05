@@ -25,20 +25,20 @@ mod twilio_verify_api;
 mod twilio_verify_services;
 mod twilio_verify_verifications;
 
-pub use builtin_providers::builtin_sms_providers;
+pub use builtin_providers::{builtin_email_providers, builtin_sms_providers};
 pub(crate) use builtin_webhook_templates::find_builtin_webhook_template;
 pub use callback_template_functions::sign_twilio_request;
 pub use created_message::CreatedMessage;
 pub use message_provider_definition::{
     MessageProviderDefinition, ProviderCredential, ProviderErrorResponse, ProviderFieldMapping,
-    ProviderOperation, ProviderResponseTemplate, ProviderValidationRule,
+    ProviderHeaderTemplate, ProviderOperation, ProviderResponseTemplate, ProviderValidationRule,
 };
 pub use operation_matcher::ProviderRoute;
 pub(crate) use operation_matcher::match_operation;
 pub(crate) use provider_call::ProviderCall;
 pub use provider_catalog::{
-    SMS_PROVIDER_AREA, find_area_provider, find_shipped_provider, is_modified, load_area_providers,
-    save_area_provider,
+    EMAIL_PROVIDER_AREA, SMS_PROVIDER_AREA, find_area_provider, find_shipped_provider, is_modified,
+    load_area_providers, save_area_provider,
 };
 pub(crate) use provider_form_fields::read_provider_form_fields;
 pub use provider_http::{ProviderHttpRequest, ProviderHttpResponse};

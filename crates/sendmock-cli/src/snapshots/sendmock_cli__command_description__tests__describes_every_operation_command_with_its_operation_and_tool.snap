@@ -2408,6 +2408,29 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms providers create",
+    "usage": "sendmock sms providers create",
+    "aliases": [],
+    "summary": "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+    "arguments": [],
+    "flags": [
+      "--key",
+      "--name",
+      "--start-from"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/providers",
+        "operation_id": "postSmsProviders",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_provider_create"
+    ]
+  },
+  {
     "command": "sendmock sms providers show",
     "usage": "sendmock sms providers show <providerKey>",
     "aliases": [],
@@ -2570,6 +2593,216 @@ expression: command_descriptions
         "method": "GET",
         "path": "/api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
         "operation_id": "getSmsProvidersByProviderKeyCredentialsByCredentialName",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
+    "command": "sendmock email providers list",
+    "usage": "sendmock email providers list",
+    "aliases": [],
+    "summary": "Email providers, built in and custom, removed ones included.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/providers",
+        "operation_id": "getEmailsProviders",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_list"
+    ]
+  },
+  {
+    "command": "sendmock email providers create",
+    "usage": "sendmock email providers create",
+    "aliases": [],
+    "summary": "Add a custom provider, copied from another or blank; 409 when the key is taken.",
+    "arguments": [],
+    "flags": [
+      "--key",
+      "--name",
+      "--start-from"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/providers",
+        "operation_id": "postEmailsProviders",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_create"
+    ]
+  },
+  {
+    "command": "sendmock email providers show",
+    "usage": "sendmock email providers show <providerKey>",
+    "aliases": [],
+    "summary": "One provider definition; secret credentials masked.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/providers/{providerKey}",
+        "operation_id": "getEmailsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_get"
+    ]
+  },
+  {
+    "command": "sendmock email providers update",
+    "usage": "sendmock email providers update <providerKey>",
+    "aliases": [],
+    "summary": "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--accent",
+      "--callback-template-key",
+      "--check-credentials",
+      "--credentials",
+      "--error-responses",
+      "--field-mapping",
+      "--host",
+      "--enabled",
+      "--key",
+      "--message-id-template",
+      "--name",
+      "--operations",
+      "--outcome-error-codes",
+      "--status-names",
+      "--success-response",
+      "--validation-rules"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/emails/providers/{providerKey}",
+        "operation_id": "patchEmailsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_update"
+    ]
+  },
+  {
+    "command": "sendmock email providers delete",
+    "usage": "sendmock email providers delete <providerKey>",
+    "aliases": [],
+    "summary": "Remove a built-in (restorable) or delete a custom provider; its messages stay.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails/providers/{providerKey}",
+        "operation_id": "deleteEmailsProvidersByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_delete"
+    ]
+  },
+  {
+    "command": "sendmock email providers restore",
+    "usage": "sendmock email providers restore <providerKey>",
+    "aliases": [],
+    "summary": "Bring a removed built-in back as it was.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/providers/{providerKey}/restore",
+        "operation_id": "postEmailsProvidersByProviderKeyRestore",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_restore"
+    ]
+  },
+  {
+    "command": "sendmock email providers reset",
+    "usage": "sendmock email providers reset <providerKey>",
+    "aliases": [],
+    "summary": "Put a built-in provider back as shipped.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/providers/{providerKey}/reset",
+        "operation_id": "postEmailsProvidersByProviderKeyReset",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_reset"
+    ]
+  },
+  {
+    "command": "sendmock email providers preview",
+    "usage": "sendmock email providers preview <providerKey>",
+    "aliases": [],
+    "summary": "Run a sample request through a definition: the message it would store and the answer it would give.",
+    "arguments": [
+      "providerKey"
+    ],
+    "flags": [
+      "--provider",
+      "--sample-request"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/providers/{providerKey}/preview",
+        "operation_id": "postEmailsProvidersByProviderKeyPreview",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_provider_preview"
+    ]
+  },
+  {
+    "command": "sendmock email providers credential",
+    "usage": "sendmock email providers credential <providerKey> <credentialName> --reveal",
+    "aliases": [],
+    "summary": "Reveal one secret credential (asked for after a confirmation).",
+    "arguments": [
+      "providerKey",
+      "credentialName"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/providers/{providerKey}/credentials/{credentialName}",
+        "operation_id": "getEmailsProvidersByProviderKeyCredentialsByCredentialName",
         "selector": null
       }
     ],

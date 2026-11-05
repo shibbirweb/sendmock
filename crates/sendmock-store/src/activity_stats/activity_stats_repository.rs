@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use rusqlite::{Connection, Row, params};
@@ -55,6 +56,23 @@ impl ActivityStatsRepository {
     }
 
     /// Emails and SMS per hour from `window_start_unix_ms` on.
+    /// Emails each source (`smtp`, `native_api`, an email provider's key) stored since then.
+    pub async fn count_emails_by_source_since(
+        &self,
+        since_unix_ms: i64,
+    ) -> Result<HashMap<String, u32>, StoreError> {
+        self.database
+            .read(move |connection| {
+                let mut statement = connection.prepare(
+                    "SELECT source, COUNT(*) FROM emails WHERE received_at >= ?1 GROUP BY source",
+                )?;
+                Ok(statement
+                    .query_map([since_unix_ms], |row| Ok((row.get(0)?, row.get(1)?)))?
+                    .collect::<rusqlite::Result<_>>()?)
+            })
+            .await
+    }
+
     pub async fn count_messages_by_hour(
         &self,
         window_start_unix_ms: i64,

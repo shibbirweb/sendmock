@@ -11,7 +11,8 @@ use sendmock_ops::{
     AnswerKind, AppEvent, AppSettingsUpdate, DeliveryOrder, DeliveryTrigger, InstanceDetails,
     MessageProviderInput, OperationContext, OperationRegistry, ReleaseChannel, SampleEmail,
     SampleEmailSender, SmtpMessage, SuccessStatus, UpdateCheckMode, build_operation_registry,
-    builtin_sms_providers, enqueue_webhook_delivery, run_due_deliveries, store_smtp_message,
+    builtin_email_providers, builtin_sms_providers, enqueue_webhook_delivery, run_due_deliveries,
+    store_smtp_message,
 };
 use sendmock_store::{
     ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
@@ -144,6 +145,8 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
+    samples.extend([sms_provider_create_samples()]);
+    samples.extend(prepare_email_provider_samples(app_router).await);
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);
     samples.extend(prepare_webhook_send_samples(app_router).await);
@@ -215,6 +218,74 @@ async fn prepare_sms_provider_samples(
         (
             "deleteSmsProvidersByProviderKey",
             vec![json!({ "provider_key": "plivo" })],
+        ),
+    ]
+}
+
+fn sms_provider_create_samples() -> (&'static str, Vec<Value>) {
+    (
+        "postSmsProviders",
+        vec![
+            json!({ "name": "SSL Wireless", "key": "ssl_wireless", "start_from": null }),
+            json!({ "name": "Twilio EU", "key": "twilio_eu", "start_from": "twilio" }),
+        ],
+    )
+}
+
+/// A shipped email provider's settings, as `PATCH` and the preview take them.
+fn email_provider_input(provider_key: &str) -> Value {
+    builtin_email_providers()
+        .into_iter()
+        .find(|provider| provider.key == provider_key)
+        .map(|provider| serde_json::to_value(MessageProviderInput::from(provider)))
+        .and_then(Result::ok)
+        .unwrap_or_else(|| panic!("{provider_key} is shipped"))
+}
+
+/// Brevo removed first, so restoring it applies; SparkPost-like custom ones are created.
+async fn prepare_email_provider_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let removal = Request::delete("/api/v1/emails/providers/brevo")
+        .body(Body::empty())
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    app_router
+        .clone()
+        .oneshot(removal)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let mut postmark_update = email_provider_input("postmark");
+    postmark_update["provider_key"] = json!("postmark");
+    vec![
+        ("getEmailsProviders", vec![json!({})]),
+        (
+            "getEmailsProvidersByProviderKey",
+            vec![json!({ "provider_key": "sendgrid" })],
+        ),
+        ("patchEmailsProvidersByProviderKey", vec![postmark_update]),
+        (
+            "postEmailsProvidersByProviderKeyRestore",
+            vec![json!({ "provider_key": "brevo" })],
+        ),
+        (
+            "postEmailsProvidersByProviderKeyReset",
+            vec![json!({ "provider_key": "sendgrid" })],
+        ),
+        (
+            "postEmailsProvidersByProviderKeyPreview",
+            vec![json!({ "provider_key": "resend", "provider": email_provider_input("resend") })],
+        ),
+        (
+            "getEmailsProvidersByProviderKeyCredentialsByCredentialName",
+            vec![json!({ "provider_key": "sendgrid", "credential_name": "api_key" })],
+        ),
+        (
+            "deleteEmailsProvidersByProviderKey",
+            vec![json!({ "provider_key": "ses" })],
+        ),
+        (
+            "postEmailsProviders",
+            vec![json!({ "name": "SparkPost", "key": "sparkpost", "start_from": "sendgrid" })],
         ),
     ]
 }

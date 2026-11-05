@@ -79,8 +79,8 @@ pub use payments::{
 };
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
-    ProviderRoute, answer_provider_request, builtin_sms_providers, load_sms_provider_definitions,
-    sign_twilio_request,
+    ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
+    load_sms_provider_definitions, sign_twilio_request,
 };
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{

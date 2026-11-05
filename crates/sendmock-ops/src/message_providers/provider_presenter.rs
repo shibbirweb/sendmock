@@ -11,14 +11,19 @@ async fn count_recent_messages(
     operation_context: &OperationContext,
     area: &str,
 ) -> Result<HashMap<String, u32>, OperationError> {
-    if area != SMS_PROVIDER_AREA {
-        return Ok(HashMap::new());
-    }
     let since_unix_ms = operation_context.clock.now_unix_ms() - DAY_MS;
-    Ok(operation_context
-        .sms_repository
-        .count_messages_by_api_since(since_unix_ms)
-        .await?)
+    let recent_message_counts = if area == SMS_PROVIDER_AREA {
+        operation_context
+            .sms_repository
+            .count_messages_by_api_since(since_unix_ms)
+            .await?
+    } else {
+        operation_context
+            .activity_stats_repository
+            .count_emails_by_source_since(since_unix_ms)
+            .await?
+    };
+    Ok(recent_message_counts)
 }
 
 /// The providers as the API answers them: secrets masked, Modified and recent message counts.
@@ -51,8 +56,8 @@ pub async fn present_provider(
         .ok_or_else(|| OperationError::Internal("the provider was not presented".to_owned()))
 }
 
-/// The definition every SMS provider operation shares; each names only what differs.
-pub fn sms_provider_definition(
+/// The definition every provider operation shares; each names only what differs.
+pub fn provider_definition(
     operation_id: &'static str,
     method: HttpMethod,
     path: &'static str,
