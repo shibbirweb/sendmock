@@ -53,7 +53,7 @@ jobs:
           VERSION: ${{ needs.decide.outputs.version }}
           COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          bun scripts/version.ts notes "$VERSION" > "$RUNNER_TEMP/release-notes.md"
+          bun scripts/release/release.ts release-body "$VERSION" > "$RUNNER_TEMP/release-notes.md"
           gh release view "$TAG_NAME" > /dev/null 2>&1 || gh release create "$TAG_NAME" --draft --prerelease \
             --target "$COMMIT_SHA" --title "SendMock $VERSION" --notes-file "$RUNNER_TEMP/release-notes.md"
 

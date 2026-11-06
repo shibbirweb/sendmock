@@ -8,8 +8,12 @@
  *     bun scripts/release/release.ts merged-pull-requests --since last-tag|last-stable
  *     bun scripts/release/release.ts agreement <tag> <is-prerelease>
  *     bun scripts/release/release.ts release-number
+ *     bun scripts/release/release.ts release-body <version>
+ *     bun scripts/release/release.ts check-release-body <version> <published-body-file>
+ *     bun scripts/release/release.ts release-pull-request|promote-pull-request <version>
  *
- * `decide` writes `should_act`, `version` and `tag_name` to `$GITHUB_OUTPUT` when set.
+ * `decide` writes `should_act`, `version` and `tag_name` to `$GITHUB_OUTPUT` when set, and the
+ * pull request commands write `title`, `base` and `head`.
  */
 
 import { appendFileSync, readFileSync } from "node:fs";
@@ -28,8 +32,13 @@ import {
   decideDockerTags,
   findNextReleaseNumber,
   findReleaseBlockers,
+  findReleaseBodyDifferences,
   findVersionMismatches,
+  planPromotePullRequest,
+  planReleasePullRequest,
   type PublicationWorkflow,
+  readReleaseBody,
+  type ReleasePullRequest,
 } from "./release-decisions";
 
 const repositoryRoot = join(import.meta.dir, "../..");
@@ -124,6 +133,35 @@ function checkAgreement(tagName: string, isPrereleaseText: string) {
   console.log(`${tagName} agrees with the code.`);
 }
 
+function printReleaseBody(version: string): string {
+  try {
+    return readReleaseBody(
+      readFileSync(join(repositoryRoot, "CHANGELOG.md"), "utf8"),
+      version,
+    );
+  } catch (missingSection) {
+    return fail(String((missingSection as Error).message));
+  }
+}
+
+function checkReleaseBody(version: string, publishedBodyPath: string) {
+  const differences = findReleaseBodyDifferences(
+    printReleaseBody(version),
+    readFileSync(publishedBodyPath, "utf8"),
+  );
+  if (differences.length > 0) {
+    fail(
+      `The release body of ${version} is not its CHANGELOG.md section:\n${differences.join("\n")}`,
+    );
+  }
+  console.log(`The release body of ${version} is its CHANGELOG.md section.`);
+}
+
+function writePullRequestPlan(pullRequest: ReleasePullRequest) {
+  console.log(JSON.stringify(pullRequest));
+  writeGitHubOutputs(pullRequest);
+}
+
 const publicationWorkflows: PublicationWorkflow[] = [
   "beta-publish",
   "stable-promote",
@@ -150,6 +188,28 @@ switch (command) {
   case "release-number":
     console.log(findNextReleaseNumber(readTagNames()));
     break;
+  case "release-body":
+    console.log(printReleaseBody(firstArgument ?? ""));
+    break;
+  case "check-release-body":
+    checkReleaseBody(firstArgument ?? "", secondArgument ?? "");
+    break;
+  case "release-pull-request":
+    writePullRequestPlan(
+      planReleasePullRequest(
+        firstArgument ?? "",
+        findNextReleaseNumber(readTagNames()),
+      ),
+    );
+    break;
+  case "promote-pull-request":
+    writePullRequestPlan(
+      planPromotePullRequest(
+        firstArgument ?? "",
+        findNextReleaseNumber(readTagNames()),
+      ),
+    );
+    break;
   case "docker-tags":
     console.log(
       decideDockerTags(firstArgument ?? "", secondArgument ?? "").join(" "),
@@ -157,6 +217,6 @@ switch (command) {
     break;
   default:
     fail(
-      "Usage: bun scripts/release/release.ts readiness|decide <workflow>|merged-pull-requests --since last-tag|last-stable|agreement <tag> <is-prerelease>|release-number|docker-tags <version> <channel>",
+      "Usage: bun scripts/release/release.ts readiness|decide <workflow>|merged-pull-requests --since last-tag|last-stable|agreement <tag> <is-prerelease>|release-number|release-body <version>|check-release-body <version> <file>|release-pull-request <version>|promote-pull-request <version>|docker-tags <version> <channel>",
     );
 }

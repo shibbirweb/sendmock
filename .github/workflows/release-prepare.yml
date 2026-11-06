@@ -55,9 +55,8 @@ jobs:
           version="$(bun scripts/version.ts bump "$BUMP" --pull-requests "$RUNNER_TEMP/merged-since-last-tag.json")"
           if [[ "$version" == *-beta.* ]]; then since=last-tag; else since=last-stable; fi
           bun scripts/version.ts changelog --pull-requests "$RUNNER_TEMP/merged-since-$since.json"
-          bun scripts/version.ts notes "$version" > "$RUNNER_TEMP/release-notes.md"
+          bun scripts/release/release.ts release-body "$version" > "$RUNNER_TEMP/release-notes.md"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "release_number=$(bun scripts/release/release.ts release-number)" >> "$GITHUB_OUTPUT"
           echo "## $version" >> "$GITHUB_STEP_SUMMARY"
           cat "$RUNNER_TEMP/release-notes.md" >> "$GITHUB_STEP_SUMMARY"
           git diff --stat
@@ -67,12 +66,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
           VERSION: ${{ steps.release.outputs.version }}
-          RELEASE_NUMBER: ${{ steps.release.outputs.release_number }}
         run: |
-          title="chore:[REL-$RELEASE_NUMBER] release $VERSION"
+          pull_request="$(bun scripts/release/release.ts release-pull-request "$VERSION")"
+          title="$(echo "$pull_request" | jq -r .title)"
+          base="$(echo "$pull_request" | jq -r .base)"
+          head="$(echo "$pull_request" | jq -r .head)"
           git config user.name "MD. Shibbir Ahmed"
           git config user.email "shibbirweb@gmail.com"
-          git switch -c "release/v$VERSION"
+          git switch -c "$head"
           git commit -am "$title"
-          git push origin "release/v$VERSION"
-          gh pr create --base develop --head "release/v$VERSION" --title "$title" --body-file "$RUNNER_TEMP/release-notes.md"
+          git push origin "$head"
+          gh pr create --base "$base" --head "$head" --title "$title" --body-file "$RUNNER_TEMP/release-notes.md"

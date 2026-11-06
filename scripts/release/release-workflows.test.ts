@@ -175,3 +175,54 @@ describe("Docker edge", () => {
     ).toContain("mcp-publisher login github-oidc");
   });
 });
+
+describe("release pull requests and bodies in the workflows", () => {
+  type CallingJob = {
+    uses?: string;
+    with?: Record<string, unknown>;
+    steps?: { run?: string }[];
+  };
+  function readJobs(fileName: string) {
+    return readWorkflow(fileName).jobs as Record<string, CallingJob>;
+  }
+  function readRunText(job: CallingJob | undefined) {
+    return (job?.steps ?? []).map((step) => step.run ?? "").join("\n");
+  }
+
+  test("DS-04.1 Prepare release opens the planned pull request, and merging it publishes a beta on every channel", () => {
+    const betaRelease = readJobs("beta-publish.yml").release;
+
+    expect(readRunText(readJobs("release-prepare.yml").prepare)).toContain(
+      "bun scripts/release/release.ts release-pull-request",
+    );
+    expect(betaRelease?.uses).toBe("./.github/workflows/release.yml");
+    expect(betaRelease?.with?.channel).toBe("beta");
+    expect(betaRelease?.with?.publish).toBe(true);
+  });
+
+  test("DS-04.3 Promote stable opens the planned develop to main pull request, and merging it publishes the stable", () => {
+    const stableRelease = readJobs("stable-publish.yml").release;
+
+    expect(readRunText(readJobs("stable-promote.yml").promote)).toContain(
+      "bun scripts/release/release.ts promote-pull-request",
+    );
+    expect(stableRelease?.uses).toBe("./.github/workflows/release.yml");
+    expect(stableRelease?.with?.channel).toBe("stable");
+    expect(stableRelease?.with?.publish).toBe(true);
+  });
+
+  test("DS-05.5 every body comes from its section and is read back after publishing", () => {
+    for (const fileName of ["beta-publish.yml", "stable-publish.yml"]) {
+      expect(readRunText(readJobs(fileName).draft)).toContain(
+        "bun scripts/release/release.ts release-body",
+      );
+    }
+    const publishText = readRunText(readJobs("release.yml").publish);
+
+    expect(publishText).toContain("--notes-file");
+    expect(publishText).toContain(
+      'bun scripts/release/release.ts check-release-body "$VERSION"',
+    );
+    expect(publishText).not.toContain("--notes ");
+  });
+});

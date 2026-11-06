@@ -37,11 +37,13 @@ jobs:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
           VERSION: ${{ steps.decision.outputs.version }}
         run: |
-          if [ -n "$(gh pr list --base main --head develop --state open --json number --jq '.[].number')" ]; then
-            echo "A develop to main pull request is already open."
+          pull_request="$(bun scripts/release/release.ts promote-pull-request "$VERSION")"
+          base="$(echo "$pull_request" | jq -r .base)"
+          head="$(echo "$pull_request" | jq -r .head)"
+          if [ -n "$(gh pr list --base "$base" --head "$head" --state open --json number --jq '.[].number')" ]; then
+            echo "A $head to $base pull request is already open."
             exit 0
           fi
-          release_number="$(bun scripts/release/release.ts release-number)"
-          gh pr create --base main --head develop \
-            --title "chore:[REL-$release_number] promote $VERSION to main" \
+          gh pr create --base "$base" --head "$head" \
+            --title "$(echo "$pull_request" | jq -r .title)" \
             --body "Merge with a merge commit, never squash, so main and develop share history. Merging publishes $VERSION."

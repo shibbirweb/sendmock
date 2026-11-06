@@ -1,3 +1,4 @@
+import { extractReleaseNotes } from "../version/changelog";
 import {
   formatVersion,
   isBeta,
@@ -122,4 +123,73 @@ export function decideDockerTags(version: string, channel: string): string[] {
   }
   const { major, minor } = parsedVersion;
   return ["latest", version, `${major}.${minor}`, `${major}`];
+}
+
+/**
+ * A release's body: its `CHANGELOG.md` section without the heading, word for word (DS-05.5).
+ * A version without a section is refused, so no release goes out with an empty body.
+ */
+export function readReleaseBody(changelog: string, version: string): string {
+  const releaseNotes = extractReleaseNotes(changelog, version);
+  if (releaseNotes === null) {
+    throw new Error(
+      `CHANGELOG.md has no section for ${version}; Prepare release writes it.`,
+    );
+  }
+  return releaseNotes;
+}
+
+function normalizeBodyLines(body: string): string[] {
+  return body
+    .replaceAll("\r\n", "\n")
+    .trim()
+    .split("\n")
+    .map((line) => line.trimEnd());
+}
+
+/** Where a published release body differs from its section, line by line (DS-05.5). */
+export function findReleaseBodyDifferences(
+  expectedBody: string,
+  publishedBody: string,
+): string[] {
+  const expectedLines = normalizeBodyLines(expectedBody);
+  const publishedLines = normalizeBodyLines(publishedBody);
+  const lineCount = Math.max(expectedLines.length, publishedLines.length);
+  const differences: string[] = [];
+  for (let lineIndex = 0; lineIndex < lineCount; lineIndex += 1) {
+    const expectedLine = expectedLines[lineIndex] ?? "(no line)";
+    const publishedLine = publishedLines[lineIndex] ?? "(no line)";
+    if (expectedLine !== publishedLine) {
+      differences.push(
+        `line ${lineIndex + 1}: expected "${expectedLine}", published "${publishedLine}"`,
+      );
+    }
+  }
+  return differences;
+}
+
+export type ReleasePullRequest = { title: string; base: string; head: string };
+
+/** The pull request Prepare release opens into `develop` with the version and its notes (DS-04.1). */
+export function planReleasePullRequest(
+  version: string,
+  releaseNumber: number,
+): ReleasePullRequest {
+  return {
+    title: `chore:[REL-${releaseNumber}] release ${version}`,
+    base: "develop",
+    head: `release/v${version}`,
+  };
+}
+
+/** The pull request Promote stable opens from `develop` into `main` (DS-04.3). */
+export function planPromotePullRequest(
+  version: string,
+  releaseNumber: number,
+): ReleasePullRequest {
+  return {
+    title: `chore:[REL-${releaseNumber}] promote ${version} to main`,
+    base: "main",
+    head: "develop",
+  };
 }

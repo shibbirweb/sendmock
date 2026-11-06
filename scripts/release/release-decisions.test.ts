@@ -1,11 +1,18 @@
 import { describe, expect, test } from "bun:test";
 
+import { insertChangelogSection } from "../version/changelog";
+import { computeNextVersion } from "../version/next-version";
+import { formatVersion, parseVersion } from "../version/semantic-version";
 import {
-  decidePublication,
   decideDockerTags,
+  decidePublication,
   findNextReleaseNumber,
   findReleaseBlockers,
+  findReleaseBodyDifferences,
   findVersionMismatches,
+  planPromotePullRequest,
+  planReleasePullRequest,
+  readReleaseBody,
 } from "./release-decisions";
 
 describe("decidePublication", () => {
@@ -146,3 +153,125 @@ describe("decideDockerTags", () => {
     expect(() => decideDockerTags("next", "stable")).toThrow();
   });
 });
+
+describe("release bodies", () => {
+  const betaSection =
+    "## 0.2.0-beta.1 - 2026-11-01\n\n### Added\n\n- SMS threads (#7)\n";
+  const stableSection = [
+    "## 0.2.0 - 2026-11-09",
+    "",
+    "### Added",
+    "",
+    "- SMS threads (#7)",
+    "- Webhook replay (#9)",
+    "",
+    "### Fixed",
+    "",
+    "- Retry timing (#8)",
+    "",
+  ].join("\n");
+  const changelogFile = insertChangelogSection(
+    insertChangelogSection(null, betaSection),
+    stableSection,
+  );
+
+  test("DS-05.5 a beta's body is its section without the heading", () => {
+    expect(readReleaseBody(changelogFile, "0.2.0-beta.1")).toBe(
+      "### Added\n\n- SMS threads (#7)",
+    );
+  });
+
+  test("DS-05.5 a stable's body is its section, which collects its betas", () => {
+    expect(readReleaseBody(changelogFile, "0.2.0")).toBe(
+      "### Added\n\n- SMS threads (#7)\n- Webhook replay (#9)\n\n### Fixed\n\n- Retry timing (#8)",
+    );
+  });
+
+  test("DS-05.5 a version without a section is refused", () => {
+    expect(() => readReleaseBody(changelogFile, "0.3.0")).toThrow(
+      "CHANGELOG.md has no section for 0.3.0",
+    );
+  });
+
+  test("DS-05.5 a published body matches its section word for word, line endings aside", () => {
+    const releaseBody = readReleaseBody(changelogFile, "0.2.0");
+
+    expect(
+      findReleaseBodyDifferences(
+        releaseBody,
+        `${releaseBody.replaceAll("\n", "\r\n")}\r\n`,
+      ),
+    ).toEqual([]);
+    expect(
+      findReleaseBodyDifferences(
+        releaseBody,
+        releaseBody.replace("Webhook replay", "Replay"),
+      ),
+    ).toEqual([
+      'line 4: expected "- Webhook replay (#9)", published "- Replay (#9)"',
+    ]);
+    expect(findReleaseBodyDifferences("### Added", "")).toEqual([
+      'line 1: expected "### Added", published ""',
+    ]);
+  });
+});
+
+describe("release pull requests from a release history (dry run)", () => {
+  test("DS-04.1 a beta bump opens the release pull request into develop, and merging it publishes the pre-release", () => {
+    const releaseTags = ["v0.1.0", "v0.2.0-beta.1"];
+    const nextVersionResult = computeNextVersion("beta", {
+      currentVersion: parseVersion("0.2.0-beta.1") ?? failToParse(),
+      lastStableVersion: parseVersion("0.1.0") ?? failToParse(),
+      isCurrentVersionTagged: true,
+      changeKindsSinceLastTag: ["feature"],
+    });
+    const nextVersion =
+      "version" in nextVersionResult
+        ? formatVersion(nextVersionResult.version)
+        : failToParse();
+
+    expect(nextVersion).toBe("0.2.0-beta.2");
+    expect(
+      planReleasePullRequest(nextVersion, findNextReleaseNumber(releaseTags)),
+    ).toEqual({
+      title: "chore:[REL-3] release 0.2.0-beta.2",
+      base: "develop",
+      head: "release/v0.2.0-beta.2",
+    });
+    expect(decidePublication("beta-publish", nextVersion, releaseTags)).toEqual(
+      {
+        shouldAct: true,
+        version: "0.2.0-beta.2",
+        tagName: "v0.2.0-beta.2",
+      },
+    );
+  });
+
+  test("DS-04.3 a stable on develop opens the develop to main pull request, and merging it publishes the stable", () => {
+    const releaseTags = ["v0.1.0", "v0.2.0-beta.1", "v0.2.0-beta.2"];
+
+    expect(
+      decidePublication("stable-promote", "0.2.0", releaseTags).shouldAct,
+    ).toBe(true);
+    expect(
+      planPromotePullRequest("0.2.0", findNextReleaseNumber(releaseTags)),
+    ).toEqual({
+      title: "chore:[REL-4] promote 0.2.0 to main",
+      base: "main",
+      head: "develop",
+    });
+    expect(decidePublication("stable-publish", "0.2.0", releaseTags)).toEqual({
+      shouldAct: true,
+      version: "0.2.0",
+      tagName: "v0.2.0",
+    });
+    expect(
+      decidePublication("stable-publish", "0.2.0", [...releaseTags, "v0.2.0"])
+        .shouldAct,
+    ).toBe(false);
+  });
+});
+
+function failToParse(): never {
+  throw new Error("not a version");
+}

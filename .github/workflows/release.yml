@@ -574,11 +574,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ inputs.tag_name }}
+          VERSION: ${{ inputs.version }}
         run: |
+          bun scripts/release/release.ts release-body "$VERSION" > "$RUNNER_TEMP/release-notes.md"
           gh release delete beta --cleanup-tag --yes || true
           gh release create beta dist/* --prerelease --target "$COMMIT_SHA" \
-            --title "Latest beta" \
-            --notes "The newest beta, now $TAG_NAME. These links always give the newest beta; see $TAG_NAME for its notes."
+            --title "Latest beta: SendMock $VERSION" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"
+
+      # Every release and pre-release body is its CHANGELOG.md section word for word (DS-05.5).
+      - name: Read each published body back and compare it with its section
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          release_tags="$TAG_NAME"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then release_tags="$TAG_NAME beta"; fi
+          for release_tag in $release_tags; do
+            gh release view "$release_tag" --json body --jq .body > "$RUNNER_TEMP/published-body.md"
+            bun scripts/release/release.ts check-release-body "$VERSION" "$RUNNER_TEMP/published-body.md"
+          done
 
   # The release images on GHCR (and Docker Hub with its token), signed like edge.
   docker:
