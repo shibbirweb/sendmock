@@ -100,7 +100,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 8 | In progress |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | UI in U2, backend Phase 3 | 9 | In progress |
-| [WH-04](03-webhooks.md#wh-04-standard-webhooks-signing) | Standard Webhooks signing | Phase 3 | 3 | In progress |
+| [WH-04](03-webhooks.md#wh-04-standard-webhooks-signing) | Standard Webhooks signing | Phase 3 | 3 | Accepted |
 | [WH-05](03-webhooks.md#wh-05-manual-send-and-replay) | Manual send and replay | UI in U2, backend Phase 3 | 6 | In progress |
 | [WH-06](03-webhooks.md#wh-06-provider-formats-and-signatures) | Provider formats and signatures | Phase 3 (Twilio, Vonage), Phase 4 (email providers) | 3 | Accepted |
 | [WH-07](03-webhooks.md#wh-07-variables-and-templating) | Variables and templating | UI in U2 (nunjucks preview), backend Phase 3 (`minijinja`), Phase 4 (fake data, aliases, env, multipart) | 16 | Accepted |
@@ -114,7 +114,7 @@ On top of its own criteria, a feature is done only when:
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
 | [PL-01](04-catcher-platform.md#pl-01-rest-api-and-openapi) | REST API and OpenAPI | Phase 0 onwards | 5 | Accepted |
 | [PL-02](04-catcher-platform.md#pl-02-realtime) | Realtime | Phase 1 | 2 | Accepted |
-| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | In progress |
+| [PL-03](04-catcher-platform.md#pl-03-test-helpers) | Test helpers | Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait) | 5 | Accepted |
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | Accepted |
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | In progress |

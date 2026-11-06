@@ -44,7 +44,7 @@ UI in U2 (WH-03.7 to WH-03.9), backend Phase 3.
 
 Phase 3. Docs: [Signing](../05-webhooks.md#signing).
 
-- [ ] WH-04.1 Native deliveries carry `webhook-id`, `webhook-timestamp` and `webhook-signature` exactly as the Standard Webhooks spec defines, and verify with the official libraries in at least Node, Python, PHP and Go.
+- [x] WH-04.1 Native deliveries carry `webhook-id`, `webhook-timestamp` and `webhook-signature` exactly as the Standard Webhooks spec defines, and verify with the official libraries in at least Node, Python, PHP and Go. (#48)
 - [x] WH-04.2 `webhook-id` stays the same across retries of one event. (#48)
 - [x] WH-04.3 Secret rotation signs with both secrets during the overlap window, then only with the new one. (#48)
 

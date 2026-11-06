@@ -57,7 +57,7 @@ Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
 - [x] PL-03.2 `since` prevents matching messages older than the request window. (#48)
 - [x] PL-03.3 `otp` and `links` return the latest values per recipient and channel. (#48)
 - [x] PL-03.4 `--ready-json` with port `0` prints the bound addresses once ready. (#48)
-- [ ] PL-03.5 `POST /samples/{kind}` creates an email (over SMTP, with its SMTP session logged), an SMS or a verification through the normal path, firing the same events and webhooks as real traffic, with matching CLI and MCP commands.
+- [x] PL-03.5 `POST /samples/{kind}` creates an email (over SMTP, with its SMTP session logged), an SMS or a verification through the normal path, firing the same events and webhooks as real traffic, with matching CLI and MCP commands. (#48)
 
 ## PL-04 Seed file and reset
 
@@ -109,7 +109,7 @@ Phase 0.
 
 Phase 1.
 
-- [ ] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration.
+- [x] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration. (#48)
 - [ ] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load.
 
 ## PL-09 Demo data
