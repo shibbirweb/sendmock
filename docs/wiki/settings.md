@@ -44,7 +44,7 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 
 ### General
 
-**Retention:** **Keep at most** a number of emails and SMS, and **Delete traffic older than** a number of days, or **Keep forever**. Older traffic is pruned when a limit is reached; configuration is never pruned. **Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
+**Retention:** **Keep at most** a number of emails and SMS, and **Delete traffic older than** a number of days, or **Keep forever**. Older traffic is pruned every few seconds once a limit is reached: emails with their SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries keep the newest **emails** count, and SMS and verifications the newest **SMS** count. Configuration (endpoints, rules, templates, variables, saved deliveries, numbers, providers) and deliveries still waiting to be sent are never pruned, and the database file gives the freed space back. **Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
 
 ### Seed
 

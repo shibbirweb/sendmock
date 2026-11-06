@@ -10,16 +10,16 @@ use sendmock_store::{
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
     PaymentSubscriptionRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
     SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
-    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, VerificationRepository,
-    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
-    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
-    WebhookVariableRepository,
+    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
+    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
+    WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
     AppSettingsStore, EnvironmentReader, EventBus, InstanceDetails, MediaFetcher,
-    OtpExtractorCache, ProcessEnvironment, ReplyWebhookSender, SampleEmailSender,
-    StatusCallbackSender, UpdateChecker, WebhookSender,
+    ProcessEnvironment, ReplyWebhookSender, SampleEmailSender, StatusCallbackSender, UpdateChecker,
+    WebhookSender,
 };
 
 /// The dependencies operations run with, passed in rather than reached through globals.
@@ -64,7 +64,7 @@ pub struct OperationContext {
     pub random_source: Arc<dyn RandomSource>,
     pub event_bus: EventBus,
     pub settings_store: AppSettingsStore,
-    pub otp_extractor_cache: OtpExtractorCache,
+    pub traffic_pruner: TrafficPruner,
     /// Set once the SMTP listener runs, so samples can go through it.
     pub sample_email_sender: Option<Arc<dyn SampleEmailSender>>,
     pub update_checker: UpdateChecker,
@@ -175,7 +175,7 @@ impl OperationContext {
         Self {
             email_repository: EmailRepository::new(share_database()),
             settings_store: AppSettingsStore::new(SettingsRepository::new(share_database())),
-            otp_extractor_cache: OtpExtractorCache::default(),
+            traffic_pruner: TrafficPruner::new(share_database()),
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(share_database()),
             smtp_session_repository: SmtpSessionRepository::new(share_database()),
             api_request_repository: ApiRequestRepository::new(share_database()),

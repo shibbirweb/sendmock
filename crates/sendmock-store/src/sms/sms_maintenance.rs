@@ -49,26 +49,4 @@ impl SmsRepository {
             })
             .await
     }
-
-    /// Keeps the newest `max_count` messages and drops those created before the cutoff.
-    pub async fn prune_messages(
-        &self,
-        max_count: u64,
-        created_before_unix_ms: Option<i64>,
-    ) -> Result<u64, StoreError> {
-        self.database()
-            .write(move |connection| {
-                let kept_count = i64::try_from(max_count).unwrap_or(i64::MAX);
-                let mut deleted_count = connection.execute(
-                    "DELETE FROM sms_messages WHERE id IN (SELECT id FROM sms_messages ORDER BY id DESC LIMIT -1 OFFSET ?1)",
-                    params![kept_count],
-                )?;
-                if let Some(created_before_unix_ms) = created_before_unix_ms {
-                    deleted_count +=
-                        connection.execute("DELETE FROM sms_messages WHERE created_at < ?1", params![created_before_unix_ms])?;
-                }
-                Ok(deleted_count as u64)
-            })
-            .await
-    }
 }

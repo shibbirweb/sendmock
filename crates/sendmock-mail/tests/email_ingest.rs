@@ -8,6 +8,7 @@ use sendmock_mail::{
 };
 use sendmock_store::{
     Database, DatabaseLocation, EMBEDDED_MIGRATIONS, EmailListFilter, EmailRepository,
+    PrunableTable, TrafficPruner,
 };
 
 /// A clock tests move forward by hand.
@@ -29,6 +30,7 @@ impl SteppingClock {
 
 struct IngestFixture {
     email_repository: EmailRepository,
+    traffic_pruner: TrafficPruner,
     ingest_service: EmailIngestService,
     clock: Arc<SteppingClock>,
 }
@@ -38,7 +40,8 @@ fn build_fixture() -> IngestFixture {
         Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)
             .unwrap_or_else(|open_error| panic!("an in-memory database: {open_error}")),
     );
-    let email_repository = EmailRepository::new(database);
+    let email_repository = EmailRepository::new(Arc::clone(&database));
+    let traffic_pruner = TrafficPruner::new(database);
     let clock = Arc::new(SteppingClock {
         now_unix_ms: AtomicI64::new(1_767_225_600_000),
     });
@@ -49,6 +52,7 @@ fn build_fixture() -> IngestFixture {
     );
     IngestFixture {
         email_repository,
+        traffic_pruner,
         ingest_service,
         clock,
     }
@@ -296,13 +300,13 @@ async fn prunes_the_oldest_beyond_the_count_and_everything_older_than_the_cut_of
     }
 
     let deleted_by_count = fixture
-        .email_repository
-        .prune_emails(Some(3), None)
+        .traffic_pruner
+        .prune(PrunableTable::EMAILS, Some(3), None)
         .await
         .unwrap_or_else(|error| panic!("a prune: {error:?}"));
     let deleted_by_age = fixture
-        .email_repository
-        .prune_emails(None, Some(1_767_225_600_000 + 4000))
+        .traffic_pruner
+        .prune(PrunableTable::EMAILS, None, Some(1_767_225_600_000 + 4000))
         .await
         .unwrap_or_else(|error| panic!("a prune: {error:?}"));
 

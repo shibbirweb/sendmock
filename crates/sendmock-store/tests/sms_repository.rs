@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use sendmock_store::{
     Database, DatabaseLocation, EMBEDDED_MIGRATIONS, MessageOpenRecord, NewSmsRecord,
-    OpenRecording, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository, SmsListFilter,
-    SmsMediaRecord, SmsRecord, SmsRepository, SmsStatusChangeRecord, StoreError,
+    OpenRecording, PrunableTable, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository,
+    SmsListFilter, SmsMediaRecord, SmsRecord, SmsRepository, SmsStatusChangeRecord, StoreError,
+    TrafficPruner,
 };
 
 fn repository() -> Result<SmsRepository, StoreError> {
@@ -198,7 +199,7 @@ async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreEr
         EMBEDDED_MIGRATIONS,
     )?);
     let repository = SmsRepository::new(Arc::clone(&database));
-    let callback_attempt_repository = SmsCallbackAttemptRepository::new(database);
+    let callback_attempt_repository = SmsCallbackAttemptRepository::new(Arc::clone(&database));
     for sms_id in ["01A", "01B", "01C"] {
         repository
             .insert_message(plain(sms(sms_id, "outbound", "Hi")))
@@ -220,7 +221,9 @@ async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreEr
         })
         .await?;
 
-    let pruned_count = repository.prune_messages(2, None).await?;
+    let pruned_count = TrafficPruner::new(Arc::clone(&database))
+        .prune(PrunableTable::SMS_MESSAGES, Some(2), None)
+        .await?;
 
     assert_eq!(pruned_count, 1);
     assert_eq!(repository.find_message("01A").await?, None);

@@ -224,3 +224,26 @@ async fn links_answer_the_newest_email_per_recipient() {
     assert_eq!(sam_links["links"], json!(["https://shop.test/verify/new"]));
     assert_eq!(ann_links["links"], json!(["https://shop.test/verify/ann"]));
 }
+
+// AC: PL-03.5
+#[tokio::test]
+async fn a_sample_sms_goes_through_the_normal_path() {
+    let (app_router, _) = build_test_app();
+
+    let (status, sample) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/samples/sms",
+        Some(&json!({ "to": "+447700900123" })),
+    )
+    .await;
+    let (_, sms_page) = call_api(&app_router, "GET", "/api/v1/sms?to=%2B447700900123", None).await;
+
+    assert!(status == 200 || status == 201, "{status} {sample}");
+    assert_eq!(sample["kind"], "sms");
+    assert_eq!(sms_page["items"][0]["id"], sample["id"]);
+    assert_eq!(
+        read_otp(&app_router, "to=%2B447700900123&channel=sms").await,
+        "482913"
+    );
+}

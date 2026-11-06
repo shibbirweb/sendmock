@@ -112,9 +112,8 @@ pub use seed::{
     apply_seed_toml, restore_seed_state, validate_seed_toml,
 };
 pub use settings::{
-    AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, OtpExtractorCache,
-    SmsSimulationProfile, UpdateCheckMode, build_ingest_options, prune_traffic,
-    read_ingest_options,
+    AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
+    UpdateCheckMode, build_ingest_options, prune_traffic, read_ingest_options,
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,

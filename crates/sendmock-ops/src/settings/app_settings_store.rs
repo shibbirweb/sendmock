@@ -1,19 +1,22 @@
 use std::sync::Arc;
 
+use sendmock_mail::OtpExtractor;
 use sendmock_store::{SettingsRepository, StoreError};
 use tokio::sync::RwLock;
 
 use super::app_settings::AppSettings;
+use super::otp_extractor_cache::OtpExtractorCache;
 
 /// All settings live under one key, as one JSON object.
 const APP_SETTINGS_KEY: &str = "app";
 
 /// The settings, read from the database once and kept in memory, so every message can
-/// read them without a query; a save writes both.
+/// read them without a query; a save writes both. The OTP patterns are kept compiled too.
 #[derive(Clone)]
 pub struct AppSettingsStore {
     settings_repository: SettingsRepository,
     cached_settings: Arc<RwLock<Option<AppSettings>>>,
+    otp_extractor_cache: OtpExtractorCache,
 }
 
 impl AppSettingsStore {
@@ -21,7 +24,14 @@ impl AppSettingsStore {
         Self {
             settings_repository,
             cached_settings: Arc::default(),
+            otp_extractor_cache: OtpExtractorCache::default(),
         }
+    }
+
+    /// The extractor for these settings' OTP patterns, compiled only when they change.
+    pub fn otp_extractor_for(&self, settings: &AppSettings) -> OtpExtractor {
+        self.otp_extractor_cache
+            .otp_extractor_for(&settings.otp_patterns)
     }
 
     pub async fn current(&self) -> Result<AppSettings, StoreError> {

@@ -9,9 +9,6 @@ use super::{
 };
 use crate::{Database, StoreError};
 
-/// Rows deleted per statement while pruning, so ingest never waits long on the writer.
-const PRUNE_BATCH_SIZE: i64 = 500;
-
 /// Every email query; no business rules.
 #[derive(Clone)]
 pub struct EmailRepository {
@@ -186,49 +183,6 @@ impl EmailRepository {
                 Ok(())
             })
             .await
-    }
-
-    /// Deletes the oldest emails beyond `max_count` and those received before the cut-off,
-    /// in batches; answers how many were deleted.
-    pub async fn prune_emails(
-        &self,
-        max_count: Option<u64>,
-        received_before_unix_ms: Option<i64>,
-    ) -> Result<u64, StoreError> {
-        self.database
-            .write(move |connection| {
-                let mut deleted_count = 0_u64;
-                if let Some(received_before_unix_ms) = received_before_unix_ms {
-                    deleted_count += delete_in_batches(connection, "DELETE FROM emails WHERE id IN (SELECT id FROM emails WHERE received_at < ?1 LIMIT ?2)", received_before_unix_ms)?;
-                }
-                if let Some(max_count) = max_count {
-                    let kept_count = i64::try_from(max_count).unwrap_or(i64::MAX);
-                    deleted_count += delete_in_batches(
-                        connection,
-                        "DELETE FROM emails WHERE id IN (SELECT id FROM emails ORDER BY id DESC LIMIT -1 OFFSET ?1) \
-                         AND id IN (SELECT id FROM emails ORDER BY id ASC LIMIT ?2)",
-                        kept_count,
-                    )?;
-                }
-                Ok(deleted_count)
-            })
-            .await
-    }
-}
-
-fn delete_in_batches(
-    connection: &Connection,
-    delete_statement: &str,
-    bound_value: i64,
-) -> Result<u64, StoreError> {
-    let mut deleted_count = 0_u64;
-    loop {
-        let batch_deleted =
-            connection.execute(delete_statement, params![bound_value, PRUNE_BATCH_SIZE])?;
-        deleted_count += u64::try_from(batch_deleted).unwrap_or_default();
-        if i64::try_from(batch_deleted).unwrap_or_default() < PRUNE_BATCH_SIZE {
-            return Ok(deleted_count);
-        }
     }
 }
 

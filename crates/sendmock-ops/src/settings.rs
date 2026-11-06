@@ -11,7 +11,6 @@ mod traffic_retention;
 pub use app_settings::{AppSettings, mask_url_password};
 pub use app_settings_store::AppSettingsStore;
 pub use app_settings_update::AppSettingsUpdate;
-pub use otp_extractor_cache::OtpExtractorCache;
 pub use reset_operation::ResetOperation;
 pub use setting_choices::{
     EmailOutcomeProfile, OpenedEventMode, PaymentOutcomeProfile, SmsSimulationProfile,
