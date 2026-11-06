@@ -5,6 +5,9 @@ export type OperatingSystem = "macos" | "linux" | "windows";
 
 const releaseDownloadUrl =
   "https://github.com/shibbirweb/sendmock/releases/latest/download";
+/** The rolling `beta` pre-release: GitHub's `latest` skips pre-releases. */
+const betaDownloadUrl =
+  "https://github.com/shibbirweb/sendmock/releases/download/beta";
 
 /** The Install page's install script command for the platform and channel. */
 function buildInstallScriptCommand(
@@ -13,12 +16,12 @@ function buildInstallScriptCommand(
 ): string {
   if (operatingSystem === "windows") {
     return isBeta
-      ? `& ([scriptblock]::Create((irm ${releaseDownloadUrl}/install.ps1))) -Channel beta`
+      ? `& ([scriptblock]::Create((irm ${betaDownloadUrl}/install.ps1))) -Channel beta`
       : `irm ${releaseDownloadUrl}/install.ps1 | iex`;
   }
 
   return isBeta
-    ? `curl -fsSL ${releaseDownloadUrl}/install.sh | sh -s -- --channel beta`
+    ? `curl -fsSL ${betaDownloadUrl}/install.sh | sh -s -- --channel beta`
     : `curl -fsSL ${releaseDownloadUrl}/install.sh | sh`;
 }
 

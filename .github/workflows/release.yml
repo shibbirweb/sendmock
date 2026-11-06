@@ -38,6 +38,8 @@ on:
       - .github/workflows/release.yml
       - packaging/**
       - scripts/release/**
+      - scripts/release-tests/**
+      - scripts/install/**
       - scripts/binary-smoke-test.ts
 
 permissions:
@@ -201,6 +203,15 @@ jobs:
         shell: bash
         run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
 
+      - name: The install script installs the stable and the beta onto a new shell's PATH (macOS, Linux)
+        if: matrix.archive == 'tar.gz'
+        run: sh scripts/release-tests/install-script.sh dist/sendmock-${{ matrix.target }}.tar.gz ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
+
+      - name: The install script installs the stable and the beta onto a new shell's Path (Windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: ./scripts/release-tests/install-script.ps1 dist/sendmock-${{ matrix.target }}.zip ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
+
       - name: Starts with no runtime in minimal Linux images
         if: matrix.containers
         run: |
@@ -332,8 +343,8 @@ jobs:
       - name: The tag and pre-release flag agree with the code
         run: bun scripts/release/release.ts agreement "${{ inputs.tag_name }}" "${{ env.RELEASE_CHANNEL == 'beta' }}"
 
-      - name: The API contract goes with the binaries
-        run: cp docs/api/openapi.yaml dist/openapi.yaml
+      - name: The API contract and the install scripts go with the binaries
+        run: cp docs/api/openapi.yaml scripts/install/install.sh scripts/install/install.ps1 dist/
 
       - name: Upload the files and publish the release
         env:

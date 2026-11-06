@@ -94,4 +94,4 @@ curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/insta
 irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex
 ```
 
-The beta comes from the same scripts with `--channel beta`. Considered and not chosen: the website (`https://shibbirweb.github.io/sendmock/install.sh`, shorter but served from the site's branch) and a raw file in the repository (tied to the branch layout). The install page and the landing page's quick start use these URLs.
+The beta comes from the same scripts with `--channel beta`, fetched from the rolling `beta` pre-release (`https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh`), since GitHub's `latest` skips pre-releases and so has no script before the first stable (changed 2026-11-06, Phase 5 W1). Considered and not chosen: the website (`https://shibbirweb.github.io/sendmock/install.sh`, shorter but served from the site's branch) and a raw file in the repository (tied to the branch layout). The install page and the landing page's quick start use these URLs.

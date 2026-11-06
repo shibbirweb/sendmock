@@ -77,7 +77,7 @@ describe("buildUpgradeCommand", () => {
         offeredVersion: "0.2.0-beta.1",
       }),
     ).toBe(
-      "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta",
+      "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta",
     );
   });
 

@@ -50,8 +50,10 @@ The script downloads the right binary from the latest GitHub release, checks its
    Beta:
 
    ```bash
-   curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta
+   curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta
    ```
+
+   It puts `sendmock` in `~/.local/bin` and adds that folder to your shell's profile. Add `--install-dir <folder>` to choose another folder, or `--no-modify-path` to leave your profile as it is.
 
 2. Open a new terminal window, so it picks up the new `PATH`.
 
@@ -80,8 +82,10 @@ Prefer to download the binary yourself? Go to [Binaries](#binaries).
    Beta:
 
    ```powershell
-   & ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta
+   & ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta
    ```
+
+   It puts `sendmock.exe` in `%LOCALAPPDATA%\Programs\sendmock` and adds that folder to your user `Path`. To choose another folder, run it as a script block with `-InstallDir <folder>`; add `-NoModifyPath` to leave your `Path` as it is.
 
 3. Close PowerShell and open a new window, so it picks up the new `PATH`.
 
@@ -183,9 +187,9 @@ Let your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI or another one 
       - macOS or Linux with Homebrew, stable: `brew install shibbirweb/tap/sendmock`
       - macOS or Linux with Homebrew, beta: `brew install shibbirweb/tap/sendmock-beta`
       - Linux or macOS without Homebrew, stable: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`
-      - Linux or macOS without Homebrew, beta: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh -s -- --channel beta`
+      - Linux or macOS without Homebrew, beta: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta`
       - Windows (PowerShell), stable: `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`
-      - Windows (PowerShell), beta: `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta`
+      - Windows (PowerShell), beta: `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta`
       - Docker, stable: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock`
       - Docker, beta: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta`
       The full steps are on https://shibbirweb.github.io/sendmock/docs/install/. Before you run each command, show it to me, say in one sentence what it does, and wait for my OK.

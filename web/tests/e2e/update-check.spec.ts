@@ -161,7 +161,7 @@ test("PL-05.13 the upgrade command follows the platform SendMock runs on", async
   await checkButton(page).click();
   await expect(
     page.getByText(
-      "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta",
+      "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta",
     ),
   ).toBeVisible();
 

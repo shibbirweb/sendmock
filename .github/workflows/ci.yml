@@ -312,6 +312,11 @@ jobs:
       - name: Script tests
         run: bun test scripts/
 
+      - name: The install scripts are POSIX sh and valid PowerShell
+        run: |
+          shellcheck --shell=sh scripts/install/install.sh scripts/release-tests/install-script.sh
+          pwsh -NoProfile -Command '$failed = $false; foreach ($scriptPath in "scripts/install/install.ps1", "scripts/release-tests/install-script.ps1") { $parseErrors = $null; [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref] $null, [ref] $parseErrors) | Out-Null; foreach ($parseError in $parseErrors) { Write-Host "${scriptPath}: $parseError"; $failed = $true } }; if ($failed) { exit 1 }'
+
       - name: Criteria named by tests exist, accepted features are proven
         run: bun scripts/acceptance.ts
 

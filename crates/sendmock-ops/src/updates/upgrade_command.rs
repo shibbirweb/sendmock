@@ -5,6 +5,9 @@ use crate::ReleaseChannel;
 
 const RELEASE_DOWNLOAD_URL: &str =
     "https://github.com/shibbirweb/sendmock/releases/latest/download";
+/// The rolling `beta` pre-release: GitHub's `latest` skips pre-releases, so before the first
+/// stable it has no install script.
+const BETA_DOWNLOAD_URL: &str = "https://github.com/shibbirweb/sendmock/releases/download/beta";
 
 /// How SendMock was installed, baked in by each package; it picks the upgrade command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, JsonSchema)]
@@ -60,11 +63,11 @@ pub fn build_upgrade_command(
 fn build_install_script_command(is_windows: bool, is_beta: bool) -> String {
     match (is_windows, is_beta) {
         (true, true) => format!(
-            "& ([scriptblock]::Create((irm {RELEASE_DOWNLOAD_URL}/install.ps1))) -Channel beta"
+            "& ([scriptblock]::Create((irm {BETA_DOWNLOAD_URL}/install.ps1))) -Channel beta"
         ),
         (true, false) => format!("irm {RELEASE_DOWNLOAD_URL}/install.ps1 | iex"),
         (false, true) => {
-            format!("curl -fsSL {RELEASE_DOWNLOAD_URL}/install.sh | sh -s -- --channel beta")
+            format!("curl -fsSL {BETA_DOWNLOAD_URL}/install.sh | sh -s -- --channel beta")
         }
         (false, false) => format!("curl -fsSL {RELEASE_DOWNLOAD_URL}/install.sh | sh"),
     }
@@ -108,7 +111,7 @@ mod tests {
         assert!(
             command(InstallMethod::InstallScript, "linux", ReleaseChannel::Beta)
                 .is_some_and(|install_command| install_command
-                    .ends_with("install.sh | sh -s -- --channel beta"))
+                    .ends_with("/releases/download/beta/install.sh | sh -s -- --channel beta"))
         );
         assert_eq!(
             command(InstallMethod::Unknown, "linux", ReleaseChannel::Stable),
