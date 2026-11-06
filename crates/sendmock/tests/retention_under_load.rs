@@ -16,6 +16,8 @@ const MAX_EMAILS: u64 = 100;
 /// Longer than the retention task's 10 second interval, so a prune runs while mail arrives.
 const SENDING_ROUND: Duration = Duration::from_secs(11);
 const PRUNE_WAIT: Duration = Duration::from_secs(30);
+/// The `journal_size_limit` file databases are opened with.
+const WAL_SIZE_LIMIT_BYTES: u64 = 4 * 1024 * 1024;
 
 /// Sends one line (or nothing, for the greeting) and answers the reply's code.
 fn exchange(reader: &mut BufReader<TcpStream>, line: Option<&str>) -> io::Result<u16> {
@@ -134,8 +136,11 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
         slowest_message < Duration::from_secs(2),
         "{slowest_message:?}"
     );
+    // The write-ahead log may sit anywhere up to its 4 MiB limit, depending on whether the last
+    // checkpoint could run; growth beyond that and a quarter means pruning is not keeping up.
     assert!(
-        size_after_second_round <= size_after_first_round + size_after_first_round / 4,
+        size_after_second_round
+            <= size_after_first_round + size_after_first_round / 4 + WAL_SIZE_LIMIT_BYTES,
         "{size_after_first_round} bytes after the first round, {size_after_second_round} after the second"
     );
     Ok(())
