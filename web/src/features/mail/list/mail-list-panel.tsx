@@ -102,6 +102,7 @@ export function MailListPanel({
           });
           toast(`${deletedCount} emails deleted`);
         }}
+        emailFilters={emailFilters}
         isFiltered={searchText.trim() !== ""}
         onDeleteAll={() => {
           deleteAllEmails.mutate(emailFilters);

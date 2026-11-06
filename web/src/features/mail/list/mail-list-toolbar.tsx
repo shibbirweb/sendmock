@@ -20,8 +20,11 @@ import {
 } from "@/components/ui/tooltip";
 import { ImportEmailDialog } from "@/features/mail/list/import-email-dialog";
 import { useMailNotifications } from "@/features/mail/list/use-mail-notifications";
+import type { EmailListFilters } from "@/lib/api/types";
 
 type MailListToolbarProps = {
+  /** The list's current search; notifications only come for emails that fit it. */
+  emailFilters: EmailListFilters;
   loadedEmailCount: number;
   totalEmailCount: number;
   checkedEmailCount: number;
@@ -34,6 +37,7 @@ type MailListToolbarProps = {
 };
 
 export function MailListToolbar({
+  emailFilters,
   loadedEmailCount,
   totalEmailCount,
   checkedEmailCount,
@@ -44,7 +48,7 @@ export function MailListToolbar({
   onDeleteAll,
 }: MailListToolbarProps) {
   const { isSupported, isEnabled, toggleNotifications } =
-    useMailNotifications();
+    useMailNotifications(emailFilters);
   const isAllChecked =
     loadedEmailCount > 0 && checkedEmailCount === loadedEmailCount;
   const hasChecked = checkedEmailCount > 0;
