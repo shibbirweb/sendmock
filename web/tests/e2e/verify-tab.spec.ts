@@ -124,10 +124,9 @@ test("VF-01.2 a new service starts from the Verify defaults in Settings", async 
   await expect(page.getByText("Settings saved")).toBeVisible();
 
   // In-app navigation keeps the mock's saved settings, which a page load would reset.
-  await page
-    .locator("[data-sidebar='sidebar']")
-    .getByRole("link", { name: "Verify", exact: true })
-    .click();
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  await sidebar.getByRole("link", { name: "SMS", exact: true }).click();
+  await sidebar.getByRole("link", { name: "Verify", exact: true }).click();
   await page.getByRole("tab", { name: "Services" }).click();
   await page.getByRole("button", { name: "New service" }).click();
   const serviceDialog = page.getByRole("dialog", {
