@@ -4,7 +4,55 @@ import { join } from "node:path";
 /** Every file that carries the version; the workspace Cargo.toml is the source of truth. */
 export const workspaceManifestPath = "Cargo.toml";
 const cargoLockPath = "Cargo.lock";
-const packageManifestPaths = ["web/package.json", "website/package.json"];
+const packageManifestPaths = [
+  "web/package.json",
+  "website/package.json",
+  "testcontainers/node/package.json",
+];
+
+/**
+ * Other files that carry the version, each with the pattern around it: the Testcontainers
+ * modules' versions and their default image tags, which name the SendMock they were released
+ * with (Go's version is its tag).
+ */
+const textVersionFiles = [
+  {
+    filePath: "testcontainers/python/pyproject.toml",
+    pattern: /(\[project\][^[]*?\nversion = ")([^"]+)(")/,
+  },
+  {
+    filePath: "testcontainers/java/pom.xml",
+    pattern:
+      /(<artifactId>sendmock-testcontainers<\/artifactId>\s*<version>)([^<]+)(<\/version>)/,
+  },
+  {
+    filePath:
+      "testcontainers/dotnet/SendMock.Testcontainers/SendMock.Testcontainers.csproj",
+    pattern: /(<Version>)([^<]+)(<\/Version>)/,
+  },
+  ...[
+    "testcontainers/node/src/sendmock-container.ts",
+    "testcontainers/python/sendmock_testcontainers/__init__.py",
+    "testcontainers/java/src/main/java/io/github/shibbirweb/sendmock/SendMockContainer.java",
+    "testcontainers/go/sendmock.go",
+    "testcontainers/dotnet/SendMock.Testcontainers/SendMockContainer.cs",
+  ].map((filePath) => ({
+    filePath,
+    pattern: /(ghcr\.io\/shibbirweb\/sendmock:)([^"]+)(")/,
+  })),
+];
+
+export function readTextVersion(text: string, pattern: RegExp): string | null {
+  return text.match(pattern)?.[2] ?? null;
+}
+
+export function writeTextVersion(
+  text: string,
+  pattern: RegExp,
+  version: string,
+): string {
+  return text.replace(pattern, `$1${version}$3`);
+}
 
 const workspaceVersionPattern =
   /(\[workspace\.package\][^[]*?\nversion = ")([^"]+)(")/;
@@ -73,6 +121,10 @@ export function readAllVersions(
         (JSON.parse(readText(filePath)) as { version?: string }).version ??
         null,
     })),
+    ...textVersionFiles.map(({ filePath, pattern }) => ({
+      filePath,
+      version: readTextVersion(readText(filePath), pattern),
+    })),
   ];
 }
 
@@ -93,5 +145,8 @@ export function writeAllVersions(repositoryRoot: string, version: string) {
   rewrite(cargoLockPath, (text) => writeLockedCrateVersions(text, version));
   for (const filePath of packageManifestPaths) {
     rewrite(filePath, (text) => writePackageVersion(text, version));
+  }
+  for (const { filePath, pattern } of textVersionFiles) {
+    rewrite(filePath, (text) => writeTextVersion(text, pattern, version));
   }
 }

@@ -9,7 +9,7 @@ namespace SendMock.Testcontainers;
 /// </summary>
 public sealed class SendMockContainer : IAsyncDisposable
 {
-    public const string DefaultImage = "ghcr.io/shibbirweb/sendmock:beta";
+    public const string DefaultImage = "ghcr.io/shibbirweb/sendmock:0.0.0";
     private const ushort SmtpPort = 1025;
     private const ushort HttpPort = 8025;
     private const ushort ProviderPort = 8026;

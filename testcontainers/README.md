@@ -14,7 +14,7 @@ Each folder starts SendMock in Docker from a test, in one language, and gives th
 | Python | `python` | `sendmock-testcontainers` | testcontainers 4.15.0 |
 | .NET | `dotnet` | `SendMock.Testcontainers` | Testcontainers 4.16.0 |
 
-The default image is `ghcr.io/shibbirweb/sendmock:beta`; every module also takes another image. The packages are not published yet; publishing comes with the 1.0 release work.
+Each module's default image is the SendMock release of the same version (`ghcr.io/shibbirweb/sendmock:<version>`), which `scripts/version.ts` keeps in step; every module also takes another image. Each release publishes the modules under its version (`.github/workflows/testcontainers-publish.yml`): npm, PyPI, NuGet and Maven Central, and a `testcontainers/go/v<version>` tag for Go.
 
 CI builds the image from the commit and runs each module's test against it (`.github/workflows/testcontainers.yml`). To run one by hand, for example the Python module:
 

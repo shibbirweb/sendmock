@@ -11,6 +11,10 @@
 __pycache__/
 
 # Testcontainers module builds
+testcontainers/node/node_modules/
+testcontainers/node/dist/
+testcontainers/python/dist/
+testcontainers/dotnet/out/
 testcontainers/java/target/
 testcontainers/dotnet/**/bin/
 testcontainers/dotnet/**/obj/

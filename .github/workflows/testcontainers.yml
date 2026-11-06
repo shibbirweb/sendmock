@@ -63,22 +63,33 @@ jobs:
             language: java
             folder: java
             run: mvn --batch-mode --quiet test
+            pack: mvn --batch-mode --quiet -P release -Dgpg.skip -DskipTests package && ls target/sendmock-testcontainers-*-sources.jar target/sendmock-testcontainers-*-javadoc.jar
           - module: Node
             language: node
             folder: node
             run: bun install && node --test 'test/*.test.ts'
+            pack: >-
+              bun run build && npm pack && mkdir "$RUNNER_TEMP/node-project" && cp sendmock-testcontainers-*.tgz "$RUNNER_TEMP/node-project/" &&
+              cd "$RUNNER_TEMP/node-project" && npm init -y > /dev/null && npm install ./sendmock-testcontainers-*.tgz &&
+              node -e "import('sendmock-testcontainers').then((module) => { if (typeof module.SendMockContainer !== 'function') { process.exit(1); } })"
           - module: Go
             language: go
             folder: go
             run: go test ./...
+            pack: go vet ./... && go mod verify
           - module: Python
             language: python
             folder: python
             run: pip install --quiet ".[test]" && pytest -q
+            pack: >-
+              pip install --quiet build && python -m build && python -m venv "$RUNNER_TEMP/python-project" &&
+              "$RUNNER_TEMP/python-project/bin/pip" install --quiet dist/*.whl &&
+              "$RUNNER_TEMP/python-project/bin/python" -c "from sendmock_testcontainers import SendMockContainer"
           - module: .NET
             language: dotnet
             folder: dotnet
             run: dotnet test SendMock.Testcontainers.Tests
+            pack: dotnet pack SendMock.Testcontainers --configuration Release --output out && unzip -l out/SendMock.Testcontainers.*.nupkg | grep -q "lib/.*/SendMock.Testcontainers.dll"
     steps:
       - uses: actions/checkout@v5
 
@@ -122,3 +133,9 @@ jobs:
       - name: Test the ${{ matrix.module }} module
         working-directory: testcontainers/${{ matrix.folder }}
         run: ${{ matrix.run }}
+
+      # AC: DS-06.1
+      - name: Package the ${{ matrix.module }} module as its registry would and load the package
+        working-directory: testcontainers/${{ matrix.folder }}
+        run: ${{ matrix.pack }}
+
