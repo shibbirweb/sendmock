@@ -13,6 +13,7 @@ mod delivery_view;
 mod delivery_wait_operation;
 mod email_template_data;
 mod endpoint_body_rendering;
+mod endpoint_delivery_health;
 mod endpoint_inputs;
 mod endpoint_operations;
 mod endpoint_preview_operation;
