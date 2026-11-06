@@ -190,3 +190,76 @@ test("UI-12.2 SMS > Providers lists the built-ins served by the live binary", as
   ).toBeEnabled();
   expect(failedApiCalls).toEqual([]);
 });
+
+const onePixelPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+test("SM-15.4 SM-15.5 a reply as recipient with a photo shows as MMS and reaches the app with its media", async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  const mmsAppNumber = "+15550007777";
+  const contactNumber = "+447700900777";
+  const binPath = `live-mms-app-${test.info().retry + 1}`;
+  const numberResponse = await request.post("/api/v1/numbers", {
+    data: {
+      number: mmsAppNumber,
+      label: "MMS app",
+      channels: ["sms"],
+      inbound_url: `${baseURL}/catch/${binPath}/sms`,
+      inbound_method: "POST",
+      inbound_fallback_url: null,
+      inbound_template_id: null,
+      status_callback_url: null,
+      messaging_service_sid: null,
+    },
+  });
+  expect([201, 409]).toContain(numberResponse.status());
+  const sendResponse = await request.post("/api/v1/sms", {
+    data: { from: mmsAppNumber, to: contactNumber, body: "Send us a photo" },
+  });
+  expect(sendResponse.status()).toBe(201);
+  const failedApiCalls = watchFailedApiCalls(page);
+
+  await page.goto("/sms");
+  await page.locator(threadList).getByText(contactNumber).click();
+  await page.getByLabel("Choose files to attach").setInputFiles({
+    name: "photo.png",
+    mimeType: "image/png",
+    buffer: onePixelPng,
+  });
+  await expect(page.getByRole("list", { name: "Files to send" })).toContainText(
+    "photo.png",
+  );
+  const composer = page.getByLabel(`Reply as ${contactNumber}`);
+  await composer.fill("Here it is");
+  await composer.press("Enter");
+
+  const mmsBubble = page
+    .locator(conversation)
+    .locator("[data-sms-direction='inbound']")
+    .filter({ hasText: "Here it is" });
+  await expect(mmsBubble.getByRole("img", { name: "photo.png" })).toBeVisible();
+  await expect(mmsBubble.getByText("MMS", { exact: true })).toBeVisible();
+  await mmsBubble.getByTitle(/open message details/).click();
+  await expect(
+    page
+      .getByRole("dialog", { name: "Message details" })
+      .getByRole("region", { name: "Message media" }),
+  ).toContainText("Media (1)");
+
+  await expect
+    .poll(async () =>
+      JSON.stringify(await (await request.get("/api/v1/http/requests")).json()),
+    )
+    .toContain("MediaUrl0");
+  const capturedText = JSON.stringify(
+    await (await request.get("/api/v1/http/requests")).json(),
+  );
+  expect(capturedText).toContain(binPath);
+  expect(capturedText).toContain("NumMedia=1");
+  expect(failedApiCalls).toEqual([]);
+});
