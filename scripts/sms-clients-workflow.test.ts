@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 type ClientEntry = { client: string; folder: string; run: string };
 
@@ -7,21 +7,50 @@ const smsClientsWorkflow = Bun.YAML.parse(
   readFileSync(".github/workflows/sms-clients.yml", "utf8"),
 ) as { jobs: { client: { strategy: { matrix: { include: ClientEntry[] } } } } };
 const clientEntries = smsClientsWorkflow.jobs.client.strategy.matrix.include;
+const exampleSourceExtensions = [
+  ".js",
+  ".py",
+  ".php",
+  ".go",
+  ".java",
+  ".cs",
+  ".rb",
+];
+
+/** Every source file of an example folder, joined, so a check does not depend on its layout. */
+function readExampleSources(exampleFolder: string): string {
+  return readdirSync(exampleFolder, { recursive: true, encoding: "utf8" })
+    .filter((relativePath) =>
+      exampleSourceExtensions.some((extension) =>
+        relativePath.endsWith(extension),
+      ),
+    )
+    .map((relativePath) =>
+      readFileSync(`${exampleFolder}/${relativePath}`, "utf8"),
+    )
+    .join("\n");
+}
 
 describe("SMS clients workflow", () => {
-  test("VF-03.4 the official Twilio SDKs run a Verify login, each from its example folder", () => {
+  test("SM-02.4 VF-03.4 the official Twilio SDKs send and run a Verify login, each from its example folder", () => {
     expect(clientEntries.map((clientEntry) => clientEntry.client)).toEqual([
       "Twilio Node SDK",
       "Twilio Python SDK",
+      "Twilio PHP SDK",
+      "Twilio Go SDK",
+      "Twilio Java SDK",
+      "Twilio C# SDK",
+      "Twilio Ruby SDK",
     ]);
     for (const clientEntry of clientEntries) {
-      expect(existsSync(`examples/sms/${clientEntry.folder}`)).toBe(true);
-      expect(
-        readFileSync(
-          `examples/sms/${clientEntry.folder}/${clientEntry.run.split(" ").at(-1)}`,
-          "utf8",
-        ),
-      ).toContain("verification");
+      const exampleSources = readExampleSources(
+        `examples/sms/${clientEntry.folder}`,
+      );
+      const comparableSources = exampleSources
+        .toLowerCase()
+        .replaceAll("_", "");
+      expect(comparableSources).toContain("statuscallback");
+      expect(comparableSources).toContain("verificationcheck");
     }
   });
 

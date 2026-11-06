@@ -201,7 +201,8 @@ test("SM-15.4 SM-15.5 a reply as recipient with a photo shows as MMS and reaches
   request,
   baseURL,
 }) => {
-  const mmsAppNumber = "+15550007777";
+  // Its own number per attempt: numbers stay registered on the shared binary across tests and retries.
+  const mmsAppNumber = `+1555000778${test.info().retry}`;
   const contactNumber = "+447700900777";
   const binPath = `live-mms-app-${test.info().retry + 1}`;
   const numberResponse = await request.post("/api/v1/numbers", {
@@ -217,7 +218,7 @@ test("SM-15.4 SM-15.5 a reply as recipient with a photo shows as MMS and reaches
       messaging_service_sid: null,
     },
   });
-  expect([201, 409]).toContain(numberResponse.status());
+  expect(numberResponse.status()).toBe(201);
   const sendResponse = await request.post("/api/v1/sms", {
     data: { from: mmsAppNumber, to: contactNumber, body: "Send us a photo" },
   });

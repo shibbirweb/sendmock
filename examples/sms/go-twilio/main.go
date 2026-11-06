@@ -112,7 +112,8 @@ func newSendMockTwilioClient(providerURL string) (*twilio.RestClient, error) {
 		return nil, err
 	}
 	baseClient := &twilioclient.Client{
-		Credentials: twilioclient.NewCredentials(accountSid, "any-auth-token"),
+		// twilio-go refuses an auth token with anything but letters and digits (error 21224).
+		Credentials: twilioclient.NewCredentials(accountSid, "anyauthtoken"),
 		HTTPClient:  &http.Client{Transport: providerPortTransport{providerURL: parsedProviderURL}},
 	}
 	baseClient.SetAccountSid(accountSid)
