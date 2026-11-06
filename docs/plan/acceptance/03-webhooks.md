@@ -6,14 +6,14 @@ Plan: [05-webhooks.md](../05-webhooks.md), [12-webhook-variables.md](../12-webho
 
 UI in U2, backend Phase 3.
 
-- [ ] WH-01.1 Endpoints can be created, edited, disabled and deleted from UI, API, CLI, MCP and the seed file.
-- [ ] WH-01.2 "Send test" delivers `test.ping` and shows the response.
-- [ ] WH-01.3 Secrets are write-only: masked in UI, API, logs and MCP; "reveal" requires confirmation.
+- [x] WH-01.1 Endpoints can be created, edited, disabled and deleted from UI, API, CLI, MCP and the seed file. (#48)
+- [x] WH-01.2 "Send test" delivers `test.ping` and shows the response. (#48)
+- [x] WH-01.3 Secrets are write-only: masked in UI, API, logs and MCP; "reveal" requires confirmation. (#48)
 - [x] WH-01.4 A `localhost` URL while running in Docker shows the `host.docker.internal` hint. (#48)
 - [x] WH-01.5 Timeout (1 to 60 s), max attempts (1 to 10) and retry delays (1 s to 24 h) are validated the same way in the UI and API, and the sheet previews the attempt schedule. (#48)
 - [x] WH-01.6 A template's required variables show as missing until they are set as endpoint or global variables (endpoint ones win); names with token, secret, key or password are stored as masked secrets. (#48)
-- [ ] WH-01.7 The endpoints table shows each endpoint's 24-hour success sparkline with the rate as text, and the enabled switch applies at once.
-- [ ] WH-01.8 Rotating the secret shows the new masked secret and until when the old one stays valid.
+- [x] WH-01.7 The endpoints table shows each endpoint's 24-hour success sparkline with the rate as text, and the enabled switch applies at once. (#48)
+- [x] WH-01.8 Rotating the secret shows the new masked secret and until when the old one stays valid. (#48)
 
 ## WH-02 Rules and filters
 
@@ -21,10 +21,10 @@ UI in U2, backend Phase 3.
 
 - [x] WH-02.1 A rule fires only for its selected events and only when its filter matches. (#48)
 - [x] WH-02.2 Every documented field, operator (`equals`, `contains`, `starts_with`, `matches`, `regex`, `exists`) and combinator (`all`, `any`, `not`) evaluates correctly. (#48)
-- [ ] WH-02.3 The preview shows exactly which of the last 50 messages would match.
+- [x] WH-02.3 The preview shows exactly which of the last 50 messages would match. (#48)
 - [x] WH-02.4 Disabled rules never fire; rule order is respected. (#48)
 - [x] WH-02.5 The builder checks every condition the same way as the API (field, value unless `exists`, valid regex, header name) and round-trips every filter the API accepts (`all`, `any`, `not`, one nested group). (#48)
-- [ ] WH-02.6 The rules list shows firing order, endpoint, events and a plain-language filter summary; rules can be reordered, switched on and off at once and filtered by endpoint.
+- [x] WH-02.6 The rules list shows firing order, endpoint, events and a plain-language filter summary; rules can be reordered, switched on and off at once and filtered by endpoint. (#48)
 
 ## WH-03 Delivery engine and retries
 
@@ -36,9 +36,9 @@ UI in U2 (WH-03.7 to WH-03.9), backend Phase 3.
 - [x] WH-03.4 Exhausted deliveries fire `webhook.failed`; cancelled deliveries stop retrying. (#48)
 - [x] WH-03.5 Each attempt stores the full request and the response (body truncated at 64 KB with a flag), duration and error. (#48)
 - [x] WH-03.6 Concurrency never exceeds the configured limit. (#48)
-- [ ] WH-03.7 The deliveries log shows time, event, endpoint, trigger, status, duration and attempt, narrows by status, endpoint and event, loads 50 rows at a time and shows new deliveries as they happen.
-- [ ] WH-03.8 A delivery's detail shows request and response side by side with formatted bodies and the truncation note, lists every attempt of the event, links to the message that caused it and copies the request as cURL.
-- [ ] WH-03.9 "Cancel retries" marks a retrying delivery cancelled so it never runs again; a `render_failed` delivery shows the template error instead of a request.
+- [x] WH-03.7 The deliveries log shows time, event, endpoint, trigger, status, duration and attempt, narrows by status, endpoint and event, loads 50 rows at a time and shows new deliveries as they happen. (#48)
+- [x] WH-03.8 A delivery's detail shows request and response side by side with formatted bodies and the truncation note, lists every attempt of the event, links to the message that caused it and copies the request as cURL. (#48)
+- [x] WH-03.9 "Cancel retries" marks a retrying delivery cancelled so it never runs again; a `render_failed` delivery shows the template error instead of a request. (#48)
 
 ## WH-04 Standard Webhooks signing
 
@@ -52,12 +52,12 @@ Phase 3. Docs: [Signing](../05-webhooks.md#signing).
 
 UI in U2, backend Phase 3.
 
-- [ ] WH-05.1 "Send to webhook" from any email or SMS sends it to the chosen endpoint and template.
-- [ ] WH-05.2 Replay as-is resends the stored request; Re-render uses fresh variables; Edit and replay sends the edited body.
-- [ ] WH-05.3 The composer sends a hand-written request using any template preset.
+- [x] WH-05.1 "Send to webhook" from any email or SMS sends it to the chosen endpoint and template. (#48)
+- [x] WH-05.2 Replay as-is resends the stored request; Re-render uses fresh variables; Edit and replay sends the edited body. (#48)
+- [x] WH-05.3 The composer sends a hand-written request using any template preset. (#48)
 - [x] WH-05.4 API (`/send`, `/replay`) and CLI (`sendmock webhook send`) trigger the same behaviour, including variable overrides. (#48)
-- [ ] WH-05.5 Send to webhook and the composer ask for every Prompt variable in scope, prefilled with its default, and take per-send overrides that win over endpoint and global values for that send only; the preview shows the result before sending.
-- [ ] WH-05.6 The rendered body can be edited before a manual send and is then sent as written; a render error blocks sending; the result links to the new `manual` delivery and can be saved with a name.
+- [x] WH-05.5 Send to webhook and the composer ask for every Prompt variable in scope, prefilled with its default, and take per-send overrides that win over endpoint and global values for that send only; the preview shows the result before sending. (#48)
+- [x] WH-05.6 The rendered body can be edited before a manual send and is then sent as written; a render error blocks sending; the result links to the new `manual` delivery and can be saved with a name. (#48)
 
 ## WH-06 Provider formats and signatures
 
@@ -116,18 +116,18 @@ UI in U2, backend Phase 3 (create, clone, linked/detached), Phase 4 (import/expo
 
 UI in U2, backend Phase 3.
 
-- [ ] WH-10.1 Any delivery or composer request can be saved with a name, and survives pruning and `reset`.
-- [ ] WH-10.2 A saved delivery can be resent to any endpoint and turned into a template.
+- [x] WH-10.1 Any delivery or composer request can be saved with a name, and survives pruning and `reset`. (#48)
+- [x] WH-10.2 A saved delivery can be resent to any endpoint and turned into a template. (#48)
 - [x] WH-10.3 Saved deliveries are included in seed export. (#48)
-- [ ] WH-10.4 The Saved screen lists saved deliveries newest first with their stored request, searches them by name, and renames and deletes them.
+- [x] WH-10.4 The Saved screen lists saved deliveries newest first with their stored request, searches them by name, and renames and deletes them. (#48)
 
 ## WH-11 Webhook metrics
 
 UI in U1/U2, backend Phase 3.
 
-- [ ] WH-11.1 Overview and Webhooks show deliveries over time, success rate, p50/p95 latency and top failure codes per endpoint.
+- [x] WH-11.1 Overview and Webhooks show deliveries over time, success rate, p50/p95 latency and top failure codes per endpoint. (#48)
 - [x] WH-11.2 `/api/v1/stats` numbers match the delivery log. (#48)
-- [ ] WH-11.3 The Webhooks overview narrows to 24 hours or 7 days and to one endpoint; its chart stacks succeeded, retrying and failed deliveries per hour or day with a legend, a tooltip with p50 / p95 latency and a table view, beside the totals, per-endpoint metrics, top failure codes and recent failures.
+- [x] WH-11.3 The Webhooks overview narrows to 24 hours or 7 days and to one endpoint; its chart stacks succeeded, retrying and failed deliveries per hour or day with a legend, a tooltip with p50 / p95 latency and a table view, beside the totals, per-endpoint metrics, top failure codes and recent failures. (#48)
 
 ## WH-12 Inbound routes (Mailgun style)
 

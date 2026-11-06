@@ -74,11 +74,11 @@ UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage).
 
 UI in U1, backend per feature phase.
 
-- [ ] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`.
+- [x] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`. (#48)
 - [x] PL-05.2 Invalid values are rejected with a field-level error. (#48)
 - [x] PL-05.3 Each section saves only its own changes, Save is disabled until something changed, and Discard restores the saved values. (#48)
-- [ ] PL-05.4 Reset to seed and the delete-all buttons ask for confirmation before acting.
-- [ ] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`.
+- [x] PL-05.4 Reset to seed and the delete-all buttons ask for confirmation before acting. (#48)
+- [x] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`. (#48)
 - [x] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged. (#48)
 - [x] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body. (#48)
 - [x] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips. (#48)
@@ -94,7 +94,7 @@ Phase 0 onwards.
 
 - [x] PL-06.1 The native binary binds only `127.0.0.1` by default; Docker binds `0.0.0.0` and prints a notice when no UI auth is set. (#48)
 - [x] PL-06.2 With `--ui-auth`, UI, API, WebSocket and MCP over HTTP all require credentials or the API token. (#48)
-- [ ] PL-06.3 No secret (webhook secrets, provider tokens, SMTP AUTH passwords, relay passwords) appears in any API response, log line, MCP result or export.
+- [x] PL-06.3 No secret (webhook secrets, provider tokens, SMTP AUTH passwords, relay passwords) appears in any API response, log line, MCP result or export. (#48)
 - [x] PL-06.4 CORS only allows the configured origins; the docs playground origin can be removed with `--cors-origins`. (#48)
 
 ## PL-07 Configuration
@@ -110,7 +110,7 @@ Phase 0.
 Phase 1.
 
 - [x] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration. (#48)
-- [ ] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load.
+- [x] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load. (#48)
 
 ## PL-09 Demo data
 
