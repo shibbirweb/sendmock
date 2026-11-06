@@ -122,22 +122,22 @@ On top of its own criteria, a feature is done only when:
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
-| [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | In progress |
+| [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
 | [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals) | 7 | In progress |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Accepted |
-| [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | In progress |
-| [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | In progress |
-| [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | In progress |
-| [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 4 | In progress |
-| [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | UI done (2026-10-29) |
-| [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | UI done (2026-10-29) |
+| [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 4 | Accepted |
+| [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | Accepted |
+| [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | Accepted |
+| [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 4 | Accepted |
+| [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Accepted |
+| [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Accepted |
 | [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 4 | UI done (2026-10-29) |
-| [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 4 | UI done (2026-10-29) |
-| [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | UI done (2026-10-29) |
-| [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | UI done (2026-10-29) |
-| [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Not started |
+| [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 4 | Accepted |
+| [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | Accepted |
+| [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | Accepted |
+| [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Accepted |
 | [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Accepted |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | In progress |
