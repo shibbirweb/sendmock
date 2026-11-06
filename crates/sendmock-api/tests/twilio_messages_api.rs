@@ -126,6 +126,28 @@ async fn create_fetch_and_list_answer_twilio_shaped_messages() {
 
 // AC: SM-02.1
 #[tokio::test]
+async fn message_dates_use_twilios_rfc_2822_format() {
+    let (app_router, _) = build_test_app();
+
+    let (_, created_message) = send_twilio(
+        &app_router,
+        "To=%2B8801700000000&From=%2B15005550006&Body=Dated",
+    )
+    .await;
+
+    for date_field in ["date_created", "date_updated"] {
+        let date_text = created_message[date_field].as_str().unwrap_or_default();
+        assert!(
+            chrono::DateTime::parse_from_rfc2822(date_text).is_ok()
+                && date_text.ends_with(" +0000"),
+            "{date_field} is {date_text}"
+        );
+    }
+    assert_eq!(created_message["date_sent"], Value::Null);
+}
+
+// AC: SM-02.1
+#[tokio::test]
 async fn a_body_with_quotes_keeps_the_answer_valid_json() {
     let (app_router, _) = build_test_app();
 

@@ -33,6 +33,7 @@ tower-http.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
+chrono.workspace = true
 jsonschema.workspace = true
 serde_yaml_ng.workspace = true
 sendmock-payments.workspace = true

@@ -6,6 +6,8 @@ type ArgumentFilter = (
   filterArguments: string[],
 ) => unknown;
 
+const shortWeekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 const shortMonthNames = [
   "Jan",
   "Feb",
@@ -39,12 +41,13 @@ function formatUtcDate(dateInput: unknown, formatText: string): string {
     H: padTwoDigits(parsedDate.getUTCHours()),
     M: padTwoDigits(parsedDate.getUTCMinutes()),
     S: padTwoDigits(parsedDate.getUTCSeconds()),
+    a: shortWeekdayNames[parsedDate.getUTCDay()] ?? "",
     b: shortMonthNames[parsedDate.getUTCMonth()] ?? "",
     s: String(Math.floor(parsedDate.getTime() / 1000)),
   };
 
   return formatText.replace(
-    /%([YymdHMSsb%])/g,
+    /%([YymdHMSsab%])/g,
     (_, formatCode: string) => dateParts[formatCode] ?? "%",
   );
 }

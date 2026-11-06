@@ -56,6 +56,18 @@ describe("template conditions and argument filters", () => {
     });
   });
 
+  test("SM-02.1 date writes Twilio's RFC 2822 dates with the weekday", () => {
+    expect(
+      renderTemplateText(
+        '{{ event.created_at | date("%a, %d %b %Y %H:%M:%S +0000") }}',
+        smsContext,
+      ),
+    ).toMatchObject({
+      renderedText: "Thu, 01 Jan 2026 09:05:07 +0000",
+      errors: [],
+    });
+  });
+
   test("WH-06.1 a Twilio status callback names an error code only when there is one", () => {
     const deliveredForm = new URLSearchParams(
       renderBody("twilio.status_callback", smsContext),
