@@ -1,5 +1,5 @@
 use std::io::{self, BufRead, BufReader, Write};
-use std::process::{Child, ChildStdin, ChildStdout, Stdio};
+use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 
 use serde_json::{Value, json};
 
@@ -19,9 +19,16 @@ impl McpSession {
         http_addr: &str,
         extra_arguments: &[&str],
     ) -> io::Result<Self> {
-        let mut child = sendmock_command(working_directory)
+        let mut mcp_command = sendmock_command(working_directory);
+        mcp_command
             .args(["mcp", "--server", &format!("http://{http_addr}")])
-            .args(extra_arguments)
+            .args(extra_arguments);
+        Self::start_command(&mut mcp_command)
+    }
+
+    /// Starts and initialises a session from a prepared `sendmock mcp` command.
+    pub fn start_command(mcp_command: &mut Command) -> io::Result<Self> {
+        let mut child = mcp_command
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())

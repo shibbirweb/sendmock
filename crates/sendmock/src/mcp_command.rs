@@ -11,6 +11,7 @@ use sendmock_ops::{
 use serde_json::Value;
 
 use crate::cli_arguments::McpArguments;
+use crate::embedded_server::EmbeddedServer;
 
 /// Runs tool calls as REST calls to a running SendMock, as the CLI does.
 struct RemoteOperationRunner {
@@ -43,14 +44,15 @@ impl OperationRunner for RemoteOperationRunner {
 }
 
 /// `sendmock mcp`: an MCP server on stdin and stdout whose tools call the SendMock at
-/// `--server`. Nothing but protocol messages goes to stdout.
+/// `--server`, started in this process first with `--embedded` when none answers there.
+/// Nothing but protocol messages goes to stdout.
 pub fn run_mcp_command(mcp_arguments: &McpArguments) -> ExitCode {
     let server_url = resolve_server_url(
         mcp_arguments.server.as_deref(),
         std::env::var("SENDMOCK_HTTP_ADDR").ok().as_deref(),
     );
     let operation_runner = RemoteOperationRunner {
-        api_client: ApiClient::new(server_url, mcp_arguments.token.clone()).for_mcp(),
+        api_client: ApiClient::new(server_url.clone(), mcp_arguments.token.clone()).for_mcp(),
     };
     let tool_catalog = McpToolCatalog::new(
         &build_operation_registry(),
@@ -68,11 +70,36 @@ pub fn run_mcp_command(mcp_arguments: &McpArguments) -> ExitCode {
             return CliExitCode::Error.into();
         }
     };
-    match runtime.block_on(serve_mcp_over_stdio(mcp_server)) {
+    let served = runtime.block_on(async {
+        let embedded_server = if mcp_arguments.embedded {
+            EmbeddedServer::start_unless_running(&server_url)
+                .await
+                .map_err(|embedded_error| embedded_error.to_string())?
+        } else {
+            None
+        };
+        serve_until_stopped(mcp_server, embedded_server).await
+    });
+    match served {
         Ok(()) => CliExitCode::Success.into(),
         Err(serve_error) => {
             eprintln!("The MCP server stopped: {serve_error}");
             CliExitCode::Error.into()
         }
+    }
+}
+
+/// Serves MCP until stdin closes, or until the embedded server stops on a signal, since
+/// its signal handling replaces the default exit.
+async fn serve_until_stopped(
+    mcp_server: SendmockMcpServer,
+    embedded_server: Option<EmbeddedServer>,
+) -> Result<(), String> {
+    let Some(embedded_server) = embedded_server else {
+        return serve_mcp_over_stdio(mcp_server).await;
+    };
+    tokio::select! {
+        served = serve_mcp_over_stdio(mcp_server) => served,
+        () = embedded_server.wait_until_stopped() => Ok(()),
     }
 }

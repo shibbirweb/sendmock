@@ -7,6 +7,7 @@ mod client_command;
 mod config;
 mod demo_startup;
 mod email_network_clients;
+mod embedded_server;
 mod github_release_source;
 mod help_output;
 mod http_call_sender;
