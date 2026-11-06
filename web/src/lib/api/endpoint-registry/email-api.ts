@@ -158,6 +158,14 @@ const emailEndpoints = tagEndpoints("Email", [
   },
   {
     method: "GET",
+    path: "/api/v1/emails/{emailId}/mime/{partId}",
+    summary:
+      "Download one MIME part, decoded, by its position in the MIME tree.",
+    response: fileOf("application/octet-stream"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
     path: "/api/v1/emails/{emailId}/raw",
     summary: "The raw message source.",
     response: fileOf("message/rfc822"),

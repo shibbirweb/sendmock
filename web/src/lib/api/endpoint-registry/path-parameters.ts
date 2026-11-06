@@ -76,6 +76,11 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "The virtual number's ID, from `GET /api/v1/numbers`.",
     example: exampleUlid,
   },
+  partId: {
+    description:
+      "The part's position in the MIME tree, as `GET /emails/{emailId}/mime` numbers it, e.g. `1.2`.",
+    example: "1.2",
+  },
   paymentId: {
     description: "The payment's ID, from `GET /api/v1/payments`.",
     example: exampleUlid,

@@ -34,7 +34,10 @@ pub use inbound_routing::{
 pub use incoming_email::{EmailEnvelope, IncomingEmail};
 pub use mail_error::MailError;
 pub use native_message::{NativeAttachment, NativeMessage, build_raw_message, guess_content_type};
-pub use parsing::{MimeTreeNode, ParsedAttachment, ParsedEmail, parse_email};
+pub use parsing::{
+    MimePartContent, MimeTreeNode, ParsedAttachment, ParsedEmail, find_mime_part_content,
+    parse_email,
+};
 pub use raw_message_codec::{compress_raw_message, decompress_raw_message};
 pub use spamd_protocol::{
     SpamdReplyError, SpamdReport, SpamdRule, build_spamd_report_request, parse_spamd_reply,

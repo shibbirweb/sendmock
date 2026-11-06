@@ -339,6 +339,16 @@ jobs:
           tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C "$RUNNER_TEMP/budget-binary"
           bun scripts/performance-budget.ts "$RUNNER_TEMP/budget-binary/sendmock"
 
+      # Diagnostic: the same memory report on the other zigbuild musl binary, to tell whether its
+      # higher idle heap comes from how it is built (plan 30, idle memory note); never fails.
+      - name: Idle memory breakdown (arm64 musl, report only)
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        continue-on-error: true
+        run: |
+          mkdir "$RUNNER_TEMP/budget-binary"
+          tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C "$RUNNER_TEMP/budget-binary"
+          bun scripts/performance-budget.ts "$RUNNER_TEMP/budget-binary/sendmock" || true
+
       - name: Starts with no runtime in minimal Linux images
         if: matrix.containers
         run: |

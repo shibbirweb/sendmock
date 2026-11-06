@@ -1710,6 +1710,10 @@ fn build_email_follow_up_samples(by_email: &Value) -> Vec<(&'static str, Vec<Val
     let email_id = &by_email["email_id"];
     vec![
         (
+            "getEmailsByEmailIdMimeByPartId",
+            vec![json!({ "email_id": email_id, "part_id": "1" })],
+        ),
+        (
             "postEmailsByEmailIdReply",
             vec![json!({ "email_id": email_id, "body": "Thanks!", "reply_all": true })],
         ),

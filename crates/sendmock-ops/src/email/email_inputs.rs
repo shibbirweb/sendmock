@@ -7,6 +7,13 @@ pub struct EmailReference {
     pub email_id: String,
 }
 
+/// Names one MIME part of an email by its dotted position in the MIME tree (`1.2`).
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct MimePartReference {
+    pub email_id: String,
+    pub part_id: String,
+}
+
 /// Names one attachment of an email by its position.
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct AttachmentReference {

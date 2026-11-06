@@ -14,15 +14,20 @@ pub struct MimeTreeNode {
     pub children: Vec<MimeTreeNode>,
 }
 
-/// Builds the tree from the root part; part ids are dotted positions (`1`, `1.2`).
-pub fn build_mime_tree(part: MessagePart<'_>, part_id: String) -> MimeTreeNode {
-    let content_type = part.content_type().map_or_else(
+/// `type/subtype` in lower case; a part without a content type is `text/plain`.
+pub fn describe_content_type(part: &MessagePart<'_>) -> String {
+    part.content_type().map_or_else(
         || "text/plain".to_owned(),
         |content_type| match content_type.subtype() {
             Some(subtype) => format!("{}/{}", content_type.ctype(), subtype).to_lowercase(),
             None => content_type.ctype().to_lowercase(),
         },
-    );
+    )
+}
+
+/// Builds the tree from the root part; part ids are dotted positions (`1`, `1.2`).
+pub fn build_mime_tree(part: MessagePart<'_>, part_id: String) -> MimeTreeNode {
+    let content_type = describe_content_type(&part);
     let children = part
         .children()
         .enumerate()

@@ -19,7 +19,7 @@ pub struct ResourceRoute {
 }
 
 /// Every documented resource (docs/plan/14-ai-integration.md#resources).
-pub const RESOURCE_ROUTES: [ResourceRoute; 14] = [
+pub const RESOURCE_ROUTES: [ResourceRoute; 15] = [
     ResourceRoute {
         uri_template: "sendmock://docs/skill",
         name: "skill",
@@ -55,6 +55,12 @@ pub const RESOURCE_ROUTES: [ResourceRoute; 14] = [
         name: "email-raw",
         description: "The email's original .eml.",
         operation_id: "getEmailsByEmailIdRaw",
+    },
+    ResourceRoute {
+        uri_template: "sendmock://emails/{emailId}/mime/{partId}",
+        name: "email-mime-part",
+        description: "One MIME part of the email, decoded.",
+        operation_id: "getEmailsByEmailIdMimeByPartId",
     },
     ResourceRoute {
         uri_template: "sendmock://emails/{emailId}/attachments/{attachmentIndex}",

@@ -187,7 +187,8 @@ impl Operation for CreateVerifyServiceOperation {
         operation_context: &OperationContext,
         input: VerifyServiceInput,
     ) -> Result<VerifyService, OperationError> {
-        let new_service = build_verify_service(input, new_verify_service(operation_context).await?)?;
+        let new_service =
+            build_verify_service(input, new_verify_service(operation_context).await?)?;
         operation_context
             .verify_service_repository
             .save_service(new_service.clone())

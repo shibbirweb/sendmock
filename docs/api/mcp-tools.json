@@ -29816,6 +29816,50 @@
       "ui": "Settings > Connection > AI agents > Download the skill"
     },
     {
+      "uri": "sendmock://emails/{emailId}/mime/{partId}",
+      "slug": "resource-emails-emailid-mime-partid",
+      "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+      "mime_type": "application/octet-stream",
+      "area": "Email",
+      "area_slug": "email",
+      "parameters": [
+        {
+          "name": "emailId",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "partId",
+          "input": {
+            "name": "partId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The part's position in the MIME tree, as `GET /emails/{emailId}/mime` numbers it, e.g. `1.2`.",
+          "example": "1.2"
+        }
+      ],
+      "operation": {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/mime/{partId}",
+        "operation_id": "getEmailsByEmailIdMimeByPartId",
+        "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+        "area_slug": "email",
+        "selector": null
+      },
+      "cli": "sendmock email mime-part <emailId> <partId>",
+      "ui": "Mail > open email > MIME, download a part"
+    },
+    {
       "uri": "sendmock://emails/{emailId}/raw",
       "slug": "resource-emails-emailid-raw",
       "summary": "The raw message source.",

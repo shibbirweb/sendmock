@@ -1,6 +1,10 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { EmailDetail, EmailReleaseRequest } from "@/lib/api/types";
+import type {
+  EmailDetail,
+  EmailReleaseRequest,
+  MimePart,
+} from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import {
   buildHtmlCheckReport,
@@ -19,6 +23,24 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { buildPlaceholderSvg } from "@/mocks/fixtures/fixture-helpers";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+
+/** The part at a dotted position in the tree, as the binary numbers them. */
+function findMimePart(
+  rootPart: MimePart,
+  partId: string,
+): MimePart | undefined {
+  if (rootPart.part_id === partId) {
+    return rootPart;
+  }
+  for (const childPart of rootPart.children) {
+    const foundPart = findMimePart(childPart, partId);
+    if (foundPart) {
+      return foundPart;
+    }
+  }
+
+  return undefined;
+}
 
 function findEmail(emailId: unknown): EmailDetail | undefined {
   return mockDatabase.emails.find((email) => email.id === emailId);
@@ -67,6 +89,30 @@ export const emailDetailHandlers = [
   http.get(
     "*/api/v1/emails/:emailId/mime",
     withEmail((email) => HttpResponse.json(buildEmailMimeTree(email))),
+  ),
+
+  http.get("*/api/v1/emails/:emailId/mime/:partId", async (resolverInfo) =>
+    withEmail((email) => {
+      const mimePart = findMimePart(
+        buildEmailMimeTree(email),
+        String(resolverInfo.params.partId),
+      );
+      if (!mimePart) {
+        return createNotFoundResponse("MIME part");
+      }
+      const partBody = mimePart.content_type.startsWith("text/html")
+        ? (email.html_body ?? "")
+        : mimePart.content_type.startsWith("text/")
+          ? (email.text_body ?? "")
+          : `Demo content of part ${mimePart.part_id}`;
+
+      return new HttpResponse(partBody, {
+        headers: {
+          "Content-Type": mimePart.content_type,
+          "Content-Disposition": `attachment; filename="${mimePart.filename ?? `part-${mimePart.part_id}`}"`,
+        },
+      });
+    })(resolverInfo),
   ),
 
   http.get(

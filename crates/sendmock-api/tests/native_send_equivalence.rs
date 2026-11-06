@@ -143,3 +143,65 @@ async fn a_native_send_stores_the_same_email_as_the_equivalent_smtp_message() {
     assert_eq!(native_email["attachments"][0]["size_bytes"], 2);
     assert_eq!(native_email["bcc"][0]["address"], "audit@shop.test");
 }
+
+async fn download(app_router: &axum::Router, path: &str) -> (u16, String, Vec<u8>) {
+    let request = Request::builder()
+        .uri(path)
+        .body(Body::empty())
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    let response = app_router
+        .clone()
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let status = response.status().as_u16();
+    let disposition = response
+        .headers()
+        .get("content-disposition")
+        .and_then(|header_value| header_value.to_str().ok())
+        .unwrap_or_default()
+        .to_owned();
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_else(|error| panic!("a body: {error}"));
+    (status, disposition, body_bytes.to_vec())
+}
+
+// AC: EM-04.6
+#[tokio::test]
+async fn each_mime_part_downloads_decoded_with_its_name() {
+    let (app_router, _) = build_test_app();
+    let raw_created = send_raw(&app_router).await;
+    let email_id = raw_created["id"].as_str().unwrap_or_default();
+
+    let (_, mime_tree) = call_api(
+        &app_router,
+        "GET",
+        &format!("/api/v1/emails/{email_id}/mime"),
+        None,
+    )
+    .await;
+    let (attachment_status, attachment_disposition, attachment_bytes) =
+        download(&app_router, &format!("/api/v1/emails/{email_id}/mime/1.2")).await;
+    let (text_status, _, text_bytes) = download(
+        &app_router,
+        &format!("/api/v1/emails/{email_id}/mime/1.1.1"),
+    )
+    .await;
+    let (missing_status, _, _) =
+        download(&app_router, &format!("/api/v1/emails/{email_id}/mime/1.9")).await;
+
+    assert_eq!(mime_tree["children"][1]["part_id"], "1.2");
+    assert_eq!(attachment_status, 200);
+    assert!(
+        attachment_disposition.contains("order.txt"),
+        "{attachment_disposition}"
+    );
+    assert_eq!(attachment_bytes, b"10");
+    assert_eq!(text_status, 200);
+    assert_eq!(
+        String::from_utf8_lossy(&text_bytes).trim(),
+        "Hi Sam, your order is on its way."
+    );
+    assert_eq!(missing_status, 404);
+}

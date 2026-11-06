@@ -629,6 +629,28 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email mime-part",
+    "usage": "sendmock email mime-part <emailId> <partId>",
+    "aliases": [],
+    "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+    "arguments": [
+      "emailId",
+      "partId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/mime/{partId}",
+        "operation_id": "getEmailsByEmailIdMimeByPartId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock://emails/{emailId}/mime/{partId}"
+    ]
+  },
+  {
     "command": "sendmock email attachments",
     "usage": "sendmock email attachments <emailId> <attachmentIndex>",
     "aliases": [],

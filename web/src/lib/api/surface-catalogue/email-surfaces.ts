@@ -67,6 +67,12 @@ export const emailSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_email_mime",
     ui: "Mail > open email > MIME",
   },
+  "GET /api/v1/emails/{emailId}/mime/{partId}": {
+    phase: "5",
+    cli: "sendmock email mime-part <emailId> <partId>",
+    mcp: "sendmock://emails/{emailId}/mime/{partId}",
+    ui: "Mail > open email > MIME, download a part",
+  },
   "GET /api/v1/emails/{emailId}/raw": {
     phase: "1",
     cli: "sendmock email raw <emailId>",

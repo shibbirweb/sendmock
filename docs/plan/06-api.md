@@ -21,6 +21,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/emails` | list, cursor pagination (`?cursor=&limit=`), filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
 | GET | `/emails/{emailId}` | parsed message (headers, text, html, attachments meta, extracted data) |
 | GET | `/emails/{emailId}/raw` | original `.eml` |
+| GET | `/emails/{emailId}/mime/{partId}` | download one MIME part, decoded, by its position in the MIME tree (`1.2`) |
 | GET | `/emails/{emailId}/html` | sanitised HTML for preview iframe |
 | GET | `/emails/{emailId}/attachments/{attachmentIndex}` | download attachment |
 | PATCH | `/emails/{emailId}` | mark read/unread, set tags |

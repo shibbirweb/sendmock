@@ -1587,6 +1587,66 @@
       ]
     },
     {
+      "command": "sendmock email mime-part",
+      "slug": "email-mime-part",
+      "usage": "sendmock email mime-part <emailId> <partId>",
+      "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/mime/{partId}",
+          "operation_id": "getEmailsByEmailIdMimeByPartId",
+          "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "emailId",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        },
+        {
+          "name": "partId",
+          "input": {
+            "name": "partId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The part's position in the MIME tree, as `GET /emails/{emailId}/mime` numbers it, e.g. `1.2`.",
+          "example": "1.2",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock email mime-part 01JB7T9Q2R5W8X3Y6Z1A4B7C9D 1.2",
+      "output": "file (application/octet-stream)",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock://emails/{emailId}/mime/{partId}"
+      ],
+      "ui": [
+        "Mail > open email > MIME, download a part"
+      ]
+    },
+    {
       "command": "sendmock email open",
       "slug": "email-open",
       "usage": "sendmock email open <emailId> [flags]",

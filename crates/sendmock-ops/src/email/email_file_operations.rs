@@ -1,6 +1,6 @@
-use sendmock_mail::decompress_raw_message;
+use sendmock_mail::{decompress_raw_message, find_mime_part_content};
 
-use super::email_inputs::{AttachmentReference, EmailReference};
+use super::email_inputs::{AttachmentReference, EmailReference, MimePartReference};
 use crate::{
     AnswerKind, FileAnswer, Operation, OperationContext, OperationDefinition, OperationError,
 };
@@ -47,18 +47,63 @@ impl Operation for DownloadRawEmailOperation {
         operation_context: &OperationContext,
         input: EmailReference,
     ) -> Result<FileAnswer, OperationError> {
-        let compressed_raw_message = operation_context
-            .email_repository
-            .read_compressed_raw_message(&input.email_id)
-            .await?
-            .ok_or_else(|| OperationError::NotFound {
-                message: format!("No email with id {}", input.email_id),
-            })?;
         Ok(FileAnswer {
             content_type: "message/rfc822".to_owned(),
             file_name: Some(format!("{}.eml", input.email_id)),
-            bytes: decompress_raw_message(&compressed_raw_message)
-                .map_err(|decode_error| OperationError::Internal(decode_error.to_string()))?,
+            bytes: read_raw_message(operation_context, &input.email_id).await?,
+        })
+    }
+}
+
+/// The stored message, decompressed, or not found.
+async fn read_raw_message(
+    operation_context: &OperationContext,
+    email_id: &str,
+) -> Result<Vec<u8>, OperationError> {
+    let compressed_raw_message = operation_context
+        .email_repository
+        .read_compressed_raw_message(email_id)
+        .await?
+        .ok_or_else(|| OperationError::NotFound {
+            message: format!("No email with id {email_id}"),
+        })?;
+    decompress_raw_message(&compressed_raw_message)
+        .map_err(|decode_error| OperationError::Internal(decode_error.to_string()))
+}
+
+pub struct DownloadMimePartOperation;
+
+impl Operation for DownloadMimePartOperation {
+    type Input = MimePartReference;
+    type Output = FileAnswer;
+
+    fn definition(&self) -> OperationDefinition {
+        file_get(
+            "getEmailsByEmailIdMimeByPartId",
+            "/api/v1/emails/{emailId}/mime/{partId}",
+            "Download one MIME part, decoded, by its position in the MIME tree.",
+            "sendmock email mime-part <emailId> <partId>",
+            "sendmock://emails/{emailId}/mime/{partId}",
+            "application/octet-stream",
+        )
+    }
+
+    async fn execute(
+        &self,
+        operation_context: &OperationContext,
+        input: MimePartReference,
+    ) -> Result<FileAnswer, OperationError> {
+        let raw_message = read_raw_message(operation_context, &input.email_id).await?;
+        let part_content =
+            find_mime_part_content(&raw_message, &input.part_id).ok_or_else(|| {
+                OperationError::NotFound {
+                    message: format!("Email {} has no part {}", input.email_id, input.part_id),
+                }
+            })?;
+        Ok(FileAnswer {
+            content_type: part_content.content_type,
+            file_name: Some(part_content.file_name),
+            bytes: part_content.bytes,
         })
     }
 }

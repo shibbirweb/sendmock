@@ -43,7 +43,8 @@ pub(crate) use email_access::read_wait_duration;
 pub use email_check_operations::CheckEmailHtmlOperation;
 pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
 pub use email_file_operations::{
-    DownloadAttachmentOperation, DownloadRawEmailOperation, GetAttachmentThumbnailOperation,
+    DownloadAttachmentOperation, DownloadMimePartOperation, DownloadRawEmailOperation,
+    GetAttachmentThumbnailOperation,
 };
 pub use email_network_clients::EmailNetworkClients;
 pub use email_open_operations::{ListEmailOpensOperation, RecordEmailOpenOperation};
@@ -91,6 +92,7 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ReceiveInboundEmailOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);
+    operation_registry.register(DownloadMimePartOperation);
     operation_registry.register(DownloadAttachmentOperation);
     operation_registry.register(GetAttachmentThumbnailOperation);
     operation_registry.register(SendEmailOperation);

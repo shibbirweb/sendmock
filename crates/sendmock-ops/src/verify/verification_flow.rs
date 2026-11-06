@@ -60,7 +60,6 @@ async fn choose_verification_code(
     ))
 }
 
-
 /// Starts a verification, or resends the code of the recipient's pending one, as Twilio does;
 /// the sixth send to a recipient is refused.
 pub async fn start_verification(

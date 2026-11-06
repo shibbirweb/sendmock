@@ -5,7 +5,7 @@
  */
 
 /** The Stage B phase that builds an operation's backend (docs/plan/24-stage-b-coverage.md). */
-export type StageBPhase = "0" | "1" | "2" | "3" | "3P" | "4";
+export type StageBPhase = "0" | "1" | "2" | "3" | "3P" | "4" | "5";
 
 export type OperationSurfaces = {
   /** When the binary starts serving it; the live UI shows Not available yet before (UI-12). */

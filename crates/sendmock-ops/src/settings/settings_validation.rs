@@ -32,7 +32,9 @@ fn validate_verify_defaults(update: &AppSettingsUpdate) -> Result<(), OperationE
         "Choose 60 to 86,400 seconds",
     )?;
     if let Some(Some(fixed_code)) = &update.verify_fixed_code {
-        let is_digits = fixed_code.chars().all(|character| character.is_ascii_digit());
+        let is_digits = fixed_code
+            .chars()
+            .all(|character| character.is_ascii_digit());
         if !is_digits || !(4..=10).contains(&fixed_code.len()) {
             return Err(field_error(
                 "verify_fixed_code",

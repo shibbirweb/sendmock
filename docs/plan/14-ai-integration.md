@@ -343,7 +343,7 @@ Generated from the surface catalogue like the command tree; every tool runs one 
 | `verify` | `sendmock_verify_force`, `sendmock_verify_get`, `sendmock_verify_list`, `sendmock_verify_service_create`, `sendmock_verify_service_delete`, `sendmock_verify_service_list`, `sendmock_verify_service_update` |
 | `webhooks` | `sendmock_webhook_delivery_cancel`, `sendmock_webhook_delivery_get`, `sendmock_webhook_delivery_list`, `sendmock_webhook_delivery_replay`, `sendmock_webhook_delivery_wait`, `sendmock_webhook_endpoint_create`, `sendmock_webhook_endpoint_delete`, `sendmock_webhook_endpoint_get`, `sendmock_webhook_endpoint_list`, `sendmock_webhook_endpoint_rotate_secret`, `sendmock_webhook_endpoint_save_as_template`, `sendmock_webhook_endpoint_test`, `sendmock_webhook_endpoint_update`, `sendmock_webhook_metrics`, `sendmock_webhook_render`, `sendmock_webhook_rule_create`, `sendmock_webhook_rule_delete`, `sendmock_webhook_rule_get`, `sendmock_webhook_rule_list`, `sendmock_webhook_rule_move`, `sendmock_webhook_rule_preview`, `sendmock_webhook_rule_update`, `sendmock_webhook_saved_create`, `sendmock_webhook_saved_delete`, `sendmock_webhook_saved_list`, `sendmock_webhook_saved_save_as_template`, `sendmock_webhook_saved_send`, `sendmock_webhook_saved_update`, `sendmock_webhook_send`, `sendmock_webhook_template_list` |
 
-Resources: `sendmock://docs/skill`, `sendmock://emails/{emailId}/attachments/{attachmentIndex}`, `sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail`, `sendmock://emails/{emailId}/raw`, `sendmock://http/requests/{requestId}/files/{fileIndex}`, `sendmock://sms/{smsId}/media/{mediaIndex}`
+Resources: `sendmock://docs/skill`, `sendmock://emails/{emailId}/attachments/{attachmentIndex}`, `sendmock://emails/{emailId}/mime/{partId}`, `sendmock://emails/{emailId}/parts/{attachmentIndex}/thumbnail`, `sendmock://emails/{emailId}/raw`, `sendmock://http/requests/{requestId}/files/{fileIndex}`, `sendmock://sms/{smsId}/media/{mediaIndex}`
 
 - **Toolsets** keep the tool list small for the model: default is `core,email,sms,verify,extract,webhooks` (`webhooks` includes `sendmock_webhook_template_list`, since creating an endpoint needs a template id; changed 2026-11-06 after the scripted agent session could not find it); `--toolsets all` or a custom list enables more (`rules`, `http`, `logs`, `numbers`, `payments`, `templates`, `variables`, `admin`, `scenario`).
 - **`--read-only`** exposes only read tools (safe for exploratory sessions).
@@ -356,6 +356,7 @@ Resources: `sendmock://docs/skill`, `sendmock://emails/{emailId}/attachments/{at
 |-----|---------|
 | `sendmock://emails/{emailId}` | parsed email (text body, headers summary) |
 | `sendmock://emails/{emailId}/raw` | original `.eml` |
+| `sendmock://emails/{emailId}/mime/{partId}` | one MIME part, decoded |
 | `sendmock://sms/{smsId}` | SMS with status history |
 | `sendmock://webhooks/deliveries/{deliveryId}` | full request/response |
 | `sendmock://webhooks/templates/{templateId}` | template definition |
