@@ -23,6 +23,25 @@ fn app_answer(status_code: u16, content_type: &str, body: &str) -> TwimlAppAnswe
     }
 }
 
+/// The recent `sms.reply_webhook` events once one names the message: the event is published
+/// just after the outcome is stored, so the detail can show it first.
+async fn wait_for_reply_webhook_event(fixture: &ReplyWebhookFixture, sms_id: &Value) -> Value {
+    for _ in 0..200 {
+        let (_, recent_events) = call_api(
+            &fixture.app_router,
+            "GET",
+            "/api/v1/events/recent?type=sms.reply_webhook",
+            None,
+        )
+        .await;
+        if recent_events[0]["data"]["id"] == *sms_id {
+            return recent_events;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(25)).await;
+    }
+    Value::Null
+}
+
 async fn receive_and_wait(fixture: &ReplyWebhookFixture) -> Value {
     let inbound_sms = fixture.receive_text("YES").await;
     fixture.wait_for_reply_webhook(&inbound_sms["id"]).await
@@ -149,13 +168,7 @@ async fn a_failing_fallback_leaves_the_reply_webhook_failed() {
     assert_eq!(reply_webhook["outcome"], "failed");
     assert_eq!(reply_webhook["error_code"], "11200");
     assert_eq!(reply_webhook["status_code"], 500);
-    let (_, recent_events) = call_api(
-        &fixture.app_router,
-        "GET",
-        "/api/v1/events/recent?type=sms.reply_webhook",
-        None,
-    )
-    .await;
+    let recent_events = wait_for_reply_webhook_event(&fixture, &sms_detail["id"]).await;
     assert_eq!(recent_events[0]["data"]["id"], sms_detail["id"]);
     assert_eq!(
         recent_events[0]["data"]["reply_webhook"]["outcome"],
