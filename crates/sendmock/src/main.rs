@@ -42,6 +42,13 @@ use sendmock_ops::build_operation_registry;
 
 use cli_arguments::{BuiltInCommand, CliArguments};
 
+// musl's allocator keeps much more of the startup heap than glibc's (23 MB of anonymous memory
+// at idle against 16 MB, same code and threads), which put the shipped static binary past its
+// idle memory budget (DS-07); mimalloc gives it back.
+#[cfg(target_env = "musl")]
+#[global_allocator]
+static GLOBAL_ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 /// The name a symlink gives the binary to make it act as `sendmail`.
 const SENDMAIL_NAME: &str = "sendmail";
 

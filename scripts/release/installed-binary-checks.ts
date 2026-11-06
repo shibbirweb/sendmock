@@ -65,6 +65,7 @@ async function checkDefaultListeners(binaryPath: string) {
       healthResult.exitCode === 0,
       "4. sendmock health exits 0 once it is ready",
     );
+    console.log("5. the API and the embedded UI answer:");
     await checkRunningBinary(`http://${runningSendmock.httpAddress}`);
   } finally {
     checkCleanStop(await stopSendmock(runningSendmock));

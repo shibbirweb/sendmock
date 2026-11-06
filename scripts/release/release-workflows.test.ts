@@ -121,7 +121,9 @@ describe("Release build", () => {
     expect(linuxContainers).toBe("alpine:3.22 busybox:1.37");
     expect(checksumRunText).toContain("SHA256SUMS");
     for (const testCase of ["2.", "3.", "4.", "5.", "6.", "7.", "8."]) {
-      expect(installedChecks).toContain(`"${testCase} `);
+      expect(installedChecks).toMatch(
+        new RegExp(`["\`]${testCase.replace(".", "\\.")} `),
+      );
     }
   });
 

@@ -45,6 +45,8 @@ jsonschema = { version = "0.60", default-features = false }
 mail-parser = "1"
 md5 = { package = "md-5", version = "0.11" }
 mime_guess = "2"
+# Only the static musl builds use it, as their global allocator (see crates/sendmock/src/main.rs).
+mimalloc = { version = "0.1", default-features = false }
 minijinja = { version = "3", default-features = false, features = [
     "builtins",
     "debug",
