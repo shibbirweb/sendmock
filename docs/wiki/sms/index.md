@@ -43,6 +43,22 @@ Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, group
 - **Twilio** (Messages API, Messaging Services, WhatsApp with `whatsapp:` addresses) and **Vonage** at their real paths on port `8026`.
 - Any `from` is accepted. Numbers only matter for replies and sender pools ([Numbers](../numbers.md)).
 
+### Twilio SDKs
+
+Twilio's official SDKs have no base URL setting, so give each one a small custom HTTP client (the SDK's own extension point) that sends the request to `http://127.0.0.1:8026` with the same path and query. Messages and Verify then work unchanged, status callbacks included.
+
+| SDK | Extension point |
+|-----|-----------------|
+| Node | a `twilio.RequestClient` subclass passed as `httpClient` |
+| Python | a `TwilioHttpClient` subclass passed as `http_client` |
+| PHP | a `Twilio\Http\CurlClient` subclass passed as the client's fifth argument |
+| Go | an `http.Client` with a custom `Transport` on `twilioclient.Client`, in `twilio.ClientParams` |
+| Java | a `com.twilio.http.HttpClient` subclass passed to `TwilioRestClient.Builder.httpClient` |
+| C# | a `DelegatingHandler` in the `System.Net.Http.HttpClient` given to `SystemNetHttpClient` |
+| Ruby | a `Twilio::HTTP::Client` subclass passed as the client's fifth argument |
+
+Each one is a complete, tested example in [`examples/sms`](https://github.com/shibbirweb/sendmock/tree/develop/examples/sms).
+
 ### The conversation list
 
 One row per contact and number pair, with the last message, time and a channel badge (SMS or WhatsApp). Search finds numbers and message text.

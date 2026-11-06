@@ -1,0 +1,11 @@
+{
+  "name": "sendmock/example-sms-twilio-php",
+  "description": "Sends an SMS and runs a Verify login against SendMock with the official Twilio PHP SDK.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "twilio/sdk": "8.14.0"
+  }
+}
