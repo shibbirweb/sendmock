@@ -238,6 +238,11 @@ jobs:
       - name: Start it, check the API and the UI, stop it
         run: bun scripts/binary-smoke-test.ts target/release/sendmock
 
+      # The budgets are set for Linux x64, the CI benchmark machine (DS-07).
+      - name: Performance budgets (size, cold start, idle memory, SMTP ingest)
+        if: matrix.os == 'ubuntu-latest'
+        run: bun scripts/performance-budget.ts target/release/sendmock
+
       # The live UI suite runs against this binary in the Playwright image.
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'

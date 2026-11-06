@@ -299,6 +299,14 @@ jobs:
             exit 1
           }
 
+      # The shipped static binary against the budgets, on Linux x64 (DS-07).
+      - name: Performance budgets (size, cold start, idle memory, SMTP ingest)
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          mkdir "$RUNNER_TEMP/budget-binary"
+          tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C "$RUNNER_TEMP/budget-binary"
+          bun scripts/performance-budget.ts "$RUNNER_TEMP/budget-binary/sendmock"
+
       - name: Starts with no runtime in minimal Linux images
         if: matrix.containers
         run: |
