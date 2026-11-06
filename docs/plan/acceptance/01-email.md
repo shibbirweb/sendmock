@@ -42,16 +42,16 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 - [x] EM-04.3 Desktop, tablet and mobile width toggles resize the preview. (UI on mock data; live in Phase 1)
 - [x] EM-04.4 Text, Source (highlighted), Headers and Attachments tabs show the correct content; CID inline images display in the HTML view. (UI on mock data; live in Phase 1)
 - [x] EM-04.5 Attachments download with the original filename and bytes; image attachments show thumbnails. (#48)
-- [ ] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded.
-- [ ] EM-04.7 "Screenshot" saves a PNG of the rendered HTML.
-- [ ] EM-04.8 Broken HTML, missing charsets and non-English content (Bangla, Arabic, Japanese) render without errors.
+- [x] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded. (#48)
+- [x] EM-04.7 "Screenshot" saves a PNG of the rendered HTML. (#48)
+- [x] EM-04.8 Broken HTML, missing charsets and non-English content (Bangla, Arabic, Japanese) render without errors. (#48)
 
 ## EM-05 OTP and link extraction
 
 UI in U1, backend Phase 1.
 
 - [x] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies. (#48)
-- [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
+- [x] EM-05.2 Links (including verification and reset links) are extracted and listed. (#48)
 - [x] EM-05.3 Custom OTP patterns from Settings are used for new messages. (#48)
 - [x] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code. (#48)
 - [x] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient. (#48)
@@ -154,7 +154,7 @@ Phase 4.
 
 UI in U1, live in Phase 1.
 
-- [ ] EM-16.1 After the user grants permission, a notification appears for each new email (respecting the optional filter).
+- [x] EM-16.1 After the user grants permission, a notification appears for each new email (respecting the optional filter). (#48)
 - [x] EM-16.2 Nothing is requested or shown until the user turns notifications on. (UI on mock data; live in Phase 1)
 
 ## EM-17 Simulated replies and inbound email

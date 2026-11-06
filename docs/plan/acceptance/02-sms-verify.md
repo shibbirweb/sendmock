@@ -159,7 +159,7 @@ UI in U3 (W16), runtime in Phase 2 (built-ins) and 4 (custom). Plan: [22-configu
 UI in U1, backend Phase 2. Docs: [Twilio Verify](../04-sms.md#twilio-verify).
 
 - [x] VF-01.1 `POST /v2/Services` creates a service and `GET` returns it in Twilio's shape.
-- [ ] VF-01.2 Code length (4 to 10), fixed code and TTL can be set per service and globally.
+- [x] VF-01.2 Code length (4 to 10), fixed code and TTL can be set per service and globally. (#48)
 - [x] VF-01.3 Services can be created, edited and deleted from the Services tab, with the code length, fixed code and TTL rules enforced in the form and the API.
 
 ## VF-02 Start a verification and deliver the code
