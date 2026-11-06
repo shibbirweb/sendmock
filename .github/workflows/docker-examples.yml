@@ -47,10 +47,24 @@ jobs:
       - name: The app waits for SendMock's health check, then its email and SMS are read back
         working-directory: examples/docker
         run: |
-          docker compose up --build --detach
-          test "$(docker compose wait app)" = "0"
-          curl -fsS "http://127.0.0.1:8025/api/v1/wait/email?to=compose@example.test&timeout=10s" | jq -e '.subject == "Sent from the Compose example"'
-          curl -fsS "http://127.0.0.1:8025/api/v1/wait/sms?to=%2B15550002222&timeout=10s" | jq -e '.body == "Sent from the Compose example"'
+          # Failures are written as annotations, which the public checks API shows without the log.
+          report_failure() {
+            echo "::error title=Compose example::$1"
+            docker compose logs --no-color | tail -n 8 | sed 's/^/::error title=Compose logs::/'
+            exit 1
+          }
+          docker compose up --build --detach || report_failure "docker compose up failed"
+          app_container="$(docker compose ps --all --quiet app)"
+          for _ in $(seq 1 60); do
+            [ "$(docker inspect --format '{{.State.Status}}' "$app_container")" = "exited" ] && break
+            sleep 2
+          done
+          app_exit_code="$(docker inspect --format '{{.State.ExitCode}}' "$app_container")"
+          [ "$app_exit_code" = "0" ] || report_failure "the app exited with $app_exit_code"
+          email_answer="$(curl -sS "http://127.0.0.1:8025/api/v1/wait/email?to=compose@example.test&timeout=10s")"
+          echo "$email_answer" | jq -e '.subject == "Sent from the Compose example"' > /dev/null || report_failure "wait/email answered: $email_answer"
+          sms_answer="$(curl -sS "http://127.0.0.1:8025/api/v1/wait/sms?to=%2B15550002222&timeout=10s")"
+          echo "$sms_answer" | jq -e '.body == "Sent from the Compose example"' > /dev/null || report_failure "wait/sms answered: $sms_answer"
           docker compose down --volumes
 
   service-container:
