@@ -42,6 +42,7 @@ pass "the HEALTHCHECK reports healthy once listening"
 
 app_info="$(curl -fsS "http://127.0.0.1:$host_port/api/v1/info")"
 echo "$app_info" | grep -q '"database_path":"/data/sendmock.db"' || fail "the database is in /data: $app_info"
+# AC: UI-04.3 (the UI defaults its connect hints to the Compose host when this is true)
 echo "$app_info" | grep -q '"is_container":true' || fail "it knows it runs in a container: $app_info"
 pass "the database is /data/sendmock.db and it knows it runs in a container"
 
