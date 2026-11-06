@@ -111,3 +111,11 @@ Phase 1.
 
 - [ ] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration.
 - [ ] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load.
+
+## PL-09 Demo data
+
+Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
+
+- [ ] PL-09.1 `sendmock serve --demo` (or `SENDMOCK_DEMO=1`) on an empty instance loads the website demo's sample data: emails, SMS conversations, verifications, webhook endpoints, rules and deliveries, HTTP bins with requests, and payments, each made through the same operation real traffic uses.
+- [ ] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data (events fire, search finds it, reset clears it unless a seed file holds it).
+- [ ] PL-09.3 With data already stored, `--demo` loads nothing and says so in the log; the data file the binary embeds matches the mock's fixtures, checked by a test.
