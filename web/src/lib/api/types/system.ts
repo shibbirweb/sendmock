@@ -341,6 +341,21 @@ export type AppSettings = {
    * @example 80
    */
   payment_random_success_rate_percent: number;
+  /**
+   * Digits in each code of a Verify service made without its own code length, 4 to 10.
+   * @example 6
+   */
+  verify_default_code_length: number;
+  /**
+   * How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+   * @example 600
+   */
+  verify_default_ttl_seconds: number;
+  /**
+   * Sent by every Verify service without its own fixed code; null for random codes.
+   * @example "123456"
+   */
+  verify_fixed_code: string | null;
 };
 
 /** What happens to a new hosted checkout (PY-09.4): wait for the page, or settle at once. */

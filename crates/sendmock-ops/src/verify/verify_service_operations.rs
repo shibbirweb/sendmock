@@ -72,22 +72,26 @@ pub(crate) fn build_verify_service(
     })
 }
 
-/// `VA` and 32 hex digits, as Twilio writes Verify service SIDs.
-pub fn new_verify_service(operation_context: &OperationContext) -> VerifyServiceRecord {
+/// A new service with a `VA` and 32 hex digits SID, as Twilio writes them, and the code length
+/// and TTL from the Verify defaults in Settings.
+pub async fn new_verify_service(
+    operation_context: &OperationContext,
+) -> Result<VerifyServiceRecord, OperationError> {
+    let settings = operation_context.settings_store.current().await?;
     let random_source = &operation_context.random_source;
-    VerifyServiceRecord {
+    Ok(VerifyServiceRecord {
         service_sid: format!(
             "VA{:016x}{:016x}",
             random_source.next_u64(),
             random_source.next_u64()
         ),
         friendly_name: String::new(),
-        code_length: 6,
+        code_length: settings.verify_default_code_length,
         fixed_code: None,
-        ttl_seconds: 600,
+        ttl_seconds: settings.verify_default_ttl_seconds,
         created_by: operation_context.request_client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
-    }
+    })
 }
 
 pub async fn find_service_or_not_found(
@@ -183,7 +187,7 @@ impl Operation for CreateVerifyServiceOperation {
         operation_context: &OperationContext,
         input: VerifyServiceInput,
     ) -> Result<VerifyService, OperationError> {
-        let new_service = build_verify_service(input, new_verify_service(operation_context))?;
+        let new_service = build_verify_service(input, new_verify_service(operation_context).await?)?;
         operation_context
             .verify_service_repository
             .save_service(new_service.clone())

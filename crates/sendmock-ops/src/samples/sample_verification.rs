@@ -22,7 +22,7 @@ pub async fn create_sample_verification(
         None => {
             let sample_service = sendmock_store::VerifyServiceRecord {
                 friendly_name: SAMPLE_SERVICE_NAME.to_owned(),
-                ..new_verify_service(operation_context)
+                ..new_verify_service(operation_context).await?
             };
             operation_context
                 .verify_service_repository

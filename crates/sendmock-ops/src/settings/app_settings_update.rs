@@ -73,6 +73,14 @@ pub struct AppSettingsUpdate {
     pub payment_outcome_profile: Option<PaymentOutcomeProfile>,
     /// Used by the `random` outcome profile.
     pub payment_random_success_rate_percent: Option<u32>,
+    /// Digits in each code of a Verify service made without its own code length, 4 to 10.
+    pub verify_default_code_length: Option<u32>,
+    /// How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+    pub verify_default_ttl_seconds: Option<u32>,
+    /// Sent by every Verify service without its own fixed code; null for random codes.
+    #[serde(default, deserialize_with = "read_present_value")]
+    #[schemars(with = "Option<String>")]
+    pub verify_fixed_code: Option<Option<String>>,
 }
 
 /// Copies each named field from the update when it carries one.
@@ -121,6 +129,9 @@ impl AppSettingsUpdate {
             payment_default_currency,
             payment_outcome_profile,
             payment_random_success_rate_percent,
+            verify_default_code_length,
+            verify_default_ttl_seconds,
+            verify_fixed_code,
         );
         settings.relay_smtp_url = keep_stored_password(settings.relay_smtp_url, stored_relay_url);
         settings

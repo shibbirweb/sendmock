@@ -7331,6 +7331,23 @@ components:
           description: Used by the `random` outcome profile.
           examples:
             - 80
+        verify_default_code_length:
+          type: number
+          description: Digits in each code of a Verify service made without its own code length, 4 to 10.
+          examples:
+            - 6
+        verify_default_ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+          examples:
+            - 600
+        verify_fixed_code:
+          type:
+            - string
+            - "null"
+          description: Sent by every Verify service without its own fixed code; null for random codes.
+          examples:
+            - "123456"
       required:
         - max_emails
         - max_sms
@@ -7361,6 +7378,9 @@ components:
         - payment_default_currency
         - payment_outcome_profile
         - payment_random_success_rate_percent
+        - verify_default_code_length
+        - verify_default_ttl_seconds
+        - verify_fixed_code
     AppSettingsUpdate:
       type: object
       properties:
@@ -7526,6 +7546,23 @@ components:
           description: Used by the `random` outcome profile.
           examples:
             - 80
+        verify_default_code_length:
+          type: number
+          description: Digits in each code of a Verify service made without its own code length, 4 to 10.
+          examples:
+            - 6
+        verify_default_ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+          examples:
+            - 600
+        verify_fixed_code:
+          type:
+            - string
+            - "null"
+          description: Sent by every Verify service without its own fixed code; null for random codes.
+          examples:
+            - "123456"
       description: "Body of PATCH /api/v1/settings: only the changed keys."
     AppStats:
       type: object

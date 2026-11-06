@@ -193,7 +193,7 @@ async fn the_email_channel_captures_an_email_and_call_captures_nothing() {
     assert!(!read_code(&app_router, "sam@example.test").await.is_empty());
 }
 
-// AC: VF-02.3
+// AC: VF-02.3 VF-01.2
 #[tokio::test]
 async fn a_fixed_code_is_always_sent() {
     let (app_router, _) = build_test_app();
@@ -320,4 +320,91 @@ async fn the_app_can_cancel_a_verification_and_bad_params_get_60200() {
         (400, json!(60200))
     );
     assert_eq!(bad_channel_status, 400);
+}
+
+// AC: VF-01.2
+#[tokio::test]
+async fn the_verify_defaults_in_settings_shape_new_services_and_their_codes() {
+    let (app_router, _) = build_test_app();
+    let (settings_status, saved_settings) = call_api(
+        &app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({
+            "verify_default_code_length": 8,
+            "verify_default_ttl_seconds": 300,
+            "verify_fixed_code": "24682468",
+        })),
+    )
+    .await;
+    let (_, created_service) =
+        call_form(&app_router, "POST", SERVICES_PATH, "FriendlyName=Shop").await;
+    let service_sid = created_service["sid"]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+    let (_, native_services) = call_api(&app_router, "GET", "/api/v1/verify/services", None).await;
+
+    start(&app_router, &service_sid, "To=%2B14155550100&Channel=sms").await;
+
+    assert_eq!(settings_status, 200, "{saved_settings}");
+    assert_eq!(created_service["code_length"], 8);
+    assert_eq!(native_services[0]["sid"], service_sid.as_str());
+    assert_eq!(native_services[0]["ttl_seconds"], 300);
+    assert_eq!(read_code(&app_router, "+14155550100").await, "24682468");
+}
+
+// AC: VF-01.2
+#[tokio::test]
+async fn a_service_with_its_own_fixed_code_keeps_it_over_the_global_one() {
+    let (app_router, _) = build_test_app();
+    call_api(
+        &app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({ "verify_fixed_code": "24682468" })),
+    )
+    .await;
+    let own_code_service = json!({ "friendly_name": "Shop", "code_length": 6, "fixed_code": "123456", "ttl_seconds": 600 });
+    let (_, created_service) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/verify/services",
+        Some(&own_code_service),
+    )
+    .await;
+    let service_sid = created_service["sid"]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+
+    start(&app_router, &service_sid, "To=%2B14155550100&Channel=sms").await;
+
+    assert_eq!(read_code(&app_router, "+14155550100").await, "123456");
+}
+
+// AC: VF-01.2
+#[tokio::test]
+async fn verify_defaults_out_of_range_are_refused_with_their_field() {
+    let (app_router, _) = build_test_app();
+
+    let (length_status, length_error) = call_api(
+        &app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({ "verify_default_code_length": 12 })),
+    )
+    .await;
+    let (code_status, code_error) = call_api(
+        &app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({ "verify_fixed_code": "12ab" })),
+    )
+    .await;
+
+    assert_eq!(length_status, 400);
+    assert_eq!(length_error["error"]["field"], "verify_default_code_length");
+    assert_eq!(code_status, 400);
+    assert_eq!(code_error["error"]["field"], "verify_fixed_code");
 }

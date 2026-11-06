@@ -5125,7 +5125,10 @@ expression: command_descriptions
       "--sms-failure-rate-percent",
       "--sms-simulation-profile",
       "--spamassassin-address",
-      "--update-check-mode"
+      "--update-check-mode",
+      "--verify-default-code-length",
+      "--verify-default-ttl-seconds",
+      "--verify-fixed-code"
     ],
     "operations": [
       {

@@ -11,7 +11,36 @@ pub fn validate_settings_update(update: &AppSettingsUpdate) -> Result<(), Operat
     validate_chaos_settings(update)?;
     validate_addresses(update)?;
     validate_otp_patterns(update.otp_patterns.as_deref())?;
+    validate_verify_defaults(update)?;
     validate_payment_settings(update)
+}
+
+/// The same ranges as a Verify service's own code length and TTL; a fixed code is 4 to 10 digits.
+fn validate_verify_defaults(update: &AppSettingsUpdate) -> Result<(), OperationError> {
+    check_range(
+        "verify_default_code_length",
+        update.verify_default_code_length.map(u64::from),
+        4,
+        10,
+        "Choose 4 to 10 digits",
+    )?;
+    check_range(
+        "verify_default_ttl_seconds",
+        update.verify_default_ttl_seconds.map(u64::from),
+        60,
+        86_400,
+        "Choose 60 to 86,400 seconds",
+    )?;
+    if let Some(Some(fixed_code)) = &update.verify_fixed_code {
+        let is_digits = fixed_code.chars().all(|character| character.is_ascii_digit());
+        if !is_digits || !(4..=10).contains(&fixed_code.len()) {
+            return Err(field_error(
+                "verify_fixed_code",
+                "Use 4 to 10 digits, or leave it empty for random codes",
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn validate_limits(update: &AppSettingsUpdate) -> Result<(), OperationError> {

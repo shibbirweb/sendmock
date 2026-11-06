@@ -11847,6 +11847,51 @@
           "allowed_values": null,
           "description": "Used by the `random` outcome profile.",
           "example": 80
+        },
+        {
+          "flag": "--verify-default-code-length",
+          "input": {
+            "name": "verify_default_code_length",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<verify-default-code-length>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+          "example": 6
+        },
+        {
+          "flag": "--verify-default-ttl-seconds",
+          "input": {
+            "name": "verify_default_ttl_seconds",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<verify-default-ttl-seconds>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+          "example": 600
+        },
+        {
+          "flag": "--verify-fixed-code",
+          "input": {
+            "name": "verify_fixed_code",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<verify-fixed-code>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+          "example": "123456"
         }
       ],
       "example": "sendmock settings set --max-emails 1000 --max-sms 1000",

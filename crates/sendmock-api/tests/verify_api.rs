@@ -28,7 +28,7 @@ async fn start_sample_verification(app_router: &axum::Router) -> Value {
         .1
 }
 
-// AC: VF-01.3
+// AC: VF-01.3 VF-01.2
 #[tokio::test]
 async fn services_are_created_edited_and_deleted_with_the_rules_enforced() {
     let (app_router, _) = build_test_app();

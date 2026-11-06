@@ -32,7 +32,7 @@ pub async fn answer_verify_service_request(
             }
             save_service(
                 operation_context,
-                new_verify_service(operation_context),
+                new_verify_service(operation_context).await?,
                 fields,
                 account_sid,
                 201,

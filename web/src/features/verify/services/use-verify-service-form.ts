@@ -2,11 +2,16 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/api/api-client";
+import { useAppSettings } from "@/lib/api/hooks/use-system-queries";
 import {
   useCreateVerifyService,
   useUpdateVerifyService,
 } from "@/lib/api/hooks/use-verify-queries";
-import type { VerifyService, VerifyServiceInput } from "@/lib/api/types";
+import type {
+  AppSettings,
+  VerifyService,
+  VerifyServiceInput,
+} from "@/lib/api/types";
 import {
   type VerifyServiceFieldErrors,
   validateVerifyServiceInput,
@@ -19,12 +24,17 @@ export type VerifyServiceFormValues = {
   ttlMinutes: string;
 };
 
-const newServiceValues: VerifyServiceFormValues = {
-  friendlyName: "",
-  codeLength: 6,
-  fixedCode: "",
-  ttlMinutes: "10",
-};
+/** A new service starts from the Verify defaults in Settings (VF-01.2). */
+function toNewServiceValues(
+  appSettings: AppSettings | undefined,
+): VerifyServiceFormValues {
+  return {
+    friendlyName: "",
+    codeLength: appSettings?.verify_default_code_length ?? 6,
+    fixedCode: "",
+    ttlMinutes: String((appSettings?.verify_default_ttl_seconds ?? 600) / 60),
+  };
+}
 
 function toFormValues(verifyService: VerifyService): VerifyServiceFormValues {
   return {
@@ -58,8 +68,11 @@ export function useVerifyServiceForm({
 }) {
   const createVerifyService = useCreateVerifyService();
   const updateVerifyService = useUpdateVerifyService();
+  const appSettings = useAppSettings().data;
   const [formValues, setFormValues] = React.useState(() =>
-    editedService === null ? newServiceValues : toFormValues(editedService),
+    editedService === null
+      ? toNewServiceValues(appSettings)
+      : toFormValues(editedService),
   );
   const [fieldErrors, setFieldErrors] =
     React.useState<VerifyServiceFieldErrors>({});

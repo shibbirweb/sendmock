@@ -67,6 +67,13 @@ pub struct AppSettings {
     pub payment_outcome_profile: PaymentOutcomeProfile,
     /// Used by the `random` outcome profile.
     pub payment_random_success_rate_percent: u32,
+    /// Digits in each code of a Verify service made without its own code length, 4 to 10.
+    pub verify_default_code_length: u32,
+    /// How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+    pub verify_default_ttl_seconds: u32,
+    /// Sent by every Verify service without its own fixed code; null for random codes.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub verify_fixed_code: Option<String>,
 }
 
 impl Default for AppSettings {
@@ -104,6 +111,9 @@ impl Default for AppSettings {
             payment_default_currency: "USD".to_owned(),
             payment_outcome_profile: PaymentOutcomeProfile::Interactive,
             payment_random_success_rate_percent: 80,
+            verify_default_code_length: 6,
+            verify_default_ttl_seconds: 600,
+            verify_fixed_code: None,
         }
     }
 }

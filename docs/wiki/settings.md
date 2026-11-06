@@ -62,6 +62,7 @@ The seed file (`sendmock.seed.toml`) is the configuration SendMock starts from a
 ### SMS
 
 - **Delivery simulation:** the profile (**Instant**, **Realistic**, **Manual**), the **Failure rate**, **Strict Twilio test mode** (reject `From` numbers that are not Twilio test numbers with 21606).
+- **Verify defaults:** the **Code length** and **Code lifetime** new Verify services start with (including services your app creates through Twilio's API without a `CodeLength`), and a **Fixed code for every service** that has none of its own; empty means random codes.
 - **Magic numbers:** the switch, and the reference table of Twilio's test numbers and SendMock's after-send numbers ([Delivery and test numbers](./sms/delivery-and-test-numbers.md)).
 - **Custom outcome numbers:** your own rules, with **Test a number**, which says whether a rule, a magic number or the profile applies ([Advanced: SMS outcome numbers](./advanced/sms-outcome-numbers.md)).
 

@@ -35,6 +35,32 @@ fn timeline_entry(kind: &str, at_unix_ms: i64, detail: String) -> VerificationTi
     }
 }
 
+/// The pending verification's code when one is open, else the service's fixed code, the global
+/// fixed code from Settings, or a random code of the service's length.
+async fn choose_verification_code(
+    operation_context: &OperationContext,
+    verify_service: &VerifyServiceRecord,
+    pending_verification: Option<&VerificationRecord>,
+) -> Result<String, OperationError> {
+    if let Some(pending) = pending_verification {
+        return Ok(pending.code.clone());
+    }
+    let global_fixed_code = operation_context
+        .settings_store
+        .current()
+        .await?
+        .verify_fixed_code;
+    Ok(generate_verification_code(
+        verify_service.code_length,
+        verify_service
+            .fixed_code
+            .as_deref()
+            .or(global_fixed_code.as_deref()),
+        operation_context.random_source.as_ref(),
+    ))
+}
+
+
 /// Starts a verification, or resends the code of the recipient's pending one, as Twilio does;
 /// the sixth send to a recipient is refused.
 pub async fn start_verification(
@@ -53,14 +79,12 @@ pub async fn start_verification(
     {
         return Ok(Err(VerifyRefusal::MaxSendAttempts));
     }
-    let code = match &pending_verification {
-        Some(pending) => pending.code.clone(),
-        None => generate_verification_code(
-            verify_service.code_length,
-            verify_service.fixed_code.as_deref(),
-            operation_context.random_source.as_ref(),
-        ),
-    };
+    let code = choose_verification_code(
+        operation_context,
+        verify_service,
+        pending_verification.as_ref(),
+    )
+    .await?;
     let delivered_code = deliver_verification_code(
         operation_context,
         &verify_service.friendly_name,

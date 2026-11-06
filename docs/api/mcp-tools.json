@@ -16608,6 +16608,42 @@
           "allowed_values": null,
           "description": "Used by the `random` outcome profile.",
           "example": 80
+        },
+        {
+          "name": "verify_default_code_length",
+          "input": {
+            "name": "verify_default_code_length",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+          "example": 6
+        },
+        {
+          "name": "verify_default_ttl_seconds",
+          "input": {
+            "name": "verify_default_ttl_seconds",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+          "example": 600
+        },
+        {
+          "name": "verify_fixed_code",
+          "input": {
+            "name": "verify_fixed_code",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+          "example": "123456"
         }
       ],
       "input_schema": {
@@ -16845,6 +16881,30 @@
             "description": "Used by the `random` outcome profile.",
             "examples": [
               80
+            ]
+          },
+          "verify_default_code_length": {
+            "type": "number",
+            "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+            "examples": [
+              6
+            ]
+          },
+          "verify_default_ttl_seconds": {
+            "type": "number",
+            "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+            "examples": [
+              600
+            ]
+          },
+          "verify_fixed_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+            "examples": [
+              "123456"
             ]
           }
         },
