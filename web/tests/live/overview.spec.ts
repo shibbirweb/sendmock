@@ -134,7 +134,9 @@ test("UI-03.2 a live recent failure opens its delivery", async ({
     new RegExp(`/webhooks/deliveries\\?delivery=${failedDeliveryId}`),
   );
   await expect(
-    page.getByRole("dialog", { name: "Delivery" }).getByText(endpointName),
+    page
+      .getByRole("dialog", { name: "Delivery" })
+      .getByText(endpointName, { exact: true }),
   ).toBeVisible();
 });
 
@@ -225,7 +227,10 @@ test("UI-03.5 live stat tiles show today's counts and the connect card copies th
   const appInfo = (await (await request.get("/api/v1/info")).json()) as {
     smtp_address: string;
     http_address: string;
+    is_container: boolean;
   };
+  // In a container the UI defaults to the Compose host (UI-04.3).
+  const expectedHost = appInfo.is_container ? "sendmock" : "127.0.0.1";
   await openOverview(page);
 
   await expect(findStatTile(page, "Emails")).toContainText(
@@ -245,10 +250,10 @@ test("UI-03.5 live stat tiles show today's counts and the connect card copies th
   const httpPort = appInfo.http_address.split(":").pop() ?? "";
   await page.getByRole("button", { name: "Copy SMTP address" }).click();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    `127.0.0.1:${smtpPort}`,
+    `${expectedHost}:${smtpPort}`,
   );
   await page.getByRole("button", { name: "Copy API base URL" }).click();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    `http://127.0.0.1:${httpPort}/api/v1`,
+    `http://${expectedHost}:${httpPort}/api/v1`,
   );
 });

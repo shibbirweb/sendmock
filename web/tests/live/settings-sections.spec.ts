@@ -39,7 +39,8 @@ test.beforeAll(async ({ request }) => {
   );
 });
 
-test.afterAll(async ({ request }) => {
+// Each test puts the settings back, so a later test never runs with strict Twilio test mode left on.
+test.afterEach(async ({ request }) => {
   const restoreResponse = await request.patch("/api/v1/settings", {
     data: originalSettings,
   });
