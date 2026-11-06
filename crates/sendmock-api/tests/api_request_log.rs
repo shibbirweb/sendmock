@@ -81,6 +81,26 @@ async fn a_rejected_native_request_is_logged_with_the_exact_response() {
     assert_eq!(logged_request["linked_message"], Value::Null);
 }
 
+// AC: EM-07.2
+#[tokio::test]
+async fn an_invalid_send_names_its_field_and_is_logged() {
+    let app_router = build_router();
+
+    let (status, response_body) = send_request(
+        &app_router,
+        post_send(r#"{"from":"nobody","to":["sam@example.test"],"subject":"Hi","text":"Hello"}"#),
+    )
+    .await;
+    let logged_page = list_logged_requests(&app_router, "?status_class=4xx").await;
+    let error_body: Value = serde_json::from_str(&response_body)
+        .unwrap_or_else(|error| panic!("a JSON error body: {error}"));
+
+    assert_eq!(status, 400);
+    assert_eq!(error_body["error"]["field"], "from");
+    assert_eq!(logged_page["total_count"], 1);
+    assert_eq!(logged_page["items"][0]["response_status"], 400);
+}
+
 // AC: SM-13.2
 // AC: SM-13.3
 #[tokio::test]

@@ -38,7 +38,7 @@ async fn create_service(
         .await
 }
 
-// AC: SM-09.2, SM-09.4
+// AC: SM-09.2, SM-09.4, SM-12.2
 #[tokio::test]
 async fn the_numbers_inbound_url_gets_twilios_fields_and_signed_headers() {
     let fixture = ReplyWebhookFixture::new(ScriptedTwimlApp::default()).await;
@@ -46,7 +46,11 @@ async fn the_numbers_inbound_url_gets_twilios_fields_and_signed_headers() {
 
     let inbound_sms = fixture.receive_text("Is my order ready?").await;
     let received_requests = fixture.twiml_app.wait_for_requests(1).await;
+    let (_, webhook_rules) =
+        support::test_app::call_api(&fixture.app_router, "GET", "/api/v1/webhooks/rules", None)
+            .await;
 
+    assert_eq!(webhook_rules, json!([]));
     assert_eq!(received_requests.len(), 1);
     let webhook_request = &received_requests[0];
     let form_fields = read_form_fields(webhook_request);

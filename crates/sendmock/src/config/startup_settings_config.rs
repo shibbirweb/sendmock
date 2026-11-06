@@ -153,6 +153,7 @@ mod tests {
         assert_eq!(parse_days("a week"), None);
     }
 
+    // AC: EM-03.2
     #[test]
     fn a_flag_wins_over_the_file() {
         let serve_arguments = ServeArguments {

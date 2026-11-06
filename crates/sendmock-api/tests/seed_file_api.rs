@@ -79,7 +79,7 @@ async fn export_seed(app_router: &axum::Router) -> String {
 }
 
 // AC: PL-04.1
-// AC: SM-03.3
+// AC: SM-03.3 SM-07.7
 #[tokio::test]
 async fn applying_a_seed_creates_every_item_and_applying_it_again_changes_nothing() {
     let app_router = build_seeded_app();

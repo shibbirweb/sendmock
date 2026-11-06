@@ -135,6 +135,7 @@ fn numbers_and_messaging_services_are_managed_from_the_cli() {
     assert_eq!(services[0]["number_ids"][0], number_id.as_str());
 }
 
+// AC: SM-07.7
 #[test]
 fn a_custom_outcome_number_from_the_cli_decides_the_outcome() {
     let working_directory = tempfile::tempdir().expect("temporary folder");

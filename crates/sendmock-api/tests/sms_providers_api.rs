@@ -5,6 +5,8 @@ mod support {
 
 use axum::body::Body;
 use axum::http::Request;
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use serde_json::{Value, json};
 use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
@@ -353,4 +355,56 @@ async fn the_preview_answers_the_providers_error_for_a_refused_sample() {
             .as_str()
             .is_some_and(|body| body.contains("21604"))
     );
+}
+
+/// A Twilio send with Basic auth `ACtest00000000000000000000000000:<auth_token>`.
+async fn send_twilio_with_token(app_router: &axum::Router, auth_token: &str) -> (u16, Value) {
+    let basic_credentials =
+        STANDARD.encode(format!("ACtest00000000000000000000000000:{auth_token}"));
+    let request = Request::post(
+        "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+    )
+    .header("content-type", "application/x-www-form-urlencoded")
+    .header("authorization", format!("Basic {basic_credentials}"))
+    .body(Body::from(
+        "To=%2B8801700000000&From=%2B15005550006&Body=Hi",
+    ))
+    .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    let response = app_router
+        .clone()
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let status = response.status().as_u16();
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_else(|error| panic!("a body: {error}"));
+    (
+        status,
+        serde_json::from_slice(&body_bytes).unwrap_or(Value::Null),
+    )
+}
+
+// AC: SM-02.3
+#[tokio::test]
+async fn with_credentials_enforced_a_wrong_token_gets_twilios_401() {
+    let (app_router, _) = build_test_app();
+    let mut twilio_input = read_provider_input(&app_router, "twilio").await;
+    twilio_input["check_credentials"] = json!(true);
+    let (edit_status, edited) = call_api(
+        &app_router,
+        "PATCH",
+        &format!("{PROVIDERS_PATH}/twilio"),
+        Some(&twilio_input),
+    )
+    .await;
+
+    let (wrong_status, wrong_answer) = send_twilio_with_token(&app_router, "wrong-token").await;
+    let (right_status, _) = send_twilio_with_token(&app_router, "twilio-test-token").await;
+
+    assert_eq!(edit_status, 200, "{edited}");
+    assert_eq!(wrong_status, 401);
+    assert_eq!(wrong_answer["code"], 20003);
+    assert_eq!(wrong_answer["status"], 401);
+    assert_eq!(right_status, 201);
 }
