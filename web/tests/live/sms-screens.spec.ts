@@ -201,9 +201,9 @@ test("SM-15.4 SM-15.5 a reply as recipient with a photo shows as MMS and reaches
   request,
   baseURL,
 }) => {
-  // Its own number per attempt: numbers stay registered on the shared binary across tests and retries.
+  // Its own numbers per attempt: numbers and threads stay on the shared binary across tests and retries.
   const mmsAppNumber = `+1555000778${test.info().retry}`;
-  const contactNumber = "+447700900777";
+  const contactNumber = `+44770090078${test.info().retry}`;
   const binPath = `live-mms-app-${test.info().retry + 1}`;
   const numberResponse = await request.post("/api/v1/numbers", {
     data: {
@@ -241,7 +241,7 @@ test("SM-15.4 SM-15.5 a reply as recipient with a photo shows as MMS and reaches
 
   const mmsBubble = page
     .locator(conversation)
-    .locator("[data-sms-direction='inbound']")
+    .getByRole("listitem")
     .filter({ hasText: "Here it is" });
   await expect(mmsBubble.getByRole("img", { name: "photo.png" })).toBeVisible();
   await expect(mmsBubble.getByText("MMS", { exact: true })).toBeVisible();
