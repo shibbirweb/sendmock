@@ -25,6 +25,7 @@ import {
 } from "./github-api";
 import {
   decidePublication,
+  decideDockerTags,
   findNextReleaseNumber,
   findReleaseBlockers,
   findVersionMismatches,
@@ -149,8 +150,13 @@ switch (command) {
   case "release-number":
     console.log(findNextReleaseNumber(readTagNames()));
     break;
+  case "docker-tags":
+    console.log(
+      decideDockerTags(firstArgument ?? "", secondArgument ?? "").join(" "),
+    );
+    break;
   default:
     fail(
-      "Usage: bun scripts/release/release.ts readiness|decide <workflow>|merged-pull-requests --since last-tag|last-stable|agreement <tag> <is-prerelease>|release-number",
+      "Usage: bun scripts/release/release.ts readiness|decide <workflow>|merged-pull-requests --since last-tag|last-stable|agreement <tag> <is-prerelease>|release-number|docker-tags <version> <channel>",
     );
 }

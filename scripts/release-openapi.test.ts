@@ -21,4 +21,19 @@ describe("Release build", () => {
     expect(copyIndex).toBeGreaterThan(-1);
     expect(uploadIndex).toBeGreaterThan(copyIndex);
   });
+
+  test("DS-03.2 the publish job attaches install.sh and install.ps1 to every release", () => {
+    const publishSteps = releaseWorkflow.jobs.publish.steps;
+    const copyIndex = publishSteps.findIndex((step) =>
+      step.run?.includes(
+        "cp scripts/install/install.sh scripts/install/install.ps1 dist/",
+      ),
+    );
+    const uploadIndex = publishSteps.findIndex((step) =>
+      step.run?.includes('gh release upload "$TAG_NAME" dist/*'),
+    );
+
+    expect(copyIndex).toBeGreaterThan(-1);
+    expect(uploadIndex).toBeGreaterThan(copyIndex);
+  });
 });

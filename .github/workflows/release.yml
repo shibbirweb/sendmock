@@ -74,11 +74,9 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          # beta: `beta` and the version; stable: `latest`, the version and major.minor.
-          if [ "$RELEASE_CHANNEL" = "beta" ]; then
-            echo "docker_tags=beta $version" >> "$GITHUB_OUTPUT"
-          else
-            echo "docker_tags=latest $version ${version%.*}" >> "$GITHUB_OUTPUT"
+          # beta: `beta` and the version; stable: `latest`, the version, major.minor and major (DS-02.4).
+          if [ "$RELEASE_CHANNEL" = "beta" ] || [ "$RELEASE_CHANNEL" = "stable" ]; then
+            echo "docker_tags=$(bun scripts/release/release.ts docker-tags "$version" "$RELEASE_CHANNEL")" >> "$GITHUB_OUTPUT"
           fi
 
   web-dist:
@@ -344,7 +342,9 @@ jobs:
         run: bun scripts/release/release.ts agreement "${{ inputs.tag_name }}" "${{ env.RELEASE_CHANNEL == 'beta' }}"
 
       - name: The API contract and the install scripts go with the binaries
-        run: cp docs/api/openapi.yaml scripts/install/install.sh scripts/install/install.ps1 dist/
+        run: |
+          cp docs/api/openapi.yaml dist/openapi.yaml
+          cp scripts/install/install.sh scripts/install/install.ps1 dist/
 
       - name: Upload the files and publish the release
         env:
@@ -383,6 +383,13 @@ jobs:
       commit_sha: ${{ inputs.commit_sha }}
       image_tags: ${{ needs.plan.outputs.docker_tags }}
       channel: ${{ inputs.channel }}
+
+  # The Docker page's examples against the image just pushed, as users run them (DS-02.6).
+  docker-examples:
+    needs: [plan, docker]
+    uses: ./.github/workflows/docker-examples.yml
+    with:
+      image: ghcr.io/shibbirweb/sendmock:${{ needs.plan.outputs.version }}
 
   # The formula in the tap, when the owner has set HOMEBREW_TAP_TOKEN (DS-03.1).
   homebrew:

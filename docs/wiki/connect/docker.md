@@ -228,6 +228,45 @@ Endpoints, rules, numbers and templates can come from a [seed file](../advanced/
    docker compose up -d sendmock
    ```
 
+## Load a config file and template files
+
+The image also reads `/config/sendmock.toml` (the [configuration file](../configuration.md)) and every template file in `/templates` (as `--templates-dir` does) when they are mounted.
+
+1. Mount them into the `sendmock` service:
+
+   ```yaml
+   sendmock:
+     image: ghcr.io/shibbirweb/sendmock
+     volumes:
+       - sendmock-data:/data
+       - ./sendmock.toml:/config/sendmock.toml:ro
+       - ./webhook-templates:/templates:ro
+   ```
+
+2. Restart the service:
+
+   ```bash
+   docker compose up -d sendmock
+   ```
+
+Template files are read again when they change, so you can edit them without a restart.
+
+## Look inside a running container
+
+The image has no shell, which keeps it small. Every tag has a `-debug` twin with the same SendMock on a base that has a shell (`/busybox/sh`), for looking around:
+
+1. Start the debug image:
+
+   ```bash
+   docker run -d --name sendmock-debug -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta-debug
+   ```
+
+2. Open a shell in it:
+
+   ```bash
+   docker exec -it sendmock-debug /busybox/sh
+   ```
+
 ## Protect the UI when ports are published
 
 Published ports can be reached from other machines on your network. Set a username and password for the web UI and API:

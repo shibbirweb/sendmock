@@ -1,8 +1,9 @@
 # The images: `edge` on every push to develop, and the release tags (`beta` and the version,
-# or `latest` and the version) when Release build calls it; for linux/amd64 and linux/arm64,
-# each built and tested on its own runner, then joined under the tags and signed
-# (docs/plan/09-distribution.md). Pull requests that change the image build and test it
-# without pushing.
+# or `latest`, the version, major.minor and major) when Release build calls it; for linux/amd64
+# and linux/arm64, each built and tested on its own runner, then joined under the tags, signed
+# and checked (docs/plan/09-distribution.md). Every tag has a `-debug` twin built on
+# distroless's debug base. Pull requests that change the image build and test it without
+# pushing.
 name: Docker edge
 
 on:
@@ -27,6 +28,7 @@ on:
       - .dockerignore
       - .github/workflows/docker-edge.yml
       - scripts/docker-image-test.sh
+      - scripts/docker-published-check.sh
 
 permissions:
   contents: read
@@ -45,7 +47,7 @@ env:
 
 jobs:
   image:
-    name: Image for ${{ matrix.platform }}
+    name: Image for ${{ matrix.platform }} (${{ matrix.variant }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -54,8 +56,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest }
-          - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm }
+          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest, variant: plain, build_target: "" }
+          - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm, variant: plain, build_target: "" }
+          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest, variant: debug, build_target: debug }
+          - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm, variant: debug, build_target: debug }
     steps:
       - uses: actions/checkout@v5
         with:
@@ -68,14 +72,15 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          target: ${{ matrix.build_target }}
           load: true
           tags: sendmock:test
           build-args: SENDMOCK_RELEASE_CHANNEL=${{ env.RELEASE_CHANNEL }}
           cache-from: type=gha,scope=${{ matrix.architecture }}
           cache-to: type=gha,mode=max,scope=${{ matrix.architecture }}
 
-      - name: Non-root, data in /data, healthy, the notice, a clean stop and the size
-        run: scripts/docker-image-test.sh sendmock:test
+      - name: Non-root, data in /data, healthy, the notice, mounted config and templates, a clean stop and the size
+        run: scripts/docker-image-test.sh sendmock:test ${{ matrix.variant }}
 
       - name: Log in to GHCR
         if: env.IS_PUBLISHING == 'true'
@@ -92,6 +97,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          target: ${{ matrix.build_target }}
           outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           build-args: SENDMOCK_RELEASE_CHANNEL=${{ env.RELEASE_CHANNEL }}
           sbom: true
@@ -109,12 +115,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: env.IS_PUBLISHING == 'true'
         with:
-          name: digest-${{ matrix.architecture }}
+          name: digest-${{ matrix.variant }}-${{ matrix.architecture }}
           path: ${{ runner.temp }}/digests/*
           retention-days: 1
 
   manifest:
-    name: Tag and sign it
+    name: Tag, sign and check it (${{ matrix.variant }})
     if: github.event_name == 'push' || inputs.image_tags != ''
     needs: image
     runs-on: ubuntu-latest
@@ -122,12 +128,21 @@ jobs:
       contents: read
       packages: write
       id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [plain, debug]
     env:
       HAS_DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN != '' }}
+      TAG_SUFFIX: ${{ matrix.variant == 'debug' && '-debug' || '' }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.commit_sha || github.sha }}
+
       - uses: actions/download-artifact@v4
         with:
-          pattern: digest-*
+          pattern: digest-${{ matrix.variant }}-*
           path: ${{ runner.temp }}/digests
           merge-multiple: true
 
@@ -151,16 +166,24 @@ jobs:
         run: |
           tags=()
           for image_tag in $IMAGE_TAGS; do
-            tags+=(-t "$GHCR_IMAGE:$image_tag")
-            if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then tags+=(-t "$DOCKERHUB_IMAGE:$image_tag"); fi
+            tags+=(-t "$GHCR_IMAGE:$image_tag$TAG_SUFFIX")
+            if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then tags+=(-t "$DOCKERHUB_IMAGE:$image_tag$TAG_SUFFIX"); fi
           done
           docker buildx imagetools create "${tags[@]}" $(printf "$GHCR_IMAGE@sha256:%s " *)
 
       - uses: sigstore/cosign-installer@v3
 
       - name: Sign it without a stored key (GitHub OIDC)
+        id: sign
         run: |
-          first_tag="${IMAGE_TAGS%% *}"
+          first_tag="${IMAGE_TAGS%% *}$TAG_SUFFIX"
           manifest_digest="$(docker buildx imagetools inspect "$GHCR_IMAGE:$first_tag" --format '{{json .Manifest}}' | jq -r .digest)"
+          echo "manifest_digest=$manifest_digest" >> "$GITHUB_OUTPUT"
           cosign sign --yes "$GHCR_IMAGE@$manifest_digest"
           if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then cosign sign --yes "$DOCKERHUB_IMAGE@$manifest_digest"; fi
+
+      # AC: DS-02.5
+      - name: Every tag is signed by this workflow, carries an SBOM and provenance, and is under 25 MB
+        env:
+          MANIFEST_DIGEST: ${{ steps.sign.outputs.manifest_digest }}
+        run: bash scripts/docker-published-check.sh "$GHCR_IMAGE" "$MANIFEST_DIGEST" "$IMAGE_TAGS" "$TAG_SUFFIX"

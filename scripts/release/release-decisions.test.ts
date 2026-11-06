@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
   decidePublication,
+  decideDockerTags,
   findNextReleaseNumber,
   findReleaseBlockers,
   findVersionMismatches,
@@ -112,5 +113,36 @@ describe("findNextReleaseNumber", () => {
     expect(
       findNextReleaseNumber(["v0.1.0-beta.1", "v0.1.0-beta.2", "beta"]),
     ).toBe(3);
+  });
+});
+
+describe("decideDockerTags", () => {
+  test("DS-02.4 a stable pushes latest, the version, major.minor and major", () => {
+    expect(decideDockerTags("1.4.2", "stable")).toEqual([
+      "latest",
+      "1.4.2",
+      "1.4",
+      "1",
+    ]);
+    expect(decideDockerTags("0.3.0", "stable")).toEqual([
+      "latest",
+      "0.3.0",
+      "0.3",
+      "0",
+    ]);
+  });
+
+  test("DS-02.4 a beta pushes beta and its version", () => {
+    expect(decideDockerTags("1.5.0-beta.2", "beta")).toEqual([
+      "beta",
+      "1.5.0-beta.2",
+    ]);
+  });
+
+  test("refuses a version that does not fit the channel", () => {
+    expect(() => decideDockerTags("1.5.0-beta.2", "stable")).toThrow();
+    expect(() => decideDockerTags("1.5.0", "beta")).toThrow();
+    expect(() => decideDockerTags("1.5.0", "dev")).toThrow();
+    expect(() => decideDockerTags("next", "stable")).toThrow();
   });
 });

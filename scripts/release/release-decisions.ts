@@ -99,3 +99,27 @@ export function findNextReleaseNumber(existingTagNames: string[]): number {
       .length + 1
   );
 }
+
+/**
+ * The image tags a release pushes (DS-02.4): a beta is `beta` and its version, a stable is
+ * `latest`, its version, `major.minor` and `major`. The workflow adds a `-debug` twin of each.
+ */
+export function decideDockerTags(version: string, channel: string): string[] {
+  const parsedVersion = parseVersion(version);
+  if (parsedVersion === null) {
+    throw new Error(`${version} is not a release version`);
+  }
+  if (channel === "beta") {
+    if (!isBeta(parsedVersion)) {
+      throw new Error(
+        `a beta release carries a -beta.N version, not ${version}`,
+      );
+    }
+    return ["beta", version];
+  }
+  if (channel !== "stable" || isBeta(parsedVersion)) {
+    throw new Error(`no image tags for ${version} on the ${channel} channel`);
+  }
+  const { major, minor } = parsedVersion;
+  return ["latest", version, `${major}.${minor}`, `${major}`];
+}

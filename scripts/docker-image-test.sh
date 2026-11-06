@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-# Checks a built SendMock image before it is pushed (DS-02.1, DS-02.2, DS-02.5): non-root,
-# data in /data, healthy once listening, the notice about listening without UI auth, a clean
-# stop on SIGTERM, and under 25 MB compressed.
+# Checks a built SendMock image before it is pushed (DS-02.1, DS-02.2, DS-02.3, DS-02.5):
+# non-root, data in /data, healthy once listening, the notice about listening without UI auth,
+# a clean stop on SIGTERM, a mounted /config/sendmock.toml, /config/sendmock.seed.toml and
+# /templates loaded, and under 25 MB compressed. The debug variant must have a shell; the plain
+# image must not.
 #
-#     scripts/docker-image-test.sh <image>
+#     scripts/docker-image-test.sh <image> [plain|debug]
 set -euo pipefail
 
 image="$1"
+variant="${2:-plain}"
 host_port=18025
+mounted_host_port=18026
 maximum_compressed_bytes=26214400
 
 fail() {
@@ -51,6 +55,49 @@ docker stop --time 15 "$container_id" > /dev/null
 exit_code="$(docker inspect --format '{{.State.ExitCode}}' "$container_id")"
 [ "$exit_code" = "0" ] || fail "SIGTERM stops it with exit code 0 (it exited $exit_code)"
 pass "SIGTERM (docker stop) stops it with exit code 0"
+
+# AC: DS-02.3
+mount_directory="$(mktemp -d)"
+mkdir -p "$mount_directory/config" "$mount_directory/templates"
+printf 'max_emails = 1234\n' > "$mount_directory/config/sendmock.toml"
+printf '# An empty seed file is a valid one.\n' > "$mount_directory/config/sendmock.seed.toml"
+cat > "$mount_directory/templates/shop-orders.toml" <<'TEMPLATE'
+id = "file.shop_orders"
+name = "Shop orders from a file"
+service = "Shop"
+events = ["email.received"]
+
+[request]
+method = "POST"
+content_type = "application/json"
+body = '{"subject": "{{ data.subject }}"}'
+TEMPLATE
+chmod -R a+rX "$mount_directory"
+mounted_container_id="$(docker run -d -p "127.0.0.1:$mounted_host_port:8025" \
+  -v "$mount_directory/config:/config:ro" -v "$mount_directory/templates:/templates:ro" "$image")"
+trap 'docker rm -f "$container_id" "$mounted_container_id" > /dev/null 2>&1 || true' EXIT
+mounted_url="http://127.0.0.1:$mounted_host_port/api/v1"
+for _ in $(seq 1 60); do
+  curl -fsS "$mounted_url/health" > /dev/null 2>&1 && break
+  sleep 1
+done
+curl -fsS "$mounted_url/settings" | grep -q '"max_emails":1234' || fail "the mounted /config/sendmock.toml is loaded: $(curl -sS "$mounted_url/settings")"
+pass "the mounted /config/sendmock.toml is loaded"
+curl -fsS "$mounted_url/seed/status" | grep -q '"source_path":"/config/sendmock.seed.toml"' || fail "the mounted /config/sendmock.seed.toml is applied: $(curl -sS "$mounted_url/seed/status")"
+pass "the mounted /config/sendmock.seed.toml is applied"
+curl -fsS "$mounted_url/webhooks/templates/file.shop_orders" | grep -q '"source":"file"' || fail "a template file mounted at /templates is loaded"
+pass "a template file mounted at /templates is loaded"
+docker rm -f "$mounted_container_id" > /dev/null
+
+if [ "$variant" = "debug" ]; then
+  docker run --rm --entrypoint /busybox/sh "$image" -c 'id -u' | grep -q '^10001$' || fail "the debug image has a shell and runs as UID 10001"
+  pass "the debug image has a busybox shell and runs as UID 10001"
+else
+  if docker run --rm --entrypoint /bin/sh "$image" -c true > /dev/null 2>&1; then
+    fail "the plain image has no shell"
+  fi
+  pass "the plain image has no shell"
+fi
 
 compressed_bytes="$(docker save "$image" | gzip -9 | wc -c | tr -d ' ')"
 [ "$compressed_bytes" -lt "$maximum_compressed_bytes" ] || fail "the image is under 25 MB compressed ($compressed_bytes bytes)"
