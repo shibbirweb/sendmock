@@ -253,6 +253,7 @@ async fn rename_vonage_and_remove_messagebird(app_router: &axum::Router) {
 
 // AC: PL-04.4
 // AC: SM-16.7
+// AC: WH-10.3
 #[tokio::test]
 async fn an_export_with_webhooks_and_an_edited_provider_reproduces_on_a_fresh_instance() {
     let first_app = build_seeded_app();
@@ -264,6 +265,14 @@ async fn an_export_with_webhooks_and_an_edited_provider_reproduces_on_a_fresh_in
     apply_seed(&fresh_app, &exported_seed).await;
 
     assert_eq!(export_seed(&fresh_app).await, exported_seed);
+    assert!(
+        exported_seed.contains("[[webhook.saved]]") && exported_seed.contains("Order shipped"),
+        "{exported_seed}"
+    );
+    assert_eq!(
+        items(&get(&fresh_app, "/api/v1/webhooks/saved").await)[0]["name"],
+        "Order shipped"
+    );
     assert!(
         exported_seed.contains("${VONAGE_API_SECRET_SECRET}"),
         "{exported_seed}"

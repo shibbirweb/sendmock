@@ -253,3 +253,84 @@ async fn the_preview_marks_which_recent_messages_would_match() {
     );
     assert_eq!(sms_only_preview["checked_count"], 0);
 }
+
+async fn preview_match_count(app_router: &axum::Router, event_type: &str, filter: Value) -> Value {
+    let (status, preview) = call_api(
+        app_router,
+        "POST",
+        &format!("{RULES_PATH}/preview"),
+        Some(&json!({ "events": [event_type], "filter": filter })),
+    )
+    .await;
+    assert_eq!(status, 200, "{preview}");
+    preview["match_count"].clone()
+}
+
+/// One email with every optional part, one plain email and one SMS.
+async fn store_messages_with_every_field(app_router: &axum::Router) {
+    let (_, full_email) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/send",
+        Some(&json!({
+            "from": "orders@shop.test", "to": ["sam@example.test"], "cc": ["manager@example.test"],
+            "subject": "Order 1042", "text": "Your parcel ships today",
+            "headers": { "X-Order-Id": "1042" },
+            "attachments": [{ "filename": "order.txt", "content": "MTA=", "content_type": "text/plain" }],
+        })),
+    )
+    .await;
+    let full_email_path = format!(
+        "/api/v1/emails/{}",
+        full_email["id"].as_str().unwrap_or_default()
+    );
+    call_api(
+        app_router,
+        "PATCH",
+        &full_email_path,
+        Some(&json!({ "tags": ["vip"] })),
+    )
+    .await;
+    send_email(app_router, "ann@example.com", "Newsletter").await;
+    let (sms_status, _) = call_api(
+        app_router,
+        "POST",
+        "/api/v1/sms",
+        Some(
+            &json!({ "from": "+15550001111", "to": "+8801700000000", "body": "Your code is 4821" }),
+        ),
+    )
+    .await;
+    assert_eq!(sms_status, 201);
+}
+
+// AC: WH-02.2
+#[tokio::test]
+async fn every_documented_email_and_sms_field_is_read_from_stored_messages() {
+    let (app_router, _) = build_test_app();
+    store_messages_with_every_field(&app_router).await;
+    let conditions = [
+        ("email.received", "from", "equals", "orders@shop.test"),
+        ("email.received", "to", "starts_with", "sam@"),
+        ("email.received", "cc", "matches", "*@example.test"),
+        ("email.received", "subject", "contains", "1042"),
+        ("email.received", "body", "regex", "ships (today|tomorrow)"),
+        ("email.received", "header:x-order-id", "equals", "1042"),
+        ("email.received", "has_attachment", "equals", "true"),
+        ("email.received", "tag", "equals", "vip"),
+        ("sms.sent", "from", "equals", "+15550001111"),
+        ("sms.sent", "to", "starts_with", "+880"),
+        ("sms.sent", "body", "contains", "4821"),
+        ("sms.sent", "status", "exists", ""),
+        ("sms.sent", "api", "equals", "native"),
+    ];
+
+    for (event_type, field, operator, value) in conditions {
+        let filter = json!({ "field": field, "operator": operator, "value": value });
+        assert_eq!(
+            preview_match_count(&app_router, event_type, filter).await,
+            1,
+            "{event_type} {field} {operator} {value}"
+        );
+    }
+}

@@ -29,3 +29,37 @@ pub async fn record_response(response: reqwest::Response) -> RecordedHttpRespons
         is_body_truncated,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn answer_with_body(body: Vec<u8>) -> reqwest::Response {
+        let http_answer = axum::http::Response::builder()
+            .status(502)
+            .header("content-type", "text/plain")
+            .body(body)
+            .unwrap_or_default();
+        reqwest::Response::from(http_answer)
+    }
+
+    // AC: WH-03.5
+    #[tokio::test]
+    async fn a_body_past_64_kb_is_cut_and_flagged() {
+        let recorded = record_response(answer_with_body(vec![b'x'; 70_000])).await;
+
+        assert_eq!(recorded.status_code, 502);
+        assert_eq!(recorded.headers["content-type"], "text/plain");
+        assert_eq!(recorded.body.len(), 65_536);
+        assert!(recorded.is_body_truncated);
+    }
+
+    // AC: WH-03.5
+    #[tokio::test]
+    async fn a_body_within_64_kb_is_kept_whole() {
+        let recorded = record_response(answer_with_body(b"Bad gateway".to_vec())).await;
+
+        assert_eq!(recorded.body, "Bad gateway");
+        assert!(!recorded.is_body_truncated);
+    }
+}
