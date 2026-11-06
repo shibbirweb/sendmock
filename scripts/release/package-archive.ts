@@ -17,6 +17,8 @@ import {
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
+import { readTarCommand } from "./archive-tool";
+
 const repositoryRoot = join(import.meta.dir, "../..");
 const includedFiles = ["LICENSE-MIT", "LICENSE-APACHE", "README.md"];
 
@@ -47,12 +49,12 @@ function main() {
   mkdirSync(outputDirectory, { recursive: true });
   const archiveName = archiveFileName(targetTriple);
   const archivePath = join(outputDirectory, archiveName);
-  // bsdtar (macOS, Windows) picks zip from the .zip name with -a; GNU tar on Linux makes the .tar.gz.
+  // bsdtar (macOS, Windows' tar.exe) picks zip from the .zip name with -a; GNU tar on Linux makes the .tar.gz.
   const tarArguments = archiveName.endsWith(".zip")
     ? ["-a", "-cf", archivePath]
     : ["-czf", archivePath];
   const tarResult = Bun.spawnSync([
-    "tar",
+    readTarCommand(),
     ...tarArguments,
     "-C",
     stagingDirectory,

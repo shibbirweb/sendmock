@@ -20,9 +20,10 @@ import {
   startSendmock,
   stopSendmock,
 } from "../binary-smoke-test";
+import { hasZipSignature, readTarCommand } from "./archive-tool";
 
 function runTar(tarArguments: string[]): string {
-  const tarResult = Bun.spawnSync(["tar", ...tarArguments]);
+  const tarResult = Bun.spawnSync([readTarCommand(), ...tarArguments]);
   if (tarResult.exitCode !== 0) {
     throw new Error(
       `tar ${tarArguments.join(" ")}: ${tarResult.stderr.toString()}`,
@@ -103,6 +104,12 @@ async function main() {
     ? "sendmock.exe"
     : "sendmock";
   checkChecksum(archivePath);
+  if (archivePath.endsWith(".zip")) {
+    check(
+      hasZipSignature(readFileSync(archivePath)),
+      "the archive is a real zip file, as Expand-Archive and Scoop need",
+    );
+  }
   checkLayout(archivePath, binaryName);
   const extractDirectory = mkdtempSync(join(tmpdir(), "sendmock-archive-"));
   runTar(["-xf", archivePath, "-C", extractDirectory]);

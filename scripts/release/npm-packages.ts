@@ -13,6 +13,8 @@ import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { readTarCommand } from "./archive-tool";
+
 const repository = {
   type: "git",
   url: "git+https://github.com/shibbirweb/sendmock.git",
@@ -123,7 +125,7 @@ function unpackBinary(
   const unpackCommand =
     isWindows && process.platform === "linux"
       ? ["unzip", "-q", "-o", archivePath, "-d", extractDirectory]
-      : ["tar", "-xf", archivePath, "-C", extractDirectory];
+      : [readTarCommand(), "-xf", archivePath, "-C", extractDirectory];
   const unpackResult = Bun.spawnSync(unpackCommand);
   if (unpackResult.exitCode !== 0) {
     throw new Error(
