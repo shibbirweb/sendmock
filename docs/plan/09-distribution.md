@@ -72,7 +72,7 @@ Each job runs the same test cases against the archive the release will publish, 
 8. Stopping it (`SIGTERM` on macOS and Linux, a console stop event on Windows) shuts down cleanly with exit code 0.
 9. The install script for the platform (`install.sh` on macOS and Linux, `install.ps1` on Windows) installs the stable and, with the beta option, the beta, and `sendmock` is on the `PATH` of a new shell.
 
-The test cases live in one script per shell (`scripts/release-tests/binary.sh` and `binary.ps1`) so every platform runs the same list, and the Docker image and package channels reuse cases 2 to 8 ([DS-03.6](acceptance/07-distribution-website.md#ds-03-package-managers-and-install-scripts)).
+The test cases live in one Bun script (`scripts/release/installed-binary-checks.ts`, changed on 2026-11-06 from one script per shell, since every test job already runs Bun) so every platform runs the same list, and the Docker image and package channels reuse cases 2 to 8 through `scripts/release/check-installed.ts` ([DS-03.6](acceptance/07-distribution-website.md#ds-03-package-managers-and-install-scripts)).
 
 ## Release channels
 

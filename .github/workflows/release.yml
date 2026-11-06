@@ -197,7 +197,8 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Checksum, layout, version, default listeners, API, UI and a clean stop
+      # AC: DS-01.2 DS-01.3 DS-01.4
+      - name: "Test cases 1 to 8: checksum and layout, version, listeners, health, UI, an email and an SMS, a restart, a clean stop"
         shell: bash
         run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
 

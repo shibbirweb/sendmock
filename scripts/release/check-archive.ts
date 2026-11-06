@@ -5,22 +5,17 @@
  *
  *     bun scripts/release/check-archive.ts <archive> <version> <channel>
  *
- * Checks the checksum and the layout, the version and channel, that the binary starts
- * with no runtime installed and listens on 127.0.0.1 only, the API and the embedded UI,
- * and a clean stop. Linux container checks (alpine, busybox) run in the workflow.
+ * Checks the checksum and the layout (case 1), then runs cases 2 to 8 on the unpacked binary
+ * (installed-binary-checks.ts). Linux container checks (alpine, busybox) run in the workflow.
  */
 
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
-import {
-  check,
-  checkRunningBinary,
-  startSendmock,
-  stopSendmock,
-} from "../binary-smoke-test";
+import { check } from "../binary-smoke-test";
 import { hasZipSignature, readTarCommand } from "./archive-tool";
+import { runInstalledBinaryChecks } from "./installed-binary-checks";
 
 function runTar(tarArguments: string[]): string {
   const tarResult = Bun.spawnSync([readTarCommand(), ...tarArguments]);
@@ -59,39 +54,6 @@ function checkLayout(archivePath: string, binaryName: string) {
   );
 }
 
-function checkVersion(
-  binaryPath: string,
-  expectedVersion: string,
-  expectedChannel: string,
-) {
-  const versionResult = Bun.spawnSync([binaryPath, "version", "--json"]);
-  const reportedVersion = JSON.parse(versionResult.stdout.toString()) as {
-    version: string;
-    channel: string;
-  };
-  check(
-    reportedVersion.version === expectedVersion &&
-      reportedVersion.channel === expectedChannel,
-    `sendmock version reports ${expectedVersion} (${expectedChannel})`,
-  );
-}
-
-async function checkDefaultListeners(binaryPath: string) {
-  const runningSendmock = await startSendmock(binaryPath, ["--db", "memory"]);
-  const exitCode = await stopSendmock(runningSendmock);
-  check(
-    runningSendmock.httpAddress === "127.0.0.1:8025",
-    "it listens on 127.0.0.1:8025 by default",
-  );
-  check(
-    runningSendmock.smtpAddress === "127.0.0.1:1025",
-    "it takes SMTP on 127.0.0.1:1025 by default",
-  );
-  if (process.platform !== "win32") {
-    check(exitCode === 0, "SIGTERM stops it with exit code 0");
-  }
-}
-
 async function main() {
   const [archivePath, expectedVersion, expectedChannel] = process.argv.slice(2);
   if (!archivePath || !expectedVersion || !expectedChannel) {
@@ -114,21 +76,7 @@ async function main() {
   const extractDirectory = mkdtempSync(join(tmpdir(), "sendmock-archive-"));
   runTar(["-xf", archivePath, "-C", extractDirectory]);
   const binaryPath = join(extractDirectory, binaryName);
-  checkVersion(binaryPath, expectedVersion, expectedChannel);
-  await checkDefaultListeners(binaryPath);
-  const runningSendmock = await startSendmock(binaryPath, [
-    "--http-addr",
-    "127.0.0.1:0",
-    "--smtp-addr",
-    "127.0.0.1:0",
-    "--db",
-    "memory",
-  ]);
-  try {
-    await checkRunningBinary(`http://${runningSendmock.httpAddress}`);
-  } finally {
-    await stopSendmock(runningSendmock);
-  }
+  await runInstalledBinaryChecks(binaryPath, expectedVersion, expectedChannel);
 }
 
 await main();

@@ -82,7 +82,50 @@ describe("Release build", () => {
     expect(releaseWorkflow.jobs.publish?.if).toBe("inputs.publish");
   });
 
-  test("tests each of the six targets on a runner of its own operating system and CPU", () => {
+  test("DS-01.1 builds macOS arm64 and x64, static Linux x64 and arm64, and Windows x64 and arm64", () => {
+    const builtTargets = (
+      releaseWorkflow.jobs.build?.strategy?.matrix?.include ?? []
+    ).map((entry) => entry.target);
+
+    expect(builtTargets.sort()).toEqual([
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-musl",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-musl",
+    ]);
+  });
+
+  test("DS-01.2 DS-01.3 DS-01.4 each archive runs test cases 1 to 8, Linux also in alpine and busybox, and SHA256SUMS is published", () => {
+    const testSteps =
+      (releaseWorkflow.jobs as Record<string, { steps?: { run?: string }[] }>)
+        .test?.steps ?? [];
+    const testRunText = testSteps.map((step) => step.run ?? "").join("\n");
+    const checksumRunText = (
+      (releaseWorkflow.jobs as Record<string, { steps?: { run?: string }[] }>)
+        .checksums?.steps ?? []
+    )
+      .map((step) => step.run ?? "")
+      .join("\n");
+    const linuxContainers = (
+      releaseWorkflow.jobs.test?.strategy?.matrix?.include ?? []
+    ).find((entry) => entry.target === "x86_64-unknown-linux-musl")?.containers;
+    const installedChecks = readFileSync(
+      join(import.meta.dir, "installed-binary-checks.ts"),
+      "utf8",
+    );
+
+    expect(testRunText).toContain("bun scripts/release/check-archive.ts");
+    expect(testRunText).toContain("/sendmock/sendmock version --json");
+    expect(linuxContainers).toBe("alpine:3.22 busybox:1.37");
+    expect(checksumRunText).toContain("SHA256SUMS");
+    for (const testCase of ["2.", "3.", "4.", "5.", "6.", "7.", "8."]) {
+      expect(installedChecks).toContain(`"${testCase} `);
+    }
+  });
+
+  test("DS-01.4 tests each of the six targets on a runner of its own operating system and CPU", () => {
     const testedTargets = Object.fromEntries(
       (releaseWorkflow.jobs.test?.strategy?.matrix?.include ?? []).map(
         (entry) => [entry.target, entry.runner],
@@ -146,7 +189,11 @@ describe("Docker edge", () => {
       "${{ needs.plan.outputs.docker_tags }}",
     );
     expect(releaseJobs.homebrew?.if).toBe(publishedChannelCondition);
-    expect(releaseJobs.checksums?.needs).toEqual(["test", "linux-packages"]);
+    expect(releaseJobs.checksums?.needs).toEqual([
+      "test",
+      "linux-packages",
+      "linux-community-packages",
+    ]);
     expect(releaseJobs.publish?.needs).toContain("smtp-clients");
   });
 
