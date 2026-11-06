@@ -313,6 +313,20 @@ jobs:
           docker run --rm -v "$PWD/packages:/packages:ro" fedora:42 \
             sh -c 'dnf install -y -q /packages/*.rpm > /dev/null && sendmock version --json'
 
+      - name: Our signed APT and YUM repository installs and upgrades sendmock with apt and dnf
+        env:
+          NFPM_ARCH: ${{ matrix.architecture }}
+          SENDMOCK_VERSION: "99.0.0"
+        run: |
+          sudo apt-get install -y -qq apt-utils createrepo-c > /dev/null
+          mkdir "$RUNNER_TEMP/packages-newer"
+          for packager in deb rpm; do
+            "$RUNNER_TEMP/nfpm" package --config packaging/nfpm.yaml --packager "$packager" --target "$RUNNER_TEMP/packages-newer/"
+          done
+          mkdir "$RUNNER_TEMP/packages-tested"
+          cp packages/*.deb packages/*.rpm "$RUNNER_TEMP/packages-tested/"
+          sh scripts/release-tests/package-repository-test.sh "$RUNNER_TEMP/packages-tested" "$RUNNER_TEMP/packages-newer"
+
       - uses: actions/upload-artifact@v4
         with:
           name: archive-packages-${{ matrix.architecture }}

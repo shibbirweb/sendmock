@@ -99,6 +99,82 @@ Prefer to download the binary yourself? Go to [Binaries](#binaries).
 
 Prefer to download the binary yourself? Go to [Binaries](#binaries).
 
+## apt (Debian and Ubuntu)
+
+Our signed repository keeps SendMock up to date with the rest of your system.
+
+1. Add the repository's signing key:
+
+   ```bash
+   sudo install -d -m 0755 /etc/apt/keyrings
+   ```
+
+   ```bash
+   curl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null
+   ```
+
+2. Add the repository.
+
+   Stable:
+
+   ```bash
+   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main" | sudo tee /etc/apt/sources.list.d/sendmock.list
+   ```
+
+   Beta:
+
+   ```bash
+   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main" | sudo tee /etc/apt/sources.list.d/sendmock.list
+   ```
+
+3. Install SendMock:
+
+   ```bash
+   sudo apt update
+   ```
+
+   ```bash
+   sudo apt install sendmock
+   ```
+
+4. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
+
+   ```bash
+   sendmock --version
+   ```
+
+`sudo apt upgrade` installs new releases. Each release also attaches the `.deb` file, for `sudo apt install ./sendmock_<version>_amd64.deb` without the repository.
+
+## dnf (Fedora, RHEL and similar)
+
+1. Add the repository.
+
+   Stable:
+
+   ```bash
+   sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-stable.repo
+   ```
+
+   Beta:
+
+   ```bash
+   sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-beta.repo
+   ```
+
+2. Install SendMock. The first time, dnf asks you to accept the repository's signing key:
+
+   ```bash
+   sudo dnf install sendmock
+   ```
+
+3. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
+
+   ```bash
+   sendmock --version
+   ```
+
+`sudo dnf upgrade` installs new releases. Each release also attaches the `.rpm` file, for `sudo dnf install ./sendmock-<version>.x86_64.rpm` without the repository.
+
 ## Scoop (Windows)
 
 1. Add the SendMock bucket:
