@@ -41,7 +41,7 @@ Config precedence: flags > `SENDMOCK_*` env vars > `sendmock.toml` (current dir,
 | Windows | x64 | `x86_64-pc-windows-msvc` | |
 | Windows | arm64 | `aarch64-pc-windows-msvc` | |
 
-Cross-compilation via `cargo-zigbuild` for Linux targets and native GitHub Actions runners for macOS and Windows. Everything uses rustls (no OpenSSL) and bundled SQLite, so there are no system library dependencies.
+Static Linux binaries built natively in the `rust:1.98-alpine` image on x64 and arm64 runners (the same build as the Docker image; `cargo-zigbuild` cross builds idled about 10 MB higher, over the memory budget), and native GitHub Actions runners for macOS and Windows. Everything uses rustls (no OpenSSL) and bundled SQLite, so there are no system library dependencies.
 
 ### Release archives
 

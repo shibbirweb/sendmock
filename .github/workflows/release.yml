@@ -111,8 +111,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
-          - { target: aarch64-unknown-linux-musl, runner: ubuntu-latest, cross: zigbuild }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: alpine }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, cross: alpine }
           - { target: aarch64-apple-darwin, runner: macos-latest, cross: cargo }
           - { target: x86_64-apple-darwin, runner: macos-latest, cross: cargo }
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
@@ -136,26 +136,34 @@ jobs:
         with:
           key: ${{ matrix.target }}
 
-      - name: Zig for static Linux builds
-        if: matrix.cross == 'zigbuild'
-        uses: mlugg/setup-zig@v2
-
-      - uses: taiki-e/install-action@v2
-        if: matrix.cross == 'zigbuild'
-        with:
-          tool: cargo-zigbuild
-
       - uses: oven-sh/setup-bun@v2
 
       - name: Build
         shell: bash
         env:
           SENDMOCK_RELEASE_CHANNEL: ${{ env.RELEASE_CHANNEL }}
+          BUILD_TARGET: ${{ matrix.target }}
+        # The static Linux binaries are built natively on Alpine, like the Docker image: built
+        # with cargo-zigbuild they idled with about 10 MB more heap, over the memory budget. The
+        # image's own toolchain builds them; the one rust-toolchain.toml names would be downloaded.
         run: |
-          if [ "${{ matrix.cross }}" = "zigbuild" ]; then
-            cargo zigbuild --release --locked -p sendmock --target ${{ matrix.target }}
+          if [ "${{ matrix.cross }}" = "alpine" ]; then
+            mkdir -p "$HOME/.cargo/registry" "$HOME/.cargo/git"
+            docker run --rm \
+              --volume "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
+              --workdir "$GITHUB_WORKSPACE" \
+              --volume "$HOME/.cargo/registry:/usr/local/cargo/registry" \
+              --volume "$HOME/.cargo/git:/usr/local/cargo/git" \
+              --env SENDMOCK_RELEASE_CHANNEL \
+              --env BUILD_TARGET \
+              --env HOST_OWNER="$(id -u):$(id -g)" \
+              rust:1.98-alpine \
+              sh -euc 'apk add --no-cache gcc musl-dev
+                export RUSTUP_TOOLCHAIN="$(rustup default | cut -d " " -f 1)"
+                cargo build --release --locked -p sendmock --target "$BUILD_TARGET"
+                chown -R "$HOST_OWNER" target /usr/local/cargo/registry /usr/local/cargo/git'
           else
-            cargo build --release --locked -p sendmock --target ${{ matrix.target }}
+            cargo build --release --locked -p sendmock --target "$BUILD_TARGET"
           fi
 
       - name: Pack the archive and its checksum
@@ -339,8 +347,7 @@ jobs:
           tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C "$RUNNER_TEMP/budget-binary"
           bun scripts/performance-budget.ts "$RUNNER_TEMP/budget-binary/sendmock"
 
-      # Diagnostic: the same memory report on the other zigbuild musl binary, to tell whether its
-      # higher idle heap comes from how it is built (plan 30, idle memory note); never fails.
+      # The same report on the arm64 musl binary, which has no budget of its own; never fails.
       - name: Idle memory breakdown (arm64 musl, report only)
         if: matrix.target == 'aarch64-unknown-linux-musl'
         continue-on-error: true
