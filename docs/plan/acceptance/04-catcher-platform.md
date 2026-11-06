@@ -117,5 +117,6 @@ Phase 1.
 Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 - [ ] PL-09.1 `sendmock serve --demo` (or `SENDMOCK_DEMO=1`) on an empty instance loads the website demo's sample data: emails, SMS conversations, verifications, webhook endpoints, rules and deliveries, HTTP bins with requests, and payments, each made through the same operation real traffic uses.
-- [ ] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data (events fire, search finds it, reset clears it unless a seed file holds it).
+- [ ] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data: events fire and rules queue deliveries, search finds it, and reset clears its traffic and treats its endpoints, rules and bins as any other configuration (kept without a seed file).
+  - Changed 2026-11-06 while building W8: the first wording said reset clears the demo data unless a seed file holds it, but reset without a seed file keeps all configuration (PL-04), so the demo's endpoints, rules and bins follow that rule like configuration made by hand.
 - [ ] PL-09.3 With data already stored, `--demo` loads nothing and says so in the log; the data file the binary embeds matches the mock's fixtures, checked by a test.

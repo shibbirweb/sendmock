@@ -5,6 +5,7 @@ mod catcher_listener;
 mod cli_arguments;
 mod client_command;
 mod config;
+mod demo_startup;
 mod email_network_clients;
 mod github_release_source;
 mod help_output;

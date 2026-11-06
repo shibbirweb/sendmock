@@ -3,6 +3,7 @@
 pub mod ai;
 mod bkash;
 mod custom_gateways;
+mod demo;
 mod email;
 mod events;
 mod http_catcher;
@@ -48,6 +49,7 @@ mod updates;
 mod verify;
 mod webhooks;
 
+pub use demo::{DemoDataError, DemoLoadOutcome, load_demo_data};
 pub use email::{
     EmailAddress, EmailAttachment, EmailDetail, EmailNetworkClients, EmailRelay, EmailSummary,
     ExtractedData, LinkChecker, LinkProbe, RelayMessage, SpamChecker, SpamdReport, SpamdRule,

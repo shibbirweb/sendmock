@@ -1,7 +1,7 @@
 /**
  * Writes the shipped email and SMS provider definitions, webhook templates and the
  * template reference (field descriptions, functions, filters), and the payment
- * flows, methods, step types and label variables to
+ * flows, methods, step types and label variables, and the demo data, to
  * crates/sendmock-ops/builtin/ (and the payment event names the `payment_event`
  * filter reads to crates/sendmock-core/), where the binary embeds them, so the mock and
  * the runtime answer from one source (docs/plan/22-configurable-providers.md).
@@ -18,6 +18,7 @@ import {
 import { flowLabelVariables } from "../src/lib/payments/flow-label-variables";
 import { paymentProviderEventNames } from "../src/lib/payments/payment-provider-event-names";
 import { paymentStepCatalogue } from "../src/lib/payments/payment-step-catalogue";
+import { buildDemoSteps } from "../src/mocks/demo/build-demo-steps";
 import { buildBuiltinEmailProviders } from "../src/mocks/fixtures/email-provider-fixtures";
 import { buildBuiltinPaymentFlows } from "../src/mocks/fixtures/payment-flow-fixtures";
 import { buildBuiltinPaymentGateways } from "../src/mocks/fixtures/payment-gateway-fixtures";
@@ -110,6 +111,11 @@ export function buildBuiltinDefinitionFiles(): {
     {
       filePath: join(coreTemplateDirectory, "payment-event-names.json"),
       content: `${JSON.stringify(paymentProviderEventNames, null, 2)}\n`,
+    },
+    {
+      // What `sendmock --demo` loads into a fresh instance (PL-09).
+      filePath: join(builtinDirectory, "demo-data.json"),
+      content: `${JSON.stringify({ steps: buildDemoSteps() }, null, 2)}\n`,
     },
     {
       filePath: join(builtinDirectory, "http-bin-presets.json"),

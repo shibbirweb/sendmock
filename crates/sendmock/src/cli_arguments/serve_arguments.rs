@@ -113,6 +113,10 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_READY_JSON")]
     pub ready_json: bool,
 
+    /// Fill an empty instance with the website demo's sample data (emails, SMS, webhooks, catcher bins, payments)
+    #[arg(long, env = "SENDMOCK_DEMO")]
+    pub demo: bool,
+
     /// Protect the UI, API, realtime streams and MCP over HTTP: `user:password`, or `file:<path>` with `user:password` lines
     #[arg(
         long,

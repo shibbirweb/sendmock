@@ -28,6 +28,10 @@ Secrets are never written to an export in plain text.
 
 `--catcher-addr 127.0.0.1:8030` (or `SENDMOCK_CATCHER_ADDR`, or `catcher_addr` in `sendmock.toml`) starts a port where every request is captured by the HTTP catcher, at any path, the first path segment naming the bin. It is off unless set. See [Catch every path on its own port](./http/index.md#catch-every-path-on-its-own-port).
 
+## Sample data: `--demo`
+
+`sendmock --demo` (or `SENDMOCK_DEMO=1`) fills an empty instance at startup with the sample data of the [live demo](/demo/): emails, SMS conversations, a verification, webhook endpoints and rules, HTTP catcher bins and payments. Each item goes through the same API call your app or the UI would make, so events fire and rules deliver; the demo's endpoints post to SendMock's own catcher, so nothing leaves your machine. When the instance already holds data, `--demo` adds nothing and says so in the log.
+
 ## Template files: `--templates-dir`
 
 Keep webhook templates in your repository as files. Point `--templates-dir` (or `SENDMOCK_TEMPLATES_DIR`) at a folder of `.toml` template files, in the format **Export** writes from Webhooks > Templates. SendMock loads them at startup and again within two seconds whenever a file is added, changed or removed. They show in the gallery as **File** templates, and endpoints can use them like any other; to change one, edit its file (SendMock refuses edits and deletes with `409`). A file without an `id` gets `file.<file name>`; a file that does not parse is skipped and named in the log.

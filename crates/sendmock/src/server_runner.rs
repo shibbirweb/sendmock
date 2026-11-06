@@ -15,6 +15,7 @@ use tokio::task::JoinSet;
 
 use crate::catcher_listener::start_catcher_listener;
 use crate::config::ServerConfig;
+use crate::demo_startup::load_demo_data_at_startup;
 use crate::email_network_clients::with_email_network_clients;
 use crate::http_call_sender::{HttpCallSender, REPLY_WEBHOOK_TIMEOUT, STATUS_CALLBACK_TIMEOUT};
 use crate::http_media_fetcher::HttpMediaFetcher;
@@ -89,12 +90,13 @@ pub async fn run_server(
     }
     apply_startup_settings(server_config, &operation_context).await;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
-    spawn_background_tasks(
+    start_background_work(
         &mut background_tasks,
         &operation_context,
         &shutdown_receiver_for_tasks,
-        server_config.templates_directory.as_deref(),
-    );
+        server_config,
+    )
+    .await;
     announce_ready(server_config, &listeners.addresses, &operation_context);
     let http_shutdown = async move {
         shutdown_signal.wait().await;
@@ -187,6 +189,24 @@ fn build_http_router(
     )
     .nest_service(MCP_HTTP_PATH, mcp_http_service);
     apply_access_control(app_router, server_config.access_control.clone())
+}
+
+/// The background tasks, then `--demo`'s sample data, so the rule subscriber sees its events.
+async fn start_background_work(
+    background_tasks: &mut JoinSet<()>,
+    operation_context: &OperationContext,
+    shutdown_receiver: &watch::Receiver<bool>,
+    server_config: &ServerConfig,
+) {
+    spawn_background_tasks(
+        background_tasks,
+        operation_context,
+        shutdown_receiver,
+        server_config.templates_directory.as_deref(),
+    );
+    if server_config.loads_demo_data {
+        load_demo_data_at_startup(operation_context).await;
+    }
 }
 
 /// The update check, the retention trim, the webhook dispatcher and the `--templates-dir`

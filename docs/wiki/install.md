@@ -522,3 +522,5 @@ After installing with Homebrew, an install script or a binary:
    ```
 
 4. Point your app's SMTP settings at host `127.0.0.1`, port `1025`. [Connect your app](./connect/index.md) has the settings for each language.
+
+To look around before your app sends anything, start it with sample data instead: `sendmock --demo` fills an empty instance with the emails, SMS, webhooks, catcher bins and payments the [live demo](/demo/) shows. An instance that already holds data is left as it is.

@@ -40,6 +40,8 @@ pub struct ServerConfig {
     pub config_file_path: Option<PathBuf>,
     /// `--ready-json`: the ready line on stdout, logs on stderr.
     pub prints_ready_json: bool,
+    /// `--demo`: load the demo data into an empty instance at startup.
+    pub loads_demo_data: bool,
 }
 
 impl ServerConfig {
@@ -115,6 +117,7 @@ impl ServerConfig {
             templates_directory: serve_arguments.templates_directory.clone(),
             config_file_path,
             prints_ready_json: serve_arguments.ready_json,
+            loads_demo_data: serve_arguments.demo,
         })
     }
 

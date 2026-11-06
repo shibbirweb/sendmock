@@ -3,7 +3,7 @@
 mod scenario_file;
 mod scenario_operations;
 mod scenario_runner;
-mod scenario_values;
+pub(crate) mod scenario_values;
 mod scenario_wire;
 
 pub use scenario_operations::{RunScenarioOperation, ValidateScenarioOperation};
