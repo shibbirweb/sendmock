@@ -1,6 +1,7 @@
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::process::{Child, Command, Output, Stdio};
+use std::sync::Mutex;
 use std::sync::mpsc::{self, Receiver};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -35,6 +36,8 @@ pub struct ReadyAddresses {
 pub struct SendmockProcess {
     child: Child,
     stdout_lines: Receiver<String>,
+    /// Lines already taken from `stdout_lines`, kept so a test can read the whole output.
+    read_lines: Mutex<Vec<String>>,
 }
 
 impl SendmockProcess {
@@ -71,6 +74,7 @@ impl SendmockProcess {
         Ok(Self {
             child,
             stdout_lines,
+            read_lines: Mutex::new(Vec::new()),
         })
     }
 
@@ -105,12 +109,33 @@ impl SendmockProcess {
         let deadline = Instant::now() + STARTUP_TIMEOUT;
         while let Some(time_left) = deadline.checked_duration_since(Instant::now()) {
             match self.stdout_lines.recv_timeout(time_left) {
-                Ok(line) if line.contains(expected_text) => return line,
-                Ok(_) => {}
+                Ok(line) => {
+                    self.keep_read_line(line.clone());
+                    if line.contains(expected_text) {
+                        return line;
+                    }
+                }
                 Err(_) => break,
             }
         }
         panic!("sendmock never printed a line with {expected_text:?}");
+    }
+
+    /// Everything the server printed so far, waiting until it has been quiet for `quiet_period`.
+    pub fn read_printed_lines(&self, quiet_period: Duration) -> Vec<String> {
+        while let Ok(line) = self.stdout_lines.recv_timeout(quiet_period) {
+            self.keep_read_line(line);
+        }
+        self.read_lines
+            .lock()
+            .map(|read_lines| read_lines.clone())
+            .unwrap_or_default()
+    }
+
+    fn keep_read_line(&self, line: String) {
+        if let Ok(mut read_lines) = self.read_lines.lock() {
+            read_lines.push(line);
+        }
     }
 
     #[cfg(unix)]
