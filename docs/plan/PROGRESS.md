@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 56 / 108 accepted (AI-03, AI-04, AI-05, AI-06, DS-06, EM-01, EM-02, EM-06, EM-08 to EM-15, EM-17, EM-18, HC-02, HC-03, PL-01, PL-02, PY-01 to PY-12, SM-01, SM-03 to SM-06, SM-08 to SM-11, SM-13, SM-14, SM-16, UI-12, VF-02 to VF-04, WH-06 to WH-09, WH-12, WS-05), 360 / 499 criteria ticked; `bun scripts/acceptance.ts` prints the rest |
+| **Feature acceptance** | 57 / 109 accepted (AI-03, AI-04, AI-06, DS-06, EM-01, EM-02, EM-06, EM-08 to EM-15, EM-17, EM-18, HC-01, HC-02, HC-03, PL-01, PL-02, PL-09, PY-01 to PY-12, SM-01, SM-03 to SM-06, SM-08 to SM-11, SM-13, SM-14, SM-16, UI-12, VF-02 to VF-04, WH-06 to WH-09, WH-12, WS-05), 369 / 505 criteria ticked; `bun scripts/acceptance.ts` prints the rest |
 
 **Next up:**
 
@@ -343,9 +343,9 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper
 - [ ] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6)
 - [ ] Testcontainers modules (published by each release from W3b; ticked when the first release publishes them)
-- [ ] Remaining catcher presets and catch-all port (the presets already ship; the port is W6)
+- [x] Remaining catcher presets and catch-all port (the presets already ship; the port is W6, HC-01 accepted) (#48)
 - [ ] Performance and size budgets enforced in CI
-- [ ] `sendmock --demo`
+- [x] `sendmock --demo` (PL-09 accepted) (#48)
 - [ ] Claude Code plugin, MCP registry listing, skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
 - [ ] Deeper docs: a page per screen explaining every control and text (what it does, what it changes or sends, where its text comes from, how it links, CLI/API/MCP, errors), kept true by a Playwright crawl ([19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started), WS-10); written screen by screen as each live mode lands

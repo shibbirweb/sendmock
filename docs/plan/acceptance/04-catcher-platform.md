@@ -9,7 +9,7 @@ UI in U2, backend Phase 4.
 - [x] HC-01.1 Any method and path under `/catch/<bin>/...` is captured with method, URL, query, headers, body and timing; the bin is created on first use. (#48)
 - [x] HC-01.2 JSON, form and multipart bodies are parsed and shown pretty; uploaded files are downloadable. (#48)
 - [x] HC-01.3 `http.captured` fires and the request appears in the UI live. (#48)
-- [ ] HC-01.4 The optional catch-all port captures requests at any path.
+- [x] HC-01.4 The optional catch-all port captures requests at any path. (#48)
 - [x] HC-01.5 "Forward to URL" resends a captured request; "Copy as cURL" reproduces it. (#48)
 - [x] HC-01.6 The HTTP screen lists bins with preset, request count and last request, and a bin's requests newest first (method, path, status returned, time); a bin can be added from a preset, its catch URL copied, its requests cleared and the bin deleted. (#48)
 - [x] HC-01.7 The request detail shows the full URL, headers, query, the body pretty or raw, uploaded files to download, and the response sent with the rule that produced it; "Send to webhook" sends the captured request to an endpoint. (#48)
@@ -116,7 +116,7 @@ Phase 1.
 
 Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
-- [ ] PL-09.1 `sendmock serve --demo` (or `SENDMOCK_DEMO=1`) on an empty instance loads the website demo's sample data: emails, SMS conversations, verifications, webhook endpoints, rules and deliveries, HTTP bins with requests, and payments, each made through the same operation real traffic uses.
-- [ ] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data: events fire and rules queue deliveries, search finds it, and reset clears its traffic and treats its endpoints, rules and bins as any other configuration (kept without a seed file).
+- [x] PL-09.1 `sendmock serve --demo` (or `SENDMOCK_DEMO=1`) on an empty instance loads the website demo's sample data: emails, SMS conversations, verifications, webhook endpoints, rules and deliveries, HTTP bins with requests, and payments, each made through the same operation real traffic uses. (#48)
+- [x] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data: events fire and rules queue deliveries, search finds it, and reset clears its traffic and treats its endpoints, rules and bins as any other configuration (kept without a seed file). (#48)
   - Changed 2026-11-06 while building W8: the first wording said reset clears the demo data unless a seed file holds it, but reset without a seed file keeps all configuration (PL-04), so the demo's endpoints, rules and bins follow that rule like configuration made by hand.
-- [ ] PL-09.3 With data already stored, `--demo` loads nothing and says so in the log; the data file the binary embeds matches the mock's fixtures, checked by a test.
+- [x] PL-09.3 With data already stored, `--demo` loads nothing and says so in the log; the data file the binary embeds matches the mock's fixtures, checked by a test. (#48)

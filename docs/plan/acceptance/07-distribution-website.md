@@ -10,7 +10,7 @@ Phase 0 (build), Phase 5 (all targets).
 - [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
 - [ ] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release.
 - [ ] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)).
-- [ ] DS-01.5 On each platform the install page's steps work as written: the unpack commands, the `PATH` step and the platform's install script (stable and beta) leave a working `sendmock` on the `PATH` of a new shell.
+- [x] DS-01.5 On each platform the install page's steps work as written: the unpack commands, the `PATH` step and the platform's install script (stable and beta) leave a working `sendmock` on the `PATH` of a new shell. (#48)
 
 ## DS-02 Docker image
 
@@ -18,8 +18,8 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 - [x] DS-02.1 The image runs on `linux/amd64` and `linux/arm64` as a non-root user, with data in `/data`. (#48)
 - [x] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully. (#48)
-- [ ] DS-02.3 Mounted `/config/sendmock.toml`, `/config/sendmock.seed.toml` and `/templates` are loaded.
-- [ ] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`.
+- [x] DS-02.3 Mounted `/config/sendmock.toml`, `/config/sendmock.seed.toml` and `/templates` are loaded. (#48)
+- [x] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`. (#48)
 - [ ] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB.
 - [ ] DS-02.6 The Compose example and the GitHub Actions service-container example work as documented.
 
@@ -28,9 +28,9 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs). Official distribution repositories are later and have no criteria yet ([09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27)).
 
 - [ ] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
-- [ ] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums.
+- [x] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums. (#48)
 - [ ] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally.
-- [ ] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary.
+- [x] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary. (#48)
 - [ ] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary.
 - [ ] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow.
 
