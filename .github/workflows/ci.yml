@@ -292,11 +292,64 @@ jobs:
           path: web/playwright-report
           retention-days: 7
 
+  # The Claude Code plugin installs from this repository's marketplace with the skill the
+  # binary serves and the MCP server (AI-05.5). No API key is needed to validate or install.
+  claude-plugin:
+    name: Claude Code plugin
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_VERSION: 2.1.318
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: The plugin's skill is the repository's skill
+        run: bun scripts/plugin-skill.ts check
+
+      - name: Install Claude Code and SendMock
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash -s "$CLAUDE_CODE_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          chmod +x sendmock-binary/sendmock
+          echo "$GITHUB_WORKSPACE/sendmock-binary" >> "$GITHUB_PATH"
+
+      - name: The plugin and the marketplace pass claude plugin validate
+        run: |
+          claude --version
+          claude plugin validate plugin --strict
+          claude plugin validate . --strict
+
+      - name: Install the plugin from the repository's marketplace
+        run: |
+          claude plugin marketplace add "$GITHUB_WORKSPACE"
+          claude plugin install sendmock@sendmock
+          claude plugin details sendmock
+          claude plugin list --json > plugin-list.json
+
+      - name: The installed plugin has this version, the MCP server and the binary's skill
+        run: |
+          sendmock serve --db memory > sendmock.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if sendmock health > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+          sendmock ai skill --output skill-from-binary.md
+          bun scripts/plugin-installed-check.ts plugin-list.json skill-from-binary.md
+
   # One check for the rulesets to require, whatever the number of operating systems.
   rust-result:
     name: Rust
     if: always()
-    needs: [rust, rust-coverage, binary-smoke, web-live]
+    needs: [rust, rust-coverage, binary-smoke, web-live, claude-plugin]
     runs-on: ubuntu-latest
     steps:
       - name: Every Rust job passed
@@ -305,6 +358,7 @@ jobs:
           test "${{ needs.rust-coverage.result }}" = "success"
           test "${{ needs.binary-smoke.result }}" = "success"
           test "${{ needs.web-live.result }}" = "success"
+          test "${{ needs.claude-plugin.result }}" = "success"
 
   acceptance:
     name: Acceptance traceability

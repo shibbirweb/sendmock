@@ -8,14 +8,22 @@ const packageManifestPaths = [
   "web/package.json",
   "website/package.json",
   "testcontainers/node/package.json",
+  "plugin/.claude-plugin/plugin.json",
 ];
 
+/** The version line in the plugin's copy of the skill, as `sendmock ai skill` renders it. */
+export const pluginSkillVersionPattern = /(Written for SendMock )(\S+?)(\. )/;
+
 /**
- * Other files that carry the version, each with the pattern around it: the Testcontainers
- * modules' versions and their default image tags, which name the SendMock they were released
- * with (Go's version is its tag).
+ * Other files that carry the version, each with the pattern around it: the plugin's copy of
+ * the skill, the Testcontainers modules' versions and their default image tags, which name the
+ * SendMock they were released with (Go's version is its tag).
  */
 const textVersionFiles = [
+  {
+    filePath: "plugin/skills/sendmock/SKILL.md",
+    pattern: pluginSkillVersionPattern,
+  },
   {
     filePath: "testcontainers/python/pyproject.toml",
     pattern: /(\[project\][^[]*?\nversion = ")([^"]+)(")/,

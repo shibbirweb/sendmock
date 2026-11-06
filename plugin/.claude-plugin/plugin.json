@@ -1,0 +1,21 @@
+{
+  "name": "sendmock",
+  "version": "0.0.0",
+  "displayName": "SendMock",
+  "description": "Test and debug email, SMS, payments, HTTP calls and webhooks locally: the SendMock skill and its MCP server.",
+  "author": {
+    "name": "MD. Shibbir Ahmed",
+    "url": "https://github.com/shibbirweb"
+  },
+  "homepage": "https://shibbirweb.github.io/sendmock/",
+  "repository": "https://github.com/shibbirweb/sendmock",
+  "license": "MIT OR Apache-2.0",
+  "keywords": [
+    "email",
+    "sms",
+    "webhooks",
+    "payments",
+    "testing",
+    "mcp"
+  ]
+}

@@ -3,7 +3,7 @@ title: AI
 description: Let coding agents set up, test and extend SendMock through MCP and the CLI. Setup, what an agent can do, and the safety rules.
 ---
 
-> MCP tools and CLI commands arrive with each backend phase (email in Phase 1, SMS in Phase 2, webhooks in Phase 3, payments in Phase 3P). The agent skill, the built-in prompts and `sendmock ai install` arrive in Phase 4.
+> MCP tools and CLI commands arrive with each backend phase (email in Phase 1, SMS in Phase 2, webhooks in Phase 3, payments in Phase 3P). The agent skill, the built-in prompts and `sendmock ai install` arrive in Phase 4, the Claude Code plugin in Phase 5.
 
 Every SendMock feature is an operation that the UI, the REST API, the CLI and the MCP server all share. So anything you can click, an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, VS Code agents and others) can do too, with the same checks: create a gateway, compose a flow, write a template, add a rule, read an OTP, replay a delivery.
 
@@ -24,6 +24,24 @@ sendmock ai install --target claude-code     # or codex, cursor, gemini, vscode
 ```
 
 It registers the MCP server with your agent and installs the agent skill (or an instructions section for agents without skills). It shows what it will change and asks first; `--scope project` writes to the repository instead of your user settings. `--target print` prints the snippets for any other agent.
+
+### Claude Code plugin
+
+In Claude Code you can install the SendMock plugin instead. It carries the agent skill and registers the MCP server, and Claude Code updates it with each SendMock release. The MCP server runs `sendmock mcp`, so SendMock itself must be installed and on your `PATH`.
+
+1. Add SendMock's plugin marketplace:
+
+   ```text
+   /plugin marketplace add shibbirweb/sendmock
+   ```
+
+2. Install the plugin:
+
+   ```text
+   /plugin install sendmock@sendmock
+   ```
+
+### Any other agent
 
 Or register the MCP server yourself: the command is `sendmock mcp` (stdio). The running server also serves MCP over HTTP at `http://127.0.0.1:8025/mcp`.
 
