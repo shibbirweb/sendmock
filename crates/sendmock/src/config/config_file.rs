@@ -16,6 +16,7 @@ pub struct ConfigFile {
     pub smtp_addr: Option<SocketAddr>,
     pub smtps_addr: Option<SocketAddr>,
     pub provider_addr: Option<SocketAddr>,
+    pub catcher_addr: Option<SocketAddr>,
     /// `{ twilio = 8027 }`: providers with their own port.
     pub provider_ports: Option<BTreeMap<String, u16>>,
     pub smtp_max_size: Option<String>,

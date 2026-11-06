@@ -1,5 +1,6 @@
 //! `/catch/<bin>/...`: every method is captured in the bin and answered with its reply
-//! (HC-01.1).
+//! (HC-01.1). The catch-all port does the same at any path, the first segment naming the bin
+//! (HC-01.4).
 
 use std::collections::BTreeMap;
 use std::net::SocketAddr;
@@ -23,9 +24,44 @@ pub fn build_catch_router(operation_context: &OperationContext) -> Router {
         .with_state(operation_context.clone())
 }
 
+/// The router of `--catcher-addr`: every request, at any method and path, is captured.
+pub fn build_catch_all_router(operation_context: &OperationContext) -> Router {
+    Router::new()
+        .fallback(capture_request_at_any_path)
+        .with_state(operation_context.clone())
+}
+
+/// On the catch-all port the first path segment names the bin, so `/orders/new` is
+/// `/catch/orders/new` and `/` is the `default` bin.
+fn to_catch_path(request_path: &str) -> String {
+    let path_after_slash = request_path.trim_start_matches('/');
+    if path_after_slash.is_empty() {
+        return "/catch/default".to_owned();
+    }
+    format!("/catch/{path_after_slash}")
+}
+
+async fn capture_request_at_any_path(
+    State(operation_context): State<OperationContext>,
+    request: Request,
+) -> Response {
+    let catch_path = to_catch_path(request.uri().path());
+    capture_into_bin(operation_context, request, catch_path).await
+}
+
 async fn capture_request(
     State(operation_context): State<OperationContext>,
     request: Request,
+) -> Response {
+    let catch_path = request.uri().path().to_owned();
+    capture_into_bin(operation_context, request, catch_path).await
+}
+
+/// Captures the request in the bin `catch_path` names; the stored URL is the one the app used.
+async fn capture_into_bin(
+    operation_context: OperationContext,
+    request: Request,
+    catch_path: String,
 ) -> Response {
     let client_ip = request
         .extensions()
@@ -55,7 +91,7 @@ async fn capture_request(
     let incoming_request = IncomingHttpRequest {
         method: request_parts.method.as_str().to_owned(),
         url: format!("http://{host}{}", request_parts.uri),
-        path: request_parts.uri.path().to_owned(),
+        path: catch_path,
         query_string: request_parts.uri.query().map(str::to_owned),
         headers,
         body: body_bytes.to_vec(),
@@ -88,4 +124,18 @@ fn build_catch_response(mock_response: &sendmock_ops::HttpMockResponse) -> Respo
         }
     }
     response
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // AC: HC-01.4
+    #[test]
+    fn the_first_path_segment_names_the_bin_on_the_catch_all_port() {
+        assert_eq!(to_catch_path("/orders/new"), "/catch/orders/new");
+        assert_eq!(to_catch_path("/orders"), "/catch/orders");
+        assert_eq!(to_catch_path("/"), "/catch/default");
+        assert_eq!(to_catch_path(""), "/catch/default");
+    }
 }

@@ -1,6 +1,7 @@
 //! The `sendmock` binary: runs the server, or a client command against a running one.
 
 mod ai_install;
+mod catcher_listener;
 mod cli_arguments;
 mod client_command;
 mod config;

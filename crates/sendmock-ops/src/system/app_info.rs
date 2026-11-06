@@ -14,6 +14,9 @@ pub struct AppInfo {
     /// Always present, null when the provider port is off, as the contract requires.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub provider_address: Option<String>,
+    /// Always present, null when the catch-all catcher port is off.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub catcher_address: Option<String>,
     pub database_path: String,
     pub database_size_bytes: u64,
     /// True when SendMock runs in Docker, so the UI defaults to container hostnames.

@@ -24,6 +24,10 @@ Endpoints, rules, templates, variables, numbers, Messaging Services, Verify serv
 
 Secrets are never written to an export in plain text.
 
+## The catch-all catcher port: `--catcher-addr`
+
+`--catcher-addr 127.0.0.1:8030` (or `SENDMOCK_CATCHER_ADDR`, or `catcher_addr` in `sendmock.toml`) starts a port where every request is captured by the HTTP catcher, at any path, the first path segment naming the bin. It is off unless set. See [Catch every path on its own port](./http/index.md#catch-every-path-on-its-own-port).
+
 ## Template files: `--templates-dir`
 
 Keep webhook templates in your repository as files. Point `--templates-dir` (or `SENDMOCK_TEMPLATES_DIR`) at a folder of `.toml` template files, in the format **Export** writes from Webhooks > Templates. SendMock loads them at startup and again within two seconds whenever a file is added, changed or removed. They show in the gallery as **File** templates, and endpoints can use them like any other; to change one, edit its file (SendMock refuses edits and deletes with `409`). A file without an `id` gets `file.<file name>`; a file that does not parse is skipped and named in the log.

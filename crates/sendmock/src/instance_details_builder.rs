@@ -10,6 +10,7 @@ pub fn build_instance_details(
     bound_http_addr: SocketAddr,
     bound_smtp_addr: SocketAddr,
     bound_provider_addr: Option<SocketAddr>,
+    bound_catcher_addr: Option<SocketAddr>,
     started_at_unix_ms: i64,
 ) -> InstanceDetails {
     InstanceDetails {
@@ -19,6 +20,7 @@ pub fn build_instance_details(
         http_address: bound_http_addr.to_string(),
         smtp_address: bound_smtp_addr.to_string(),
         provider_address: bound_provider_addr.map(|provider_addr| provider_addr.to_string()),
+        catcher_address: bound_catcher_addr.map(|catcher_addr| catcher_addr.to_string()),
         is_container: CONTAINER_MARKER_FILES
             .iter()
             .any(|marker_file| Path::new(marker_file).exists()),

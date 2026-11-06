@@ -40,6 +40,7 @@ impl Operation for GetInfoOperation {
             smtp_address: instance_details.smtp_address.clone(),
             http_address: instance_details.http_address.clone(),
             provider_address: instance_details.provider_address.clone(),
+            catcher_address: instance_details.catcher_address.clone(),
             database_path: operation_context.database.location().to_string(),
             database_size_bytes: operation_context.database.size_bytes().await?,
             is_container: instance_details.is_container,
@@ -77,6 +78,7 @@ mod tests {
                 http_address: "127.0.0.1:8025".to_owned(),
                 smtp_address: "127.0.0.1:1025".to_owned(),
                 provider_address: None,
+                catcher_address: None,
                 is_container: false,
             },
         ))

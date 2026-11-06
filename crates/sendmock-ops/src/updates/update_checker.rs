@@ -191,6 +191,7 @@ mod tests {
                 http_address: "127.0.0.1:8025".to_owned(),
                 smtp_address: "127.0.0.1:1025".to_owned(),
                 provider_address: None,
+                catcher_address: None,
                 is_container: false,
             },
         )

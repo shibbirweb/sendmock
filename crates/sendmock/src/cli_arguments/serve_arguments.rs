@@ -29,6 +29,10 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_PROVIDER_ADDR", value_name = "HOST:PORT")]
     pub provider_addr: Option<SocketAddr>,
 
+    /// Address that captures every request at any path in the HTTP catcher, the first path segment naming the bin; off unless set
+    #[arg(long, env = "SENDMOCK_CATCHER_ADDR", value_name = "HOST:PORT")]
+    pub catcher_addr: Option<SocketAddr>,
+
     /// Give one provider its own port, as `provider=port` (repeat or separate with commas), for providers that share a path
     #[arg(
         long = "provider-port",

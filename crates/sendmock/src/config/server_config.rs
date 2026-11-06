@@ -27,6 +27,8 @@ pub struct ServerConfig {
     pub smtp_addr: SocketAddr,
     pub smtp: SmtpConfig,
     pub provider_ports: ProviderPortConfig,
+    /// `--catcher-addr`: the HTTP catcher's catch-all port, off unless set.
+    pub catcher_addr: Option<SocketAddr>,
     pub startup_settings: StartupSettingsConfig,
     pub access_control: AccessControlSettings,
     pub database_location: DatabaseLocation,
@@ -95,6 +97,7 @@ impl ServerConfig {
                 .unwrap_or(DEFAULT_SMTP_ADDR),
             smtp,
             provider_ports,
+            catcher_addr: serve_arguments.catcher_addr.or(config_file.catcher_addr),
             startup_settings,
             access_control,
             database_location: database_setting

@@ -13,6 +13,7 @@ use tokio::net::TcpListener;
 use tokio::sync::watch;
 use tokio::task::JoinSet;
 
+use crate::catcher_listener::start_catcher_listener;
 use crate::config::ServerConfig;
 use crate::email_network_clients::with_email_network_clients;
 use crate::http_call_sender::{HttpCallSender, REPLY_WEBHOOK_TIMEOUT, STATUS_CALLBACK_TIMEOUT};
@@ -41,6 +42,7 @@ struct BoundListeners {
     smtp_listener: TcpListener,
     smtps_listener: Option<TcpListener>,
     provider_listeners: Vec<ProviderListener>,
+    catcher_listener: Option<TcpListener>,
     addresses: ListenerAddresses,
 }
 
@@ -52,6 +54,8 @@ struct ListenerAddresses {
     smtps_addr: Option<SocketAddr>,
     /// The listener serving every provider at its real paths, when configured.
     provider_addr: Option<SocketAddr>,
+    /// The HTTP catcher's catch-all listener, when configured.
+    catcher_addr: Option<SocketAddr>,
 }
 
 pub async fn run_server(
@@ -71,9 +75,12 @@ pub async fn run_server(
         listeners.smtps_listener,
         shutdown_receiver,
     )?;
-    start_provider_listeners(
+    start_extra_http_listeners(
         &mut background_tasks,
         listeners.provider_listeners,
+        listeners
+            .catcher_listener
+            .zip(listeners.addresses.catcher_addr),
         &operation_context,
         &shutdown_receiver_for_providers,
     );
@@ -102,6 +109,31 @@ pub async fn run_server(
     while background_tasks.join_next().await.is_some() {}
     tracing::info!("SendMock stopped");
     Ok(())
+}
+
+/// The provider listeners and the catch-all catcher listener, each stopping on the shutdown signal.
+fn start_extra_http_listeners(
+    background_tasks: &mut JoinSet<()>,
+    provider_listeners: Vec<ProviderListener>,
+    catcher_listener: Option<(TcpListener, SocketAddr)>,
+    operation_context: &OperationContext,
+    shutdown_receiver: &watch::Receiver<bool>,
+) {
+    start_provider_listeners(
+        background_tasks,
+        provider_listeners,
+        operation_context,
+        shutdown_receiver,
+    );
+    if let Some((catcher_listener, catcher_addr)) = catcher_listener {
+        start_catcher_listener(
+            background_tasks,
+            catcher_listener,
+            catcher_addr,
+            operation_context,
+            shutdown_receiver,
+        );
+    }
 }
 
 /// The SMTP listener, and the SMTPS one when configured, each stopping on the shutdown signal.
@@ -199,6 +231,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
             listeners.addresses.http_addr,
             listeners.addresses.smtp_addr,
             listeners.addresses.provider_addr,
+            listeners.addresses.catcher_addr,
             started_at_unix_ms,
         ),
     )
@@ -250,6 +283,10 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         None => None,
     };
     let provider_listeners = bind_provider_listeners(&server_config.provider_ports).await?;
+    let catcher_listener = match server_config.catcher_addr {
+        Some(catcher_addr) => Some(bind_listener(catcher_addr, "--catcher-addr").await?),
+        None => None,
+    };
     let local_address = |listener: &TcpListener, configured_address: SocketAddr| {
         listener
             .local_addr()
@@ -268,12 +305,16 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
             .iter()
             .find(|provider_listener| provider_listener.is_shared())
             .map(|provider_listener| provider_listener.bound_addr),
+        catcher_addr: catcher_listener
+            .as_ref()
+            .and_then(|listener| listener.local_addr().ok()),
     };
     Ok(BoundListeners {
         http_listener,
         smtp_listener,
         smtps_listener,
         provider_listeners,
+        catcher_listener,
         addresses,
     })
 }
@@ -288,6 +329,7 @@ fn announce_ready(
         smtp_addr,
         smtps_addr,
         provider_addr,
+        catcher_addr,
     } = addresses;
     if !http_addr.ip().is_loopback() && server_config.access_control.ui_auth.is_none() {
         tracing::warn!(
@@ -301,6 +343,7 @@ fn announce_ready(
             "smtp_addr": smtp_addr.to_string(),
             "smtps_addr": smtps_addr.map(|smtps_addr| smtps_addr.to_string()),
             "provider_addr": provider_addr.map(|provider_addr| provider_addr.to_string()),
+            "catcher_addr": catcher_addr.map(|catcher_addr| catcher_addr.to_string()),
             "version": env!("CARGO_PKG_VERSION"),
         });
         println!("{ready_line}");
@@ -310,6 +353,7 @@ fn announce_ready(
         smtp_addr = %smtp_addr,
         smtps_addr = ?smtps_addr,
         provider_addr = ?provider_addr,
+        catcher_addr = ?catcher_addr,
         database = %operation_context.database.location(),
         config_file = ?server_config.config_file_path,
         "SendMock is ready"

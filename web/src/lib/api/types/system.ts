@@ -167,6 +167,8 @@ export type AppInfo = {
   smtp_address: string;
   http_address: string;
   provider_address: string | null;
+  /** The catch-all catcher port (`--catcher-addr`); null when it is off. */
+  catcher_address: string | null;
   database_path: string;
   database_size_bytes: number;
   /** True when SendMock runs in Docker, so the UI defaults to container hostnames. */

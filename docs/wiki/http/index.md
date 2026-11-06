@@ -76,6 +76,20 @@ The bin's response rules and default reply. See [Responses](./responses.md).
 - Rules per path and method, templated bodies that echo the request, delays and failure rates: [Advanced: catcher responses](../advanced/catcher-responses.md).
 - A new preset (a service whose reply shape SendMock does not know yet) needs code; ask for it with a provider request issue.
 
+### Catch every path on its own port
+
+Some apps let you change only the host of the service they call, not the path. Start SendMock with a catch-all port and point the app's host at it; every request it gets is captured, at any method and path.
+
+1. Start SendMock with the port on:
+
+   ```bash
+   sendmock --catcher-addr 127.0.0.1:8030
+   ```
+
+2. Point the app's host at `http://127.0.0.1:8030`. The first part of the path names the bin, so `POST http://127.0.0.1:8030/orders/42` lands in the bin `orders`, and a request to `/` lands in `default`.
+
+The bin's rules, presets, delays and failure rates work as on `/catch/<bin>/...`. The flag is also `SENDMOCK_CATCHER_ADDR` and `catcher_addr` in `sendmock.toml`; in Docker use `0.0.0.0:8030` and publish port `8030`. When it is on, each bin shows both catch URLs.
+
 ## From your code
 
 Create a bin that answers like Firebase Cloud Messaging, then point your app's push base URL at its catch URL.
