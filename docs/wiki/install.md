@@ -175,6 +175,68 @@ Our signed repository keeps SendMock up to date with the rest of your system.
 
 `sudo dnf upgrade` installs new releases. Each release also attaches the `.rpm` file, for `sudo dnf install ./sendmock-<version>.x86_64.rpm` without the repository.
 
+## AUR (Arch Linux)
+
+1. Install SendMock with your AUR helper.
+
+   Stable:
+
+   ```bash
+   yay -S sendmock-bin
+   ```
+
+   Beta:
+
+   ```bash
+   yay -S sendmock-beta-bin
+   ```
+
+2. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
+
+   ```bash
+   sendmock --version
+   ```
+
+## COPR (Fedora)
+
+COPR has the stable only; [dnf](#dnf-fedora-rhel-and-similar) has the beta too.
+
+1. Turn on the SendMock COPR project:
+
+   ```bash
+   sudo dnf copr enable shibbirweb/sendmock
+   ```
+
+2. Install SendMock:
+
+   ```bash
+   sudo dnf install sendmock
+   ```
+
+3. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
+
+   ```bash
+   sendmock --version
+   ```
+
+## Nix
+
+Nixpkgs has the stable once its maintainers have merged it.
+
+1. Run SendMock without installing it:
+
+   ```bash
+   nix run nixpkgs#sendmock
+   ```
+
+2. Or install it into your profile:
+
+   ```bash
+   nix profile install nixpkgs#sendmock
+   ```
+
+3. Go on to [Start SendMock](#start-sendmock).
+
 ## Scoop (Windows)
 
 1. Add the SendMock bucket:

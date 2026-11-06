@@ -375,9 +375,77 @@ jobs:
           path: packages
           retention-days: 3
 
+  # The AUR, COPR and Nix packages built and installed from the tested x86_64 archive, served
+  # locally (DS-03.5, plan 30 W5b).
+  linux-community-packages:
+    name: AUR, COPR and Nix packages
+    needs: [plan, test]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      DOWNLOAD_URL: http://127.0.0.1:8767
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: archive-x86_64-unknown-linux-musl
+          path: served
+
+      - name: Serve the tested archive, with stand-ins for the other targets' archives
+        run: |
+          cd served
+          for other_target in aarch64-unknown-linux-musl x86_64-apple-darwin aarch64-apple-darwin; do
+            cp sendmock-x86_64-unknown-linux-musl.tar.gz "sendmock-$other_target.tar.gz"
+            sha256sum "sendmock-$other_target.tar.gz" > "sendmock-$other_target.tar.gz.sha256"
+          done
+          cat ./*.sha256 > "$RUNNER_TEMP/SHA256SUMS"
+          python3 -m http.server 8767 --bind 127.0.0.1 > /dev/null 2>&1 &
+
+      # AC: DS-03.5
+      - name: makepkg builds sendmock-bin and pacman installs it (Arch)
+        run: |
+          mkdir aur
+          bun scripts/release/aur-package.ts "$VERSION" "$RELEASE_CHANNEL" "$RUNNER_TEMP/SHA256SUMS" aur "$DOWNLOAD_URL"
+          docker run --rm --network host -v "$PWD/aur:/aur:ro" archlinux:base-devel sh -c '
+            set -e
+            useradd --create-home builder
+            cp /aur/PKGBUILD /home/builder/ && chown builder /home/builder/PKGBUILD
+            su builder -c "cd /home/builder && makepkg --noconfirm --printsrcinfo > .SRCINFO && makepkg --noconfirm"
+            pacman -U --noconfirm /home/builder/*.pkg.tar.zst > /dev/null
+            sendmock version --json
+          '
+
+      # AC: DS-03.5
+      - name: rpmbuild builds the COPR spec and dnf installs it (Fedora)
+        run: |
+          bun scripts/release/copr-spec.ts "$VERSION" "$(date -u +%Y-%m-%d)" "$DOWNLOAD_URL" > sendmock.spec
+          docker run --rm --network host -v "$PWD/sendmock.spec:/sendmock.spec:ro" fedora:42 sh -c '
+            set -e
+            dnf install -y -q rpm-build > /dev/null
+            rpmbuild -bb --define "_disable_source_fetch 0" /sendmock.spec > /dev/null
+            dnf install -y -q /root/rpmbuild/RPMS/x86_64/sendmock-*.rpm > /dev/null
+            sendmock version --json
+          '
+
+      # AC: DS-03.5
+      - name: nix-build builds package.nix and its binary runs (Nix)
+        run: |
+          bun scripts/release/nix-package.ts "$VERSION" "$RUNNER_TEMP/SHA256SUMS" "$DOWNLOAD_URL" > package.nix
+          docker run --rm --network host -v "$PWD/package.nix:/build/package.nix:ro" nixos/nix:2.35.4 sh -c '
+            set -e
+            cd /build
+            nix-build --expr "(import (fetchTarball \"https://github.com/NixOS/nixpkgs/archive/nixos-25.11.tar.gz\") {}).callPackage ./package.nix {}" --out-link /tmp/sendmock-result
+            /tmp/sendmock-result/bin/sendmock version --json
+          '
+
   checksums:
     name: SHA256SUMS
-    needs: [test, linux-packages]
+    needs: [test, linux-packages, linux-community-packages]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -777,4 +845,111 @@ jobs:
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
         run: choco push "sendmock.${{ needs.plan.outputs.version }}.nupkg" --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
+
+  # sendmock-bin or sendmock-beta-bin on the AUR, when AUR_SSH_PRIVATE_KEY is set (DS-03.5).
+  aur:
+    name: AUR package
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    env:
+      HAS_AUR_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write the PKGBUILD and its .SRCINFO
+        run: |
+          mkdir aur
+          bun scripts/release/aur-package.ts "${{ needs.plan.outputs.version }}" "$RELEASE_CHANNEL" dist/SHA256SUMS aur
+          docker run --rm -v "$PWD/aur:/aur" archlinux:base-devel sh -c \
+            'useradd builder && chown -R builder /aur && su builder -c "cd /aur && makepkg --printsrcinfo > .SRCINFO"'
+          cat aur/PKGBUILD aur/.SRCINFO
+
+      - name: Push them to the AUR
+        if: env.HAS_AUR_KEY == 'true'
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          package_name="sendmock-bin"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then package_name="sendmock-beta-bin"; fi
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur && chmod 600 ~/.ssh/aur
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
+          git clone "ssh://aur@aur.archlinux.org/${package_name}.git" aur-repository
+          cp aur/PKGBUILD aur/.SRCINFO aur-repository/
+          cd aur-repository
+          git config user.name "MD. Shibbir Ahmed"
+          git config user.email "shibbirweb@gmail.com"
+          git add PKGBUILD .SRCINFO
+          git diff --cached --quiet || git commit -m "${package_name} ${VERSION}"
+          git push origin HEAD:master
+
+  # A stable on COPR (shibbirweb/sendmock), when COPR_CONFIG holds the copr-cli configuration
+  # from https://copr.fedorainfracloud.org/api/ (DS-03.5).
+  copr:
+    name: COPR build
+    needs: [plan, publish]
+    if: inputs.publish && inputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    env:
+      HAS_COPR_CONFIG: ${{ secrets.COPR_CONFIG != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.HAS_COPR_CONFIG == 'true'
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+        if: env.HAS_COPR_CONFIG == 'true'
+
+      - name: Build the source RPM and send it to COPR
+        if: env.HAS_COPR_CONFIG == 'true'
+        env:
+          COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+        run: |
+          bun scripts/release/copr-spec.ts "${{ needs.plan.outputs.version }}" "$(date -u +%Y-%m-%d)" > sendmock.spec
+          printf '%s\n' "$COPR_CONFIG" > copr-config
+          docker run --rm -v "$PWD/sendmock.spec:/sendmock.spec:ro" -v "$PWD/copr-config:/root/.config/copr:ro" fedora:42 sh -c '
+            set -e
+            dnf install -y -q rpm-build copr-cli > /dev/null
+            rpmbuild -bs --define "_disable_source_fetch 0" /sendmock.spec
+            copr-cli build shibbirweb/sendmock /root/rpmbuild/SRPMS/sendmock-*.src.rpm
+          '
+
+  # package.nix for a stable, attached to the release; the owner opens the first Nixpkgs pull
+  # request with it, and Nixpkgs' update bot follows later releases (DS-03.5).
+  nix:
+    name: Nix package file
+    needs: [plan, publish]
+    if: inputs.publish && inputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Attach package.nix to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bun scripts/release/nix-package.ts "${{ needs.plan.outputs.version }}" dist/SHA256SUMS > package.nix
+          gh release upload "${{ inputs.tag_name }}" package.nix --clobber
 
