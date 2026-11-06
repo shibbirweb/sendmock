@@ -9,6 +9,28 @@ SendMock is one static binary with the web UI built in. Pick one way to install 
 
 Every way has a **stable** build (from `main`) and a **beta** build (from `develop`, with the newest features first). Use one or the other. The beta has its own docs; see [Docs versions](./versions.md).
 
+## Which way to choose
+
+Every way below installs the same `sendmock`. The table says which systems each one serves and whether it has the stable, the beta or both.
+
+| Way to install | Systems | Stable | Beta |
+|---|---|---|---|
+| [Homebrew](#homebrew-macos-and-linux) | macOS, Linux | Yes | Yes |
+| [Install script (Linux and macOS)](#install-script-linux-and-macos) | macOS, Linux | Yes | Yes |
+| [Install script (Windows)](#install-script-windows) | Windows | Yes | Yes |
+| [apt](#apt-debian-and-ubuntu) | Linux | Yes | Yes |
+| [dnf](#dnf-fedora-rhel-and-similar) | Linux | Yes | Yes |
+| [AUR](#aur-arch-linux) | Linux | Yes | Yes |
+| [COPR](#copr-fedora) | Linux | Yes | No |
+| [Nix](#nix) | Linux, macOS | Yes | No |
+| [Scoop](#scoop-windows) | Windows | Yes | Yes |
+| [WinGet](#winget-windows) | Windows | Yes | No |
+| [Chocolatey](#chocolatey-windows) | Windows | Yes | No |
+| [npm](#npm-projects-with-nodejs) | macOS, Linux, Windows | Yes | Yes |
+| [Cargo](#cargo-rust-developers) | macOS, Linux, Windows | Yes | No |
+| [Docker](#docker) | macOS, Linux, Windows | Yes | Yes |
+| [Binaries](#binaries) | macOS, Linux, Windows | Yes | Yes |
+
 ## Homebrew (macOS and Linux)
 
 1. Install SendMock.

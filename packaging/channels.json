@@ -1,0 +1,509 @@
+{
+  "channels": [
+    {
+      "key": "homebrew",
+      "name": "Homebrew",
+      "section": "Homebrew (macOS and Linux)",
+      "systems": [
+        "macos",
+        "linux"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "brew install shibbirweb/tap/sendmock",
+        "brew install shibbirweb/tap/sendmock-beta"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Homebrew installs the formula from a local tap and server"
+      },
+      "installs": [
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "brew install shibbirweb/tap/sendmock",
+            "beta": "brew install shibbirweb/tap/sendmock-beta"
+          },
+          "command": "$(brew --prefix)/bin/sendmock"
+        },
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"\nbrew install shibbirweb/tap/sendmock",
+            "beta": "eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"\nbrew install shibbirweb/tap/sendmock-beta"
+          },
+          "command": "/home/linuxbrew/.linuxbrew/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "install-script-unix",
+      "name": "Install script (Linux and macOS)",
+      "section": "Install script (Linux and macOS)",
+      "systems": [
+        "macos",
+        "linux"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh",
+        "curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "The install script installs the stable and the beta onto a new shell's PATH (macOS, Linux)"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh",
+            "beta": "curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta"
+          },
+          "command": "$HOME/.local/bin/sendmock"
+        },
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh",
+            "beta": "curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta"
+          },
+          "command": "$HOME/.local/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "install-script-windows",
+      "name": "Install script (Windows)",
+      "section": "Install script (Windows)",
+      "systems": [
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex",
+        "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "The install script installs the stable and the beta onto a new shell's Path (Windows)"
+      },
+      "installs": [
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex",
+            "beta": "& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta"
+          },
+          "command": "$env:LOCALAPPDATA\\Programs\\sendmock\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "apt",
+      "name": "apt",
+      "section": "apt (Debian and Ubuntu)",
+      "systems": [
+        "linux"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "sudo install -d -m 0755 /etc/apt/keyrings",
+        "curl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null",
+        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
+        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
+        "sudo apt update",
+        "sudo apt install sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Our signed APT and YUM repository installs and upgrades sendmock"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock",
+            "beta": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock"
+          },
+          "command": "/usr/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "dnf",
+      "name": "dnf",
+      "section": "dnf (Fedora, RHEL and similar)",
+      "systems": [
+        "linux"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-stable.repo",
+        "sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-beta.repo",
+        "sudo dnf install sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Our signed APT and YUM repository installs and upgrades sendmock"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "container": "fedora:42",
+          "shell": "bash",
+          "prepare": "dnf install -y -q sudo unzip",
+          "install": {
+            "stable": "sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-stable.repo\nsudo dnf install -y sendmock",
+            "beta": "sudo curl -fsSL -o /etc/yum.repos.d/sendmock.repo https://shibbirweb.github.io/sendmock/packages/sendmock-beta.repo\nsudo dnf install -y sendmock"
+          },
+          "command": "/usr/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "aur",
+      "name": "AUR",
+      "section": "AUR (Arch Linux)",
+      "systems": [
+        "linux"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "yay -S sendmock-bin",
+        "yay -S sendmock-beta-bin"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "makepkg builds sendmock-bin and pacman installs it"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "container": "archlinux:latest",
+          "shell": "bash",
+          "prepare": "pacman -Syu --noconfirm --needed base-devel git sudo unzip\nuseradd -m aur-builder\necho 'aur-builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/aur-builder",
+          "install": {
+            "stable": "sudo -u aur-builder bash -c 'cd /tmp && git clone https://aur.archlinux.org/sendmock-bin.git && cd sendmock-bin && makepkg -si --noconfirm'",
+            "beta": "sudo -u aur-builder bash -c 'cd /tmp && git clone https://aur.archlinux.org/sendmock-beta-bin.git && cd sendmock-beta-bin && makepkg -si --noconfirm'"
+          },
+          "command": "/usr/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "copr",
+      "name": "COPR",
+      "section": "COPR (Fedora)",
+      "systems": [
+        "linux"
+      ],
+      "stages": [
+        "stable"
+      ],
+      "availability": "later",
+      "page_commands": [
+        "sudo dnf copr enable shibbirweb/sendmock",
+        "sudo dnf install sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "rpmbuild builds the COPR spec and dnf installs it"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "container": "fedora:42",
+          "shell": "bash",
+          "prepare": "dnf install -y -q sudo unzip dnf-plugins-core",
+          "install": {
+            "stable": "sudo dnf copr enable -y shibbirweb/sendmock\nsudo dnf install -y sendmock"
+          },
+          "command": "/usr/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "nix",
+      "name": "Nix",
+      "section": "Nix",
+      "systems": [
+        "linux",
+        "macos"
+      ],
+      "stages": [
+        "stable"
+      ],
+      "availability": "later",
+      "page_commands": [
+        "nix run nixpkgs#sendmock",
+        "nix profile install nixpkgs#sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "nix-build builds package.nix and its binary runs"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon\n. \"$HOME/.nix-profile/etc/profile.d/nix.sh\"\nnix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#sendmock"
+          },
+          "command": "$HOME/.nix-profile/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "scoop",
+      "name": "Scoop",
+      "section": "Scoop (Windows)",
+      "systems": [
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket",
+        "scoop install shibbirweb/sendmock",
+        "scoop install shibbirweb/sendmock-beta"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Scoop installs the manifest from a local server"
+      },
+      "installs": [
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "prepare": "Invoke-Expression \"& {$(Invoke-RestMethod https://get.scoop.sh)} -RunAsAdmin\"",
+          "install": {
+            "stable": "scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket\nscoop install shibbirweb/sendmock",
+            "beta": "scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket\nscoop install shibbirweb/sendmock-beta"
+          },
+          "command": "$env:USERPROFILE\\scoop\\shims\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "winget",
+      "name": "WinGet",
+      "section": "WinGet (Windows)",
+      "systems": [
+        "windows"
+      ],
+      "stages": [
+        "stable"
+      ],
+      "availability": "later",
+      "page_commands": [
+        "winget install shibbirweb.sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "WinGet and Chocolatey install their packages from a local server"
+      },
+      "installs": [
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "winget install shibbirweb.sendmock --accept-package-agreements --accept-source-agreements --disable-interactivity"
+          },
+          "command": "$env:LOCALAPPDATA\\Microsoft\\WinGet\\Links\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "chocolatey",
+      "name": "Chocolatey",
+      "section": "Chocolatey (Windows)",
+      "systems": [
+        "windows"
+      ],
+      "stages": [
+        "stable"
+      ],
+      "availability": "later",
+      "page_commands": [
+        "choco install sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "WinGet and Chocolatey install their packages from a local server"
+      },
+      "installs": [
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "choco install sendmock --yes --no-progress"
+          },
+          "command": "$env:ChocolateyInstall\\bin\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "npm",
+      "name": "npm",
+      "section": "npm (projects with Node.js)",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "npm install --save-dev sendmock",
+        "npm install --save-dev sendmock@beta",
+        "npx sendmock --version"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "npm installs the launcher and this platform's package"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npm-project\" && cd \"$RUNNER_TEMP/npm-project\" && npm init -y > /dev/null\nnpm install --save-dev sendmock",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npm-project\" && cd \"$RUNNER_TEMP/npm-project\" && npm init -y > /dev/null\nnpm install --save-dev sendmock@beta"
+          },
+          "command": "$RUNNER_TEMP/npm-project/node_modules/.bin/sendmock"
+        },
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npm-project\" && cd \"$RUNNER_TEMP/npm-project\" && npm init -y > /dev/null\nnpm install --save-dev sendmock",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npm-project\" && cd \"$RUNNER_TEMP/npm-project\" && npm init -y > /dev/null\nnpm install --save-dev sendmock@beta"
+          },
+          "command": "$RUNNER_TEMP/npm-project/node_modules/.bin/sendmock"
+        },
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "New-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npm-project\" | Out-Null; Set-Location \"$env:RUNNER_TEMP\\npm-project\"; npm init -y | Out-Null\nnpm install --save-dev sendmock",
+            "beta": "New-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npm-project\" | Out-Null; Set-Location \"$env:RUNNER_TEMP\\npm-project\"; npm init -y | Out-Null\nnpm install --save-dev sendmock@beta"
+          },
+          "command": "$env:RUNNER_TEMP\\npm-project\\node_modules\\@sendmock\\win32-x64\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "cargo",
+      "name": "Cargo",
+      "section": "Cargo (Rust developers)",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "cargo install sendmock --locked"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Every crate packages and builds from its package"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "cargo install sendmock --locked"
+          },
+          "command": "$HOME/.cargo/bin/sendmock"
+        }
+      ]
+    },
+    {
+      "key": "docker",
+      "name": "Docker",
+      "section": "Docker",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
+        "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta"
+      ],
+      "release_test": {
+        "workflow": "docker-edge.yml",
+        "step": "Every tag is signed by this workflow, carries an SBOM and provenance"
+      },
+      "installs": []
+    },
+    {
+      "key": "binaries",
+      "name": "Binaries",
+      "section": "Binaries",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "Test cases 1 to 8"
+      },
+      "installs": []
+    }
+  ]
+}
