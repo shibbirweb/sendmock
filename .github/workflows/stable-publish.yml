@@ -57,8 +57,18 @@ jobs:
           gh release view "$TAG_NAME" > /dev/null 2>&1 || gh release create "$TAG_NAME" --draft \
             --target "$COMMIT_SHA" --title "SendMock $VERSION" --notes-file "$RUNNER_TEMP/release-notes.md"
 
+  # The skill's evals with Claude Code on the commit being released, when the owner has set
+  # ANTHROPIC_API_KEY (AI-05.7); without the key they pass with a notice.
+  skill-evals:
+    needs: decide
+    if: needs.decide.outputs.should_act == 'true'
+    uses: ./.github/workflows/skill-evals.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ github.event.workflow_run.head_sha }}
+
   release:
-    needs: [decide, draft]
+    needs: [decide, draft, skill-evals]
     # The Docker tags and the Homebrew tap need these, and the registry and tap secrets.
     permissions:
       contents: write

@@ -18,3 +18,5 @@ testcontainers/dotnet/out/
 testcontainers/java/target/
 testcontainers/dotnet/**/bin/
 testcontainers/dotnet/**/obj/
+/plugin/evals/results/
+/skill-eval-results/
