@@ -231,6 +231,37 @@ jobs:
           echo "$version_json"
           echo "$version_json" | grep -q "\"version\":\"$VERSION\"" || { echo "npx sendmock does not run $VERSION" >&2; exit 1; }
 
+      # AC: DS-03.1 DS-03.6
+      - name: Homebrew installs the formula from a local tap and server, and it passes test cases 2 to 8 (macOS, Linux x64)
+        if: matrix.archive == 'tar.gz' && matrix.target != 'aarch64-unknown-linux-musl'
+        shell: bash
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_FROM_API: "1"
+          HOMEBREW_NO_ANALYTICS: "1"
+        run: |
+          brew_command="$(command -v brew || echo /home/linuxbrew/.linuxbrew/bin/brew)"
+          # The formula names all four macOS and Linux archives; this runner only has its own.
+          checksum_lines="$(cat dist/*.sha256)"
+          for formula_target in aarch64-apple-darwin x86_64-apple-darwin aarch64-unknown-linux-musl x86_64-unknown-linux-musl; do
+            if ! echo "$checksum_lines" | grep -q "sendmock-$formula_target.tar.gz"; then
+              checksum_lines="$checksum_lines
+          $(printf '0%.0s' $(seq 1 64))  sendmock-$formula_target.tar.gz"
+            fi
+          done
+          echo "$checksum_lines" > "$RUNNER_TEMP/SHA256SUMS"
+          formula_name="sendmock"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then formula_name="sendmock-beta"; fi
+          bun scripts/release/homebrew-formula.ts "$VERSION" "$RELEASE_CHANNEL" "$RUNNER_TEMP/SHA256SUMS" http://127.0.0.1:8767 > "$RUNNER_TEMP/formula.rb"
+          python3 -m http.server 8767 --bind 127.0.0.1 --directory dist > /dev/null 2>&1 &
+          server_pid=$!
+          "$brew_command" tap-new --no-git local/sendmock-test
+          cp "$RUNNER_TEMP/formula.rb" "$("$brew_command" --repository local/sendmock-test)/Formula/$formula_name.rb"
+          "$brew_command" install "local/sendmock-test/$formula_name"
+          kill "$server_pid"
+          bun scripts/release/check-installed.ts "$("$brew_command" --prefix)/bin/sendmock" "$VERSION" "$RELEASE_CHANNEL"
+
       # AC: DS-03.1
       - name: Scoop installs the manifest from a local server, and its shim runs sendmock (Windows)
         if: matrix.archive == 'zip'

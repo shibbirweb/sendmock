@@ -3,7 +3,9 @@
  * The Homebrew formula for a release (`sendmock` for stable, `sendmock-beta` for beta),
  * from the release's SHA256SUMS (DS-03.1). Release build pushes it to the tap.
  *
- *     bun scripts/release/homebrew-formula.ts <version> <channel> <SHA256SUMS>
+ *     bun scripts/release/homebrew-formula.ts <version> <channel> <SHA256SUMS> [download address]
+ *
+ * The download address defaults to the release's assets; the release tests pass a local server.
  */
 import { readFileSync } from "node:fs";
 
@@ -47,6 +49,7 @@ export function buildHomebrewFormula(
   version: string,
   channel: string,
   checksums: Map<string, string>,
+  downloadUrl = `${releaseDownloadUrl}/v${version}`,
 ): string {
   const formulaName = readFormulaName(channel);
   const platformBlocks = ["on_macos", "on_linux"].map((osBlock) => {
@@ -60,7 +63,7 @@ export function buildHomebrewFormula(
         }
         return [
           `    ${platform.cpu} do`,
-          `      url "${releaseDownloadUrl}/v${version}/${archiveName}"`,
+          `      url "${downloadUrl}/${archiveName}"`,
           `      sha256 "${checksum}"`,
           "    end",
         ].join("\n");
@@ -92,10 +95,10 @@ end
 }
 
 if (import.meta.main) {
-  const [version, channel, checksumsPath] = process.argv.slice(2);
+  const [version, channel, checksumsPath, downloadUrl] = process.argv.slice(2);
   if (!version || !channel || !checksumsPath) {
     console.error(
-      "Usage: bun scripts/release/homebrew-formula.ts <version> <channel> <SHA256SUMS>",
+      "Usage: bun scripts/release/homebrew-formula.ts <version> <channel> <SHA256SUMS> [download address]",
     );
     process.exit(2);
   }
@@ -104,6 +107,7 @@ if (import.meta.main) {
       version,
       channel,
       parseChecksums(readFileSync(checksumsPath, "utf8")),
+      downloadUrl,
     ),
   );
 }

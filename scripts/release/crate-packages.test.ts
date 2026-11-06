@@ -69,4 +69,24 @@ describe("crates.io packages", () => {
       expect(stagingScript).toContain(`crates/${crateName}/${stagedFolder}`);
     }
   });
+
+  test("DS-03.1 a cargo install build reports the channel it was published on, not dev", () => {
+    const stagingScript = readFileSync(
+      "scripts/release/stage-crate-files.sh",
+      "utf8",
+    );
+    const buildScript = readFileSync("crates/sendmock/build.rs", "utf8");
+
+    expect(readCrateManifest("sendmock").package.include).toContain(
+      "release-channel",
+    );
+    expect(stagingScript).toContain('release_channel="${1:-stable}"');
+    expect(stagingScript).toContain("crates/sendmock/release-channel");
+    expect(buildScript).toContain(
+      "cargo::rustc-env=SENDMOCK_RELEASE_CHANNEL=",
+    );
+    expect(readFileSync(".gitignore", "utf8")).toContain(
+      "/crates/sendmock/release-channel",
+    );
+  });
 });

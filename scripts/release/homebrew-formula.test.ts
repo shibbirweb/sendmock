@@ -45,6 +45,19 @@ describe("Homebrew formula", () => {
     expect(formula).toContain('conflicts_with "sendmock-beta"');
   });
 
+  test("DS-03.1 the release tests can point the formula at a local server", () => {
+    const formula = buildHomebrewFormula(
+      "0.1.0",
+      "stable",
+      parseChecksums(checksumsText),
+      "http://127.0.0.1:8767",
+    );
+
+    expect(formula).toContain(
+      'url "http://127.0.0.1:8767/sendmock-x86_64-apple-darwin.tar.gz"\n      sha256 "bb"',
+    );
+  });
+
   test("a missing archive stops the release instead of writing a broken formula", () => {
     expect(() =>
       buildHomebrewFormula(

@@ -20,3 +20,4 @@ testcontainers/dotnet/**/bin/
 testcontainers/dotnet/**/obj/
 /plugin/evals/results/
 /skill-eval-results/
+/crates/sendmock/release-channel

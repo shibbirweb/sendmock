@@ -60,6 +60,25 @@ function readResidentMemoryBytes(processId: number): number {
 }
 
 /**
+ * On Linux, where idle memory sits closest to its budget, which kind of pages make it up
+ * (heap and stacks, the mapped binary, shared memory) and how many threads hold stacks.
+ */
+function readLinuxMemoryBreakdown(processId: number): string | null {
+  try {
+    const statusText = readFileSync(`/proc/${processId}/status`, "utf8");
+    return statusText
+      .split("\n")
+      .filter((statusLine) =>
+        /^(VmRSS|RssAnon|RssFile|RssShmem|VmStk|Threads):/.test(statusLine),
+      )
+      .map((statusLine) => statusLine.replace(/\s+/g, " "))
+      .join(", ");
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Sends a command (or nothing, for the greeting) and resolves with the reply's last line, the
  * one with a space after the code.
  */
@@ -143,6 +162,12 @@ async function measureRunningBinary(binaryPath: string) {
     const idleMemoryBytes = readResidentMemoryBytes(
       runningSendmock.sendmock.pid,
     );
+    const memoryBreakdown = readLinuxMemoryBreakdown(
+      runningSendmock.sendmock.pid,
+    );
+    if (memoryBreakdown !== null) {
+      console.log(`::notice title=Idle memory breakdown::${memoryBreakdown}`);
+    }
     const messagesPerConnection = smtpMessageCount / smtpConnectionCount;
     const startedAt = performance.now();
     await Promise.all(

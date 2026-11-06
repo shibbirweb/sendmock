@@ -7,6 +7,12 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 readme = "../../README.md"
+# release-channel is written before packaging (scripts/release/stage-crate-files.sh).
+include = [
+    "build.rs",
+    "release-channel",
+    "src/**/*",
+]
 
 [dependencies]
 sendmock-core.workspace = true
