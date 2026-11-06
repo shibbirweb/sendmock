@@ -27,7 +27,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api", "user_agent"? }` (default `api`); a `ui` open the opened-events settings leave out records nothing and still answers 204 |
 | GET | `/emails/{emailId}/opens` | open history, oldest first: `opened_at`, `source`, `user_agent` |
 | DELETE | `/emails/{emailId}` | delete one |
-| DELETE | `/emails` | delete all (or by filter) |
+| DELETE | `/emails` | delete all, or only those matching the list's filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
 | GET | `/emails/latest` | newest message, optionally filtered by `to` |
 | POST | `/send` | native HTTP send (JSON, with base64 `attachments`, see [03-email.md](03-email.md#native-send-attachments)); provider-compatible send APIs live under `/providers/*` and the provider port ([03-email.md](03-email.md#http-send-apis)) |
 | POST | `/emails/{emailId}/simulate` | simulate `delivered`, `deferred`, `bounced` (hard/soft), `complained`, `unsubscribed` |

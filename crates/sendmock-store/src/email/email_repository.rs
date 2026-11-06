@@ -157,6 +157,20 @@ impl EmailRepository {
             .await
     }
 
+    /// Deletes the emails the filter lists (every email with an empty filter); answers how many.
+    pub async fn delete_matching_emails(&self, filter: EmailListFilter) -> Result<u64, StoreError> {
+        self.database
+            .write(move |connection| {
+                let (where_clause, parameters) = filter.to_sql_conditions();
+                let deleted_count = connection.execute(
+                    &format!("DELETE FROM emails WHERE {where_clause}"),
+                    rusqlite::params_from_iter(parameters),
+                )?;
+                Ok(u64::try_from(deleted_count).unwrap_or_default())
+            })
+            .await
+    }
+
     pub async fn add_timeline_entry(
         &self,
         email_id: &str,

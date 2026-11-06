@@ -31,6 +31,31 @@ test("EM-03.4 search filters narrow the list and chips toggle them", async ({
   await expect(passwordResetSubject).toBeHidden();
 });
 
+test("EM-03.5 with a search on, delete removes only the matching emails", async ({
+  page,
+}) => {
+  const listPanel = page.locator(emailList);
+  const passwordResetSubject = listPanel.getByText("Reset your password", {
+    exact: true,
+  });
+  await page.getByLabel("Search emails").fill("from:billing");
+  await expect(page).toHaveURL(/q=from%3Abilling/);
+  await expect(listPanel.getByText("Invoice INV-2026-0042")).toBeVisible();
+
+  await page.getByRole("button", { name: "Delete matching emails" }).click();
+  await expect(
+    page.getByRole("alertdialog", { name: "Delete the matching emails?" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Delete matching", exact: true })
+    .click();
+  await expect(listPanel.getByText("Invoice INV-2026-0042")).toBeHidden();
+
+  await page.getByLabel("Search emails").fill("");
+  await expect(page).not.toHaveURL(/q=/);
+  await expect(passwordResetSubject).toBeVisible();
+});
+
 test("EM-05.4 an opened email shows its code with a copy button", async ({
   page,
 }) => {

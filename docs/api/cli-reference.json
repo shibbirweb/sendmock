@@ -471,8 +471,8 @@
     {
       "command": "sendmock email delete-all",
       "slug": "email-delete-all",
-      "usage": "sendmock email delete-all --yes",
-      "summary": "Delete every email.",
+      "usage": "sendmock email delete-all --yes [flags]",
+      "summary": "Delete every email, or only those that match the filters.",
       "area": "Email",
       "area_slug": "email",
       "operations": [
@@ -480,7 +480,7 @@
           "method": "DELETE",
           "path": "/api/v1/emails",
           "operation_id": "deleteEmails",
-          "summary": "Delete every email.",
+          "summary": "Delete every email, or only those that match the filters.",
           "area_slug": "email",
           "selector": null
         }
@@ -499,9 +499,132 @@
           "allowed_values": null,
           "description": "Confirms a destructive command; without it the command stops.",
           "example": true
+        },
+        {
+          "flag": "--query",
+          "input": {
+            "name": "query",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<query>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Search text; supports from:, to: and tag: prefixes.",
+          "example": "to:user@example.test reset"
+        },
+        {
+          "flag": "--from",
+          "input": {
+            "name": "from",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<from>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Sender contains.",
+          "example": "no-reply@shop.test"
+        },
+        {
+          "flag": "--to",
+          "input": {
+            "name": "to",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<to>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A recipient contains.",
+          "example": "user@example.test"
+        },
+        {
+          "flag": "--tag",
+          "input": {
+            "name": "tag",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<tag>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Has this tag.",
+          "example": "signup"
+        },
+        {
+          "flag": "--unread",
+          "input": {
+            "name": "is_unread",
+            "location": "query"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only unread.",
+          "example": true
+        },
+        {
+          "flag": "--has-attachment",
+          "input": {
+            "name": "has_attachment",
+            "location": "query"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only with attachments.",
+          "example": true
+        },
+        {
+          "flag": "--source",
+          "input": {
+            "name": "source",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<source>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+          "example": "smtp"
+        },
+        {
+          "flag": "--direction",
+          "input": {
+            "name": "direction",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<direction>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "outbound",
+            "inbound"
+          ],
+          "description": "Outbound from your app or inbound to it.",
+          "example": "outbound"
         }
       ],
-      "example": "sendmock email delete-all --yes",
+      "example": "sendmock email delete-all --yes --query 'to:user@example.test reset' --from no-reply@shop.test",
       "output": null,
       "exit_codes": [
         0,

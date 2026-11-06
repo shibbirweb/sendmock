@@ -28,6 +28,8 @@ type MailListToolbarProps = {
   onToggleAllChecked: (isChecked: boolean) => void;
   onMarkCheckedRead: () => void;
   onDeleteChecked: () => void;
+  /** A search or filter is on, so the delete removes only the matching emails. */
+  isFiltered: boolean;
   onDeleteAll: () => void;
 };
 
@@ -38,6 +40,7 @@ export function MailListToolbar({
   onToggleAllChecked,
   onMarkCheckedRead,
   onDeleteChecked,
+  isFiltered,
   onDeleteAll,
 }: MailListToolbarProps) {
   const { isSupported, isEnabled, toggleNotifications } =
@@ -107,7 +110,9 @@ export function MailListToolbar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Delete all emails"
+                  aria-label={
+                    isFiltered ? "Delete matching emails" : "Delete all emails"
+                  }
                   disabled={totalEmailCount === 0}
                 >
                   <Trash2Icon />
@@ -115,10 +120,16 @@ export function MailListToolbar({
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete all emails?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {isFiltered
+                      ? "Delete the matching emails?"
+                      : "Delete all emails?"}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This removes all {totalEmailCount} captured emails. It
-                    cannot be undone.
+                    {isFiltered
+                      ? `This removes the ${totalEmailCount} emails that match the search; the others stay.`
+                      : `This removes all ${totalEmailCount} captured emails.`}{" "}
+                    It cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -127,7 +138,7 @@ export function MailListToolbar({
                     variant="destructive"
                     onClick={onDeleteAll}
                   >
-                    Delete all
+                    {isFiltered ? "Delete matching" : "Delete all"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

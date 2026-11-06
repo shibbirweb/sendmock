@@ -38,6 +38,45 @@ pub struct EmailListQuery {
     pub direction: Option<String>,
 }
 
+/// The list's filters without paging: which emails a delete removes (all when none are set).
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct EmailFilterQuery {
+    /// Search text; supports from:, to: and tag: prefixes.
+    pub query: Option<String>,
+    /// Sender contains.
+    pub from: Option<String>,
+    /// A recipient contains.
+    pub to: Option<String>,
+    /// Has this tag.
+    pub tag: Option<String>,
+    /// Only unread.
+    pub is_unread: Option<bool>,
+    /// Only with attachments.
+    pub has_attachment: Option<bool>,
+    /// How it arrived: smtp, sendmail, native_api, or an email provider's key.
+    pub source: Option<String>,
+    /// Outbound from your app or inbound to it.
+    pub direction: Option<String>,
+}
+
+impl EmailFilterQuery {
+    /// The same filters as a list request, so a delete removes exactly what the list shows.
+    pub fn to_list_query(&self) -> EmailListQuery {
+        EmailListQuery {
+            cursor: None,
+            limit: None,
+            query: self.query.clone(),
+            from: self.from.clone(),
+            to: self.to.clone(),
+            tag: self.tag.clone(),
+            is_unread: self.is_unread,
+            has_attachment: self.has_attachment,
+            source: self.source.clone(),
+            direction: self.direction.clone(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct EmailUpdateInput {
     pub email_id: String,

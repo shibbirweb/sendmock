@@ -1062,9 +1062,66 @@ paths:
       x-sendmock-ui: Mail
     delete:
       operationId: deleteEmails
-      summary: Delete every email.
+      summary: Delete every email, or only those that match the filters.
       tags:
         - Email
+      parameters:
+        - name: query
+          in: query
+          required: false
+          description: "Search text; supports from:, to: and tag: prefixes."
+          schema:
+            type: string
+          example: to:user@example.test reset
+        - name: from
+          in: query
+          required: false
+          description: Sender contains.
+          schema:
+            type: string
+          example: no-reply@shop.test
+        - name: to
+          in: query
+          required: false
+          description: A recipient contains.
+          schema:
+            type: string
+          example: user@example.test
+        - name: tag
+          in: query
+          required: false
+          description: Has this tag.
+          schema:
+            type: string
+          example: signup
+        - name: is_unread
+          in: query
+          required: false
+          description: Only unread.
+          schema:
+            type: boolean
+          example: true
+        - name: has_attachment
+          in: query
+          required: false
+          description: Only with attachments.
+          schema:
+            type: boolean
+          example: true
+        - name: source
+          in: query
+          required: false
+          description: "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid."
+          schema:
+            $ref: "#/components/schemas/EmailSource"
+          example: smtp
+        - name: direction
+          in: query
+          required: false
+          description: Outbound from your app or inbound to it.
+          schema:
+            $ref: "#/components/schemas/EmailDirection"
+          example: outbound
       responses:
         "204":
           description: No content.

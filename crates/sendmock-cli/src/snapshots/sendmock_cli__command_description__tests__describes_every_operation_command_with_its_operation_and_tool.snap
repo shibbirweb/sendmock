@@ -180,9 +180,18 @@ expression: command_descriptions
     "command": "sendmock email delete-all",
     "usage": "sendmock email delete-all",
     "aliases": [],
-    "summary": "Delete every email.",
+    "summary": "Delete every email, or only those that match the filters.",
     "arguments": [],
-    "flags": [],
+    "flags": [
+      "--direction",
+      "--from",
+      "--has-attachment",
+      "--unread",
+      "--query",
+      "--source",
+      "--tag",
+      "--to"
+    ],
     "operations": [
       {
         "method": "DELETE",

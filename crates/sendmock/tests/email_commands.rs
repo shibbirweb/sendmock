@@ -158,6 +158,7 @@ fn waiting_for_an_email_that_never_comes_exits_with_the_timeout_code() {
     assert_eq!(output.status.code(), Some(4));
 }
 
+// AC: EM-03.5
 #[test]
 fn delete_all_asks_for_yes_then_empties_the_mailbox() {
     let working_directory = tempfile::tempdir().expect("temporary folder");
@@ -183,6 +184,51 @@ fn delete_all_asks_for_yes_then_empties_the_mailbox() {
     assert_eq!(refused.status.code(), Some(2));
     assert_eq!(confirmed.status.code(), Some(0));
     assert_eq!(remaining["total_count"], 0);
+}
+
+// AC: EM-03.5
+#[test]
+fn delete_all_with_a_filter_keeps_the_other_emails() {
+    let working_directory = tempfile::tempdir().expect("temporary folder");
+    let (_sendmock, http_addr) = start_server(working_directory.path());
+    send_code_email(working_directory.path(), &http_addr);
+    let other_send = run_command(
+        working_directory.path(),
+        &http_addr,
+        &[
+            "email",
+            "send",
+            "--from",
+            "app@shop.test",
+            "--to",
+            "lee@example.test",
+            "--subject",
+            "Hello Lee",
+            "--text",
+            "Hi",
+        ],
+    );
+
+    let filtered_delete = run_command(
+        working_directory.path(),
+        &http_addr,
+        &["email", "delete-all", "--to", "sam@example.test", "--yes"],
+    );
+    let remaining = stdout_json(&run_command(
+        working_directory.path(),
+        &http_addr,
+        &["email", "list"],
+    ));
+
+    assert_eq!(other_send.status.code(), Some(0));
+    assert_eq!(
+        filtered_delete.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&filtered_delete.stderr)
+    );
+    assert_eq!(remaining["total_count"], 1);
+    assert_eq!(remaining["items"][0]["subject"], "Hello Lee");
 }
 
 // AC: EM-03.3

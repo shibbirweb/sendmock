@@ -1,8 +1,9 @@
-use super::email_inputs::{EmailReference, EmailUpdateInput};
+use super::email_inputs::{EmailFilterQuery, EmailReference, EmailUpdateInput};
+use super::email_search_query::build_email_list_filter;
 use super::email_summary::EmailSummary;
 use crate::{
-    HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
-    OperationError, SuccessStatus, publish_email_deleted,
+    HttpMethod, NoContent, Operation, OperationContext, OperationDefinition, OperationError,
+    SuccessStatus, publish_email_deleted,
 };
 
 pub struct UpdateEmailOperation;
@@ -87,7 +88,7 @@ impl Operation for DeleteEmailOperation {
 pub struct DeleteAllEmailsOperation;
 
 impl Operation for DeleteAllEmailsOperation {
-    type Input = NoInput;
+    type Input = EmailFilterQuery;
     type Output = NoContent;
 
     fn definition(&self) -> OperationDefinition {
@@ -95,7 +96,7 @@ impl Operation for DeleteAllEmailsOperation {
             operation_id: "deleteEmails",
             method: HttpMethod::Delete,
             path: "/api/v1/emails",
-            summary: "Delete every email.",
+            summary: "Delete every email, or only those that match the filters.",
             is_destructive: true,
             cli_usage: "sendmock email delete-all",
             mcp_tool: "sendmock_email_delete_all",
@@ -107,11 +108,11 @@ impl Operation for DeleteAllEmailsOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        _input: NoInput,
+        input: EmailFilterQuery,
     ) -> Result<NoContent, OperationError> {
         let deleted_count = operation_context
             .email_repository
-            .delete_all_emails()
+            .delete_matching_emails(build_email_list_filter(&input.to_list_query()))
             .await?;
         if deleted_count > 0 {
             publish_email_deleted(operation_context, None, deleted_count);

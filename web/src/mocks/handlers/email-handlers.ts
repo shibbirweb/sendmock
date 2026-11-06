@@ -219,9 +219,12 @@ export const emailHandlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  http.delete("*/api/v1/emails", async () => {
+  http.delete("*/api/v1/emails", async ({ request }) => {
     await applyMockConditions();
-    mockDatabase.emails = [];
+    const requestUrl = new URL(request.url);
+    mockDatabase.emails = mockDatabase.emails.filter(
+      (email) => !matchesEmailFilters(email, requestUrl),
+    );
     publishMockEvent("email.deleted", { id: null });
 
     return new HttpResponse(null, { status: 204 });

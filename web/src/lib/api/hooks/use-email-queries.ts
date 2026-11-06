@@ -93,9 +93,13 @@ export function useDeleteEmail() {
   );
 }
 
+/** Deletes the emails the filters list, or every email when there are none (EM-03.5). */
 export function useDeleteAllEmails() {
-  return useEmailMutation(() =>
-    requestApi<void>("/emails", { method: "DELETE" }),
+  return useEmailMutation((emailFilters: EmailListFilters = {}) =>
+    requestApi<void>("/emails", {
+      method: "DELETE",
+      queryParameters: emailFilters,
+    }),
   );
 }
 

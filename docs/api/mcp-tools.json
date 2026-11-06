@@ -631,7 +631,7 @@
     {
       "name": "sendmock_email_delete_all",
       "toolset": "email",
-      "summary": "Delete every email.",
+      "summary": "Delete every email, or only those that match the filters.",
       "area": "Email",
       "area_slug": "email",
       "operations": [
@@ -639,7 +639,7 @@
           "method": "DELETE",
           "path": "/api/v1/emails",
           "operation_id": "deleteEmails",
-          "summary": "Delete every email.",
+          "summary": "Delete every email, or only those that match the filters.",
           "area_slug": "email",
           "selector": null
         }
@@ -650,12 +650,189 @@
         "destructive_hint": true,
         "idempotent_hint": true
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "query",
+          "input": {
+            "name": "query",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Search text; supports from:, to: and tag: prefixes.",
+          "example": "to:user@example.test reset"
+        },
+        {
+          "name": "from",
+          "input": {
+            "name": "from",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Sender contains.",
+          "example": "no-reply@shop.test"
+        },
+        {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A recipient contains.",
+          "example": "user@example.test"
+        },
+        {
+          "name": "tag",
+          "input": {
+            "name": "tag",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Has this tag.",
+          "example": "signup"
+        },
+        {
+          "name": "is_unread",
+          "input": {
+            "name": "is_unread",
+            "location": "query"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only unread.",
+          "example": true
+        },
+        {
+          "name": "has_attachment",
+          "input": {
+            "name": "has_attachment",
+            "location": "query"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only with attachments.",
+          "example": true
+        },
+        {
+          "name": "source",
+          "input": {
+            "name": "source",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+          "example": "smtp"
+        },
+        {
+          "name": "direction",
+          "input": {
+            "name": "direction",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "outbound",
+            "inbound"
+          ],
+          "description": "Outbound from your app or inbound to it.",
+          "example": "outbound"
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search text; supports from:, to: and tag: prefixes.",
+            "examples": [
+              "to:user@example.test reset"
+            ]
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender contains.",
+            "examples": [
+              "no-reply@shop.test"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "description": "A recipient contains.",
+            "examples": [
+              "user@example.test"
+            ]
+          },
+          "tag": {
+            "type": "string",
+            "description": "Has this tag.",
+            "examples": [
+              "signup"
+            ]
+          },
+          "is_unread": {
+            "type": "boolean",
+            "description": "Only unread.",
+            "examples": [
+              true
+            ]
+          },
+          "has_attachment": {
+            "type": "boolean",
+            "description": "Only with attachments.",
+            "examples": [
+              true
+            ]
+          },
+          "source": {
+            "$ref": "#/$defs/EmailSource",
+            "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+            "examples": [
+              "smtp"
+            ]
+          },
+          "direction": {
+            "$ref": "#/$defs/EmailDirection",
+            "description": "Outbound from your app or inbound to it.",
+            "examples": [
+              "outbound"
+            ]
+          }
+        },
+        "$defs": {
+          "EmailDirection": {
+            "type": "string",
+            "enum": [
+              "outbound",
+              "inbound"
+            ],
+            "description": "`outbound`: mail your app sent; `inbound`: mail coming in to your app."
+          },
+          "EmailSource": {
+            "type": "string",
+            "description": "How an email reached SendMock: a transport (`smtp`, `sendmail`, `native_api`, `verify`, `simulated`) or the key of the email provider whose API it was sent through (`sendgrid`, or a custom provider's key; docs/plan/22).",
+            "examples": [
+              "sendgrid"
+            ]
+          }
+        }
       },
-      "example_arguments": {},
+      "example_arguments": {
+        "query": "to:user@example.test reset",
+        "from": "no-reply@shop.test"
+      },
       "output": null,
       "cli": [
         "sendmock email delete-all --yes"
