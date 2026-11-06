@@ -434,8 +434,9 @@ jobs:
           bun scripts/release/copr-spec.ts "$VERSION" "$(date -u +%Y-%m-%d)" "$DOWNLOAD_URL" > sendmock.spec
           docker run --rm --network host -v "$PWD/sendmock.spec:/sendmock.spec:ro" fedora:42 sh -c '
             set -e
-            dnf install -y -q rpm-build > /dev/null
-            rpmbuild -bb --define "_disable_source_fetch 0" /sendmock.spec > /dev/null
+            dnf install -y -q rpm-build rpmdevtools > /dev/null
+            spectool --get-files --sourcedir /sendmock.spec
+            rpmbuild -bb /sendmock.spec > /dev/null
             dnf install -y -q /root/rpmbuild/RPMS/x86_64/sendmock-*.rpm > /dev/null
             sendmock version --json
           '
@@ -930,8 +931,9 @@ jobs:
           printf '%s\n' "$COPR_CONFIG" > copr-config
           docker run --rm -v "$PWD/sendmock.spec:/sendmock.spec:ro" -v "$PWD/copr-config:/root/.config/copr:ro" fedora:42 sh -c '
             set -e
-            dnf install -y -q rpm-build copr-cli > /dev/null
-            rpmbuild -bs --define "_disable_source_fetch 0" /sendmock.spec
+            dnf install -y -q rpm-build rpmdevtools copr-cli > /dev/null
+            spectool --get-files --sourcedir /sendmock.spec
+            rpmbuild -bs /sendmock.spec
             copr-cli build shibbirweb/sendmock /root/rpmbuild/SRPMS/sendmock-*.src.rpm
           '
 
