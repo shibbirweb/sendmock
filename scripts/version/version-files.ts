@@ -16,13 +16,20 @@ export const pluginSkillVersionPattern = /(Written for SendMock )(\S+?)(\. )/;
 
 /**
  * Other files that carry the version, each with the pattern around it: the plugin's copy of
- * the skill, the Testcontainers modules' versions and their default image tags, which name the
- * SendMock they were released with (Go's version is its tag).
+ * the skill, the MCP registry's `server.json` (the server, its npm package and its image tag),
+ * the Testcontainers modules' versions and their default image tags, which name the SendMock
+ * they were released with (Go's version is its tag).
  */
 const textVersionFiles = [
   {
     filePath: "plugin/skills/sendmock/SKILL.md",
     pattern: pluginSkillVersionPattern,
+  },
+  { filePath: "server.json", pattern: /(\n  "version": ")([^"]+)(")/ },
+  { filePath: "server.json", pattern: /(\n {6}"version": ")([^"]+)(")/ },
+  {
+    filePath: "server.json",
+    pattern: /(ghcr\.io\/shibbirweb\/sendmock:)([^"]+)(")/,
   },
   {
     filePath: "testcontainers/python/pyproject.toml",

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.shibbirweb/sendmock",
+  "title": "SendMock",
+  "description": "Test email, SMS, payments and webhooks locally: read messages, OTPs and webhook deliveries.",
+  "version": "0.0.0",
+  "websiteUrl": "https://shibbirweb.github.io/sendmock/",
+  "repository": {
+    "url": "https://github.com/shibbirweb/sendmock",
+    "source": "github",
+    "id": "1432529944"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "sendmock",
+      "version": "0.0.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "SENDMOCK_SERVER",
+          "description": "The running SendMock to talk to",
+          "default": "http://127.0.0.1:8025"
+        },
+        {
+          "name": "SENDMOCK_TOKEN",
+          "description": "API token, when the server has UI auth on",
+          "isSecret": true
+        },
+        {
+          "name": "SENDMOCK_MCP_TOOLSETS",
+          "description": "Toolsets to expose, comma-separated, or all",
+          "default": "core,email,sms,verify,extract,webhooks"
+        }
+      ]
+    },
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/shibbirweb/sendmock:0.0.0",
+      "runtimeHint": "docker",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--add-host",
+          "description": "Lets the container reach a SendMock running on the host (needed on Linux)",
+          "value": "host.docker.internal:host-gateway"
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "SENDMOCK_SERVER",
+          "description": "The running SendMock to talk to, as the container reaches it",
+          "default": "http://host.docker.internal:8025"
+        },
+        {
+          "name": "SENDMOCK_TOKEN",
+          "description": "API token, when the server has UI auth on",
+          "isSecret": true
+        },
+        {
+          "name": "SENDMOCK_MCP_TOOLSETS",
+          "description": "Toolsets to expose, comma-separated, or all",
+          "default": "core,email,sms,verify,extract,webhooks"
+        }
+      ]
+    }
+  ]
+}

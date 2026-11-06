@@ -733,6 +733,35 @@ jobs:
           done
           npm publish npm-packages/sendmock --access public --tag "$dist_tag"
 
+  # The server in the official MCP registry for a stable, once the npm package and the image it
+  # names are published (the registry checks both claim its name); GitHub OIDC proves the
+  # io.github.shibbirweb namespace, so no token is kept (AI-05.6).
+  mcp-registry:
+    name: MCP registry
+    needs: [plan, npm, docker]
+    if: inputs.publish && inputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: ./.github/actions/install-mcp-publisher
+
+      - name: server.json names this release
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          grep -q "ghcr.io/shibbirweb/sendmock:$VERSION\"" server.json
+
+      - name: Publish to the MCP registry
+        run: |
+          mcp-publisher login github-oidc
+          mcp-publisher publish server.json
+
   # The Testcontainers modules under the release's version, each registry once the owner sets
   # it up (DS-06, plan 30 W3b).
   testcontainers:

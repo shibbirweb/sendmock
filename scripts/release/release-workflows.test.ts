@@ -149,4 +149,29 @@ describe("Docker edge", () => {
     expect(releaseJobs.checksums?.needs).toEqual(["test", "linux-packages"]);
     expect(releaseJobs.publish?.needs).toContain("smtp-clients");
   });
+
+  test("AI-05.6 a published stable goes to the MCP registry after the npm package and the image", () => {
+    const releaseJobs = readWorkflow("release.yml").jobs as Record<
+      string,
+      {
+        if?: string;
+        needs?: string[];
+        permissions?: Record<string, string>;
+        steps?: { uses?: string; run?: string }[];
+      }
+    >;
+    const registryJob = releaseJobs["mcp-registry"];
+
+    expect(registryJob?.if).toBe(
+      "inputs.publish && inputs.channel == 'stable'",
+    );
+    expect(registryJob?.needs).toEqual(["plan", "npm", "docker"]);
+    expect(registryJob?.permissions?.["id-token"]).toBe("write");
+    expect(registryJob?.steps?.map((step) => step.uses ?? "")).toContain(
+      "./.github/actions/install-mcp-publisher",
+    );
+    expect(
+      registryJob?.steps?.map((step) => step.run ?? "").join("\n"),
+    ).toContain("mcp-publisher login github-oidc");
+  });
 });

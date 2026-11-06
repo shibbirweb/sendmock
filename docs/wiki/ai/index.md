@@ -43,7 +43,7 @@ In Claude Code you can install the SendMock plugin instead. It carries the agent
 
 ### Any other agent
 
-Or register the MCP server yourself: the command is `sendmock mcp` (stdio). The running server also serves MCP over HTTP at `http://127.0.0.1:8025/mcp`.
+Or register the MCP server yourself: the command is `sendmock mcp` (stdio). From 1.0, MCP clients that browse the official MCP registry also find it there as `io.github.shibbirweb/sendmock`, run through the npm package or the Docker image. The running server also serves MCP over HTTP at `http://127.0.0.1:8025/mcp`.
 
 The [MCP reference](/mcp/) lists every tool with the inputs it takes, an example call and what it returns, and the [CLI reference](/cli/) does the same for every command.
 

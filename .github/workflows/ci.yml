@@ -345,6 +345,18 @@ jobs:
           sendmock ai skill --output skill-from-binary.md
           bun scripts/plugin-installed-check.ts plugin-list.json skill-from-binary.md
 
+  # server.json passes the official MCP registry's own validation (AI-05.6).
+  mcp-registry:
+    name: MCP registry manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./.github/actions/install-mcp-publisher
+
+      - name: mcp-publisher validate
+        run: mcp-publisher validate server.json
+
   # One check for the rulesets to require, whatever the number of operating systems.
   rust-result:
     name: Rust
