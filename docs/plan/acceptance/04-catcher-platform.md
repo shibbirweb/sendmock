@@ -53,9 +53,9 @@ Phase 1.
 
 Phase 1 (email), Phase 2 (SMS, Verify), Phase 4 (HTTP), Phase 3 (webhook wait).
 
-- [ ] PL-03.1 `wait/email`, `wait/sms`, `wait/http` and `wait/webhook` return as soon as a match arrives and `408` after the timeout.
-- [ ] PL-03.2 `since` prevents matching messages older than the request window.
-- [ ] PL-03.3 `otp` and `links` return the latest values per recipient and channel.
+- [x] PL-03.1 `wait/email`, `wait/sms`, `wait/http` and `wait/webhook` return as soon as a match arrives and `408` after the timeout. (#48)
+- [x] PL-03.2 `since` prevents matching messages older than the request window. (#48)
+- [x] PL-03.3 `otp` and `links` return the latest values per recipient and channel. (#48)
 - [x] PL-03.4 `--ready-json` with port `0` prints the bound addresses once ready. (#48)
 - [ ] PL-03.5 `POST /samples/{kind}` creates an email (over SMTP, with its SMTP session logged), an SMS or a verification through the normal path, firing the same events and webhooks as real traffic, with matching CLI and MCP commands.
 
@@ -68,7 +68,7 @@ UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage).
 - [x] PL-04.3 `reset` wipes all traffic and restores exactly the seed state. (#48)
 - [x] PL-04.4 `seed export` then `seed apply` on a fresh instance reproduces the same configuration. (#48)
 - [x] PL-04.5 `seed validate` reports errors with file line numbers and changes nothing. (#48)
-- [ ] PL-04.6 Settings > Seed shows the seed status, exports the file, and validates then applies an uploaded or pasted file after a confirmation.
+- [x] PL-04.6 Settings > Seed shows the seed status, exports the file, and validates then applies an uploaded or pasted file after a confirmation. (#48)
 
 ## PL-05 Settings
 
@@ -76,12 +76,12 @@ UI in U1, backend per feature phase.
 
 - [ ] PL-05.1 Every setting in the Settings screen is saved, applied without restart and returned by `GET /settings`.
 - [x] PL-05.2 Invalid values are rejected with a field-level error. (#48)
-- [ ] PL-05.3 Each section saves only its own changes, Save is disabled until something changed, and Discard restores the saved values.
+- [x] PL-05.3 Each section saves only its own changes, Save is disabled until something changed, and Discard restores the saved values. (#48)
 - [ ] PL-05.4 Reset to seed and the delete-all buttons ask for confirmation before acting.
 - [ ] PL-05.5 Connection snippets exist for every listed language and use the host for where the app runs (local, Docker host, Compose service) and the ports from `/info`.
-- [ ] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged.
-- [ ] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body.
-- [ ] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips.
+- [x] PL-05.7 Request headers and optional payload fields added in Connection appear in every language's API snippet, in that language's syntax; invalid JSON is flagged. (#48)
+- [x] PL-05.8 A `{{file:<name>}}` value in a Connection body makes every language's snippet read and base64-encode that file and put it in the body. (#48)
+- [x] PL-05.9 The SMS body in Connection offers `media` and `media_urls` chips. (#48)
 - [x] PL-05.6 About shows the version, channel, listeners and database, and the update check never runs until it is turned on. (#48)
 - [x] PL-05.10 The update check has the modes Off (default), Manual and Daily in Settings > About, `sendmock.toml` and `SENDMOCK_UPDATE_CHECK`; Daily checks on start and once a day, and Manual only on request. (#48)
 - [x] PL-05.11 A found version shows its date, its release notes and the upgrade command for the install method (Homebrew, Scoop, Docker, install script, npm, or the release page when unknown); with Daily it raises one header notification per new version. (#48)
