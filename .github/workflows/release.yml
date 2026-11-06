@@ -257,6 +257,48 @@ jobs:
             Stop-Process -Id $server.Id -Force
           }
 
+      # AC: DS-03.4
+      - name: WinGet and Chocolatey install their packages from a local server (Windows x64)
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          try {
+            $checksumLines = @(Get-Content dist/*.sha256) + (("0" * 64) + "  sendmock-aarch64-pc-windows-msvc.zip")
+            $checksumLines | Set-Content "$env:RUNNER_TEMP/SHA256SUMS"
+            bun scripts/release/winget-manifests.ts $env:VERSION "$env:RUNNER_TEMP/SHA256SUMS" "$env:RUNNER_TEMP/winget" http://127.0.0.1:8766
+            bun scripts/release/chocolatey-package.ts $env:VERSION "$env:RUNNER_TEMP/SHA256SUMS" "$env:RUNNER_TEMP/chocolatey" http://127.0.0.1:8766
+            $server = Start-Process python -ArgumentList "-m", "http.server", "8766", "--bind", "127.0.0.1" -WorkingDirectory dist -PassThru
+
+            if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+              Install-Module Microsoft.WinGet.Client -Force -Scope CurrentUser -Repository PSGallery
+              Repair-WinGetPackageManager -AllUsers -Latest
+            }
+            winget settings --enable LocalManifestFiles
+            winget validate --manifest "$env:RUNNER_TEMP/winget"
+            if ($LASTEXITCODE -ne 0) { throw "winget validate refused the manifests" }
+            winget install --manifest "$env:RUNNER_TEMP/winget" --accept-package-agreements --accept-source-agreements --disable-interactivity
+            if ($LASTEXITCODE -ne 0) { throw "winget install failed with exit code $LASTEXITCODE" }
+            $wingetVersion = (& "$env:LOCALAPPDATA/Microsoft/WinGet/Links/sendmock.exe" version --json | ConvertFrom-Json).version
+            if ($wingetVersion -ne $env:VERSION) { throw "the WinGet command runs $wingetVersion, not $env:VERSION" }
+            Write-Host "PASS: winget installs the sendmock command"
+
+            Push-Location "$env:RUNNER_TEMP/chocolatey"
+            choco pack sendmock.nuspec --limit-output
+            choco install sendmock --source . --yes --no-progress --limit-output
+            if ($LASTEXITCODE -ne 0) { throw "choco install failed with exit code $LASTEXITCODE" }
+            Pop-Location
+            $chocolateyVersion = (& "$env:ChocolateyInstall/bin/sendmock.exe" version --json | ConvertFrom-Json).version
+            if ($chocolateyVersion -ne $env:VERSION) { throw "the Chocolatey shim runs $chocolateyVersion, not $env:VERSION" }
+            Write-Host "PASS: choco installs the sendmock command"
+            Stop-Process -Id $server.Id -Force
+          }
+          catch {
+            Write-Host "::error title=WinGet and Chocolatey test::$($_.Exception.Message)"
+            exit 1
+          }
+
       - name: Starts with no runtime in minimal Linux images
         if: matrix.containers
         run: |
@@ -662,4 +704,76 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
         run: cargo publish --workspace --locked
+
+  # A stable on WinGet: wingetcreate opens the pull request to microsoft/winget-pkgs from the
+  # owner's fork, when WINGET_TOKEN is set (DS-03.4).
+  winget:
+    name: WinGet submission
+    needs: [plan, publish]
+    if: inputs.publish && inputs.channel == 'stable'
+    runs-on: windows-latest
+    env:
+      HAS_WINGET_TOKEN: ${{ secrets.WINGET_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write the manifests from SHA256SUMS
+        shell: pwsh
+        run: |
+          bun scripts/release/winget-manifests.ts "${{ needs.plan.outputs.version }}" dist/SHA256SUMS winget
+          Get-Content winget/*
+
+      - name: Submit them to microsoft/winget-pkgs
+        if: env.HAS_WINGET_TOKEN == 'true'
+        shell: pwsh
+        env:
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          ./wingetcreate.exe submit --token $env:WINGET_TOKEN --prtitle "New version: shibbirweb.sendmock version ${{ needs.plan.outputs.version }}" winget
+
+  # A stable on Chocolatey, when CHOCOLATEY_API_KEY is set; each version then waits for
+  # Chocolatey's moderators (DS-03.4).
+  chocolatey:
+    name: Chocolatey package
+    needs: [plan, publish]
+    if: inputs.publish && inputs.channel == 'stable'
+    runs-on: windows-latest
+    env:
+      HAS_CHOCOLATEY_KEY: ${{ secrets.CHOCOLATEY_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write and pack the package from SHA256SUMS
+        shell: pwsh
+        run: |
+          bun scripts/release/chocolatey-package.ts "${{ needs.plan.outputs.version }}" dist/SHA256SUMS chocolatey
+          Push-Location chocolatey
+          choco pack sendmock.nuspec --limit-output
+
+      - name: Push it to the Chocolatey community repository
+        if: env.HAS_CHOCOLATEY_KEY == 'true'
+        shell: pwsh
+        working-directory: chocolatey
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        run: choco push "sendmock.${{ needs.plan.outputs.version }}.nupkg" --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
 

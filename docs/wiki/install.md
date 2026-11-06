@@ -205,6 +205,42 @@ Our signed repository keeps SendMock up to date with the rest of your system.
 
 4. Go on to [Start SendMock](#start-sendmock).
 
+## WinGet (Windows)
+
+WinGet is built into Windows 10 and 11. It has the stable only.
+
+1. Install SendMock:
+
+   ```powershell
+   winget install shibbirweb.sendmock
+   ```
+
+2. Open a new PowerShell window and check that it is installed:
+
+   ```powershell
+   sendmock --version
+   ```
+
+3. Go on to [Start SendMock](#start-sendmock). `winget upgrade shibbirweb.sendmock` installs new releases.
+
+## Chocolatey (Windows)
+
+Chocolatey has the stable only. A new version appears there once Chocolatey's moderators approve it, which can take a few days.
+
+1. Install SendMock from an administrator PowerShell:
+
+   ```powershell
+   choco install sendmock
+   ```
+
+2. Check that it is installed:
+
+   ```powershell
+   sendmock --version
+   ```
+
+3. Go on to [Start SendMock](#start-sendmock). `choco upgrade sendmock` installs new releases.
+
 ## npm (projects with Node.js)
 
 The `sendmock` package runs the right binary for your computer, so a JavaScript project can keep SendMock in its dev dependencies and start it in CI.
