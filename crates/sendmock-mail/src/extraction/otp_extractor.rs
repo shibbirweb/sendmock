@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use regex::Regex;
 
 /// 4 to 8 digit codes next to the words people use for them, before or after.
@@ -7,16 +9,18 @@ pub const DEFAULT_OTP_PATTERNS: [&str; 2] = [
 ];
 
 /// Finds one-time codes with the default patterns, or the custom ones from Settings. A
-/// pattern's first capture group is the code; without one, the whole match is.
+/// pattern's first capture group is the code; without one, the whole match is. Clones share
+/// the compiled patterns and their search caches, since compiling them is far dearer than
+/// running them.
 #[derive(Debug, Clone)]
 pub struct OtpExtractor {
-    patterns: Vec<Regex>,
+    patterns: Arc<[Regex]>,
 }
 
 impl OtpExtractor {
     pub fn with_default_patterns() -> Self {
         Self::with_patterns(&DEFAULT_OTP_PATTERNS).unwrap_or(Self {
-            patterns: Vec::new(),
+            patterns: Arc::from([]),
         })
     }
 
@@ -26,13 +30,15 @@ impl OtpExtractor {
             .iter()
             .map(|pattern_text| Regex::new(pattern_text))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Self { patterns })
+        Ok(Self {
+            patterns: Arc::from(patterns),
+        })
     }
 
     /// Every code found, first seen first, without repeats.
     pub fn extract_codes(&self, message_text: &str) -> Vec<String> {
         let mut codes: Vec<String> = Vec::new();
-        for pattern in &self.patterns {
+        for pattern in self.patterns.iter() {
             for code_match in pattern.captures_iter(message_text) {
                 let code = code_match
                     .get(1)
