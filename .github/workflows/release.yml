@@ -426,8 +426,9 @@ jobs:
         run: sh scripts/release/stage-crate-files.sh
 
       # AC: DS-03.1
+      # --allow-dirty: the staged copies are untracked on purpose; the checkout is otherwise clean.
       - name: Every crate packages and builds from its package (cargo publish --dry-run)
-        run: cargo publish --workspace --dry-run --locked
+        run: cargo publish --workspace --dry-run --locked --allow-dirty
 
   # Real mailers in eight languages against this commit's SMTP server, before publishing.
   smtp-clients:
@@ -703,7 +704,7 @@ jobs:
       - name: Publish every crate in dependency order
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
-        run: cargo publish --workspace --locked
+        run: cargo publish --workspace --locked --allow-dirty
 
   # A stable on WinGet: wingetcreate opens the pull request to microsoft/winget-pkgs from the
   # owner's fork, when WINGET_TOKEN is set (DS-03.4).
