@@ -141,6 +141,7 @@ export async function sendEmail(
 
 export type LiveDelivery = {
   id: string;
+  attempt: number;
   status: string;
   event_type: string;
   trigger: string;

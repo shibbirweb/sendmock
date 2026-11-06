@@ -70,7 +70,7 @@ test("WH-03.7 the live log shows each delivery and narrows by status, endpoint a
   const failingReceiver = await startWebhookReceiver(500, "down");
   const failing = await createRuleFiredEndpoint(request, failingReceiver.url);
   await sendEmail(request, `Order ${failing.subjectToken}`);
-  await waitForDelivery(request, failing.endpointId, "failed");
+  await waitForDelivery(request, failing.endpointId, "exhausted");
   const passingReceiver = await startWebhookReceiver(200, "ok");
   const passingName = makeUniqueName("Live passing");
   const passingId = await createEndpoint(
@@ -155,17 +155,27 @@ test("WH-03.8 a live delivery shows request and response, the truncation note, a
   const retrying = await createRuleFiredEndpoint(request, receiver.url, {
     retry_policy: {
       max_attempts: 3,
-      backoff_seconds: [600, 600],
+      backoff_seconds: [1, 600],
       retry_on_client_errors: false,
     },
   });
   await sendEmail(request, `Retry ${retrying.subjectToken}`);
-  const failedAttempt = await waitForDelivery(
-    request,
-    retrying.endpointId,
-    "failed",
+  await expect
+    .poll(
+      async () =>
+        (await listEndpointDeliveries(request, retrying.endpointId)).filter(
+          (delivery) => delivery.status === "failed",
+        ).length,
+      { timeout: 20_000 },
+    )
+    .toBe(2);
+  const secondAttempt = (
+    await listEndpointDeliveries(request, retrying.endpointId)
+  ).find((delivery) => delivery.attempt === 2);
+  const deliveryDrawer = await openDeliveryDrawer(
+    page,
+    secondAttempt?.id ?? "",
   );
-  const deliveryDrawer = await openDeliveryDrawer(page, failedAttempt.id);
 
   await expect(
     deliveryDrawer.getByRole("region", { name: "Request", exact: true }),
@@ -182,10 +192,10 @@ test("WH-03.8 a live delivery shows request and response, the truncation note, a
     ),
   ).toBeVisible();
   await expect(deliveryDrawer.getByText("Caused by")).toBeVisible();
+  await expect(deliveryDrawer.getByText("2 of 3")).toBeVisible();
   const attemptsList = deliveryDrawer.getByRole("region", { name: "Attempts" });
-  await expect(
-    attemptsList.getByRole("link", { name: /Attempt 1/ }),
-  ).toBeVisible();
+  await expect(attemptsList.getByRole("link")).toHaveCount(2);
+  await attemptsList.getByRole("link", { name: /Attempt 1/ }).click();
   await expect(deliveryDrawer.getByText("1 of 3")).toBeVisible();
 
   await deliveryDrawer.getByRole("button", { name: "Copy as cURL" }).click();

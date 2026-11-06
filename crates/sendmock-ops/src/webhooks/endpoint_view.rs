@@ -53,7 +53,7 @@ pub fn write_request_settings(
 }
 
 /// The endpoint as the API shows it: the secret masked and the previous one's expiry only
-/// while it still signs. Delivery numbers stay empty until deliveries are recorded.
+/// while it still signs. The delivery numbers start empty; `add_delivery_health` fills them.
 pub fn build_endpoint_view(
     stored_endpoint: WebhookEndpointRecord,
     now_unix_ms: i64,

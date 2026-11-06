@@ -56,7 +56,15 @@ async function changeAndSave(
   await page.goto(`/settings?section=${sectionId}`);
   const settingsForm = page.getByRole("form", { name: formName });
   await changeField(settingsForm);
+  const savePromise = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/v1/settings") &&
+      response.request().method() === "PATCH",
+    { timeout: 10_000 },
+  );
   await settingsForm.getByRole("button", { name: "Save changes" }).click();
+  const saveResponse = await savePromise;
+  expect(saveResponse.status(), await saveResponse.text()).toBe(200);
   await expect(page.getByText("Settings saved").first()).toBeVisible();
 }
 
@@ -102,10 +110,13 @@ test("PL-05.1 a change in each settings section is returned by GET /settings and
       .fill("nobody@chaos-live.test");
   });
   await changeAndSave(page, "otp", "OTP patterns", async (settingsForm) => {
+    const patternCount = await settingsForm
+      .getByRole("list", { name: "OTP patterns" })
+      .getByRole("listitem")
+      .count();
     await settingsForm.getByRole("button", { name: "Add pattern" }).click();
     await settingsForm
-      .getByLabel(/^Pattern \d+$/)
-      .last()
+      .getByLabel(`Pattern ${patternCount + 1}`, { exact: true })
       .fill("ref ([A-Z]{3}[0-9]{3})");
   });
   await changeAndSave(page, "about", "Updates", async (settingsForm) => {

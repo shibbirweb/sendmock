@@ -3,6 +3,7 @@ use sendmock_store::WebhookSecretRotation;
 use sendmock_webhooks::WebhookSecret;
 use serde::Serialize;
 
+use super::endpoint_delivery_health::add_endpoint_delivery_health;
 use super::endpoint_inputs::{RotateSecretRequest, WebhookEndpointReference};
 use super::endpoint_operations::find_stored_endpoint;
 use super::endpoint_validation::ALLOWED_OVERLAP_HOURS;
@@ -93,6 +94,7 @@ impl Operation for RotateWebhookEndpointSecretOperation {
             )
             .await?;
         let rotated_endpoint = find_stored_endpoint(operation_context, &input.endpoint_id).await?;
-        build_endpoint_view(rotated_endpoint, now_unix_ms)
+        let endpoint = build_endpoint_view(rotated_endpoint, now_unix_ms)?;
+        add_endpoint_delivery_health(operation_context, endpoint).await
     }
 }

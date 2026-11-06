@@ -1,6 +1,7 @@
 use sendmock_store::WebhookEndpointRecord;
 use sendmock_webhooks::WebhookSecret;
 
+use super::endpoint_delivery_health::{add_delivery_health, add_endpoint_delivery_health};
 use super::endpoint_inputs::{
     WebhookEndpointInput, WebhookEndpointReference, WebhookEndpointUpdate,
 };
@@ -52,13 +53,14 @@ impl Operation for ListWebhookEndpointsOperation {
         _input: NoInput,
     ) -> Result<Vec<WebhookEndpoint>, OperationError> {
         let now_unix_ms = operation_context.clock.now_unix_ms();
-        operation_context
+        let endpoints = operation_context
             .webhook_endpoint_repository
             .list_endpoints()
             .await?
             .into_iter()
             .map(|stored_endpoint| build_endpoint_view(stored_endpoint, now_unix_ms))
-            .collect()
+            .collect::<Result<Vec<_>, _>>()?;
+        add_delivery_health(operation_context, endpoints).await
     }
 }
 
@@ -138,7 +140,8 @@ impl Operation for GetWebhookEndpointOperation {
         input: WebhookEndpointReference,
     ) -> Result<WebhookEndpoint, OperationError> {
         let stored_endpoint = find_stored_endpoint(operation_context, &input.endpoint_id).await?;
-        build_endpoint_view(stored_endpoint, operation_context.clock.now_unix_ms())
+        let endpoint = build_endpoint_view(stored_endpoint, operation_context.clock.now_unix_ms())?;
+        add_endpoint_delivery_health(operation_context, endpoint).await
     }
 }
 
@@ -192,7 +195,9 @@ impl Operation for UpdateWebhookEndpointOperation {
             .webhook_endpoint_repository
             .update_endpoint(changed_endpoint.clone())
             .await?;
-        build_endpoint_view(changed_endpoint, operation_context.clock.now_unix_ms())
+        let endpoint =
+            build_endpoint_view(changed_endpoint, operation_context.clock.now_unix_ms())?;
+        add_endpoint_delivery_health(operation_context, endpoint).await
     }
 }
 

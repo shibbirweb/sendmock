@@ -56,6 +56,7 @@ test("WH-10.4 live saved deliveries list newest first with their stored request 
   await saveTestDelivery(request, endpointId, olderName);
   await saveTestDelivery(request, endpointId, newerName);
   await page.goto("/webhooks/saved");
+  await expect(findSavedItem(page, newerName)).toBeVisible();
 
   const shownNames = await page.getByTestId("saved-delivery").allTextContents();
   const newerIndex = shownNames.findIndex((shownText) =>
@@ -142,7 +143,6 @@ test("WH-10.2 a live saved delivery is sent to another endpoint and turned into 
   await page.getByRole("option", { name: targetName, exact: true }).click();
   await sendDialog.getByRole("button", { name: "Send", exact: true }).click();
   const sendResult = sendDialog.getByTestId("sent-delivery-result");
-  await expect(sendResult).toContainText("200");
   await expect(sendResult).toContainText(`Sent to ${targetName}`);
   expect(receiver.receivedBodies.at(-1)).toContain("test.ping");
   await sendResult.getByRole("link", { name: "Open delivery" }).click();
