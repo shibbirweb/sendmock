@@ -179,12 +179,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz }
-          - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz }
-          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz, containers: "alpine:3.22 busybox:1.37" }
-          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz, containers: "alpine:3.22" }
-          - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip }
-          - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip }
+          - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz, npm_platform: darwin-arm64 }
+          - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz, npm_platform: darwin-x64 }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz, npm_platform: linux-x64, containers: "alpine:3.22 busybox:1.37" }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz, npm_platform: linux-arm64, containers: "alpine:3.22" }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip, npm_platform: win32-x64 }
+          - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip, npm_platform: win32-arm64 }
     steps:
       - uses: actions/checkout@v5
         with:
@@ -209,6 +209,53 @@ jobs:
         if: matrix.archive == 'zip'
         shell: pwsh
         run: ./scripts/release-tests/install-script.ps1 dist/sendmock-${{ matrix.target }}.zip ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # AC: DS-03.1
+      - name: npm installs the launcher and this platform's package, and npx runs sendmock
+        shell: bash
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          bun scripts/release/npm-packages.ts "$VERSION" dist "$RUNNER_TEMP/npm-packages" ${{ matrix.target }}
+          cd "$RUNNER_TEMP/npm-packages"
+          npm pack ./sendmock ./${{ matrix.npm_platform }}
+          mkdir "$RUNNER_TEMP/npm-project" && cd "$RUNNER_TEMP/npm-project"
+          npm init -y > /dev/null
+          npm install "$RUNNER_TEMP"/npm-packages/*.tgz
+          version_json="$(npx --no-install sendmock version --json)"
+          echo "$version_json"
+          echo "$version_json" | grep -q "\"version\":\"$VERSION\"" || { echo "npx sendmock does not run $VERSION" >&2; exit 1; }
+
+      # AC: DS-03.1
+      - name: Scoop installs the manifest from a local server, and its shim runs sendmock (Windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          # The manifest names both Windows archives; this runner only has its own, and Scoop only downloads that one.
+          $checksumLines = @(Get-Content dist/*.sha256)
+          foreach ($windowsTarget in "x86_64-pc-windows-msvc", "aarch64-pc-windows-msvc") {
+            if (-not ($checksumLines -match "sendmock-$windowsTarget.zip")) { $checksumLines += ("0" * 64) + "  sendmock-$windowsTarget.zip" }
+          }
+          $checksumLines | Set-Content "$env:RUNNER_TEMP/SHA256SUMS"
+          bun scripts/release/scoop-manifest.ts $env:VERSION $env:RELEASE_CHANNEL "$env:RUNNER_TEMP/SHA256SUMS" http://127.0.0.1:8765 | Set-Content "$env:RUNNER_TEMP/sendmock.json"
+          $server = Start-Process python -ArgumentList "-m", "http.server", "8765", "--bind", "127.0.0.1" -WorkingDirectory dist -PassThru
+          try {
+            Invoke-Expression "& {$(Invoke-RestMethod https://get.scoop.sh)} -RunAsAdmin"
+            scoop install "$env:RUNNER_TEMP/sendmock.json"
+            $versionJson = & "$env:USERPROFILE/scoop/shims/sendmock.exe" version --json
+            Write-Host $versionJson
+            if (($versionJson | ConvertFrom-Json).version -ne $env:VERSION) { throw "the Scoop shim does not run $env:VERSION" }
+            if (-not (([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -match "scoop\\shims")) { throw "Scoop did not put its shims on the user Path" }
+          }
+          finally {
+            Stop-Process -Id $server.Id -Force
+          }
 
       - name: Starts with no runtime in minimal Linux images
         if: matrix.containers
@@ -433,3 +480,92 @@ jobs:
           git add Formula
           git diff --cached --quiet || git commit -m "chore: ${formula_name} ${VERSION}"
           git push
+
+  # The manifest in the bucket, when the owner has set SCOOP_BUCKET_TOKEN (DS-03.1).
+  scoop:
+    name: Scoop manifest
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    env:
+      HAS_BUCKET_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Write the manifest from SHA256SUMS
+        run: |
+          bun scripts/release/scoop-manifest.ts "${{ needs.plan.outputs.version }}" "$RELEASE_CHANNEL" dist/SHA256SUMS > manifest.json
+          cat manifest.json
+
+      - name: Push it to shibbirweb/scoop-bucket
+        if: env.HAS_BUCKET_TOKEN == 'true'
+        env:
+          BUCKET_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          manifest_name="sendmock"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then manifest_name="sendmock-beta"; fi
+          git clone --depth 1 "https://x-access-token:${BUCKET_TOKEN}@github.com/shibbirweb/scoop-bucket.git" bucket
+          mkdir -p bucket/bucket
+          cp manifest.json "bucket/bucket/${manifest_name}.json"
+          cd bucket
+          git config user.name "MD. Shibbir Ahmed"
+          git config user.email "shibbirweb@gmail.com"
+          git add bucket
+          git diff --cached --quiet || git commit -m "chore: ${manifest_name} ${VERSION}"
+          git push
+
+  # The npm packages with npm trusted publishing (GitHub OIDC, no stored token), when the owner
+  # has set the repository variable NPM_PUBLISHING to true after linking the packages to this
+  # workflow on npm (DS-03.1).
+  npm:
+    name: npm packages
+    needs: [plan, publish]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable') && vars.NPM_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: npm with trusted publishing
+        run: npm install -g npm@11
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: dist
+
+      - name: Publish the platform packages, then the launcher
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          dist_tag="latest"
+          if [ "$RELEASE_CHANNEL" = "beta" ]; then dist_tag="beta"; fi
+          bun scripts/release/npm-packages.ts "$VERSION" dist npm-packages
+          for package_directory in npm-packages/*/; do
+            if [ "$(basename "$package_directory")" != "sendmock" ]; then
+              npm publish "$package_directory" --access public --tag "$dist_tag"
+            fi
+          done
+          npm publish npm-packages/sendmock --access public --tag "$dist_tag"
+

@@ -99,6 +99,62 @@ Prefer to download the binary yourself? Go to [Binaries](#binaries).
 
 Prefer to download the binary yourself? Go to [Binaries](#binaries).
 
+## Scoop (Windows)
+
+1. Add the SendMock bucket:
+
+   ```powershell
+   scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket
+   ```
+
+2. Install SendMock.
+
+   Stable:
+
+   ```powershell
+   scoop install shibbirweb/sendmock
+   ```
+
+   Beta:
+
+   ```powershell
+   scoop install shibbirweb/sendmock-beta
+   ```
+
+3. Check that it is installed:
+
+   ```powershell
+   sendmock --version
+   ```
+
+4. Go on to [Start SendMock](#start-sendmock).
+
+## npm (projects with Node.js)
+
+The `sendmock` package runs the right binary for your computer, so a JavaScript project can keep SendMock in its dev dependencies and start it in CI.
+
+1. Add it to your project.
+
+   Stable:
+
+   ```bash
+   npm install --save-dev sendmock
+   ```
+
+   Beta:
+
+   ```bash
+   npm install --save-dev sendmock@beta
+   ```
+
+2. Check that it runs:
+
+   ```bash
+   npx sendmock --version
+   ```
+
+3. Start it with `npx sendmock`, or add `"sendmock": "sendmock"` to your `scripts`. Then go on to [Start SendMock](#start-sendmock).
+
 ## Docker
 
 1. Start the container.
