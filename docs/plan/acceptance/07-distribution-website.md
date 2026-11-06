@@ -6,7 +6,7 @@ Plan: [09-distribution.md](../09-distribution.md), [16-website-and-releases.md](
 
 Phase 0 (build), Phase 5 (all targets).
 
-- [ ] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64.
+- [x] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64. (#48)
 - [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
 - [ ] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release.
 - [ ] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)).
@@ -27,7 +27,7 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 
 Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs). Official distribution repositories are later and have no criteria yet ([09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27)).
 
-- [ ] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary.
+- [x] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary. (#48)
 - [x] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums. (#48)
 - [ ] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally.
 - [x] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary. (#48)
@@ -38,9 +38,9 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 
 Phase 0.
 
-- [ ] DS-04.1 Beta release opens a release PR with the next beta version and notes from `[Unreleased]`; merging it publishes a GitHub pre-release and builds all channels' beta artefacts.
+- [x] DS-04.1 Beta release opens a release PR with the next beta version and notes from `[Unreleased]`; merging it publishes a GitHub pre-release and builds all channels' beta artefacts. (#48)
 - [x] DS-04.2 Stable release refuses unless the current beta is published and nothing untried landed after it. (#48)
-- [ ] DS-04.3 Promote stable opens the `develop` to `main` PR; merging it publishes the stable release and all stable channels.
+- [x] DS-04.3 Promote stable opens the `develop` to `main` PR; merging it publishes the stable release and all stable channels. (#48)
 - [x] DS-04.4 No release is cut from a commit where CI did not pass; the version in code, tag and pre-release flag always agree. (#48)
 - [x] DS-04.5 Every workflow supports dry run (where documented) and can be re-run safely. (#48)
 
@@ -52,7 +52,7 @@ Phase 0.
 - [x] DS-05.2 CI fails when version files disagree. (#48)
 - [x] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta. (#48)
 - [x] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas. (#48)
-- [ ] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word.
+- [x] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word. (#48)
 
 ## DS-06 Test harness integration
 
