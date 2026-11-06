@@ -343,6 +343,36 @@ jobs:
           path: dist
           retention-days: 7
 
+  # Every crate packages and builds as crates.io would, with the UI and the skill inside, so
+  # `cargo install sendmock` works once the stable is published (DS-03.1).
+  crates:
+    name: crates.io packages
+    needs: web-dist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+
+      - name: Toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: crates-package
+
+      - name: Put the UI and the skill inside the crates that embed them
+        run: sh scripts/release/stage-crate-files.sh
+
+      # AC: DS-03.1
+      - name: Every crate packages and builds from its package (cargo publish --dry-run)
+        run: cargo publish --workspace --dry-run --locked
+
   # Real mailers in eight languages against this commit's SMTP server, before publishing.
   smtp-clients:
     uses: ./.github/workflows/smtp-clients.yml
@@ -370,7 +400,7 @@ jobs:
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, example-apps]
+    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, example-apps, crates]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -568,4 +598,39 @@ jobs:
             fi
           done
           npm publish npm-packages/sendmock --access public --tag "$dist_tag"
+
+  # The crates on crates.io for a stable, with crates.io trusted publishing (GitHub OIDC, no
+  # stored token), when the owner has set the repository variable CRATES_PUBLISHING to true
+  # after adding this workflow as each crate's trusted publisher (DS-03.1).
+  crates-publish:
+    name: crates.io
+    needs: [plan, publish]
+    if: inputs.publish && inputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-web-dist
+          path: web/dist
+
+      - name: Toolchain
+        run: rustup toolchain install
+
+      - name: Put the UI and the skill inside the crates that embed them
+        run: sh scripts/release/stage-crate-files.sh
+
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: crates-io-auth
+
+      - name: Publish every crate in dependency order
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
+        run: cargo publish --workspace --locked
 

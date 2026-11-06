@@ -1,20 +1,29 @@
-/// `SKILL.md` as written in the repository; the version is filled in when it is served.
-const SKILL_TEMPLATE: &str = include_str!("../../../../skill/sendmock/SKILL.md");
+/// `SKILL.md` as written in the repository (or the copy a published crate carries, build.rs); the version is filled in when it is served.
+const SKILL_TEMPLATE: &str = include_str!(concat!(env!("SENDMOCK_SKILL_DIR"), "/SKILL.md"));
 const VERSION_PLACEHOLDER: &str = "{{sendmock_version}}";
 
 /// The skill's example scenarios, by file name, as `sendmock ai install` writes them.
 pub const SKILL_EXAMPLES: [(&str, &str); 3] = [
     (
         "otp-from-sms.toml",
-        include_str!("../../../../skill/sendmock/examples/otp-from-sms.toml"),
+        include_str!(concat!(
+            env!("SENDMOCK_SKILL_DIR"),
+            "/examples/otp-from-sms.toml"
+        )),
     ),
     (
         "reply-by-email.toml",
-        include_str!("../../../../skill/sendmock/examples/reply-by-email.toml"),
+        include_str!(concat!(
+            env!("SENDMOCK_SKILL_DIR"),
+            "/examples/reply-by-email.toml"
+        )),
     ),
     (
         "stripe-checkout.toml",
-        include_str!("../../../../skill/sendmock/examples/stripe-checkout.toml"),
+        include_str!(concat!(
+            env!("SENDMOCK_SKILL_DIR"),
+            "/examples/stripe-checkout.toml"
+        )),
     ),
 ];
 

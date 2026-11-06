@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   findDisagreeingFiles,
   readAllVersions,
+  readInternalDependencyVersions,
   readLockedCrateVersions,
   readWorkspaceVersion,
   writeLockedCrateVersions,
@@ -40,6 +41,18 @@ describe("version files (DS-05.1)", () => {
       version: "0.4.0-beta.1",
       private: true,
     });
+  });
+
+  test("DS-05.1 writes the exact version the workspace pins its own crates to", () => {
+    const workspaceWithCrates = `${cargoToml}\n[workspace.dependencies]\nsendmock-api = { path = "crates/sendmock-api", version = "=0.3.1" }\nsendmock-core = { path = "crates/sendmock-core", version = "=0.3.1" }\nserde = { version = "1" }\n`;
+
+    const rewritten = writeWorkspaceVersion(workspaceWithCrates, "1.0.0");
+
+    expect(readInternalDependencyVersions(rewritten)).toEqual([
+      "1.0.0",
+      "1.0.0",
+    ]);
+    expect(rewritten).toContain('serde = { version = "1" }');
   });
 
   test("DS-05.2 names the files that disagree with Cargo.toml", () => {

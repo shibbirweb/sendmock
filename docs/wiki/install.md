@@ -155,6 +155,24 @@ The `sendmock` package runs the right binary for your computer, so a JavaScript 
 
 3. Start it with `npx sendmock`, or add `"sendmock": "sendmock"` to your `scripts`. Then go on to [Start SendMock](#start-sendmock).
 
+## Cargo (Rust developers)
+
+The stable comes from crates.io and builds from source, with the web UI already inside. There is no beta here; use another way for the beta.
+
+1. Install SendMock:
+
+   ```bash
+   cargo install sendmock --locked
+   ```
+
+2. Check that it is installed:
+
+   ```bash
+   sendmock --version
+   ```
+
+3. Go on to [Start SendMock](#start-sendmock).
+
 ## Docker
 
 1. Start the container.

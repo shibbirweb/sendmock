@@ -1,6 +1,10 @@
 # Rust build output
 /target/
 
+# Copies a published crate carries, staged before packaging (scripts/release/stage-crate-files.sh)
+/crates/sendmock-api/web-dist/
+/crates/sendmock-ops/skill/
+
 .DS_Store
 
 # Python bytecode from the examples

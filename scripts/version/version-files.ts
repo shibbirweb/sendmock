@@ -8,6 +8,8 @@ const packageManifestPaths = ["web/package.json", "website/package.json"];
 
 const workspaceVersionPattern =
   /(\[workspace\.package\][^[]*?\nversion = ")([^"]+)(")/;
+const internalDependencyVersionPattern =
+  /(\nsendmock(?:-[a-z]+)? = \{ path = "crates\/[a-z-]+", version = "=)([^"]+)(")/g;
 const workspaceCrateVersionPattern =
   /(\[\[package\]\]\nname = "sendmock(?:-[a-z]+)?"\nversion = ")([^"]+)(")/g;
 
@@ -18,7 +20,16 @@ export function readWorkspaceVersion(cargoToml: string): string | null {
 }
 
 export function writeWorkspaceVersion(cargoToml: string, version: string) {
-  return cargoToml.replace(workspaceVersionPattern, `$1${version}$3`);
+  return cargoToml
+    .replace(workspaceVersionPattern, `$1${version}$3`)
+    .replace(internalDependencyVersionPattern, `$1${version}$3`);
+}
+
+/** The exact versions the workspace pins its own crates to (`version = "=X.Y.Z"`). */
+export function readInternalDependencyVersions(cargoToml: string): string[] {
+  return [...cargoToml.matchAll(internalDependencyVersionPattern)].map(
+    (dependencyMatch) => dependencyMatch[2] ?? "",
+  );
 }
 
 export function readLockedCrateVersions(cargoLock: string): string[] {
@@ -49,6 +60,9 @@ export function readAllVersions(
       filePath: workspaceManifestPath,
       version: readWorkspaceVersion(readText(workspaceManifestPath)),
     },
+    ...readInternalDependencyVersions(readText(workspaceManifestPath)).map(
+      (version) => ({ filePath: workspaceManifestPath, version }),
+    ),
     ...readLockedCrateVersions(readText(cargoLockPath)).map((version) => ({
       filePath: cargoLockPath,
       version,

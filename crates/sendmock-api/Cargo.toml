@@ -6,7 +6,12 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
+# web-dist is the UI build copied in before packaging (scripts/release/stage-crate-files.sh).
+include = [
+    "build.rs",
+    "src/**/*",
+    "web-dist/**/*",
+]
 
 [dependencies]
 sendmock-core.workspace = true

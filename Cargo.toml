@@ -15,18 +15,20 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/shibbirweb/sendmock"
 homepage = "https://shibbirweb.github.io/sendmock/"
 
+# Internal crates carry the exact workspace version, as crates.io needs a version beside the path
+# and the crates are released together (scripts/version.ts writes it).
 [workspace.dependencies]
-sendmock-api = { path = "crates/sendmock-api" }
-sendmock-cli = { path = "crates/sendmock-cli" }
-sendmock-core = { path = "crates/sendmock-core" }
-sendmock-mail = { path = "crates/sendmock-mail" }
-sendmock-mcp = { path = "crates/sendmock-mcp" }
-sendmock-ops = { path = "crates/sendmock-ops" }
-sendmock-smtp = { path = "crates/sendmock-smtp" }
-sendmock-sms = { path = "crates/sendmock-sms" }
-sendmock-payments = { path = "crates/sendmock-payments" }
-sendmock-store = { path = "crates/sendmock-store" }
-sendmock-webhooks = { path = "crates/sendmock-webhooks" }
+sendmock-api = { path = "crates/sendmock-api", version = "=0.0.0" }
+sendmock-cli = { path = "crates/sendmock-cli", version = "=0.0.0" }
+sendmock-core = { path = "crates/sendmock-core", version = "=0.0.0" }
+sendmock-mail = { path = "crates/sendmock-mail", version = "=0.0.0" }
+sendmock-mcp = { path = "crates/sendmock-mcp", version = "=0.0.0" }
+sendmock-ops = { path = "crates/sendmock-ops", version = "=0.0.0" }
+sendmock-smtp = { path = "crates/sendmock-smtp", version = "=0.0.0" }
+sendmock-sms = { path = "crates/sendmock-sms", version = "=0.0.0" }
+sendmock-payments = { path = "crates/sendmock-payments", version = "=0.0.0" }
+sendmock-store = { path = "crates/sendmock-store", version = "=0.0.0" }
+sendmock-webhooks = { path = "crates/sendmock-webhooks", version = "=0.0.0" }
 
 axum = "0.8"
 chrono = { version = "0.4", default-features = false, features = [
@@ -79,6 +81,7 @@ rmcp = { version = "3.8", default-features = false, features = [
 ] }
 roxmltree = "0.21"
 rust-embed = { version = "8", features = [
+    "interpolate-folder-path",
     "mime-guess",
 ] }
 rusqlite = { version = "0.41", features = [
