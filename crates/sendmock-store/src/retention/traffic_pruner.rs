@@ -70,8 +70,9 @@ impl TrafficPruner {
             .await
     }
 
-    /// Gives the pages pruning freed back to the file system, so the database file stays the
-    /// same size under continuous traffic instead of keeping its largest size.
+    /// Gives the pages pruning freed back to the file system and trims the write-ahead log, so
+    /// the files on disk stay the same size under continuous traffic instead of keeping their
+    /// largest size.
     pub async fn reclaim_free_pages(&self) -> Result<(), StoreError> {
         // A database made without incremental auto-vacuum keeps its free pages; stop when
         // the count no longer falls rather than loop forever.
@@ -88,10 +89,21 @@ impl TrafficPruner {
                 })
                 .await?;
             if remaining_free_pages == 0 || remaining_free_pages >= previous_free_pages {
-                return Ok(());
+                return self.truncate_write_ahead_log().await;
             }
             previous_free_pages = remaining_free_pages;
         }
+    }
+
+    /// Copies the write-ahead log into the database and cuts it back to nothing, which also
+    /// lets the vacuum above shrink the database file. A busy reader only postpones it.
+    async fn truncate_write_ahead_log(&self) -> Result<(), StoreError> {
+        self.database
+            .write(|connection| {
+                connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()))?;
+                Ok(())
+            })
+            .await
     }
 
     async fn delete_in_batches(

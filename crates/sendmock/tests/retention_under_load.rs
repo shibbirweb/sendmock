@@ -86,6 +86,21 @@ fn database_size_bytes(database_path: &Path) -> u64 {
         .sum()
 }
 
+/// The size once the retention task has finished vacuuming and trimming the log: two equal
+/// readings half a second apart.
+fn wait_for_settled_size(database_path: &Path) -> u64 {
+    let deadline = Instant::now() + Duration::from_secs(10);
+    let mut previous_size = database_size_bytes(database_path);
+    loop {
+        std::thread::sleep(Duration::from_millis(500));
+        let current_size = database_size_bytes(database_path);
+        if current_size == previous_size || Instant::now() > deadline {
+            return current_size;
+        }
+        previous_size = current_size;
+    }
+}
+
 // AC: PL-08.2
 #[test]
 fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Result<()> {
@@ -109,10 +124,10 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
 
     let slowest_in_first_round = send_mail_for_a_round(&ready_addresses.smtp_addr, &message_body)?;
     wait_until_pruned(&ready_addresses.http_addr)?;
-    let size_after_first_round = database_size_bytes(&database_path);
+    let size_after_first_round = wait_for_settled_size(&database_path);
     let slowest_in_second_round = send_mail_for_a_round(&ready_addresses.smtp_addr, &message_body)?;
     wait_until_pruned(&ready_addresses.http_addr)?;
-    let size_after_second_round = database_size_bytes(&database_path);
+    let size_after_second_round = wait_for_settled_size(&database_path);
 
     let slowest_message = slowest_in_first_round.max(slowest_in_second_round);
     assert!(

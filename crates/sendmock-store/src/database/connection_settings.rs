@@ -21,6 +21,9 @@ pub fn connection_target(location: &DatabaseLocation) -> String {
     }
 }
 
+/// What the write-ahead log is trimmed to after a checkpoint.
+const WAL_SIZE_LIMIT_BYTES: i64 = 4 * 1024 * 1024;
+
 pub fn open_write_connection(
     connection_target: &str,
     location: &DatabaseLocation,
@@ -41,6 +44,9 @@ pub fn open_write_connection(
     if matches!(location, DatabaseLocation::File(_)) {
         connection.pragma_update(None, "journal_mode", "WAL")?;
         connection.pragma_update(None, "synchronous", "NORMAL")?;
+        // SQLite reuses the write-ahead log but keeps it at its largest size; this trims it
+        // back after each checkpoint, so a burst of mail does not leave a large file behind.
+        connection.pragma_update(None, "journal_size_limit", WAL_SIZE_LIMIT_BYTES)?;
     }
     Ok(connection)
 }
