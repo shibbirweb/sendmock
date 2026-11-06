@@ -1,11 +1,12 @@
 use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 
 use rusqlite::{Connection, OpenFlags};
 
 use crate::{DatabaseLocation, StoreError};
 
-const BUSY_TIMEOUT_MS: u32 = 5000;
+pub(crate) const BUSY_TIMEOUT: Duration = Duration::from_millis(5000);
 
 /// SQLite gives each plain `:memory:` connection its own empty database, so every
 /// connection of one in-memory store opens the same named shared-cache database instead.
@@ -37,7 +38,7 @@ pub fn open_write_connection(
             | OpenFlags::SQLITE_OPEN_CREATE
             | OpenFlags::SQLITE_OPEN_URI,
     )?;
-    connection.busy_timeout(std::time::Duration::from_millis(u64::from(BUSY_TIMEOUT_MS)))?;
+    connection.busy_timeout(BUSY_TIMEOUT)?;
     connection.pragma_update(None, "foreign_keys", "ON")?;
     // auto_vacuum only takes effect when set before the first table is created.
     connection.pragma_update(None, "auto_vacuum", "INCREMENTAL")?;
@@ -56,7 +57,7 @@ pub fn open_read_connection(connection_target: &str) -> Result<Connection, Store
         connection_target,
         OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI,
     )?;
-    connection.busy_timeout(std::time::Duration::from_millis(u64::from(BUSY_TIMEOUT_MS)))?;
+    connection.busy_timeout(BUSY_TIMEOUT)?;
     // In the shared cache of the in-memory store, readers take table locks that make the
     // writer fail with SQLITE_LOCKED, which no busy timeout retries; read-uncommitted
     // readers take none. Files use WAL, where this pragma has no effect.

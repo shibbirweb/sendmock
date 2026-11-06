@@ -1,8 +1,10 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use rusqlite::params;
 
 use super::prunable_table::PrunableTable;
+use crate::database::BUSY_TIMEOUT;
 use crate::{Database, StoreError};
 
 /// Rows deleted per write; small enough that a waiting ingest write is never held long.
@@ -96,11 +98,16 @@ impl TrafficPruner {
     }
 
     /// Copies the write-ahead log into the database and cuts it back to nothing, which also
-    /// lets the vacuum above shrink the database file. A busy reader only postpones it.
+    /// lets the vacuum above shrink the database file. With a reader still on the log it is
+    /// skipped until the next prune: waiting for the reader would hold every ingest write.
     async fn truncate_write_ahead_log(&self) -> Result<(), StoreError> {
         self.database
             .write(|connection| {
-                connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()))?;
+                connection.busy_timeout(Duration::ZERO)?;
+                let checkpoint_result =
+                    connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
+                connection.busy_timeout(BUSY_TIMEOUT)?;
+                checkpoint_result?;
                 Ok(())
             })
             .await

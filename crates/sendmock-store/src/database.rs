@@ -2,6 +2,8 @@ mod connection_settings;
 mod database_readers;
 mod database_writer;
 
+pub(crate) use connection_settings::BUSY_TIMEOUT;
+
 use rusqlite::Connection;
 
 use crate::migration::apply_migrations;
