@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 59 / 109 accepted (AI-03, AI-04, AI-06, DS-04, DS-05, DS-06, EM-01, EM-02, EM-06, EM-08 to EM-15, EM-17, EM-18, HC-01, HC-02, HC-03, PL-01, PL-02, PL-09, PY-01 to PY-12, SM-01, SM-03 to SM-06, SM-08 to SM-11, SM-13, SM-14, SM-16, UI-12, VF-02 to VF-04, WH-06 to WH-09, WH-12, WS-05), 376 / 505 criteria ticked; `bun scripts/acceptance.ts` prints the rest |
+| **Feature acceptance** | 66 / 109 accepted (AI-01, AI-03, AI-04, AI-06, DS-04 to DS-06, EM-01 to EM-03, EM-06 to EM-15, EM-17, EM-18, HC-01 to HC-03, PL-01, PL-02, PL-07, PL-09, PY-01 to PY-12, SM-01, SM-03 to SM-14, SM-16, UI-12, VF-02 to VF-04, WH-06 to WH-09, WH-12, WS-05, WS-09), 385 / 505 criteria ticked; `bun scripts/acceptance.ts` prints the rest |
 
 **Next up:**
 

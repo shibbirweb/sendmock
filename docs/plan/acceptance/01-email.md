@@ -28,10 +28,10 @@ Phase 1.
 Phase 1.
 
 - [x] EM-03.1 Raw messages are stored zstd-compressed and the downloaded `.eml` is byte-identical to what was received. (#48)
-- [ ] EM-03.2 With `--max-emails N` the oldest messages are pruned so at most N remain; `--max-age` prunes by age.
+- [x] EM-03.2 With `--max-emails N` the oldest messages are pruned so at most N remain; `--max-age` prunes by age. (#48)
 - [x] EM-03.3 `--db memory` keeps nothing on disk. (#48)
 - [x] EM-03.4 Full-text search and the filters `from:`, `to:`, `subject:`, `has:attachment`, `is:unread`, `tag:`, `source:` return the correct messages, in under 200 ms with 10,000 stored emails. (#48)
-- [ ] EM-03.5 Delete one, delete by filter and delete all work from UI, API, CLI and MCP.
+- [x] EM-03.5 Delete one, delete by filter and delete all work from UI, API, CLI and MCP. (#48)
 
 ## EM-04 Email viewer
 
@@ -52,8 +52,8 @@ UI in U1, backend Phase 1.
 
 - [x] EM-05.1 4 to 8 digit codes near words such as "code", "OTP" or "verification" are extracted from text and HTML bodies. (#48)
 - [ ] EM-05.2 Links (including verification and reset links) are extracted and listed.
-- [ ] EM-05.3 Custom OTP patterns from Settings are used for new messages.
-- [ ] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code.
+- [x] EM-05.3 Custom OTP patterns from Settings are used for new messages. (#48)
+- [x] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code. (#48)
 - [x] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient. (#48)
 
 ## EM-06 sendmail shim
@@ -68,8 +68,8 @@ Phase 1.
 
 Phase 1.
 
-- [ ] EM-07.1 `POST /api/v1/send` with from, to, cc, bcc, subject, text, html, attachments and headers stores a message equal to the equivalent SMTP message.
-- [ ] EM-07.2 Invalid input returns `400` with a field-level error and is recorded in the HTTP request log.
+- [x] EM-07.1 `POST /api/v1/send` with from, to, cc, bcc, subject, text, html, attachments and headers stores a message equal to the equivalent SMTP message. (#48)
+- [x] EM-07.2 Invalid input returns `400` with a field-level error and is recorded in the HTTP request log. (#48)
 - [x] EM-07.3 The stored email shows source `native_api`. (#48)
 - [x] EM-07.4 `attachments` with `filename`, base64 `content`, optional `content_type` (guessed from the extension when missing) and optional `content_id` (inline, shown through `cid:`) are stored as attachments of the message. (#48)
 - [x] EM-07.5 A missing filename, invalid base64 or attachments over the size limit return `400` naming the attachment. (#48)

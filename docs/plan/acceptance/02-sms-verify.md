@@ -18,7 +18,7 @@ Phase 2.
 
 - [x] SM-02.1 Create, fetch and list at `/2010-04-01/Accounts/{AccountSid}/Messages[...].json` return Twilio-shaped JSON with `SM` + 32 hex IDs.
 - [x] SM-02.2 Missing or invalid params return Twilio's error JSON and HTTP status.
-- [ ] SM-02.3 Any credentials are accepted by default; with credentials enforced, wrong ones return `401` in Twilio's format.
+- [x] SM-02.3 Any credentials are accepted by default; with credentials enforced, wrong ones return `401` in Twilio's format. (#48)
 - [ ] SM-02.4 The official Twilio SDKs (PHP, Node, Python, Go, Java, C#, Ruby) send successfully using the documented redirection recipe.
 
 ## SM-03 Twilio Messaging Services
@@ -63,7 +63,7 @@ Phase 2. Docs: [Delivery simulation](../04-sms.md#delivery-simulation).
 - [x] SM-07.4 Strict Twilio test mode rejects non-magic `From` numbers with `21606`.
 - [x] SM-07.5 A failure rate of N% marks about N% of messages `undelivered`/`failed` over 1,000 sends (within 5 points).
 - [x] SM-07.6 Every transition is stored in the status history and shown in the message drawer.
-- [ ] SM-07.7 Custom outcome numbers can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file, with the code and delay rules enforced.
+- [x] SM-07.7 Custom outcome numbers can be created, edited, reordered, switched off and deleted from Settings, the API, CLI, MCP and the seed file, with the code and delay rules enforced. (#48)
 - [x] SM-07.8 The first enabled matching custom rule wins over magic numbers and the profile, `*` patterns match any digits, and each outcome (`reject`, `undelivered`, `failed`, `delayed_delivery`, `read`) behaves as documented.
 - [x] SM-07.9 With the Magic numbers switch off, `+15005550xxx` numbers behave like any other number; "Test a number" shows which rule, magic number or profile applies.
 
@@ -108,7 +108,7 @@ Phase 4.
 UI in U1, backend Phase 2 (moved from Phase 4 on 2026-10-29).
 
 - [x] SM-12.1 Numbers can be created, edited and deleted with label, channels, inbound URL and format, and status callback.
-- [ ] SM-12.2 An inbound message to a registered number goes to its inbound URL without needing a rule.
+- [x] SM-12.2 An inbound message to a registered number goes to its inbound URL without needing a rule. (#48)
 - [x] SM-12.3 The form and the API reject a number that is not E.164, is already registered, has no channel, or has a URL that is not `http` or `https`.
 
 ## SM-13 API request log

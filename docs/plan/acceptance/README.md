@@ -61,11 +61,11 @@ On top of its own criteria, a feature is done only when:
 |---------|------|-------|----------|--------|
 | [EM-01](01-email.md#em-01-smtp-receive) | SMTP receive | Phase 1 | 6 | Accepted |
 | [EM-02](01-email.md#em-02-smtp-tls-and-auth) | SMTP TLS and AUTH | Phase 1 | 5 | Accepted |
-| [EM-03](01-email.md#em-03-storage-retention-and-search) | Storage, retention and search | Phase 1 | 5 | In progress |
+| [EM-03](01-email.md#em-03-storage-retention-and-search) | Storage, retention and search | Phase 1 | 5 | Accepted |
 | [EM-04](01-email.md#em-04-email-viewer) | Email viewer | UI in U1, live in Phase 1 | 8 | In progress |
 | [EM-05](01-email.md#em-05-otp-and-link-extraction) | OTP and link extraction | UI in U1, backend Phase 1 | 5 | In progress |
 | [EM-06](01-email.md#em-06-sendmail-shim) | sendmail shim | Phase 1 | 3 | Accepted |
-| [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | In progress |
+| [EM-07](01-email.md#em-07-native-http-send-api) | Native HTTP send API | Phase 1 (mock in U1) | 5 | Accepted |
 | [EM-08](01-email.md#em-08-email-provider-http-send-apis) | Email provider HTTP send APIs | Phase 4 | 5 | Accepted |
 | [EM-09](01-email.md#em-09-smtp-session-log) | SMTP session log | UI in U1, backend Phase 1 | 5 | Accepted |
 | [EM-10](01-email.md#em-10-delivery-outcome-simulation) | Delivery outcome simulation | UI in U1, native events Phase 3, provider formats Phase 4 | 6 | Accepted |
@@ -83,12 +83,12 @@ On top of its own criteria, a feature is done only when:
 | [SM-04](02-sms-verify.md#sm-04-vonage-sms-api) | Vonage SMS API | Phase 2 | 3 | Accepted |
 | [SM-05](02-sms-verify.md#sm-05-other-sms-providers-and-generic-vendor) | Other SMS providers and generic vendor | Phase 4 | 2 | Accepted |
 | [SM-06](02-sms-verify.md#sm-06-encoding-and-segments) | Encoding and segments | Phase 2 | 3 | Accepted |
-| [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | In progress |
+| [SM-07](02-sms-verify.md#sm-07-delivery-simulation-and-magic-numbers) | Delivery simulation and magic numbers | UI in U1, backend Phase 2 | 9 | Accepted |
 | [SM-08](02-sms-verify.md#sm-08-status-callbacks) | Status callbacks | Phase 2 | 3 | Accepted |
 | [SM-09](02-sms-verify.md#sm-09-inbound-sms-and-two-way-conversations) | Inbound SMS and two-way conversations | Phase 2 (inbound), Phase 3 (reply webhook and TwiML) | 7 | Accepted |
 | [SM-10](02-sms-verify.md#sm-10-sms-opened-read-events) | SMS opened (read) events | Phase 3 | 3 | Accepted |
 | [SM-11](02-sms-verify.md#sm-11-whatsapp-via-twilio) | WhatsApp via Twilio | Phase 4 | 3 | Accepted |
-| [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 2 | 3 | In progress |
+| [SM-12](02-sms-verify.md#sm-12-virtual-numbers) | Virtual numbers | UI in U1, backend Phase 2 | 3 | Accepted |
 | [SM-13](02-sms-verify.md#sm-13-api-request-log) | API request log | UI in U1, backend Phase 1 and 2 | 5 | Accepted |
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Accepted |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | In progress |
@@ -118,10 +118,10 @@ On top of its own criteria, a feature is done only when:
 | [PL-04](04-catcher-platform.md#pl-04-seed-file-and-reset) | Seed file and reset | UI in U1, backend Phase 0 (parse, validate) and Phase 3 (full coverage) | 6 | In progress |
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | In progress |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | In progress |
-| [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | In progress |
+| [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Accepted |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Not started |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
-| [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | In progress |
+| [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | In progress |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
@@ -154,7 +154,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Not started |
 | [WS-07](07-distribution-website.md#ws-07-cli-and-mcp-reference) | CLI and MCP reference | Phase U3 | 5 | Not started |
 | [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Not started |
-| [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | In progress |
+| [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B) | 4 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Accepted |
