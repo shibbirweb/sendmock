@@ -7,9 +7,9 @@ Plan: [09-distribution.md](../09-distribution.md), [16-website-and-releases.md](
 Phase 0 (build), Phase 5 (all targets).
 
 - [x] DS-01.1 Release binaries build for macOS arm64/x64, Linux x64/arm64 (static musl) and Windows x64/arm64. (#48)
-- [ ] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI.
-- [ ] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release.
-- [ ] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)).
+- [x] DS-01.2 Each binary starts with no runtime or system libraries installed and serves the embedded UI. (#48)
+- [x] DS-01.3 `sendmock version` prints version and channel; checksums are published with every release. (#48)
+- [x] DS-01.4 Before publishing, the release workflow tests each target's archive on a runner of that operating system and CPU (macOS arm64 and x64, Linux x64 and arm64, Windows x64 and arm64) with the same test cases: checksum and archive layout, version, start with no runtime (Linux also in `alpine` and `busybox`), localhost-only listeners, health, embedded UI, an email and an SMS read back through the API, data kept across a restart, and a clean stop; a failure on any platform stops the release ([09](../09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)). (#48)
 - [x] DS-01.5 On each platform the install page's steps work as written: the unpack commands, the `PATH` step and the platform's install script (stable and beta) leave a working `sendmock` on the `PATH` of a new shell. (#48)
 
 ## DS-02 Docker image
@@ -29,10 +29,10 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 
 - [x] DS-03.1 Homebrew (`sendmock`, `sendmock-beta`), Scoop (`sendmock`, `sendmock-beta`), npm (`latest`, `beta` dist-tags) and `cargo install` (stable only) install a working binary. (#48)
 - [x] DS-03.2 `install.sh` and `install.ps1` install the stable by default and the beta with `--channel beta`, verifying checksums. (#48)
-- [ ] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally.
+- [x] DS-03.3 Every release attaches `.deb` and `.rpm` packages that install a working `sendmock` with `apt install ./...` and `dnf install ./...` (Phase 1); from 1.0 our signed APT and YUM repository serves them, with `stable` and `beta` components, and `apt install sendmock` / `dnf install sendmock` upgrade normally. (#48)
 - [x] DS-03.4 From 1.0 each stable release is submitted to WinGet (`shibbirweb.sendmock`) and Chocolatey (`sendmock`) by the release workflow, and both install a working binary. (#48)
-- [ ] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary.
-- [ ] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow.
+- [x] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary. (#48)
+- [x] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow. (#48)
 
 ## DS-04 Release workflows
 
@@ -65,8 +65,8 @@ Phase 1 (`--ready-json`), Phase 2 (Testcontainers; moved from Phase 5 on 2026-10
 
 Phase 5 (enforced in CI).
 
-- [ ] DS-07.1 Release binary under 20 MB, idle memory under 30 MB, cold start under 200 ms, SMTP ingest 500+ small messages/s on the CI benchmark machine.
-- [ ] DS-07.2 CI fails when a budget is exceeded without an explicit override.
+- [x] DS-07.1 Release binary under 20 MB, idle memory under 30 MB, cold start under 200 ms, SMTP ingest 500+ small messages/s on the CI benchmark machine. (#48)
+- [x] DS-07.2 CI fails when a budget is exceeded without an explicit override. (#48)
 
 ---
 

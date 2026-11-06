@@ -19,7 +19,7 @@ Phase 2.
 - [x] SM-02.1 Create, fetch and list at `/2010-04-01/Accounts/{AccountSid}/Messages[...].json` return Twilio-shaped JSON with `SM` + 32 hex IDs.
 - [x] SM-02.2 Missing or invalid params return Twilio's error JSON and HTTP status.
 - [x] SM-02.3 Any credentials are accepted by default; with credentials enforced, wrong ones return `401` in Twilio's format. (#48)
-- [ ] SM-02.4 The official Twilio SDKs (PHP, Node, Python, Go, Java, C#, Ruby) send successfully using the documented redirection recipe.
+- [x] SM-02.4 The official Twilio SDKs (PHP, Node, Python, Go, Java, C#, Ruby) send successfully using the documented redirection recipe. (#48)
 
 ## SM-03 Twilio Messaging Services
 
@@ -136,8 +136,8 @@ UI in U1, backend Phase 2 (Twilio and native), Phase 4 (WhatsApp). Docs: [MMS an
 - [x] SM-15.1 A Twilio send with `MediaUrl` stores a copy of each file; a URL that cannot be fetched fails the message with `11200`. (#48)
 - [x] SM-15.2 A native send with `media_urls` and / or inline base64 `media` stores the media, and `GET /sms/{smsId}/media/{mediaIndex}` returns each file with its content type. (#48)
 - [x] SM-15.3 More than 10 items, more than 5 MB, a missing filename or invalid base64 returns `400` naming the item. (#48)
-- [ ] SM-15.4 Bubbles show image thumbnails and file chips with an "MMS" or "Media" badge, and the message drawer lists the media.
-- [ ] SM-15.5 "Reply as recipient" can attach files, and the reply webhook sends `NumMedia` and `MediaUrl{N}` pointing at SendMock's copies.
+- [x] SM-15.4 Bubbles show image thumbnails and file chips with an "MMS" or "Media" badge, and the message drawer lists the media. (#48)
+- [x] SM-15.5 "Reply as recipient" can attach files, and the reply webhook sends `NumMedia` and `MediaUrl{N}` pointing at SendMock's copies. (#48)
 
 ---
 
