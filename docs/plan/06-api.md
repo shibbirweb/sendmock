@@ -203,7 +203,7 @@ Requests that capture traffic name their project in the `X-SendMock-Project` hea
 
 ## Push
 
-Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01). The provider APIs (FCM HTTP v1 first) are answered on the provider port and under `/providers/<key>/`, like the SMS and email providers; these endpoints read what they stored.
+Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01). The provider APIs (FCM HTTP v1, Expo's push send and receipts, OneSignal's create notification) are answered on the provider port and under `/providers/<key>/`, like the SMS and email providers; these endpoints read what they stored.
 
 | Method | Path | Purpose |
 |--------|------|---------|

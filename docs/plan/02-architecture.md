@@ -100,6 +100,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | Storage | `rusqlite` (bundled, FTS5) | no system SQLite dependency; `spawn_blocking` or a small pool |
 | Migrations | hand-rolled, `PRAGMA user_version` | embedded SQL migrations, no extra dependency (see [Database](#database-sqlite)) |
 | Compression | `zstd` | raw `.eml` bodies compressed at rest |
+| Request decompression | `flate2` (pure Rust) | provider requests sent with `Content-Encoding: gzip`, as `expo-server-sdk` sends them |
 | HTTP client | `reqwest` (rustls) | webhook delivery |
 | Signing | `hmac`, `sha2`, `sha1`, `base64` | Standard Webhooks HMAC-SHA256 native signatures, Twilio-style HMAC-SHA1 |
 | Outbound SMTP | `lettre` (rustls) | release and auto-forward to a real relay |

@@ -41,6 +41,9 @@ clap = { version = "4", features = [
     "string",
 ] }
 dirs = "7"
+flate2 = { version = "1", default-features = false, features = [
+    "rust_backend",
+] }
 futures-util = { version = "0.3", default-features = false }
 jsonschema = { version = "0.60", default-features = false }
 mail-parser = "1"

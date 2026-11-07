@@ -1,7 +1,9 @@
 //! Push notifications: provider APIs answered in code, stored, and read back
 //! (docs/plan/32-after-1-0.md, A7).
 
+mod expo_push_api;
 mod fcm_send_api;
+mod onesignal_notifications_api;
 mod push_api;
 mod push_inputs;
 mod push_operations;

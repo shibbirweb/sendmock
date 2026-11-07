@@ -13,6 +13,7 @@ use sendmock_ops::{
 };
 
 use crate::api_error_response::ApiErrorResponse;
+use crate::request_body_decoding::decode_request_body;
 
 /// Provider requests larger than this are refused before they are read, as the REST routes do.
 const MAXIMUM_REQUEST_BODY_BYTES: usize = 32 * 1024 * 1024;
@@ -104,7 +105,15 @@ pub async fn answer_provider_http_request(
             Err(error_response) => return error_response.into_response(),
         };
     let operation_context = project_context.as_ref().unwrap_or(operation_context);
-    let Ok(request_bytes) = to_bytes(request_body, MAXIMUM_REQUEST_BODY_BYTES).await else {
+    let request_bytes = match to_bytes(request_body, MAXIMUM_REQUEST_BODY_BYTES).await {
+        Ok(request_bytes) => decode_request_body(
+            &request_parts.headers,
+            request_bytes.to_vec(),
+            MAXIMUM_REQUEST_BODY_BYTES,
+        ),
+        Err(_) => None,
+    };
+    let Some(request_bytes) = request_bytes else {
         return ApiErrorResponse::invalid_json_body("the request body is too large or unreadable")
             .into_response();
     };
@@ -114,7 +123,7 @@ pub async fn answer_provider_http_request(
         path: provider_path,
         query_string: request_parts.uri.query().map(str::to_owned),
         headers: request_headers.iter().cloned().collect(),
-        body: request_bytes.to_vec(),
+        body: request_bytes,
     };
     let provider_outcome =
         match answer_provider_request(operation_context, provider_route, &provider_request).await {

@@ -28,6 +28,7 @@ pub use template_filter_catalogue::{TEMPLATE_FILTER_CATALOGUE, TemplateFilterEnt
 pub use template_functions::{StandardTemplateFunctions, TemplateFunctions};
 pub use template_names::{BUILTIN_FILTER_NAMES, SENDMOCK_FILTER_NAMES};
 pub use template_postman_aliases::POSTMAN_ALIASES;
+pub use template_random_values::generate_uuid_v4;
 pub use template_renderer::{
     MAXIMUM_RENDERED_BYTES, RenderedTemplate, TemplateEscape, TemplateProblem,
     TemplateProblemSeverity, TemplateRenderMode, render_template, render_template_in_mode,

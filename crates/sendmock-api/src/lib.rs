@@ -10,6 +10,7 @@ mod mailpit_routes;
 mod openapi_document;
 mod provider_routes;
 mod realtime;
+mod request_body_decoding;
 mod request_input;
 mod rest_router;
 mod ui_assets;
