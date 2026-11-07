@@ -190,6 +190,15 @@ UI in U1, backend Phase 2.
 - [x] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown. (#48)
 - [x] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code. (#48)
 
+
+## VF-05 Vonage Verify v2
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a4-vonage-verify-v2-vf-05).
+
+- [ ] VF-05.1 `POST /v2/verify` with an `sms` workflow starts a verification, delivers its code by SMS into SendMock, and answers 202 with a `request_id`; an `email` workflow delivers it by email.
+- [ ] VF-05.2 `POST /v2/verify/{request_id}` with the right code answers 200 `complete`, a wrong code 400 `Invalid Code`, and a finished, cancelled or unknown request 404 `Not Found`, each in Vonage's problem shape.
+- [ ] VF-05.3 `DELETE /v2/verify/{request_id}` cancels the verification; every Vonage verification shows in Verify under a service named after its brand.
+- [ ] VF-05.4 The Vonage Node SDK's `Verify2` client starts and checks a verification against SendMock, with the code read from SendMock's API.
 ## SM-17 More SMS providers
 
 After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a3-more-sms-providers-sm-17).

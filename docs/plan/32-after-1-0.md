@@ -11,7 +11,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A1 | Mailpit API compatibility | #163 | EM-19 (new) |
 | A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) |
 | A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) |
-| A4 | Vonage Verify v2 and other verify APIs | #160 | to be written |
+| A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) |
 | A5 | Multi-project inboxes | #167 | to be written |
 | A6 | POP3 read access | #159 | to be written |
 | A7 | Push notification emulation | #166 | to be written |
@@ -111,4 +111,23 @@ The exact paths, fields and shapes above are checked against the API references 
 **As built, A3e Amazon SNS (2026-11-07):** the AWS SDK's SNS client (`@aws-sdk/client-sns` 3.1164.0) uses the Query protocol: a form posted to `/` with `Action=Publish`, answered in XML. A definition describes that (form request, `PublishResponse` and `ErrorResponse` bodies with `Content-Type: text/xml`); two engine changes were needed. SNS has no sender field, and the engine required one: a provider whose field mapping has no `from` and no messaging service now stores its messages from the provider's name (`send_operation_kind.rs`), while providers that map a sender still require it. And `/providers/<key>/` with nothing after it fell through to the web UI, since a catch-all route takes no empty path; `provider_routes.rs` now routes a provider's root. SNS logs delivery status to CloudWatch, so the provider has no callback. Tests: `more_sms_providers_api.rs` and `examples/sms/node-sns`; SM-17.6 is proven by `message-providers.spec.ts` (the five listed as built-in) and `sms-clients-workflow.test.ts` (the providers page names each send API).
 
 **Also found while building A3:** the CI run of A3a failed SM-16.3 because the demo's live traffic toasts stack over the last provider row's buttons, now that the list is longer; that test hides the toaster. And `otp_answers_the_newest_code_per_recipient_and_channel` failed about 3 times in 10: two SMS stored in the same millisecond got random ULIDs, so "the newest" (and any list in id order) could swap them. `SystemIdGenerator` now uses the `ulid` crate's monotonic generator, with a test that 10,000 ids in a row strictly increase.
+
+## A4. Vonage Verify v2 (VF-05)
+
+**Why:** Twilio Verify is the only one-time-code API SendMock answers (VF-01 to VF-04). Vonage Verify v2 is the other common one; an app using it cannot run its login flow against SendMock today. Other providers' verify APIs (Sinch Verification, Infobip 2FA, Plivo Verify) follow as later parts once this one shows the pattern.
+
+**What Vonage sends and answers,** read from the Vonage Node SDK's source and its test data (`@vonage/verify2` 1.22.1, 2026-11-07), which builds every URL from a configurable `apiHost`:
+
+| Request | Answer |
+|---------|--------|
+| `POST /v2/verify` with `brand`, `workflow` (`[{channel: "sms", to}]`, also `email`, `whatsapp`, `voice`), optional `code_length`, `code`, `locale`, `channel_timeout`, `callback_url` | 202 `{ request_id }` |
+| `POST /v2/verify/{request_id}` with `code` | 200 `{ request_id, status: "complete" }`; a wrong code 400 problem `Invalid Code` |
+| `DELETE /v2/verify/{request_id}` | 204, the request cancelled |
+| a finished, cancelled or unknown request | 404 problem `Not Found`, "Request <id> was not found or it has been verified already." |
+
+Errors are problem details (`title`, `type`, `detail`, `instance`), as the SDK's data sets show.
+
+**How:** like Twilio Verify, a stateful API stays in code as an adapter (`vonage_verify_api.rs` beside `twilio_verify_api.rs`, [22](22-configurable-providers.md)) over the same verify domain, so a Vonage verification is an ordinary SendMock verification: listed in Verify, its code delivered as an SMS (or email, or WhatsApp) into SendMock, readable by `GET /api/v1/otp`, and firing the same `verify.*` events. Vonage has no verify service the way Twilio does, only a `brand` per request, so SendMock keeps one verify service per brand, made on first use and named after it, with `code_length` (default 4) and the workflow's channel taken from the request. A wrong code counts toward the service's attempt limit; past it, the request ends and later checks answer 404, as Vonage's do. The provider is built in as `vonage_verify`, a sibling of the existing `vonage` SMS provider, and the Vonage Node SDK's `Verify2` client runs a login against it in the SMS clients workflow.
+
+**Not in this part:** `next_workflow`, silent authentication and templates; the status `callback_url` events; Vonage's legacy Verify v1 (`/verify/json`).
 

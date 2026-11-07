@@ -232,6 +232,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
       "Forcing a verification's state (approve, expire, cancel) and emitting verify events.",
     outcome: "Reach rare states in tests without waiting for timeouts.",
   },
+  "VF-05": {
+    summary:
+      "Vonage Verify v2: start a verification, deliver its code into SendMock and check it, in Vonage's own request and answer shapes.",
+    outcome:
+      "Test a login flow that uses Vonage Verify without sending a real code.",
+  },
   "WH-01": {
     summary:
       "Webhook endpoints with URLs, headers, secrets, timeouts, retry policies and health at a glance.",

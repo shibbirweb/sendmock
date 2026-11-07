@@ -23,14 +23,6 @@ const backlogItems: BacklogItem[] = [
       "Mail comes in over SMTP and the provider HTTP APIs, and is read through the web UI, the REST API, the CLI and MCP.",
   },
   {
-    key: "later-verify-apis",
-    title: "Vonage Verify v2 and other providers' verify APIs",
-    area: "Verify",
-    idea: "Emulate more one-time-code verification APIs, starting with Vonage Verify v2, with the providers' real request, response and error shapes.",
-    today:
-      "Twilio Verify is emulated (features VF-01 to VF-04), and the code is delivered over SMS or email into SendMock.",
-  },
-  {
     key: "later-whatsapp-cloud",
     title: "Full WhatsApp Business Cloud API emulation",
     area: "SMS",
