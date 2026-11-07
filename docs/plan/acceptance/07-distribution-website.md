@@ -95,8 +95,8 @@ Phase U3.
 U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
 
 - [ ] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher.
-- [ ] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift.
-- [ ] WS-03.3 The link checker finds no broken internal links; search works on the static site.
+- [x] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift. (#48)
+- [x] WS-03.3 The link checker finds no broken internal links; search works on the static site. (#48)
 - [x] WS-03.4 The version list is worked out from the git tags: the newest stable tag of the newest minor at `/`, the newest tag of each older minor at `/vX.Y/`, `develop` at `/next/`; beta tags get no docs of their own; with no stable tag yet, `/` is a Preview built from `develop`.
 - [x] WS-03.5 A tagged version is built from that tag's `docs/wiki`, `docs/api` and `web/` (its own demo) with the current website code, without changing the working tree.
 - [x] WS-03.6 The docs sidebar has a version switcher listing every version with the current one marked; picking a version opens the same page in that version.
