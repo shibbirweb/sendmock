@@ -65,6 +65,16 @@ pub fn open_read_connection(connection_target: &str) -> Result<Connection, Store
     Ok(connection)
 }
 
+/// A read-write connection that only runs checkpoints; it never opens a write transaction.
+pub fn open_checkpoint_connection(connection_target: &str) -> Result<Connection, StoreError> {
+    let connection = Connection::open_with_flags(
+        connection_target,
+        OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_URI,
+    )?;
+    connection.busy_timeout(BUSY_TIMEOUT)?;
+    Ok(connection)
+}
+
 fn create_parent_folder(file_path: &Path) -> Result<(), StoreError> {
     match file_path
         .parent()

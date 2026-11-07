@@ -114,3 +114,87 @@ async fn creates_missing_folders_and_reports_its_size() -> Result<(), Box<dyn st
     assert!(database.size_bytes().await? > 0);
     Ok(())
 }
+
+async fn save_many_settings(database: &Database, setting_count: usize) -> Result<(), StoreError> {
+    database
+        .write(move |connection| {
+            let transaction = connection.transaction()?;
+            for setting_number in 0..setting_count {
+                transaction.execute(
+                    "INSERT INTO settings (key, value, updated_at) VALUES (?1, ?2, 0)",
+                    [format!("bulk_{setting_number}"), "x".repeat(400)],
+                )?;
+            }
+            transaction.commit()?;
+            Ok(())
+        })
+        .await
+}
+
+// AC: PL-08.2
+#[tokio::test]
+async fn a_checkpoint_runs_while_the_writer_is_busy() -> Result<(), Box<dyn std::error::Error>> {
+    let database_folder = tempfile::tempdir()?;
+    let database = std::sync::Arc::new(Database::open(
+        DatabaseLocation::File(database_folder.path().join("sendmock.db")),
+        EMBEDDED_MIGRATIONS,
+    )?);
+    save_many_settings(&database, 500).await?;
+    let (release_writer, writer_released) = std::sync::mpsc::channel::<()>();
+    let (report_writer_busy, writer_busy) = tokio::sync::oneshot::channel::<()>();
+    let writing_database = std::sync::Arc::clone(&database);
+    let held_write = tokio::spawn(async move {
+        writing_database
+            .write(move |_connection| {
+                let _ = report_writer_busy.send(());
+                writer_released
+                    .recv()
+                    .map_err(|_| StoreError::WriterStopped)?;
+                Ok(())
+            })
+            .await
+    });
+    writer_busy.await?;
+
+    let checkpoint = tokio::time::timeout(
+        std::time::Duration::from_secs(10),
+        database.checkpoint_without_blocking_writes(),
+    )
+    .await;
+    release_writer.send(())?;
+    held_write.await??;
+
+    let checkpoint_progress = checkpoint??.ok_or("a file database has a write-ahead log")?;
+    assert!(checkpoint_progress.log_frame_count > 0);
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_checkpoint_copies_a_quiet_log_into_the_database_file()
+-> Result<(), Box<dyn std::error::Error>> {
+    let database_folder = tempfile::tempdir()?;
+    let database = Database::open(
+        DatabaseLocation::File(database_folder.path().join("sendmock.db")),
+        EMBEDDED_MIGRATIONS,
+    )?;
+    save_many_settings(&database, 500).await?;
+
+    let checkpoint_progress = database
+        .checkpoint_without_blocking_writes()
+        .await?
+        .ok_or("a file database has a write-ahead log")?;
+
+    assert_eq!(
+        checkpoint_progress.checkpointed_frame_count,
+        checkpoint_progress.log_frame_count
+    );
+    Ok(())
+}
+
+#[tokio::test]
+async fn an_in_memory_database_has_no_log_to_checkpoint() -> Result<(), StoreError> {
+    let database = Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)?;
+
+    assert_eq!(database.checkpoint_without_blocking_writes().await?, None);
+    Ok(())
+}

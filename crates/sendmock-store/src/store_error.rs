@@ -25,4 +25,7 @@ pub enum StoreError {
 
     #[error("A database read could not finish: {0}")]
     ReadInterrupted(String),
+
+    #[error("A database checkpoint could not finish: {0}")]
+    CheckpointInterrupted(String),
 }

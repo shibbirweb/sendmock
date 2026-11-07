@@ -1,14 +1,19 @@
 mod connection_settings;
+mod database_checkpointer;
 mod database_readers;
 mod database_writer;
 
 pub(crate) use connection_settings::BUSY_TIMEOUT;
+pub use database_checkpointer::CheckpointProgress;
 
 use rusqlite::Connection;
 
 use crate::migration::apply_migrations;
 use crate::{DatabaseLocation, Migration, StoreError};
-use connection_settings::{connection_target, open_read_connection, open_write_connection};
+use connection_settings::{
+    connection_target, open_checkpoint_connection, open_read_connection, open_write_connection,
+};
+use database_checkpointer::DatabaseCheckpointer;
 use database_readers::DatabaseReaders;
 use database_writer::DatabaseWriter;
 
@@ -19,6 +24,8 @@ pub struct Database {
     location: DatabaseLocation,
     writer: DatabaseWriter,
     readers: DatabaseReaders,
+    /// Only file databases have a write-ahead log to copy.
+    checkpointer: Option<DatabaseCheckpointer>,
 }
 
 impl Database {
@@ -35,10 +42,17 @@ impl Database {
         let read_connections = (0..READ_CONNECTION_COUNT)
             .map(|_| open_read_connection(&connection_target))
             .collect::<Result<Vec<_>, _>>()?;
+        let checkpointer = match &location {
+            DatabaseLocation::File(_) => Some(DatabaseCheckpointer::new(
+                open_checkpoint_connection(&connection_target)?,
+            )),
+            DatabaseLocation::InMemory => None,
+        };
         Ok(Self {
             location,
             writer: DatabaseWriter::start(write_connection),
             readers: DatabaseReaders::new(read_connections),
+            checkpointer,
         })
     }
 
@@ -60,6 +74,17 @@ impl Database {
         Operation: FnOnce(&Connection) -> Result<T, StoreError> + Send + 'static,
     {
         self.readers.read(operation).await
+    }
+
+    /// Copies what it can of the write-ahead log into the database file without waiting for,
+    /// or holding up, any write. An in-memory database has no log and answers `None`.
+    pub async fn checkpoint_without_blocking_writes(
+        &self,
+    ) -> Result<Option<CheckpointProgress>, StoreError> {
+        match &self.checkpointer {
+            Some(checkpointer) => Ok(Some(checkpointer.checkpoint_passively().await?)),
+            None => Ok(None),
+        }
     }
 
     pub async fn size_bytes(&self) -> Result<u64, StoreError> {

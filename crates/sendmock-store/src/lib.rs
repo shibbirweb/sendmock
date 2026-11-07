@@ -39,7 +39,7 @@ pub use activity_stats::{
     ActivityStatsRepository, HourlyActivityRecord, HourlyCountRecord, MessageTotalsRecord,
 };
 pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
-pub use database::Database;
+pub use database::{CheckpointProgress, Database};
 pub use database_location::DatabaseLocation;
 pub use email::{
     AttachmentRecord, EmailListFilter, EmailPage, EmailRecord, EmailRepository,

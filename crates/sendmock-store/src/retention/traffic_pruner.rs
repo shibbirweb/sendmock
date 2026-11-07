@@ -10,7 +10,7 @@ use crate::{Database, StoreError};
 /// Rows deleted per write; small enough that a waiting ingest write is never held long.
 const PRUNE_BATCH_SIZE: i64 = 500;
 /// Pages handed back to the file system per write, for the same reason.
-const VACUUM_PAGES_PER_WRITE: i64 = 1000;
+const VACUUM_PAGES_PER_WRITE: i64 = 250;
 
 /// Child rows whose tables have no cascading key, removed once their parent is gone.
 const ORPHAN_CLEANUP_STATEMENTS: [&str; 2] = [
@@ -101,6 +101,9 @@ impl TrafficPruner {
     /// lets the vacuum above shrink the database file. With a reader still on the log it is
     /// skipped until the next prune: waiting for the reader would hold every ingest write.
     async fn truncate_write_ahead_log(&self) -> Result<(), StoreError> {
+        // The copy and its sync can take seconds on a slow disk, so they run first, beside
+        // ingest; the truncate in the writer's queue then has almost nothing left to copy.
+        self.database.checkpoint_without_blocking_writes().await?;
         self.database
             .write(|connection| {
                 connection.busy_timeout(Duration::ZERO)?;
