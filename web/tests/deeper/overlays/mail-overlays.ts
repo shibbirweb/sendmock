@@ -65,6 +65,24 @@ export const mailOverlays: DeeperOverlay[] = [
     baseline: "An email is open",
   },
   {
+    name: "Forwarding",
+    open: async (page) => {
+      await openNewsletterEmail(page);
+      await page.getByRole("button", { name: "Forward", exact: true }).click();
+    },
+    scope: "screen",
+    baseline: "An email is open",
+  },
+  {
+    name: "Emails are selected",
+    open: (page) =>
+      page
+        .getByRole("checkbox", { name: /^Select email from/ })
+        .first()
+        .check(),
+    scope: "screen",
+  },
+  {
     name: "Simulate an event menu",
     open: async (page) => {
       await openNewsletterEmail(page);
@@ -111,9 +129,9 @@ export const mailOverlays: DeeperOverlay[] = [
   },
 ];
 
-/** The SendGrid provider, a built-in with every tab filled in. */
-async function openProviderEditor(page: Page) {
-  await page.getByRole("button", { name: "SendGrid" }).first().click();
+/** A built-in provider (SendGrid, Twilio), with every tab filled in. */
+async function openProviderEditor(page: Page, providerName: string) {
+  await page.getByRole("button", { name: providerName }).first().click();
   await expect(page.getByRole("tab", { name: "General" })).toBeVisible();
 }
 
@@ -125,25 +143,28 @@ const providerTabNames = [
   "Try it",
 ];
 
-/** Mail > Providers and the SMS one share the provider editor. */
-export const mailProvidersOverlays: DeeperOverlay[] = [
-  {
-    name: "Add a provider dialog",
-    open: (page) => page.getByRole("button", { name: "Add provider" }).click(),
-    scope: "dialog",
-  },
-  {
-    name: "Provider editor, General tab",
-    open: openProviderEditor,
-    scope: "dialog",
-  },
-  ...providerTabNames.map((tabName): DeeperOverlay => ({
-    name: `Provider editor, ${tabName} tab`,
-    open: async (page) => {
-      await openProviderEditor(page);
-      await page.getByRole("tab", { name: tabName }).click();
+/** Mail > Providers and SMS > Providers share the provider editor. */
+export function buildProvidersOverlays(providerName: string): DeeperOverlay[] {
+  return [
+    {
+      name: "Add a provider dialog",
+      open: (page) =>
+        page.getByRole("button", { name: "Add provider" }).click(),
+      scope: "dialog",
     },
-    scope: "dialog",
-    baseline: "Provider editor, General tab",
-  })),
-];
+    {
+      name: "Provider editor, General tab",
+      open: (page) => openProviderEditor(page, providerName),
+      scope: "dialog",
+    },
+    ...providerTabNames.map((tabName): DeeperOverlay => ({
+      name: `Provider editor, ${tabName} tab`,
+      open: async (page) => {
+        await openProviderEditor(page, providerName);
+        await page.getByRole("tab", { name: tabName }).click();
+      },
+      scope: "dialog",
+      baseline: "Provider editor, General tab",
+    })),
+  ];
+}

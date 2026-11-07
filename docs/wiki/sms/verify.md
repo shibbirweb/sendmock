@@ -47,6 +47,8 @@ Click a row (or open `?verification=<sid>`; `Esc` closes): the code large with c
 
 A table of Verify services: name, SID (copy), code length, fixed code (or Random), lifetime, and Edit and Delete. **New service** asks for a name, a code length (4 to 10), an optional fixed code (digits, exactly the code length) and the lifetime in minutes (1 to 1,440).
 
+
+Every control and text, one by one: [Verify in depth](../deeper/sms/verify.md).
 ## Customize
 
 - A **fixed code** per service makes automated tests deterministic.

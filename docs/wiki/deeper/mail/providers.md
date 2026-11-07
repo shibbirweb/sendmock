@@ -54,13 +54,13 @@ Column.
 
 Column.
 
-- **What it does:** Its key: the `/providers/<key>/` path and the source stored on its emails.
+- **What it does:** Its key: the `/providers/<key>/` path and the source stored on its messages.
 
 ### 8. Last # hours
 
 Column.
 
-- **What it does:** How many emails it took in the last 24 hours.
+- **What it does:** How many messages it took in the last 24 hours.
 
 ### 9. Enabled
 

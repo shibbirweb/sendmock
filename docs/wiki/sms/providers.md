@@ -50,6 +50,8 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 | **Preview** | a sample request, the message SendMock would store, the answer it would give, the problems, and what templates can read |
 | **Try it** | the base URLs and a `curl` command for this provider |
 
+
+Every control and text, one by one: [SMS providers in depth](../deeper/sms/providers.md).
 ## Customize
 
 The full walkthrough, adding Africa's Talking from its API docs: [Advanced: create an SMS provider](../advanced/sms-provider.md).

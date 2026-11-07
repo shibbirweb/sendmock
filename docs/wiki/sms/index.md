@@ -79,6 +79,8 @@ Each bubble's menu has **Message details**, **Simulate read**, **Send to webhook
 
 Facts (id, from, to, API, channel, segments, Messaging Service), the **status history**, the original **request JSON** (with a link to the API request log), each **callback attempt**, the media list, and **Set status** (Delivered, Undelivered or Failed with an error code) to move a message by hand. Incoming messages also get a **Reply webhook** tab.
 
+
+Every control and text, one by one: [SMS messages in depth](../deeper/sms/messages.md).
 ## Customize
 
 - Make your own numbers fail, arrive late or be read: [Advanced: SMS outcome numbers](../advanced/sms-outcome-numbers.md).
