@@ -795,3 +795,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | A3a built: Infobip's SMS API (`/sms/2/text/advanced`) as a built-in provider, with its answers, errors and delivery reports, and its official Node SDK in the SMS clients workflow. |
 | 2026-11-07 | Fix after CI on `3b7d370`: the generated webhook templates reference lists `email.clicked` for the email providers, and `template_event_name_filters.rs` is formatted. |
 | 2026-11-07 | A3b built: Telnyx's Messages API (`/v2/messages`) as a built-in provider, with its answers, errors and status webhooks (`telnyx.message` now tells inbound `message.received` from outbound `message.sent` and `message.finalized`), and its official Node SDK in the SMS clients workflow. |
+| 2026-11-07 | A3c built: Sinch's batches API as a built-in provider, with its answers, errors and delivery reports, and its official Node SDK in the SMS clients workflow. |

@@ -87,6 +87,7 @@ describe("email and SMS provider API", () => {
       "messagebird",
       "infobip",
       "telnyx",
+      "sinch",
       "sslwireless",
     ]);
     expect(

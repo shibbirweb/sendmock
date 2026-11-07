@@ -844,5 +844,112 @@
       "failed": "sending_failed",
       "undelivered": "delivery_failed"
     }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_token",
+        "value": "test_sinch_token",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "sinch",
+    "name": "Sinch",
+    "area": "sms",
+    "accent": "#ffbe3c",
+    "host": "us.sms.api.sinch.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/xms/v1/{service_plan_id}/batches",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to[*]"
+      },
+      {
+        "part": "body",
+        "source": "body"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "callback_url"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "body",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"id\": \"{{ message.provider_id }}\", \"to\": [\"{{ message.to }}\"], \"from\": \"{{ message.from }}\", \"canceled\": false, \"body\": \"{{ message.body }}\", \"type\": \"mt_text\", \"created_at\": \"{{ now_iso() }}\", \"modified_at\": \"{{ now_iso() }}\", \"delivery_report\": \"{{ request.body.delivery_report | default(\"none\") }}\", \"feedback_enabled\": false, \"flash_message\": false}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": \"syntax_constraint_violation\", \"text\": \"{{ error.reason }}\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": \"unauthorized\", \"text\": \"Invalid credentials\"}"
+      }
+    ],
+    "message_id_template": "01{{ random_hex(24) | upper }}",
+    "callback_template_key": "sinch.sms",
+    "status_names": {
+      "sent": "sent",
+      "delivered": "delivered",
+      "failed": "failed",
+      "undelivered": "undelivered"
+    }
   }
 ]

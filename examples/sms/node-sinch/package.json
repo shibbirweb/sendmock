@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-sinch-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sinch/sdk-core": "1.8.0"
+  }
+}

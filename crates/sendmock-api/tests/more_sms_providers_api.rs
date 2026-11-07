@@ -194,3 +194,72 @@ async fn telnyx_sends_message_sent_then_message_finalized_to_the_webhook_url() {
     assert_eq!(events[1]["data"]["payload"]["to"][0]["status"], "delivered");
     assert_eq!(events[1]["data"]["payload"]["direction"], "outbound");
 }
+
+const SINCH_SEND_PATH: &str = "/providers/sinch/xms/v1/test-service-plan/batches";
+
+/// The body Sinch's Node SDK sends for `sms.batches.send`.
+fn sinch_batch(body: Option<&str>) -> Value {
+    let mut batch = json!({
+        "from": "+15550001111",
+        "to": ["+14155550100"],
+        "delivery_report": "per_recipient",
+        "callback_url": CALLBACK_URL,
+    });
+    if let Some(body) = body {
+        batch["body"] = json!(body);
+    }
+    batch
+}
+
+// AC: SM-17.3
+#[tokio::test]
+async fn sinch_creates_a_batch_and_answers_its_batch_object() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let sent = send_json(
+        &app_router,
+        SINCH_SEND_PATH,
+        &sinch_batch(Some("Your code is 482913")),
+    )
+    .await;
+
+    assert_eq!(sent.status, 201, "{}", sent.body_text);
+    assert_eq!(sent.body["type"], "mt_text");
+    assert_eq!(sent.body["to"], json!(["+14155550100"]));
+    assert_eq!(sent.body["canceled"], false);
+    assert_eq!(sent.body["delivery_report"], "per_recipient");
+    let stored_sms = read_newest_sms(&app_router).await;
+    assert_eq!(stored_sms["api"], "sinch");
+    assert_eq!(stored_sms["provider_id"], sent.body["id"]);
+}
+
+// AC: SM-17.3
+#[tokio::test]
+async fn sinch_refuses_a_batch_without_a_body_with_its_error_code() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let refused = send_json(&app_router, SINCH_SEND_PATH, &sinch_batch(None)).await;
+
+    assert_eq!(refused.status, 400, "{}", refused.body_text);
+    assert_eq!(refused.body["code"], "syntax_constraint_violation");
+    assert!(refused.body["text"].is_string());
+}
+
+// AC: SM-17.3
+#[tokio::test]
+async fn sinch_sends_recipient_delivery_reports_to_the_callback_url() {
+    let (app_router, callback_sender) = build_app_with_recorder().await;
+
+    let sent = send_json(&app_router, SINCH_SEND_PATH, &sinch_batch(Some("Hello"))).await;
+    let reports = callback_sender.wait_for_requests(2).await;
+
+    let report_statuses: Vec<Value> = reports
+        .iter()
+        .map(|report| serde_json::from_str::<Value>(&report.body).unwrap_or(Value::Null))
+        .map(|report| report["status"].clone())
+        .collect();
+    assert_eq!(report_statuses, [json!("Dispatched"), json!("Delivered")]);
+    let last_report: Value = serde_json::from_str(&reports[1].body).unwrap_or(Value::Null);
+    assert_eq!(last_report["type"], "recipient_delivery_report_sms");
+    assert_eq!(last_report["batch_id"], sent.body["id"]);
+}

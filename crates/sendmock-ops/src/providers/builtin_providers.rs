@@ -35,7 +35,8 @@ mod tests {
                 "plivo",
                 "messagebird",
                 "infobip",
-                "telnyx"
+                "telnyx",
+                "sinch"
             ]
         );
     }

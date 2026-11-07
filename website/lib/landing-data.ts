@@ -39,6 +39,7 @@ export const emulatedProviderNames = {
     "MessageBird",
     "Infobip",
     "Telnyx",
+    "Sinch",
   ],
   payments: ["Stripe", "PayPal", "SSLCommerz", "bKash"],
 };

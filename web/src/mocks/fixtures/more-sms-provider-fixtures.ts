@@ -124,7 +124,66 @@ function buildTelnyxProvider(): MessageProviderRecord {
   });
 }
 
+/**
+ * Sinch's SMS REST API, as its Node SDK calls it with a service plan ID and API token
+ * (`@sinch/sdk-core`, `POST /xms/v1/{service_plan_id}/batches` with a Bearer token;
+ * https://developers.sinch.com/docs/sms/api-reference/sms/tag/Batches/, checked 2026-11-07).
+ * Delivery reports go to `callback_url` as `sinch.sms`, which turns SendMock's status names
+ * into Sinch's itself.
+ */
+function buildSinchProvider(): MessageProviderRecord {
+  return buildProviderFixture({
+    key: "sinch",
+    name: "Sinch",
+    area: "sms",
+    accent: "#ffbe3c",
+    host: "us.sms.api.sinch.com",
+    credentials: [
+      { name: "api_token", value: "test_sinch_token", is_secret: true },
+    ],
+    operations: [
+      {
+        kind: "send",
+        method: "POST",
+        path: "/xms/v1/{service_plan_id}/batches",
+        request_format: "json",
+      },
+    ],
+    field_mapping: [
+      { part: "from", source: "from" },
+      { part: "to", source: "to[*]" },
+      { part: "body", source: "body" },
+      { part: "status_callback_url", source: "callback_url" },
+    ],
+    validation_rules: requireParts(["from", "to", "body"]),
+    success_response: respondWithJson(
+      201,
+      '{"id": "{{ message.provider_id }}", "to": ["{{ message.to }}"], "from": "{{ message.from }}", "canceled": false, "body": "{{ message.body }}", "type": "mt_text", "created_at": "{{ now_iso() }}", "modified_at": "{{ now_iso() }}", "delivery_report": "{{ request.body.delivery_report | default("none") }}", "feedback_enabled": false, "flash_message": false}',
+    ),
+    error_responses: [
+      answerError(
+        "missing_field",
+        400,
+        '{"code": "syntax_constraint_violation", "text": "{{ error.reason }}"}',
+      ),
+      answerError(
+        "unauthorized",
+        401,
+        '{"code": "unauthorized", "text": "Invalid credentials"}',
+      ),
+    ],
+    message_id_template: "01{{ random_hex(24) | upper }}",
+    callback_template_key: "sinch.sms",
+    status_names: {
+      sent: "sent",
+      delivered: "delivered",
+      failed: "failed",
+      undelivered: "undelivered",
+    },
+  });
+}
+
 /** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
-  return [buildInfobipProvider(), buildTelnyxProvider()];
+  return [buildInfobipProvider(), buildTelnyxProvider(), buildSinchProvider()];
 }
