@@ -1,0 +1,32 @@
+[package]
+name = "sendmock-tray"
+description = "A menu bar and system tray app for SendMock: starts it, shows the unread counts and opens the web UI."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+# The tray shell needs GTK on Linux, so it is behind a feature: workspace builds, clippy and
+# packaging check the library without it, and `cargo install sendmock-tray --features gui`
+# builds the app.
+[features]
+gui = [
+    "dep:tao",
+    "dep:tray-icon",
+]
+
+[[bin]]
+name = "sendmock-tray"
+path = "src/main.rs"
+required-features = [
+    "gui",
+]
+
+[dependencies]
+serde_json.workspace = true
+tao = { version = "0.37", optional = true }
+tray-icon = { version = "0.26", optional = true }
+
+[lints]
+workspace = true

@@ -71,6 +71,16 @@ Phase 5 (enforced in CI).
 - [x] DS-07.1 Release binary under 20 MB, idle memory under 30 MB, cold start under 200 ms, SMTP ingest 500+ small messages/s on the CI benchmark machine. (#48)
 - [x] DS-07.2 CI fails when a budget is exceeded without an explicit override. (#48)
 
+## DS-08 System tray app
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a9-system-tray-app-ds-08).
+
+- [ ] DS-08.1 With no SendMock answering, the tray app starts `sendmock serve` and shows it running at its address; with one already running it uses that one; Quit stops only a server the tray started.
+- [ ] DS-08.2 The menu shows the unread email and SMS counts, refreshed every few seconds, and Open SendMock opens the web UI in the default browser.
+- [ ] DS-08.3 Start SendMock and Stop SendMock control a server the tray started; Stop is not offered for one it found running, and a server that exits shows as not running.
+- [ ] DS-08.4 The tray app builds and its tests pass on Linux, macOS and Windows in CI, and the `sendmock` binary gains no GUI dependency.
+- [ ] DS-08.5 The docs say how to install and run the tray app on each OS.
+
 ---
 
 ## WS-01 Site and deployment

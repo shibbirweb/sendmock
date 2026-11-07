@@ -564,6 +564,32 @@ Let your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI or another one 
 
 Every release also has a `SHA256SUMS` file to check the download, and older versions are on the [releases page](https://github.com/shibbirweb/sendmock/releases).
 
+## Menu bar and tray app
+
+`sendmock-tray` puts SendMock in the macOS menu bar or the Windows and Linux system tray. It uses the SendMock already running at `http://127.0.0.1:8025`, or starts `sendmock serve` itself, and its menu shows the status and the unread email and SMS counts, opens the web UI, starts and stops the server it started, and quits (stopping only a server it started). It needs SendMock installed (any way above) and Rust to build.
+
+1. On Linux only, install the libraries the tray uses (Debian and Ubuntu shown):
+
+   ```bash
+   sudo apt-get install -y libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
+   ```
+
+2. Install the tray app:
+
+   ```bash
+   cargo install sendmock-tray --features gui --locked
+   ```
+
+3. Start it:
+
+   ```bash
+   sendmock-tray
+   ```
+
+4. Click the envelope in the menu bar or tray. On macOS the unread total shows next to it.
+
+To watch another address, start it with `sendmock-tray --url http://127.0.0.1:9000`; to start a particular binary, add `--sendmock /path/to/sendmock`. A server the tray starts keeps its data where `sendmock` always does.
+
 ## Start SendMock
 
 After installing with Homebrew, an install script or a binary:

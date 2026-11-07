@@ -135,6 +135,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "Binary size, idle memory, cold start and SMTP throughput budgets enforced in CI.",
     outcome: "SendMock stays lightweight as it grows.",
   },
+  "DS-08": {
+    summary:
+      "A menu bar and system tray app that finds or starts SendMock, shows the unread email and SMS counts, opens the web UI and stops what it started.",
+    outcome:
+      "Keep SendMock running all day without a terminal window, and see at a glance that mail arrived.",
+  },
   "WS-01": {
     summary:
       "The website, built and tested on every pull request and published to GitHub Pages, with the live demo at `/demo/`.",

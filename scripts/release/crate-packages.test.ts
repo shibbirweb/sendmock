@@ -22,6 +22,8 @@ const readCrateManifest = (crateName: string) =>
     readFileSync(join("crates", crateName, "Cargo.toml"), "utf8"),
   ) as CrateManifest;
 
+const applicationCrateNames = ["sendmock", "sendmock-tray"];
+
 describe("crates.io packages", () => {
   test("DS-03.1 every crate can be published and says what it is", () => {
     for (const crateName of crateNames) {
@@ -44,7 +46,10 @@ describe("crates.io packages", () => {
     expect(
       internalDependencies.map(([dependencyName]) => dependencyName).sort(),
     ).toEqual(
-      crateNames.filter((crateName) => crateName !== "sendmock").sort(),
+      // The applications (the binary and the tray app) are what nothing depends on.
+      crateNames
+        .filter((crateName) => !applicationCrateNames.includes(crateName))
+        .sort(),
     );
     for (const [, dependency] of internalDependencies) {
       expect(dependency.version).toMatch(/^=\d+\.\d+\.\d+/);

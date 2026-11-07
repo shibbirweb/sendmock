@@ -33,6 +33,7 @@ export const crateLayers: Record<
   "sendmock-cli": { layerName: "transport", layerRank: 4 },
   "sendmock-mcp": { layerName: "transport", layerRank: 4 },
   sendmock: { layerName: "application", layerRank: 5 },
+  "sendmock-tray": { layerName: "application", layerRank: 5 },
 };
 
 export type CrateManifest = {

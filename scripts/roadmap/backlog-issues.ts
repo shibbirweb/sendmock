@@ -24,14 +24,6 @@ const backlogItems: BacklogItem[] = [
     source: `${blobBase}/docs/plan/09-distribution.md#later`,
   },
   {
-    key: "later-tray-app",
-    title: "System tray app",
-    area: "Distribution",
-    idea: "A small menu bar or system tray app that starts and stops SendMock, shows new messages and opens the web UI.",
-    today:
-      "SendMock runs as a single binary or a Docker image, with its web UI in the browser.",
-  },
-  {
     key: "later-official-repositories",
     title: "Official distribution repositories (Debian, Ubuntu, Fedora, Arch)",
     area: "Distribution",

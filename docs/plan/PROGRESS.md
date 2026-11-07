@@ -368,7 +368,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A6: POP3 read access (#159, EM-21 accepted, #48)
 - [x] A7: Push notification emulation (#166, PN-01) (#48)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161, SM-18)
-- [ ] A9: System tray app (#168)
+- [ ] A9: System tray app (#168, DS-08)
 - [ ] A10: Helm chart and Docker Desktop extension (#162)
 - [ ] A11: Official distribution repositories (#169; needs the distributions' maintainers)e `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
@@ -831,3 +831,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-08 | Fix: CI on ed3e0c5 found the WhatsApp Cloud API taking Mailgun's `/v3/<domain>/messages` on the provider port (the Email provider SDKs run), both in code and through the definition's `{version}` template. Cloud paths now need a Graph version with a minor number (`v21.0`) and numeric ids, the definition's path names `v21.0`, and a regression test sends Mailgun on the provider port. It also found the SMS clients test and the landing page's provider list not updated for WhatsApp Cloud. |
 | 2026-11-08 | A8c built: WhatsApp Cloud statuses and replies posted to the provider's `webhook_url` in Meta's envelope, signed with `X-Hub-Signature-256`; Meta's callback URL check across REST, CLI, MCP and a button on the provider's Callbacks tab; the `whatsapp.cloud` template. A8 is complete once CI proves SM-18. |
 | 2026-11-08 | CI green on 20ca95f (every workflow, the Push SDKs and the WhatsApp example among them): PN-01.1 to PN-01.6 ticked and PN-01 accepted, so A7 is done; SM-18.1 to SM-18.3 ticked. |
+| 2026-11-08 | Plan: A9 system tray app ([32](32-after-1-0.md#a9-system-tray-app-ds-08), DS-08 new with 5 criteria): a separate `sendmock-tray` binary on `tray-icon` that finds or starts SendMock, shows the unread counts, opens the UI and stops what it started; the GUI behind a `gui` feature so the workspace needs no GTK. |
+| 2026-11-08 | A9 built: `sendmock-tray`, a menu bar and tray app that finds or starts SendMock, shows the unread counts, opens the web UI and stops only what it started; the GUI behind a `gui` feature, built and tested on three OSes in the new "Tray app" workflow, and install steps on the Install page. |
