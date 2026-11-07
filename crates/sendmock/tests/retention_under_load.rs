@@ -105,6 +105,10 @@ fn wait_for_settled_size(database_path: &Path) -> u64 {
 
 // AC: PL-08.2
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "stalls on shared Windows CI runners: https://github.com/shibbirweb/sendmock/issues/171"
+)]
 fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Result<()> {
     let working_directory = tempfile::tempdir()?;
     let database_path = working_directory.path().join("sendmock.db");
