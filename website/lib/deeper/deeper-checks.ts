@@ -9,21 +9,34 @@ export function findDeeperProblems(
   surfacesById: Map<string, OperationSurfaces>,
 ): string[] {
   return deeperPages.flatMap((deeperPage) => {
-    const screenControls = new Set(
-      listScreenStates(inventory, deeperPage.screen).flatMap(
-        (screenState) => screenState.controls,
-      ),
+    const screenStates = listScreenStates(inventory, deeperPage.screen);
+    const isDocumented = (state: string, control: string) =>
+      deeperPage.entries.some(
+        (entry) =>
+          entry.control === control &&
+          (entry.state === undefined || entry.state === state),
+      );
+    const missingEntries = screenStates.flatMap((screenState) =>
+      screenState.controls
+        .filter((control) => !isDocumented(screenState.state, control))
+        .map(
+          (control) =>
+            `${deeperPage.file}: no entry for "${control}" (${screenState.state})`,
+        ),
     );
-    const documentedControls = new Set(
-      deeperPage.entries.map((entry) => entry.control),
-    );
-    const missingEntries = [...screenControls]
-      .filter((control) => !documentedControls.has(control))
-      .map((control) => `${deeperPage.file}: no entry for "${control}"`);
-    const staleEntries = [...documentedControls]
-      .filter((control) => !screenControls.has(control))
+    const staleEntries = deeperPage.entries
+      .filter(
+        (entry) =>
+          !screenStates.some(
+            (screenState) =>
+              (entry.state === undefined ||
+                entry.state === screenState.state) &&
+              screenState.controls.includes(entry.control),
+          ),
+      )
       .map(
-        (control) => `${deeperPage.file}: "${control}" is not on the screen`,
+        (entry) =>
+          `${deeperPage.file}: "${entry.control}" is not on the screen`,
       );
     const unknownOperations = deeperPage.entries.flatMap((entry) =>
       (entry.operationIds ?? [])
@@ -33,6 +46,12 @@ export function findDeeperProblems(
             `${deeperPage.file}: unknown operation ${operationId}`,
         ),
     );
+    const entryKeys = deeperPage.entries.map(
+      (entry) => `${entry.state ?? ""}|${entry.control}`,
+    );
+    const duplicateEntries = entryKeys
+      .filter((entryKey, keyIndex) => entryKeys.indexOf(entryKey) !== keyIndex)
+      .map((entryKey) => `${deeperPage.file}: two entries for "${entryKey}"`);
     const isEveryEntryDescribed = deeperPage.entries.every(
       (entry) => entry.does.trim() !== "",
     );
@@ -40,6 +59,7 @@ export function findDeeperProblems(
       ...missingEntries,
       ...staleEntries,
       ...unknownOperations,
+      ...duplicateEntries,
       ...(isEveryEntryDescribed
         ? []
         : [`${deeperPage.file}: an entry says nothing`]),

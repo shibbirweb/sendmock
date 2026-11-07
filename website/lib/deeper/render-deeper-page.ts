@@ -101,9 +101,13 @@ export function renderDeeperPage(
   screenStates: ScreenState[],
   surfacesById: Map<string, OperationSurfaces>,
 ): string {
-  const entriesByControl = new Map(
-    deeperPage.entries.map((entry) => [entry.control, entry]),
-  );
+  const findEntry = (state: string, control: string) =>
+    deeperPage.entries.find(
+      (entry) => entry.control === control && entry.state === state,
+    ) ??
+    deeperPage.entries.find(
+      (entry) => entry.control === control && entry.state === undefined,
+    );
   const guideLink = posix.relative(
     posix.dirname(posix.join("deeper", deeperPage.file)),
     deeperPage.guidePage,
@@ -111,7 +115,7 @@ export function renderDeeperPage(
   let entryNumber = 0;
   const sections = screenStates.map((screenState) => {
     const renderedEntries = screenState.controls.flatMap((control) => {
-      const entry = entriesByControl.get(control);
+      const entry = findEntry(screenState.state, control);
       if (entry === undefined) {
         return [];
       }

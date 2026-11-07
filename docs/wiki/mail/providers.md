@@ -67,6 +67,8 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 
 A provider with template errors cannot be saved, and a path that another enabled provider answers is refused with its name.
 
+
+Every control and text, one by one: [Email providers in depth](../deeper/mail/providers.md).
 ## Customize
 
 The full walkthrough, from the provider's API docs to a working provider: [Advanced: create an email provider](../advanced/email-provider.md).

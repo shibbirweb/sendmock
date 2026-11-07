@@ -9,3 +9,4 @@ The list of controls is read from the demo by a crawl, so a page always matches 
 
 - [Sidebar and header in depth](./app-shell.md): Every control of the sidebar and the header, which every screen shares.
 - [Inbox in depth](./mail/inbox.md): Every control and text of Mail > Inbox, an open email and its dialogs.
+- [Email providers in depth](./mail/providers.md): Every control and text of Mail > Providers, the provider editor and its tabs.

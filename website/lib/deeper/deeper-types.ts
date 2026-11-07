@@ -2,6 +2,8 @@
 export type DeeperEntry = {
   /** The control as the inventory names it, such as `button: Delete all emails`. */
   control: string;
+  /** Only for the control in this state, when the same name means something else elsewhere. */
+  state?: string;
   /** What it does, step by step, and what you see afterwards. */
   does: string;
   /** What it changes or sends: stored data, events, webhooks, log entries. */
