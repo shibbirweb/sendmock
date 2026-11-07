@@ -18,12 +18,17 @@ export const pluginSkillVersionPattern = /(Written for SendMock )(\S+?)(\. )/;
  * Other files that carry the version, each with the pattern around it: the plugin's copy of
  * the skill, the MCP registry's `server.json` (the server, its npm package and its image tag),
  * the Testcontainers modules' versions and their default image tags, which name the SendMock
- * they were released with (Go's version is its tag).
+ * they were released with (Go's version is its tag), and the Helm chart's version and appVersion.
  */
 const textVersionFiles = [
   {
     filePath: "plugin/skills/sendmock/SKILL.md",
     pattern: pluginSkillVersionPattern,
+  },
+  { filePath: "packaging/helm/sendmock/Chart.yaml", pattern: /(\nversion: )(\S+)(\n)/ },
+  {
+    filePath: "packaging/helm/sendmock/Chart.yaml",
+    pattern: /(\nappVersion: ")([^"]+)(")/,
   },
   { filePath: "server.json", pattern: /(\n  "version": ")([^"]+)(")/ },
   { filePath: "server.json", pattern: /(\n {6}"version": ")([^"]+)(")/ },

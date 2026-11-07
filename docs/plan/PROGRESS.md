@@ -369,7 +369,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A7: Push notification emulation (#166, PN-01) (#48)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161, SM-18)
 - [ ] A9: System tray app (#168, DS-08)
-- [ ] A10: Helm chart and Docker Desktop extension (#162)
+- [ ] A10: Helm chart and Docker Desktop extension (#162, DS-09, DS-10)
 - [ ] A11: Official distribution repositories (#169; needs the distributions' maintainers)e `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
 - [ ] Done-when check: installs and runs via every channel on macOS, Linux, Windows
@@ -833,3 +833,6 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-08 | CI green on 20ca95f (every workflow, the Push SDKs and the WhatsApp example among them): PN-01.1 to PN-01.6 ticked and PN-01 accepted, so A7 is done; SM-18.1 to SM-18.3 ticked. |
 | 2026-11-08 | Plan: A9 system tray app ([32](32-after-1-0.md#a9-system-tray-app-ds-08), DS-08 new with 5 criteria): a separate `sendmock-tray` binary on `tray-icon` that finds or starts SendMock, shows the unread counts, opens the UI and stops what it started; the GUI behind a `gui` feature so the workspace needs no GTK. |
 | 2026-11-08 | A9 built: `sendmock-tray`, a menu bar and tray app that finds or starts SendMock, shows the unread counts, opens the web UI and stops only what it started; the GUI behind a `gui` feature, built and tested on three OSes in the new "Tray app" workflow, and install steps on the Install page. |
+| 2026-11-08 | Plan: A10 ([32](32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10)): a Helm chart (DS-09, 4 criteria) installed on kind in CI, and a Docker Desktop extension (DS-10, 4 criteria) whose image CI builds and checks; publishing both follows the release runbook. |
+| 2026-11-08 | A10 built: the Helm chart (`packaging/helm/sendmock`, linted, rendered and installed on kind in the new "Helm chart" workflow) and the Docker Desktop extension (`packaging/docker-desktop`, checked with Docker's own validator locally and built for both platforms in its workflow); publishing both follows the release runbook. |
+| 2026-11-08 | Fix: CI on 134f181 found `docs/wiki/reference/webhook-templates.md` out of date for the new `whatsapp.cloud` template (the binary crate's reference page test, which the local runs had skipped); regenerated, and the binary crate's suite now runs locally too before pushing. |

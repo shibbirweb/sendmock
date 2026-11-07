@@ -15,15 +15,6 @@ type BacklogItem = {
 
 const backlogItems: BacklogItem[] = [
   {
-    key: "later-helm-docker-desktop",
-    title: "Helm chart and Docker Desktop extension",
-    area: "Distribution",
-    idea: "A Helm chart for a shared team instance in Kubernetes, and a Docker Desktop extension that runs SendMock from Docker Desktop.",
-    today:
-      "The Docker image (feature DS-02) runs anywhere Docker does, with Compose and GitHub Actions service-container examples.",
-    source: `${blobBase}/docs/plan/09-distribution.md#later`,
-  },
-  {
     key: "later-official-repositories",
     title: "Official distribution repositories (Debian, Ubuntu, Fedora, Arch)",
     area: "Distribution",

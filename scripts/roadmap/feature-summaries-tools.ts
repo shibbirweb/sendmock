@@ -141,6 +141,17 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Keep SendMock running all day without a terminal window, and see at a glance that mail arrived.",
   },
+  "DS-09": {
+    summary:
+      "A Helm chart that runs SendMock on Kubernetes with health probes, SMTP and HTTP services, optional persistence, provider port and Ingress.",
+    outcome:
+      "Run one shared SendMock for a team or a CI cluster with a single helm install.",
+  },
+  "DS-10": {
+    summary:
+      "A Docker Desktop extension that runs SendMock and opens its web UI from Docker Desktop's dashboard.",
+    outcome: "Start SendMock with one click in Docker Desktop.",
+  },
   "WS-01": {
     summary:
       "The website, built and tested on every pull request and published to GitHub Pages, with the live demo at `/demo/`.",

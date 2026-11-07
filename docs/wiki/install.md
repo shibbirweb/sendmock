@@ -436,6 +436,38 @@ Good to know:
 - Captured mail and SMS live in the container's `/data` folder. With `--rm` they are gone when the container stops; use Docker Compose below to keep them.
 - To connect an app that also runs in Docker, see [Connect your app: Docker](./connect/docker.md).
 
+## Docker Desktop extension
+
+The extension runs SendMock inside Docker Desktop and adds a **SendMock** tab that shows whether it is running and opens the web UI. SMTP is on `localhost:1025` and the web UI on `http://localhost:8025`, as with `docker run`. Until it is in Docker's Marketplace, build and install it from a clone of the repository:
+
+1. Get the repository:
+
+   ```bash
+   git clone https://github.com/shibbirweb/sendmock.git
+   ```
+
+2. Go into it:
+
+   ```bash
+   cd sendmock
+   ```
+
+3. Build the extension image:
+
+   ```bash
+   docker build -t sendmock-docker-extension:0.0.1 packaging/docker-desktop
+   ```
+
+4. Install it into Docker Desktop:
+
+   ```bash
+   docker extension install sendmock-docker-extension:0.0.1
+   ```
+
+5. Open **SendMock** in Docker Desktop's sidebar, then **Open SendMock**.
+
+To remove it, run `docker extension rm sendmock-docker-extension`; its data volume stays until you delete it.
+
 ## Docker Compose
 
 Use this to keep SendMock running with captured mail and SMS kept across restarts.

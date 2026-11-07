@@ -1,0 +1,15 @@
+apiVersion: v2
+name: sendmock
+description: SendMock catches the email, SMS, push notifications, payments and webhooks your app sends, for development and CI.
+type: application
+# The chart and SendMock share one version, which scripts/version.ts writes.
+version: 0.0.0
+appVersion: "0.0.0"
+home: https://shibbirweb.github.io/sendmock/
+sources:
+  - https://github.com/shibbirweb/sendmock
+keywords:
+  - email
+  - smtp
+  - sms
+  - testing

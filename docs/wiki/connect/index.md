@@ -30,3 +30,4 @@ Pick your language:
 Running in containers:
 
 - [Docker](./docker.md)
+- [Kubernetes](./kubernetes.md)

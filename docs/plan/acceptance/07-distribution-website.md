@@ -81,6 +81,24 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [ ] DS-08.4 The tray app builds and its tests pass on Linux, macOS and Windows in CI, and the `sendmock` binary gains no GUI dependency.
 - [ ] DS-08.5 The docs say how to install and run the tray app on each OS.
 
+## DS-09 Helm chart
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
+
+- [ ] DS-09.1 The chart runs SendMock as the image's non-root user with health probes on `/api/v1/health`, and a Service for SMTP and HTTP (and the provider port when enabled).
+- [ ] DS-09.2 Values set the image, resources, persistence for `/data` (a claim, or an empty directory), extra `SENDMOCK_*` settings, the provider port and an optional Ingress for the web UI.
+- [ ] DS-09.3 CI lints and renders the chart with every option and installs it on a kind cluster, where SendMock answers its health check and catches an email sent over SMTP.
+- [ ] DS-09.4 The docs say how to install the chart and change its values.
+
+## DS-10 Docker Desktop extension
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
+
+- [ ] DS-10.1 The extension image has `metadata.json` and every label Docker requires, and its VM service runs SendMock with SMTP and HTTP published on the host.
+- [ ] DS-10.2 Its dashboard tab shows whether SendMock answers and opens the web UI.
+- [ ] DS-10.3 CI builds the extension image and checks its labels and metadata.
+- [ ] DS-10.4 The docs say how to install the extension.
+
 ---
 
 ## WS-01 Site and deployment
