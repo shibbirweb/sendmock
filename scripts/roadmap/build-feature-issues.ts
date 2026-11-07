@@ -162,7 +162,8 @@ function buildFeatureIssue(
       `status: ${status.toLowerCase()}`,
     ],
     status,
-    target: "1.0",
+    // Features planned after 1.0 say so first in their intro (acceptance/01-email.md EM-19).
+    target: intro.phase.startsWith("After 1.0") ? "After 1.0" : "1.0",
     area,
     isClosed: isDone,
     criteriaSummary: `${tickedCount} of ${criteriaCount}`,

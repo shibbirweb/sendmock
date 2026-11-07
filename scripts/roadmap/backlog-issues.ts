@@ -48,15 +48,6 @@ const backlogItems: BacklogItem[] = [
     source: `${blobBase}/docs/plan/09-distribution.md#later`,
   },
   {
-    key: "later-mailpit-aliases",
-    title: "Mailpit API compatibility aliases",
-    area: "Email",
-    idea: "Optional aliases for Mailpit's REST API paths and answers, so test suites written against Mailpit can switch to SendMock with no code change, if there is demand.",
-    today:
-      "SendMock has its own REST API (`/api/v1`), described by `docs/api/openapi.yaml`.",
-    source: `${blobBase}/docs/plan/10-open-questions.md#9-mailpit-api-compatibility`,
-  },
-  {
     key: "later-email-clicked",
     title: "`email.clicked` link-click tracking event",
     area: "Webhooks",

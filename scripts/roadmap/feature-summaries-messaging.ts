@@ -106,6 +106,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Add a provider SendMock does not ship, or adjust a built-in one, without waiting for a release.",
   },
+  "EM-19": {
+    summary:
+      "Mailpit's REST API paths and answers on SendMock: list, search, read, tag and delete messages as Mailpit's API does.",
+    outcome:
+      "Switch a test suite written against Mailpit's API to SendMock with no code change.",
+  },
   "SM-01": {
     summary:
       "A native SMS API to send messages and read them back, with status and metadata.",
