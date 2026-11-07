@@ -82,12 +82,12 @@ Every channel has a **beta** track (from `develop`) and a **stable** track (from
 |---------|-----------|
 | GitHub Releases | archives + SHA256 checksums, built by a tag-triggered workflow (consider `cargo-dist`) |
 | Install scripts | `curl -fsSL .../install.sh \| sh`, `irm .../install.ps1 \| iex` |
-| Homebrew | tap first (`brew install <owner>/tap/sendmock`), core later |
+| Homebrew | tap first (`brew install shibbirweb/tap/sendmock`), core later |
 | Linux packages | `.deb` and `.rpm` on every GitHub release (`cargo-deb`, `cargo-generate-rpm`); later our own signed APT and YUM repository |
 | Scoop / WinGet | manifest in a bucket repo, WinGet later |
 | Chocolatey | community package, later |
 | AUR, COPR, Nixpkgs | community packages for Arch, Fedora and Nix, later |
-| Docker | `ghcr.io/<owner>/sendmock` and Docker Hub; multi-arch; see [Docker](#docker) |
+| Docker | `ghcr.io/shibbirweb/sendmock` and Docker Hub; multi-arch; see [Docker](#docker) |
 | Cargo | `cargo install sendmock` (requires prebuilt UI in the crate package) |
 | npm (optional) | `npx sendmock` wrapper that downloads the right binary, handy for JS projects and CI |
 
@@ -153,7 +153,7 @@ Stable (from `main`): `latest`, `1`, `1.4`, `1.4.2`. Beta (from `develop`): `bet
 docker run -d --name sendmock \
   -p 8025:8025 -p 1025:1025 \
   -v sendmock-data:/data \
-  ghcr.io/<owner>/sendmock:1
+  ghcr.io/shibbirweb/sendmock:1
 ```
 
 Compose example (with seed file, provider port and healthcheck dependency) is in [08-integrations.md](08-integrations.md#docker-compose).
@@ -163,7 +163,7 @@ CI service container (GitHub Actions):
 ```yaml
 services:
   sendmock:
-    image: ghcr.io/<owner>/sendmock:1
+    image: ghcr.io/shibbirweb/sendmock:1
     ports:
       - 1025:1025
       - 8025:8025
