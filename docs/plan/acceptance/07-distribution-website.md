@@ -166,7 +166,7 @@ Phase U3 (owner feedback F16). Plan: [16-website-and-releases.md](../16-website-
 
 Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17). Plan: [19-user-guide.md](../19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started).
 
-- [ ] WS-10.1 Every screen has a Deeper page under `docs/wiki/deeper/`, linked from its menu page, with an entry for every button, menu item, switch, tab, field, filter, column, badge, shortcut and every text the screen can show (empty states, errors, toasts, dialogs, status labels).
-- [ ] WS-10.2 Each entry says where the control is (an annotated screenshot), what it does and what you see afterwards, what it changes or sends (data, events, webhooks, logs), where its text comes from, how it links to other screens, the same action from the CLI, REST API and MCP, and the errors it can show with what to do.
-- [ ] WS-10.3 A Playwright crawl of the demo lists every control per screen, and a test fails when a control has no entry or an entry names a control that no longer exists.
-- [ ] WS-10.4 The data sources and the CLI, REST API and MCP equivalents are generated from the OpenAPI spec and the surface catalogue, and the annotated screenshots from `bun run screenshots`, so they cannot drift from the code.
+- [x] WS-10.1 Every screen has a Deeper page under `docs/wiki/deeper/`, linked from its menu page, with an entry for every button, menu item, switch, tab, field, filter, column, badge, shortcut and every text the screen can show (empty states, errors, toasts, dialogs, status labels). (#48)
+- [x] WS-10.2 Each entry says where the control is (an annotated screenshot), what it does and what you see afterwards, what it changes or sends (data, events, webhooks, logs), where its text comes from, how it links to other screens, the same action from the CLI, REST API and MCP, and the errors it can show with what to do. (#48)
+- [x] WS-10.3 A Playwright crawl of the demo lists every control per screen, and a test fails when a control has no entry or an entry names a control that no longer exists. (#48)
+- [x] WS-10.4 The data sources and the CLI, REST API and MCP equivalents are generated from the OpenAPI spec and the surface catalogue, and the annotated screenshots from `bun run screenshots`, so they cannot drift from the code. (#48)
