@@ -48,6 +48,8 @@ pub fn open_write_connection(
         // SQLite reuses the write-ahead log but keeps it at its largest size; this trims it
         // back after each checkpoint, so a burst of mail does not leave a large file behind.
         connection.pragma_update(None, "journal_size_limit", WAL_SIZE_LIMIT_BYTES)?;
+        // The checkpoint connection copies the log in the background, so no write waits for it.
+        connection.pragma_update(None, "wal_autocheckpoint", 0)?;
     }
     Ok(connection)
 }

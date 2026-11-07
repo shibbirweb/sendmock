@@ -43,9 +43,12 @@ impl Database {
             .map(|_| open_read_connection(&connection_target))
             .collect::<Result<Vec<_>, _>>()?;
         let checkpointer = match &location {
-            DatabaseLocation::File(_) => Some(DatabaseCheckpointer::new(
-                open_checkpoint_connection(&connection_target)?,
-            )),
+            DatabaseLocation::File(_) => {
+                let checkpointer =
+                    DatabaseCheckpointer::new(open_checkpoint_connection(&connection_target)?);
+                checkpointer.start_background_checkpoints()?;
+                Some(checkpointer)
+            }
             DatabaseLocation::InMemory => None,
         };
         Ok(Self {

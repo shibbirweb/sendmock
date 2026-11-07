@@ -191,6 +191,25 @@ async fn a_checkpoint_copies_a_quiet_log_into_the_database_file()
     Ok(())
 }
 
+// AC: PL-08.2
+#[tokio::test]
+async fn no_write_runs_a_checkpoint_itself() -> Result<(), Box<dyn std::error::Error>> {
+    let database_folder = tempfile::tempdir()?;
+    let database = Database::open(
+        DatabaseLocation::File(database_folder.path().join("sendmock.db")),
+        EMBEDDED_MIGRATIONS,
+    )?;
+
+    let automatic_checkpoint_pages: i64 = database
+        .write(|connection| {
+            Ok(connection.query_row("PRAGMA wal_autocheckpoint", [], |row| row.get(0))?)
+        })
+        .await?;
+
+    assert_eq!(automatic_checkpoint_pages, 0);
+    Ok(())
+}
+
 #[tokio::test]
 async fn an_in_memory_database_has_no_log_to_checkpoint() -> Result<(), StoreError> {
     let database = Database::open(DatabaseLocation::InMemory, EMBEDDED_MIGRATIONS)?;
