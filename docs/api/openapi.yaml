@@ -1626,6 +1626,67 @@ paths:
       x-sendmock-cli: sendmock email opens <emailId>
       x-sendmock-mcp: sendmock_email_opens
       x-sendmock-ui: Mail > open email > Timeline (opened entries)
+  /api/v1/emails/{emailId}/clicks:
+    post:
+      operationId: postEmailsByEmailIdClicks
+      summary: Record a click on one of the email's links and fire email.clicked.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailClickRequest"
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email click <emailId>
+      x-sendmock-mcp: sendmock_email_click
+      x-sendmock-ui: Mail > open email > click a link in the preview, or Simulate click
+    get:
+      operationId: getEmailsByEmailIdClicks
+      summary: Every recorded click on the email's links, newest first.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailClickRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email clicks <emailId>
+      x-sendmock-mcp: sendmock_email_clicks
+      x-sendmock-ui: Mail > open email > Timeline (clicked entries)
   /api/v1/emails/{emailId}/release:
     post:
       operationId: postEmailsByEmailIdRelease
@@ -7129,6 +7190,7 @@ components:
         - email.received
         - email.inbound
         - email.opened
+        - email.clicked
         - email.delivered
         - email.deferred
         - email.bounced
@@ -8205,6 +8267,46 @@ components:
         - is_inline
         - download_url
         - thumbnail_url
+    EmailClickRecord:
+      type: object
+      properties:
+        clicked_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        url:
+          type: string
+        source:
+          $ref: "#/components/schemas/OpenSource"
+        user_agent:
+          type:
+            - string
+            - "null"
+      required:
+        - clicked_at
+        - url
+        - source
+        - user_agent
+      description: One click on an email's link, newest first in `GET /emails/{emailId}/clicks`.
+    EmailClickRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The link that was clicked; one of the email's links (`extracted.links`).
+          examples:
+            - https://app.test/verify?token=abc123
+        source:
+          $ref: "#/components/schemas/OpenSource"
+          description: "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`."
+          examples:
+            - api
+        user_agent:
+          type: string
+          description: The browser or client that clicked, kept in the click history. The UI sends its own.
+          examples:
+            - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+      required:
+        - url
+      description: Body of `POST /emails/{emailId}/clicks`.
     EmailDeliveryStatus:
       type: string
       enum:
@@ -8263,6 +8365,9 @@ components:
           anyOf:
             - $ref: "#/components/schemas/IsoTimestamp"
             - type: "null"
+        click_count:
+          type: number
+          description: Every recorded click on the email's links (`GET /emails/{emailId}/clicks`).
         smtp_session_id:
           anyOf:
             - $ref: "#/components/schemas/Ulid"
@@ -8331,6 +8436,7 @@ components:
         - attachments
         - bcc
         - cc
+        - click_count
         - delivery_status
         - direction
         - envelope_from
@@ -8781,6 +8887,7 @@ components:
       enum:
         - received
         - opened
+        - clicked
         - delivered
         - deferred
         - bounced

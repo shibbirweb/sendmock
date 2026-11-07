@@ -113,6 +113,25 @@ export function useOpenEmail() {
   );
 }
 
+/** Records a click on one of the email's links and fires `email.clicked` (EM-20). */
+export function useClickEmailLink() {
+  return useEmailMutation(
+    ({
+      emailId,
+      url,
+      clickSource,
+    }: {
+      emailId: string;
+      url: string;
+      clickSource: OpenSource;
+    }) =>
+      requestApi<void>(`/emails/${emailId}/clicks`, {
+        method: "POST",
+        requestBody: { url, ...buildOpenEventRequest(clickSource) },
+      }),
+  );
+}
+
 export function useSimulateEmailOutcome() {
   return useEmailMutation(
     ({

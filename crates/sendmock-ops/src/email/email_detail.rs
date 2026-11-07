@@ -65,6 +65,8 @@ pub struct EmailDetail {
     pub extracted: ExtractedData,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub opened_at: Option<String>,
+    /// Every recorded click on the email's links (`GET /emails/{emailId}/clicks`).
+    pub click_count: u64,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub smtp_session_id: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
@@ -110,6 +112,8 @@ impl From<&EmailRecord> for EmailDetail {
                 links: email.links.clone(),
             },
             opened_at: email.opened_at_unix_ms.map(format_rfc3339),
+            // The clicks live in their own table; `load_email_detail` counts them.
+            click_count: 0,
             smtp_session_id: email.smtp_session_id.clone(),
             smtp_auth_user: email.smtp_auth_user.clone(),
             template: None,

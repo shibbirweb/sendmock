@@ -102,6 +102,7 @@
     ],
     "Simulate an event menu": [
       "menuitem: Open (email.opened)",
+      "menuitem: Click a link (email.clicked)",
       "menuitem: Delivered",
       "menuitem: Hard bounce",
       "menuitem: Soft bounce",

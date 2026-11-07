@@ -113,6 +113,10 @@ pub(crate) async fn load_email_detail(
     email: &EmailRecord,
 ) -> Result<EmailDetail, OperationError> {
     let mut email_detail = EmailDetail::from(email);
+    email_detail.click_count = operation_context
+        .email_repository
+        .count_clicks(&email.email_id)
+        .await?;
     let provider_send = operation_context
         .email_stores
         .sends

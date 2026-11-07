@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ReleaseEmailDialog } from "@/features/mail/detail/release-email-dialog";
+import { SimulateClickMenu } from "@/features/mail/detail/simulate-click-menu";
 import {
   canRespondToEmail,
   type EmailComposerMode,
@@ -133,6 +134,7 @@ export function MailDetailActions({
               <EyeIcon />
               Open (email.opened)
             </DropdownMenuItem>
+            <SimulateClickMenu email={email} />
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Delivery outcome</DropdownMenuLabel>
             {simulatedOutcomes.map(({ label, outcome }) => (

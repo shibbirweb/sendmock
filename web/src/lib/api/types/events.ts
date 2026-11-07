@@ -5,6 +5,7 @@ export const appEventTypes = [
   "email.received",
   "email.inbound",
   "email.opened",
+  "email.clicked",
   "email.delivered",
   "email.deferred",
   "email.bounced",

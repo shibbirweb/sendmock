@@ -38,7 +38,7 @@ curl http://127.0.0.1:8025/api/v1/message/latest
 - **`GET /api/v1/info` and `POST /api/v1/send`** are SendMock's own endpoints at the same paths, with SendMock's shapes ([REST API](../reference/index.md)). An app that sends mail over SMTP, as most do, is not affected.
 - **Tags** are stored in lower case.
 - **Message IDs** are SendMock's IDs; use them as Mailpit's (read them from a list, pass them back).
-- **Not emulated:** Mailpit's chaos settings, web UI configuration, HTML, link and spam checks, release, thumbnails, and renaming or deleting a tag. SendMock has its own [SMTP chaos](../settings.md#chaos), [HTML, link and spam checks](reading-and-checks.md) and [release](release.md).
+- **Not emulated:** Mailpit's chaos settings, web UI configuration, HTML, link and spam checks, release, thumbnails, and renaming or deleting a tag. SendMock has its own [SMTP chaos](../settings.md#chaos), [HTML, link and spam checks](./reading-and-checks.md) and [release](./release.md).
 
 ## What SendMock adds
 

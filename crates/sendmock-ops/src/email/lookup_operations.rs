@@ -7,6 +7,7 @@ use super::email_access::{read_wait_duration, wait_for_newest_email};
 use super::email_detail::EmailDetail;
 use super::email_inputs::{EmailWaitQuery, LinksQuery, RecipientLookupQuery};
 use super::lookups::{LinksLookup, OtpLookup};
+use super::read_email_operations::load_email_detail;
 use crate::{Operation, OperationContext, OperationDefinition, OperationError};
 
 const DEFAULT_WAIT: Duration = Duration::from_secs(30);
@@ -260,7 +261,7 @@ impl Operation for WaitForEmailOperation {
         };
         let wait_duration = read_wait_duration(input.timeout.as_deref(), DEFAULT_WAIT)?;
         match wait_for_newest_email(operation_context, filter, wait_duration).await? {
-            Some(matching_email) => Ok(EmailDetail::from(&matching_email)),
+            Some(matching_email) => load_email_detail(operation_context, &matching_email).await,
             None => Err(OperationError::Timeout {
                 message: format!(
                     "No matching email arrived within {} ms",

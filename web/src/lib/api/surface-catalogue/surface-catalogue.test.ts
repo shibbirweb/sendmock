@@ -16,7 +16,7 @@ const registeredOperationKeys = apiEndpoints.map(
 );
 const catalogueEntries = Object.entries(surfaceCatalogue);
 
-const stageBPhases = ["0", "1", "2", "3", "3P", "4", "5"];
+const stageBPhases = ["0", "1", "2", "3", "3P", "4", "5", "A2"];
 
 describe("surface catalogue", () => {
   test("UI-12.1 every operation names the phase it arrives in", () => {

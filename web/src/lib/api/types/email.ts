@@ -88,6 +88,8 @@ export type EmailDetail = EmailSummary & {
   attachments: EmailAttachment[];
   extracted: ExtractedData;
   opened_at: IsoTimestamp | null;
+  /** Every recorded click on the email's links (`GET /emails/{emailId}/clicks`). */
+  click_count: number;
   smtp_session_id: Ulid | null;
   smtp_auth_user: string | null;
   template: EmailTemplateData | null;
@@ -100,6 +102,7 @@ export type EmailDetail = EmailSummary & {
 export type EmailTimelineKind =
   | "received"
   | "opened"
+  | "clicked"
   | "delivered"
   | "deferred"
   | "bounced"

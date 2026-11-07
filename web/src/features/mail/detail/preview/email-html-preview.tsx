@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { buildPreviewDocument } from "@/features/mail/detail/preview/build-preview-document";
+import { usePreviewLinkClicks } from "@/features/mail/detail/preview/use-preview-link-clicks";
 import { buildApiUrl } from "@/lib/api/api-client";
 import type { EmailDetail } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export function EmailHtmlPreview({ email }: { email: EmailDetail }) {
   const [previewDevice, setPreviewDevice] =
     React.useState<PreviewDevice>("desktop");
   const [isRemoteImagesAllowed, setRemoteImagesAllowed] = React.useState(false);
+  const trackPreviewLinkClicks = usePreviewLinkClicks(email);
 
   const previewDocument = React.useMemo(
     () =>
@@ -130,6 +132,7 @@ export function EmailHtmlPreview({ email }: { email: EmailDetail }) {
           srcDoc={previewDocument}
           onLoad={(loadEvent) => {
             fitIframeHeight(loadEvent.currentTarget);
+            trackPreviewLinkClicks(loadEvent.currentTarget);
           }}
           className={cn(
             "min-h-64 rounded bg-white transition-[width]",

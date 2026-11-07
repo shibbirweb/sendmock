@@ -5,6 +5,7 @@ import type {
   EmailDetail,
   EmailTimelineEntry,
   HttpBin,
+  EmailClickRecord,
   OpenRecord,
   HttpResponseRule,
   PaymentDetail,
@@ -107,6 +108,8 @@ export type MockDatabase = {
   emailTimelines: Map<string, EmailTimelineEntry[]>;
   /** Each email's and SMS's open history, oldest first, by message id. */
   messageOpens: Map<string, OpenRecord[]>;
+  /** Each email's click history, newest first, by email id. */
+  emailClicks: Map<string, EmailClickRecord[]>;
   /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
   attachmentContents: Map<string, Uint8Array>;
   /** Bytes of SMS media sent inline, keyed `smsId/index`. */
@@ -219,6 +222,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       emails: [],
       emailTimelines: new Map(),
       messageOpens: new Map(),
+      emailClicks: new Map(),
       attachmentContents: new Map(),
       smsMediaContents: new Map(),
       smsMessages: [],
@@ -287,6 +291,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
     ),
     smsMessages,
     messageOpens: buildOpenRecordFixtures([...emails, ...smsMessages]),
+    emailClicks: new Map(),
     verifications: linkVerificationMessages(
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,

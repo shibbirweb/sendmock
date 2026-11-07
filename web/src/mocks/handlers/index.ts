@@ -7,6 +7,7 @@ import { messageRuleHandlers } from "@/mocks/handlers/message-rule-handlers";
 import { outcomeTestHandlers } from "@/mocks/handlers/outcome-test-handlers";
 import { paymentTestValueHandlers } from "@/mocks/handlers/payment-test-value-handlers";
 import { waitHandlers } from "@/mocks/handlers/wait-handlers";
+import { emailClickHandlers } from "@/mocks/handlers/email-click-handlers";
 import { emailHandlers } from "@/mocks/handlers/email-handlers";
 import { emailResponseHandlers } from "@/mocks/handlers/email-response-handlers";
 import { httpBinHandlers } from "@/mocks/handlers/http-bin-handlers";
@@ -57,6 +58,7 @@ export const mockHandlers = [
   ...emailDetailHandlers,
   ...nativeSendHandlers,
   ...emailHandlers,
+  ...emailClickHandlers,
   ...emailResponseHandlers,
   ...smsSendHandlers,
   ...smsHandlers,

@@ -117,6 +117,18 @@ export const emailSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_email_opens",
     ui: "Mail > open email > Timeline (opened entries)",
   },
+  "POST /api/v1/emails/{emailId}/clicks": {
+    phase: "A2",
+    cli: "sendmock email click <emailId>",
+    mcp: "sendmock_email_click",
+    ui: "Mail > open email > click a link in the preview, or Simulate click",
+  },
+  "GET /api/v1/emails/{emailId}/clicks": {
+    phase: "A2",
+    cli: "sendmock email clicks <emailId>",
+    mcp: "sendmock_email_clicks",
+    ui: "Mail > open email > Timeline (clicked entries)",
+  },
   "POST /api/v1/emails/{emailId}/release": {
     phase: "4",
     cli: "sendmock email release <emailId>",

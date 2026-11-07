@@ -6,6 +6,8 @@ use crate::AppEvent;
 
 /// The fields an opened event carries about the open itself.
 const OPEN_EVENT_FIELDS: [&str; 3] = ["first_open", "open_count", "source"];
+/// The fields a clicked event carries about the click itself.
+const CLICK_EVENT_FIELDS: [&str; 4] = ["url", "first_click", "click_count", "source"];
 
 /// HTML without its tags, for emails that have no text part.
 fn strip_html_tags(html_body: &str) -> String {
@@ -76,15 +78,23 @@ pub fn build_sms_rule_message(stored_sms: &SmsRecord) -> RuleMessage {
         .with_field("first_open", vec![(stored_sms.open_count == 1).to_string()])
 }
 
-/// An opened event's own `first_open`, `open_count` and `source` win over the stored
-/// message's: a later open may have changed the count, and an email's stored `source` says
-/// how it arrived, not who opened it.
-pub fn with_open_event_fields(rule_message: RuleMessage, app_event: &AppEvent) -> RuleMessage {
-    if !app_event.event_type.ends_with(".opened") {
+/// An opened or clicked event's own fields (`first_open`, `open_count`, `url`, `first_click`,
+/// `click_count`, `source`) win over the stored message's: a later open or click may have
+/// changed the count, and an email's stored `source` says how it arrived, not who opened it.
+pub fn with_engagement_event_fields(
+    rule_message: RuleMessage,
+    app_event: &AppEvent,
+) -> RuleMessage {
+    let event_fields: &[&str] = if app_event.event_type.ends_with(".opened") {
+        &OPEN_EVENT_FIELDS
+    } else if app_event.event_type.ends_with(".clicked") {
+        &CLICK_EVENT_FIELDS
+    } else {
         return rule_message;
-    }
-    OPEN_EVENT_FIELDS
-        .into_iter()
+    };
+    event_fields
+        .iter()
+        .copied()
         .fold(rule_message, |open_message, field_key| {
             match &app_event.data[field_key] {
                 Value::Null => open_message,
@@ -116,7 +126,8 @@ mod tests {
             .with_field("open_count", vec!["4".to_owned()])
             .with_field("source", vec!["smtp".to_owned()]);
 
-        let open_message = with_open_event_fields(stored_fields, &opened_event("email.opened"));
+        let open_message =
+            with_engagement_event_fields(stored_fields, &opened_event("email.opened"));
 
         assert_eq!(
             open_message.read_field("first_open"),
@@ -132,12 +143,42 @@ mod tests {
         );
     }
 
+    // AC: EM-20.4
+    #[test]
+    fn clicked_events_are_filtered_on_the_click_they_carry() {
+        let clicked_event = AppEvent {
+            data: json!({
+                "id": "01A",
+                "url": "https://app.test/verify",
+                "first_click": true,
+                "click_count": 2,
+                "source": "api",
+            }),
+            ..opened_event("email.clicked")
+        };
+
+        let click_message = with_engagement_event_fields(RuleMessage::default(), &clicked_event);
+
+        assert_eq!(
+            click_message.read_field("url"),
+            Some(vec!["https://app.test/verify".to_owned()])
+        );
+        assert_eq!(
+            click_message.read_field("first_click"),
+            Some(vec!["true".to_owned()])
+        );
+        assert_eq!(
+            click_message.read_field("click_count"),
+            Some(vec!["2".to_owned()])
+        );
+    }
+
     #[test]
     fn other_events_keep_the_stored_fields() {
         let stored_fields = RuleMessage::default().with_field("source", vec!["smtp".to_owned()]);
 
         let event_message =
-            with_open_event_fields(stored_fields.clone(), &opened_event("email.received"));
+            with_engagement_event_fields(stored_fields.clone(), &opened_event("email.received"));
 
         assert_eq!(event_message, stored_fields);
     }

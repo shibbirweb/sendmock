@@ -409,6 +409,152 @@
       ]
     },
     {
+      "command": "sendmock email click",
+      "slug": "email-click",
+      "usage": "sendmock email click <emailId> [flags]",
+      "summary": "Record a click on one of the email's links and fire email.clicked.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "postEmailsByEmailIdClicks",
+          "summary": "Record a click on one of the email's links and fire email.clicked.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "emailId",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<url>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The link that was clicked; one of the email's links (`extracted.links`).",
+          "example": "https://app.test/verify?token=abc123"
+        },
+        {
+          "flag": "--source",
+          "input": {
+            "name": "source",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<source>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "ui",
+            "manual",
+            "api"
+          ],
+          "description": "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.",
+          "example": "api"
+        },
+        {
+          "flag": "--user-agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<user-agent>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        }
+      ],
+      "example": "sendmock email click 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --url 'https://app.test/verify?token=abc123' --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_click"
+      ],
+      "ui": [
+        "Mail > open email > click a link in the preview, or Simulate click"
+      ]
+    },
+    {
+      "command": "sendmock email clicks",
+      "slug": "email-clicks",
+      "usage": "sendmock email clicks <emailId>",
+      "summary": "Every recorded click on the email's links, newest first.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "getEmailsByEmailIdClicks",
+          "summary": "Every recorded click on the email's links, newest first.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "emailId",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock email clicks 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "output": "EmailClickRecord[]",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_clicks"
+      ],
+      "ui": [
+        "Mail > open email > Timeline (clicked entries)"
+      ]
+    },
+    {
       "command": "sendmock email delete",
       "slug": "email-delete",
       "usage": "sendmock email delete <emailId> [flags]",
@@ -15029,6 +15175,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -16706,6 +16853,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -16996,6 +17144,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -17199,6 +17348,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -18663,6 +18813,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",

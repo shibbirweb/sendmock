@@ -213,6 +213,23 @@ const emailEndpoints = tagEndpoints("Email", [
   },
   {
     method: "POST",
+    path: "/api/v1/emails/{emailId}/clicks",
+    summary:
+      "Record a click on one of the email's links and fire email.clicked.",
+    requestBody: typeRef("EmailClickRequest"),
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/emails/{emailId}/clicks",
+    summary: "Every recorded click on the email's links, newest first.",
+    response: listOf("EmailClickRecord"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
     path: "/api/v1/emails/{emailId}/release",
     summary: "Send the email on through the allowlisted relay.",
     requestBody: typeRef("EmailReleaseRequest"),

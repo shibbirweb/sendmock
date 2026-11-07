@@ -567,6 +567,205 @@
       ]
     },
     {
+      "name": "sendmock_email_click",
+      "toolset": "email",
+      "summary": "Record a click on one of the email's links and fire email.clicked.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "postEmailsByEmailIdClicks",
+          "summary": "Record a click on one of the email's links and fire email.clicked.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The link that was clicked; one of the email's links (`extracted.links`).",
+          "example": "https://app.test/verify?token=abc123"
+        },
+        {
+          "name": "source",
+          "input": {
+            "name": "source",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "ui",
+            "manual",
+            "api"
+          ],
+          "description": "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.",
+          "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The link that was clicked; one of the email's links (`extracted.links`).",
+            "examples": [
+              "https://app.test/verify?token=abc123"
+            ]
+          },
+          "source": {
+            "$ref": "#/$defs/OpenSource",
+            "description": "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.",
+            "examples": [
+              "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+            ]
+          }
+        },
+        "required": [
+          "email_id",
+          "url"
+        ],
+        "$defs": {
+          "OpenSource": {
+            "type": "string",
+            "enum": [
+              "ui",
+              "manual",
+              "api"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "url": "https://app.test/verify?token=abc123",
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+      },
+      "output": null,
+      "cli": [
+        "sendmock email click <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > click a link in the preview, or Simulate click"
+      ]
+    },
+    {
+      "name": "sendmock_email_clicks",
+      "toolset": "email",
+      "summary": "Every recorded click on the email's links, newest first.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "getEmailsByEmailIdClicks",
+          "summary": "Every recorded click on the email's links, newest first.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "email_id"
+        ]
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "EmailClickRecord[]",
+      "cli": [
+        "sendmock email clicks <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > Timeline (clicked entries)"
+      ]
+    },
+    {
       "name": "sendmock_email_delete",
       "toolset": "email",
       "summary": "Delete one email.",
@@ -22671,6 +22870,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -22757,6 +22957,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -25430,6 +25631,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -25574,6 +25776,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -26010,6 +26213,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -26116,6 +26320,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -26330,6 +26535,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -26478,6 +26684,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -28727,6 +28934,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -28935,6 +29143,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",

@@ -42,8 +42,8 @@ pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiReq
 pub use database::{CheckpointProgress, Database};
 pub use database_location::DatabaseLocation;
 pub use email::{
-    AttachmentRecord, EmailListFilter, EmailPage, EmailRecord, EmailRepository,
-    NewAttachmentRecord, NewEmailRecord, StoredEmailAddress, TimelineRecord,
+    AttachmentRecord, EmailClickRecord, EmailListFilter, EmailPage, EmailRecord, EmailRepository,
+    NewAttachmentRecord, NewEmailRecord, RecordedEmailClick, StoredEmailAddress, TimelineRecord,
 };
 pub use email_provider_send::{
     EmailLocalTemplateRecord, EmailLocalTemplateRepository, EmailProviderSendRecord,

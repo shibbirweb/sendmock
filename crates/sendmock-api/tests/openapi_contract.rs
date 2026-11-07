@@ -1622,7 +1622,8 @@ async fn prepare_email_outcome_samples(
     )]
 }
 
-/// Opens of a sent email and an outbound SMS, from the UI with a user agent and from a script.
+/// Opens and clicks of a sent email and opens of an outbound SMS, from the UI with a user agent
+/// and from a script.
 async fn prepare_open_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
     let email_id = post_json(app_router, "/api/v1/send", &native_send_sample()).await["id"].clone();
     let sms_id = post_json(
@@ -1644,6 +1645,17 @@ async fn prepare_open_samples(app_router: &axum::Router) -> Vec<(&'static str, V
         ),
         (
             "getEmailsByEmailIdOpens",
+            vec![json!({ "email_id": email_id })],
+        ),
+        (
+            "postEmailsByEmailIdClicks",
+            vec![
+                json!({ "email_id": email_id, "url": "https://shop.test/confirm?t=1", "source": "ui", "user_agent": "Mozilla/5.0 (Macintosh)" }),
+                json!({ "email_id": email_id, "url": "https://shop.test/confirm?t=1" }),
+            ],
+        ),
+        (
+            "getEmailsByEmailIdClicks",
             vec![json!({ "email_id": email_id })],
         ),
         (

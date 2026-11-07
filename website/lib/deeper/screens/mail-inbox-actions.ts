@@ -56,6 +56,12 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     operationIds: ["postEmailsByEmailIdOpen"],
   },
   {
+    control: "menuitem: Click a link (email.clicked)",
+    does: "Lists the email's links; choosing one records a click on it, as a provider's click tracking would. Shown when the email has links.",
+    changes: "Fires `email.clicked` with the link, `first_click` and the click count, and adds it to the Timeline. A link clicked in the HTML preview does the same with `source: \"ui\"`.",
+    operationIds: ["postEmailsByEmailIdClicks"],
+  },
+  {
     control: "menuitem: Delivered",
     does: "Marks the email delivered.",
     changes: "Fires `email.delivered` and adds it to the Timeline.",

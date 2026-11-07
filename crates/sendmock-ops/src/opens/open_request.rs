@@ -6,13 +6,10 @@ use crate::{OperationContext, OperationError};
 /// Longer than any browser sends; it keeps the open history readable.
 const MAX_USER_AGENT_LENGTH: usize = 512;
 
-/// The open as it is stored: now, from the source, with the user agent trimmed (a blank one
-/// is none).
-pub(crate) fn build_open_record(
-    operation_context: &OperationContext,
-    open_source: OpenSource,
+/// The user agent an open or click sends, trimmed (a blank one is none) and not too long.
+pub(crate) fn read_user_agent(
     user_agent: Option<String>,
-) -> Result<MessageOpenRecord, OperationError> {
+) -> Result<Option<String>, OperationError> {
     let user_agent = user_agent
         .map(|user_agent| user_agent.trim().to_owned())
         .filter(|user_agent| !user_agent.is_empty());
@@ -25,9 +22,18 @@ pub(crate) fn build_open_record(
             field: Some("user_agent".to_owned()),
         });
     }
+    Ok(user_agent)
+}
+
+/// The open as it is stored: now, from the source, with the user agent read as above.
+pub(crate) fn build_open_record(
+    operation_context: &OperationContext,
+    open_source: OpenSource,
+    user_agent: Option<String>,
+) -> Result<MessageOpenRecord, OperationError> {
     Ok(MessageOpenRecord {
         opened_at_unix_ms: operation_context.clock.now_unix_ms(),
         source: open_source.as_str().to_owned(),
-        user_agent,
+        user_agent: read_user_agent(user_agent)?,
     })
 }

@@ -146,6 +146,7 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
     extracted,
     opened_at:
       openCount > 0 ? minutesAgo(Math.max(emailSpec.minutesAgo - 2, 0)) : null,
+    click_count: 0,
     // Set by the log fixtures, which create the session for each SMTP email.
     smtp_session_id: null,
     smtp_auth_user: null,
