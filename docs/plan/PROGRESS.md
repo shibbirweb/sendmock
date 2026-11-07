@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 106 / 114 accepted (all but AI-05, DS-02, DS-03, PL-10, SM-17, UI-07, VF-05 and WS-03), 513 / 538 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 108 / 114 accepted (all but AI-05, DS-02, DS-03, PL-10, UI-07 and WS-03), 527 / 538 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -78,7 +78,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3P | Payment gateway backend | Done apart from the beta release | 8 / 9 |
 | 4 | Integrations, fidelity and AI | Done apart from the beta release ([29](29-phase-4.md)) | 21 / 22 |
 | 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 9 / 17 |
-| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 2 / 11 |
+| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 4 / 11 |
 
 ---
 
@@ -361,8 +361,8 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 
 - [x] A1: Mailpit API compatibility (#163, EM-19) (#48)
 - [x] A2: `email.clicked` link-click tracking (#164, EM-20) (#48)
-- [ ] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165)
-- [ ] A4: Vonage Verify v2 and other verify APIs (#160)
+- [x] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165, SM-17 accepted, #48)
+- [x] A4: Vonage Verify v2 and other verify APIs (#160, VF-05 accepted, #48)
 - [ ] A5: Multi-project inboxes, as projects (#167, PL-10)
 - [ ] A6: POP3 read access (#159)
 - [ ] A7: Push notification emulation (#166)
@@ -808,3 +808,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | A5a3 built: every read of captured traffic (emails, latest email, SMS, conversations, verifications, OTP, links, the email and SMS waits, recent events) takes `project`, and every project's items without it; conversations count only the project's messages. Email, SMS and verification events carry `project`, and webhook rules filter on it (a new `project` rule field, in the UI too). The live stream is not filtered on the server: the UI filters its toasts by the event's project (A5c). |
 | 2026-11-07 | A5b built: provider APIs take the project from `X-SendMock-Project` or a `/projects/<key>/` URL prefix (stripped before the provider sees the path) on the provider port and under `/providers/<key>/`; the Telnyx Node SDK example sends under the prefix in the SMS clients workflow. `/projects/` is now reserved like `/api/` and `/providers/`. |
 | 2026-11-07 | A5c built (UI): Settings > Projects (list with traffic counts, New project, Rename, Delete, and how to send to a project with copy buttons), a top bar project picker shown once a second project exists, kept in the URL as `?project=` across screens (a root search parameter), which scopes Mail, SMS and Verify lists and the pop-up toasts; the mock answers the same filters and the header. The embedded UI is 1.98 MB of its 2 MB budget. Deeper pages, the Settings guide and the agent skill cover it. |
+| 2026-11-07 | Ticked SM-17 and VF-05 (accepted) and PL-10.1, PL-10.2, PL-10.5 and PL-10.6 after CI, including the SMS clients workflow, passed on 225c86e. A3 and A4 are done. |

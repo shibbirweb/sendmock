@@ -95,12 +95,12 @@ On top of its own criteria, a feature is done only when:
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Accepted |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | Accepted |
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
-| [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | After 1.0 (A3) | 6 | In progress |
+| [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | After 1.0 (A3) | 6 | Accepted |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
 | [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | Accepted |
-| [VF-05](02-sms-verify.md#vf-05-vonage-verify-v2) | Vonage Verify v2 | After 1.0 (A4) | 4 | In progress |
+| [VF-05](02-sms-verify.md#vf-05-vonage-verify-v2) | Vonage Verify v2 | After 1.0 (A4) | 4 | Accepted |
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 8 | Accepted |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 6 | Accepted |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | UI in U2, backend Phase 3 | 9 | Accepted |

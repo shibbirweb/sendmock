@@ -195,18 +195,19 @@ UI in U1, backend Phase 2.
 
 After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a4-vonage-verify-v2-vf-05).
 
-- [ ] VF-05.1 `POST /v2/verify` with an `sms` workflow starts a verification, delivers its code by SMS into SendMock, and answers 202 with a `request_id`; an `email` workflow delivers it by email.
-- [ ] VF-05.2 `POST /v2/verify/{request_id}` with the right code answers 200 `completed`, a wrong code 400 `Invalid Code`, and a finished, cancelled or unknown request 404 `Not Found`, each in Vonage's problem shape.
-- [ ] VF-05.3 `DELETE /v2/verify/{request_id}` cancels the verification; every Vonage verification shows in Verify under a service named after its brand.
-- [ ] VF-05.4 The Vonage Node SDK's `Verify2` client starts and checks a verification against SendMock, with the code read from SendMock's API.
+- [x] VF-05.1 `POST /v2/verify` with an `sms` workflow starts a verification, delivers its code by SMS into SendMock, and answers 202 with a `request_id`; an `email` workflow delivers it by email. (#48)
+- [x] VF-05.2 `POST /v2/verify/{request_id}` with the right code answers 200 `completed`, a wrong code 400 `Invalid Code`, and a finished, cancelled or unknown request 404 `Not Found`, each in Vonage's problem shape. (#48)
+  - Changed 2026-11-07 while building A4: the first wording said `complete`; Vonage's API and its Node SDK's `checkCode` answer `completed`, so the criterion names the real status.
+- [x] VF-05.3 `DELETE /v2/verify/{request_id}` cancels the verification; every Vonage verification shows in Verify under a service named after its brand. (#48)
+- [x] VF-05.4 The Vonage Node SDK's `Verify2` client starts and checks a verification against SendMock, with the code read from SendMock's API. (#48)
 ## SM-17 More SMS providers
 
 After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a3-more-sms-providers-sm-17).
 
-- [ ] SM-17.1 Infobip's send API captures the SMS and answers in Infobip's shape, with its errors; delivery reports reach the `notifyUrl` in Infobip's format; the Infobip Node SDK sends through it.
-- [ ] SM-17.2 Telnyx's send API captures the SMS and answers in Telnyx's shape, with its errors; status webhooks reach the `webhook_url` in Telnyx's format; the Telnyx Node SDK sends through it.
-- [ ] SM-17.3 Sinch's batches API captures the SMS and answers in Sinch's shape, with its errors; delivery reports reach the `callback_url` in Sinch's format; the Sinch Node SDK sends through it.
-- [ ] SM-17.4 Africa's Talking's messaging API captures the SMS and answers in its shape, with its errors; the Africa's Talking Node SDK sends through it.
-- [ ] SM-17.5 Amazon SNS's `Publish` with a `PhoneNumber` captures the SMS and answers SNS's `PublishResponse`, with SNS's errors; the AWS SDK's SNS client sends through it.
-- [ ] SM-17.6 SMS > Providers lists the five as built-in providers, and the docs list their send APIs.
+- [x] SM-17.1 Infobip's send API captures the SMS and answers in Infobip's shape, with its errors; delivery reports reach the `notifyUrl` in Infobip's format; the Infobip Node SDK sends through it. (#48)
+- [x] SM-17.2 Telnyx's send API captures the SMS and answers in Telnyx's shape, with its errors; status webhooks reach the `webhook_url` in Telnyx's format; the Telnyx Node SDK sends through it. (#48)
+- [x] SM-17.3 Sinch's batches API captures the SMS and answers in Sinch's shape, with its errors; delivery reports reach the `callback_url` in Sinch's format; the Sinch Node SDK sends through it. (#48)
+- [x] SM-17.4 Africa's Talking's messaging API captures the SMS and answers in its shape, with its errors; the Africa's Talking Node SDK sends through it. (#48)
+- [x] SM-17.5 Amazon SNS's `Publish` with a `PhoneNumber` captures the SMS and answers SNS's `PublishResponse`, with SNS's errors; the AWS SDK's SNS client sends through it. (#48)
+- [x] SM-17.6 SMS > Providers lists the five as built-in providers, and the docs list their send APIs. (#48)
 
