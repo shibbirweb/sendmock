@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 105 / 112 accepted (all but AI-05, DS-02, DS-03, EM-20, SM-17, UI-07 and WS-03), 507 / 526 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 106 / 112 accepted (all but AI-05, DS-02, DS-03, SM-17, UI-07 and WS-03), 513 / 526 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -78,7 +78,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3P | Payment gateway backend | Done apart from the beta release | 8 / 9 |
 | 4 | Integrations, fidelity and AI | Done apart from the beta release ([29](29-phase-4.md)) | 21 / 22 |
 | 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 9 / 17 |
-| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 1 / 11 |
+| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 2 / 11 |
 
 ---
 
@@ -360,7 +360,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owner decision (2026-11-07), each item planned with its criteria before code.
 
 - [x] A1: Mailpit API compatibility (#163, EM-19) (#48)
-- [ ] A2: `email.clicked` link-click tracking (#164)
+- [x] A2: `email.clicked` link-click tracking (#164, EM-20) (#48)
 - [ ] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165)
 - [ ] A4: Vonage Verify v2 and other verify APIs (#160)
 - [ ] A5: Multi-project inboxes (#167)
@@ -789,7 +789,7 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Plan: A2 `email.clicked` ([32](32-after-1-0.md#a2-emailclicked-link-click-tracking-em-20), EM-20 new with 6 criteria, API note in [06](06-api.md)): clicks from the preview (`ui`), Simulate click and `POST /emails/{emailId}/clicks`, each provider's real click shape (checked against their docs), in four parts A2a to A2d. |
 | 2026-11-07 | A2a and A2b built: `email.clicked` from a link clicked in the preview, Simulate > Click a link and `POST /api/v1/emails/{emailId}/clicks`, with the click history, `click_count`, timeline entries and rule filters on `url`, `first_click` and `click_count`. The A1 website build had failed on two links of the Mailpit page that needed `./`; fixed. |
 | 2026-11-07 | A2c built: SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo and SparkPost templates send a click in that provider's documented shape, checked end to end against a fixture of each provider's click fields. Fixed the demo template renderer's nested `if` handling, which the new templates exposed. |
-| 2026-11-07 | A2d built: clicked events in the Mail, webhooks and rules guides and the agent skill, with CLI and MCP tests. Every EM-20 criterion now has a test; they tick once CI passes. |
+| 2026-11-07 | A2d built: clicked events in the Mail, webhooks and rules guides and the agent skill, with CLI and MCP tests. Every EM-20 criterion now has a test; EM-20 ticked after CI passed on `1d17028`. |
 | 2026-11-07 | Fix after CI on `46a7f75`: the CLI snapshot gains the click commands, the Rules screen's Deeper inventory gains `email.clicked`, and the click code had taken the embedded UI 1.9 KB over its 2 MB budget (UI-06.3). The UI now ships only Geist's Latin and Latin Extended subsets; text in Cyrillic or Vietnamese falls back to the system font through `unicode-range`. That saves about 30 KB (1.97 MB now). |
 | 2026-11-07 | Plan: A3 more SMS providers ([32](32-after-1-0.md#a3-more-sms-providers-sm-17), SM-17 new with 6 criteria): Infobip, Telnyx, Sinch, Africa's Talking and Amazon SNS as built-in provider definitions, each checked against its API reference and its official Node SDK, one part each (A3a to A3e). |
 | 2026-11-07 | A3a built: Infobip's SMS API (`/sms/2/text/advanced`) as a built-in provider, with its answers, errors and delivery reports, and its official Node SDK in the SMS clients workflow. |

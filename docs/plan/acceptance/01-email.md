@@ -195,10 +195,10 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a2-emailclicked-link-click-tracking-em-20).
 
-- [ ] EM-20.1 Clicking a link in an email's preview opens it in a new tab as before and fires `email.clicked` with `source: "ui"`, the URL and the browser's user agent.
-- [ ] EM-20.2 Simulate click (`manual`) and `POST /api/v1/emails/{emailId}/clicks` (`api`) always fire; a URL that is not one of the email's links answers 422 `unknown_link`.
-- [ ] EM-20.3 The event carries the email fields, `url`, `clicked_at`, `first_click`, `click_count`, `source` and `user_agent`; `GET /api/v1/emails/{emailId}/clicks` lists every click newest first, the detail shows `click_count` and the timeline shows each click.
-- [ ] EM-20.4 Webhook rules can match `email.clicked` and filter on `url`, `first_click`, `click_count` and `source`.
-- [ ] EM-20.5 The SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo and SparkPost templates send a click in that provider's own shape and event name, checked against fixtures built from each provider's documented click payload.
-- [ ] EM-20.6 `sendmock email click` and the MCP tool `sendmock_email_click` record a click, and the docs and the agent skill describe clicked events.
+- [x] EM-20.1 Clicking a link in an email's preview opens it in a new tab as before and fires `email.clicked` with `source: "ui"`, the URL and the browser's user agent. (#48)
+- [x] EM-20.2 Simulate click (`manual`) and `POST /api/v1/emails/{emailId}/clicks` (`api`) always fire; a URL that is not one of the email's links answers 422 `unknown_link`. (#48)
+- [x] EM-20.3 The event carries the email fields, `url`, `clicked_at`, `first_click`, `click_count`, `source` and `user_agent`; `GET /api/v1/emails/{emailId}/clicks` lists every click newest first, the detail shows `click_count` and the timeline shows each click. (#48)
+- [x] EM-20.4 Webhook rules can match `email.clicked` and filter on `url`, `first_click`, `click_count` and `source`. (#48)
+- [x] EM-20.5 The SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo and SparkPost templates send a click in that provider's own shape and event name, checked against fixtures built from each provider's documented click payload. (#48)
+- [x] EM-20.6 `sendmock email click` and the MCP tool `sendmock_email_click` record a click, and the docs and the agent skill describe clicked events. (#48)
 
