@@ -54,6 +54,9 @@ jobs:
       - name: GitHub issue forms and community files (UI-10.2)
         run: bun run test:repository
 
+      - name: Deeper docs inventory parser (WS-10.3)
+        run: bun run test:deeper
+
 
   # The end-to-end suite is most of the run time, so four jobs share it
   # (Playwright --shard) and run next to the checks above.
