@@ -2540,6 +2540,91 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock projects list",
+    "usage": "sendmock projects list",
+    "aliases": [],
+    "summary": "Every project, default first, with the traffic each holds.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/projects",
+        "operation_id": "getProjects",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_project_list"
+    ]
+  },
+  {
+    "command": "sendmock projects create",
+    "usage": "sendmock projects create",
+    "aliases": [],
+    "summary": "Add a project that apps can send traffic to by its key.",
+    "arguments": [],
+    "flags": [
+      "--key",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/projects",
+        "operation_id": "postProjects",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_project_create"
+    ]
+  },
+  {
+    "command": "sendmock projects update",
+    "usage": "sendmock projects update <projectKey>",
+    "aliases": [],
+    "summary": "Rename a project; its key stays the same.",
+    "arguments": [
+      "projectKey"
+    ],
+    "flags": [
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/projects/{projectKey}",
+        "operation_id": "patchProjectsByProjectKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_project_update"
+    ]
+  },
+  {
+    "command": "sendmock projects delete",
+    "usage": "sendmock projects delete <projectKey>",
+    "aliases": [],
+    "summary": "Delete a project with its emails, SMS and verifications.",
+    "arguments": [
+      "projectKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/projects/{projectKey}",
+        "operation_id": "deleteProjectsByProjectKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_project_delete"
+    ]
+  },
+  {
     "command": "sendmock route list",
     "usage": "sendmock route list",
     "aliases": [],

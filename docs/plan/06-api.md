@@ -188,6 +188,19 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 
+## Projects
+
+Built after 1.0 as [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5 (PL-10).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/projects` | every project, `default` first, each with `key`, `name`, `created_at` and its `email_count`, `sms_count` and `verification_count` |
+| POST | `/projects` | add a project (`key`: lowercase letters, digits and dashes, 1 to 40 characters, starting with a letter or digit; `name`); `409 project_exists` when the key is taken |
+| PATCH | `/projects/{projectKey}` | rename a project (`name`); the key never changes, since apps send it |
+| DELETE | `/projects/{projectKey}` | delete a project and its emails, SMS and verifications; `409 default_project` for `default` |
+
+Requests that capture traffic name their project in the `X-SendMock-Project` header (an unknown key answers `404 project_not_found`); without it they go to `default`. Lists and lookups of captured traffic take an optional `project` query parameter.
+
 ## Realtime
 
 `GET /api/v1/ws` (WebSocket). Server pushes event envelopes identical to the native webhook format (`{ id, type, created_at, data }`, with `data` trimmed to list-view fields). The UI uses it to update lists, counters and the delivery log live. A Server-Sent Events fallback at `/api/v1/events` is cheap to add and handy for `curl`.

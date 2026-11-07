@@ -3,6 +3,7 @@ import { httpCatcherSurfaces } from "./http-catcher-surfaces";
 import { messageProviderSurfaces } from "./message-provider-surfaces";
 import { messageRuleSurfaces } from "./message-rule-surfaces";
 import { paymentSurfaces } from "./payment-surfaces";
+import { projectSurfaces } from "./project-surfaces";
 import { smsSurfaces } from "./sms-surfaces";
 import type { OperationSurfaces, SurfaceCatalogue } from "./surface-definition";
 import { systemSurfaces } from "./system-surfaces";
@@ -33,6 +34,7 @@ export const surfaceCatalogue: SurfaceCatalogue = {
   ...webhookDeliverySurfaces,
   ...webhookTemplateSurfaces,
   ...testHelperSurfaces,
+  ...projectSurfaces,
 };
 
 /** `GET /api/v1/emails/{emailId}`, the catalogue key of an endpoint. */

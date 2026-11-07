@@ -45,6 +45,7 @@ tags:
   - name: Saved deliveries
   - name: Webhook templates
   - name: Webhook variables
+  - name: Projects
 paths:
   /api/v1/health:
     get:
@@ -7018,6 +7019,114 @@ paths:
       x-sendmock-cli: sendmock webhook var preview
       x-sendmock-mcp: sendmock_webhook_variable_preview
       x-sendmock-ui: Webhooks > Variables > variable sheet > Resolves to
+  /api/v1/projects:
+    get:
+      operationId: getProjects
+      summary: Every project, default first, with the traffic each holds.
+      tags:
+        - Projects
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects list
+      x-sendmock-mcp: sendmock_project_list
+      x-sendmock-ui: Settings > Projects
+    post:
+      operationId: postProjects
+      summary: Add a project that apps can send traffic to by its key.
+      tags:
+        - Projects
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects create
+      x-sendmock-mcp: sendmock_project_create
+      x-sendmock-ui: Settings > Projects > New project
+  /api/v1/projects/{projectKey}:
+    patch:
+      operationId: patchProjectsByProjectKey
+      summary: Rename a project; its key stays the same.
+      tags:
+        - Projects
+      parameters:
+        - name: projectKey
+          in: path
+          required: true
+          description: The project's key, from the list of projects.
+          schema:
+            type: string
+          example: shop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects update <projectKey>
+      x-sendmock-mcp: sendmock_project_update
+      x-sendmock-ui: Settings > Projects > Rename
+    delete:
+      operationId: deleteProjectsByProjectKey
+      summary: Delete a project with its emails, SMS and verifications.
+      tags:
+        - Projects
+      parameters:
+        - name: projectKey
+          in: path
+          required: true
+          description: The project's key, from the list of projects.
+          schema:
+            type: string
+          example: shop
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects delete <projectKey>
+      x-sendmock-mcp: sendmock_project_delete
+      x-sendmock-ui: Settings > Projects > Delete
 components:
   schemas:
     ActivityBucket:
@@ -12378,6 +12487,72 @@ components:
         - redirected
         - delayed
         - notification_sent
+    Project:
+      type: object
+      properties:
+        key:
+          type: string
+          description: What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.
+          examples:
+            - shop
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+        created_at:
+          type: string
+          examples:
+            - 2026-11-07T10:00:00Z
+        email_count:
+          type: number
+          examples:
+            - 12
+        sms_count:
+          type: number
+          examples:
+            - 4
+        verification_count:
+          type: number
+          examples:
+            - 2
+      required:
+        - key
+        - name
+        - created_at
+        - email_count
+        - sms_count
+        - verification_count
+      description: "A name for captured traffic: the emails, SMS and verifications sent to it."
+    ProjectInput:
+      type: object
+      properties:
+        key:
+          type: string
+          description: What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.
+          examples:
+            - shop
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+      required:
+        - key
+        - name
+      description: Body of POST /api/v1/projects.
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+      required:
+        - name
+      additionalProperties: false
+      description: "Body of PATCH /api/v1/projects/{projectKey}: the new name."
     ProviderCredential:
       type: object
       properties:

@@ -10713,6 +10713,230 @@
       ]
     },
     {
+      "command": "sendmock projects create",
+      "slug": "projects-create",
+      "usage": "sendmock projects create [flags]",
+      "summary": "Add a project that apps can send traffic to by its key.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/projects",
+          "operation_id": "postProjects",
+          "summary": "Add a project that apps can send traffic to by its key.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<key>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.",
+          "example": "shop"
+        },
+        {
+          "flag": "--name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "example": "sendmock projects create --key shop --name Shop",
+      "output": "Project",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_project_create"
+      ],
+      "ui": [
+        "Settings > Projects > New project"
+      ]
+    },
+    {
+      "command": "sendmock projects delete",
+      "slug": "projects-delete",
+      "usage": "sendmock projects delete <projectKey> [flags]",
+      "summary": "Delete a project with its emails, SMS and verifications.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "deleteProjectsByProjectKey",
+          "summary": "Delete a project with its emails, SMS and verifications.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "projectKey",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock projects delete shop --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_project_delete"
+      ],
+      "ui": [
+        "Settings > Projects > Delete"
+      ]
+    },
+    {
+      "command": "sendmock projects list",
+      "slug": "projects-list",
+      "usage": "sendmock projects list",
+      "summary": "Every project, default first, with the traffic each holds.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "operation_id": "getProjects",
+          "summary": "Every project, default first, with the traffic each holds.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock projects list",
+      "output": "Project[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_project_list"
+      ],
+      "ui": [
+        "Settings > Projects"
+      ]
+    },
+    {
+      "command": "sendmock projects update",
+      "slug": "projects-update",
+      "usage": "sendmock projects update <projectKey> [flags]",
+      "summary": "Rename a project; its key stays the same.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "patchProjectsByProjectKey",
+          "summary": "Rename a project; its key stays the same.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "projectKey",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "example": "sendmock projects update shop --name Shop",
+      "output": "Project",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_project_update"
+      ],
+      "ui": [
+        "Settings > Projects > Rename"
+      ]
+    },
+    {
       "command": "sendmock reset",
       "slug": "reset",
       "usage": "sendmock reset --yes",

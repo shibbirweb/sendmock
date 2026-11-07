@@ -145,6 +145,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_outcome_rule_samples(app_router).await);
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_message_rule_samples(app_router).await);
+    samples.extend(prepare_project_samples(app_router).await);
     samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -292,6 +293,37 @@ async fn prepare_inbound_route_samples(
             vec![
                 json!({ "filter": { "kind": "match_header", "header_name": "subject", "pattern": ".*help" } }),
             ],
+        ),
+    ]
+}
+
+/// Two projects: one the rename sample changes, one the delete sample removes.
+async fn prepare_project_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    post_json(
+        app_router,
+        "/api/v1/projects",
+        &json!({ "key": "billing", "name": "Billing" }),
+    )
+    .await;
+    post_json(
+        app_router,
+        "/api/v1/projects",
+        &json!({ "key": "old-shop", "name": "Old shop" }),
+    )
+    .await;
+    vec![
+        ("getProjects", vec![json!({})]),
+        (
+            "postProjects",
+            vec![json!({ "key": "shop", "name": "Shop" })],
+        ),
+        (
+            "patchProjectsByProjectKey",
+            vec![json!({ "project_key": "billing", "name": "Billing team" })],
+        ),
+        (
+            "deleteProjectsByProjectKey",
+            vec![json!({ "project_key": "old-shop" })],
         ),
     ]
 }

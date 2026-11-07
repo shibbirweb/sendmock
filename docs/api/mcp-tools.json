@@ -15890,6 +15890,270 @@
       ]
     },
     {
+      "name": "sendmock_project_create",
+      "toolset": "core",
+      "summary": "Add a project that apps can send traffic to by its key.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/projects",
+          "operation_id": "postProjects",
+          "summary": "Add a project that apps can send traffic to by its key.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.",
+          "example": "shop"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the project, shown in the UI.",
+            "examples": [
+              "Shop"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ]
+      },
+      "example_arguments": {
+        "key": "shop",
+        "name": "Shop"
+      },
+      "output": "Project",
+      "cli": [
+        "sendmock projects create"
+      ],
+      "ui": [
+        "Settings > Projects > New project"
+      ]
+    },
+    {
+      "name": "sendmock_project_delete",
+      "toolset": "core",
+      "summary": "Delete a project with its emails, SMS and verifications.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "deleteProjectsByProjectKey",
+          "summary": "Delete a project with its emails, SMS and verifications.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project_key",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "description": "The project's key, from the list of projects.",
+            "examples": [
+              "shop"
+            ]
+          }
+        },
+        "required": [
+          "project_key"
+        ]
+      },
+      "example_arguments": {
+        "project_key": "shop"
+      },
+      "output": null,
+      "cli": [
+        "sendmock projects delete <projectKey>"
+      ],
+      "ui": [
+        "Settings > Projects > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_project_list",
+      "toolset": "core",
+      "summary": "Every project, default first, with the traffic each holds.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "operation_id": "getProjects",
+          "summary": "Every project, default first, with the traffic each holds.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "Project[]",
+      "cli": [
+        "sendmock projects list"
+      ],
+      "ui": [
+        "Settings > Projects"
+      ]
+    },
+    {
+      "name": "sendmock_project_update",
+      "toolset": "core",
+      "summary": "Rename a project; its key stays the same.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "patchProjectsByProjectKey",
+          "summary": "Rename a project; its key stays the same.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project_key",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "description": "The project's key, from the list of projects.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the project, shown in the UI.",
+            "examples": [
+              "Shop"
+            ]
+          }
+        },
+        "required": [
+          "project_key",
+          "name"
+        ]
+      },
+      "example_arguments": {
+        "project_key": "shop",
+        "name": "Shop"
+      },
+      "output": "Project",
+      "cli": [
+        "sendmock projects update <projectKey>"
+      ],
+      "ui": [
+        "Settings > Projects > Rename"
+      ]
+    },
+    {
       "name": "sendmock_reset",
       "toolset": "admin",
       "summary": "Delete all traffic and restore the seed configuration.",

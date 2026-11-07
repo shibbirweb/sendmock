@@ -30,6 +30,7 @@ mod page_of;
 mod payments;
 mod paypal;
 mod present_value;
+mod projects;
 mod providers;
 mod razorpay;
 mod request_client;
@@ -99,6 +100,7 @@ pub use payments::{
     PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
     PaymentMethodDefinition, PaymentSummary,
 };
+pub use projects::Project;
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
@@ -169,6 +171,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);
+    projects::register_project_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);

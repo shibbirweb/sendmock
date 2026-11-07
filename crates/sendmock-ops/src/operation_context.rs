@@ -8,10 +8,10 @@ use sendmock_store::{
     EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
     MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    PaymentSubscriptionRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
-    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
-    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    PaymentSubscriptionRepository, ProjectRepository, SavedWebhookDeliveryRepository,
+    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
+    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
+    TrafficPruner, VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
     WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
     WebhookTemplateRepository, WebhookVariableRepository,
 };
@@ -88,6 +88,7 @@ pub struct OperationContext {
     pub environment_reader: Arc<dyn EnvironmentReader>,
     /// Who made this request, recorded as `created_by` on what it creates.
     pub request_client: crate::RequestClient,
+    pub project_repository: ProjectRepository,
 }
 
 /// Wake the background dispatchers when work is queued.
@@ -170,7 +171,6 @@ impl OperationContext {
         id_generator: Arc<dyn IdGenerator>,
         instance_details: InstanceDetails,
     ) -> Self {
-        let email_ingest_service = build_email_ingest_service(&database, &clock, &id_generator);
         let share_database = || Arc::clone(&database);
         Self {
             email_repository: EmailRepository::new(share_database()),
@@ -202,13 +202,14 @@ impl OperationContext {
             saved_webhook_delivery_repository: SavedWebhookDeliveryRepository::new(share_database()),
             dispatch_signals: DispatchSignals::default(),
             http_catcher_stores: HttpCatcherStores::new(&database),
+            project_repository: ProjectRepository::new(share_database()),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
+            email_ingest_service: build_email_ingest_service(&database, &clock, &id_generator),
             database,
             clock,
             id_generator,
             instance_details: Arc::new(instance_details),
-            email_ingest_service,
             event_bus: EventBus::default(),
             sample_email_sender: None,
             update_checker: UpdateChecker::default(),

@@ -7,6 +7,7 @@ import { messageRulesApi } from "./message-rules-api";
 import { numbersApi } from "./numbers-api";
 import { paymentConfigApi } from "./payment-config-api";
 import { paymentsApi } from "./payments-api";
+import { projectsApi } from "./projects-api";
 import { smsApi } from "./sms-api";
 import { systemApi } from "./system-api";
 import { webhookDeliveriesApi } from "./webhook-deliveries-api";
@@ -38,4 +39,5 @@ export const apiEndpoints: ApiEndpoint[] = [
   ...webhooksApi,
   ...webhookDeliveriesApi,
   ...webhookTemplatesApi,
+  ...projectsApi,
 ];

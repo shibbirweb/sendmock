@@ -85,6 +85,10 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "The payment's ID, from `GET /api/v1/payments`.",
     example: exampleUlid,
   },
+  projectKey: {
+    description: "The project's key, from the list of projects.",
+    example: "shop",
+  },
   providerKey: {
     description:
       "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
