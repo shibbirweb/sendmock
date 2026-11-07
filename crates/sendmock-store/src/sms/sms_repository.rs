@@ -24,6 +24,11 @@ impl SmsRepository {
         Self { database }
     }
 
+    /// Files uploaded to the WhatsApp Cloud API, kept beside the messages that send them.
+    pub fn whatsapp_media(&self) -> super::WhatsappMediaRepository {
+        super::WhatsappMediaRepository::new(Arc::clone(&self.database))
+    }
+
     pub(super) fn database(&self) -> &Database {
         &self.database
     }

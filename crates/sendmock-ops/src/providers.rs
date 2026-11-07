@@ -29,6 +29,9 @@ mod twilio_verify_verifications;
 mod vonage_verify_api;
 mod whatsapp_cloud_api;
 mod whatsapp_cloud_content;
+mod whatsapp_cloud_media;
+mod whatsapp_cloud_paths;
+mod whatsapp_cloud_send;
 mod whatsapp_graph_errors;
 mod whatsapp_read_receipts;
 
@@ -60,3 +63,4 @@ pub(crate) use provider_webhook_request::{
 pub(crate) use request_checks::{ProviderFailure, find_rule_failure, has_valid_credentials};
 pub(crate) use request_reader::read_request_fields;
 pub(crate) use twilio_answers::answer_json;
+pub use whatsapp_cloud_media::find_whatsapp_media_download;

@@ -28,7 +28,7 @@ export function buildWhatsappCloudProvider(): MessageProviderRecord {
       {
         kind: "send",
         method: "POST",
-        path: "/{version}/{phone_number_id}/messages",
+        path: "/v21.0/{phone_number_id}/messages",
         request_format: "json",
       },
     ],

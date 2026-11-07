@@ -154,4 +154,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 36,
         sql: include_str!("../migrations/0036_push_notifications.sql"),
     },
+    Migration {
+        schema_version: 37,
+        sql: include_str!("../migrations/0037_whatsapp_media.sql"),
+    },
 ];

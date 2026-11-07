@@ -87,7 +87,8 @@ pub use seed_state::{SeedStateRecord, SeedStateRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
     NewSmsRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord, SmsPage, SmsRecord,
-    SmsRepository, SmsStatusChangeRecord, SmsThreadRecord,
+    SmsRepository, SmsStatusChangeRecord, SmsThreadRecord, WhatsappMediaRecord,
+    WhatsappMediaRepository,
 };
 pub use sms_callback_attempt::{
     CallbackAttemptResult, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository,

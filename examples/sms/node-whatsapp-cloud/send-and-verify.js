@@ -1,7 +1,8 @@
 // An app calling Meta's WhatsApp Business Cloud API over HTTP, as most apps do (Meta's Node SDK
 // is archived), against SendMock's provider port: a text, a template and an interactive message
 // are sent and read back from SendMock's API, a message without its body gets Graph's error,
-// and a read receipt marks the conversation read (SM-18.1, SM-18.2, SM-18.5).
+// a read receipt marks the conversation read, and a document is uploaded, sent by its media id
+// and downloaded again (SM-18.1, SM-18.2, SM-18.3, SM-18.5).
 const providerUrl = process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026";
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
 const phoneNumberId = "106540352242922";
@@ -91,10 +92,42 @@ async function checkRefusalAndReadReceipt(textMessage) {
   expectEqual(readReceipt.answer.success, true, "read receipt");
 }
 
+async function uploadSendAndDownloadMedia() {
+  currentStep = "media upload";
+  const invoiceText = "%PDF-1.4 invoice 1042";
+  const uploadForm = new FormData();
+  uploadForm.append("messaging_product", "whatsapp");
+  uploadForm.append("type", "application/pdf");
+  uploadForm.append("file", new Blob([invoiceText], { type: "application/pdf" }), "invoice.pdf");
+  const uploadResponse = await fetch(`${providerUrl}/v21.0/${phoneNumberId}/media`, {
+    method: "POST",
+    headers: { Authorization: "Bearer whatsapp-access-token" },
+    body: uploadForm,
+  });
+  const { id: mediaId } = await uploadResponse.json();
+
+  currentStep = "document sent by media id";
+  const documentMessage = await sendMessage("document", { id: mediaId, filename: "invoice.pdf" });
+  const storedDocument = await readStoredMessage(documentMessage.id);
+  expectEqual(storedDocument.media[0]?.content_type, "application/pdf", "attached file type");
+
+  currentStep = "media lookup and download";
+  const lookupResponse = await fetch(`${providerUrl}/v21.0/${mediaId}`, {
+    headers: { Authorization: "Bearer whatsapp-access-token" },
+  });
+  const mediaDetails = await lookupResponse.json();
+  expectEqual(mediaDetails.file_size, invoiceText.length, "media size");
+  const downloadResponse = await fetch(mediaDetails.url, {
+    headers: { Authorization: "Bearer whatsapp-access-token" },
+  });
+  expectEqual(await downloadResponse.text(), invoiceText, "downloaded file");
+}
+
 try {
   const textMessage = await sendEveryKind();
   await checkRefusalAndReadReceipt(textMessage);
-  console.log("WhatsApp Cloud API: text, template and interactive sent, refusal and read receipt checked.");
+  await uploadSendAndDownloadMedia();
+  console.log("WhatsApp Cloud API: every kind sent, refusal, read receipt and media checked.");
 } catch (stepError) {
   console.error(`Failed at ${currentStep}:`, stepError);
   process.exit(1);

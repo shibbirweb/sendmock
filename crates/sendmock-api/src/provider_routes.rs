@@ -9,7 +9,7 @@ use axum::routing::any;
 use sendmock_ops::{
     CompletedApiRequest, OperationContext, PROJECT_HEADER, ProviderHttpRequest, ProviderOutcome,
     ProviderRequestLogEntry, ProviderRoute, answer_provider_request, find_named_project,
-    record_provider_request,
+    find_whatsapp_media_download, record_provider_request,
 };
 
 use crate::api_error_response::ApiErrorResponse;
@@ -88,6 +88,15 @@ async fn answer_prefixed_provider_request(
     .await
 }
 
+/// The body as the provider reads it, inflated when gzipped; `None` when it is too large or
+/// unreadable.
+async fn read_request_bytes(headers: &HeaderMap, request_body: Body) -> Option<Vec<u8>> {
+    let request_bytes = to_bytes(request_body, MAXIMUM_REQUEST_BODY_BYTES)
+        .await
+        .ok()?;
+    decode_request_body(headers, request_bytes.to_vec(), MAXIMUM_REQUEST_BODY_BYTES)
+}
+
 /// Answers a provider request, records it in the API request log under the provider's key,
 /// and answers exactly what the provider would.
 pub async fn answer_provider_http_request(
@@ -105,15 +114,7 @@ pub async fn answer_provider_http_request(
             Err(error_response) => return error_response.into_response(),
         };
     let operation_context = project_context.as_ref().unwrap_or(operation_context);
-    let request_bytes = match to_bytes(request_body, MAXIMUM_REQUEST_BODY_BYTES).await {
-        Ok(request_bytes) => decode_request_body(
-            &request_parts.headers,
-            request_bytes.to_vec(),
-            MAXIMUM_REQUEST_BODY_BYTES,
-        ),
-        Err(_) => None,
-    };
-    let Some(request_bytes) = request_bytes else {
+    let Some(request_bytes) = read_request_bytes(&request_parts.headers, request_body).await else {
         return ApiErrorResponse::invalid_json_body("the request body is too large or unreadable")
             .into_response();
     };
@@ -125,6 +126,13 @@ pub async fn answer_provider_http_request(
         headers: request_headers.iter().cloned().collect(),
         body: request_bytes,
     };
+    match find_whatsapp_media_download(operation_context, &provider_request).await {
+        Ok(Some((mime_type, media_content))) => {
+            return build_media_response(&mime_type, media_content);
+        }
+        Ok(None) => {}
+        Err(operation_error) => return ApiErrorResponse::from(operation_error).into_response(),
+    }
     let provider_outcome =
         match answer_provider_request(operation_context, provider_route, &provider_request).await {
             Ok(provider_outcome) => provider_outcome,
@@ -144,6 +152,18 @@ pub async fn answer_provider_http_request(
     };
     record_outcome(operation_context, &provider_outcome, completed_request).await;
     build_http_response(provider_outcome)
+}
+
+/// A file the WhatsApp Cloud API's download link serves: bytes, which provider answers (text)
+/// cannot carry.
+fn build_media_response(mime_type: &str, media_content: Vec<u8>) -> Response {
+    let content_type = HeaderValue::try_from(mime_type)
+        .unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream"));
+    let mut response = Response::new(Body::from(media_content));
+    response
+        .headers_mut()
+        .insert(axum::http::header::CONTENT_TYPE, content_type);
+    response
 }
 
 /// The request's headers as text, for the provider runtime and the request log.

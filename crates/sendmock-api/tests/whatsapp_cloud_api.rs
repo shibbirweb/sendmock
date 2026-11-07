@@ -1,9 +1,11 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod email_provider_requests;
     pub mod test_app;
 }
 
 use serde_json::{Value, json};
+use support::email_provider_requests::send_provider_request;
 use support::test_app::{build_test_app, call_api};
 
 const MESSAGES_PATH: &str = "/providers/whatsapp_cloud/v21.0/106540352242922/messages";
@@ -164,4 +166,23 @@ async fn a_read_receipt_marks_the_conversation_read() {
     assert_eq!((status, read_answer), (200, json!({ "success": true })));
     assert_eq!(unknown_status, 400);
     assert_eq!(threads[0]["unread_count"], 0, "{threads}");
+}
+
+// AC: SM-18.1
+#[tokio::test]
+async fn mailguns_v3_messages_path_on_the_provider_port_is_not_taken_for_the_cloud_api() {
+    let (_, operation_context) = build_test_app();
+    let provider_port_router = sendmock_api::build_provider_port_router(&operation_context, None);
+    let form_body = "from=shop%40mg.example.test&to=sam%40example.test&subject=Hi&text=Hello";
+
+    let reply = send_provider_request(
+        &provider_port_router,
+        "/v3/mg.example.test/messages",
+        "application/x-www-form-urlencoded",
+        form_body.as_bytes().to_vec(),
+    )
+    .await;
+
+    assert_eq!(reply.status, 200, "{}", reply.body_text);
+    assert_eq!(reply.body["message"], "Queued. Thank you.");
 }

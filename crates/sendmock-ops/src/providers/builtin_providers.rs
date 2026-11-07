@@ -39,7 +39,8 @@ mod tests {
                 "sinch",
                 "africastalking",
                 "sns",
-                "vonage_verify"
+                "vonage_verify",
+                "whatsapp_cloud"
             ]
         );
     }

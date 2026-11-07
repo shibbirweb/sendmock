@@ -68,6 +68,11 @@ async fn delete_all_traffic(operation_context: &OperationContext) -> Result<u64,
         .delete_notifications(None)
         .await?;
     operation_context
+        .sms_repository
+        .whatsapp_media()
+        .delete_all_media()
+        .await?;
+    operation_context
         .logs
         .smtp_sessions
         .delete_all_sessions()

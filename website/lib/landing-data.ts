@@ -43,6 +43,7 @@ export const emulatedProviderNames = {
     "Africa's Talking",
     "Amazon SNS",
     "Vonage Verify",
+    "WhatsApp Cloud",
   ],
   payments: ["Stripe", "PayPal", "SSLCommerz", "bKash"],
 };

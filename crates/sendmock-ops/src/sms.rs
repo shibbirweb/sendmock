@@ -31,7 +31,7 @@ pub use sms_delivery_runner::start_sms_delivery;
 pub use sms_detail::SmsMessageDetail;
 pub(crate) use sms_detail::{find_sms_or_not_found, load_sms_detail};
 pub use sms_ingest::{IncomingSms, store_sms};
-pub(crate) use sms_inputs::SmsReference;
+pub(crate) use sms_inputs::{InlineSmsMedia, SmsReference};
 pub use sms_lookups::{describe_sms_code, find_newest_sms_with_code};
 pub use sms_media_intake::{AcceptedMedia, MediaProblem, accept_media};
 pub use sms_open_operations::{ListSmsOpensOperation, RecordSmsOpenOperation};

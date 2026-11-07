@@ -68,7 +68,8 @@ describe("SMS clients workflow", () => {
     const otherEntries = clientEntries.filter(
       (clientEntry) =>
         !clientEntry.client.startsWith("Twilio ") &&
-        !clientEntry.client.startsWith("Vonage "),
+        !clientEntry.client.startsWith("Vonage ") &&
+        !clientEntry.client.startsWith("WhatsApp "),
     );
 
     expect(otherEntries.map((clientEntry) => clientEntry.client)).toEqual(
@@ -89,6 +90,21 @@ describe("SMS clients workflow", () => {
       });
       expect(exampleSources).toContain("/api/v1/sms");
     }
+  });
+
+  test("SM-18.5 an app calls the WhatsApp Cloud API over HTTP from its folder, with media and a read receipt", () => {
+    const whatsappEntry = clientEntries.find(
+      (clientEntry) => clientEntry.client === "WhatsApp Cloud API over HTTP",
+    );
+    const exampleSources = readExampleSources(
+      `examples/sms/${whatsappEntry?.folder ?? ""}`,
+    );
+
+    expect(whatsappEntry?.run).toBe("node send-and-verify.js");
+    expect(exampleSources).toContain("/v21.0/");
+    expect(exampleSources).toContain("/media");
+    expect(exampleSources).toContain('status: "read"');
+    expect(exampleSources).toContain("/api/v1/sms?api=whatsapp_cloud");
   });
 
   test("VF-05.4 the Vonage Verify2 client runs a login from its folder with the code read from SendMock", () => {

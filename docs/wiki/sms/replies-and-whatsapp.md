@@ -91,6 +91,8 @@ Apps that call Meta's WhatsApp Business Cloud API directly send to SendMock the 
 
 Every message type is stored with a body you can read: text, templates (`Template order_update (en_US)` and their body parameters), images, video, audio, documents and stickers (their caption, with media links downloaded as the file), locations, contacts, interactive buttons and lists, and reactions. A request Meta would refuse (no `messaging_product`, no `to`, an unknown `type`, a missing `text.body`) gets Graph's error object with code `100` and nothing is stored. `{ "messaging_product": "whatsapp", "status": "read", "message_id": "wamid..." }` marks the conversation read and answers `{ "success": true }`. The magic numbers work here too: a refused number answers code `131026`, "Message undeliverable".
 
+Media works as on Meta: upload a file with `POST /v21.0/<phone_number_id>/media` (multipart, with `messaging_product=whatsapp`, `type` and `file`) and get its `id`; `GET /v21.0/<media_id>` answers its `url`, `mime_type`, `sha256` and `file_size`; the `url` downloads the file; `DELETE /v21.0/<media_id>` removes it. Send an image, video, audio file, document or sticker by that `id` (or by a `link`), and the message carries the file. Uploaded files are kept like messages: pruned with them, cleared by a reset, and deleted with their project.
+
 Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
 ## From the CLI, API and AI
