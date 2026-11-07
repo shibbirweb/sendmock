@@ -5,6 +5,7 @@
  *
  *     bun scripts/release-readiness.ts
  */
+import { readCriterionReferences } from "./acceptance";
 import {
   listFeaturesNotAccepted,
   listUntickedCriterionIds,
@@ -41,11 +42,15 @@ for (const feature of featuresNotAccepted) {
 
 const runbookSteps = readRunbookSteps();
 const untickedCriterionIds = listUntickedCriterionIds();
+const criterionReferences = readCriterionReferences();
 console.log(`\nUnticked criteria (${untickedCriterionIds.length}):`);
 for (const criterionId of untickedCriterionIds) {
   const provingStep = runbookSteps.find((step) => step.provenCriterionIds.includes(criterionId));
+  const testCount = criterionReferences.get(criterionId)?.size ?? 0;
   const stepText = provingStep
     ? `step ${provingStep.stepNumber}, ${provingStep.title}`
-    : "no runbook step, proven in CI";
+    : testCount > 0
+      ? `ticks when its ${testCount} test files pass in CI`
+      : "no runbook step and no test yet";
   console.log(`  ${criterionId}: ${stepText}`);
 }

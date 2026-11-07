@@ -169,7 +169,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/events/recent?since=&type=&limit=` | the latest events, newest first: the polling twin of the realtime stream |
 | GET | `/integrations/{stack}?channel=&host=` | copy-ready settings for a stack (Laravel, Django, Express, ...), as Settings > Connection shows them |
 | POST | `/scenarios/validate`, `/scenarios/run` | check or run a scenario file ([14](14-ai-integration.md#scenarios)); the run answers a step-by-step report |
-| GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration; the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
+| GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration, for the installed binary and through npx (`npx_install_command`, `npx_mcp_config`, added 2026-11-07 for AI-05.9); the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
 | POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |

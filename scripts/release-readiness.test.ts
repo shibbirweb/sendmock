@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
+import { readCriterionReferences } from "./acceptance";
 import {
   listUntickedCriterionIds,
   listWorkflowSettings,
@@ -17,13 +18,15 @@ describe("the 1.0 release runbook", () => {
     expect(unnamedSettings).toEqual([]);
   });
 
-  test("names a step that proves every unticked criterion", () => {
+  test("names a step for every unticked criterion that no test in the repository proves", () => {
     const provenCriterionIds = readRunbookSteps().flatMap((step) => step.provenCriterionIds);
-    const criteriaWithoutStep = listUntickedCriterionIds().filter(
-      (criterionId) => !provenCriterionIds.includes(criterionId),
+    const criterionReferences = readCriterionReferences();
+    const criteriaWithoutProof = listUntickedCriterionIds().filter(
+      (criterionId) =>
+        !provenCriterionIds.includes(criterionId) && !criterionReferences.has(criterionId),
     );
 
-    expect(criteriaWithoutStep).toEqual([]);
+    expect(criteriaWithoutProof).toEqual([]);
   });
 
   test("numbers its steps in order from 1", () => {

@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 104 / 109 accepted (all but AI-05, DS-02, DS-03, UI-07 and WS-03), 500 / 507 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 104 / 109 accepted (all but AI-05, DS-02, DS-03, UI-07 and WS-03), 500 / 508 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -341,6 +341,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [x] Release builds for all 6 targets, checksums, install scripts with `--channel` (DS-01 accepted, DS-03.2) (#48)
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
 - [ ] Run with no install: `npx sendmock`, `bunx`, `pnpm dlx`, `yarn dlx` (W16, DS-03.7, added 2026-11-07, owner request)
+- [ ] Agents start SendMock through npx: `ai install`, `GET /ai/agents` and Settings > Connection give `npx -y sendmock mcp` (W17, AI-05.9, added 2026-11-07)
 - [x] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper (DS-03.1; each publishes once its secret or trusted publisher is set, runbook step 3) (#48)
 - [x] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6; DS-03 accepted, submitted by the release workflow once the runbook's secrets are set) (#48)
 - [ ] Testcontainers modules (published by each release from W3b; ticked when the first release publishes them)
@@ -764,3 +765,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Plan (owner request): SendMock also runs with no install through `npx sendmock` (and `bunx`, `pnpm dlx`, `yarn dlx`), a channel of its own: W16 in [30](30-phase-5.md), DS-03.7 (new), the row in [09](09-distribution.md#package-channels-by-stage-decided-2026-10-27); proven before publishing by the release workflow and after by Install channels on the first beta (runbook step 6). |
 | 2026-11-07 | Phase 5 W16 built: the `npx` channel (install page section "npx (no install)" with `npx`, `bunx`, `pnpm dlx` and `yarn dlx`), a release step that runs `npx` from the packed packages in an empty folder on every target, and the Install channels entry that runs test cases 2 to 8 through `npx` after publishing. DS-03.7 waits for the first beta (runbook step 6). |
 | 2026-11-07 | Fix: the UI-06.2 timing budget (an email opens in under 200 ms; 51 ms median locally) once measured 209 to 223 ms on a CI shard where another Playwright worker shared the runner. Timing specs are now their own Playwright project (`timing`), which CI runs after shard 1's tests with one worker. |
+| 2026-11-07 | Plan: agents start SendMock through npx (W17 in [30](30-phase-5.md), AI-05.9 new, [14](14-ai-integration.md#one-command-setup-per-harness), `GET /ai/agents` in [06](06-api.md)): with only npx there is no `sendmock` on the `PATH`, so `ai install`, the API and Settings > Connection also give `npx -y sendmock mcp`. Open question for the owner: whether the Claude Code plugin should start SendMock through npx too. The runbook test now accepts an unticked criterion that a test in the repository names, since CI ticks it. |

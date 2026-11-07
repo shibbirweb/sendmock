@@ -119,6 +119,17 @@ export function collectCriterionReferences(
   return referencesByCriterionId;
 }
 
+/** Each criterion ID named by a test in the repository, with the files that name it. */
+export function readCriterionReferences(): Map<string, Set<string>> {
+  const testFileContents = testRoots
+    .flatMap((testRoot) => listTestFiles(join(repositoryRoot, testRoot)))
+    .map((filePath) => ({
+      filePath: relative(repositoryRoot, filePath),
+      fileContent: readFileSync(filePath, "utf8"),
+    }));
+  return collectCriterionReferences(testFileContents);
+}
+
 function runAcceptanceCheck(isSummaryOnly: boolean): number {
   const featureStatuses = parseFeatureStatuses(
     readFileSync(join(acceptanceDirectory, "README.md"), "utf8"),
@@ -133,13 +144,7 @@ function runAcceptanceCheck(isSummaryOnly: boolean): number {
       status: featureStatuses.get(feature.featureId) ?? feature.status,
     }));
 
-  const testFileContents = testRoots
-    .flatMap((testRoot) => listTestFiles(join(repositoryRoot, testRoot)))
-    .map((filePath) => ({
-      filePath: relative(repositoryRoot, filePath),
-      fileContent: readFileSync(filePath, "utf8"),
-    }));
-  const referencesByCriterionId = collectCriterionReferences(testFileContents);
+  const referencesByCriterionId = readCriterionReferences();
   const knownCriterionIds = new Set(features.flatMap((feature) => feature.criterionIds));
   const problems: string[] = [];
 

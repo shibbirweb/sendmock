@@ -35,6 +35,7 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
 | W14 (W14a, then a commit per menu) | Deeper docs: the control inventory crawl, then a Deeper page per screen | WS-10 | W13 |
 | W15 (W15a, W15b) | The 1.0 runbook (W15a) and the done-when check after the owner's release (W15b) | Phase 5 done-when | W1 to W14 |
 | W16 | Run with no install: `npx sendmock` (and `bunx`, `pnpm dlx`, `yarn dlx`) as its own channel, added 2026-11-07 (owner request) | DS-03.7 (new) | W3a, W11 |
+| W17 | Agents start SendMock through npx: `ai install`, `GET /ai/agents` and Settings > Connection give the `npx -y sendmock mcp` form, added 2026-11-07 (owner request) | AI-05.9 (new) | W16 |
 
 ## Design notes
 
@@ -112,6 +113,13 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
   - The install page gets a section "npx (no install)" after npm: `npx sendmock` for the stable, `npx sendmock@beta` for the beta, and the same with `bunx`, `pnpm dlx` and `yarn dlx`, plus a note that the first run downloads the binary (under 20 MB) into the package manager's cache and later runs start at once. A new `npx` entry in `packaging/channels.json` (macOS, Linux and Windows; stable and beta; `after-publish`) puts it in the install page's channel table, as for every other channel (DS-03.6).
   - Before publishing, the release workflow's npm step also runs `npx --yes --package <launcher tarball> --package <platform tarball> sendmock version --json` from an empty folder, so a launcher that only works inside a project fails the release.
   - After publishing, the Install channels workflow writes a small `sendmock` script per runner that calls `npx --yes sendmock@<version>` with its arguments (a `.cmd` on Windows) and runs test cases 2 to 8 through it, which proves the published package from the registry on every operating system. DS-03.7 ticks when that run passes on the first beta (runbook step 6).
+- **W17 design (agents through npx, 2026-11-07, owner request):** W16 lets people run SendMock with no install, but every agent configuration SendMock writes or shows starts `sendmock mcp`, which is not on their `PATH`. The design is in [14](14-ai-integration.md#one-command-setup-per-harness). Built in one commit, in layer order:
+  - `sendmock-ops`: a value `McpLaunch` (`Installed`, `Npx`) that gives the command and arguments, the Claude Code command line, the Codex table and the `ai install` command for each form. `list_agent_setups()` and `sendmock ai install` both read it, so the strings written to disk and the ones shown cannot differ (today each file spells them out).
+  - REST: `AiAgentSetup` gains `npx_install_command` and `npx_mcp_config` (06-api first, then `web/src/lib/api/types/automation.ts`, the regenerated spec, the contract sample and the mock).
+  - Binary: `sendmock ai install` takes `--npx`, and uses the npx form by itself when `SENDMOCK_LAUNCHER=npm`, which the npm launcher sets for the binary it starts.
+  - UI: Settings > Connection > AI agents gets a choice "SendMock runs as: Installed / npx (no install)" that switches the install command and the configuration shown.
+  - Docs: the AI page and the install page's npx section show the npx form, with `cmd /c` for Windows agents that cannot start `npx` directly.
+  - Tests naming AI-05.9: unit tests for `McpLaunch` and the install plan's npx files, a binary test of `ai install --npx --yes` and of the launcher variable, the contract test, and a Playwright test of the choice.
 
 ## Owner steps
 

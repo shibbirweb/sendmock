@@ -428,6 +428,10 @@ sendmock-skill/
 
 Each target shows a diff and asks before writing unless `--yes`. Exact config file locations and formats per harness are verified at implementation time, since they change between harness versions.
 
+**Through npx, with no install (added 2026-11-07, owner request; Phase 5 W17, AI-05.9).** Someone who runs SendMock with `npx sendmock` has no `sendmock` on the `PATH`, so a configuration that starts `sendmock mcp` cannot start. Every agent configuration therefore comes in two forms from one source (`McpLaunch` in `sendmock-ops`): the installed binary (`sendmock mcp`) and npx (`npx -y sendmock mcp`; `claude mcp add sendmock -- npx -y sendmock mcp` for Claude Code, `command = "npx"`, `args = ["-y", "sendmock", "mcp"]` for Codex). `npx sendmock ai install --target <agent>` writes the npx form by itself, since the npm launcher tells the binary it was started through npm (`SENDMOCK_LAUNCHER=npm`); `--npx` asks for it from an installed binary too. `GET /ai/agents` gives both forms and Settings > Connection lets you pick one. On Windows some agents cannot start `npx` directly; the docs show `cmd /c npx -y sendmock mcp` for them.
+
+Open question for the owner: the Claude Code plugin's `.mcp.json` starts the installed binary. Starting it through npx instead would make the plugin work with no separate install, at the cost of needing Node.js; it stays on the binary until the owner decides.
+
 Later: publish SendMock as a **Claude Code plugin** (skill + MCP server bundled) and list it in MCP registries.
 
 ## Docs for agents
