@@ -90,8 +90,16 @@ export const messageProvidersApi: ApiEndpoint[] = [
     "Email providers",
     buildProviderEndpoints("/api/v1/emails/providers", "Email"),
   ),
-  ...tagEndpoints(
-    "SMS providers",
-    buildProviderEndpoints("/api/v1/sms/providers", "SMS"),
-  ),
+  ...tagEndpoints("SMS providers", [
+    ...buildProviderEndpoints("/api/v1/sms/providers", "SMS"),
+    {
+      method: "POST",
+      path: "/api/v1/sms/whatsapp-cloud/verify-webhook",
+      summary:
+        "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+      requestBody: typeRef("WhatsappWebhookVerificationRequest"),
+      response: typeRef("WhatsappWebhookVerification"),
+      errorStatuses: [422],
+    },
+  ]),
 ];

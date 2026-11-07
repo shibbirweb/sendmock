@@ -21,6 +21,8 @@ use crate::{OperationContext, OperationError};
 pub(super) struct CloudSender {
     pub(super) business_number: String,
     pub(super) phone_number_id: String,
+    /// Meta's callback URL for the app: statuses go there in Meta's envelope.
+    pub(super) webhook_url: Option<String>,
 }
 
 /// Meta's numbers have no `+`; SendMock stores E.164.
@@ -141,7 +143,7 @@ async fn store_cloud_message(
         body: content.body,
         status: "queued".to_owned(),
         error_code: None,
-        status_callback_url: None,
+        status_callback_url: sender.webhook_url.clone(),
         messaging_service_sid: None,
         account: None,
         metadata_json: Some(json!({ "phone_number_id": sender.phone_number_id }).to_string()),

@@ -92,6 +92,20 @@
     "required_variables": []
   },
   {
+    "id": "whatsapp.cloud",
+    "name": "WhatsApp Cloud: messages and statuses",
+    "service": "WhatsApp Cloud",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "WhatsApp Cloud: messages and statuses payload, matching the provider's documented format.",
+    "required_variables": [
+      "whatsapp_cloud_app_secret"
+    ]
+  },
+  {
     "id": "mailgun.routes",
     "name": "Mailgun: routes (inbound)",
     "service": "Mailgun",

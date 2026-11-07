@@ -3,6 +3,7 @@ import { definitionLookupHandlers } from "@/mocks/handlers/definition-lookup-han
 import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
 import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
 import { messageProviderHandlers } from "@/mocks/handlers/message-provider-handlers";
+import { whatsappCloudHandlers } from "@/mocks/handlers/whatsapp-cloud-handlers";
 import { messageRuleHandlers } from "@/mocks/handlers/message-rule-handlers";
 import { projectHandlers } from "@/mocks/handlers/project-handlers";
 import { pushHandlers } from "@/mocks/handlers/push-handlers";
@@ -56,6 +57,7 @@ export const mockHandlers = [
   ...outcomeTestHandlers,
   ...definitionLookupHandlers,
   ...messageProviderHandlers,
+  ...whatsappCloudHandlers,
   ...messageRuleHandlers,
   ...projectHandlers,
   ...pushHandlers,

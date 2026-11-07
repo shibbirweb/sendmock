@@ -23,6 +23,14 @@ export function buildWhatsappCloudProvider(): MessageProviderRecord {
       { name: "access_token", value: "whatsapp-access-token", is_secret: true },
       { name: "app_secret", value: "whatsapp-app-secret", is_secret: true },
       { name: "phone_number", value: "+15550783881", is_secret: false },
+      { name: "phone_number_id", value: "106540352242922", is_secret: false },
+      {
+        name: "business_account_id",
+        value: "102290129340398",
+        is_secret: false,
+      },
+      { name: "webhook_url", value: "", is_secret: false },
+      { name: "verify_token", value: "sendmock-verify-token", is_secret: true },
     ],
     operations: [
       {
@@ -49,7 +57,7 @@ export function buildWhatsappCloudProvider(): MessageProviderRecord {
       ),
     ],
     message_id_template: "wamid.HBgL{{ random_hex(48) }}",
-    callback_template_key: null,
+    callback_template_key: "whatsapp.cloud",
     status_names: {
       sent: "sent",
       delivered: "delivered",

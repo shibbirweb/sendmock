@@ -5,8 +5,19 @@ use sendmock_payments::{sign_paddle_payload, sign_razorpay_payload, sign_stripe_
 use sendmock_webhooks::{WebhookSecret, sign_payload, sign_sendgrid_event};
 use serde_json::Value;
 
+/// The signatures over the rendered body, known here even when the template's own functions
+/// (a provider callback's) do not list them.
+const BODY_SIGNER_NAMES: [&str; 6] = [
+    "stripe_signature",
+    "razorpay_signature",
+    "paddle_signature",
+    "svix_signature",
+    "sendgrid_signature",
+    "whatsapp_signature",
+];
+
 /// The functions header templates see once the body is rendered: the Stripe, Razorpay,
-/// Paddle, Svix (Resend) and SendGrid signatures sign that body for real, as each provider's
+/// Paddle, Svix (Resend), SendGrid and WhatsApp signatures sign that body for real, as each provider's
 /// library checks it; every other function is the template's own.
 #[derive(Clone)]
 pub struct SignedBodyFunctions {
@@ -64,6 +75,14 @@ impl TemplateFunctions for SignedBodyFunctions {
                 sign_stripe_payload(secret, self.read_now_seconds(), &self.signed_body)
             }
             "razorpay_signature" => sign_razorpay_payload(secret, &self.signed_body),
+            // Meta's `X-Hub-Signature-256` is the same hex HMAC-SHA256 of the body as
+            // Razorpay's, behind a `sha256=` prefix.
+            "whatsapp_signature" => {
+                format!(
+                    "sha256={}",
+                    sign_razorpay_payload(secret, &self.signed_body)
+                )
+            }
             "paddle_signature" => {
                 sign_paddle_payload(secret, self.read_now_seconds(), &self.signed_body)
             }
@@ -81,7 +100,13 @@ impl TemplateFunctions for SignedBodyFunctions {
     }
 
     fn function_names(&self) -> Vec<&'static str> {
-        self.template_functions.function_names()
+        let mut function_names = self.template_functions.function_names();
+        for body_signer in BODY_SIGNER_NAMES {
+            if !function_names.contains(&body_signer) {
+                function_names.push(body_signer);
+            }
+        }
+        function_names
     }
 
     fn to_shared(&self) -> Arc<dyn TemplateFunctions> {

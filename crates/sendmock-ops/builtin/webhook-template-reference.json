@@ -116,6 +116,12 @@
       "example": "0ea09d611215f3d22f53207c37444d39..."
     },
     {
+      "name": "whatsapp_signature",
+      "signature": "whatsapp_signature(app_secret)",
+      "description": "An X-Hub-Signature-256 header (sha256=...): the HMAC-SHA256 of the rendered body with the app secret, as Meta signs WhatsApp webhooks.",
+      "example": "sha256=4b1c3d2e9f0a7b6c5d4e3f2a1b0c9d8e..."
+    },
+    {
       "name": "paddle_signature",
       "signature": "paddle_signature(secret)",
       "description": "A Paddle-Signature header (ts=...;h1=...) over the rendered body.",

@@ -9,7 +9,7 @@
  * the After 1.0 item (`A2`, `A5`, `A7`, docs/plan/32-after-1-0.md).
  */
 export type StageBPhase =
-  "0" | "1" | "2" | "3" | "3P" | "4" | "5" | "A2" | "A5" | "A7";
+  "0" | "1" | "2" | "3" | "3P" | "4" | "5" | "A2" | "A5" | "A7" | "A8";
 
 export type OperationSurfaces = {
   /** When the binary starts serving it; the live UI shows Not available yet before (UI-12). */

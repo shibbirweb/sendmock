@@ -15225,6 +15225,56 @@
       ]
     },
     {
+      "command": "sendmock sms whatsapp-cloud verify-webhook",
+      "slug": "sms-whatsapp-cloud-verify-webhook",
+      "usage": "sendmock sms whatsapp-cloud verify-webhook [flags]",
+      "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/whatsapp-cloud/verify-webhook",
+          "operation_id": "postSmsWhatsappCloudVerifyWebhook",
+          "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.",
+          "example": "http://127.0.0.1:3000/whatsapp/webhook"
+        }
+      ],
+      "example": "sendmock sms whatsapp-cloud verify-webhook --url http://127.0.0.1:3000/whatsapp/webhook",
+      "output": "WhatsappWebhookVerification",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_sms_whatsapp_verify_webhook"
+      ],
+      "ui": [
+        "SMS > Providers > WhatsApp Cloud > Verify callback URL"
+      ]
+    },
+    {
       "command": "sendmock stats",
       "slug": "stats",
       "usage": "sendmock stats",

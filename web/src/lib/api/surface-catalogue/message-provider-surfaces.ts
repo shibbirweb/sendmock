@@ -96,6 +96,12 @@ export const messageProviderSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_sms_provider_restore",
     ui: "SMS > Providers > Removed > Restore",
   },
+  "POST /api/v1/sms/whatsapp-cloud/verify-webhook": {
+    phase: "A8",
+    cli: "sendmock sms whatsapp-cloud verify-webhook",
+    mcp: "sendmock_sms_whatsapp_verify_webhook",
+    ui: "SMS > Providers > WhatsApp Cloud > Verify callback URL",
+  },
   "POST /api/v1/sms/providers/{providerKey}/reset": {
     phase: "2",
     cli: "sendmock sms providers reset <providerKey>",

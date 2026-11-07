@@ -1,12 +1,18 @@
 // An app calling Meta's WhatsApp Business Cloud API over HTTP, as most apps do (Meta's Node SDK
 // is archived), against SendMock's provider port: a text, a template and an interactive message
 // are sent and read back from SendMock's API, a message without its body gets Graph's error,
-// a read receipt marks the conversation read, and a document is uploaded, sent by its media id
-// and downloaded again (SM-18.1, SM-18.2, SM-18.3, SM-18.5).
+// a read receipt marks the conversation read, a document is uploaded, sent by its media id and
+// downloaded again, and the app's webhook handler passes Meta's callback URL check, then
+// receives a status and a reply whose X-Hub-Signature-256 it verifies (SM-18.1 to SM-18.5).
+import { createHmac } from "node:crypto";
+import { createServer } from "node:http";
+
 const providerUrl = process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026";
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
 const phoneNumberId = "106540352242922";
 const customer = "16505551234";
+const appSecret = "whatsapp-app-secret";
+const verifyToken = "sendmock-verify-token";
 /** What the app is doing, so a failure in CI names the step. */
 let currentStep = "starting";
 
@@ -123,11 +129,85 @@ async function uploadSendAndDownloadMedia() {
   expectEqual(await downloadResponse.text(), invoiceText, "downloaded file");
 }
 
+/** The app's webhook handler: Meta's check by GET, signed envelopes by POST. */
+function startWebhookHandler(receivedChanges) {
+  const webhookServer = createServer((request, response) => {
+    const requestUrl = new URL(request.url, "http://127.0.0.1");
+    if (request.method === "GET") {
+      const isOurToken = requestUrl.searchParams.get("hub.verify_token") === verifyToken;
+      response.writeHead(isOurToken ? 200 : 403);
+      response.end(isOurToken ? requestUrl.searchParams.get("hub.challenge") : "");
+      return;
+    }
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+    });
+    request.on("end", () => {
+      const expectedSignature = `sha256=${createHmac("sha256", appSecret).update(body).digest("hex")}`;
+      const isSigned = request.headers["x-hub-signature-256"] === expectedSignature;
+      receivedChanges.push({ isSigned, value: JSON.parse(body).entry[0].changes[0].value });
+      response.writeHead(200);
+      response.end();
+    });
+  });
+  return new Promise((resolve) => {
+    webhookServer.listen(0, "127.0.0.1", () => resolve(webhookServer));
+  });
+}
+
+async function callSendMock(method, path, requestBody) {
+  const response = await fetch(`${sendmockUrl}/api/v1${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: requestBody === undefined ? undefined : JSON.stringify(requestBody),
+  });
+  return response.json();
+}
+
+async function waitForChange(receivedChanges, isWanted, label) {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const wantedChange = receivedChanges.find(({ value }) => isWanted(value));
+    if (wantedChange !== undefined) {
+      expectEqual(wantedChange.isSigned, true, `${label} signature`);
+      return wantedChange.value;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`No ${label} reached the webhook handler`);
+}
+
+async function receiveSignedWebhooks() {
+  currentStep = "callback URL setup";
+  const receivedChanges = [];
+  const webhookServer = await startWebhookHandler(receivedChanges);
+  const callbackUrl = `http://127.0.0.1:${webhookServer.address().port}/whatsapp/webhook`;
+  const cloudProvider = await callSendMock("GET", "/sms/providers/whatsapp_cloud");
+  const webhookCredential = cloudProvider.credentials.find((credential) => credential.name === "webhook_url");
+  webhookCredential.value = callbackUrl;
+  await callSendMock("PATCH", "/sms/providers/whatsapp_cloud", cloudProvider);
+  await callSendMock("PATCH", "/settings", { sms_simulation_profile: "instant" });
+
+  currentStep = "Meta's callback URL check";
+  const verification = await callSendMock("POST", "/sms/whatsapp-cloud/verify-webhook", {});
+  expectEqual(verification.is_verified, true, "callback URL check");
+
+  currentStep = "status webhook";
+  const statusMessage = await sendMessage("text", { body: "Your table is ready" });
+  await waitForChange(receivedChanges, (value) => value.statuses?.[0]?.id === statusMessage.id && value.statuses[0].status === "delivered", "delivered status");
+
+  currentStep = "reply webhook";
+  await callSendMock("POST", "/sms/inbound", { from: `+${customer}`, to: "+15550783881", body: "On my way", channel: "whatsapp" });
+  await waitForChange(receivedChanges, (value) => value.messages?.[0]?.text?.body === "On my way", "reply");
+  webhookServer.close();
+}
+
 try {
   const textMessage = await sendEveryKind();
   await checkRefusalAndReadReceipt(textMessage);
   await uploadSendAndDownloadMedia();
-  console.log("WhatsApp Cloud API: every kind sent, refusal, read receipt and media checked.");
+  await receiveSignedWebhooks();
+  console.log("WhatsApp Cloud API: sends, refusal, read receipt, media and signed webhooks checked.");
 } catch (stepError) {
   console.error(`Failed at ${currentStep}:`, stepError);
   process.exit(1);

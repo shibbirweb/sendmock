@@ -21706,6 +21706,65 @@
       ]
     },
     {
+      "name": "sendmock_sms_whatsapp_verify_webhook",
+      "toolset": "sms",
+      "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/whatsapp-cloud/verify-webhook",
+          "operation_id": "postSmsWhatsappCloudVerifyWebhook",
+          "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.",
+          "example": "http://127.0.0.1:3000/whatsapp/webhook"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.",
+            "examples": [
+              "http://127.0.0.1:3000/whatsapp/webhook"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "url": "http://127.0.0.1:3000/whatsapp/webhook"
+      },
+      "output": "WhatsappWebhookVerification",
+      "cli": [
+        "sendmock sms whatsapp-cloud verify-webhook"
+      ],
+      "ui": [
+        "SMS > Providers > WhatsApp Cloud > Verify callback URL"
+      ]
+    },
+    {
       "name": "sendmock_stats",
       "toolset": "core",
       "summary": "Counts and rates shown on the Overview.",

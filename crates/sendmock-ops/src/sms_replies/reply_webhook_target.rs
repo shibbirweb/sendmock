@@ -1,5 +1,8 @@
 use sendmock_sms::TwimlMethod;
 
+use crate::providers::{
+    WHATSAPP_CLOUD_TEMPLATE_ID, find_whatsapp_cloud_callback_url, load_sms_provider_definitions,
+};
 use crate::{OperationContext, OperationError};
 
 /// Who configured the URL an inbound message is sent to.
@@ -37,7 +40,7 @@ pub async fn resolve_reply_webhook_target(
         .find_by_number(app_number)
         .await?
     else {
-        return Ok(None);
+        return resolve_whatsapp_cloud_target(operation_context, app_number).await;
     };
     let messaging_service = match virtual_number.messaging_service_sid.as_deref() {
         Some(service_sid) => {
@@ -70,4 +73,25 @@ pub async fn resolve_reply_webhook_target(
         }
         _ => Ok(virtual_number.inbound_url.clone().map(number_target)),
     }
+}
+
+/// A reply to the WhatsApp Cloud business number goes to Meta's callback URL of the app, as
+/// the business number's own URL, in Meta's envelope; nothing when no callback URL is set.
+async fn resolve_whatsapp_cloud_target(
+    operation_context: &OperationContext,
+    app_number: &str,
+) -> Result<Option<ReplyWebhookTarget>, OperationError> {
+    let providers = load_sms_provider_definitions(operation_context).await?;
+    Ok(
+        find_whatsapp_cloud_callback_url(&providers, app_number).map(|callback_url| {
+            ReplyWebhookTarget {
+                kind: ReplyWebhookTargetKind::Number,
+                url: callback_url,
+                method: TwimlMethod::Post,
+                fallback_url: None,
+                messaging_service_sid: None,
+                template_id: Some(WHATSAPP_CLOUD_TEMPLATE_ID.to_owned()),
+            }
+        }),
+    )
 }

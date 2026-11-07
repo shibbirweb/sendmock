@@ -152,7 +152,13 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
-    samples.extend([sms_provider_create_samples()]);
+    samples.extend([
+        sms_provider_create_samples(),
+        (
+            "postSmsWhatsappCloudVerifyWebhook",
+            vec![json!({ "url": "http://127.0.0.1:9/whatsapp/webhook" })],
+        ),
+    ]);
     samples.extend(prepare_email_provider_samples(app_router).await);
     samples.extend(prepare_webhook_endpoint_samples(app_router).await);
     samples.extend(prepare_webhook_delivery_samples(app_router, operation_context).await);

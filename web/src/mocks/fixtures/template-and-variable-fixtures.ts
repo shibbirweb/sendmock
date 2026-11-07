@@ -201,6 +201,14 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     [],
   ],
   [
+    "whatsapp.cloud",
+    "WhatsApp Cloud: messages and statuses",
+    "WhatsApp Cloud",
+    "sms-provider",
+    ["sms.inbound", "sms.status"],
+    ["whatsapp_cloud_app_secret"],
+  ],
+  [
     "mailgun.routes",
     "Mailgun: routes (inbound)",
     "Mailgun",

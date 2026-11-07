@@ -17,6 +17,8 @@ use super::whatsapp_read_receipts::answer_read_receipt;
 use crate::{OperationContext, OperationError, ProviderRoute};
 
 pub const WHATSAPP_CLOUD_PROVIDER_KEY: &str = "whatsapp_cloud";
+/// Meta's webhook envelope, for statuses and replies alike.
+pub const WHATSAPP_CLOUD_TEMPLATE_ID: &str = "whatsapp.cloud";
 /// The business number messages are stored from when the provider names none.
 const DEFAULT_BUSINESS_NUMBER: &str = "+15550783881";
 
@@ -45,6 +47,22 @@ fn read_credential<'provider>(
         .find(|credential| credential.name == credential_name)
         .map(|credential| credential.value.as_str())
         .filter(|value| !value.is_empty())
+}
+
+/// Meta's callback URL for replies to `app_number`: set when the `whatsapp_cloud` provider is
+/// on, its business number is `app_number` and it has a `webhook_url`.
+pub fn find_whatsapp_cloud_callback_url(
+    providers: &[MessageProviderDefinition],
+    app_number: &str,
+) -> Option<String> {
+    let cloud_provider = providers
+        .iter()
+        .find(|provider| provider.key == WHATSAPP_CLOUD_PROVIDER_KEY && provider.is_routable())?;
+    let business_number =
+        read_credential(cloud_provider, "phone_number").unwrap_or(DEFAULT_BUSINESS_NUMBER);
+    (business_number == app_number)
+        .then(|| read_credential(cloud_provider, "webhook_url").map(str::to_owned))
+        .flatten()
 }
 
 /// The Cloud API, served with the `whatsapp_cloud` provider while it is routable.
@@ -183,6 +201,7 @@ async fn answer_messages_request(
             .unwrap_or(DEFAULT_BUSINESS_NUMBER)
             .to_owned(),
         phone_number_id: phone_number_id.to_owned(),
+        webhook_url: read_credential(cloud_provider, "webhook_url").map(str::to_owned),
     };
     answer_send(operation_context, &sender, &message).await
 }

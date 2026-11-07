@@ -59,7 +59,7 @@ pub struct WebhookTemplateFunctions {
     pub standard_functions: StandardTemplateFunctions,
 }
 
-const PROVIDER_HELPER_NAMES: [&str; 8] = [
+const PROVIDER_HELPER_NAMES: [&str; 9] = [
     "twilio_signature",
     "sendgrid_signature",
     "mailgun_signature",
@@ -67,6 +67,7 @@ const PROVIDER_HELPER_NAMES: [&str; 8] = [
     "stripe_signature",
     "razorpay_signature",
     "paddle_signature",
+    "whatsapp_signature",
     "sslcommerz_verify_sign",
 ];
 
@@ -123,6 +124,7 @@ impl TemplateFunctions for WebhookTemplateFunctions {
                 random_hex()
             ),
             "razorpay_signature" => random_hex(),
+            "whatsapp_signature" => format!("sha256={}", random_hex()),
             "sendgrid_signature" => {
                 STANDARD.encode(self.call_standard_text("random_string", &[Value::from(70)]))
             }

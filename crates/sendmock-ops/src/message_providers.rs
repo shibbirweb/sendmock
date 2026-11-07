@@ -10,6 +10,7 @@ mod provider_views;
 mod sample_request_builder;
 mod sms_provider_operations;
 mod template_reference;
+mod whatsapp_webhook_verification;
 
 pub use credential_masking::mask_secret_value;
 pub(crate) use credential_masking::{mask_secret_credentials, merge_credentials};
@@ -35,6 +36,10 @@ pub(crate) use template_reference::{
     TemplateHelperEntry, TemplateReference, build_template_reference,
 };
 
+pub use whatsapp_webhook_verification::{
+    VerifyWhatsappWebhookOperation, WhatsappWebhookVerification, WhatsappWebhookVerificationRequest,
+};
+
 use crate::OperationRegistry;
 
 /// The SMS and email provider operations, custom providers included.
@@ -48,6 +53,7 @@ pub fn register_sms_provider_operations(operation_registry: &mut OperationRegist
     operation_registry.register(ResetSmsProviderOperation);
     operation_registry.register(PreviewSmsProviderOperation);
     operation_registry.register(RevealSmsProviderCredentialOperation);
+    operation_registry.register(VerifyWhatsappWebhookOperation);
     operation_registry.register(ListEmailProvidersOperation);
     operation_registry.register(CreateEmailProviderOperation);
     operation_registry.register(GetEmailProviderOperation);

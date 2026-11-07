@@ -84,7 +84,7 @@ mod tests {
     fn every_catalogue_entry_has_a_request_shape() {
         let builtin_templates = list_builtin_templates();
 
-        assert_eq!(builtin_templates.len(), 33);
+        assert_eq!(builtin_templates.len(), 34);
         assert_eq!(builtin_templates[0].summary.id, NATIVE_TEMPLATE_ID);
     }
 }

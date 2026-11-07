@@ -80,7 +80,8 @@ pub use logs::{
 };
 pub use message_providers::{
     MessageProviderInput, MessageProviderPreview, MessageProviderView, ProviderCredentialReveal,
-    ProviderSampleRequest, mask_secret_value,
+    ProviderSampleRequest, WhatsappWebhookVerification, WhatsappWebhookVerificationRequest,
+    mask_secret_value,
 };
 pub use message_rules::{ForwardRule, TagRule};
 pub use no_input::NoInput;

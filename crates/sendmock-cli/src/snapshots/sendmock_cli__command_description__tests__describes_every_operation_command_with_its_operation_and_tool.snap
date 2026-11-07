@@ -3909,6 +3909,27 @@ expression: command_descriptions
     "mcp": []
   },
   {
+    "command": "sendmock sms whatsapp-cloud verify-webhook",
+    "usage": "sendmock sms whatsapp-cloud verify-webhook",
+    "aliases": [],
+    "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+    "arguments": [],
+    "flags": [
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/sms/whatsapp-cloud/verify-webhook",
+        "operation_id": "postSmsWhatsappCloudVerifyWebhook",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_whatsapp_verify_webhook"
+    ]
+  },
+  {
     "command": "sendmock email providers list",
     "usage": "sendmock email providers list",
     "aliases": [],

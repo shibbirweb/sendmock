@@ -76,7 +76,7 @@ async fn every_builtin_template_renders_against_its_sample_and_a_real_message() 
         .filter(|listed_template| listed_template["source"] == "builtin")
         .collect();
 
-    assert_eq!(builtin_templates.len(), 33);
+    assert_eq!(builtin_templates.len(), 34);
     for builtin_template in builtin_templates {
         let template_id = builtin_template["id"].as_str().unwrap_or_default();
         let first_event = builtin_template["events"][0].as_str().unwrap_or_default();

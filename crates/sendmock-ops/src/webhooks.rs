@@ -221,3 +221,4 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ExportWebhookTemplateOperation);
     operation_registry.register(GetWebhookTemplateReferenceOperation);
 }
+pub(crate) use signed_body_functions::SignedBodyFunctions;

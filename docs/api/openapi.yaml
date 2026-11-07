@@ -3998,6 +3998,32 @@ paths:
       x-sendmock-mcp: null
       x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
       x-sendmock-ui: SMS > Providers > provider > General > Reveal
+  /api/v1/sms/whatsapp-cloud/verify-webhook:
+    post:
+      operationId: postSmsWhatsappCloudVerifyWebhook
+      summary: Send Meta's callback URL check to the app and report whether it answered the challenge.
+      tags:
+        - SMS providers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappWebhookVerificationRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappWebhookVerification"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms whatsapp-cloud verify-webhook
+      x-sendmock-mcp: sendmock_sms_whatsapp_verify_webhook
+      x-sendmock-ui: SMS > Providers > WhatsApp Cloud > Verify callback URL
   /api/v1/http/bins:
     get:
       operationId: getHttpBins
@@ -16638,6 +16664,53 @@ components:
         - random_mode
         - description
       description: Body of POST and PATCH /api/v1/webhooks/variables.
+    WhatsappWebhookVerification:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL called, with the check's query.
+        challenge:
+          type: string
+          description: The `hub.challenge` sent, which the app must answer as its whole body.
+          examples:
+            - "1158201444"
+        is_verified:
+          type: boolean
+          description: True when the app answered `200` with exactly the challenge, as Meta requires.
+        status_code:
+          type:
+            - number
+            - "null"
+          examples:
+            - 200
+        answer:
+          type:
+            - string
+            - "null"
+          description: The app's answer body.
+        error:
+          type:
+            - string
+            - "null"
+          description: Why there was no answer, such as a refused connection.
+      required:
+        - url
+        - challenge
+        - is_verified
+        - status_code
+        - answer
+        - error
+      description: What the app answered Meta's callback URL check.
+    WhatsappWebhookVerificationRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.
+          examples:
+            - http://127.0.0.1:3000/whatsapp/webhook
+      description: Body of POST /api/v1/sms/whatsapp-cloud/verify-webhook.
   responses:
     BadRequest:
       description: The request is invalid.

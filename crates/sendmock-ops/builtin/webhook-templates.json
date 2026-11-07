@@ -311,5 +311,15 @@
     "body_template": "{\n  \"event_id\": \"evt_{{ random_string(26) | lower }}\",\n  \"event_type\": \"{{ event.type | payment_event(\"paddle\") }}\",\n  \"occurred_at\": \"{{ event.created_at }}\",\n  \"notification_id\": \"ntf_{{ random_string(26) | lower }}\",\n  \"data\": {\n    \"id\": \"{{ data.provider_ids.transaction | default(data.provider_reference) }}\",\n    \"status\": \"{{ event.type | payment_event(\"paddle_status\") }}\",\n    \"origin\": \"web\",\n    \"currency_code\": \"{{ data.currency }}\",\n    \"created_at\": \"{{ data.created_at }}\",\n    \"custom_data\": {{ data.metadata | json }},\n    \"details\": {\n      \"totals\": {\n        \"total\": \"{{ data.amount_minor }}\",\n        \"currency_code\": \"{{ data.currency }}\"\n      }\n    }\n  }\n}",
     "doc_url": "https://developer.paddle.com/webhooks/transactions/transaction-completed",
     "verified_on": "2026-11-05"
+  },
+  "whatsapp.cloud": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Hub-Signature-256": "{{ whatsapp_signature(vars.whatsapp_cloud_app_secret) }}"
+    },
+    "body_template": "{\n  \"object\": \"whatsapp_business_account\",\n  \"entry\": [{\n    \"id\": \"{{ vars.whatsapp_cloud_business_account_id }}\",\n    \"changes\": [{\n      \"field\": \"messages\",\n      \"value\": {\n        \"messaging_product\": \"whatsapp\",\n        \"metadata\": {\n          \"display_phone_number\": \"{% if event.type == \"sms.inbound\" %}{{ data.to_number | replace(\"+\", \"\") }}{% else %}{{ data.from_number | replace(\"+\", \"\") }}{% endif %}\",\n          \"phone_number_id\": \"{{ vars.whatsapp_cloud_phone_number_id }}\"\n        },\n{% if event.type == \"sms.inbound\" %}        \"contacts\": [{ \"profile\": { \"name\": \"{{ data.from_number }}\" }, \"wa_id\": \"{{ data.from_number | replace(\"+\", \"\") }}\" }],\n        \"messages\": [{\n          \"from\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n          \"id\": \"{{ data.provider_id }}\",\n          \"timestamp\": \"{{ event.created_at | unix }}\",\n          \"type\": \"text\",\n          \"text\": { \"body\": \"{{ data.body }}\" }\n        }]\n{% else %}        \"statuses\": [{\n          \"id\": \"{{ data.provider_id }}\",\n          \"status\": \"{{ data.status }}\",\n          \"timestamp\": \"{{ event.created_at | unix }}\",\n          \"recipient_id\": \"{{ data.to_number | replace(\"+\", \"\") }}\"{% if data.status == \"failed\" %},\n          \"errors\": [{ \"code\": 131026, \"title\": \"Message undeliverable\", \"message\": \"Message undeliverable\", \"error_data\": { \"details\": \"Message failed to send because the recipient could not be reached (SendMock outcome {{ data.error_code }}).\" } }]{% endif %}\n        }]\n{% endif %}      }\n    }]\n  }]\n}",
+    "doc_url": "https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components",
+    "verified_on": "2026-11-08"
   }
 }

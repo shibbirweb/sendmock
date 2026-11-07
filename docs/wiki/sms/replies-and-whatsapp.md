@@ -93,6 +93,17 @@ Every message type is stored with a body you can read: text, templates (`Templat
 
 Media works as on Meta: upload a file with `POST /v21.0/<phone_number_id>/media` (multipart, with `messaging_product=whatsapp`, `type` and `file`) and get its `id`; `GET /v21.0/<media_id>` answers its `url`, `mime_type`, `sha256` and `file_size`; the `url` downloads the file; `DELETE /v21.0/<media_id>` removes it. Send an image, video, audio file, document or sticker by that `id` (or by a `link`), and the message carries the file. Uploaded files are kept like messages: pruned with them, cleared by a reset, and deleted with their project.
 
+### Webhooks to your app
+
+Meta sends one app callback URL every status and every reply. Set it in **SMS > Providers > WhatsApp Cloud**, as the **webhook_url** credential, and SendMock does the same:
+
+1. Set **webhook_url** to your handler, for example `http://127.0.0.1:3000/whatsapp/webhook`, and save.
+2. On the **Callbacks** tab, press **Verify callback URL**. SendMock calls your URL with `GET ?hub.mode=subscribe&hub.verify_token=<verify_token>&hub.challenge=<number>`, as Meta does, and says whether your handler answered the challenge.
+3. Send a message. Each status (`sent`, `delivered`, `read`, and `failed` with error `131026` for an undeliverable number) is posted to your URL in Meta's `whatsapp_business_account` envelope, signed with `X-Hub-Signature-256: sha256=<HMAC-SHA256 of the body with the app_secret credential>`. They are retried and listed on the message like any status callback.
+4. Reply as the customer in the conversation (to the business number, `+15550783881` by default). The reply is posted to the same URL as a `messages` change, signed the same way.
+
+The envelope uses the **phone_number_id** and **business_account_id** credentials for `metadata.phone_number_id` and the entry `id`. The same format is the `whatsapp.cloud` template in **Webhooks > Templates**, for rules that send other events in Meta's shape (they read the app secret from the `whatsapp_cloud_app_secret` variable).
+
 Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
 ## From the CLI, API and AI

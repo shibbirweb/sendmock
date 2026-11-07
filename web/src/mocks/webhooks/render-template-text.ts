@@ -140,6 +140,8 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
     `t=${Math.floor(Date.now() / 1000)},v1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
   razorpay_signature: () =>
     faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase(),
+  whatsapp_signature: () =>
+    `sha256=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
   paddle_signature: () =>
     `ts=${Math.floor(Date.now() / 1000)};h1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
   sslcommerz_verify_sign: () =>

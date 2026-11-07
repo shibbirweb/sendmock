@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 
-use sendmock_core::{StandardTemplateFunctions, TemplateEscape, render_template};
+use sendmock_core::{
+    StandardTemplateFunctions, TemplateEscape, TemplateFunctions, render_template,
+};
 use serde_json::{Map, Value};
 
 use super::builtin_webhook_templates::WebhookTemplateDefinition;
@@ -8,6 +10,7 @@ use super::callback_template_functions::CallbackTemplateFunctions;
 use super::message_provider_definition::MessageProviderDefinition;
 use crate::OperationContext;
 use crate::sms::RecordedHttpRequest;
+use crate::webhooks::SignedBodyFunctions;
 
 /// Where a provider webhook goes and what a send adds to the template's request.
 #[derive(Debug, Clone, Copy)]
@@ -80,7 +83,10 @@ pub fn render_provider_webhook_request(
             webhook_template,
             is_get,
             template_context,
-            template_functions,
+            &SignedBodyFunctions {
+                template_functions: template_functions.to_shared(),
+                signed_body: body.clone(),
+            },
         ),
         body,
     }
@@ -113,12 +119,13 @@ fn render_body(
 }
 
 /// SendMock's defaults, then the template's headers rendered after the body, so they can
-/// sign it. A `GET` has no body, so no `Content-Type`.
+/// sign it (`X-Twilio-Signature` from `body_fields`, `X-Hub-Signature-256` from the body
+/// itself). A `GET` has no body, so no `Content-Type`.
 fn render_headers(
     webhook_template: &WebhookTemplateDefinition,
     is_get: bool,
     template_context: &Value,
-    template_functions: &CallbackTemplateFunctions,
+    template_functions: &SignedBodyFunctions,
 ) -> BTreeMap<String, String> {
     let mut headers = BTreeMap::from([("User-Agent".to_owned(), "SendMock".to_owned())]);
     if !is_get {
