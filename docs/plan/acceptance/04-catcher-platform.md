@@ -127,9 +127,9 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 - [x] PL-10.1 Projects are listed, created, renamed and deleted through REST, CLI and MCP; keys are lowercase letters, digits and dashes; `default` always exists and cannot be deleted; deleting a project deletes its emails, SMS and verifications. (#48)
 - [x] PL-10.2 An email sent over SMTP with an AUTH username that is a project's key is stored in that project; without AUTH, or with any other username, it is stored in `default`. (#48)
-- [ ] PL-10.3 The REST send APIs and the provider APIs store their email, SMS or verification in the project named by `X-SendMock-Project`; an unknown project is refused with 404.
-- [ ] PL-10.4 A provider API called under `/projects/<project>/` stores its message in that project and answers as it does without the prefix; an official SDK given that base URL sends through it.
+- [x] PL-10.3 The REST send APIs and the provider APIs store their email, SMS or verification in the project named by `X-SendMock-Project`; an unknown project is refused with 404. (#48)
+- [x] PL-10.4 A provider API called under `/projects/<project>/` stores its message in that project and answers as it does without the prefix; an official SDK given that base URL sends through it. (#48)
 - [x] PL-10.5 Every list and lookup of captured traffic (emails, SMS, threads, verifications, OTP, links, wait helpers, recent events) takes `project` and returns only that project's items; without it, every project's. (#48)
 - [x] PL-10.6 Events carry `project` in their data, and a webhook rule can filter on it. (#48)
-- [ ] PL-10.7 The UI shows a project switcher, kept in the URL, once a second project exists; it filters Mail, SMS and Verify; Settings > Projects manages projects and shows how to send to each.
+- [x] PL-10.7 The UI shows a project switcher, kept in the URL, once a second project exists; it filters Mail, SMS and Verify; Settings > Projects manages projects and shows how to send to each. (#48)
 - [ ] PL-10.8 The seed file exports and imports projects, and reset keeps them.
