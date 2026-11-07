@@ -132,4 +132,4 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] PL-10.5 Every list and lookup of captured traffic (emails, SMS, threads, verifications, OTP, links, wait helpers, recent events) takes `project` and returns only that project's items; without it, every project's. (#48)
 - [x] PL-10.6 Events carry `project` in their data, and a webhook rule can filter on it. (#48)
 - [x] PL-10.7 The UI shows a project switcher, kept in the URL, once a second project exists; it filters Mail, SMS and Verify; Settings > Projects manages projects and shows how to send to each. (#48)
-- [ ] PL-10.8 The seed file exports and imports projects, and reset keeps them.
+- [x] PL-10.8 The seed file exports and imports projects, and reset keeps them. (#48)

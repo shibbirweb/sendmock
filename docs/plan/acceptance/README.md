@@ -80,7 +80,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | Accepted |
 | [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | After 1.0 (A1) | 6 | Accepted |
 | [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | After 1.0 (A2) | 6 | Accepted |
-| [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | After 1.0 (A6) | 6 | In progress |
+| [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | After 1.0 (A6) | 6 | Accepted |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |
@@ -127,7 +127,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Accepted |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
-| [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | In progress |
+| [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | Accepted |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | In progress |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |

@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 108 / 116 accepted (all but AI-05, DS-02, DS-03, EM-21, PL-10, PN-01, UI-07 and WS-03), 530 / 550 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 110 / 116 accepted (all but AI-05, DS-02, DS-03, PN-01, UI-07 and WS-03), 537 / 550 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -78,7 +78,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3P | Payment gateway backend | Done apart from the beta release | 8 / 9 |
 | 4 | Integrations, fidelity and AI | Done apart from the beta release ([29](29-phase-4.md)) | 21 / 22 |
 | 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 9 / 17 |
-| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 4 / 11 |
+| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 6 / 11 |
 
 ---
 
@@ -363,8 +363,8 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A2: `email.clicked` link-click tracking (#164, EM-20) (#48)
 - [x] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165, SM-17 accepted, #48)
 - [x] A4: Vonage Verify v2 and other verify APIs (#160, VF-05 accepted, #48)
-- [ ] A5: Multi-project inboxes, as projects (#167, PL-10)
-- [ ] A6: POP3 read access (#159, EM-21)
+- [x] A5: Multi-project inboxes, as projects (#167, PL-10 accepted, #48)
+- [x] A6: POP3 read access (#159, EM-21 accepted, #48)
 - [ ] A7: Push notification emulation (#166, PN-01)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161)
 - [ ] A9: System tray app (#168)
@@ -817,3 +817,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Fix: on Windows the load test got a `451` for one SMTP message: the background truncate also ran when the passive pass had left frames, then copied and synced them under the write lock, longer than a waiting write's 5-second busy timeout. It now runs only when the passive pass copied the whole log, so it has nothing to copy or sync. |
 | 2026-11-07 | Plan: A7 push notifications ([32](32-after-1-0.md#a7-push-notifications-pn-01), PN-01 new with 6 criteria, a new acceptance file `09-push.md`): FCM HTTP v1, Expo and OneSignal answered in code over a push store, magic tokens for each provider's failures, REST, CLI and MCP with a wait helper, `push.sent` and `push.failed` events and a Push screen; APNs and Web Push later. |
 | 2026-11-07 | A7a built: the push store (migration 0036), REST, CLI and MCP for push notifications with a wait helper, and FCM HTTP v1's send API answered in code (message names, dry runs, Google's error shape); the API reference gained a Push group. The SMTP session and API request repositories are now grouped as `LogStores`. |
+| 2026-11-07 | Ticked PL-10.8 and EM-21 after CI passed on 5cca763, with the Python `poplib` job and the Windows load test green: PL-10 and EM-21 accepted, A5 and A6 done. |
