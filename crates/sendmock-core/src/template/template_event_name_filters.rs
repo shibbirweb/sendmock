@@ -65,7 +65,14 @@ const PROVIDER_EVENT_NAMES: [(&str, [&str; 6]); 8] = [
     ),
     (
         "clicked",
-        ["click", "Click", "email.clicked", "clicked", "Click", "click"],
+        [
+            "click",
+            "Click",
+            "email.clicked",
+            "clicked",
+            "Click",
+            "click",
+        ],
     ),
     (
         "unsubscribed",
@@ -142,7 +149,10 @@ mod tests {
             "email.sent"
         );
         assert_eq!(sendgrid_event_filter("email.clicked".to_owned()), "click");
-        assert_eq!(postmark_record_type_filter("email.clicked".to_owned()), "Click");
+        assert_eq!(
+            postmark_record_type_filter("email.clicked".to_owned()),
+            "Click"
+        );
         assert_eq!(mailgun_event_filter("email.clicked".to_owned()), "clicked");
         assert_eq!(sendgrid_event_filter("sms.status".to_owned()), "sms.status");
         assert_eq!(mailgun_event_filter("email.bounced".to_owned()), "failed");

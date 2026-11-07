@@ -17,16 +17,16 @@ Pick one on a webhook endpoint to send events in that service's format, signed a
 
 | Template | Name | Events | Required variables |
 | --- | --- | --- | --- |
-| `mailgun.routes` | Mailgun: routes (inbound) | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` | `mailgun_signing_key` |
-| `mailgun.events` | Mailgun: event webhooks | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` | `mailgun_signing_key` |
-| `postmark.webhooks` | Postmark: delivery, bounce, spam and open webhooks | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
-| `brevo.events` | Brevo: transactional webhooks | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `mailgun.routes` | Mailgun: routes (inbound) | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` | `mailgun_signing_key` |
+| `mailgun.events` | Mailgun: event webhooks | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` | `mailgun_signing_key` |
+| `postmark.webhooks` | Postmark: delivery, bounce, spam and open webhooks | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `brevo.events` | Brevo: transactional webhooks | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
 | `sendgrid.inbound_parse` | SendGrid: Inbound Parse | `email.received` |  |
-| `sendgrid.events` | SendGrid: Event Webhook | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
-| `postmark.inbound` | Postmark: inbound | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
-| `ses.sns` | Amazon SES via SNS | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
-| `resend.events` | Resend: webhook events | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` | `resend_signing_secret` |
-| `sparkpost.events` | SparkPost: event webhooks | `email.received`, `email.opened`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `sendgrid.events` | SendGrid: Event Webhook | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `postmark.inbound` | Postmark: inbound | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `ses.sns` | Amazon SES via SNS | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
+| `resend.events` | Resend: webhook events | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` | `resend_signing_secret` |
+| `sparkpost.events` | SparkPost: event webhooks | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
 
 ## SMS providers
 
