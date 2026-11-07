@@ -11,6 +11,7 @@ on:
       - examples/apps/**
       - examples/http-presets/**
       - examples/recipes/**
+      - examples/playground-snippets/**
       - docs/wiki/recipes/**
       - docs/wiki/connect/**
       - .github/workflows/example-apps.yml
@@ -23,6 +24,7 @@ on:
       - examples/apps/**
       - examples/http-presets/**
       - examples/recipes/**
+      - examples/playground-snippets/**
       - docs/wiki/recipes/**
       - docs/wiki/connect/**
       - .github/workflows/example-apps.yml
@@ -325,6 +327,12 @@ jobs:
         run: |
           if [ -f package.json ]; then bun install; fi
           node "$GITHUB_WORKSPACE/examples/recipes/run-recipes.mjs" ${{ matrix.language }}
+
+      # AC: WS-04.2
+      - name: The API playground's snippets run against SendMock as the playground shows them
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/recipe-target
+        run: node examples/playground-snippets/run-playground-snippets.mjs ${{ matrix.language }}
 
       - name: SendMock and stand-in app logs
         if: failure()
