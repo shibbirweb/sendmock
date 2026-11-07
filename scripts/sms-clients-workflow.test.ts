@@ -57,12 +57,13 @@ describe("SMS clients workflow", () => {
     }
   });
 
-  test("SM-17.1 SM-17.2 SM-17.3 SM-17.4 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
+  test("SM-17.1 SM-17.2 SM-17.3 SM-17.4 SM-17.5 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
     const providerPackages: Record<string, string> = {
       "Infobip Node SDK": "@infobip-api/sdk",
       "Telnyx Node SDK": "telnyx",
       "Sinch Node SDK": "@sinch/sdk-core",
       "Africa's Talking Node SDK": "africastalking",
+      "AWS SDK SNS client": "@aws-sdk/client-sns",
     };
     const otherEntries = clientEntries.filter(
       (clientEntry) => !clientEntry.client.startsWith("Twilio "),
@@ -101,4 +102,26 @@ describe("SMS clients workflow", () => {
       /needs: \[plan, checksums, smtp-clients, sms-clients[^\]]*\]/,
     );
   });
+
+  test("SM-17.6 the providers page lists each new SMS provider with its send API", () => {
+    const providersPage = readFileSync("docs/wiki/providers.md", "utf8");
+    const sendApis: Record<string, string> = {
+      Infobip: "POST /sms/2/text/advanced",
+      Telnyx: "POST /v2/messages",
+      Sinch: "POST /xms/v1/{service_plan_id}/batches",
+      "Africa's Talking": "POST /version1/messaging",
+      "Amazon SNS": "Publish",
+    };
+
+    for (const [providerName, sendApi] of Object.entries(sendApis)) {
+      const providerRow = providersPage
+        .split("\n")
+        .find((pageLine) => pageLine.startsWith(`| ${providerName} |`));
+      expect({ providerName, row: providerRow?.includes(sendApi) }).toEqual({
+        providerName,
+        row: true,
+      });
+    }
+  });
 });
+

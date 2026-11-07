@@ -328,3 +328,84 @@ async fn africas_talking_refuses_a_message_without_text_as_plain_text() {
         "Request is missing required form field 'message'"
     );
 }
+
+const SNS_PUBLISH_PATH: &str = "/providers/sns/";
+
+async fn publish_to_sns(
+    app_router: &axum::Router,
+    form_body: &str,
+) -> support::email_provider_requests::ProviderReply {
+    send_provider_request(
+        app_router,
+        SNS_PUBLISH_PATH,
+        "application/x-www-form-urlencoded; charset=utf-8",
+        form_body.as_bytes().to_vec(),
+    )
+    .await
+}
+
+// AC: SM-17.5
+#[tokio::test]
+async fn sns_publishes_to_a_phone_number_and_answers_its_publish_response() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let published = publish_to_sns(
+        &app_router,
+        "Action=Publish&Version=2010-03-31&PhoneNumber=%2B14155550100&Message=Your+code+is+482913",
+    )
+    .await;
+
+    assert_eq!(published.status, 200, "{}", published.body_text);
+    assert!(
+        published
+            .header("content-type")
+            .is_some_and(|content_type| content_type.starts_with("text/xml")),
+        "{:?}",
+        published.headers
+    );
+    assert!(
+        published
+            .body_text
+            .starts_with("<PublishResponse xmlns=\"http://sns.amazonaws.com/doc/2010-03-31/\">"),
+        "{}",
+        published.body_text
+    );
+    let stored_sms = read_newest_sms(&app_router).await;
+    assert_eq!(stored_sms["api"], "sns");
+    assert_eq!(stored_sms["to_number"], "+14155550100");
+    assert_eq!(stored_sms["from_number"], "Amazon SNS");
+    let message_id = stored_sms["provider_id"].as_str().unwrap_or_default();
+    assert!(
+        published
+            .body_text
+            .contains(&format!("<MessageId>{message_id}</MessageId>")),
+        "{}",
+        published.body_text
+    );
+}
+
+// AC: SM-17.5
+#[tokio::test]
+async fn sns_refuses_an_empty_message_with_its_xml_error() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let refused = publish_to_sns(
+        &app_router,
+        "Action=Publish&Version=2010-03-31&PhoneNumber=%2B14155550100",
+    )
+    .await;
+
+    assert_eq!(refused.status, 400, "{}", refused.body_text);
+    assert!(
+        refused.body_text.contains("<Code>InvalidParameter</Code>"),
+        "{}",
+        refused.body_text
+    );
+    assert!(
+        refused
+            .body_text
+            .contains("Invalid parameter: Empty message"),
+        "{}",
+        refused.body_text
+    );
+}

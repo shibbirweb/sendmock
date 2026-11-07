@@ -35,9 +35,25 @@ test("SM-16.1 SMS > Providers lists the built-ins and the demo's custom provider
 }) => {
   await page.goto("/sms/providers");
 
-  await expect(page.getByTestId("message-provider-row")).toHaveCount(10);
+  await expect(page.getByTestId("message-provider-row")).toHaveCount(11);
   await expect(providerRow(page, "SSL Wireless")).toContainText("Custom");
   await expect(providerRow(page, "Twilio")).toContainText("Built-in");
+});
+
+test("SM-17.6 SMS > Providers lists the providers added after 1.0 as built-ins", async ({
+  page,
+}) => {
+  await page.goto("/sms/providers");
+
+  for (const providerName of [
+    "Infobip",
+    "Telnyx",
+    "Sinch",
+    "Africa's Talking",
+    "Amazon SNS",
+  ]) {
+    await expect(providerRow(page, providerName)).toContainText("Built-in");
+  }
 });
 
 test("EM-18.2 a provider is added as a copy of a built-in", async ({
@@ -60,6 +76,11 @@ test("SM-16.3 a built-in is removed and restored, and a custom provider is delet
   page,
 }) => {
   await page.goto("/sms/providers");
+  // The demo's live traffic and these actions raise toasts at the bottom right, over the last
+  // row's buttons; this test reads the rows, not the toasts.
+  await page.addStyleTag({
+    content: "[data-sonner-toaster] { display: none !important; }",
+  });
 
   await chooseRowAction(page, "Vonage", "Remove");
   await page.getByRole("button", { name: "Remove", exact: true }).click();

@@ -23,7 +23,30 @@ pub fn build_provider_router(operation_context: &OperationContext) -> Router {
             "/providers/{provider_key}/{*provider_path}",
             any(answer_prefixed_provider_request),
         )
+        // A catch-all takes no empty path, and APIs such as Amazon SNS's post to `/` itself.
+        .route(
+            "/providers/{provider_key}/",
+            any(answer_prefixed_root_request),
+        )
+        .route(
+            "/providers/{provider_key}",
+            any(answer_prefixed_root_request),
+        )
         .with_state(operation_context.clone())
+}
+
+async fn answer_prefixed_root_request(
+    State(operation_context): State<OperationContext>,
+    Path(provider_key): Path<String>,
+    request: Request,
+) -> Response {
+    answer_provider_http_request(
+        &operation_context,
+        ProviderRoute::Prefixed(&provider_key),
+        "/".to_owned(),
+        request,
+    )
+    .await
 }
 
 /// A provider port: every path is a provider's real path. With a provider key, only that

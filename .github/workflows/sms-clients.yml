@@ -119,6 +119,11 @@ jobs:
             language: node
             folder: node-africastalking
             run: bun install && node send-and-verify.js
+          # AC: SM-17.5
+          - client: AWS SDK SNS client
+            language: node
+            folder: node-sns
+            run: bun install && node send-and-verify.js
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

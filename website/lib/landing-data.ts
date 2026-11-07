@@ -41,6 +41,7 @@ export const emulatedProviderNames = {
     "Telnyx",
     "Sinch",
     "Africa's Talking",
+    "Amazon SNS",
   ],
   payments: ["Stripe", "PayPal", "SSLCommerz", "bKash"],
 };

@@ -244,6 +244,77 @@ function buildAfricasTalkingProvider(): MessageProviderRecord {
   });
 }
 
+const snsNamespace = "http://sns.amazonaws.com/doc/2010-03-31/";
+
+/** An SNS error answer in the Query API's XML. */
+function snsError(
+  kind: "missing_field" | "unauthorized",
+  status: number,
+  errorType: string,
+  errorCode: string,
+  errorMessage: string,
+) {
+  return {
+    kind,
+    status,
+    headers: [{ name: "Content-Type", template: "text/xml" }],
+    body: `<ErrorResponse xmlns="${snsNamespace}"><Error><Type>${errorType}</Type><Code>${errorCode}</Code><Message>${errorMessage}</Message></Error><RequestId>{{ uuid() }}</RequestId></ErrorResponse>`,
+  };
+}
+
+/**
+ * Amazon SNS's `Publish` to a phone number, as the AWS SDK's SNS client calls it: the Query
+ * protocol, a form posted to `/` with `Action=Publish`, answered in XML
+ * (https://docs.aws.amazon.com/sns/latest/api/API_Publish.html, checked 2026-11-07). SNS has
+ * no sender field, so the provider maps none and its messages are stored from its name. SNS
+ * logs delivery status to CloudWatch rather than calling back, so there is no callback.
+ */
+function buildAmazonSnsProvider(): MessageProviderRecord {
+  return buildProviderFixture({
+    key: "sns",
+    name: "Amazon SNS",
+    area: "sms",
+    accent: "#e7157b",
+    host: "sns.us-east-1.amazonaws.com",
+    credentials: [
+      { name: "access_key_id", value: "AKIATESTSENDMOCK", is_secret: false },
+      { name: "secret_access_key", value: "test_sns_secret", is_secret: true },
+    ],
+    operations: [
+      { kind: "send", method: "POST", path: "/", request_format: "form" },
+    ],
+    field_mapping: [
+      { part: "to", source: "PhoneNumber" },
+      { part: "body", source: "Message" },
+    ],
+    validation_rules: requireParts(["to", "body"]),
+    success_response: {
+      status: 200,
+      headers: [{ name: "Content-Type", template: "text/xml" }],
+      body: `<PublishResponse xmlns="${snsNamespace}"><PublishResult><MessageId>{{ message.provider_id }}</MessageId></PublishResult><ResponseMetadata><RequestId>{{ uuid() }}</RequestId></ResponseMetadata></PublishResponse>`,
+    },
+    error_responses: [
+      snsError(
+        "missing_field",
+        400,
+        "Sender",
+        "InvalidParameter",
+        '{% if error.part == "body" %}Invalid parameter: Empty message{% else %}Invalid parameter: TopicArn or TargetArn Reason: no value for required parameter{% endif %}',
+      ),
+      snsError(
+        "unauthorized",
+        403,
+        "Sender",
+        "InvalidClientTokenId",
+        "The security token included in the request is invalid.",
+      ),
+    ],
+    message_id_template: "{{ uuid() }}",
+    callback_template_key: null,
+    status_names: {},
+  });
+}
+
 /** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
   return [
@@ -251,5 +322,6 @@ export function buildMoreSmsProviders(): MessageProviderRecord[] {
     buildTelnyxProvider(),
     buildSinchProvider(),
     buildAfricasTalkingProvider(),
+    buildAmazonSnsProvider(),
   ];
 }

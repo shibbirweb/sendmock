@@ -25,7 +25,7 @@ They are a starting point, not a fixed list:
 | Amazon SES | `POST /v2/email/outbound-emails` | [Mail](./mail/index.md) |
 | Brevo | `POST /v3/smtp/email` | [Mail](./mail/index.md) |
 
-## SMS (9 built in)
+## SMS (10 built in)
 
 | Provider | What the built-in answers | Read more |
 | --- | --- | --- |
@@ -38,6 +38,7 @@ They are a starting point, not a fixed list:
 | Telnyx | `POST /v2/messages` and `message.sent` / `message.finalized` webhooks to `webhook_url` | [SMS](./sms/index.md) |
 | Sinch | `POST /xms/v1/{service_plan_id}/batches` and delivery reports to `callback_url` | [SMS](./sms/index.md) |
 | Africa's Talking | `POST /version1/messaging` (delivery reports through a webhook rule with the Africa's Talking template, since the real callback is set on the account) | [SMS](./sms/index.md) |
+| Amazon SNS | `Publish` to a `PhoneNumber` (the Query API: a form posted to `/`, an XML answer); SNS logs delivery status to CloudWatch, so there are no callbacks | [SMS](./sms/index.md) |
 
 ## Payments (4 built in)
 

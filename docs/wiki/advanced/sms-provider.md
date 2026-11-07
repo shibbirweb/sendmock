@@ -5,7 +5,7 @@ description: Answer an SMS API SendMock does not ship, such as a regional vendor
 
 > Try it in the [demo](/demo/sms/providers).
 
-SendMock ships Twilio, Twilio Verify, Vonage, Plivo, MessageBird, Infobip, Telnyx, Sinch and Africa's Talking. Regional vendors are added without code, because a provider is a definition: the requests it answers, where each part of the message is read from, what it answers and its error codes. The demo already has one added this way: **SSL Wireless**.
+SendMock ships Twilio, Twilio Verify, Vonage, Plivo, MessageBird, Infobip, Telnyx, Sinch, Africa's Talking and Amazon SNS. Regional vendors are added without code, because a provider is a definition: the requests it answers, where each part of the message is read from, what it answers and its error codes. The demo already has one added this way: **SSL Wireless**.
 
 This walkthrough adds **Clickatell**, whose send API is `POST /messages` with a JSON body. Swap in your vendor's names and fields as you go. A vendor path may not start with `/api/` or `/providers/`, which are SendMock's own.
 

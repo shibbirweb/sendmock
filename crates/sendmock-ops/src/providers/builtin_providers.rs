@@ -37,7 +37,8 @@ mod tests {
                 "infobip",
                 "telnyx",
                 "sinch",
-                "africastalking"
+                "africastalking",
+                "sns"
             ]
         );
     }

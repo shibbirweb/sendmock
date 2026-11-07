@@ -86,6 +86,17 @@ pub async fn answer_send(
     })
 }
 
+/// A provider whose requests carry no sender at all (Amazon SNS maps neither `from` nor a
+/// messaging service) sends from its own name; one that maps a sender still requires it.
+fn read_unmapped_sender(provider_call: &ProviderCall<'_>) -> Option<String> {
+    let maps_a_sender = provider_call
+        .provider
+        .field_mapping
+        .iter()
+        .any(|field_mapping| matches!(field_mapping.part.as_str(), "from" | "messaging_service"));
+    (!maps_a_sender).then(|| provider_call.provider.name.clone())
+}
+
 fn read_send_parts(provider_call: &ProviderCall<'_>) -> Result<SendParts, ProviderFailure> {
     let part_values = provider_call.read_part_values();
     if let Some(failure) = find_rule_failure(provider_call.provider, &part_values) {
@@ -99,7 +110,9 @@ fn read_send_parts(provider_call: &ProviderCall<'_>) -> Result<SendParts, Provid
     };
     let send_parts = SendParts {
         to: first_value("to").unwrap_or_default(),
-        from: first_value("from").unwrap_or_default(),
+        from: first_value("from")
+            .or_else(|| read_unmapped_sender(provider_call))
+            .unwrap_or_default(),
         body: first_value("body").unwrap_or_default(),
         media_urls: part_values.get("media_urls").cloned().unwrap_or_default(),
         status_callback_url: first_value("status_callback_url"),

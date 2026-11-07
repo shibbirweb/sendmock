@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-sns-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-sns": "3.1164.0"
+  }
+}
