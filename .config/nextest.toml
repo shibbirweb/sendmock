@@ -6,3 +6,10 @@ terminate-after = 5
 # CI turns the failures into annotations with scripts/nextest-failures.ts.
 [profile.default.junit]
 path = "junit.xml"
+
+# The retention load test times SMTP replies while pruning runs. Beside a thousand other tests
+# a busy Windows runner stalls for seconds on its own, which says nothing about SendMock, so
+# this test takes every test thread and runs alone.
+[[profile.default.overrides]]
+filter = "binary(retention_under_load)"
+threads-required = "num-test-threads"
