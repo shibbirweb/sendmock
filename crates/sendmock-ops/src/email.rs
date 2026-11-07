@@ -23,6 +23,7 @@ mod link_checker;
 mod list_unsubscribe_report;
 mod lookup_operations;
 mod lookups;
+pub mod mailpit;
 mod mime_part;
 mod native_send_request;
 mod out_of_office_reply;

@@ -1,0 +1,247 @@
+{
+  "source": "github.com/axllent/mailpit, server/ui/api/v1/swagger.json at v1.33.0; definitions only, types kept, descriptions and examples dropped",
+  "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "Address": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      }
+    },
+    "Attachment": {
+      "type": "object",
+      "properties": {
+        "Checksums": {
+          "type": "object",
+          "properties": {
+            "MD5": {
+              "type": "string"
+            },
+            "SHA1": {
+              "type": "string"
+            },
+            "SHA256": {
+              "type": "string"
+            }
+          }
+        },
+        "ContentID": {
+          "type": "string"
+        },
+        "ContentType": {
+          "type": "string"
+        },
+        "FileName": {
+          "type": "string"
+        },
+        "PartID": {
+          "type": "string"
+        },
+        "Size": {
+          "type": "integer"
+        }
+      }
+    },
+    "ListUnsubscribe": {
+      "type": "object",
+      "properties": {
+        "Errors": {
+          "type": "string"
+        },
+        "Header": {
+          "type": "string"
+        },
+        "HeaderPost": {
+          "type": "string"
+        },
+        "Links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "Attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attachment"
+          }
+        },
+        "Bcc": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Cc": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Date": {
+          "type": "string"
+        },
+        "From": {
+          "$ref": "#/definitions/Address"
+        },
+        "HTML": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Inline": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attachment"
+          }
+        },
+        "ListUnsubscribe": {
+          "$ref": "#/definitions/ListUnsubscribe"
+        },
+        "MessageID": {
+          "type": "string"
+        },
+        "ReplyTo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "ReturnPath": {
+          "type": "string"
+        },
+        "Size": {
+          "type": "integer"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Text": {
+          "type": "string"
+        },
+        "To": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Username": {
+          "type": "string"
+        }
+      }
+    },
+    "MessageSummary": {
+      "type": "object",
+      "properties": {
+        "Attachments": {
+          "type": "integer"
+        },
+        "Bcc": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Cc": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Created": {
+          "type": "string"
+        },
+        "From": {
+          "$ref": "#/definitions/Address"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "MessageID": {
+          "type": "string"
+        },
+        "Read": {
+          "type": "boolean"
+        },
+        "ReplyTo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Size": {
+          "type": "integer"
+        },
+        "Snippet": {
+          "type": "string"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "To": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          }
+        },
+        "Username": {
+          "type": "string"
+        }
+      }
+    },
+    "MessagesSummary": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessageSummary"
+          }
+        },
+        "messages_count": {
+          "type": "integer"
+        },
+        "messages_unread": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer"
+        },
+        "unread": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

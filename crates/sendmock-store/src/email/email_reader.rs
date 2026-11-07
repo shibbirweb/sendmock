@@ -108,7 +108,7 @@ pub fn list_timeline(
         .collect()
 }
 
-fn with_attachments(
+pub(super) fn with_attachments(
     connection: &Connection,
     mut email: EmailRecord,
 ) -> rusqlite::Result<EmailRecord> {

@@ -6,6 +6,7 @@ mod api_request_logging;
 mod app_router;
 mod catch_routes;
 mod http_server;
+mod mailpit_routes;
 mod openapi_document;
 mod provider_routes;
 mod realtime;

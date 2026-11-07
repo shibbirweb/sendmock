@@ -50,6 +50,7 @@ mod verify;
 mod webhooks;
 
 pub use demo::{DemoDataError, DemoLoadOutcome, load_demo_data};
+pub use email::mailpit;
 pub use email::{
     EmailAddress, EmailAttachment, EmailDetail, EmailNetworkClients, EmailRelay, EmailSummary,
     ExtractedData, LinkChecker, LinkProbe, RelayMessage, SpamChecker, SpamdReport, SpamdRule,
