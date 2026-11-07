@@ -74,7 +74,8 @@ Phase 5 (enforced in CI).
 
 Phase U0.
 
-- [ ] WS-01.1 `website.yml` builds on pull requests and deploys to GitHub Pages from `main` and `develop`.
+- [ ] WS-01.1 `website.yml` builds and tests the site on pull requests, and deploys to GitHub Pages from `develop` and from each published release (whose stable docs come from its tag).
+  - Changed 2026-11-07 (W12d1): the old wording said "from `main` and `develop`". Since the versioned docs (U3 W17, [16](../16-website-and-releases.md#versioned-builds)) every deploy builds each version from its tag and `/next/` from `develop`, so a push to `main` has nothing of its own to deploy; the stable docs reach the site through the release published from `main`.
 - [ ] WS-01.2 `/demo/` serves the mock-mode app and every screen works there.
 
 ## WS-02 Landing page

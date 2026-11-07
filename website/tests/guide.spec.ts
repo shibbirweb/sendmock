@@ -4,6 +4,11 @@ import { fileURLToPath } from "node:url";
 
 import { expect, test } from "@playwright/test";
 
+import {
+  readNavigationSource,
+  readSidebarPaths,
+} from "./support/read-sidebar-paths";
+
 const wikiDirectory = fileURLToPath(
   new URL("../../docs/wiki", import.meta.url),
 );
@@ -52,18 +57,6 @@ const templateHeadings = [
   "Customize",
   "From the CLI, API and AI",
 ];
-
-/** Sidebar paths, read from the single list the sidebar is built from. */
-function readSidebarPaths(): string[] {
-  const navigationSource = readFileSync(
-    join(webSourceDirectory, "navigation/navigation-items.ts"),
-    "utf8",
-  );
-
-  return [...navigationSource.matchAll(/path: "([^"]+)"/g)].map(
-    (pathMatch) => pathMatch[1] ?? "",
-  );
-}
 
 function readSettingsSectionLabels(): string[] {
   const sectionsSource = readFileSync(
@@ -148,12 +141,10 @@ test("WS-06.1 every sidebar item has a guide page with the template headings", (
 });
 
 test("WS-06.1 every sidebar item's docs link opens its guide page", () => {
-  const navigationSource = readFileSync(
-    join(webSourceDirectory, "navigation/navigation-items.ts"),
-    "utf8",
-  );
   const docsPathByMenuPath = [
-    ...navigationSource.matchAll(/path: "([^"]+)",\s*docsPath: "([^"]+)"/g),
+    ...readNavigationSource().matchAll(
+      /path: "([^"]+)",\s*docsPath: "([^"]+)"/g,
+    ),
   ].map((pathMatch) => [pathMatch[1] ?? "", pathMatch[2] ?? ""]);
 
   expect(docsPathByMenuPath.length).toBe(readSidebarPaths().length);
