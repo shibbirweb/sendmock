@@ -9,7 +9,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | # | Item | Issue | Feature |
 |---|------|-------|---------|
 | A1 | Mailpit API compatibility | #163 | EM-19 (new) |
-| A2 | `email.clicked` link-click tracking | #164 | to be written |
+| A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) |
 | A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | to be written |
 | A4 | Vonage Verify v2 and other verify APIs | #160 | to be written |
 | A5 | Multi-project inboxes | #167 | to be written |
@@ -53,3 +53,26 @@ Smallest change with the most users first; items that need an outside party (a d
 **Tests naming EM-19:** unit tests of the adapter's translations; API tests for every endpoint above, each answer checked against the fixture's definitions; an end-to-end test that sends mail over SMTP and reads it back through the Mailpit paths, as a Mailpit-based test suite does.
 
 **As built (2026-11-07):** `crates/sendmock-ops/src/email/mailpit/` (`mailpit_shapes.rs`, `mailpit_mailbox.rs`) and `crates/sendmock-api/src/mailpit_routes.rs`, merged into the app router, so UI auth covers it like the native API. New store queries in `crates/sendmock-store/src/email/email_mailbox_queries.rs` (a page by offset, counts, every tag, read status for a search), and `compute_file_checksums` in `sendmock-core` for the attachments' `Checksums`. Deletes and per-message changes go through the native operations, so `email.deleted` and the UI follow. Two things found while building: the mail parser renders an HTML version of a text-only message for SendMock's preview, which Mailpit does not have, so the adapter reads the MIME tree and answers `HTML: ""` and a 404 view for those; and Mailpit's dates are Go's RFC 3339 without trailing zero fractions, which SendMock's format already matches. Tests: `mailpit_api.rs` (every endpoint, each answer checked against `fixtures/mailpit/mailpit-definitions.json`), `crates/sendmock/tests/mailpit_compatibility.rs` (SMTP to `search` and `message/latest` on a real binary), unit tests in `mailpit_shapes.rs`, and `scripts/mailpit-docs.test.ts` (the guide lists every path the router serves).
+
+## A2. `email.clicked` link-click tracking (EM-20)
+
+**Why:** apps test click tracking the way they test opens: "the user clicked the verify link, so stop the reminder", engagement scores, A/B links. Every email provider SendMock emulates reports clicks, and `email.opened` already exists ([05](05-webhooks.md#opened-events), EM-11); clicks were left for after 1.0 ([11](11-roadmap.md)).
+
+**What the providers send** (checked against their docs on 2026-11-07): SendGrid `"event": "click"` with `url` (and `url_offset`); Mailgun `"event": "clicked"` with `url`; Postmark `"RecordType": "Click"` with `OriginalLink` and `ClickLocation` (`HTML` or `Text`); Resend `"type": "email.clicked"` with `data.click` `{ ipAddress, link, timestamp, userAgent }`; Amazon SES `"eventType": "Click"` with `click` `{ ipAddress, link, linkTags, timestamp, userAgent }`; Brevo `"event": "click"` with `link`; SparkPost `"type": "click"` with `target_link_url`. Each built-in template gains its click shape, and each provider's status names gain `clicked`, so a provider endpoint receives clicks exactly as the provider sends them.
+
+**When it fires,** as opens do, but a click is always deliberate, so there is no setting to turn the UI's clicks off:
+
+| Source | `source` | Behaviour |
+|--------|----------|-----------|
+| A link clicked in the email's HTML or text preview | `ui` | the link opens in a new tab as before, and the click is recorded |
+| Simulate click in the email's actions (pick one of its links) | `manual` | always fires |
+| `POST /api/v1/emails/{emailId}/clicks` with `url` (and optional `user_agent`) | `api` | always fires, for CI tests |
+
+The URL must be one of the email's links (the `links` SendMock already extracts, EM-13), as a provider only tracks links it rewrote; another URL answers 422 `unknown_link` with the email's links in the message.
+
+**Payload** (`email.clicked`): the email fields `email.opened` carries, plus `url`, `clicked_at`, `first_click` (the first click on that URL), `click_count` (all clicks on the email), `source` and `user_agent`. Each click is kept (`GET /api/v1/emails/{emailId}/clicks`, newest first), the email's detail gains `click_count`, and its timeline shows each click.
+
+**Where it lives:** migration `email_clicks` (email, URL, time, source, user agent); `EmailClickRepository` beside the opens; `RecordEmailClickOperation` and `ListEmailClicksOperation` in `crates/sendmock-ops/src/email/` (so REST, CLI `sendmock email click <emailId> --url` and the MCP tool `sendmock_email_click` come from the registry); the event in the event catalogue and webhook rule filters on `url`, `first_click`, `click_count` and `source`. The UI first, against the mock (API change in [06](06-api.md), then types, the regenerated spec and the MSW handlers), then the binary.
+
+**Split:** A2a the contract, mock and UI (the preview's click capture, Simulate click, the timeline entries, the Deeper entries); A2b the binary (store, operations, event, rule filters); A2c the provider templates and their fixture tests; A2d the docs (Opened and clicked events, the Mail guide, the skill).
+

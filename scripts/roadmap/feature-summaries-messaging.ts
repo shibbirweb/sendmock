@@ -112,6 +112,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Switch a test suite written against Mailpit's API to SendMock with no code change.",
   },
+  "EM-20": {
+    summary:
+      "An `email.clicked` event when a link in a caught email is clicked: from the preview, Simulate click or the API, sent in each provider's own click shape.",
+    outcome:
+      "Test click tracking and engagement logic the way you test opens, with no real recipient.",
+  },
   "SM-01": {
     summary:
       "A native SMS API to send messages and read them back, with status and metadata.",

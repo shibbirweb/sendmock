@@ -77,15 +77,26 @@ function listAcceptanceFiles(): string[] {
   );
 }
 
-/** Every `- [ ] XX-00.N` criterion still open in `docs/plan/acceptance/`. */
+/** Every `- [ ] XX-00.N` criterion of the 1.0 release still open in `docs/plan/acceptance/`. */
 export function listUntickedCriterionIds(): string[] {
   return listAcceptanceFiles().flatMap((fileName) =>
-    [
-      ...readFileSync(join(acceptanceDirectory, fileName), "utf8").matchAll(
-        /^- \[ \] ([A-Z]{2}-\d{2}\.\d+) /gm,
+    readFileSync(join(acceptanceDirectory, fileName), "utf8")
+      .split(/^(?=## [A-Z]{2}-\d{2} )/m)
+      .filter((featureSection) => !isPlannedAfterRelease(featureSection))
+      .flatMap((featureSection) =>
+        [...featureSection.matchAll(/^- \[ \] ([A-Z]{2}-\d{2}\.\d+) /gm)].map(
+          (criterionMatch) => criterionMatch[1] ?? "",
+        ),
       ),
-    ].map((criterionMatch) => criterionMatch[1] ?? ""),
   );
+}
+
+/** A feature planned after 1.0 (docs/plan/32-after-1-0.md) is not part of the 1.0 release. */
+function isPlannedAfterRelease(featureSection: string): boolean {
+  const introLine = featureSection
+    .split("\n")
+    .find((line, lineIndex) => lineIndex > 0 && line.trim() !== "");
+  return introLine?.startsWith("After 1.0") ?? false;
 }
 
 /** Features whose status in the acceptance README is not `Accepted`, with that status. */

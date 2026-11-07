@@ -29,6 +29,12 @@ describe("the 1.0 release runbook", () => {
     expect(criteriaWithoutProof).toEqual([]);
   });
 
+  test("leaves out the criteria of features planned after 1.0", () => {
+    expect(listUntickedCriterionIds().some((criterionId) => criterionId.startsWith("EM-20."))).toBe(
+      false,
+    );
+  });
+
   test("numbers its steps in order from 1", () => {
     const stepNumbers = readRunbookSteps().map((step) => step.stepNumber);
 

@@ -48,14 +48,6 @@ const backlogItems: BacklogItem[] = [
     source: `${blobBase}/docs/plan/09-distribution.md#later`,
   },
   {
-    key: "later-email-clicked",
-    title: "`email.clicked` link-click tracking event",
-    area: "Webhooks",
-    idea: "An `email.clicked` event, fired when a link in a caught email is opened through SendMock, with the link and the click count, delivered to webhook endpoints like the other events.",
-    today:
-      "`email.opened` fires when an email is opened (feature EM-11), and the links in an email are listed and checked (feature EM-13).",
-  },
-  {
     key: "later-provider-formats",
     title: "More provider formats (AWS SNS SMS, Infobip and others)",
     area: "SMS",
