@@ -4,24 +4,50 @@
 
 use serde_json::{Value, json};
 
+use super::magic_push_tokens::{PushTokenFailure, read_push_token_failure};
 use super::push_store::{NewPushNotification, store_push_notification};
 use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, answer_json};
 use crate::{OperationContext, OperationError};
 
 const FCM_ERROR_TYPE: &str = "type.googleapis.com/google.firebase.fcm.v1.FcmError";
 
-fn answer_fcm_error(status: u16, status_name: &str, message: &str) -> ProviderHttpResponse {
-    answer_json(
-        status,
-        json!({
-            "error": {
-                "code": status,
-                "message": message,
-                "status": status_name,
-                "details": [{ "@type": FCM_ERROR_TYPE, "errorCode": status_name }],
-            }
-        }),
-    )
+/// Google's error shape; `firebase-admin` maps the `FcmError` detail's `errorCode` to its own
+/// `messaging/...` code.
+fn build_fcm_error(status: u16, status_name: &str, error_code: &str, message: &str) -> Value {
+    json!({
+        "error": {
+            "code": status,
+            "message": message,
+            "status": status_name,
+            "details": [{ "@type": FCM_ERROR_TYPE, "errorCode": error_code }],
+        }
+    })
+}
+
+/// What FCM answers a magic token: its status, status name, `FcmError` code and message.
+fn describe_token_failure(
+    token_failure: PushTokenFailure,
+) -> (u16, &'static str, &'static str, &'static str) {
+    match token_failure {
+        PushTokenFailure::Unregistered => (
+            404,
+            "NOT_FOUND",
+            "UNREGISTERED",
+            "Requested entity was not found.",
+        ),
+        PushTokenFailure::Invalid => (
+            400,
+            "INVALID_ARGUMENT",
+            "INVALID_ARGUMENT",
+            "The registration token is not a valid FCM registration token",
+        ),
+        PushTokenFailure::Throttled => (
+            429,
+            "RESOURCE_EXHAUSTED",
+            "QUOTA_EXCEEDED",
+            "Quota exceeded for sending messages to this device.",
+        ),
+    }
 }
 
 /// The project id of a send path, or `None` for any other path.
@@ -99,6 +125,27 @@ fn read_fcm_notification(message: &Value) -> NewPushNotification {
     }
 }
 
+/// Stores the send as failed and answers FCM's error for the magic token.
+async fn refuse_magic_token(
+    operation_context: &OperationContext,
+    request_body: &Value,
+    device_token: String,
+    token_failure: PushTokenFailure,
+) -> Result<ProviderHttpResponse, OperationError> {
+    let (status, status_name, error_code, error_message) = describe_token_failure(token_failure);
+    let response = build_fcm_error(status, status_name, error_code, error_message);
+    let failed_notification = NewPushNotification {
+        device_token,
+        error_reason: Some(error_code.to_owned()),
+        request: request_body.clone(),
+        response_status: status,
+        response: response.clone(),
+        ..read_fcm_notification(&request_body["message"])
+    };
+    store_push_notification(operation_context, failed_notification).await?;
+    Ok(answer_json(status, response))
+}
+
 /// Answers an FCM send, or `None` when the request is not one.
 pub async fn answer_fcm_send(
     operation_context: &OperationContext,
@@ -110,15 +157,27 @@ pub async fn answer_fcm_send(
     let request_body: Value = serde_json::from_slice(&request.body).unwrap_or(Value::Null);
     let message = &request_body["message"];
     let Some(device_token) = read_target(message) else {
-        return Ok(Some(answer_fcm_error(
+        let refusal = build_fcm_error(
             400,
             "INVALID_ARGUMENT",
+            "INVALID_ARGUMENT",
             "Recipient of the message is not set.",
-        )));
+        );
+        return Ok(Some(answer_json(400, refusal)));
     };
     if request_body["validate_only"].as_bool() == Some(true) {
         let dry_run_name = format!("projects/{project_id}/messages/fake_message_id");
         return Ok(Some(answer_json(200, json!({ "name": dry_run_name }))));
+    }
+    if let Some(token_failure) = read_push_token_failure(&device_token) {
+        let refusal = refuse_magic_token(
+            operation_context,
+            &request_body,
+            device_token,
+            token_failure,
+        )
+        .await?;
+        return Ok(Some(refusal));
     }
     let message_name = format!(
         "projects/{project_id}/messages/0:{}%{:016x}",

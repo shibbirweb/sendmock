@@ -7308,7 +7308,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock push clear
       x-sendmock-mcp: sendmock_push_delete_all
-      x-sendmock-ui: Push > Delete all
+      x-sendmock-ui: Push > Clear all
   /api/v1/push/{pushId}:
     get:
       operationId: getPushByPushId
@@ -7595,6 +7595,8 @@ components:
         - verify.started
         - verify.checked
         - verify.expired
+        - push.sent
+        - push.failed
         - http.captured
         - payment.created
         - payment.authorized
@@ -13407,7 +13409,7 @@ components:
       properties:
         field:
           type: string
-          description: "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`."
+          description: "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`."
           examples:
             - subject
         operator:

@@ -21,6 +21,10 @@ describe("listQueryKeysToRefresh", () => {
     );
   });
 
+  test("PN-01.6 a push event refreshes the Push screen", () => {
+    expect(listQueryKeysToRefresh("push.failed")).toEqual([queryKeys.push.all]);
+  });
+
   test("an event outside every area refreshes nothing", () => {
     expect(listQueryKeysToRefresh("test.ping")).toEqual([]);
   });

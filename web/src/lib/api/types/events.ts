@@ -21,6 +21,8 @@ export const appEventTypes = [
   "verify.started",
   "verify.checked",
   "verify.expired",
+  "push.sent",
+  "push.failed",
   "http.captured",
   "payment.created",
   "payment.authorized",

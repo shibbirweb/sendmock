@@ -23,6 +23,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `sms.inbound` | a simulated incoming SMS was created (also sent to the number's reply webhook, see [04-sms.md](04-sms.md#reply-webhook-twilio-style)) |
 | `sms.reply_webhook` | an inbound message's reply webhook finished and its result is on the message; drives the live conversation and cannot be picked in rules, like `webhook.delivered` |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify emulation (see [04-sms.md](04-sms.md#twilio-verify)) |
+| `push.sent`, `push.failed` | a push notification sent through FCM, Expo or OneSignal, or refused by a magic token (added after 1.0, [32](32-after-1-0.md#a7-push-notifications-pn-01) A7) |
 | `http.captured` | the HTTP catcher captured a request from your app (see [15-http-catcher.md](15-http-catcher.md)) |
 | `payment.*`, `checkout.*`, `subscription.*` | payment gateway emulation: created, authorized, succeeded, failed, canceled, refunded, disputes, checkout completed/expired, subscriptions (see [17-payments.md](17-payments.md#events)) |
 | `webhook.failed` | a delivery exhausted retries (useful to chain alerts) |
@@ -119,7 +120,7 @@ A rule links events to an endpoint with an optional filter:
 }
 ```
 
-- Fields: email (`from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`), SMS (`from`, `to`, `body`, `status`, `api`), opened events (`open_count`, `first_open`, `source`), and on email, SMS and verification events `project` (added after 1.0, [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5).
+- Fields: email (`from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`), SMS (`from`, `to`, `body`, `status`, `api`), opened events (`open_count`, `first_open`, `source`), and on email, SMS and verification events `project` (added after 1.0, [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5); push events (`token`, `title`, `body`, `provider`, `status`, `project`, after 1.0, A7).
 - Operators: `equals`, `contains`, `starts_with`, `matches` (glob), `regex`, `exists`.
 - Combinators: `all`, `any`, `not`.
 - The UI provides a visual rule builder plus a "test against recent messages" preview that shows which existing messages would match.

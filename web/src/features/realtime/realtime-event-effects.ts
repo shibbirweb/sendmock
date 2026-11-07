@@ -12,6 +12,7 @@ const queryKeysByEventArea: Record<string, QueryKey[]> = {
   email: [queryKeys.emails.all, queryKeys.system.stats],
   sms: [queryKeys.sms.all, queryKeys.system.stats],
   verify: [queryKeys.verify.all, queryKeys.sms.all, queryKeys.system.stats],
+  push: [queryKeys.push.all],
   http: [queryKeys.httpCatcher.all, queryKeys.system.stats],
   webhook: [queryKeys.webhooks.all, queryKeys.system.stats],
   payment: [queryKeys.payments.all, queryKeys.system.stats],

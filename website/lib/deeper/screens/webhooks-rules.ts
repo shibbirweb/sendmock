@@ -29,6 +29,14 @@ const eventDescriptions: [string, string][] = [
     "a code is checked, or a verification is approved, canceled or runs out of attempts",
   ],
   ["verify.expired", "a verification expires"],
+  [
+    "push.sent",
+    "your app sends a push notification through FCM, Expo or OneSignal",
+  ],
+  [
+    "push.failed",
+    "a push notification is refused, as a magic device token asks",
+  ],
   ["http.captured", "the HTTP catcher captures a request"],
   ["payment.created", "a payment is created"],
   ["payment.authorized", "a payment is authorized"],

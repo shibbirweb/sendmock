@@ -4,7 +4,8 @@ use tokio::sync::broadcast::error::RecvError;
 
 use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
 use super::rule_messages::{
-    build_email_rule_message, build_sms_rule_message, with_engagement_event_fields,
+    build_email_rule_message, build_push_rule_message, build_sms_rule_message,
+    with_engagement_event_fields,
 };
 use super::rule_view::{read_rule_events, read_rule_filter};
 use crate::{AppEvent, OperationContext, OperationError};
@@ -46,6 +47,19 @@ async fn load_event_subject(
             stored_sms
                 .as_ref()
                 .map(build_sms_rule_message)
+                .unwrap_or_default(),
+        ));
+    }
+    if app_event.event_type.starts_with("push.") {
+        let stored_push = operation_context
+            .push_notifications
+            .find_notification(&subject_id)
+            .await?;
+        return Ok((
+            Some(subject_id),
+            stored_push
+                .as_ref()
+                .map(build_push_rule_message)
                 .unwrap_or_default(),
         ));
     }

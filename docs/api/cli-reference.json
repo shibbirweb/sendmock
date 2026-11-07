@@ -11152,7 +11152,7 @@
         "sendmock_push_delete_all"
       ],
       "ui": [
-        "Push > Delete all"
+        "Push > Clear all"
       ]
     },
     {
@@ -16031,6 +16031,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -17709,6 +17711,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -18000,6 +18004,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -18204,6 +18210,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -19669,6 +19677,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",

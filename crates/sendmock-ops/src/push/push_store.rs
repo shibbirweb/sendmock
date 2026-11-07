@@ -1,7 +1,8 @@
 use sendmock_store::PushNotificationRecord;
-use serde_json::Value;
+use serde_json::{Value, json};
 
-use crate::{OperationContext, OperationError};
+use crate::events::publish_event;
+use crate::{AppEventType, OperationContext, OperationError};
 
 /// What an adapter read from a provider request and answered.
 #[derive(Debug, Clone, Default)]
@@ -52,5 +53,28 @@ pub async fn store_push_notification(
         .push_notifications
         .insert_notification(push_record.clone())
         .await?;
+    publish_push_event(operation_context, &push_record);
     Ok(push_record)
+}
+
+/// `push.sent`, or `push.failed` when the provider refused it, naming the notification.
+fn publish_push_event(operation_context: &OperationContext, push_record: &PushNotificationRecord) {
+    let event_type = if push_record.status == "failed" {
+        AppEventType::PushFailed
+    } else {
+        AppEventType::PushSent
+    };
+    publish_event(
+        operation_context,
+        event_type,
+        json!({
+            "id": push_record.push_id,
+            "provider": push_record.provider,
+            "device_token": push_record.device_token,
+            "title": push_record.title,
+            "status": push_record.status,
+            "error_reason": push_record.error_reason,
+            "project": push_record.project_key,
+        }),
+    );
 }

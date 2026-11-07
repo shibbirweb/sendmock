@@ -76,6 +76,12 @@ The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provid
 
 `sendmock_http_bin_create` with a preset (Slack, Discord, Telegram, push), point the app at the bin's URL, and `sendmock_http_wait` for the call.
 
+### Test push notifications
+
+1. Point the app's push SDK at the provider port: `EXPO_BASE_URL` for `expo-server-sdk`, the base server for OneSignal, FCM HTTP v1's `/v1/projects/<project>/messages:send` path for Firebase.
+2. Trigger the app's flow, then `sendmock_push_wait` with the `device_token` for the notification; its `title`, `body`, `data`, `request` and `response` are what the app sent and was told.
+3. To test a dead or bad token, send to a token containing `unregistered`, `invalid` or `throttled`: the provider's own error comes back and the notification is stored as `failed`.
+
 ### Share one SendMock between apps
 
 `sendmock_project_list` shows the projects. When there is more than one, find the app's project (its SMTP username, the `X-SendMock-Project` header it sends, or the `/projects/<key>/` prefix in its provider base URL) and pass `project` to every read: `sendmock_email_wait`, `sendmock_otp_get`, `sendmock_links_get` and the lists, so another app's message is never read as this one's. `sendmock_project_create` adds a project; ask before `sendmock_project_delete`, which deletes its traffic.

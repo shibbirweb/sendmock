@@ -67,6 +67,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated |
 | `sms.inbound` | the contact replied |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify activity |
+| `push.sent`, `push.failed` | your app sent a push notification through FCM, Expo or OneSignal, or the provider refused it ([Push](../push.md)) |
 | `http.captured` | the HTTP Catcher recorded a request |
 | `payment.*`, `checkout.*` | payments were created, succeeded, failed, refunded, disputed; checkouts completed or expired |
 | `webhook.failed` | a delivery used up its retries (useful for alerts) |

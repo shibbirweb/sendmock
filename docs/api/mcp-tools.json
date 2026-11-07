@@ -5582,7 +5582,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -6031,7 +6031,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -7143,7 +7143,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -16488,7 +16488,7 @@
         "sendmock push clear"
       ],
       "ui": [
-        "Push > Delete all"
+        "Push > Clear all"
       ]
     },
     {
@@ -22421,7 +22421,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -22861,7 +22861,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -23926,6 +23926,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -24013,6 +24015,8 @@
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -26687,6 +26691,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -26832,6 +26838,8 @@
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -26859,7 +26867,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -27269,6 +27277,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -27376,6 +27386,8 @@
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -27403,7 +27415,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -27591,6 +27603,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -27740,6 +27754,8 @@
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -27767,7 +27783,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -29990,6 +30006,8 @@
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -30199,6 +30217,8 @@
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",

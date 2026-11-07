@@ -23,6 +23,7 @@ Your app sends push notifications through FCM, Expo or OneSignal with their own 
 | your app's Expo sends (`POST /--/api/v2/push/send`, one message or a batch) and receipt checks (`POST /--/api/v2/push/getReceipts`) | this screen, one row per recipient |
 | your app's OneSignal sends (`POST /notifications`) | this screen, one row per subscription or alias |
 | the `X-SendMock-Project` header or a `/projects/<key>/` prefix | the notification's [project](./settings.md#projects) |
+| | `push.sent` and `push.failed` events to [Webhooks > Rules](./webhooks/rules.md), which can filter on `token`, `title`, `body`, `provider` and `project` |
 | | the API request to [Logs > API requests](./logs.md) |
 
 ## Use it
@@ -46,6 +47,18 @@ Your app sends push notifications through FCM, Expo or OneSignal with their own 
    - FCM: send to `http://127.0.0.1:8026/v1/projects/<your-project>/messages:send`; `firebase-admin` has no base URL option, so route its requests to that address in development.
 2. Send a notification from your app (an order shipped, a chat message). A row appears with its title, device token, provider and status.
 3. Click the row. The drawer shows the lock screen card (switch between **iOS** and **Android**), the data payload, the request and the answer.
+
+## Test failures with magic tokens
+
+A device token (or Expo push token, OneSignal subscription or alias id) that contains one of these words fails the way the provider fails, so you can test how your app handles a dead or bad token. The notification is still listed, as **Failed**, with the reason and the error your app got.
+
+| Token contains | FCM | Expo | OneSignal |
+| --- | --- | --- | --- |
+| `unregistered` | `404 NOT_FOUND`, `UNREGISTERED` (`messaging/registration-token-not-registered` in `firebase-admin`) | the recipient's ticket: `DeviceNotRegistered` | the id under `errors.invalid_player_ids` (or `errors.invalid_aliases`) |
+| `invalid` | `400 INVALID_ARGUMENT` (`messaging/invalid-argument`) | the recipient's ticket: `DeviceNotRegistered`, not a valid Expo push token | as `unregistered` |
+| `throttled` | `429 RESOURCE_EXHAUSTED`, `QUOTA_EXCEEDED` (`messaging/message-rate-exceeded`) | the recipient's ticket: `MessageRateExceeded` | the whole request: `429`, "API rate limit exceeded" |
+
+When every OneSignal recipient is refused, the answer is `{ "id": "", "errors": ["All included players are not subscribed"] }`, as OneSignal answers it.
 
 ## Everything on this screen
 

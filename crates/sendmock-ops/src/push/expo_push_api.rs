@@ -5,6 +5,7 @@
 use sendmock_core::template::generate_uuid_v4;
 use serde_json::{Map, Value, json};
 
+use super::magic_push_tokens::{PushTokenFailure, read_push_token_failure};
 use super::push_store::{NewPushNotification, store_push_notification};
 use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, answer_json};
 use crate::{OperationContext, OperationError};
@@ -76,6 +77,57 @@ fn build_expo_notification(message: &Value, push_token: String) -> NewPushNotifi
     }
 }
 
+/// The error ticket Expo gives a magic token's recipient: its error code and the ticket.
+fn build_error_ticket(push_token: &str, token_failure: PushTokenFailure) -> (&'static str, Value) {
+    let (error_code, message) = match token_failure {
+        PushTokenFailure::Unregistered => (
+            "DeviceNotRegistered",
+            format!("\"{push_token}\" is not a registered push notification recipient"),
+        ),
+        PushTokenFailure::Invalid => (
+            "DeviceNotRegistered",
+            format!("\"{push_token}\" is not a valid Expo push token"),
+        ),
+        PushTokenFailure::Throttled => (
+            "MessageRateExceeded",
+            format!("\"{push_token}\" is receiving too many notifications"),
+        ),
+    };
+    let ticket = json!({
+        "status": "error",
+        "message": message,
+        "details": { "error": error_code, "expoPushToken": push_token },
+    });
+    (error_code, ticket)
+}
+
+/// One recipient's ticket and the notification stored for it.
+async fn issue_ticket(
+    operation_context: &OperationContext,
+    message: &Value,
+    push_token: String,
+) -> Result<Value, OperationError> {
+    let (provider_message_id, error_reason, ticket) = match read_push_token_failure(&push_token) {
+        Some(token_failure) => {
+            let (error_code, ticket) = build_error_ticket(&push_token, token_failure);
+            (String::new(), Some(error_code.to_owned()), ticket)
+        }
+        None => {
+            let ticket_id = generate_uuid_v4(operation_context.random_source.as_ref());
+            let ticket = json!({ "status": "ok", "id": ticket_id });
+            (ticket_id, None, ticket)
+        }
+    };
+    let expo_notification = NewPushNotification {
+        provider_message_id,
+        error_reason,
+        response: ticket.clone(),
+        ..build_expo_notification(message, push_token)
+    };
+    store_push_notification(operation_context, expo_notification).await?;
+    Ok(ticket)
+}
+
 /// Answers a send: every recipient gets a ticket, in order, and a stored notification.
 async fn answer_expo_send(
     operation_context: &OperationContext,
@@ -88,15 +140,7 @@ async fn answer_expo_send(
     let mut tickets = Vec::new();
     for (message, recipients) in messages {
         for push_token in recipients {
-            let ticket_id = generate_uuid_v4(operation_context.random_source.as_ref());
-            let ticket = json!({ "status": "ok", "id": ticket_id });
-            let expo_notification = NewPushNotification {
-                provider_message_id: ticket_id,
-                response: ticket.clone(),
-                ..build_expo_notification(&message, push_token)
-            };
-            store_push_notification(operation_context, expo_notification).await?;
-            tickets.push(ticket);
+            tickets.push(issue_ticket(operation_context, &message, push_token).await?);
         }
     }
     let is_single_ticket = request_body.is_object() && tickets.len() == 1;

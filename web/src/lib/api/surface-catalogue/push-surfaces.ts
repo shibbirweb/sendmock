@@ -12,7 +12,7 @@ export const pushSurfaces: SurfaceCatalogue = {
     phase: "A7",
     cli: "sendmock push clear",
     mcp: "sendmock_push_delete_all",
-    ui: "Push > Delete all",
+    ui: "Push > Clear all",
   },
   "GET /api/v1/push/{pushId}": {
     phase: "A7",

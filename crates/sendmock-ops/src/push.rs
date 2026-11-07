@@ -3,6 +3,7 @@
 
 mod expo_push_api;
 mod fcm_send_api;
+mod magic_push_tokens;
 mod onesignal_notifications_api;
 mod push_api;
 mod push_inputs;

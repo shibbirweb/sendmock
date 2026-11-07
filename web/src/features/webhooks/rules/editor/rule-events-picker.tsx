@@ -6,6 +6,7 @@ const eventAreaLabels: Record<string, string> = {
   email: "Email",
   sms: "SMS",
   verify: "Verify",
+  push: "Push",
   http: "HTTP",
   payment: "Payments",
   checkout: "Checkout",
