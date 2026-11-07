@@ -280,3 +280,33 @@ fn tags_are_added_and_removed_through_mcp() -> io::Result<()> {
     assert_eq!(cleared["structuredContent"]["tags"], json!([]));
     Ok(())
 }
+
+// AC: EM-20.6
+#[test]
+fn an_agent_clicks_an_emails_link_through_mcp() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let mut mcp_session = McpSession::start(
+        working_directory.path(),
+        &sendmock.wait_for_http_addr(),
+        &[],
+    )?;
+    let send_result = mcp_session.call_tool(
+        "sendmock_email_send",
+        json!({ "from": "app@shop.test", "to": ["sam@example.test"], "subject": "Verify", "text": "Verify at https://shop.test/verify" }),
+    )?;
+    let email_id = send_result["structuredContent"]["id"].clone();
+
+    mcp_session.call_tool(
+        "sendmock_email_click",
+        json!({ "email_id": email_id, "url": "https://shop.test/verify" }),
+    )?;
+    let clicks = mcp_session.call_tool("sendmock_email_clicks", json!({ "email_id": email_id }))?;
+
+    // A list comes back as the tool's text, since structured content must be an object.
+    let click_list: Value =
+        serde_json::from_str(clicks["content"][0]["text"].as_str().unwrap_or_default())
+            .unwrap_or_default();
+    assert_eq!(click_list[0]["url"], "https://shop.test/verify", "{clicks}");
+    Ok(())
+}

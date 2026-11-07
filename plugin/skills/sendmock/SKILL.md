@@ -32,7 +32,7 @@ Written for SendMock 0.0.0. SendMock catches what an app sends (email over SMTP 
 
 1. `sendmock_webhook_template_list` to find the provider's format (Twilio, SendGrid, Stripe, ...).
 2. `sendmock_webhook_endpoint_create` with the app's local URL and that template, then `sendmock_webhook_rule_create` for the events the app needs.
-3. Make the event happen (`sendmock_sms_simulate_inbound`, `sendmock_email_simulate`, a payment), then read `sendmock_webhook_delivery_list` and `sendmock_webhook_delivery_get` for what the app answered.
+3. Make the event happen (`sendmock_sms_simulate_inbound`, `sendmock_email_simulate`, `sendmock_email_open` or `sendmock_email_click` for open and click tracking, a payment), then read `sendmock_webhook_delivery_list` and `sendmock_webhook_delivery_get` for what the app answered.
 4. A failed delivery: read its request and response, fix the app, then `sendmock_webhook_delivery_replay`.
 
 ### Take a test payment

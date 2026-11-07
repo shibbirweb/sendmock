@@ -59,6 +59,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `email.received` | your app sent an email to SendMock |
 | `email.inbound` | an incoming email arrived (a simulated reply or forward, or mail to an inbound domain) |
 | `email.opened` | an email was opened in the UI, or an open was simulated |
+| `email.clicked` | a link of an email was clicked in the preview, or a click was simulated |
 | `email.delivered`, `email.deferred`, `email.bounced`, `email.complained`, `email.unsubscribed` | a delivery outcome was simulated ([Outcomes](../mail/outcomes.md)) |
 | `email.released` | an email was released to a real SMTP relay |
 | `sms.sent` | your app sent an SMS or WhatsApp message |

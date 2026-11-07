@@ -29,7 +29,7 @@ Above the tabs, one-time codes and links found in the email are listed, each wit
 | **Attachments** | each file with its size and type, image thumbnails, download | check the right file went out |
 | **MIME** | the tree of parts: type, encoding, size, download per part | debug inline images (`cid:`) and multipart problems |
 | **Checks** | client support for the HTML and CSS used, link and image check results, the spam score (when SpamAssassin is set in [Settings > Email](../settings.md#email)), and unsubscribe header checks | fix what Outlook or Gmail will not show, broken links, spammy content |
-| **Timeline** | received (with a link to the SMTP session or API request), opened, delivered, bounced, complained, released, replied, forwarded, and each webhook sent | follow everything that happened to this email |
+| **Timeline** | received (with a link to the SMTP session or API request), opened, clicked, delivered, bounced, complained, released, replied, forwarded, and each webhook sent | follow everything that happened to this email |
 | **Template data** | for provider API sends that used a template id: the id and the dynamic data | check the data your app passed to SendGrid or Postmark templates |
 
 ## Opened events
@@ -42,6 +42,16 @@ Opening an email in the UI counts as the recipient opening it: SendMock fires `e
 - **Mark unread** keeps the open count and the first open time.
 
 Each open is kept with its time, its source (`ui`, `manual` or `api`) and the user agent that sent it, if any.
+
+## Clicked events
+
+A click on one of an email's links counts as the recipient clicking it, as a provider's click tracking reports it: SendMock fires `email.clicked` with the link, `first_click` (the first click on that link), `click_count` (all clicks on the email), the source and the user agent. The email's Timeline shows each click.
+
+- **A link clicked in the HTML preview** opens in a new tab as before, and fires `email.clicked` with `source: "ui"`. A click is always on purpose, so there is no setting to turn this off.
+- **Simulate > Click a link** lists the email's links; choosing one fires `email.clicked` with `source: "manual"`.
+- **The API, CLI and MCP** fire it for a link you name, which must be one of the email's links; any other URL is refused with `unknown_link`, since a provider only tracks the links it rewrote.
+
+An email provider's webhook template (SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo, SparkPost) sends the click in that provider's own shape, so your app's click handler receives what the real provider would send.
 
 ## From the CLI, API and AI
 
@@ -58,6 +68,8 @@ Each open is kept with its time, its source (`ui`, `manual` or `api`) and the us
 | timeline | [`sendmock email timeline <emailId>`](/cli/email/#email-timeline) | [`GET /api/v1/emails/{emailId}/timeline`](/api/email/#getEmailsByEmailIdTimeline) | [`sendmock_email_timeline`](/mcp/email/#sendmock_email_timeline) |
 | simulate an open | [`sendmock email open <emailId>`](/cli/email/#email-open) | [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen) | [`sendmock_email_open`](/mcp/email/#sendmock_email_open) |
 | open history | [`sendmock email opens <emailId>`](/cli/email/#email-opens) | [`GET /api/v1/emails/{emailId}/opens`](/api/email/#getEmailsByEmailIdOpens) | [`sendmock_email_opens`](/mcp/email/#sendmock_email_opens) |
+| click a link | [`sendmock email click <emailId>`](/cli/email/#email-click) | [`POST /api/v1/emails/{emailId}/clicks`](/api/email/#postEmailsByEmailIdClicks) | [`sendmock_email_click`](/mcp/email/#sendmock_email_click) |
+| click history | [`sendmock email clicks <emailId>`](/cli/email/#email-clicks) | [`GET /api/v1/emails/{emailId}/clicks`](/api/email/#getEmailsByEmailIdClicks) | [`sendmock_email_clicks`](/mcp/email/#sendmock_email_clicks) |
 
 ## Related
 

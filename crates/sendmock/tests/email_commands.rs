@@ -271,3 +271,39 @@ fn tags_are_added_and_removed_from_the_cli() {
     );
     assert_eq!(stdout_json(&untagged)["tags"], serde_json::json!(["qa"]));
 }
+
+// AC: EM-20.6
+#[test]
+fn a_click_is_recorded_and_listed_from_the_cli() {
+    let working_directory = tempfile::tempdir()
+        .unwrap_or_else(|folder_error| panic!("temporary folder: {folder_error}"));
+    let (_sendmock, http_addr) = start_server(working_directory.path());
+    let email_id = send_code_email(working_directory.path(), &http_addr);
+
+    let click = run_command(
+        working_directory.path(),
+        &http_addr,
+        &[
+            "email",
+            "click",
+            &email_id,
+            "--url",
+            "https://shop.test/confirm",
+        ],
+    );
+    let clicks = run_command(
+        working_directory.path(),
+        &http_addr,
+        &["email", "clicks", &email_id, "--json"],
+    );
+
+    assert_eq!(
+        click.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&click.stderr)
+    );
+    let click_list = stdout_json(&clicks);
+    assert_eq!(click_list[0]["url"], "https://shop.test/confirm");
+    assert_eq!(click_list[0]["source"], "api");
+}

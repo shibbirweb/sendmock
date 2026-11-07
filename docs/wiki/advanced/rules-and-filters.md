@@ -19,7 +19,8 @@ A rule's filter decides which events reach its endpoint. The builder covers simp
 | --- | --- |
 | `email.*` | From, To, Cc, Subject, Body, Header (asks for the header name), Has attachment, Tag |
 | `sms.*` | From, To, Body, Status, API |
-| `email.opened`, `sms.opened` | Open count, First open, Source |
+| `email.opened`, `sms.opened` | Open count, First open, Open or click source |
+| `email.clicked` | Clicked link, Click count, First click on the link, Open or click source |
 
 With email and SMS events both ticked, both sets show; a condition on a field the event does not have never matches.
 
