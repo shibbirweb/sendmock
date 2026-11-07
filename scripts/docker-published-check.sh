@@ -5,6 +5,10 @@
 # compressed in the registry.
 #
 #     scripts/docker-published-check.sh <image> <manifest digest> "<tags>" <tag suffix>
+#
+# Pull requests rehearse it on a local registry (docker-edge.yml, publish-rehearsal), where
+# EXPECTED_PLATFORMS names the one platform pushed and COSIGN_PUBLIC_KEY the key the job signed
+# with, since a pull request's signature cannot come from the publishing workflow.
 set -euo pipefail
 
 image="$1"
@@ -12,6 +16,9 @@ manifest_digest="$2"
 image_tags="$3"
 tag_suffix="${4:-}"
 maximum_compressed_bytes=26214400
+expected_platforms="${EXPECTED_PLATFORMS:-linux/amd64 linux/arm64}"
+# shellcheck disable=SC2086 # the platforms are space-separated on purpose
+expected_platform_count="$(printf '%s\n' $expected_platforms | wc -l | tr -d ' ')"
 
 fail() {
   echo "Failed: $1" >&2
@@ -29,18 +36,24 @@ done
 # shellcheck disable=SC2086 # the tags are space-separated on purpose
 pass "every tag points at $manifest_digest: $(printf "%s$tag_suffix " $image_tags)"
 
-cosign verify "$image@$manifest_digest" \
-  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github\.com/shibbirweb/sendmock/\.github/workflows/docker-edge\.yml@' \
-  > /dev/null || fail "the image is signed by the docker-edge workflow"
-pass "cosign verify: signed by the docker-edge workflow through GitHub OIDC"
+if [ -n "${COSIGN_PUBLIC_KEY:-}" ]; then
+  cosign verify "$image@$manifest_digest" --key "$COSIGN_PUBLIC_KEY" --insecure-ignore-tlog=true \
+    > /dev/null || fail "the image is signed with $COSIGN_PUBLIC_KEY"
+  pass "cosign verify: signed with $COSIGN_PUBLIC_KEY"
+else
+  cosign verify "$image@$manifest_digest" \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+    --certificate-identity-regexp '^https://github\.com/shibbirweb/sendmock/\.github/workflows/docker-edge\.yml@' \
+    > /dev/null || fail "the image is signed by the docker-edge workflow"
+  pass "cosign verify: signed by the docker-edge workflow through GitHub OIDC"
+fi
 
 image_index="$(docker buildx imagetools inspect "$image@$manifest_digest" --raw)"
 platform_digests="$(echo "$image_index" | jq -r '.manifests[] | select(.platform.os == "linux") | .digest')"
 attestation_count="$(echo "$image_index" | jq '[.manifests[] | select(.annotations["vnd.docker.reference.type"] == "attestation-manifest")] | length')"
-[ "$(echo "$platform_digests" | wc -l | tr -d ' ')" = "2" ] || fail "the index holds linux/amd64 and linux/arm64"
-[ "$attestation_count" = "2" ] || fail "each platform has an attestation manifest (found $attestation_count)"
-for platform in linux/amd64 linux/arm64; do
+[ "$(echo "$platform_digests" | wc -l | tr -d ' ')" = "$expected_platform_count" ] || fail "the index holds $expected_platforms"
+[ "$attestation_count" = "$expected_platform_count" ] || fail "each platform has an attestation manifest (found $attestation_count)"
+for platform in $expected_platforms; do
   sbom_format="$(docker buildx imagetools inspect "$image@$manifest_digest" --format "{{ json (index .SBOM \"$platform\") }}" | jq -r '.SPDX.spdxVersion // empty')"
   [ -n "$sbom_format" ] || fail "$platform carries an SPDX SBOM"
   provenance_type="$(docker buildx imagetools inspect "$image@$manifest_digest" --format "{{ json (index .Provenance \"$platform\") }}" | jq -r '.SLSA.buildType // .SLSA.buildDefinition.buildType // empty')"

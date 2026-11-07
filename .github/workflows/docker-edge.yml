@@ -3,7 +3,7 @@
 # and linux/arm64, each built and tested on its own runner, then joined under the tags, signed
 # and checked (docs/plan/09-distribution.md). Every tag has a `-debug` twin built on
 # distroless's debug base. Pull requests that change the image build and test it without
-# pushing.
+# pushing, and rehearse the published-image check on a registry on the runner.
 name: Docker edge
 
 on:
@@ -118,6 +118,65 @@ jobs:
           name: digest-${{ matrix.variant }}-${{ matrix.architecture }}
           path: ${{ runner.temp }}/digests/*
           retention-days: 1
+
+  # The published-image check rehearsed before anything is published (DS-02.5): the commit's
+  # image pushed with an SBOM and provenance to a registry on the runner, signed with a key made
+  # here, then checked by the same script the manifest job runs after a real push.
+  publish-rehearsal:
+    name: Signed, with an SBOM and provenance, under 25 MB (rehearsal on a local registry)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    env:
+      REHEARSAL_IMAGE: localhost:5000/sendmock
+    steps:
+      - uses: actions/checkout@v5
+
+      # The builder shares the runner's network, so it reaches the registry on localhost.
+      - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Push by digest, with an SBOM and provenance
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          outputs: type=image,name=${{ env.REHEARSAL_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          build-args: SENDMOCK_RELEASE_CHANNEL=edge
+          sbom: true
+          provenance: mode=max
+          cache-from: type=gha,scope=amd64
+
+      - name: The tag, as the manifest job makes it
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+        run: docker buildx imagetools create -t "$REHEARSAL_IMAGE:rehearsal" "$REHEARSAL_IMAGE@$IMAGE_DIGEST"
+
+      - uses: sigstore/cosign-installer@v3
+
+      - name: Sign it with a key made in this job
+        id: sign
+        env:
+          COSIGN_PASSWORD: ""
+        run: |
+          cosign generate-key-pair
+          manifest_digest="$(docker buildx imagetools inspect "$REHEARSAL_IMAGE:rehearsal" --format '{{json .Manifest}}' | jq -r .digest)"
+          echo "manifest_digest=$manifest_digest" >> "$GITHUB_OUTPUT"
+          cosign sign --yes --key cosign.key --tlog-upload=false "$REHEARSAL_IMAGE@$manifest_digest"
+
+      # AC: DS-02.5
+      - name: The tag is signed, carries an SBOM and provenance, and is under 25 MB
+        env:
+          MANIFEST_DIGEST: ${{ steps.sign.outputs.manifest_digest }}
+          EXPECTED_PLATFORMS: linux/amd64
+          COSIGN_PUBLIC_KEY: cosign.pub
+        run: bash scripts/docker-published-check.sh "$REHEARSAL_IMAGE" "$MANIFEST_DIGEST" rehearsal ""
 
   manifest:
     name: Tag, sign and check it (${{ matrix.variant }})
