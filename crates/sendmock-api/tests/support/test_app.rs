@@ -32,6 +32,7 @@ pub fn build_test_app_with(
             smtp_address: "127.0.0.1:1025".to_owned(),
             provider_address: None,
             catcher_address: None,
+            pop3_address: None,
             is_container: false,
         },
     );

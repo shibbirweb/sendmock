@@ -26,6 +26,7 @@ export function buildMockAppInfo(): AppInfo {
     http_address: `${listenHost}:8025`,
     provider_address: null,
     catcher_address: null,
+    pop3_address: null,
     database_path: "(in-browser demo data)",
     database_size_bytes: 0,
     is_container: isRunningInContainer,

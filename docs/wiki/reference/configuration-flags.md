@@ -15,6 +15,8 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--smtps-addr <HOST:PORT>` | `SENDMOCK_SMTPS_ADDR` | `smtps_addr` |  | Address for the SMTPS listener (TLS from the first byte); off unless set. |
 | `--provider-addr <HOST:PORT>` | `SENDMOCK_PROVIDER_ADDR` | `provider_addr` |  | Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; off unless set. |
 | `--catcher-addr <HOST:PORT>` | `SENDMOCK_CATCHER_ADDR` | `catcher_addr` |  | Address that captures every request at any path in the HTTP catcher, the first path segment naming the bin; off unless set. |
+| `--pop3-addr <HOST:PORT>` | `SENDMOCK_POP3_ADDR` | `pop3_addr` |  | Address for the POP3 listener, which serves the captured mail per project; off unless set. |
+| `--pop3-auth <MODE>` | `SENDMOCK_POP3_AUTH` | `pop3_auth` | `accept-any` | POP3 login: `accept-any` or `file:<path>` with `user:password` lines; the username picks the project. |
 | `--provider-port <PROVIDER=PORT>` | `SENDMOCK_PROVIDER_PORTS` | `provider_ports` |  | Give one provider its own port, as `provider=port` (repeat or separate with commas), for providers that share a path. |
 | `--smtp-max-size <SIZE>` | `SENDMOCK_SMTP_MAX_SIZE` | `smtp_max_size` | `25MB` | Largest message SMTP accepts; larger ones get 552. |
 | `--smtp-auth <MODE>` | `SENDMOCK_SMTP_AUTH` | `smtp_auth` | `accept-any` | SMTP AUTH: `accept-any`, `none` (not offered) or `file:<path>` with `user:password` lines. |

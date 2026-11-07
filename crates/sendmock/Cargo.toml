@@ -20,6 +20,7 @@ sendmock-mail.workspace = true
 sendmock-webhooks.workspace = true
 sendmock-store.workspace = true
 sendmock-ops.workspace = true
+sendmock-pop3.workspace = true
 sendmock-smtp.workspace = true
 sendmock-api.workspace = true
 sendmock-cli.workspace = true

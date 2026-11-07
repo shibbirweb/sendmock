@@ -19,6 +19,7 @@ mod instance_details_builder;
 mod listener_binding;
 mod logging;
 mod mcp_command;
+mod pop3_startup;
 mod provider_listeners;
 #[cfg(test)]
 mod reference_pages;

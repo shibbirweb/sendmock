@@ -33,6 +33,14 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_CATCHER_ADDR", value_name = "HOST:PORT")]
     pub catcher_addr: Option<SocketAddr>,
 
+    /// Address for the POP3 listener, which serves the captured mail per project; off unless set
+    #[arg(long, env = "SENDMOCK_POP3_ADDR", value_name = "HOST:PORT")]
+    pub pop3_addr: Option<SocketAddr>,
+
+    /// POP3 login: `accept-any` or `file:<path>` with `user:password` lines; the username picks the project [default: accept-any]
+    #[arg(long, env = "SENDMOCK_POP3_AUTH", value_name = "MODE")]
+    pub pop3_auth: Option<String>,
+
     /// Give one provider its own port, as `provider=port` (repeat or separate with commas), for providers that share a path
     #[arg(
         long = "provider-port",

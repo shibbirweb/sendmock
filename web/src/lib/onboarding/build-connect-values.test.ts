@@ -14,6 +14,7 @@ const localAppInfo: AppInfo = {
   http_address: "127.0.0.1:9025",
   provider_address: null,
   catcher_address: null,
+  pop3_address: null,
   database_path: "sendmock.db",
   database_size_bytes: 0,
   is_container: false,

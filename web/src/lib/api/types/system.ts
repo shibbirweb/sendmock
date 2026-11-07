@@ -169,6 +169,8 @@ export type AppInfo = {
   provider_address: string | null;
   /** The catch-all catcher port (`--catcher-addr`); null when it is off. */
   catcher_address: string | null;
+  /** The POP3 listener (`--pop3-addr`), which serves the captured mail per project; null when it is off (EM-21). */
+  pop3_address: string | null;
   database_path: string;
   database_size_bytes: number;
   /** True when SendMock runs in Docker, so the UI defaults to container hostnames. */

@@ -7,6 +7,7 @@ use sendmock_store::DatabaseLocation;
 use super::access_config::resolve_access_control;
 use super::config_file::ConfigFile;
 use super::config_file_locator::locate_config_file;
+use super::pop3_config::Pop3Config;
 use super::provider_port_config::ProviderPortConfig;
 use super::seed_file_locator::{CONTAINER_CONFIG_DIRECTORY, locate_seed_file};
 use super::smtp_config::SmtpConfig;
@@ -29,6 +30,8 @@ pub struct ServerConfig {
     pub provider_ports: ProviderPortConfig,
     /// `--catcher-addr`: the HTTP catcher's catch-all port, off unless set.
     pub catcher_addr: Option<SocketAddr>,
+    /// `--pop3-addr` and `--pop3-auth`: the POP3 listener, off unless set.
+    pub pop3: Option<Pop3Config>,
     pub startup_settings: StartupSettingsConfig,
     pub access_control: AccessControlSettings,
     pub database_location: DatabaseLocation,
@@ -100,6 +103,7 @@ impl ServerConfig {
             smtp,
             provider_ports,
             catcher_addr: serve_arguments.catcher_addr.or(config_file.catcher_addr),
+            pop3: Pop3Config::resolve(serve_arguments, &config_file)?,
             startup_settings,
             access_control,
             database_location: database_setting

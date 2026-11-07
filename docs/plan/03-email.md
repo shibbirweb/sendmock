@@ -39,6 +39,8 @@ Custom async implementation on tokio. A full MTA library is unnecessary: we only
 | `--smtp-tls-cert`, `--smtp-tls-key` | `SENDMOCK_SMTP_TLS_CERT`, `SENDMOCK_SMTP_TLS_KEY` | generated | custom certificate; turns STARTTLS on |
 | `--smtp-require-tls` | `SENDMOCK_SMTP_REQUIRE_TLS` | off | refuse `MAIL` before `STARTTLS`; turns STARTTLS on |
 | `--smtp-allow-rcpt` | | `*` | glob list; others get 550 (useful to test bounce handling) |
+| `--pop3-addr` | `SENDMOCK_POP3_ADDR` | off | listen address for POP3 read access (added after 1.0, [32](32-after-1-0.md#a6-pop3-read-access-em-21) A6) |
+| `--pop3-auth` | `SENDMOCK_POP3_AUTH` | `accept-any` | `accept-any` or `file:<path>`, the same `user:password` lines as `--smtp-auth`; the username picks the project |
 
 ### SMTP session log
 

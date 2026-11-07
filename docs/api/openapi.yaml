@@ -7435,6 +7435,11 @@ components:
             - string
             - "null"
           description: The catch-all catcher port (`--catcher-addr`); null when it is off.
+        pop3_address:
+          type:
+            - string
+            - "null"
+          description: The POP3 listener (`--pop3-addr`), which serves the captured mail per project; null when it is off.
         database_path:
           type: string
         database_size_bytes:
@@ -7455,6 +7460,7 @@ components:
         - http_address
         - provider_address
         - catcher_address
+        - pop3_address
         - database_path
         - database_size_bytes
         - is_container

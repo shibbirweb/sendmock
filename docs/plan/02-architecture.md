@@ -47,6 +47,7 @@ Optional extra listeners (off by default):
 | Provider port | `--provider-addr 127.0.0.1:8026` | SMS and email provider emulation at the **real provider paths** (Twilio, Verify, SendGrid, Resend, ...), for SDKs that only let you change the host. See [04-sms.md](04-sms.md) and [03-email.md](03-email.md#http-send-apis). |
 | SMTPS | `--smtps-addr 127.0.0.1:1465` | implicit TLS SMTP |
 | HTTP catcher port | `--catcher-addr 127.0.0.1:8030` | capture any request at any path ([15-http-catcher.md](15-http-catcher.md)) |
+| POP3 | `--pop3-addr 127.0.0.1:1110` | read the captured mail over POP3, one project per login ([32](32-after-1-0.md#a6-pop3-read-access-em-21)) |
 
 Inside the Docker image all listeners bind `0.0.0.0` ([09-distribution.md](09-distribution.md#docker)).
 

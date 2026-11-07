@@ -30,6 +30,7 @@ async fn start_server() -> std::io::Result<SocketAddr> {
             smtp_address: "127.0.0.1:1025".to_owned(),
             provider_address: None,
             catcher_address: None,
+            pop3_address: None,
             is_container: false,
         },
     );

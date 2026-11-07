@@ -34,6 +34,8 @@ pub struct InstanceDetails {
     pub provider_address: Option<String>,
     /// The HTTP catcher's catch-all listener (`--catcher-addr`), when on.
     pub catcher_address: Option<String>,
+    /// The POP3 listener (`--pop3-addr`), when on.
+    pub pop3_address: Option<String>,
     pub is_container: bool,
 }
 

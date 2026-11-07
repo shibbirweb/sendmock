@@ -22,6 +22,7 @@ use crate::http_media_fetcher::HttpMediaFetcher;
 use crate::http_webhook_sender::HttpWebhookSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
+use crate::pop3_startup::{bind_pop3_listener, serve_pop3_listener};
 use crate::provider_listeners::{
     ProviderListener, bind_provider_listeners, start_provider_listeners,
 };
@@ -42,6 +43,7 @@ struct BoundListeners {
     http_listener: TcpListener,
     smtp_listener: TcpListener,
     smtps_listener: Option<TcpListener>,
+    pop3_listener: Option<TcpListener>,
     provider_listeners: Vec<ProviderListener>,
     catcher_listener: Option<TcpListener>,
     addresses: ListenerAddresses,
@@ -57,6 +59,8 @@ struct ListenerAddresses {
     provider_addr: Option<SocketAddr>,
     /// The HTTP catcher's catch-all listener, when configured.
     catcher_addr: Option<SocketAddr>,
+    /// The POP3 listener, when configured.
+    pop3_addr: Option<SocketAddr>,
 }
 
 pub async fn run_server(
@@ -69,11 +73,11 @@ pub async fn run_server(
     let (shutdown_sender, shutdown_receiver) = watch::channel(false);
     let shutdown_receiver_for_tasks = shutdown_receiver.clone();
     let shutdown_receiver_for_providers = shutdown_receiver.clone();
-    let mut background_tasks = start_smtp_listeners(
+    let mut background_tasks = start_mail_listeners(
         server_config,
         &operation_context,
-        listeners.smtp_listener,
-        listeners.smtps_listener,
+        (listeners.smtp_listener, listeners.smtps_listener),
+        listeners.pop3_listener,
         shutdown_receiver,
     )?;
     start_extra_http_listeners(
@@ -138,16 +142,25 @@ fn start_extra_http_listeners(
     }
 }
 
-/// The SMTP listener, and the SMTPS one when configured, each stopping on the shutdown signal.
-fn start_smtp_listeners(
+/// The SMTP listener, and the SMTPS and POP3 ones when configured, each stopping on the
+/// shutdown signal.
+fn start_mail_listeners(
     server_config: &ServerConfig,
     operation_context: &OperationContext,
-    smtp_listener: TcpListener,
-    smtps_listener: Option<TcpListener>,
+    (smtp_listener, smtps_listener): (TcpListener, Option<TcpListener>),
+    pop3_listener: Option<TcpListener>,
     shutdown_receiver: watch::Receiver<bool>,
 ) -> Result<JoinSet<()>, StartupError> {
     let smtp_server = build_smtp_server(server_config, operation_context.clone())?;
     let mut smtp_listeners = JoinSet::new();
+    if let (Some(pop3_listener), Some(pop3_config)) = (pop3_listener, &server_config.pop3) {
+        smtp_listeners.spawn(serve_pop3_listener(
+            pop3_listener,
+            pop3_config,
+            operation_context,
+            shutdown_receiver.clone(),
+        ));
+    }
     smtp_listeners.spawn(serve_smtp(
         smtp_listener,
         Arc::clone(&smtp_server),
@@ -252,6 +265,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
             listeners.addresses.smtp_addr,
             listeners.addresses.provider_addr,
             listeners.addresses.catcher_addr,
+            listeners.addresses.pop3_addr,
             started_at_unix_ms,
         ),
     )
@@ -307,6 +321,7 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         Some(catcher_addr) => Some(bind_listener(catcher_addr, "--catcher-addr").await?),
         None => None,
     };
+    let pop3_listener = bind_pop3_listener(server_config).await?;
     let local_address = |listener: &TcpListener, configured_address: SocketAddr| {
         listener
             .local_addr()
@@ -328,11 +343,15 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         catcher_addr: catcher_listener
             .as_ref()
             .and_then(|listener| listener.local_addr().ok()),
+        pop3_addr: pop3_listener
+            .as_ref()
+            .and_then(|listener| listener.local_addr().ok()),
     };
     Ok(BoundListeners {
         http_listener,
         smtp_listener,
         smtps_listener,
+        pop3_listener,
         provider_listeners,
         catcher_listener,
         addresses,
@@ -350,6 +369,7 @@ fn announce_ready(
         smtps_addr,
         provider_addr,
         catcher_addr,
+        pop3_addr,
     } = addresses;
     if !http_addr.ip().is_loopback() && server_config.access_control.ui_auth.is_none() {
         tracing::warn!(
@@ -364,6 +384,7 @@ fn announce_ready(
             "smtps_addr": smtps_addr.map(|smtps_addr| smtps_addr.to_string()),
             "provider_addr": provider_addr.map(|provider_addr| provider_addr.to_string()),
             "catcher_addr": catcher_addr.map(|catcher_addr| catcher_addr.to_string()),
+            "pop3_addr": pop3_addr.map(|pop3_addr| pop3_addr.to_string()),
             "version": env!("CARGO_PKG_VERSION"),
         });
         println!("{ready_line}");
@@ -374,6 +395,7 @@ fn announce_ready(
         smtps_addr = ?smtps_addr,
         provider_addr = ?provider_addr,
         catcher_addr = ?catcher_addr,
+        pop3_addr = ?pop3_addr,
         database = %operation_context.database.location(),
         config_file = ?server_config.config_file_path,
         "SendMock is ready"

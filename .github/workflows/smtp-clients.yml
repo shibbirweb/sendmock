@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - crates/sendmock-smtp/**
+      - crates/sendmock-pop3/**
       - crates/sendmock-mail/**
       - crates/sendmock/src/sendmail_shim.rs
       - crates/sendmock/src/sendmail_shim/**
@@ -18,6 +19,7 @@ on:
       - main
     paths:
       - crates/sendmock-smtp/**
+      - crates/sendmock-pop3/**
       - crates/sendmock-mail/**
       - examples/smtp/**
       - .github/workflows/smtp-clients.yml
@@ -90,6 +92,11 @@ jobs:
             language: python
             folder: python-django
             run: pip install --quiet -r requirements.txt && python send.py
+          - client: Python poplib reads the mailbox
+            language: python
+            folder: python-poplib
+            run: python verify.py
+            checks_itself: true
           - client: pytest reads the OTP
             language: python
             folder: python-pytest
@@ -120,6 +127,8 @@ jobs:
       SMTP_HOST: 127.0.0.1
       SMTP_PORT: "1025"
       SENDMOCK_SMTP_ADDR: 127.0.0.1:1025
+      # POP3 is off by default; the poplib client reads the mail through it (EM-21.6).
+      SENDMOCK_POP3_ADDR: 127.0.0.1:1110
     steps:
       - uses: actions/checkout@v5
 

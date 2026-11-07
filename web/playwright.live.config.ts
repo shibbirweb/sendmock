@@ -28,7 +28,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `${sendmockBinary} --http-addr 127.0.0.1:${livePort} --smtp-addr 127.0.0.1:0 --catcher-addr 127.0.0.1:0 --db memory`,
+    command: `${sendmockBinary} --http-addr 127.0.0.1:${livePort} --smtp-addr 127.0.0.1:0 --catcher-addr 127.0.0.1:0 --pop3-addr 127.0.0.1:0 --db memory`,
     url: `http://127.0.0.1:${livePort}/api/v1/health`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
