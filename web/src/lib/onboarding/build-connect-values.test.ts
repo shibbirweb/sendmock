@@ -62,6 +62,20 @@ describe("buildConnectValues", () => {
     );
   });
 
+  test("PN-01.6 push gives each provider's base URL, under /providers without the provider port", () => {
+    const pathTarget = readConnectTarget(localAppInfo, "this-machine");
+
+    expect(
+      buildConnectValues("push", pathTarget).map(
+        (connectValue) => connectValue.connectValue,
+      ),
+    ).toEqual([
+      "http://127.0.0.1:9025/providers/fcm",
+      "http://127.0.0.1:9025/providers/expo",
+      "http://127.0.0.1:9025/providers/onesignal",
+    ]);
+  });
+
   test("falls back to the default ports before /info has loaded", () => {
     const connectTarget = readConnectTarget(undefined, "this-machine");
 

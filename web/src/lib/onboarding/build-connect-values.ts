@@ -6,7 +6,8 @@ import {
 } from "@/lib/settings/build-connection-snippets";
 
 /** Which part of SendMock a how to connect card is about. */
-export type ConnectArea = "smtp" | "sms" | "verify" | "api" | "overview";
+export type ConnectArea =
+  "smtp" | "sms" | "verify" | "push" | "api" | "overview";
 
 export type ConnectValue = {
   label: string;
@@ -80,6 +81,21 @@ export function buildConnectValues(
         {
           label: "Start a verification",
           connectValue: "POST /v2/Services/{ServiceSid}/Verifications",
+        },
+      ];
+    case "push":
+      return [
+        {
+          label: "FCM base URL",
+          connectValue: buildProviderBaseUrl(connectTarget, "fcm"),
+        },
+        {
+          label: "EXPO_BASE_URL",
+          connectValue: buildProviderBaseUrl(connectTarget, "expo"),
+        },
+        {
+          label: "OneSignal base URL",
+          connectValue: buildProviderBaseUrl(connectTarget, "onesignal"),
         },
       ];
     case "api":

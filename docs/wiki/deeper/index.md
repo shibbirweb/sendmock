@@ -13,6 +13,7 @@ The list of controls is read from the demo by a crawl, so a page always matches 
 - [SMS messages in depth](./sms/messages.md): Every control and text of SMS > Messages, a conversation and a message's details.
 - [Verify in depth](./sms/verify.md): Every control and text of SMS > Verify, a verification's details and the services.
 - [SMS providers in depth](./sms/providers.md): Every control and text of SMS > Providers, the provider editor and its tabs.
+- [Push in depth](./push.md): Every control and text of Push and a notification's drawer.
 - [Webhooks overview in depth](./webhooks/overview.md): Every control and text of Webhooks > Overview.
 - [Endpoints in depth](./webhooks/endpoints.md): Every control and text of Webhooks > Endpoints and the endpoint editor's tabs.
 - [Rules in depth](./webhooks/rules.md): Every control and text of Webhooks > Rules and the rule editor.

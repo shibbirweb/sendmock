@@ -69,6 +69,7 @@ import {
   buildSavedDeliveryFixtures,
   buildWebhookTemplateFixtures,
 } from "@/mocks/fixtures/template-and-variable-fixtures";
+import { buildPushFixtures } from "@/mocks/fixtures/push-fixtures";
 import { buildWebhookVariableFixtures } from "@/mocks/fixtures/webhook-variable-fixtures";
 import {
   buildVerificationFixtures,
@@ -307,7 +308,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,
     ),
-    pushNotifications: [],
+    pushNotifications: buildPushFixtures(),
     webhookDeliveries: sortNewestFirst(webhookDeliveries),
     payments: sortNewestFirst(payments),
     httpBins: httpCatcherTraffic.httpBins,

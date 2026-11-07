@@ -9,6 +9,7 @@ import type {
   MessageProviderPreviewRequest,
   PaymentGatewayPreviewRequest,
   PaymentListFilters,
+  PushListFilters,
   RulePreviewRequest,
   TemplateRenderRequest,
   VariablePreviewRequest,
@@ -52,6 +53,12 @@ export const queryKeys = {
     detail: (verificationSid: string) =>
       ["verify", "detail", verificationSid] as const,
     services: ["verify", "services"] as const,
+  },
+  push: {
+    all: ["push"] as const,
+    list: (pushFilters: PushListFilters) =>
+      ["push", "list", pushFilters] as const,
+    detail: (pushId: string) => ["push", "detail", pushId] as const,
   },
   numbers: {
     all: ["numbers"] as const,

@@ -1,4 +1,4 @@
-import type { IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 
 export type PushProvider = "fcm" | "expo" | "onesignal";
 export type PushStatus = "sent" | "failed";
@@ -39,4 +39,13 @@ export type PushNotification = {
   /** @example "default" */
   project: string;
   created_at: IsoTimestamp;
+};
+
+/** Query of GET /api/v1/push; the filters match exactly. */
+export type PushListFilters = PageRequest & {
+  device_token?: string;
+  provider?: PushProvider;
+  status?: PushStatus;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };

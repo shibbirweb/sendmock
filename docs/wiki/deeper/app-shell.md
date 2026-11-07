@@ -46,7 +46,15 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [SMS](../sms/index.md).
 
-### 5. HTTP Catcher
+### 5. Push
+
+Link.
+
+- **What it does:** Opens Push, every push notification sent through FCM, Expo or OneSignal. The keyboard shortcut is `g` then `u`.
+- **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
+- **Links to:** [Push](../push.md).
+
+### 6. HTTP Catcher
 
 Link.
 
@@ -54,7 +62,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [HTTP Catcher](../http/index.md).
 
-### 6. Webhooks
+### 7. Webhooks
 
 Link.
 
@@ -62,7 +70,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Webhooks](../webhooks/index.md).
 
-### 7. Payments
+### 8. Payments
 
 Link.
 
@@ -70,7 +78,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Payments](../payments/index.md).
 
-### 8. Numbers
+### 9. Numbers
 
 Link.
 
@@ -78,7 +86,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Numbers](../numbers.md).
 
-### 9. Scenarios
+### 10. Scenarios
 
 Link.
 
@@ -86,7 +94,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Scenarios](../scenarios.md).
 
-### 10. Logs
+### 11. Logs
 
 Link.
 
@@ -94,7 +102,7 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Logs](../logs.md).
 
-### 11. Settings
+### 12. Settings
 
 Link.
 
@@ -102,39 +110,39 @@ Link.
 - **Where its text comes from:** The sidebar is built from one list in the app, the same one the command palette and the shortcuts use, so the three never disagree.
 - **Links to:** [Settings](../settings.md).
 
-### 12. Documentation
+### 13. Documentation
 
 Link.
 
 - **What it does:** Opens the docs of the version you run, in a new tab.
 - **Where its text comes from:** The docs address is built into the app.
 
-### 13. Report an issue
+### 14. Report an issue
 
 Link.
 
 - **What it does:** Opens GitHub's bug report form in a new tab, filled in with your SendMock version, release channel, operating system and browser. Nothing else is sent, and nothing at all until you submit the form.
 - **Where its text comes from:** The version and channel come from `GET /api/v1/info`; the system and browser from the browser itself.
 
-### 14. Request a feature
+### 15. Request a feature
 
 Link.
 
 - **What it does:** Opens GitHub's feature request form in a new tab, filled in the same way as Report an issue.
 
-### 15. Report a security issue
+### 16. Report a security issue
 
 Link.
 
 - **What it does:** Opens GitHub's private security advisory form, so a vulnerability is not reported in public.
 
-### 16. Star on GitHub
+### 17. Star on GitHub
 
 Link.
 
 - **What it does:** Opens the SendMock repository on GitHub in a new tab.
 
-### 17. Live · demo data, version #.#.#-dev
+### 18. Live · demo data, version #.#.#-dev
 
 Status.
 
@@ -142,46 +150,46 @@ Status.
 - **Where its text comes from:** The connection state of the realtime stream, and the version the app was built with.
 - **Errors:** Offline, retrying means the realtime stream dropped: the app keeps trying, and screens still load when you open them. If it stays offline, check SendMock is still running.
 
-### 18. Toggle Sidebar
+### 19. Toggle Sidebar
 
 Button.
 
 - **What it does:** Collapses the sidebar to icons, or opens it again. On a phone it opens the sidebar as a panel. The keyboard shortcut is `⌘` or `Ctrl` with `B`.
 - **What it changes:** Remembered in the browser for your next visit.
 
-### 19. Search or jump to... ⌘K
+### 20. Search or jump to... ⌘K
 
 Button.
 
 - **What it does:** Opens the command palette: type a screen's name to go to it, or run one of its actions, Switch theme (`T`) and Show keyboard shortcuts (`?`). `⌘` or `Ctrl` with `K` opens it from anywhere.
 
-### 20. Demo controls
+### 21. Demo controls
 
 Button.
 
 - **What it does:** Only on the website demo: opens the demo controls, which add sample traffic, slow down or fail the demo API, switch between the standard, large and empty data sets, and turn the live traffic every 12 seconds on or off.
 - **What it changes:** Only the demo in your browser tab; reloading the page starts a fresh demo.
 
-### 21. Keyboard shortcuts
+### 22. Keyboard shortcuts
 
 Button.
 
 - **What it does:** Opens the list of keyboard shortcuts. `?` opens it too.
 
-### 22. Help
+### 23. Help
 
 Button.
 
 - **What it does:** Opens the Help menu: Documentation, Keyboard shortcuts, What's new, Report an issue, Request a feature, Report a security issue and Star on GitHub, the same links as the sidebar's.
 
-### 23. Change theme
+### 24. Change theme
 
 Button.
 
 - **What it does:** Opens a menu to pick System, Light or Dark. System follows your computer's setting. `T` switches to the next theme from anywhere.
 - **What it changes:** Remembered in the browser for your next visit.
 
-### 24. Notifications
+### 25. Notifications
 
 Button.
 

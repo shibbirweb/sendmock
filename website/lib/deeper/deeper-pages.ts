@@ -3,6 +3,7 @@ import { appShellPage } from "./screens/app-shell";
 import { httpCatcherPage } from "./screens/http-catcher";
 import { logsPage, scenariosPage } from "./screens/logs-scenarios";
 import { numbersPage } from "./screens/numbers";
+import { pushPage } from "./screens/push";
 import {
   apiReferencePage,
   overviewPage,
@@ -38,6 +39,7 @@ export const deeperPages: DeeperPage[] = [
   smsMessagesPage,
   smsVerifyPage,
   smsProvidersPage,
+  pushPage,
   webhooksOverviewPage,
   webhooksEndpointsPage,
   webhooksRulesPage,

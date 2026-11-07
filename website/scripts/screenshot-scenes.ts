@@ -91,6 +91,7 @@ const landingScenes: Scene[] = [
 const docsScenes: Scene[] = [
   listScene("overview", "/", "Overview · SendMock"),
   listScene("verify", "/sms/verify", "Verify · SendMock"),
+  listScene("push", "/push", "Push · SendMock"),
   {
     name: "http",
     isLandingShot: false,

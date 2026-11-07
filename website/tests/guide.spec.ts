@@ -28,6 +28,7 @@ const guidePageByMenuPath: Record<string, string> = {
   "/sms": "sms/index.md",
   "/sms/verify": "sms/verify.md",
   "/sms/providers": "sms/providers.md",
+  "/push": "push.md",
   "/http": "http/index.md",
   "/webhooks/overview": "webhooks/index.md",
   "/webhooks/endpoints": "webhooks/endpoints.md",

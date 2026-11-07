@@ -1,5 +1,6 @@
 import {
   ActivityIcon,
+  BellRingIcon,
   BookmarkIcon,
   ChartColumnIcon,
   CreditCardIcon,
@@ -129,6 +130,16 @@ export const navigationItems: NavigationItem[] = [
         icon: ServerCogIcon,
       },
     ],
+  },
+  {
+    title: "Push",
+    path: "/push",
+    docsPath: "push/",
+    listOperationKey: "GET /api/v1/push",
+    upcomingDescription:
+      "Push notifications your app sends through FCM, Expo and OneSignal.",
+    icon: BellRingIcon,
+    shortcutKey: "u",
   },
   {
     title: "HTTP Catcher",

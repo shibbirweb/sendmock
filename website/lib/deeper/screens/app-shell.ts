@@ -46,6 +46,12 @@ export const appShellPage: DeeperPage = {
       ", the conversations of every SMS; under it are Verify (`g` then `v`) and Providers",
     ),
     menuLink(
+      "Push",
+      "u",
+      "push.md",
+      ", every push notification sent through FCM, Expo or OneSignal",
+    ),
+    menuLink(
       "HTTP Catcher",
       "h",
       "http/index.md",

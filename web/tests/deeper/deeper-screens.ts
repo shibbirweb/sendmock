@@ -9,6 +9,7 @@ import {
   paymentMethodOverlays,
   subscriptionOverlays,
 } from "./overlays/payment-overlays";
+import { pushOverlays } from "./overlays/push-overlays";
 import { smsOverlays, verifyOverlays } from "./overlays/sms-overlays";
 import {
   httpCatcherOverlays,
@@ -57,6 +58,7 @@ const trafficScreenPaths = new Set([
   "/mail",
   "/sms",
   "/sms/verify",
+  "/push",
   "/http",
   "/webhooks/overview",
   "/webhooks/deliveries",
@@ -72,6 +74,7 @@ const overlaysByPath: Record<string, DeeperOverlay[]> = {
   "/sms": smsOverlays,
   "/sms/verify": verifyOverlays,
   "/sms/providers": buildProvidersOverlays("Twilio"),
+  "/push": pushOverlays,
   "/webhooks/overview": webhookOverviewOverlays,
   "/webhooks/endpoints": webhookEndpointOverlays,
   "/webhooks/rules": webhookRuleOverlays,
