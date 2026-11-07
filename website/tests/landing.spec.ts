@@ -1,5 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import {
+  allEmulatedProviderNames,
+  testedLanguageNames,
+} from "../lib/landing-data";
 import { countSpecOperations } from "./support/count-spec-operations";
 
 /** Scrolls the whole page so every in-view animation gets its chance to run. */
@@ -356,8 +360,8 @@ test("WS-02.1 the number ticker counts the providers, languages and API operatio
   await scrollThroughPage(page);
 
   await expect(page.getByTestId("number-ticker")).toHaveText([
-    "15",
-    "8",
+    String(allEmulatedProviderNames.length),
+    String(testedLanguageNames.length),
     String(countSpecOperations()),
   ]);
 });
@@ -431,8 +435,8 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   );
   // The tickers show their final values without counting.
   await expect(page.getByTestId("number-ticker")).toHaveText([
-    "15",
-    "8",
+    String(allEmulatedProviderNames.length),
+    String(testedLanguageNames.length),
     String(countSpecOperations()),
   ]);
   // The feature cards' SMS list shows every message at once.
