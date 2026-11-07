@@ -184,12 +184,12 @@ UI in U3 (W16), runtime in Phase 4. Plan: [22-configurable-providers.md](../22-c
 
 After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a1-mailpit-api-compatibility-em-19).
 
-- [ ] EM-19.1 `GET /api/v1/messages` and `GET /api/v1/search` answer Mailpit's `MessagesSummary` (`total`, `unread`, `messages_count`, `messages_unread`, `start`, `tags`, `messages`), newest first, with `start` and `limit`; search reads Mailpit's `from:`, `to:`, `subject:`, `tag:`, `is:read`, `is:unread` and `has:attachment` filters and plain words.
-- [ ] EM-19.2 `GET /api/v1/message/{ID}` (and `latest`) answers Mailpit's `Message` and marks the message read; `/headers`, `/raw`, `/part/{PartID}`, `/view/{ID}.html` and `/view/{ID}.txt` answer as Mailpit does, and a missing message or part answers 404 with a plain text body.
-- [ ] EM-19.3 `PUT /api/v1/messages` sets read or unread by IDs, by search or for every message; `DELETE /api/v1/messages` deletes by IDs or every message; `DELETE /api/v1/search` deletes the matches; each answers `ok`.
-- [ ] EM-19.4 `GET /api/v1/tags` lists every tag and `PUT /api/v1/tags` replaces the tags of the given messages.
-- [ ] EM-19.5 Every answer above matches the definitions in Mailpit's own API definition (`swagger.json` at `v1.33.0`, kept as a test fixture), and mail sent over SMTP reads back through the Mailpit paths as a Mailpit-based test suite reads it.
-- [ ] EM-19.6 The guide's "Coming from Mailpit" page lists what works unchanged, the endpoints whose shape differs (`/api/v1/info`, `/api/v1/send`) and what is not emulated.
+- [x] EM-19.1 `GET /api/v1/messages` and `GET /api/v1/search` answer Mailpit's `MessagesSummary` (`total`, `unread`, `messages_count`, `messages_unread`, `start`, `tags`, `messages`), newest first, with `start` and `limit`; search reads Mailpit's `from:`, `to:`, `subject:`, `tag:`, `is:read`, `is:unread` and `has:attachment` filters and plain words. (#48)
+- [x] EM-19.2 `GET /api/v1/message/{ID}` (and `latest`) answers Mailpit's `Message` and marks the message read; `/headers`, `/raw`, `/part/{PartID}`, `/view/{ID}.html` and `/view/{ID}.txt` answer as Mailpit does, and a missing message or part answers 404 with a plain text body. (#48)
+- [x] EM-19.3 `PUT /api/v1/messages` sets read or unread by IDs, by search or for every message; `DELETE /api/v1/messages` deletes by IDs or every message; `DELETE /api/v1/search` deletes the matches; each answers `ok`. (#48)
+- [x] EM-19.4 `GET /api/v1/tags` lists every tag and `PUT /api/v1/tags` replaces the tags of the given messages. (#48)
+- [x] EM-19.5 Every answer above matches the definitions in Mailpit's own API definition (`swagger.json` at `v1.33.0`, kept as a test fixture), and mail sent over SMTP reads back through the Mailpit paths as a Mailpit-based test suite reads it. (#48)
+- [x] EM-19.6 The guide's "Coming from Mailpit" page lists what works unchanged, the endpoints whose shape differs (`/api/v1/info`, `/api/v1/send`) and what is not emulated. (#48)
 
 ## EM-20 Email clicked events
 
