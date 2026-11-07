@@ -10,7 +10,7 @@ Smallest change with the most users first; items that need an outside party (a d
 |---|------|-------|---------|
 | A1 | Mailpit API compatibility | #163 | EM-19 (new) |
 | A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) |
-| A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | to be written |
+| A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) |
 | A4 | Vonage Verify v2 and other verify APIs | #160 | to be written |
 | A5 | Multi-project inboxes | #167 | to be written |
 | A6 | POP3 read access | #159 | to be written |
@@ -82,3 +82,20 @@ The URL must be one of the email's links (the `links` SendMock already extracts,
 **As built, A2c (2026-11-07):** the click shapes live in the template definitions (`web/src/mocks/fixtures/template-definitions.ts`, exported to `crates/sendmock-ops/builtin/` with the providers' `clicked` status names and `email.clicked` in each email template's events), plus `clicked` in both event name tables (`template_event_name_filters.rs` and the demo's `render-template-text.ts`). SES now sends a click as event publishing does (`eventType` with a `click` object) and SparkPost sends opens and clicks as `track_event`s. `crates/sendmock-api/tests/email_click_provider_formats.rs` delivers one click to all seven templates and reads each body at the paths `fixtures/provider_webhooks/click_events.json` records from the providers' docs. Building it found a bug in the demo's template renderer: an `if` nested in another `if`'s branch took the inner tag into its condition and left an `endif` behind; the condition now stops at the first `%}` (regression test in `render-template-conditions.test.ts`).
 
 **As built, A2d (2026-11-07):** "Clicked events" in the Mail guide's reading page with the CLI, API and MCP rows, `email.clicked` in the webhooks event list and its fields in Rules and filters, `sendmock_email_click` named in the skill's webhook workflow (and the plugin's copy), and binary tests of `sendmock email click` and the MCP tool (`email_commands.rs`, `mcp_stdio.rs`). A list from an MCP tool comes back as the tool's text, since structured content must be an object.
+
+## A3. More SMS providers (SM-17)
+
+**Why:** apps that send SMS through Infobip, Telnyx, Sinch, Africa's Talking or Amazon SNS cannot point their SDK at SendMock yet. SendMock already has the webhook formats for the first four (`infobip.dlr`, `telnyx.message`, `sinch.sms`, `africastalking.sms`, checked against their docs on 2026-11-05) but not their send APIs; SNS has neither. Five SMS providers ship today (Twilio, Twilio Verify, Vonage, Plivo, MessageBird).
+
+**How:** each provider is a new definition beside the built-in ones (SM-16, [22](22-configurable-providers.md)), so nothing in the existing providers changes: its send operation (method, path, request format), the field mapping to SendMock's message parts, the success answer and the error answers in the provider's own shape, the message ID it makes, its status names, and the callback template its delivery reports use. The definitions live in `web/src/mocks/fixtures/more-sms-provider-fixtures.ts` (the existing file is long) and are exported to `crates/sendmock-ops/builtin/` like the others. Every request and answer is read from the provider's API reference first, as a fixture with its link and the date checked; each provider also passes its official Node SDK against the provider port in the SMS clients workflow, as the Twilio SDKs do.
+
+| Part | Provider | Send API | Delivery reports | Node SDK |
+|------|----------|----------|------------------|----------|
+| A3a | Infobip | `POST /sms/2/text/advanced` | `infobip.dlr` to `notifyUrl` | `@infobip-api/sdk` |
+| A3b | Telnyx | `POST /v2/messages` | `telnyx.message` to `webhook_url` | `telnyx` |
+| A3c | Sinch | `POST /xms/v1/{service_plan_id}/batches` | `sinch.sms` to `callback_url` | `@sinch/sdk-core` |
+| A3d | Africa's Talking | `POST /version1/messaging` | `africastalking.sms` to the callback set on the account (the provider's settings) | `africastalking` |
+| A3e | Amazon SNS | `Publish` with `PhoneNumber` (the query API: form body, XML answer) | none: SNS logs delivery status to CloudWatch, which SendMock does not emulate | `@aws-sdk/client-sns` |
+
+The exact paths, fields and shapes above are checked against the API references when each part starts and corrected here if they differ. A part that finds the provider's API cannot be described by a definition (for example SNS's request signing or XML answers) says so in its As built note and adds the smallest engine change it needs, with its own test.
+

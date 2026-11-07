@@ -204,6 +204,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Add a provider SendMock does not ship without waiting for a release.",
   },
+  "SM-17": {
+    summary:
+      "Infobip, Telnyx, Sinch, Africa's Talking and Amazon SNS as built-in SMS providers: their send APIs, answers, errors and delivery reports in their own shapes.",
+    outcome:
+      "Point an app that sends SMS through one of these providers at SendMock with no code change.",
+  },
   "VF-01": {
     summary:
       "Verify services, as in Twilio Verify, with code length, TTL, channels and fixed codes per service or globally.",

@@ -189,3 +189,15 @@ UI in U1, backend Phase 2.
 - [x] VF-04.2 `verify.started`, `verify.checked` and `verify.expired` fire and can trigger webhook rules.
 - [x] VF-04.3 The Verify tab lists verifications with code, status, attempts and expiry countdown. (#48)
 - [x] VF-04.4 The verification drawer shows the timeline and links to the captured SMS or email that carried the code. (#48)
+
+## SM-17 More SMS providers
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a3-more-sms-providers-sm-17).
+
+- [ ] SM-17.1 Infobip's send API captures the SMS and answers in Infobip's shape, with its errors; delivery reports reach the `notifyUrl` in Infobip's format; the Infobip Node SDK sends through it.
+- [ ] SM-17.2 Telnyx's send API captures the SMS and answers in Telnyx's shape, with its errors; status webhooks reach the `webhook_url` in Telnyx's format; the Telnyx Node SDK sends through it.
+- [ ] SM-17.3 Sinch's batches API captures the SMS and answers in Sinch's shape, with its errors; delivery reports reach the `callback_url` in Sinch's format; the Sinch Node SDK sends through it.
+- [ ] SM-17.4 Africa's Talking's messaging API captures the SMS and answers in its shape, with its errors; the Africa's Talking Node SDK sends through it.
+- [ ] SM-17.5 Amazon SNS's `Publish` with a `PhoneNumber` captures the SMS and answers SNS's `PublishResponse`, with SNS's errors; the AWS SDK's SNS client sends through it.
+- [ ] SM-17.6 SMS > Providers lists the five as built-in providers, and the docs list their send APIs.
+

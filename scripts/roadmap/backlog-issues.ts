@@ -48,14 +48,6 @@ const backlogItems: BacklogItem[] = [
     source: `${blobBase}/docs/plan/09-distribution.md#later`,
   },
   {
-    key: "later-provider-formats",
-    title: "More provider formats (AWS SNS SMS, Infobip and others)",
-    area: "SMS",
-    idea: "More provider APIs and webhook formats, such as AWS SNS for SMS and Infobip's SMS API, each as a provider registered beside the built-in ones.",
-    today:
-      "Built in: SendGrid, Mailgun, Postmark, Resend, Amazon SES (with SNS notifications) and Brevo for email; Twilio, Twilio Verify, Vonage, Plivo and MessageBird for SMS, plus custom providers defined in the UI or the seed file (features EM-18 and SM-16). An Infobip webhook template exists.",
-  },
-  {
     key: "later-push-emulation",
     title: "Push notification emulation",
     area: "HTTP catcher",
