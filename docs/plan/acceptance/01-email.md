@@ -202,3 +202,13 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] EM-20.5 The SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo and SparkPost templates send a click in that provider's own shape and event name, checked against fixtures built from each provider's documented click payload. (#48)
 - [x] EM-20.6 `sendmock email click` and the MCP tool `sendmock_email_click` record a click, and the docs and the agent skill describe clicked events. (#48)
 
+## EM-21 POP3 read access
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a6-pop3-read-access-em-21).
+
+- [ ] EM-21.1 With `--pop3-addr` (off by default), SendMock answers POP3 on that address: a greeting, CAPA, USER and PASS, STAT, LIST, UIDL, RETR, TOP, NOOP, DELE, RSET and QUIT, with `-ERR` for an unknown command, a command out of turn and a line that is too long.
+- [ ] EM-21.2 `--pop3-auth` accepts any login by default, or only the `user:password` lines of a `file:<path>`; a wrong password answers `-ERR`, and five failed logins close the connection.
+- [ ] EM-21.3 The username picks the mailbox: a project's key reads that project's emails, any other username reads `default`; the mailbox holds the newest 100 emails, numbered oldest first, and is fixed at login.
+- [ ] EM-21.4 RETR answers the raw message as SendMock received it, dot-stuffed; TOP answers its headers and the first n body lines; UIDL answers each email's id, the same in every session.
+- [ ] EM-21.5 DELE marks a message and RSET clears the marks; QUIT deletes the marked emails as the API does, firing `email.deleted`, and a connection that drops without QUIT deletes nothing.
+- [ ] EM-21.6 `/api/v1/info` and Settings > Connection show the POP3 address when it is on, and Python's `poplib` logs in, lists and retrieves an email SendMock captured over SMTP.

@@ -118,6 +118,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Test click tracking and engagement logic the way you test opens, with no real recipient.",
   },
+  "EM-21": {
+    summary:
+      "A POP3 listener (off by default) that serves the mail SendMock caught, per project, with the commands mail clients and `poplib` use.",
+    outcome:
+      "Test a feature or a script that reads a mailbox over POP3 against SendMock, without changing it.",
+  },
   "SM-01": {
     summary:
       "A native SMS API to send messages and read them back, with status and metadata.",

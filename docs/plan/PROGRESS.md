@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 108 / 114 accepted (all but AI-05, DS-02, DS-03, PL-10, UI-07 and WS-03), 527 / 538 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 108 / 115 accepted (all but AI-05, DS-02, DS-03, EM-21, PL-10, UI-07 and WS-03), 527 / 544 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -364,7 +364,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165, SM-17 accepted, #48)
 - [x] A4: Vonage Verify v2 and other verify APIs (#160, VF-05 accepted, #48)
 - [ ] A5: Multi-project inboxes, as projects (#167, PL-10)
-- [ ] A6: POP3 read access (#159)
+- [ ] A6: POP3 read access (#159, EM-21)
 - [ ] A7: Push notification emulation (#166)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161)
 - [ ] A9: System tray app (#168)
@@ -810,3 +810,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | A5c built (UI): Settings > Projects (list with traffic counts, New project, Rename, Delete, and how to send to a project with copy buttons), a top bar project picker shown once a second project exists, kept in the URL as `?project=` across screens (a root search parameter), which scopes Mail, SMS and Verify lists and the pop-up toasts; the mock answers the same filters and the header. The embedded UI is 1.98 MB of its 2 MB budget. Deeper pages, the Settings guide and the agent skill cover it. |
 | 2026-11-07 | Ticked SM-17 and VF-05 (accepted) and PL-10.1, PL-10.2, PL-10.5 and PL-10.6 after CI, including the SMS clients workflow, passed on 225c86e. A3 and A4 are done. |
 | 2026-11-07 | A5d built: seed files carry `[[projects]]` (export, apply adds or renames, a reset with a seed restores exactly its projects), in the binary and the mock; the seed file guide shows the section. |
+| 2026-11-07 | Plan: A6 POP3 read access ([32](32-after-1-0.md#a6-pop3-read-access-em-21), EM-21 new with 6 criteria), modelled on Mailpit's POP3 server: off by default, `--pop3-addr` and `--pop3-auth`, the username picks the project's mailbox, the newest 100 emails fixed at login, DELE applied on QUIT. A new `sendmock-pop3` crate holds the protocol and listener. |

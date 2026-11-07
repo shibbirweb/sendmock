@@ -15,14 +15,6 @@ type BacklogItem = {
 
 const backlogItems: BacklogItem[] = [
   {
-    key: "later-pop3",
-    title: "POP3 read access",
-    area: "Email",
-    idea: "A POP3 listener so an app or test that reads a mailbox over POP3 can read the mail SendMock caught, without changing its code.",
-    today:
-      "Mail comes in over SMTP and the provider HTTP APIs, and is read through the web UI, the REST API, the CLI and MCP.",
-  },
-  {
     key: "later-whatsapp-cloud",
     title: "Full WhatsApp Business Cloud API emulation",
     area: "SMS",

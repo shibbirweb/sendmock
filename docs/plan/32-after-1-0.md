@@ -13,7 +13,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) |
 | A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) |
 | A5 | Multi-project inboxes | #167 | PL-10 (new) |
-| A6 | POP3 read access | #159 | to be written |
+| A6 | POP3 read access | #159 | EM-21 (new) |
 | A7 | Push notification emulation | #166 | to be written |
 | A8 | WhatsApp Business Cloud API, in full | #161 | to be written |
 | A9 | System tray app | #168 | to be written |
@@ -168,3 +168,19 @@ Projects separate traffic; they do not secure it. Anyone who can open SendMock c
 **As built, A5c (2026-11-07):** Settings > Projects lists the projects with their traffic counts, adds (key and name), renames and deletes them, and shows the three ways to send to one with copy buttons. The top bar picker appears once a second project exists; its choice is a root search parameter kept from screen to screen with TanStack Router's `retainSearchParams`, read by the email, SMS, conversation and verification list hooks, so every screen using them is scoped. The realtime provider sits outside the router and reads the choice from the URL when an event arrives; events about another project stay in the bell without a toast. Seed files carry `[[projects]]` (`key`, `name`; never `default`), applied by a seed adapter that adds or renames and, on a reset with a seed, removes the projects the seed does not list. Tests: `projects.spec.ts` (mock mode), `realtime-event-effects.test.ts`, `project_seed_api.rs`.
 
 **Not in this part:** per-project settings, retention or webhook endpoints; per-project credentials that SendMock checks; routing by recipient rules (smtp4dev's model), which tag rules and inbound routes already cover for filtering.
+
+## A6. POP3 read access (EM-21)
+
+**Why:** some apps and test suites read a mailbox over POP3: an inbound-mail feature that polls a support address, a QA script built on Python's `poplib` or PHP's IMAP extension, a desktop mail client pointed at a test server. Today they cannot read what SendMock caught without changing to its API.
+
+**How others do it** (Mailpit's `internal/pop3` source, read 2026-11-07): Mailpit's POP3 server is off until credentials are configured, since it hands out every message. It serves the newest 100 messages, with USER and PASS, STAT, LIST, UIDL (the message id), RETR, TOP, NOOP, DELE, RSET, QUIT and CAPA (RFC 1939 and 2449); DELE only marks, and the marked messages are deleted when the client sends QUIT, so a dropped connection deletes nothing. A line over RFC 1939's limit is refused, an idle session closes after 10 minutes, and five failed logins close the connection. TLS is implicit, with a certificate given on the command line.
+
+**How:** a new `sendmock-pop3` crate with the protocol (a session state machine over a `Pop3Mailbox` trait, testable without a socket) and the listener, wired by the binary like the SMTP one; the mailbox is implemented in `sendmock-ops` over the email repository, so deletes go through the same path as the API and fire `email.deleted`.
+
+- **Off by default:** `--pop3-addr` (`SENDMOCK_POP3_ADDR`) turns it on, bound to `127.0.0.1` unless told otherwise (Docker publishes it only when asked).
+- **Login:** `--pop3-auth` takes `accept-any` (the default, as for SMTP on a local machine) or `file:<path>` with the same `user:password` lines as `--smtp-auth`.
+- **Mailbox:** the username picks it, as SMTP's does: a project's key reads that project's emails ([A5](#a5-projects-multi-project-inboxes-pl-10)), any other username reads `default`. The newest 100 emails of that project, numbered oldest first as POP3 clients expect; the list is fixed at login, as RFC 1939 asks.
+- **Messages:** RETR answers the stored raw message with dot-stuffing; TOP the headers and the first n body lines; UIDL the email id, which never changes, so clients that remember downloaded ids work across sessions.
+- **Seen in the product:** `/api/v1/info` lists the POP3 address, Settings > Connection shows the host, port and how to log in, and the CLI's `serve --help` and the configuration docs describe the options.
+
+**Not in this part:** STLS and implicit TLS (SendMock runs on the developer's machine or a private network; TLS follows if asked), APOP and SASL logins, IMAP.
