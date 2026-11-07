@@ -28,3 +28,13 @@ test("PL-01.4 the API reference opens from Help, finds an operation and gives it
     page.getByRole("link", { name: "Download openapi.json" }),
   ).toHaveAttribute("href", "/api/openapi.json");
 });
+
+test("PL-01.4 the API reference screen names itself in the header", async ({
+  page,
+}) => {
+  await page.goto("/api-reference");
+
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "API reference",
+  );
+});
