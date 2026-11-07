@@ -146,14 +146,14 @@ On top of its own criteria, a feature is done only when:
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Accepted |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Accepted |
-| [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Not started |
-| [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | UI done (2026-10-29) |
+| [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
+| [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
-| [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | UI done (2026-10-29) |
+| [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | Accepted |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Accepted |
-| [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Not started |
-| [WS-07](07-distribution-website.md#ws-07-cli-and-mcp-reference) | CLI and MCP reference | Phase U3 | 5 | Not started |
-| [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Not started |
+| [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Accepted |
+| [WS-07](07-distribution-website.md#ws-07-cli-and-mcp-reference) | CLI and MCP reference | Phase U3 | 5 | Accepted |
+| [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Accepted |
 | [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B) | 4 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
