@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use rusqlite::Connection;
 
+use super::BUSY_TIMEOUT;
 use crate::StoreError;
 
 /// How far a checkpoint got: frames in the write-ahead log and how many of them are now in
@@ -15,6 +16,8 @@ pub struct CheckpointProgress {
 
 /// How often the background thread copies the write-ahead log into the database file.
 const BACKGROUND_CHECKPOINT_INTERVAL: Duration = Duration::from_secs(1);
+/// About 4 MiB of 4 KiB pages: a longer log is cut back once it has been copied.
+const LOG_FRAMES_BEFORE_TRUNCATE: i64 = 1024;
 
 /// A connection of its own for copying the write-ahead log into the database file. A passive
 /// checkpoint never takes the write lock, so the copy and its sync run beside ingest instead of
@@ -66,15 +69,33 @@ impl DatabaseCheckpointer {
     }
 }
 
-/// One passive checkpoint while the database is open; answers whether it still is. A busy or
-/// failed checkpoint is left for the next one.
+/// One checkpoint while the database is open; answers whether it still is. A busy or failed
+/// checkpoint is left for the next one.
 fn checkpoint_while_open(open_connection: &Weak<Mutex<Connection>>) -> bool {
     let Some(connection) = open_connection.upgrade() else {
         return false;
     };
     let connection = connection.lock().unwrap_or_else(PoisonError::into_inner);
-    let _ = connection.query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |_| Ok(()));
+    let log_frame_count = connection
+        .query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |row| {
+            row.get::<_, i64>(1)
+        })
+        .unwrap_or_default();
+    if log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE {
+        let _ = truncate_copied_log(&connection);
+    }
     true
+}
+
+/// Beside steady writes a passive checkpoint seldom copies the whole log, so the writer never
+/// starts it over and it keeps growing. Right after the passive copy almost nothing is left,
+/// so a truncating checkpoint holds writers only briefly; it is tried without waiting, and
+/// skipped while a write or an older read is in the way.
+fn truncate_copied_log(connection: &Connection) -> rusqlite::Result<()> {
+    connection.busy_timeout(Duration::ZERO)?;
+    let checkpoint_result = connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
+    connection.busy_timeout(BUSY_TIMEOUT)?;
+    checkpoint_result
 }
 
 #[cfg(test)]
@@ -112,6 +133,26 @@ mod tests {
             .unwrap_or_else(PoisonError::into_inner);
         assert!(is_still_open);
         assert_eq!(uncopied_frame_count(&connection)?, 0);
+        Ok(())
+    }
+
+    #[test]
+    fn a_long_log_is_cut_back_once_it_is_copied() -> Result<(), Box<dyn std::error::Error>> {
+        let database_folder = tempfile::tempdir()?;
+        let connection = open_wal_database(&database_folder)?;
+        connection.execute_batch(
+            "WITH RECURSIVE note_numbers(note_number) AS \
+             (SELECT 1 UNION ALL SELECT note_number + 1 FROM note_numbers WHERE note_number < 6000) \
+             INSERT INTO notes SELECT hex(randomblob(1000)) FROM note_numbers;",
+        )?;
+        let log_path = database_folder.path().join("sendmock.db-wal");
+        let log_size_before = std::fs::metadata(&log_path)?.len();
+        let shared_connection = Arc::new(Mutex::new(connection));
+
+        checkpoint_while_open(&Arc::downgrade(&shared_connection));
+
+        assert!(log_size_before > 4 * 1024 * 1024, "{log_size_before}");
+        assert_eq!(std::fs::metadata(&log_path)?.len(), 0);
         Ok(())
     }
 
