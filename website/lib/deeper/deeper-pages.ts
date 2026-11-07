@@ -3,14 +3,10 @@ import { appShellPage } from "./screens/app-shell";
 import { mailInboxPage } from "./screens/mail-inbox";
 import { mailProvidersPage } from "./screens/mail-providers";
 import { paymentsGatewaysPage } from "./screens/payments-gateways";
-import {
-  paymentsListPage,
-  paymentsSubscriptionsPage,
-} from "./screens/payments-list";
-import {
-  paymentsFlowsPage,
-  paymentsMethodsPage,
-} from "./screens/payments-methods-flows";
+import { paymentsFlowsPage } from "./screens/payments-flows";
+import { paymentsListPage } from "./screens/payments-list";
+import { paymentsMethodsPage } from "./screens/payments-methods";
+import { paymentsSubscriptionsPage } from "./screens/payments-subscriptions";
 import { smsMessagesPage } from "./screens/sms-messages";
 import { smsProvidersPage } from "./screens/sms-providers";
 import { smsVerifyPage } from "./screens/sms-verify";
@@ -23,10 +19,8 @@ import { webhooksEndpointsPage } from "./screens/webhooks-endpoints";
 import { webhooksInboundRoutesPage } from "./screens/webhooks-inbound-routes";
 import { webhooksOverviewPage } from "./screens/webhooks-overview";
 import { webhooksRulesPage } from "./screens/webhooks-rules";
-import {
-  webhooksTemplatesPage,
-  webhooksVariablesPage,
-} from "./screens/webhooks-templates-variables";
+import { webhooksTemplatesPage } from "./screens/webhooks-templates";
+import { webhooksVariablesPage } from "./screens/webhooks-variables";
 
 /** Every Deeper page written so far (W14c onward adds a menu at a time). */
 export const deeperPages: DeeperPage[] = [
