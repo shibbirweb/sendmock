@@ -1,0 +1,151 @@
+// The after-1.0 backlog from docs/plan/11-roadmap.md, as issues.
+import type { FeatureIssue } from "./build-feature-issues";
+
+const blobBase = "https://github.com/shibbirweb/sendmock/blob/feat/phase-0";
+const roadmapLink = `[After 1.0 (backlog)](${blobBase}/docs/plan/11-roadmap.md#after-10-backlog)`;
+
+type BacklogItem = {
+  key: string;
+  title: string;
+  area: string;
+  idea: string;
+  today: string;
+  source?: string;
+};
+
+const backlogItems: BacklogItem[] = [
+  {
+    key: "later-pop3",
+    title: "POP3 read access",
+    area: "Email",
+    idea: "A POP3 listener so an app or test that reads a mailbox over POP3 can read the mail SendMock caught, without changing its code.",
+    today:
+      "Mail comes in over SMTP and the provider HTTP APIs, and is read through the web UI, the REST API, the CLI and MCP.",
+  },
+  {
+    key: "later-verify-apis",
+    title: "Vonage Verify v2 and other providers' verify APIs",
+    area: "Verify",
+    idea: "Emulate more one-time-code verification APIs, starting with Vonage Verify v2, with the providers' real request, response and error shapes.",
+    today:
+      "Twilio Verify is emulated (features VF-01 to VF-04), and the code is delivered over SMS or email into SendMock.",
+  },
+  {
+    key: "later-whatsapp-cloud",
+    title: "Full WhatsApp Business Cloud API emulation",
+    area: "SMS",
+    idea: "Meta's WhatsApp Business Cloud API (messages, templates, media and its webhooks), emulated like the SMS providers.",
+    today:
+      "WhatsApp messages work through Twilio's Messages API with `whatsapp:` addresses (feature SM-11).",
+  },
+  {
+    key: "later-helm-docker-desktop",
+    title: "Helm chart and Docker Desktop extension",
+    area: "Distribution",
+    idea: "A Helm chart for a shared team instance in Kubernetes, and a Docker Desktop extension that runs SendMock from Docker Desktop.",
+    today:
+      "The Docker image (feature DS-02) runs anywhere Docker does, with Compose and GitHub Actions service-container examples.",
+    source: `${blobBase}/docs/plan/09-distribution.md#later`,
+  },
+  {
+    key: "later-mailpit-aliases",
+    title: "Mailpit API compatibility aliases",
+    area: "Email",
+    idea: "Optional aliases for Mailpit's REST API paths and answers, so test suites written against Mailpit can switch to SendMock with no code change, if there is demand.",
+    today:
+      "SendMock has its own REST API (`/api/v1`), described by `docs/api/openapi.yaml`.",
+    source: `${blobBase}/docs/plan/10-open-questions.md#9-mailpit-api-compatibility`,
+  },
+  {
+    key: "later-email-clicked",
+    title: "`email.clicked` link-click tracking event",
+    area: "Webhooks",
+    idea: "An `email.clicked` event, fired when a link in a caught email is opened through SendMock, with the link and the click count, delivered to webhook endpoints like the other events.",
+    today:
+      "`email.opened` fires when an email is opened (feature EM-11), and the links in an email are listed and checked (feature EM-13).",
+  },
+  {
+    key: "later-provider-formats",
+    title: "More provider formats (AWS SNS SMS, Infobip and others)",
+    area: "SMS",
+    idea: "More provider APIs and webhook formats, such as AWS SNS for SMS and Infobip's SMS API, each as a provider registered beside the built-in ones.",
+    today:
+      "Built in: SendGrid, Mailgun, Postmark, Resend, Amazon SES (with SNS notifications) and Brevo for email; Twilio, Twilio Verify, Vonage, Plivo and MessageBird for SMS, plus custom providers defined in the UI or the seed file (features EM-18 and SM-16). An Infobip webhook template exists.",
+  },
+  {
+    key: "later-push-emulation",
+    title: "Push notification emulation",
+    area: "HTTP catcher",
+    idea: "Emulate push notification services (Apple Push Notification service and others) with the same catch-and-webhook model as email and SMS: the app sends a push, SendMock stores it and shows it.",
+    today:
+      "The HTTP catcher captures requests to Firebase Cloud Messaging, Expo and OneSignal through its presets and answers them as those services do (feature HC-03).",
+  },
+  {
+    key: "later-multi-project",
+    title: "Multi-project inboxes",
+    area: "Platform",
+    idea: "Separate namespaces inside one instance, picked by SMTP username or API key, so several projects or developers share a SendMock without seeing each other's messages.",
+    today:
+      "One instance holds one set of emails, SMS, webhooks and settings; separate instances can run on other ports.",
+  },
+  {
+    key: "later-tray-app",
+    title: "System tray app",
+    area: "Distribution",
+    idea: "A small menu bar or system tray app that starts and stops SendMock, shows new messages and opens the web UI.",
+    today:
+      "SendMock runs as a single binary or a Docker image, with its web UI in the browser.",
+  },
+  {
+    key: "later-official-repositories",
+    title: "Official distribution repositories (Debian, Ubuntu, Fedora, Arch)",
+    area: "Distribution",
+    idea: "`sudo apt install sendmock` and the like with no setup, from the distributions' own repositories. This needs a sponsor or packager in each distribution, every Rust dependency packaged there, and a history of stable releases.",
+    today:
+      "SendMock ships through its own channels: install scripts, Homebrew, Scoop, npm, cargo, our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs (feature DS-03).",
+    source: `${blobBase}/docs/plan/09-distribution.md#package-channels-by-stage-decided-2026-10-27`,
+  },
+];
+
+export const backlogIssues: FeatureIssue[] = backlogItems.map(
+  (backlogItem) => ({
+    key: backlogItem.key,
+    title: `${backlogItem.area}: ${backlogItem.title}`,
+    body: [
+      "### Summary",
+      "",
+      backlogItem.idea,
+      "",
+      "### What SendMock does today",
+      "",
+      backlogItem.today,
+      "",
+      "### Status",
+      "",
+      "| | |",
+      "|---|---|",
+      "| **Status** | Later |",
+      `| **Area** | ${backlogItem.area} |`,
+      "| **Target** | After 1.0 |",
+      "| **Acceptance criteria** | Not written yet |",
+      "",
+      "Not started. Before work begins, the feature gets an ID and numbered acceptance criteria in `docs/plan/acceptance/`, and this issue is updated with them.",
+      "",
+      "### References",
+      "",
+      `- Roadmap: ${roadmapLink}`,
+      ...(backlogItem.source ? [`- Design notes: ${backlogItem.source}`] : []),
+      "",
+    ].join("\n"),
+    labels: [
+      "feature",
+      `area: ${backlogItem.area.toLowerCase()}`,
+      "status: later",
+    ],
+    status: "Later",
+    target: "After 1.0",
+    area: backlogItem.area,
+    isClosed: false,
+    criteriaSummary: "Not written yet",
+  }),
+);
