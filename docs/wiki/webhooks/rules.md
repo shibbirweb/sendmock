@@ -48,6 +48,8 @@ Rules in firing order with move up and down, name, endpoint, event chips, a plai
 
 Every enabled rule is checked, top to bottom, and **each matching rule creates its own delivery**. Order matters for reading the list and for the delivery order, not for stopping: a message can match several rules.
 
+
+Every control and text, one by one: [Rules in depth](../deeper/webhooks/rules.md).
 ## Customize
 
 Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](../advanced/rules-and-filters.md).

@@ -54,6 +54,8 @@ A live table, newest first, 50 rows at a time ("Showing 50 of N", more as you sc
 | **Cancel retries** | stops a delivery that would retry (asks first) |
 | **Save** | keeps the request under a name in [Saved](./composer-and-saved.md#saved-deliveries) |
 
+
+Every control and text, one by one: [Deliveries in depth](../deeper/webhooks/deliveries.md).
 ## Customize
 
 The retry schedule is per endpoint ([Endpoints](./endpoints.md), Retries tab).

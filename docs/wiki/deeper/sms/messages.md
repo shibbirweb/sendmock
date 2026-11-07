@@ -101,7 +101,7 @@ Heading.
 
 - **What it does:** A day separator; messages are grouped by the day they were sent.
 
-### 15. #:# AM
+### 15. #:#
 
 Link.
 

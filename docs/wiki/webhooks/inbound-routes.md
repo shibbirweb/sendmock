@@ -47,6 +47,8 @@ Routes by priority (lower runs first) with move up and down, description, the ex
 
 Matching routes run by priority until one calls Stop. The forward is Mailgun's `multipart/form-data` with `recipient`, `sender`, `subject`, `body-plain`, `stripped-text` (the new text without the quoted original), `stripped-signature`, `body-html`, attachments, `message-headers`, and `timestamp`, `token` and `signature` (signed with the webhook signing key). Your app answering `406` rejects the message without retries; other errors are retried.
 
+
+Every control and text, one by one: [Inbound routes in depth](../deeper/webhooks/inbound-routes.md).
 ## Customize
 
 Ticket routing with named groups, store and notify, and other providers' formats: [Advanced: inbound routes](../advanced/inbound-routes.md).

@@ -63,6 +63,8 @@ Bookmarks made with **Save** on a delivery, at **Webhooks > Saved**, newest firs
 
 Saved deliveries survive pruning and reset, and are written to the seed export (without signature headers, which are made fresh on each send).
 
+
+Every control and text, one by one: [Composer in depth](../deeper/webhooks/composer.md) and [Saved deliveries in depth](../deeper/webhooks/saved.md).
 ## Customize
 
 - Presets come from [templates](./templates.md); a stored request becomes one with **Save as template** ([Advanced: templates](../advanced/templates.md)).

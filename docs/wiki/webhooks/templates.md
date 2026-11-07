@@ -54,6 +54,8 @@ Payment notifications (Stripe, PayPal, SSLCommerz, bKash) are shaped by each [ga
 
 The request shape (method, content type, headers, body template), **Events it fits**, required **Variables**, **Provider docs**, which endpoints use it, a **Preview** against the built-in sample or a recent message (with warnings and errors), and actions: **Use in new endpoint**, **Edit** (built-ins too), **Clone**, **Export**, **History** (revisions with a diff and restore) and Delete (custom only).
 
+
+Every control and text, one by one: [Templates in depth](../deeper/webhooks/templates.md).
 ## Customize
 
 Edit a built-in (it shows **Modified**; **Reset to default** brings back the shipped one), create from blank, clone, import and export, share a templates folder with your team: [Advanced: templates](../advanced/templates.md).

@@ -88,6 +88,8 @@ The first Webhooks screen shows how deliveries are going, live.
 
 SendMock's own JSON follows [Standard Webhooks](https://www.standardwebhooks.com/): `webhook-id`, `webhook-timestamp` and `webhook-signature` headers with the endpoint's `whsec_` secret, so the official libraries verify it. Runnable examples for the Node, Python, PHP and Go libraries are in [`examples/webhooks`](https://github.com/shibbirweb/sendmock/tree/develop/examples/webhooks). Provider templates sign the provider's way (`X-Twilio-Signature`, Mailgun's `signature` field, `Stripe-Signature`, ...).
 
+
+Every control and text, one by one: [Webhooks overview in depth](../deeper/webhooks/overview.md).
 ## Customize
 
 - Shape requests for any service: [Advanced: templates](../advanced/templates.md) and [Advanced: request editor](../advanced/request-editor.md).
