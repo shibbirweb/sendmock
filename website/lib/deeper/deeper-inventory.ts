@@ -1,10 +1,17 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-/** The inventory the crawl of the demo writes (`web/tests/deeper/`, WS-10.3). */
-const inventoryFilePath = fileURLToPath(
-  new URL("../../../web/tests/deeper/inventory.json", import.meta.url),
+/** The inventory the crawl of the demo writes, a file per screen (`web/tests/deeper/`, WS-10.3). */
+const inventoryDirectory = fileURLToPath(
+  new URL("../../../web/tests/deeper/inventory", import.meta.url),
 );
+
+type ScreenInventoryFile = {
+  order: number;
+  path: string;
+  states: Record<string, string[]>;
+};
 
 type DeeperInventoryFile = {
   shell: string[];
@@ -15,9 +22,24 @@ type DeeperInventoryFile = {
 export type ScreenState = { state: string; controls: string[] };
 
 export function loadDeeperInventory(): DeeperInventoryFile {
-  return JSON.parse(
-    readFileSync(inventoryFilePath, "utf8"),
-  ) as DeeperInventoryFile;
+  const screenFiles = readdirSync(inventoryDirectory)
+    .filter((fileName) => fileName.endsWith(".json"))
+    .map(
+      (fileName) =>
+        JSON.parse(
+          readFileSync(join(inventoryDirectory, fileName), "utf8"),
+        ) as ScreenInventoryFile,
+    )
+    .sort((firstFile, secondFile) => firstFile.order - secondFile.order);
+  const shellFile = screenFiles.find(
+    (screenFile) => screenFile.path === "shell",
+  );
+  return {
+    shell: shellFile?.states.normal ?? [],
+    screens: screenFiles
+      .filter((screenFile) => screenFile !== shellFile)
+      .map(({ path, states }) => ({ path, states })),
+  };
 }
 
 /** Every screen the crawl read, `shell` first. */

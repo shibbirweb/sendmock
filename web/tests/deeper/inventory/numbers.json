@@ -1,0 +1,29 @@
+{
+  "order": 22,
+  "path": "/numbers",
+  "states": {
+    "normal": [
+      "heading: Numbers",
+      "link: Read the Numbers guide",
+      "heading: Numbers",
+      "paragraph: Fake numbers with inbound webhooks and status callbacks, and the Messaging Services that pool them.",
+      "tab: Numbers",
+      "tab: Messaging Services",
+      "paragraph: Fake numbers your app sends from, with their inbound webhooks.",
+      "button: Add number",
+      "columnheader: Number",
+      "columnheader: Channels",
+      "columnheader: Webhooks",
+      "columnheader: Messaging Service",
+      "columnheader: Actions",
+      "each item, button: Copy +#",
+      "each item, button: Edit +#",
+      "each item, button: Delete +#"
+    ],
+    "failing": [
+      "alert: Could not load the numbers. Try again",
+      "paragraph: Could not load the numbers.",
+      "button: Try again"
+    ]
+  }
+}

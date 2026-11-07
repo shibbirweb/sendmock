@@ -137,12 +137,18 @@ const verifyServiceEntries: DeeperEntry[] = [
     does: "Edit and Delete for each service.",
   },
   {
-    control: "each item, button: …",
-    does: "Edit opens the service's settings; Delete removes it after you confirm.",
-    operationIds: [
-      "patchVerifyServicesByServiceSid",
-      "deleteVerifyServicesByServiceSid",
-    ],
+    control: "each item, button: Copy SID of Acme …",
+    does: "Copies the service's SID, for your app's Verify calls.",
+  },
+  {
+    control: "each item, button: Edit Acme …",
+    does: "Opens the service's settings: name, code length, expiry and fixed code.",
+    operationIds: ["patchVerifyServicesByServiceSid"],
+  },
+  {
+    control: "each item, button: Delete Acme …",
+    does: "Deletes the service after you confirm.",
+    operationIds: ["deleteVerifyServicesByServiceSid"],
   },
   {
     control: "heading: New Verify service",

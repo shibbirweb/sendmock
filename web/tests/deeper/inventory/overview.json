@@ -1,0 +1,38 @@
+{
+  "order": 1,
+  "path": "/",
+  "states": {
+    "normal": [
+      "heading: Overview",
+      "link: Read the Overview guide",
+      "heading: Overview",
+      "paragraph: Everything your apps sent to SendMock, updated live.",
+      "each item, link: …",
+      "switch: Show as table",
+      "columnheader: Endpoint",
+      "columnheader: Deliveries",
+      "columnheader: Success",
+      "columnheader: p# / p#",
+      "columnheader: Retries",
+      "columnheader: Top failures",
+      "each item, img: …",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy SMTP address",
+      "button: Copy API base URL",
+      "link: More snippets"
+    ],
+    "empty": [
+      "paragraph: No failed deliveries. Every webhook got through.",
+      "paragraph: Nothing yet. Send an email or SMS from your app, or try a sample.",
+      "button: Send a sample email",
+      "button: Send a sample SMS"
+    ],
+    "failing": [
+      "alert: Could not load the overview. Check that SendMock is running. Try again",
+      "paragraph: Could not load the overview. Check that SendMock is running.",
+      "button: Try again"
+    ]
+  }
+}

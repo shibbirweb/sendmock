@@ -3,6 +3,16 @@ import type { Page } from "@playwright/test";
 import { appScreens } from "../e2e/support/app-screens";
 import { buildProvidersOverlays, mailOverlays } from "./overlays/mail-overlays";
 import { smsOverlays, verifyOverlays } from "./overlays/sms-overlays";
+import {
+  inboundRouteOverlays,
+  savedDeliveryOverlays,
+  webhookDeliveryOverlays,
+  webhookEndpointOverlays,
+  webhookOverviewOverlays,
+  webhookRuleOverlays,
+  webhookTemplateOverlays,
+  webhookVariableOverlays,
+} from "./overlays/webhook-overlays";
 
 /** How the mock answers while a state is read, chosen in the dev toolbar. */
 export type DeeperDataState = "normal" | "empty" | "failing";
@@ -48,6 +58,14 @@ const overlaysByPath: Record<string, DeeperOverlay[]> = {
   "/sms": smsOverlays,
   "/sms/verify": verifyOverlays,
   "/sms/providers": buildProvidersOverlays("Twilio"),
+  "/webhooks/overview": webhookOverviewOverlays,
+  "/webhooks/endpoints": webhookEndpointOverlays,
+  "/webhooks/rules": webhookRuleOverlays,
+  "/webhooks/inbound-routes": inboundRouteOverlays,
+  "/webhooks/deliveries": webhookDeliveryOverlays,
+  "/webhooks/templates": webhookTemplateOverlays,
+  "/webhooks/variables": webhookVariableOverlays,
+  "/webhooks/saved": savedDeliveryOverlays,
 };
 
 /** Every screen of the app, with the data states and overlays its Deeper page covers. */

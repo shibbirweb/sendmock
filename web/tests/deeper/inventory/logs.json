@@ -1,0 +1,42 @@
+{
+  "order": 24,
+  "path": "/logs",
+  "states": {
+    "normal": [
+      "heading: Logs",
+      "link: Read the Logs guide",
+      "heading: Logs",
+      "paragraph: Every SMTP session and API request, including the ones that failed, so you can see why a client was rejected.",
+      "tab: SMTP sessions",
+      "tab: API requests",
+      "button: All",
+      "button: Delivered",
+      "button: Failed",
+      "textbox: Search SMTP sessions",
+      "columnheader: Time",
+      "columnheader: Client",
+      "columnheader: TLS",
+      "columnheader: AUTH",
+      "columnheader: Result",
+      "columnheader: Emails",
+      "columnheader: Duration",
+      "each item, link: …"
+    ],
+    "empty": [
+      "paragraph: No SMTP sessions yet",
+      "paragraph: Point your app's SMTP settings at SendMock; every connection shows up here, even the ones that fail.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy SMTP host",
+      "button: Copy SMTP port",
+      "link: More snippets",
+      "button: Send a sample email"
+    ],
+    "failing": [
+      "alert: Could not load the SMTP log. Try again",
+      "paragraph: Could not load the SMTP log.",
+      "button: Try again"
+    ]
+  }
+}

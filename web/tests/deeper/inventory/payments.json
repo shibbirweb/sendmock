@@ -1,0 +1,36 @@
+{
+  "order": 17,
+  "path": "/payments",
+  "states": {
+    "normal": [
+      "heading: Payments",
+      "link: Read the Payments guide",
+      "heading: Payments",
+      "paragraph: Test payments made through the emulated gateways. No real money moves, and only test cards are accepted.",
+      "button: New payment",
+      "button: All",
+      "button: Succeeded",
+      "button: Pending",
+      "button: Failed",
+      "button: Refunded",
+      "button: Disputed",
+      "combobox: Provider",
+      "combobox: Currency",
+      "columnheader: Amount",
+      "columnheader: Provider",
+      "columnheader: Status",
+      "columnheader: Customer",
+      "columnheader: Time",
+      "each item, link: …"
+    ],
+    "empty": [
+      "paragraph: No payments yet",
+      "paragraph: Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz."
+    ],
+    "failing": [
+      "alert: Could not load the payments. Try again",
+      "paragraph: Could not load the payments.",
+      "button: Try again"
+    ]
+  }
+}

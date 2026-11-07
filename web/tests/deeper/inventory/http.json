@@ -1,0 +1,34 @@
+{
+  "order": 7,
+  "path": "/http",
+  "states": {
+    "normal": [
+      "heading: HTTP Catcher",
+      "link: Read the HTTP Catcher guide",
+      "heading: Bins",
+      "button: New bin",
+      "button: All requests #",
+      "button: slack Slack # Last # minutes ago",
+      "button: discord Discord # Last # minutes ago",
+      "button: push Firebase # Last # minutes ago",
+      "button: analytics # Last # minutes ago",
+      "button: uploads # Last # minutes ago",
+      "heading: All requests",
+      "each item, button: POST … # minutes ago #",
+      "paragraph: Pick a request to see what your app sent and what SendMock answered."
+    ],
+    "empty": [
+      "button: slack Slack # No requests yet",
+      "button: discord Discord # No requests yet",
+      "button: push Firebase # No requests yet",
+      "button: analytics # No requests yet",
+      "button: uploads # No requests yet",
+      "paragraph: No requests caught yet."
+    ],
+    "failing": [
+      "alert: Could not load the HTTP bins. Try again",
+      "paragraph: Could not load the HTTP bins.",
+      "button: Try again"
+    ]
+  }
+}

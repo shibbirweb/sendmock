@@ -37,8 +37,13 @@ export type InventoryOptions = {
   isRecordingParagraphs: boolean;
 };
 
+/** Digits become `#` and a clock time `#:#`, so a crawl at another hour reads the same. */
 export function normalizeName(name: string): string {
-  return name.replace(/\s+/g, " ").replace(/\d+/g, "#").trim();
+  return name
+    .replace(/\s+/g, " ")
+    .replace(/\d+/g, "#")
+    .replace(/#:#( ?[AP]M)?/g, "#:#")
+    .trim();
 }
 
 function readNodeText(node: AriaNode): string {
@@ -138,42 +143,53 @@ function generalizeNames(names: string[]): string {
 function mergeItems(
   itemControlLists: InventoryControl[][],
 ): InventoryControl[] {
-  const namesByRole = new Map<string, string[]>();
+  // Badge icons vary from item to item, so they are grouped by role; every other control is
+  // grouped by its place in the item, so a row's Edit and Delete buttons stay apart.
+  const namesByKey = new Map<string, { role: string; names: string[] }>();
   for (const itemControls of itemControlLists) {
+    const occurrenceByRole = new Map<string, number>();
     for (const itemControl of itemControls) {
-      namesByRole.set(itemControl.role, [
-        ...(namesByRole.get(itemControl.role) ?? []),
-        itemControl.name,
-      ]);
+      const occurrence = occurrenceByRole.get(itemControl.role) ?? 0;
+      occurrenceByRole.set(itemControl.role, occurrence + 1);
+      const groupKey =
+        itemControl.role === "img"
+          ? "img"
+          : `${itemControl.role}#${occurrence}`;
+      const group = namesByKey.get(groupKey) ?? {
+        role: itemControl.role,
+        names: [],
+      };
+      group.names.push(itemControl.name);
+      namesByKey.set(groupKey, group);
     }
   }
-  return [...namesByRole].flatMap(([role, names]) => {
-    const distinctNames = [...new Set(names)];
-    const isSharedByEveryItem =
-      names.length === itemControlLists.length && distinctNames.length === 1;
-    if (isSharedByEveryItem) {
-      return [{ role, name: distinctNames[0] ?? "", isPerItem: true }];
-    }
-    // Icons such as Unread or Has attachments are labels a row may or may not show.
-    if (role === "img") {
-      const labels = distinctNames.filter(
-        (name) => names.filter((otherName) => otherName === name).length >= 2,
-      );
-      const hasRecordNames = labels.length < distinctNames.length;
-      return [...labels, ...(hasRecordNames ? [dataNamePlaceholder] : [])].map(
-        (name) => ({
-          role,
-          name,
-          isPerItem: true,
-        }),
-      );
-    }
-    const generalizedName =
+  return [...namesByKey.values()].flatMap(({ role, names }) =>
+    role === "img" ? mergeBadgeNames(names) : [mergeNames(role, names)],
+  );
+}
+
+/** Icons such as Unread or Has attachments: a label two items share stays. */
+function mergeBadgeNames(names: string[]): InventoryControl[] {
+  const distinctNames = [...new Set(names)];
+  const labels = distinctNames.filter(
+    (name) => names.filter((otherName) => otherName === name).length >= 2,
+  );
+  const hasRecordNames = labels.length < distinctNames.length;
+  return [...labels, ...(hasRecordNames ? [dataNamePlaceholder] : [])].map(
+    (name) => ({ role: "img", name, isPerItem: true }),
+  );
+}
+
+function mergeNames(role: string, names: string[]): InventoryControl {
+  const distinctNames = [...new Set(names)];
+  return {
+    role,
+    name:
       distinctNames.length === 1
         ? (distinctNames[0] ?? "")
-        : generalizeNames(distinctNames);
-    return [{ role, name: generalizedName, isPerItem: true }];
-  });
+        : generalizeNames(distinctNames),
+    isPerItem: true,
+  };
 }
 
 /** The controls of a snapshot in screen order, each once. */

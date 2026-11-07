@@ -1,0 +1,25 @@
+{
+  "order": 19,
+  "path": "/payments/methods",
+  "states": {
+    "normal": [
+      "heading: Methods",
+      "link: Read the Methods guide",
+      "heading: Payment methods",
+      "paragraph: What customers pay with on test checkout pages, and the test values each one accepts.",
+      "button: Add method",
+      "columnheader: Method",
+      "columnheader: Flow",
+      "columnheader: Offered by",
+      "columnheader: Test values",
+      "columnheader: Enabled",
+      "each item, switch: … enabled",
+      "each item, button: Edit …"
+    ],
+    "failing": [
+      "alert: Could not load the payment methods. Try again",
+      "paragraph: Could not load the payment methods.",
+      "button: Try again"
+    ]
+  }
+}

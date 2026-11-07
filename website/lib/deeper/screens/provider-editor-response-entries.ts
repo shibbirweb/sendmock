@@ -169,5 +169,9 @@ export function buildProviderEditorResponseEntries({
         "paragraph: The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.",
       does: "Explains where the provider port comes from and what the sample gets back.",
     },
+    {
+      control: "each item, button: Expand …",
+      does: "Shows the fields inside a value, such as the parts of `request` or `message`.",
+    },
   ];
 }

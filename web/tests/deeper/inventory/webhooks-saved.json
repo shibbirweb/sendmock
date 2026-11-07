@@ -1,0 +1,34 @@
+{
+  "order": 16,
+  "path": "/webhooks/saved",
+  "states": {
+    "normal": [
+      "heading: Saved",
+      "link: Read the Saved guide",
+      "heading: Saved deliveries",
+      "paragraph: Requests you bookmarked, kept through pruning and reset, ready to send again.",
+      "textbox: Search saved deliveries",
+      "button: Twilio STOP reply POST http://localhost:#/sms/inbound From the composer · Twilio: inbound SMS · saved # hours ago",
+      "button: Send Twilio STOP reply",
+      "button: Rename Twilio STOP reply",
+      "button: Save as template Twilio STOP reply",
+      "button: Delete Twilio STOP reply"
+    ],
+    "Send a saved delivery dialog": [
+      "heading: Send \"Twilio STOP reply\"",
+      "paragraph: The stored body goes to the endpoint's URL with its method.",
+      "combobox: Endpoint",
+      "checkbox: Re-render with fresh values",
+      "paragraph: New timestamp, signature and random values, as a fresh event would get.",
+      "button: Cancel",
+      "button: Send",
+      "button: Close"
+    ],
+    "empty": [],
+    "failing": [
+      "alert: Could not load the saved deliveries. Try again",
+      "paragraph: Could not load the saved deliveries.",
+      "button: Try again"
+    ]
+  }
+}

@@ -52,6 +52,11 @@ export function splitControl(control: string): {
   };
 }
 
+/** The docs site reads pages as MDX, where `{`, `}` and `<` start code; GitHub shows the escapes as plain characters. */
+export function escapeMdxText(text: string): string {
+  return text.replace(/[\\{}<]/g, (character) => `\\${character}`);
+}
+
 function renderSurfaces(
   operationIds: string[],
   surfacesById: Map<string, OperationSurfaces>,
@@ -86,7 +91,7 @@ function renderEntry(
     ...renderSurfaces(entry.operationIds ?? [], surfacesById),
   ];
   return [
-    `### ${entryNumber}. ${name}`,
+    `### ${entryNumber}. ${escapeMdxText(name)}`,
     "",
     `${kindText}.`,
     "",

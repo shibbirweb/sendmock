@@ -1,0 +1,29 @@
+{
+  "order": 20,
+  "path": "/payments/flows",
+  "states": {
+    "normal": [
+      "heading: Flows",
+      "link: Read the Flows guide",
+      "heading: Payment flows",
+      "paragraph: The steps a customer goes through on test checkout pages. Each method runs one flow.",
+      "button: Add flow",
+      "columnheader: Flow",
+      "columnheader: Steps",
+      "columnheader: Picker tab",
+      "columnheader: Methods",
+      "button: Edit Card",
+      "button: Edit Wallet",
+      "button: Edit Bank",
+      "button: Edit Account",
+      "button: Edit QR",
+      "button: Edit Bank transfer",
+      "button: Edit Voucher"
+    ],
+    "failing": [
+      "alert: Could not load the payment flows. Try again",
+      "paragraph: Could not load the payment flows.",
+      "button: Try again"
+    ]
+  }
+}

@@ -19,11 +19,9 @@ import {
 } from "../deeper/deeper-screens";
 import { buildInventory } from "../deeper/inventory-builder";
 import {
-  type DeeperInventory,
   describeControl,
-  type ScreenInventory,
-  inventoryFilePath,
   renderInventoryFile,
+  toInventoryFilePath,
 } from "../deeper/inventory-file";
 import { navigateInApp } from "./support/app-screens";
 
@@ -65,6 +63,7 @@ async function readControls(
   return previousControls;
 }
 
+/** Live traffic off, and the data state's API answers and data set (a fresh page is normal). */
 async function chooseDataState(page: Page, dataState: DeeperDataState) {
   const dataStateChoice = dataStateChoices[dataState];
   await page.getByRole("button", { name: "Demo controls" }).click();
@@ -72,14 +71,16 @@ async function chooseDataState(page: Page, dataState: DeeperDataState) {
   if ((await liveTraffic.getAttribute("aria-checked")) === "true") {
     await liveTraffic.click();
   }
-  await page.getByRole("combobox").first().click();
-  await page
-    .getByRole("option", { name: dataStateChoice.apiResponses, exact: true })
-    .click();
-  await page.getByRole("combobox").nth(1).click();
-  await page
-    .getByRole("option", { name: dataStateChoice.dataSet, exact: true })
-    .click();
+  if (dataState !== "normal") {
+    await page.getByRole("combobox").first().click();
+    await page
+      .getByRole("option", { name: dataStateChoice.apiResponses, exact: true })
+      .click();
+    await page.getByRole("combobox").nth(1).click();
+    await page
+      .getByRole("option", { name: dataStateChoice.dataSet, exact: true })
+      .click();
+  }
   await page.keyboard.press("Escape");
   await page.keyboard.press("Escape");
 }
@@ -106,36 +107,18 @@ async function readScreenState(
   ];
 }
 
-/** Each data state in a fresh page, so no screen shows data cached from another state. */
-async function readAllScreens(
+/** A data state in a fresh page, so the screen shows no data cached from another state. */
+async function readDataState(
   browser: Browser,
+  deeperScreen: DeeperScreen,
   dataState: DeeperDataState,
-): Promise<{ shellControls: string[]; screenStates: Map<string, string[]> }> {
+): Promise<string[]> {
   const page = await browser.newPage();
   await page.goto("/");
   await chooseDataState(page, dataState);
-  const shellControls = [
-    ...new Set([
-      ...(await readControls(page.locator('[data-sidebar="sidebar"]'), false)),
-      ...(await readControls(appHeader(page), false)).filter(
-        (control) => !isScreenHeaderControl(control),
-      ),
-    ]),
-  ];
-  const screenStates = new Map<string, string[]>();
-  for (const deeperScreen of deeperScreens) {
-    if (
-      dataState === "normal" ||
-      deeperScreen.extraDataStates.includes(dataState)
-    ) {
-      screenStates.set(
-        deeperScreen.path,
-        await readScreenState(page, deeperScreen, dataState),
-      );
-    }
-  }
+  const stateControls = await readScreenState(page, deeperScreen, dataState);
   await page.close();
-  return { shellControls, screenStates };
+  return stateControls;
 }
 
 function readOverlayScope(page: Page, scope: DeeperOverlay["scope"]): Locator {
@@ -183,39 +166,47 @@ async function readOverlays(
   return overlayStates;
 }
 
-async function crawlInventory(browser: Browser): Promise<DeeperInventory> {
-  const normal = await readAllScreens(browser, "normal");
-  const screenInventories: ScreenInventory[] = [];
-  for (const deeperScreen of deeperScreens) {
-    const normalControls = normal.screenStates.get(deeperScreen.path) ?? [];
-    screenInventories.push({
-      path: deeperScreen.path,
-      states: Object.fromEntries([
-        ["normal", normalControls],
-        ...(await readOverlays(browser, deeperScreen, normalControls)),
-      ]),
-    });
+async function crawlScreen(
+  browser: Browser,
+  deeperScreen: DeeperScreen,
+): Promise<Record<string, string[]>> {
+  const normalControls = await readDataState(browser, deeperScreen, "normal");
+  const states: Record<string, string[]> = Object.fromEntries([
+    ["normal", normalControls],
+    ...(await readOverlays(browser, deeperScreen, normalControls)),
+  ]);
+  for (const dataState of deeperScreen.extraDataStates) {
+    const normalSet = new Set(normalControls);
+    states[dataState] = (
+      await readDataState(browser, deeperScreen, dataState)
+    ).filter((control) => !normalSet.has(control));
   }
-  for (const dataState of ["empty", "failing"] as const) {
-    const extraState = await readAllScreens(browser, dataState);
-    for (const screenInventory of screenInventories) {
-      const stateControls = extraState.screenStates.get(screenInventory.path);
-      if (stateControls !== undefined) {
-        const normalControls = new Set(screenInventory.states.normal);
-        screenInventory.states[dataState] = stateControls.filter(
-          (control) => !normalControls.has(control),
-        );
-      }
-    }
-  }
-  return { shell: normal.shellControls, screens: screenInventories };
+  return states;
 }
 
-test("WS-10.3 the Deeper inventory lists every control and text of every screen of the demo", async ({
-  browser,
-}, testInfo) => {
-  test.setTimeout(600_000);
-  const freshInventory = renderInventoryFile(await crawlInventory(browser));
+async function crawlShell(browser: Browser): Promise<string[]> {
+  const page = await browser.newPage();
+  await page.goto("/");
+  await chooseDataState(page, "normal");
+  const shellControls = [
+    ...new Set([
+      ...(await readControls(page.locator('[data-sidebar="sidebar"]'), false)),
+      ...(await readControls(appHeader(page), false)).filter(
+        (control) => !isScreenHeaderControl(control),
+      ),
+    ]),
+  ];
+  await page.close();
+  return shellControls;
+}
+
+/** Compares a fresh inventory file with the committed one, or writes it when asked. */
+async function checkInventoryFile(
+  fileKey: string,
+  freshInventory: string,
+  attach: (name: string, body: string) => Promise<void>,
+) {
+  const inventoryFilePath = toInventoryFilePath(fileKey);
   if (process.env.DEEPER_UPDATE === "1") {
     mkdirSync(dirname(inventoryFilePath), { recursive: true });
     writeFileSync(inventoryFilePath, freshInventory);
@@ -225,13 +216,51 @@ test("WS-10.3 the Deeper inventory lists every control and text of every screen 
     ? readFileSync(inventoryFilePath, "utf8")
     : "";
   if (committedInventory !== freshInventory) {
-    await testInfo.attach("inventory.json", {
-      body: freshInventory,
-      contentType: "application/json",
-    });
+    await attach(`${fileKey}.json`, freshInventory);
   }
   expect(
     committedInventory,
-    "A screen changed: run DEEPER_UPDATE=1 bun --bun playwright test deeper-inventory, or take inventory.json from the report, then update its Deeper entries",
+    `${fileKey} changed: run DEEPER_UPDATE=1 bun --bun playwright test deeper-inventory, or take ${fileKey}.json from the report, then update its Deeper entries`,
   ).toBe(freshInventory);
+}
+
+const attachTo =
+  (testInfo: {
+    attach: (
+      name: string,
+      options: { body: string; contentType: string },
+    ) => Promise<void>;
+  }) =>
+  (name: string, body: string) =>
+    testInfo.attach(name, { body, contentType: "application/json" });
+
+test("WS-10.3 the Deeper inventory lists every control of the sidebar and header", async ({
+  browser,
+}, testInfo) => {
+  await checkInventoryFile(
+    "shell",
+    renderInventoryFile({
+      order: 0,
+      path: "shell",
+      states: { normal: await crawlShell(browser) },
+    }),
+    attachTo(testInfo),
+  );
 });
+
+for (const [screenIndex, deeperScreen] of deeperScreens.entries()) {
+  test(`WS-10.3 the Deeper inventory lists every control and text of ${deeperScreen.path}`, async ({
+    browser,
+  }, testInfo) => {
+    test.setTimeout(300_000);
+    await checkInventoryFile(
+      deeperScreen.path,
+      renderInventoryFile({
+        order: screenIndex + 1,
+        path: deeperScreen.path,
+        states: await crawlScreen(browser, deeperScreen),
+      }),
+      attachTo(testInfo),
+    );
+  });
+}

@@ -1,0 +1,62 @@
+{
+  "order": 14,
+  "path": "/webhooks/templates",
+  "states": {
+    "normal": [
+      "heading: Templates",
+      "link: Read the Templates guide",
+      "heading: Webhook templates",
+      "paragraph: Payload formats your endpoints can send: SendMock's own JSON, providers your app already parses, chat tools, and your own.",
+      "button: Import",
+      "button: New template",
+      "tab: All",
+      "tab: Generic",
+      "tab: Email providers",
+      "tab: SMS providers",
+      "tab: Payment gateways",
+      "tab: Chat",
+      "tab: Automation",
+      "tab: Custom",
+      "textbox: Search templates",
+      "combobox: Event filter",
+      "each item, link: …"
+    ],
+    "A template is open": [
+      "heading: Native SendMock JSON",
+      "paragraph: SendMock · Built-in · revision #",
+      "link: Use in new endpoint",
+      "button: Edit",
+      "button: Clone",
+      "button: Export",
+      "paragraph: Native SendMock JSON payload, matching the provider's documented format.",
+      "heading: Body template",
+      "combobox: Preview with",
+      "heading: Rendered headers",
+      "heading: Rendered body",
+      "button: Copy rendered body",
+      "button: Close"
+    ],
+    "Import a template dialog": [
+      "heading: Import a template",
+      "paragraph: A .sendmock-template.toml or JSON file exported from SendMock, or its text.",
+      "button: File",
+      "textbox: Template text",
+      "button: Cancel",
+      "button: Import",
+      "button: Close"
+    ],
+    "New template editor": [
+      "heading: New template",
+      "paragraph: It starts as SendMock's native JSON; change it in the editor that opens next.",
+      "textbox: Name",
+      "button: Cancel",
+      "button: Create",
+      "button: Close"
+    ],
+    "failing": [
+      "alert: Could not load the templates. Try again",
+      "paragraph: Could not load the templates.",
+      "button: Try again"
+    ]
+  }
+}

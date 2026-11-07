@@ -1,0 +1,40 @@
+{
+  "order": 26,
+  "path": "/settings",
+  "states": {
+    "normal": [
+      "heading: Settings",
+      "link: Read the Settings guide",
+      "heading: Settings",
+      "paragraph: Changes apply at once, without a restart. Export them to the seed file to keep them across resets.",
+      "link: General",
+      "link: Seed",
+      "link: Email",
+      "link: SMS",
+      "link: Payments",
+      "link: Notifications",
+      "link: Opened events",
+      "link: Chaos",
+      "link: OTP patterns",
+      "link: Connection",
+      "link: About",
+      "heading: Retention",
+      "paragraph: Older traffic is pruned when a limit is reached. Configuration is never pruned.",
+      "spinbutton: Keep at most",
+      "paragraph: Turn off to delete traffic after a number of days.",
+      "switch: Keep forever",
+      "button: Discard",
+      "button: Save changes",
+      "heading: Danger zone",
+      "paragraph: These cannot be undone. Each asks first.",
+      "button: Delete all emails",
+      "button: Delete all SMS",
+      "button: Reset to seed"
+    ],
+    "failing": [
+      "alert: Could not load the settings. Try again",
+      "paragraph: Could not load the settings.",
+      "button: Try again"
+    ]
+  }
+}

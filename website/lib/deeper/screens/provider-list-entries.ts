@@ -63,7 +63,7 @@ export function buildProviderListEntries({
     },
     {
       control: "each item, button: …",
-      does: "Opens the provider's editor.",
+      does: "The provider's name; opens its editor.",
       operationIds: [`get${operationArea}ProvidersByProviderKey`],
     },
     {
@@ -101,6 +101,19 @@ export function buildProviderListEntries({
       control: "button: Try again",
       does: "Loads the list again.",
       operationIds: [`get${operationArea}Providers`],
+    },
+    {
+      control: "each item, button: Edit …",
+      does: "Opens the provider's editor.",
+      operationIds: [`get${operationArea}ProvidersByProviderKey`],
+    },
+    {
+      control: "each item, button: More for …",
+      does: "Opens a menu with Reset to default (a modified built-in), Remove (a built-in, which then answers 404 until restored from the Removed group) or Delete (your own provider), each after you confirm.",
+      operationIds: [
+        `post${operationArea}ProvidersByProviderKeyReset`,
+        `delete${operationArea}ProvidersByProviderKey`,
+      ],
     },
   ];
 }

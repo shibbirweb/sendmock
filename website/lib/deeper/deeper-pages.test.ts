@@ -33,4 +33,22 @@ describe("Deeper pages (WS-10)", () => {
       expect(readFileSync(pagePath, "utf8"), pageFile).toBe(freshText);
     }
   });
+
+  test("WS-10.4 no page has an unescaped { } or < outside code, which the MDX docs site would read as code", () => {
+    const unsafeLines = [...renderDeeperPages()].flatMap(
+      ([pageFile, pageText]) =>
+        pageText
+          .replace(/^---\n[\s\S]*?\n---\n/, "")
+          .split("\n")
+          .map((line) =>
+            line.replace(/`[^`]*`/g, "").replace(/\]\([^)]*\)/g, "]"),
+          )
+          .filter((proseLine) =>
+            /(^|[^\\])[{}<]/.test(proseLine.replace(/^> /, "")),
+          )
+          .map((proseLine) => `${pageFile}: ${proseLine}`),
+    );
+
+    expect(unsafeLines).toEqual([]);
+  });
 });

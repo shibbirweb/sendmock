@@ -76,4 +76,31 @@ describe("the Deeper inventory crawl (WS-10.3)", () => {
       },
     ]);
   });
+
+  test("WS-10.3 a row's different buttons stay apart, each with the words its rows share", () => {
+    const tableSnapshot = `- table:
+  - rowgroup:
+    - row:
+      - button "Orders app"
+      - button "Send test to Orders app"
+      - button "Delete Orders app"
+    - row:
+      - button "Team Slack alerts"
+      - button "Send test to Team Slack alerts"
+      - button "Delete Team Slack alerts"`;
+
+    expect(
+      buildInventory(parseAriaSnapshot(tableSnapshot), {
+        isRecordingParagraphs: false,
+      }).map((control) => control.name),
+    ).toEqual(["…", "Send test to …", "Delete …"]);
+  });
+
+  test("WS-10.3 a clock time reads the same whatever the hour of the crawl", () => {
+    expect(
+      buildInventory(parseAriaSnapshot('- link "9:41 AM"\n- link "10:05 PM"'), {
+        isRecordingParagraphs: false,
+      }).map((control) => control.name),
+    ).toEqual(["#:#"]);
+  });
 });

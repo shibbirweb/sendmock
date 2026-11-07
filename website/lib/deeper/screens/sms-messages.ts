@@ -116,7 +116,7 @@ const smsConversationEntries: DeeperEntry[] = [
     does: "A day separator; messages are grouped by the day they were sent.",
   },
   {
-    control: "link: #:# AM",
+    control: "link: #:#",
     does: "The time a message was sent; opens its Message details.",
   },
   {

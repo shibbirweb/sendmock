@@ -1,0 +1,25 @@
+{
+  "order": 18,
+  "path": "/payments/gateways",
+  "states": {
+    "normal": [
+      "heading: Gateways",
+      "link: Read the Gateways guide",
+      "heading: Payment gateways",
+      "paragraph: The providers SendMock emulates: what their checkout offers, what they send back to your app, and the notifications they post.",
+      "button: Add gateway",
+      "columnheader: Gateway",
+      "columnheader: Key",
+      "columnheader: Methods offered",
+      "columnheader: Notifications to",
+      "columnheader: Enabled",
+      "each item, switch: … enabled",
+      "each item, button: Edit …"
+    ],
+    "failing": [
+      "alert: Could not load the gateways. Try again",
+      "paragraph: Could not load the gateways.",
+      "button: Try again"
+    ]
+  }
+}

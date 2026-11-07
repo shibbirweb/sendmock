@@ -1,0 +1,46 @@
+{
+  "order": 25,
+  "path": "/api-reference",
+  "states": {
+    "normal": [
+      "heading: Not found",
+      "heading: API reference",
+      "paragraph: The REST API of this instance, read from its /api/openapi.json . Every screen, CLI command and MCP tool calls these endpoints.",
+      "link: Download openapi.json",
+      "searchbox: Search the API",
+      "status: # of # operations",
+      "heading: System",
+      "heading: Seed",
+      "heading: Logs",
+      "heading: Test helpers",
+      "heading: Automation",
+      "heading: Email",
+      "heading: Inbound routes",
+      "heading: Tag rules",
+      "heading: Forward rules",
+      "heading: SMS",
+      "heading: Outcome rules",
+      "heading: Verify",
+      "heading: Numbers",
+      "heading: Email providers",
+      "heading: SMS providers",
+      "heading: HTTP Catcher",
+      "heading: Payments",
+      "heading: Checkout",
+      "heading: Payment flows",
+      "heading: Payment gateways",
+      "heading: Payment methods",
+      "heading: Webhook endpoints",
+      "heading: Webhook rules",
+      "heading: Webhook deliveries",
+      "heading: Saved deliveries",
+      "heading: Webhook templates",
+      "heading: Webhook variables"
+    ],
+    "failing": [
+      "alert: Could not load the API reference. Try again",
+      "paragraph: Could not load the API reference.",
+      "button: Try again"
+    ]
+  }
+}

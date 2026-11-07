@@ -1,0 +1,21 @@
+{
+  "order": 21,
+  "path": "/payments/subscriptions",
+  "states": {
+    "normal": [
+      "heading: Subscriptions",
+      "link: Read the Subscriptions guide",
+      "heading: Subscriptions",
+      "paragraph: Each subscription keeps its own clock: advance it to charge the next renewal through its gateway, or cancel it.",
+      "button: New subscription",
+      "paragraph: No subscriptions yet",
+      "paragraph: Start one with New subscription, or POST /api/v#/payments/subscriptions, to test renewals, failed payments and cancellations."
+    ],
+    "empty": [],
+    "failing": [
+      "alert: Could not load the subscriptions. Try again",
+      "paragraph: Could not load the subscriptions.",
+      "button: Try again"
+    ]
+  }
+}
