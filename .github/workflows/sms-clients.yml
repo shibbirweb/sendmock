@@ -99,6 +99,11 @@ jobs:
             language: ruby
             folder: ruby-twilio
             run: bundle install --quiet && bundle exec ruby send_and_verify.rb
+          # AC: SM-17.1
+          - client: Infobip Node SDK
+            language: node
+            folder: node-infobip
+            run: bun install && node send-and-verify.js
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

@@ -28,7 +28,14 @@ mod tests {
 
         assert_eq!(
             provider_keys,
-            vec!["twilio", "twilio_verify", "vonage", "plivo", "messagebird"]
+            vec![
+                "twilio",
+                "twilio_verify",
+                "vonage",
+                "plivo",
+                "messagebird",
+                "infobip"
+            ]
         );
     }
 

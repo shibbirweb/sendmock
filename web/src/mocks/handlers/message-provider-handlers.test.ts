@@ -74,7 +74,7 @@ describe("email and SMS provider API", () => {
     expect(JSON.stringify(providers)).not.toContain("SG.test_key_123");
   });
 
-  test("SM-16.1 lists the five SMS built-ins and the demo's custom provider", async () => {
+  test("SM-16.1 lists the SMS built-ins and the demo's custom provider", async () => {
     const providers = await readJson<MessageProviderDefinition[]>(
       await callApi("GET", "/sms/providers"),
     );
@@ -85,6 +85,7 @@ describe("email and SMS provider API", () => {
       "vonage",
       "plivo",
       "messagebird",
+      "infobip",
       "sslwireless",
     ]);
     expect(

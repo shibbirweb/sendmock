@@ -6,6 +6,7 @@ import {
   requireParts,
   respondWithJson,
 } from "@/mocks/fixtures/message-provider-builder";
+import { buildMoreSmsProviders } from "@/mocks/fixtures/more-sms-provider-fixtures";
 
 const twilioMessagesPath = "/2010-04-01/Accounts/{AccountSid}/Messages";
 
@@ -380,6 +381,7 @@ export function buildBuiltinSmsProviders(): MessageProviderRecord[] {
     buildVonageProvider(),
     buildPlivoProvider(),
     buildMessagebirdProvider(),
+    ...buildMoreSmsProviders(),
   ];
 }
 

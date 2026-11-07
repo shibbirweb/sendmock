@@ -71,7 +71,14 @@ async fn the_list_shows_the_built_ins_with_secrets_masked_and_recent_message_cou
     assert_eq!(status, 200);
     assert_eq!(
         provider_keys,
-        vec!["twilio", "twilio_verify", "vonage", "plivo", "messagebird"]
+        vec![
+            "twilio",
+            "twilio_verify",
+            "vonage",
+            "plivo",
+            "messagebird",
+            "infobip"
+        ]
     );
     assert_eq!(vonage["is_builtin"], true);
     assert_eq!(vonage["is_modified"], false);
