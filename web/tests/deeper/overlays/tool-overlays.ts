@@ -81,7 +81,13 @@ export const scenariosOverlays: DeeperOverlay[] = [
     async (page) => {
       await loadExample(page);
       await page.getByRole("button", { name: "Run", exact: true }).click();
-      await expect(page.getByRole("status").last()).toBeVisible();
+      // Other status texts (validation, toasts) can show first, so wait for the run's own result.
+      await expect(
+        page.getByRole("status").filter({ hasText: /^(Passed|Failed):/ }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Run", exact: true }),
+      ).toBeVisible();
     },
     "An example is loaded",
   ),
