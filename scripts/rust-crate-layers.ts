@@ -28,6 +28,7 @@ export const crateLayers: Record<
   "sendmock-payments": { layerName: "domain", layerRank: 2 },
   "sendmock-ops": { layerName: "operations", layerRank: 3 },
   "sendmock-smtp": { layerName: "transport", layerRank: 4 },
+  "sendmock-pop3": { layerName: "transport", layerRank: 4 },
   "sendmock-api": { layerName: "transport", layerRank: 4 },
   "sendmock-cli": { layerName: "transport", layerRank: 4 },
   "sendmock-mcp": { layerName: "transport", layerRank: 4 },

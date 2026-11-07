@@ -56,7 +56,7 @@ impl Operation for DownloadRawEmailOperation {
 }
 
 /// The stored message, decompressed, or not found.
-pub(super) async fn read_raw_message(
+pub(crate) async fn read_raw_message(
     operation_context: &OperationContext,
     email_id: &str,
 ) -> Result<Vec<u8>, OperationError> {

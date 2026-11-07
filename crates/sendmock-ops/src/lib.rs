@@ -29,6 +29,7 @@ mod paddle;
 mod page_of;
 mod payments;
 mod paypal;
+mod pop3_mailbox;
 mod present_value;
 mod projects;
 mod providers;
@@ -100,6 +101,10 @@ pub use page_of::PageOf;
 pub use payments::{
     PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
     PaymentMethodDefinition, PaymentSummary,
+};
+pub use pop3_mailbox::{
+    POP3_MAILBOX_SIZE, Pop3MailboxMessage, delete_pop3_messages, open_pop3_mailbox,
+    read_pop3_message,
 };
 pub use projects::{PROJECT_HEADER, Project, find_named_project};
 pub use providers::{

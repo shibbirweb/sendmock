@@ -2316,6 +2316,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "sendmock-pop3"
+version = "0.0.0"
+dependencies = [
+ "sendmock-core",
+ "sendmock-ops",
+ "sendmock-store",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "sendmock-sms"
 version = "0.0.0"
 dependencies = [

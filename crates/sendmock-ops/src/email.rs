@@ -45,6 +45,7 @@ pub(crate) use email_access::read_wait_duration;
 pub use email_check_operations::CheckEmailHtmlOperation;
 pub use email_click_operations::{ListEmailClicksOperation, RecordEmailClickOperation};
 pub use email_detail::{EmailAttachment, EmailDetail, ExtractedData};
+pub(crate) use email_file_operations::read_raw_message;
 pub use email_file_operations::{
     DownloadAttachmentOperation, DownloadMimePartOperation, DownloadRawEmailOperation,
     GetAttachmentThumbnailOperation,

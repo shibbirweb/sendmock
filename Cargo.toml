@@ -27,6 +27,7 @@ sendmock-ops = { path = "crates/sendmock-ops", version = "=0.0.0" }
 sendmock-smtp = { path = "crates/sendmock-smtp", version = "=0.0.0" }
 sendmock-sms = { path = "crates/sendmock-sms", version = "=0.0.0" }
 sendmock-payments = { path = "crates/sendmock-payments", version = "=0.0.0" }
+sendmock-pop3 = { path = "crates/sendmock-pop3", version = "=0.0.0" }
 sendmock-store = { path = "crates/sendmock-store", version = "=0.0.0" }
 sendmock-webhooks = { path = "crates/sendmock-webhooks", version = "=0.0.0" }
 

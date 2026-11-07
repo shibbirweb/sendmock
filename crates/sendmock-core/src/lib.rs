@@ -2,6 +2,7 @@
 
 pub mod byte_size;
 pub mod clock;
+pub mod credentials_file;
 pub mod file_checksums;
 pub mod id_generator;
 pub mod random_source;
@@ -11,6 +12,7 @@ pub mod wildcard_pattern;
 
 pub use byte_size::parse_size_bytes;
 pub use clock::{Clock, FixedClock, SystemClock};
+pub use credentials_file::read_credentials_file;
 pub use file_checksums::{FileChecksums, compute_file_checksums};
 pub use id_generator::{IdGenerator, SequentialIdGenerator, SystemIdGenerator};
 pub use random_source::{RandomSource, SeededRandomSource, SystemRandomSource};

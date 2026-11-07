@@ -37,19 +37,12 @@ impl SmtpAuthMode {
     }
 
     fn read_credentials_file(file_path: &str) -> Result<Self, SmtpAuthModeError> {
-        let file_text = std::fs::read_to_string(file_path).map_err(|read_error| {
-            SmtpAuthModeError::UnreadableFile {
+        sendmock_core::read_credentials_file(file_path)
+            .map(Self::Credentials)
+            .map_err(|read_error| SmtpAuthModeError::UnreadableFile {
                 file_path: file_path.to_owned(),
                 reason: read_error.to_string(),
-            }
-        })?;
-        let credentials = file_text
-            .lines()
-            .filter(|line| !line.trim().is_empty() && !line.trim_start().starts_with('#'))
-            .filter_map(|line| line.split_once(':'))
-            .map(|(username, password)| (username.trim().to_owned(), password.trim().to_owned()))
-            .collect();
-        Ok(Self::Credentials(credentials))
+            })
     }
 
     pub fn is_offered(&self) -> bool {
