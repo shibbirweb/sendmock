@@ -43,6 +43,7 @@ describe("install channels", () => {
       "winget",
       "chocolatey",
       "npm",
+      "npx",
       "cargo",
       "docker",
       "binaries",
@@ -105,6 +106,46 @@ describe("install channels", () => {
       stableMatrix.find((entry) => entry.name === "Homebrew on macos-latest")
         ?.container,
     ).toBe("");
+  });
+});
+
+describe("npx with no install", () => {
+  const npxChannel = channels.find((channel) => channel.key === "npx");
+
+  test("DS-03.7 npx runs the published stable and beta on macOS, Linux and Windows with no install", () => {
+    const stableMatrix = buildChannelMatrix(channels, "stable", "npx");
+    const betaMatrix = buildChannelMatrix(channels, "beta", "npx");
+
+    expect(npxChannel?.systems).toEqual(["macos", "linux", "windows"]);
+    expect(stableMatrix.map((entry) => entry.runner)).toEqual([
+      "ubuntu-latest",
+      "macos-latest",
+      "windows-latest",
+    ]);
+    for (const matrixEntry of stableMatrix) {
+      expect(matrixEntry.script).toContain("npx --yes sendmock@latest");
+      expect(matrixEntry.script).not.toContain("npm install");
+    }
+    for (const matrixEntry of betaMatrix) {
+      expect(matrixEntry.script).toContain("npx --yes sendmock@beta");
+    }
+  });
+
+  test("DS-03.7 the install page shows npx, bunx, pnpm dlx and yarn dlx as a way to run with no install", () => {
+    const section = readPageSection(installPage, "npx (no install)");
+
+    for (const runCommand of [
+      "npx sendmock",
+      "npx sendmock@beta",
+      "bunx sendmock",
+      "pnpm dlx sendmock",
+      "yarn dlx sendmock",
+    ]) {
+      expect({ runCommand, isShown: section?.includes(runCommand) }).toEqual({
+        runCommand,
+        isShown: true,
+      });
+    }
   });
 });
 

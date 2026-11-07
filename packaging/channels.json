@@ -430,6 +430,61 @@
       ]
     },
     {
+      "key": "npx",
+      "name": "npx",
+      "section": "npx (no install)",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "npx sendmock",
+        "npx sendmock@beta",
+        "bunx sendmock",
+        "pnpm dlx sendmock",
+        "yarn dlx sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "npx runs sendmock from the packed packages with no install"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/npx-bin/sendmock"
+        },
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/npx-bin/sendmock"
+        },
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "npx --yes sendmock@latest version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\"",
+            "beta": "npx --yes sendmock@beta version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\""
+          },
+          "command": "$env:RUNNER_TEMP\\npx-bin\\sendmock.exe"
+        }
+      ]
+    },
+    {
       "key": "cargo",
       "name": "Cargo",
       "section": "Cargo (Rust developers)",

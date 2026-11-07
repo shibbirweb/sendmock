@@ -239,6 +239,20 @@ jobs:
           echo "$version_json"
           echo "$version_json" | grep -q "\"version\":\"$VERSION\"" || { echo "npx sendmock does not run $VERSION" >&2; exit 1; }
 
+      # AC: DS-03.7
+      - name: npx runs sendmock from the packed packages with no install
+        shell: bash
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          # An empty folder, so the launcher cannot lean on a project's node_modules.
+          cd "$(mktemp -d)"
+          launcher_tarball="$RUNNER_TEMP/npm-packages/sendmock-$VERSION.tgz"
+          platform_tarball="$(ls "$RUNNER_TEMP"/npm-packages/sendmock-*-"$VERSION".tgz)"
+          version_json="$(npx --yes --package "$launcher_tarball" --package "$platform_tarball" sendmock version --json)"
+          echo "$version_json"
+          echo "$version_json" | grep -q "\"version\":\"$VERSION\"" || { echo "npx with no install does not run $VERSION" >&2; exit 1; }
+
       # AC: DS-03.1 DS-03.6
       - name: Homebrew installs the formula from a local tap and server, and it passes test cases 2 to 8 (macOS, Linux x64)
         if: matrix.archive == 'tar.gz' && matrix.target != 'aarch64-unknown-linux-musl'

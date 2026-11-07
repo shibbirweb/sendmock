@@ -27,6 +27,7 @@ Every way below installs the same `sendmock`. The table says which systems each 
 | [WinGet](#winget-windows) | Windows | Yes | No |
 | [Chocolatey](#chocolatey-windows) | Windows | Yes | No |
 | [npm](#npm-projects-with-nodejs) | macOS, Linux, Windows | Yes | Yes |
+| [npx](#npx-no-install) | macOS, Linux, Windows | Yes | Yes |
 | [Cargo](#cargo-rust-developers) | macOS, Linux, Windows | Yes | No |
 | [Docker](#docker) | macOS, Linux, Windows | Yes | Yes |
 | [Binaries](#binaries) | macOS, Linux, Windows | Yes | Yes |
@@ -350,6 +351,44 @@ The `sendmock` package runs the right binary for your computer, so a JavaScript 
    ```
 
 3. Start it with `npx sendmock`, or add `"sendmock": "sendmock"` to your `scripts`. Then go on to [Start SendMock](#start-sendmock).
+
+## npx (no install)
+
+Run SendMock straight from npm without installing anything first. You need Node.js 18 or newer (or Bun, pnpm or Yarn). The first run downloads the binary for your computer (under 20 MB) into the package manager's cache; later runs start at once.
+
+1. Start the stable:
+
+   ```bash
+   npx sendmock
+   ```
+
+   Or the beta:
+
+   ```bash
+   npx sendmock@beta
+   ```
+
+2. Any command works the same way, for example the MCP server for an AI agent:
+
+   ```bash
+   npx sendmock mcp
+   ```
+
+3. With another package manager, use its runner instead of `npx`:
+
+   ```bash
+   bunx sendmock
+   ```
+
+   ```bash
+   pnpm dlx sendmock
+   ```
+
+   ```bash
+   yarn dlx sendmock
+   ```
+
+Then go on to [Start SendMock](#start-sendmock).
 
 ## Cargo (Rust developers)
 
