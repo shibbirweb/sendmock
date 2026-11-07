@@ -24,7 +24,10 @@ fn check_reference_page(page_file_name: &str, rendered_page: &str) {
         fs::write(&page_path, rendered_page).expect("the reference page is writable");
         return;
     }
-    let committed_page = fs::read_to_string(&page_path).unwrap_or_default();
+    // A Windows checkout may turn the committed page's line endings into CRLF.
+    let committed_page = fs::read_to_string(&page_path)
+        .unwrap_or_default()
+        .replace("\r\n", "\n");
     assert!(
         committed_page == rendered_page,
         "docs/wiki/reference/{page_file_name} is out of date: run \
