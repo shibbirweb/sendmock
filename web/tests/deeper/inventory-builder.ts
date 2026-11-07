@@ -28,13 +28,7 @@ const controlRoles = new Set([
   "img",
 ]);
 /** Texts recorded by their words, since they rarely have a name of their own. */
-const textRoles = new Set([
-  "heading",
-  "alert",
-  "status",
-  "dialog",
-  "alertdialog",
-]);
+const textRoles = new Set(["heading", "alert", "status"]);
 const itemRoles = new Set(["listitem", "row"]);
 const dataNamePlaceholder = "…";
 

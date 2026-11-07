@@ -31,6 +31,3 @@ export type DeeperPage = {
   intro: string;
   entries: DeeperEntry[];
 };
-
-/** A data state of a screen, as the crawl reads it from the demo. */
-export type DeeperState = "normal" | "empty" | "failing";

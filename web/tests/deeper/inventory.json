@@ -50,7 +50,12 @@
           "button: Copy API base URL",
           "link: More snippets"
         ],
-        "empty": [],
+        "empty": [
+          "paragraph: No failed deliveries. Every webhook got through.",
+          "paragraph: Nothing yet. Send an email or SMS from your app, or try a sample.",
+          "button: Send a sample email",
+          "button: Send a sample SMS"
+        ],
         "failing": [
           "alert: Could not load the overview. Check that SendMock is running. Try again",
           "paragraph: Could not load the overview. Check that SendMock is running.",
@@ -80,6 +85,124 @@
           "each item, img: …",
           "each item, link: …",
           "paragraph: Select an email to read it. Use J and K to move through the list."
+        ],
+        "An email is open": [
+          "heading: Welcome to Acme: here is what is new this week",
+          "button: Reply",
+          "button: Forward",
+          "button: Mark as unread",
+          "button: Delete email",
+          "button: Simulate an event",
+          "button: More actions",
+          "link: SendGrid",
+          "button: Edit tags",
+          "link: https://acme.test/blog",
+          "button: Copy link",
+          "tab: HTML",
+          "tab: Text",
+          "tab: Source",
+          "tab: Headers",
+          "tab: Attachments (#)",
+          "tab: MIME",
+          "tab: Checks",
+          "tab: Timeline",
+          "tab: Template data",
+          "radio: Desktop width",
+          "radio: Tablet width",
+          "radio: Mobile width",
+          "button: Load remote images",
+          "button: Screenshot"
+        ],
+        "An email with a code is open": [
+          "heading: Your verification code",
+          "link: SMTP",
+          "button: Copy code #"
+        ],
+        "Attachments tab": [
+          "img: hero.png",
+          "link: Download hero.png"
+        ],
+        "MIME tab": [
+          "each item, link: Download part …"
+        ],
+        "Checks tab": [
+          "heading: HTML compatibility: #%",
+          "paragraph: CSS background (line #): Partly supported in Outlook for Windows (#%).",
+          "paragraph: Inline CID images (line #): Partly supported in Outlook for Windows (#%).",
+          "paragraph: Remote images (line #): Partly supported in Outlook for Windows (#%).",
+          "heading: Links and images",
+          "button: Check links",
+          "paragraph: Runs only when you ask, because it makes real requests to every link.",
+          "heading: Spam score: #.# / #"
+        ],
+        "Template data tab": [
+          "paragraph: Sent with provider template d-#f#c#b#a#e#d . The template content lives at the provider, so only the data is shown."
+        ],
+        "Replying": [
+          "heading: Reply as recipient",
+          "button: Close composer",
+          "combobox: From",
+          "textbox: Subject",
+          "textbox: Message",
+          "button: Send reply",
+          "button: Cancel",
+          "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
+        ],
+        "Simulate an event menu": [
+          "menuitem: Open (email.opened)",
+          "menuitem: Delivered",
+          "menuitem: Hard bounce",
+          "menuitem: Soft bounce",
+          "menuitem: Spam complaint",
+          "menuitem: Unsubscribe"
+        ],
+        "More actions menu": [
+          "menuitem: Download .eml",
+          "menuitem: Release to real SMTP",
+          "menuitem: Send to webhook"
+        ],
+        "Release dialog": [
+          "heading: Release to real SMTP",
+          "paragraph: Sends this email through your relay server so you can check it in a real inbox. Only recipients on the relay allowlist are accepted.",
+          "textbox: Recipients (comma separated)",
+          "button: Cancel",
+          "button: Release",
+          "button: Close"
+        ],
+        "Send to webhook dialog": [
+          "heading: Send to webhook",
+          "paragraph: Sends \"Welcome to Acme: here is what is new this week\" to an endpoint now.",
+          "combobox: Endpoint",
+          "combobox: Format",
+          "paragraph: A template here is used for this send only.",
+          "textbox: vars.reason",
+          "paragraph: Asked for on manual sends.",
+          "paragraph: None. A value here wins over the endpoint and global value of that name, for this send only.",
+          "button: Add override",
+          "switch: Edit body",
+          "button: Copy rendered URL",
+          "heading: Rendered headers",
+          "heading: Rendered body",
+          "button: Copy rendered body",
+          "button: Cancel",
+          "button: Send",
+          "button: Close"
+        ],
+        "Import .eml dialog": [
+          "heading: Import .eml",
+          "paragraph: Store a whole message, headers and all, from a file or pasted text.",
+          "radio: Sent by your app As if your app sent it, like the sendmail shim (POST /send/raw).",
+          "radio: Incoming to your app As a reply or new mail to your app; inbound routes deliver it.",
+          "textbox: Message",
+          "button: Upload a .eml file",
+          "button: Import",
+          "button: Close"
+        ],
+        "Delete all emails dialog": [
+          "heading: Delete all emails?",
+          "paragraph: This removes all # captured emails. It cannot be undone.",
+          "button: Cancel",
+          "button: Delete all"
         ],
         "empty": [
           "paragraph: No emails yet",
@@ -115,6 +238,118 @@
           "each item, switch: … enabled",
           "each item, button: …"
         ],
+        "Add a provider dialog": [
+          "heading: Add a provider",
+          "paragraph: Answer a provider SendMock does not ship, from blank or from the closest email provider; you set its requests and responses next.",
+          "textbox: Name",
+          "textbox: Key",
+          "paragraph: Its /providers/<key>/ path and the name stored on messages; fixed once added.",
+          "combobox: Start from",
+          "button: Cancel",
+          "button: Add provider",
+          "button: Close"
+        ],
+        "Provider editor, General tab": [
+          "heading: SendGrid",
+          "paragraph: Built-in Key sendgrid , # messages in the last # hours.",
+          "tab: General",
+          "tab: Requests",
+          "tab: Responses",
+          "tab: Callbacks",
+          "tab: Preview",
+          "tab: Try it",
+          "textbox: Name",
+          "textbox: Key",
+          "paragraph: Its /providers/<key>/ path and the name stored on messages; fixed once added.",
+          "textbox: Host",
+          "paragraph: The provider's API host. On the provider port it tells apart providers that share a path.",
+          "textbox: Accent colour",
+          "textbox: Accent",
+          "paragraph: The colour of its badge on messages.",
+          "switch: Enabled",
+          "paragraph: What your app is configured with. Templates read them as credentials.<name> ; secrets stay masked, in the preview too.",
+          "textbox: Credential # name",
+          "textbox: Credential # value",
+          "checkbox: Secret",
+          "button: Reveal api_key",
+          "button: Remove credential #",
+          "button: Add credential",
+          "switch: Check credentials",
+          "paragraph: Off: any credentials pass. On: a request without a secret credential gets the provider's unauthorized answer.",
+          "button: Cancel",
+          "button: Save provider",
+          "button: Close"
+        ],
+        "Provider editor, Requests tab": [
+          "paragraph: The paths as the provider's API has them; use {name} for a part that changes, like /v#/{domain}/messages .",
+          "combobox: Request # kind",
+          "combobox: Request # method",
+          "textbox: Request # path",
+          "combobox: Request # format",
+          "button: Remove request #",
+          "button: Add request",
+          "paragraph: A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.",
+          "combobox: Mapping # part",
+          "textbox: Mapping # source",
+          "button: Remove mapping #",
+          "button: Map a part",
+          "combobox: Check # part",
+          "combobox: Check # kind",
+          "spinbutton: Check # max length",
+          "combobox: Check # error",
+          "button: Remove check #",
+          "button: Add check"
+        ],
+        "Provider editor, Responses tab": [
+          "paragraph: Templates read request , message , error and credentials ; the Preview tab lists every value with an example.",
+          "textbox: Message id",
+          "paragraph: The provider's id for each message, e.g. SM{{ random_hex(#) }}.",
+          "heading: Success response",
+          "spinbutton: Success response status",
+          "textbox: Success response header # name",
+          "textbox: Success response header # value",
+          "button: Remove Success response header #",
+          "button: Add header",
+          "textbox: Success response body",
+          "combobox: Error response # kind",
+          "button: Remove error response #",
+          "spinbutton: Error response # status",
+          "textbox: Error response # header # name",
+          "textbox: Error response # header # value",
+          "button: Remove Error response # header #",
+          "textbox: Error response # body",
+          "button: Add an error response"
+        ],
+        "Provider editor, Callbacks tab": [
+          "combobox: Callback template",
+          "paragraph: The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.",
+          "paragraph: The provider's name for each SendMock status, as its callbacks and fetch answers show it.",
+          "textbox: delivered",
+          "textbox: bounced",
+          "textbox: complained",
+          "textbox: opened"
+        ],
+        "Provider editor, Preview tab": [
+          "heading: Sample request",
+          "paragraph: A send built from the field mapping. Edit it to try another request.",
+          "combobox: Sample method",
+          "textbox: Sample path",
+          "textbox: Sample body",
+          "heading: Stored message",
+          "heading: Response",
+          "textbox: Search the reference",
+          "heading: Values",
+          "each item, button: …",
+          "heading: Functions",
+          "heading: Filters",
+          "each item, button: … }}"
+        ],
+        "Provider editor, Try it tab": [
+          "button: Copy sdk base url (provider port)",
+          "button: Copy base url on the main port",
+          "button: Copy a curl command",
+          "paragraph: The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language."
+        ],
         "failing": [
           "alert: Could not load the providers. Try again",
           "paragraph: Could not load the providers.",
@@ -137,7 +372,18 @@
           "each item, img: …",
           "paragraph: Select a conversation to read it. Use J and K to move through the list."
         ],
-        "empty": [],
+        "empty": [
+          "paragraph: No SMS yet",
+          "paragraph: Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.",
+          "radio: This machine",
+          "radio: Docker host",
+          "radio: Compose",
+          "button: Copy Native API",
+          "button: Copy Twilio base URL",
+          "button: Copy Vonage base URL",
+          "link: More snippets",
+          "button: Send a sample SMS"
+        ],
         "failing": [
           "alert: Could not load conversations. Try again",
           "paragraph: Could not load conversations.",
@@ -373,7 +619,7 @@
           "columnheader: Status",
           "columnheader: Duration",
           "columnheader: Attempt",
-          "each item, link: …",
+          "each item, link: # … ago",
           "button: Load more"
         ],
         "empty": [

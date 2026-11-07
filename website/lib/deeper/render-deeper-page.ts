@@ -2,9 +2,9 @@ import { posix } from "node:path";
 
 import type { ScreenState } from "./deeper-inventory";
 import type { OperationSurfaces } from "./deeper-surfaces";
-import type { DeeperEntry, DeeperPage, DeeperState } from "./deeper-types";
+import type { DeeperEntry, DeeperPage } from "./deeper-types";
 
-const stateHeadings: Record<DeeperState, string> = {
+const stateHeadings: Record<string, string> = {
   normal: "On the screen",
   empty: "With no data yet",
   failing: "When the data cannot load",
@@ -119,7 +119,7 @@ export function renderDeeperPage(
       return [renderEntry(entryNumber, control, entry, surfacesById)];
     });
     return [
-      `## ${stateHeadings[screenState.state]}`,
+      `## ${stateHeadings[screenState.state] ?? screenState.state}`,
       "",
       ...renderedEntries,
     ].join("\n");

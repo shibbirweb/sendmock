@@ -13,6 +13,7 @@ import { parseAriaSnapshot } from "../deeper/aria-snapshot-parser";
 import {
   dataStateChoices,
   type DeeperDataState,
+  type DeeperOverlay,
   type DeeperScreen,
   deeperScreens,
 } from "../deeper/deeper-screens";
@@ -20,6 +21,7 @@ import { buildInventory } from "../deeper/inventory-builder";
 import {
   type DeeperInventory,
   describeControl,
+  type ScreenInventory,
   inventoryFilePath,
   renderInventoryFile,
 } from "../deeper/inventory-file";
@@ -31,13 +33,36 @@ const appHeader = (page: Page) => page.locator("main header").first();
 const isScreenHeaderControl = (control: string) =>
   control.startsWith("heading: ") || /^link: Read the .* guide$/.test(control);
 
-async function readControls(
+async function readControlsOnce(
   scope: Locator,
   isRecordingParagraphs: boolean,
 ): Promise<string[]> {
   return buildInventory(parseAriaSnapshot(await scope.ariaSnapshot()), {
     isRecordingParagraphs,
   }).map(describeControl);
+}
+
+/**
+ * The controls once two reads 400 ms apart agree: a refetch after a data state change can
+ * land after the screen first shows, and "networkidle" does not wait for one in an app.
+ */
+async function readControls(
+  scope: Locator,
+  isRecordingParagraphs: boolean,
+): Promise<string[]> {
+  let previousControls = await readControlsOnce(scope, isRecordingParagraphs);
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await scope.page().waitForTimeout(400);
+    const currentControls = await readControlsOnce(
+      scope,
+      isRecordingParagraphs,
+    );
+    if (currentControls.join("\n") === previousControls.join("\n")) {
+      return currentControls;
+    }
+    previousControls = currentControls;
+  }
+  return previousControls;
 }
 
 async function chooseDataState(page: Page, dataState: DeeperDataState) {
@@ -113,14 +138,64 @@ async function readAllScreens(
   return { shellControls, screenStates };
 }
 
+function readOverlayScope(page: Page, scope: DeeperOverlay["scope"]): Locator {
+  if (scope === "dialog") {
+    return page.locator('[role="dialog"], [role="alertdialog"]').last();
+  }
+  return scope === "menu" ? page.getByRole("menu").last() : screenContent(page);
+}
+
+/**
+ * Each overlay from a fresh load of its screen. A screen overlay leaves out what the screen
+ * shows anyway, and any overlay leaves out its baseline's controls; one adding nothing is
+ * left out.
+ */
+async function readOverlays(
+  browser: Browser,
+  deeperScreen: DeeperScreen,
+  normalControls: string[],
+): Promise<[string, string[]][]> {
+  const page = await browser.newPage();
+  const overlayStates: [string, string[]][] = [];
+  const controlsByOverlay = new Map<string, string[]>();
+  for (const overlay of deeperScreen.overlays) {
+    await page.goto(deeperScreen.path);
+    await chooseDataState(page, "normal");
+    await readScreenState(page, deeperScreen, "normal");
+    await overlay.open(page);
+    const overlayScope = readOverlayScope(page, overlay.scope);
+    await expect(overlayScope).toBeVisible();
+    await expect(overlayScope.locator('[data-slot="skeleton"]')).toHaveCount(0);
+    const overlayControls = await readControls(overlayScope, true);
+    controlsByOverlay.set(overlay.name, overlayControls);
+    const leftOutControls = new Set([
+      ...(overlay.scope === "screen" ? normalControls : []),
+      ...(controlsByOverlay.get(overlay.baseline ?? "") ?? []),
+    ]);
+    const newControls = overlayControls.filter(
+      (control) => !leftOutControls.has(control),
+    );
+    if (newControls.length > 0) {
+      overlayStates.push([overlay.name, newControls]);
+    }
+  }
+  await page.close();
+  return overlayStates;
+}
+
 async function crawlInventory(browser: Browser): Promise<DeeperInventory> {
   const normal = await readAllScreens(browser, "normal");
-  const screenInventories = deeperScreens.map((deeperScreen) => ({
-    path: deeperScreen.path,
-    states: {
-      normal: normal.screenStates.get(deeperScreen.path) ?? [],
-    } as Record<string, string[]>,
-  }));
+  const screenInventories: ScreenInventory[] = [];
+  for (const deeperScreen of deeperScreens) {
+    const normalControls = normal.screenStates.get(deeperScreen.path) ?? [];
+    screenInventories.push({
+      path: deeperScreen.path,
+      states: Object.fromEntries([
+        ["normal", normalControls],
+        ...(await readOverlays(browser, deeperScreen, normalControls)),
+      ]),
+    });
+  }
   for (const dataState of ["empty", "failing"] as const) {
     const extraState = await readAllScreens(browser, dataState);
     for (const screenInventory of screenInventories) {

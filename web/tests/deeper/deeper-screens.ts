@@ -1,11 +1,27 @@
+import type { Page } from "@playwright/test";
+
 import { appScreens } from "../e2e/support/app-screens";
+import { mailOverlays, mailProvidersOverlays } from "./overlays/mail-overlays";
 
 /** How the mock answers while a state is read, chosen in the dev toolbar. */
 export type DeeperDataState = "normal" | "empty" | "failing";
 
+/** A tab, pane, dialog or menu opened on a screen, read as a state of its own. */
+export type DeeperOverlay = {
+  /** The state's heading on the Deeper page, such as "An email is open". */
+  name: string;
+  /** Steps from the screen as it first loads. */
+  open: (page: Page) => Promise<void>;
+  /** The screen itself (only what the steps added is recorded), or the dialog or menu. */
+  scope: "screen" | "dialog" | "menu";
+  /** An earlier overlay whose controls are left out, so a tab lists what the tab adds. */
+  baseline?: string;
+};
+
 export type DeeperScreen = {
   path: string;
   title: string;
+  overlays: DeeperOverlay[];
   /** The data states read beside `normal`; each records only what it adds. */
   extraDataStates: DeeperDataState[];
 };
@@ -25,10 +41,16 @@ const trafficScreenPaths = new Set([
   "/logs",
 ]);
 
-/** Every screen of the app, with the data states its Deeper page covers. */
+const overlaysByPath: Record<string, DeeperOverlay[]> = {
+  "/mail": mailOverlays,
+  "/mail/providers": mailProvidersOverlays,
+};
+
+/** Every screen of the app, with the data states and overlays its Deeper page covers. */
 export const deeperScreens: DeeperScreen[] = appScreens.map((appScreen) => ({
   path: appScreen.path,
   title: appScreen.title,
+  overlays: overlaysByPath[appScreen.path] ?? [],
   extraDataStates: [
     ...(trafficScreenPaths.has(appScreen.path) ? (["empty"] as const) : []),
     ...(appScreen.loadsDataOnOpen === false ? [] : (["failing"] as const)),

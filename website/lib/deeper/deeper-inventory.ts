@@ -1,8 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import type { DeeperState } from "./deeper-types";
-
 /** The inventory the crawl of the demo writes (`web/tests/deeper/`, WS-10.3). */
 const inventoryFilePath = fileURLToPath(
   new URL("../../../web/tests/deeper/inventory.json", import.meta.url),
@@ -10,10 +8,11 @@ const inventoryFilePath = fileURLToPath(
 
 type DeeperInventoryFile = {
   shell: string[];
-  screens: { path: string; states: Partial<Record<DeeperState, string[]>> }[];
+  screens: { path: string; states: Record<string, string[]> }[];
 };
 
-export type ScreenState = { state: DeeperState; controls: string[] };
+/** `normal`, `empty`, `failing`, or the name of a tab, dialog or menu the crawl opened. */
+export type ScreenState = { state: string; controls: string[] };
 
 export function loadDeeperInventory(): DeeperInventoryFile {
   return JSON.parse(
@@ -26,7 +25,10 @@ export function listInventoryScreens(inventory: DeeperInventoryFile): string[] {
   return ["shell", ...inventory.screens.map((screen) => screen.path)];
 }
 
-/** A screen's controls per data state, in screen order; empty states are left out. */
+/**
+ * A screen's controls per state, in screen order: the normal state, the tabs, dialogs and
+ * menus the crawl opened, then the empty and failing data states; empty states are left out.
+ */
 export function listScreenStates(
   inventory: DeeperInventoryFile,
   screen: string,
@@ -37,11 +39,7 @@ export function listScreenStates(
   const screenInventory = inventory.screens.find(
     (inventoryScreen) => inventoryScreen.path === screen,
   );
-  const stateOrder: DeeperState[] = ["normal", "empty", "failing"];
-  return stateOrder
-    .map((state) => ({
-      state,
-      controls: screenInventory?.states[state] ?? [],
-    }))
+  return Object.entries(screenInventory?.states ?? {})
+    .map(([state, controls]) => ({ state, controls }))
     .filter((screenState) => screenState.controls.length > 0);
 }
