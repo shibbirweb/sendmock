@@ -820,3 +820,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | A7a built: the push store (migration 0036), REST, CLI and MCP for push notifications with a wait helper, and FCM HTTP v1's send API answered in code (message names, dry runs, Google's error shape); the API reference gained a Push group. The SMTP session and API request repositories are now grouped as `LogStores`. |
 | 2026-11-07 | Ticked PL-10.8 and EM-21 after CI passed on 5cca763, with the Python `poplib` job and the Windows load test green: PL-10 and EM-21 accepted, A5 and A6 done. |
 | 2026-11-07 | Session end: the resume note and prompt now point at the After 1.0 backlog (A7b next). |
+| 2026-11-07 | Fix: CI on 2913f24 found the A7a push test over the 50-line limit and two binary parity mismatches (`DELETE /push` took paging flags, and `push wait` renamed `--timeout` to `--wait`); `DELETE /push` now takes `PushFilterQuery` and the wait keeps `--timeout`. |

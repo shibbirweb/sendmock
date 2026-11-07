@@ -113,7 +113,7 @@ pub use providers::{
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
     load_sms_provider_definitions, sign_twilio_request,
 };
-pub use push::{PushListQuery, PushNotification, PushReference, PushWaitQuery};
+pub use push::{PushFilterQuery, PushListQuery, PushNotification, PushReference, PushWaitQuery};
 pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};
 pub use request_scope::RequestScope;
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};

@@ -2710,9 +2710,7 @@ expression: command_descriptions
     "summary": "Delete every push notification, or one project's.",
     "arguments": [],
     "flags": [
-      "--cursor",
       "--device-token",
-      "--limit",
       "--project",
       "--provider",
       "--status"
@@ -2739,7 +2737,7 @@ expression: command_descriptions
       "--device-token",
       "--project",
       "--since",
-      "--wait"
+      "--timeout"
     ],
     "operations": [
       {

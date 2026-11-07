@@ -9,7 +9,7 @@ mod push_store;
 mod push_views;
 
 pub(crate) use push_api::answer_push_api;
-pub use push_inputs::{PushListQuery, PushReference, PushWaitQuery};
+pub use push_inputs::{PushFilterQuery, PushListQuery, PushReference, PushWaitQuery};
 use push_operations::{
     DeletePushOperation, DeletePushesOperation, GetPushOperation, ListPushesOperation,
     WaitPushOperation,

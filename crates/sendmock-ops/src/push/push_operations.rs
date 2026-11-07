@@ -3,7 +3,7 @@ use std::time::Duration;
 use sendmock_core::parse_rfc3339;
 use sendmock_store::PushNotificationFilter;
 
-use super::push_inputs::{PushListQuery, PushReference, PushWaitQuery};
+use super::push_inputs::{PushFilterQuery, PushListQuery, PushReference, PushWaitQuery};
 use super::push_views::PushNotification;
 use crate::email::read_wait_duration;
 use crate::{
@@ -148,7 +148,7 @@ impl Operation for DeletePushOperation {
 pub struct DeletePushesOperation;
 
 impl Operation for DeletePushesOperation {
-    type Input = PushListQuery;
+    type Input = PushFilterQuery;
     type Output = NoContent;
 
     fn definition(&self) -> OperationDefinition {
@@ -168,12 +168,28 @@ impl Operation for DeletePushesOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        input: PushListQuery,
+        input: PushFilterQuery,
     ) -> Result<NoContent, OperationError> {
-        operation_context
+        let page = operation_context
             .push_notifications
-            .delete_notifications(input.project)
+            .list_notifications(
+                PushNotificationFilter {
+                    project_key: input.project,
+                    device_token: input.device_token,
+                    provider: input.provider,
+                    status: input.status,
+                    created_after_unix_ms: None,
+                },
+                None,
+                u32::MAX,
+            )
             .await?;
+        for notification in page.notifications {
+            operation_context
+                .push_notifications
+                .delete_notification(&notification.push_id)
+                .await?;
+        }
         Ok(NoContent)
     }
 }
@@ -193,7 +209,6 @@ impl Operation for WaitPushOperation {
             is_read_only: true,
             cli_usage: "sendmock push wait",
             mcp_tool: "sendmock_push_wait",
-            cli_flag_names: &[("timeout", "wait")],
             ..OperationDefinition::DEFAULTS
         }
     }

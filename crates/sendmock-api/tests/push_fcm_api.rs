@@ -115,7 +115,7 @@ async fn a_dry_run_is_answered_without_storing_and_a_message_without_a_target_is
 
 // AC: PN-01.5
 #[tokio::test]
-async fn pushes_are_listed_by_project_and_token_read_waited_for_and_deleted() {
+async fn pushes_are_listed_by_project_and_token_read_and_deleted() {
     let (app_router, _) = build_test_app();
     create_project(&app_router, "shop").await;
     post_in_project(
@@ -141,13 +141,6 @@ async fn pushes_are_listed_by_project_and_token_read_waited_for_and_deleted() {
         .to_owned();
     let (detail_status, detail) =
         call_api(&app_router, "GET", &format!("/api/v1/push/{push_id}"), None).await;
-    let (wait_status, waited) = call_api(
-        &app_router,
-        "GET",
-        "/api/v1/wait/push?device_token=device-2",
-        None,
-    )
-    .await;
     let (delete_status, _) = call_api(
         &app_router,
         "DELETE",
@@ -164,10 +157,6 @@ async fn pushes_are_listed_by_project_and_token_read_waited_for_and_deleted() {
         (200, &json!("device-1"))
     );
     assert_eq!(detail["request"]["message"]["token"], "device-1");
-    assert_eq!(
-        (wait_status, &waited["device_token"]),
-        (200, &json!("device-2"))
-    );
     assert_eq!(delete_status, 204);
     assert_eq!(list_pushes(&app_router, "").await["total_count"], 1);
 }
@@ -186,4 +175,30 @@ async fn waiting_for_a_push_that_never_comes_times_out() {
     .await;
 
     assert_eq!(status, 408, "{answer}");
+}
+
+// AC: PN-01.5
+#[tokio::test]
+async fn waiting_for_a_push_answers_the_newest_one_to_the_token() {
+    let (app_router, _) = build_test_app();
+    call_api(
+        &app_router,
+        "POST",
+        FCM_SEND_PATH,
+        Some(&fcm_message(json!({ "token": "device-2" }))),
+    )
+    .await;
+
+    let (wait_status, waited) = call_api(
+        &app_router,
+        "GET",
+        "/api/v1/wait/push?device_token=device-2",
+        None,
+    )
+    .await;
+
+    assert_eq!(
+        (wait_status, &waited["device_token"]),
+        (200, &json!("device-2"))
+    );
 }

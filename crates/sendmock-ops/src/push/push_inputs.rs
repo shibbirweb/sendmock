@@ -18,6 +18,19 @@ pub struct PushListQuery {
     pub status: Option<String>,
 }
 
+/// `DELETE /api/v1/push`: the list's filters without paging.
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct PushFilterQuery {
+    /// Only this project's notifications (its key); every project's when not set.
+    pub project: Option<String>,
+    /// Only notifications to this device token.
+    pub device_token: Option<String>,
+    /// fcm, expo or onesignal.
+    pub provider: Option<String>,
+    /// sent or failed.
+    pub status: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct PushReference {
     /// The notification's id, from `GET /api/v1/push`.
