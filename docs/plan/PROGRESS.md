@@ -338,13 +338,13 @@ Plan: [29-phase-4.md](29-phase-4.md). Built on `feat/phase-0` in #48, W1 to W15 
 
 Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 in order; the owner's accounts, tokens and release runs are listed in its [Owner steps](30-phase-5.md#owner-steps).
 
-- [ ] Release builds for all 6 targets, checksums, install scripts with `--channel`
+- [x] Release builds for all 6 targets, checksums, install scripts with `--channel` (DS-01 accepted, DS-03.2) (#48)
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
-- [ ] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper
-- [ ] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6)
+- [x] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper (DS-03.1; each publishes once its secret or trusted publisher is set, runbook step 3) (#48)
+- [x] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6; DS-03 accepted, submitted by the release workflow once the runbook's secrets are set) (#48)
 - [ ] Testcontainers modules (published by each release from W3b; ticked when the first release publishes them)
 - [x] Remaining catcher presets and catch-all port (the presets already ship; the port is W6, HC-01 accepted) (#48)
-- [ ] Performance and size budgets enforced in CI
+- [x] Performance and size budgets enforced in CI (DS-07 accepted) (#48)
 - [x] `sendmock --demo` (PL-09 accepted) (#48)
 - [ ] Claude Code plugin, MCP registry listing (the official registry, and through it the GitHub MCP Registry, AI-05.8), skill evals
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
@@ -758,3 +758,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Phase 5 W14c done: every screen has its Deeper page, the last commits adding HTTP Catcher, Numbers, Logs, Overview, Scenarios, API reference and Settings; the crawl now reads month names as whole words, waits for a scenario run's own result, and its inventory files are left alone by Prettier. The API reference screen's header named it Not found; fixed with a regression test. |
 | 2026-11-07 | Phase 5 W14b2 done, and with it W14: each Deeper page shows its screen with a numbered marker on every control in view, taken by `bun run screenshots` (scene `deeper`) and numbered by the same function as the page; a unit test fails when a page has no image. WS-10.1 to WS-10.4 ticked, WS-10 accepted. |
 | 2026-11-07 | Phase 5 W15a: the 1.0 runbook ([31](31-release-runbook.md)), ten steps with their commands, checks and the criteria each proves, and `bun scripts/release-readiness.ts`; its tests found the runbook must also name `RELEASE_TOKEN`, `HOMEBREW_TAP_TOKEN` and the Docker Hub secrets, which the owner steps had left out. |
+| 2026-11-07 | Phase 5 checklist: the release builds, package channels and performance budgets ticked, since DS-01, DS-03 and DS-07 are accepted; publishing waits for the runbook's secrets. |
