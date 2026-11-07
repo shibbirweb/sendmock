@@ -34,7 +34,8 @@
       "heading: Webhook deliveries",
       "heading: Saved deliveries",
       "heading: Webhook templates",
-      "heading: Webhook variables"
+      "heading: Webhook variables",
+      "heading: Projects"
     ],
     "failing": [
       "alert: Could not load the API reference. Try again",

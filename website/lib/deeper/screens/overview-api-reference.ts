@@ -68,6 +68,7 @@ const apiTagNames = [
   "Saved deliveries",
   "Webhook templates",
   "Webhook variables",
+  "Projects",
 ];
 
 const apiReferenceEntries: DeeperEntry[] = [
