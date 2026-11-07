@@ -120,3 +120,16 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [x] PL-09.2 Loading sends nothing off the machine, and the sample data is stored and shown as any other data: events fire and rules queue deliveries, search finds it, and reset clears its traffic and treats its endpoints, rules and bins as any other configuration (kept without a seed file). (#48)
   - Changed 2026-11-06 while building W8: the first wording said reset clears the demo data unless a seed file holds it, but reset without a seed file keeps all configuration (PL-04), so the demo's endpoints, rules and bins follow that rule like configuration made by hand.
 - [x] PL-09.3 With data already stored, `--demo` loads nothing and says so in the log; the data file the binary embeds matches the mock's fixtures, checked by a test. (#48)
+
+## PL-10 Projects
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10).
+
+- [ ] PL-10.1 Projects are listed, created, renamed and deleted through REST, CLI and MCP; keys are lowercase letters, digits and dashes; `default` always exists and cannot be deleted; deleting a project deletes its emails, SMS and verifications.
+- [ ] PL-10.2 An email sent over SMTP with an AUTH username that is a project's key is stored in that project; without AUTH, or with any other username, it is stored in `default`.
+- [ ] PL-10.3 The REST send APIs and the provider APIs store their email, SMS or verification in the project named by `X-SendMock-Project`; an unknown project is refused with 404.
+- [ ] PL-10.4 A provider API called under `/projects/<project>/` stores its message in that project and answers as it does without the prefix; an official SDK given that base URL sends through it.
+- [ ] PL-10.5 Every list and lookup of captured traffic (emails, SMS, threads, verifications, OTP, links, wait helpers, recent events) takes `project` and returns only that project's items; without it, every project's.
+- [ ] PL-10.6 Events carry `project` in their data, and a webhook rule can filter on it.
+- [ ] PL-10.7 The UI shows a project switcher, kept in the URL, once a second project exists; it filters Mail, SMS and Verify; Settings > Projects manages projects and shows how to send to each.
+- [ ] PL-10.8 The seed file exports and imports projects, and reset keeps them.

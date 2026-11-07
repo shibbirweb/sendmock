@@ -12,7 +12,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) |
 | A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) |
 | A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) |
-| A5 | Multi-project inboxes | #167 | to be written |
+| A5 | Multi-project inboxes | #167 | PL-10 (new) |
 | A6 | POP3 read access | #159 | to be written |
 | A7 | Push notification emulation | #166 | to be written |
 | A8 | WhatsApp Business Cloud API, in full | #161 | to be written |
@@ -133,3 +133,34 @@ Errors are problem details (`title`, `type`, `detail`, `instance`), as the SDK's
 
 **As built, A4 (2026-11-07):** `vonage_verify_api.rs` answers the three requests over the verify domain, tried after Twilio Verify in the provider runtime, and the `vonage_verify` definition lists it with Basic credentials (`api_key`, `api_secret`), which Verify v2 accepts beside the SDK's JWT; the JWT itself is not checked. Reading the SDK showed the check answers `completed`, not `complete` as first written here, so the table and VF-05.2 say `completed` (the SDK's `checkCode` returns that status, and an app compares against it). Vonage's phone numbers have no `+`; SendMock adds it, so the code SMS and the Verify list show E.164. The `request_id` is the verification's SID (`VE...`) rather than a UUID, so one id works in both APIs. The captured code SMS still carries `twilio_verify` as its API, since the verify domain sends it for either API. Tests: `vonage_verify_api.rs` (VF-05.1 to VF-05.3) and `examples/sms/node-vonage-verify` with `@vonage/verify2` 1.22.1 (VF-05.4), which generates an RSA key for the SDK's JWT, completes one login and cancels another.
 
+## A5. Projects: multi-project inboxes (PL-10)
+
+**Why:** a team often shares one SendMock (a dev server, a CI runner, a Docker host). Today every app's mail, SMS and codes land in one list, so each developer filters by recipient or subject and a test reading "the latest code" can read another app's. Separate instances work but need more ports and more configuration.
+
+**How others do it** (read 2026-11-07): smtp4dev keeps several mailboxes in one server, chosen by rules on the recipient, with a default mailbox for the rest and a mailbox picker in its UI ([its configuration doc](https://github.com/rnwood/smtp4dev/blob/master/docs/Configuration.md)). Mailtrap's sandbox groups inboxes into projects, and each inbox has its own SMTP credentials, so the username picks the inbox ([its sandbox API](https://docs.mailtrap.io/developers/email-sandbox/sandboxes-inboxes)). Mailpit and MailHog have one mailbox. SendMock follows Mailtrap's credentials model, since apps already set an SMTP username, plus a header and a URL prefix for HTTP APIs, which have no username of their own.
+
+**What a project is:** a name for captured traffic inside one instance. A project has a key (lowercase letters, digits and dashes, up to 40 characters) and a display name. `default` always exists and holds everything not sent to another project; it cannot be deleted.
+
+| Belongs to a project | Shared by every project |
+|---|---|
+| emails (with their attachments, timeline, opens, clicks and responses), SMS messages and threads, verifications | providers, templates, webhook endpoints, rules and variables, numbers, outcome rules, payments, HTTP bins, settings |
+
+Projects separate traffic; they do not secure it. Anyone who can open SendMock can pick any project or "All projects", as in smtp4dev. Access control stays what it is today ([PL-06](acceptance/04-catcher-platform.md#pl-06-security-defaults)).
+
+**How traffic picks its project:**
+
+| Way in | Picked by | Unknown key |
+|---|---|---|
+| SMTP | the AUTH username, when it is a project's key (any password under `accept-any`) | stored in `default`, as without AUTH; apps send all kinds of usernames, and refusing would break mail that works today |
+| REST send APIs (`/api/v1/send`, `/api/v1/sms`, inbound) | the `X-SendMock-Project` header | 404 `project_not_found` |
+| provider APIs (Twilio, Vonage, SendGrid and the rest, on the provider port or under `/providers/<key>`) | the `X-SendMock-Project` header, or the URL prefix `/projects/<project>/` before the provider's path, for SDKs that take a base URL but no extra header | 404 in the provider's own error shape when it has one for a missing resource, else SendMock's |
+
+**How reading works:** every list and lookup of captured traffic (emails, SMS, threads, verifications, `GET /otp`, `/links`, the `/wait/*` helpers, `GET /events/recent` and the realtime stream) takes an optional `project` (query parameter, `--project` in the CLI, a `project` argument in MCP). Without it they read every project, as today, so a single-project instance sees no change. Events carry `project` in their data, so a webhook rule can filter on it.
+
+**Managing projects:** Settings > Projects lists them with their key, their message counts and a "Connect" block (the SMTP username and the header or URL prefix to use), and creates, renames and deletes them. Deleting a project deletes its traffic. REST `GET/POST /api/v1/projects`, `PATCH/DELETE /api/v1/projects/{projectKey}`, CLI `sendmock projects list|create|update|delete`, MCP `sendmock_project_*`, all from operations in `sendmock-ops`. The seed file has a `[[projects]]` table, and reset keeps projects like other configuration.
+
+**In the UI:** a project switcher in the top bar ("All projects", then each project) kept in the URL (`?project=`), which filters Mail, SMS and Verify and the live toasts. It shows only when a project other than `default` exists, so a single-project instance looks as it does today.
+
+**Parts:** A5a the store, operations, REST, CLI and MCP, with SMTP and the header; A5b the provider URL prefix; A5c the UI (mock first, then live) and docs.
+
+**Not in this part:** per-project settings, retention or webhook endpoints; per-project credentials that SendMock checks; routing by recipient rules (smtp4dev's model), which tag rules and inbound routes already cover for filtering.

@@ -369,4 +369,10 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Explore every screen immediately, or demo SendMock without wiring up an app.",
   },
+  "PL-10": {
+    summary:
+      "Projects inside one instance: mail, SMS and codes kept apart by SMTP username, a header or a URL prefix, with a project switcher in the UI.",
+    outcome:
+      "Share one SendMock across apps or developers without reading each other's messages.",
+  },
 };

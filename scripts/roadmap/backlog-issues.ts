@@ -48,14 +48,6 @@ const backlogItems: BacklogItem[] = [
       "The HTTP catcher captures requests to Firebase Cloud Messaging, Expo and OneSignal through its presets and answers them as those services do (feature HC-03).",
   },
   {
-    key: "later-multi-project",
-    title: "Multi-project inboxes",
-    area: "Platform",
-    idea: "Separate namespaces inside one instance, picked by SMTP username or API key, so several projects or developers share a SendMock without seeing each other's messages.",
-    today:
-      "One instance holds one set of emails, SMS, webhooks and settings; separate instances can run on other ports.",
-  },
-  {
     key: "later-tray-app",
     title: "System tray app",
     area: "Distribution",

@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 106 / 113 accepted (all but AI-05, DS-02, DS-03, SM-17, UI-07, VF-05 and WS-03), 513 / 530 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 106 / 114 accepted (all but AI-05, DS-02, DS-03, PL-10, SM-17, UI-07, VF-05 and WS-03), 513 / 538 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -363,7 +363,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A2: `email.clicked` link-click tracking (#164, EM-20) (#48)
 - [ ] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165)
 - [ ] A4: Vonage Verify v2 and other verify APIs (#160)
-- [ ] A5: Multi-project inboxes (#167)
+- [ ] A5: Multi-project inboxes, as projects (#167, PL-10)
 - [ ] A6: POP3 read access (#159)
 - [ ] A7: Push notification emulation (#166)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161)
@@ -801,3 +801,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Plan: A4 Vonage Verify v2 ([32](32-after-1-0.md#a4-vonage-verify-v2-vf-05), VF-05 new with 4 criteria): an adapter over the verify domain like Twilio Verify, a verify service per brand, shapes read from the Vonage Node SDK's source and test data. |
 | 2026-11-07 | A4 built: Vonage Verify v2 (`POST /v2/verify`, check and cancel) answered over the verify domain as the built-in `vonage_verify` provider, one verify service per brand, checked with the Vonage Node SDK's `Verify2` client in the SMS clients workflow. VF-05.2 now says `completed`, the status Vonage and its SDK use. |
 | 2026-11-07 | Fix: the Windows retention load test still saw one SMTP reply take 9.8 s while running alone. SQLite's automatic checkpoint runs inside whichever write crosses its threshold, so an ingest write waited for the log copy and its sync; the writer now has `wal_autocheckpoint` off, and the checkpoint connection copies the log every second on a thread of its own, which never holds the write lock. |
+| 2026-11-07 | Plan: A5 projects ([32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10), PL-10 new with 8 criteria): captured email, SMS and verifications kept per project inside one instance, picked by the SMTP AUTH username (as Mailtrap's per-inbox credentials do), the `X-SendMock-Project` header or a `/projects/<project>/` URL prefix for provider SDKs; reads take `project` and default to every project; a top bar switcher once a second project exists. Built in three parts (A5a backend, A5b provider prefix, A5c UI). |
