@@ -179,3 +179,15 @@ UI in U3 (W16), runtime in Phase 4. Plan: [22-configurable-providers.md](../22-c
 - [x] EM-18.6 REST, CLI and MCP list, get, create, update, delete or remove, restore, reset and preview email providers with the same validation as the UI; secrets are masked in every answer, the CLI and UI reveal one after a confirmation, and MCP never reveals them; the skill's `add-email-provider` workflow takes an agent from the provider's API docs to a working provider (definition, preview, test send, seed export).
 - [x] EM-18.7 The seed file exports changed built-ins and custom providers under `[[email.providers]]` with secrets as `${ENV}` references, and applying it recreates them. (UI and mock API; the live runtime in Phase 4)
 - [x] EM-18.8 The shipped built-ins pass the existing provider fixture and SDK tests (EM-08) unchanged, so the defaults still match the real providers. (#48)
+
+## EM-19 Mailpit API compatibility
+
+After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a1-mailpit-api-compatibility-em-19).
+
+- [ ] EM-19.1 `GET /api/v1/messages` and `GET /api/v1/search` answer Mailpit's `MessagesSummary` (`total`, `unread`, `messages_count`, `messages_unread`, `start`, `tags`, `messages`), newest first, with `start` and `limit`; search reads Mailpit's `from:`, `to:`, `subject:`, `tag:`, `is:read`, `is:unread` and `has:attachment` filters and plain words.
+- [ ] EM-19.2 `GET /api/v1/message/{ID}` (and `latest`) answers Mailpit's `Message` and marks the message read; `/headers`, `/raw`, `/part/{PartID}`, `/view/{ID}.html` and `/view/{ID}.txt` answer as Mailpit does, and a missing message or part answers 404 with a plain text body.
+- [ ] EM-19.3 `PUT /api/v1/messages` sets read or unread by IDs, by search or for every message; `DELETE /api/v1/messages` deletes by IDs or every message; `DELETE /api/v1/search` deletes the matches; each answers `ok`.
+- [ ] EM-19.4 `GET /api/v1/tags` lists every tag and `PUT /api/v1/tags` replaces the tags of the given messages.
+- [ ] EM-19.5 Every answer above matches the definitions in Mailpit's own API definition (`swagger.json` at `v1.33.0`, kept as a test fixture), and mail sent over SMTP reads back through the Mailpit paths as a Mailpit-based test suite reads it.
+- [ ] EM-19.6 The guide's "Coming from Mailpit" page lists what works unchanged, the endpoints whose shape differs (`/api/v1/info`, `/api/v1/send`) and what is not emulated.
+

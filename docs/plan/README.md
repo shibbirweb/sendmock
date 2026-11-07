@@ -46,6 +46,7 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 29 | [Phase 4](29-phase-4.md) | Integrations, fidelity and AI: provider emulation depth, the HTTP Catcher presets, the agent skill and the example apps in eight languages |
 | 30 | [Phase 5](30-phase-5.md) | Distribution and 1.0 stable: install scripts, Docker, package channels, budgets, the acceptance close-out, the website docs and the Deeper pages |
 | 31 | [Release runbook](31-release-runbook.md) | The owner's steps to the 1.0 release, with commands, checks and the criteria each proves; `bun scripts/release-readiness.ts` lists what is still open |
+| 32 | [After 1.0](32-after-1-0.md) | The backlog built after 1.0 (Mailpit API compatibility, click tracking, more SMS and verify providers, multi-project inboxes, POP3, push emulation, WhatsApp, tray app, Helm and Docker Desktop), in order, with a design note per item |
 
 ## Headline decisions
 

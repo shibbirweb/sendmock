@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 104 / 109 accepted (all but AI-05, DS-02, DS-03, UI-07 and WS-03), 501 / 508 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 104 / 110 accepted (all but AI-05, DS-02, DS-03, EM-19, UI-07 and WS-03), 501 / 514 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -77,7 +77,8 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3 | Webhooks backend | Done apart from the beta release | 16 / 17 |
 | 3P | Payment gateway backend | Done apart from the beta release | 8 / 9 |
 | 4 | Integrations, fidelity and AI | Done apart from the beta release ([29](29-phase-4.md)) | 21 / 22 |
-| 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)) | 0 / 15 |
+| 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 9 / 17 |
+| A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 0 / 11 |
 
 ---
 
@@ -352,7 +353,23 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
 - [x] Deeper docs: a page per screen explaining every control and text (what it does, what it changes or sends, where its text comes from, how it links, CLI/API/MCP, errors), kept true by a Playwright crawl ([19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started), WS-10); written screen by screen as each live mode lands
 - [x] Final product name applied everywhere (the product name audit in `scripts/product-name-audit.ts`, W13d) (#48)
-- [ ] **Release `1.0.0`** (Stable release, Promote stable, Publish stable)
+- [ ] **Releas
+
+### After 1.0 (A1 to A11)
+
+Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owner decision (2026-11-07), each item planned with its criteria before code.
+
+- [ ] A1: Mailpit API compatibility (#163, EM-19)
+- [ ] A2: `email.clicked` link-click tracking (#164)
+- [ ] A3: More SMS provider formats: AWS SNS SMS, Infobip (#165)
+- [ ] A4: Vonage Verify v2 and other verify APIs (#160)
+- [ ] A5: Multi-project inboxes (#167)
+- [ ] A6: POP3 read access (#159)
+- [ ] A7: Push notification emulation (#166)
+- [ ] A8: WhatsApp Business Cloud API, in full (#161)
+- [ ] A9: System tray app (#168)
+- [ ] A10: Helm chart and Docker Desktop extension (#162)
+- [ ] A11: Official distribution repositories (#169; needs the distributions' maintainers)e `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
 - [ ] Done-when check: installs and runs via every channel on macOS, Linux, Windows
 
@@ -767,3 +784,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Fix: the UI-06.2 timing budget (an email opens in under 200 ms; 51 ms median locally) once measured 209 to 223 ms on a CI shard where another Playwright worker shared the runner. Timing specs are now their own Playwright project (`timing`), which CI runs after shard 1's tests with one worker. |
 | 2026-11-07 | Plan: agents start SendMock through npx (W17 in [30](30-phase-5.md), AI-05.9 new, [14](14-ai-integration.md#one-command-setup-per-harness), `GET /ai/agents` in [06](06-api.md)): with only npx there is no `sendmock` on the `PATH`, so `ai install`, the API and Settings > Connection also give `npx -y sendmock mcp`. Open question for the owner: whether the Claude Code plugin should start SendMock through npx too. The runbook test now accepts an unticked criterion that a test in the repository names, since CI ticks it. |
 | 2026-11-07 | Phase 5 W17 built: agents start SendMock through npx. `sendmock ai install --npx` (the default when run with npx) writes `npx -y sendmock mcp`, `GET /ai/agents` gives `npx_install_command` and `npx_mcp_config`, and Settings > Connection > AI agents has "SendMock runs as: Installed / npx (no install)". The AI page no longer names `--scope project` and `--target print`, which never existed. AI-05.9 ticked after CI passed on `0b7e1f5`. |
+| 2026-11-07 | Owner decision: with every 1.0 criterion waiting on the release steps, build the After 1.0 backlog now on `feat/phase-0` (#48). Plan: [32](32-after-1-0.md) with the order A1 to A11; A1 Mailpit API compatibility designed from Mailpit's own `swagger.json` at `v1.33.0`, new feature EM-19 with 6 criteria; [10](10-open-questions.md) §9 decided. |

@@ -198,4 +198,4 @@ These make SendMock useful from any test framework without polling loops:
 - Times: RFC 3339 UTC strings in JSON.
 - Pagination: opaque `next_cursor` (ULID based).
 - Versioning: breaking changes go to `/api/v2`; `v1` stays stable once 1.0 ships.
-- Mailpit-compatible aliases (`/api/v1/messages`, `/api/v1/message/{ID}`) are a stretch goal to ease migration of existing test suites.
+- Mailpit-compatible aliases (`/api/v1/messages`, `/api/v1/message/{ID}`, `/api/v1/search`, `/api/v1/tags`, `/view/{ID}.html`) ease migration of existing test suites: built after 1.0 as [32](32-after-1-0.md#a1-mailpit-api-compatibility-em-19) A1 (EM-19). They are compatibility routes, like the provider APIs, not operations, and are not in this spec.

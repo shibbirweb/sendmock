@@ -66,9 +66,9 @@ MIT or Apache-2.0 (dual licence is the Rust norm). Recommendation: dual MIT/Apac
 
 Recommendation: none. Opt-in update check only.
 
-## 9. Mailpit API compatibility
+## 9. Mailpit API compatibility (decided 2026-11-07)
 
-Worth offering compatibility aliases so existing Mailpit-based test suites can switch with no code change? Recommendation: yes, as a stretch goal after 1.0 if there is demand.
+Worth offering compatibility aliases so existing Mailpit-based test suites can switch with no code change? Recommendation: yes, as a stretch goal after 1.0 if there is demand. **Decided:** built as A1 of the After 1.0 work ([32](32-after-1-0.md#a1-mailpit-api-compatibility-em-19), EM-19); `/api/v1/info` and `/api/v1/send` keep SendMock's own shapes.
 
 ## 10. Persistence default (decided 2026-10-25)
 
