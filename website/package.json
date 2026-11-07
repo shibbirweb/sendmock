@@ -13,6 +13,8 @@
     "sync-docs": "bun scripts/sync-docs.ts",
     "examples": "bun scripts/write-examples.ts",
     "examples:check": "bun scripts/write-examples.ts --check",
+    "deeper": "bun scripts/write-deeper.ts",
+    "deeper:check": "bun scripts/write-deeper.ts --check",
     "test:e2e": "bun --bun playwright test",
     "test:unit": "bun test lib",
     "test:lighthouse": "bun test lighthouse"

@@ -49,6 +49,8 @@ The bottom of the sidebar has icon links to the docs, **Report an issue**, **Req
 - **Help menu**: the docs, keyboard shortcuts, what's new, **Report an issue**, **Request a feature**, private security reporting and the repository.
 - **Theme** (`T`): light, dark or follow the system.
 
+Every control of the sidebar and the header, one by one: [Sidebar and header in depth](./deeper/app-shell.md).
+
 ## Keys that work in lists
 
 | Key | Does |
