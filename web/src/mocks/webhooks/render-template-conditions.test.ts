@@ -106,4 +106,25 @@ describe("template conditions and argument filters", () => {
       "message-timestamp": "2026-01-01 09:05:07",
     });
   });
+
+  test("an if inside another if's branches resolves before the outer one, as Jinja does", () => {
+    const clickContext: TemplateContext = {
+      event: { type: "email.clicked" },
+      data: { user_agent: null },
+      vars: {},
+    };
+
+    expect(
+      renderTemplateText(
+        '{% if event.type == "email.clicked" %}A{% else %}{% if event.type == "email.opened" %}B{% else %}C{% endif %}{% endif %}',
+        clickContext,
+      ).renderedText,
+    ).toBe("A");
+    expect(
+      renderTemplateText(
+        'x{% if event.type == "email.clicked" %}[{% if data.user_agent %}agent{% endif %}]{% endif %}y',
+        clickContext,
+      ).renderedText,
+    ).toBe("x[]y");
+  });
 });

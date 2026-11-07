@@ -18,6 +18,7 @@ type TemplateSpec = [
 const emailOutcomeEvents: AppEventType[] = [
   "email.received",
   "email.opened",
+  "email.clicked",
   "email.delivered",
   "email.bounced",
   "email.complained",

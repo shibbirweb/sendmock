@@ -140,7 +140,8 @@
       "delivered": "delivered",
       "bounced": "bounce",
       "complained": "spamreport",
-      "opened": "open"
+      "opened": "open",
+      "clicked": "click"
     }
   },
   {
@@ -261,7 +262,8 @@
       "delivered": "delivered",
       "bounced": "failed",
       "complained": "complained",
-      "opened": "opened"
+      "opened": "opened",
+      "clicked": "clicked"
     }
   },
   {
@@ -402,7 +404,8 @@
       "delivered": "Delivery",
       "bounced": "Bounce",
       "complained": "SpamComplaint",
-      "opened": "Open"
+      "opened": "Open",
+      "clicked": "Click"
     }
   },
   {
@@ -556,7 +559,8 @@
       "delivered": "email.delivered",
       "bounced": "email.bounced",
       "complained": "email.complained",
-      "opened": "email.opened"
+      "opened": "email.opened",
+      "clicked": "email.clicked"
     }
   },
   {
@@ -682,7 +686,8 @@
       "delivered": "Delivery",
       "bounced": "Bounce",
       "complained": "Complaint",
-      "opened": "Open"
+      "opened": "Open",
+      "clicked": "Click"
     }
   },
   {
@@ -815,7 +820,8 @@
       "delivered": "delivered",
       "bounced": "hard_bounce",
       "complained": "spam",
-      "opened": "opened"
+      "opened": "opened",
+      "clicked": "click"
     }
   }
 ]

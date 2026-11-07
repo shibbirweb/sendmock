@@ -190,6 +190,7 @@ const providerEventNames: Record<string, string[]> = {
     "spam",
   ],
   opened: ["open", "Open", "email.opened", "opened", "Open", "opened"],
+  clicked: ["click", "Click", "email.clicked", "clicked", "Click", "click"],
   unsubscribed: [
     "unsubscribe",
     "Subscription",

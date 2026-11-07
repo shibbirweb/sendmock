@@ -212,7 +212,8 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     "id": "{{ event.id }}",
     "timestamp": {{ mailgun_timestamp }},
     "event": "{{ event.type | mailgun_event }}",
-    "recipient": "{{ data.to[0].address }}",
+    "recipient": "{{ data.to[0].address }}",{% if event.type == "email.clicked" %}
+    "url": "{{ data.url }}",{% endif %}
     "message": {
       "headers": {
         "message-id": "{{ data.message_id | default(data.id) }}",
@@ -243,7 +244,11 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "ReceivedAt": "{{ event.created_at }}",
   "Details": "",
   "Metadata": {},
-  "ServerID": 23
+  "ServerID": 23{% if event.type == "email.clicked" %},
+  "OriginalLink": "{{ data.url }}",
+  "ClickLocation": "HTML",
+  "Platform": "Desktop",
+  "UserAgent": "{% if data.user_agent %}{{ data.user_agent }}{% endif %}"{% endif %}
 }`,
     doc_url: "https://postmarkapp.com/developer/webhooks/webhooks-overview",
     verified_on: verifiedOn,
@@ -261,7 +266,9 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "message-id": "{{ data.message_id | default(data.id) }}",
   "ts_event": {{ event.created_at | unix }},
   "subject": "{{ data.subject }}",
-  "tag": ""
+  "tag": ""{% if event.type == "email.clicked" %},
+  "link": "{{ data.url }}",
+  "user_agent": "{% if data.user_agent %}{{ data.user_agent }}{% endif %}"{% endif %}
 }`,
     doc_url: "https://developers.brevo.com/docs/transactional-webhooks",
     verified_on: verifiedOn,
@@ -273,14 +280,15 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     body_template: `[
   {
     "msys": {
-      "message_event": {
+      "{% if event.type == "email.clicked" %}track_event{% else %}{% if event.type == "email.opened" %}track_event{% else %}message_event{% endif %}{% endif %}": {
         "type": "{{ event.type | sendgrid_event }}",
         "event_id": "{{ event.id }}",
         "message_id": "{{ data.message_id | default(data.id) }}",
         "rcpt_to": "{{ data.to[0].address }}",
         "friendly_from": "{{ data.from.address }}",
         "subject": "{{ data.subject }}",
-        "timestamp": "{{ event.created_at | unix }}"
+        "timestamp": "{{ event.created_at | unix }}"{% if event.type == "email.clicked" %},
+        "target_link_url": "{{ data.url }}"{% endif %}
       }
     }
   }
@@ -301,7 +309,9 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     "email": "{{ data.to[0].address }}",
     "timestamp": {{ event.created_at | unix }},
     "smtp-id": "<{{ data.message_id | default(data.id) }}>",
-    "event": "{{ event.type | sendgrid_event }}",
+    "event": "{{ event.type | sendgrid_event }}",{% if event.type == "email.clicked" %}
+    "url": "{{ data.url }}",
+    "url_offset": { "index": 0, "type": "html" },{% endif %}
     "category": [],
     "sg_event_id": "{{ event.id }}",
     "sg_message_id": "{{ data.message_id | default(data.id) }}.filter0001.1-1"
@@ -323,7 +333,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   "Type": "Notification",
   "MessageId": "{{ event.id }}",
   "TopicArn": "arn:aws:sns:us-east-1:123456789012:sendmock-ses",
-  "Message": "{\\"notificationType\\":\\"{{ event.type | ses_type }}\\",\\"mail\\":{\\"timestamp\\":\\"{{ event.created_at }}\\",\\"messageId\\":\\"{{ data.message_id | default(data.id) }}\\",\\"source\\":\\"{{ data.from.address }}\\",\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}",
+  "Message": "{\\"{% if event.type == "email.clicked" %}eventType{% else %}notificationType{% endif %}\\":\\"{{ event.type | ses_type }}\\",{% if event.type == "email.clicked" %}\\"click\\":{\\"ipAddress\\":\\"127.0.0.1\\",\\"link\\":\\"{{ data.url }}\\",\\"linkTags\\":{},\\"timestamp\\":\\"{{ data.clicked_at }}\\",\\"userAgent\\":\\"{% if data.user_agent %}{{ data.user_agent }}{% endif %}\\"},{% endif %}\\"mail\\":{\\"timestamp\\":\\"{{ event.created_at }}\\",\\"messageId\\":\\"{{ data.message_id | default(data.id) }}\\",\\"source\\":\\"{{ data.from.address }}\\",\\"destination\\":[\\"{{ data.to[0].address }}\\"]}}",
   "Timestamp": "{{ event.created_at }}",
   "SignatureVersion": "1",
   "Signature": "{{ random_string(344) }}",
@@ -351,7 +361,13 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     "email_id": "{{ data.message_id | default(data.id) }}",
     "from": "{{ data.from.address }}",
     "to": ["{{ data.to[0].address }}"],
-    "subject": "{{ data.subject }}"
+    "subject": "{{ data.subject }}"{% if event.type == "email.clicked" %},
+    "click": {
+      "ipAddress": "127.0.0.1",
+      "link": "{{ data.url }}",
+      "timestamp": "{{ data.clicked_at }}",
+      "userAgent": "{% if data.user_agent %}{{ data.user_agent }}{% endif %}"
+    }{% endif %}
   }
 }`,
     doc_url: "https://resend.com/docs/dashboard/webhooks/event-types",

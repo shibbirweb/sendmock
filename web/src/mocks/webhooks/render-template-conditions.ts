@@ -1,8 +1,10 @@
 /** Reads a context path for a condition; `undefined` when it is missing. */
 type ConditionValueReader = (pathText: string) => unknown;
 
+// The condition stops at the first `%}`, so an outer `if` cannot take in an inner one's tag
+// as part of its condition and leave the inner one's `endif` behind.
 const innermostIfPattern =
-  /\{%-?\s*if\s+([\s\S]+?)\s*-?%\}((?:(?!\{%-?\s*if\s)[\s\S])*?)\{%-?\s*endif\s*-?%\}/;
+  /\{%-?\s*if\s+((?:(?!%\})[\s\S])+?)\s*-?%\}((?:(?!\{%-?\s*if\s)[\s\S])*?)\{%-?\s*endif\s*-?%\}/;
 const elsePattern = /\{%-?\s*else\s*-?%\}/;
 const comparisonPattern = /^(\S+)\s*(==|!=)\s*"([^"]*)"$/;
 

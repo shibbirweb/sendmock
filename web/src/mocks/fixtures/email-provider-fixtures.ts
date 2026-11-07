@@ -12,6 +12,7 @@ const emailStatusNames = {
   bounced: "bounce",
   complained: "spamreport",
   opened: "open",
+  clicked: "click",
 };
 
 function buildSendgridProvider(): MessageProviderRecord {
@@ -128,6 +129,7 @@ function buildMailgunProvider(): MessageProviderRecord {
       bounced: "failed",
       complained: "complained",
       opened: "opened",
+      clicked: "clicked",
     },
   });
 }
@@ -199,6 +201,7 @@ function buildPostmarkProvider(): MessageProviderRecord {
       bounced: "Bounce",
       complained: "SpamComplaint",
       opened: "Open",
+      clicked: "Click",
     },
   });
 }
@@ -272,6 +275,7 @@ function buildResendProvider(): MessageProviderRecord {
       bounced: "email.bounced",
       complained: "email.complained",
       opened: "email.opened",
+      clicked: "email.clicked",
     },
   });
 }
@@ -334,6 +338,7 @@ function buildSesProvider(): MessageProviderRecord {
       bounced: "Bounce",
       complained: "Complaint",
       opened: "Open",
+      clicked: "Click",
     },
   });
 }
@@ -394,6 +399,7 @@ function buildBrevoProvider(): MessageProviderRecord {
       bounced: "hard_bounce",
       complained: "spam",
       opened: "opened",
+      clicked: "click",
     },
   });
 }

@@ -3,7 +3,7 @@
 
 /// SendMock's outcome, then SendGrid's, SES's, Resend's, Mailgun's, Postmark's and Brevo's
 /// names for it.
-const PROVIDER_EVENT_NAMES: [(&str, [&str; 6]); 7] = [
+const PROVIDER_EVENT_NAMES: [(&str, [&str; 6]); 8] = [
     (
         "received",
         [
@@ -62,6 +62,10 @@ const PROVIDER_EVENT_NAMES: [(&str, [&str; 6]); 7] = [
     (
         "opened",
         ["open", "Open", "email.opened", "opened", "Open", "opened"],
+    ),
+    (
+        "clicked",
+        ["click", "Click", "email.clicked", "clicked", "Click", "click"],
     ),
     (
         "unsubscribed",
@@ -137,6 +141,9 @@ mod tests {
             resend_type_filter("email.received".to_owned()),
             "email.sent"
         );
+        assert_eq!(sendgrid_event_filter("email.clicked".to_owned()), "click");
+        assert_eq!(postmark_record_type_filter("email.clicked".to_owned()), "Click");
+        assert_eq!(mailgun_event_filter("email.clicked".to_owned()), "clicked");
         assert_eq!(sendgrid_event_filter("sms.status".to_owned()), "sms.status");
         assert_eq!(mailgun_event_filter("email.bounced".to_owned()), "failed");
         assert_eq!(
