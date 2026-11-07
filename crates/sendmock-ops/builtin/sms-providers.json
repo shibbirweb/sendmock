@@ -1249,5 +1249,92 @@
       "approved": "completed",
       "canceled": "cancelled"
     }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "access_token",
+        "value": "whatsapp-access-token",
+        "is_secret": true
+      },
+      {
+        "name": "app_secret",
+        "value": "whatsapp-app-secret",
+        "is_secret": true
+      },
+      {
+        "name": "phone_number",
+        "value": "+15550783881",
+        "is_secret": false
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "whatsapp_cloud",
+    "name": "WhatsApp Cloud",
+    "area": "sms",
+    "accent": "#25d366",
+    "host": "graph.facebook.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/{version}/{phone_number_id}/messages",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "body",
+        "source": "text.body"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"messaging_product\": \"whatsapp\", \"contacts\": [{\"input\": \"{{ message.to }}\", \"wa_id\": \"{{ message.to }}\"}], \"messages\": [{\"id\": \"{{ message.provider_id }}\"}]}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"error\": {\"message\": \"(#100) The parameter {{ error.part }} is required.\", \"type\": \"OAuthException\", \"code\": 100, \"error_data\": {\"messaging_product\": \"whatsapp\", \"details\": \"The parameter {{ error.part }} is required.\"}, \"fbtrace_id\": \"A{{ random_hex(16) }}\"}}"
+      }
+    ],
+    "message_id_template": "wamid.HBgL{{ random_hex(48) }}",
+    "callback_template_key": null,
+    "status_names": {
+      "sent": "sent",
+      "delivered": "delivered",
+      "read": "read",
+      "failed": "failed",
+      "undelivered": "failed"
+    }
   }
 ]

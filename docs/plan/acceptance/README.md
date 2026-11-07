@@ -98,6 +98,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | Accepted |
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
 | [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | After 1.0 (A3) | 6 | Accepted |
+| [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | After 1.0 (A8) | 5 | Not started |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |

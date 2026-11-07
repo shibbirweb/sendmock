@@ -35,7 +35,7 @@ test("SM-16.1 SMS > Providers lists the built-ins and the demo's custom provider
 }) => {
   await page.goto("/sms/providers");
 
-  await expect(page.getByTestId("message-provider-row")).toHaveCount(12);
+  await expect(page.getByTestId("message-provider-row")).toHaveCount(13);
   await expect(providerRow(page, "SSL Wireless")).toContainText("Custom");
   await expect(providerRow(page, "Twilio")).toContainText("Built-in");
 });
@@ -54,6 +54,16 @@ test("SM-17.6 SMS > Providers lists the providers added after 1.0 as built-ins",
   ]) {
     await expect(providerRow(page, providerName)).toContainText("Built-in");
   }
+});
+
+test("SM-18.5 SMS > Providers lists WhatsApp Cloud as a built-in provider", async ({
+  page,
+}) => {
+  await page.goto("/sms/providers");
+
+  const whatsappRow = providerRow(page, "WhatsApp Cloud");
+  await expect(whatsappRow).toContainText("Built-in");
+  await expect(whatsappRow).toContainText("whatsapp_cloud");
 });
 
 test("EM-18.2 a provider is added as a copy of a built-in", async ({

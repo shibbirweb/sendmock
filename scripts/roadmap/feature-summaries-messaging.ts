@@ -222,6 +222,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Point an app that sends SMS through one of these providers at SendMock with no code change.",
   },
+  "SM-18": {
+    summary:
+      "Meta's WhatsApp Business Cloud API answered as Meta does: every message type, read receipts, media, Graph errors, and signed status and reply webhooks to the app's callback URL.",
+    outcome:
+      "Point an app that calls the Cloud API at SendMock and test WhatsApp sends, statuses and replies without a Meta business account.",
+  },
   "VF-01": {
     summary:
       "Verify services, as in Twilio Verify, with code length, TTL, channels and fixed codes per service or globally.",

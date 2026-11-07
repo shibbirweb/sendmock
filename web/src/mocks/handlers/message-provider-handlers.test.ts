@@ -91,6 +91,7 @@ describe("email and SMS provider API", () => {
       "africastalking",
       "sns",
       "vonage_verify",
+      "whatsapp_cloud",
       "sslwireless",
     ]);
     expect(

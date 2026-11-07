@@ -82,7 +82,8 @@ async fn the_list_shows_the_built_ins_with_secrets_masked_and_recent_message_cou
             "sinch",
             "africastalking",
             "sns",
-            "vonage_verify"
+            "vonage_verify",
+            "whatsapp_cloud"
         ]
     );
     assert_eq!(vonage["is_builtin"], true);

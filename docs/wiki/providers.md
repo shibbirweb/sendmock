@@ -39,6 +39,7 @@ They are a starting point, not a fixed list:
 | Sinch | `POST /xms/v1/{service_plan_id}/batches` and delivery reports to `callback_url` | [SMS](./sms/index.md) |
 | Africa's Talking | `POST /version1/messaging` (delivery reports through a webhook rule with the Africa's Talking template, since the real callback is set on the account) | [SMS](./sms/index.md) |
 | Amazon SNS | `Publish` to a `PhoneNumber` (the Query API: a form posted to `/`, an XML answer); SNS logs delivery status to CloudWatch, so there are no callbacks | [SMS](./sms/index.md) |
+| WhatsApp Cloud | Meta's WhatsApp Business Cloud API: `POST /{version}/{phone_number_id}/messages` for every message type, read receipts, and Graph's errors | [Replies and WhatsApp](./sms/replies-and-whatsapp.md#whatsapp-cloud-api) |
 | Vonage Verify | Verify v2: start a verification (`POST /v2/verify`), check its code and cancel it; each brand gets its own verify service | [Verify](./sms/verify.md) |
 
 ## Payments (4 built in)

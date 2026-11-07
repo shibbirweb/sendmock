@@ -367,7 +367,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A5: Multi-project inboxes, as projects (#167, PL-10 accepted, #48)
 - [x] A6: POP3 read access (#159, EM-21 accepted, #48)
 - [ ] A7: Push notification emulation (#166, PN-01)
-- [ ] A8: WhatsApp Business Cloud API, in full (#161)
+- [ ] A8: WhatsApp Business Cloud API, in full (#161, SM-18)
 - [ ] A9: System tray app (#168)
 - [ ] A10: Helm chart and Docker Desktop extension (#162)
 - [ ] A11: Official distribution repositories (#169; needs the distributions' maintainers)e `1.0.0`** (Stable release, Promote stable, Publish stable)
@@ -824,3 +824,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | A7b built: Expo's push send (single or batched, a ticket per recipient) and `getReceipts`, and OneSignal's create notification (subscriptions, player ids, aliases and segments) answered in code and stored; the provider routes now read gzip request bodies, as `expo-server-sdk` sends them (`flate2`, the one new dependency). |
 | 2026-11-07 | A7c built: the Push screen (provider and status chips, a device token filter, Clear all, and a drawer with an iOS or Android lock screen preview, the data, the request and the answer), mock data, the guide page, its Deeper page and retaken screenshots; the embedded UI is at 2.00 MB, about 5 KB under its budget. |
 | 2026-11-08 | A7d built: magic device tokens (`unregistered`, `invalid`, `throttled`) fail in each provider's own shape and are stored as failed; `push.sent` and `push.failed` reach webhook rules, which filter on `token`, `title` and `provider`; the "Push SDKs" workflow runs `firebase-admin`, `expo-server-sdk` and OneSignal's SDK against an offline release binary. A7 is complete once CI proves PN-01. |
+| 2026-11-08 | Plan: A8 WhatsApp Business Cloud API ([32](32-after-1-0.md#a8-whatsapp-business-cloud-api-sm-18), SM-18 new with 5 criteria): the Cloud API's messages, read receipts, media and Graph errors answered in code by a `whatsapp_cloud` provider, its statuses and replies posted to the app's callback URL in Meta's signed envelope, in three parts. |
+| 2026-11-08 | A8a built: the WhatsApp Cloud API's messages endpoint (text, template, media by link, location, contacts, interactive and reaction, each stored as a readable WhatsApp message), read receipts and Graph's errors, a built-in `whatsapp_cloud` provider, the guide section and an HTTP example in the SMS clients workflow. |

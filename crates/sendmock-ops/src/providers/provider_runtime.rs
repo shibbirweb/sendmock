@@ -16,6 +16,7 @@ use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
 use super::vonage_verify_api::answer_vonage_verify;
+use super::whatsapp_cloud_api::answer_whatsapp_cloud;
 use crate::custom_gateways::answer_custom_gateway_request;
 use crate::{OperationContext, OperationError};
 
@@ -108,7 +109,7 @@ pub async fn answer_provider_request(
 }
 
 /// The APIs served in code beside the definitions: the payment gateways', Mailgun's routes,
-/// custom gateways', Twilio's Messaging Services and Verify, and Vonage Verify.
+/// custom gateways', Twilio's Messaging Services and Verify, Vonage Verify and WhatsApp Cloud.
 async fn answer_code_served_api(
     operation_context: &OperationContext,
     providers: &[MessageProviderDefinition],
@@ -149,7 +150,12 @@ async fn answer_code_served_api(
     {
         return Ok(Some(twilio_verify_outcome));
     }
-    answer_vonage_verify(operation_context, providers, provider_route, request).await
+    if let Some(vonage_verify_outcome) =
+        answer_vonage_verify(operation_context, providers, provider_route, request).await?
+    {
+        return Ok(Some(vonage_verify_outcome));
+    }
+    answer_whatsapp_cloud(operation_context, providers, provider_route, request).await
 }
 
 /// Twilio's Messaging Services API, served with the Twilio provider while it is routable.

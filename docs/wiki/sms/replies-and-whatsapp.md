@@ -76,6 +76,21 @@ Failures carry Twilio's error codes, shown on the message and in **Message detai
 - Media (`MediaUrl` on Twilio, `media_urls` or inline `media` on the native API) shows as thumbnails and file chips in the bubble, with an MMS or Media badge and a media list in **Message details**.
 - **Simulate read** on an outgoing message fires `sms.opened` and turns the ticks blue, for read receipts. Only outgoing messages can be read: opening a message your app received answers `409`.
 
+## WhatsApp Cloud API
+
+Apps that call Meta's WhatsApp Business Cloud API directly send to SendMock the same way: change the host `https://graph.facebook.com` to the provider port, `http://127.0.0.1:8026` (or `http://127.0.0.1:8025/providers/whatsapp_cloud`), and keep the path.
+
+1. Send as your app does, for example with `curl`:
+
+   ```sh
+   curl -X POST http://127.0.0.1:8026/v21.0/106540352242922/messages -H "Authorization: Bearer any" -H "Content-Type: application/json" -d '{"messaging_product":"whatsapp","to":"16505551234","type":"text","text":{"body":"Your order shipped"}}'
+   ```
+
+2. The answer is Meta's: `messaging_product`, `contacts` with the `wa_id`, and `messages` with a `wamid.` id (`message_status: "accepted"` for a template).
+3. The message shows in **SMS** as a WhatsApp conversation from the provider's business number (`+15550783881` unless you change the **phone_number** credential in **SMS > Providers > WhatsApp Cloud**).
+
+Every message type is stored with a body you can read: text, templates (`Template order_update (en_US)` and their body parameters), images, video, audio, documents and stickers (their caption, with media links downloaded as the file), locations, contacts, interactive buttons and lists, and reactions. A request Meta would refuse (no `messaging_product`, no `to`, an unknown `type`, a missing `text.body`) gets Graph's error object with code `100` and nothing is stored. `{ "messaging_product": "whatsapp", "status": "read", "message_id": "wamid..." }` marks the conversation read and answers `{ "success": true }`. The magic numbers work here too: a refused number answers code `131026`, "Message undeliverable".
+
 Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
 ## From the CLI, API and AI

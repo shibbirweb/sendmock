@@ -124,6 +124,11 @@ jobs:
             language: node
             folder: node-sns
             run: bun install && node send-and-verify.js
+          # AC: SM-18.5
+          - client: WhatsApp Cloud API over HTTP
+            language: node
+            folder: node-whatsapp-cloud
+            run: node send-and-verify.js
           # AC: VF-05.4
           - client: Vonage Verify2 Node SDK
             language: node

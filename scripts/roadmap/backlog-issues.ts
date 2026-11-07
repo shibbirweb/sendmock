@@ -15,14 +15,6 @@ type BacklogItem = {
 
 const backlogItems: BacklogItem[] = [
   {
-    key: "later-whatsapp-cloud",
-    title: "Full WhatsApp Business Cloud API emulation",
-    area: "SMS",
-    idea: "Meta's WhatsApp Business Cloud API (messages, templates, media and its webhooks), emulated like the SMS providers.",
-    today:
-      "WhatsApp messages work through Twilio's Messages API with `whatsapp:` addresses (feature SM-11).",
-  },
-  {
     key: "later-helm-docker-desktop",
     title: "Helm chart and Docker Desktop extension",
     area: "Distribution",

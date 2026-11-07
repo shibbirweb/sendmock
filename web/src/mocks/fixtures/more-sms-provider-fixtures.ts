@@ -5,6 +5,7 @@ import {
   requireParts,
   respondWithJson,
 } from "@/mocks/fixtures/message-provider-builder";
+import { buildWhatsappCloudProvider } from "@/mocks/fixtures/whatsapp-cloud-provider-fixture";
 
 /**
  * Infobip's SMS API v2, as its Node SDK calls it (`@infobip-api/sdk`, `/sms/2/text/advanced`;
@@ -378,7 +379,7 @@ function buildVonageVerifyProvider(): MessageProviderRecord {
   });
 }
 
-/** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
+/** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3, A4 and A8). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
   return [
     buildInfobipProvider(),
@@ -387,5 +388,6 @@ export function buildMoreSmsProviders(): MessageProviderRecord[] {
     buildAfricasTalkingProvider(),
     buildAmazonSnsProvider(),
     buildVonageVerifyProvider(),
+    buildWhatsappCloudProvider(),
   ];
 }
