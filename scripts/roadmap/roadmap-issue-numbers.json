@@ -671,7 +671,8 @@
     "number": 146,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvGhU",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "PY-01": {
     "number": 147,
@@ -761,13 +762,15 @@
     "number": 159,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvIWM",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "VF-05": {
     "number": 160,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvIb4",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "SM-18": {
     "number": 161,
@@ -785,31 +788,36 @@
     "number": 163,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvItA",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "EM-20": {
     "number": 164,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvIz4",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "SM-17": {
     "number": 165,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvI5A",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "PN-01": {
     "number": 166,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvI_U",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "PL-10": {
     "number": 167,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvJGI",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "DS-08": {
     "number": 168,
@@ -825,5 +833,10 @@
   },
   "overview": {
     "number": 170
+  },
+  "DS-10": {
+    "number": 172,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhG2MQc",
+    "isFieldsSet": true
   }
 }

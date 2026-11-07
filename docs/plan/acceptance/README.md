@@ -98,7 +98,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | Accepted |
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
 | [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | After 1.0 (A3) | 6 | Accepted |
-| [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | After 1.0 (A8) | 5 | In progress |
+| [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | After 1.0 (A8) | 5 | Accepted |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
@@ -155,9 +155,9 @@ On top of its own criteria, a feature is done only when:
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Accepted |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Accepted |
-| [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | After 1.0 (A9) | 5 | Not started |
-| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 4 | Not started |
-| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 4 | Not started |
+| [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | After 1.0 (A9) | 5 | Accepted |
+| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 4 | Accepted |
+| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 4 | Accepted |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
