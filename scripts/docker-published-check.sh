@@ -29,6 +29,13 @@ pass() {
   echo "ok   $1"
 }
 
+# buildx answers .SBOM and .Provenance as a map by platform for a multi-platform index, but as
+# the attestation itself when the index holds one platform.
+read_attestation() {
+  docker buildx imagetools inspect "$image@$manifest_digest" --format "{{ json .$1 }}" \
+    | jq --arg platform "$2" 'if has($platform) then .[$platform] else . end'
+}
+
 for image_tag in $image_tags; do
   tag_digest="$(docker buildx imagetools inspect "$image:$image_tag$tag_suffix" --format '{{json .Manifest}}' | jq -r .digest)"
   [ "$tag_digest" = "$manifest_digest" ] || fail "$image:$image_tag$tag_suffix points at $manifest_digest (it points at $tag_digest)"
@@ -54,9 +61,9 @@ attestation_count="$(echo "$image_index" | jq '[.manifests[] | select(.annotatio
 [ "$(echo "$platform_digests" | wc -l | tr -d ' ')" = "$expected_platform_count" ] || fail "the index holds $expected_platforms"
 [ "$attestation_count" = "$expected_platform_count" ] || fail "each platform has an attestation manifest (found $attestation_count)"
 for platform in $expected_platforms; do
-  sbom_format="$(docker buildx imagetools inspect "$image@$manifest_digest" --format "{{ json (index .SBOM \"$platform\") }}" | jq -r '.SPDX.spdxVersion // empty')"
+  sbom_format="$(read_attestation SBOM "$platform" | jq -r '.SPDX.spdxVersion // empty')"
   [ -n "$sbom_format" ] || fail "$platform carries an SPDX SBOM"
-  provenance_type="$(docker buildx imagetools inspect "$image@$manifest_digest" --format "{{ json (index .Provenance \"$platform\") }}" | jq -r '.SLSA.buildType // .SLSA.buildDefinition.buildType // empty')"
+  provenance_type="$(read_attestation Provenance "$platform" | jq -r '.SLSA.buildType // .SLSA.buildDefinition.buildType // empty')"
   [ -n "$provenance_type" ] || fail "$platform carries SLSA provenance"
   pass "$platform carries an SBOM ($sbom_format) and provenance"
 done
