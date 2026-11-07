@@ -54,4 +54,17 @@ function locateBinary(platform, cpu, resolvePackageJson) {
   }
 }
 
-module.exports = { findPlatformPackage, locateBinary, platformPackages };
+/**
+ * The binary's environment: this one, plus a mark that npm started it, so
+ * `npx sendmock ai install` writes agent configurations that also start SendMock through npx.
+ */
+function buildBinaryEnvironment(parentEnvironment) {
+  return { ...parentEnvironment, SENDMOCK_LAUNCHER: "npm" };
+}
+
+module.exports = {
+  buildBinaryEnvironment,
+  findPlatformPackage,
+  locateBinary,
+  platformPackages,
+};

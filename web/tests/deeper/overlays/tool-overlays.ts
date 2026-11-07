@@ -115,6 +115,18 @@ export const settingsOverlays: DeeperOverlay[] = [
         .click(),
     ),
   ),
+  screenOverlay(
+    "AI agents through npx",
+    async (page) => {
+      await page
+        .locator("#main-content")
+        .getByRole("link", { name: "Connection", exact: true })
+        .click();
+      await page.getByRole("radio", { name: "npx (no install)" }).click();
+      await expect(page.getByText("Nothing to install")).toBeVisible();
+    },
+    "Connection section",
+  ),
   ...["Delete all emails", "Delete all SMS", "Reset to seed"].map(
     (buttonName) =>
       dialogOverlay(`${buttonName} dialog`, (page) =>

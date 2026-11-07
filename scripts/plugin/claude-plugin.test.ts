@@ -88,12 +88,12 @@ describe("Claude Code plugin", () => {
     expect(mcpConfiguration).toEqual({
       mcpServers: { sendmock: { command: "sendmock", args: ["mcp"] } },
     });
-    expect(
-      readFileSync(
-        join(repositoryRoot, "crates/sendmock/src/ai_install/install_plan.rs"),
-        "utf8",
-      ),
-    ).toContain('json!({ "command": "sendmock", "args": ["mcp"] })');
+    const mcpLaunchSource = readFileSync(
+      join(repositoryRoot, "crates/sendmock-ops/src/ai/mcp_launch.rs"),
+      "utf8",
+    );
+    expect(mcpLaunchSource).toContain('Self::Installed => "sendmock"');
+    expect(mcpLaunchSource).toContain('Self::Installed => &["mcp"]');
   });
 
   test("AI-05.5 the plugin's skill is the repository's skill with this version filled in", () => {

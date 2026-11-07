@@ -257,3 +257,68 @@ fn an_endpoint_created_with_the_cli_records_cli() {
     );
     assert_eq!(created_endpoint["created_by"], "cli", "{created_endpoint}");
 }
+
+// AC: AI-05.9
+#[test]
+fn ai_install_with_npx_writes_configurations_that_start_sendmock_through_npx() {
+    let (project_directory, home_directory) = (make_directory(), make_directory());
+
+    let output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "codex", "--npx", "--yes"],
+    );
+    let vscode_output = run_install(
+        project_directory.path(),
+        home_directory.path(),
+        &["--target", "vscode", "--npx", "--yes"],
+    );
+
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(vscode_output.status.code(), Some(0));
+    let codex_config = read_text(&home_directory.path().join(".codex/config.toml"));
+    assert!(
+        codex_config.contains("command = \"npx\"\nargs = [\"-y\", \"sendmock\", \"mcp\"]"),
+        "{codex_config}"
+    );
+    let vscode_config: serde_json::Value = serde_json::from_str(&read_text(
+        &project_directory.path().join(".vscode/mcp.json"),
+    ))
+    .unwrap_or_default();
+    assert_eq!(vscode_config["servers"]["sendmock"]["command"], "npx");
+    assert_eq!(
+        vscode_config["servers"]["sendmock"]["args"],
+        serde_json::json!(["-y", "sendmock", "mcp"])
+    );
+}
+
+// AC: AI-05.9
+#[test]
+fn ai_install_started_by_the_npm_launcher_uses_npx_without_being_asked() {
+    let (project_directory, home_directory) = (make_directory(), make_directory());
+
+    let output = run_until_exit(
+        sendmock_command(project_directory.path())
+            .env("HOME", home_directory.path())
+            .env("SENDMOCK_LAUNCHER", "npm")
+            .args(["ai", "install", "--target", "claude-code", "--yes"])
+            .stdin(std::process::Stdio::null()),
+    )
+    .unwrap_or_else(|run_error| panic!("the command runs: {run_error}"));
+
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let mcp_config: serde_json::Value =
+        serde_json::from_str(&read_text(&project_directory.path().join(".mcp.json")))
+            .unwrap_or_default();
+    assert_eq!(mcp_config["mcpServers"]["sendmock"]["command"], "npx");
+}

@@ -424,7 +424,7 @@ sendmock-skill/
 | `cursor` | `.cursor/mcp.json` | `.cursor/rules/sendmock.mdc` |
 | `gemini` | Gemini CLI `settings.json` `mcpServers` | `GEMINI.md` section |
 | `vscode` | `.vscode/mcp.json` | `.github/copilot-instructions.md` section |
-| `print` | prints the JSON/TOML snippets for any other harness | prints the skill |
+| (no `--target`) | prints every agent's install command and MCP configuration, for any other harness (built this way instead of a `print` target) | `sendmock ai skill` prints the skill |
 
 Each target shows a diff and asks before writing unless `--yes`. Exact config file locations and formats per harness are verified at implementation time, since they change between harness versions.
 

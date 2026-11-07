@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use sendmock_ops::ai::{AiAgentTarget, SKILL_EXAMPLES};
+use sendmock_ops::ai::{AiAgentTarget, McpLaunch, SKILL_EXAMPLES};
 use serde_json::json;
 
 use super::config_merging::{merge_codex_toml, merge_json_server, merge_markdown_section};
@@ -55,7 +55,11 @@ fn plan_markdown_section(file_path: PathBuf, skill_markdown: &str) -> PlannedFil
 }
 
 /// Claude Code reads the project's `.mcp.json` and the skill folder under `.claude/skills/`.
-fn plan_claude_code(install_places: &InstallPlaces<'_>, skill_markdown: &str) -> Vec<PlannedFile> {
+fn plan_claude_code(
+    install_places: &InstallPlaces<'_>,
+    skill_markdown: &str,
+    mcp_launch: McpLaunch,
+) -> Vec<PlannedFile> {
     let skill_directory = install_places
         .project_directory
         .join(".claude/skills/sendmock");
@@ -63,7 +67,7 @@ fn plan_claude_code(install_places: &InstallPlaces<'_>, skill_markdown: &str) ->
         plan_json_server(
             install_places.project_directory.join(".mcp.json"),
             "mcpServers",
-            json!({ "command": "sendmock", "args": ["mcp"] }),
+            mcp_launch.stdio_server_entry(),
         ),
         PlannedFile {
             path: skill_directory.join("SKILL.md"),
@@ -94,19 +98,22 @@ fn plan_cursor_rule(install_places: &InstallPlaces<'_>, skill_markdown: &str) ->
     }
 }
 
-/// The MCP registration and the skill or instructions for one agent (AI-05.2).
+/// The MCP registration and the skill or instructions for one agent (AI-05.2), starting
+/// SendMock the way `mcp_launch` says (AI-05.9).
 pub fn plan_install(
     target: AiAgentTarget,
     install_places: &InstallPlaces<'_>,
     skill_markdown: &str,
+    mcp_launch: McpLaunch,
 ) -> Vec<PlannedFile> {
-    let stdio_server = json!({ "command": "sendmock", "args": ["mcp"] });
+    let stdio_server = mcp_launch.stdio_server_entry();
     let project_directory = install_places.project_directory;
     match target {
-        AiAgentTarget::ClaudeCode => plan_claude_code(install_places, skill_markdown),
+        AiAgentTarget::ClaudeCode => plan_claude_code(install_places, skill_markdown, mcp_launch),
         AiAgentTarget::Codex => {
             let config_path = install_places.home_directory.join(".codex/config.toml");
-            let new_text = merge_codex_toml(&read_existing(&config_path));
+            let new_text =
+                merge_codex_toml(&read_existing(&config_path), &mcp_launch.codex_table());
             vec![
                 PlannedFile {
                     path: config_path,
@@ -135,7 +142,11 @@ pub fn plan_install(
             plan_json_server(
                 project_directory.join(".vscode/mcp.json"),
                 "servers",
-                json!({ "type": "stdio", "command": "sendmock", "args": ["mcp"] }),
+                json!({
+                    "type": "stdio",
+                    "command": mcp_launch.command(),
+                    "args": mcp_launch.arguments(),
+                }),
             ),
             plan_markdown_section(
                 project_directory.join(".github/copilot-instructions.md"),

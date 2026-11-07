@@ -6996,6 +6996,12 @@ components:
         instructions_path:
           type: string
           description: Where the skill or instructions go, e.g. `.claude/skills/sendmock/`.
+        npx_install_command:
+          type: string
+          description: The install command for someone who runs SendMock through npx, with nothing installed.
+        npx_mcp_config:
+          type: string
+          description: The MCP configuration that starts SendMock with `npx -y sendmock mcp`.
       required:
         - target
         - name
@@ -7003,6 +7009,8 @@ components:
         - mcp_config_path
         - mcp_config
         - instructions_path
+        - npx_install_command
+        - npx_mcp_config
       description: "One item of GET /api/v1/ai/agents: how to connect an AI agent."
     AiAgentTarget:
       type: string

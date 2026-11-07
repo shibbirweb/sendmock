@@ -3,7 +3,7 @@
 
 const { spawn } = require("node:child_process");
 
-const { locateBinary } = require("../lib/launcher.js");
+const { buildBinaryEnvironment, locateBinary } = require("../lib/launcher.js");
 
 const located = locateBinary(process.platform, process.arch, require.resolve);
 if (located.errorMessage) {
@@ -13,6 +13,7 @@ if (located.errorMessage) {
 
 const child = spawn(located.binaryPath, process.argv.slice(2), {
   stdio: "inherit",
+  env: buildBinaryEnvironment(process.env),
 });
 // Ctrl+C and stop requests reach SendMock, which shuts down cleanly and exits on its own.
 for (const signalName of ["SIGINT", "SIGTERM", "SIGHUP"]) {

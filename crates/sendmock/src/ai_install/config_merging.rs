@@ -28,8 +28,7 @@ pub fn merge_json_server(existing_text: &str, servers_key: &str, server_entry: V
 }
 
 /// Codex's `[mcp_servers.sendmock]` table, replacing one already there and keeping the rest.
-pub fn merge_codex_toml(existing_text: &str) -> String {
-    let sendmock_table = "[mcp_servers.sendmock]\ncommand = \"sendmock\"\nargs = [\"mcp\"]\n";
+pub fn merge_codex_toml(existing_text: &str, sendmock_table: &str) -> String {
     let mut kept_lines: Vec<&str> = Vec::new();
     let mut is_in_sendmock_table = false;
     for line in existing_text.lines() {
@@ -73,6 +72,8 @@ pub fn merge_markdown_section(existing_text: &str, section_body: &str) -> String
 
 #[cfg(test)]
 mod tests {
+    use sendmock_ops::ai::McpLaunch;
+
     use super::*;
 
     // AC: AI-05.2
@@ -95,7 +96,7 @@ mod tests {
     fn the_codex_table_is_replaced_and_other_tables_stay() {
         let existing = "model = \"o3\"\n\n[mcp_servers.sendmock]\ncommand = \"old\"\n\n[mcp_servers.other]\ncommand = \"x\"\n";
 
-        let merged = merge_codex_toml(existing);
+        let merged = merge_codex_toml(existing, &McpLaunch::Installed.codex_table());
 
         assert!(merged.contains("model = \"o3\""));
         assert!(merged.contains("[mcp_servers.other]\ncommand = \"x\""));

@@ -21,7 +21,29 @@ SendMock not installed yet? Your agent can install it too: paste the prompt from
 sendmock ai install --target claude-code     # or codex, cursor, gemini, vscode
 ```
 
-It registers the MCP server with your agent and installs the agent skill (or an instructions section for agents without skills). It shows what it will change and asks first; `--scope project` writes to the repository instead of your user settings. `--target print` prints the snippets for any other agent.
+It registers the MCP server with your agent and installs the agent skill (or an instructions section for agents without skills): in the project for Claude Code, Cursor and VS Code, and in your user settings for Codex and Gemini CLI. It shows what it will change and asks first; `--yes` writes without asking. Without `--target` it prints every agent's install command and MCP configuration, for any other agent.
+
+### With npx (nothing installed)
+
+If you run SendMock with [npx](../install.md#npx-no-install), there is no `sendmock` on your `PATH`, so the agent starts SendMock through npx instead. You need Node.js.
+
+1. Set up your agent:
+
+   ```bash
+   npx sendmock ai install --target claude-code
+   ```
+
+   Run through npx, it writes configurations that start SendMock with `npx -y sendmock mcp`. From an installed SendMock, add `--npx` to get the same.
+
+2. Or register the MCP server yourself with the command `npx -y sendmock mcp`. In Claude Code:
+
+   ```bash
+   claude mcp add sendmock -- npx -y sendmock mcp
+   ```
+
+3. On Windows, if your agent cannot start `npx` directly, use `cmd /c npx -y sendmock mcp` as the command.
+
+Settings > Connection > AI agents shows each agent's commands in both forms: choose **npx (no install)** under **SendMock runs as**.
 
 ### Claude Code plugin
 

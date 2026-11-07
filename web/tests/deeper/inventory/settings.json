@@ -247,6 +247,8 @@
       "heading: AI agents",
       "paragraph: Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.",
       "combobox: AI agent",
+      "radio: Installed",
+      "radio: npx (no install)",
       "heading: Install command",
       "button: Copy install command",
       "heading: MCP configuration",
@@ -271,6 +273,10 @@
       "radio: Manual Only when you press Check for updates.",
       "radio: Daily On start and once a day; a new version shows in the notifications.",
       "button: Check for updates"
+    ],
+    "AI agents through npx": [
+      "paragraph: Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .",
+      "paragraph: The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change."
     ],
     "Delete all emails dialog": [
       "heading: Delete all emails?",

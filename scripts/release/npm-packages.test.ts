@@ -16,16 +16,23 @@ import {
   writeNpmPackages,
 } from "./npm-packages";
 
-const { findPlatformPackage, locateBinary, platformPackages } =
-  require("../../packaging/npm/sendmock/lib/launcher.js") as {
-    findPlatformPackage: (platform: string, cpu: string) => string | null;
-    locateBinary: (
-      platform: string,
-      cpu: string,
-      resolvePackageJson: (request: string) => string,
-    ) => { binaryPath?: string; errorMessage?: string };
-    platformPackages: Record<string, string>;
-  };
+const {
+  buildBinaryEnvironment,
+  findPlatformPackage,
+  locateBinary,
+  platformPackages,
+} = require("../../packaging/npm/sendmock/lib/launcher.js") as {
+  buildBinaryEnvironment: (
+    parentEnvironment: Record<string, string>,
+  ) => Record<string, string>;
+  findPlatformPackage: (platform: string, cpu: string) => string | null;
+  locateBinary: (
+    platform: string,
+    cpu: string,
+    resolvePackageJson: (request: string) => string,
+  ) => { binaryPath?: string; errorMessage?: string };
+  platformPackages: Record<string, string>;
+};
 
 describe("npm packages", () => {
   test("DS-03.1 sendmock lists a platform package for every target at the same version", () => {
@@ -134,5 +141,12 @@ describe("npm launcher", () => {
     expect(locateBinary("freebsd", "x64", () => "").errorMessage).toContain(
       "no build for freebsd on x64",
     );
+  });
+
+  test("AI-05.9 tells the binary that npm started it and keeps the rest of the environment", () => {
+    expect(buildBinaryEnvironment({ PATH: "/usr/bin" })).toEqual({
+      PATH: "/usr/bin",
+      SENDMOCK_LAUNCHER: "npm",
+    });
   });
 });

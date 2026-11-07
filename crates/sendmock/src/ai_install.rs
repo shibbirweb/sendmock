@@ -12,7 +12,7 @@ use std::process::ExitCode;
 
 use clap::{Arg, ArgAction, Command};
 use sendmock_cli::{CliExitCode, MatchedOperation};
-use sendmock_ops::ai::{AiAgentTarget, list_agent_setups, render_skill_markdown};
+use sendmock_ops::ai::{AiAgentTarget, McpLaunch, list_agent_setups, render_skill_markdown};
 use serde_json::{Value, json};
 
 use install_plan::{InstallPlaces, PlannedFile, plan_install};
@@ -21,18 +21,41 @@ use line_diff::render_line_diff;
 /// The operation whose command `ai install` is.
 pub const AI_AGENTS_OPERATION_ID: &str = "getAiAgents";
 
-/// `--yes` writes without asking, for scripts and agents.
+/// Set by the npm launcher for the binary it starts, so `npx sendmock ai install` writes
+/// configurations that also start SendMock through npx.
+const LAUNCHER_VARIABLE: &str = "SENDMOCK_LAUNCHER";
+
+/// `--yes` writes without asking, for scripts and agents; `--npx` writes configurations that
+/// start SendMock through npx.
 pub fn add_install_flags(root_command: Command) -> Command {
     root_command.mut_subcommand("ai", |ai_command| {
         ai_command.mut_subcommand("install", |install_command| {
-            install_command.arg(
-                Arg::new("yes")
-                    .long("yes")
-                    .action(ArgAction::SetTrue)
-                    .help("Write the files without asking"),
-            )
+            install_command
+                .arg(
+                    Arg::new("yes")
+                        .long("yes")
+                        .action(ArgAction::SetTrue)
+                        .help("Write the files without asking"),
+                )
+                .arg(
+                    Arg::new("npx")
+                        .long("npx")
+                        .action(ArgAction::SetTrue)
+                        .help("Start SendMock through npx (npx -y sendmock mcp), for when it is not installed; the default when run with npx"),
+                )
         })
     })
+}
+
+/// npx when asked, or when the npm launcher started this binary; the installed binary otherwise.
+fn choose_mcp_launch(is_npx_asked: bool) -> McpLaunch {
+    let is_started_by_npm =
+        std::env::var(LAUNCHER_VARIABLE).is_ok_and(|launcher| launcher == "npm");
+    if is_npx_asked || is_started_by_npm {
+        McpLaunch::Npx
+    } else {
+        McpLaunch::Installed
+    }
 }
 
 fn read_home_directory() -> PathBuf {
@@ -72,7 +95,12 @@ fn show_path(file_path: &Path, project_directory: &Path) -> String {
 }
 
 /// Prints each change and writes them once confirmed.
-fn install_for(target: AiAgentTarget, is_confirmed: bool, as_json: bool) -> ExitCode {
+fn install_for(
+    target: AiAgentTarget,
+    is_confirmed: bool,
+    as_json: bool,
+    mcp_launch: McpLaunch,
+) -> ExitCode {
     let project_directory = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let home_directory = read_home_directory();
     let install_places = InstallPlaces {
@@ -80,13 +108,14 @@ fn install_for(target: AiAgentTarget, is_confirmed: bool, as_json: bool) -> Exit
         home_directory: &home_directory,
     };
     let skill_markdown = render_skill_markdown(env!("CARGO_PKG_VERSION"));
-    let changed_files: Vec<PlannedFile> = plan_install(target, &install_places, &skill_markdown)
-        .into_iter()
-        .filter(|planned_file| {
-            std::fs::read_to_string(&planned_file.path).ok().as_deref()
-                != Some(&planned_file.new_text)
-        })
-        .collect();
+    let changed_files: Vec<PlannedFile> =
+        plan_install(target, &install_places, &skill_markdown, mcp_launch)
+            .into_iter()
+            .filter(|planned_file| {
+                std::fs::read_to_string(&planned_file.path).ok().as_deref()
+                    != Some(&planned_file.new_text)
+            })
+            .collect();
     for planned_file in &changed_files {
         let old_text = std::fs::read_to_string(&planned_file.path).unwrap_or_default();
         let file_label = show_path(&planned_file.path, &project_directory);
@@ -131,6 +160,12 @@ pub fn run_ai_install(matched_operation: &MatchedOperation) -> ExitCode {
         .flatten()
         .copied()
         .unwrap_or(false);
+    let is_npx_asked = command_matches
+        .try_get_one::<bool>("npx")
+        .ok()
+        .flatten()
+        .copied()
+        .unwrap_or(false);
     let Some(target_text) = command_matches
         .try_get_one::<String>("target")
         .ok()
@@ -143,7 +178,12 @@ pub fn run_ai_install(matched_operation: &MatchedOperation) -> ExitCode {
         return CliExitCode::Success.into();
     };
     match serde_json::from_value::<AiAgentTarget>(Value::from(target_text.as_str())) {
-        Ok(target) => install_for(target, is_confirmed, as_json),
+        Ok(target) => install_for(
+            target,
+            is_confirmed,
+            as_json,
+            choose_mcp_launch(is_npx_asked),
+        ),
         Err(_) => {
             eprintln!(
                 "Unknown agent {target_text}: use claude-code, codex, cursor, gemini or vscode."
