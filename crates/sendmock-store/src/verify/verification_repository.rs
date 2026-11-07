@@ -26,7 +26,7 @@ impl VerificationRepository {
             .write(move |connection| {
                 let transaction = connection.transaction()?;
                 transaction.execute(
-                    &format!("INSERT INTO verifications ({VERIFICATION_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)"),
+                    &format!("INSERT INTO verifications ({VERIFICATION_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)"),
                     params![
                         verification.verification_sid,
                         verification.service_sid,
@@ -43,6 +43,7 @@ impl VerificationRepository {
                         verification.linked_thread_id,
                         verification.created_at_unix_ms,
                         verification.updated_at_unix_ms,
+                        verification.project_key,
                     ],
                 )?;
                 append_timeline(&transaction, &verification.verification_sid, &timeline_entries)?;

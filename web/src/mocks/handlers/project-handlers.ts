@@ -14,18 +14,14 @@ import {
 
 const projectKeyPattern = /^[a-z0-9][a-z0-9-]{0,39}$/;
 
-/** Traffic stored before projects existed, or without one, belongs to `default`. */
-function isInProject(trafficItem: object, projectKey: string): boolean {
-  const trafficProject =
-    "project" in trafficItem && typeof trafficItem.project === "string"
-      ? trafficItem.project
-      : defaultProjectKey;
+type ProjectTraffic = { project: string };
 
-  return trafficProject === projectKey;
+function isInProject(trafficItem: ProjectTraffic, projectKey: string): boolean {
+  return trafficItem.project === projectKey;
 }
 
 function toProject(projectRecord: ProjectRecord): Project {
-  const countIn = (trafficItems: object[]) =>
+  const countIn = (trafficItems: ProjectTraffic[]) =>
     trafficItems.filter((trafficItem) =>
       isInProject(trafficItem, projectRecord.key),
     ).length;
@@ -123,7 +119,7 @@ export const projectHandlers = [
       return createNotFoundResponse("Project");
     }
     const projectKey = String(params.projectKey);
-    const isKept = (trafficItem: object) =>
+    const isKept = (trafficItem: ProjectTraffic) =>
       !isInProject(trafficItem, projectKey);
     mockDatabase.projects = mockDatabase.projects.filter(
       (projectRecord) => projectRecord.key !== projectKey,

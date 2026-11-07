@@ -45,6 +45,8 @@ pub struct Verification {
     pub linked_message_id: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub linked_thread_id: Option<String>,
+    /// The project it was started in: `default` unless the sender named another.
+    pub project: String,
 }
 
 impl From<&VerificationRecord> for Verification {
@@ -63,6 +65,7 @@ impl From<&VerificationRecord> for Verification {
             created_at: format_rfc3339(verification.created_at_unix_ms),
             linked_message_id: verification.linked_message_id.clone(),
             linked_thread_id: verification.linked_thread_id.clone(),
+            project: verification.project_key.clone(),
         }
     }
 }

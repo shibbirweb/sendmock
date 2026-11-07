@@ -49,6 +49,8 @@ pub struct EmailDetail {
     pub direction: String,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub response_kind: Option<String>,
+    /// The project it was sent to: `default` unless the sender named another.
+    pub project: String,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub message_id: Option<String>,
     pub cc: Vec<EmailAddress>,
@@ -97,6 +99,7 @@ impl From<&EmailRecord> for EmailDetail {
             has_otp: !email.otp_codes.is_empty(),
             direction: email.direction.clone(),
             response_kind: None,
+            project: email.project_key.clone(),
             message_id: email.message_id.clone(),
             cc: to_email_addresses(&email.cc),
             bcc: to_email_addresses(&email.bcc),

@@ -68,6 +68,11 @@ export type EmailSummary = {
   direction: EmailDirection;
   /** Set on inbound emails made by Reply or Forward, for the list icon. */
   response_kind: EmailResponseKind | null;
+  /**
+   * The project the email was sent to: `default` unless the sender named another (PL-10).
+   * @example "default"
+   */
+  project: string;
 };
 
 export type EmailTemplateData = {

@@ -150,6 +150,7 @@ async fn insert_started(
     let now_unix_ms = operation_context.clock.now_unix_ms();
     let verify_service = verification_start.verify_service;
     let started = VerificationRecord {
+        project_key: operation_context.request.project_key.clone(),
         verification_sid: generate_verification_sid(operation_context),
         service_sid: verify_service.service_sid.clone(),
         service_name: verify_service.friendly_name.clone(),

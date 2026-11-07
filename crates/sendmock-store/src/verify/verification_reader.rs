@@ -3,7 +3,7 @@ use rusqlite::{Connection, Row, params_from_iter};
 
 use super::{VerificationFilter, VerificationPage, VerificationRecord};
 
-pub const VERIFICATION_COLUMNS: &str = "sid, service_sid, service_name, account_sid, to_address, channel, code, status, check_attempts, send_attempts, expires_at, linked_message_id, linked_thread_id, created_at, updated_at";
+pub const VERIFICATION_COLUMNS: &str = "sid, service_sid, service_name, account_sid, to_address, channel, code, status, check_attempts, send_attempts, expires_at, linked_message_id, linked_thread_id, created_at, updated_at, project_key";
 
 /// The filter as SQL conditions joined with AND, with their parameters in the same order.
 fn build_conditions(filter: &VerificationFilter) -> (String, Vec<SqlValue>) {
@@ -94,5 +94,6 @@ pub fn read_verification_row(row: &Row<'_>) -> rusqlite::Result<VerificationReco
         linked_thread_id: row.get(12)?,
         created_at_unix_ms: row.get(13)?,
         updated_at_unix_ms: row.get(14)?,
+        project_key: row.get(15)?,
     })
 }

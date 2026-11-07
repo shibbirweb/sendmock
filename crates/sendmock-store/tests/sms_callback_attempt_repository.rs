@@ -21,6 +21,7 @@ async fn repository_with_message() -> Result<SmsCallbackAttemptRepository, Store
 
 fn outbound_sms() -> SmsRecord {
     SmsRecord {
+        project_key: "default".to_owned(),
         sms_id: "01SMS".to_owned(),
         provider_id: "SM01".to_owned(),
         direction: "outbound".to_owned(),

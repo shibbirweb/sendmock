@@ -316,6 +316,7 @@ mod tests {
     fn sample_email() -> EmailRecord {
         EmailRecord {
             email_id: "01JCK0000000000000000000AB".to_owned(),
+            project_key: "default".to_owned(),
             received_at_unix_ms: 1_762_500_000_000,
             message_id: Some("<welcome@shop.test>".to_owned()),
             subject: "Welcome".to_owned(),

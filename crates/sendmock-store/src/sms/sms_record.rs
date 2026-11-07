@@ -39,6 +39,8 @@ pub struct SmsRecord {
     /// Inbound only: the latest reply webhook run's outcome, as JSON.
     pub reply_webhook_json: Option<String>,
     pub media: Vec<SmsMediaRecord>,
+    /// The project the message was sent to; `default` unless the sender named another.
+    pub project_key: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

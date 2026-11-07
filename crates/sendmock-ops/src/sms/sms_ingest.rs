@@ -41,7 +41,11 @@ pub async fn store_sms(
     let sms_id = operation_context.id_generator.generate_id().to_string();
     let now_unix_ms = operation_context.clock.now_unix_ms();
     let is_inbound = incoming_sms.is_inbound;
-    let (sms, media_contents) = build_sms_record(incoming_sms, sms_id, now_unix_ms, otp_codes);
+    let (mut sms, media_contents) = build_sms_record(incoming_sms, sms_id, now_unix_ms, otp_codes);
+    operation_context
+        .request
+        .project_key
+        .clone_into(&mut sms.project_key);
     operation_context
         .sms_repository
         .insert_message(NewSmsRecord {
@@ -98,6 +102,10 @@ fn resolve_numbers(from_address: &str, to_address: &str, is_inbound: bool) -> Co
     }
 }
 
+fn name_direction(is_inbound: bool) -> &'static str {
+    if is_inbound { "inbound" } else { "outbound" }
+}
+
 fn build_sms_record(
     incoming_sms: IncomingSms,
     sms_id: String,
@@ -112,13 +120,10 @@ fn build_sms_record(
     let (is_whatsapp, from_number, to_number) =
         (numbers.is_whatsapp, numbers.from_number, numbers.to_number);
     let (app_number, contact_number) = (numbers.app_number, numbers.contact_number);
-    let direction = if incoming_sms.is_inbound {
-        "inbound"
-    } else {
-        "outbound"
-    };
+    let direction = name_direction(incoming_sms.is_inbound);
     let segment_count = count_segments(&incoming_sms.body);
     let sms = SmsRecord {
+        project_key: String::new(),
         provider_id: incoming_sms.provider_id.unwrap_or_else(|| sms_id.clone()),
         direction: direction.to_owned(),
         channel: if is_whatsapp { "whatsapp" } else { "sms" }.to_owned(),

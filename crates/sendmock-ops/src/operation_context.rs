@@ -86,9 +86,9 @@ pub struct OperationContext {
     pub email_stores: EmailStores,
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
-    /// Who made this request, recorded as `created_by` on what it creates.
-    pub request_client: crate::RequestClient,
     pub project_repository: ProjectRepository,
+    /// Who sent this request and the project its traffic goes to.
+    pub request: crate::RequestScope,
 }
 
 /// Wake the background dispatchers when work is queued.
@@ -203,6 +203,7 @@ impl OperationContext {
             dispatch_signals: DispatchSignals::default(),
             http_catcher_stores: HttpCatcherStores::new(&database),
             project_repository: ProjectRepository::new(share_database()),
+            request: crate::RequestScope::default(),
             webhook_sender: None,
             random_source: Arc::new(SystemRandomSource),
             email_ingest_service: build_email_ingest_service(&database, &clock, &id_generator),
@@ -219,13 +220,18 @@ impl OperationContext {
             status_callback_sender: None,
             reply_webhook_sender: None,
             environment_reader: Arc::new(ProcessEnvironment),
-            request_client: crate::RequestClient::default(),
         }
     }
 
     /// The same context for one request from this client.
     pub fn with_request_client(mut self, request_client: crate::RequestClient) -> Self {
-        self.request_client = request_client;
+        self.request.client = request_client;
+        self
+    }
+
+    /// The same context for a request that names its project; the caller checks it exists.
+    pub fn with_project_key(mut self, project_key: &str) -> Self {
+        project_key.clone_into(&mut self.request.project_key);
         self
     }
 

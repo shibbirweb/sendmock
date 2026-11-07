@@ -84,6 +84,11 @@ export type SmsMessage = {
   in_reply_to_sms_id: Ulid | null;
   created_at: IsoTimestamp;
   updated_at: IsoTimestamp;
+  /**
+   * The project the message was sent to: `default` unless the sender named another (PL-10).
+   * @example "default"
+   */
+  project: string;
 };
 
 /** A verb of the TwiML an app answered with (SM-09.7). */

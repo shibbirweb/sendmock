@@ -195,9 +195,9 @@ fn insert_email_row(
         "INSERT INTO emails (id, received_at, message_id, subject, from_address, to_addresses, cc_addresses, \
          bcc_addresses, reply_to_addresses, envelope_from, envelope_to, headers, text_body, html_body, snippet, \
          size_bytes, attachment_count, is_read, tags, source, direction, delivery_status, open_count, opened_at, \
-         otp_codes, links, smtp_session_id, smtp_auth_user, mime_tree, raw_message) \
+         otp_codes, links, smtp_session_id, smtp_auth_user, mime_tree, raw_message, project_key) \
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, \
-         ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29, ?30)",
+         ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29, ?30, ?31)",
         rusqlite::params![
             email.email_id,
             email.received_at_unix_ms,
@@ -229,6 +229,7 @@ fn insert_email_row(
             email.smtp_auth_user,
             email.mime_tree_json,
             new_email.compressed_raw_message,
+            email.project_key,
         ],
     )
 }

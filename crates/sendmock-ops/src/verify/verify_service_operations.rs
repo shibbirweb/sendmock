@@ -89,7 +89,7 @@ pub async fn new_verify_service(
         code_length: settings.verify_default_code_length,
         fixed_code: None,
         ttl_seconds: settings.verify_default_ttl_seconds,
-        created_by: operation_context.request_client.as_str().to_owned(),
+        created_by: operation_context.request.client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     })
 }

@@ -1,6 +1,7 @@
 use sendmock_mail::{EmailEnvelope, IncomingEmail};
 use sendmock_store::SmtpSessionRecord;
 
+use crate::projects::find_named_project;
 use crate::{OperationContext, OperationError, complete_email_intake, read_ingest_options};
 
 /// A message as an SMTP session received it.
@@ -13,8 +14,22 @@ pub struct SmtpMessage {
     pub auth_user: Option<String>,
 }
 
-/// Stores an SMTP message through the same path as every other email; answers its id.
+/// Stores an SMTP message through the same path as every other email; answers its id. An
+/// AUTH username that is a project's key sends the message to that project.
 pub async fn store_smtp_message(
+    operation_context: &OperationContext,
+    smtp_message: SmtpMessage,
+) -> Result<String, OperationError> {
+    match find_named_project(operation_context, smtp_message.auth_user.as_deref()).await? {
+        Some(project_key) => {
+            let project_context = operation_context.clone().with_project_key(&project_key);
+            store_in_project(&project_context, smtp_message).await
+        }
+        None => store_in_project(operation_context, smtp_message).await,
+    }
+}
+
+async fn store_in_project(
     operation_context: &OperationContext,
     smtp_message: SmtpMessage,
 ) -> Result<String, OperationError> {

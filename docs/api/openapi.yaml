@@ -8540,6 +8540,11 @@ components:
             - $ref: "#/components/schemas/EmailResponseKind"
             - type: "null"
           description: Set on inbound emails made by Reply or Forward, for the list icon.
+        project:
+          type: string
+          description: "The project the email was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - attachment_count
         - attachments
@@ -8560,6 +8565,7 @@ components:
         - message_id
         - open_count
         - opened_at
+        - project
         - received_at
         - reply_to
         - response_kind
@@ -8949,6 +8955,11 @@ components:
             - $ref: "#/components/schemas/EmailResponseKind"
             - type: "null"
           description: Set on inbound emails made by Reply or Forward, for the list icon.
+        project:
+          type: string
+          description: "The project the email was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - id
         - received_at
@@ -8966,6 +8977,7 @@ components:
         - has_otp
         - direction
         - response_kind
+        - project
       description: Fields shown in the mail list.
     EmailTemplateData:
       type: object
@@ -13595,6 +13607,11 @@ components:
           $ref: "#/components/schemas/IsoTimestamp"
         updated_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - id
         - provider_id
@@ -13619,6 +13636,7 @@ components:
         - in_reply_to_sms_id
         - created_at
         - updated_at
+        - project
     SmsMessageDetail:
       type: object
       properties:
@@ -13708,6 +13726,11 @@ components:
           $ref: "#/components/schemas/IsoTimestamp"
         updated_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - account
         - api
@@ -13727,6 +13750,7 @@ components:
         - messaging_service_sid
         - open_count
         - opened_at
+        - project
         - provider_id
         - reply_webhook
         - reply_webhook_attempts
@@ -14893,6 +14917,11 @@ components:
             - string
             - "null"
           description: Conversation of the linked SMS, for the "Open message" link.
+        project:
+          type: string
+          description: "The project the verification was started in: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - sid
         - service_sid
@@ -14907,6 +14936,7 @@ components:
         - created_at
         - linked_message_id
         - linked_thread_id
+        - project
     VerificationDetail:
       type: object
       properties:
@@ -14946,6 +14976,11 @@ components:
             - string
             - "null"
           description: Conversation of the linked SMS, for the "Open message" link.
+        project:
+          type: string
+          description: "The project the verification was started in: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - channel
         - check_attempts
@@ -14954,6 +14989,7 @@ components:
         - expires_at
         - linked_message_id
         - linked_thread_id
+        - project
         - send_attempts
         - service_name
         - service_sid

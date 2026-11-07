@@ -92,7 +92,7 @@ impl Operation for CreateSmsOutcomeRuleOperation {
             delay_seconds: input.delay_seconds,
             note: input.note,
             is_enabled: input.is_enabled,
-            created_by: operation_context.request_client.as_str().to_owned(),
+            created_by: operation_context.request.client.as_str().to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         })?;
         let stored_rule = operation_context

@@ -63,6 +63,8 @@ pub struct SmsMessage {
     pub in_reply_to_sms_id: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    /// The project it was sent to: `default` unless the sender named another.
+    pub project: String,
 }
 
 impl From<&SmsRecord> for SmsMessage {
@@ -101,6 +103,7 @@ impl From<&SmsRecord> for SmsMessage {
             in_reply_to_sms_id: sms.in_reply_to_sms_id.clone(),
             created_at: format_rfc3339(sms.created_at_unix_ms),
             updated_at: format_rfc3339(sms.updated_at_unix_ms),
+            project: sms.project_key.clone(),
         }
     }
 }

@@ -7,7 +7,7 @@ use super::EmailRecord;
 pub const EMAIL_COLUMNS: &str = "id, received_at, message_id, subject, from_address, to_addresses, cc_addresses, \
      bcc_addresses, reply_to_addresses, envelope_from, envelope_to, headers, text_body, html_body, snippet, \
      size_bytes, is_read, tags, source, direction, delivery_status, open_count, opened_at, otp_codes, links, \
-     smtp_session_id, smtp_auth_user, mime_tree";
+     smtp_session_id, smtp_auth_user, mime_tree, project_key";
 
 /// A JSON column read into its type; a damaged value reads as the type's default.
 fn read_json_column<Column: DeserializeOwned + Default>(
@@ -49,6 +49,7 @@ pub fn read_email_row(row: &Row<'_>) -> rusqlite::Result<EmailRecord> {
         smtp_auth_user: row.get(26)?,
         mime_tree_json: row.get(27)?,
         attachments: Vec::new(),
+        project_key: row.get(28)?,
     })
 }
 

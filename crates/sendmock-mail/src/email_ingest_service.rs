@@ -20,6 +20,8 @@ const SNIPPET_LENGTH: usize = 200;
 pub struct IngestOptions {
     pub otp_extractor: OtpExtractor,
     pub is_plus_address_tagging_enabled: bool,
+    /// The project the email is stored in.
+    pub project_key: String,
 }
 
 impl Default for IngestOptions {
@@ -27,6 +29,7 @@ impl Default for IngestOptions {
         Self {
             otp_extractor: OtpExtractor::with_default_patterns(),
             is_plus_address_tagging_enabled: true,
+            project_key: "default".to_owned(),
         }
     }
 }
@@ -150,6 +153,7 @@ fn build_email_record(
         mime_tree_json: serde_json::to_string(&parsed_email.mime_tree)
             .unwrap_or_else(|_| "null".to_owned()),
         attachments: build_attachment_records(parsed_email),
+        project_key: ingest_options.project_key.clone(),
     }
 }
 

@@ -5,6 +5,10 @@ mod project_inputs;
 mod project_operations;
 mod project_views;
 
+pub use project_checks::find_named_project;
+
+/// The header a request names its project in; the traffic it captures is stored there.
+pub const PROJECT_HEADER: &str = "x-sendmock-project";
 use project_operations::{
     CreateProjectOperation, DeleteProjectOperation, ListProjectsOperation, UpdateProjectOperation,
 };

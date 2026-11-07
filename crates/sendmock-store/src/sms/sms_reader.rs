@@ -92,7 +92,7 @@ pub fn list_threads(connection: &Connection) -> rusqlite::Result<Vec<SmsThreadRe
     ))?;
     let mut thread_rows: Vec<(SmsRecord, i64, i64)> = statement
         .query_map([], |row| {
-            Ok((read_sms_row(row)?, row.get(32)?, row.get(33)?))
+            Ok((read_sms_row(row)?, row.get(33)?, row.get(34)?))
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
     let mut last_messages: Vec<SmsRecord> = thread_rows

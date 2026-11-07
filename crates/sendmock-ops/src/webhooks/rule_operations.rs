@@ -129,7 +129,7 @@ impl Operation for CreateWebhookRuleOperation {
                 events_json: write_json(&input.events)?,
                 filter_json: input.filter.as_ref().map(write_json).transpose()?,
                 is_enabled: input.is_enabled,
-                created_by: operation_context.request_client.as_str().to_owned(),
+                created_by: operation_context.request.client.as_str().to_owned(),
                 created_at_unix_ms: operation_context.clock.now_unix_ms(),
             })
             .await?;

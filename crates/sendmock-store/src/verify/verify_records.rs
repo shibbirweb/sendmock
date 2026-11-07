@@ -30,6 +30,8 @@ pub struct VerificationRecord {
     pub linked_thread_id: Option<String>,
     pub created_at_unix_ms: i64,
     pub updated_at_unix_ms: i64,
+    /// The project the verification was started in; `default` unless the app named another.
+    pub project_key: String,
 }
 
 /// One step of a verification: `started`, `code_sent`, `check_failed`, `approved`, ...

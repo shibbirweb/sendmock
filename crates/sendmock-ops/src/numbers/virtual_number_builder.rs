@@ -107,7 +107,7 @@ fn new_number_record(operation_context: &OperationContext) -> VirtualNumberRecor
         inbound_template_id: None,
         status_callback_url: None,
         messaging_service_sid: None,
-        created_by: operation_context.request_client.as_str().to_owned(),
+        created_by: operation_context.request.client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }
 }

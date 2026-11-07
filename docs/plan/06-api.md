@@ -199,7 +199,7 @@ Built after 1.0 as [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10)
 | PATCH | `/projects/{projectKey}` | rename a project (`name`); the key never changes, since apps send it |
 | DELETE | `/projects/{projectKey}` | delete a project and its emails, SMS and verifications; `409 default_project` for `default` |
 
-Requests that capture traffic name their project in the `X-SendMock-Project` header (an unknown key answers `404 project_not_found`); without it they go to `default`. Lists and lookups of captured traffic take an optional `project` query parameter.
+Requests that capture traffic name their project in the `X-SendMock-Project` header (an unknown key answers `404 project_not_found`); without it they go to `default`. Over SMTP, an AUTH username that is a project's key picks that project. Every email, SMS and verification shows its `project`. Lists and lookups of captured traffic take an optional `project` query parameter.
 
 ## Realtime
 

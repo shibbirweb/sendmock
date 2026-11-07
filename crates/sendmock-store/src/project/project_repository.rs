@@ -78,6 +78,23 @@ impl ProjectRepository {
             .await
     }
 
+    /// Whether a project has this key; cheaper than `find_project`, which counts its traffic.
+    pub async fn has_project(&self, project_key: &str) -> Result<bool, StoreError> {
+        let project_key = project_key.to_owned();
+        self.database
+            .read(move |connection| {
+                Ok(connection
+                    .query_row(
+                        "SELECT 1 FROM projects WHERE project_key = ?1",
+                        [project_key],
+                        |_| Ok(()),
+                    )
+                    .optional()?
+                    .is_some())
+            })
+            .await
+    }
+
     /// Adds the project unless its key is taken; answers whether it was added.
     pub async fn insert_project(&self, new_project: ProjectRecord) -> Result<bool, StoreError> {
         self.database

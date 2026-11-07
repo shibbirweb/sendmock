@@ -47,6 +47,7 @@ pub fn build_ingest_options(settings: &AppSettings) -> IngestOptions {
     IngestOptions {
         otp_extractor: compile_otp_extractor(&settings.otp_patterns),
         is_plus_address_tagging_enabled: settings.is_plus_address_tagging_enabled,
+        project_key: sendmock_store::DEFAULT_PROJECT_KEY.to_owned(),
     }
 }
 
@@ -60,5 +61,6 @@ pub async fn read_ingest_options(
             .settings_store
             .otp_extractor_for(&settings),
         is_plus_address_tagging_enabled: settings.is_plus_address_tagging_enabled,
+        project_key: operation_context.request.project_key.clone(),
     })
 }

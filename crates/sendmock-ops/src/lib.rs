@@ -34,6 +34,7 @@ mod projects;
 mod providers;
 mod razorpay;
 mod request_client;
+mod request_scope;
 mod samples;
 mod scenarios;
 mod seed;
@@ -100,13 +101,14 @@ pub use payments::{
     PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
     PaymentMethodDefinition, PaymentSummary,
 };
-pub use projects::Project;
+pub use projects::{PROJECT_HEADER, Project, find_named_project};
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
     load_sms_provider_definitions, sign_twilio_request,
 };
 pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};
+pub use request_scope::RequestScope;
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
 pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,

@@ -5,6 +5,7 @@ import { mockDatabase } from "@/mocks/db/mock-database";
 import { createProviderId } from "@/mocks/fixtures/fixture-helpers";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { sendOutboundSmsSample } from "@/mocks/samples/create-sample-sms";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 const sampleRecipient = "+14155550100";
 const verifySenderNumber = "+15550002222";
@@ -46,6 +47,7 @@ export function createSampleVerification(): string {
     body: `Your ${verifyService.friendly_name} verification code is: ${code}`,
   });
   const verification: VerificationDetail = {
+    project: defaultProjectKey,
     sid: createProviderId("VE"),
     service_sid: verifyService.sid,
     service_name: verifyService.friendly_name,

@@ -16,6 +16,7 @@ import {
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
 import { buildSmsCallbackAttempt } from "@/mocks/fixtures/sms-callback-builder";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 type SmsFixtureSpec = {
   minutesAgo: number;
@@ -113,6 +114,7 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
   const openCount = smsSpec.openCount ?? 0;
 
   const smsMessage: SmsMessageDetail = {
+    project: defaultProjectKey,
     id: createMockUlid(minutesAgoInMs(smsSpec.minutesAgo)),
     provider_id:
       api === "twilio" ? createProviderId("SM") : createProviderId(""),

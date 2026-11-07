@@ -42,6 +42,8 @@ pub struct EmailRecord {
     /// The MIME tree as JSON, shaped by the mail domain.
     pub mime_tree_json: String,
     pub attachments: Vec<AttachmentRecord>,
+    /// The project the email was sent to; `default` unless the sender named another.
+    pub project_key: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

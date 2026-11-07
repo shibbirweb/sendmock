@@ -15,6 +15,7 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 export type EmailFixtureSpec = {
   minutesAgo: number;
@@ -109,6 +110,7 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
 
   const email: EmailDetail = {
     id: emailId,
+    project: defaultProjectKey,
     received_at: receivedAt,
     message_id: `<${faker.string.alphanumeric(16)}@${emailSpec.from.address.split("@")[1] ?? "app.test"}>`,
     from: emailSpec.from,

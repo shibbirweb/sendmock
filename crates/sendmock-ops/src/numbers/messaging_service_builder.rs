@@ -28,7 +28,7 @@ pub async fn build_messaging_service(
         ),
         None => (
             generate_service_sid(operation_context),
-            operation_context.request_client.as_str().to_owned(),
+            operation_context.request.client.as_str().to_owned(),
             operation_context.clock.now_unix_ms(),
         ),
     };

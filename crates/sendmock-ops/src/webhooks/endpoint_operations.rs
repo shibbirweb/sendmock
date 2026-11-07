@@ -104,7 +104,7 @@ impl Operation for CreateWebhookEndpointOperation {
                 .to_owned(),
             previous_signing_secret: None,
             previous_secret_expires_at_unix_ms: None,
-            created_by: operation_context.request_client.as_str().to_owned(),
+            created_by: operation_context.request.client.as_str().to_owned(),
             created_at_unix_ms: now_unix_ms,
         };
         operation_context

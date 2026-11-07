@@ -22,6 +22,7 @@ fn sms(sms_id: &str, direction: &str, body: &str) -> SmsRecord {
         (contact_number, app_number)
     };
     SmsRecord {
+        project_key: "default".to_owned(),
         sms_id: sms_id.to_owned(),
         provider_id: format!("SM{sms_id}"),
         direction: direction.to_owned(),

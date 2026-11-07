@@ -40,6 +40,7 @@ function toEmailSummary(email: EmailDetail): EmailSummary {
     has_otp: email.has_otp,
     direction: email.direction,
     response_kind: email.response_kind,
+    project: email.project,
   };
 }
 

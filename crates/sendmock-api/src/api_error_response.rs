@@ -36,6 +36,21 @@ impl ApiErrorResponse {
         }
     }
 
+    /// `X-SendMock-Project` names no project: refused rather than stored in `default`, so a
+    /// typo in the key shows at once.
+    pub fn unknown_project(project_key: &str) -> Self {
+        Self {
+            status: StatusCode::NOT_FOUND,
+            detail: ApiErrorDetail {
+                code: "project_not_found",
+                message: format!(
+                    "No project with key {project_key}; create it in Settings > Projects first"
+                ),
+                field: None,
+            },
+        }
+    }
+
     pub fn invalid_json_body(reason: &str) -> Self {
         Self {
             status: StatusCode::BAD_REQUEST,

@@ -86,6 +86,8 @@ fn build_cors_layer(cors_origins: &[String]) -> Option<CorsLayer> {
                 AUTHORIZATION,
                 axum::http::header::CONTENT_TYPE,
                 axum::http::header::ACCEPT,
+                axum::http::HeaderName::from_static(sendmock_ops::PROJECT_HEADER),
+                axum::http::HeaderName::from_static(sendmock_ops::REQUEST_CLIENT_HEADER),
             ])
             .allow_private_network(true),
     )

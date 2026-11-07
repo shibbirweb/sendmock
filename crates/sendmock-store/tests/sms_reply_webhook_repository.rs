@@ -33,6 +33,7 @@ async fn repositories_with_inbound_message() -> Result<Repositories, StoreError>
 fn inbound_sms() -> SmsRecord {
     SmsRecord {
         sms_id: SMS_ID.to_owned(),
+        project_key: "default".to_owned(),
         provider_id: "SM01".to_owned(),
         direction: "inbound".to_owned(),
         channel: "sms".to_owned(),

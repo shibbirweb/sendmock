@@ -81,6 +81,7 @@ mod tests {
     fn build_original_email() -> EmailRecord {
         EmailRecord {
             email_id: "01ORIGINAL".to_owned(),
+            project_key: "default".to_owned(),
             received_at_unix_ms: 1_767_225_600_000,
             message_id: None,
             subject: "Your receipt".to_owned(),

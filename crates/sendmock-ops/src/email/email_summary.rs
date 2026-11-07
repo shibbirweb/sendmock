@@ -44,6 +44,8 @@ pub struct EmailSummary {
     /// Set on inbound emails made by Reply or Forward, for the list icon.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub response_kind: Option<String>,
+    /// The project it was sent to: `default` unless the sender named another.
+    pub project: String,
 }
 
 impl From<&EmailRecord> for EmailSummary {
@@ -65,6 +67,7 @@ impl From<&EmailRecord> for EmailSummary {
             has_otp: !email.otp_codes.is_empty(),
             direction: email.direction.clone(),
             response_kind: None,
+            project: email.project_key.clone(),
         }
     }
 }

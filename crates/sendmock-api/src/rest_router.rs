@@ -12,7 +12,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{MethodFilter, MethodRouter, on};
 use sendmock_ops::{
     ErasedOperation, HttpMethod, OperationAnswer, OperationContext, OperationRegistry,
-    REQUEST_CLIENT_HEADER, RequestClient, to_snake_case,
+    PROJECT_HEADER, REQUEST_CLIENT_HEADER, RequestClient, find_named_project, to_snake_case,
 };
 
 use serde_json::Value;
@@ -114,14 +114,9 @@ fn build_operation_route(
                 body,
                 reads_body,
             };
-            let request_context = match headers
-                .get(REQUEST_CLIENT_HEADER)
-                .and_then(|header_value| header_value.to_str().ok())
-            {
-                Some(client_name) => operation_context
-                    .clone()
-                    .with_request_client(RequestClient::from_header_value(client_name)),
-                None => operation_context.clone(),
+            let request_context = match build_request_context(&operation_context, &headers).await {
+                Ok(request_context) => request_context,
+                Err(error_response) => return error_response.into_response(),
             };
             match assemble_input(operation.as_ref(), &input_schema, request_parts) {
                 Ok(input) => run_operation(operation.as_ref(), &request_context, input).await,
@@ -129,6 +124,33 @@ fn build_operation_route(
             }
         },
     )
+}
+
+/// The context for one request: who sent it (`X-SendMock-Client`) and the project its
+/// traffic goes to (`X-SendMock-Project`, which must name a project).
+async fn build_request_context(
+    operation_context: &OperationContext,
+    headers: &HeaderMap,
+) -> Result<OperationContext, ApiErrorResponse> {
+    let read_header = |header_name: &str| {
+        headers
+            .get(header_name)
+            .and_then(|header_value| header_value.to_str().ok())
+            .map(str::trim)
+            .filter(|header_value| !header_value.is_empty())
+    };
+    let mut request_context = operation_context.clone();
+    if let Some(client_name) = read_header(REQUEST_CLIENT_HEADER) {
+        request_context =
+            request_context.with_request_client(RequestClient::from_header_value(client_name));
+    }
+    if let Some(project_name) = read_header(PROJECT_HEADER) {
+        let project_key = find_named_project(operation_context, Some(project_name))
+            .await?
+            .ok_or_else(|| ApiErrorResponse::unknown_project(project_name))?;
+        request_context = request_context.with_project_key(&project_key);
+    }
+    Ok(request_context)
 }
 
 async fn run_operation(

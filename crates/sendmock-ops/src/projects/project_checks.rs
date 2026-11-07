@@ -68,6 +68,22 @@ pub async fn find_project_or_not_found(
         .ok_or_else(|| project_not_found(project_key))
 }
 
+/// The project a sender named, when that name is a project's key; any other name, such as an
+/// SMTP username that is not a project, picks none.
+pub async fn find_named_project(
+    operation_context: &OperationContext,
+    project_name: Option<&str>,
+) -> Result<Option<String>, OperationError> {
+    let Some(project_name) = project_name.filter(|project_name| !project_name.is_empty()) else {
+        return Ok(None);
+    };
+    let is_project = operation_context
+        .project_repository
+        .has_project(project_name)
+        .await?;
+    Ok(is_project.then(|| project_name.to_owned()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
