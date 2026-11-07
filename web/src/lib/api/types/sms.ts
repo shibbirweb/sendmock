@@ -42,7 +42,7 @@ export type InlineSmsMedia = {
   filename: string;
   /**
    * The file bytes, base64 encoded.
-   * @example "/9j/4AAQSkZJRgABAQ"
+   * @example "/9j/4AAQSkZJRgABAQ=="
    */
   content: string;
   /**

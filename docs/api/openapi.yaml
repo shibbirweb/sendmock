@@ -9706,7 +9706,7 @@ components:
           type: string
           description: The file bytes, base64 encoded.
           examples:
-            - /9j/4AAQSkZJRgABAQ
+            - /9j/4AAQSkZJRgABAQ==
         content_type:
           type: string
           description: Guessed from the file extension when missing.

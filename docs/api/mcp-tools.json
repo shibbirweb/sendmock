@@ -19854,7 +19854,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
@@ -19923,7 +19923,7 @@
               [
                 {
                   "filename": "photo.jpg",
-                  "content": "/9j/4AAQSkZJRgABAQ",
+                  "content": "/9j/4AAQSkZJRgABAQ==",
                   "content_type": "image/jpeg"
                 }
               ]
@@ -19950,7 +19950,7 @@
                 "type": "string",
                 "description": "The file bytes, base64 encoded.",
                 "examples": [
-                  "/9j/4AAQSkZJRgABAQ"
+                  "/9j/4AAQSkZJRgABAQ=="
                 ]
               },
               "content_type": {
@@ -20211,7 +20211,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
@@ -20265,7 +20265,7 @@
               [
                 {
                   "filename": "photo.jpg",
-                  "content": "/9j/4AAQSkZJRgABAQ",
+                  "content": "/9j/4AAQSkZJRgABAQ==",
                   "content_type": "image/jpeg"
                 }
               ]
@@ -20292,7 +20292,7 @@
                 "type": "string",
                 "description": "The file bytes, base64 encoded.",
                 "examples": [
-                  "/9j/4AAQSkZJRgABAQ"
+                  "/9j/4AAQSkZJRgABAQ=="
                 ]
               },
               "content_type": {

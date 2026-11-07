@@ -12189,7 +12189,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
@@ -13632,7 +13632,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
