@@ -81,7 +81,7 @@
     "method": "POST",
     "content_type": "application/json",
     "header_templates": {},
-    "body_template": "{\n  \"data\": {\n    \"event_type\": \"message.received\",\n    \"payload\": {\n      \"id\": \"{{ data.provider_id }}\",\n      \"from\": { \"phone_number\": \"{{ data.from_number }}\" },\n      \"to\": [{ \"phone_number\": \"{{ data.to_number }}\" }],\n      \"text\": \"{{ data.body }}\"\n    }\n  }\n}",
+    "body_template": "{\n  \"data\": {\n    \"event_type\": \"{% if event.type == \"sms.inbound\" %}message.received{% else %}{% if data.status == \"sent\" %}message.sent{% else %}message.finalized{% endif %}{% endif %}\",\n    \"id\": \"{{ uuid() }}\",\n    \"occurred_at\": \"{{ event.created_at }}\",\n    \"record_type\": \"event\",\n    \"payload\": {\n      \"id\": \"{{ data.provider_id }}\",\n      \"record_type\": \"message\",\n      \"direction\": \"{% if event.type == \"sms.inbound\" %}inbound{% else %}outbound{% endif %}\",\n      \"type\": \"SMS\",\n      \"from\": { \"phone_number\": \"{{ data.from_number }}\" },\n      \"to\": [{ \"phone_number\": \"{{ data.to_number }}\"{% if event.type == \"sms.status\" %}, \"status\": \"{{ data.status }}\"{% endif %} }],\n      \"text\": \"{{ data.body }}\",\n      \"errors\": []\n    }\n  },\n  \"meta\": { \"attempt\": 1 }\n}",
     "doc_url": "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",
     "verified_on": "2026-09-30"
   },

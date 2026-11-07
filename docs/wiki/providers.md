@@ -25,7 +25,7 @@ They are a starting point, not a fixed list:
 | Amazon SES | `POST /v2/email/outbound-emails` | [Mail](./mail/index.md) |
 | Brevo | `POST /v3/smtp/email` | [Mail](./mail/index.md) |
 
-## SMS (6 built in)
+## SMS (7 built in)
 
 | Provider | What the built-in answers | Read more |
 | --- | --- | --- |
@@ -35,6 +35,7 @@ They are a starting point, not a fixed list:
 | Plivo | `POST /v1/Account/{auth_id}/Message/` | [SMS](./sms/index.md) |
 | MessageBird | `POST /messages` | [SMS](./sms/index.md) |
 | Infobip | `POST /sms/2/text/advanced` and delivery reports to `notifyUrl` | [SMS](./sms/index.md) |
+| Telnyx | `POST /v2/messages` and `message.sent` / `message.finalized` webhooks to `webhook_url` | [SMS](./sms/index.md) |
 
 ## Payments (4 built in)
 

@@ -86,6 +86,7 @@ describe("email and SMS provider API", () => {
       "plivo",
       "messagebird",
       "infobip",
+      "telnyx",
       "sslwireless",
     ]);
     expect(

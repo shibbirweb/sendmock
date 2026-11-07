@@ -5,7 +5,7 @@ description: The SMS APIs SendMock answers like the real provider. Change a buil
 
 > Try it in the [demo](/demo/sms/providers).
 
-An SMS provider is one API SendMock answers like the real one: Twilio, Twilio Verify, Vonage, Plivo, MessageBird, Infobip, or one you add. The demo already has one you could add yourself: **SSL Wireless**, a regional vendor, added from blank. Providers are data, not code, like [payment gateways](../payments/gateways.md), and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
+An SMS provider is one API SendMock answers like the real one: Twilio, Twilio Verify, Vonage, Plivo, MessageBird, Infobip, Telnyx, or one you add. The demo already has one you could add yourself: **SSL Wireless**, a regional vendor, added from blank. Providers are data, not code, like [payment gateways](../payments/gateways.md), and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
 
 ![The SMS Providers screen](../images/sms-providers.jpg)
 

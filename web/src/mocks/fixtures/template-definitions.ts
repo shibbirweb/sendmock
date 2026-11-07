@@ -170,19 +170,29 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     verified_on: verifiedOn,
   },
   "telnyx.message": {
+    // Inbound messages are message.received; an outbound status is message.sent, then
+    // message.finalized with the final status on the recipient (checked 2026-11-07).
     method: "POST",
     content_type: jsonType,
     header_templates: {},
     body_template: `{
   "data": {
-    "event_type": "message.received",
+    "event_type": "{% if event.type == "sms.inbound" %}message.received{% else %}{% if data.status == "sent" %}message.sent{% else %}message.finalized{% endif %}{% endif %}",
+    "id": "{{ uuid() }}",
+    "occurred_at": "{{ event.created_at }}",
+    "record_type": "event",
     "payload": {
       "id": "{{ data.provider_id }}",
+      "record_type": "message",
+      "direction": "{% if event.type == "sms.inbound" %}inbound{% else %}outbound{% endif %}",
+      "type": "SMS",
       "from": { "phone_number": "{{ data.from_number }}" },
-      "to": [{ "phone_number": "{{ data.to_number }}" }],
-      "text": "{{ data.body }}"
+      "to": [{ "phone_number": "{{ data.to_number }}"{% if event.type == "sms.status" %}, "status": "{{ data.status }}"{% endif %} }],
+      "text": "{{ data.body }}",
+      "errors": []
     }
-  }
+  },
+  "meta": { "attempt": 1 }
 }`,
     doc_url:
       "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",

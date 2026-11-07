@@ -733,5 +733,116 @@
       "failed": "failed",
       "undelivered": "undelivered"
     }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "KEY_test_telnyx",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "telnyx",
+    "name": "Telnyx",
+    "area": "sms",
+    "accent": "#00c08b",
+    "host": "api.telnyx.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v2/messages",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "body",
+        "source": "text"
+      },
+      {
+        "part": "media_urls",
+        "source": "media_urls[*]"
+      },
+      {
+        "part": "status_callback_url",
+        "source": "webhook_url"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "body",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"data\": {\"record_type\": \"message\", \"direction\": \"outbound\", \"id\": \"{{ message.provider_id }}\", \"type\": \"SMS\", \"from\": {\"phone_number\": \"{{ message.from }}\", \"carrier\": \"TELNYX LLC\", \"line_type\": \"VoIP\"}, \"to\": [{\"phone_number\": \"{{ message.to }}\", \"status\": \"queued\", \"carrier\": \"\", \"line_type\": \"\"}], \"text\": \"{{ message.body }}\", \"subject\": null, \"media\": [], \"webhook_url\": \"{{ request.body.webhook_url | default(\"\") }}\", \"webhook_failover_url\": \"\", \"encoding\": \"GSM-7\", \"parts\": 1, \"tags\": [], \"cost\": null, \"received_at\": \"{{ now_iso() }}\", \"sent_at\": null, \"completed_at\": null, \"valid_until\": null, \"errors\": []}}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 422,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"code\": \"10004\", \"title\": \"Missing required parameter\", \"detail\": \"{{ error.reason }}\"}]}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"code\": \"10009\", \"title\": \"Authentication failed\", \"detail\": \"The API key looks malformed. Check that you copied it correctly.\"}]}"
+      }
+    ],
+    "message_id_template": "{{ uuid() }}",
+    "callback_template_key": "telnyx.message",
+    "status_names": {
+      "sent": "sent",
+      "delivered": "delivered",
+      "failed": "sending_failed",
+      "undelivered": "delivery_failed"
+    }
   }
 ]

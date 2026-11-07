@@ -35,7 +35,7 @@ test("SM-16.1 SMS > Providers lists the built-ins and the demo's custom provider
 }) => {
   await page.goto("/sms/providers");
 
-  await expect(page.getByTestId("message-provider-row")).toHaveCount(7);
+  await expect(page.getByTestId("message-provider-row")).toHaveCount(8);
   await expect(providerRow(page, "SSL Wireless")).toContainText("Custom");
   await expect(providerRow(page, "Twilio")).toContainText("Built-in");
 });

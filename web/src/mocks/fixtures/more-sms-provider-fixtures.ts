@@ -65,7 +65,66 @@ function buildInfobipProvider(): MessageProviderRecord {
   });
 }
 
+/**
+ * Telnyx's Messages API v2, as its Node SDK calls it (`telnyx`, `POST /messages` under
+ * `https://api.telnyx.com/v2`; https://developers.telnyx.com/api/messaging/send-message,
+ * checked 2026-11-07). Status webhooks go to `webhook_url` as `telnyx.message` events.
+ */
+function buildTelnyxProvider(): MessageProviderRecord {
+  return buildProviderFixture({
+    key: "telnyx",
+    name: "Telnyx",
+    area: "sms",
+    accent: "#00c08b",
+    host: "api.telnyx.com",
+    credentials: [
+      { name: "api_key", value: "KEY_test_telnyx", is_secret: true },
+    ],
+    operations: [
+      {
+        kind: "send",
+        method: "POST",
+        path: "/v2/messages",
+        request_format: "json",
+      },
+    ],
+    field_mapping: [
+      { part: "from", source: "from" },
+      { part: "to", source: "to" },
+      { part: "body", source: "text" },
+      { part: "media_urls", source: "media_urls[*]" },
+      { part: "status_callback_url", source: "webhook_url" },
+    ],
+    validation_rules: requireParts(["from", "to", "body"]),
+    success_response: respondWithJson(
+      200,
+      '{"data": {"record_type": "message", "direction": "outbound", "id": "{{ message.provider_id }}", "type": "SMS", "from": {"phone_number": "{{ message.from }}", "carrier": "TELNYX LLC", "line_type": "VoIP"}, "to": [{"phone_number": "{{ message.to }}", "status": "queued", "carrier": "", "line_type": ""}], "text": "{{ message.body }}", "subject": null, "media": [], "webhook_url": "{{ request.body.webhook_url | default("") }}", "webhook_failover_url": "", "encoding": "GSM-7", "parts": 1, "tags": [], "cost": null, "received_at": "{{ now_iso() }}", "sent_at": null, "completed_at": null, "valid_until": null, "errors": []}}',
+    ),
+    error_responses: [
+      answerError(
+        "missing_field",
+        422,
+        '{"errors": [{"code": "10004", "title": "Missing required parameter", "detail": "{{ error.reason }}"}]}',
+      ),
+      answerError(
+        "unauthorized",
+        401,
+        '{"errors": [{"code": "10009", "title": "Authentication failed", "detail": "The API key looks malformed. Check that you copied it correctly."}]}',
+      ),
+    ],
+    message_id_template: "{{ uuid() }}",
+    callback_template_key: "telnyx.message",
+    // Telnyx's own status names, which telnyx.message puts on the recipient.
+    status_names: {
+      sent: "sent",
+      delivered: "delivered",
+      failed: "sending_failed",
+      undelivered: "delivery_failed",
+    },
+  });
+}
+
 /** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
-  return [buildInfobipProvider()];
+  return [buildInfobipProvider(), buildTelnyxProvider()];
 }

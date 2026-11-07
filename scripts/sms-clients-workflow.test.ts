@@ -57,9 +57,10 @@ describe("SMS clients workflow", () => {
     }
   });
 
-  test("SM-17.1 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
+  test("SM-17.1 SM-17.2 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
     const providerPackages: Record<string, string> = {
       "Infobip Node SDK": "@infobip-api/sdk",
+      "Telnyx Node SDK": "telnyx",
     };
     const otherEntries = clientEntries.filter(
       (clientEntry) => !clientEntry.client.startsWith("Twilio "),

@@ -104,6 +104,11 @@ jobs:
             language: node
             folder: node-infobip
             run: bun install && node send-and-verify.js
+          # AC: SM-17.2
+          - client: Telnyx Node SDK
+            language: node
+            folder: node-telnyx
+            run: bun install && node send-and-verify.js
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

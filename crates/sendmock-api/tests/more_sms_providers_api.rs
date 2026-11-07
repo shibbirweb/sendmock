@@ -117,3 +117,80 @@ async fn infobip_reports_the_final_status_to_the_notify_url() {
     assert_eq!(report_result["status"]["groupName"], "DELIVERED");
     assert_eq!(report_result["error"]["name"], "NO_ERROR");
 }
+
+const TELNYX_SEND_PATH: &str = "/providers/telnyx/v2/messages";
+
+/// The body Telnyx's Node SDK sends for `client.messages.send`.
+fn telnyx_message(text: Option<&str>) -> Value {
+    let mut message = json!({
+        "from": "+15550001111",
+        "to": "+14155550100",
+        "webhook_url": CALLBACK_URL,
+    });
+    if let Some(text) = text {
+        message["text"] = json!(text);
+    }
+    message
+}
+
+// AC: SM-17.2
+#[tokio::test]
+async fn telnyx_queues_a_message_and_answers_its_message_object() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let sent = send_json(
+        &app_router,
+        TELNYX_SEND_PATH,
+        &telnyx_message(Some("Your code is 482913")),
+    )
+    .await;
+
+    assert_eq!(sent.status, 200, "{}", sent.body_text);
+    let message = &sent.body["data"];
+    assert_eq!(message["record_type"], "message");
+    assert_eq!(message["direction"], "outbound");
+    assert_eq!(message["to"][0]["phone_number"], "+14155550100");
+    assert_eq!(message["to"][0]["status"], "queued");
+    assert_eq!(message["webhook_url"], CALLBACK_URL);
+    let stored_sms = read_newest_sms(&app_router).await;
+    assert_eq!(stored_sms["api"], "telnyx");
+    assert_eq!(stored_sms["provider_id"], message["id"]);
+}
+
+// AC: SM-17.2
+#[tokio::test]
+async fn telnyx_refuses_a_message_without_text_in_its_errors_list() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let refused = send_json(&app_router, TELNYX_SEND_PATH, &telnyx_message(None)).await;
+
+    assert_eq!(refused.status, 422, "{}", refused.body_text);
+    assert_eq!(refused.body["errors"][0]["code"], "10004");
+    assert!(refused.body["errors"][0]["detail"].is_string());
+}
+
+// AC: SM-17.2
+#[tokio::test]
+async fn telnyx_sends_message_sent_then_message_finalized_to_the_webhook_url() {
+    let (app_router, callback_sender) = build_app_with_recorder().await;
+
+    send_json(
+        &app_router,
+        TELNYX_SEND_PATH,
+        &telnyx_message(Some("Hello")),
+    )
+    .await;
+    let webhooks = callback_sender.wait_for_requests(2).await;
+
+    let events: Vec<Value> = webhooks
+        .iter()
+        .map(|webhook| serde_json::from_str(&webhook.body).unwrap_or(Value::Null))
+        .collect();
+    let event_types: Vec<&Value> = events
+        .iter()
+        .map(|event| &event["data"]["event_type"])
+        .collect();
+    assert_eq!(event_types, ["message.sent", "message.finalized"]);
+    assert_eq!(events[1]["data"]["payload"]["to"][0]["status"], "delivered");
+    assert_eq!(events[1]["data"]["payload"]["direction"], "outbound");
+}

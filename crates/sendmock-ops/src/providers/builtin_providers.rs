@@ -34,7 +34,8 @@ mod tests {
                 "vonage",
                 "plivo",
                 "messagebird",
-                "infobip"
+                "infobip",
+                "telnyx"
             ]
         );
     }

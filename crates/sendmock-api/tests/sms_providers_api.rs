@@ -77,7 +77,8 @@ async fn the_list_shows_the_built_ins_with_secrets_masked_and_recent_message_cou
             "vonage",
             "plivo",
             "messagebird",
-            "infobip"
+            "infobip",
+            "telnyx"
         ]
     );
     assert_eq!(vonage["is_builtin"], true);
