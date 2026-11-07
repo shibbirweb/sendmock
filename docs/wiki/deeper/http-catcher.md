@@ -9,6 +9,10 @@ The HTTP Catcher keeps every request your app sends to a bin's catch URL, and an
 
 The screen as a whole: [HTTP Catcher](../http/index.md).
 
+![HTTP Catcher, with a number on each control](./images/http-catcher.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. HTTP Catcher

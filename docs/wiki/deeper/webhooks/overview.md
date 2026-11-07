@@ -9,6 +9,10 @@ Webhooks > Overview shows how your endpoints are doing, computed from the delive
 
 The screen as a whole: [Webhooks](../../webhooks/index.md).
 
+![Webhooks overview, with a number on each control](../images/webhooks-overview.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Webhooks

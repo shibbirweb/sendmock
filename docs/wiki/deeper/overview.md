@@ -9,6 +9,10 @@ The Overview shows today's traffic across email, SMS, webhooks, HTTP and payment
 
 The screen as a whole: [Overview](../overview.md).
 
+![Overview, with a number on each control](./images/overview.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Overview

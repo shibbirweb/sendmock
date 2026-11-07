@@ -9,6 +9,10 @@ Settings changes how SendMock behaves, section by section; every change applies 
 
 The screen as a whole: [Settings](../settings.md).
 
+![Settings, with a number on each control](./images/settings.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Settings

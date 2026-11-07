@@ -9,6 +9,10 @@ Scenarios writes, validates and runs a multi-step check against this SendMock.
 
 The screen as a whole: [Scenarios](../scenarios.md).
 
+![Scenarios, with a number on each control](./images/scenarios.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Scenarios

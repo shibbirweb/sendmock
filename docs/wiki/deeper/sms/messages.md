@@ -9,6 +9,10 @@ SMS > Messages groups every SMS, MMS and WhatsApp message into conversations by 
 
 The screen as a whole: [SMS](../../sms/index.md).
 
+![SMS messages, with a number on each control](../images/sms-messages.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. SMS

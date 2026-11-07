@@ -9,6 +9,10 @@ Webhooks > Templates holds every payload format an endpoint can send, built in o
 
 The screen as a whole: [Templates](../../webhooks/templates.md).
 
+![Templates, with a number on each control](../images/webhooks-templates.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Templates

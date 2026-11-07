@@ -9,6 +9,10 @@ The sidebar on the left and the header across the top are the same on every scre
 
 The screen as a whole: [Tour of the app](../tour.md).
 
+![Sidebar and header, with a number on each control](./images/app-shell.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. SendMock Mail · SMS · Payments

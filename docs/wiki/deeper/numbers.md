@@ -9,6 +9,10 @@ Numbers holds the fake phone numbers your app owns, with their webhooks, and the
 
 The screen as a whole: [Numbers](../numbers.md).
 
+![Numbers, with a number on each control](./images/numbers.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Numbers

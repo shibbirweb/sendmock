@@ -9,6 +9,10 @@ SMS > Providers lists the SMS APIs SendMock answers like the real provider. The 
 
 The screen as a whole: [SMS > Providers](../../sms/providers.md).
 
+![SMS providers, with a number on each control](../images/sms-providers.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Providers

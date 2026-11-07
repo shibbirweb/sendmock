@@ -11,7 +11,7 @@ export type Scene = {
   open: (page: Page, appBaseUrl: string) => Promise<void>;
 };
 
-async function navigateInApp(page: Page, targetPath: string) {
+export async function navigateInApp(page: Page, targetPath: string) {
   await page.evaluate((path) => {
     window.history.pushState({}, "", path);
     window.dispatchEvent(new PopStateEvent("popstate"));

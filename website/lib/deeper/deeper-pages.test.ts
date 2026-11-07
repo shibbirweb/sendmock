@@ -6,6 +6,7 @@ import { findDeeperProblems } from "./deeper-checks";
 import { listInventoryScreens, loadDeeperInventory } from "./deeper-inventory";
 import { deeperPages, pendingDeeperScreens } from "./deeper-pages";
 import { indexOperationSurfaces } from "./deeper-surfaces";
+import { toDeeperImageFile } from "./render-deeper-page";
 import { deeperDirectory, renderDeeperPages } from "./render-deeper-pages";
 
 const inventory = loadDeeperInventory();
@@ -24,6 +25,14 @@ describe("Deeper pages (WS-10)", () => {
     );
 
     expect(screensWithoutPage).toEqual(pendingDeeperScreens);
+  });
+
+  test("WS-10.2 every page has its annotated screenshot from bun run screenshots", () => {
+    const pagesWithoutImage = deeperPages
+      .map((deeperPage) => toDeeperImageFile(deeperPage.file))
+      .filter((imageFile) => !existsSync(join(deeperDirectory, imageFile)));
+
+    expect(pagesWithoutImage).toEqual([]);
   });
 
   test("WS-10.4 every page is a fresh render of its entries, the inventory and the API references", () => {

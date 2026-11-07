@@ -9,6 +9,10 @@ Payments > Methods holds what customers pay with on test checkout pages, and the
 
 The screen as a whole: [Methods](../../payments/methods.md).
 
+![Methods, with a number on each control](../images/payments-methods.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Methods

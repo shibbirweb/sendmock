@@ -9,6 +9,10 @@ Webhooks > Composer writes a webhook request by hand, or from any template, and 
 
 The screen as a whole: [Composer and saved deliveries](../../webhooks/composer-and-saved.md).
 
+![Composer, with a number on each control](../images/webhooks-composer.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Composer

@@ -9,6 +9,10 @@ Webhooks > Endpoints lists the URLs SendMock delivers webhooks to, each with its
 
 The screen as a whole: [Endpoints](../../webhooks/endpoints.md).
 
+![Endpoints, with a number on each control](../images/webhooks-endpoints.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Endpoints

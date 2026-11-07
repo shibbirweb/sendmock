@@ -9,6 +9,10 @@ Webhooks > Rules decides which events go to which endpoint: each rule picks even
 
 The screen as a whole: [Rules](../../webhooks/rules.md).
 
+![Rules, with a number on each control](../images/webhooks-rules.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Rules

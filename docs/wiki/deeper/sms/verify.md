@@ -9,6 +9,10 @@ SMS > Verify shows every one-time code your app requested through the Twilio Ver
 
 The screen as a whole: [Verify](../../sms/verify.md).
 
+![Verify, with a number on each control](../images/sms-verify.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Verify

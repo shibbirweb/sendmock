@@ -9,6 +9,10 @@ Webhooks > Variables holds the values templates read as `{{ vars.name }}`.
 
 The screen as a whole: [Variables](../../webhooks/variables.md).
 
+![Variables, with a number on each control](../images/webhooks-variables.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Variables

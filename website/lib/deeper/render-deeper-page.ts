@@ -3,6 +3,7 @@ import { posix } from "node:path";
 import type { ScreenState } from "./deeper-inventory";
 import type { OperationSurfaces } from "./deeper-surfaces";
 import type { DeeperEntry, DeeperPage } from "./deeper-types";
+import { numberDeeperEntries } from "./number-deeper-entries";
 
 const stateHeadings: Record<string, string> = {
   normal: "On the screen",
@@ -100,39 +101,40 @@ function renderEntry(
   ].join("\n");
 }
 
+/** Where a page's annotated screenshot lives, relative to `docs/wiki/deeper/`. */
+export function toDeeperImageFile(pageFile: string): string {
+  return `images/${pageFile.replace(/\.md$/, "").replaceAll("/", "-")}.jpg`;
+}
+
 /** The Markdown of a Deeper page, its entries numbered in screen order. */
 export function renderDeeperPage(
   deeperPage: DeeperPage,
   screenStates: ScreenState[],
   surfacesById: Map<string, OperationSurfaces>,
 ): string {
-  const findEntry = (state: string, control: string) =>
-    deeperPage.entries.find(
-      (entry) => entry.control === control && entry.state === state,
-    ) ??
-    deeperPage.entries.find(
-      (entry) => entry.control === control && entry.state === undefined,
-    );
   const guideLink = posix.relative(
     posix.dirname(posix.join("deeper", deeperPage.file)),
     deeperPage.guidePage,
   );
-  let entryNumber = 0;
-  const sections = screenStates.map((screenState) => {
-    const renderedEntries = screenState.controls.flatMap((control) => {
-      const entry = findEntry(screenState.state, control);
-      if (entry === undefined) {
-        return [];
-      }
-      entryNumber += 1;
-      return [renderEntry(entryNumber, control, entry, surfacesById)];
-    });
-    return [
-      `## ${stateHeadings[screenState.state] ?? screenState.state}`,
-      "",
-      ...renderedEntries,
-    ].join("\n");
-  });
+  const relativeImagePath = posix.relative(
+    posix.dirname(deeperPage.file),
+    toDeeperImageFile(deeperPage.file),
+  );
+  // MDX reads a path without `./` or `../` as a package to import.
+  const imageLink = relativeImagePath.startsWith("../")
+    ? relativeImagePath
+    : `./${relativeImagePath}`;
+  const sections = numberDeeperEntries(deeperPage, screenStates).map(
+    (numberedState) =>
+      [
+        `## ${stateHeadings[numberedState.state] ?? numberedState.state}`,
+        "",
+        ...numberedState.numberedEntries.map(
+          ({ entryNumber, control, entry }) =>
+            renderEntry(entryNumber, control, entry, surfacesById),
+        ),
+      ].join("\n"),
+  );
   return [
     "---",
     `title: ${deeperPage.title}`,
@@ -144,6 +146,10 @@ export function renderDeeperPage(
     deeperPage.intro,
     "",
     `The screen as a whole: [${deeperPage.guideTitle}](${guideLink}).`,
+    "",
+    `![${deeperPage.title.replace(/ in depth$/, "")}, with a number on each control](${imageLink})`,
+    "",
+    "The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.",
     "",
     ...sections,
   ]

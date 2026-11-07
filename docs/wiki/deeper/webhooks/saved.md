@@ -9,6 +9,10 @@ Webhooks > Saved keeps the requests you bookmarked, through pruning and reset, t
 
 The screen as a whole: [Composer and saved deliveries](../../webhooks/composer-and-saved.md).
 
+![Saved deliveries, with a number on each control](../images/webhooks-saved.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Saved

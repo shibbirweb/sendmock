@@ -9,6 +9,10 @@ The API reference, opened from Help, lists every REST operation the running Send
 
 The screen as a whole: [Reference](../reference/index.md).
 
+![API reference, with a number on each control](./images/api-reference.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. API reference

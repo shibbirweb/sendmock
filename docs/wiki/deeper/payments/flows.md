@@ -9,6 +9,10 @@ Payments > Flows holds the steps a customer goes through on test checkout pages.
 
 The screen as a whole: [Flows](../../payments/flows.md).
 
+![Flows, with a number on each control](../images/payments-flows.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Flows

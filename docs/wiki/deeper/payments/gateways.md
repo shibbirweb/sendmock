@@ -9,6 +9,10 @@ Payments > Gateways holds the payment providers SendMock emulates: their checkou
 
 The screen as a whole: [Gateways](../../payments/gateways.md).
 
+![Gateways, with a number on each control](../images/payments-gateways.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Gateways

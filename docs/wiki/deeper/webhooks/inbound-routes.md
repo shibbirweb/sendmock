@@ -9,6 +9,10 @@ Webhooks > Inbound routes decides what happens to incoming email, in Mailgun's r
 
 The screen as a whole: [Inbound routes](../../webhooks/inbound-routes.md).
 
+![Inbound routes, with a number on each control](../images/webhooks-inbound-routes.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Inbound routes

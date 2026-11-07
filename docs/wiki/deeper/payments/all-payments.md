@@ -9,6 +9,10 @@ Payments > All payments lists every test payment, from any gateway, and lets you
 
 The screen as a whole: [Payments](../../payments/index.md).
 
+![Payments, with a number on each control](../images/payments-all-payments.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Payments

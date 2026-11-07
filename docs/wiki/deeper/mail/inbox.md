@@ -9,6 +9,10 @@ Mail > Inbox lists every email SendMock caught, whatever the recipient, and show
 
 The screen as a whole: [Inbox](../../mail/index.md).
 
+![Inbox, with a number on each control](../images/mail-inbox.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Mail

@@ -9,6 +9,10 @@ Logs keeps every SMTP session and every API request, failed ones included, to se
 
 The screen as a whole: [Logs](../logs.md).
 
+![Logs, with a number on each control](./images/logs.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Logs

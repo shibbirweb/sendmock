@@ -9,6 +9,10 @@ Payments > Subscriptions tests renewals, failed renewal payments and cancellatio
 
 The screen as a whole: [Subscriptions](../../payments/subscriptions.md).
 
+![Subscriptions, with a number on each control](../images/payments-subscriptions.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Subscriptions

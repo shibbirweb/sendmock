@@ -9,6 +9,10 @@ Mail > Providers lists the email APIs SendMock answers like the real provider. T
 
 The screen as a whole: [Mail > Providers](../../mail/providers.md).
 
+![Email providers, with a number on each control](../images/mail-providers.jpg)
+
+The numbers match the entries below. The picture shows the first screenful; controls further down, and texts, have no marker.
+
 ## On the screen
 
 ### 1. Providers
