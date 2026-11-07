@@ -37,6 +37,8 @@ Category tabs (All, Generic, Email providers, SMS providers, Chat, Automation, C
 
 ### Built-in templates
 
+Every built-in template, with its events and required variables, is listed in [Built-in webhook templates](../reference/webhook-templates.md).
+
 **Act like the provider** (your app receives what the provider would send):
 
 | Area | Services |

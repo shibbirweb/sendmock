@@ -32,7 +32,7 @@ A template is the shape of a webhook request. When no built-in matches what your
 
 ## What a custom template has
 
-Name, description, the **events** it fits (the gallery and endpoint picker only offer it for those), its **required variables** (endpoints show them as **Missing** until set), method, content type, headers, query and body, and the body mode (Fields, Raw or None). Inside `{{ }}`, suggestions list every value, function and filter; the reference panel explains each.
+Name, description, the **events** it fits (the gallery and endpoint picker only offer it for those), its **required variables** (endpoints show them as **Missing** until set), method, content type, headers, query and body, and the body mode (Fields, Raw or None). Inside `{{ }}`, suggestions list every value, function and filter; the reference panel explains each. Every filter is also listed in [Template filters](../reference/template-filters.md).
 
 ## Fake data and Postman aliases
 

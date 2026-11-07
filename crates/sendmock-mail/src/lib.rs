@@ -14,10 +14,10 @@ mod spamd_protocol;
 
 pub use delivery_outcome::{
     AddressOutcomeSource, BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome,
-    EmailOutcomeRule, EmailRuleOutcome, FOLLOW_UP_DELAY_MS, OutcomeAction, OutcomeSettings,
-    OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome, RecipientRefusal,
-    find_magic_address_outcome, is_valid_address_pattern, is_valid_refusal_code,
-    plan_email_outcome, resolve_address_outcome,
+    EmailOutcomeRule, EmailRuleOutcome, FOLLOW_UP_DELAY_MS, MagicAddress, OutcomeAction,
+    OutcomeSettings, OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome,
+    RecipientRefusal, describe_magic_outcome, find_magic_address_outcome, is_valid_address_pattern,
+    is_valid_refusal_code, list_magic_addresses, plan_email_outcome, resolve_address_outcome,
 };
 pub use email_ingest_service::{EmailIngestService, IngestOptions};
 pub use extraction::{

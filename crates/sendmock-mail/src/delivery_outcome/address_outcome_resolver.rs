@@ -31,7 +31,7 @@ impl AddressOutcomeSource<'_> {
 }
 
 /// The wording of the magic address table in Settings.
-fn describe_magic_outcome(email_outcome: EmailOutcome) -> &'static str {
+pub fn describe_magic_outcome(email_outcome: EmailOutcome) -> &'static str {
     match email_outcome {
         EmailOutcome::Delivered => "email.delivered",
         EmailOutcome::HardBounce => "Hard bounce (550 5.1.1)",

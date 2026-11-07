@@ -11,6 +11,8 @@ mod smtp_config;
 mod startup_settings_config;
 
 pub use config_error::ConfigError;
+#[cfg(test)]
+pub(crate) use config_file::ConfigFile;
 pub use log_format::LogFormat;
 pub use log_level::LogLevel;
 pub use provider_port_config::ProviderPortConfig;

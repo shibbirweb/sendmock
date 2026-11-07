@@ -20,6 +20,32 @@ const SES_SIMULATOR_ADDRESSES: [(&str, EmailOutcome); 5] = [
     ("suppressionlist", EmailOutcome::SuppressionList),
 ];
 
+/// A magic address as the reference lists it: `bounce@<any domain>` or a full SES address.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MagicAddress {
+    pub address: String,
+    pub outcome: EmailOutcome,
+}
+
+/// Every magic address: SendMock's aliases on any domain, then the SES mailbox simulator.
+pub fn list_magic_addresses() -> Vec<MagicAddress> {
+    let any_domain_addresses =
+        ANY_DOMAIN_ALIASES
+            .iter()
+            .map(|(local_part, outcome)| MagicAddress {
+                address: format!("{local_part}@<any domain>"),
+                outcome: *outcome,
+            });
+    let simulator_addresses =
+        SES_SIMULATOR_ADDRESSES
+            .iter()
+            .map(|(local_part, outcome)| MagicAddress {
+                address: format!("{local_part}@{SES_SIMULATOR_DOMAIN}"),
+                outcome: *outcome,
+            });
+    any_domain_addresses.chain(simulator_addresses).collect()
+}
+
 /// The outcome a magic recipient address asks for; addresses compare without case.
 pub fn find_magic_address_outcome(recipient_address: &str) -> Option<EmailOutcome> {
     let lowercase_address = recipient_address.trim().to_lowercase();

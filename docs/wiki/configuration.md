@@ -14,6 +14,8 @@ Ports, database path, auth, relay SMTP and retention. Precedence, highest first:
 3. `sendmock.toml`
 4. defaults
 
+Every flag, with its variable, key and default, is in [Configuration flags](./reference/configuration-flags.md).
+
 ## What SendMock starts with: `sendmock.seed.toml`
 
 Endpoints, rules, templates, variables, numbers, Messaging Services, Verify services and payment setup. **Reset to seed** in Settings (or `POST /api/v1/reset`) deletes all traffic and restores this file, so every test run starts from the same state.

@@ -20,6 +20,8 @@ mod listener_binding;
 mod logging;
 mod mcp_command;
 mod provider_listeners;
+#[cfg(test)]
+mod reference_pages;
 mod retention_task;
 mod seed_file_check;
 mod sendmail_shim;

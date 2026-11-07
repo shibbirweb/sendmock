@@ -113,6 +113,35 @@ static TWILIO_FROM_NUMBERS: [MagicNumber; 4] = [
     MagicNumber::rejected("+15005550008", "Message queue full", "21611"),
 ];
 
+/// A group of magic numbers as the magic number reference lists them.
+#[derive(Debug, Clone, Copy)]
+pub struct MagicNumberGroup {
+    pub title: &'static str,
+    pub match_field: MatchField,
+    pub magic_numbers: &'static [MagicNumber],
+}
+
+/// Every magic number, in the groups the simulation checks them by.
+pub fn list_magic_number_groups() -> [MagicNumberGroup; 3] {
+    [
+        MagicNumberGroup {
+            title: "Twilio's test numbers as the recipient (`To`), refused when the message is sent",
+            match_field: MatchField::To,
+            magic_numbers: &TWILIO_TO_NUMBERS,
+        },
+        MagicNumberGroup {
+            title: "SendMock's numbers as the recipient (`To`), accepted and then changed by a status callback",
+            match_field: MatchField::To,
+            magic_numbers: &SENDMOCK_AFTER_SEND_NUMBERS,
+        },
+        MagicNumberGroup {
+            title: "Twilio's test numbers as the sender (`From`)",
+            match_field: MatchField::From,
+            magic_numbers: &TWILIO_FROM_NUMBERS,
+        },
+    ]
+}
+
 /// The magic number a recipient or sender is, ignoring a `whatsapp:` prefix.
 pub fn find_magic_number(match_field: MatchField, number: &str) -> Option<&'static MagicNumber> {
     let compared_number = strip_whatsapp_prefix(number.trim());
