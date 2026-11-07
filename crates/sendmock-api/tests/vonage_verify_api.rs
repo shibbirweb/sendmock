@@ -79,7 +79,7 @@ async fn an_sms_workflow_starts_a_verification_and_delivers_its_code_by_sms() {
     let code = verification["code"].as_str().unwrap_or_default();
     assert_eq!(code.len(), 6);
     assert_eq!(verification["status"], "pending");
-    assert_eq!(code_sms["to"], "+447700900001");
+    assert_eq!(code_sms["to_number"], "+447700900001");
     assert_eq!(
         code_sms["body"],
         format!("Your Shop verification code is: {code}")
