@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 105 / 109 accepted (all but AI-05, DS-02, UI-07 and WS-03), 500 / 506 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10) |
+| **Feature acceptance** | 104 / 109 accepted (all but AI-05, DS-02, DS-03, UI-07 and WS-03), 500 / 507 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -340,6 +340,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 
 - [x] Release builds for all 6 targets, checksums, install scripts with `--channel` (DS-01 accepted, DS-03.2) (#48)
 - [ ] Docker stable tags, `-debug` variants, SBOM, provenance, cosign, image smoke test
+- [ ] Run with no install: `npx sendmock`, `bunx`, `pnpm dlx`, `yarn dlx` (W16, DS-03.7, added 2026-11-07, owner request)
 - [x] Homebrew tap (`sendmock`, `sendmock-beta`), Scoop bucket, npm wrapper (DS-03.1; each publishes once its secret or trusted publisher is set, runbook step 3) (#48)
 - [x] Our signed APT and YUM repository, WinGet, Chocolatey, AUR, COPR and Nixpkgs ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27), DS-03.3 to DS-03.6; DS-03 accepted, submitted by the release workflow once the runbook's secrets are set) (#48)
 - [ ] Testcontainers modules (published by each release from W3b; ticked when the first release publishes them)
@@ -760,3 +761,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Phase 5 W15a: the 1.0 runbook ([31](31-release-runbook.md)), ten steps with their commands, checks and the criteria each proves, and `bun scripts/release-readiness.ts`; its tests found the runbook must also name `RELEASE_TOKEN`, `HOMEBREW_TAP_TOKEN` and the Docker Hub secrets, which the owner steps had left out. |
 | 2026-11-07 | Phase 5 checklist: the release builds, package channels and performance budgets ticked, since DS-01, DS-03 and DS-07 are accepted; publishing waits for the runbook's secrets. |
 | 2026-11-07 | Fix: on Windows runners the retention load test twice saw one SMTP message wait 8 to 9 s (PL-08.2). The prune's `wal_checkpoint(TRUNCATE)` copied the whole write-ahead log and synced it inside the writer's queue, holding every ingest write behind a slow disk. A passive checkpoint on its own connection now does the copy beside ingest first, so the truncate in the queue has almost nothing left; vacuum steps are 250 pages. A store test proves a checkpoint finishes while the writer is held. |
+| 2026-11-07 | Plan (owner request): SendMock also runs with no install through `npx sendmock` (and `bunx`, `pnpm dlx`, `yarn dlx`), a channel of its own: W16 in [30](30-phase-5.md), DS-03.7 (new), the row in [09](09-distribution.md#package-channels-by-stage-decided-2026-10-27); proven before publishing by the release workflow and after by Install channels on the first beta (runbook step 6). |

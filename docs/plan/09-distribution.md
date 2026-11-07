@@ -89,7 +89,7 @@ Every channel has a **beta** track (from `develop`) and a **stable** track (from
 | AUR, COPR, Nixpkgs | community packages for Arch, Fedora and Nix, later |
 | Docker | `ghcr.io/shibbirweb/sendmock` and Docker Hub; multi-arch; see [Docker](#docker) |
 | Cargo | `cargo install sendmock` (requires prebuilt UI in the crate package) |
-| npm (optional) | `npx sendmock` wrapper that downloads the right binary, handy for JS projects and CI |
+| npm | the `sendmock` package runs the right binary for the computer, as a dev dependency in a JavaScript project or with no install at all through `npx sendmock` (added 2026-11-07, owner request; also `bunx`, `pnpm dlx` and `yarn dlx`) |
 
 Optional later: a macOS menu-bar / system tray launcher.
 
@@ -112,6 +112,7 @@ Channels we run ourselves ship early; a distribution's official repository is ru
 | | COPR | `sudo dnf copr enable shibbirweb/sendmock`, `sudo dnf install sendmock` | Fedora's personal repositories |
 | | Nixpkgs | `nix-env -iA nixpkgs.sendmock` | a PR to `nixpkgs`; the update bot follows new releases |
 | | npm wrapper, `cargo install` | as in the table above | |
+| | npx, with no install | `npx sendmock` (stable), `npx sendmock@beta`, or `bunx sendmock`, `pnpm dlx sendmock`, `yarn dlx sendmock` | the npm package, fetched into the package manager's cache on first run; added 2026-11-07 (owner request), DS-03.7 |
 | Optional | Snap Store | `sudo snap install sendmock` | cross-distribution, reviewed by Canonical; only if users ask |
 | | Ubuntu PPA | `sudo add-apt-repository ppa:shibbirweb/sendmock` | Launchpad builds from source with vendored crates; our APT repository covers the same need |
 | With traction | Homebrew core | `brew install sendmock` | needs a well-known project with stable releases that build from source; tap users keep working |
