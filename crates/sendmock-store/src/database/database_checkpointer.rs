@@ -76,21 +76,29 @@ fn checkpoint_while_open(open_connection: &Weak<Mutex<Connection>>) -> bool {
         return false;
     };
     let connection = connection.lock().unwrap_or_else(PoisonError::into_inner);
-    let log_frame_count = connection
-        .query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |row| {
-            row.get::<_, i64>(1)
+    let checkpoint_progress = connection.query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |row| {
+        Ok(CheckpointProgress {
+            log_frame_count: row.get(1)?,
+            checkpointed_frame_count: row.get(2)?,
         })
-        .unwrap_or_default();
-    if log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE {
-        let _ = truncate_copied_log(&connection);
+    });
+    if let Ok(checkpoint_progress) = checkpoint_progress {
+        let is_whole_log_copied =
+            checkpoint_progress.checkpointed_frame_count == checkpoint_progress.log_frame_count;
+        if is_whole_log_copied && checkpoint_progress.log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE
+        {
+            let _ = truncate_copied_log(&connection);
+        }
     }
     true
 }
 
 /// Beside steady writes a passive checkpoint seldom copies the whole log, so the writer never
-/// starts it over and it keeps growing. Right after the passive copy almost nothing is left,
-/// so a truncating checkpoint holds writers only briefly; it is tried without waiting, and
-/// skipped while a write or an older read is in the way.
+/// starts it over and it keeps growing. Once a passive pass has copied all of it, a truncating
+/// checkpoint has nothing to copy or sync and only cuts the file, so it holds writers for a
+/// moment; it is tried without waiting, and skipped while a write or an older read is in the
+/// way. It is never tried with frames left, since copying and syncing them under the write
+/// lock made SMTP writes time out on a slow disk.
 fn truncate_copied_log(connection: &Connection) -> rusqlite::Result<()> {
     connection.busy_timeout(Duration::ZERO)?;
     let checkpoint_result = connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
