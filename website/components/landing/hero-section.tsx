@@ -20,7 +20,7 @@ export function HeroSection() {
       />
       <div className="rounded-full border bg-fd-card px-4 py-1 text-sm">
         <AnimatedShinyText>
-          In development: UI preview with demo data
+          Not released yet: try the live demo with sample data
         </AnimatedShinyText>
       </div>
       <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">

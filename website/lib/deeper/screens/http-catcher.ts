@@ -1,0 +1,107 @@
+import type { DeeperEntry, DeeperPage } from "../deeper-types";
+
+const binListEntries: DeeperEntry[] = [
+  { control: "heading: HTTP Catcher", does: "Names the open screen in the header." },
+  {
+    control: "link: Read the HTTP Catcher guide",
+    does: "Opens this screen's page in the user guide, in a new tab.",
+    links: "[HTTP Catcher](../../http/index.md).",
+  },
+  { control: "heading: Bins", does: "The bins: each has a catch URL that keeps every request sent to it.", operationIds: ["getHttpBins"] },
+  { control: "button: New bin", does: "Opens New bin." },
+  { control: "button: All requests #", does: "Shows the requests of every bin, with their count.", operationIds: ["getHttpRequests"] },
+  {
+    control: "button: slack Slack # Last # minutes ago",
+    does: "A bin (here the demo's `slack` bin with the Slack preset): its name, preset, request count and last request. Shows its requests.",
+  },
+  { control: "button: discord Discord # Last # minutes ago", does: "The demo's `discord` bin, answering as Discord does." },
+  { control: "button: push Firebase # Last # minutes ago", does: "The demo's `push` bin, answering as Firebase Cloud Messaging does." },
+  { control: "button: analytics # Last # minutes ago", does: "The demo's `analytics` bin, with no preset." },
+  { control: "button: uploads # Last # minutes ago", does: "The demo's `uploads` bin, with no preset." },
+  { control: "heading: All requests", does: "The requests of the chosen bin, newest first." },
+  {
+    control: "each item, button: POST … # minutes ago #",
+    does: "A captured request: its method, path, when it came and the status SendMock answered; shows it.",
+    operationIds: ["getHttpRequestsByRequestId"],
+  },
+  {
+    control: "paragraph: Pick a request to see what your app sent and what SendMock answered.",
+    does: "Shown until a request is open.",
+  },
+  { control: "button: slack Slack # No requests yet", does: "A bin with no requests yet." },
+  { control: "button: discord Discord # No requests yet", does: "A bin with no requests yet." },
+  { control: "button: push Firebase # No requests yet", does: "A bin with no requests yet." },
+  { control: "button: analytics # No requests yet", does: "A bin with no requests yet." },
+  { control: "button: uploads # No requests yet", does: "A bin with no requests yet." },
+  { control: "paragraph: No requests caught yet.", does: "Shown while no request has come." },
+  {
+    control: "alert: Could not load the HTTP bins. Try again",
+    does: "Shown when the bins could not be loaded.",
+    errors: "Check SendMock is running, then press Try again.",
+  },
+  { control: "paragraph: Could not load the HTTP bins.", does: "The message inside the alert." },
+  { control: "button: Try again", does: "Loads the bins again.", operationIds: ["getHttpBins"] },
+];
+
+const binDetailEntries: DeeperEntry[] = [
+  { control: "heading: slack", does: "The open bin's name (here `slack`)." },
+  { control: "tab: Requests", does: "The bin's captured requests." },
+  {
+    control: "tab: Responses",
+    does: "What the bin answers: its default reply and the rules that answer some requests differently, with delays and failure rates.",
+    links: "[Advanced: catcher responses](../../advanced/catcher-responses.md).",
+    operationIds: ["getHttpBinsByBinIdResponses"],
+  },
+  { control: "button: Copy catch URL", does: "Copies the bin's catch URL, `/catch/<bin>/...`, to point your app at." },
+  { control: "button: Clear requests", does: "Deletes the bin's captured requests.", operationIds: ["deleteHttpRequests"] },
+  { control: "button: Delete bin", does: "Deletes the bin and its requests, after you confirm.", operationIds: ["deleteHttpBinsByBinId"] },
+  { control: "each item, button: POST / # minutes ago #", does: "A request in this bin; shows it." },
+  { control: "button: Copy URL", does: "Copies the full URL the request was sent to." },
+  { control: "paragraph: Month #, #, #:# from #.#.#.#, answered in # ms", does: "When the request came, from which address, and how long SendMock took to answer." },
+  { control: "button: Copy as cURL", does: "Copies the request as a curl command." },
+  {
+    control: "button: Forward to URL",
+    does: "Sends the same request on to another URL, such as your local handler, and shows its answer.",
+    operationIds: ["postHttpRequestsByRequestIdForward"],
+  },
+  {
+    control: "button: Send to webhook",
+    does: "Sends the request's `http.captured` event to a webhook endpoint now.",
+    operationIds: ["postWebhooksEndpointsByEndpointIdSend"],
+  },
+  { control: "tab: Preview", does: "How the message would look in the service the preset copies (here Slack)." },
+  { control: "tab: Body", does: "The body as received, formatted when it is JSON or a form." },
+  { control: "tab: Headers", does: "Every header received." },
+  { control: "tab: Query", does: "The query parameters." },
+  { control: "tab: Response", does: "What SendMock answered: status, headers and body, and which rule chose it." },
+  { control: "paragraph: Incoming webhook APP", does: "In the Slack preview: the sender as Slack would show it." },
+  { control: "paragraph: Email bounced", does: "In the Slack preview: the message text (here a bounce alert)." },
+  { control: "paragraph: unknown-user@example.com did not get Your verification code .", does: "In the Slack preview: the message's details." },
+  { control: "paragraph: Reason # #.#.# user unknown", does: "In the Slack preview: a field of the message." },
+  { control: "paragraph: Provider SendMock", does: "In the Slack preview: a field of the message." },
+  { control: "paragraph: Sent by acme-app worker", does: "In the Slack preview: the message's footer." },
+  { control: "heading: New bin", does: "The New bin dialog." },
+  { control: "paragraph: Requests to its catch URL are kept here and answered with its reply.", does: "Explains a bin." },
+  { control: "textbox: Name", does: "The bin's name, which is also its catch URL's first path part." },
+  { control: "paragraph: http://#.#.#.#:#/catch/<name>", does: "The catch URL the bin will have." },
+  {
+    control: "combobox: Preset",
+    does: "A service to answer as: Slack, Discord, Teams, Google Chat, Telegram, FCM, Expo, OneSignal or generic.",
+  },
+  { control: "paragraph: Answers # {\"ok\":true}.", does: "What the chosen preset answers." },
+  { control: "button: Cancel", does: "Closes the dialog without doing anything." },
+  { control: "button: Add bin", does: "Adds the bin.", operationIds: ["postHttpBins"] },
+  { control: "button: Close", does: "Closes the dialog." },
+];
+
+/** HTTP Catcher: bins, their requests and replies. */
+export const httpCatcherPage: DeeperPage = {
+  screen: "/http",
+  file: "http-catcher.md",
+  title: "HTTP Catcher in depth",
+  description: "Every control and text of the HTTP Catcher, a bin and a request.",
+  guidePage: "http/index.md",
+  guideTitle: "HTTP Catcher",
+  intro: "The HTTP Catcher keeps every request your app sends to a bin's catch URL, and answers as the service it stands in for.",
+  entries: [...binListEntries, ...binDetailEntries],
+};

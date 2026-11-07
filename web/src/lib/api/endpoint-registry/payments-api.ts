@@ -36,6 +36,16 @@ const paymentEndpoints = tagEndpoints("Payments", [
     response: pageOf("PaymentSummary"),
   },
   {
+    method: "POST",
+    path: "/api/v1/payments",
+    summary:
+      "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+    requestBody: typeRef("PaymentCreateRequest"),
+    response: typeRef("PaymentDetail"),
+    successStatus: 201,
+    errorStatuses: [400, 404, 422],
+  },
+  {
     method: "GET",
     path: "/api/v1/payments/test-cards",
     summary: "The test values of every enabled payment method.",
@@ -62,7 +72,7 @@ const paymentEndpoints = tagEndpoints("Payments", [
     summary: "Move the payment on: capture, refund, dispute, fail.",
     requestBody: typeRef("PaymentSimulateRequest"),
     response: typeRef("PaymentDetail"),
-    errorStatuses: [404, 409],
+    errorStatuses: [400, 404, 409, 422],
   },
   {
     method: "POST",
@@ -73,6 +83,46 @@ const paymentEndpoints = tagEndpoints("Payments", [
     response: typeRef("PaymentDetail"),
     successStatus: 201,
     errorStatuses: [400],
+  },
+]);
+
+const subscriptionEndpoints = tagEndpoints("Payments", [
+  {
+    method: "GET",
+    path: "/api/v1/payments/subscriptions",
+    summary: "Subscriptions, newest first.",
+    response: listOf("PaymentSubscription"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions",
+    summary: "Start a subscription on a gateway, with an optional trial.",
+    requestBody: typeRef("PaymentSubscriptionCreateRequest"),
+    response: typeRef("PaymentSubscription"),
+    successStatus: 201,
+    errorStatuses: [400, 404, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}",
+    summary: "One subscription with its timeline and renewal payments.",
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+    summary: "Move the subscription's clock to its next renewal and charge it.",
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404, 409],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+    summary: "Cancel the subscription now or at the end of its period.",
+    requestBody: typeRef("PaymentSubscriptionCancelRequest"),
+    response: typeRef("PaymentSubscription"),
+    errorStatuses: [404, 409],
   },
 ]);
 
@@ -90,11 +140,12 @@ const checkoutEndpoints = tagEndpoints("Checkout", [
     summary: "Pay, decline or cancel from the checkout page.",
     requestBody: typeRef("CheckoutCompleteRequest"),
     response: typeRef("CheckoutSession"),
-    errorStatuses: [400, 404, 409],
+    errorStatuses: [400, 404, 409, 422],
   },
 ]);
 
 export const paymentsApi: ApiEndpoint[] = [
   ...paymentEndpoints,
+  ...subscriptionEndpoints,
   ...checkoutEndpoints,
 ];

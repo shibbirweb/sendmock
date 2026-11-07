@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { variableKindLabels } from "@/features/webhooks/variables/variable-kinds";
 import type { WebhookVariable } from "@/lib/api/types";
+import { CreatedByBadge } from "@/components/common/created-by-badge";
 
 export type VariableRowActions = {
   onEdit: (webhookVariable: WebhookVariable) => void;
@@ -79,6 +80,7 @@ export function VariablesTable({
             <TableCell className="max-w-56">
               <code className="block truncate font-mono text-xs font-medium">
                 vars.{webhookVariable.name}
+                <CreatedByBadge createdBy={webhookVariable.created_by} />
               </code>
               <span className="block text-[11px] text-muted-foreground sm:hidden">
                 {variableKindLabels[webhookVariable.kind]}

@@ -3,7 +3,7 @@ title: Request editor
 description: Write a webhook request by hand. Body modes, query and headers, Strict or Lenient rendering, the code editor and the live preview.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/endpoints) today.
+> Try it in the [demo](/demo/webhooks/endpoints).
 
 The request editor is the endpoint sheet's **Request** tab; the Composer and the template editor use the same one. It decides exactly what an endpoint sends.
 

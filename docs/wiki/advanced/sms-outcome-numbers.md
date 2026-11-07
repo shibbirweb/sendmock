@@ -3,7 +3,7 @@ title: SMS outcome numbers
 description: Your own numbers and patterns that are rejected, fail after sending, arrive late or are read.
 ---
 
-> Works in your install from Phase 2. Try it in the [demo](/demo/settings?section=sms) today.
+> Try it in the [demo](/demo/settings?section=sms).
 
 Twilio's test numbers cover the standard errors. Your own rules cover your QA numbers: "this one always fails with 30007", "every `+1555777*` number is delivered after 10 seconds".
 

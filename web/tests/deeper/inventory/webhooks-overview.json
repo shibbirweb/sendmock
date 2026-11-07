@@ -1,0 +1,44 @@
+{
+  "order": 9,
+  "path": "/webhooks/overview",
+  "states": {
+    "normal": [
+      "heading: Webhooks",
+      "link: Read the Webhooks guide",
+      "heading: Webhooks overview",
+      "paragraph: How your endpoints are doing: volume, success, latency and what fails.",
+      "radio: # hours",
+      "radio: # days",
+      "combobox: Endpoint",
+      "switch: Show as table",
+      "columnheader: Endpoint",
+      "columnheader: Deliveries",
+      "columnheader: Success",
+      "columnheader: p# / p#",
+      "columnheader: Retries",
+      "columnheader: Top failures",
+      "each item, button: …",
+      "each item, img: …",
+      "link: Open failed deliveries",
+      "each item, link: …"
+    ],
+    "Shown as a table": [
+      "columnheader: Hour",
+      "columnheader: Succeeded",
+      "columnheader: Retrying",
+      "columnheader: Failed",
+      "columnheader: Total",
+      "columnheader: p# latency"
+    ],
+    "empty": [
+      "paragraph: No deliveries yet",
+      "paragraph: Deliveries show up here once a rule fires or you send a test to an endpoint.",
+      "link: Go to endpoints"
+    ],
+    "failing": [
+      "alert: Could not load the webhook metrics. Try again",
+      "paragraph: Could not load the webhook metrics.",
+      "button: Try again"
+    ]
+  }
+}

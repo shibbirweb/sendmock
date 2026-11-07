@@ -3,7 +3,7 @@ title: Go
 description: Connect Go apps to SendMock with net/smtp and net/http.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

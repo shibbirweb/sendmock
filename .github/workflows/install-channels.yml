@@ -1,0 +1,72 @@
+# Installs a published SendMock through each channel, from the real registries, on each
+# operating system the channel serves, and runs test cases 2 to 8 on what it installed
+# (DS-03.6, docs/plan/30-phase-5.md W11). The channels and their install steps come from
+# packaging/channels.json. Run it after a release: `after-publish` right away, every channel
+# once WinGet, Chocolatey, COPR and Nixpkgs have taken the version.
+name: Install channels
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The published version to expect, such as 1.0.0
+        type: string
+        required: true
+      channel:
+        description: Which release to install
+        type: choice
+        options: [stable, beta]
+        default: stable
+      channels:
+        description: Channel keys separated by commas, after-publish, or empty for every channel
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: Channels for ${{ inputs.channel }} ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - id: matrix
+        env:
+          RELEASE_CHANNEL: ${{ inputs.channel }}
+          CHANNELS: ${{ inputs.channels }}
+        run: |
+          matrix="$(bun scripts/release/install-channels.ts matrix "$RELEASE_CHANNEL" "$CHANNELS")"
+          echo "$matrix"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  install:
+    name: ${{ matrix.name }}
+    needs: plan
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    env:
+      VERSION: ${{ inputs.version }}
+      RELEASE_CHANNEL: ${{ inputs.channel }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: What the channel needs on a bare system
+        if: matrix.prepare != ''
+        run: ${{ matrix.prepare }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install through the channel, then run test cases 2 to 8
+        run: ${{ matrix.script }}

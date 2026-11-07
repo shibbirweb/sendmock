@@ -38,3 +38,19 @@ test("UI-11.3 every operation in the reference shows its CLI command, MCP tool a
     page.locator("#getWebhooksEndpointsByEndpointIdSecret"),
   ).toContainText("None: Agents may set secrets but never read them back");
 });
+
+test("PL-01.5 the site serves openapi.yaml, linked from the API reference", async ({
+  page,
+  request,
+}) => {
+  const openApiResponse = await request.get("/openapi.yaml");
+  const openApiYaml = await openApiResponse.text();
+
+  expect(openApiResponse.ok()).toBe(true);
+  expect(openApiYaml).toContain("openapi: 3.1");
+  expect(openApiYaml).toContain("operationId: getPayments");
+  await page.goto("/api/");
+  await expect(
+    page.getByRole("link", { name: "Download openapi.yaml" }),
+  ).toHaveAttribute("href", "../openapi.yaml");
+});

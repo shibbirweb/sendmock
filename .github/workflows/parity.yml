@@ -38,3 +38,23 @@ jobs:
 
       - name: Catalogue, AI plan, user guide, mock handlers and spec agree
         run: bun run test:parity
+
+  binary-parity:
+    name: The binary matches the surface catalogue
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: The binary's commands and MCP tools
+        run: cargo run --locked -q -p sendmock -- help --all --json > binary-surfaces.json
+
+      - name: Same names as docs/api/cli-reference.json and mcp-tools.json (summary on the job page)
+        run: bun scripts/binary-surface-parity.ts binary-surfaces.json

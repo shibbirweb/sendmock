@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiReferenceRouteImport } from './routes/api-reference'
 import { Route as HttpRouteImport } from './routes/http'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as MailRouteImport } from './routes/mail'
 import { Route as NumbersRouteImport } from './routes/numbers'
+import { Route as PushRouteImport } from './routes/push'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
@@ -24,6 +26,7 @@ import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
 import { Route as PaymentsFlowsRouteImport } from './routes/payments/flows'
 import { Route as PaymentsGatewaysRouteImport } from './routes/payments/gateways'
 import { Route as PaymentsMethodsRouteImport } from './routes/payments/methods'
+import { Route as PaymentsSubscriptionsRouteImport } from './routes/payments/subscriptions'
 import { Route as SmsConversationsRouteImport } from './routes/sms/_conversations'
 import { Route as SmsProvidersRouteImport } from './routes/sms/providers'
 import { Route as SmsVerifyRouteImport } from './routes/sms/verify'
@@ -44,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiReferenceRoute = ApiReferenceRouteImport.update({
+  id: '/api-reference',
+  path: '/api-reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HttpRoute = HttpRouteImport.update({
   id: '/http',
   path: '/http',
@@ -62,6 +70,11 @@ const MailRoute = MailRouteImport.update({
 const NumbersRoute = NumbersRouteImport.update({
   id: '/numbers',
   path: '/numbers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PushRoute = PushRouteImport.update({
+  id: '/push',
+  path: '/push',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScenariosRoute = ScenariosRouteImport.update({
@@ -112,6 +125,11 @@ const PaymentsGatewaysRoute = PaymentsGatewaysRouteImport.update({
 const PaymentsMethodsRoute = PaymentsMethodsRouteImport.update({
   id: '/payments/methods',
   path: '/payments/methods',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsSubscriptionsRoute = PaymentsSubscriptionsRouteImport.update({
+  id: '/payments/subscriptions',
+  path: '/payments/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SmsConversationsRoute = SmsConversationsRouteImport.update({
@@ -188,10 +206,12 @@ const SmsConversationsThreadIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
+  '/push': typeof PushRoute
   '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
@@ -200,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms': typeof SmsConversationsRouteWithChildren
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
@@ -219,9 +240,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/numbers': typeof NumbersRoute
+  '/push': typeof PushRoute
   '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
@@ -230,6 +253,7 @@ export interface FileRoutesByTo {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
   '/webhooks/composer': typeof WebhooksComposerRoute
@@ -249,10 +273,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api-reference': typeof ApiReferenceRoute
   '/http': typeof HttpRoute
   '/logs': typeof LogsRoute
   '/mail': typeof MailRouteWithChildren
   '/numbers': typeof NumbersRoute
+  '/push': typeof PushRoute
   '/scenarios': typeof ScenariosRoute
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
@@ -261,6 +287,7 @@ export interface FileRoutesById {
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
   '/payments/methods': typeof PaymentsMethodsRoute
+  '/payments/subscriptions': typeof PaymentsSubscriptionsRoute
   '/sms/_conversations': typeof SmsConversationsRouteWithChildren
   '/sms/providers': typeof SmsProvidersRoute
   '/sms/verify': typeof SmsVerifyRoute
@@ -282,10 +309,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/mail'
     | '/numbers'
+    | '/push'
     | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
@@ -294,6 +323,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms'
     | '/sms/providers'
     | '/sms/verify'
@@ -313,9 +343,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/numbers'
+    | '/push'
     | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
@@ -324,6 +356,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms/providers'
     | '/sms/verify'
     | '/webhooks/composer'
@@ -342,10 +375,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/api-reference'
     | '/http'
     | '/logs'
     | '/mail'
     | '/numbers'
+    | '/push'
     | '/scenarios'
     | '/settings'
     | '/mail/$emailId'
@@ -354,6 +389,7 @@ export interface FileRouteTypes {
     | '/payments/flows'
     | '/payments/gateways'
     | '/payments/methods'
+    | '/payments/subscriptions'
     | '/sms/_conversations'
     | '/sms/providers'
     | '/sms/verify'
@@ -374,10 +410,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiReferenceRoute: typeof ApiReferenceRoute
   HttpRoute: typeof HttpRoute
   LogsRoute: typeof LogsRoute
   MailRoute: typeof MailRouteWithChildren
   NumbersRoute: typeof NumbersRoute
+  PushRoute: typeof PushRoute
   ScenariosRoute: typeof ScenariosRoute
   SettingsRoute: typeof SettingsRoute
   MailProvidersRoute: typeof MailProvidersRoute
@@ -385,6 +423,7 @@ export interface RootRouteChildren {
   PaymentsFlowsRoute: typeof PaymentsFlowsRoute
   PaymentsGatewaysRoute: typeof PaymentsGatewaysRoute
   PaymentsMethodsRoute: typeof PaymentsMethodsRoute
+  PaymentsSubscriptionsRoute: typeof PaymentsSubscriptionsRoute
   SmsConversationsRoute: typeof SmsConversationsRouteWithChildren
   SmsProvidersRoute: typeof SmsProvidersRoute
   SmsVerifyRoute: typeof SmsVerifyRoute
@@ -407,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-reference': {
+      id: '/api-reference'
+      path: '/api-reference'
+      fullPath: '/api-reference'
+      preLoaderRoute: typeof ApiReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/http': {
@@ -435,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/numbers'
       fullPath: '/numbers'
       preLoaderRoute: typeof NumbersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/push': {
+      id: '/push'
+      path: '/push'
+      fullPath: '/push'
+      preLoaderRoute: typeof PushRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scenarios': {
@@ -505,6 +558,13 @@ declare module '@tanstack/react-router' {
       path: '/payments/methods'
       fullPath: '/payments/methods'
       preLoaderRoute: typeof PaymentsMethodsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/subscriptions': {
+      id: '/payments/subscriptions'
+      path: '/payments/subscriptions'
+      fullPath: '/payments/subscriptions'
+      preLoaderRoute: typeof PaymentsSubscriptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sms/_conversations': {
@@ -635,10 +695,12 @@ const SmsConversationsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiReferenceRoute: ApiReferenceRoute,
   HttpRoute: HttpRoute,
   LogsRoute: LogsRoute,
   MailRoute: MailRouteWithChildren,
   NumbersRoute: NumbersRoute,
+  PushRoute: PushRoute,
   ScenariosRoute: ScenariosRoute,
   SettingsRoute: SettingsRoute,
   MailProvidersRoute: MailProvidersRoute,
@@ -646,6 +708,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentsFlowsRoute: PaymentsFlowsRoute,
   PaymentsGatewaysRoute: PaymentsGatewaysRoute,
   PaymentsMethodsRoute: PaymentsMethodsRoute,
+  PaymentsSubscriptionsRoute: PaymentsSubscriptionsRoute,
   SmsConversationsRoute: SmsConversationsRouteWithChildren,
   SmsProvidersRoute: SmsProvidersRoute,
   SmsVerifyRoute: SmsVerifyRoute,

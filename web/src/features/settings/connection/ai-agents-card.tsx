@@ -11,10 +11,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { buildApiUrl } from "@/lib/api/api-client";
 import { useAiAgents } from "@/lib/api/hooks/use-automation-queries";
-import type { AiAgentTarget } from "@/lib/api/types";
+import type { AiAgentSetup, AiAgentTarget } from "@/lib/api/types";
+
+type McpLaunch = "installed" | "npx";
+
+const mcpLaunchLabels: Record<McpLaunch, string> = {
+  installed: "Installed",
+  npx: "npx (no install)",
+};
+
+/** The command and configuration for how SendMock runs, and where the configuration goes. */
+function readLaunchSetup(agentSetup: AiAgentSetup, mcpLaunch: McpLaunch) {
+  const isNpx = mcpLaunch === "npx";
+  const mcpConfig = isNpx ? agentSetup.npx_mcp_config : agentSetup.mcp_config;
+  return {
+    installCommand: isNpx
+      ? agentSetup.npx_install_command
+      : agentSetup.install_command,
+    mcpConfig,
+    // Claude Code's configuration is a command, so it is also its own place.
+    mcpConfigPath:
+      agentSetup.mcp_config_path === agentSetup.mcp_config
+        ? mcpConfig
+        : agentSetup.mcp_config_path,
+  };
+}
 
 function CodeBlock({ title, code }: { title: string; code: string }) {
   return (
@@ -36,10 +61,15 @@ export function AiAgentsCard() {
   const aiAgentsQuery = useAiAgents();
   const [selectedTarget, setSelectedTarget] =
     React.useState<AiAgentTarget>("claude-code");
+  const [mcpLaunch, setMcpLaunch] = React.useState<McpLaunch>("installed");
   const aiAgents = aiAgentsQuery.data ?? [];
   const selectedAgent =
     aiAgents.find((aiAgent) => aiAgent.target === selectedTarget) ??
     aiAgents[0];
+  const launchSetup =
+    selectedAgent === undefined
+      ? undefined
+      : readLaunchSetup(selectedAgent, mcpLaunch);
 
   return (
     <SettingsSectionCard
@@ -65,20 +95,51 @@ export function AiAgentsCard() {
           </SelectContent>
         </Select>
       </FormField>
-      {selectedAgent !== undefined && (
+      <div className="grid gap-1.5">
+        <span className="text-sm font-medium">SendMock runs as</span>
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          size="sm"
+          aria-label="SendMock runs as"
+          value={mcpLaunch}
+          onValueChange={(selectedLaunch) => {
+            if (selectedLaunch) {
+              setMcpLaunch(selectedLaunch as McpLaunch);
+            }
+          }}
+          className="w-full sm:w-72"
+        >
+          {(Object.keys(mcpLaunchLabels) as McpLaunch[]).map((launchOption) => (
+            <ToggleGroupItem
+              key={launchOption}
+              value={launchOption}
+              className="flex-1 text-xs"
+            >
+              {mcpLaunchLabels[launchOption]}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+        {mcpLaunch === "npx" && (
+          <p className="text-xs text-muted-foreground">
+            Nothing to install: the agent starts SendMock with{" "}
+            <code className="font-mono">npx -y sendmock mcp</code>, which needs
+            Node.js. On Windows, if the agent cannot start npx, use{" "}
+            <code className="font-mono">cmd /c npx -y sendmock mcp</code>.
+          </p>
+        )}
+      </div>
+      {selectedAgent !== undefined && launchSetup !== undefined && (
         <div className="grid gap-4">
           <CodeBlock
             title="Install command"
-            code={selectedAgent.install_command}
+            code={launchSetup.installCommand}
           />
-          <CodeBlock
-            title="MCP configuration"
-            code={selectedAgent.mcp_config}
-          />
+          <CodeBlock title="MCP configuration" code={launchSetup.mcpConfig} />
           <p className="text-xs text-muted-foreground">
             The install command writes the configuration to{" "}
-            <code className="font-mono">{selectedAgent.mcp_config_path}</code>{" "}
-            and the skill to{" "}
+            <code className="font-mono">{launchSetup.mcpConfigPath}</code> and
+            the skill to{" "}
             <code className="font-mono">{selectedAgent.instructions_path}</code>
             , after showing what it will change.
           </p>

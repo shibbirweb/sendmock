@@ -25,7 +25,12 @@ export default function ApiReferencePage() {
           and paged lists with an opaque{" "}
           <code className="font-mono">next_cursor</code>. Generated from{" "}
           <code className="font-mono">docs/api/openapi.yaml</code> (
-          {operations.length} operations).
+          {operations.length} operations).{" "}
+          <a className="underline" href="../openapi.yaml" download>
+            Download openapi.yaml
+          </a>
+          , also attached to every release and served by the binary at{" "}
+          <code className="font-mono">/api/openapi.json</code>.
         </p>
         <p className="text-fd-muted-foreground">
           Every operation has <strong>Try it in Demo mode</strong>: requests are

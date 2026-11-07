@@ -102,3 +102,38 @@ test("VF-01.3 a service can be created, edited and deleted", async ({
     page.getByRole("row").filter({ hasText: "E2E Signup" }),
   ).toHaveCount(0);
 });
+
+test("VF-01.2 a new service starts from the Verify defaults in Settings", async ({
+  page,
+}) => {
+  await page.goto("/settings?section=sms");
+  const defaultsForm = page.getByRole("form", { name: "Verify defaults" });
+  await defaultsForm.getByLabel("Code length").fill("8");
+  await defaultsForm.getByLabel("Code lifetime").fill("300");
+  await defaultsForm.getByLabel("Fixed code for every service").fill("12ab");
+  await defaultsForm.getByRole("button", { name: "Save changes" }).click();
+  await expect(
+    defaultsForm.getByText(
+      "Use 4 to 10 digits, or leave it empty for random codes",
+    ),
+  ).toBeVisible();
+  await defaultsForm
+    .getByLabel("Fixed code for every service")
+    .fill("24682468");
+  await defaultsForm.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Settings saved")).toBeVisible();
+
+  // In-app navigation keeps the mock's saved settings, which a page load would reset.
+  const sidebar = page.locator("[data-sidebar='sidebar']");
+  await sidebar.getByRole("link", { name: "SMS", exact: true }).click();
+  await sidebar.getByRole("link", { name: "Verify", exact: true }).click();
+  await page.getByRole("tab", { name: "Services" }).click();
+  await page.getByRole("button", { name: "New service" }).click();
+  const serviceDialog = page.getByRole("dialog", {
+    name: "New Verify service",
+  });
+  await expect(serviceDialog.getByLabel("Code length")).toHaveText("8 digits");
+  await expect(serviceDialog.getByLabel("Expires after (minutes)")).toHaveValue(
+    "5",
+  );
+});

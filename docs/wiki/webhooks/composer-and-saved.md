@@ -3,7 +3,7 @@ title: Composer and Saved
 description: Send webhooks by hand. Send to webhook from any message, write a request in the Composer, and keep requests in Saved to send again.
 ---
 
-> Try it in the [demo](/demo/webhooks/composer). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/composer).
 
 Rules send automatically. These three tools send when you say so.
 
@@ -63,6 +63,8 @@ Bookmarks made with **Save** on a delivery, at **Webhooks > Saved**, newest firs
 
 Saved deliveries survive pruning and reset, and are written to the seed export (without signature headers, which are made fresh on each send).
 
+
+Every control and text, one by one: [Composer in depth](../deeper/webhooks/composer.md) and [Saved deliveries in depth](../deeper/webhooks/saved.md).
 ## Customize
 
 - Presets come from [templates](./templates.md); a stored request becomes one with **Save as template** ([Advanced: templates](../advanced/templates.md)).
@@ -74,7 +76,7 @@ Saved deliveries survive pruning and reset, and are written to the seed export (
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
 | send a message or a written request | [`sendmock webhook send --endpoint <endpointId>`](/cli/webhook-endpoints/#webhook-send) | [`POST /api/v1/webhooks/endpoints/{endpointId}/send`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSend) | [`sendmock_webhook_send`](/mcp/webhook-endpoints/#sendmock_webhook_send) |
-| render without sending | [`sendmock webhook render --endpoint <endpointId>`](/cli/webhook-endpoints/#webhook-render) | [`POST /api/v1/webhooks/endpoints/preview`](/api/webhook-endpoints/#postWebhooksEndpointsPreview) | [`sendmock_webhook_render`](/mcp/webhook-endpoints/#sendmock_webhook_render) |
+| render without sending | [`sendmock webhook render --endpoint-id <endpointId>`](/cli/webhook-endpoints/#webhook-render) | [`POST /api/v1/webhooks/endpoints/preview`](/api/webhook-endpoints/#postWebhooksEndpointsPreview) | [`sendmock_webhook_render`](/mcp/webhook-endpoints/#sendmock_webhook_render) |
 | saved list | [`sendmock webhook saved list`](/cli/saved-deliveries/#webhook-saved-list) | [`GET /api/v1/webhooks/saved`](/api/saved-deliveries/#getWebhooksSaved) | [`sendmock_webhook_saved_list`](/mcp/saved-deliveries/#sendmock_webhook_saved_list) |
 | send a saved one | [`sendmock webhook saved send <savedId>`](/cli/saved-deliveries/#webhook-saved-send) | [`POST /api/v1/webhooks/saved/{savedId}/send`](/api/saved-deliveries/#postWebhooksSavedBySavedIdSend) | [`sendmock_webhook_saved_send`](/mcp/saved-deliveries/#sendmock_webhook_saved_send) |
 | rename | [`sendmock webhook saved rename <savedId>`](/cli/saved-deliveries/#webhook-saved-rename) | [`PATCH /api/v1/webhooks/saved/{savedId}`](/api/saved-deliveries/#patchWebhooksSavedBySavedId) | [`sendmock_webhook_saved_update`](/mcp/saved-deliveries/#sendmock_webhook_saved_update) |

@@ -3,7 +3,7 @@ title: Catcher responses
 description: Make an HTTP Catcher bin answer like a real API, or like a failing one. Rules by path, templated bodies, delays and failure rates.
 ---
 
-> Works in your install from Phase 4. Try it in the [demo](/demo/http) today.
+> Try it in the [demo](/demo/http).
 
 Each bin answers every request with its default reply, unless a response rule matches first. Rules let one bin behave like a whole API: success here, a rate limit there, an occasional 500, a slow endpoint.
 

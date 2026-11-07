@@ -3,7 +3,7 @@ title: Overview
 description: The home dashboard. Counts, activity, webhook health, recent failures and how to connect, live.
 ---
 
-> Try it in the [demo](/demo/). Works in your install from Phase 1 (message counts) and Phase 3 (webhook health).
+> Try it in the [demo](/demo/).
 
 The first screen you see: what SendMock has caught, how your webhooks are doing, and the addresses your app needs.
 
@@ -58,6 +58,8 @@ The newest emails and SMS, each linking to it. With nothing yet, it offers **Sen
 
 The SMTP address and API base URL with copy buttons, and a link to [Settings > Connection](./settings.md#connection) for full snippets per language.
 
+
+Every control and text, one by one: [Overview in depth](./deeper/overview.md).
 ## Customize
 
 Nothing to configure here. What the tiles count follows your retention in [Settings > General](./settings.md#general).

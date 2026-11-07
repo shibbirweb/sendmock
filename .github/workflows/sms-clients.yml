@@ -1,0 +1,205 @@
+# The official Twilio SDKs (Node, Python, PHP, Go, Java, C# and Ruby) send an SMS with status
+# callbacks to a local handler and run a Verify login against a SendMock release binary (SM-02.4,
+# VF-03.4, the Phase 2 done-when check). Runs on changes to the SMS code or the examples, and from Release
+# build before anything is published.
+name: SMS clients
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-sms/**
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/sms/**
+      - crates/sendmock-ops/src/verify/**
+      - crates/sendmock-ops/builtin/**
+      - examples/sms/**
+      - .github/workflows/sms-clients.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-sms/**
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/sms/**
+      - crates/sendmock-ops/src/verify/**
+      - crates/sendmock-ops/builtin/**
+      - examples/sms/**
+      - .github/workflows/sms-clients.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  binary:
+    name: Release binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sendmock-for-sms-clients
+          path: target/release/sendmock
+          retention-days: 1
+
+  client:
+    name: ${{ matrix.client }}
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - client: Twilio Node SDK
+            language: node
+            folder: node-twilio
+            run: bun install && node send-and-verify.js
+          - client: Twilio Python SDK
+            language: python
+            folder: python-twilio
+            run: pip install --quiet -r requirements.txt && python send_and_verify.py
+          - client: Twilio PHP SDK
+            language: php
+            folder: php-twilio
+            run: composer install --no-interaction --quiet && php send-and-verify.php
+          - client: Twilio Go SDK
+            language: go
+            folder: go-twilio
+            run: go run .
+          - client: Twilio Java SDK
+            language: java
+            folder: java-twilio
+            run: mvn --quiet --batch-mode compile exec:java
+          - client: Twilio C# SDK
+            language: dotnet
+            folder: dotnet-twilio
+            run: dotnet run
+          - client: Twilio Ruby SDK
+            language: ruby
+            folder: ruby-twilio
+            run: bundle install --quiet && bundle exec ruby send_and_verify.rb
+          # AC: SM-17.1
+          - client: Infobip Node SDK
+            language: node
+            folder: node-infobip
+            run: bun install && node send-and-verify.js
+          # AC: SM-17.2 PL-10.4
+          - client: Telnyx Node SDK
+            language: node
+            folder: node-telnyx
+            run: bun install && node send-and-verify.js
+          # AC: SM-17.3
+          - client: Sinch Node SDK
+            language: node
+            folder: node-sinch
+            run: bun install && node send-and-verify.js
+          # AC: SM-17.4
+          - client: Africa's Talking Node SDK
+            language: node
+            folder: node-africastalking
+            run: bun install && node send-and-verify.js
+          # AC: SM-17.5
+          - client: AWS SDK SNS client
+            language: node
+            folder: node-sns
+            run: bun install && node send-and-verify.js
+          # AC: SM-18.5
+          - client: WhatsApp Cloud API over HTTP
+            language: node
+            folder: node-whatsapp-cloud
+            run: node send-and-verify.js
+          # AC: VF-05.4
+          - client: Vonage Verify2 Node SDK
+            language: node
+            folder: node-vonage-verify
+            run: bun install && node send-and-verify.js
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+      SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-sms-clients
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Start SendMock with the provider port
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory --provider-addr 127.0.0.1:8026 > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        if: matrix.language == 'node'
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        if: matrix.language == 'python'
+        with:
+          python-version: "3.13"
+
+      - uses: shivammathur/setup-php@v2
+        if: matrix.language == 'php'
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - uses: actions/setup-go@v5
+        if: matrix.language == 'go'
+        with:
+          go-version: "1.23"
+          cache-dependency-path: examples/sms/go-twilio/go.sum
+
+      - uses: actions/setup-java@v4
+        if: matrix.language == 'java'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: actions/setup-dotnet@v4
+        if: matrix.language == 'dotnet'
+        with:
+          dotnet-version: "8.0.x"
+
+      - uses: ruby/setup-ruby@v1
+        if: matrix.language == 'ruby'
+        with:
+          ruby-version: "3.3"
+
+      - name: Send and verify with the ${{ matrix.client }}
+        working-directory: examples/sms/${{ matrix.folder }}
+        run: ${{ matrix.run }}
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log

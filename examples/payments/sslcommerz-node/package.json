@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-payments-sslcommerz-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "sslcommerz-lts": "1.2.0"
+  }
+}

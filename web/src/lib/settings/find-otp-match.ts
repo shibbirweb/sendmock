@@ -3,10 +3,20 @@ export type OtpMatch = {
   code: string;
 };
 
+/**
+ * Leading inline flags such as `(?i)`: the server's patterns are Rust regexes, which allow
+ * them, and JavaScript only takes them as RegExp flags.
+ */
+const leadingInlineFlags = /^\(\?([ims]+)\)/;
+
 /** Compiles a pattern case-insensitively, or returns null when it is invalid. */
 export function compileOtpPattern(otpPattern: string): RegExp | null {
+  const inlineFlags = leadingInlineFlags.exec(otpPattern)?.[1] ?? "";
+  const patternBody =
+    inlineFlags === "" ? otpPattern : otpPattern.slice(inlineFlags.length + 3);
+  const regexFlags = [...new Set(["i", ...inlineFlags])].join("");
   try {
-    return new RegExp(otpPattern, "i");
+    return new RegExp(patternBody, regexFlags);
   } catch {
     return null;
   }

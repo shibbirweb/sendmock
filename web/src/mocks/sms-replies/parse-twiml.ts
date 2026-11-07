@@ -1,4 +1,4 @@
-import type { TwimlVerb } from "@/lib/api/types";
+import type { TwimlMethod, TwimlVerb } from "@/lib/api/types";
 
 export type TwimlParseResult =
   { isValid: true; verbs: TwimlVerb[] } | { isValid: false; message: string };
@@ -7,6 +7,13 @@ function readChildText(messageElement: Element, childName: string): string[] {
   return [...messageElement.getElementsByTagName(childName)].map(
     (childElement) => childElement.textContent?.trim() ?? "",
   );
+}
+
+/** `POST` is Twilio's default when the attribute is missing. */
+function readMethod(verbElement: Element): TwimlMethod {
+  return verbElement.getAttribute("method")?.trim().toUpperCase() === "GET"
+    ? "GET"
+    : "POST";
 }
 
 function toMessageVerb(messageElement: Element): TwimlVerb {
@@ -22,6 +29,8 @@ function toMessageVerb(messageElement: Element): TwimlVerb {
     to: messageElement.getAttribute("to"),
     from: messageElement.getAttribute("from"),
     status_callback: messageElement.getAttribute("statusCallback"),
+    action: messageElement.getAttribute("action"),
+    method: readMethod(messageElement),
     media_urls: mediaUrls,
   };
 }
@@ -52,7 +61,11 @@ export function parseTwiml(twimlText: string): TwimlParseResult {
       }
       if (verbElement.nodeName === "Redirect") {
         return [
-          { verb: "Redirect", url: verbElement.textContent?.trim() ?? "" },
+          {
+            verb: "Redirect",
+            url: verbElement.textContent?.trim() ?? "",
+            method: readMethod(verbElement),
+          },
         ];
       }
       return [];

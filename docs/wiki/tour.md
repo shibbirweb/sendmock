@@ -33,6 +33,7 @@ Press `G` and then the key in the table to jump to a menu from anywhere.
 | Payments > Gateways | | the emulated providers: Stripe, PayPal, SSLCommerz, bKash, your own | [Gateways](./payments/gateways.md) |
 | Payments > Methods | | what a customer pays with (card, bKash, Nagad, ...) and its test values | [Methods](./payments/methods.md) |
 | Payments > Flows | | the steps a checkout page asks for (card form, number, OTP, PIN, ...) | [Flows](./payments/flows.md) |
+| Payments > Subscriptions | | recurring payments, renewed, failed and canceled on their own clock | [Subscriptions](./payments/subscriptions.md) |
 | Numbers | `G N` | your fake phone numbers and Messaging Services, set up like a provider console | [Numbers](./numbers.md) |
 | Scenarios | `G C` | multi-step tests you write once and run again, step by step | [Scenarios](./scenarios.md) |
 | Logs | `G L` | the raw SMTP sessions and API requests behind every message | [Logs](./logs.md) |
@@ -47,6 +48,8 @@ The bottom of the sidebar has icon links to the docs, **Report an issue**, **Req
 - **Notification bell**: the unread count and the last 50 notable events (new email, new or inbound SMS, failed webhook deliveries), each linking to its item. Pop-up toasts can be turned off or moved in **Settings > Notifications**.
 - **Help menu**: the docs, keyboard shortcuts, what's new, **Report an issue**, **Request a feature**, private security reporting and the repository.
 - **Theme** (`T`): light, dark or follow the system.
+
+Every control of the sidebar and the header, one by one: [Sidebar and header in depth](./deeper/app-shell.md).
 
 ## Keys that work in lists
 

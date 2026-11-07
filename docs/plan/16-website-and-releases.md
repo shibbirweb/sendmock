@@ -18,7 +18,7 @@ Two things that work together:
 | Styling | Tailwind CSS v4 + shadcn/ui | same tokens as the app UI (`web/`) so the site and app look like one product |
 | Animated components | **Magic UI** (React + Tailwind + Motion, installed through the shadcn CLI registry) | landing page, feature sections, playground polish |
 | AI-assisted building | **Magic UI MCP server** in the repo's `.mcp.json` | lets Claude Code / Cursor pull Magic UI components correctly (installer: `@magicuidesign/cli`; exact Claude Code command to verify) |
-| Hosting | GitHub Pages via Actions (`actions/upload-pages-artifact`, `actions/deploy-pages`) | `https://<owner>.github.io/<repo>/`, custom domain later |
+| Hosting | GitHub Pages via Actions (`actions/upload-pages-artifact`, `actions/deploy-pages`) | `https://shibbirweb.github.io/sendmock/`, custom domain later |
 | Diagrams | Mermaid | architecture, release flow |
 
 Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so they render a static state when reduced motion is on) and are kept out of the docs reading area so they never slow down reference pages.
@@ -279,8 +279,8 @@ flowchart LR
 - **Surfaces:** `GET /api/v1/updates` (`409` while the mode is `off`, `502` "Could not check for updates" when GitHub cannot be reached), `sendmock update check`, MCP `sendmock_update_check`; the mode is a setting (`update_check_mode`, replacing the boolean `is_update_check_enabled`). The answer (`UpdateCheckResult`) carries the running version, channel and install method, whether the channel is checked at all (`is_channel_checked`, false for edge and dev), the offered release (`available_release`: version, `published_at`, `release_notes_markdown`, `release_url` and `upgrade_command`, null when the method is unknown), `checked_at` and `is_from_cache`.
 - **When:** the mode select, the notification and the upgrade command are UI work on mock data (U3); the real check ships with the first beta (Phase 1), since that is the first version anyone can update from.
 - **Upgrade commands follow the running platform (decided 2026-10-28, owner feedback F18):** the server builds the command for the operating system it runs on (detected at run time, never guessed from the browser), the channel and the install method, and every command is one the [Install page](../wiki/install.md) gives for that platform and channel:
-  - Install script on macOS and Linux: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`, with `-s -- --channel beta` for beta.
-  - Install script on Windows (PowerShell): `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`, and `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta` for beta.
+  - Install script on macOS and Linux: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`, and `curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta` for beta.
+  - Install script on Windows (PowerShell): `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`, and `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta` for beta.
   - Homebrew (macOS and Linux only): `brew upgrade shibbirweb/tap/sendmock`, or `sendmock-beta`.
   - Scoop (Windows only): `scoop update sendmock`, or `sendmock-beta`.
   - Docker (any platform, multi-arch image): `docker pull ghcr.io/shibbirweb/sendmock:<version>`.

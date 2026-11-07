@@ -3,7 +3,7 @@ title: Messages
 description: Twilio and Vonage compatible SMS and WhatsApp, shown as conversations, with delivery status, callbacks and replies.
 ---
 
-> Try it in the [demo](/demo/sms). Works in your install from Phase 2 (sending, status and callbacks), Phase 3 (reply webhooks) and Phase 4 (WhatsApp and more providers).
+> Try it in the [demo](/demo/sms).
 
 Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, grouped into conversations like a phone shows them. Nothing reaches a real phone. **SMS** opens the messages; [SMS > Verify](./verify.md) and [SMS > Providers](./providers.md) sit under it.
 
@@ -22,7 +22,7 @@ Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, group
 | Gets from | Sends to |
 | --- | --- |
 | your app over `POST /api/v1/sms`, the Twilio Messages API or the Vonage SMS API | `sms.sent`, `sms.status`, `sms.opened` and `sms.inbound` events to [Webhooks > Rules](../webhooks/rules.md) |
-| [Settings > SMS](../settings.md#sms): profile, failure rate, magic and custom outcome numbers | each message's status callback, logged in [Deliveries](../webhooks/deliveries.md) |
+| [Settings > SMS](../settings.md#sms): profile, failure rate, magic and custom outcome numbers | each message's status callback, with every attempt in **Message details** |
 | replies you type in a conversation | the number's reply webhook, set in [Numbers](../numbers.md), and TwiML answers back into the conversation |
 | [Verify](./verify.md): codes go out as SMS | the API request to [Logs > API requests](../logs.md) |
 | [Settings > OTP patterns](../settings.md#otp-patterns) | **Send to webhook**: one message to any endpoint, by hand |
@@ -42,6 +42,22 @@ Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, group
 - **Native API:** `POST /api/v1/sms` with `from`, `to` and `body`, plus optional `status_callback`, `media_urls` or inline `media`.
 - **Twilio** (Messages API, Messaging Services, WhatsApp with `whatsapp:` addresses) and **Vonage** at their real paths on port `8026`.
 - Any `from` is accepted. Numbers only matter for replies and sender pools ([Numbers](../numbers.md)).
+
+### Twilio SDKs
+
+Twilio's official SDKs have no base URL setting, so give each one a small custom HTTP client (the SDK's own extension point) that sends the request to `http://127.0.0.1:8026` with the same path and query. Messages and Verify then work unchanged, status callbacks included.
+
+| SDK | Extension point |
+|-----|-----------------|
+| Node | a `twilio.RequestClient` subclass passed as `httpClient` |
+| Python | a `TwilioHttpClient` subclass passed as `http_client` |
+| PHP | a `Twilio\Http\CurlClient` subclass passed as the client's fifth argument |
+| Go | an `http.Client` with a custom `Transport` on `twilioclient.Client`, in `twilio.ClientParams` |
+| Java | a `com.twilio.http.HttpClient` subclass passed to `TwilioRestClient.Builder.httpClient` |
+| C# | a `DelegatingHandler` in the `System.Net.Http.HttpClient` given to `SystemNetHttpClient` |
+| Ruby | a `Twilio::HTTP::Client` subclass passed as the client's fifth argument |
+
+Each one is a complete, tested example in [`examples/sms`](https://github.com/shibbirweb/sendmock/tree/develop/examples/sms).
 
 ### The conversation list
 
@@ -63,6 +79,8 @@ Each bubble's menu has **Message details**, **Simulate read**, **Send to webhook
 
 Facts (id, from, to, API, channel, segments, Messaging Service), the **status history**, the original **request JSON** (with a link to the API request log), each **callback attempt**, the media list, and **Set status** (Delivered, Undelivered or Failed with an error code) to move a message by hand. Incoming messages also get a **Reply webhook** tab.
 
+
+Every control and text, one by one: [SMS messages in depth](../deeper/sms/messages.md).
 ## Customize
 
 - Make your own numbers fail, arrive late or be read: [Advanced: SMS outcome numbers](../advanced/sms-outcome-numbers.md).
@@ -254,8 +272,6 @@ public class SmsTests
 | reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
 | delete one | [`sendmock sms delete <smsId>`](/cli/sms/#sms-delete) | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | [`sendmock_sms_delete`](/mcp/sms/#sendmock_sms_delete) |
 | delete everything | [`sendmock sms delete-all --yes`](/cli/sms/#sms-delete-all) | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all) |
-
-The SMS commands and tools arrive in Phase 2.
 
 ## Related
 

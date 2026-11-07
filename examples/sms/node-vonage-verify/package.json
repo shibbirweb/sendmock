@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-vonage-verify-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vonage/verify2": "1.22.1"
+  }
+}

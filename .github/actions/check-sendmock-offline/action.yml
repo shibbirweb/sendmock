@@ -1,0 +1,18 @@
+# Fails when the firewall rule start-sendmock-offline added rejected a single packet SendMock
+# sent beyond this machine, proving it opened no connection to a real provider (PY-01.3).
+name: Check SendMock stayed offline
+description: Fail if SendMock sent anything beyond loopback
+runs:
+  using: composite
+  steps:
+    - name: SendMock opened no connection beyond this machine
+      shell: bash
+      run: |
+        for firewall in iptables ip6tables; do
+          sudo "$firewall" -L OUTPUT -v -n -x
+          rejected_packets=$(sudo "$firewall" -L OUTPUT -v -n -x | awk '/owner UID match/ { total += $1 } END { print total + 0 }')
+          if [ "$rejected_packets" -ne 0 ]; then
+            echo "::error::$firewall rejected $rejected_packets packets SendMock sent beyond this machine"
+            exit 1
+          fi
+        done

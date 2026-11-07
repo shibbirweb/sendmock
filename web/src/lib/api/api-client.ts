@@ -42,6 +42,8 @@ function buildRequestInit(requestOptions: ApiRequestOptions): RequestInit {
     method: requestOptions.method ?? "GET",
     headers: {
       ...(contentType === undefined ? {} : { "Content-Type": contentType }),
+      // New items record that the UI made them (AI-05.4).
+      "X-Sendmock-Client": "ui",
       ...requestOptions.headers,
     },
     body:
@@ -129,4 +131,19 @@ export function buildRealtimeUrl(): string {
   realtimeUrl.protocol = realtimeUrl.protocol === "https:" ? "wss:" : "ws:";
 
   return realtimeUrl.toString();
+}
+
+/** Where the instance serves its OpenAPI document, outside `/api/v1`. */
+export const openApiDocumentUrl = `${import.meta.env.VITE_API_BASE_URL ?? ""}/api/openapi.json`;
+
+/** The instance's OpenAPI document, for the API reference screen. */
+export async function requestOpenApiDocument<DocumentType>(
+  abortSignal?: AbortSignal,
+): Promise<DocumentType> {
+  const response = await fetch(openApiDocumentUrl, { signal: abortSignal });
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorBody(response));
+  }
+
+  return (await response.json()) as DocumentType;
 }

@@ -1,0 +1,49 @@
+# Opens the develop to main pull request when develop carries an untagged stable version.
+name: Promote stable
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Promote a stable to main
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - id: decision
+        run: bun scripts/release/release.ts decide stable-promote
+
+      - name: Open the pull request into main (merge commit, never squash)
+        if: steps.decision.outputs.should_act == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+          VERSION: ${{ steps.decision.outputs.version }}
+        run: |
+          pull_request="$(bun scripts/release/release.ts promote-pull-request "$VERSION")"
+          base="$(echo "$pull_request" | jq -r .base)"
+          head="$(echo "$pull_request" | jq -r .head)"
+          if [ -n "$(gh pr list --base "$base" --head "$head" --state open --json number --jq '.[].number')" ]; then
+            echo "A $head to $base pull request is already open."
+            exit 0
+          fi
+          gh pr create --base "$base" --head "$head" \
+            --title "$(echo "$pull_request" | jq -r .title)" \
+            --body "Merge with a merge commit, never squash, so main and develop share history. Merging publishes $VERSION."

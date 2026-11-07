@@ -14,6 +14,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AnswerDisputeDialog } from "@/features/payments/detail/answer-dispute-dialog";
 import { RefundPaymentDialog } from "@/features/payments/detail/refund-payment-dialog";
 import { ApiError } from "@/lib/api/api-client";
 import {
@@ -42,7 +43,15 @@ export function PaymentSimulateMenu({
 }) {
   const simulatePayment = useSimulatePayment();
   const resendNotification = useResendPaymentNotification();
+  // The dialogs stay mounted and close through `open`: unmounting an open dialog could
+  // leave the page locked. A new key each opening starts them fresh.
   const [isRefundOpen, setRefundOpen] = React.useState(false);
+  const [isAnswerOpen, setAnswerOpen] = React.useState(false);
+  const [dialogOpeningCount, setDialogOpeningCount] = React.useState(0);
+  const openDialog = (setDialogOpen: (isOpen: boolean) => void) => {
+    setDialogOpeningCount((openingCount) => openingCount + 1);
+    setDialogOpen(true);
+  };
   const availableActions = listSimulateActions(paymentDetail);
   const reportError = (requestError: Error) => {
     toast.error(
@@ -68,7 +77,9 @@ export function PaymentSimulateMenu({
 
   return (
     <div className="flex flex-wrap gap-2">
-      <DropdownMenu>
+      {/* Not modal: a live update re-renders the drawer as the menu closes, and a modal
+          menu could leave the page locked for the next one. */}
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button size="sm" disabled={availableActions.length === 0}>
             <FlaskConicalIcon />
@@ -131,11 +142,21 @@ export function PaymentSimulateMenu({
                 </DropdownMenuSub>
               );
             }
+            if (simulateAction === "answer_dispute") {
+              return (
+                <DropdownMenuItem
+                  key={simulateAction}
+                  onSelect={() => openDialog(setAnswerOpen)}
+                >
+                  Answer dispute...
+                </DropdownMenuItem>
+              );
+            }
             if (simulateAction === "refund") {
               return (
                 <DropdownMenuItem
                   key={simulateAction}
-                  onSelect={() => setRefundOpen(true)}
+                  onSelect={() => openDialog(setRefundOpen)}
                 >
                   Refund...
                 </DropdownMenuItem>
@@ -175,8 +196,10 @@ export function PaymentSimulateMenu({
         <SendIcon />
         Resend notification
       </Button>
-      {isRefundOpen && (
+      {dialogOpeningCount > 0 && (
         <RefundPaymentDialog
+          key={`refund-${dialogOpeningCount}`}
+          isOpen={isRefundOpen}
           paymentDetail={paymentDetail}
           isRefunding={simulatePayment.isPending}
           onRefund={(refundAmountMinor) => {
@@ -188,6 +211,22 @@ export function PaymentSimulateMenu({
             );
           }}
           onClose={() => setRefundOpen(false)}
+        />
+      )}
+      {dialogOpeningCount > 0 && (
+        <AnswerDisputeDialog
+          key={`answer-${dialogOpeningCount}`}
+          isOpen={isAnswerOpen}
+          isAnswering={simulatePayment.isPending}
+          onAnswer={(disputeEvidence) => {
+            runAction(
+              { action: "answer_dispute", dispute_evidence: disputeEvidence },
+              () => {
+                setAnswerOpen(false);
+              },
+            );
+          }}
+          onClose={() => setAnswerOpen(false)}
         />
       )}
     </div>

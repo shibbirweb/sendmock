@@ -3,7 +3,7 @@ title: Variables
 description: Values templates read as vars.name. Fixed values, secrets, values from the message, random values, combinations and values asked for at send time.
 ---
 
-> Try it in the [demo](/demo/webhooks/variables). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/variables).
 
 Templates read variables as `{{ vars.name }}`. They hold what a template needs that is not in the event: an auth token for a signature, a tenant id, a chat id, a fresh random id per send.
 
@@ -50,6 +50,8 @@ Every global and endpoint variable: name (as `vars.name`), kind, value (secrets 
 
 A variable is **Global** or belongs to one endpoint. An endpoint's variable wins over a global one of the same name, and a send-time override wins over both.
 
+
+Every control and text, one by one: [Variables in depth](../deeper/webhooks/variables.md).
 ## Customize
 
 Dynamic expressions, generators, computed values and send-time overrides in depth: [Advanced: variables](../advanced/variables.md).

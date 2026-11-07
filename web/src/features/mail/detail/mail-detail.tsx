@@ -3,6 +3,11 @@ import * as React from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ExtractedDataPanel } from "@/features/mail/detail/extracted-data-panel";
 import { MailDetailHeader } from "@/features/mail/detail/mail-detail-header";
 import { EmailHtmlPreview } from "@/features/mail/detail/preview/email-html-preview";
@@ -23,6 +28,7 @@ import {
 } from "@/features/mail/detail/tabs/email-source-tabs";
 import { useEmailOpenTracking } from "@/features/mail/detail/use-email-open-tracking";
 import { useEmail, useEmailTimeline } from "@/lib/api/hooks/use-email-queries";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 
 export function MailDetail({ emailId }: { emailId: string }) {
   const emailQuery = useEmail(emailId);
@@ -34,6 +40,9 @@ export function MailDetail({ emailId }: { emailId: string }) {
     React.useState<EmailComposerMode | null>(null);
   useEmailOpenTracking(email);
   useEmailResponseShortcuts(email, setComposerMode);
+  const checksAvailability = useOperationAvailability(
+    "GET /api/v1/emails/{emailId}/html-check",
+  );
 
   if (emailQuery.isPending) {
     return (
@@ -92,15 +101,37 @@ export function MailDetail({ emailId }: { emailId: string }) {
       >
         {/* Up to ten tabs: they wrap inside the pill rather than scroll out of sight. */}
         <TabsList className="flex-wrap justify-start group-data-horizontal/tabs:h-auto">
-          {tabDefinitions.map((tabDefinition) => (
-            <TabsTrigger
-              key={tabDefinition.value}
-              value={tabDefinition.value}
-              className="h-7 flex-none"
-            >
-              {tabDefinition.label}
-            </TabsTrigger>
-          ))}
+          {tabDefinitions.map((tabDefinition) =>
+            tabDefinition.value === "checks" &&
+            !checksAvailability.isAvailable ? (
+              <Tooltip key={tabDefinition.value}>
+                <TooltipTrigger asChild>
+                  {/* A disabled tab gets no pointer events, so the tooltip hangs on a wrapper. */}
+                  <span tabIndex={0} className="inline-flex">
+                    <TabsTrigger
+                      value={tabDefinition.value}
+                      disabled
+                      aria-label={`${tabDefinition.label}: ${checksAvailability.unavailableLabel}`}
+                      className="h-7 flex-none"
+                    >
+                      {tabDefinition.label}
+                    </TabsTrigger>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {checksAvailability.unavailableLabel}
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <TabsTrigger
+                key={tabDefinition.value}
+                value={tabDefinition.value}
+                className="h-7 flex-none"
+              >
+                {tabDefinition.label}
+              </TabsTrigger>
+            ),
+          )}
         </TabsList>
         <TabsContent value="html">
           <EmailHtmlPreview email={email} />

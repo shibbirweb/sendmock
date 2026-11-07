@@ -25,6 +25,22 @@ function NamedLinks({ namedLinks }: { namedLinks: NamedLink[] }) {
   );
 }
 
+/** Which input value picks this operation, for a command or tool that runs several. */
+export function describeSelector(
+  selector: ReferencedOperation["selector"],
+): string | null {
+  if (selector === null) {
+    return null;
+  }
+  if (selector.value !== undefined) {
+    return `${selector.input}: ${selector.value}`;
+  }
+  if (selector.isGiven !== undefined) {
+    return `${selector.isGiven ? "with" : "without"} ${selector.input}`;
+  }
+  return null;
+}
+
 /** The same thing from the REST API, the other surface (CLI or MCP) and the app. */
 export function OtherWaysList({
   operations,
@@ -37,6 +53,8 @@ export function OtherWaysList({
   otherSurfaceLinks: NamedLink[];
   uiPlaces: string[];
 }) {
+  const isShared = operations.length > 1;
+
   return (
     <dl
       aria-label="Other ways"
@@ -44,16 +62,33 @@ export function OtherWaysList({
     >
       <dt className="text-fd-muted-foreground">API</dt>
       <dd className="grid gap-1">
-        {operations.map((operation) => (
-          <Link
-            key={operation.operation_id}
-            href={toApiOperationUrl(operation)}
-            className="flex flex-wrap items-center gap-2 underline"
-          >
-            <MethodBadge method={operation.method} />
-            <code className="font-mono break-all">{operation.path}</code>
-          </Link>
-        ))}
+        {operations.map((operation) => {
+          const selectorText = isShared
+            ? describeSelector(operation.selector)
+            : null;
+          return (
+            <span
+              key={operation.operation_id}
+              className="flex flex-wrap items-center gap-2"
+            >
+              {selectorText !== null && (
+                <code
+                  data-testid="operation-selector"
+                  className="font-mono text-xs text-fd-muted-foreground"
+                >
+                  {selectorText}
+                </code>
+              )}
+              <Link
+                href={toApiOperationUrl(operation)}
+                className="flex flex-wrap items-center gap-2 underline"
+              >
+                <MethodBadge method={operation.method} />
+                <code className="font-mono break-all">{operation.path}</code>
+              </Link>
+            </span>
+          );
+        })}
       </dd>
       {otherSurfaceLinks.length > 0 && (
         <>

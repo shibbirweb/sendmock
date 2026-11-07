@@ -170,4 +170,31 @@ describe("validateEmailOutcomeRuleInput", () => {
 
     expect(Object.keys(fieldErrors).sort()).toEqual(["pattern", "smtp_code"]);
   });
+
+  test("EM-10.5 refuses success codes, mismatched classes and multi-line diagnostics", () => {
+    const validInput = {
+      pattern: "*@bounce.qa.test",
+      outcome: "hard_bounce" as const,
+      smtp_code: "550 5.1.1",
+      diagnostic: "user unknown",
+      note: "",
+      is_enabled: true,
+    };
+
+    expect(validateEmailOutcomeRuleInput(validInput)).toEqual({});
+    expect(
+      validateEmailOutcomeRuleInput({ ...validInput, smtp_code: "250 2.0.0" })
+        .smtp_code,
+    ).toBeDefined();
+    expect(
+      validateEmailOutcomeRuleInput({ ...validInput, smtp_code: "550 4.1.1" })
+        .smtp_code,
+    ).toBeDefined();
+    expect(
+      validateEmailOutcomeRuleInput({
+        ...validInput,
+        diagnostic: "denied\r\n250 OK",
+      }).diagnostic,
+    ).toBe("Use one line of at most 200 characters");
+  });
 });

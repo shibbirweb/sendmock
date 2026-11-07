@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   describeEventForNotification,
+  isEventForSelectedProject,
   listQueryKeysToRefresh,
 } from "@/features/realtime/realtime-event-effects";
 import { queryKeys } from "@/lib/api/query-keys";
@@ -18,6 +19,10 @@ describe("listQueryKeysToRefresh", () => {
     expect(listQueryKeysToRefresh("verify.started")).toContainEqual(
       queryKeys.sms.all,
     );
+  });
+
+  test("PN-01.6 a push event refreshes the Push screen", () => {
+    expect(listQueryKeysToRefresh("push.failed")).toEqual([queryKeys.push.all]);
   });
 
   test("an event outside every area refreshes nothing", () => {
@@ -87,5 +92,29 @@ describe("describeEventForNotification", () => {
         data: {},
       }),
     ).toBeNull();
+  });
+});
+
+describe("isEventForSelectedProject", () => {
+  const shopEmailEvent = {
+    id: "evt_1",
+    type: "email.received" as const,
+    created_at: "2026-11-07T10:00:00Z",
+    data: { id: "01A", project: "shop" },
+  };
+
+  test("PL-10.7 a toast shows only for the selected project's traffic", () => {
+    expect(isEventForSelectedProject(shopEmailEvent, "shop")).toBe(true);
+    expect(isEventForSelectedProject(shopEmailEvent, "blog")).toBe(false);
+    expect(isEventForSelectedProject(shopEmailEvent, null)).toBe(true);
+  });
+
+  test("an event about no project's traffic always fits", () => {
+    expect(
+      isEventForSelectedProject(
+        { ...shopEmailEvent, type: "test.ping", data: {} },
+        "blog",
+      ),
+    ).toBe(true);
   });
 });

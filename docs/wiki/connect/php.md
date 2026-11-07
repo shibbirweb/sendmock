@@ -3,7 +3,7 @@ title: PHP and Laravel
 description: Connect PHP and Laravel apps to SendMock with laravel, Symfony or plain PHP.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

@@ -42,22 +42,20 @@ function readAutomaticOutcome(
   return outcomesByProfile[appSettings.payment_outcome_profile];
 }
 
-/**
- * A hosted test checkout for any gateway, custom ones included
- * (`POST /payments/checkout`, PY-12.3), newest first in the list.
- */
-export function createTestCheckout(
-  mockDatabase: Pick<
-    MockDatabase,
-    | "payments"
-    | "paymentGateways"
-    | "webhookEndpoints"
-    | "webhookDeliveries"
-    | "settings"
-  >,
+export type NewPaymentDatabase = Pick<
+  MockDatabase,
+  | "payments"
+  | "paymentGateways"
+  | "webhookEndpoints"
+  | "webhookDeliveries"
+  | "settings"
+>;
+
+/** A new payment waiting to be paid with its checkout page, stored newest first. */
+export function storeNewPayment(
+  mockDatabase: NewPaymentDatabase,
   checkoutRequest: PaymentCheckoutCreateRequest,
-  nowMs: number = Date.now(),
-  randomValue: number = Math.random(),
+  nowMs: number,
 ): PaymentDetail {
   const paymentId = createMockUlid(nowMs);
   const providerIds = buildProviderIds(checkoutRequest.provider, nowMs);
@@ -86,6 +84,7 @@ export function createTestCheckout(
     failure_code: null,
     refunded_minor: 0,
     captured_minor: 0,
+    capture_method: checkoutRequest.capture_method ?? "automatic",
     method: null,
     method_key: null,
     line_items: lineItems,
@@ -113,6 +112,21 @@ export function createTestCheckout(
     "payment.created",
     nowMs,
   );
+
+  return paymentDetail;
+}
+
+/**
+ * A hosted test checkout for any gateway, custom ones included
+ * (`POST /payments/checkout`, PY-12.3), newest first in the list.
+ */
+export function createTestCheckout(
+  mockDatabase: NewPaymentDatabase,
+  checkoutRequest: PaymentCheckoutCreateRequest,
+  nowMs: number = Date.now(),
+  randomValue: number = Math.random(),
+): PaymentDetail {
+  const paymentDetail = storeNewPayment(mockDatabase, checkoutRequest, nowMs);
   const automaticOutcome = readAutomaticOutcome(
     mockDatabase.settings,
     randomValue,

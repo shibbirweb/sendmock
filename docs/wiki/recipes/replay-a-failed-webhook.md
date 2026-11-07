@@ -3,7 +3,7 @@ title: Replay a failed webhook
 description: Find a failed delivery, read what your handler got and answered, fix it, and send the same request again.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/deliveries) today.
+> Try it in the [demo](/demo/webhooks/deliveries).
 
 **The situation:** a webhook handler in your app returned 500 (or timed out). You want to see exactly what it received, fix it, and try again without making the event happen again.
 

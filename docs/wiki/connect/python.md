@@ -3,7 +3,7 @@ title: Python
 description: Connect Python apps to SendMock with smtplib, Django and requests.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

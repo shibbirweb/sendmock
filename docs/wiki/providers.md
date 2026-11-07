@@ -3,7 +3,7 @@ title: Supported providers
 description: The provider APIs SendMock ships with, by product area. Each is a built-in you can change, remove or add to.
 ---
 
-> **Coming with the provider phases.** Email provider APIs arrive in Phase 4, SMS providers in Phases 2 and 4, payment gateways in Phase 3. The demo shows them today.
+> Try them in the [demo](/demo/mail/providers).
 
 SendMock ships with these providers **built in**. Each answers at the provider's real path, with the provider's real response and error shapes, so your app or its official SDK keeps working when you point it at SendMock. Plain SMTP works for every email library.
 
@@ -25,7 +25,7 @@ They are a starting point, not a fixed list:
 | Amazon SES | `POST /v2/email/outbound-emails` | [Mail](./mail/index.md) |
 | Brevo | `POST /v3/smtp/email` | [Mail](./mail/index.md) |
 
-## SMS (5 built in)
+## SMS (11 built in)
 
 | Provider | What the built-in answers | Read more |
 | --- | --- | --- |
@@ -34,6 +34,13 @@ They are a starting point, not a fixed list:
 | Vonage | `POST /sms/json` and delivery receipts | [SMS](./sms/index.md) |
 | Plivo | `POST /v1/Account/{auth_id}/Message/` | [SMS](./sms/index.md) |
 | MessageBird | `POST /messages` | [SMS](./sms/index.md) |
+| Infobip | `POST /sms/2/text/advanced` and delivery reports to `notifyUrl` | [SMS](./sms/index.md) |
+| Telnyx | `POST /v2/messages` and `message.sent` / `message.finalized` webhooks to `webhook_url` | [SMS](./sms/index.md) |
+| Sinch | `POST /xms/v1/{service_plan_id}/batches` and delivery reports to `callback_url` | [SMS](./sms/index.md) |
+| Africa's Talking | `POST /version1/messaging` (delivery reports through a webhook rule with the Africa's Talking template, since the real callback is set on the account) | [SMS](./sms/index.md) |
+| Amazon SNS | `Publish` to a `PhoneNumber` (the Query API: a form posted to `/`, an XML answer); SNS logs delivery status to CloudWatch, so there are no callbacks | [SMS](./sms/index.md) |
+| WhatsApp Cloud | Meta's WhatsApp Business Cloud API: `POST /{version}/{phone_number_id}/messages` for every message type, read receipts, and Graph's errors | [Replies and WhatsApp](./sms/replies-and-whatsapp.md#whatsapp-cloud-api) |
+| Vonage Verify | Verify v2: start a verification (`POST /v2/verify`), check its code and cancel it; each brand gets its own verify service | [Verify](./sms/verify.md) |
 
 ## Payments (4 built in)
 

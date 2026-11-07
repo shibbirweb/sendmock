@@ -7,6 +7,7 @@ import type {
   VerifyService,
 } from "@/lib/api/types";
 import { createProviderId, minutesAgo } from "@/mocks/fixtures/fixture-helpers";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 export function buildVerifyServiceFixtures(): VerifyService[] {
   return [
@@ -172,6 +173,7 @@ export function buildVerificationFixtures(
   return verificationSpecs.map((verificationSpec) => {
     const verifyService = verifyServices[verificationSpec.serviceIndex];
     const verification: Verification = {
+      project: defaultProjectKey,
       sid: createProviderId("VE"),
       service_sid: verifyService?.sid ?? "",
       service_name: verifyService?.friendly_name ?? "",

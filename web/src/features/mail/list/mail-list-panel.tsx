@@ -102,8 +102,10 @@ export function MailListPanel({
           });
           toast(`${deletedCount} emails deleted`);
         }}
+        emailFilters={emailFilters}
+        isFiltered={searchText.trim() !== ""}
         onDeleteAll={() => {
-          deleteAllEmails.mutate();
+          deleteAllEmails.mutate(emailFilters);
           void navigate({
             to: "/mail",
             search: (previousSearch) => previousSearch,

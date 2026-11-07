@@ -109,4 +109,8 @@ export type AiAgentSetup = {
   mcp_config: string;
   /** Where the skill or instructions go, e.g. `.claude/skills/sendmock/`. */
   instructions_path: string;
+  /** The install command for someone who runs SendMock through npx, with nothing installed. */
+  npx_install_command: string;
+  /** The MCP configuration that starts SendMock with `npx -y sendmock mcp`. */
+  npx_mcp_config: string;
 };

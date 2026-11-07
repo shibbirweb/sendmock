@@ -1,0 +1,151 @@
+{
+  "doc_url": "https://razorpay.com/docs/webhooks/payloads/payments/",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "entity": "event",
+    "account_id": "acc_BFQ7uQEaa7j2z7",
+    "event": "payment.captured",
+    "contains": [
+      "payment"
+    ],
+    "payload": {
+      "payment": {
+        "entity": {
+          "id": "pay_DESlfW9H8K9uqM",
+          "entity": "payment",
+          "amount": 100,
+          "currency": "INR",
+          "status": "captured",
+          "order_id": "order_DESlLckIVRkHWj",
+          "method": "netbanking",
+          "captured": true,
+          "email": "gaurav.kumar@example.com",
+          "error_code": null,
+          "error_reason": null,
+          "created_at": 1567674599
+        }
+      }
+    },
+    "created_at": 1567674606
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "entity",
+      "account_id",
+      "event",
+      "contains",
+      "payload",
+      "created_at"
+    ],
+    "properties": {
+      "entity": {
+        "const": "event"
+      },
+      "account_id": {
+        "type": "string",
+        "pattern": "^acc_[0-9A-Za-z]+$"
+      },
+      "event": {
+        "type": "string",
+        "pattern": "^[a-z_]+(\\.[a-z_]+)+$"
+      },
+      "contains": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "created_at": {
+        "type": "integer"
+      },
+      "payload": {
+        "type": "object",
+        "required": [
+          "payment"
+        ],
+        "properties": {
+          "payment": {
+            "type": "object",
+            "required": [
+              "entity"
+            ],
+            "properties": {
+              "entity": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "entity",
+                  "amount",
+                  "currency",
+                  "status",
+                  "method",
+                  "captured",
+                  "created_at"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "entity": {
+                    "const": "payment"
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$"
+                  },
+                  "status": {
+                    "enum": [
+                      "created",
+                      "authorized",
+                      "captured",
+                      "refunded",
+                      "failed"
+                    ]
+                  },
+                  "order_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "method": {
+                    "type": "string"
+                  },
+                  "captured": {
+                    "type": "boolean"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "error_code": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "error_reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "created_at": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -89,6 +89,24 @@ describe("runReplyWebhook", () => {
     expect(inboundMessage.reply_webhook_attempts).toEqual([]);
   });
 
+  test("SM-09.3 a plain text answer is sent back as the reply", () => {
+    const { mockDatabase, inboundMessage } = setUpInbound("+15550002222");
+    const alertsNumber = mockDatabase.virtualNumbers.find(
+      (virtualNumber) => virtualNumber.number === "+15550002222",
+    );
+    if (alertsNumber === undefined) {
+      throw new Error("The fixtures need the Alerts number.");
+    }
+    alertsNumber.inbound_url = "http://localhost:8000/sms/text-reply";
+    const replies = runReplyWebhook(mockDatabase, inboundMessage);
+
+    expect(inboundMessage.reply_webhook).toMatchObject({
+      outcome: "succeeded",
+      reply_count: 1,
+    });
+    expect(replies[0]?.body).toBe("Thanks! We got your message.");
+  });
+
   test("SM-09.7 a 500 without a fallback fails with 11200", () => {
     const { mockDatabase, inboundMessage } = setUpInbound("+15550002222");
     const alertsNumber = mockDatabase.virtualNumbers.find(

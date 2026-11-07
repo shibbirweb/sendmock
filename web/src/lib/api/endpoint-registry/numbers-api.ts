@@ -3,6 +3,7 @@ import {
   listOf,
   pageOf,
   pageQueryParameters,
+  projectQueryParameter,
   tagEndpoints,
   typeRef,
 } from "./endpoint-definition";
@@ -32,6 +33,7 @@ const verifyEndpoints = tagEndpoints("Verify", [
         schema: typeRef("VerifyChannel"),
         example: "sms",
       },
+      projectQueryParameter("verifications"),
     ],
     response: pageOf("Verification"),
   },

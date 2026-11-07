@@ -183,6 +183,23 @@ test("WH-01.6 a global variable satisfies a template's need", async ({
   );
 });
 
+test("WH-08.2 choosing a template asks for its required variables", async ({
+  page,
+}) => {
+  const endpointSheet = await openEndpointSheet(page, "Laravel inbound mail");
+  await endpointSheet.getByRole("tab", { name: "Request" }).click();
+  await endpointSheet.getByRole("combobox", { name: "Template" }).click();
+  await page.getByRole("option", { name: "Twilio: inbound SMS" }).click();
+  await endpointSheet.getByRole("tab", { name: "Variables" }).click();
+
+  const requiredVariable = endpointSheet.getByTestId("required-variable");
+  await expect(requiredVariable).toContainText("twilio_auth_token");
+  await expect(requiredVariable).toContainText("Missing");
+  await expect(
+    endpointSheet.getByLabel("Value for twilio_auth_token"),
+  ).toBeVisible();
+});
+
 test("WH-01.7 the table shows success sparklines and the switch applies at once", async ({
   page,
 }) => {
@@ -224,4 +241,23 @@ test("WH-01.8 rotating the secret shows the new secret and the overlap end", asy
   await expect(
     endpointSheet.getByTestId("previous-secret-expiry"),
   ).toContainText("The previous secret also signs until");
+});
+
+test("AI-05.4 an endpoint an AI agent made carries the MCP badge", async ({
+  page,
+}) => {
+  await page.goto("/webhooks/endpoints");
+
+  const agentEndpointRow = page
+    .getByRole("row")
+    .filter({ hasText: "Team Slack alerts" });
+  await expect(
+    agentEndpointRow.getByText("MCP", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "SMS status callbacks" })
+      .getByText("MCP", { exact: true }),
+  ).toHaveCount(0);
 });

@@ -3,7 +3,7 @@ title: HTTP Catcher
 description: A bin for any HTTP call your app makes (Slack, Discord, push, third-party APIs), recorded and answered the way you choose.
 ---
 
-> Try it in the [demo](/demo/http). Works in your install from Phase 4 (bins, responses, Slack, Discord, Telegram and FCM presets) and Phase 5 (Teams, Google Chat, Expo, OneSignal presets).
+> Try it in the [demo](/demo/http).
 
 Apps send more than email and SMS: Slack alerts, Discord messages, push notifications, analytics pings, calls to partner APIs. Point any of them at a SendMock bin and every request is recorded, shown, and answered with a reply your app accepts.
 
@@ -71,10 +71,26 @@ Method and full URL, time, client IP and duration, then tabs:
 
 The bin's response rules and default reply. See [Responses](./responses.md).
 
+
+Every control and text, one by one: [HTTP Catcher in depth](../deeper/http-catcher.md).
 ## Customize
 
 - Rules per path and method, templated bodies that echo the request, delays and failure rates: [Advanced: catcher responses](../advanced/catcher-responses.md).
 - A new preset (a service whose reply shape SendMock does not know yet) needs code; ask for it with a provider request issue.
+
+### Catch every path on its own port
+
+Some apps let you change only the host of the service they call, not the path. Start SendMock with a catch-all port and point the app's host at it; every request it gets is captured, at any method and path.
+
+1. Start SendMock with the port on:
+
+   ```bash
+   sendmock --catcher-addr 127.0.0.1:8030
+   ```
+
+2. Point the app's host at `http://127.0.0.1:8030`. The first part of the path names the bin, so `POST http://127.0.0.1:8030/orders/42` lands in the bin `orders`, and a request to `/` lands in `default`.
+
+The bin's rules, presets, delays and failure rates work as on `/catch/<bin>/...`. The flag is also `SENDMOCK_CATCHER_ADDR` and `catcher_addr` in `sendmock.toml`; in Docker use `0.0.0.0:8030` and publish port `8030`. When it is on, each bin shows both catch URLs.
 
 ## From your code
 

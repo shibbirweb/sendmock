@@ -3,7 +3,7 @@ title: .NET
 description: Connect .NET apps to SendMock with mailKit, SmtpClient and HttpClient.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

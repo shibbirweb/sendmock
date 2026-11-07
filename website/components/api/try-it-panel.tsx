@@ -6,6 +6,7 @@ import type {
   ApiOperation,
   SchemaComponents,
 } from "@/lib/openapi/openapi-types";
+import { useDemoBridge } from "@/lib/playground/demo-bridge-provider";
 
 import { CodeSnippets } from "./code-snippets";
 import { EventStreamPanel } from "./event-stream-panel";
@@ -23,6 +24,8 @@ export function TryItBody({
 }) {
   const requestState = usePlaygroundRequest(operation, schemas);
 
+  const { target } = useDemoBridge();
+
   return (
     <div className="grid gap-4">
       <RequestForm
@@ -37,9 +40,7 @@ export function TryItBody({
           onClick={() => void requestState.send()}
           className="rounded-md bg-fd-primary px-4 py-1.5 text-sm font-medium text-fd-primary-foreground disabled:opacity-50"
         >
-          {requestState.isReady
-            ? "Send to the demo API"
-            : "Starting the demo API..."}
+          {describeSendButton(requestState.isReady, target.kind)}
         </button>
       </div>
       {requestState.response && (
@@ -85,4 +86,14 @@ export function TryItPanel(props: {
       )}
     </details>
   );
+}
+
+function describeSendButton(
+  isReady: boolean,
+  targetKind: "demo" | "instance",
+): string {
+  if (targetKind === "instance") {
+    return "Send to your SendMock";
+  }
+  return isReady ? "Send to the demo API" : "Starting the demo API...";
 }

@@ -99,6 +99,41 @@ describe("validateWebhookEndpointInput", () => {
     ).toEqual({});
   });
 
+  test("WH-07.16 a file field needs the multipart encoding and a URL", () => {
+    const fileField = {
+      name: "invoice",
+      value_type: "file" as const,
+      value: "https://files.app.test/42.pdf",
+    };
+
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        fields_encoding: "json",
+        body_fields: [fileField],
+      }),
+    ).toEqual({ body_fields: "invoice is a file: use the Multipart encoding" });
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        fields_encoding: "multipart",
+        body_fields: [{ ...fileField, value: "not a url" }],
+      }),
+    ).toEqual({
+      body_fields: "invoice must be an http or https URL to the file",
+    });
+    expect(
+      validateWebhookEndpointInput({
+        ...validEndpointInput,
+        body_mode: "fields",
+        fields_encoding: "multipart",
+        body_fields: [fileField],
+      }),
+    ).toEqual({});
+  });
+
   test("WH-07.14 Fields mode needs named, unique fields", () => {
     expect(
       validateWebhookEndpointInput({

@@ -13,6 +13,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
   includesText,
+  keepRequestedProject,
   parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
 import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
@@ -77,7 +78,10 @@ export const emailImportHandlers = [
     const latestQuery = new URL(request.url).searchParams;
     const recipient = latestQuery.get("to") ?? "";
     const subjectText = latestQuery.get("subject") ?? "";
-    const latestEmail = mockDatabase.emails.find(
+    const latestEmail = keepRequestedProject(
+      mockDatabase.emails,
+      latestQuery,
+    ).find(
       (email) =>
         email.to.some((address) => includesText(address.address, recipient)) &&
         includesText(email.subject, subjectText),

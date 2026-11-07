@@ -3,7 +3,7 @@ title: Chaos
 description: Make the mail server reject, slow down or drop connections on purpose, and make SMS fail at a rate, to test your app's error handling.
 ---
 
-> Works in your install from Phase 4. Try it in the [demo](/demo/settings?section=chaos) today.
+> Try it in the [demo](/demo/settings?section=chaos).
 
 Real mail servers have bad days: they reject with "try again later", they are slow, they drop the connection mid-message. Chaos makes SendMock do the same, so you can see your mailer retry (or not).
 

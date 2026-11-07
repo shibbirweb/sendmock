@@ -5,6 +5,7 @@
     "checkout-page",
     "gateways",
     "methods",
-    "flows"
+    "flows",
+    "subscriptions"
   ]
 }

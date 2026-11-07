@@ -15,6 +15,7 @@
     "overview",
     "mail",
     "sms",
+    "push",
     "http",
     "webhooks",
     "payments",
@@ -25,10 +26,12 @@
     "---Use it---",
     "recipes",
     "advanced",
+    "deeper",
     "ai",
     "---Tools---",
     "cli",
     "configuration",
+    "reference",
     "troubleshooting"
   ]
 }

@@ -14,6 +14,7 @@ import { OtpPatternsSection } from "@/features/settings/sections/otp-patterns-se
 import { SeedSection } from "@/features/settings/sections/seed-section";
 import { NotificationsSection } from "@/features/settings/sections/notifications-section";
 import { PaymentsSection } from "@/features/settings/sections/payments-section";
+import { ProjectsSection } from "@/features/settings/sections/projects-section";
 import { SmsSection } from "@/features/settings/sections/sms-section";
 import { SettingsNav } from "@/features/settings/settings-nav";
 import {
@@ -35,6 +36,8 @@ function SelectedSection({
       return <GeneralSection appSettings={appSettings} />;
     case "seed":
       return <SeedSection />;
+    case "projects":
+      return <ProjectsSection />;
     case "email":
       return <EmailSection appSettings={appSettings} />;
     case "sms":

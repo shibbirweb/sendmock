@@ -1,0 +1,84 @@
+# Runs the skill's evals with Claude Code against a release binary built from the commit, and
+# reports each case (AI-05.7, docs/plan/30-phase-5.md W9c). On demand, and from Publish stable
+# before a stable is released. Without the ANTHROPIC_API_KEY secret it says so and passes, as
+# the model calls are billed to that key; pull requests only check the cases are well formed
+# (the Claude Code plugin job in CI).
+name: Skill evals
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: The model under test (empty for Claude Code's default)
+        type: string
+        default: ""
+      case:
+        description: Run one case by name (empty for all)
+        type: string
+        default: ""
+  workflow_call:
+    inputs:
+      commit_sha:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    name: Skill evals with Claude Code
+    runs-on: ubuntu-latest
+    env:
+      HAS_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      CLAUDE_CODE_VERSION: 2.1.318
+    steps:
+      - name: Without the API key the evals cannot run
+        if: env.HAS_ANTHROPIC_API_KEY != 'true'
+        run: echo "::notice title=Skill evals::ANTHROPIC_API_KEY is not set, so the skill evals did not run."
+
+      - uses: actions/checkout@v5
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        with:
+          ref: ${{ inputs.commit_sha || github.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+
+      - name: Toolchain from rust-toolchain.toml
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+
+      - name: Release build with the UI embedded
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        run: |
+          (cd web && bun install --frozen-lockfile && VITE_API_MODE=live bun run build)
+          cargo build --release --locked -p sendmock
+
+      - name: Install Claude Code
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash -s "$CLAUDE_CODE_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run each case and check its end state
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MODEL: ${{ inputs.model }}
+          CASE: ${{ inputs.case }}
+        run: |
+          eval_options=()
+          if [ -n "$MODEL" ]; then eval_options+=(--model "$MODEL"); fi
+          if [ -n "$CASE" ]; then eval_options+=(--case "$CASE"); fi
+          bun scripts/skill-evals.ts run target/release/sendmock --output skill-eval-results "${eval_options[@]}"
+
+      - uses: actions/upload-artifact@v4
+        if: always() && env.HAS_ANTHROPIC_API_KEY == 'true'
+        with:
+          name: skill-eval-results
+          path: skill-eval-results
+          retention-days: 30

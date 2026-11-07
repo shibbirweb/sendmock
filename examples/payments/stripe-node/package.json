@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-payments-stripe-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "stripe": "18.0.0"
+  }
+}

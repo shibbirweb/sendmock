@@ -3,7 +3,7 @@ title: Settings
 description: How SendMock behaves. Retention, the seed file, email and SMS outcomes, payments, notifications, chaos, OTP patterns and connection snippets.
 ---
 
-> Try it in the [demo](/demo/settings). Works in your install from Phase 0 (the server settings), with each section arriving with its feature.
+> Try it in the [demo](/demo/settings).
 
 Settings decide how every capture menu behaves. They take effect at once, without a restart.
 
@@ -15,6 +15,7 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 | --- | --- |
 | [General](#general) | the database growing forever; starting clean |
 | [Seed](#seed) | the same setup for every teammate and every CI run |
+| [Projects](#projects) | several apps or developers sharing one SendMock without reading each other's mail, SMS and codes |
 | [Email](#email) | bounce and complaint tests, reply domains, safe release to real SMTP |
 | [SMS](#sms) | failure and delay tests, matching Twilio's test credentials |
 | [Payments](#payments) | the merchant name, currency, automatic outcomes for automated tests, the test values to type |
@@ -44,11 +45,23 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 
 ### General
 
-**Retention:** **Keep at most** a number of emails and SMS, and **Delete traffic older than** a number of days, or **Keep forever**. Older traffic is pruned when a limit is reached; configuration is never pruned. **Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
+**Retention:** **Keep at most** a number of emails and SMS, and **Delete traffic older than** a number of days, or **Keep forever**. Older traffic is pruned every few seconds once a limit is reached: emails with their SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries keep the newest **emails** count, and SMS and verifications the newest **SMS** count. Configuration (endpoints, rules, templates, variables, saved deliveries, numbers, providers) and deliveries still waiting to be sent are never pruned, and the database file gives the freed space back. **Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
 
 ### Seed
 
 The seed file (`sendmock.seed.toml`) is the configuration SendMock starts from and resets to, kept in your repository. The card shows its path, when it was applied, and what changed since. **Export** downloads the current configuration (secrets written as `${ENV_VAR}` references, never in plain text). **Apply a seed file** takes an upload or pasted text; **Validate** lists errors with line numbers and a summary of the changes before you confirm. See [Advanced: seed file](./advanced/seed-file.md).
+
+### Projects
+
+A project keeps captured emails, SMS and verifications apart inside one SendMock; settings, providers, webhooks and rules stay shared. **Default** always exists and holds everything sent to no other project. The table shows each project's name, key and how many emails, SMS and codes it holds, with **Rename** (the key never changes) and **Delete** (its traffic goes with it, after asking). **New project** asks for a key (lowercase letters, digits and dashes) and a name.
+
+Apps send to a project by its key, one of three ways, shown with copy buttons under the table:
+
+1. Over SMTP, use the key as the AUTH username (any password). Other usernames go to Default.
+2. On the REST or provider APIs, add the header `X-SendMock-Project: <key>`.
+3. For a provider SDK that takes a base URL but no extra header, put `/projects/<key>` after the base URL, such as `http://127.0.0.1:8026/projects/shop`.
+
+A key that is not a project is refused with 404 on the APIs, so a typo shows at once. Once a second project exists, a **Project** picker appears in the top bar: pick one and Mail, SMS and Verify show only its traffic, and pop-ups only its events. The choice stays in the URL (`?project=shop`) as you move between screens. Every list in the API, CLI and MCP takes the same `project` filter, and webhook rules can filter on `project`.
 
 ### Email
 
@@ -62,6 +75,7 @@ The seed file (`sendmock.seed.toml`) is the configuration SendMock starts from a
 ### SMS
 
 - **Delivery simulation:** the profile (**Instant**, **Realistic**, **Manual**), the **Failure rate**, **Strict Twilio test mode** (reject `From` numbers that are not Twilio test numbers with 21606).
+- **Verify defaults:** the **Code length** and **Code lifetime** new Verify services start with (including services your app creates through Twilio's API without a `CodeLength`), and a **Fixed code for every service** that has none of its own; empty means random codes.
 - **Magic numbers:** the switch, and the reference table of Twilio's test numbers and SendMock's after-send numbers ([Delivery and test numbers](./sms/delivery-and-test-numbers.md)).
 - **Custom outcome numbers:** your own rules, with **Test a number**, which says whether a rule, a magic number or the profile applies ([Advanced: SMS outcome numbers](./advanced/sms-outcome-numbers.md)).
 
@@ -100,6 +114,8 @@ Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the 
 - A found version shows its release date, its release notes and the upgrade command for how you installed SendMock (Homebrew, Scoop, Docker, the install script or npm), with a copy button. When SendMock does not know how it was installed, use the release page link.
 - A check is kept for 24 hours. When GitHub cannot be reached, it says "Could not check for updates" and tries again on the next check.
 
+
+Every control and text, one by one: [Settings in depth](./deeper/settings.md).
 ## Customize
 
 Settings are part of the seed file, so a team shares them: [Advanced: seed file](./advanced/seed-file.md) and [Recipe: share your setup](./recipes/share-your-setup.md). To check a whole flow on every run, write a [scenario](./advanced/scenarios.md).
@@ -242,6 +258,10 @@ public class SettingsTests
 | export the seed | [`sendmock seed export`](/cli/seed/#seed-export) | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | [`sendmock_seed_export`](/mcp/seed/#sendmock_seed_export) |
 | validate a seed file | [`sendmock seed validate <file>`](/cli/seed/#seed-validate) | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | [`sendmock_seed_validate`](/mcp/seed/#sendmock_seed_validate) |
 | apply a seed file | [`sendmock seed apply <file>`](/cli/seed/#seed-apply) | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | [`sendmock_seed_apply`](/mcp/seed/#sendmock_seed_apply) |
+| list projects | [`sendmock projects list`](/cli/projects/#projects-list) | [`GET /api/v1/projects`](/api/projects/#getProjects) | [`sendmock_project_list`](/mcp/projects/#sendmock_project_list) |
+| add a project | [`sendmock projects create`](/cli/projects/#projects-create) | [`POST /api/v1/projects`](/api/projects/#postProjects) | [`sendmock_project_create`](/mcp/projects/#sendmock_project_create) |
+| rename a project | [`sendmock projects update <projectKey>`](/cli/projects/#projects-update) | [`PATCH /api/v1/projects/{projectKey}`](/api/projects/#patchProjectsByProjectKey) | [`sendmock_project_update`](/mcp/projects/#sendmock_project_update) |
+| delete a project and its traffic | [`sendmock projects delete <projectKey>`](/cli/projects/#projects-delete) | [`DELETE /api/v1/projects/{projectKey}`](/api/projects/#deleteProjectsByProjectKey) | [`sendmock_project_delete`](/mcp/projects/#sendmock_project_delete) |
 | tag rules | [`sendmock email tag-rules list`](/cli/tag-rules/#email-tag-rules-list) | [`GET /api/v1/tag-rules`](/api/tag-rules/#getTagRules) | [`sendmock_tag_rule_list`](/mcp/tag-rules/#sendmock_tag_rule_list) |
 | add a tag rule | [`sendmock email tag-rules create`](/cli/tag-rules/#email-tag-rules-create) | [`POST /api/v1/tag-rules`](/api/tag-rules/#postTagRules) | [`sendmock_tag_rule_create`](/mcp/tag-rules/#sendmock_tag_rule_create) |
 | auto-forward rules | [`sendmock email forward-rules list`](/cli/forward-rules/#email-forward-rules-list) | [`GET /api/v1/forward-rules`](/api/forward-rules/#getForwardRules) | [`sendmock_forward_rule_list`](/mcp/forward-rules/#sendmock_forward_rule_list) |

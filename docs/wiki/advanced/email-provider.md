@@ -3,7 +3,7 @@ title: Create an email provider
 description: Answer an email API SendMock does not ship, from its docs to a working provider, step by step.
 ---
 
-> The screen works today in the [demo](/demo/mail/providers); requests to a custom provider's API are answered from Phase 4.
+> Try it in the [demo](/demo/mail/providers).
 
 SendMock ships SendGrid, Mailgun, Postmark, Resend, Amazon SES and Brevo. Any other email API can be added without code, because a provider is a definition: the requests it answers, where each part of the email is read from, and what it answers.
 

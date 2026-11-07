@@ -3,7 +3,7 @@ title: Templates
 description: The shapes a webhook request can take. Built-in templates act like Twilio, Postmark, SendGrid, Slack and more; your own cover the rest.
 ---
 
-> Try it in the [demo](/demo/webhooks/templates). Works in your install from Phase 3 (native, Twilio, Vonage, Slack, Discord and custom templates) and Phase 4 (the other providers, import and export).
+> Try it in the [demo](/demo/webhooks/templates).
 
 A template is a recipe for a webhook request: method, content type, headers, body and signature, written with `{{ }}` placeholders that are filled from the event and [variables](./variables.md).
 
@@ -37,6 +37,8 @@ Category tabs (All, Generic, Email providers, SMS providers, Chat, Automation, C
 
 ### Built-in templates
 
+Every built-in template, with its events and required variables, is listed in [Built-in webhook templates](../reference/webhook-templates.md).
+
 **Act like the provider** (your app receives what the provider would send):
 
 | Area | Services |
@@ -52,6 +54,8 @@ Payment notifications (Stripe, PayPal, SSLCommerz, bKash) are shaped by each [ga
 
 The request shape (method, content type, headers, body template), **Events it fits**, required **Variables**, **Provider docs**, which endpoints use it, a **Preview** against the built-in sample or a recent message (with warnings and errors), and actions: **Use in new endpoint**, **Edit** (built-ins too), **Clone**, **Export**, **History** (revisions with a diff and restore) and Delete (custom only).
 
+
+Every control and text, one by one: [Templates in depth](../deeper/webhooks/templates.md).
 ## Customize
 
 Edit a built-in (it shows **Modified**; **Reset to default** brings back the shipped one), create from blank, clone, import and export, share a templates folder with your team: [Advanced: templates](../advanced/templates.md).

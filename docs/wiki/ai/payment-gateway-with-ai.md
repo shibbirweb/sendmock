@@ -3,7 +3,7 @@ title: Create a gateway with AI
 description: A complete worked example. One prompt, every step the agent takes, what you check, and how to keep the result.
 ---
 
-> Works from Phase 3P with the MCP `payments` tools; the `add-payment-gateway` prompt and the skill's workflow arrive in Phase 4. See [AI](./index.md) to set up.
+> Uses the MCP `payments` tools and the `add-payment-gateway` prompt. See [AI](./index.md) to set up.
 
 This is the [Create a payment gateway](../advanced/payment-gateway.md) walkthrough, done by an agent. The provider is Upay, a mobile wallet (account number, OTP, PIN) that SendMock does not ship.
 

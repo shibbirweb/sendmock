@@ -119,6 +119,31 @@ describe("simulatePayment", () => {
     expect(authorizedPayment.timeline.at(-2)?.kind).toBe("captured");
   });
 
+  test("PY-07.1 paying a manual-capture checkout only authorizes it", () => {
+    const mockDatabase = createMockDatabase("standard");
+    const stripeCheckout = findPayment(mockDatabase, "Lena Vogel");
+    stripeCheckout.capture_method = "manual";
+
+    simulatePayment(mockDatabase, stripeCheckout, { action: "succeed" });
+
+    expect(stripeCheckout).toMatchObject({
+      status: "authorized",
+      captured_minor: 0,
+      checkout_url: null,
+      redirect: { outcome: "success" },
+    });
+    const timelineKinds = stripeCheckout.timeline.map(
+      (timelineEvent) => timelineEvent.kind,
+    );
+    expect(timelineKinds).toContain("authorized");
+    expect(timelineKinds).not.toContain("succeeded");
+    expect(
+      stripeCheckout.notifications.map(
+        (notification) => notification.provider_event_name,
+      ),
+    ).toContain("payment_intent.amount_capturable_updated");
+  });
+
   test("PY-07.3 a dispute opens and a lost one returns the money", () => {
     const mockDatabase = createMockDatabase("standard");
     const disputedPayment = findPayment(mockDatabase, "J. Doe");

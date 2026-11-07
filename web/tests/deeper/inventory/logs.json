@@ -1,0 +1,73 @@
+{
+  "order": 25,
+  "path": "/logs",
+  "states": {
+    "normal": [
+      "heading: Logs",
+      "link: Read the Logs guide",
+      "paragraph: Every SMTP session and API request, including the ones that failed, so you can see why a client was rejected.",
+      "tab: SMTP sessions",
+      "tab: API requests",
+      "button: All",
+      "button: Delivered",
+      "button: Failed",
+      "textbox: Search SMTP sessions",
+      "columnheader: Time",
+      "columnheader: Client",
+      "columnheader: TLS",
+      "columnheader: AUTH",
+      "columnheader: Result",
+      "columnheader: Emails",
+      "columnheader: Duration",
+      "each item, link: …"
+    ],
+    "An SMTP session is open": [
+      "heading: SMTP session",
+      "paragraph: Every command your app sent and every reply SendMock gave.",
+      "heading: Transcript",
+      "link: Open email",
+      "button: Copy transcript",
+      "each item, link: [message # bytes, stored as email]",
+      "paragraph: AUTH secrets are masked, and the message content is not repeated here: it is stored as the email.",
+      "button: Close"
+    ],
+    "API requests tab": [
+      "button: #xx",
+      "combobox: Filter by API",
+      "textbox: Search request paths",
+      "columnheader: API",
+      "columnheader: Request",
+      "columnheader: Status",
+      "each item, link: POST …"
+    ],
+    "An API request is open": [
+      "heading: API request",
+      "paragraph: Exactly what your app sent and what SendMock answered.",
+      "paragraph: POST /#-#-#/Accounts/AC#/Messages.json",
+      "link: Open SMS",
+      "heading: Request headers",
+      "heading: Request body",
+      "button: Copy request body",
+      "heading: Response body",
+      "button: Copy response body",
+      "paragraph: Credentials such as API keys and passwords are masked before logging.",
+      "button: Close"
+    ],
+    "empty": [
+      "paragraph: No SMTP sessions yet",
+      "paragraph: Point your app's SMTP settings at SendMock; every connection shows up here, even the ones that fail.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy SMTP host",
+      "button: Copy SMTP port",
+      "link: More snippets",
+      "button: Send a sample email"
+    ],
+    "failing": [
+      "alert: Could not load the SMTP log. Try again",
+      "paragraph: Could not load the SMTP log.",
+      "button: Try again"
+    ]
+  }
+}

@@ -83,3 +83,15 @@ export function parseEmailAddress(addressText: string): EmailAddress {
     ? { name: (namedMatch[1] ?? "").trim(), address: namedMatch[2] ?? "" }
     : { name: "", address: addressText.trim() };
 }
+
+/** The items of the project a read asks for (`?project=`); every item when it names none (PL-10). */
+export function keepRequestedProject<TrafficItem extends { project: string }>(
+  trafficItems: TrafficItem[],
+  searchParameters: URLSearchParams,
+): TrafficItem[] {
+  const projectKey = searchParameters.get("project");
+
+  return projectKey === null || projectKey === ""
+    ? trafficItems
+    : trafficItems.filter((trafficItem) => trafficItem.project === projectKey);
+}

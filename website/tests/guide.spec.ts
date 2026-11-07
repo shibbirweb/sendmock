@@ -4,6 +4,11 @@ import { fileURLToPath } from "node:url";
 
 import { expect, test } from "@playwright/test";
 
+import {
+  readNavigationSource,
+  readSidebarPaths,
+} from "./support/read-sidebar-paths";
+
 const wikiDirectory = fileURLToPath(
   new URL("../../docs/wiki", import.meta.url),
 );
@@ -23,6 +28,7 @@ const guidePageByMenuPath: Record<string, string> = {
   "/sms": "sms/index.md",
   "/sms/verify": "sms/verify.md",
   "/sms/providers": "sms/providers.md",
+  "/push": "push.md",
   "/http": "http/index.md",
   "/webhooks/overview": "webhooks/index.md",
   "/webhooks/endpoints": "webhooks/endpoints.md",
@@ -37,6 +43,7 @@ const guidePageByMenuPath: Record<string, string> = {
   "/payments/gateways": "payments/gateways.md",
   "/payments/methods": "payments/methods.md",
   "/payments/flows": "payments/flows.md",
+  "/payments/subscriptions": "payments/subscriptions.md",
   "/numbers": "numbers.md",
   "/scenarios": "scenarios.md",
   "/logs": "logs.md",
@@ -51,18 +58,6 @@ const templateHeadings = [
   "Customize",
   "From the CLI, API and AI",
 ];
-
-/** Sidebar paths, read from the single list the sidebar is built from. */
-function readSidebarPaths(): string[] {
-  const navigationSource = readFileSync(
-    join(webSourceDirectory, "navigation/navigation-items.ts"),
-    "utf8",
-  );
-
-  return [...navigationSource.matchAll(/path: "([^"]+)"/g)].map(
-    (pathMatch) => pathMatch[1] ?? "",
-  );
-}
 
 function readSettingsSectionLabels(): string[] {
   const sectionsSource = readFileSync(
@@ -147,12 +142,10 @@ test("WS-06.1 every sidebar item has a guide page with the template headings", (
 });
 
 test("WS-06.1 every sidebar item's docs link opens its guide page", () => {
-  const navigationSource = readFileSync(
-    join(webSourceDirectory, "navigation/navigation-items.ts"),
-    "utf8",
-  );
   const docsPathByMenuPath = [
-    ...navigationSource.matchAll(/path: "([^"]+)",\s*docsPath: "([^"]+)"/g),
+    ...readNavigationSource().matchAll(
+      /path: "([^"]+)",\s*docsPath: "([^"]+)"/g,
+    ),
   ].map((pathMatch) => [pathMatch[1] ?? "", pathMatch[2] ?? ""]);
 
   expect(docsPathByMenuPath.length).toBe(readSidebarPaths().length);

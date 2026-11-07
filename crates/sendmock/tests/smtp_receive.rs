@@ -1,0 +1,154 @@
+#[allow(dead_code, reason = "each test file uses part of the shared support")]
+mod support {
+    pub mod http_get;
+    pub mod http_post;
+    pub mod sendmock_process;
+}
+
+use std::io::{self, BufRead, BufReader, Write};
+use std::net::TcpStream;
+use std::time::{Duration, Instant};
+
+use support::http_get::send_http_get;
+use support::http_post::send_http_post;
+use support::sendmock_process::SendmockProcess;
+
+/// Sends one line (or nothing, for the greeting) and answers the reply's code.
+fn exchange(reader: &mut BufReader<TcpStream>, line: Option<&str>) -> io::Result<u16> {
+    if let Some(line) = line {
+        reader
+            .get_mut()
+            .write_all(format!("{line}\r\n").as_bytes())?;
+    }
+    loop {
+        let mut reply_line = String::new();
+        reader.read_line(&mut reply_line)?;
+        if reply_line.as_bytes().get(3) != Some(&b'-') {
+            return Ok(reply_line
+                .get(..3)
+                .and_then(|code| code.parse().ok())
+                .unwrap_or_default());
+        }
+    }
+}
+
+// AC: EM-01.1
+#[test]
+fn a_message_sent_over_smtp_is_listed_by_the_api_within_a_second() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let ready_addresses = sendmock.wait_for_ready_addresses();
+    let mut reader = BufReader::new(TcpStream::connect(&ready_addresses.smtp_addr)?);
+
+    let reply_codes = [
+        exchange(&mut reader, None)?,
+        exchange(&mut reader, Some("EHLO app.test"))?,
+        exchange(&mut reader, Some("MAIL FROM:<app@shop.test>"))?,
+        exchange(&mut reader, Some("RCPT TO:<customer@example.test>"))?,
+        exchange(&mut reader, Some("DATA"))?,
+        exchange(
+            &mut reader,
+            Some(
+                "From: app@shop.test\r\nTo: customer@example.test\r\nSubject: Order shipped\r\n\r\nOn its way.\r\n.",
+            ),
+        )?,
+    ];
+    let sent_at = Instant::now();
+    exchange(&mut reader, Some("QUIT"))?;
+    let emails_response = send_http_get(&ready_addresses.http_addr, "/api/v1/emails")?;
+
+    assert_eq!(reply_codes, [220, 250, 250, 250, 354, 250]);
+    assert!(
+        emails_response.contains("\"subject\":\"Order shipped\""),
+        "{emails_response}"
+    );
+    assert!(sent_at.elapsed() < Duration::from_secs(1));
+    Ok(())
+}
+
+/// The body of a GET, parsed as JSON.
+fn get_json(http_addr: &str, path: &str) -> io::Result<serde_json::Value> {
+    let response = send_http_get(http_addr, path)?;
+    let body_text = response.split("\r\n\r\n").nth(1).unwrap_or_default();
+    serde_json::from_str(body_text).map_err(io::Error::other)
+}
+
+// AC: EM-09.1
+// AC: EM-09.3
+#[test]
+fn each_smtp_session_is_listed_and_its_email_links_to_it() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let ready_addresses = sendmock.wait_for_ready_addresses();
+    let mut reader = BufReader::new(TcpStream::connect(&ready_addresses.smtp_addr)?);
+    for line in [
+        None,
+        Some("EHLO app.test"),
+        Some("MAIL FROM:<app@shop.test>"),
+        Some("RCPT TO:<customer@example.test>"),
+        Some("DATA"),
+        Some("Subject: Logged\r\n\r\nHello\r\n."),
+        Some("QUIT"),
+    ] {
+        exchange(&mut reader, line)?;
+    }
+    drop(reader);
+    let failed_session = TcpStream::connect(&ready_addresses.smtp_addr)?;
+    drop(failed_session);
+    std::thread::sleep(Duration::from_millis(300));
+
+    let sessions = get_json(&ready_addresses.http_addr, "/api/v1/logs/smtp")?;
+    let delivered = get_json(
+        &ready_addresses.http_addr,
+        "/api/v1/logs/smtp?result=delivered",
+    )?;
+    let email_id = delivered["items"][0]["email_ids"][0]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+    let email = get_json(
+        &ready_addresses.http_addr,
+        &format!("/api/v1/emails/{email_id}"),
+    )?;
+
+    assert_eq!(sessions["total_count"], 2);
+    assert_eq!(delivered["items"][0]["helo_name"], "app.test");
+    assert_eq!(delivered["items"][0]["result"], "delivered");
+    assert_eq!(email["smtp_session_id"], delivered["items"][0]["id"]);
+    Ok(())
+}
+
+// AC: PL-03.5
+#[test]
+fn a_sample_email_arrives_over_smtp_with_its_session_logged() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let sendmock = SendmockProcess::start_with_free_port(working_directory.path())?;
+    let http_addr = sendmock.wait_for_http_addr();
+
+    let sample_response = send_http_post(
+        &http_addr,
+        "/api/v1/samples/email",
+        r#"{"to":"qa@example.test"}"#,
+    )?;
+    std::thread::sleep(Duration::from_millis(300));
+    let sample_body: serde_json::Value =
+        serde_json::from_str(sample_response.split("\r\n\r\n").nth(1).unwrap_or_default())
+            .map_err(io::Error::other)?;
+    let email = get_json(
+        &http_addr,
+        &format!(
+            "/api/v1/emails/{}",
+            sample_body["id"].as_str().unwrap_or_default()
+        ),
+    )?;
+    let sessions = get_json(&http_addr, "/api/v1/logs/smtp")?;
+
+    assert!(
+        sample_response.starts_with("HTTP/1.1 201"),
+        "{sample_response}"
+    );
+    assert_eq!(email["source"], "smtp");
+    assert_eq!(email["subject"], "Hello from SendMock");
+    assert_eq!(sessions["items"][0]["email_ids"][0], sample_body["id"]);
+    Ok(())
+}

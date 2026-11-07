@@ -1,0 +1,87 @@
+{
+  "order": 18,
+  "path": "/payments",
+  "states": {
+    "normal": [
+      "heading: Payments",
+      "link: Read the Payments guide",
+      "paragraph: Test payments made through the emulated gateways. No real money moves, and only test cards are accepted.",
+      "button: New payment",
+      "button: All",
+      "button: Succeeded",
+      "button: Pending",
+      "button: Failed",
+      "button: Refunded",
+      "button: Disputed",
+      "combobox: Provider",
+      "combobox: Currency",
+      "columnheader: Amount",
+      "columnheader: Provider",
+      "columnheader: Status",
+      "columnheader: Customer",
+      "columnheader: Time",
+      "each item, link: …"
+    ],
+    "New payment dialog": [
+      "heading: New payment",
+      "paragraph: Paid at once with the test card, as your app's server does without a checkout page. The card's outcome decides it.",
+      "combobox: Gateway",
+      "combobox: Capture",
+      "textbox: Amount",
+      "textbox: Currency",
+      "textbox: Test card",
+      "textbox: Customer email",
+      "button: Cancel",
+      "button: Pay",
+      "button: Close"
+    ],
+    "A payment is open": [
+      "heading: Payment",
+      "paragraph: Test payment: no real money moved.",
+      "button: Copy checkout_session",
+      "button: Copy payment_intent",
+      "button: Simulate",
+      "button: Resend notification",
+      "heading: Line items",
+      "columnheader: Item",
+      "columnheader: Qty",
+      "columnheader: Price",
+      "columnheader: Total",
+      "paragraph: Metadata: order_id=ord_XJD#C",
+      "heading: Timeline",
+      "heading: Redirects",
+      "heading: Notifications",
+      "each item, link: # … # minutes ago",
+      "button: Close"
+    ],
+    "Simulate menu": [
+      "menuitem: Refund...",
+      "menuitem: Open dispute"
+    ],
+    "Refund payment dialog": [
+      "heading: Refund payment",
+      "paragraph: $#.# can be refunded.",
+      "textbox: Amount (USD)",
+      "button: Cancel",
+      "button: Refund",
+      "button: Close"
+    ],
+    "Answer dispute dialog": [
+      "heading: Answer dispute",
+      "paragraph: The dispute goes under review until it is won or lost.",
+      "textbox: Evidence",
+      "button: Cancel",
+      "button: Send answer",
+      "button: Close"
+    ],
+    "empty": [
+      "paragraph: No payments yet",
+      "paragraph: Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz."
+    ],
+    "failing": [
+      "alert: Could not load the payments. Try again",
+      "paragraph: Could not load the payments.",
+      "button: Try again"
+    ]
+  }
+}

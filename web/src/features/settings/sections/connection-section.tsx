@@ -1,4 +1,5 @@
 import { RotateCcwIcon } from "lucide-react";
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
@@ -21,6 +22,7 @@ import { AiAgentsCard } from "@/features/settings/connection/ai-agents-card";
 import { useRequestCustomization } from "@/features/settings/connection/use-request-customization";
 import { useAppLocation } from "@/features/onboarding/use-app-location";
 import { ProviderApisCard } from "@/features/settings/sections/provider-apis-card";
+import { Pop3AccessCard } from "@/features/settings/sections/pop3-access-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
 import {
@@ -256,7 +258,19 @@ export function ConnectionSection() {
         </div>
       </SettingsSectionCard>
       <ProviderApisCard />
-      <AiAgentsCard />
+      {appInfoQuery.data?.pop3_address != null && (
+        <Pop3AccessCard
+          pop3Address={appInfoQuery.data.pop3_address}
+          host={appLocationHosts[appLocation]}
+        />
+      )}
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/ai/agents"
+        featureName="AI agent setup"
+        description="Set up Claude Code, Codex, Cursor and other agents with the MCP server and skill."
+      >
+        <AiAgentsCard />
+      </FeatureAvailabilityGate>
     </>
   );
 }

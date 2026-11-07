@@ -3,7 +3,7 @@ title: Build it with AI
 description: Prompts that work for everything you can create in SendMock, what the agent does with each, and how to check the result.
 ---
 
-> Works with the MCP tools and CLI as each backend phase lands; the built-in prompts and skill arrive in Phase 4. See [AI](./index.md) to set up.
+> See [AI](./index.md) to set up the MCP server and the agent skill.
 
 Everything on the [Advanced](../advanced/index.md) pages, an agent can do from one sentence. It uses the same operations as the UI, so the same checks apply: an invalid flow, a template with errors or a card number outside the test ranges is refused the same way, and the agent fixes it.
 

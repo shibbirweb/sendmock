@@ -22,13 +22,15 @@ import {
   validateRefundAmount,
 } from "@/lib/payments/payment-actions";
 
-/** Full by default, partial when changed, never more than is left (PY-07.2). Mount when opening. */
+/** Full by default, partial when changed, never more than is left (PY-07.2). Give it a new key when opening. */
 export function RefundPaymentDialog({
+  isOpen,
   paymentDetail,
   isRefunding,
   onRefund,
   onClose,
 }: {
+  isOpen: boolean;
   paymentDetail: PaymentDetail;
   isRefunding: boolean;
   onRefund: (refundAmountMinor: number) => void;
@@ -44,7 +46,7 @@ export function RefundPaymentDialog({
 
   return (
     <Dialog
-      open
+      open={isOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           onClose();

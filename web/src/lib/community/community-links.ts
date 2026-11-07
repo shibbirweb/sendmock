@@ -12,6 +12,8 @@ export const repositoryUrl = "https://github.com/shibbirweb/sendmock";
 export const documentationUrl =
   import.meta.env.VITE_DOCS_URL ??
   "https://shibbirweb.github.io/sendmock/docs/";
+/** The phases and what each one builds, linked from Not available yet (UI-12). */
+export const roadmapUrl = `${repositoryUrl}/blob/develop/docs/plan/11-roadmap.md`;
 /** Release notes; the changelog page arrives with CHANGELOG.md in Phase 0. */
 export const changelogUrl = `${repositoryUrl}/releases`;
 /** GitHub's private vulnerability reporting, so reports are not public. */

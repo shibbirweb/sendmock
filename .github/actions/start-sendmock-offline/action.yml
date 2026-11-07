@@ -1,0 +1,46 @@
+# Installs the release binary built in target/release outside the workspace and starts it with
+# the provider port as its own system user, whose traffic beyond loopback iptables and
+# ip6tables reject. The rule is proven first: the user cannot reach the internet while the
+# runner can. Pair it with check-sendmock-offline as the job's last step (PY-01.3).
+name: Start SendMock offline
+description: Run the release binary as a user that cannot reach the network
+inputs:
+  offline-user:
+    description: The system user SendMock runs as
+    default: sendmock-offline
+runs:
+  using: composite
+  steps:
+    - name: A user whose traffic beyond this machine is rejected
+      shell: bash
+      env:
+        OFFLINE_USER: ${{ inputs.offline-user }}
+      run: |
+        sudo install -m 0755 target/release/sendmock /usr/local/bin/sendmock
+        sudo useradd --system --create-home --home-dir "/var/lib/$OFFLINE_USER" "$OFFLINE_USER"
+        for firewall in iptables ip6tables; do
+          sudo "$firewall" -A OUTPUT -m owner --uid-owner "$OFFLINE_USER" ! -o lo -j REJECT
+        done
+        if sudo -u "$OFFLINE_USER" curl -sS --max-time 10 https://api.stripe.com > /dev/null 2>&1; then
+          echo "::error::The offline user reached api.stripe.com"
+          exit 1
+        fi
+        curl -sS --max-time 10 -o /dev/null https://api.github.com
+        for firewall in iptables ip6tables; do
+          sudo "$firewall" -Z OUTPUT
+        done
+
+    - name: Start SendMock offline with the provider port
+      shell: bash
+      env:
+        OFFLINE_USER: ${{ inputs.offline-user }}
+      run: |
+        (cd / && sudo -u "$OFFLINE_USER" env HOME="/var/lib/$OFFLINE_USER" \
+          /usr/local/bin/sendmock --db memory --provider-addr 127.0.0.1:8026) \
+          > sendmock.log 2>&1 &
+        for _ in $(seq 1 30); do
+          curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+          sleep 1
+        done
+        cat sendmock.log
+        exit 1

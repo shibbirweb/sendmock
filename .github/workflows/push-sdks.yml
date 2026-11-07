@@ -1,0 +1,77 @@
+# The push providers' official Node SDKs (firebase-admin, expo-server-sdk and OneSignal's) send
+# to a SendMock release binary that cannot reach the network, every notification is read back
+# with GET /api/v1/wait/push, and a magic unregistered token gets each provider's own error
+# (PN-01.1 to PN-01.4). Runs on changes to the push code, the provider routes or the example,
+# and from Release build before anything is published.
+name: Push SDKs
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/push/**
+      - crates/sendmock-api/src/provider_routes.rs
+      - examples/push/**
+      - .github/actions/**
+      - .github/workflows/push-sdks.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/push/**
+      - crates/sendmock-api/src/provider_routes.rs
+      - examples/push/**
+      - .github/actions/**
+      - .github/workflows/push-sdks.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  sdks:
+    name: Three push provider SDKs offline
+    runs-on: ubuntu-latest
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+      SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
+      EXPO_BASE_URL: http://127.0.0.1:8026
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: ./.github/actions/start-sendmock-offline
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Send with firebase-admin, expo-server-sdk and OneSignal's SDK
+        working-directory: examples/push/node
+        run: bun install && node done-when.js
+
+      - uses: ./.github/actions/check-sendmock-offline
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log

@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { requestApi } from "@/lib/api/api-client";
+import { buildOpenEventRequest } from "@/lib/api/open-event-request";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   InboundSmsRequest,
@@ -14,21 +16,28 @@ import type {
 } from "@/lib/api/types";
 
 export function useSmsList(smsFilters: SmsListFilters = {}) {
+  const projectFilters = { ...smsFilters, project: useSelectedProjectKey() };
+
   return useQuery({
-    queryKey: queryKeys.sms.list(smsFilters),
+    queryKey: queryKeys.sms.list(projectFilters),
     queryFn: ({ signal }) =>
       requestApi<PageOf<SmsMessage>>("/sms", {
-        queryParameters: smsFilters,
+        queryParameters: projectFilters,
         abortSignal: signal,
       }),
   });
 }
 
 export function useSmsThreads() {
+  const projectKey = useSelectedProjectKey();
+
   return useQuery({
-    queryKey: queryKeys.sms.threads,
+    queryKey: queryKeys.sms.threads(projectKey),
     queryFn: ({ signal }) =>
-      requestApi<SmsThread[]>("/sms/threads", { abortSignal: signal }),
+      requestApi<SmsThread[]>("/sms/threads", {
+        queryParameters: { project: projectKey },
+        abortSignal: signal,
+      }),
   });
 }
 
@@ -96,7 +105,7 @@ export function useOpenSms() {
     ({ smsId, openSource }: { smsId: string; openSource: OpenSource }) =>
       requestApi<void>(`/sms/${smsId}/open`, {
         method: "POST",
-        requestBody: { source: openSource },
+        requestBody: buildOpenEventRequest(openSource),
       }),
   );
 }

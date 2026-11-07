@@ -1,0 +1,72 @@
+{
+  "order": 12,
+  "path": "/webhooks/inbound-routes",
+  "states": {
+    "normal": [
+      "heading: Inbound routes",
+      "link: Read the Inbound routes guide",
+      "paragraph: What happens to incoming emails, such as replies to mail your app sent: matching routes run in priority order until one stops, like Mailgun Routes.",
+      "button: Add route",
+      "columnheader: Priority",
+      "columnheader: Route",
+      "columnheader: Actions",
+      "each item, button: Move … up",
+      "each item, button: Move … down",
+      "each item, button: Edit …",
+      "each item, button: Delete …"
+    ],
+    "New route editor": [
+      "heading: Add route",
+      "paragraph: Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.",
+      "textbox: Priority",
+      "paragraph: Lower runs first.",
+      "textbox: Description",
+      "radio: Match recipient A regex on each recipient address.",
+      "radio: Match header A regex on a header, e.g. subject.",
+      "radio: Catch all Every incoming email.",
+      "textbox: Pattern",
+      "paragraph: A Python-style regex matched from the start; (?P<token>...) captures a group for \\g<token> in actions.",
+      "paragraph: match_recipient(\"\")",
+      "heading: Actions",
+      "paragraph: Run in this order; URLs and addresses can use captured groups such as \\g<token> .",
+      "button: Add action",
+      "button: Move Action #: Forward to URL up",
+      "button: Move Action #: Forward to URL down",
+      "button: Remove Action #: Forward to URL",
+      "textbox: Action #: Forward to URL target",
+      "paragraph: Fix the pattern to see which emails match.",
+      "button: Cancel",
+      "button: Add route",
+      "button: Close"
+    ],
+    "Route editor": [
+      "heading: Edit route",
+      "paragraph: Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.",
+      "textbox: Priority",
+      "paragraph: Lower runs first.",
+      "textbox: Description",
+      "radio: Match recipient A regex on each recipient address.",
+      "radio: Match header A regex on a header, e.g. subject.",
+      "radio: Catch all Every incoming email.",
+      "textbox: Pattern",
+      "paragraph: A Python-style regex matched from the start; (?P<token>...) captures a group for \\g<token> in actions.",
+      "paragraph: match_recipient(\"reply\\+(?P<token>[\\w-]+)@reply\\.app\\.test\")",
+      "heading: Actions",
+      "paragraph: Run in this order; URLs and addresses can use captured groups such as \\g<token> .",
+      "button: Add action",
+      "each item, button: Move Action #: … up",
+      "each item, button: Move Action #: … down",
+      "each item, button: Remove Action #: …",
+      "each item, textbox: Action #: Forward to URL target",
+      "paragraph: Matches # of the last # incoming emails",
+      "button: Cancel",
+      "button: Save route",
+      "button: Close"
+    ],
+    "failing": [
+      "alert: Could not load the inbound routes. Try again",
+      "paragraph: Could not load the inbound routes.",
+      "button: Try again"
+    ]
+  }
+}

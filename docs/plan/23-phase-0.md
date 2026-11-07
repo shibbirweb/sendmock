@@ -26,9 +26,11 @@ Three placeholder decisions are still open ([10](10-open-questions.md)). Phase 0
 
 The owner records each decision in [10](10-open-questions.md) and in Decisions > Made in [PROGRESS.md](PROGRESS.md).
 
+**Decided 2026-10-29:** ports `1025` / `8025`, licence `MIT OR Apache-2.0`, and the trademark check deferred to before 1.0.
+
 ## Workstreams and order
 
-One pull request per workstream into `develop`, so each Rust change gets its own CI run and review. Each branch is created only after the owner approves it ([AGENTS.md](../../AGENTS.md#commits-and-pull-requests)). W9 and W12 only need W1 and can run beside the others.
+All Phase 0 workstreams are built on one branch, `feat/phase-0`, with a commit per workstream, and one pull request into `develop` whose CI runs the tests on each push (decided 2026-10-29, as in U3); the Branch column names the part only. Each commit is made after the owner approves it ([AGENTS.md](../../AGENTS.md#commits-and-pull-requests)). W9 and W12 only need W1 and can be done in any order after it.
 
 | # | Workstream | Branch | Criteria | Depends on |
 |---|------------|--------|----------|------------|
@@ -63,8 +65,9 @@ The PROGRESS item "Versioned website builds" is no longer part of Phase 0: it mo
 - **Coverage:** `cargo llvm-cov nextest` on Linux, reported on the pull request, failing below 80% lines overall or 90% for `sendmock-ops` and the domain crates ([AGENTS.md](../../AGENTS.md#ci-enforcement)).
 - **File size:** `scripts/check-file-lines.ts` (Bun, no new dependency) fails on a Rust source file over 500 lines and lists files over 300, excluding tests, generated code and fixtures. ESLint already does this for TypeScript.
 - **Test fakes** in `sendmock-core`: the `Clock`, `IdGenerator` and `RandomSource` traits with system implementations and fixed fakes (`FixedClock`, `SequentialIdGenerator`, `SeededRandomSource`), so no test uses real time or randomness.
-- **Snapshots:** `insta` (dev dependency) for CLI `--json` output and MCP tool definitions; snapshots are reviewed in the pull request, never auto-accepted in CI.
+- **Snapshots:** `insta` (dev dependency) for CLI `--json` output and MCP tool definitions; snapshots are reviewed in the pull request, never auto-accepted in CI. It is added in W6 with the first snapshot test, not before.
 - The `rust` job and the coverage gate join the required status checks on `develop` and `main` (owner, in GitHub settings).
+- **As built:** `ci.yml` has `Rust (<os>)` on three operating systems, `Rust coverage and file size` on Linux, and one `Rust` check that passes only when both do, for the rulesets to require. `scripts/rust-file-lines.ts` counts each file up to its `#[cfg(test)]` module, and `scripts/rust-coverage.ts` reads the `cargo llvm-cov` JSON summary, gates it and writes a per-crate table to the job summary; both have Bun tests. The fakes are in `sendmock-core` (`clock/`, `id_generator/`, `random_source/`); `SeededRandomSource` is SplitMix64, checked against its published first value.
 
 ## W3: Config, tracing and graceful shutdown
 
@@ -75,6 +78,7 @@ The PROGRESS item "Versioned website builds" is no longer part of Phase 0: it mo
 - The native binary binds `127.0.0.1` by default (PL-06.1, native half).
 - **Tracing:** `tracing` and `tracing-subscriber`, human-readable by default and JSON with `SENDMOCK_LOG_FORMAT=json`.
 - **Graceful shutdown:** `SIGTERM` and Ctrl-C stop accepting connections, let in-flight requests finish for up to 10 s, then exit `0`. Tested by starting the server in a test, sending the signal (Unix) or the Ctrl-C event (Windows), and checking the exit code and that an in-flight request completed.
+- **As built:** config lives in the binary crate (`config/`: `ConfigFile`, `config_file_locator`, `ServerConfig`, `LogFormat`, `LogLevel`), `DatabaseLocation` in `sendmock-store`. `StartupError` maps a configuration mistake to exit `2` and a listener or runtime failure to exit `1` in `main` only. Binary tests in `crates/sendmock/tests/startup.rs` start the real binary, since setting environment variables inside a test is `unsafe` in Rust 2024 and the workspace forbids `unsafe`: the file, variable and flag precedence (shown by the log format), the unknown key and invalid value errors, the busy port, and `SIGTERM` (Unix). Letting in-flight requests finish is tested in W5, once there is an HTTP server to hold a request open.
 
 ## W4: SQLite store and migrations
 
@@ -86,6 +90,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 - A database from a newer SendMock version is refused with a clear message; an on-disk database is copied to `sendmock.db.bak-<version>` before migrating.
 - **Locations:** the OS data directory by default, `--db <path>` / `SENDMOCK_DB`, and `--db memory`.
 - Tests: each opens its own temporary database; cases cover a fresh database, re-running migrations (no change), the backup file, refusing a newer database, and `--db memory`.
+- **As built:** `Database` (`database/`: `DatabaseWriter` on its own thread, `DatabaseReaders` with four read-only connections, `connection_settings`) and `migration/` (`EMBEDDED_MIGRATIONS`, `apply_migrations`, which takes the migration list so tests can pass their own). Every connection of an in-memory store opens one named shared-cache database (`file:sendmock-<process>-<n>?mode=memory&cache=shared`), since SQLite gives each plain `:memory:` connection its own empty database. The backup is `VACUUM INTO <file>.bak-<schema version>`, a consistent copy while the WAL is in use. The writer runs `PRAGMA optimize` when the store closes. The binary opens the database before the runtime starts; a newer schema stops startup with exit `1`.
 
 ## W5: HTTP server, operation registry and embedded UI
 
@@ -95,6 +100,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 - **Mock mode in the binary:** in Phase 0 only, the binary embeds the mock-mode UI build, so every screen keeps working on fixtures as the done-when line says. From Phase 1 it embeds the live build only, and operations it does not serve yet show Not available yet (decided 2026-10-29, [07](07-ui.md#not-available-yet-stage-b), UI-12). The bundle budget (UI-06) measures the live build throughout.
 - **Dev proxy:** `web/vite.config.ts` proxies `/api` and `/ws` to `http://127.0.0.1:8025` when `VITE_API_MODE=live`, so the UI can run against `cargo run` with hot reload.
 - **Done-when smoke job** in `ci.yml` on all three operating systems: build the UI and the binary, start it, wait for `/api/v1/health`, fetch `/` and a deep link (`/mail`, the SPA fallback), stop it and check the exit code (DS-01.2 for the host build).
+- **As built:** `sendmock-ops` has the `Operation` trait (typed input and output, `definition()`, `execute()`), `OperationRegistry` holding operations behind `ErasedOperation` (JSON in, JSON out, input and output JSON Schemas from `schemars`), `OperationContext` (database, clock, instance details) and `OperationError`; `getHealth` and `getInfo` are the first operations. `sendmock-api` builds one route per operation and merges methods that share a path; GET and DELETE read the query string, the other methods a JSON body (empty counts as `{}`). The UI comes through the `UiAssets` trait (`EmbeddedUiAssets` with `rust-embed`, an in-memory fake in tests); `/assets/` files are cached as immutable and everything else revalidates. `serve_http` gives in-flight requests up to 10 s after the signal, tested with a slow fake operation. The smoke test is `scripts/binary-smoke-test.ts`; CI builds the UI once (`web-dist`) and runs it against a release binary on each operating system, and the `Rust` check now also needs it. `opt-level = "z"`: 5.2 MB against 6.5 MB with `3`, UI included.
 
 ## W6: CLI skeleton, MCP tool definitions and parity check
 
@@ -106,6 +112,7 @@ As decided in [02](02-architecture.md#database-sqlite):
 - Exit codes `0` ok, `1` error, `2` usage, `3` not found, `4` timeout, `5` assertion failed, mapped from typed errors at the transport edge only (AI-01.3).
 - **MCP** (`sendmock-mcp`): tool definitions (name, `inputSchema`, annotations) are generated from the registry by the rules in [21](21-reference-and-examples.md#2-one-rule-set-for-cli-flags-and-mcp-inputs); `system.health` and `system.info` share `sendmock_status` with the `view` selector, as the surface catalogue says. The stdio transport and `sendmock mcp` arrive in Phase 1 (AI-02); Phase 0 tests the generated definitions with snapshots.
 - **Parity check** (AI-01.1): the binary prints its surfaces (`sendmock help --all --json` plus the MCP definitions), and `parity.yml` compares them with the surface catalogue (`web/src/lib/api/surface-catalogue/`): every registry operation must have a REST route, a CLI command and an MCP tool with the catalogue's names. Catalogue operations the binary does not have yet are listed as planned in the job summary, with the phase they arrive in, and do not fail the job.
+- **As built:** each `OperationDefinition` carries its `cli_usage`, `mcp_tool` and `selector` as the catalogue names them. `sendmock-cli` builds one clap subcommand per operation from the words of its usage, so a registered operation always has a command, and adds `--server`, `--token` and `--json` to each; without `--server` it follows `SENDMOCK_HTTP_ADDR` (`0.0.0.0` becomes `127.0.0.1`), so `sendmock health` works in the Docker image unchanged. `reqwest` is used without TLS for now: its TLS feature builds on `aws-lc-rs`, a C dependency that complicates static musl builds, and the CLI talks to SendMock over plain HTTP; a TLS provider is chosen when webhooks need HTTPS. `sendmock-mcp` merges operations that share a tool into one definition with an enum selector input. `sendmock help --all --json` prints the commands (shaped like `docs/api/cli-reference.json`) and the MCP tools, and `scripts/binary-surface-parity.ts` compares them with `cli-reference.json` and `mcp-tools.json` in the Surface parity workflow. `sendmock version` answers from the binary itself, without a server; the catalogue lists it as an alias of `sendmock status`.
 
 ## W7: Seed loader skeleton
 
@@ -113,13 +120,15 @@ As decided in [02](02-architecture.md#database-sqlite):
 - Phase 0 checks the parts every later phase relies on: TOML syntax, known top-level sections and keys, value types, `${ENV_VAR}` reference syntax, and that secret fields use an `${ENV_VAR}` reference instead of a literal. Each later phase adds the rules for its own item kinds.
 - One operation, `seed.validate`, in every surface: `POST /api/v1/seed/validate` (answering `SeedValidation`: `is_valid`, `errors` with `line` and `message`, and the item counts per kind), `sendmock seed validate <file>` (exit `5` when invalid) and `sendmock_seed_validate`. It never changes anything (PL-04.5).
 - The server loads a seed at startup (`--seed`, `./sendmock.seed.toml`, `/config/sendmock.seed.toml` in Docker) only far enough to validate it and refuses to start on errors; applying seeds comes in Phase 3.
+- **As built:** validation is in the operations layer (`sendmock-ops/src/seed/`), since AGENTS.md puts validation there. `validate_seed_toml` parses with the `toml` crate's span-aware `DeTable::parse_recoverable`, so syntax errors and every other problem carry their line; it knows the 16 sections the UI's export and validator use, with the same item kinds in the summary, checks each section's shape (`[settings]` a table, the others lists of tables) and every string for well-formed `${NAME}` references and literal values under secret keys (`secret`, `password`, `token`, `auth_token`, `api_key`, `api_secret`). Keys inside items are checked by the phase that builds each item kind. `OperationDefinition` gained `cli_arguments` (`<file>` reads the file into `seed_toml`) and `success_flag_field` (`is_valid` false exits 5). A broken seed file stops startup with exit `2` and each problem's line.
 
 ## W8: OpenAPI contract tests
 
-- `utoipa` describes the REST adapter, and the server serves the generated document at `/api/openapi.json` (PL-01.3).
+- The OpenAPI document is generated from the operation registry: paths, methods and summaries from each `OperationDefinition`, schemas from `schemars` (JSON Schema 2020-12, which OpenAPI 3.1 uses). The server serves it at `/api/openapi.json` (PL-01.3). This replaces `utoipa` (decided 2026-10-29 in W5): the registry already knows every route, so a second description of them would only be one more dependency to keep in step.
 - A contract test compares each operation the binary serves with the same operation in the frozen `docs/api/openapi.yaml`: path, method, parameters, request and response schemas. It fails when they differ, or when the binary serves an operation the frozen file does not have.
 - Handler answers recorded in the integration tests are validated against the frozen file's schemas with `jsonschema` (dev dependency only).
 - PL-01.1 (every endpoint exists and matches) stays open: each phase adds its endpoints to this test, and it is ticked when the last one lands.
+- **As built:** `sendmock-api/src/openapi_document.rs` builds the document (`openapi: 3.1.0`, a path item per operation, request and `200` schemas from `schemars` filed under `components.schemas` by type name, `#/$defs/` references rewritten, and the contract's `ApiErrorBody` as the `default` answer). `crates/sendmock-api/tests/openapi_contract.rs` reads `docs/api/openapi.yaml` (`serde_yaml_ng`, tests only) and checks, per served operation: it exists with the same `operationId` and summary; request and answer schemas have the same top-level properties and required fields; and sample requests and the real answers (sent through the router) validate against the frozen schemas (`jsonschema`, tests only, without its HTTP and TLS features). An operation without sample inputs fails the test, so each new operation brings some. It caught one drift at once: the contract requires `provider_address` (nullable), which `schemars` had left optional.
 
 ## W9: Version script and changelog
 
@@ -130,6 +139,7 @@ As planned in [16](16-website-and-releases.md#versioning):
 - `next` implements the bump table, including the refusals (DS-05.3).
 - `changelog` builds the new section from the pull requests merged since the last tag, grouped as Breaking changes, Added and Fixed, skipping `docs:`, `test:`, `chore:`, `ci:` and `refactor:`, with a stable section collecting its betas (DS-05.4). The pull request list comes from the GitHub API in the workflow and from fixtures in the tests, so tests use no network.
 - The website gains `/changelog/`, which renders `CHANGELOG.md` and says "No releases yet" until the first one. The app's What's new link keeps opening GitHub releases until then.
+- **As built:** `scripts/version.ts` (`show`, `check`, `sync`, `next`, `bump`, `changelog`, `notes`) over modules in `scripts/version/`: `semantic-version`, `change-kind` (the PR title's prefix decides breaking, feature, fix or left out), `next-version` (the bump table as a pure function, tested row by row), `changelog` (render, insert at the top, extract a version's notes), `release-history` (tags reachable from HEAD; a stable section starts at the last stable tag, a beta at the last tag; merged pull requests from the merge commits, or from a JSON file the release workflow writes with GitHub's titles, which may have been edited after merging) and `version-files`. `sync` copies the `Cargo.toml` version into the others; it set `web/package.json` to `0.0.0` and gave `website/package.json` a version. `scripts/acceptance.ts` now also reads the tests in `scripts/` (except its own, whose fixtures use real IDs as sample data). The website's footer "What's new" opens `/changelog/`.
 
 ## W10: Release workflows
 
@@ -141,6 +151,8 @@ As planned in [16](16-website-and-releases.md#workflows). Each workflow is a thi
 - Tests: no release from a commit where CI did not pass, the version in code, tag and pre-release flag must agree (DS-04.4), a stable is refused while its beta is unpublished or has untried changes on top (DS-04.2).
 - Package channels (Homebrew, Scoop, npm, `.deb`, `.rpm`, install scripts) are added in Phase 1 and Phase 5 with DS-03.
 - **Owner setup:** "Allow GitHub Actions to create and approve pull requests", and the release secrets listed in [16](16-website-and-releases.md#workflows) once the channels that need them land.
+- **As built:** the decisions are pure functions in `scripts/release/release-decisions.ts` (whether a publish workflow has work, what blocks a release, whether the tag and pre-release flag agree with the code, the next `REL-N`), with the GitHub calls in `github-api.ts` and the entry point `release.ts`; `0.0.0`, the version before the first release, is never published. `package-archive.ts` packs each target the same way (`tar`, which on macOS and Windows also writes the `.zip`) with a `.sha256`, and `check-archive.ts` runs the per-platform cases on each target's own runner, reusing the smoke test. Publishing drafts the release first and only un-drafts it after every platform passed, so a failure publishes nothing; a re-run reuses the draft. `release.yml` also runs on pull requests that change the release machinery, without publishing, since a new workflow can only be started by hand once it is on `develop`. `release-workflows.test.ts` reads the workflow files and checks the bump choices, the dry run, the publish switch, the CI gate and the runner per target. Docker `beta` and stable images join `release.yml` with the beta channel; `edge` is W11.
+- **Owner setup, more:** optionally a `RELEASE_TOKEN` secret (a fine-grained token with contents and pull request write), so the release and promote pull requests start CI; pull requests opened with the default `GITHUB_TOKEN` do not.
 
 ## W11: Dockerfile and `edge` image
 
@@ -151,11 +163,13 @@ As planned in [09](09-distribution.md#docker):
 - Tests in the workflow before pushing: the image runs as non-root on both platforms with data in `/data` (DS-02.1), becomes healthy and stops cleanly on `SIGTERM` (DS-02.2), and is under 25 MB compressed (DS-02.5 with the signature and attestations).
 - DS-02.3 (mounted config, seed and templates) is ticked when the seed and templates are applied (Phase 3); DS-02.4 when the beta and stable tags exist.
 - **Owner setup:** a Docker Hub token as a repository secret.
+- **As built:** the `Dockerfile` builds the UI with Bun, the binary on `rust:1.98-alpine` (musl, so static), and copies it onto `scratch` with `/data` owned by UID 10001, an empty `/config` for mounts and a `/tmp` for SQLite's temporary files; `SENDMOCK_HTTP_ADDR` and `SENDMOCK_SMTP_ADDR` bind `0.0.0.0` and `SENDMOCK_DB` is `/data/sendmock.db`. Measured locally: 2 MB compressed. The binary now also loads `/config/sendmock.toml`, and warns at startup when it listens beyond this machine without UI auth. `docker-edge.yml` builds and tests each architecture on its own runner (no emulation) with `scripts/docker-image-test.sh` (non-root, healthy, `/data`, `is_container`, the UI, the notice, a clean `docker stop`, the size); on pushes to `develop` it pushes by digest with an SBOM and provenance, joins both under `edge` on GHCR (and Docker Hub when `DOCKERHUB_TOKEN` and `DOCKERHUB_USERNAME` are set) and signs with cosign through GitHub's OIDC. `scripts/acceptance.ts` now also reads `*-test.sh`. DS-02.5 is ticked once the first signed `edge` image is pushed.
 
 ## W12: README and licence
 
 - `README.md` at the root: what SendMock is in two sentences, the screenshot from the landing page, install (a note that the first beta comes with Phase 1, and the `edge` image until then), the quick start, and links to the docs, the demo, `CONTRIBUTING.md` and `SECURITY.md`.
 - The licence files from W0 (`LICENSE-MIT` and `LICENSE-APACHE` for the recommendation), which `release.yml` puts in every archive next to the readme.
+- **As built:** done before W10, since the release archives carry these files. `LICENSE-APACHE` is the standard Apache-2.0 text, copied from a crate in the Cargo registry rather than typed; `LICENSE-MIT` names MD. Shibbir Ahmed. The README says there is no release yet, points to the demo, the docs and PROGRESS, gives run-from-source steps, and states the dual licence; the `sendmock` crate points its `readme` at it.
 
 ## Criteria
 
@@ -186,12 +200,13 @@ Every crate below is already in the tech stack in [02](02-architecture.md#tech-s
 | `tracing`, `tracing-subscriber` | W3 | logs |
 | `rusqlite` (bundled) | W4 | the database |
 | `rust-embed` | W5 | the embedded UI |
-| `utoipa`, `schemars` | W5, W8 | OpenAPI and shared schemas |
+| `axum` | W5 | REST routes on `tokio` |
+| `schemars`, `serde_json` | W5, W8 | input and output schemas for OpenAPI, CLI and MCP, and JSON |
 | `reqwest` (rustls) | W6 | the CLI's HTTP client |
 | `ulid` | W2 | the `IdGenerator` |
 | `thiserror` (new) | all | typed errors per layer, as [AGENTS.md](../../AGENTS.md#layers-and-dependency-direction) requires; no runtime cost |
 | `dirs` (new) | W3, W4 | the OS config and data directories on three platforms; small, no dependencies of note |
-| `insta`, `tempfile`, `jsonschema` (new, dev only) | W2, W4, W8 | snapshots, temporary databases, schema checks; not in the binary |
+| `insta`, `tempfile`, `jsonschema`, `tower` (new, dev only) | W2, W4, W5, W8 | snapshots, temporary databases, schema checks, calling the router in tests; not in the binary |
 | `cargo-nextest`, `cargo-llvm-cov`, `cargo-zigbuild` (CI tools) | W2, W10 | test runner, coverage, Linux cross builds |
 
 The binary size, idle memory and cold start budgets in [09](09-distribution.md#performance-budget-checked-in-ci-on-linux-x64) are measured from W5 on and recorded here, so later phases can see what each one adds.

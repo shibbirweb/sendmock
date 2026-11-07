@@ -1,0 +1,180 @@
+# The Phase 3 done-when check: a rule forwards every *@inbound.local email to a local Express
+# handler that checks the Standard Webhooks signature; the handler fails at first, the delivery
+# is retried and gives up, and after the handler is fixed a replay succeeds. Beside it, the
+# official Standard Webhooks libraries for Node, Python, PHP and Go verify a native delivery
+# (WH-04.1). All against a SendMock release binary. Runs on changes to the webhook code or the
+# examples, and from Release build before anything is published.
+name: Webhook handler
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-webhooks/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/src/events/**
+      - crates/sendmock-ops/builtin/**
+      - examples/webhooks/**
+      - .github/workflows/webhook-handler.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-webhooks/**
+      - crates/sendmock-ops/src/webhooks/**
+      - crates/sendmock-ops/src/events/**
+      - crates/sendmock-ops/builtin/**
+      - examples/webhooks/**
+      - .github/workflows/webhook-handler.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  binary:
+    name: Release binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sendmock-for-webhook-handlers
+          path: target/release/sendmock
+          retention-days: 1
+
+  express:
+    name: Express handler
+    needs: binary
+    runs-on: ubuntu-latest
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-webhook-handlers
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Start SendMock
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fail, retry, fix and replay with the Express handler
+        working-directory: examples/webhooks/express-handler
+        run: bun install && node done-when.js
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
+
+  libraries:
+    name: ${{ matrix.library }}
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - library: Standard Webhooks for Node
+            language: node
+            folder: node-standard-webhooks
+            run: bun install && node verify-delivery.js
+          - library: Standard Webhooks for Python
+            language: python
+            folder: python-standard-webhooks
+            run: pip install --quiet -r requirements.txt && python verify_delivery.py
+          - library: Standard Webhooks for PHP
+            language: php
+            folder: php-standard-webhooks
+            run: composer install --no-interaction --quiet && php verify-delivery.php
+          - library: Standard Webhooks for Go
+            language: go
+            folder: go-standard-webhooks
+            run: go run .
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sendmock-for-webhook-handlers
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Start SendMock
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        if: matrix.language == 'node'
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        if: matrix.language == 'python'
+        with:
+          python-version: "3.13"
+
+      - uses: shivammathur/setup-php@v2
+        if: matrix.language == 'php'
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - uses: actions/setup-go@v5
+        if: matrix.language == 'go'
+        with:
+          go-version: "1.23"
+          cache-dependency-path: examples/webhooks/go-standard-webhooks/go.sum
+
+      - name: Verify a delivery with the ${{ matrix.library }} library
+        working-directory: examples/webhooks/${{ matrix.folder }}
+        run: ${{ matrix.run }}
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log

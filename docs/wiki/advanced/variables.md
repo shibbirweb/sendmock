@@ -3,7 +3,7 @@ title: Variables in depth
 description: Dynamic, Random, Computed and Prompt variables, secrets, scopes, and overrides at send time.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/variables) today.
+> Try it in the [demo](/demo/webhooks/variables).
 
 [Variables](../webhooks/variables.md) explains the kinds. This page shows when each one earns its place.
 
@@ -40,6 +40,7 @@ Use **Secret** for tokens and keys a signature needs. After saving, the value is
 1. A **send-time override** (in Send to webhook or the Composer) wins for that one send.
 2. Otherwise the **endpoint's** variable of that name.
 3. Otherwise the **global** one.
+4. Otherwise an environment variable named `SENDMOCK_VAR_<NAME>`, read as `vars.<name>` in lowercase (`SENDMOCK_VAR_TENANT_ID` is `vars.tenant_id`). Only that prefix is read, so other secrets in the environment are never reachable. Use it to pass values from CI.
 
 So one template can serve several endpoints: put the shared value globally and the differing one on each endpoint.
 

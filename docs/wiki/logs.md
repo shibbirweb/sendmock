@@ -3,7 +3,7 @@ title: Logs
 description: The raw SMTP sessions and API requests behind every message, including the ones SendMock rejected.
 ---
 
-> Try it in the [demo](/demo/logs). Works in your install from Phase 1 (SMTP) and Phase 2 (API requests).
+> Try it in the [demo](/demo/logs).
 
 Mail, SMS and Payments show what arrived. Logs show **how** it arrived, and what did not: every SMTP conversation and every API call, including failed and rejected ones.
 
@@ -45,6 +45,8 @@ A table: time, API (Native, Twilio, Vonage, SendGrid, ...), method, path, status
 
 The drawer: method, full path, status, duration and time; request headers (credentials masked); the request body (JSON formatted, forms as a field table) and the response body; **Open message** for what the request created.
 
+
+Every control and text, one by one: [Logs in depth](./deeper/logs.md).
 ## Customize
 
 How long logs are kept follows retention in [Settings > General](./settings.md#general). To make SMTP fail on purpose, see [Advanced: chaos](./advanced/chaos.md).

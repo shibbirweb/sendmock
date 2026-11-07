@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "path": "/api/v1/webhooks/endpoints",
+      "fields": {
+        "url": "http://127.0.0.1:4000/sms/inbound",
+        "template_id": "twilio.inbound_sms",
+        "is_enabled": true,
+        "created_by": "mcp"
+      }
+    },
+    {
+      "path": "/api/v1/webhooks/rules",
+      "fields": {
+        "events": [
+          "sms.inbound"
+        ],
+        "is_enabled": true,
+        "created_by": "mcp"
+      }
+    }
+  ]
+}

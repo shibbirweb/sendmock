@@ -47,6 +47,7 @@ Optional extra listeners (off by default):
 | Provider port | `--provider-addr 127.0.0.1:8026` | SMS and email provider emulation at the **real provider paths** (Twilio, Verify, SendGrid, Resend, ...), for SDKs that only let you change the host. See [04-sms.md](04-sms.md) and [03-email.md](03-email.md#http-send-apis). |
 | SMTPS | `--smtps-addr 127.0.0.1:1465` | implicit TLS SMTP |
 | HTTP catcher port | `--catcher-addr 127.0.0.1:8030` | capture any request at any path ([15-http-catcher.md](15-http-catcher.md)) |
+| POP3 | `--pop3-addr 127.0.0.1:1110` | read the captured mail over POP3, one project per login ([32](32-after-1-0.md#a6-pop3-read-access-em-21)) |
 
 Inside the Docker image all listeners bind `0.0.0.0` ([09-distribution.md](09-distribution.md#docker)).
 
@@ -99,6 +100,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | Storage | `rusqlite` (bundled, FTS5) | no system SQLite dependency; `spawn_blocking` or a small pool |
 | Migrations | hand-rolled, `PRAGMA user_version` | embedded SQL migrations, no extra dependency (see [Database](#database-sqlite)) |
 | Compression | `zstd` | raw `.eml` bodies compressed at rest |
+| Request decompression | `flate2` (pure Rust) | provider requests sent with `Content-Encoding: gzip`, as `expo-server-sdk` sends them |
 | HTTP client | `reqwest` (rustls) | webhook delivery |
 | Signing | `hmac`, `sha2`, `sha1`, `base64` | Standard Webhooks HMAC-SHA256 native signatures, Twilio-style HMAC-SHA1 |
 | Outbound SMTP | `lettre` (rustls) | release and auto-forward to a real relay |
@@ -110,7 +112,7 @@ Opens follow the same path: the UI (or the API) calls an `open` endpoint, `store
 | CLI / config | `clap` (derive, env), `serde`, `toml` | flags, `SENDMOCK_*` env vars, `sendmock.toml` |
 | IDs | `ulid` | sortable IDs, good for pagination |
 | Logging | `tracing`, `tracing-subscriber` | |
-| OpenAPI | `utoipa` | spec served at `/api/openapi.json` |
+| OpenAPI | generated from the operation registry and `schemars` | spec served at `/api/openapi.json`; no separate OpenAPI library, since the registry already knows every route |
 | JSON Schema | `schemars` | shared input/output schemas for CLI, MCP tools and OpenAPI |
 | MCP | `rmcp` | official Rust MCP SDK, stdio and streamable HTTP |
 | Phone numbers | `phonenumber` (optional) | E.164 normalisation and validation |
@@ -146,6 +148,7 @@ sendmock/
 │   ├── sendmock/                # binary: CLI, wiring, config
 │   ├── sendmock-core/           # shared types: Event, Email, Sms, errors
 │   ├── sendmock-store/          # SQLite, migrations, search, retention
+│   ├── sendmock-mail/           # email domain: parsing, extraction, tags, ingest
 │   ├── sendmock-smtp/           # SMTP server
 │   ├── sendmock-sms/            # SMS gateway + provider emulation
 │   ├── sendmock-webhooks/       # rules, rendering, delivery queue

@@ -1,0 +1,22 @@
+services:
+  sendmock:
+    image: ghcr.io/shibbirweb/sendmock
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - sendmock-data:/data
+
+  app:
+    build: .
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: sendmock
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: "null"
+    depends_on:
+      sendmock:
+        condition: service_healthy
+
+volumes:
+  sendmock-data:

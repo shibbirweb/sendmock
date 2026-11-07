@@ -3,7 +3,7 @@ title: Password reset email
 description: Catch your app's password reset email, check it, and follow its link to finish the reset.
 ---
 
-> Works in your install from Phase 1. Try it in the [demo](/demo/mail) today.
+> Try it in the [demo](/demo/mail).
 
 **The situation:** you are building or changing password reset. You want to click the reset link without a real inbox, and check the email looks right.
 

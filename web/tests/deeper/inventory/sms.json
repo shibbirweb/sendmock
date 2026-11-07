@@ -1,0 +1,79 @@
+{
+  "order": 4,
+  "path": "/sms",
+  "states": {
+    "normal": [
+      "heading: SMS",
+      "link: Read the SMS guide",
+      "textbox: Search conversations",
+      "button: All",
+      "button: SMS",
+      "button: WhatsApp",
+      "each item, link: +# …",
+      "each item, img: Delivered",
+      "each item, img: …",
+      "paragraph: Select a conversation to read it. Use J and K to move through the list."
+    ],
+    "A conversation is open": [
+      "heading: +#",
+      "button: Copy phone number",
+      "paragraph: with +#, # message",
+      "heading: Today",
+      "link: #:#",
+      "img: Undelivered: # Unreachable destination handset",
+      "button: Message actions",
+      "button: Attach files",
+      "textbox: Reply as +#",
+      "button: Send reply",
+      "paragraph: Simulates an inbound message from +#. # / #, # segment, GSM-#. Enter sends, Shift+Enter adds a line."
+    ],
+    "Message actions menu": [
+      "menuitem: Message details",
+      "menuitem: Simulate read",
+      "menuitem: Send to webhook",
+      "menuitem: Copy text",
+      "menuitem: Copy message ID",
+      "menuitem: Delete"
+    ],
+    "Message details, Status tab": [
+      "heading: Message details",
+      "paragraph: Status history, the original request and status callbacks.",
+      "paragraph: Your order ## has shipped.",
+      "link: Twilio",
+      "button: Copy message ID",
+      "heading: Set status",
+      "combobox: Error code for Undelivered and Failed",
+      "button: Delivered",
+      "button: Undelivered",
+      "button: Failed",
+      "tab: Status",
+      "tab: Request",
+      "tab: Callbacks (#)",
+      "button: Close"
+    ],
+    "Message details, Request tab": [
+      "button: Copy request JSON",
+      "link: Open in request log"
+    ],
+    "Message details, Callbacks tab": [
+      "paragraph: Sent to http://localhost:#/sms/status"
+    ],
+    "empty": [
+      "paragraph: No SMS yet",
+      "paragraph: Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy Native API",
+      "button: Copy Twilio base URL",
+      "button: Copy Vonage base URL",
+      "link: More snippets",
+      "button: Send a sample SMS"
+    ],
+    "failing": [
+      "alert: Could not load conversations. Try again",
+      "paragraph: Could not load conversations.",
+      "button: Try again"
+    ]
+  }
+}

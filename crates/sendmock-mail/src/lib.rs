@@ -1,0 +1,44 @@
+//! The email domain: parsing messages, extracting codes and links, tags, and storing what arrives.
+
+mod delivery_outcome;
+mod email_ingest_service;
+mod extraction;
+mod html_compatibility;
+mod inbound_routing;
+mod incoming_email;
+mod mail_error;
+mod native_message;
+mod parsing;
+mod raw_message_codec;
+mod spamd_protocol;
+
+pub use delivery_outcome::{
+    AddressOutcomeSource, BounceType, DeliveryProfile, EmailDeliveryEvent, EmailOutcome,
+    EmailOutcomeRule, EmailRuleOutcome, FOLLOW_UP_DELAY_MS, MagicAddress, OutcomeAction,
+    OutcomeSettings, OutcomeSource, OutcomeStep, PROFILE_DELAY_MS, PlannedOutcome,
+    RecipientRefusal, describe_magic_outcome, find_magic_address_outcome, is_valid_address_pattern,
+    is_valid_refusal_code, list_magic_addresses, plan_email_outcome, resolve_address_outcome,
+};
+pub use email_ingest_service::{EmailIngestService, IngestOptions};
+pub use extraction::{
+    DEFAULT_OTP_PATTERNS, OtpExtractor, extract_header_tags, extract_links,
+    extract_plus_address_tags, extract_remote_image_urls,
+};
+pub use html_compatibility::{
+    ClientSupport, CompatibilityWarning, HtmlCompatibilityReport, check_html_compatibility,
+};
+pub use inbound_routing::{
+    RoutableEmail, RouteFilterMatch, RouteFilterRule, compile_route_pattern, fill_captured_groups,
+    find_route_pattern_error, match_route_filter, strip_reply_text,
+};
+pub use incoming_email::{EmailEnvelope, IncomingEmail};
+pub use mail_error::MailError;
+pub use native_message::{NativeAttachment, NativeMessage, build_raw_message, guess_content_type};
+pub use parsing::{
+    MimePartContent, MimeTreeNode, ParsedAttachment, ParsedEmail, find_mime_part_content,
+    parse_email,
+};
+pub use raw_message_codec::{compress_raw_message, decompress_raw_message};
+pub use spamd_protocol::{
+    SpamdReplyError, SpamdReport, SpamdRule, build_spamd_report_request, parse_spamd_reply,
+};

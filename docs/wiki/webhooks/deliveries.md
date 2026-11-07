@@ -3,7 +3,7 @@ title: Deliveries
 description: The log of every request SendMock sent to your app, with its answer, retries, replay and edit and replay.
 ---
 
-> Try it in the [demo](/demo/webhooks/deliveries). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/deliveries).
 
 Every request SendMock sends to your app is logged here: rule deliveries, status callbacks, reply webhooks, inbound routes, payment notifications, tests and manual sends.
 
@@ -54,6 +54,8 @@ A live table, newest first, 50 rows at a time ("Showing 50 of N", more as you sc
 | **Cancel retries** | stops a delivery that would retry (asks first) |
 | **Save** | keeps the request under a name in [Saved](./composer-and-saved.md#saved-deliveries) |
 
+
+Every control and text, one by one: [Deliveries in depth](../deeper/webhooks/deliveries.md).
 ## Customize
 
 The retry schedule is per endpoint ([Endpoints](./endpoints.md), Retries tab).

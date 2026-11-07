@@ -70,6 +70,16 @@ export function tagEndpoints(
   return areaEndpoints.map((areaEndpoint) => ({ ...areaEndpoint, tag }));
 }
 
+/** `project`: only one project's captured traffic (PL-10). */
+export function projectQueryParameter(trafficName: string): QueryParameter {
+  return {
+    name: "project",
+    description: `Only this project's ${trafficName} (its key); every project's when not set.`,
+    schema: "string",
+    example: "shop",
+  };
+}
+
 /** `cursor` and `limit`, shared by every paged list. */
 export const pageQueryParameters: QueryParameter[] = [
   {

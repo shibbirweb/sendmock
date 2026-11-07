@@ -1,75 +1,102 @@
+import skillTemplate from "../../../../skill/sendmock/SKILL.md?raw";
 import type { AiAgentSetup } from "@/lib/api/types";
 
-const mcpServerJson = JSON.stringify(
-  { mcpServers: { sendmock: { command: "sendmock", args: ["mcp"] } } },
-  null,
-  2,
-);
+type McpLaunch = { command: string; args: string[] };
 
-/** How each AI agent connects, as `sendmock ai install` writes it (docs/plan/14-ai-integration.md). */
+const installedLaunch: McpLaunch = { command: "sendmock", args: ["mcp"] };
+const npxLaunch: McpLaunch = {
+  command: "npx",
+  args: ["-y", "sendmock", "mcp"],
+};
+
+function renderServersJson(mcpLaunch: McpLaunch, isVscode: boolean): string {
+  const sendmockServer = isVscode ? { type: "stdio", ...mcpLaunch } : mcpLaunch;
+  const serversKey = isVscode ? "servers" : "mcpServers";
+  return JSON.stringify(
+    { [serversKey]: { sendmock: sendmockServer } },
+    null,
+    2,
+  );
+}
+
+function renderCodexTable(mcpLaunch: McpLaunch): string {
+  const quotedArguments = mcpLaunch.args
+    .map((argument) => `"${argument}"`)
+    .join(", ");
+  return `[mcp_servers.sendmock]\ncommand = "${mcpLaunch.command}"\nargs = [${quotedArguments}]`;
+}
+
+function renderClaudeCodeCommand(mcpLaunch: McpLaunch): string {
+  return `claude mcp add sendmock -- ${[mcpLaunch.command, ...mcpLaunch.args].join(" ")}`;
+}
+
+function buildSetup(
+  setup: Pick<
+    AiAgentSetup,
+    "target" | "name" | "mcp_config_path" | "instructions_path"
+  >,
+  renderConfig: (mcpLaunch: McpLaunch) => string,
+): AiAgentSetup {
+  return {
+    ...setup,
+    install_command: `sendmock ai install --target ${setup.target}`,
+    mcp_config: renderConfig(installedLaunch),
+    npx_install_command: `npx sendmock ai install --target ${setup.target}`,
+    npx_mcp_config: renderConfig(npxLaunch),
+  };
+}
+
+/** How each AI agent connects, as `sendmock ai install` writes it, installed or through npx (docs/plan/14-ai-integration.md). */
 export const aiAgentSetups: AiAgentSetup[] = [
-  {
-    target: "claude-code",
-    name: "Claude Code",
-    install_command: "sendmock ai install --target claude-code",
-    mcp_config_path: "claude mcp add sendmock -- sendmock mcp",
-    mcp_config: "claude mcp add sendmock -- sendmock mcp",
-    instructions_path: ".claude/skills/sendmock/",
-  },
-  {
-    target: "codex",
-    name: "Codex",
-    install_command: "sendmock ai install --target codex",
-    mcp_config_path: "~/.codex/config.toml",
-    mcp_config: '[mcp_servers.sendmock]\ncommand = "sendmock"\nargs = ["mcp"]',
-    instructions_path: "AGENTS.md",
-  },
-  {
-    target: "cursor",
-    name: "Cursor",
-    install_command: "sendmock ai install --target cursor",
-    mcp_config_path: ".cursor/mcp.json",
-    mcp_config: mcpServerJson,
-    instructions_path: ".cursor/rules/sendmock.mdc",
-  },
-  {
-    target: "gemini",
-    name: "Gemini CLI",
-    install_command: "sendmock ai install --target gemini",
-    mcp_config_path: "~/.gemini/settings.json",
-    mcp_config: mcpServerJson,
-    instructions_path: "GEMINI.md",
-  },
-  {
-    target: "vscode",
-    name: "VS Code",
-    install_command: "sendmock ai install --target vscode",
-    mcp_config_path: ".vscode/mcp.json",
-    mcp_config: JSON.stringify(
-      {
-        servers: {
-          sendmock: { type: "stdio", command: "sendmock", args: ["mcp"] },
-        },
-      },
-      null,
-      2,
-    ),
-    instructions_path: ".github/copilot-instructions.md",
-  },
+  buildSetup(
+    {
+      target: "claude-code",
+      name: "Claude Code",
+      mcp_config_path: renderClaudeCodeCommand(installedLaunch),
+      instructions_path: ".claude/skills/sendmock/",
+    },
+    renderClaudeCodeCommand,
+  ),
+  buildSetup(
+    {
+      target: "codex",
+      name: "Codex",
+      mcp_config_path: "~/.codex/config.toml",
+      instructions_path: "AGENTS.md",
+    },
+    renderCodexTable,
+  ),
+  buildSetup(
+    {
+      target: "cursor",
+      name: "Cursor",
+      mcp_config_path: ".cursor/mcp.json",
+      instructions_path: ".cursor/rules/sendmock.mdc",
+    },
+    (mcpLaunch) => renderServersJson(mcpLaunch, false),
+  ),
+  buildSetup(
+    {
+      target: "gemini",
+      name: "Gemini CLI",
+      mcp_config_path: "~/.gemini/settings.json",
+      instructions_path: "GEMINI.md",
+    },
+    (mcpLaunch) => renderServersJson(mcpLaunch, false),
+  ),
+  buildSetup(
+    {
+      target: "vscode",
+      name: "VS Code",
+      mcp_config_path: ".vscode/mcp.json",
+      instructions_path: ".github/copilot-instructions.md",
+    },
+    (mcpLaunch) => renderServersJson(mcpLaunch, true),
+  ),
 ];
 
-/** The agent skill, as `sendmock ai skill --print` prints it (outline from docs/plan/14-ai-integration.md). */
-export const agentSkillMarkdown = `---
-name: sendmock
-description: Test and debug email, SMS, payments and webhooks locally with SendMock.
----
-
-# SendMock
-
-Use SendMock when testing or debugging anything that sends email or SMS, takes payments, or receives provider webhooks locally.
-
-1. Check it runs: \`sendmock status --json\` (MCP: \`sendmock_status\`). If not, start \`sendmock serve\` or ask the user.
-2. Prefer the MCP tools; otherwise use the CLI with \`--json\`.
-3. Workflows: connect an app, read an OTP, set up inbound webhooks with the right template, simulate outcomes, debug failed deliveries (check Logs first), complete Twilio Verify flows, add a payment gateway or flow, capture Slack and push calls with the HTTP catcher, write a scenario, export the setup with \`sendmock seed export\`.
-4. Safety: never reset or delete everything without asking; never print secrets; keep webhooks on local URLs unless asked.
-`;
+/** The skill the binary serves (skill/sendmock/SKILL.md), for the demo's version. */
+export const agentSkillMarkdown = skillTemplate.replace(
+  "{{sendmock_version}}",
+  "0.0.0-dev",
+);

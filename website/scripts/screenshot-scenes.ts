@@ -11,7 +11,7 @@ export type Scene = {
   open: (page: Page, appBaseUrl: string) => Promise<void>;
 };
 
-async function navigateInApp(page: Page, targetPath: string) {
+export async function navigateInApp(page: Page, targetPath: string) {
   await page.evaluate((path) => {
     window.history.pushState({}, "", path);
     window.dispatchEvent(new PopStateEvent("popstate"));
@@ -91,6 +91,7 @@ const landingScenes: Scene[] = [
 const docsScenes: Scene[] = [
   listScene("overview", "/", "Overview · SendMock"),
   listScene("verify", "/sms/verify", "Verify · SendMock"),
+  listScene("push", "/push", "Push · SendMock"),
   {
     name: "http",
     isLandingShot: false,
@@ -163,6 +164,37 @@ const docsScenes: Scene[] = [
     "Methods · Payments · SendMock",
   ),
   listScene("payment-flows", "/payments/flows", "Flows · Payments · SendMock"),
+  {
+    name: "payment-subscriptions",
+    isLandingShot: false,
+    open: async (page) => {
+      await navigateInApp(page, "/payments/subscriptions");
+      for (const [customerEmail, cardNumber] of [
+        ["sam@example.test", "4242424242424242"],
+        ["lee@example.test", "4000000000009995"],
+      ]) {
+        await page.getByRole("button", { name: "New subscription" }).click();
+        const newDialog = page.getByRole("dialog", {
+          name: "New subscription",
+        });
+        await newDialog.getByLabel("Customer email").fill(customerEmail ?? "");
+        await newDialog.getByLabel("Test card").fill(cardNumber ?? "");
+        await newDialog
+          .getByRole("button", { name: "Start subscription" })
+          .click();
+        await newDialog.waitFor({ state: "hidden" });
+      }
+      await page
+        .getByRole("button", { name: "More for sam@example.test" })
+        .click();
+      await page.getByRole("menuitem", { name: "Advance to renewal" }).click();
+      await page
+        .getByTestId("subscription-row")
+        .filter({ hasText: "sam@example.test" })
+        .getByText("2", { exact: true })
+        .waitFor();
+    },
+  },
   listScene("numbers", "/numbers", "Numbers · SendMock"),
   {
     name: "scenarios",

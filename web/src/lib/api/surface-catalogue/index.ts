@@ -3,6 +3,8 @@ import { httpCatcherSurfaces } from "./http-catcher-surfaces";
 import { messageProviderSurfaces } from "./message-provider-surfaces";
 import { messageRuleSurfaces } from "./message-rule-surfaces";
 import { paymentSurfaces } from "./payment-surfaces";
+import { projectSurfaces } from "./project-surfaces";
+import { pushSurfaces } from "./push-surfaces";
 import { smsSurfaces } from "./sms-surfaces";
 import type { OperationSurfaces, SurfaceCatalogue } from "./surface-definition";
 import { systemSurfaces } from "./system-surfaces";
@@ -11,7 +13,11 @@ import { webhookDeliverySurfaces } from "./webhook-delivery-surfaces";
 import { webhookSurfaces } from "./webhook-surfaces";
 import { webhookTemplateSurfaces } from "./webhook-template-surfaces";
 
-export type { OperationSurfaces, SurfaceCatalogue } from "./surface-definition";
+export type {
+  OperationSurfaces,
+  StageBPhase,
+  SurfaceCatalogue,
+} from "./surface-definition";
 
 /**
  * Every operation's CLI command, MCP tool and UI place, keyed like the endpoint
@@ -29,6 +35,8 @@ export const surfaceCatalogue: SurfaceCatalogue = {
   ...webhookDeliverySurfaces,
   ...webhookTemplateSurfaces,
   ...testHelperSurfaces,
+  ...projectSurfaces,
+  ...pushSurfaces,
 };
 
 /** `GET /api/v1/emails/{emailId}`, the catalogue key of an endpoint. */

@@ -1,0 +1,15 @@
+{
+  "name": "sendmock",
+  "description": "The SendMock plugin for Claude Code.",
+  "owner": {
+    "name": "MD. Shibbir Ahmed",
+    "url": "https://github.com/shibbirweb"
+  },
+  "plugins": [
+    {
+      "name": "sendmock",
+      "source": "./plugin",
+      "description": "Test and debug email, SMS, payments, HTTP calls and webhooks locally: the SendMock skill and its MCP server."
+    }
+  ]
+}

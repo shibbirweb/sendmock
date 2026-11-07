@@ -66,7 +66,7 @@ export type ActivityBucket = {
 };
 
 export type FailureCodeCount = {
-  /** HTTP status as text (`"500"`), or `"timeout"` / `"connection"`. */
+  /** HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`. */
   failure_code: string;
   failure_count: number;
 };
@@ -167,10 +167,19 @@ export type AppInfo = {
   smtp_address: string;
   http_address: string;
   provider_address: string | null;
+  /** The catch-all catcher port (`--catcher-addr`); null when it is off. */
+  catcher_address: string | null;
+  /** The POP3 listener (`--pop3-addr`), which serves the captured mail per project; null when it is off (EM-21). */
+  pop3_address: string | null;
   database_path: string;
   database_size_bytes: number;
   /** True when SendMock runs in Docker, so the UI defaults to container hostnames. */
   is_container: boolean;
+  /**
+   * The `operationId`s this binary serves; the UI shows Not available yet for the
+   * rest (UI-12).
+   */
+  available_operations: string[];
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */
@@ -334,6 +343,21 @@ export type AppSettings = {
    * @example 80
    */
   payment_random_success_rate_percent: number;
+  /**
+   * Digits in each code of a Verify service made without its own code length, 4 to 10.
+   * @example 6
+   */
+  verify_default_code_length: number;
+  /**
+   * How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+   * @example 600
+   */
+  verify_default_ttl_seconds: number;
+  /**
+   * Sent by every Verify service without its own fixed code; null for random codes.
+   * @example "123456"
+   */
+  verify_fixed_code: string | null;
 };
 
 /** What happens to a new hosted checkout (PY-09.4): wait for the page, or settle at once. */

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import {
   BotIcon,
   BracesIcon,
+  CreditCardIcon,
   FileCodeIcon,
   KeyRoundIcon,
   type LucideIcon,
@@ -18,6 +19,7 @@ const categoryIcons: Record<TemplateCategory, LucideIcon> = {
   generic: BracesIcon,
   "email-provider": MailIcon,
   "sms-provider": MessageSquareIcon,
+  "payment-provider": CreditCardIcon,
   chat: BotIcon,
   automation: WorkflowIcon,
   custom: FileCodeIcon,

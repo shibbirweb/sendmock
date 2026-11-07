@@ -1,0 +1,89 @@
+# The Docker page's examples, run as written (DS-02.6): the Compose example against an image
+# built from the commit, and SendMock as a GitHub Actions service container, which needs a
+# published image, so Release build calls that job with the tag it just pushed.
+name: Docker examples
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: A published image for the service-container job, such as ghcr.io/shibbirweb/sendmock:0.1.0-beta.1
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      image:
+        description: A published image for the service-container job (empty skips it)
+        type: string
+        default: ""
+  pull_request:
+    paths:
+      - Dockerfile
+      - examples/docker/**
+      - docs/wiki/connect/docker.md
+      - .github/workflows/docker-examples.yml
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    name: The Compose example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: The image from this commit, under the name the example uses
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ghcr.io/shibbirweb/sendmock:latest
+          cache-from: type=gha,scope=amd64
+
+      # AC: DS-02.6
+      - name: The app waits for SendMock's health check, then its email and SMS are read back
+        working-directory: examples/docker
+        run: |
+          # Failures are written as annotations, which the public checks API shows without the log.
+          report_failure() {
+            echo "::error title=Compose example::$1"
+            docker compose logs --no-color | tail -n 8 | sed 's/^/::error title=Compose logs::/'
+            exit 1
+          }
+          docker compose up --build --detach || report_failure "docker compose up failed"
+          app_container="$(docker compose ps --all --quiet app)"
+          for _ in $(seq 1 60); do
+            [ "$(docker inspect --format '{{.State.Status}}' "$app_container")" = "exited" ] && break
+            sleep 2
+          done
+          app_exit_code="$(docker inspect --format '{{.State.ExitCode}}' "$app_container")"
+          [ "$app_exit_code" = "0" ] || report_failure "the app exited with $app_exit_code"
+          email_answer="$(curl -sS "http://127.0.0.1:8025/api/v1/wait/email?to=compose@example.test&timeout=10s")"
+          echo "$email_answer" | jq -e '.subject == "Sent from the Compose example"' > /dev/null || report_failure "wait/email answered: $email_answer"
+          sms_answer="$(curl -sS "http://127.0.0.1:8025/api/v1/wait/sms?to=%2B15550002222&timeout=10s")"
+          echo "$sms_answer" | jq -e '.body == "Sent from the Compose example"' > /dev/null || report_failure "wait/sms answered: $sms_answer"
+          docker compose down --volumes
+
+  service-container:
+    name: SendMock as a service container
+    if: inputs.image != ''
+    runs-on: ubuntu-latest
+    services:
+      sendmock:
+        image: ${{ inputs.image }}
+        ports:
+          - 1025:1025
+          - 8025:8025
+    steps:
+      # AC: DS-02.6
+      - name: The runner waited for the health check, so mail sent right away is read back
+        env:
+          MAIL_HOST: 127.0.0.1
+          MAIL_PORT: 1025
+        run: |
+          printf 'From: ci@example.test\r\nTo: user@example.com\r\nSubject: From a service container\r\n\r\nHello.\r\n' > message.eml
+          curl -fsS "smtp://$MAIL_HOST:$MAIL_PORT" --mail-from ci@example.test --mail-rcpt user@example.com -T message.eml
+          curl -fsS "http://127.0.0.1:8025/api/v1/wait/email?to=user@example.com&timeout=10s" | jq -e '.subject == "From a service container"'

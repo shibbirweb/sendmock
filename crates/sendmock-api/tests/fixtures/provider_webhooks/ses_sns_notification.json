@@ -1,0 +1,27 @@
+{
+  "doc_url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-and-json-formats.html",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "text/plain; charset=UTF-8",
+  "documented_example": {
+    "Type": "Notification",
+    "MessageId": "22b80b92-fdea-4c2c-8f9d-bdfb0c7bf324",
+    "TopicArn": "arn:aws:sns:us-west-2:123456789012:MyTopic",
+    "Message": "{\"notificationType\":\"Delivery\",\"mail\":{\"timestamp\":\"2016-01-27T14:59:38.237Z\",\"messageId\":\"0000014644fe5ef6-9a483358-9170-4cb4-a269-f5dcdf415321-000000\",\"source\":\"john@example.com\",\"destination\":[\"jane@example.com\"]}}",
+    "Timestamp": "2012-05-02T00:54:06.655Z",
+    "SignatureVersion": "1",
+    "Signature": "EXAMPLEw6JRN...",
+    "SigningCertURL": "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-f3ecfb7224c7233fe7bb5f59f96de52f.pem",
+    "UnsubscribeURL": "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:123456789012:MyTopic:c9135db0-26c4-47ec-8998-413945fb5a96"
+  },
+  "schema": {
+    "type": "object",
+    "required": ["Type", "MessageId", "TopicArn", "Message", "Timestamp", "SignatureVersion", "Signature", "SigningCertURL", "UnsubscribeURL"],
+    "properties": {
+      "Type": { "const": "Notification" },
+      "TopicArn": { "type": "string", "pattern": "^arn:aws:sns:" },
+      "Message": { "type": "string", "pattern": "^\\{\"notificationType\":\"(Bounce|Complaint|Delivery|Send|Open|DeliveryDelay|Subscription)\"" },
+      "SignatureVersion": { "enum": ["1", "2"] }
+    }
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "doc_url": "https://docs.stripe.com/api/events/object",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "id": "evt_3MtwBwLkdIwHu7ix28a3tqPa",
+    "object": "event",
+    "api_version": "2022-11-15",
+    "created": 1680064028,
+    "data": {
+      "object": {
+        "id": "pi_3MtwBwLkdIwHu7ix28a3tqPa",
+        "object": "payment_intent",
+        "amount": 2000,
+        "amount_received": 2000,
+        "currency": "usd",
+        "last_payment_error": null,
+        "livemode": false,
+        "metadata": {},
+        "receipt_email": null,
+        "status": "succeeded"
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_8mWb2DTtLQnKXb",
+      "idempotency_key": "6d11a6b5-0d5c-4e7c-8a3c-58e3c8a5ee1a"
+    },
+    "type": "payment_intent.succeeded"
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "id",
+      "object",
+      "api_version",
+      "created",
+      "data",
+      "livemode",
+      "pending_webhooks",
+      "request",
+      "type"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^evt_[0-9A-Za-z]+$"
+      },
+      "object": {
+        "const": "event"
+      },
+      "api_version": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+      },
+      "created": {
+        "type": "integer"
+      },
+      "livemode": {
+        "type": "boolean"
+      },
+      "pending_webhooks": {
+        "type": "integer"
+      },
+      "request": {
+        "type": "object",
+        "required": [
+          "id",
+          "idempotency_key"
+        ]
+      },
+      "type": {
+        "type": "string",
+        "pattern": "^[a-z_]+(\\.[a-z_]+)+$"
+      },
+      "data": {
+        "type": "object",
+        "required": [
+          "object"
+        ],
+        "properties": {
+          "object": {
+            "type": "object",
+            "required": [
+              "id",
+              "object",
+              "amount",
+              "currency",
+              "status",
+              "metadata"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^pi_[0-9A-Za-z_]+$"
+              },
+              "object": {
+                "const": "payment_intent"
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "amount_received": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[a-z]{3}$"
+              },
+              "livemode": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object"
+              },
+              "receipt_email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "requires_payment_method",
+                  "requires_confirmation",
+                  "requires_action",
+                  "processing",
+                  "requires_capture",
+                  "canceled",
+                  "succeeded"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

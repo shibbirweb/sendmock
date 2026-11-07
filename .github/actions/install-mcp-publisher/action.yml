@@ -1,0 +1,32 @@
+# Downloads the MCP registry's publisher at a pinned release for Linux x64 and checks its
+# Sigstore bundle against the registry's release workflow before it runs (plan 30, W9b).
+name: Install mcp-publisher
+description: Download and verify the MCP registry's publisher CLI
+inputs:
+  version:
+    description: The registry release that ships the publisher
+    default: v1.8.7
+runs:
+  using: composite
+  steps:
+    - uses: sigstore/cosign-installer@v3
+
+    - name: Download and verify mcp-publisher
+      shell: bash
+      env:
+        MCP_PUBLISHER_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        archive="mcp-publisher_linux_amd64.tar.gz"
+        base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+        install_directory="$RUNNER_TEMP/mcp-publisher"
+        mkdir -p "$install_directory"
+        curl --fail --location --silent --show-error --output "$install_directory/$archive" "$base_url/$archive"
+        curl --fail --location --silent --show-error --output "$install_directory/$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+        cosign verify-blob \
+          --bundle "$install_directory/$archive.sigstore.json" \
+          --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "$install_directory/$archive"
+        tar xzf "$install_directory/$archive" -C "$install_directory" mcp-publisher
+        echo "$install_directory" >> "$GITHUB_PATH"

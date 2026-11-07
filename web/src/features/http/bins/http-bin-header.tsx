@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHttpBinActions } from "@/features/http/bins/use-http-bin-actions";
-import { useCatchUrl } from "@/features/http/use-catch-url";
+import { useCatchPortUrl, useCatchUrl } from "@/features/http/use-catch-url";
 import type { useHttpCatcherSearch } from "@/features/http/use-http-catcher-search";
 import type { HttpBin } from "@/lib/api/types";
 
@@ -28,6 +28,7 @@ function BinActions({
 }) {
   const binActions = useHttpBinActions(onDeleted);
   const catchUrl = useCatchUrl(httpBin.name);
+  const catchPortUrl = useCatchPortUrl(httpBin.name);
 
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -42,6 +43,22 @@ function BinActions({
         label="Copy catch URL"
         className="size-7"
       />
+      {catchPortUrl !== null && (
+        <>
+          <code
+            data-testid="catch-port-url"
+            title="The catch-all port: any path, the first part names the bin"
+            className="min-w-0 truncate rounded bg-muted px-1.5 py-0.5 font-mono text-xs"
+          >
+            {catchPortUrl}
+          </code>
+          <CopyButton
+            copyText={catchPortUrl}
+            label="Copy catch-all port URL"
+            className="size-7"
+          />
+        </>
+      )}
       <Button
         variant="ghost"
         size="sm"

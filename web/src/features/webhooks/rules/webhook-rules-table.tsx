@@ -18,6 +18,7 @@ import {
 import type { WebhookRule } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { describeRuleFilter } from "@/lib/webhooks/rule-filter/describe-rule-filter";
+import { CreatedByBadge } from "@/components/common/created-by-badge";
 
 export type RuleRowActions = {
   onMove: (webhookRule: WebhookRule, direction: "up" | "down") => void;
@@ -72,7 +73,10 @@ function RuleRow({
         </span>
       </TableCell>
       <TableCell className="max-w-56">
-        <span className="block truncate font-medium">{webhookRule.name}</span>
+        <span className="block truncate font-medium">
+          {webhookRule.name}
+          <CreatedByBadge createdBy={webhookRule.created_by} />
+        </span>
         <span className="block truncate text-xs text-muted-foreground">
           to {endpointName}
         </span>

@@ -15,6 +15,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
   includesText,
+  keepRequestedProject,
 } from "@/mocks/handlers/handler-utils";
 import { buildDeliveryDetail } from "@/mocks/webhooks/delivery-detail";
 
@@ -52,7 +53,7 @@ export const waitHandlers = [
     const { sinceMs, timeoutMs } = readWaitWindow(waitQuery);
     const matchedEmail = await waitForMatch(
       () =>
-        mockDatabase.emails.find(
+        keepRequestedProject(mockDatabase.emails, waitQuery).find(
           (email) =>
             isAfter(email.received_at, sinceMs) &&
             matchesFilter(
@@ -75,7 +76,7 @@ export const waitHandlers = [
     const { sinceMs, timeoutMs } = readWaitWindow(waitQuery);
     const matchedMessage = await waitForMatch(
       () =>
-        mockDatabase.smsMessages.find(
+        keepRequestedProject(mockDatabase.smsMessages, waitQuery).find(
           (smsMessage) =>
             isAfter(smsMessage.created_at, sinceMs) &&
             matchesFilter(smsMessage.to_number, waitQuery.get("to")) &&
@@ -166,7 +167,18 @@ export const waitHandlers = [
     const lookupQuery = new URL(request.url).searchParams;
     const findOtp = () =>
       findLatestOtp(
-        mockDatabase,
+        {
+          ...mockDatabase,
+          emails: keepRequestedProject(mockDatabase.emails, lookupQuery),
+          smsMessages: keepRequestedProject(
+            mockDatabase.smsMessages,
+            lookupQuery,
+          ),
+          verifications: keepRequestedProject(
+            mockDatabase.verifications,
+            lookupQuery,
+          ),
+        },
         lookupQuery.get("to") ?? "",
         lookupQuery.get("channel"),
       );
@@ -191,7 +203,10 @@ export const waitHandlers = [
     await applyMockConditions();
     const lookupQuery = new URL(request.url).searchParams;
     const findLinks = () =>
-      findLatestLinks(mockDatabase.emails, lookupQuery.get("to") ?? "");
+      findLatestLinks(
+        keepRequestedProject(mockDatabase.emails, lookupQuery),
+        lookupQuery.get("to") ?? "",
+      );
     const timeoutText = lookupQuery.get("timeout");
     if (timeoutText === null) {
       const linksLookup = findLinks();

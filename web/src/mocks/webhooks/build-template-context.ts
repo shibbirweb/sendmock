@@ -2,11 +2,16 @@ import type {
   AppEventType,
   CapturedHttpRequest,
   EmailDetail,
+  PaymentStatus,
   SmsMessage,
   TemplateRenderRequest,
   WebhookTemplateSummary,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
+import {
+  samplePaymentEventData,
+  toPaymentEventData,
+} from "@/mocks/payments/payment-event-data";
 import type { TemplateContext } from "@/mocks/webhooks/render-template-text";
 
 type ContextSubject = {
@@ -27,6 +32,17 @@ function toEmailData(email: EmailDetail): Record<string, unknown> {
     html_body: email.html_body,
     tags: email.tags,
     extracted: email.extracted,
+    headers: email.headers,
+    // The mock keeps no file bytes, so content is empty; the binary inlines files up to 1 MB.
+    attachments: email.attachments.map((attachment) => ({
+      index: attachment.index,
+      filename: attachment.filename,
+      content_type: attachment.content_type,
+      size_bytes: attachment.size_bytes,
+      content_id: attachment.content_id,
+      url: `http://127.0.0.1:8025${attachment.download_url}`,
+      content_base64: "",
+    })),
   };
 }
 
@@ -34,11 +50,16 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
   return {
     id: smsMessage.id,
     provider_id: smsMessage.provider_id,
+    channel: smsMessage.channel,
     from_number: smsMessage.from_number,
     to_number: smsMessage.to_number,
     body: smsMessage.body,
+    encoding: smsMessage.encoding,
+    segments: smsMessage.segments,
+    media: smsMessage.media,
     status: smsMessage.status,
     error_code: smsMessage.error_code,
+    messaging_service_sid: smsMessage.messaging_service_sid,
     extracted: smsMessage.extracted,
   };
 }
@@ -75,11 +96,16 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       label: "Built-in sample",
       data: {
         provider_id: "SM00000000000000000000000000000001",
+        channel: "sms",
         from_number: "+15550001111",
         to_number: "+14155550100",
         body: "Your Acme code is 482913",
+        encoding: "GSM-7",
+        segments: 1,
+        media: [],
         status: "delivered",
         error_code: null,
+        messaging_service_sid: null,
         extracted: { otp: ["482913"], links: [] },
       },
     };
@@ -98,6 +124,13 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
         body: '{"text":"Deploy finished"}',
         json: { text: "Deploy finished" },
       },
+    };
+  }
+  if (eventType.startsWith("payment.") || eventType.startsWith("checkout.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: samplePaymentEventData,
     };
   }
   if (eventType === "webhook.failed") {
@@ -126,6 +159,21 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
       extracted: { otp: ["739104"], links: [] },
     },
   };
+}
+
+/** The event a payment's latest state stands for, for a preview against it. */
+function readPaymentEventType(paymentStatus: PaymentStatus): AppEventType {
+  const eventTypes: Partial<Record<PaymentStatus, AppEventType>> = {
+    authorized: "payment.authorized",
+    succeeded: "payment.succeeded",
+    failed: "payment.failed",
+    canceled: "payment.canceled",
+    refunded: "payment.refunded",
+    partially_refunded: "payment.partially_refunded",
+    disputed: "payment.dispute_opened",
+  };
+
+  return eventTypes[paymentStatus] ?? "payment.created";
 }
 
 function findContextSubject(
@@ -169,6 +217,19 @@ function findContextSubject(
           eventType: "http.captured",
           data: toHttpRequestData(capturedRequest),
           label: `${capturedRequest.method} ${capturedRequest.path}`,
+        };
+  }
+
+  if (renderRequest.payment_id !== undefined) {
+    const paymentDetail = mockDatabase.payments.find(
+      (existingPayment) => existingPayment.id === renderRequest.payment_id,
+    );
+    return paymentDetail === undefined
+      ? null
+      : {
+          eventType: readPaymentEventType(paymentDetail.status),
+          data: toPaymentEventData(paymentDetail),
+          label: `${paymentDetail.provider_name} ${paymentDetail.provider_reference}`,
         };
   }
 

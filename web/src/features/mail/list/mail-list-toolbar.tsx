@@ -20,28 +20,35 @@ import {
 } from "@/components/ui/tooltip";
 import { ImportEmailDialog } from "@/features/mail/list/import-email-dialog";
 import { useMailNotifications } from "@/features/mail/list/use-mail-notifications";
+import type { EmailListFilters } from "@/lib/api/types";
 
 type MailListToolbarProps = {
+  /** The list's current search; notifications only come for emails that fit it. */
+  emailFilters: EmailListFilters;
   loadedEmailCount: number;
   totalEmailCount: number;
   checkedEmailCount: number;
   onToggleAllChecked: (isChecked: boolean) => void;
   onMarkCheckedRead: () => void;
   onDeleteChecked: () => void;
+  /** A search or filter is on, so the delete removes only the matching emails. */
+  isFiltered: boolean;
   onDeleteAll: () => void;
 };
 
 export function MailListToolbar({
+  emailFilters,
   loadedEmailCount,
   totalEmailCount,
   checkedEmailCount,
   onToggleAllChecked,
   onMarkCheckedRead,
   onDeleteChecked,
+  isFiltered,
   onDeleteAll,
 }: MailListToolbarProps) {
   const { isSupported, isEnabled, toggleNotifications } =
-    useMailNotifications();
+    useMailNotifications(emailFilters);
   const isAllChecked =
     loadedEmailCount > 0 && checkedEmailCount === loadedEmailCount;
   const hasChecked = checkedEmailCount > 0;
@@ -107,7 +114,9 @@ export function MailListToolbar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Delete all emails"
+                  aria-label={
+                    isFiltered ? "Delete matching emails" : "Delete all emails"
+                  }
                   disabled={totalEmailCount === 0}
                 >
                   <Trash2Icon />
@@ -115,10 +124,16 @@ export function MailListToolbar({
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete all emails?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {isFiltered
+                      ? "Delete the matching emails?"
+                      : "Delete all emails?"}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This removes all {totalEmailCount} captured emails. It
-                    cannot be undone.
+                    {isFiltered
+                      ? `This removes the ${totalEmailCount} emails that match the search; the others stay.`
+                      : `This removes all ${totalEmailCount} captured emails.`}{" "}
+                    It cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -127,7 +142,7 @@ export function MailListToolbar({
                     variant="destructive"
                     onClick={onDeleteAll}
                   >
-                    Delete all
+                    {isFiltered ? "Delete matching" : "Delete all"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

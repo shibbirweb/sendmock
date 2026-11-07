@@ -1,0 +1,43 @@
+[package]
+name = "sendmock-ops"
+description = "The SendMock operation registry shared by REST, CLI and MCP."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+# skill is the agent skill copied in before packaging (scripts/release/stage-crate-files.sh).
+include = [
+    "build.rs",
+    "builtin/**/*",
+    "src/**/*",
+    "skill/**/*",
+]
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-mail.workspace = true
+sendmock-store.workspace = true
+sendmock-sms.workspace = true
+sendmock-payments.workspace = true
+sendmock-webhooks.workspace = true
+
+base64.workspace = true
+hmac.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_urlencoded.workspace = true
+sha1.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

@@ -4,9 +4,12 @@ import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
 import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
 import { messageProviderHandlers } from "@/mocks/handlers/message-provider-handlers";
 import { messageRuleHandlers } from "@/mocks/handlers/message-rule-handlers";
+import { projectHandlers } from "@/mocks/handlers/project-handlers";
+import { pushHandlers } from "@/mocks/handlers/push-handlers";
 import { outcomeTestHandlers } from "@/mocks/handlers/outcome-test-handlers";
 import { paymentTestValueHandlers } from "@/mocks/handlers/payment-test-value-handlers";
 import { waitHandlers } from "@/mocks/handlers/wait-handlers";
+import { emailClickHandlers } from "@/mocks/handlers/email-click-handlers";
 import { emailHandlers } from "@/mocks/handlers/email-handlers";
 import { emailResponseHandlers } from "@/mocks/handlers/email-response-handlers";
 import { httpBinHandlers } from "@/mocks/handlers/http-bin-handlers";
@@ -16,7 +19,9 @@ import { nativeSendHandlers } from "@/mocks/handlers/native-send-handlers";
 import { numbersHandlers } from "@/mocks/handlers/numbers-handlers";
 import { outcomeRulesHandlers } from "@/mocks/handlers/outcome-rules-handlers";
 import { checkoutHandlers } from "@/mocks/handlers/checkout-handlers";
+import { openApiHandlers } from "@/mocks/handlers/openapi-handlers";
 import { paymentHandlers } from "@/mocks/handlers/payment-handlers";
+import { paymentSubscriptionHandlers } from "@/mocks/handlers/payment-subscription-handlers";
 import { inboundRouteHandlers } from "@/mocks/handlers/inbound-route-handlers";
 import { paymentFlowHandlers } from "@/mocks/handlers/payment-flow-handlers";
 import { paymentGatewayHandlers } from "@/mocks/handlers/payment-gateway-handlers";
@@ -52,9 +57,12 @@ export const mockHandlers = [
   ...definitionLookupHandlers,
   ...messageProviderHandlers,
   ...messageRuleHandlers,
+  ...projectHandlers,
+  ...pushHandlers,
   ...emailDetailHandlers,
   ...nativeSendHandlers,
   ...emailHandlers,
+  ...emailClickHandlers,
   ...emailResponseHandlers,
   ...smsSendHandlers,
   ...smsHandlers,
@@ -69,6 +77,8 @@ export const mockHandlers = [
   ...paymentFlowHandlers,
   ...paymentGatewayHandlers,
   ...paymentMethodHandlers,
+  ...openApiHandlers,
+  ...paymentSubscriptionHandlers,
   ...paymentHandlers,
   ...checkoutHandlers,
   ...webhookEndpointHandlers,

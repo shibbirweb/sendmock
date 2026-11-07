@@ -1,0 +1,8 @@
+{
+  "name": "sendmock-example-webhooks-node-standard-webhooks",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "standardwebhooks": "1.1.1"
+  }
+}

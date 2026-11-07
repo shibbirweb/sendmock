@@ -1,0 +1,177 @@
+{
+  "order": 2,
+  "path": "/mail",
+  "states": {
+    "normal": [
+      "heading: Mail",
+      "link: Read the Mail guide",
+      "textbox: Search emails",
+      "button: Unread",
+      "button: Attachments",
+      "button: Inbound",
+      "button: SendGrid",
+      "button: SMTP",
+      "checkbox: Select all loaded emails",
+      "button: Notify me about new emails",
+      "button: Import .eml",
+      "button: Delete all emails",
+      "each item, checkbox: Select email from …",
+      "each item, img: Unread",
+      "each item, img: Has attachments",
+      "each item, img: …",
+      "each item, link: …",
+      "paragraph: Select an email to read it. Use J and K to move through the list."
+    ],
+    "An email is open": [
+      "heading: Welcome to Acme: here is what is new this week",
+      "button: Reply",
+      "button: Forward",
+      "button: Mark as unread",
+      "button: Delete email",
+      "button: Simulate an event",
+      "button: More actions",
+      "link: SendGrid",
+      "button: Edit tags",
+      "link: https://acme.test/blog",
+      "button: Copy link",
+      "tab: HTML",
+      "tab: Text",
+      "tab: Source",
+      "tab: Headers",
+      "tab: Attachments (#)",
+      "tab: MIME",
+      "tab: Checks",
+      "tab: Timeline",
+      "tab: Template data",
+      "radio: Desktop width",
+      "radio: Tablet width",
+      "radio: Mobile width",
+      "button: Load remote images",
+      "button: Screenshot"
+    ],
+    "An email with a code is open": [
+      "heading: Your verification code",
+      "link: SMTP",
+      "button: Copy code #"
+    ],
+    "Attachments tab": [
+      "img: hero.png",
+      "link: Download hero.png"
+    ],
+    "MIME tab": [
+      "each item, link: Download part …"
+    ],
+    "Checks tab": [
+      "heading: HTML compatibility: #%",
+      "paragraph: CSS background (line #): Partly supported in Outlook for Windows (#%).",
+      "paragraph: Inline CID images (line #): Partly supported in Outlook for Windows (#%).",
+      "paragraph: Remote images (line #): Partly supported in Outlook for Windows (#%).",
+      "heading: Links and images",
+      "button: Check links",
+      "paragraph: Runs only when you ask, because it makes real requests to every link.",
+      "heading: Spam score: #.# / #"
+    ],
+    "Template data tab": [
+      "paragraph: Sent with provider template d-#f#c#b#a#e#d . The template content lives at the provider, so only the data is shown."
+    ],
+    "Replying": [
+      "heading: Reply as recipient",
+      "button: Close composer",
+      "combobox: From",
+      "textbox: Subject",
+      "textbox: Message",
+      "button: Send reply",
+      "button: Cancel",
+      "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
+    ],
+    "Forwarding": [
+      "heading: Forward as recipient",
+      "button: Close composer",
+      "combobox: From",
+      "combobox: To",
+      "textbox: Subject",
+      "textbox: Message",
+      "checkbox: Include attachments (#)",
+      "button: Send forward",
+      "button: Cancel",
+      "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
+    ],
+    "Emails are selected": [
+      "button: Mark read",
+      "button: Delete"
+    ],
+    "Simulate an event menu": [
+      "menuitem: Open (email.opened)",
+      "menuitem: Click a link (email.clicked)",
+      "menuitem: Delivered",
+      "menuitem: Hard bounce",
+      "menuitem: Soft bounce",
+      "menuitem: Spam complaint",
+      "menuitem: Unsubscribe"
+    ],
+    "More actions menu": [
+      "menuitem: Download .eml",
+      "menuitem: Release to real SMTP",
+      "menuitem: Send to webhook"
+    ],
+    "Release dialog": [
+      "heading: Release to real SMTP",
+      "paragraph: Sends this email through your relay server so you can check it in a real inbox. Only recipients on the relay allowlist are accepted.",
+      "textbox: Recipients (comma separated)",
+      "button: Cancel",
+      "button: Release",
+      "button: Close"
+    ],
+    "Send to webhook dialog": [
+      "heading: Send to webhook",
+      "paragraph: Sends \"Welcome to Acme: here is what is new this week\" to an endpoint now.",
+      "combobox: Endpoint",
+      "combobox: Format",
+      "paragraph: A template here is used for this send only.",
+      "textbox: vars.reason",
+      "paragraph: Asked for on manual sends.",
+      "paragraph: None. A value here wins over the endpoint and global value of that name, for this send only.",
+      "button: Add override",
+      "switch: Edit body",
+      "button: Copy rendered URL",
+      "heading: Rendered headers",
+      "heading: Rendered body",
+      "button: Copy rendered body",
+      "button: Cancel",
+      "button: Send",
+      "button: Close"
+    ],
+    "Import .eml dialog": [
+      "heading: Import .eml",
+      "paragraph: Store a whole message, headers and all, from a file or pasted text.",
+      "radio: Sent by your app As if your app sent it, like the sendmail shim (POST /send/raw).",
+      "radio: Incoming to your app As a reply or new mail to your app; inbound routes deliver it.",
+      "textbox: Message",
+      "button: Upload a .eml file",
+      "button: Import",
+      "button: Close"
+    ],
+    "Delete all emails dialog": [
+      "heading: Delete all emails?",
+      "paragraph: This removes all # captured emails. It cannot be undone.",
+      "button: Cancel",
+      "button: Delete all"
+    ],
+    "empty": [
+      "paragraph: No emails yet",
+      "paragraph: Point your app's SMTP settings at SendMock and send something. No auth or TLS needed.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy SMTP host",
+      "button: Copy SMTP port",
+      "link: More snippets",
+      "button: Send a sample email"
+    ],
+    "failing": [
+      "alert: Could not load emails. Try again",
+      "paragraph: Could not load emails.",
+      "button: Try again"
+    ]
+  }
+}

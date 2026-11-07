@@ -3,7 +3,7 @@ title: Ruby
 description: Connect Ruby apps to SendMock with rails Action Mailer and Net::HTTP.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

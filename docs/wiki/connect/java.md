@@ -3,7 +3,7 @@ title: Java
 description: Connect Java apps to SendMock with jakarta Mail, Spring and HttpClient.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
+import { useIsOperationQueryable } from "@/lib/api/hooks/use-operation-availability";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   DeliveryListFilters,
@@ -41,8 +42,10 @@ export function useWebhookDeliveries(
   });
 }
 
-/** Delivery health for a range and an optional endpoint (WH-11.3). */
+/** Delivery health for a range and an optional endpoint (WH-11.3); waits until served (UI-12). */
 export function useWebhookMetrics(metricsQuery: WebhookMetricsQuery) {
+  const isQueryable = useIsOperationQueryable("GET /api/v1/webhooks/metrics");
+
   return useQuery({
     queryKey: queryKeys.webhooks.metrics(metricsQuery),
     queryFn: ({ signal }) =>
@@ -51,6 +54,7 @@ export function useWebhookMetrics(metricsQuery: WebhookMetricsQuery) {
         abortSignal: signal,
       }),
     placeholderData: keepPreviousData,
+    enabled: isQueryable,
   });
 }
 

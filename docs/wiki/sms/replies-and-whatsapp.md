@@ -3,7 +3,7 @@ title: Replies and WhatsApp
 description: Reply as the contact, see your app's reply webhook and TwiML answers, and use WhatsApp and media.
 ---
 
-> Try it in the [demo](/demo/sms). Works in your install from Phase 3 (reply webhooks) and Phase 4 (WhatsApp).
+> Try it in the [demo](/demo/sms).
 
 ## What it solves
 
@@ -21,8 +21,48 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 
 1. If the number belongs to a **Messaging Service** whose inbound handling is "Send a webhook", the service's request URL is called.
 2. Otherwise the **number's inbound URL** is called, in the format set on the number (Twilio, Vonage, Plivo, ... or native JSON), with `X-Twilio-Signature` for Twilio.
-3. If that call fails, the **fallback URL** is tried.
+3. If that call fails, the **fallback URL** is called with the same request plus `ErrorCode` and `ErrorUrl`, as Twilio does. Nothing is retried after that; use **Resend reply webhook** once your handler is fixed.
 4. A number without an inbound URL sends the message to **rules only** ([Webhooks > Rules](../webhooks/rules.md) on `sms.inbound`). With both set, both receive it.
+
+## What your app receives
+
+In Twilio's format (the default), the same "A message comes in" request Twilio sends, so the handler you run in production works unchanged:
+
+- `POST` as `application/x-www-form-urlencoded`, or `GET` with the fields in the query string when the number's method is `GET`. A Messaging Service always uses `POST`.
+- Fields: `MessageSid`, `SmsSid`, `SmsMessageSid`, `AccountSid`, `MessagingServiceSid` (when the number is in a service), `From`, `To`, `Body`, `NumMedia`, `NumSegments`, `SmsStatus`, `ApiVersion`, plus `MediaUrl{N}` and `MediaContentType{N}` for each file (links to SendMock's copy) and `ProfileName` and `WaId` on WhatsApp.
+- Headers: `X-Twilio-Signature` (signed with the auth token in **Settings > SMS providers > Twilio**), `I-Twilio-Idempotency-Token` and `User-Agent: TwilioProxy/1.1`.
+
+## What your app can answer
+
+Answer with TwiML as `text/xml`, `application/xml` or `text/html`, as Twilio reads them. A `text/plain` answer is sent back to the contact as the reply text.
+
+```xml
+<Response>
+  <Message statusCallback="/sms/status">Thanks, your booking is confirmed.</Message>
+</Response>
+```
+
+| TwiML | What happens |
+| --- | --- |
+| `<Message>` with text, or `<Body>` and `<Media>` | a reply in the same conversation, from the number that was texted to the contact, delivered like any sent message |
+| `to` and `from` | send the reply to or from another number |
+| `statusCallback` | status callbacks for the reply, in Twilio's format |
+| `action` (and `method`) | called once the reply is sent, with `MessageStatus`; its TwiML replaces the verbs left in the document |
+| `<Redirect>` (and `method`) | fetches TwiML from another URL; the verbs after it are skipped |
+| an empty `<Response/>`, an empty body or `204` | no reply |
+
+Several `<Message>` verbs send several replies, in order. URLs can be relative to the URL that answered. One incoming message makes at most 10 TwiML requests, redirects and actions included, so two handlers that redirect to each other stop.
+
+## When the call fails
+
+Failures carry Twilio's error codes, shown on the message and in **Message details > Reply webhook**:
+
+| What happened | Code |
+| --- | --- |
+| an answer other than `2xx`, or none within 15 seconds | 11200 HTTP retrieval failure |
+| the connection was refused or reset | 11205 HTTP connection failure |
+| the body is not a TwiML `<Response>` document | 12100 Document parse failure |
+| any other content type, such as JSON | 12300 Invalid Content-Type |
 
 ## The result, on screen
 
@@ -34,7 +74,22 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 
 - Send to or from `whatsapp:+8801700000000` through the Twilio API and the conversation shows the WhatsApp badge and styling.
 - Media (`MediaUrl` on Twilio, `media_urls` or inline `media` on the native API) shows as thumbnails and file chips in the bubble, with an MMS or Media badge and a media list in **Message details**.
-- **Simulate read** on an outgoing message fires `sms.opened` and turns the ticks blue, for read receipts.
+- **Simulate read** on an outgoing message fires `sms.opened` and turns the ticks blue, for read receipts. Only outgoing messages can be read: opening a message your app received answers `409`.
+
+## WhatsApp Cloud API
+
+Apps that call Meta's WhatsApp Business Cloud API directly send to SendMock the same way: change the host `https://graph.facebook.com` to the provider port, `http://127.0.0.1:8026` (or `http://127.0.0.1:8025/providers/whatsapp_cloud`), and keep the path.
+
+1. Send as your app does, for example with `curl`:
+
+   ```sh
+   curl -X POST http://127.0.0.1:8026/v21.0/106540352242922/messages -H "Authorization: Bearer any" -H "Content-Type: application/json" -d '{"messaging_product":"whatsapp","to":"16505551234","type":"text","text":{"body":"Your order shipped"}}'
+   ```
+
+2. The answer is Meta's: `messaging_product`, `contacts` with the `wa_id`, and `messages` with a `wamid.` id (`message_status: "accepted"` for a template).
+3. The message shows in **SMS** as a WhatsApp conversation from the provider's business number (`+15550783881` unless you change the **phone_number** credential in **SMS > Providers > WhatsApp Cloud**).
+
+Every message type is stored with a body you can read: text, templates (`Template order_update (en_US)` and their body parameters), images, video, audio, documents and stickers (their caption, with media links downloaded as the file), locations, contacts, interactive buttons and lists, and reactions. A request Meta would refuse (no `messaging_product`, no `to`, an unknown `type`, a missing `text.body`) gets Graph's error object with code `100` and nothing is stored. `{ "messaging_product": "whatsapp", "status": "read", "message_id": "wamid..." }` marks the conversation read and answers `{ "success": true }`. The magic numbers work here too: a refused number answers code `131026`, "Message undeliverable".
 
 Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 
@@ -45,6 +100,7 @@ Step by step: [Recipe: two-way SMS](../recipes/two-way-sms.md).
 | reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
 | resend the reply webhook | [`sendmock sms resend-reply-webhook <smsId>`](/cli/sms/#sms-resend-reply-webhook) | [`POST /api/v1/sms/{smsId}/reply-webhook/resend`](/api/sms/#postSmsBySmsIdReplyWebhookResend) | [`sendmock_sms_reply_webhook_resend`](/mcp/sms/#sendmock_sms_reply_webhook_resend) |
 | simulate a read | [`sendmock sms open <smsId>`](/cli/sms/#sms-open) | [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen) | [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open) |
+| read history | [`sendmock sms opens <smsId>`](/cli/sms/#sms-opens) | [`GET /api/v1/sms/{smsId}/opens`](/api/sms/#getSmsBySmsIdOpens) | [`sendmock_sms_opens`](/mcp/sms/#sendmock_sms_opens) |
 | a media file | [`sendmock sms media <smsId> <mediaIndex>`](/cli/sms/#sms-media) | [`GET /api/v1/sms/{smsId}/media/{mediaIndex}`](/api/sms/#getSmsBySmsIdMediaByMediaIndex) | [`sendmock://sms/{smsId}/media/{mediaIndex}`](/mcp/sms/#resource-sms-smsid-media-mediaindex) |
 
 ## Related

@@ -4,73 +4,79 @@ import {
   listOf,
   pageOf,
   pageQueryParameters,
+  projectQueryParameter,
+  type QueryParameter,
   tagEndpoints,
   typeRef,
 } from "./endpoint-definition";
+
+/** The filters the email list takes; a delete with the same filters removes what it lists. */
+const emailFilterParameters: QueryParameter[] = [
+  {
+    name: "query",
+    description: "Search text; supports from:, to: and tag: prefixes.",
+    schema: "string",
+    example: "to:user@example.test reset",
+  },
+  {
+    name: "from",
+    description: "Sender contains.",
+    schema: "string",
+    example: "no-reply@shop.test",
+  },
+  {
+    name: "to",
+    description: "A recipient contains.",
+    schema: "string",
+    example: "user@example.test",
+  },
+  {
+    name: "tag",
+    description: "Has this tag.",
+    schema: "string",
+    example: "signup",
+  },
+  {
+    name: "is_unread",
+    description: "Only unread.",
+    schema: "boolean",
+    example: true,
+  },
+  {
+    name: "has_attachment",
+    description: "Only with attachments.",
+    schema: "boolean",
+    example: true,
+  },
+  {
+    name: "source",
+    description:
+      "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+    schema: typeRef("EmailSource"),
+    example: "smtp",
+  },
+  {
+    name: "direction",
+    description: "Outbound from your app or inbound to it.",
+    schema: typeRef("EmailDirection"),
+    example: "outbound",
+  },
+  projectQueryParameter("emails"),
+];
 
 const emailEndpoints = tagEndpoints("Email", [
   {
     method: "GET",
     path: "/api/v1/emails",
     summary: "Stored emails, newest first, with search and filters.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "query",
-        description: "Search text; supports from:, to: and tag: prefixes.",
-        schema: "string",
-        example: "to:user@example.test reset",
-      },
-      {
-        name: "from",
-        description: "Sender contains.",
-        schema: "string",
-        example: "no-reply@shop.test",
-      },
-      {
-        name: "to",
-        description: "A recipient contains.",
-        schema: "string",
-        example: "user@example.test",
-      },
-      {
-        name: "tag",
-        description: "Has this tag.",
-        schema: "string",
-        example: "signup",
-      },
-      {
-        name: "is_unread",
-        description: "Only unread.",
-        schema: "boolean",
-        example: true,
-      },
-      {
-        name: "has_attachment",
-        description: "Only with attachments.",
-        schema: "boolean",
-        example: true,
-      },
-      {
-        name: "source",
-        description:
-          "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
-        schema: typeRef("EmailSource"),
-        example: "smtp",
-      },
-      {
-        name: "direction",
-        description: "Outbound from your app or inbound to it.",
-        schema: typeRef("EmailDirection"),
-        example: "outbound",
-      },
-    ],
+    queryParameters: [...pageQueryParameters, ...emailFilterParameters],
     response: pageOf("EmailSummary"),
   },
   {
     method: "DELETE",
     path: "/api/v1/emails",
-    summary: "Delete every email.",
+    summary: "Delete every email, or only those that match the filters.",
+    queryParameters: emailFilterParameters,
     response: null,
     successStatus: 204,
   },
@@ -92,6 +98,7 @@ const emailEndpoints = tagEndpoints("Email", [
         schema: "string",
         example: "Reset your password",
       },
+      projectQueryParameter("emails"),
     ],
     response: typeRef("EmailDetail"),
     errorStatuses: [404],
@@ -154,6 +161,14 @@ const emailEndpoints = tagEndpoints("Email", [
   },
   {
     method: "GET",
+    path: "/api/v1/emails/{emailId}/mime/{partId}",
+    summary:
+      "Download one MIME part, decoded, by its position in the MIME tree.",
+    response: fileOf("application/octet-stream"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
     path: "/api/v1/emails/{emailId}/raw",
     summary: "The raw message source.",
     response: fileOf("message/rfc822"),
@@ -190,6 +205,30 @@ const emailEndpoints = tagEndpoints("Email", [
     requestBody: typeRef("OpenEventRequest"),
     response: null,
     successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/emails/{emailId}/opens",
+    summary: "Every recorded open of the email, oldest first.",
+    response: listOf("OpenRecord"),
+    errorStatuses: [404],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/emails/{emailId}/clicks",
+    summary:
+      "Record a click on one of the email's links and fire email.clicked.",
+    requestBody: typeRef("EmailClickRequest"),
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/emails/{emailId}/clicks",
+    summary: "Every recorded click on the email's links, newest first.",
+    response: listOf("EmailClickRecord"),
     errorStatuses: [404],
   },
   {

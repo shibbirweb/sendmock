@@ -3,7 +3,7 @@ title: Webhooks
 description: How SendMock talks back to your app. The six parts of a webhook, how they fit, and the Webhooks overview screen.
 ---
 
-> Try it in the [demo](/demo/webhooks/overview). Works in your install from Phase 3 (endpoints, rules, deliveries, templates, variables) and Phase 4 (inbound routes and more provider templates).
+> Try it in the [demo](/demo/webhooks/overview).
 
 Real services call your app back: Postmark posts inbound email, Twilio posts delivery receipts and incoming SMS, SendGrid posts bounces, Stripe posts payment events. Locally they cannot reach you without a tunnel, and you cannot make them send what you need when you need it. SendMock sends those requests itself, shaped like the provider's and signed the way it signs them.
 
@@ -59,6 +59,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `email.received` | your app sent an email to SendMock |
 | `email.inbound` | an incoming email arrived (a simulated reply or forward, or mail to an inbound domain) |
 | `email.opened` | an email was opened in the UI, or an open was simulated |
+| `email.clicked` | a link of an email was clicked in the preview, or a click was simulated |
 | `email.delivered`, `email.deferred`, `email.bounced`, `email.complained`, `email.unsubscribed` | a delivery outcome was simulated ([Outcomes](../mail/outcomes.md)) |
 | `email.released` | an email was released to a real SMTP relay |
 | `sms.sent` | your app sent an SMS or WhatsApp message |
@@ -66,6 +67,7 @@ You can also send by hand: **Send to webhook** on any email, SMS or captured req
 | `sms.opened` | an SMS was viewed in the UI, or a read was simulated |
 | `sms.inbound` | the contact replied |
 | `verify.started`, `verify.checked`, `verify.expired` | Twilio Verify activity |
+| `push.sent`, `push.failed` | your app sent a push notification through FCM, Expo or OneSignal, or the provider refused it ([Push](../push.md)) |
 | `http.captured` | the HTTP Catcher recorded a request |
 | `payment.*`, `checkout.*` | payments were created, succeeded, failed, refunded, disputed; checkouts completed or expired |
 | `webhook.failed` | a delivery used up its retries (useful for alerts) |
@@ -86,8 +88,10 @@ The first Webhooks screen shows how deliveries are going, live.
 
 ### Signing
 
-SendMock's own JSON follows [Standard Webhooks](https://www.standardwebhooks.com/): `webhook-id`, `webhook-timestamp` and `webhook-signature` headers with the endpoint's `whsec_` secret, so the official libraries verify it. Provider templates sign the provider's way (`X-Twilio-Signature`, Mailgun's `signature` field, `Stripe-Signature`, ...).
+SendMock's own JSON follows [Standard Webhooks](https://www.standardwebhooks.com/): `webhook-id`, `webhook-timestamp` and `webhook-signature` headers with the endpoint's `whsec_` secret, so the official libraries verify it. Runnable examples for the Node, Python, PHP and Go libraries are in [`examples/webhooks`](https://github.com/shibbirweb/sendmock/tree/develop/examples/webhooks). Provider templates sign the provider's way (`X-Twilio-Signature`, Mailgun's `signature` field, `Stripe-Signature`, ...).
 
+
+Every control and text, one by one: [Webhooks overview in depth](../deeper/webhooks/overview.md).
 ## Customize
 
 - Shape requests for any service: [Advanced: templates](../advanced/templates.md) and [Advanced: request editor](../advanced/request-editor.md).

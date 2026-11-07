@@ -3,7 +3,7 @@ title: Providers
 description: The email APIs SendMock answers like the real provider. Change a built-in, remove the ones you do not use, or add your own.
 ---
 
-> Try it in the [demo](/demo/mail/providers). The screen works today; requests to the provider APIs are answered from Phase 4.
+> Try it in the [demo](/demo/mail/providers).
 
 An email provider is one API SendMock answers like the real one: SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo, or one you add. Providers are data, not code, like [payment gateways](../payments/gateways.md): the requests a provider answers, how SendMock reads them and what it answers are all editable, and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
 
@@ -29,6 +29,21 @@ An email provider is one API SendMock answers like the real one: SendGrid, Mailg
 2. Open **Preview**: the sample send is stored with `ana@example.test` as recipient, and SendGrid answers `202`.
 3. Clear the sample body to `{}`: nothing is stored, and the answer is SendGrid's own `400` error.
 
+## Point your provider's SDK at SendMock
+
+Each official SDK has a setting for the address it calls. Point it at the provider port, `http://127.0.0.1:8026`, and keep your code as it is. CI sends with every one of these SDKs on each change (`examples/email-providers/node/`).
+
+| SDK | Setting |
+| --- | --- |
+| SendGrid (`@sendgrid/mail`) | `sgMail.setClient(client)` and `sgMail.setApiKey(key)`, then `client.setDefaultRequest("baseUrl", "http://127.0.0.1:8026")` on `@sendgrid/client` (after the key, which resets it) |
+| Mailgun (`mailgun.js`) | `url: "http://127.0.0.1:8026"` in `mailgun.client({...})` |
+| Postmark (`postmark`) | `new ServerClient(token, { useHttps: false, requestHost: "127.0.0.1:8026" })` |
+| Resend (`resend`) | `new Resend(key, { baseUrl: "http://127.0.0.1:8026" })` |
+| Amazon SES v2 (`@aws-sdk/client-sesv2`) | `endpoint: "http://127.0.0.1:8026"` in `new SESv2Client({...})` |
+| Brevo (`@getbrevo/brevo`) | `baseUrl: "http://127.0.0.1:8026/v3"` in `new BrevoClient({...})` |
+
+Any API key works unless **Check credentials** is on for the provider.
+
 ## Everything on this screen
 
 ### The table
@@ -52,6 +67,8 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 
 A provider with template errors cannot be saved, and a path that another enabled provider answers is refused with its name.
 
+
+Every control and text, one by one: [Email providers in depth](../deeper/mail/providers.md).
 ## Customize
 
 The full walkthrough, from the provider's API docs to a working provider: [Advanced: create an email provider](../advanced/email-provider.md).

@@ -3,7 +3,7 @@ title: Node.js
 description: Connect Node.js apps to SendMock with nodemailer and fetch.
 ---
 
-> **Applies from the first beta (Phase 1) for email and Phase 2 for SMS.** See [Connect your app](./index.md) for the ports.
+> See [Connect your app](./index.md) for the ports.
 
 ## Email
 

@@ -15,6 +15,7 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 export type EmailFixtureSpec = {
   minutesAgo: number;
@@ -109,6 +110,7 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
 
   const email: EmailDetail = {
     id: emailId,
+    project: defaultProjectKey,
     received_at: receivedAt,
     message_id: `<${faker.string.alphanumeric(16)}@${emailSpec.from.address.split("@")[1] ?? "app.test"}>`,
     from: emailSpec.from,
@@ -146,6 +148,7 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
     extracted,
     opened_at:
       openCount > 0 ? minutesAgo(Math.max(emailSpec.minutesAgo - 2, 0)) : null,
+    click_count: 0,
     // Set by the log fixtures, which create the session for each SMTP email.
     smtp_session_id: null,
     smtp_auth_user: null,

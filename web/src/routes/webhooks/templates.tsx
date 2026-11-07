@@ -18,6 +18,7 @@ const templateCategories: TemplateCategory[] = [
   "generic",
   "email-provider",
   "sms-provider",
+  "payment-provider",
   "chat",
   "automation",
   "custom",

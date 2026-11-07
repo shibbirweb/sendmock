@@ -68,6 +68,11 @@ export type EmailSummary = {
   direction: EmailDirection;
   /** Set on inbound emails made by Reply or Forward, for the list icon. */
   response_kind: EmailResponseKind | null;
+  /**
+   * The project the email was sent to: `default` unless the sender named another (PL-10).
+   * @example "default"
+   */
+  project: string;
 };
 
 export type EmailTemplateData = {
@@ -88,6 +93,8 @@ export type EmailDetail = EmailSummary & {
   attachments: EmailAttachment[];
   extracted: ExtractedData;
   opened_at: IsoTimestamp | null;
+  /** Every recorded click on the email's links (`GET /emails/{emailId}/clicks`). */
+  click_count: number;
   smtp_session_id: Ulid | null;
   smtp_auth_user: string | null;
   template: EmailTemplateData | null;
@@ -100,6 +107,7 @@ export type EmailDetail = EmailSummary & {
 export type EmailTimelineKind =
   | "received"
   | "opened"
+  | "clicked"
   | "delivered"
   | "deferred"
   | "bounced"
@@ -137,6 +145,8 @@ export type EmailListFilters = PageRequest & {
   has_attachment?: boolean;
   source?: EmailSource;
   direction?: EmailDirection;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 export type EmailUpdate = {

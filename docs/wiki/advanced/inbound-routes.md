@@ -3,7 +3,7 @@ title: Inbound routes in depth
 description: Route replies by ticket with named groups, store and notify, use other providers' inbound formats, and let your app create routes through Mailgun's API.
 ---
 
-> Works in your install from Phase 4. Try it in the [demo](/demo/webhooks/inbound-routes) today.
+> Try it in the [demo](/demo/webhooks/inbound-routes).
 
 [Inbound routes](../webhooks/inbound-routes.md) explains the screen. This page covers the patterns apps use.
 

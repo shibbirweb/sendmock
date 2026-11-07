@@ -3,7 +3,6 @@ import type {
   SavedDelivery,
   TemplateCategory,
   WebhookTemplateSummary,
-  WebhookVariable,
 } from "@/lib/api/types";
 import { createMockUlid, minutesAgo } from "@/mocks/fixtures/fixture-helpers";
 
@@ -19,9 +18,118 @@ type TemplateSpec = [
 const emailOutcomeEvents: AppEventType[] = [
   "email.received",
   "email.opened",
+  "email.clicked",
   "email.delivered",
   "email.bounced",
   "email.complained",
+];
+
+const allPaymentEvents: AppEventType[] = [
+  "payment.created",
+  "payment.authorized",
+  "payment.succeeded",
+  "payment.failed",
+  "payment.canceled",
+  "payment.refunded",
+  "payment.partially_refunded",
+  "payment.dispute_opened",
+  "payment.dispute_updated",
+  "payment.dispute_closed",
+  "checkout.completed",
+  "checkout.expired",
+];
+
+/** The payment gateways' notifications, each with the events its provider sends. */
+const paymentTemplateSpecs: TemplateSpec[] = [
+  [
+    "stripe.event",
+    "Stripe: webhook event",
+    "Stripe",
+    "payment-provider",
+    allPaymentEvents,
+    ["stripe_webhook_secret"],
+  ],
+  [
+    "paypal.webhook",
+    "PayPal: webhook event",
+    "PayPal",
+    "payment-provider",
+    allPaymentEvents.filter((eventType) => eventType !== "payment.created"),
+    [],
+  ],
+  [
+    "paypal.ipn",
+    "PayPal: IPN",
+    "PayPal",
+    "payment-provider",
+    [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed",
+    ],
+    [],
+  ],
+  [
+    "sslcommerz.ipn",
+    "SSLCommerz: IPN",
+    "SSLCommerz",
+    "payment-provider",
+    [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "checkout.expired",
+    ],
+    ["sslcommerz_store_password"],
+  ],
+  [
+    "bkash.callback",
+    "bKash: callback",
+    "bKash",
+    "payment-provider",
+    ["payment.succeeded", "payment.failed", "payment.canceled"],
+    [],
+  ],
+  [
+    "razorpay.webhook",
+    "Razorpay: webhook",
+    "Razorpay",
+    "payment-provider",
+    [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed",
+      "checkout.completed",
+    ],
+    ["razorpay_webhook_secret"],
+  ],
+  [
+    "paddle.webhook",
+    "Paddle: webhook",
+    "Paddle",
+    "payment-provider",
+    [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "checkout.completed",
+    ],
+    ["paddle_webhook_secret"],
+  ],
 ];
 
 /** The built-in catalogue from docs/plan/13-webhook-templates.md. */
@@ -101,6 +209,30 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     ["mailgun_signing_key"],
   ],
   [
+    "mailgun.events",
+    "Mailgun: event webhooks",
+    "Mailgun",
+    "email-provider",
+    emailOutcomeEvents,
+    ["mailgun_signing_key"],
+  ],
+  [
+    "postmark.webhooks",
+    "Postmark: delivery, bounce, spam and open webhooks",
+    "Postmark",
+    "email-provider",
+    emailOutcomeEvents,
+    [],
+  ],
+  [
+    "brevo.events",
+    "Brevo: transactional webhooks",
+    "Brevo",
+    "email-provider",
+    emailOutcomeEvents,
+    [],
+  ],
+  [
     "sendgrid.inbound_parse",
     "SendGrid: Inbound Parse",
     "SendGrid",
@@ -173,6 +305,46 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     ["telegram_bot_token", "telegram_chat_id"],
   ],
   [
+    "africastalking.sms",
+    "Africa's Talking: SMS notifications",
+    "Africa's Talking",
+    "sms-provider",
+    ["sms.inbound", "sms.status"],
+    [],
+  ],
+  [
+    "sinch.sms",
+    "Sinch: delivery reports and inbound SMS",
+    "Sinch",
+    "sms-provider",
+    ["sms.inbound", "sms.status"],
+    [],
+  ],
+  [
+    "infobip.dlr",
+    "Infobip: delivery reports",
+    "Infobip",
+    "sms-provider",
+    ["sms.status"],
+    [],
+  ],
+  [
+    "sparkpost.events",
+    "SparkPost: event webhooks",
+    "SparkPost",
+    "email-provider",
+    emailOutcomeEvents,
+    [],
+  ],
+  [
+    "google_chat.message",
+    "Google Chat: incoming webhook",
+    "Google Chat",
+    "chat",
+    ["email.received", "email.bounced", "sms.inbound", "webhook.failed"],
+    [],
+  ],
+  [
     "n8n.flat_json",
     "n8n / Zapier / Make: flat JSON",
     "Automation",
@@ -180,6 +352,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     ["email.received", "sms.sent", "sms.inbound"],
     [],
   ],
+  ...paymentTemplateSpecs,
 ];
 
 export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
@@ -226,95 +399,6 @@ export function buildWebhookTemplateFixtures(): WebhookTemplateSummary[] {
   ];
 
   return [...builtinTemplates, ...customTemplates];
-}
-
-type VariableSpec = Pick<
-  WebhookVariable,
-  "name" | "kind" | "value" | "description"
-> & {
-  randomMode?: WebhookVariable["random_mode"];
-  fixedValue?: string;
-};
-
-const variableSpecs: VariableSpec[] = [
-  {
-    name: "tenant_id",
-    kind: "text",
-    value: "acme",
-    description: "Tenant sent with every request.",
-  },
-  {
-    name: "priority",
-    kind: "number",
-    value: "5",
-    description: "Numeric priority field.",
-  },
-  {
-    name: "sandbox",
-    kind: "boolean",
-    value: "true",
-    description: "Marks payloads as sandbox traffic.",
-  },
-  {
-    name: "meta",
-    kind: "json",
-    value: '{"env":"local"}',
-    description: "Extra metadata object.",
-  },
-  {
-    name: "api_token",
-    kind: "secret",
-    value: "••••••••3f9a",
-    description: "Bearer token for the app.",
-  },
-  {
-    name: "recipient",
-    kind: "dynamic",
-    value: "data.to[0].address | lower",
-    description: "First recipient, lowercased.",
-  },
-  {
-    name: "nonce",
-    kind: "random",
-    value: "random_string(16)",
-    description: "Fresh nonce per send.",
-    randomMode: "per_send",
-  },
-  {
-    name: "idempotency_seed",
-    kind: "random",
-    value: "random_string(12)",
-    description: "Generated once; Regenerate to change it.",
-    randomMode: "fixed",
-    fixedValue: "k3Vq8LzP0aXm",
-  },
-  {
-    name: "full_ref",
-    kind: "computed",
-    value: "{{ vars.tenant_id }}-{{ vars.nonce }}",
-    description: "Tenant plus nonce.",
-  },
-  {
-    name: "reason",
-    kind: "prompt",
-    value: "manual test",
-    description: "Asked for on manual sends.",
-  },
-];
-
-export function buildWebhookVariableFixtures(): WebhookVariable[] {
-  return variableSpecs.map((variableSpec) => ({
-    id: createMockUlid(),
-    name: variableSpec.name,
-    kind: variableSpec.kind,
-    scope: "global",
-    endpoint_id: null,
-    value: variableSpec.value,
-    random_mode: variableSpec.randomMode ?? null,
-    fixed_value: variableSpec.fixedValue ?? null,
-    description: variableSpec.description,
-    created_by: "ui",
-  }));
 }
 
 export function buildSavedDeliveryFixtures(): SavedDelivery[] {

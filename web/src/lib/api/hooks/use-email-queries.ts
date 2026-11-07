@@ -5,7 +5,9 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { requestApi } from "@/lib/api/api-client";
+import { buildOpenEventRequest } from "@/lib/api/open-event-request";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
   EmailDetail,
@@ -19,11 +21,13 @@ import type {
 } from "@/lib/api/types";
 
 export function useEmailList(emailFilters: EmailListFilters = {}) {
+  const projectFilters = { ...emailFilters, project: useSelectedProjectKey() };
+
   return useQuery({
-    queryKey: queryKeys.emails.list(emailFilters),
+    queryKey: queryKeys.emails.list(projectFilters),
     queryFn: ({ signal }) =>
       requestApi<PageOf<EmailSummary>>("/emails", {
-        queryParameters: emailFilters,
+        queryParameters: projectFilters,
         abortSignal: signal,
       }),
   });
@@ -31,12 +35,14 @@ export function useEmailList(emailFilters: EmailListFilters = {}) {
 
 /** Email list that loads the next page as the user scrolls. */
 export function useInfiniteEmailList(emailFilters: EmailListFilters = {}) {
+  const projectFilters = { ...emailFilters, project: useSelectedProjectKey() };
+
   return useInfiniteQuery({
-    queryKey: queryKeys.emails.infiniteList(emailFilters),
+    queryKey: queryKeys.emails.infiniteList(projectFilters),
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam, signal }) =>
       requestApi<PageOf<EmailSummary>>("/emails", {
-        queryParameters: { ...emailFilters, cursor: pageParam, limit: 50 },
+        queryParameters: { ...projectFilters, cursor: pageParam, limit: 50 },
         abortSignal: signal,
       }),
     getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
@@ -92,9 +98,13 @@ export function useDeleteEmail() {
   );
 }
 
+/** Deletes the emails the filters list, or every email when there are none (EM-03.5). */
 export function useDeleteAllEmails() {
-  return useEmailMutation(() =>
-    requestApi<void>("/emails", { method: "DELETE" }),
+  return useEmailMutation((emailFilters: EmailListFilters = {}) =>
+    requestApi<void>("/emails", {
+      method: "DELETE",
+      queryParameters: emailFilters,
+    }),
   );
 }
 
@@ -103,7 +113,26 @@ export function useOpenEmail() {
     ({ emailId, openSource }: { emailId: string; openSource: OpenSource }) =>
       requestApi<void>(`/emails/${emailId}/open`, {
         method: "POST",
-        requestBody: { source: openSource },
+        requestBody: buildOpenEventRequest(openSource),
+      }),
+  );
+}
+
+/** Records a click on one of the email's links and fires `email.clicked` (EM-20). */
+export function useClickEmailLink() {
+  return useEmailMutation(
+    ({
+      emailId,
+      url,
+      clickSource,
+    }: {
+      emailId: string;
+      url: string;
+      clickSource: OpenSource;
+    }) =>
+      requestApi<void>(`/emails/${emailId}/clicks`, {
+        method: "POST",
+        requestBody: { url, ...buildOpenEventRequest(clickSource) },
       }),
   );
 }

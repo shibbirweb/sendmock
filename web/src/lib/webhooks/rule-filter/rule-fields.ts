@@ -1,7 +1,8 @@
 import type { AppEventType } from "@/lib/api/types";
 
 /** What a rule's events are about; a field only exists on some subjects. */
-export type RuleSubject = "email" | "sms" | "opened" | "http";
+export type RuleSubject =
+  "email" | "sms" | "push" | "opened" | "clicked" | "http";
 
 /** How the builder asks for a value. */
 export type RuleValueKind =
@@ -41,7 +42,7 @@ export const ruleFieldDefinitions: RuleFieldDefinition[] = [
   {
     fieldKey: "body",
     label: "Body",
-    subjects: ["email", "sms", "http"],
+    subjects: ["email", "sms", "push", "http"],
     valueKind: "text",
   },
   {
@@ -82,9 +83,51 @@ export const ruleFieldDefinitions: RuleFieldDefinition[] = [
     valueKind: "boolean",
   },
   {
+    fieldKey: "url",
+    label: "Clicked link",
+    subjects: ["clicked"],
+    valueKind: "text",
+  },
+  {
+    fieldKey: "click_count",
+    label: "Click count",
+    subjects: ["clicked"],
+    valueKind: "number",
+  },
+  {
+    fieldKey: "first_click",
+    label: "First click on the link",
+    subjects: ["clicked"],
+    valueKind: "boolean",
+  },
+  {
+    fieldKey: "project",
+    label: "Project",
+    subjects: ["email", "sms", "push"],
+    valueKind: "text",
+  },
+  {
+    fieldKey: "token",
+    label: "Device token",
+    subjects: ["push"],
+    valueKind: "text",
+  },
+  {
+    fieldKey: "title",
+    label: "Push title",
+    subjects: ["push"],
+    valueKind: "text",
+  },
+  {
+    fieldKey: "provider",
+    label: "Push provider",
+    subjects: ["push"],
+    valueKind: "text",
+  },
+  {
     fieldKey: "source",
-    label: "Open source",
-    subjects: ["opened"],
+    label: "Open or click source",
+    subjects: ["opened", "clicked"],
     valueKind: "text",
   },
 ];
@@ -102,7 +145,7 @@ export function findRuleFieldDefinition(
   );
 }
 
-/** Subjects of the selected events: `email.opened` is email and opened. */
+/** Subjects of the selected events: `email.opened` is email and opened, `email.clicked` email and clicked. */
 export function readEventSubjects(events: AppEventType[]): RuleSubject[] {
   const eventSubjects = new Set<RuleSubject>();
   for (const eventType of events) {
@@ -112,8 +155,14 @@ export function readEventSubjects(events: AppEventType[]): RuleSubject[] {
     if (eventType.startsWith("sms.")) {
       eventSubjects.add("sms");
     }
+    if (eventType.startsWith("push.")) {
+      eventSubjects.add("push");
+    }
     if (eventType.endsWith(".opened")) {
       eventSubjects.add("opened");
+    }
+    if (eventType.endsWith(".clicked")) {
+      eventSubjects.add("clicked");
     }
   }
 

@@ -57,6 +57,11 @@ export type Verification = {
   linked_message_id: Ulid | null;
   /** Conversation of the linked SMS, for the "Open message" link. */
   linked_thread_id: string | null;
+  /**
+   * The project the verification was started in: `default` unless the sender named another (PL-10).
+   * @example "default"
+   */
+  project: string;
 };
 
 export type VerificationTimelineKind =
@@ -83,6 +88,8 @@ export type VerificationListFilters = PageRequest & {
   status?: string;
   to?: string;
   channel?: VerifyChannel;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 /** Body of POST and PATCH /api/v1/verify/services. */
