@@ -26,6 +26,7 @@ pub async fn prune_traffic(operation_context: &OperationContext) -> Result<u64, 
         (PrunableTable::WEBHOOK_DELIVERIES, email_limit),
         (PrunableTable::SMS_MESSAGES, sms_limit),
         (PrunableTable::VERIFICATIONS, sms_limit),
+        (PrunableTable::PUSH_NOTIFICATIONS, sms_limit),
     ];
     let traffic_pruner = &operation_context.traffic_pruner;
     let mut pruned_count = 0;

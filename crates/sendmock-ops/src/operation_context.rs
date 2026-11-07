@@ -8,12 +8,13 @@ use sendmock_store::{
     EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
     MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    PaymentSubscriptionRepository, ProjectRepository, SavedWebhookDeliveryRepository,
-    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
-    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
-    TrafficPruner, VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    PaymentSubscriptionRepository, ProjectRepository, PushNotificationRepository,
+    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
+    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
+    SmsRepository, SmtpSessionRepository, TrafficPruner, VerificationRepository,
+    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
+    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
+    WebhookVariableRepository,
 };
 
 use crate::{
@@ -32,8 +33,8 @@ pub struct OperationContext {
     pub email_repository: EmailRepository,
     pub email_ingest_service: EmailIngestService,
     pub email_outcome_rule_repository: EmailOutcomeRuleRepository,
-    pub smtp_session_repository: SmtpSessionRepository,
-    pub api_request_repository: ApiRequestRepository,
+    /// The Logs screen's SMTP sessions and API requests.
+    pub logs: LogStores,
     pub sms_repository: SmsRepository,
     /// Status callback attempts; the rows are also the callback retry queue.
     pub sms_callback_attempt_repository: SmsCallbackAttemptRepository,
@@ -87,6 +88,7 @@ pub struct OperationContext {
     /// Reads `${ENV_VAR}` references in seed files; tests pass fixed values.
     pub environment_reader: Arc<dyn EnvironmentReader>,
     pub project_repository: ProjectRepository,
+    pub push_notifications: PushNotificationRepository,
     /// Who sent this request and the project its traffic goes to.
     pub request: crate::RequestScope,
 }
@@ -113,6 +115,22 @@ impl PaymentStores {
         Self {
             provider_objects: PaymentProviderObjectRepository::new(Arc::clone(database)),
             subscriptions: PaymentSubscriptionRepository::new(Arc::clone(database)),
+        }
+    }
+}
+
+/// What the Logs screen reads: each SMTP session's transcript and each API request.
+#[derive(Clone)]
+pub struct LogStores {
+    pub smtp_sessions: SmtpSessionRepository,
+    pub api_requests: ApiRequestRepository,
+}
+
+impl LogStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            smtp_sessions: SmtpSessionRepository::new(Arc::clone(database)),
+            api_requests: ApiRequestRepository::new(Arc::clone(database)),
         }
     }
 }
@@ -177,8 +195,8 @@ impl OperationContext {
             settings_store: AppSettingsStore::new(SettingsRepository::new(share_database())),
             traffic_pruner: TrafficPruner::new(share_database()),
             email_outcome_rule_repository: EmailOutcomeRuleRepository::new(share_database()),
-            smtp_session_repository: SmtpSessionRepository::new(share_database()),
-            api_request_repository: ApiRequestRepository::new(share_database()),
+            logs: LogStores::new(&database),
+            push_notifications: PushNotificationRepository::new(share_database()),
             sms_repository: SmsRepository::new(share_database()),
             seed_state_repository: SeedStateRepository::new(share_database()),
             payment_definition_repository: PaymentDefinitionRepository::new(share_database()),

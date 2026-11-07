@@ -142,7 +142,8 @@ async fn insert_logged_request(
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     };
     Ok(operation_context
-        .api_request_repository
+        .logs
+        .api_requests
         .insert_request(api_request)
         .await?)
 }

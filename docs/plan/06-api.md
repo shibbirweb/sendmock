@@ -201,6 +201,17 @@ Built after 1.0 as [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10)
 
 Requests that capture traffic name their project in the `X-SendMock-Project` header (an unknown key answers `404 project_not_found`); without it they go to `default`. Over SMTP, an AUTH username that is a project's key picks that project. Every email, SMS and verification shows its `project`. Lists and lookups of captured traffic take an optional `project` query parameter.
 
+## Push
+
+Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01). The provider APIs (FCM HTTP v1 first) are answered on the provider port and under `/providers/<key>/`, like the SMS and email providers; these endpoints read what they stored.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/push` | notifications, newest first, with `project`, `device_token`, `provider` and `status` filters |
+| DELETE | `/push` | delete every notification, or those the same filters match |
+| GET/DELETE | `/push/{pushId}` | one notification with its request and answer; delete it |
+| GET | `/wait/push` | wait for a notification to a `device_token` (and `project`) since a time; `408` on timeout |
+
 ## Realtime
 
 `GET /api/v1/ws` (WebSocket). Server pushes event envelopes identical to the native webhook format (`{ id, type, created_at, data }`, with `data` trimmed to list-view fields). The UI uses it to update lists, counters and the delivery log live. A Server-Sent Events fallback at `/api/v1/events` is cheap to add and handy for `curl`.

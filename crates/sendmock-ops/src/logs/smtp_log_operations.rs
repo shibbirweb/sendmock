@@ -44,7 +44,8 @@ impl Operation for ListSmtpSessionsOperation {
             search_text: input.query.filter(|query| !query.trim().is_empty()),
         };
         let page = operation_context
-            .smtp_session_repository
+            .logs
+            .smtp_sessions
             .list_sessions(filter, input.cursor, read_page_size(input.limit))
             .await?;
         Ok(PageOf {
@@ -84,7 +85,8 @@ impl Operation for GetSmtpSessionOperation {
         input: SmtpSessionReference,
     ) -> Result<SmtpSessionLogEntry, OperationError> {
         operation_context
-            .smtp_session_repository
+            .logs
+            .smtp_sessions
             .find_session(&input.session_id)
             .await?
             .map(SmtpSessionLogEntry::from)

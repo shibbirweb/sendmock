@@ -36,7 +36,8 @@ impl Operation for ListApiRequestsOperation {
             path_contains: input.path.filter(|path| !path.trim().is_empty()),
         };
         let page = operation_context
-            .api_request_repository
+            .logs
+            .api_requests
             .list_requests(filter, input.cursor, read_page_size(input.limit))
             .await?;
         Ok(PageOf {
@@ -76,7 +77,8 @@ impl Operation for GetApiRequestOperation {
         input: ApiRequestReference,
     ) -> Result<ApiRequestLogEntry, OperationError> {
         operation_context
-            .api_request_repository
+            .logs
+            .api_requests
             .find_request(&input.request_id)
             .await?
             .map(ApiRequestLogEntry::from)

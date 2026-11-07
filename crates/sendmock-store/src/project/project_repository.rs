@@ -149,6 +149,10 @@ impl ProjectRepository {
                         [&project_key],
                     )?),
                 };
+                transaction.execute(
+                    "DELETE FROM push_notifications WHERE project_key = ?1",
+                    [&project_key],
+                )?;
                 let is_deleted = transaction.execute(
                     "DELETE FROM projects WHERE project_key = ?1",
                     [&project_key],

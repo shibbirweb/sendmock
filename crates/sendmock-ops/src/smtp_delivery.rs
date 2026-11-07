@@ -88,7 +88,8 @@ pub async fn record_smtp_session(
     session: SmtpSessionRecord,
 ) -> Result<(), OperationError> {
     Ok(operation_context
-        .smtp_session_repository
+        .logs
+        .smtp_sessions
         .insert_session(session)
         .await?)
 }

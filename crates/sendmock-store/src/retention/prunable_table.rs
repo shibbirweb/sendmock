@@ -16,6 +16,7 @@ impl PrunableTable {
     pub const HTTP_REQUESTS: Self = Self::every_row("http_captured_requests", "id", "created_at");
     pub const SMS_MESSAGES: Self = Self::every_row("sms_messages", "id", "created_at");
     pub const VERIFICATIONS: Self = Self::every_row("verifications", "sid", "created_at");
+    pub const PUSH_NOTIFICATIONS: Self = Self::every_row("push_notifications", "id", "created_at");
     /// Only finished deliveries: one still queued, sending or waiting for a retry stays.
     pub const WEBHOOK_DELIVERIES: Self = Self {
         table_name: "webhook_deliveries",

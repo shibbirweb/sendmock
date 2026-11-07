@@ -20,6 +20,7 @@ mod payment_definition;
 mod payment_provider_object;
 mod payment_subscription;
 mod project;
+mod push;
 mod retention;
 mod saved_webhook_delivery;
 mod seed_state;
@@ -76,6 +77,10 @@ pub use payment_definition::{PaymentDefinitionRecord, PaymentDefinitionRepositor
 pub use payment_provider_object::{PaymentProviderObjectRecord, PaymentProviderObjectRepository};
 pub use payment_subscription::{PaymentSubscriptionRecord, PaymentSubscriptionRepository};
 pub use project::{DEFAULT_PROJECT_KEY, DeletedProjectTraffic, ProjectRecord, ProjectRepository};
+pub use push::{
+    PushNotificationFilter, PushNotificationPage, PushNotificationRecord,
+    PushNotificationRepository,
+};
 pub use retention::{PrunableTable, TrafficPruner};
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use seed_state::{SeedStateRecord, SeedStateRepository};

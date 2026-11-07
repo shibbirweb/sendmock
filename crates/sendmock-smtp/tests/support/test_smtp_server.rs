@@ -104,7 +104,8 @@ impl TestSmtpServer {
         loop {
             let sessions = self
                 .operation_context
-                .smtp_session_repository
+                .logs
+                .smtp_sessions
                 .list_sessions(SmtpSessionFilter::default(), None, 1000)
                 .await
                 .map_err(io::Error::other)?

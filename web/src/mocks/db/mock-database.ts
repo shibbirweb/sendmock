@@ -10,6 +10,7 @@ import type {
   HttpResponseRule,
   PaymentDetail,
   MessagingService,
+  PushNotification,
   SavedDelivery,
   SmsMessageDetail,
   SmtpSession,
@@ -146,6 +147,8 @@ export type MockDatabase = {
   inboundRoutes: InboundRouteRecord[];
   /** Projects, `default` first (PL-10). */
   projects: ProjectRecord[];
+  /** Push notifications, newest first (PN-01). */
+  pushNotifications: PushNotification[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -234,6 +237,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       smsMediaContents: new Map(),
       smsMessages: [],
       verifications: [],
+      pushNotifications: [],
       webhookDeliveries: [],
       capturedHttpRequests: [],
       httpFileContents: new Map(),
@@ -303,6 +307,7 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,
     ),
+    pushNotifications: [],
     webhookDeliveries: sortNewestFirst(webhookDeliveries),
     payments: sortNewestFirst(payments),
     httpBins: httpCatcherTraffic.httpBins,

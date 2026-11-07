@@ -11042,6 +11042,456 @@
       ]
     },
     {
+      "command": "sendmock push clear",
+      "slug": "push-clear",
+      "usage": "sendmock push clear [flags]",
+      "summary": "Delete every push notification, or one project's.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push",
+          "operation_id": "deletePush",
+          "summary": "Delete every push notification, or one project's.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "flag": "--device-token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<device-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        },
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock push clear --project shop --device-token dQw4w9WgXcQ:APA91bE1 --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_push_delete_all"
+      ],
+      "ui": [
+        "Push > Delete all"
+      ]
+    },
+    {
+      "command": "sendmock push delete",
+      "slug": "push-delete",
+      "usage": "sendmock push delete <pushId> [flags]",
+      "summary": "Delete one push notification.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "deletePushByPushId",
+          "summary": "Delete one push notification.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "pushId",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock push delete 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_push_delete"
+      ],
+      "ui": [
+        "Push > open a notification > Delete"
+      ]
+    },
+    {
+      "command": "sendmock push list",
+      "slug": "push-list",
+      "usage": "sendmock push list [flags]",
+      "summary": "Push notifications, newest first, with filters.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push",
+          "operation_id": "getPush",
+          "summary": "Push notifications, newest first, with filters.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--cursor",
+          "input": {
+            "name": "cursor",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<cursor>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The next_cursor of the previous page.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "flag": "--limit",
+          "input": {
+            "name": "limit",
+            "location": "query"
+          },
+          "type": "integer",
+          "value_label": "<limit>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Items per page, 1 to 200 (default 50).",
+          "example": 50
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "flag": "--device-token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<device-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        }
+      ],
+      "example": "sendmock push list --cursor 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --limit 50",
+      "output": "PageOf_PushNotification",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_push_list"
+      ],
+      "ui": [
+        "Push"
+      ]
+    },
+    {
+      "command": "sendmock push show",
+      "slug": "push-show",
+      "usage": "sendmock push show <pushId>",
+      "summary": "One push notification with its request and answer.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "getPushByPushId",
+          "summary": "One push notification with its request and answer.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "pushId",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock push show 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "output": "PushNotification",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_push_get"
+      ],
+      "ui": [
+        "Push > open a notification"
+      ]
+    },
+    {
+      "command": "sendmock push wait",
+      "slug": "push-wait",
+      "usage": "sendmock push wait [flags]",
+      "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/wait/push",
+          "operation_id": "getWaitPush",
+          "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--device-token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<device-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "flag": "--since",
+          "input": {
+            "name": "since",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<since>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only notifications sent after this time (default: 30 s ago).",
+          "example": "2026-11-07T10:00:00Z"
+        },
+        {
+          "flag": "--timeout",
+          "input": {
+            "name": "timeout",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<timeout>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
+          "example": "10s"
+        }
+      ],
+      "example": "sendmock push wait --device-token dQw4w9WgXcQ:APA91bE1 --project shop",
+      "output": "PushNotification",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "mcp": [
+        "sendmock_push_wait"
+      ],
+      "ui": [
+        "Push (new notifications appear live)"
+      ]
+    },
+    {
       "command": "sendmock reset",
       "slug": "reset",
       "usage": "sendmock reset --yes",

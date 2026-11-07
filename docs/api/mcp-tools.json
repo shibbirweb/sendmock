@@ -16289,6 +16289,567 @@
       ]
     },
     {
+      "name": "sendmock_push_delete",
+      "toolset": "core",
+      "summary": "Delete one push notification.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "deletePushByPushId",
+          "summary": "Delete one push notification.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "push_id",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "push_id": {
+            "type": "string",
+            "description": "The notification's id, from `GET /api/v1/push`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "push_id"
+        ]
+      },
+      "example_arguments": {
+        "push_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock push delete <pushId>"
+      ],
+      "ui": [
+        "Push > open a notification > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_push_delete_all",
+      "toolset": "core",
+      "summary": "Delete every push notification, or one project's.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push",
+          "operation_id": "deletePush",
+          "summary": "Delete every push notification, or one project's.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "device_token": {
+            "type": "string",
+            "description": "Only notifications to this device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/PushProvider",
+            "description": "fcm, expo or onesignal.",
+            "examples": [
+              "fcm"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/PushStatus",
+            "description": "sent or failed.",
+            "examples": [
+              "sent"
+            ]
+          }
+        },
+        "$defs": {
+          "PushProvider": {
+            "type": "string",
+            "enum": [
+              "fcm",
+              "expo",
+              "onesignal"
+            ]
+          },
+          "PushStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "project": "shop",
+        "device_token": "dQw4w9WgXcQ:APA91bE1"
+      },
+      "output": null,
+      "cli": [
+        "sendmock push clear"
+      ],
+      "ui": [
+        "Push > Delete all"
+      ]
+    },
+    {
+      "name": "sendmock_push_get",
+      "toolset": "core",
+      "summary": "One push notification with its request and answer.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "getPushByPushId",
+          "summary": "One push notification with its request and answer.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "push_id",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "push_id": {
+            "type": "string",
+            "description": "The notification's id, from `GET /api/v1/push`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "push_id"
+        ]
+      },
+      "example_arguments": {
+        "push_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PushNotification",
+      "cli": [
+        "sendmock push show <pushId>"
+      ],
+      "ui": [
+        "Push > open a notification"
+      ]
+    },
+    {
+      "name": "sendmock_push_list",
+      "toolset": "core",
+      "summary": "Push notifications, newest first, with filters.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push",
+          "operation_id": "getPush",
+          "summary": "Push notifications, newest first, with filters.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "cursor",
+          "input": {
+            "name": "cursor",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The next_cursor of the previous page.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "limit",
+          "input": {
+            "name": "limit",
+            "location": "query"
+          },
+          "type": "integer",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Items per page, 1 to 200 (default 50).",
+          "example": 50
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "The next_cursor of the previous page.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Items per page, 1 to 200 (default 50).",
+            "examples": [
+              50
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "device_token": {
+            "type": "string",
+            "description": "Only notifications to this device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/PushProvider",
+            "description": "fcm, expo or onesignal.",
+            "examples": [
+              "fcm"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/PushStatus",
+            "description": "sent or failed.",
+            "examples": [
+              "sent"
+            ]
+          }
+        },
+        "$defs": {
+          "PushProvider": {
+            "type": "string",
+            "enum": [
+              "fcm",
+              "expo",
+              "onesignal"
+            ]
+          },
+          "PushStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "cursor": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "limit": 50
+      },
+      "output": "PageOf_PushNotification",
+      "cli": [
+        "sendmock push list"
+      ],
+      "ui": [
+        "Push"
+      ]
+    },
+    {
+      "name": "sendmock_push_wait",
+      "toolset": "core",
+      "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/wait/push",
+          "operation_id": "getWaitPush",
+          "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "since",
+          "input": {
+            "name": "since",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications sent after this time (default: 30 s ago).",
+          "example": "2026-11-07T10:00:00Z"
+        },
+        {
+          "name": "timeout",
+          "input": {
+            "name": "timeout",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
+          "example": "10s"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "device_token": {
+            "type": "string",
+            "description": "The device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "since": {
+            "type": "string",
+            "description": "Only notifications sent after this time (default: 30 s ago).",
+            "examples": [
+              "2026-11-07T10:00:00Z"
+            ]
+          },
+          "timeout": {
+            "type": "string",
+            "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
+            "examples": [
+              "10s"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "device_token": "dQw4w9WgXcQ:APA91bE1",
+        "project": "shop"
+      },
+      "output": "PushNotification",
+      "cli": [
+        "sendmock push wait"
+      ],
+      "ui": [
+        "Push (new notifications appear live)"
+      ]
+    },
+    {
       "name": "sendmock_reset",
       "toolset": "admin",
       "summary": "Delete all traffic and restore the seed configuration.",

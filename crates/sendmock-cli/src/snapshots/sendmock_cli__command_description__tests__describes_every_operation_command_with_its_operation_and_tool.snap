@@ -2636,6 +2636,124 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock push list",
+    "usage": "sendmock push list",
+    "aliases": [],
+    "summary": "Push notifications, newest first, with filters.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--device-token",
+      "--limit",
+      "--project",
+      "--provider",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/push",
+        "operation_id": "getPush",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_list"
+    ]
+  },
+  {
+    "command": "sendmock push show",
+    "usage": "sendmock push show <pushId>",
+    "aliases": [],
+    "summary": "One push notification with its request and answer.",
+    "arguments": [
+      "pushId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/push/{pushId}",
+        "operation_id": "getPushByPushId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_get"
+    ]
+  },
+  {
+    "command": "sendmock push delete",
+    "usage": "sendmock push delete <pushId>",
+    "aliases": [],
+    "summary": "Delete one push notification.",
+    "arguments": [
+      "pushId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/push/{pushId}",
+        "operation_id": "deletePushByPushId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_delete"
+    ]
+  },
+  {
+    "command": "sendmock push clear",
+    "usage": "sendmock push clear",
+    "aliases": [],
+    "summary": "Delete every push notification, or one project's.",
+    "arguments": [],
+    "flags": [
+      "--cursor",
+      "--device-token",
+      "--limit",
+      "--project",
+      "--provider",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/push",
+        "operation_id": "deletePush",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock push wait",
+    "usage": "sendmock push wait",
+    "aliases": [],
+    "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+    "arguments": [],
+    "flags": [
+      "--device-token",
+      "--project",
+      "--since",
+      "--wait"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/wait/push",
+        "operation_id": "getWaitPush",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_wait"
+    ]
+  },
+  {
     "command": "sendmock route list",
     "usage": "sendmock route list",
     "aliases": [],

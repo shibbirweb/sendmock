@@ -33,6 +33,7 @@ mod pop3_mailbox;
 mod present_value;
 mod projects;
 mod providers;
+mod push;
 mod razorpay;
 mod request_client;
 mod request_scope;
@@ -112,6 +113,7 @@ pub use providers::{
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
     load_sms_provider_definitions, sign_twilio_request,
 };
+pub use push::{PushListQuery, PushNotification, PushReference, PushWaitQuery};
 pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};
 pub use request_scope::RequestScope;
 pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmailSender};
@@ -179,6 +181,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);
     projects::register_project_operations(&mut operation_registry);
+    push::register_push_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);

@@ -213,22 +213,28 @@ Heading.
 
 - **What it does:** The Projects operations; each opens to show its parameters, body, answer and a curl command.
 
+### 34. Push
+
+Heading.
+
+- **What it does:** The Push operations; each opens to show its parameters, body, answer and a curl command.
+
 ## When the data cannot load
 
-### 34. Could not load the API reference. Try again
+### 35. Could not load the API reference. Try again
 
 Message.
 
 - **What it does:** Shown when the OpenAPI document could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 35. Could not load the API reference.
+### 36. Could not load the API reference.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 36. Try again
+### 37. Try again
 
 Button.
 

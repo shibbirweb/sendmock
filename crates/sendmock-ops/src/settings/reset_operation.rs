@@ -24,48 +24,15 @@ impl Operation for ResetOperation {
         }
     }
 
-    /// Deletes every email, SMS, verification, SMTP session, logged request, webhook delivery and
-    /// payment, puts the settings back to their defaults, then restores the seed applied last:
-    /// its items as the file has them, and the configuration it does not hold deleted. Without
-    /// a seed, configuration such as numbers, services and outcome rules stays.
+    /// Deletes all traffic, puts the settings back to their defaults, then restores the seed
+    /// applied last: its items as the file has them, and the configuration it does not hold
+    /// deleted. Without a seed, configuration such as numbers, services and outcome rules stays.
     async fn execute(
         &self,
         operation_context: &OperationContext,
         _input: NoInput,
     ) -> Result<NoContent, OperationError> {
-        let deleted_email_count = operation_context
-            .email_repository
-            .delete_all_emails()
-            .await?;
-        operation_context
-            .sms_repository
-            .delete_all_messages()
-            .await?;
-        operation_context
-            .verification_repository
-            .delete_all_verifications()
-            .await?;
-        operation_context
-            .smtp_session_repository
-            .delete_all_sessions()
-            .await?;
-        operation_context
-            .api_request_repository
-            .delete_all_requests()
-            .await?;
-        operation_context
-            .webhook_delivery_repository
-            .delete_all_deliveries()
-            .await?;
-        operation_context
-            .payment_repository
-            .delete_all_payments()
-            .await?;
-        operation_context
-            .payment_stores
-            .subscriptions
-            .delete_all_subscriptions()
-            .await?;
+        let deleted_email_count = delete_all_traffic(operation_context).await?;
         operation_context
             .settings_store
             .save(
@@ -79,4 +46,49 @@ impl Operation for ResetOperation {
         }
         Ok(NoContent)
     }
+}
+
+/// Every email, SMS, verification, push notification, SMTP session, logged request, webhook
+/// delivery and payment; answers how many emails went, for `email.deleted`.
+async fn delete_all_traffic(operation_context: &OperationContext) -> Result<u64, OperationError> {
+    let deleted_email_count = operation_context
+        .email_repository
+        .delete_all_emails()
+        .await?;
+    operation_context
+        .sms_repository
+        .delete_all_messages()
+        .await?;
+    operation_context
+        .verification_repository
+        .delete_all_verifications()
+        .await?;
+    operation_context
+        .push_notifications
+        .delete_notifications(None)
+        .await?;
+    operation_context
+        .logs
+        .smtp_sessions
+        .delete_all_sessions()
+        .await?;
+    operation_context
+        .logs
+        .api_requests
+        .delete_all_requests()
+        .await?;
+    operation_context
+        .webhook_delivery_repository
+        .delete_all_deliveries()
+        .await?;
+    operation_context
+        .payment_repository
+        .delete_all_payments()
+        .await?;
+    operation_context
+        .payment_stores
+        .subscriptions
+        .delete_all_subscriptions()
+        .await?;
+    Ok(deleted_email_count)
 }

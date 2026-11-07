@@ -120,6 +120,11 @@ async fn answer_code_served_api(
     {
         return Ok(Some(gateway_outcome));
     }
+    if let Some(push_outcome) =
+        crate::push::answer_push_api(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(push_outcome));
+    }
     if let Some(mailgun_routes_outcome) = crate::inbound_routes::answer_mailgun_routes_request(
         operation_context,
         provider_route,

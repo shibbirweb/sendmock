@@ -146,6 +146,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_email_outcome_rule_samples(app_router).await);
     samples.extend(prepare_message_rule_samples(app_router).await);
     samples.extend(prepare_project_samples(app_router).await);
+    samples.extend(prepare_push_samples(app_router).await);
     samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
@@ -294,6 +295,52 @@ async fn prepare_inbound_route_samples(
                 json!({ "filter": { "kind": "match_header", "header_name": "subject", "pattern": ".*help" } }),
             ],
         ),
+    ]
+}
+
+/// Two FCM sends: one the get and wait samples read, one the delete sample removes.
+async fn prepare_push_samples(app_router: &axum::Router) -> Vec<(&'static str, Vec<Value>)> {
+    let fcm_send = |token: &str| {
+        json!({ "message": {
+            "token": token,
+            "notification": { "title": "Your order shipped", "body": "Track it in the app." },
+            "data": { "order_id": "1042" },
+        } })
+    };
+    post_json(
+        app_router,
+        "/providers/fcm/v1/projects/shop-app/messages:send",
+        &fcm_send("kept-device-token"),
+    )
+    .await;
+    post_json(
+        app_router,
+        "/providers/fcm/v1/projects/shop-app/messages:send",
+        &fcm_send("deleted-device-token"),
+    )
+    .await;
+    let push_page = send_json(app_router, "GET", "/api/v1/push", &Value::Null).await;
+    let push_ids: Vec<Value> = push_page["items"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|push_notification| push_notification["id"].clone())
+        .collect();
+    vec![
+        (
+            "getPush",
+            vec![json!({}), json!({ "device_token": "kept-device-token" })],
+        ),
+        ("getPushByPushId", vec![json!({ "push_id": push_ids[1] })]),
+        (
+            "deletePushByPushId",
+            vec![json!({ "push_id": push_ids[0] })],
+        ),
+        (
+            "getWaitPush",
+            vec![json!({ "device_token": "kept-device-token", "timeout": "1s" })],
+        ),
+        ("deletePush", vec![json!({ "project": "nowhere" })]),
     ]
 }
 
@@ -1601,12 +1648,14 @@ async fn prepare_log_samples(
     operation_context: &OperationContext,
 ) -> Vec<(&'static str, Vec<Value>)> {
     operation_context
-        .smtp_session_repository
+        .logs
+        .smtp_sessions
         .insert_session(sample_smtp_session())
         .await
         .unwrap_or_else(|error| panic!("a session is stored: {error}"));
     let logged_request_id = operation_context
-        .api_request_repository
+        .logs
+        .api_requests
         .list_requests(ApiRequestFilter::default(), None, 1)
         .await
         .unwrap_or_else(|error| panic!("requests are listed: {error}"))
