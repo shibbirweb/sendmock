@@ -29,4 +29,29 @@ describe("docs wording", () => {
     expect(wikiPages.length).toBeGreaterThan(80);
     expect(pagesWithPlanWords).toEqual([]);
   });
+
+  test("every docs page's front matter is valid YAML with a title and a description", () => {
+    const invalidPages = wikiPages.filter((pagePath) => {
+      const frontMatter = readFileSync(pagePath, "utf8").match(
+        /^---\n([\s\S]*?)\n---/,
+      )?.[1];
+      if (frontMatter === undefined) {
+        return false;
+      }
+      try {
+        const parsedFrontMatter = Bun.YAML.parse(frontMatter) as Record<
+          string,
+          unknown
+        >;
+        return (
+          typeof parsedFrontMatter.title !== "string" ||
+          typeof parsedFrontMatter.description !== "string"
+        );
+      } catch {
+        return true;
+      }
+    });
+
+    expect(invalidPages).toEqual([]);
+  });
 });

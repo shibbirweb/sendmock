@@ -1,6 +1,6 @@
 ---
 title: Install
-description: Every way to install SendMock: install scripts, package managers, Docker and binaries.
+description: Every way to install SendMock, from install scripts and package managers to Docker and binaries.
 ---
 
 > **Downloads start with the first beta.** Until it is published, build SendMock from source ([Run it from source](https://github.com/shibbirweb/sendmock#run-it-from-source)) or try the [live demo](/demo/).
