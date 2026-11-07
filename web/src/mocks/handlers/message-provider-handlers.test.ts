@@ -88,6 +88,7 @@ describe("email and SMS provider API", () => {
       "infobip",
       "telnyx",
       "sinch",
+      "africastalking",
       "sslwireless",
     ]);
     expect(
@@ -222,8 +223,8 @@ describe("email and SMS provider API", () => {
 
   test("SM-16.2 an SMS provider is added from blank with one send request", async () => {
     const createResponse = await callApi("POST", "/sms/providers", {
-      name: "Africa's Talking",
-      key: "africastalking",
+      name: "Termii",
+      key: "termii",
       start_from: null,
     });
     const createdProvider =

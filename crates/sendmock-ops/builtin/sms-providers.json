@@ -712,7 +712,7 @@
             "template": "application/json"
           }
         ],
-        "body": "{\"requestError\": {\"serviceException\": {\"messageId\": \"BAD_REQUEST\", \"text\": \"{{ error.reason }}\"}}}"
+        "body": "{\"requestError\": {\"serviceException\": {\"messageId\": \"BAD_REQUEST\", \"text\": \"{% if error.part == \"body\" %}Message text{% else %}{% if error.part == \"to\" %}Destination address{% else %}Sender{% endif %}{% endif %} is missing\"}}}"
       },
       {
         "kind": "unauthorized",
@@ -822,7 +822,7 @@
             "template": "application/json"
           }
         ],
-        "body": "{\"errors\": [{\"code\": \"10004\", \"title\": \"Missing required parameter\", \"detail\": \"{{ error.reason }}\"}]}"
+        "body": "{\"errors\": [{\"code\": \"10004\", \"title\": \"Missing required parameter\", \"detail\": \"The '{% if error.part == \"body\" %}text{% else %}{{ error.part }}{% endif %}' parameter is required.\"}]}"
       },
       {
         "kind": "unauthorized",
@@ -929,7 +929,7 @@
             "template": "application/json"
           }
         ],
-        "body": "{\"code\": \"syntax_constraint_violation\", \"text\": \"{{ error.reason }}\"}"
+        "body": "{\"code\": \"syntax_constraint_violation\", \"text\": \"Field '{{ error.part }}' is required\"}"
       },
       {
         "kind": "unauthorized",
@@ -950,6 +950,114 @@
       "delivered": "delivered",
       "failed": "failed",
       "undelivered": "undelivered"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "test_at_key",
+        "is_secret": true
+      },
+      {
+        "name": "username",
+        "value": "sandbox",
+        "is_secret": false
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "africastalking",
+    "name": "Africa's Talking",
+    "area": "sms",
+    "accent": "#f39200",
+    "host": "api.africastalking.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/version1/messaging",
+        "request_format": "form"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "body",
+        "source": "message"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "body",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"SMSMessageData\": {\"Message\": \"Sent to 1/1 Total Cost: KES 0.8000\", \"Recipients\": [{\"statusCode\": 101, \"number\": \"{{ message.to }}\", \"status\": \"Success\", \"cost\": \"KES 0.8000\", \"messageId\": \"{{ message.provider_id }}\"}]}}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "text/plain"
+          }
+        ],
+        "body": "Request is missing required form field '{% if error.part == \"body\" %}message{% else %}{{ error.part }}{% endif %}'"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "text/plain"
+          }
+        ],
+        "body": "The supplied authentication is invalid"
+      }
+    ],
+    "message_id_template": "ATXid_{{ random_hex(32) }}",
+    "callback_template_key": null,
+    "status_names": {
+      "sent": "Sent",
+      "delivered": "Success",
+      "failed": "Failed",
+      "undelivered": "Rejected"
     }
   }
 ]

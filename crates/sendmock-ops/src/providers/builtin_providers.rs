@@ -36,7 +36,8 @@ mod tests {
                 "messagebird",
                 "infobip",
                 "telnyx",
-                "sinch"
+                "sinch",
+                "africastalking"
             ]
         );
     }

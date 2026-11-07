@@ -8,7 +8,7 @@ mod support {
 use std::sync::Arc;
 
 use serde_json::{Value, json};
-use support::email_provider_requests::send_json;
+use support::email_provider_requests::{send_json, send_provider_request};
 use support::recording_callback_sender::RecordingCallbackSender;
 use support::test_app::{build_test_app_with, call_api};
 
@@ -87,10 +87,9 @@ async fn infobip_refuses_a_message_without_text_in_its_error_shape() {
         refused.body["requestError"]["serviceException"]["messageId"],
         "BAD_REQUEST"
     );
-    assert!(
-        refused.body["requestError"]["serviceException"]["text"].is_string(),
-        "{}",
-        refused.body_text
+    assert_eq!(
+        refused.body["requestError"]["serviceException"]["text"],
+        "Message text is missing"
     );
 }
 
@@ -166,7 +165,10 @@ async fn telnyx_refuses_a_message_without_text_in_its_errors_list() {
 
     assert_eq!(refused.status, 422, "{}", refused.body_text);
     assert_eq!(refused.body["errors"][0]["code"], "10004");
-    assert!(refused.body["errors"][0]["detail"].is_string());
+    assert_eq!(
+        refused.body["errors"][0]["detail"],
+        "The 'text' parameter is required."
+    );
 }
 
 // AC: SM-17.2
@@ -242,7 +244,7 @@ async fn sinch_refuses_a_batch_without_a_body_with_its_error_code() {
 
     assert_eq!(refused.status, 400, "{}", refused.body_text);
     assert_eq!(refused.body["code"], "syntax_constraint_violation");
-    assert!(refused.body["text"].is_string());
+    assert_eq!(refused.body["text"], "Field 'body' is required");
 }
 
 // AC: SM-17.3
@@ -262,4 +264,67 @@ async fn sinch_sends_recipient_delivery_reports_to_the_callback_url() {
     let last_report: Value = serde_json::from_str(&reports[1].body).unwrap_or(Value::Null);
     assert_eq!(last_report["type"], "recipient_delivery_report_sms");
     assert_eq!(last_report["batch_id"], sent.body["id"]);
+}
+
+const AFRICAS_TALKING_SEND_PATH: &str = "/providers/africastalking/version1/messaging";
+
+/// The form Africa's Talking's Node SDK sends for `SMS.send`.
+async fn send_africas_talking_form(
+    app_router: &axum::Router,
+    form_body: &str,
+) -> support::email_provider_requests::ProviderReply {
+    send_provider_request(
+        app_router,
+        AFRICAS_TALKING_SEND_PATH,
+        "application/x-www-form-urlencoded",
+        form_body.as_bytes().to_vec(),
+    )
+    .await
+}
+
+// AC: SM-17.4
+#[tokio::test]
+async fn africas_talking_sends_and_answers_201_with_its_recipients() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let sent = send_africas_talking_form(
+        &app_router,
+        "username=sandbox&to=%2B254711000111&message=Your+code+is+482913&from=AFRICASTKNG&bulkSMSMode=1&enqueue=0",
+    )
+    .await;
+
+    assert_eq!(sent.status, 201, "{}", sent.body_text);
+    let recipient = &sent.body["SMSMessageData"]["Recipients"][0];
+    assert_eq!(recipient["number"], "+254711000111");
+    assert_eq!(recipient["status"], "Success");
+    assert_eq!(recipient["statusCode"], 101);
+    let stored_sms = read_newest_sms(&app_router).await;
+    assert_eq!(stored_sms["api"], "africastalking");
+    assert_eq!(stored_sms["body"], "Your code is 482913");
+    assert_eq!(stored_sms["provider_id"], recipient["messageId"]);
+}
+
+// AC: SM-17.4
+#[tokio::test]
+async fn africas_talking_refuses_a_message_without_text_as_plain_text() {
+    let (app_router, _) = build_app_with_recorder().await;
+
+    let refused = send_africas_talking_form(
+        &app_router,
+        "username=sandbox&to=%2B254711000111&from=AFRICASTKNG",
+    )
+    .await;
+
+    assert_eq!(refused.status, 400, "{}", refused.body_text);
+    assert!(
+        refused
+            .header("content-type")
+            .is_some_and(|content_type| content_type.starts_with("text/plain")),
+        "{:?}",
+        refused.headers
+    );
+    assert_eq!(
+        refused.body_text,
+        "Request is missing required form field 'message'"
+    );
 }

@@ -114,6 +114,11 @@ jobs:
             language: node
             folder: node-sinch
             run: bun install && node send-and-verify.js
+          # AC: SM-17.4
+          - client: Africa's Talking Node SDK
+            language: node
+            folder: node-africastalking
+            run: bun install && node send-and-verify.js
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

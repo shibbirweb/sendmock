@@ -45,7 +45,7 @@ function buildInfobipProvider(): MessageProviderRecord {
       answerError(
         "missing_field",
         400,
-        '{"requestError": {"serviceException": {"messageId": "BAD_REQUEST", "text": "{{ error.reason }}"}}}',
+        `{"requestError": {"serviceException": {"messageId": "BAD_REQUEST", "text": "{% if error.part == "body" %}Message text{% else %}{% if error.part == "to" %}Destination address{% else %}Sender{% endif %}{% endif %} is missing"}}}`,
       ),
       answerError(
         "unauthorized",
@@ -104,7 +104,7 @@ function buildTelnyxProvider(): MessageProviderRecord {
       answerError(
         "missing_field",
         422,
-        '{"errors": [{"code": "10004", "title": "Missing required parameter", "detail": "{{ error.reason }}"}]}',
+        `{"errors": [{"code": "10004", "title": "Missing required parameter", "detail": "The '{% if error.part == "body" %}text{% else %}{{ error.part }}{% endif %}' parameter is required."}]}`,
       ),
       answerError(
         "unauthorized",
@@ -164,7 +164,7 @@ function buildSinchProvider(): MessageProviderRecord {
       answerError(
         "missing_field",
         400,
-        '{"code": "syntax_constraint_violation", "text": "{{ error.reason }}"}',
+        `{"code": "syntax_constraint_violation", "text": "Field '{{ error.part }}' is required"}`,
       ),
       answerError(
         "unauthorized",
@@ -183,7 +183,73 @@ function buildSinchProvider(): MessageProviderRecord {
   });
 }
 
+/**
+ * Africa's Talking's bulk SMS API, as its Node SDK calls it (`africastalking`, a form to
+ * `POST /version1/messaging` with the `apikey` header, answered 201;
+ * https://developers.africastalking.com/docs/sms/sending/bulk, checked 2026-11-07). Delivery
+ * reports go to a callback set on the account, not per message, so the provider has no
+ * callback; a webhook rule with the `africastalking.sms` template sends them instead.
+ */
+function buildAfricasTalkingProvider(): MessageProviderRecord {
+  return buildProviderFixture({
+    key: "africastalking",
+    name: "Africa's Talking",
+    area: "sms",
+    accent: "#f39200",
+    host: "api.africastalking.com",
+    credentials: [
+      { name: "api_key", value: "test_at_key", is_secret: true },
+      { name: "username", value: "sandbox", is_secret: false },
+    ],
+    operations: [
+      {
+        kind: "send",
+        method: "POST",
+        path: "/version1/messaging",
+        request_format: "form",
+      },
+    ],
+    field_mapping: [
+      { part: "from", source: "from" },
+      { part: "to", source: "to" },
+      { part: "body", source: "message" },
+    ],
+    validation_rules: requireParts(["from", "to", "body"]),
+    success_response: respondWithJson(
+      201,
+      '{"SMSMessageData": {"Message": "Sent to 1/1 Total Cost: KES 0.8000", "Recipients": [{"statusCode": 101, "number": "{{ message.to }}", "status": "Success", "cost": "KES 0.8000", "messageId": "{{ message.provider_id }}"}]}}',
+    ),
+    error_responses: [
+      {
+        kind: "missing_field",
+        status: 400,
+        headers: [{ name: "Content-Type", template: "text/plain" }],
+        body: `Request is missing required form field '{% if error.part == "body" %}message{% else %}{{ error.part }}{% endif %}'`,
+      },
+      {
+        kind: "unauthorized",
+        status: 401,
+        headers: [{ name: "Content-Type", template: "text/plain" }],
+        body: "The supplied authentication is invalid",
+      },
+    ],
+    message_id_template: "ATXid_{{ random_hex(32) }}",
+    callback_template_key: null,
+    status_names: {
+      sent: "Sent",
+      delivered: "Success",
+      failed: "Failed",
+      undelivered: "Rejected",
+    },
+  });
+}
+
 /** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
-  return [buildInfobipProvider(), buildTelnyxProvider(), buildSinchProvider()];
+  return [
+    buildInfobipProvider(),
+    buildTelnyxProvider(),
+    buildSinchProvider(),
+    buildAfricasTalkingProvider(),
+  ];
 }

@@ -57,11 +57,12 @@ describe("SMS clients workflow", () => {
     }
   });
 
-  test("SM-17.1 SM-17.2 SM-17.3 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
+  test("SM-17.1 SM-17.2 SM-17.3 SM-17.4 every other provider's official SDK sends from its folder and SendMock stores the SMS", () => {
     const providerPackages: Record<string, string> = {
       "Infobip Node SDK": "@infobip-api/sdk",
       "Telnyx Node SDK": "telnyx",
       "Sinch Node SDK": "@sinch/sdk-core",
+      "Africa's Talking Node SDK": "africastalking",
     };
     const otherEntries = clientEntries.filter(
       (clientEntry) => !clientEntry.client.startsWith("Twilio "),
@@ -76,7 +77,13 @@ describe("SMS clients workflow", () => {
       const packageJson = readFileSync(`${exampleFolder}/package.json`, "utf8");
       const providerPackage = providerPackages[clientEntry.client] ?? "";
       expect(packageJson).toContain(`"${providerPackage}"`);
-      expect(exampleSources).toContain(`from "${providerPackage}"`);
+      const importsThePackage =
+        exampleSources.includes(`from "${providerPackage}"`) ||
+        exampleSources.includes(`require("${providerPackage}")`);
+      expect({ client: clientEntry.client, importsThePackage }).toEqual({
+        client: clientEntry.client,
+        importsThePackage: true,
+      });
       expect(exampleSources).toContain("/api/v1/sms");
     }
   });
