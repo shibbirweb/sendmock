@@ -158,6 +158,7 @@ impl Operation for GetLatestEmailOperation {
         let filter = sendmock_store::EmailListFilter {
             to_contains: Some(input.to.clone()),
             subject_contains: input.subject.clone(),
+            project_key: input.project.clone(),
             ..sendmock_store::EmailListFilter::default()
         };
         let page = operation_context

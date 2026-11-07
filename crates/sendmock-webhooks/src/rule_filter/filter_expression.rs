@@ -2,7 +2,7 @@ use super::rule_message::{HEADER_FIELD_PREFIX, RuleMessage};
 use super::rule_operator::{RuleOperator, read_regex_error};
 
 /// Every field a condition may name ([05](docs/plan/05-webhooks.md#rules-automatic-mode)).
-const KNOWN_FIELDS: [&str; 15] = [
+const KNOWN_FIELDS: [&str; 16] = [
     "from",
     "to",
     "cc",
@@ -18,6 +18,7 @@ const KNOWN_FIELDS: [&str; 15] = [
     "url",
     "first_click",
     "click_count",
+    "project",
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq)]

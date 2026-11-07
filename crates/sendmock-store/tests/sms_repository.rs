@@ -179,7 +179,7 @@ async fn lists_with_filters_and_groups_conversations() -> Result<(), StoreError>
             50,
         )
         .await?;
-    let threads = repository.list_threads().await?;
+    let threads = repository.list_threads(None).await?;
 
     assert_eq!(inbound_page.total_count, 2);
     assert_eq!(searched_page.messages.len(), 1);
@@ -189,7 +189,7 @@ async fn lists_with_filters_and_groups_conversations() -> Result<(), StoreError>
     repository
         .mark_thread_read("sms-15550001111-8801700000000")
         .await?;
-    assert_eq!(repository.list_threads().await?[0].unread_count, 0);
+    assert_eq!(repository.list_threads(None).await?[0].unread_count, 0);
     Ok(())
 }
 

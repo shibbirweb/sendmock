@@ -159,6 +159,7 @@ expression: command_descriptions
       "--has-attachment",
       "--unread",
       "--limit",
+      "--project",
       "--query",
       "--source",
       "--tag",
@@ -187,6 +188,7 @@ expression: command_descriptions
       "--from",
       "--has-attachment",
       "--unread",
+      "--project",
       "--query",
       "--source",
       "--tag",
@@ -211,6 +213,7 @@ expression: command_descriptions
     "summary": "The newest email to a recipient.",
     "arguments": [],
     "flags": [
+      "--project",
       "--subject",
       "--to"
     ],
@@ -797,6 +800,7 @@ expression: command_descriptions
     "arguments": [],
     "flags": [
       "--channel",
+      "--project",
       "--wait",
       "--to"
     ],
@@ -819,6 +823,7 @@ expression: command_descriptions
     "summary": "The links of the latest email to a recipient.",
     "arguments": [],
     "flags": [
+      "--project",
       "--wait",
       "--to"
     ],
@@ -841,6 +846,7 @@ expression: command_descriptions
     "summary": "Wait until a matching email arrives; 408 on timeout.",
     "arguments": [],
     "flags": [
+      "--project",
       "--since",
       "--subject",
       "--timeout",
@@ -869,6 +875,7 @@ expression: command_descriptions
     "arguments": [],
     "flags": [
       "--limit",
+      "--project",
       "--since",
       "--type"
     ],
@@ -895,6 +902,7 @@ expression: command_descriptions
       "--direction",
       "--from",
       "--limit",
+      "--project",
       "--query",
       "--status",
       "--thread-id",
@@ -964,7 +972,9 @@ expression: command_descriptions
     "aliases": [],
     "summary": "Conversations, one per contact and your number.",
     "arguments": [],
-    "flags": [],
+    "flags": [
+      "--project"
+    ],
     "operations": [
       {
         "method": "GET",
@@ -1144,6 +1154,7 @@ expression: command_descriptions
     "arguments": [],
     "flags": [
       "--from",
+      "--project",
       "--since",
       "--timeout",
       "--to"
@@ -3422,6 +3433,7 @@ expression: command_descriptions
       "--channel",
       "--cursor",
       "--limit",
+      "--project",
       "--status",
       "--to"
     ],

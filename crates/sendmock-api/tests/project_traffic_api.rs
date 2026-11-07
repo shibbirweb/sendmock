@@ -1,54 +1,13 @@
 #[allow(dead_code, reason = "each test file uses part of the shared support")]
 mod support {
+    pub mod project_requests;
     pub mod test_app;
 }
 
-use axum::body::Body;
-use axum::http::Request;
 use sendmock_ops::{OperationContext, SmtpMessage, store_smtp_message};
 use serde_json::{Value, json};
+use support::project_requests::{create_project, post_in_project};
 use support::test_app::{build_test_app, call_api};
-use tower::ServiceExt;
-
-/// A JSON request that names its project in `X-SendMock-Project`.
-async fn call_api_in_project(
-    app_router: &axum::Router,
-    path: &str,
-    json_body: &Value,
-    project_key: &str,
-) -> (u16, Value) {
-    let request = Request::builder()
-        .method("POST")
-        .uri(path)
-        .header("content-type", "application/json")
-        .header("x-sendmock-project", project_key)
-        .body(Body::from(json_body.to_string()))
-        .unwrap_or_else(|error| panic!("a valid request: {error}"));
-    let response = app_router
-        .clone()
-        .oneshot(request)
-        .await
-        .unwrap_or_else(|error| panic!("a response: {error}"));
-    let status = response.status().as_u16();
-    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
-        .await
-        .unwrap_or_else(|error| panic!("a body: {error}"));
-    (
-        status,
-        serde_json::from_slice(&body_bytes).unwrap_or(Value::Null),
-    )
-}
-
-async fn create_shop_project(app_router: &axum::Router) {
-    let (status, created) = call_api(
-        app_router,
-        "POST",
-        "/api/v1/projects",
-        Some(&json!({ "key": "shop", "name": "Shop" })),
-    )
-    .await;
-    assert_eq!(status, 201, "{created}");
-}
 
 fn email_body(subject: &str) -> Value {
     json!({
@@ -86,7 +45,7 @@ async fn receive_smtp_message(operation_context: &OperationContext, auth_user: O
 #[tokio::test]
 async fn an_smtp_username_that_is_a_project_key_sends_mail_to_that_project() {
     let (app_router, operation_context) = build_test_app();
-    create_shop_project(&app_router).await;
+    create_project(&app_router, "shop").await;
 
     receive_smtp_message(&operation_context, Some("shop")).await;
     let shop_project = read_first_item_project(&app_router, "/api/v1/emails").await;
@@ -104,13 +63,12 @@ async fn an_smtp_username_that_is_a_project_key_sends_mail_to_that_project() {
 #[tokio::test]
 async fn the_project_header_stores_emails_sms_and_verifications_in_that_project() {
     let (app_router, _) = build_test_app();
-    create_shop_project(&app_router).await;
+    create_project(&app_router, "shop").await;
 
     let (email_status, _) =
-        call_api_in_project(&app_router, "/api/v1/send", &email_body("Hi"), "shop").await;
-    let (sms_status, _) =
-        call_api_in_project(&app_router, "/api/v1/sms", &sms_body(), "shop").await;
-    let (sample_status, sample) = call_api_in_project(
+        post_in_project(&app_router, "/api/v1/send", &email_body("Hi"), "shop").await;
+    let (sms_status, _) = post_in_project(&app_router, "/api/v1/sms", &sms_body(), "shop").await;
+    let (sample_status, sample) = post_in_project(
         &app_router,
         "/api/v1/samples/verification",
         &json!({}),
@@ -141,7 +99,7 @@ async fn an_unknown_project_is_refused_and_no_header_means_default() {
     let (app_router, _) = build_test_app();
 
     let (refused_status, refusal) =
-        call_api_in_project(&app_router, "/api/v1/send", &email_body("Hi"), "shpo").await;
+        post_in_project(&app_router, "/api/v1/send", &email_body("Hi"), "shpo").await;
     let (sent_status, _) =
         call_api(&app_router, "POST", "/api/v1/send", Some(&email_body("Hi"))).await;
     let (_, emails) = call_api(&app_router, "GET", "/api/v1/emails", None).await;
@@ -157,15 +115,15 @@ async fn an_unknown_project_is_refused_and_no_header_means_default() {
 #[tokio::test]
 async fn deleting_a_project_deletes_its_traffic_and_keeps_the_rest() {
     let (app_router, _) = build_test_app();
-    create_shop_project(&app_router).await;
-    call_api_in_project(
+    create_project(&app_router, "shop").await;
+    post_in_project(
         &app_router,
         "/api/v1/send",
         &email_body("Shop mail"),
         "shop",
     )
     .await;
-    call_api_in_project(&app_router, "/api/v1/sms", &sms_body(), "shop").await;
+    post_in_project(&app_router, "/api/v1/sms", &sms_body(), "shop").await;
     call_api(
         &app_router,
         "POST",

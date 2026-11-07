@@ -27,6 +27,7 @@ fn build_conditions(filter: &SmsListFilter) -> (String, Vec<SqlValue>) {
         ("thread_id = ?", &filter.thread_id),
         ("api = ?", &filter.api),
         ("provider_id = ?", &filter.provider_id),
+        ("project_key = ?", &filter.project_key),
     ] {
         if let Some(filter_value) = filter_value {
             conditions.push(condition);
@@ -81,17 +82,22 @@ pub fn list_messages(
 }
 
 /// Every conversation with its latest message, the most recent conversation first.
-pub fn list_threads(connection: &Connection) -> rusqlite::Result<Vec<SmsThreadRecord>> {
+/// Every conversation, newest first; with a project, only its messages count, so a
+/// conversation shows in each project that has messages in it.
+pub fn list_threads(
+    connection: &Connection,
+    project_key: Option<&str>,
+) -> rusqlite::Result<Vec<SmsThreadRecord>> {
     let mut statement = connection.prepare(&format!(
         "SELECT {SMS_COLUMNS}, thread_counts.message_count, thread_counts.unread_count FROM sms_messages \
          JOIN (SELECT thread_id AS counted_thread_id, max(id) AS last_id, count(*) AS message_count, \
                sum(CASE WHEN direction = 'inbound' AND is_read = 0 THEN 1 ELSE 0 END) AS unread_count \
-               FROM sms_messages GROUP BY thread_id) AS thread_counts \
+               FROM sms_messages WHERE ?1 IS NULL OR project_key = ?1 GROUP BY thread_id) AS thread_counts \
            ON sms_messages.id = thread_counts.last_id \
          ORDER BY sms_messages.id DESC"
     ))?;
     let mut thread_rows: Vec<(SmsRecord, i64, i64)> = statement
-        .query_map([], |row| {
+        .query_map([project_key], |row| {
             Ok((read_sms_row(row)?, row.get(33)?, row.get(34)?))
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;

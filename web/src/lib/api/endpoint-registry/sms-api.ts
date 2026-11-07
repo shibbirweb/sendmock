@@ -6,6 +6,7 @@ import {
   pageOf,
   pageQueryParameters,
   partialOf,
+  projectQueryParameter,
   tagEndpoints,
   typeRef,
 } from "./endpoint-definition";
@@ -53,6 +54,7 @@ const smsEndpoints = tagEndpoints("SMS", [
         schema: "string",
         example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       },
+      projectQueryParameter("messages"),
     ],
     response: pageOf("SmsMessage"),
   },
@@ -76,6 +78,7 @@ const smsEndpoints = tagEndpoints("SMS", [
     method: "GET",
     path: "/api/v1/sms/threads",
     summary: "Conversations, one per contact and your number.",
+    queryParameters: [projectQueryParameter("messages")],
     response: listOf("SmsThread"),
   },
   {

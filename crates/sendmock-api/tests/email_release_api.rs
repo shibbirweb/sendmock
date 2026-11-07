@@ -172,6 +172,7 @@ async fn every_release_is_on_the_timeline_with_its_result_and_fires_email_releas
             created_after_unix_ms: None,
             event_type: Some("email.released".to_owned()),
             limit: 10,
+            ..RecentEventFilter::default()
         });
     let released_data: Vec<&Value> = released_events
         .iter()

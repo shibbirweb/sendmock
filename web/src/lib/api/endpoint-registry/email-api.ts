@@ -4,6 +4,7 @@ import {
   listOf,
   pageOf,
   pageQueryParameters,
+  projectQueryParameter,
   type QueryParameter,
   tagEndpoints,
   typeRef,
@@ -60,6 +61,7 @@ const emailFilterParameters: QueryParameter[] = [
     schema: typeRef("EmailDirection"),
     example: "outbound",
   },
+  projectQueryParameter("emails"),
 ];
 
 const emailEndpoints = tagEndpoints("Email", [
@@ -96,6 +98,7 @@ const emailEndpoints = tagEndpoints("Email", [
         schema: "string",
         example: "Reset your password",
       },
+      projectQueryParameter("emails"),
     ],
     response: typeRef("EmailDetail"),
     errorStatuses: [404],

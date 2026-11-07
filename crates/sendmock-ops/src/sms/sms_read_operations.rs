@@ -4,10 +4,12 @@ use sendmock_core::parse_rfc3339;
 use sendmock_store::SmsListFilter;
 
 use super::sms_detail::{SmsMessageDetail, find_sms_or_not_found, load_sms_detail};
-use super::sms_inputs::{SmsListInput, SmsMediaReference, SmsReference, WaitSmsInput};
+use super::sms_inputs::{
+    SmsListInput, SmsMediaReference, SmsReference, SmsThreadListInput, WaitSmsInput,
+};
 use super::sms_views::{SmsMessage, SmsThread};
 use crate::{
-    AnswerKind, FileAnswer, HttpMethod, NoInput, Operation, OperationContext, OperationDefinition,
+    AnswerKind, FileAnswer, HttpMethod, Operation, OperationContext, OperationDefinition,
     OperationError, PageOf,
 };
 
@@ -65,6 +67,7 @@ impl Operation for ListSmsOperation {
             status: input.status,
             direction: input.direction,
             thread_id: input.thread_id,
+            project_key: input.project,
             ..SmsListFilter::default()
         };
         let page_size = input
@@ -86,7 +89,7 @@ impl Operation for ListSmsOperation {
 pub struct ListSmsThreadsOperation;
 
 impl Operation for ListSmsThreadsOperation {
-    type Input = NoInput;
+    type Input = SmsThreadListInput;
     type Output = Vec<SmsThread>;
 
     fn definition(&self) -> OperationDefinition {
@@ -102,9 +105,12 @@ impl Operation for ListSmsThreadsOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        _input: NoInput,
+        input: SmsThreadListInput,
     ) -> Result<Vec<SmsThread>, OperationError> {
-        let threads = operation_context.sms_repository.list_threads().await?;
+        let threads = operation_context
+            .sms_repository
+            .list_threads(input.project)
+            .await?;
         Ok(threads.into_iter().map(SmsThread::from).collect())
     }
 }
@@ -212,6 +218,7 @@ impl Operation for WaitForSmsOperation {
                     .to_owned()
             }),
             created_after_unix_ms: Some(since_unix_ms),
+            project_key: input.project.clone(),
             ..SmsListFilter::default()
         };
         let deadline = tokio::time::Instant::now() + wait_duration;

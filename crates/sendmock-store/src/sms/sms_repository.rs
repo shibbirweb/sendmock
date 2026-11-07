@@ -95,9 +95,18 @@ impl SmsRepository {
             .await
     }
 
-    pub async fn list_threads(&self) -> Result<Vec<SmsThreadRecord>, StoreError> {
+    /// Conversations newest first; in one project when one is given.
+    pub async fn list_threads(
+        &self,
+        project_key: Option<String>,
+    ) -> Result<Vec<SmsThreadRecord>, StoreError> {
         self.database
-            .read(|connection| Ok(sms_reader::list_threads(connection)?))
+            .read(move |connection| {
+                Ok(sms_reader::list_threads(
+                    connection,
+                    project_key.as_deref(),
+                )?)
+            })
             .await
     }
 

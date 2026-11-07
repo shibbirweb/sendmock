@@ -53,7 +53,17 @@ async fn load_event_subject(
     {
         return Ok((Some(subject_id), RuleMessage::default()));
     }
-    Ok((None, RuleMessage::default()))
+    Ok((None, read_event_project(app_event)))
+}
+
+/// A verification event has no stored message to read, but its data names its project.
+fn read_event_project(app_event: &AppEvent) -> RuleMessage {
+    match app_event.data["project"].as_str() {
+        Some(project_key) => {
+            RuleMessage::default().with_field("project", vec![project_key.to_owned()])
+        }
+        None => RuleMessage::default(),
+    }
 }
 
 /// Whether an enabled rule listens to the event and its filter passes the message.

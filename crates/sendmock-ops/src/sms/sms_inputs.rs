@@ -92,6 +92,14 @@ pub struct SmsListInput {
     pub direction: Option<String>,
     /// Only this conversation.
     pub thread_id: Option<String>,
+    /// Only this project's messages (its key); every project's when not set.
+    pub project: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct SmsThreadListInput {
+    /// Only this project's messages (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -104,4 +112,6 @@ pub struct WaitSmsInput {
     pub since: Option<String>,
     /// How long to wait, e.g. 10s (default 10s, at most 60s).
     pub timeout: Option<String>,
+    /// Only this project's messages (its key); every project's when not set.
+    pub project: Option<String>,
 }

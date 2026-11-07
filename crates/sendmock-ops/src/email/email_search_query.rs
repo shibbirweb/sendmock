@@ -14,6 +14,7 @@ pub fn build_email_list_filter(list_query: &EmailListQuery) -> EmailListFilter {
         has_attachment: list_query.has_attachment,
         source: list_query.source.clone(),
         direction: list_query.direction.clone(),
+        project_key: list_query.project.clone(),
         ..EmailListFilter::default()
     };
     let mut search_words: Vec<&str> = Vec::new();

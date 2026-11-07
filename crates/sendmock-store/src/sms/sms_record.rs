@@ -82,6 +82,8 @@ pub struct SmsListFilter {
     /// The provider's id for the message, such as Twilio's `SM...` SID.
     pub provider_id: Option<String>,
     pub created_after_unix_ms: Option<i64>,
+    /// Only this project's messages; every project's when not set.
+    pub project_key: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

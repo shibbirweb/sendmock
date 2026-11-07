@@ -14,6 +14,8 @@ pub struct EmailListFilter {
     pub source: Option<String>,
     pub direction: Option<String>,
     pub received_after_unix_ms: Option<i64>,
+    /// Only this project's emails; every project's when not set.
+    pub project_key: Option<String>,
 }
 
 /// Conditions joined with AND, with their parameters in the same order.
@@ -97,6 +99,12 @@ impl EmailListFilter {
             sql_conditions.add(
                 "emails.direction = ?",
                 Some(SqlValue::Text(direction.clone())),
+            );
+        }
+        if let Some(project_key) = &self.project_key {
+            sql_conditions.add(
+                "emails.project_key = ?",
+                Some(SqlValue::Text(project_key.clone())),
             );
         }
         if let Some(received_after_unix_ms) = self.received_after_unix_ms {

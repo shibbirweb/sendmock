@@ -39,13 +39,14 @@ fn read_only_get(
 /// for one, and answers at once when it is zero.
 async fn find_newest_with(
     operation_context: &OperationContext,
-    recipient: &str,
+    (recipient, project_key): (&str, Option<&str>),
     wait_duration: Duration,
     has_value: fn(&EmailRecord) -> bool,
 ) -> Result<Option<EmailRecord>, OperationError> {
     let wait_deadline = tokio::time::Instant::now() + wait_duration;
     let filter = EmailListFilter {
         to_contains: Some(recipient.to_owned()),
+        project_key: project_key.map(str::to_owned),
         ..EmailListFilter::default()
     };
     loop {
@@ -103,10 +104,13 @@ async fn lookup_sms_code(
     input: RecipientLookupQuery,
     wait_duration: Duration,
 ) -> Result<OtpLookup, OperationError> {
-    let sms_with_code =
-        crate::find_newest_sms_with_code(operation_context, &input.to, wait_duration)
-            .await?
-            .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+    let sms_with_code = crate::find_newest_sms_with_code(
+        operation_context,
+        (&input.to, input.project.as_deref()),
+        wait_duration,
+    )
+    .await?
+    .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
     let (code, source_id, received_at) = crate::describe_sms_code(&sms_with_code);
     Ok(OtpLookup {
         to: input.to,
@@ -123,9 +127,13 @@ async fn lookup_verify_code(
     input: RecipientLookupQuery,
     wait_duration: Duration,
 ) -> Result<OtpLookup, OperationError> {
-    let verification = crate::find_newest_verification(operation_context, &input.to, wait_duration)
-        .await?
-        .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
+    let verification = crate::find_newest_verification(
+        operation_context,
+        (&input.to, input.project.as_deref()),
+        wait_duration,
+    )
+    .await?
+    .ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
     Ok(OtpLookup {
         to: input.to,
         channel: "verify".to_owned(),
@@ -140,9 +148,12 @@ async fn lookup_email_code(
     input: RecipientLookupQuery,
     wait_duration: Duration,
 ) -> Result<OtpLookup, OperationError> {
-    let email_with_code = find_newest_with(operation_context, &input.to, wait_duration, |email| {
-        !email.otp_codes.is_empty()
-    })
+    let email_with_code = find_newest_with(
+        operation_context,
+        (&input.to, input.project.as_deref()),
+        wait_duration,
+        |email| !email.otp_codes.is_empty(),
+    )
     .await?;
     let email_with_code =
         email_with_code.ok_or_else(|| missing_value_error(&input, "code", wait_duration))?;
@@ -201,15 +212,18 @@ impl Operation for GetLinksOperation {
         input: LinksQuery,
     ) -> Result<LinksLookup, OperationError> {
         let wait_duration = read_wait_duration(input.timeout.as_deref(), Duration::ZERO)?;
-        let email_with_links =
-            find_newest_with(operation_context, &input.to, wait_duration, |email| {
-                !email.links.is_empty()
-            })
-            .await?;
+        let email_with_links = find_newest_with(
+            operation_context,
+            (&input.to, input.project.as_deref()),
+            wait_duration,
+            |email| !email.links.is_empty(),
+        )
+        .await?;
         let lookup_query = RecipientLookupQuery {
             to: input.to.clone(),
             channel: None,
             timeout: input.timeout.clone(),
+            project: input.project.clone(),
         };
         let email_with_links = email_with_links
             .ok_or_else(|| missing_value_error(&lookup_query, "link", wait_duration))?;
@@ -256,6 +270,7 @@ impl Operation for WaitForEmailOperation {
         let filter = EmailListFilter {
             to_contains: input.to.clone(),
             subject_contains: input.subject.clone(),
+            project_key: input.project.clone(),
             received_after_unix_ms: Some(received_after_unix_ms - 1),
             ..EmailListFilter::default()
         };

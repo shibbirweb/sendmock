@@ -14,12 +14,13 @@ const WAIT_POLL_INTERVAL: Duration = Duration::from_millis(200);
 /// answers at once when it is zero.
 pub async fn find_newest_sms_with_code(
     operation_context: &OperationContext,
-    recipient: &str,
+    (recipient, project_key): (&str, Option<&str>),
     wait_duration: Duration,
 ) -> Result<Option<SmsRecord>, OperationError> {
     let wait_deadline = tokio::time::Instant::now() + wait_duration;
     let filter = SmsListFilter {
         to_number: Some(PhoneNumber::parse(recipient).normalized().to_owned()),
+        project_key: project_key.map(str::to_owned),
         ..SmsListFilter::default()
     };
     loop {

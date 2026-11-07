@@ -71,6 +71,7 @@ pub fn publish_verification_event(
             "channel": verification.channel,
             "status": verification.status,
             "approved": verification.status == "approved",
+            "project": verification.project_key,
         }),
     );
 }

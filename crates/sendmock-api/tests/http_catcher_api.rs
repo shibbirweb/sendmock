@@ -114,6 +114,7 @@ async fn json_and_multipart_bodies_are_kept_with_downloadable_files_and_fire_htt
             created_after_unix_ms: None,
             event_type: Some("http.captured".to_owned()),
             limit: 10,
+            ..RecentEventFilter::default()
         });
     assert_eq!(captured_events.len(), 2);
 }
@@ -410,7 +411,8 @@ async fn the_http_sample_is_captured_in_the_slack_bin_like_real_traffic() {
             .recent_events(&RecentEventFilter {
                 created_after_unix_ms: None,
                 event_type: Some("http.captured".to_owned()),
-                limit: 5
+                limit: 5,
+                ..RecentEventFilter::default()
             })
             .len(),
         1

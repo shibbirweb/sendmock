@@ -81,6 +81,7 @@ impl Operation for ListVerificationsOperation {
                 .unwrap_or_default(),
             to_text: input.to,
             channel: input.channel,
+            project_key: input.project,
         };
         let page_size = input
             .limit

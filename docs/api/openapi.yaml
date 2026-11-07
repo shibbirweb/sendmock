@@ -493,6 +493,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -542,6 +549,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -738,6 +752,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -775,6 +796,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -819,6 +847,13 @@ paths:
           schema:
             type: integer
           example: 50
+        - name: project
+          in: query
+          required: false
+          description: Only events about this project's emails, SMS and verifications (its key); every event when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -1049,6 +1084,13 @@ paths:
           schema:
             $ref: "#/components/schemas/EmailDirection"
           example: outbound
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -1123,6 +1165,13 @@ paths:
           schema:
             $ref: "#/components/schemas/EmailDirection"
           example: outbound
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "204":
           description: No content.
@@ -1152,6 +1201,13 @@ paths:
           schema:
             type: string
           example: Reset your password
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -2340,6 +2396,13 @@ paths:
           schema:
             type: string
           example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -2396,6 +2459,14 @@ paths:
       summary: Conversations, one per contact and your number.
       tags:
         - SMS
+      parameters:
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -3013,6 +3084,13 @@ paths:
           schema:
             $ref: "#/components/schemas/VerifyChannel"
           example: sms
+        - name: project
+          in: query
+          required: false
+          description: Only this project's verifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.

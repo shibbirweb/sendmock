@@ -28,6 +28,10 @@ fn build_conditions(filter: &VerificationFilter) -> (String, Vec<SqlValue>) {
         conditions.push("channel = ?".to_owned());
         parameters.push(SqlValue::Text(channel.clone()));
     }
+    if let Some(project_key) = &filter.project_key {
+        conditions.push("project_key = ?".to_owned());
+        parameters.push(SqlValue::Text(project_key.clone()));
+    }
     (conditions.join(" AND "), parameters)
 }
 

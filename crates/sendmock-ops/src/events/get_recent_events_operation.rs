@@ -17,6 +17,9 @@ pub struct RecentEventsInput {
     pub event_type: Option<String>,
     /// At most this many (default 50).
     pub limit: Option<u32>,
+    /// Only events about this project's emails, SMS and verifications (its key); every
+    /// event when not set.
+    pub project: Option<String>,
 }
 
 pub struct GetRecentEventsOperation;
@@ -60,6 +63,7 @@ impl Operation for GetRecentEventsOperation {
             created_after_unix_ms,
             event_type: input.event_type,
             limit: input.limit.unwrap_or(DEFAULT_EVENT_LIMIT) as usize,
+            project_key: input.project,
         };
         Ok(operation_context
             .event_bus

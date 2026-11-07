@@ -119,7 +119,7 @@ A rule links events to an endpoint with an optional filter:
 }
 ```
 
-- Fields: email (`from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`), SMS (`from`, `to`, `body`, `status`, `api`), opened events (`open_count`, `first_open`, `source`).
+- Fields: email (`from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`), SMS (`from`, `to`, `body`, `status`, `api`), opened events (`open_count`, `first_open`, `source`), and on email, SMS and verification events `project` (added after 1.0, [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5).
 - Operators: `equals`, `contains`, `starts_with`, `matches` (glob), `regex`, `exists`.
 - Combinators: `all`, `any`, `not`.
 - The UI provides a visual rule builder plus a "test against recent messages" preview that shows which existing messages would match.

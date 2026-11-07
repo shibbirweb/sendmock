@@ -48,6 +48,8 @@ pub struct VerificationFilter {
     /// Part of the recipient.
     pub to_text: Option<String>,
     pub channel: Option<String>,
+    /// Only this project's verifications; every project's when not set.
+    pub project_key: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

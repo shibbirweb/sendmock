@@ -948,6 +948,18 @@
           ],
           "description": "Outbound from your app or inbound to it.",
           "example": "outbound"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -1007,6 +1019,13 @@
             "description": "Outbound from your app or inbound to it.",
             "examples": [
               "outbound"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -1492,6 +1511,18 @@
           "allowed_values": null,
           "description": "Subject contains.",
           "example": "Reset your password"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -1510,6 +1541,13 @@
             "examples": [
               "Reset your password"
             ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
           }
         },
         "required": [
@@ -1518,7 +1556,8 @@
       },
       "example_arguments": {
         "to": "user@example.test",
-        "subject": "Reset your password"
+        "subject": "Reset your password",
+        "project": "shop"
       },
       "output": "EmailDetail",
       "cli": [
@@ -1675,6 +1714,18 @@
           ],
           "description": "Outbound from your app or inbound to it.",
           "example": "outbound"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -1748,6 +1799,13 @@
             "description": "Outbound from your app or inbound to it.",
             "examples": [
               "outbound"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -5200,6 +5258,18 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -5231,6 +5301,13 @@
             "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
             "examples": [
               "10s"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         }
@@ -5305,6 +5382,18 @@
           "allowed_values": null,
           "description": "At most this many (default 50).",
           "example": 50
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only events about this project's emails, SMS and verifications (its key); every event when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -5329,6 +5418,13 @@
             "description": "At most this many (default 50).",
             "examples": [
               50
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only events about this project's emails, SMS and verifications (its key); every event when not set.",
+            "examples": [
+              "shop"
             ]
           }
         }
@@ -8532,6 +8628,18 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -8550,6 +8658,13 @@
             "examples": [
               "10s"
             ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
           }
         },
         "required": [
@@ -8558,7 +8673,8 @@
       },
       "example_arguments": {
         "to": "user@example.test",
-        "timeout": "10s"
+        "timeout": "10s",
+        "project": "shop"
       },
       "output": "LinksLookup",
       "cli": [
@@ -9893,6 +10009,18 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -9917,6 +10045,13 @@
             "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
             "examples": [
               "10s"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -17719,6 +17854,18 @@
           "allowed_values": null,
           "description": "Only this conversation.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -17778,6 +17925,13 @@
             "description": "Only this conversation.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -20817,12 +20971,35 @@
         "destructive_hint": false,
         "idempotent_hint": false
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          }
+        }
       },
-      "example_arguments": {},
+      "example_arguments": {
+        "project": "shop"
+      },
       "output": "SmsThread[]",
       "cli": [
         "sendmock sms threads"
@@ -20901,6 +21078,18 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -20932,6 +21121,13 @@
             "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
             "examples": [
               "10s"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         }
@@ -22489,6 +22685,18 @@
           ],
           "description": "How the code was sent.",
           "example": "sms"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's verifications (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -22527,6 +22735,13 @@
             "description": "How the code was sent.",
             "examples": [
               "sms"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's verifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },

@@ -81,6 +81,7 @@ async fn tag_rules_add_their_tag_to_matching_new_emails_once_and_skip_switched_o
             created_after_unix_ms: None,
             event_type: Some("email.received".to_owned()),
             limit: 10,
+            ..RecentEventFilter::default()
         });
     let invoice_event = received_events
         .iter()
@@ -275,6 +276,7 @@ async fn forward_rules_release_matching_emails_to_their_allowlisted_addresses() 
             created_after_unix_ms: None,
             event_type: Some("email.released".to_owned()),
             limit: 10,
+            ..RecentEventFilter::default()
         });
     assert_eq!(released_events.len(), 1);
     assert_eq!(released_events[0].app_event.data["id"], receipt["id"]);

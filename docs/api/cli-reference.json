@@ -768,6 +768,21 @@
           ],
           "description": "Outbound from your app or inbound to it.",
           "example": "outbound"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock email delete-all --yes --query 'to:user@example.test reset' --from no-reply@shop.test",
@@ -1480,9 +1495,24 @@
           "allowed_values": null,
           "description": "Subject contains.",
           "example": "Reset your password"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
-      "example": "sendmock email latest --to user@example.test --subject 'Reset your password'",
+      "example": "sendmock email latest --to user@example.test --subject 'Reset your password' --project shop",
       "output": "EmailDetail",
       "exit_codes": [
         0,
@@ -1669,6 +1699,21 @@
           ],
           "description": "Outbound from your app or inbound to it.",
           "example": "outbound"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock email list --cursor 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --limit 50",
@@ -4031,6 +4076,21 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock email wait --to user@example.test --subject 'Verify your email'",
@@ -4115,6 +4175,21 @@
           "allowed_values": null,
           "description": "At most this many (default 50).",
           "example": 50
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only events about this project's emails, SMS and verifications (its key); every event when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock events tail --since 2026-10-26T09:30:00Z --type http.captured",
@@ -5273,9 +5348,24 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
-      "example": "sendmock links --to user@example.test --wait 10s",
+      "example": "sendmock links --to user@example.test --wait 10s --project shop",
       "output": "LinksLookup",
       "exit_codes": [
         0,
@@ -6130,6 +6220,21 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock otp --to user@example.test --channel email --wait 10s",
@@ -12728,6 +12833,21 @@
           "allowed_values": null,
           "description": "Only this conversation.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock sms list --cursor 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --limit 50",
@@ -14496,7 +14616,7 @@
     {
       "command": "sendmock sms threads",
       "slug": "sms-threads",
-      "usage": "sendmock sms threads",
+      "usage": "sendmock sms threads [flags]",
       "summary": "Conversations, one per contact and your number.",
       "area": "SMS",
       "area_slug": "sms",
@@ -14512,8 +14632,24 @@
       ],
       "aliases": [],
       "arguments": [],
-      "flags": [],
-      "example": "sendmock sms threads",
+      "flags": [
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
+      "example": "sendmock sms threads --project shop",
       "output": "SmsThread[]",
       "exit_codes": [
         0,
@@ -14606,6 +14742,21 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock sms wait --to +8801700000000 --from +15550001111",
@@ -14894,6 +15045,21 @@
           ],
           "description": "How the code was sent.",
           "example": "sms"
+        },
+        {
+          "flag": "--project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<project>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this project's verifications (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "example": "sendmock verify list --cursor 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --limit 50",

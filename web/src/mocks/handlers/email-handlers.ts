@@ -11,6 +11,7 @@ import {
   applyMockConditions,
   createNotFoundResponse,
   includesText,
+  keepRequestedProject,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import {
@@ -104,7 +105,10 @@ export const emailHandlers = [
     }
 
     const requestUrl = new URL(request.url);
-    const matchingEmails = mockDatabase.emails
+    const matchingEmails = keepRequestedProject(
+      mockDatabase.emails,
+      requestUrl.searchParams,
+    )
       .filter((email) => matchesEmailFilters(email, requestUrl))
       .map(toEmailSummary);
 

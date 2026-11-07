@@ -12,6 +12,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
   includesText,
+  keepRequestedProject,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import {
@@ -37,10 +38,13 @@ function readThreadParticipants(smsMessage: SmsMessageDetail) {
   };
 }
 
-function buildSmsThreads(): SmsThread[] {
+function buildSmsThreads(searchParameters: URLSearchParams): SmsThread[] {
   const threadsById = new Map<string, SmsThread>();
 
-  for (const smsMessage of mockDatabase.smsMessages) {
+  for (const smsMessage of keepRequestedProject(
+    mockDatabase.smsMessages,
+    searchParameters,
+  )) {
     const { appNumber, contactNumber } = readThreadParticipants(smsMessage);
     const threadId = `${appNumber}|${contactNumber}`;
     const existingThread = threadsById.get(threadId);
@@ -74,7 +78,10 @@ export const smsHandlers = [
     const requestUrl = new URL(request.url);
     const searchQuery = requestUrl.searchParams.get("query") ?? "";
     const threadFilter = requestUrl.searchParams.get("thread_id");
-    const matchingMessages = mockDatabase.smsMessages.filter((smsMessage) => {
+    const matchingMessages = keepRequestedProject(
+      mockDatabase.smsMessages,
+      requestUrl.searchParams,
+    ).filter((smsMessage) => {
       const { appNumber, contactNumber } = readThreadParticipants(smsMessage);
       if (threadFilter && `${appNumber}|${contactNumber}` !== threadFilter) {
         return false;
@@ -86,10 +93,13 @@ export const smsHandlers = [
     return HttpResponse.json(paginateItems(matchingMessages, requestUrl));
   }),
 
-  http.get("*/api/v1/sms/threads", async () => {
+  http.get("*/api/v1/sms/threads", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
 
-    return conditionResponse ?? HttpResponse.json(buildSmsThreads());
+    return (
+      conditionResponse ??
+      HttpResponse.json(buildSmsThreads(new URL(request.url).searchParams))
+    );
   }),
 
   http.get("*/api/v1/sms/:smsId", async ({ params }) => {

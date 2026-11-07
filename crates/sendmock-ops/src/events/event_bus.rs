@@ -16,6 +16,8 @@ pub struct RecentEventFilter {
     pub created_after_unix_ms: Option<i64>,
     pub event_type: Option<String>,
     pub limit: usize,
+    /// Only events whose data names this project.
+    pub project_key: Option<String>,
 }
 
 /// Producers publish events; the realtime streams (and webhooks later) subscribe. The last
@@ -80,6 +82,9 @@ impl EventBus {
                         .event_type
                         .as_ref()
                         .is_none_or(|event_type| &recorded_event.app_event.event_type == event_type)
+                    && filter.project_key.as_deref().is_none_or(|project_key| {
+                        recorded_event.app_event.data["project"].as_str() == Some(project_key)
+                    })
             })
             .take(filter.limit)
             .cloned()
@@ -164,6 +169,7 @@ mod tests {
             created_after_unix_ms: Some(100),
             event_type: Some("email.received".to_owned()),
             limit: 10,
+            ..RecentEventFilter::default()
         });
 
         assert_eq!(event_ids(&everything), ["evt_3", "evt_2", "evt_1"]);

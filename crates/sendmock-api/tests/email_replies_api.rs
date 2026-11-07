@@ -62,6 +62,7 @@ fn count_events(operation_context: &OperationContext, event_type: &str) -> usize
             created_after_unix_ms: None,
             event_type: Some(event_type.to_owned()),
             limit: 100,
+            ..RecentEventFilter::default()
         })
         .len()
 }

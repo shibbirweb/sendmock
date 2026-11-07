@@ -63,6 +63,7 @@ pub fn build_email_rule_message(stored_email: &EmailRecord) -> RuleMessage {
             "first_open",
             vec![(stored_email.open_count == 1).to_string()],
         )
+        .with_field("project", vec![stored_email.project_key.clone()])
         .with_headers(stored_email.headers.clone())
 }
 
@@ -76,6 +77,7 @@ pub fn build_sms_rule_message(stored_sms: &SmsRecord) -> RuleMessage {
         .with_field("api", vec![stored_sms.api.clone()])
         .with_field("open_count", vec![stored_sms.open_count.to_string()])
         .with_field("first_open", vec![(stored_sms.open_count == 1).to_string()])
+        .with_field("project", vec![stored_sms.project_key.clone()])
 }
 
 /// An opened or clicked event's own fields (`first_open`, `open_count`, `url`, `first_click`,

@@ -43,6 +43,8 @@ pub struct EmailListQuery {
     pub source: Option<String>,
     /// Outbound from your app or inbound to it.
     pub direction: Option<String>,
+    /// Only this project's emails (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 /// The list's filters without paging: which emails a delete removes (all when none are set).
@@ -64,6 +66,8 @@ pub struct EmailFilterQuery {
     pub source: Option<String>,
     /// Outbound from your app or inbound to it.
     pub direction: Option<String>,
+    /// Only this project's emails (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 impl EmailFilterQuery {
@@ -80,6 +84,7 @@ impl EmailFilterQuery {
             has_attachment: self.has_attachment,
             source: self.source.clone(),
             direction: self.direction.clone(),
+            project: self.project.clone(),
         }
     }
 }
@@ -99,6 +104,8 @@ pub struct LatestEmailQuery {
     pub to: String,
     /// Subject contains.
     pub subject: Option<String>,
+    /// Only this project's emails (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -111,6 +118,8 @@ pub struct EmailWaitQuery {
     pub since: Option<String>,
     /// How long to wait, e.g. 30s (default 30s).
     pub timeout: Option<String>,
+    /// Only this project's emails (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -121,6 +130,8 @@ pub struct RecipientLookupQuery {
     pub channel: Option<String>,
     /// How long to wait for a first match, e.g. 10s (default: answer at once).
     pub timeout: Option<String>,
+    /// Only this project's messages (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -129,6 +140,8 @@ pub struct LinksQuery {
     pub to: String,
     /// How long to wait for a first match, e.g. 10s (default: answer at once).
     pub timeout: Option<String>,
+    /// Only this project's emails (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 /// A whole message (RFC 5322), as sent by your app.

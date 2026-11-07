@@ -39,6 +39,8 @@ pub struct VerificationListInput {
     /// Part of the recipient's number or address.
     pub to: Option<String>,
     pub channel: Option<String>,
+    /// Only this project's verifications (its key); every project's when not set.
+    pub project: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

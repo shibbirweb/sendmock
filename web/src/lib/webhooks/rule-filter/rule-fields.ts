@@ -100,6 +100,12 @@ export const ruleFieldDefinitions: RuleFieldDefinition[] = [
     valueKind: "boolean",
   },
   {
+    fieldKey: "project",
+    label: "Project",
+    subjects: ["email", "sms"],
+    valueKind: "text",
+  },
+  {
     fieldKey: "source",
     label: "Open or click source",
     subjects: ["opened", "clicked"],

@@ -110,14 +110,21 @@ impl VerificationRepository {
         .await
     }
 
-    /// The newest verification for a recipient, whatever its service, for `/otp`.
+    /// The newest verification for a recipient, whatever its service, for `/otp`; in one
+    /// project when one is given.
     pub async fn find_newest_for_recipient(
         &self,
         to_address: &str,
+        project_key: Option<&str>,
     ) -> Result<Option<VerificationRecord>, StoreError> {
         self.find_one(
-            "to_address = ?1",
-            vec![SqlValue::Text(to_address.to_owned())],
+            "to_address = ?1 AND (?2 IS NULL OR project_key = ?2)",
+            vec![
+                SqlValue::Text(to_address.to_owned()),
+                project_key.map_or(SqlValue::Null, |project_key| {
+                    SqlValue::Text(project_key.to_owned())
+                }),
+            ],
         )
         .await
     }
