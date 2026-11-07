@@ -76,6 +76,10 @@ The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provid
 
 `sendmock_http_bin_create` with a preset (Slack, Discord, Telegram, push), point the app at the bin's URL, and `sendmock_http_wait` for the call.
 
+### Share one SendMock between apps
+
+`sendmock_project_list` shows the projects. When there is more than one, find the app's project (its SMTP username, the `X-SendMock-Project` header it sends, or the `/projects/<key>/` prefix in its provider base URL) and pass `project` to every read: `sendmock_email_wait`, `sendmock_otp_get`, `sendmock_links_get` and the lists, so another app's message is never read as this one's. `sendmock_project_create` adds a project; ask before `sendmock_project_delete`, which deletes its traffic.
+
 ### Make it repeatable
 
 Write the steps as a scenario file (see `examples/`), check it with `sendmock_scenario_validate` and run it with `sendmock_scenario_run` or `sendmock scenario run <file>`, which exits with `5` when an `assert` fails, so it works in CI. Export the setup with `sendmock seed export` so it can be committed.

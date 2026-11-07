@@ -8,6 +8,7 @@
       "paragraph: Changes apply at once, without a restart. Export them to the seed file to keep them across resets.",
       "link: General",
       "link: Seed",
+      "link: Projects",
       "link: Email",
       "link: SMS",
       "link: Payments",
@@ -42,6 +43,23 @@
       "textbox: Seed file (TOML)",
       "button: Validate",
       "button: Apply"
+    ],
+    "Projects section": [
+      "heading: Projects",
+      "paragraph: Keep apps' or developers' mail, SMS and codes apart in one SendMock. Settings, providers and webhooks are shared.",
+      "columnheader: Name",
+      "columnheader: Key",
+      "columnheader: Emails",
+      "columnheader: SMS",
+      "columnheader: Codes",
+      "columnheader: Actions",
+      "button: Rename Default",
+      "button: New project",
+      "heading: Send to shop",
+      "paragraph: Traffic that names no project goes to Default. A project you have not created is refused, so a typo shows at once.",
+      "button: Copy the SMTP username",
+      "button: Copy the header",
+      "button: Copy the base URL"
     ],
     "Email section": [
       "heading: Receiving and delivery outcomes",

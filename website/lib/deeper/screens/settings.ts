@@ -8,6 +8,7 @@ import {
   settingsBehaviourEntries,
   settingsConnectionAboutEntries,
 } from "./settings-other";
+import { settingsProjectsEntries } from "./settings-projects";
 import {
   settingsPaymentsEntries,
   settingsSmsEntries,
@@ -37,6 +38,7 @@ export const settingsPage: DeeperPage = {
       operationIds: ["deleteSms"],
     },
     ...settingsSeedEntries,
+    ...settingsProjectsEntries,
     ...settingsEmailEntries,
     ...settingsSmsEntries,
     ...settingsPaymentsEntries,

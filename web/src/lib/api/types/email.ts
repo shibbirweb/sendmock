@@ -145,6 +145,8 @@ export type EmailListFilters = PageRequest & {
   has_attachment?: boolean;
   source?: EmailSource;
   direction?: EmailDirection;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 export type EmailUpdate = {

@@ -176,6 +176,8 @@ export type SmsListFilters = PageRequest & {
   status?: SmsStatus;
   direction?: SmsDirection;
   thread_id?: string;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 /** Body of POST /api/v1/sms (native send). */

@@ -3,6 +3,7 @@ import {
   BellRingIcon,
   DatabaseIcon,
   FlameIcon,
+  FolderKanbanIcon,
   InfoIcon,
   KeyRoundIcon,
   type LucideIcon,
@@ -18,6 +19,7 @@ import type { AppSettings } from "@/lib/api/types";
 export const settingsSectionIds = [
   "general",
   "seed",
+  "projects",
   "email",
   "sms",
   "payments",
@@ -38,6 +40,7 @@ export const settingsSections: {
 }[] = [
   { sectionId: "general", label: "General", icon: SlidersHorizontalIcon },
   { sectionId: "seed", label: "Seed", icon: DatabaseIcon },
+  { sectionId: "projects", label: "Projects", icon: FolderKanbanIcon },
   { sectionId: "email", label: "Email", icon: MailIcon },
   { sectionId: "sms", label: "SMS", icon: MessageSquareIcon },
   { sectionId: "payments", label: "Payments", icon: ReceiptIcon },

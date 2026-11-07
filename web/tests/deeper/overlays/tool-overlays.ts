@@ -95,6 +95,7 @@ export const scenariosOverlays: DeeperOverlay[] = [
 
 const settingsSectionNames = [
   "Seed",
+  "Projects",
   "Email",
   "SMS",
   "Payments",

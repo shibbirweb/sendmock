@@ -101,3 +101,28 @@ export function describeEventForNotification(
 ): EventNotification | null {
   return notificationDescribers[appEvent.type]?.(appEvent.data) ?? null;
 }
+
+/**
+ * Whether a live toast for this event fits the project picked in the top bar: events about
+ * another project's traffic stay in the bell without a toast (PL-10.7). Events about nothing
+ * in a project, such as a webhook delivery, always fit.
+ */
+export function isEventForSelectedProject(
+  appEvent: AppEvent,
+  selectedProjectKey: string | null,
+): boolean {
+  const eventData: unknown = appEvent.data;
+  const eventProject =
+    typeof eventData === "object" &&
+    eventData !== null &&
+    "project" in eventData &&
+    typeof eventData.project === "string"
+      ? eventData.project
+      : null;
+
+  return (
+    selectedProjectKey === null ||
+    eventProject === null ||
+    eventProject === selectedProjectKey
+  );
+}

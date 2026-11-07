@@ -41,7 +41,8 @@ export const queryKeys = {
   sms: {
     all: ["sms"] as const,
     list: (smsFilters: SmsListFilters) => ["sms", "list", smsFilters] as const,
-    threads: ["sms", "threads"] as const,
+    threads: (projectKey: string | undefined) =>
+      ["sms", "threads", projectKey ?? null] as const,
     detail: (smsId: string) => ["sms", "detail", smsId] as const,
   },
   verify: {
@@ -146,6 +147,7 @@ export const queryKeys = {
     test: (ruleKind: string, testedValue: string, matchField: string) =>
       ["outcome-rules", ruleKind, "test", testedValue, matchField] as const,
   },
+  projects: ["projects"] as const,
   messageRules: {
     tag: ["message-rules", "tag-rules"] as const,
     forward: ["message-rules", "forward-rules"] as const,

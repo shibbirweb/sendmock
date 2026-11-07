@@ -21,6 +21,7 @@ import {
   type EmailOutcomePlan,
   planEmailOutcome,
 } from "@/mocks/realtime/outcome-plans";
+import { readRequestProject } from "@/mocks/handlers/request-project";
 
 const sendPath = "/api/v1/send";
 
@@ -88,6 +89,10 @@ export const nativeSendHandlers = [
       return conditionResponse;
     }
 
+    const requestProject = readRequestProject(request);
+    if ("refusal" in requestProject) {
+      return requestProject.refusal;
+    }
     const nativeSendRequest = (await request.json()) as NativeSendRequest;
     if (!nativeSendRequest.from || (nativeSendRequest.to ?? []).length === 0) {
       return rejectSend(nativeSendRequest, "from and to are required");
@@ -126,6 +131,7 @@ export const nativeSendHandlers = [
       })),
     });
     const storedEmail = emailFixture.email;
+    storedEmail.project = requestProject.projectKey;
     for (const [
       attachmentIndex,
       parsedAttachment,

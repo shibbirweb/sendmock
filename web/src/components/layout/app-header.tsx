@@ -19,6 +19,7 @@ import { documentationUrl } from "@/lib/community/community-links";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
 import { HelpMenu } from "@/features/help/help-menu";
 import { NotificationBell } from "@/features/notifications/notification-bell";
+import { ProjectSwitcher } from "@/features/projects/project-switcher";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
 /**
@@ -103,6 +104,7 @@ export function AppHeader() {
         <PageGuideLink navigationItem={currentNavigationItem} />
       )}
       <div className="ml-auto flex shrink-0 items-center gap-1">
+        <ProjectSwitcher />
         {/* The wide search button needs a laptop width next to the sidebar. */}
         <Button
           variant="outline"

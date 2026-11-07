@@ -3,6 +3,7 @@ import type { DeeperEntry } from "../deeper-types";
 const sectionLinks: [string, string][] = [
   ["General", "Retention and the danger zone."],
   ["Seed", "The seed file: export, validate and apply."],
+  ["Projects", "Projects that keep apps' or developers' traffic apart."],
   ["Email", "Receiving, delivery outcomes, release, tag and forward rules, outcome addresses."],
   ["SMS", "Delivery simulation, Verify defaults, outcome numbers and magic numbers."],
   ["Payments", "The hosted checkout and the test values."],

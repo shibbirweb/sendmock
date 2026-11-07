@@ -14,6 +14,7 @@ import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
 import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
+import { readRequestProject } from "@/mocks/handlers/request-project";
 
 const whatsappPrefix = "whatsapp:";
 
@@ -53,6 +54,10 @@ export const smsSendHandlers = [
       return conditionResponse;
     }
 
+    const requestProject = readRequestProject(request);
+    if ("refusal" in requestProject) {
+      return requestProject.refusal;
+    }
     const nativeSmsRequest =
       (await request.json()) as Partial<NativeSmsRequest>;
     const missingField = findMissingSendField(nativeSmsRequest);
@@ -117,6 +122,7 @@ export const smsSendHandlers = [
       statusCallbackUrl: nativeSmsRequest.status_callback ?? null,
       parsedMedia: mediaResult.media,
     });
+    outboundMessage.project = requestProject.projectKey;
     storeSmsMediaBytes(outboundMessage.id, mediaResult.media);
 
     outboundMessage.api_request_id = recordNativeApiRequest({

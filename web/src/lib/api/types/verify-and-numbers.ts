@@ -88,6 +88,8 @@ export type VerificationListFilters = PageRequest & {
   status?: string;
   to?: string;
   channel?: VerifyChannel;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 /** Body of POST and PATCH /api/v1/verify/services. */
