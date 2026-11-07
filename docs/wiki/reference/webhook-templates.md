@@ -38,6 +38,7 @@ Pick one on a webhook endpoint to send events in that service's format, signed a
 | `vonage.dlr` | Vonage: delivery receipt | `sms.status` |  |
 | `plivo.inbound` | Plivo: inbound message | `sms.inbound`, `sms.status` |  |
 | `telnyx.message` | Telnyx: message events | `sms.inbound`, `sms.status` |  |
+| `whatsapp.cloud` | WhatsApp Cloud: messages and statuses | `sms.inbound`, `sms.status` | `whatsapp_cloud_app_secret` |
 | `africastalking.sms` | Africa's Talking: SMS notifications | `sms.inbound`, `sms.status` |  |
 | `sinch.sms` | Sinch: delivery reports and inbound SMS | `sms.inbound`, `sms.status` |  |
 | `infobip.dlr` | Infobip: delivery reports | `sms.status` |  |
