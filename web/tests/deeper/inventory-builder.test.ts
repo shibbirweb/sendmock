@@ -103,4 +103,26 @@ describe("the Deeper inventory crawl (WS-10.3)", () => {
       }).map((control) => control.name),
     ).toEqual(["#:#"]);
   });
+
+  test("WS-10.3 a date reads the same whatever the month and time of the crawl", () => {
+    expect(
+      buildInventory(
+        parseAriaSnapshot(
+          "- paragraph: Nov 7, 2026, 5:04:12 PM from 127.0.0.1",
+        ),
+        { isRecordingParagraphs: true },
+      ).map((control) => control.name),
+    ).toEqual(["Month #, #, #:# from #.#.#.#"]);
+  });
+
+  test("WS-10.3 a word that starts like a month stays as it is", () => {
+    expect(
+      buildInventory(
+        parseAriaSnapshot('- button "Mark as read"\n- button "Decline"'),
+        {
+          isRecordingParagraphs: false,
+        },
+      ).map((control) => control.name),
+    ).toEqual(["Mark as read", "Decline"]);
+  });
 });

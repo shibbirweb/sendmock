@@ -101,9 +101,12 @@ async function readScreenState(
   const headerControls = (await readControls(appHeader(page), false)).filter(
     isScreenHeaderControl,
   );
+  // A screen that repeats its name above the content is listed once.
   return [
-    ...headerControls,
-    ...(await readControls(screenContent(page), true)),
+    ...new Set([
+      ...headerControls,
+      ...(await readControls(screenContent(page), true)),
+    ]),
   ];
 }
 

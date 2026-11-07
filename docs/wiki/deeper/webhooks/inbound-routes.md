@@ -24,65 +24,59 @@ Link.
 - **What it does:** Opens this screen's page in the user guide, in a new tab.
 - **Links to:** [Inbound routes](../../webhooks/inbound-routes.md).
 
-### 3. Inbound routes
-
-Heading.
-
-- **What it does:** Names the screen, in the header and above the list.
-
-### 4. What happens to incoming emails, such as replies to mail your app sent: matching routes run in priority order until one stops, like Mailgun Routes.
+### 3. What happens to incoming emails, such as replies to mail your app sent: matching routes run in priority order until one stops, like Mailgun Routes.
 
 Text.
 
 - **What it does:** Explains the screen.
 - **Same action elsewhere:** REST [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes), CLI [`sendmock route list`](/cli/inbound-routes/#route-list), MCP [`sendmock_inbound_route_list`](/mcp/inbound-routes/#sendmock_inbound_route_list)
 
-### 5. Add route
+### 4. Add route
 
 Button.
 
 - **What it does:** Opens the route editor; in it, adds the route.
 - **Same action elsewhere:** REST [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes), CLI [`sendmock route create`](/cli/inbound-routes/#route-create), MCP [`sendmock_inbound_route_create`](/mcp/inbound-routes/#sendmock_inbound_route_create)
 
-### 6. Priority
+### 5. Priority
 
 Column.
 
 - **What it does:** The route's priority; lower runs first.
 
-### 7. Route
+### 6. Route
 
 Column.
 
 - **What it does:** Its expression and actions, in Mailgun's syntax.
 
-### 8. Actions
+### 7. Actions
 
 Column.
 
 - **What it does:** Move, Edit and Delete.
 
-### 9. Move … up
+### 8. Move … up
 
 Button, in each row.
 
 - **What it does:** Runs the route earlier.
 - **Same action elsewhere:** REST [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId), CLI [`sendmock route update`](/cli/inbound-routes/#route-update), MCP [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update)
 
-### 10. Move … down
+### 9. Move … down
 
 Button, in each row.
 
 - **What it does:** Runs the route later.
 - **Same action elsewhere:** REST [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId), CLI [`sendmock route update`](/cli/inbound-routes/#route-update), MCP [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update)
 
-### 11. Edit …
+### 10. Edit …
 
 Button, in each row.
 
 - **What it does:** Opens the route's editor.
 
-### 12. Delete …
+### 11. Delete …
 
 Button, in each row.
 
@@ -91,135 +85,135 @@ Button, in each row.
 
 ## New route editor
 
-### 13. Add route
+### 12. Add route
 
 Heading.
 
 - **What it does:** The new route editor.
 
-### 14. Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.
+### 13. Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.
 
 Text.
 
 - **What it does:** Explains the editor.
 
-### 15. Priority
+### 14. Priority
 
 Field.
 
 - **What it does:** When the route runs among the others.
 
-### 16. Lower runs first.
+### 15. Lower runs first.
 
 Text.
 
 - **What it does:** Explains the priority.
 
-### 17. Description
+### 16. Description
 
 Field.
 
 - **What it does:** A note on what the route is for.
 
-### 18. Match recipient A regex on each recipient address.
+### 17. Match recipient A regex on each recipient address.
 
 Choice.
 
 - **What it does:** The route takes emails whose recipient matches the pattern (`match_recipient`).
 
-### 19. Match header A regex on a header, e.g. subject.
+### 18. Match header A regex on a header, e.g. subject.
 
 Choice.
 
 - **What it does:** The route takes emails whose header matches the pattern (`match_header`).
 
-### 20. Catch all Every incoming email.
+### 19. Catch all Every incoming email.
 
 Choice.
 
 - **What it does:** The route takes every incoming email (`catch_all`).
 
-### 21. Pattern
+### 20. Pattern
 
 Field.
 
 - **What it does:** The regular expression to match.
 
-### 22. A Python-style regex matched from the start; (?P\<token>...) captures a group for \\g\<token> in actions.
+### 21. A Python-style regex matched from the start; (?P\<token>...) captures a group for \\g\<token> in actions.
 
 Text.
 
 - **What it does:** Explains the pattern: a named group can be used in the actions.
 - **Links to:** [Advanced: inbound routes](../../advanced/inbound-routes.md).
 
-### 23. match_recipient("")
+### 22. match_recipient("")
 
 Text.
 
 - **What it does:** The expression as Mailgun would show it, while the pattern is empty.
 
-### 24. Actions
+### 23. Actions
 
 Heading.
 
 - **What it does:** What the route does with a matching email.
 
-### 25. Run in this order; URLs and addresses can use captured groups such as \\g\<token> .
+### 24. Run in this order; URLs and addresses can use captured groups such as \\g\<token> .
 
 Text.
 
 - **What it does:** Explains the actions: forward to a URL or an address, store, or stop.
 
-### 26. Add action
+### 25. Add action
 
 Button.
 
 - **What it does:** Adds an action.
 
-### 27. Move Action #: Forward to URL up
+### 26. Move Action #: Forward to URL up
 
 Button.
 
 - **What it does:** Runs the action earlier.
 
-### 28. Move Action #: Forward to URL down
+### 27. Move Action #: Forward to URL down
 
 Button.
 
 - **What it does:** Runs the action later.
 
-### 29. Remove Action #: Forward to URL
+### 28. Remove Action #: Forward to URL
 
 Button.
 
 - **What it does:** Removes the action.
 
-### 30. Action #: Forward to URL target
+### 29. Action #: Forward to URL target
 
 Field.
 
 - **What it does:** Where the action forwards the email: a URL gets Mailgun's multipart fields, signed.
 
-### 31. Fix the pattern to see which emails match.
+### 30. Fix the pattern to see which emails match.
 
 Text.
 
 - **What it does:** Shown while the pattern is not valid.
 
-### 32. Cancel
+### 31. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 33. Add route
+### 32. Add route
 
 Button.
 
 - **What it does:** Adds the route; it takes the next incoming email.
 - **Same action elsewhere:** REST [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes), CLI [`sendmock route create`](/cli/inbound-routes/#route-create), MCP [`sendmock_inbound_route_create`](/mcp/inbound-routes/#sendmock_inbound_route_create)
 
-### 34. Close
+### 33. Close
 
 Button.
 
@@ -227,136 +221,136 @@ Button.
 
 ## Route editor
 
-### 35. Edit route
+### 34. Edit route
 
 Heading.
 
 - **What it does:** The editor of an existing route.
 
-### 36. Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.
+### 35. Which incoming emails it takes, and what it does with them, in Mailgun's route syntax.
 
 Text.
 
 - **What it does:** Explains the editor.
 
-### 37. Priority
+### 36. Priority
 
 Field.
 
 - **What it does:** When the route runs among the others.
 
-### 38. Lower runs first.
+### 37. Lower runs first.
 
 Text.
 
 - **What it does:** Explains the priority.
 
-### 39. Description
+### 38. Description
 
 Field.
 
 - **What it does:** A note on what the route is for.
 
-### 40. Match recipient A regex on each recipient address.
+### 39. Match recipient A regex on each recipient address.
 
 Choice.
 
 - **What it does:** The route takes emails whose recipient matches the pattern (`match_recipient`).
 
-### 41. Match header A regex on a header, e.g. subject.
+### 40. Match header A regex on a header, e.g. subject.
 
 Choice.
 
 - **What it does:** The route takes emails whose header matches the pattern (`match_header`).
 
-### 42. Catch all Every incoming email.
+### 41. Catch all Every incoming email.
 
 Choice.
 
 - **What it does:** The route takes every incoming email (`catch_all`).
 
-### 43. Pattern
+### 42. Pattern
 
 Field.
 
 - **What it does:** The regular expression to match.
 
-### 44. A Python-style regex matched from the start; (?P\<token>...) captures a group for \\g\<token> in actions.
+### 43. A Python-style regex matched from the start; (?P\<token>...) captures a group for \\g\<token> in actions.
 
 Text.
 
 - **What it does:** Explains the pattern: a named group can be used in the actions.
 - **Links to:** [Advanced: inbound routes](../../advanced/inbound-routes.md).
 
-### 45. match_recipient("reply\\+(?P\<token>[\\w-]+)@reply\\.app\\.test")
+### 44. match_recipient("reply\\+(?P\<token>[\\w-]+)@reply\\.app\\.test")
 
 Text.
 
 - **What it does:** The expression as Mailgun would show it (here the demo's reply route).
 
-### 46. Actions
+### 45. Actions
 
 Heading.
 
 - **What it does:** What the route does with a matching email.
 
-### 47. Run in this order; URLs and addresses can use captured groups such as \\g\<token> .
+### 46. Run in this order; URLs and addresses can use captured groups such as \\g\<token> .
 
 Text.
 
 - **What it does:** Explains the actions: forward to a URL or an address, store, or stop.
 
-### 48. Add action
+### 47. Add action
 
 Button.
 
 - **What it does:** Adds an action.
 
-### 49. Move Action #: … up
+### 48. Move Action #: … up
 
 Button, in each row.
 
 - **What it does:** Runs that action earlier.
 
-### 50. Move Action #: … down
+### 49. Move Action #: … down
 
 Button, in each row.
 
 - **What it does:** Runs that action later.
 
-### 51. Remove Action #: …
+### 50. Remove Action #: …
 
 Button, in each row.
 
 - **What it does:** Removes that action.
 
-### 52. Action #: Forward to URL target
+### 51. Action #: Forward to URL target
 
 Field, in each row.
 
 - **What it does:** Where that action forwards the email.
 
-### 53. Matches # of the last # incoming emails
+### 52. Matches # of the last # incoming emails
 
 Text.
 
 - **What it does:** How many recent incoming emails the route would take.
 - **Same action elsewhere:** REST [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest), CLI [`sendmock route test`](/cli/inbound-routes/#route-test), MCP [`sendmock_inbound_route_test`](/mcp/inbound-routes/#sendmock_inbound_route_test)
 
-### 54. Cancel
+### 53. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 55. Save route
+### 54. Save route
 
 Button.
 
 - **What it does:** Saves the route.
 - **Same action elsewhere:** REST [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId), CLI [`sendmock route update`](/cli/inbound-routes/#route-update), MCP [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update)
 
-### 56. Close
+### 55. Close
 
 Button.
 
@@ -364,20 +358,20 @@ Button.
 
 ## When the data cannot load
 
-### 57. Could not load the inbound routes. Try again
+### 56. Could not load the inbound routes. Try again
 
 Message.
 
 - **What it does:** Shown when the routes could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 58. Could not load the inbound routes.
+### 57. Could not load the inbound routes.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 59. Try again
+### 58. Try again
 
 Button.
 

@@ -24,112 +24,106 @@ Link.
 - **What it does:** Opens this screen's page in the user guide, in a new tab.
 - **Links to:** [Verify](../../sms/verify.md).
 
-### 3. Verify
-
-Heading.
-
-- **What it does:** Names the screen, in the header and above the tabs.
-
-### 4. Twilio Verify emulation: every code your app requests, its attempts and expiry, and controls to force any outcome.
+### 3. Twilio Verify emulation: every code your app requests, its attempts and expiry, and controls to force any outcome.
 
 Text.
 
 - **What it does:** Explains the screen.
 
-### 5. Verifications
+### 4. Verifications
 
 Tab.
 
 - **What it does:** Every verification your app started, newest first.
 - **Same action elsewhere:** REST [`GET /api/v1/verify`](/api/verify/#getVerify), CLI [`sendmock verify list`](/cli/verify/#verify-list), MCP [`sendmock_verify_list`](/mcp/verify/#sendmock_verify_list)
 
-### 6. Services
+### 5. Services
 
 Tab.
 
 - **What it does:** The Verify services apps start verifications against.
 - **Same action elsewhere:** REST [`GET /api/v1/verify/services`](/api/verify/#getVerifyServices), CLI [`sendmock verify services list`](/cli/verify/#verify-services-list), MCP [`sendmock_verify_service_list`](/mcp/verify/#sendmock_verify_service_list)
 
-### 7. All
+### 6. All
 
 Button.
 
 - **What it does:** Shows every verification.
 
-### 8. Pending
+### 7. Pending
 
 Button.
 
 - **What it does:** Shows only verifications still waiting for a correct code.
 
-### 9. Approved
+### 8. Approved
 
 Button.
 
 - **What it does:** Shows only approved verifications.
 
-### 10. Failed
+### 9. Failed
 
 Button.
 
 - **What it does:** Shows only verifications that expired, were cancelled or ran out of attempts.
 
-### 11. Search verifications
+### 10. Search verifications
 
 Field.
 
 - **What it does:** Filters by phone number, email address or service.
 
-### 12. To
+### 11. To
 
 Column.
 
 - **What it does:** Who the code went to.
 
-### 13. Channel
+### 12. Channel
 
 Column.
 
 - **What it does:** SMS, WhatsApp, email or call.
 
-### 14. Service
+### 13. Service
 
 Column.
 
 - **What it does:** The Verify service it belongs to.
 
-### 15. Code
+### 14. Code
 
 Column.
 
 - **What it does:** The code that was sent.
 
-### 16. Status
+### 15. Status
 
 Column.
 
 - **What it does:** Pending, approved, canceled, expired or max attempts reached.
 
-### 17. Attempts
+### 16. Attempts
 
 Column.
 
 - **What it does:** How many checks were made, against the service's limit.
 
-### 18. Time
+### 17. Time
 
 Column.
 
 - **What it does:** When it was started.
 
-### 19. …
+### 18. …
 
 Link, in each row.
 
 - **What it does:** Opens the verification's details.
 - **Same action elsewhere:** REST [`GET /api/v1/verify/{verificationSid}`](/api/verify/#getVerifyByVerificationSid), CLI [`sendmock verify show`](/cli/verify/#verify-show), MCP [`sendmock_verify_get`](/mcp/verify/#sendmock_verify_get)
 
-### 20. Copy code #
+### 19. Copy code #
 
 Button, in each row.
 
@@ -137,38 +131,38 @@ Button, in each row.
 
 ## A verification is open
 
-### 21. Verification
+### 20. Verification
 
 Heading.
 
 - **What it does:** The details drawer of one verification.
 
-### 22. Code, attempts and everything that happened to it.
+### 21. Code, attempts and everything that happened to it.
 
 Text.
 
 - **What it does:** Explains the drawer: the code, each check with its result, and the timeline.
 
-### 23. Copy code
+### 22. Copy code
 
 Button.
 
 - **What it does:** Copies the code.
 
-### 24. Open the message
+### 23. Open the message
 
 Link.
 
 - **What it does:** Opens the SMS or email the code was delivered in.
 - **Links to:** [SMS](../../sms/index.md).
 
-### 25. Force a state
+### 24. Force a state
 
 Heading.
 
 - **What it does:** Moves the verification to a final state by hand, to test what your app does then.
 
-### 26. Approve
+### 25. Approve
 
 Button.
 
@@ -176,14 +170,14 @@ Button.
 - **What it changes:** Fires `verify.checked` with the status `approved`.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce), CLI [`sendmock verify force`](/cli/verify/#verify-force), MCP [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force)
 
-### 27. Cancel
+### 26. Cancel
 
 Button.
 
 - **What it does:** In the drawer, cancels the verification (fires `verify.checked` with the status `canceled`); in a dialog, closes it without saving.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce), CLI [`sendmock verify force`](/cli/verify/#verify-force), MCP [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force)
 
-### 28. Expire
+### 27. Expire
 
 Button.
 
@@ -191,7 +185,7 @@ Button.
 - **What it changes:** Fires `verify.expired`.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce), CLI [`sendmock verify force`](/cli/verify/#verify-force), MCP [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force)
 
-### 29. Max attempts
+### 28. Max attempts
 
 Button.
 
@@ -199,13 +193,13 @@ Button.
 - **What it changes:** Fires `verify.checked` with the status `max_attempts_reached`.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce), CLI [`sendmock verify force`](/cli/verify/#verify-force), MCP [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force)
 
-### 30. Your app sees the new state on its next check or fetch.
+### 29. Your app sees the new state on its next check or fetch.
 
 Text.
 
 - **What it does:** Explains when the forced state takes effect.
 
-### 31. Close
+### 30. Close
 
 Button.
 
@@ -213,56 +207,56 @@ Button.
 
 ## Services tab
 
-### 32. Code length, an optional fixed code and how long codes stay valid.
+### 31. Code length, an optional fixed code and how long codes stay valid.
 
 Text.
 
 - **What it does:** Explains what a service sets.
 
-### 33. New service
+### 32. New service
 
 Button.
 
 - **What it does:** Opens the New Verify service dialog.
 
-### 34. Name
+### 33. Name
 
 Column.
 
 - **What it does:** The service's friendly name.
 
-### 35. SID
+### 34. SID
 
 Column.
 
 - **What it does:** Its `VA...` SID, which apps put in the Verify API path.
 
-### 36. Expires after
+### 35. Expires after
 
 Column.
 
 - **What it does:** How long a code stays valid.
 
-### 37. Actions
+### 36. Actions
 
 Column.
 
 - **What it does:** Edit and Delete for each service.
 
-### 38. Copy SID of Acme …
+### 37. Copy SID of Acme …
 
 Button, in each row.
 
 - **What it does:** Copies the service's SID, for your app's Verify calls.
 
-### 39. Edit Acme …
+### 38. Edit Acme …
 
 Button, in each row.
 
 - **What it does:** Opens the service's settings: name, code length, expiry and fixed code.
 - **Same action elsewhere:** REST [`PATCH /api/v1/verify/services/{serviceSid}`](/api/verify/#patchVerifyServicesByServiceSid), CLI [`sendmock verify services update`](/cli/verify/#verify-services-update), MCP [`sendmock_verify_service_update`](/mcp/verify/#sendmock_verify_service_update)
 
-### 40. Delete Acme …
+### 39. Delete Acme …
 
 Button, in each row.
 
@@ -271,63 +265,63 @@ Button, in each row.
 
 ## New Verify service dialog
 
-### 41. New Verify service
+### 40. New Verify service
 
 Heading.
 
 - **What it does:** The New Verify service dialog.
 
-### 42. Apps start verifications against a service by its SID.
+### 41. Apps start verifications against a service by its SID.
 
 Text.
 
 - **What it does:** Explains the SID.
 
-### 43. Name
+### 42. Name
 
 Field.
 
 - **What it does:** The service's friendly name.
 
-### 44. Code length
+### 43. Code length
 
 Drop-down.
 
 - **What it does:** How many digits the codes have, 4 to 10.
 
-### 45. Expires after (minutes)
+### 44. Expires after (minutes)
 
 Number field.
 
 - **What it does:** How long a code stays valid.
 
-### 46. Fixed code (optional)
+### 45. Fixed code (optional)
 
 Field.
 
 - **What it does:** A code every verification of this service uses, instead of a random one.
 
-### 47. Leave empty for a random code. A fixed code makes tests deterministic.
+### 46. Leave empty for a random code. A fixed code makes tests deterministic.
 
 Text.
 
 - **What it does:** Explains the fixed code.
 
-### 48. Cancel
+### 47. Cancel
 
 Button.
 
 - **What it does:** In the drawer, cancels the verification (fires `verify.checked` with the status `canceled`); in a dialog, closes it without saving.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce), CLI [`sendmock verify force`](/cli/verify/#verify-force), MCP [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force)
 
-### 49. Create service
+### 48. Create service
 
 Button.
 
 - **What it does:** Creates the service with a new SID.
 - **Same action elsewhere:** REST [`POST /api/v1/verify/services`](/api/verify/#postVerifyServices), CLI [`sendmock verify services create`](/cli/verify/#verify-services-create), MCP [`sendmock_verify_service_create`](/mcp/verify/#sendmock_verify_service_create)
 
-### 50. Close
+### 49. Close
 
 Button.
 
@@ -335,19 +329,19 @@ Button.
 
 ## With no data yet
 
-### 51. No verifications yet
+### 50. No verifications yet
 
 Text.
 
 - **What it does:** Shown when no verification was started yet.
 
-### 52. Start one from your app with the Twilio Verify API. The code shows up here and in the SMS screen.
+### 51. Start one from your app with the Twilio Verify API. The code shows up here and in the SMS screen.
 
 Text.
 
 - **What it does:** Explains how verifications arrive.
 
-### 53. This machine
+### 52. This machine
 
 Choice.
 
@@ -355,38 +349,38 @@ Choice.
 - **What it changes:** Shared with Settings > Connection and remembered in the browser.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 54. Docker host
+### 53. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host.
 
-### 55. Compose
+### 54. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project.
 
-### 56. Copy Twilio base URL
+### 55. Copy Twilio base URL
 
 Button.
 
 - **What it does:** Copies the base URL to give Twilio's SDK.
 
-### 57. Copy Start a verification
+### 56. Copy Start a verification
 
 Button.
 
 - **What it does:** Copies the Verify API URL that starts a verification.
 
-### 58. More snippets
+### 57. More snippets
 
 Link.
 
 - **What it does:** Opens Settings > Connection.
 - **Links to:** [Settings](../../settings.md).
 
-### 59. Start a sample verification
+### 58. Start a sample verification
 
 Button.
 
@@ -396,20 +390,20 @@ Button.
 
 ## When the data cannot load
 
-### 60. Could not load verifications. Try again
+### 59. Could not load verifications. Try again
 
 Message.
 
 - **What it does:** Shown when the verifications could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 61. Could not load verifications.
+### 60. Could not load verifications.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 62. Try again
+### 61. Try again
 
 Button.
 

@@ -5,7 +5,6 @@
     "normal": [
       "heading: Inbound routes",
       "link: Read the Inbound routes guide",
-      "heading: Inbound routes",
       "paragraph: What happens to incoming emails, such as replies to mail your app sent: matching routes run in priority order until one stops, like Mailgun Routes.",
       "button: Add route",
       "columnheader: Priority",

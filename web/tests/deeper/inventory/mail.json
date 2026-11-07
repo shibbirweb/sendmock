@@ -54,8 +54,13 @@
       "link: SMTP",
       "button: Copy code #"
     ],
-    "Attachments tab": ["img: hero.png", "link: Download hero.png"],
-    "MIME tab": ["each item, link: Download part …"],
+    "Attachments tab": [
+      "img: hero.png",
+      "link: Download hero.png"
+    ],
+    "MIME tab": [
+      "each item, link: Download part …"
+    ],
     "Checks tab": [
       "heading: HTML compatibility: #%",
       "paragraph: CSS background (line #): Partly supported in Outlook for Windows (#%).",
@@ -91,7 +96,10 @@
       "button: Cancel",
       "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
     ],
-    "Emails are selected": ["button: Mark read", "button: Delete"],
+    "Emails are selected": [
+      "button: Mark read",
+      "button: Delete"
+    ],
     "Simulate an event menu": [
       "menuitem: Open (email.opened)",
       "menuitem: Delivered",

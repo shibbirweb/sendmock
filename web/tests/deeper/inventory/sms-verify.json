@@ -5,7 +5,6 @@
     "normal": [
       "heading: Verify",
       "link: Read the Verify guide",
-      "heading: Verify",
       "paragraph: Twilio Verify emulation: every code your app requests, its attempts and expiry, and controls to force any outcome.",
       "tab: Verifications",
       "tab: Services",

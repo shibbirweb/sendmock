@@ -37,12 +37,19 @@ export type InventoryOptions = {
   isRecordingParagraphs: boolean;
 };
 
-/** Digits become `#` and a clock time `#:#`, so a crawl at another hour reads the same. */
+/**
+ * Digits become `#`, a clock time `#:#` and a month name `Month`, so a crawl at another hour
+ * or in another month reads the same.
+ */
 export function normalizeName(name: string): string {
   return name
     .replace(/\s+/g, " ")
     .replace(/\d+/g, "#")
-    .replace(/#:#( ?[AP]M)?/g, "#:#")
+    .replace(/#(:#)+( ?[AP]M)?/g, "#:#")
+    .replace(
+      /\b(Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|June?|July?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)\b/g,
+      "Month",
+    )
     .trim();
 }
 
