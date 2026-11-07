@@ -11,12 +11,12 @@ test("WS-03.3 search finds a docs page in the static site's index and opens it",
   });
   await page.goto("/docs/");
 
-  await page
-    .getByRole("button", { name: /search/i })
-    .first()
-    .click();
+  // The full-width search button of the docs layout opens the search dialog.
+  await page.locator("button[data-search-full]").first().click();
   const searchDialog = page.getByRole("dialog");
-  await searchDialog.getByRole("textbox").fill("Magic numbers and addresses");
+  await searchDialog
+    .getByPlaceholder("Search")
+    .fill("Magic numbers and addresses");
   const pageResult = searchDialog
     .getByText("Magic numbers and addresses", { exact: true })
     .first();
