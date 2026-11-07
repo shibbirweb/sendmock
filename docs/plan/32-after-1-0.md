@@ -14,7 +14,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) |
 | A5 | Multi-project inboxes | #167 | PL-10 (new) |
 | A6 | POP3 read access | #159 | EM-21 (new) |
-| A7 | Push notification emulation | #166 | to be written |
+| A7 | Push notification emulation | #166 | PN-01 (new) |
 | A8 | WhatsApp Business Cloud API, in full | #161 | to be written |
 | A9 | System tray app | #168 | to be written |
 | A10 | Helm chart and Docker Desktop extension | #162 | to be written |
@@ -186,3 +186,19 @@ Projects separate traffic; they do not secure it. Anyone who can open SendMock c
 **As built (2026-11-07):** A6a is the `sendmock-pop3` crate (`Pop3Session` over a `Pop3Mailbox` trait, tested with a fake, and the listener with a 512-byte line limit and a 10-minute idle timeout) and `sendmock-ops/src/pop3_mailbox.rs`; transport crates may not depend on each other, so the `user:password` file reader moved from `sendmock-smtp` to `sendmock-core` for both. A6b wires it into the binary: `--pop3-addr` and `--pop3-auth` (flags, environment and `sendmock.toml`), the listener started with the SMTP ones and stopped on shutdown, `pop3_addr` in the ready line, `pop3_address` in `/api/v1/info` (null when off; the types, the mock and the spec changed together), and a POP3 card in Settings > Connection, shown only while POP3 is on, so mock mode is unchanged. Tests: `pop3_session_tests.rs`, `pop3_listener.rs` (over a socket with SendMock's operations), `pop3_config.rs`, the live `pop3-connection.spec.ts` (the live suite now starts the binary with `--pop3-addr 127.0.0.1:0`), and `examples/smtp/python-poplib/verify.py` in the SMTP clients workflow, which turns POP3 on for the job.
 
 **Not in this part:** STLS and implicit TLS (SendMock runs on the developer's machine or a private network; TLS follows if asked), APOP and SASL logins, IMAP.
+
+## A7. Push notifications (PN-01)
+
+**Why:** apps send push notifications through Firebase Cloud Messaging, Expo and OneSignal as often as they send email or SMS: sign-in codes, order updates, chat messages. Today the HTTP catcher captures those calls as raw requests (HC-03): nothing shows the notification as the phone would, and a test cannot wait for "the push to this device" or make a token fail the way an expired one does.
+
+**How it works:** push becomes its own area beside Mail and SMS, with the same model: the app calls the provider's real API on the provider port (or under `/providers/<key>/`), SendMock stores the notification and answers exactly as the provider does, fires `push.sent`, and shows it in **Push**.
+
+- **Providers, in code like Twilio Verify** (their answers depend on stored state and their requests are nested JSON): FCM HTTP v1 (`POST /v1/projects/{project_id}/messages:send`, answering `{ "name": "projects/<id>/messages/<id>" }`), Expo (`POST /--/api/v2/push/send`, one message or a list, answering tickets; `POST /--/api/v2/push/getReceipts`), OneSignal (`POST /notifications`). Each adapter is read from the provider's official SDK and its tests before it is written: `firebase-admin`, `expo-server-sdk`, `@onesignal/node-onesignal`. APNs needs HTTP/2 with TLS, which the provider port does not serve, and follows later.
+- **What is stored:** the provider, the device token (or Expo push token, or OneSignal player or alias), the title, body, image, sound, badge and data, the platform the message targets when it says, the request as sent, the answer, and the project ([A5](#a5-projects-multi-project-inboxes-pl-10)) from the header or URL prefix.
+- **Failures on purpose:** magic device tokens like SMS's magic numbers: a token containing `unregistered` answers each provider's "not registered" error (FCM `UNREGISTERED` 404, Expo `DeviceNotRegistered`, OneSignal `invalid_player_ids`), `invalid` its invalid-token error, and `throttled` its rate limit (FCM `QUOTA_EXCEEDED` 429).
+- **Reading and waiting:** `GET /api/v1/push` (with `project`, `token`, `provider`), `GET /api/v1/push/{pushId}`, `DELETE`, and `GET /api/v1/wait/push`, with CLI and MCP commands from the same operations. `push.sent` and `push.failed` events reach webhook rules, which filter on `token`, `title` and `project`.
+- **The Push screen:** a list of notifications and a detail with a phone-style preview (lock screen card for iOS and Android), the data payload, the request and the answer; filters by provider, token and status. Built on the mock first, as every screen is.
+
+**Parts:** A7a the store, operations and FCM; A7b Expo and OneSignal; A7c the Push screen (mock, then live); A7d magic tokens, events and the SDK examples in CI.
+
+**Not in this part:** APNs, Web Push (VAPID), topics and condition sends (FCM topics are stored as the target, with no fan-out), delivery receipts beyond Expo's `getReceipts`.

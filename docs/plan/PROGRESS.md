@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 108 / 115 accepted (all but AI-05, DS-02, DS-03, EM-21, PL-10, UI-07 and WS-03), 530 / 544 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 108 / 116 accepted (all but AI-05, DS-02, DS-03, EM-21, PL-10, PN-01, UI-07 and WS-03), 530 / 550 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -365,7 +365,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [x] A4: Vonage Verify v2 and other verify APIs (#160, VF-05 accepted, #48)
 - [ ] A5: Multi-project inboxes, as projects (#167, PL-10)
 - [ ] A6: POP3 read access (#159, EM-21)
-- [ ] A7: Push notification emulation (#166)
+- [ ] A7: Push notification emulation (#166, PN-01)
 - [ ] A8: WhatsApp Business Cloud API, in full (#161)
 - [ ] A9: System tray app (#168)
 - [ ] A10: Helm chart and Docker Desktop extension (#162)
@@ -815,3 +815,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-07 | Ticked PL-10.3, PL-10.4 and PL-10.7 after CI and the SMS clients workflow (the Telnyx SDK under `/projects/shop/`) passed on 752ba5f; PL-10.8 waits for CI on the seed adapter. |
 | 2026-11-07 | A6b built: `--pop3-addr` and `--pop3-auth` in the binary (flags, environment, `sendmock.toml`), `pop3_address` in `/api/v1/info`, a POP3 card in Settings > Connection while it is on, Python `poplib` reading per-project mailboxes in the SMTP clients workflow, and the configuration guide section. |
 | 2026-11-07 | Fix: on Windows the load test got a `451` for one SMTP message: the background truncate also ran when the passive pass had left frames, then copied and synced them under the write lock, longer than a waiting write's 5-second busy timeout. It now runs only when the passive pass copied the whole log, so it has nothing to copy or sync. |
+| 2026-11-07 | Plan: A7 push notifications ([32](32-after-1-0.md#a7-push-notifications-pn-01), PN-01 new with 6 criteria, a new acceptance file `09-push.md`): FCM HTTP v1, Expo and OneSignal answered in code over a push store, magic tokens for each provider's failures, REST, CLI and MCP with a wait helper, `push.sent` and `push.failed` events and a Push screen; APNs and Web Push later. |

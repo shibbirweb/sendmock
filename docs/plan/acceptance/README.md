@@ -16,6 +16,7 @@ Phase progress lives in [PROGRESS.md](../PROGRESS.md); this folder tracks featur
 | [06-ui.md](06-ui.md) | Web UI as a whole (UI) |
 | [07-distribution-website.md](07-distribution-website.md) | Distribution and releases (DS), Website and playground (WS) |
 | [08-payments.md](08-payments.md) | Payment gateway emulation (PY) |
+| [09-push.md](09-push.md) | Push notifications (PN) |
 
 ## IDs
 
@@ -127,6 +128,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
 | [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | In progress |
+| [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | In progress |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |

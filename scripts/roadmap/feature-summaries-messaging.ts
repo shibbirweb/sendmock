@@ -124,6 +124,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Test a feature or a script that reads a mailbox over POP3 against SendMock, without changing it.",
   },
+  "PN-01": {
+    summary:
+      "Push notifications as their own area: FCM, Expo and OneSignal answered as the real services, each notification shown as the phone would, with magic tokens that fail on purpose.",
+    outcome:
+      "See and test every push your app sends without a device or a Firebase project.",
+  },
   "SM-01": {
     summary:
       "A native SMS API to send messages and read them back, with status and metadata.",

@@ -32,14 +32,6 @@ const backlogItems: BacklogItem[] = [
     source: `${blobBase}/docs/plan/09-distribution.md#later`,
   },
   {
-    key: "later-push-emulation",
-    title: "Push notification emulation",
-    area: "HTTP catcher",
-    idea: "Emulate push notification services (Apple Push Notification service and others) with the same catch-and-webhook model as email and SMS: the app sends a push, SendMock stores it and shows it.",
-    today:
-      "The HTTP catcher captures requests to Firebase Cloud Messaging, Expo and OneSignal through its presets and answers them as those services do (feature HC-03).",
-  },
-  {
     key: "later-tray-app",
     title: "System tray app",
     area: "Distribution",
