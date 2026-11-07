@@ -60,6 +60,8 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 - **Tabs:** HTML, Text, Source, Headers, Attachments, MIME, Checks, Timeline and Template data. Each is explained in [Reading and checks](./reading-and-checks.md).
 - **Actions:** mark read or unread, **Simulate** (Delivered, Hard bounce, Soft bounce, Spam complaint, Unsubscribe; see [Outcomes](./outcomes.md)), **Reply**, **Reply all**, **Forward** (see [Replies and forwards](./replies-and-forwards.md)), tag, download `.eml`, **Send to webhook**, **Release to real SMTP** (see [Release](./release.md)) and delete.
 
+Every control and text, one by one: [Inbox in depth](../deeper/mail/inbox.md).
+
 ## Customize
 
 - Make your own addresses bounce, defer or be rejected: [Advanced: email outcome addresses](../advanced/email-outcome-addresses.md).

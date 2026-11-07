@@ -1,13 +1,13 @@
 import type { DeeperPage } from "./deeper-types";
 import { appShellPage } from "./screens/app-shell";
+import { mailInboxPage } from "./screens/mail-inbox";
 
 /** Every Deeper page written so far (W14c onward adds a menu at a time). */
-export const deeperPages: DeeperPage[] = [appShellPage];
+export const deeperPages: DeeperPage[] = [appShellPage, mailInboxPage];
 
 /** Screens of the inventory whose page is not written yet; the list only shrinks. */
 export const pendingDeeperScreens = [
   "/",
-  "/mail",
   "/mail/providers",
   "/sms",
   "/sms/verify",

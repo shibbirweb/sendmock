@@ -8,3 +8,4 @@ The guide's menu pages explain a screen as a whole. These pages go one level dow
 The list of controls is read from the demo by a crawl, so a page always matches the screen it describes.
 
 - [Sidebar and header in depth](./app-shell.md): Every control of the sidebar and the header, which every screen shares.
+- [Inbox in depth](./mail/inbox.md): Every control and text of Mail > Inbox, an open email and its dialogs.
