@@ -3,7 +3,7 @@ title: Replies and WhatsApp
 description: Reply as the contact, see your app's reply webhook and TwiML answers, and use WhatsApp and media.
 ---
 
-> Try it in the [demo](/demo/sms). Works in your install from Phase 3 (reply webhooks) and Phase 4 (WhatsApp).
+> Try it in the [demo](/demo/sms).
 
 ## What it solves
 

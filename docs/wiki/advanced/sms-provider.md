@@ -3,7 +3,7 @@ title: Create an SMS provider
 description: Answer an SMS API SendMock does not ship, such as a regional vendor, from its docs to a working provider, step by step.
 ---
 
-> The screen works today in the [demo](/demo/sms/providers); requests to a custom provider's API are answered from Phase 4.
+> Try it in the [demo](/demo/sms/providers).
 
 SendMock ships Twilio, Twilio Verify, Vonage, Plivo and MessageBird. Regional vendors are added without code, because a provider is a definition: the requests it answers, where each part of the message is read from, what it answers and its error codes. The demo already has one added this way: **SSL Wireless**.
 

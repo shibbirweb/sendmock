@@ -3,7 +3,7 @@ title: Logs
 description: The raw SMTP sessions and API requests behind every message, including the ones SendMock rejected.
 ---
 
-> Try it in the [demo](/demo/logs). Works in your install from Phase 1 (SMTP) and Phase 2 (API requests).
+> Try it in the [demo](/demo/logs).
 
 Mail, SMS and Payments show what arrived. Logs show **how** it arrived, and what did not: every SMTP conversation and every API call, including failed and rejected ones.
 

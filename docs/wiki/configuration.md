@@ -3,7 +3,7 @@ title: Configuration and seed file
 description: sendmock.toml, environment variables and the sendmock.seed.toml seed file.
 ---
 
-> **Server settings arrive in Phase 0; the seed file grows with each backend phase.** Settings > General and Settings > Seed in the [live demo](/demo/) show the screens.
+> Settings > General and Settings > Seed in the [live demo](/demo/) show the screens.
 
 ## How SendMock runs: `sendmock.toml`
 

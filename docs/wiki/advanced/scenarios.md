@@ -3,7 +3,7 @@ title: Scenarios
 description: Write a multi-step test once in TOML and run it again and again, by hand, in CI or from an AI agent.
 ---
 
-> Try it in the [demo](/demo/scenarios) on the [Scenarios](../scenarios.md) screen. Works in your install from Phase 4.
+> Try it in the [demo](/demo/scenarios) on the [Scenarios](../scenarios.md) screen.
 
 A scenario is a list of steps: set things up, trigger your app, wait for the message, check it, simulate what happens next. Each step is a SendMock operation (the same ones as the CLI and MCP tools), plus `http` to call your app, `assert` and `sleep`.
 

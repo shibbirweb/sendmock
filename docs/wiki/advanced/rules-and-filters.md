@@ -3,7 +3,7 @@ title: Rules and filters
 description: Exact filters for webhook rules. Groups, not, headers, regex, multi-value fields, and how several rules fire.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/rules) today.
+> Try it in the [demo](/demo/webhooks/rules).
 
 A rule's filter decides which events reach its endpoint. The builder covers simple cases in one row and complex ones with groups.
 

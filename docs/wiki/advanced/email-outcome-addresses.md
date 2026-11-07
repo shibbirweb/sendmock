@@ -3,7 +3,7 @@ title: Email outcome addresses
 description: Your own addresses and patterns that always deliver, bounce, defer, complain, unsubscribe or are rejected.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/settings?section=email) today.
+> Try it in the [demo](/demo/settings?section=email).
 
 The magic addresses (`bounce@`, `complaint@`, ...) cover the common cases. Your own rules cover the rest: a QA domain where everything bounces, one address that is always rejected, a diagnostic text your app parses.
 

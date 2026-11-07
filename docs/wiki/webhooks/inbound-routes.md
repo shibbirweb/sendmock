@@ -3,7 +3,7 @@ title: Inbound routes
 description: Decide where incoming email goes, the way Mailgun Routes do. Match a recipient or header, then forward, store or stop.
 ---
 
-> Try it in the [demo](/demo/webhooks/inbound-routes). Works in your install from Phase 4.
+> Try it in the [demo](/demo/webhooks/inbound-routes).
 
 Incoming email (a reply or forward you simulated in [Mail](../mail/replies-and-forwards.md), or mail to an inbound domain) is delivered by routes. They follow Mailgun's model exactly, so a route copied from the Mailgun dashboard, or created by your app through Mailgun's Routes API, behaves the same.
 

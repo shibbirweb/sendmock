@@ -3,7 +3,7 @@ title: Getting started
 description: Install SendMock, explore it with samples, connect your app and get your first webhook, in about 10 minutes.
 ---
 
-> **Coming with the first beta (Phase 1).** Installers and the server are not released yet. Until then, steps 2, 4 and 5 can be tried in the [live demo](/demo/).
+> **Downloads start with the first beta.** Until it is published, steps 2, 4 and 5 can be tried in the [live demo](/demo/).
 
 This first run uses only what SendMock ships with. Nothing needs to be configured.
 

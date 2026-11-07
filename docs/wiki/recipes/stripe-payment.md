@@ -3,7 +3,7 @@ title: Stripe payment
 description: Create a Stripe Checkout Session, pay with a test card on the test checkout page, and handle Stripe's signed webhook.
 ---
 
-> Works in your install from Phase 3P. Try it in the [demo](/demo/payments/gateways) today.
+> Try it in the [demo](/demo/payments/gateways).
 
 **The situation:** your app takes payments with Stripe Checkout. You want to run the whole flow (your page, Stripe's page, back to yours, the webhook) without a Stripe account, internet or a tunnel.
 

@@ -3,7 +3,7 @@ title: Subscriptions
 description: Recurring payments on a gateway, renewed, failed and canceled on each subscription's own clock.
 ---
 
-> Try it in the [demo](/demo/payments/subscriptions). Works in your install from Phase 4.
+> Try it in the [demo](/demo/payments/subscriptions).
 
 A subscription charges a test card on a gateway every day, week, month or year. Nothing waits for real time: each subscription keeps its own clock, and **Advance to renewal** moves it to the next renewal and charges the card as a payment through the gateway, so your app receives the same notifications it gets from a real renewal.
 

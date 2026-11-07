@@ -3,7 +3,7 @@ title: Release
 description: Send a real copy of a caught email through your SMTP relay, only to addresses you allow.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 4.
+> Try it in the [demo](/demo/mail).
 
 SendMock never delivers email by itself. Sometimes you do want one real copy: a designer wants the newsletter in their own Outlook, or you want to check a real Gmail inbox. **Release** sends a copy through a real SMTP relay, and only to addresses on your allowlist.
 

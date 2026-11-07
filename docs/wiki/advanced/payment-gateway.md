@@ -3,7 +3,7 @@ title: Create a payment gateway
 description: Emulate a payment provider SendMock does not ship, from its docs to a working checkout, redirect and notification, step by step.
 ---
 
-> Works in your install from Phase 3P. Try every step in the [demo](/demo/payments/gateways) today.
+> Try every step in the [demo](/demo/payments/gateways).
 
 SendMock ships Stripe, PayPal, SSLCommerz, bKash and a native gateway. Any other provider can be added without code, because a gateway is a definition: the methods its checkout offers, the fields its redirect sends back, and the shape and signature of its notification.
 
@@ -38,7 +38,7 @@ The method now shows "No gateway yet". More on methods: [Create a payment method
 4. **Checkout:** remove the methods you do not want (**Remove Card**), then **Add a method** > **Upay**. With several methods, order them as the provider's page does.
 5. **Merchant:** add the credentials your app sends, one row each (`merchant_id`, `api_key`, and `api_secret` marked secret), and pick the **Notification endpoint**: the [webhook endpoint](../webhooks/endpoints.md) for your app's notification URL.
 6. **Redirect:** pick GET or POST, then add a row per field: name `payment_ref_id`, template `{{ payment.reference }}`; name `status`, template `{{ redirect.status }}`. Mark fields that only come on success as **Only on success**.
-7. **Notification:** pick JSON or Form; set the **event name** for each native event your provider reports (for example `payment.succeeded` as `COMPLETED`, `payment.failed` as `FAILED`; leave the rest blank to send nothing); write the **body template**; and add a header template for the signature, for example `X-Upay-Signature` as `{{ body | hmac_sha256(merchant.api_secret) }}` (`body` holds the rendered body, so the signature covers exactly what is sent). The demo's preview only knows a few filters and refuses `hmac_sha256`, so leave the signature header out when you try this in the demo; your install has every filter from Phase 3P.
+7. **Notification:** pick JSON or Form; set the **event name** for each native event your provider reports (for example `payment.succeeded` as `COMPLETED`, `payment.failed` as `FAILED`; leave the rest blank to send nothing); write the **body template**; and add a header template for the signature, for example `X-Upay-Signature` as `{{ body | hmac_sha256(merchant.api_secret) }}` (`body` holds the rendered body, so the signature covers exactly what is sent). The demo's preview only knows a few filters and refuses `hmac_sha256`, so leave the signature header out when you try this in the demo; your install has every filter.
 
 A JSON body template for this example:
 

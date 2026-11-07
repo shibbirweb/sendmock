@@ -1,9 +1,9 @@
 ---
 title: Install
-description: Binaries, Homebrew, Docker and building from source.
+description: Every way to install SendMock: install scripts, package managers, Docker and binaries.
 ---
 
-> **Coming with the first beta (Phase 1).** Docker `edge` images are published from `develop` from Phase 0. Stable channels arrive with 1.0 in Phase 5.
+> **Downloads start with the first beta.** Until it is published, build SendMock from source ([Run it from source](https://github.com/shibbirweb/sendmock#run-it-from-source)) or try the [live demo](/demo/).
 
 SendMock is one static binary with the web UI built in. Pick one way to install it below and follow its steps; all of them run the same thing.
 

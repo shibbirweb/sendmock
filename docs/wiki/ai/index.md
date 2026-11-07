@@ -3,8 +3,6 @@ title: AI
 description: Let coding agents set up, test and extend SendMock through MCP and the CLI. Setup, what an agent can do, and the safety rules.
 ---
 
-> MCP tools and CLI commands arrive with each backend phase (email in Phase 1, SMS in Phase 2, webhooks in Phase 3, payments in Phase 3P). The agent skill, the built-in prompts and `sendmock ai install` arrive in Phase 4, the Claude Code plugin in Phase 5.
-
 Every SendMock feature is an operation that the UI, the REST API, the CLI and the MCP server all share. So anything you can click, an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, VS Code agents and others) can do too, with the same checks: create a gateway, compose a flow, write a template, add a rule, read an OTP, replay a delivery.
 
 ## What an agent can do for you

@@ -3,7 +3,7 @@ title: Reply by email
 description: Answer a notification email as its recipient and have the reply posted to your app, as Mailgun Routes would.
 ---
 
-> Works in your install from Phase 4. Try it in the [demo](/demo/mail) today.
+> Try it in the [demo](/demo/mail).
 
 **The situation:** your app emails ticket updates from `reply+<ticket>@reply.app.test`, and people answer by email. In production, Mailgun receives the reply and posts it to your app. You want to test that handler locally.
 

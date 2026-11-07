@@ -3,7 +3,7 @@ title: Variables
 description: Values templates read as vars.name. Fixed values, secrets, values from the message, random values, combinations and values asked for at send time.
 ---
 
-> Try it in the [demo](/demo/webhooks/variables). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/variables).
 
 Templates read variables as `{{ vars.name }}`. They hold what a template needs that is not in the event: an auth token for a signature, a tenant id, a chat id, a fresh random id per send.
 

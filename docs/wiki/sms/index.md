@@ -3,7 +3,7 @@ title: Messages
 description: Twilio and Vonage compatible SMS and WhatsApp, shown as conversations, with delivery status, callbacks and replies.
 ---
 
-> Try it in the [demo](/demo/sms). Works in your install from Phase 2 (sending, status and callbacks), Phase 3 (reply webhooks) and Phase 4 (WhatsApp and more providers).
+> Try it in the [demo](/demo/sms).
 
 Every SMS and WhatsApp message your app sends lands in **SMS > Messages**, grouped into conversations like a phone shows them. Nothing reaches a real phone. **SMS** opens the messages; [SMS > Verify](./verify.md) and [SMS > Providers](./providers.md) sit under it.
 
@@ -270,8 +270,6 @@ public class SmsTests
 | reply as the contact | [`sendmock sms inbound`](/cli/sms/#sms-inbound) | [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound) | [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound) |
 | delete one | [`sendmock sms delete <smsId>`](/cli/sms/#sms-delete) | [`DELETE /api/v1/sms/{smsId}`](/api/sms/#deleteSmsBySmsId) | [`sendmock_sms_delete`](/mcp/sms/#sendmock_sms_delete) |
 | delete everything | [`sendmock sms delete-all --yes`](/cli/sms/#sms-delete-all) | [`DELETE /api/v1/sms`](/api/sms/#deleteSms) | [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all) |
-
-The SMS commands and tools arrive in Phase 2.
 
 ## Related
 

@@ -3,7 +3,7 @@ title: Numbers and Messaging Services
 description: Set up numbers with reply webhooks and fallbacks, and Messaging Services with sender pools, as in a provider console.
 ---
 
-> Works in your install from Phase 3 (number webhooks) and Phase 4 (the full registry). Try it in the [demo](/demo/numbers) today.
+> Try it in the [demo](/demo/numbers).
 
 ## When you would
 

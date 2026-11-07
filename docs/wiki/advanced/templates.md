@@ -3,7 +3,7 @@ title: Create and edit templates
 description: Edit a built-in template, clone one, write your own, keep revisions, and share templates with your team.
 ---
 
-> Works in your install from Phase 3 (custom templates) and Phase 4 (import, export and the templates folder). Try it in the [demo](/demo/webhooks/templates) today.
+> Try it in the [demo](/demo/webhooks/templates).
 
 A template is the shape of a webhook request. When no built-in matches what your app expects, change one or write your own.
 

@@ -3,7 +3,7 @@ title: Scenarios
 description: Write a multi-step test once, check it and run it step by step, in the app, from the CLI, in CI or from an AI agent.
 ---
 
-> Try it in the [demo](/demo/scenarios). Works in your install from Phase 4.
+> Try it in the [demo](/demo/scenarios).
 
 A scenario is a short TOML file: set things up, make your app do something, wait for the message, check a value, simulate what happens next. The **Scenarios** screen writes, checks and runs one, and shows every step's input and answer.
 

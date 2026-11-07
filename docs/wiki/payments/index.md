@@ -3,7 +3,7 @@ title: Payments
 description: Test checkouts for Stripe, PayPal, SSLCommerz and bKash with real redirects and notifications, and every payment with its timeline and Simulate menu.
 ---
 
-> Try it in the [demo](/demo/payments). Works in your install from Phase 3P (Stripe, PayPal, SSLCommerz and the native API) and Phase 4 (bKash, Razorpay, Paddle).
+> Try it in the [demo](/demo/payments).
 
 SendMock is a fake payment gateway. Your app creates a payment through the gateway's real API; SendMock answers like the gateway, shows a test checkout page, sends the browser back to your app and posts the gateway's notification (IPN or webhook), signed as the gateway signs it. No real money moves and no real card is accepted.
 

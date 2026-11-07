@@ -3,7 +3,7 @@ title: Rules
 description: Send matching events to an endpoint automatically, with a visual filter and a preview against recent messages.
 ---
 
-> Try it in the [demo](/demo/webhooks/rules). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/rules).
 
 A rule says "when these events happen, and they match this filter, send them to this endpoint". Rules are what make webhooks automatic.
 

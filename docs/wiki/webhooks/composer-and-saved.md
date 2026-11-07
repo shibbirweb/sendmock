@@ -3,7 +3,7 @@ title: Composer and Saved
 description: Send webhooks by hand. Send to webhook from any message, write a request in the Composer, and keep requests in Saved to send again.
 ---
 
-> Try it in the [demo](/demo/webhooks/composer). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/composer).
 
 Rules send automatically. These three tools send when you say so.
 

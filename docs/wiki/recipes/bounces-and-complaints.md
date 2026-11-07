@@ -3,7 +3,7 @@ title: Bounces and complaints
 description: Make an email bounce or be marked as spam, by hand or with a magic address, and send the event to your app in your provider's format.
 ---
 
-> Works in your install from Phase 3 (native events) and Phase 4 (provider formats). Try it in the [demo](/demo/mail) today.
+> Try it in the [demo](/demo/mail).
 
 **The situation:** your app should stop emailing addresses that bounce and people who mark it as spam, and maybe show "email bounced" to an admin. Real bounces are hard to produce, so this code is rarely tested.
 

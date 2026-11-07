@@ -3,7 +3,7 @@ title: Verify
 description: Twilio Verify emulation with codes you can read, live expiry, and outcomes you can force.
 ---
 
-> Try it in the [demo](/demo/sms/verify). Works in your install from Phase 2.
+> Try it in the [demo](/demo/sms/verify).
 
 Your app starts and checks verifications through Twilio Verify's real API. **SMS > Verify** shows every verification with its code, so you, a test or an agent can read it instead of waiting for a phone.
 

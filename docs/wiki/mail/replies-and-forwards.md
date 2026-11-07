@@ -3,7 +3,7 @@ title: Replies and forwards
 description: Act as the person your app emailed. Reply, reply all or forward, and the result arrives as incoming email for your app.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 4.
+> Try it in the [demo](/demo/mail).
 
 Many apps let people answer an email: a support ticket notification, a comment digest, a "reply to this message" address like `reply+42@reply.app.test`. In production the provider (Mailgun, SendGrid, Postmark) receives that reply and posts it to your app. SendMock does the same locally.
 

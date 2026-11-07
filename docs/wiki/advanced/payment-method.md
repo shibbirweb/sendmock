@@ -3,7 +3,7 @@ title: Create a payment method
 description: Add a wallet, bank or card method with its own test values, and offer it on any gateway.
 ---
 
-> Works in your install from Phase 3P. Try it in the [demo](/demo/payments/methods) today.
+> Try it in the [demo](/demo/payments/methods).
 
 A method is what a customer picks on the checkout page. Add one when your provider offers a wallet or bank SendMock does not ship (Upay, a local bank), or when you want a second card method with other test cards.
 

@@ -3,7 +3,7 @@ title: Supported providers
 description: The provider APIs SendMock ships with, by product area. Each is a built-in you can change, remove or add to.
 ---
 
-> **Coming with the provider phases.** Email provider APIs arrive in Phase 4, SMS providers in Phases 2 and 4, payment gateways in Phase 3. The demo shows them today.
+> Try them in the [demo](/demo/mail/providers).
 
 SendMock ships with these providers **built in**. Each answers at the provider's real path, with the provider's real response and error shapes, so your app or its official SDK keeps working when you point it at SendMock. Plain SMTP works for every email library.
 

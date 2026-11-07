@@ -3,7 +3,7 @@ title: Providers
 description: The email APIs SendMock answers like the real provider. Change a built-in, remove the ones you do not use, or add your own.
 ---
 
-> Try it in the [demo](/demo/mail/providers). The screen works today; requests to the provider APIs are answered from Phase 4.
+> Try it in the [demo](/demo/mail/providers).
 
 An email provider is one API SendMock answers like the real one: SendGrid, Mailgun, Postmark, Resend, Amazon SES, Brevo, or one you add. Providers are data, not code, like [payment gateways](../payments/gateways.md): the requests a provider answers, how SendMock reads them and what it answers are all editable, and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
 

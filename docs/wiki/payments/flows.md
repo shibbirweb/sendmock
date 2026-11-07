@@ -3,7 +3,7 @@ title: Flows
 description: The steps a checkout page asks for, in order, built from a catalogue of step types, with your own labels.
 ---
 
-> Try it in the [demo](/demo/payments/flows). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments/flows).
 
 A flow is the sequence of steps a customer goes through for one kind of method: a card form; or an account number, then an OTP, then a PIN; or a QR code to scan. Methods use flows, so changing a flow changes every method that runs it.
 

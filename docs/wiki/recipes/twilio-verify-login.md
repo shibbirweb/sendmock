@@ -3,7 +3,7 @@ title: Twilio Verify login
 description: Log in with a Twilio Verify code, then test an expired code, a canceled verification and too many attempts.
 ---
 
-> Works in your install from Phase 2. Try it in the [demo](/demo/sms/verify) today.
+> Try it in the [demo](/demo/sms/verify).
 
 **The situation:** your app logs people in, or confirms phone numbers, with Twilio Verify. The happy path is easy; an expired code or too many wrong tries are not.
 

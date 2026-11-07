@@ -3,7 +3,7 @@ title: Inbound email
 description: Receive email in your app the way Postmark, SendGrid or Mailgun posts it, with a built-in template and a rule.
 ---
 
-> Works in your install from Phase 3 (native and Twilio formats) and Phase 4 (email provider formats). Try it in the [demo](/demo/webhooks/templates) today.
+> Try it in the [demo](/demo/webhooks/templates).
 
 **The situation:** your app receives email through a provider's inbound webhook: support tickets from `support@`, invoices from a mailbox, replies. You want to test the handler with the provider's real payload, without a public URL.
 

@@ -3,7 +3,7 @@ title: Outcomes
 description: Simulate delivered, deferred, bounced, complained and unsubscribed, by hand or with magic addresses, and send them to your app.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 3 (native events) and Phase 4 (provider formats).
+> Try it in the [demo](/demo/mail).
 
 Real email providers tell your app what happened after sending: the email was delivered, bounced, marked as spam, or the person unsubscribed. Your app usually reacts (stop mailing a dead address, show "email bounced" to an admin). SendMock creates those outcomes on demand.
 

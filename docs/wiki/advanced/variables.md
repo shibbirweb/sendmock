@@ -3,7 +3,7 @@ title: Variables in depth
 description: Dynamic, Random, Computed and Prompt variables, secrets, scopes, and overrides at send time.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/variables) today.
+> Try it in the [demo](/demo/webhooks/variables).
 
 [Variables](../webhooks/variables.md) explains the kinds. This page shows when each one earns its place.
 

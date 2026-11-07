@@ -3,7 +3,7 @@ title: HTTP Catcher
 description: A bin for any HTTP call your app makes (Slack, Discord, push, third-party APIs), recorded and answered the way you choose.
 ---
 
-> Try it in the [demo](/demo/http). Works in your install from Phase 4 (bins, responses, Slack, Discord, Telegram and FCM presets) and Phase 5 (Teams, Google Chat, Expo, OneSignal presets).
+> Try it in the [demo](/demo/http).
 
 Apps send more than email and SMS: Slack alerts, Discord messages, push notifications, analytics pings, calls to partner APIs. Point any of them at a SendMock bin and every request is recorded, shown, and answered with a reply your app accepts.
 

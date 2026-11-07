@@ -3,7 +3,7 @@ title: Endpoints
 description: Where SendMock sends, with the URL and method, the request's template, the signing secret, retries and variables.
 ---
 
-> Try it in the [demo](/demo/webhooks/endpoints). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/endpoints).
 
 An endpoint is one destination for webhooks, usually one handler in your app.
 

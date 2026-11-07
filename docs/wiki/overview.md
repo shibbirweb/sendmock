@@ -3,7 +3,7 @@ title: Overview
 description: The home dashboard. Counts, activity, webhook health, recent failures and how to connect, live.
 ---
 
-> Try it in the [demo](/demo/). Works in your install from Phase 1 (message counts) and Phase 3 (webhook health).
+> Try it in the [demo](/demo/).
 
 The first screen you see: what SendMock has caught, how your webhooks are doing, and the addresses your app needs.
 

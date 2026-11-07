@@ -3,7 +3,7 @@ title: Inbox
 description: Catch every email your app sends over SMTP or a provider API, read it, check it, and simulate what happens next.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 1 (SMTP and the native API), Phase 3 (outcome events) and Phase 4 (provider APIs, checks, replies and release).
+> Try it in the [demo](/demo/mail).
 
 Every email your app sends lands in **Mail > Inbox**, whatever the recipient, and nothing is delivered to a real inbox. **Mail** opens the inbox; [Mail > Providers](./providers.md) lists the email APIs SendMock answers.
 
@@ -236,8 +236,6 @@ public class MailTests
 | create an incoming email | [`sendmock email inbound`](/cli/email/#email-inbound) | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | [`sendmock_email_inbound`](/mcp/email/#sendmock_email_inbound) |
 | delete one | [`sendmock email delete <emailId>`](/cli/email/#email-delete) | [`DELETE /api/v1/emails/{emailId}`](/api/email/#deleteEmailsByEmailId) | [`sendmock_email_delete`](/mcp/email/#sendmock_email_delete) |
 | delete everything | [`sendmock email delete-all --yes`](/cli/email/#email-delete-all) | [`DELETE /api/v1/emails`](/api/email/#deleteEmails) | [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all) |
-
-The email commands and tools arrive in Phase 1.
 
 ## Related
 

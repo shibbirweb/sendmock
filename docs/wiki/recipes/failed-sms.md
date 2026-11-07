@@ -3,7 +3,7 @@ title: Failed SMS
 description: Make SMS fail with Twilio's real error codes, at send time or after, and check how your app handles it.
 ---
 
-> Works in your install from Phase 2. Try it in the [demo](/demo/settings?section=sms) today.
+> Try it in the [demo](/demo/settings?section=sms).
 
 **The situation:** your app should handle an SMS that cannot be sent (invalid number, opted out) and one that is accepted but never arrives (unreachable handset, carrier filter). On Twilio these are hard to produce on demand.
 

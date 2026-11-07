@@ -3,7 +3,7 @@ title: Connect your app
 description: Point your app's mail, SMS and payment settings at SendMock.
 ---
 
-> **Applies from the first beta (Phase 1).** The demo's Settings > Connection shows the same snippets for each language.
+> The demo's Settings > Connection shows the same snippets for each language.
 
 SendMock speaks the protocols your app already uses, so connecting is a settings change, not a code change:
 

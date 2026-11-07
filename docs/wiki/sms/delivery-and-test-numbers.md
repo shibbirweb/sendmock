@@ -3,7 +3,7 @@ title: Delivery and test numbers
 description: How SMS move from queued to delivered or failed, Twilio's official test numbers, and the status callbacks your app receives.
 ---
 
-> Try it in the [demo](/demo/sms). Works in your install from Phase 2.
+> Try it in the [demo](/demo/sms).
 
 ## What it solves
 

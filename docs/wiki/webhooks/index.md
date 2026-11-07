@@ -3,7 +3,7 @@ title: Webhooks
 description: How SendMock talks back to your app. The six parts of a webhook, how they fit, and the Webhooks overview screen.
 ---
 
-> Try it in the [demo](/demo/webhooks/overview). Works in your install from Phase 3 (endpoints, rules, deliveries, templates, variables) and Phase 4 (inbound routes and more provider templates).
+> Try it in the [demo](/demo/webhooks/overview).
 
 Real services call your app back: Postmark posts inbound email, Twilio posts delivery receipts and incoming SMS, SendGrid posts bounces, Stripe posts payment events. Locally they cannot reach you without a tunnel, and you cannot make them send what you need when you need it. SendMock sends those requests itself, shaped like the provider's and signed the way it signs them.
 

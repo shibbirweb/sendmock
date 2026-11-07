@@ -3,7 +3,7 @@ title: Templates
 description: The shapes a webhook request can take. Built-in templates act like Twilio, Postmark, SendGrid, Slack and more; your own cover the rest.
 ---
 
-> Try it in the [demo](/demo/webhooks/templates). Works in your install from Phase 3 (native, Twilio, Vonage, Slack, Discord and custom templates) and Phase 4 (the other providers, import and export).
+> Try it in the [demo](/demo/webhooks/templates).
 
 A template is a recipe for a webhook request: method, content type, headers, body and signature, written with `{{ }}` placeholders that are filled from the event and [variables](./variables.md).
 

@@ -3,7 +3,7 @@ title: Two-way SMS
 description: Reply as the contact, have your app's webhook receive it in Twilio's format, and see its TwiML answer in the conversation.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/sms) today.
+> Try it in the [demo](/demo/sms).
 
 **The situation:** people answer your SMS: STOP to opt out, YES to confirm, or a question to support. Your app has a webhook for incoming SMS and answers with TwiML. You cannot text your laptop.
 

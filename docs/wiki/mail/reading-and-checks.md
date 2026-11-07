@@ -3,7 +3,7 @@ title: Reading and checks
 description: Every tab of an open email, the extracted codes and links, and the quality checks.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 1 (reading) and Phase 4 (Checks).
+> Try it in the [demo](/demo/mail).
 
 Open any email in **Mail** to see these tabs. They answer "what exactly did my app send?" and "will it look right for the people who get it?".
 

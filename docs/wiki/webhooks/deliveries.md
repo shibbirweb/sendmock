@@ -3,7 +3,7 @@ title: Deliveries
 description: The log of every request SendMock sent to your app, with its answer, retries, replay and edit and replay.
 ---
 
-> Try it in the [demo](/demo/webhooks/deliveries). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/deliveries).
 
 Every request SendMock sends to your app is logged here: rule deliveries, status callbacks, reply webhooks, inbound routes, payment notifications, tests and manual sends.
 

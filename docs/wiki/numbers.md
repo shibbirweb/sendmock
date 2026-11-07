@@ -3,7 +3,7 @@ title: Numbers
 description: Your fake phone numbers and Messaging Services, set up the way you would in a provider's console, for replies and sender pools.
 ---
 
-> Try it in the [demo](/demo/numbers). Works in your install from Phase 3 (number webhooks) and Phase 4 (the full registry).
+> Try it in the [demo](/demo/numbers).
 
 You do not need numbers to send SMS: any `From` is accepted. Numbers matter when the contact **replies**: like a Twilio number, each one says where incoming messages go. Messaging Services group numbers into a **sender pool**.
 

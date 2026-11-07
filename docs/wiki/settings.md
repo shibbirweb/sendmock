@@ -3,7 +3,7 @@ title: Settings
 description: How SendMock behaves. Retention, the seed file, email and SMS outcomes, payments, notifications, chaos, OTP patterns and connection snippets.
 ---
 
-> Try it in the [demo](/demo/settings). Works in your install from Phase 0 (the server settings), with each section arriving with its feature.
+> Try it in the [demo](/demo/settings).
 
 Settings decide how every capture menu behaves. They take effect at once, without a restart.
 

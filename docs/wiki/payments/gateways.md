@@ -3,7 +3,7 @@ title: Gateways
 description: The emulated payment providers. What each offers at checkout, its credentials, what it sends back to your app, and your own gateways.
 ---
 
-> Try it in the [demo](/demo/payments/gateways). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments/gateways).
 
 A gateway is one emulated payment provider: Stripe, PayPal, SSLCommerz, bKash, Native, or one you add. Gateways are data, not code: what a gateway offers, what its redirect carries and what its notification looks like are all editable, and **Reset to default** brings a built-in back.
 

@@ -3,7 +3,7 @@ title: Docker
 description: Connect your app to SendMock when either of them runs in Docker, with Compose, CI and webhook examples.
 ---
 
-> **Applies from the first beta (Phase 1).** See [Install](../install.md) to start SendMock in Docker, and your language's page for the code side.
+> See [Install](../install.md) to start SendMock in Docker, and your language's page for the code side.
 
 ## Which address to use
 
