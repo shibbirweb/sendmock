@@ -22,3 +22,8 @@ The list of controls is read from the demo by a crawl, so a page always matches 
 - [Templates in depth](./webhooks/templates.md): Every control and text of Webhooks > Templates, a template and its dialogs.
 - [Variables in depth](./webhooks/variables.md): Every control and text of Webhooks > Variables and the variable editor.
 - [Saved deliveries in depth](./webhooks/saved.md): Every control and text of Webhooks > Saved and its Send dialog.
+- [Payments in depth](./payments/all-payments.md): Every control and text of Payments > All payments, a payment and its dialogs.
+- [Gateways in depth](./payments/gateways.md): Every control and text of Payments > Gateways and the gateway editor's tabs.
+- [Methods in depth](./payments/methods.md): Every control and text of Payments > Methods and the method editor.
+- [Flows in depth](./payments/flows.md): Every control and text of Payments > Flows and the flow editor.
+- [Subscriptions in depth](./payments/subscriptions.md): Every control and text of Payments > Subscriptions and New subscription.

@@ -2,6 +2,13 @@ import type { Page } from "@playwright/test";
 
 import { appScreens } from "../e2e/support/app-screens";
 import { buildProvidersOverlays, mailOverlays } from "./overlays/mail-overlays";
+import {
+  paymentFlowOverlays,
+  paymentGatewayOverlays,
+  paymentListOverlays,
+  paymentMethodOverlays,
+  subscriptionOverlays,
+} from "./overlays/payment-overlays";
 import { smsOverlays, verifyOverlays } from "./overlays/sms-overlays";
 import {
   inboundRouteOverlays,
@@ -66,6 +73,11 @@ const overlaysByPath: Record<string, DeeperOverlay[]> = {
   "/webhooks/templates": webhookTemplateOverlays,
   "/webhooks/variables": webhookVariableOverlays,
   "/webhooks/saved": savedDeliveryOverlays,
+  "/payments": paymentListOverlays,
+  "/payments/gateways": paymentGatewayOverlays,
+  "/payments/methods": paymentMethodOverlays,
+  "/payments/flows": paymentFlowOverlays,
+  "/payments/subscriptions": subscriptionOverlays,
 };
 
 /** Every screen of the app, with the data states and overlays its Deeper page covers. */

@@ -53,6 +53,8 @@ Name, key and flow (fixed after creation), accent colour, and the test values th
 
 A built-in shows **Reset to default** (asks first). A custom method can be deleted while no payment uses it.
 
+
+Every control and text, one by one: [Methods in depth](../deeper/payments/methods.md).
 ## Customize
 
 Add a new wallet end to end: [Advanced: payment method](../advanced/payment-method.md).

@@ -16,6 +16,38 @@
       "each item, switch: … enabled",
       "each item, button: Edit …"
     ],
+    "Add a payment method dialog": [
+      "heading: Add a payment method",
+      "paragraph: Pick the flow the customer goes through; you set its test values next. Flows are edited in Payments > Flows.",
+      "radio: Card Card form",
+      "radio: Wallet Account number, OTP, PIN",
+      "radio: Bank Confirm",
+      "radio: Account Signed-in account",
+      "radio: QR QR code",
+      "radio: Bank transfer Reference code",
+      "radio: Voucher Voucher code",
+      "textbox: Name",
+      "textbox: Key",
+      "paragraph: Used by the API; fixed once added.",
+      "button: Cancel",
+      "button: Add method",
+      "button: Close"
+    ],
+    "Method editor": [
+      "heading: Card",
+      "paragraph: Card flow, key card",
+      "textbox: Name",
+      "textbox: Accent colour",
+      "textbox: Accent",
+      "textbox: Test card # number",
+      "combobox: Test card # outcome",
+      "button: Remove test card #",
+      "button: Add test card",
+      "button: Reset to default",
+      "button: Cancel",
+      "button: Save method",
+      "button: Close"
+    ],
     "failing": [
       "alert: Could not load the payment methods. Try again",
       "paragraph: Could not load the payment methods.",

@@ -46,6 +46,8 @@ The customer with the gateway and the card's last four digits, the plan with its
 | Trial days | days before the first charge; `0` charges at once |
 | Test card | the test card that pays each renewal; a real card number is refused |
 
+
+Every control and text, one by one: [Subscriptions in depth](../deeper/payments/subscriptions.md).
 ## Customize
 
 Write the renewal into a test: start a subscription with the API, advance it, and wait for the renewal's payment with `sendmock payments wait`.

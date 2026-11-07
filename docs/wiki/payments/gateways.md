@@ -62,6 +62,8 @@ Plus the template functions and filters, and `uuid()`, `random_hex(length)`, `no
 
 A built-in can be edited and disabled but not deleted; it shows **Modified** once edited, and **Reset to default** (asks first) restores it. A custom gateway can be deleted while no payment uses it.
 
+
+Every control and text, one by one: [Gateways in depth](../deeper/payments/gateways.md).
 ## Customize
 
 The full walkthrough, from the provider's docs to a working checkout and a seed export: [Advanced: create a gateway](../advanced/payment-gateway.md). An AI agent can do it for you: [AI: create a gateway with AI](../ai/payment-gateway-with-ai.md).

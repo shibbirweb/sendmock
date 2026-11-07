@@ -86,6 +86,8 @@ The **Simulate** menu offers only what the payment's status allows:
 
 Wallets (bKash, Nagad, Rocket) use test numbers such as `01770000001` (succeeds) and `01770000002` (insufficient balance), the OTP `123456` and the PIN `12121`. [Settings > Payments](../settings.md#payments) lists the test values of every enabled method. A real card number is refused with "Use a test card" and never stored or logged.
 
+
+Every control and text, one by one: [Payments in depth](../deeper/payments/all-payments.md).
 ## Customize
 
 - Change what a built-in gateway sends, or add your own: [Gateways](./gateways.md), [Advanced: create a gateway](../advanced/payment-gateway.md).

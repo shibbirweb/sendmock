@@ -73,6 +73,8 @@ A built-in shows **Modified** and **Reset to default**; it cannot be deleted. A 
 
 A step type SendMock cannot show yet needs code (a checkout component and a server check); ask for it with a provider request issue.
 
+
+Every control and text, one by one: [Flows in depth](../deeper/payments/flows.md).
 ## Customize
 
 Compose a QR wallet flow from scratch: [Advanced: payment flow](../advanced/payment-flow.md).

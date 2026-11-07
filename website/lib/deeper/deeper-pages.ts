@@ -2,6 +2,15 @@ import type { DeeperPage } from "./deeper-types";
 import { appShellPage } from "./screens/app-shell";
 import { mailInboxPage } from "./screens/mail-inbox";
 import { mailProvidersPage } from "./screens/mail-providers";
+import { paymentsGatewaysPage } from "./screens/payments-gateways";
+import {
+  paymentsListPage,
+  paymentsSubscriptionsPage,
+} from "./screens/payments-list";
+import {
+  paymentsFlowsPage,
+  paymentsMethodsPage,
+} from "./screens/payments-methods-flows";
 import { smsMessagesPage } from "./screens/sms-messages";
 import { smsProvidersPage } from "./screens/sms-providers";
 import { smsVerifyPage } from "./screens/sms-verify";
@@ -36,17 +45,17 @@ export const deeperPages: DeeperPage[] = [
   webhooksTemplatesPage,
   webhooksVariablesPage,
   webhooksSavedPage,
+  paymentsListPage,
+  paymentsGatewaysPage,
+  paymentsMethodsPage,
+  paymentsFlowsPage,
+  paymentsSubscriptionsPage,
 ];
 
 /** Screens of the inventory whose page is not written yet; the list only shrinks. */
 export const pendingDeeperScreens = [
   "/",
   "/http",
-  "/payments",
-  "/payments/gateways",
-  "/payments/methods",
-  "/payments/flows",
-  "/payments/subscriptions",
   "/numbers",
   "/scenarios",
   "/logs",
