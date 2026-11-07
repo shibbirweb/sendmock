@@ -31,7 +31,15 @@ export const frameworkNames = [
  */
 export const emulatedProviderNames = {
   email: ["SendGrid", "Mailgun", "Postmark", "Resend", "Amazon SES", "Brevo"],
-  sms: ["Twilio", "Twilio Verify", "Vonage", "Plivo", "MessageBird"],
+  sms: [
+    "Twilio",
+    "Twilio Verify",
+    "Vonage",
+    "Plivo",
+    "MessageBird",
+    "Infobip",
+    "Telnyx",
+  ],
   payments: ["Stripe", "PayPal", "SSLCommerz", "bKash"],
 };
 
