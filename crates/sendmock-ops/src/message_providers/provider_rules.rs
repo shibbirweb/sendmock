@@ -10,7 +10,7 @@ use crate::providers::MessageProviderDefinition;
 use crate::{OperationContext, OperationError};
 
 /// Paths SendMock answers itself, never a provider's.
-const RESERVED_PATH_PREFIXES: &[&str] = &["/api/", "/providers/"];
+const RESERVED_PATH_PREFIXES: &[&str] = &["/api/", "/projects/", "/providers/"];
 
 /// Refuses a save as the Providers screen does (docs/plan/22, Rules): the first field problem,
 /// then the first template error.
@@ -119,7 +119,7 @@ pub fn find_path_problem(path: &str) -> Option<String> {
         .any(|reserved_prefix| path.starts_with(reserved_prefix))
     {
         return Some(format!(
-            "{path} is SendMock's own path; providers cannot use /api/ or /providers/"
+            "{path} is SendMock's own path; providers cannot use /api/, /projects/ or /providers/"
         ));
     }
     let open_brace_count = path.matches('{').count();

@@ -102,7 +102,7 @@ The built-ins are definitions that reproduce the requests, responses and errors 
 ## 5. Rules
 
 - **Keys:** lowercase letters, digits and `_`, 2 to 32 characters, unique in the area. `native` is reserved.
-- **Paths:** must start with `/`, may use `{name}` parts, and must not start with `/api/` or `/providers/`. Two enabled providers in one area may not answer the same method and path unless their hosts differ. A save that would clash is refused and names the other provider.
+- **Paths:** must start with `/`, may use `{name}` parts, and must not start with `/api/`, `/projects/` or `/providers/` (`/projects/` since [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5, where it picks a project). Two enabled providers in one area may not answer the same method and path unless their hosts differ. A save that would clash is refused and names the other provider.
 - **Removing a built-in** keeps its definition; Restore brings it back as it was (edited or not). Reset to default works on removed built-ins too.
 - **Disabling** keeps a provider listed but answers nothing, like a removed one.
 - **Deleting a custom provider** asks first, naming how many messages it caught; those messages keep its key and name as text.

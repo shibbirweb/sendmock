@@ -1,5 +1,6 @@
 // The official Telnyx Node SDK against SendMock's provider port: an SMS with status webhooks to a
-// local handler, then the message read back from SendMock's API (SM-17.2).
+// local handler, then the message read back from SendMock's API (SM-17.2). A second client sends
+// under the `/projects/shop/` prefix, and the message is found in that project (PL-10.4).
 import { once } from "node:events";
 import { createServer } from "node:http";
 import Telnyx from "telnyx";
@@ -67,6 +68,53 @@ const storedSms = (await smsListResponse.json()).items.find(
   (sms) => sms.provider_id === sentMessage.id,
 );
 if (storedSms?.body !== "Your code is 482913" || storedSms.api !== "telnyx") {
-  throw new Error(`SendMock did not store the SMS: ${JSON.stringify(storedSms)}`);
+  throw new Error(
+    `SendMock did not store the SMS: ${JSON.stringify(storedSms)}`,
+  );
 }
-console.log(`Telnyx SDK: ${sentMessage.id} sent, webhooks ${receivedEvents.join(", ")}`);
+console.log(
+  `Telnyx SDK: ${sentMessage.id} sent, webhooks ${receivedEvents.join(", ")}`,
+);
+
+/** A project for the second send; it may exist from an earlier run. */
+async function createShopProject() {
+  const projectResponse = await fetch(
+    new URL("/api/v1/projects", sendmockUrl),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ key: "shop", name: "Shop" }),
+    },
+  );
+  if (projectResponse.status !== 201 && projectResponse.status !== 409) {
+    throw new Error(`Could not create the project: ${projectResponse.status}`);
+  }
+}
+
+await createShopProject();
+const shopClient = new Telnyx({
+  apiKey: "KEY_any",
+  baseURL: `${providerUrl}/projects/shop/v2`,
+});
+const { data: shopMessage } = await shopClient.messages.send({
+  from: "+15550001111",
+  to: "+14155550101",
+  text: "Your shop code is 731904",
+});
+const shopListResponse = await fetch(
+  new URL("/api/v1/sms?project=shop", sendmockUrl),
+);
+const shopSms = (await shopListResponse.json()).items.find(
+  (sms) => sms.provider_id === shopMessage.id,
+);
+if (
+  shopSms?.project !== "shop" ||
+  shopSms.body !== "Your shop code is 731904"
+) {
+  throw new Error(
+    `SendMock did not store the SMS in shop: ${JSON.stringify(shopSms)}`,
+  );
+}
+console.log(
+  `Telnyx SDK under /projects/shop/: ${shopMessage.id} stored in shop`,
+);

@@ -104,7 +104,7 @@ jobs:
             language: node
             folder: node-infobip
             run: bun install && node send-and-verify.js
-          # AC: SM-17.2
+          # AC: SM-17.2 PL-10.4
           - client: Telnyx Node SDK
             language: node
             folder: node-telnyx

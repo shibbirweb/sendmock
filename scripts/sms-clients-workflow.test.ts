@@ -107,6 +107,19 @@ describe("SMS clients workflow", () => {
     expect(exampleSources).toContain('"completed"');
   });
 
+  test("PL-10.4 the Telnyx SDK sends under a project prefix and the message is found in that project", () => {
+    const telnyxEntry = clientEntries.find(
+      (clientEntry) => clientEntry.client === "Telnyx Node SDK",
+    );
+    const exampleSources = readExampleSources(
+      `examples/sms/${telnyxEntry?.folder ?? ""}`,
+    );
+
+    expect(exampleSources).toContain("/api/v1/projects");
+    expect(exampleSources).toContain("${providerUrl}/projects/shop/v2");
+    expect(exampleSources).toContain("/api/v1/sms?project=shop");
+  });
+
   test("Release build runs the SMS clients before it publishes", () => {
     const releaseWorkflow = readFileSync(
       ".github/workflows/release.yml",

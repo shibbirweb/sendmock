@@ -3,12 +3,13 @@ use std::time::Instant;
 use axum::Router;
 use axum::body::{Body, to_bytes};
 use axum::extract::{Path, Request, State};
-use axum::http::{HeaderName, HeaderValue, StatusCode};
+use axum::http::{HeaderMap, HeaderName, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::any;
 use sendmock_ops::{
-    CompletedApiRequest, OperationContext, ProviderHttpRequest, ProviderOutcome,
-    ProviderRequestLogEntry, ProviderRoute, answer_provider_request, record_provider_request,
+    CompletedApiRequest, OperationContext, PROJECT_HEADER, ProviderHttpRequest, ProviderOutcome,
+    ProviderRequestLogEntry, ProviderRoute, answer_provider_request, find_named_project,
+    record_provider_request,
 };
 
 use crate::api_error_response::ApiErrorResponse;
@@ -96,20 +97,18 @@ pub async fn answer_provider_http_request(
 ) -> Response {
     let started_at = Instant::now();
     let (request_parts, request_body) = request.into_parts();
+    let (path_project, provider_path) = split_project_prefix(provider_path);
+    let project_context =
+        match pick_project_context(operation_context, path_project, &request_parts.headers).await {
+            Ok(project_context) => project_context,
+            Err(error_response) => return error_response.into_response(),
+        };
+    let operation_context = project_context.as_ref().unwrap_or(operation_context);
     let Ok(request_bytes) = to_bytes(request_body, MAXIMUM_REQUEST_BODY_BYTES).await else {
         return ApiErrorResponse::invalid_json_body("the request body is too large or unreadable")
             .into_response();
     };
-    let request_headers: Vec<(String, String)> = request_parts
-        .headers
-        .iter()
-        .map(|(header_name, header_value)| {
-            (
-                header_name.as_str().to_owned(),
-                String::from_utf8_lossy(header_value.as_bytes()).into_owned(),
-            )
-        })
-        .collect();
+    let request_headers = read_request_headers(&request_parts.headers);
     let provider_request = ProviderHttpRequest {
         method: request_parts.method.to_string(),
         path: provider_path,
@@ -136,6 +135,54 @@ pub async fn answer_provider_http_request(
     };
     record_outcome(operation_context, &provider_outcome, completed_request).await;
     build_http_response(provider_outcome)
+}
+
+/// The request's headers as text, for the provider runtime and the request log.
+fn read_request_headers(headers: &HeaderMap) -> Vec<(String, String)> {
+    headers
+        .iter()
+        .map(|(header_name, header_value)| {
+            (
+                header_name.as_str().to_owned(),
+                String::from_utf8_lossy(header_value.as_bytes()).into_owned(),
+            )
+        })
+        .collect()
+}
+
+/// `/projects/<key>/<the provider's path>`: the project for SDKs that take a base URL but
+/// cannot add a header. Answers the project named, if any, and the provider's own path.
+fn split_project_prefix(provider_path: String) -> (Option<String>, String) {
+    let Some(project_and_path) = provider_path.strip_prefix("/projects/") else {
+        return (None, provider_path);
+    };
+    let (project_name, rest_of_path) = project_and_path
+        .split_once('/')
+        .unwrap_or((project_and_path, ""));
+    (Some(project_name.to_owned()), format!("/{rest_of_path}"))
+}
+
+/// The context for a request that names a project, by URL prefix or `X-SendMock-Project`;
+/// `None` keeps the shared context (`default`). An unknown project is refused.
+async fn pick_project_context(
+    operation_context: &OperationContext,
+    path_project: Option<String>,
+    headers: &HeaderMap,
+) -> Result<Option<OperationContext>, ApiErrorResponse> {
+    let header_project = headers
+        .get(PROJECT_HEADER)
+        .and_then(|header_value| header_value.to_str().ok())
+        .map(str::trim)
+        .filter(|header_value| !header_value.is_empty());
+    let Some(project_name) = path_project.as_deref().or(header_project) else {
+        return Ok(None);
+    };
+    let project_key = find_named_project(operation_context, Some(project_name))
+        .await?
+        .ok_or_else(|| ApiErrorResponse::unknown_project(project_name))?;
+    Ok(Some(
+        operation_context.clone().with_project_key(&project_key),
+    ))
 }
 
 async fn record_outcome(

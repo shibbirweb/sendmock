@@ -20,7 +20,7 @@ export type MessageProviderFieldErrors = Partial<
 const providerKeyPattern = /^[a-z][a-z0-9_]{1,31}$/;
 const credentialNamePattern = /^[A-Za-z0-9_.-]+$/;
 /** Paths SendMock answers itself, never a provider's. */
-const reservedPathPrefixes = ["/api/", "/providers/"];
+const reservedPathPrefixes = ["/api/", "/projects/", "/providers/"];
 
 type ProviderIdentity = Pick<
   MessageProviderDefinition,
@@ -44,7 +44,7 @@ export function findPathProblem(path: string): string | undefined {
     return `${path || "A path"} must start with /`;
   }
   if (reservedPathPrefixes.some((prefix) => path.startsWith(prefix))) {
-    return `${path} is SendMock's own path; providers cannot use /api/ or /providers/`;
+    return `${path} is SendMock's own path; providers cannot use /api/, /projects/ or /providers/`;
   }
   const openBraceCount = (path.match(/\{/g) ?? []).length;
   const closeBraceCount = (path.match(/\}/g) ?? []).length;
