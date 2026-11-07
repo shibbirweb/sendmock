@@ -7,6 +7,7 @@ mod payment_definition_seed;
 mod payment_flow_seed_adapter;
 mod payment_gateway_seed_adapter;
 mod payment_method_seed_adapter;
+mod project_seed_adapter;
 mod saved_delivery_seed_adapter;
 mod settings_seed_adapter;
 mod sms_outcome_rule_seed_adapter;
@@ -24,6 +25,7 @@ use messaging_service_seed_adapter::MessagingServiceSeedAdapter;
 use payment_flow_seed_adapter::PaymentFlowSeedAdapter;
 use payment_gateway_seed_adapter::PaymentGatewaySeedAdapter;
 use payment_method_seed_adapter::PaymentMethodSeedAdapter;
+use project_seed_adapter::ProjectSeedAdapter;
 use saved_delivery_seed_adapter::SavedDeliverySeedAdapter;
 use settings_seed_adapter::SettingsSeedAdapter;
 use sms_outcome_rule_seed_adapter::SmsOutcomeRuleSeedAdapter;
@@ -45,6 +47,7 @@ use super::seed_section_adapter::SeedSectionAdapter;
 pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
     vec![
         Box::new(SettingsSeedAdapter),
+        Box::new(ProjectSeedAdapter),
         Box::new(VerifyServiceSeedAdapter),
         Box::new(MessagingServiceSeedAdapter),
         Box::new(VirtualNumberSeedAdapter),

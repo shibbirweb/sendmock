@@ -6,6 +6,7 @@ mod project_operations;
 mod project_views;
 
 pub use project_checks::find_named_project;
+pub(crate) use project_checks::{check_project_key, check_project_name};
 
 /// The header a request names its project in; the traffic it captures is stored there.
 pub const PROJECT_HEADER: &str = "x-sendmock-project";

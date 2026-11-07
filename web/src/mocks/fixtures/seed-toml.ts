@@ -6,6 +6,7 @@ import {
   formatTomlTable,
   toSecretReference,
 } from "@/mocks/fixtures/seed-toml-format";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 function readEndpointName(
   mockDatabase: MockDatabase,
@@ -40,6 +41,14 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
     otp_patterns: settings.otp_patterns,
   });
   const itemTables = [
+    ...mockDatabase.projects
+      .filter((projectRecord) => projectRecord.key !== defaultProjectKey)
+      .map((projectRecord) =>
+        formatTomlTable("[[projects]]", {
+          key: projectRecord.key,
+          name: projectRecord.name,
+        }),
+      ),
     ...mockDatabase.webhookEndpoints.map((webhookEndpoint) =>
       formatTomlTable("[[webhook.endpoints]]", {
         name: webhookEndpoint.name,
@@ -154,6 +163,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
 /** Seed sections and how the summary names them. */
 const knownSeedSections: Record<string, string> = {
   "[settings]": "Settings",
+  "[[projects]]": "Project",
   "[[webhook.endpoints]]": "Webhook endpoint",
   "[[webhook.rules]]": "Webhook rule",
   "[[webhook.templates]]": "Webhook template",

@@ -89,6 +89,18 @@ enabled = true
 
 `[settings]` takes the same keys as **Settings** and `PATCH /api/v1/settings`. Export writes only the settings you changed from the defaults.
 
+## Projects
+
+Projects keep apps' traffic apart in one SendMock ([Settings: Projects](../settings.md#projects)). The seed file lists every project but `default`, which always exists:
+
+```toml
+[[projects]]
+key = "shop"
+name = "Shop"
+```
+
+Applying adds a project or renames the one with the same key. A reset keeps the projects you made when no seed file was applied, and restores exactly the seed's projects when one was.
+
 ## Email templates
 
 Apps that send through SendGrid dynamic templates, Postmark templates or Brevo templates only send a template id and its data; the provider holds the template. SendMock keeps the id and the data on the email (the **Template data** tab). To also see the email the provider would have sent, give SendMock a local stand-in under the same id:

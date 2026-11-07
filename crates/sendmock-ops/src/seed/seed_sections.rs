@@ -19,6 +19,7 @@ pub const SETTINGS_SECTION: SeedSection = SeedSection {
     item_kind: "Settings",
     is_item_list: false,
 };
+pub const PROJECTS_SECTION: SeedSection = item_list("projects", "Project");
 pub const WEBHOOK_ENDPOINTS_SECTION: SeedSection =
     item_list("webhook.endpoints", "Webhook endpoint");
 pub const WEBHOOK_RULES_SECTION: SeedSection = item_list("webhook.rules", "Webhook rule");
@@ -43,8 +44,9 @@ pub const PAYMENT_METHODS_SECTION: SeedSection = item_list("payments.methods", "
 pub const PAYMENT_GATEWAYS_SECTION: SeedSection = item_list("payments.gateways", "Payment gateway");
 
 /// Every section a seed file may hold, in the order the summary lists them.
-pub const SEED_SECTIONS: [SeedSection; 20] = [
+pub const SEED_SECTIONS: [SeedSection; 21] = [
     SETTINGS_SECTION,
+    PROJECTS_SECTION,
     WEBHOOK_ENDPOINTS_SECTION,
     WEBHOOK_RULES_SECTION,
     WEBHOOK_TEMPLATES_SECTION,
