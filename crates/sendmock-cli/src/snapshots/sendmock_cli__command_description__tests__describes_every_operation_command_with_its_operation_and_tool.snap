@@ -387,6 +387,52 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email click",
+    "usage": "sendmock email click <emailId>",
+    "aliases": [],
+    "summary": "Record a click on one of the email's links and fire email.clicked.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [
+      "--source",
+      "--url",
+      "--user-agent"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/{emailId}/clicks",
+        "operation_id": "postEmailsByEmailIdClicks",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_click"
+    ]
+  },
+  {
+    "command": "sendmock email clicks",
+    "usage": "sendmock email clicks <emailId>",
+    "aliases": [],
+    "summary": "Every recorded click on the email's links, newest first.",
+    "arguments": [
+      "emailId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/clicks",
+        "operation_id": "getEmailsByEmailIdClicks",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_clicks"
+    ]
+  },
+  {
     "command": "sendmock email check unsubscribe",
     "usage": "sendmock email check <emailId> unsubscribe",
     "aliases": [],

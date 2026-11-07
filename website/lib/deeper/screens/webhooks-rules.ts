@@ -11,6 +11,7 @@ const eventDescriptions: [string, string][] = [
     "an incoming email arrives: a simulated reply or forward, or mail to an inbound domain",
   ],
   ["email.opened", "an email is opened"],
+  ["email.clicked", "a link of an email is clicked"],
   ["email.delivered", "an email is marked delivered"],
   ["email.deferred", "an email's delivery is deferred"],
   ["email.bounced", "an email bounces"],

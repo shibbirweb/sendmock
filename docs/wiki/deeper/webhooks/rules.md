@@ -175,280 +175,286 @@ Checkbox.
 
 - **What it does:** Sends `email.opened`, fired when an email is opened.
 
-### 26. email.delivered
+### 26. email.clicked
+
+Checkbox.
+
+- **What it does:** Sends `email.clicked`, fired when a link of an email is clicked.
+
+### 27. email.delivered
 
 Checkbox.
 
 - **What it does:** Sends `email.delivered`, fired when an email is marked delivered.
 
-### 27. email.deferred
+### 28. email.deferred
 
 Checkbox.
 
 - **What it does:** Sends `email.deferred`, fired when an email's delivery is deferred.
 
-### 28. email.bounced
+### 29. email.bounced
 
 Checkbox.
 
 - **What it does:** Sends `email.bounced`, fired when an email bounces.
 
-### 29. email.complained
+### 30. email.complained
 
 Checkbox.
 
 - **What it does:** Sends `email.complained`, fired when a spam complaint is recorded.
 
-### 30. email.unsubscribed
+### 31. email.unsubscribed
 
 Checkbox.
 
 - **What it does:** Sends `email.unsubscribed`, fired when an unsubscribe is recorded.
 
-### 31. email.released
+### 32. email.released
 
 Checkbox.
 
 - **What it does:** Sends `email.released`, fired when an email is released to a real inbox.
 
-### 32. email.deleted
+### 33. email.deleted
 
 Checkbox.
 
 - **What it does:** Sends `email.deleted`, fired when an email is deleted.
 
-### 33. sms.sent
+### 34. sms.sent
 
 Checkbox.
 
 - **What it does:** Sends `sms.sent`, fired when your app sends an SMS.
 
-### 34. sms.status
+### 35. sms.status
 
 Checkbox.
 
 - **What it does:** Sends `sms.status`, fired when an SMS changes status.
 
-### 35. sms.opened
+### 36. sms.opened
 
 Checkbox.
 
 - **What it does:** Sends `sms.opened`, fired when an SMS is read.
 
-### 36. sms.inbound
+### 37. sms.inbound
 
 Checkbox.
 
 - **What it does:** Sends `sms.inbound`, fired when an inbound SMS arrives.
 
-### 37. verify.started
+### 38. verify.started
 
 Checkbox.
 
 - **What it does:** Sends `verify.started`, fired when a verification starts.
 
-### 38. verify.checked
+### 39. verify.checked
 
 Checkbox.
 
 - **What it does:** Sends `verify.checked`, fired when a code is checked, or a verification is approved, canceled or runs out of attempts.
 
-### 39. verify.expired
+### 40. verify.expired
 
 Checkbox.
 
 - **What it does:** Sends `verify.expired`, fired when a verification expires.
 
-### 40. http.captured
+### 41. http.captured
 
 Checkbox.
 
 - **What it does:** Sends `http.captured`, fired when the HTTP catcher captures a request.
 
-### 41. payment.created
+### 42. payment.created
 
 Checkbox.
 
 - **What it does:** Sends `payment.created`, fired when a payment is created.
 
-### 42. payment.authorized
+### 43. payment.authorized
 
 Checkbox.
 
 - **What it does:** Sends `payment.authorized`, fired when a payment is authorized.
 
-### 43. payment.succeeded
+### 44. payment.succeeded
 
 Checkbox.
 
 - **What it does:** Sends `payment.succeeded`, fired when a payment succeeds.
 
-### 44. payment.failed
+### 45. payment.failed
 
 Checkbox.
 
 - **What it does:** Sends `payment.failed`, fired when a payment fails.
 
-### 45. payment.canceled
+### 46. payment.canceled
 
 Checkbox.
 
 - **What it does:** Sends `payment.canceled`, fired when a payment is canceled or voided.
 
-### 46. payment.refunded
+### 47. payment.refunded
 
 Checkbox.
 
 - **What it does:** Sends `payment.refunded`, fired when a payment is refunded in full.
 
-### 47. payment.partially_refunded
+### 48. payment.partially_refunded
 
 Checkbox.
 
 - **What it does:** Sends `payment.partially_refunded`, fired when part of a payment is refunded.
 
-### 48. payment.dispute_opened
+### 49. payment.dispute_opened
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_opened`, fired when a dispute is opened.
 
-### 49. payment.dispute_updated
+### 50. payment.dispute_updated
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_updated`, fired when a dispute is answered or changes.
 
-### 50. payment.dispute_closed
+### 51. payment.dispute_closed
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_closed`, fired when a dispute is closed.
 
-### 51. checkout.completed
+### 52. checkout.completed
 
 Checkbox.
 
 - **What it does:** Sends `checkout.completed`, fired when a checkout is completed.
 
-### 52. checkout.expired
+### 53. checkout.expired
 
 Checkbox.
 
 - **What it does:** Sends `checkout.expired`, fired when a checkout expires.
 
-### 53. subscription.created
+### 54. subscription.created
 
 Checkbox.
 
 - **What it does:** Sends `subscription.created`, fired when a subscription is created.
 
-### 54. subscription.renewed
+### 55. subscription.renewed
 
 Checkbox.
 
 - **What it does:** Sends `subscription.renewed`, fired when a subscription renews.
 
-### 55. subscription.payment_failed
+### 56. subscription.payment_failed
 
 Checkbox.
 
 - **What it does:** Sends `subscription.payment_failed`, fired when a subscription's renewal payment fails.
 
-### 56. subscription.canceled
+### 57. subscription.canceled
 
 Checkbox.
 
 - **What it does:** Sends `subscription.canceled`, fired when a subscription is canceled.
 
-### 57. webhook.failed
+### 58. webhook.failed
 
 Checkbox.
 
 - **What it does:** Sends `webhook.failed`, fired when a webhook delivery fails for good.
 
-### 58. test.ping
+### 59. test.ping
 
 Checkbox.
 
 - **What it does:** Sends `test.ping`, fired when an endpoint test is sent.
 
-### 59. Filter
+### 60. Filter
 
 Heading.
 
 - **What it does:** Conditions on the event's fields; with none, every selected event is sent.
 - **Links to:** [Advanced: rules and filters](../../advanced/rules-and-filters.md).
 
-### 60. Negate filter
+### 61. Negate filter
 
 Button.
 
 - **What it does:** Sends the events that do not match the filter instead.
 
-### 61. Filter combinator
+### 62. Filter combinator
 
 Drop-down.
 
 - **What it does:** Whether all conditions must match, or any one.
 
-### 62. No conditions: every selected event fires.
+### 63. No conditions: every selected event fires.
 
 Text.
 
 - **What it does:** Shown while the filter is empty.
 
-### 63. Add condition
+### 64. Add condition
 
 Button.
 
 - **What it does:** Adds a condition.
 
-### 64. Add group
+### 65. Add group
 
 Button.
 
 - **What it does:** Adds a group of conditions with its own all or any.
 
-### 65. Preview
+### 66. Preview
 
 Heading.
 
 - **What it does:** Tries the rule on recent real messages before you save it.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/preview`](/api/webhook-rules/#postWebhooksRulesPreview), CLI [`sendmock webhook rule preview`](/cli/webhook-rules/#webhook-rule-preview), MCP [`sendmock_webhook_rule_preview`](/mcp/webhook-rules/#sendmock_webhook_rule_preview)
 
-### 66. Matches # of the last # messages
+### 67. Matches # of the last # messages
 
 Text.
 
 - **What it does:** How many recent messages the rule would send.
 
-### 67. Show non-matching
+### 68. Show non-matching
 
 Switch.
 
 - **What it does:** Lists the recent messages that would not be sent too, with the condition that failed.
 
-### 68. Matches
+### 69. Matches
 
 Badge.
 
 - **What it does:** Marks a recent message the rule matches.
 
-### 69. Cancel
+### 70. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 70. Add rule
+### 71. Add rule
 
 Button.
 
 - **What it does:** Adds the rule; it applies to the next event.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules`](/api/webhook-rules/#postWebhooksRules), CLI [`sendmock webhook rule create`](/cli/webhook-rules/#webhook-rule-create), MCP [`sendmock_webhook_rule_create`](/mcp/webhook-rules/#sendmock_webhook_rule_create)
 
-### 71. Close
+### 72. Close
 
 Button.
 
@@ -456,353 +462,359 @@ Button.
 
 ## Rule editor
 
-### 72. Support inbox to Laravel
+### 73. Support inbox to Laravel
 
 Heading.
 
 - **What it does:** The rule open in the editor (here a demo rule).
 
-### 73. Which events go to the endpoint, and only when the filter matches.
+### 74. Which events go to the endpoint, and only when the filter matches.
 
 Text.
 
 - **What it does:** Explains the editor.
 
-### 74. Name
+### 75. Name
 
 Field.
 
 - **What it does:** The rule's name.
 
-### 75. Endpoint
+### 76. Endpoint
 
 Drop-down.
 
 - **What it does:** The endpoint matching events are delivered to.
 - **Links to:** [Endpoints](../../webhooks/endpoints.md).
 
-### 76. Events
+### 77. Events
 
 Heading.
 
 - **What it does:** The events the rule sends; tick one or more.
 
-### 77. email.received
+### 78. email.received
 
 Checkbox.
 
 - **What it does:** Sends `email.received`, fired when an email your app sent arrives (SMTP, a provider API, sendmail or the native API).
 
-### 78. email.inbound
+### 79. email.inbound
 
 Checkbox.
 
 - **What it does:** Sends `email.inbound`, fired when an incoming email arrives: a simulated reply or forward, or mail to an inbound domain.
 
-### 79. email.opened
+### 80. email.opened
 
 Checkbox.
 
 - **What it does:** Sends `email.opened`, fired when an email is opened.
 
-### 80. email.delivered
+### 81. email.clicked
+
+Checkbox.
+
+- **What it does:** Sends `email.clicked`, fired when a link of an email is clicked.
+
+### 82. email.delivered
 
 Checkbox.
 
 - **What it does:** Sends `email.delivered`, fired when an email is marked delivered.
 
-### 81. email.deferred
+### 83. email.deferred
 
 Checkbox.
 
 - **What it does:** Sends `email.deferred`, fired when an email's delivery is deferred.
 
-### 82. email.bounced
+### 84. email.bounced
 
 Checkbox.
 
 - **What it does:** Sends `email.bounced`, fired when an email bounces.
 
-### 83. email.complained
+### 85. email.complained
 
 Checkbox.
 
 - **What it does:** Sends `email.complained`, fired when a spam complaint is recorded.
 
-### 84. email.unsubscribed
+### 86. email.unsubscribed
 
 Checkbox.
 
 - **What it does:** Sends `email.unsubscribed`, fired when an unsubscribe is recorded.
 
-### 85. email.released
+### 87. email.released
 
 Checkbox.
 
 - **What it does:** Sends `email.released`, fired when an email is released to a real inbox.
 
-### 86. email.deleted
+### 88. email.deleted
 
 Checkbox.
 
 - **What it does:** Sends `email.deleted`, fired when an email is deleted.
 
-### 87. sms.sent
+### 89. sms.sent
 
 Checkbox.
 
 - **What it does:** Sends `sms.sent`, fired when your app sends an SMS.
 
-### 88. sms.status
+### 90. sms.status
 
 Checkbox.
 
 - **What it does:** Sends `sms.status`, fired when an SMS changes status.
 
-### 89. sms.opened
+### 91. sms.opened
 
 Checkbox.
 
 - **What it does:** Sends `sms.opened`, fired when an SMS is read.
 
-### 90. sms.inbound
+### 92. sms.inbound
 
 Checkbox.
 
 - **What it does:** Sends `sms.inbound`, fired when an inbound SMS arrives.
 
-### 91. verify.started
+### 93. verify.started
 
 Checkbox.
 
 - **What it does:** Sends `verify.started`, fired when a verification starts.
 
-### 92. verify.checked
+### 94. verify.checked
 
 Checkbox.
 
 - **What it does:** Sends `verify.checked`, fired when a code is checked, or a verification is approved, canceled or runs out of attempts.
 
-### 93. verify.expired
+### 95. verify.expired
 
 Checkbox.
 
 - **What it does:** Sends `verify.expired`, fired when a verification expires.
 
-### 94. http.captured
+### 96. http.captured
 
 Checkbox.
 
 - **What it does:** Sends `http.captured`, fired when the HTTP catcher captures a request.
 
-### 95. payment.created
+### 97. payment.created
 
 Checkbox.
 
 - **What it does:** Sends `payment.created`, fired when a payment is created.
 
-### 96. payment.authorized
+### 98. payment.authorized
 
 Checkbox.
 
 - **What it does:** Sends `payment.authorized`, fired when a payment is authorized.
 
-### 97. payment.succeeded
+### 99. payment.succeeded
 
 Checkbox.
 
 - **What it does:** Sends `payment.succeeded`, fired when a payment succeeds.
 
-### 98. payment.failed
+### 100. payment.failed
 
 Checkbox.
 
 - **What it does:** Sends `payment.failed`, fired when a payment fails.
 
-### 99. payment.canceled
+### 101. payment.canceled
 
 Checkbox.
 
 - **What it does:** Sends `payment.canceled`, fired when a payment is canceled or voided.
 
-### 100. payment.refunded
+### 102. payment.refunded
 
 Checkbox.
 
 - **What it does:** Sends `payment.refunded`, fired when a payment is refunded in full.
 
-### 101. payment.partially_refunded
+### 103. payment.partially_refunded
 
 Checkbox.
 
 - **What it does:** Sends `payment.partially_refunded`, fired when part of a payment is refunded.
 
-### 102. payment.dispute_opened
+### 104. payment.dispute_opened
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_opened`, fired when a dispute is opened.
 
-### 103. payment.dispute_updated
+### 105. payment.dispute_updated
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_updated`, fired when a dispute is answered or changes.
 
-### 104. payment.dispute_closed
+### 106. payment.dispute_closed
 
 Checkbox.
 
 - **What it does:** Sends `payment.dispute_closed`, fired when a dispute is closed.
 
-### 105. checkout.completed
+### 107. checkout.completed
 
 Checkbox.
 
 - **What it does:** Sends `checkout.completed`, fired when a checkout is completed.
 
-### 106. checkout.expired
+### 108. checkout.expired
 
 Checkbox.
 
 - **What it does:** Sends `checkout.expired`, fired when a checkout expires.
 
-### 107. subscription.created
+### 109. subscription.created
 
 Checkbox.
 
 - **What it does:** Sends `subscription.created`, fired when a subscription is created.
 
-### 108. subscription.renewed
+### 110. subscription.renewed
 
 Checkbox.
 
 - **What it does:** Sends `subscription.renewed`, fired when a subscription renews.
 
-### 109. subscription.payment_failed
+### 111. subscription.payment_failed
 
 Checkbox.
 
 - **What it does:** Sends `subscription.payment_failed`, fired when a subscription's renewal payment fails.
 
-### 110. subscription.canceled
+### 112. subscription.canceled
 
 Checkbox.
 
 - **What it does:** Sends `subscription.canceled`, fired when a subscription is canceled.
 
-### 111. webhook.failed
+### 113. webhook.failed
 
 Checkbox.
 
 - **What it does:** Sends `webhook.failed`, fired when a webhook delivery fails for good.
 
-### 112. test.ping
+### 114. test.ping
 
 Checkbox.
 
 - **What it does:** Sends `test.ping`, fired when an endpoint test is sent.
 
-### 113. Filter
+### 115. Filter
 
 Heading.
 
 - **What it does:** Conditions on the event's fields; with none, every selected event is sent.
 - **Links to:** [Advanced: rules and filters](../../advanced/rules-and-filters.md).
 
-### 114. Negate filter
+### 116. Negate filter
 
 Button.
 
 - **What it does:** Sends the events that do not match the filter instead.
 
-### 115. Filter combinator
+### 117. Filter combinator
 
 Drop-down.
 
 - **What it does:** Whether all conditions must match, or any one.
 
-### 116. Negate condition #
+### 118. Negate condition #
 
 Button.
 
 - **What it does:** Turns that one condition around.
 
-### 117. Field #
+### 119. Field #
 
 Drop-down.
 
 - **What it does:** The event field the condition reads, such as `data.to[0].address` or `data.subject`.
 
-### 118. Remove condition #
+### 120. Remove condition #
 
 Button.
 
 - **What it does:** Removes the condition.
 
-### 119. Operator #
+### 121. Operator #
 
 Drop-down.
 
 - **What it does:** How the field is compared: equals, contains, matches a pattern, is in a list, and so on.
 
-### 120. Value #
+### 122. Value #
 
 Field.
 
 - **What it does:** What the field is compared with.
 
-### 121. Add condition
+### 123. Add condition
 
 Button.
 
 - **What it does:** Adds a condition.
 
-### 122. Add group
+### 124. Add group
 
 Button.
 
 - **What it does:** Adds a group of conditions with its own all or any.
 
-### 123. Preview
+### 125. Preview
 
 Heading.
 
 - **What it does:** Tries the rule on recent real messages before you save it.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/preview`](/api/webhook-rules/#postWebhooksRulesPreview), CLI [`sendmock webhook rule preview`](/cli/webhook-rules/#webhook-rule-preview), MCP [`sendmock_webhook_rule_preview`](/mcp/webhook-rules/#sendmock_webhook_rule_preview)
 
-### 124. Matches # of the last # messages
+### 126. Matches # of the last # messages
 
 Text.
 
 - **What it does:** How many recent messages the rule would send.
 
-### 125. Show non-matching
+### 127. Show non-matching
 
 Switch.
 
 - **What it does:** Lists the recent messages that would not be sent too, with the condition that failed.
 
-### 126. No recent message matches.
+### 128. No recent message matches.
 
 Text.
 
 - **What it does:** Shown when none of the recent messages would be sent.
 
-### 127. Cancel
+### 129. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 128. Save changes
+### 130. Save changes
 
 Button.
 
 - **What it does:** Saves the rule; it applies to the next event.
 - **Same action elsewhere:** REST [`PATCH /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#patchWebhooksRulesByRuleId), CLI [`sendmock webhook rule update`](/cli/webhook-rules/#webhook-rule-update), MCP [`sendmock_webhook_rule_update`](/mcp/webhook-rules/#sendmock_webhook_rule_update)
 
-### 129. Close
+### 131. Close
 
 Button.
 
@@ -810,25 +822,25 @@ Button.
 
 ## Delete rule dialog
 
-### 130. Delete Support inbox to Laravel?
+### 132. Delete Support inbox to Laravel?
 
 Heading.
 
 - **What it does:** The confirmation before deleting a rule (here a demo rule).
 
-### 131. Its events stop going to the endpoint. Past deliveries stay in the log.
+### 133. Its events stop going to the endpoint. Past deliveries stay in the log.
 
 Text.
 
 - **What it does:** Says what deleting changes.
 
-### 132. Keep it
+### 134. Keep it
 
 Button.
 
 - **What it does:** Closes the confirmation without deleting.
 
-### 133. Delete
+### 135. Delete
 
 Button.
 
@@ -837,20 +849,20 @@ Button.
 
 ## When the data cannot load
 
-### 134. Could not load the rules. Try again
+### 136. Could not load the rules. Try again
 
 Message.
 
 - **What it does:** Shown when the rules could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 135. Could not load the rules.
+### 137. Could not load the rules.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 136. Try again
+### 138. Try again
 
 Button.
 
