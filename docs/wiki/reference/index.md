@@ -14,3 +14,4 @@ Every reference here is generated from SendMock's code or its API contract, and 
 | [CLI reference](/cli/) | every `sendmock` command with its arguments, flags and output |
 | [MCP reference](/mcp/) | every MCP tool and resource with its inputs and result |
 | [API reference](/api/) | every REST endpoint, from `docs/api/openapi.yaml` |
+| [API reference in depth](../deeper/api-reference.md) | every control of the in-app API reference, opened from Help |

@@ -101,6 +101,8 @@ Version and channel, uptime, listeners (SMTP, HTTP and API, provider port), the 
 - A found version shows its release date, its release notes and the upgrade command for how you installed SendMock (Homebrew, Scoop, Docker, the install script or npm), with a copy button. When SendMock does not know how it was installed, use the release page link.
 - A check is kept for 24 hours. When GitHub cannot be reached, it says "Could not check for updates" and tries again on the next check.
 
+
+Every control and text, one by one: [Settings in depth](./deeper/settings.md).
 ## Customize
 
 Settings are part of the seed file, so a team shares them: [Advanced: seed file](./advanced/seed-file.md) and [Recipe: share your setup](./recipes/share-your-setup.md). To check a whole flow on every run, write a [scenario](./advanced/scenarios.md).

@@ -51,6 +51,8 @@ Each `[[steps]]` table has:
 
 The summary ("Passed: 5 of 5 steps in 120 ms", or "Failed at step 2: ..."), then each step with its status, time, the value it saved, and **Input and answer** to open. Nothing is stored: the report stays until the next run.
 
+
+Every control and text, one by one: [Scenarios in depth](./deeper/scenarios.md).
 ## Customize
 
 The full file format and a CI example: [Advanced: scenarios](./advanced/scenarios.md).

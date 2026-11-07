@@ -27,3 +27,10 @@ The list of controls is read from the demo by a crawl, so a page always matches 
 - [Methods in depth](./payments/methods.md): Every control and text of Payments > Methods and the method editor.
 - [Flows in depth](./payments/flows.md): Every control and text of Payments > Flows and the flow editor.
 - [Subscriptions in depth](./payments/subscriptions.md): Every control and text of Payments > Subscriptions and New subscription.
+- [HTTP Catcher in depth](./http-catcher.md): Every control and text of the HTTP Catcher, a bin and a request.
+- [Numbers in depth](./numbers.md): Every control and text of Numbers, Messaging Services and the number editor.
+- [Logs in depth](./logs.md): Every control and text of Logs, an SMTP session and an API request.
+- [Overview in depth](./overview.md): Every control and text of the Overview dashboard.
+- [Scenarios in depth](./scenarios.md): Every control and text of Scenarios.
+- [API reference in depth](./api-reference.md): Every control and text of the in-app API reference.
+- [Settings in depth](./settings.md): Every control and text of every Settings section.

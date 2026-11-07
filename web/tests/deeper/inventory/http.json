@@ -17,6 +17,44 @@
       "each item, button: POST … # minutes ago #",
       "paragraph: Pick a request to see what your app sent and what SendMock answered."
     ],
+    "A bin is open": [
+      "heading: slack",
+      "tab: Requests",
+      "tab: Responses",
+      "button: Copy catch URL",
+      "button: Clear requests",
+      "button: Delete bin",
+      "each item, button: POST / # minutes ago #"
+    ],
+    "A request is open": [
+      "button: Copy URL",
+      "paragraph: Month #, #, #:# from #.#.#.#, answered in # ms",
+      "button: Copy as cURL",
+      "button: Forward to URL",
+      "button: Send to webhook",
+      "tab: Preview",
+      "tab: Body",
+      "tab: Headers",
+      "tab: Query",
+      "tab: Response",
+      "paragraph: Incoming webhook APP",
+      "paragraph: Email bounced",
+      "paragraph: unknown-user@example.com did not get Your verification code .",
+      "paragraph: Reason # #.#.# user unknown",
+      "paragraph: Provider SendMock",
+      "paragraph: Sent by acme-app worker"
+    ],
+    "New bin dialog": [
+      "heading: New bin",
+      "paragraph: Requests to its catch URL are kept here and answered with its reply.",
+      "textbox: Name",
+      "paragraph: http://#.#.#.#:#/catch/<name>",
+      "combobox: Preset",
+      "paragraph: Answers # {\"ok\":true}.",
+      "button: Cancel",
+      "button: Add bin",
+      "button: Close"
+    ],
     "empty": [
       "button: slack Slack # No requests yet",
       "button: discord Discord # No requests yet",

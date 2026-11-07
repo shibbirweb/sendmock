@@ -5,7 +5,6 @@
     "normal": [
       "heading: Subscriptions",
       "link: Read the Subscriptions guide",
-      "heading: Subscriptions",
       "paragraph: Each subscription keeps its own clock: advance it to charge the next renewal through its gateway, or cancel it.",
       "button: New subscription",
       "paragraph: No subscriptions yet",

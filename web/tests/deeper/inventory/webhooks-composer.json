@@ -5,7 +5,6 @@
     "normal": [
       "heading: Composer",
       "link: Read the Composer guide",
-      "heading: Composer",
       "paragraph: Write a webhook request by hand, start from any template, and send it to an endpoint.",
       "combobox: Send to",
       "paragraph: Its secret signs the request.",

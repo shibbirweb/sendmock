@@ -5,7 +5,6 @@
     "normal": [
       "heading: Overview",
       "link: Read the Overview guide",
-      "heading: Overview",
       "paragraph: Everything your apps sent to SendMock, updated live.",
       "each item, link: …",
       "switch: Show as table",

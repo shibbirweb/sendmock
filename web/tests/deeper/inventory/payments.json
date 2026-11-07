@@ -5,7 +5,6 @@
     "normal": [
       "heading: Payments",
       "link: Read the Payments guide",
-      "heading: Payments",
       "paragraph: Test payments made through the emulated gateways. No real money moves, and only test cards are accepted.",
       "button: New payment",
       "button: All",
@@ -55,7 +54,10 @@
       "each item, link: # … # minutes ago",
       "button: Close"
     ],
-    "Simulate menu": ["menuitem: Refund...", "menuitem: Open dispute"],
+    "Simulate menu": [
+      "menuitem: Refund...",
+      "menuitem: Open dispute"
+    ],
     "Refund payment dialog": [
       "heading: Refund payment",
       "paragraph: $#.# can be refunded.",

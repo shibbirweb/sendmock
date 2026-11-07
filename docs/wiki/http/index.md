@@ -71,6 +71,8 @@ Method and full URL, time, client IP and duration, then tabs:
 
 The bin's response rules and default reply. See [Responses](./responses.md).
 
+
+Every control and text, one by one: [HTTP Catcher in depth](../deeper/http-catcher.md).
 ## Customize
 
 - Rules per path and method, templated bodies that echo the request, delays and failure rates: [Advanced: catcher responses](../advanced/catcher-responses.md).

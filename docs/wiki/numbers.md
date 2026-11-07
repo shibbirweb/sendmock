@@ -60,6 +60,8 @@ A table: name, SID (copy), sender pool (number chips), inbound handling and acti
 
 Delete asks first and leaves the numbers unassigned.
 
+
+Every control and text, one by one: [Numbers in depth](./deeper/numbers.md).
 ## Customize
 
 Two-way SMS and sender pools in depth: [Advanced: numbers and Messaging Services](./advanced/numbers-and-services.md). Numbers and services go into the seed file, so your team gets the same ones.

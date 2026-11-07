@@ -5,7 +5,6 @@
     "normal": [
       "heading: Scenarios",
       "link: Read the Scenarios guide",
-      "heading: Scenarios",
       "paragraph: A test written once and run again: each step calls an operation, waits for a message, or checks a value. The same file runs with sendmock scenario run and in CI.",
       "button: Load example",
       "button: Upload",
@@ -13,6 +12,9 @@
       "textbox: Scenario",
       "button: Validate",
       "button: Run"
+    ],
+    "The example has run": [
+      "status: Passed: # of # steps in # ms"
     ]
   }
 }

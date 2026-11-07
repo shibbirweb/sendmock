@@ -1,5 +1,12 @@
 import type { DeeperPage } from "./deeper-types";
 import { appShellPage } from "./screens/app-shell";
+import { httpCatcherPage } from "./screens/http-catcher";
+import { logsPage, scenariosPage } from "./screens/logs-scenarios";
+import { numbersPage } from "./screens/numbers";
+import {
+  apiReferencePage,
+  overviewPage,
+} from "./screens/overview-api-reference";
 import { mailInboxPage } from "./screens/mail-inbox";
 import { mailProvidersPage } from "./screens/mail-providers";
 import { paymentsGatewaysPage } from "./screens/payments-gateways";
@@ -7,6 +14,7 @@ import { paymentsFlowsPage } from "./screens/payments-flows";
 import { paymentsListPage } from "./screens/payments-list";
 import { paymentsMethodsPage } from "./screens/payments-methods";
 import { paymentsSubscriptionsPage } from "./screens/payments-subscriptions";
+import { settingsPage } from "./screens/settings";
 import { smsMessagesPage } from "./screens/sms-messages";
 import { smsProvidersPage } from "./screens/sms-providers";
 import { smsVerifyPage } from "./screens/sms-verify";
@@ -44,15 +52,14 @@ export const deeperPages: DeeperPage[] = [
   paymentsMethodsPage,
   paymentsFlowsPage,
   paymentsSubscriptionsPage,
+  httpCatcherPage,
+  numbersPage,
+  logsPage,
+  overviewPage,
+  scenariosPage,
+  apiReferencePage,
+  settingsPage,
 ];
 
 /** Screens of the inventory whose page is not written yet; the list only shrinks. */
-export const pendingDeeperScreens = [
-  "/",
-  "/http",
-  "/numbers",
-  "/scenarios",
-  "/logs",
-  "/api-reference",
-  "/settings",
-];
+export const pendingDeeperScreens: string[] = [];

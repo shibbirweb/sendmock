@@ -45,6 +45,8 @@ A table: time, API (Native, Twilio, Vonage, SendGrid, ...), method, path, status
 
 The drawer: method, full path, status, duration and time; request headers (credentials masked); the request body (JSON formatted, forms as a field table) and the response body; **Open message** for what the request created.
 
+
+Every control and text, one by one: [Logs in depth](./deeper/logs.md).
 ## Customize
 
 How long logs are kept follows retention in [Settings > General](./settings.md#general). To make SMTP fail on purpose, see [Advanced: chaos](./advanced/chaos.md).

@@ -11,6 +11,13 @@ import {
 } from "./overlays/payment-overlays";
 import { smsOverlays, verifyOverlays } from "./overlays/sms-overlays";
 import {
+  httpCatcherOverlays,
+  logsOverlays,
+  numbersOverlays,
+  scenariosOverlays,
+  settingsOverlays,
+} from "./overlays/tool-overlays";
+import {
   inboundRouteOverlays,
   savedDeliveryOverlays,
   webhookDeliveryOverlays,
@@ -78,6 +85,11 @@ const overlaysByPath: Record<string, DeeperOverlay[]> = {
   "/payments/methods": paymentMethodOverlays,
   "/payments/flows": paymentFlowOverlays,
   "/payments/subscriptions": subscriptionOverlays,
+  "/http": httpCatcherOverlays,
+  "/numbers": numbersOverlays,
+  "/logs": logsOverlays,
+  "/scenarios": scenariosOverlays,
+  "/settings": settingsOverlays,
 };
 
 /** Every screen of the app, with the data states and overlays its Deeper page covers. */

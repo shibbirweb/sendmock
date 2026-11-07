@@ -3,7 +3,6 @@
   "path": "/api-reference",
   "states": {
     "normal": [
-      "heading: Not found",
       "heading: API reference",
       "paragraph: The REST API of this instance, read from its /api/openapi.json . Every screen, CLI command and MCP tool calls these endpoints.",
       "link: Download openapi.json",
