@@ -1152,5 +1152,102 @@
     "message_id_template": "{{ uuid() }}",
     "callback_template_key": null,
     "status_names": {}
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "vonage-key",
+        "is_secret": false
+      },
+      {
+        "name": "api_secret",
+        "value": "vonage-secret",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "vonage_verify",
+    "name": "Vonage Verify",
+    "area": "sms",
+    "accent": "#871fff",
+    "host": "api.nexmo.com",
+    "operations": [
+      {
+        "kind": "start_verification",
+        "method": "POST",
+        "path": "/v2/verify",
+        "request_format": "json"
+      },
+      {
+        "kind": "check_verification",
+        "method": "POST",
+        "path": "/v2/verify/{request_id}",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "to",
+        "source": "workflow[0].to"
+      },
+      {
+        "part": "body",
+        "source": "code"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 202,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"request_id\": \"{{ message.provider_id }}\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 422,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"title\": \"Invalid params\", \"type\": \"https://developer.vonage.com/api-errors#invalid-params\", \"detail\": \"The value of one or more parameters is invalid\", \"instance\": \"{{ random_hex(32) }}\"}"
+      },
+      {
+        "kind": "not_found",
+        "status": 404,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"title\": \"Not Found\", \"type\": \"https://developer.vonage.com/api-errors#not-found\", \"detail\": \"Request was not found or it has been verified already.\", \"instance\": \"{{ random_hex(32) }}\"}"
+      }
+    ],
+    "message_id_template": "{{ uuid() }}",
+    "callback_template_key": null,
+    "status_names": {
+      "pending": "pending",
+      "approved": "completed",
+      "canceled": "cancelled"
+    }
   }
 ]

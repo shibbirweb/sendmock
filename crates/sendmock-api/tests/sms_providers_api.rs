@@ -81,7 +81,8 @@ async fn the_list_shows_the_built_ins_with_secrets_masked_and_recent_message_cou
             "telnyx",
             "sinch",
             "africastalking",
-            "sns"
+            "sns",
+            "vonage_verify"
         ]
     );
     assert_eq!(vonage["is_builtin"], true);

@@ -66,7 +66,9 @@ describe("SMS clients workflow", () => {
       "AWS SDK SNS client": "@aws-sdk/client-sns",
     };
     const otherEntries = clientEntries.filter(
-      (clientEntry) => !clientEntry.client.startsWith("Twilio "),
+      (clientEntry) =>
+        !clientEntry.client.startsWith("Twilio ") &&
+        !clientEntry.client.startsWith("Vonage "),
     );
 
     expect(otherEntries.map((clientEntry) => clientEntry.client)).toEqual(
@@ -87,6 +89,22 @@ describe("SMS clients workflow", () => {
       });
       expect(exampleSources).toContain("/api/v1/sms");
     }
+  });
+
+  test("VF-05.4 the Vonage Verify2 client runs a login from its folder with the code read from SendMock", () => {
+    const vonageEntry = clientEntries.find(
+      (clientEntry) => clientEntry.client === "Vonage Verify2 Node SDK",
+    );
+    const exampleFolder = `examples/sms/${vonageEntry?.folder ?? ""}`;
+    const exampleSources = readExampleSources(exampleFolder);
+    const packageJson = readFileSync(`${exampleFolder}/package.json`, "utf8");
+
+    expect(vonageEntry?.folder).toBe("node-vonage-verify");
+    expect(packageJson).toContain('"@vonage/verify2"');
+    expect(exampleSources).toContain('from "@vonage/verify2"');
+    expect(exampleSources).toContain("/api/v1/verify/");
+    expect(exampleSources).toContain("checkCode");
+    expect(exampleSources).toContain('"completed"');
   });
 
   test("Release build runs the SMS clients before it publishes", () => {
@@ -124,4 +142,3 @@ describe("SMS clients workflow", () => {
     }
   });
 });
-

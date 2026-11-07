@@ -124,6 +124,11 @@ jobs:
             language: node
             folder: node-sns
             run: bun install && node send-and-verify.js
+          # AC: VF-05.4
+          - client: Vonage Verify2 Node SDK
+            language: node
+            folder: node-vonage-verify
+            run: bun install && node send-and-verify.js
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

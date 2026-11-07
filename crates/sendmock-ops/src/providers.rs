@@ -26,6 +26,7 @@ mod twilio_messaging_services;
 mod twilio_verify_api;
 mod twilio_verify_services;
 mod twilio_verify_verifications;
+mod vonage_verify_api;
 
 pub use builtin_providers::{builtin_email_providers, builtin_sms_providers};
 pub(crate) use builtin_webhook_templates::find_builtin_webhook_template;

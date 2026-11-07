@@ -90,6 +90,7 @@ describe("email and SMS provider API", () => {
       "sinch",
       "africastalking",
       "sns",
+      "vonage_verify",
       "sslwireless",
     ]);
     expect(

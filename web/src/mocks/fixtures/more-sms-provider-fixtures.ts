@@ -315,6 +315,69 @@ function buildAmazonSnsProvider(): MessageProviderRecord {
   });
 }
 
+/**
+ * Vonage Verify v2 (`POST /v2/verify`, `POST` and `DELETE /v2/verify/{request_id}`), as the
+ * Vonage Node SDK's `Verify2` calls it; read from its source and test data, checked
+ * 2026-11-07. Served in code over the verify domain, like Twilio Verify; this definition lists
+ * it and its credentials (Basic auth with the API key and secret, which Verify v2 accepts beside
+ * the SDK's JWT). Each brand gets a verify service of its own.
+ */
+function buildVonageVerifyProvider(): MessageProviderRecord {
+  return buildProviderFixture({
+    key: "vonage_verify",
+    name: "Vonage Verify",
+    area: "sms",
+    accent: "#871fff",
+    host: "api.nexmo.com",
+    credentials: [
+      { name: "api_key", value: "vonage-key", is_secret: false },
+      { name: "api_secret", value: "vonage-secret", is_secret: true },
+    ],
+    operations: [
+      {
+        kind: "start_verification",
+        method: "POST",
+        path: "/v2/verify",
+        request_format: "json",
+      },
+      {
+        kind: "check_verification",
+        method: "POST",
+        path: "/v2/verify/{request_id}",
+        request_format: "json",
+      },
+    ],
+    field_mapping: [
+      { part: "to", source: "workflow[0].to" },
+      { part: "body", source: "code" },
+    ],
+    validation_rules: requireParts(["to"]),
+    success_response: respondWithJson(
+      202,
+      '{"request_id": "{{ message.provider_id }}"}',
+    ),
+    error_responses: [
+      answerError(
+        "missing_field",
+        422,
+        '{"title": "Invalid params", "type": "https://developer.vonage.com/api-errors#invalid-params", "detail": "The value of one or more parameters is invalid", "instance": "{{ random_hex(32) }}"}',
+      ),
+      answerError(
+        "not_found",
+        404,
+        '{"title": "Not Found", "type": "https://developer.vonage.com/api-errors#not-found", "detail": "Request was not found or it has been verified already.", "instance": "{{ random_hex(32) }}"}',
+      ),
+    ],
+    message_id_template: "{{ uuid() }}",
+    callback_template_key: null,
+    status_names: {
+      pending: "pending",
+      approved: "completed",
+      canceled: "cancelled",
+    },
+  });
+}
+
 /** The SMS providers added after 1.0 (docs/plan/32-after-1-0.md, A3). */
 export function buildMoreSmsProviders(): MessageProviderRecord[] {
   return [
@@ -323,5 +386,6 @@ export function buildMoreSmsProviders(): MessageProviderRecord[] {
     buildSinchProvider(),
     buildAfricasTalkingProvider(),
     buildAmazonSnsProvider(),
+    buildVonageVerifyProvider(),
   ];
 }

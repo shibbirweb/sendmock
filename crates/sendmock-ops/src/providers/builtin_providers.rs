@@ -38,7 +38,8 @@ mod tests {
                 "telnyx",
                 "sinch",
                 "africastalking",
-                "sns"
+                "sns",
+                "vonage_verify"
             ]
         );
     }

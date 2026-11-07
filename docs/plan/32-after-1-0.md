@@ -121,7 +121,7 @@ The exact paths, fields and shapes above are checked against the API references 
 | Request | Answer |
 |---------|--------|
 | `POST /v2/verify` with `brand`, `workflow` (`[{channel: "sms", to}]`, also `email`, `whatsapp`, `voice`), optional `code_length`, `code`, `locale`, `channel_timeout`, `callback_url` | 202 `{ request_id }` |
-| `POST /v2/verify/{request_id}` with `code` | 200 `{ request_id, status: "complete" }`; a wrong code 400 problem `Invalid Code` |
+| `POST /v2/verify/{request_id}` with `code` | 200 `{ request_id, status: "completed" }` (the SDK's `checkCode` returns this status); a wrong code 400 problem `Invalid Code` |
 | `DELETE /v2/verify/{request_id}` | 204, the request cancelled |
 | a finished, cancelled or unknown request | 404 problem `Not Found`, "Request <id> was not found or it has been verified already." |
 
@@ -130,4 +130,6 @@ Errors are problem details (`title`, `type`, `detail`, `instance`), as the SDK's
 **How:** like Twilio Verify, a stateful API stays in code as an adapter (`vonage_verify_api.rs` beside `twilio_verify_api.rs`, [22](22-configurable-providers.md)) over the same verify domain, so a Vonage verification is an ordinary SendMock verification: listed in Verify, its code delivered as an SMS (or email, or WhatsApp) into SendMock, readable by `GET /api/v1/otp`, and firing the same `verify.*` events. Vonage has no verify service the way Twilio does, only a `brand` per request, so SendMock keeps one verify service per brand, made on first use and named after it, with `code_length` (default 4) and the workflow's channel taken from the request. A wrong code counts toward the service's attempt limit; past it, the request ends and later checks answer 404, as Vonage's do. The provider is built in as `vonage_verify`, a sibling of the existing `vonage` SMS provider, and the Vonage Node SDK's `Verify2` client runs a login against it in the SMS clients workflow.
 
 **Not in this part:** `next_workflow`, silent authentication and templates; the status `callback_url` events; Vonage's legacy Verify v1 (`/verify/json`).
+
+**As built, A4 (2026-11-07):** `vonage_verify_api.rs` answers the three requests over the verify domain, tried after Twilio Verify in the provider runtime, and the `vonage_verify` definition lists it with Basic credentials (`api_key`, `api_secret`), which Verify v2 accepts beside the SDK's JWT; the JWT itself is not checked. Reading the SDK showed the check answers `completed`, not `complete` as first written here, so the table and VF-05.2 say `completed` (the SDK's `checkCode` returns that status, and an app compares against it). Vonage's phone numbers have no `+`; SendMock adds it, so the code SMS and the Verify list show E.164. The `request_id` is the verification's SID (`VE...`) rather than a UUID, so one id works in both APIs. The captured code SMS still carries `twilio_verify` as its API, since the verify domain sends it for either API. Tests: `vonage_verify_api.rs` (VF-05.1 to VF-05.3) and `examples/sms/node-vonage-verify` with `@vonage/verify2` 1.22.1 (VF-05.4), which generates an RSA key for the SDK's JWT, completes one login and cancels another.
 
