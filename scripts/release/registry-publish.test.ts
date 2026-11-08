@@ -86,6 +86,38 @@ describe("the Registry publish workflow", () => {
     }
   });
 
+  test("DS-03.8 the plan runs the default branch's code, never the triggering commit's", () => {
+    const planCheckout = (registryWorkflow.jobs.plan?.steps ?? []).find((step) =>
+      step.uses?.startsWith("actions/checkout"),
+    );
+
+    expect(planCheckout).toBeDefined();
+    expect(planCheckout?.with?.ref).toBeUndefined();
+  });
+
+  test("DS-03.8 publishes only when the release tag points at the released commit", () => {
+    const tagCheck = (registryWorkflow.jobs.plan?.steps ?? []).find((step) =>
+      step.run?.includes("commits/refs/tags/$TAG_NAME"),
+    );
+
+    expect(tagCheck?.run).toContain('"$tagged_commit" != "$COMMIT_SHA"');
+    expect(tagCheck?.run).toContain("exit 1");
+  });
+
+  test("DS-03.8 every publishing job checks out the verified release tag", () => {
+    for (const [jobName, job] of Object.entries(registryWorkflow.jobs)) {
+      if (jobName === "plan") {
+        continue;
+      }
+      const checkout = (job.steps ?? []).find((step) =>
+        step.uses?.startsWith("actions/checkout"),
+      );
+      expect(checkout?.with?.ref, jobName).toBe(
+        "refs/tags/${{ needs.plan.outputs.tag_name }}",
+      );
+    }
+  });
+
   test("DS-03.8 holds every trusted publishing job, each with an OIDC token", () => {
     expect(Object.keys(registryWorkflow.jobs).sort()).toEqual([
       "crates",
