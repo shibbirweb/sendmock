@@ -25,7 +25,8 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--smtp-starttls` | `SENDMOCK_SMTP_STARTTLS` | `smtp_starttls` |  | Offer STARTTLS on the SMTP port, with a self-signed certificate generated on first run unless --smtp-tls-cert is set. |
 | `--smtp-require-tls` | `SENDMOCK_SMTP_REQUIRE_TLS` | `smtp_require_tls` |  | Refuse MAIL with 530 until the client has run STARTTLS (turns STARTTLS on). |
 | `--smtp-allow-rcpt <GLOBS>` | `SENDMOCK_SMTP_ALLOW_RCPT` | `smtp_allow_rcpt` | `*` | Recipients SMTP accepts, as comma-separated globs; others get 550. |
-| `--max-emails <COUNT>` | `SENDMOCK_MAX_EMAILS` | `max_emails` | `1000` | The most emails kept; older ones (and older SMTP and API log entries) are pruned. |
+| `--max-emails <COUNT>` | `SENDMOCK_MAX_EMAILS` | `max_emails` | `1000` | The most emails kept; older ones (and older SMTP and API log entries) are pruned; 0 keeps every email. |
+| `--max-sms <COUNT>` | `SENDMOCK_MAX_SMS` | `max_sms` | `1000` | The most SMS kept (with verifications and push notifications); older ones are pruned; 0 keeps every SMS. |
 | `--max-age <DAYS>` | `SENDMOCK_MAX_AGE` | `max_age` | keep until the count limit | Prune traffic older than this, such as 7d. |
 | `--update-check <MODE>` | `SENDMOCK_UPDATE_CHECK` | `update_check` | `off` | When to look for a newer release: off, manual or daily. |
 | `--relay-smtp <URL>` | `SENDMOCK_RELAY_SMTP` | `relay_smtp` | `off` | A real SMTP server that Release and auto-forward rules send through, such as smtp://user:password@smtp.example.com:587. |

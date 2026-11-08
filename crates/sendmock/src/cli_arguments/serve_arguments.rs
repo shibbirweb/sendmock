@@ -88,9 +88,13 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_SMTP_ALLOW_RCPT", value_name = "GLOBS")]
     pub smtp_allow_rcpt: Option<String>,
 
-    /// The most emails kept; older ones (and older SMTP and API log entries) are pruned [default: 1000]
+    /// The most emails kept; older ones (and older SMTP and API log entries) are pruned; 0 keeps every email [default: 1000]
     #[arg(long, env = "SENDMOCK_MAX_EMAILS", value_name = "COUNT")]
     pub max_emails: Option<u64>,
+
+    /// The most SMS kept (with verifications and push notifications); older ones are pruned; 0 keeps every SMS [default: 1000]
+    #[arg(long, env = "SENDMOCK_MAX_SMS", value_name = "COUNT")]
+    pub max_sms: Option<u64>,
 
     /// Prune traffic older than this, such as 7d [default: keep until the count limit]
     #[arg(long, env = "SENDMOCK_MAX_AGE", value_name = "DAYS")]

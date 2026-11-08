@@ -26,6 +26,39 @@ Endpoints, rules, templates, variables, numbers, Messaging Services, Verify serv
 
 Secrets are never written to an export in plain text.
 
+## How much is kept: `--max-emails`, `--max-sms` and `--max-age`
+
+SendMock keeps the newest messages and deletes older ones automatically, within a few seconds of a limit being reached.
+
+| Limit | Flag | Variable | `sendmock.toml` | Default |
+| --- | --- | --- | --- | --- |
+| Emails | `--max-emails` | `SENDMOCK_MAX_EMAILS` | `max_emails` | 1,000 |
+| SMS | `--max-sms` | `SENDMOCK_MAX_SMS` | `max_sms` | 1,000 |
+| Age | `--max-age` (such as `7d`) | `SENDMOCK_MAX_AGE` | `max_age` | none: kept until a count limit is reached |
+
+What each limit covers:
+
+- **Emails:** emails with their SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries. Each keeps its own newest count.
+- **SMS:** SMS (with WhatsApp media), verifications and push notifications.
+- **Age:** every kind of traffic above.
+- **Never deleted:** configuration (endpoints, rules, templates, variables, numbers, providers, saved deliveries), deliveries still waiting to be sent, and payments.
+
+Each count limit takes 0 to 1,000,000. Settings > General > Retention changes them at once, without a restart.
+
+### No limit
+
+Set a count limit to `0` to keep every email or every SMS:
+
+```bash
+sendmock --max-emails 0 --max-sms 0
+```
+
+Use it with care:
+
+- With no age limit either, nothing stops the database growing until the disk is full, and lists and searches slow down as it grows.
+- SendMock warns in its log at startup, and Settings shows a warning, while that is so.
+- A fixed limit is recommended for disk and memory safety. To keep everything for a while, add an age limit instead, such as `--max-age 30d`.
+
 ## The catch-all catcher port: `--catcher-addr`
 
 `--catcher-addr 127.0.0.1:8030` (or `SENDMOCK_CATCHER_ADDR`, or `catcher_addr` in `sendmock.toml`) starts a port where every request is captured by the HTTP catcher, at any path, the first path segment naming the bin. It is off unless set. See [Catch every path on its own port](./http/index.md#catch-every-path-on-its-own-port).

@@ -126,7 +126,8 @@ pub use seed::{
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
-    UpdateCheckMode, build_ingest_options, prune_traffic, read_ingest_options,
+    UpdateCheckMode, build_ingest_options, list_unbounded_traffic, prune_traffic,
+    read_ingest_options,
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,

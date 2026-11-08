@@ -45,7 +45,15 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 
 ### General
 
-**Retention:** **Keep at most** a number of emails and SMS, and **Delete traffic older than** a number of days, or **Keep forever**. Older traffic is pruned every few seconds once a limit is reached: emails with their SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries keep the newest **emails** count, and SMS and verifications the newest **SMS** count. Configuration (endpoints, rules, templates, variables, saved deliveries, numbers, providers) and deliveries still waiting to be sent are never pruned, and the database file gives the freed space back. **Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
+**Retention:**
+
+- **Keep at most** a number of emails and a number of SMS (1,000 each by default). Older traffic is pruned every few seconds once a limit is reached.
+- The email count also bounds SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries; the SMS count bounds verifications and push notifications.
+- **Delete traffic older than** a number of days, or **Keep forever**.
+- **0 means no limit.** With no age limit either, a warning shows: the database grows until the disk is full, so a fixed limit is recommended. See [How much is kept](./configuration.md#how-much-is-kept---max-emails---max-sms-and---max-age).
+- Configuration (endpoints, rules, templates, variables, saved deliveries, numbers, providers), deliveries still waiting to be sent and payments are never pruned, and the database file gives the freed space back.
+
+**Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
 
 ### Seed
 

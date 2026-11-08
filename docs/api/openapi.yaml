@@ -7700,12 +7700,12 @@ components:
       properties:
         max_emails:
           type: number
-          description: The most emails kept; the oldest are deleted past it.
+          description: The most emails kept; the oldest are deleted past it. 0 keeps every email (no limit).
           examples:
             - 1000
         max_sms:
           type: number
-          description: The most SMS kept; the oldest are deleted past it.
+          description: The most SMS kept (with verifications and push notifications); the oldest are deleted past it. 0 keeps every SMS (no limit).
           examples:
             - 1000
         max_age_days:
@@ -7915,12 +7915,12 @@ components:
       properties:
         max_emails:
           type: number
-          description: The most emails kept; the oldest are deleted past it.
+          description: The most emails kept; the oldest are deleted past it. 0 keeps every email (no limit).
           examples:
             - 1000
         max_sms:
           type: number
-          description: The most SMS kept; the oldest are deleted past it.
+          description: The most SMS kept (with verifications and push notifications); the oldest are deleted past it. 0 keeps every SMS (no limit).
           examples:
             - 1000
         max_age_days:

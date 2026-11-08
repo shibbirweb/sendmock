@@ -306,6 +306,9 @@ Key/value table for runtime-editable settings (retention, SMS simulation profile
 ### Retention
 
 - `--max-emails` / `--max-sms` (default 1000 each) and optional `--max-age` (e.g. `7d`).
+- `0` means no count limit (owner request, 2026-11-08), as Mailpit's `--max 0` does; each limit takes 0 to 1,000,000. The email limit also bounds SMTP sessions, logged API requests, HTTP catcher requests and finished webhook deliveries; the SMS limit bounds verifications, push notifications and WhatsApp media. Payments are not pruned.
+- A limit of 0 with no `--max-age` lets the database grow until the disk is full, and lists and searches slow down with it. SendMock warns at startup in its log, and Settings shows a warning beside the field, while that is so; the docs recommend a fixed limit (or an age limit) for disk and memory safety.
+- `--max-sms` (`SENDMOCK_MAX_SMS`, `max_sms` in `sendmock.toml`) was planned with `--max-emails` but only reachable through Settings and the API until 2026-11-08; it now works like `--max-emails`, a startup value overwriting the stored setting.
 - A background task prunes oldest rows and runs `VACUUM` occasionally.
 - `--db memory` (or `:memory:`) for ephemeral CI runs.
 - Configuration (endpoints, rules, templates, variables, numbers, services, bins, saved deliveries) is never pruned; only traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) is.

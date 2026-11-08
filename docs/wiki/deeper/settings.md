@@ -113,7 +113,7 @@ Heading.
 
 - **What it does:** How much traffic is kept.
 
-### 17. Older traffic is pruned when a limit is reached. Configuration is never pruned.
+### 17. Older traffic is pruned when a limit is reached; 0 means no limit. Configuration is never pruned.
 
 Text.
 
@@ -123,7 +123,7 @@ Text.
 
 Number field.
 
-- **What it does:** The most emails kept (and the same limit for the other traffic).
+- **What it does:** The most emails kept, which also bounds SMTP sessions, API requests, HTTP requests and finished deliveries; the second field is the most SMS, which also bounds verifications and push notifications. 0 keeps everything, with a warning when no age limit is set.
 
 ### 19. Turn off to delete traffic after a number of days.
 

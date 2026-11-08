@@ -174,3 +174,47 @@ async fn pruning_trims_every_kind_of_traffic_and_never_configuration() {
         );
     }
 }
+
+// AC: PL-08.4
+#[tokio::test]
+async fn a_limit_of_zero_keeps_every_email_and_sms() {
+    let fixture = build_send_fixture(&[ScriptedAnswer::Status(200), ScriptedAnswer::Status(200)]);
+    let endpoint_id = fixture.create_endpoint(json!({})).await;
+    create_traffic_twice(&fixture, &endpoint_id).await;
+    let (status, saved_settings) = call_api(
+        &fixture.app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({ "max_emails": 0, "max_sms": 0 })),
+    )
+    .await;
+    assert_eq!(status, 200, "{saved_settings}");
+    assert_eq!(saved_settings["max_emails"], 0);
+    assert_eq!(saved_settings["max_sms"], 0);
+    let email_count = count_at(&fixture, "/api/v1/emails").await;
+    let sms_count = count_at(&fixture, "/api/v1/sms").await;
+
+    sendmock_ops::prune_traffic(&fixture.operation_context)
+        .await
+        .unwrap_or_else(|prune_error| panic!("pruning: {prune_error}"));
+
+    assert!(email_count >= 2 && sms_count >= 2);
+    assert_eq!(count_at(&fixture, "/api/v1/emails").await, email_count);
+    assert_eq!(count_at(&fixture, "/api/v1/sms").await, sms_count);
+}
+
+// AC: PL-08.4
+#[tokio::test]
+async fn a_limit_above_one_million_is_refused() {
+    let fixture = build_send_fixture(&[]);
+
+    let (status, answer) = call_api(
+        &fixture.app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&json!({ "max_sms": 1_000_001 })),
+    )
+    .await;
+
+    assert_eq!(status, 400, "{answer}");
+}

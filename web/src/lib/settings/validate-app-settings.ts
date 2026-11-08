@@ -73,15 +73,15 @@ export function validateAppSettingsUpdate(
     fieldErrors,
     settingsUpdate,
     "max_emails",
-    [1, 1_000_000],
-    "Choose 1 to 1,000,000",
+    [0, 1_000_000],
+    "Choose 0 (no limit) to 1,000,000",
   );
   checkRange(
     fieldErrors,
     settingsUpdate,
     "max_sms",
-    [1, 1_000_000],
-    "Choose 1 to 1,000,000",
+    [0, 1_000_000],
+    "Choose 0 (no limit) to 1,000,000",
   );
   if (
     settingsUpdate.max_age_days !== undefined &&
