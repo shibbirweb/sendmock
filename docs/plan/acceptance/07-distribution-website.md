@@ -20,7 +20,7 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 - [x] DS-02.2 The HEALTHCHECK (`sendmock health`) reports healthy once listeners are ready; `SIGTERM` shuts down gracefully. (#48)
 - [x] DS-02.3 Mounted `/config/sendmock.toml`, `/config/sendmock.seed.toml` and `/templates` are loaded. (#48)
 - [x] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`. (#48)
-- [ ] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB.
+- [x] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB. (#48)
   - Waiting (W12d3, 2026-11-07): pull requests rehearse the check on a local registry with a key made in the job; the criterion ticks when `docker-published-check.sh` passes on the first push to `develop` after #48 merges, which publishes `edge` signed by the workflow (W15).
 - [ ] DS-02.6 The Compose example and the GitHub Actions service-container example work as documented.
   - Waiting (W12d3, 2026-11-07): the Compose example passes on every pull request; the service-container job needs a published image, so it ticks when the Release build runs it on the first beta (W15).
