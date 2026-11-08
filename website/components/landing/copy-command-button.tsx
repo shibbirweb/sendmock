@@ -44,22 +44,36 @@ export function CopyCommandButton({
     }
   };
 
+  const buttonName = isCopied ? "Copied" : label;
+
   return (
-    <button
-      type="button"
-      onClick={copyCommand}
-      aria-label={isCopied ? "Copied" : label}
-      title={isCopied ? "Copied" : label}
-      className={cn(
-        "rounded-md p-1.5 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground",
-        className,
-      )}
-    >
-      {isCopied ? (
-        <CheckIcon aria-hidden className="size-4" />
-      ) : (
-        <CopyIcon aria-hidden className="size-4" />
-      )}
-    </button>
+    // The tooltip shows at once on hover or keyboard focus, where a native title waits a second;
+    // it stays up while "Copied" is showing, so a click visibly worked.
+    <span className={cn("group relative inline-flex", className)}>
+      <button
+        type="button"
+        onClick={copyCommand}
+        aria-label={buttonName}
+        className="rounded-md p-1.5 text-fd-muted-foreground transition-colors outline-none hover:bg-fd-accent hover:text-fd-accent-foreground focus-visible:ring-2 focus-visible:ring-(--brand-from)"
+      >
+        {isCopied ? (
+          <CheckIcon aria-hidden className="size-4" />
+        ) : (
+          <CopyIcon aria-hidden className="size-4" />
+        )}
+      </button>
+      {/* The button already carries this text as its name, so screen readers skip the copy. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute top-full right-0 z-20 mt-1.5 rounded-md bg-fd-primary px-2 py-1 text-xs font-medium whitespace-nowrap text-fd-primary-foreground shadow-md transition-opacity",
+          isCopied
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 group-has-[:focus-visible]:opacity-100",
+        )}
+      >
+        {buttonName}
+      </span>
+    </span>
   );
 }
