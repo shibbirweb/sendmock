@@ -27,18 +27,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Build for both platforms Docker publishes extensions on
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: packaging/docker-desktop
           platforms: linux/amd64,linux/arm64
 
       - name: Build for inspection
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: packaging/docker-desktop
           load: true

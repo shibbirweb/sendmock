@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report-${{ matrix.shard }}
           path: web/playwright-report
@@ -211,7 +211,7 @@ jobs:
           VITE_API_MODE: live
         run: bun run build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: web-dist
           path: web/dist
@@ -229,7 +229,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: web-dist
           path: web/dist
@@ -253,7 +253,7 @@ jobs:
         run: bun scripts/performance-budget.ts target/release/sendmock
 
       # The live UI suite runs against this binary in the Playwright image.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: matrix.os == 'ubuntu-latest'
         with:
           name: sendmock-linux
@@ -275,7 +275,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: sendmock-linux
           path: sendmock-binary
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report-live
           path: web/playwright-report
@@ -314,7 +314,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: sendmock-linux
           path: sendmock-binary

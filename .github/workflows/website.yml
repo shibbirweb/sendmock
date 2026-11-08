@@ -84,7 +84,7 @@ jobs:
             echo "has_repository=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: steps.build.outputs.has_repository == 'true'
         with:
           name: package-repository
@@ -172,7 +172,7 @@ jobs:
 
       - name: Our APT and YUM repository at /packages/
         if: github.event_name != 'pull_request' && needs.package-repository.outputs.has_repository == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: package-repository
           path: website/out/packages

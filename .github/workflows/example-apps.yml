@@ -59,7 +59,7 @@ jobs:
       - name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: sendmock-for-example-apps
           path: target/release/sendmock
@@ -108,7 +108,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: sendmock-for-example-apps
           path: sendmock-binary
@@ -129,22 +129,22 @@ jobs:
         with:
           php-version: "8.3"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: matrix.setup == 'node'
         with:
           node-version: "22"
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: matrix.setup == 'python'
         with:
           python-version: "3.13"
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         if: matrix.setup == 'go'
         with:
           go-version: "1.23"
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         if: matrix.setup == 'java'
         with:
           distribution: temurin
@@ -155,7 +155,7 @@ jobs:
         with:
           ruby-version: "3.3"
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         if: matrix.setup == 'dotnet'
         with:
           dotnet-version: "8.0.x"
@@ -175,14 +175,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: sendmock-for-example-apps
           path: sendmock-binary
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
 
@@ -234,19 +234,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: sendmock-for-example-apps
           path: sendmock-binary
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
 
       - if: matrix.language == 'python'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -254,7 +254,7 @@ jobs:
         run: pip install pytest requests
 
       - if: matrix.language == 'go'
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.22"
 
@@ -267,7 +267,7 @@ jobs:
         run: gem install rspec
 
       - if: matrix.language == 'java'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -287,7 +287,7 @@ jobs:
           echo "JAVA_TEST_CLASSPATH=$(ls "$PWD"/*.jar | paste -sd: -)" >> "$GITHUB_ENV"
 
       - if: matrix.language == 'csharp'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 

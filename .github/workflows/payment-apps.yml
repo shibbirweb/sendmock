@@ -76,7 +76,7 @@ jobs:
 
       - uses: ./.github/actions/start-sendmock-offline
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
 
@@ -93,7 +93,7 @@ jobs:
         working-directory: examples/payments/stripe-php
         run: composer install --no-interaction --no-progress && php verify.php
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
