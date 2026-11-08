@@ -61,7 +61,7 @@ function RetentionCard({ appSettings }: { appSettings: AppSettings }) {
   return (
     <SettingsSectionCard
       title="Retention"
-      description="Older traffic is pruned when a limit is reached; 0 means no limit. Configuration is never pruned."
+      description="Older traffic is pruned when a limit is reached; zero means no limit. Configuration is never pruned."
       isDirty={sectionForm.isDirty}
       isSaving={sectionForm.isSaving}
       onSave={sectionForm.saveChanges}

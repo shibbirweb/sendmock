@@ -19,7 +19,7 @@
       "link: Connection",
       "link: About",
       "heading: Retention",
-      "paragraph: Older traffic is pruned when a limit is reached; 0 means no limit. Configuration is never pruned.",
+      "paragraph: Older traffic is pruned when a limit is reached; zero means no limit. Configuration is never pruned.",
       "spinbutton: Keep at most",
       "paragraph: Turn off to delete traffic after a number of days.",
       "switch: Keep forever",

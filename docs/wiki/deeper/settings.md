@@ -113,7 +113,7 @@ Heading.
 
 - **What it does:** How much traffic is kept.
 
-### 17. Older traffic is pruned when a limit is reached; 0 means no limit. Configuration is never pruned.
+### 17. Older traffic is pruned when a limit is reached; zero means no limit. Configuration is never pruned.
 
 Text.
 

@@ -33,7 +33,7 @@ export const settingsGeneralEntries: DeeperEntry[] = [
     does: `Opens the ${sectionName} section: ${sectionContents.charAt(0).toLowerCase()}${sectionContents.slice(1)}`,
   })),
   { control: "heading: Retention", does: "How much traffic is kept." },
-  { control: "paragraph: Older traffic is pruned when a limit is reached; 0 means no limit. Configuration is never pruned.", does: "Explains retention: emails, SMS, requests and deliveries are pruned; endpoints, rules and other configuration never." },
+  { control: "paragraph: Older traffic is pruned when a limit is reached; zero means no limit. Configuration is never pruned.", does: "Explains retention: emails, SMS, requests and deliveries are pruned; endpoints, rules and other configuration never." },
   { control: "spinbutton: Keep at most", does: "The most emails kept, which also bounds SMTP sessions, API requests, HTTP requests and finished deliveries; the second field is the most SMS, which also bounds verifications and push notifications. 0 keeps everything, with a warning when no age limit is set." },
   { control: "paragraph: Turn off to delete traffic after a number of days.", does: "Explains Keep forever." },
   { control: "switch: Keep forever", does: "When off, traffic older than the number of days you set is deleted too." },
