@@ -135,7 +135,8 @@ function startWebhookHandler(receivedChanges) {
     const requestUrl = new URL(request.url, "http://127.0.0.1");
     if (request.method === "GET") {
       const isOurToken = requestUrl.searchParams.get("hub.verify_token") === verifyToken;
-      response.writeHead(isOurToken ? 200 : 403);
+      // Meta's check expects the challenge echoed back, as plain text and never as HTML.
+      response.writeHead(isOurToken ? 200 : 403, { "Content-Type": "text/plain; charset=utf-8" });
       response.end(isOurToken ? requestUrl.searchParams.get("hub.challenge") : "");
       return;
     }
