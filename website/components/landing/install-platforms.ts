@@ -36,8 +36,8 @@ const binaryPlatformRun = {
 
 /**
  * One install command per platform, then the command that starts the server. The runners that
- * need no install lead, and npx is the tab every visitor sees first. Archive names follow
- * docs/plan/09-distribution.md (Release archives).
+ * need no install lead; a visitor whose system is known sees that system's tab first instead
+ * (`orderInstallPlatforms`). Archive names follow docs/plan/09-distribution.md (Release archives).
  */
 export const installPlatforms: InstallPlatform[] = [
   {
@@ -179,3 +179,25 @@ export const installPlatforms: InstallPlatform[] = [
     ],
   },
 ];
+
+/**
+ * The tabs for one visitor: their own system first when it is known, since its install
+ * command is the one they are most likely to run, then the rest in the order above.
+ */
+export function orderInstallPlatforms(
+  platforms: InstallPlatform[],
+  visitorPlatformKey: string | null,
+): InstallPlatform[] {
+  const visitorPlatform = platforms.find(
+    (installPlatform) => installPlatform.key === visitorPlatformKey,
+  );
+  if (visitorPlatform === undefined) {
+    return platforms;
+  }
+  return [
+    visitorPlatform,
+    ...platforms.filter(
+      (installPlatform) => installPlatform !== visitorPlatform,
+    ),
+  ];
+}

@@ -52,12 +52,17 @@ test("WS-02.1 the hero's Quick start button brings the install terminal into vie
 const releaseUrl =
   "https://github.com/shibbirweb/sendmock/releases/latest/download";
 const visitorUserAgents = {
+  // ChromeOS has no install tab of its own, so the default order shows.
+  unknownSystem:
+    "Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   Windows:
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
 };
 
 test.describe("the quick start's platform tabs", () => {
-  test("WS-02.1 the quick start leads with npx and shows the install command for each operating system", async ({
+  test.use({ userAgent: visitorUserAgents.unknownSystem });
+
+  test("WS-02.1 the quick start leads with npx for an unknown system and shows the install command for each one", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -271,19 +276,27 @@ test.describe("the quick start downloads", () => {
 test.describe("the quick start for a Windows visitor", () => {
   test.use({ userAgent: visitorUserAgents.Windows });
 
-  test("WS-02.1 the quick start opens on npx whatever the visitor's operating system", async ({
+  test("WS-02.1 the quick start puts the visitor's own system first and opens on it", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
+    const platformTabs = page.getByRole("tablist", { name: "Your platform" });
 
+    await expect(platformTabs.getByRole("tab")).toHaveText([
+      "Windows",
+      "npx",
+      "bunx",
+      "Docker",
+      "macOS",
+      "Linux",
+      "AI",
+    ]);
     await expect(
-      page
-        .getByRole("tablist", { name: "Your platform" })
-        .getByRole("tab", { name: "npx" }),
+      platformTabs.getByRole("tab", { name: "Windows" }),
     ).toHaveAttribute("aria-selected", "true");
     await expect(page.getByTestId("quick-start-terminal")).toContainText(
-      "$ npx sendmock",
+      `PS> irm ${releaseUrl}/install.ps1 | iex`,
     );
   });
 

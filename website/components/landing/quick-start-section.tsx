@@ -1,12 +1,15 @@
 "use client";
 
 import { SparklesIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { detectOperatingSystem } from "@/lib/detect-operating-system";
 
 import { cn } from "@/lib/utils";
 
 import { AiInstallLinks, AiInstallPromptWindow } from "./ai-install-panel";
 import { CopyCommandButton } from "./copy-command-button";
-import { installPlatforms } from "./install-platforms";
+import { installPlatforms, orderInstallPlatforms } from "./install-platforms";
 import {
   InstallTerminal,
   InstallTerminalPlaceholder,
@@ -29,12 +32,24 @@ export function QuickStartSection({
 }: {
   installPrompt: string | null;
 }) {
-  const aiTabIndex = installPrompt === null ? -1 : installPlatforms.length;
+  const [orderedPlatforms, setOrderedPlatforms] = useState(installPlatforms);
+  const aiTabIndex = installPrompt === null ? -1 : orderedPlatforms.length;
   const { selectedIndex, setSelectedIndex, moveSelection, tabId, panelId } =
-    useArrowKeyTabs(installPlatforms.length + (installPrompt === null ? 0 : 1));
+    useArrowKeyTabs(orderedPlatforms.length + (installPrompt === null ? 0 : 1));
   const isAiTabSelected = selectedIndex === aiTabIndex;
   const selectedPlatform =
-    installPlatforms[selectedIndex] ?? installPlatforms[0];
+    orderedPlatforms[selectedIndex] ?? orderedPlatforms[0];
+
+  // The site is static, so the visitor's system is known only in the browser; its tab moves
+  // to the front and, being first, is the one selected.
+  useEffect(() => {
+    setOrderedPlatforms(
+      orderInstallPlatforms(
+        installPlatforms,
+        detectOperatingSystem(navigator.userAgent),
+      ),
+    );
+  }, []);
 
   return (
     <section
@@ -55,7 +70,7 @@ export function QuickStartSection({
         onKeyDown={moveSelection}
         className="flex flex-wrap justify-center gap-0.5 rounded-full border bg-fd-card p-1 sm:gap-1"
       >
-        {installPlatforms.map((installPlatform, platformIndex) => (
+        {orderedPlatforms.map((installPlatform, platformIndex) => (
           <button
             key={installPlatform.key}
             id={tabId(platformIndex)}
@@ -106,7 +121,7 @@ export function QuickStartSection({
         aria-labelledby={tabId(selectedIndex)}
         className="grid w-full max-w-2xl grid-cols-[minmax(0,1fr)]"
       >
-        {installPlatforms.map((installPlatform) => (
+        {orderedPlatforms.map((installPlatform) => (
           <InstallTerminalPlaceholder
             key={installPlatform.key}
             installPlatform={installPlatform}
@@ -137,7 +152,7 @@ export function QuickStartSection({
           />
         )}
         <div className="row-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)]">
-          {installPlatforms.map((installPlatform) => (
+          {orderedPlatforms.map((installPlatform) => (
             <PlatformFooter
               key={installPlatform.key}
               installPlatform={installPlatform}
