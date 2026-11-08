@@ -35,7 +35,7 @@ Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so 
 | `/mcp/` | MCP reference generated from `docs/api/mcp-tools.json`: every tool and resource with its inputs, annotations, example call and links |
 | `/demo/` | The real SendMock web UI built in mock mode (Stage A mock layer), fully clickable in the browser |
 | `/templates/` | Catalogue of built-in webhook payload templates, generated from the template TOML files |
-| `/changelog/` | Rendered `CHANGELOG.md`, with beta and stable releases marked |
+| `/changelog/` | Rendered `CHANGELOG.md`: what the current beta holds (`[Unreleased]`), then each stable release |
 | `/download/` | OS-detected install instructions, stable and beta side by side |
 | `/next/...` | The same site built from `develop` (beta docs), with a "Beta" banner |
 | `/v0.x/...` | Older stable minor versions |
@@ -191,27 +191,22 @@ Every stable goes through at least one beta, so the beta channel always tries a 
 
 #### The changelog
 
-- `CHANGELOG.md` at the repository root is **written by the Prepare release workflow only**. It is in the repository from 2026-11-08 with only its header (the text the workflow writes), so it is there to read before the first release; the first release adds its section under that header (`insertChangelogSection` treats a header-only file as an empty one). Each release adds one section at the top, built from the pull requests merged into `develop` since the last tag:
+**Changed 2026-11-09 (owner decision, #212):** SendMock keeps its changelog by hand, as nibtree does, in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format. Until then Prepare release wrote one line per merged pull request title, and the first beta's notes would have been 27 such lines starting with a logo tweak; titles cannot be fixed once merged.
 
-  | Pull request title | Changelog group |
-  | --- | --- |
-  | `feat!:` or `fix!:` | **Breaking changes** |
-  | `feat:` | **Added** |
-  | `fix:` | **Fixed** |
-  | `docs:`, `test:`, `chore:`, `ci:`, `refactor:` | left out |
-
-- Each line is the pull request title without its prefix and ticket, with the first letter capitalised and the PR linked: `feat:[U3] add Inbox and Messages to the Mail and SMS sidebar menus` becomes `- Add Inbox and Messages to the Mail and SMS sidebar menus (#37)`.
-- The pull request title is therefore the release note: write it for users, in the commit format. A change users should not read about uses `chore:`.
-- A stable section collects its betas: `0.4.0` lists everything since `0.3.1`, so stable readers do not need the beta sections.
-- The section is the GitHub release body word for word, and the website's `/changelog/` page renders the whole file.
+- **Every user-visible change adds a line under `## [Unreleased]` in `CHANGELOG.md`, in the same pull request.** Lines go under `### Added`, `### Changed`, `### Fixed` or `### Removed` (and `### Breaking changes` for a `feat!:` change), written for users: what it does and where to find it, not how it was built. Changes users do not see (docs, tests, chores, CI, refactors) add nothing.
+- **A beta's release notes are the `[Unreleased]` section as it is.** Prepare release refuses a beta while `[Unreleased]` is empty ("describe what the beta holds there first"). Betas leave the section in place, so each beta lists everything since the last stable.
+- **A stable release dates the section:** Prepare release turns `## [Unreleased]` into `## [x.y.z] - YYYY-MM-DD` and puts an empty `## [Unreleased]` above it.
+- **Nobody writes release notes anywhere else.** The GitHub release body, the release pull request's description and the website's `/changelog/` page come only from `CHANGELOG.md`: a beta's body is `[Unreleased]` at its release commit, a stable's is its dated section, word for word (DS-05.5).
+- Pull request titles still drive the version bump (`feat!:` and `fix!:` mark breaking changes, and a stable is refused while untried `feat:` or `fix:` changes sit on top of its beta), so they keep the commit format.
 
 ```bash
 bun scripts/version.ts show            # 0.4.0-beta.2
 bun scripts/version.ts check           # all files agree
 bun scripts/version.ts next beta       # what bump=beta would make, without writing
 bun scripts/version.ts bump minor      # write the next version into every file
-bun scripts/version.ts changelog       # write the CHANGELOG.md section for the new version
-bun scripts/version.ts notes 0.4.0     # print a version's section (the release body)
+bun scripts/version.ts changelog       # a stable: date [Unreleased]; a beta: refuse an empty [Unreleased]
+bun scripts/version.ts notes           # print the [Unreleased] section (a beta's release body)
+bun scripts/version.ts notes 0.4.0     # print a stable's dated section (its release body)
 ```
 
 ### Workflows
@@ -219,10 +214,10 @@ bun scripts/version.ts notes 0.4.0     # print a version's section (the release 
 | Workflow | Trigger | Does |
 |----------|---------|------|
 | `ci.yml` | push to `develop`/`main`, pull requests | Rust (fmt, clippy, tests on 3 OSes), web and website (lint, typecheck, tests, build), version check, docs check, OpenAPI contract tests |
-| `release-prepare.yml` (Prepare release) | manual, on `develop`, choice `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run` | Checks CI passed and no release is in progress, works out the version from the choice (see [The bump choices](#the-bump-choices)), writes it into every file with `scripts/version.ts`, writes the `CHANGELOG.md` section from the merged pull requests, and opens release PR `chore:[REL-N] release X.Y.Z[-beta.N]`; with `dry_run` it only prints the version and the section |
-| `beta-publish.yml` | CI finished on `develop` | If `develop` holds an unpublished beta version: creates the GitHub **pre-release** with its changelog section as the body and calls `release.yml` |
+| `release-prepare.yml` (Prepare release) | manual, on `develop`, choice `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run` | Checks CI passed and no release is in progress, works out the version from the choice (see [The bump choices](#the-bump-choices)), writes it into every file with `scripts/version.ts`, dates `[Unreleased]` in `CHANGELOG.md` for a stable (and refuses a beta while `[Unreleased]` is empty), and opens release PR `chore:[REL-N] release X.Y.Z[-beta.N]` with the release notes as its description; with `dry_run` it only prints the version and the notes |
+| `beta-publish.yml` | CI finished on `develop` | If `develop` holds an unpublished beta version: creates the GitHub **pre-release** with the `[Unreleased]` section of `CHANGELOG.md` as the body and calls `release.yml` |
 | `stable-promote.yml` | CI finished on `develop` | If `develop` holds an untagged stable version: opens the `develop` -> `main` PR (merge commit, never squash) |
-| `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) with its changelog section as the body and calls `release.yml` |
+| `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) with its dated `CHANGELOG.md` section as the body and calls `release.yml` |
 | `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); runs the binary tests on every platform before anything is published ([09](09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)); version comes from the code and must match the tag |
 | `registry-publish.yml` (Registry publish) | "Publish beta" or "Publish stable" finished | If that run published a release: npm (launcher, platform packages, `sendmock-testcontainers`), PyPI (`sendmock-testcontainers`), crates.io and the MCP registry for a stable, all with GitHub OIDC; the only workflow registered as trusted publisher, since registries cannot trust a called workflow (plan 30 W18) |
 | `docker-edge.yml` (Docker image) | push to `develop`, pull requests, and Release build | Builds and tests the image on every push and pull request without publishing; publishes the release tags only when Release build calls it (owner decision, 2026-11-08: nothing is published before a release) |
@@ -302,7 +297,7 @@ Conventional prefixes drive the version bump and changelog grouping (`feat:`, `f
 
 - **Phase U0:** `develop` and `main` branches, branch protection, `ci.yml` for `web/` and `website/`, website skeleton (Fumadocs + Magic UI landing draft), `website.yml` deploying to Pages with `/demo/` = mock-mode UI. This replaces the generic "static preview build" as the shareable preview URL.
 - **Phase U3:** API reference and **playground in Demo mode** generated from the frozen OpenAPI spec; landing page polished with Magic UI; docs IA drafted.
-- **Phase 0:** `scripts/version.ts` (bump choices and changelog writing), `CHANGELOG.md` (created by the first Prepare release run), all release workflows (`release-prepare.yml`, `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`). Versioned website builds (`/next/`, switcher, banner) moved to U3 W17 on 2026-10-27, so the first release freezes its docs.
+- **Phase 0:** `scripts/version.ts` (bump choices and changelog writing), `CHANGELOG.md` (written by hand under `[Unreleased]` since 2026-11-09), all release workflows (`release-prepare.yml`, `beta-publish.yml`, `stable-promote.yml`, `stable-publish.yml`, `release.yml`, `docker-edge.yml`). Versioned website builds (`/next/`, switcher, banner) moved to U3 W17 on 2026-10-27, so the first release freezes its docs.
 - **Phase 1:** first beta `0.1.0-beta.1` (email backend) published through the beta channel, made with Prepare release `bump: minor`; the real update check; playground **Local mode** with CORS support in SendMock.
 - **Phases 2-4:** a beta per phase (or more often); docs pages and generated references grow with each feature.
 - **Phase 5:** first stable `1.0.0` promoted to `main`; all stable channels go live; `main` becomes the default branch.

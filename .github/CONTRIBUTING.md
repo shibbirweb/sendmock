@@ -22,6 +22,13 @@ cd website && bun install && bun run dev    # the website and docs, http://local
 - `docs:`, `test:`, `chore:`, `ci:` and `refactor:` for everything else; `feat!:` for breaking changes.
 - No co-author trailers.
 
+## Changelog
+
+- A change users can see adds a line under `## [Unreleased]` in `CHANGELOG.md`, in the same pull request, under `### Added`, `### Changed`, `### Fixed` or `### Removed`.
+- Write it for users: what the change does and where to find it, not how it was built.
+- Docs, tests, chores, CI and refactors add nothing.
+- The release notes of every beta and stable release come only from this file, so nobody writes them anywhere else.
+
 ## Tests
 
 Every change comes with tests that run in CI:

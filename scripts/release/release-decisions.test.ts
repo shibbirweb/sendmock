@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 
-import { insertChangelogSection } from "../version/changelog";
 import { computeNextVersion } from "../version/next-version";
 import { formatVersion, parseVersion } from "../version/semantic-version";
 import {
@@ -155,35 +154,37 @@ describe("decideDockerTags", () => {
 });
 
 describe("release bodies", () => {
-  const betaSection =
-    "## 0.2.0-beta.1 - 2026-11-01\n\n### Added\n\n- SMS threads (#7)\n";
-  const stableSection = [
-    "## 0.2.0 - 2026-11-09",
+  const changelogFile = [
+    "# Changelog",
+    "",
+    "## [Unreleased]",
     "",
     "### Added",
     "",
-    "- SMS threads (#7)",
-    "- Webhook replay (#9)",
+    "- Webhook replay from the delivery log.",
+    "",
+    "## [0.2.0] - 2026-11-09",
+    "",
+    "### Added",
+    "",
+    "- SMS threads.",
+    "- Webhook replay.",
     "",
     "### Fixed",
     "",
-    "- Retry timing (#8)",
+    "- Retry timing.",
     "",
   ].join("\n");
-  const changelogFile = insertChangelogSection(
-    insertChangelogSection(null, betaSection),
-    stableSection,
-  );
 
-  test("DS-05.5 a beta's body is its section without the heading", () => {
-    expect(readReleaseBody(changelogFile, "0.2.0-beta.1")).toBe(
-      "### Added\n\n- SMS threads (#7)",
+  test("DS-05.5 a beta's body is the [Unreleased] section without its heading", () => {
+    expect(readReleaseBody(changelogFile, "0.3.0-beta.1")).toBe(
+      "### Added\n\n- Webhook replay from the delivery log.",
     );
   });
 
-  test("DS-05.5 a stable's body is its section, which collects its betas", () => {
+  test("DS-05.5 a stable's body is its dated section", () => {
     expect(readReleaseBody(changelogFile, "0.2.0")).toBe(
-      "### Added\n\n- SMS threads (#7)\n- Webhook replay (#9)\n\n### Fixed\n\n- Retry timing (#8)",
+      "### Added\n\n- SMS threads.\n- Webhook replay.\n\n### Fixed\n\n- Retry timing.",
     );
   });
 
@@ -208,7 +209,7 @@ describe("release bodies", () => {
         releaseBody.replace("Webhook replay", "Replay"),
       ),
     ).toEqual([
-      'line 4: expected "- Webhook replay (#9)", published "- Replay (#9)"',
+      'line 4: expected "- Webhook replay.", published "- Replay."',
     ]);
     expect(findReleaseBodyDifferences("### Added", "")).toEqual([
       'line 1: expected "### Added", published ""',

@@ -7,13 +7,14 @@
  *     bun scripts/version.ts sync                 copy the Cargo.toml version into every file
  *     bun scripts/version.ts next <bump>          what a bump would make, without writing
  *     bun scripts/version.ts bump <bump>          write the next version into every file
- *     bun scripts/version.ts changelog [--pull-requests <file>]
- *                                                 write the CHANGELOG.md section for the version
- *     bun scripts/version.ts notes <version>      print a version's section (the release body)
+ *     bun scripts/version.ts changelog            ready CHANGELOG.md for the version: a beta needs
+ *                                                 entries under [Unreleased], a stable dates them
+ *     bun scripts/version.ts notes [<version>]    print the release notes: [Unreleased] with no
+ *                                                 version or for a beta, else the dated section
  *
- * `<bump>` is beta, patch, minor, major or stable. The pull request list comes from the
- * merge commits, or from a JSON file of `{ number, title }` (the release workflow passes
- * GitHub's titles, which may have been edited after merging).
+ * `<bump>` is beta, patch, minor, major or stable. The bump reads the merged pull requests
+ * from the merge commits, or from a JSON file of `{ number, title }` (the release workflow
+ * passes GitHub's titles, which may have been edited after merging).
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -22,8 +23,8 @@ import { join } from "node:path";
 import { classifyChange, type MergedPullRequest } from "./version/change-kind";
 import {
   extractReleaseNotes,
-  insertChangelogSection,
-  renderChangelogSection,
+  prepareChangelogForRelease,
+  readChangelogSection,
 } from "./version/changelog";
 import {
   computeNextVersion,
@@ -32,7 +33,6 @@ import {
 } from "./version/next-version";
 import {
   findLastStable,
-  findSectionStartTag,
   readMergedPullRequestsSince,
   readReleaseTags,
 } from "./version/release-history";
@@ -104,35 +104,36 @@ function workOutNextVersion(bump: ReleaseBump): SemanticVersion {
     : nextVersion.version;
 }
 
+function readChangelog(): string {
+  return existsSync(changelogPath) ? readFileSync(changelogPath, "utf8") : "";
+}
+
 function writeChangelog() {
-  const currentVersion = readCurrentVersion();
-  const startTag = findSectionStartTag(
-    currentVersion,
-    readReleaseTags(repositoryRoot),
-  );
+  const version = formatVersion(readCurrentVersion());
   const releaseDate = new Date().toISOString().slice(0, 10);
-  const section = renderChangelogSection(
-    formatVersion(currentVersion),
+  const prepared = prepareChangelogForRelease(
+    readChangelog(),
+    version,
     releaseDate,
-    readPullRequests(startTag),
   );
-  const existingChangelog = existsSync(changelogPath)
-    ? readFileSync(changelogPath, "utf8")
-    : null;
-  writeFileSync(
-    changelogPath,
-    insertChangelogSection(existingChangelog, section),
-  );
-  console.log(section);
+  if ("refusal" in prepared) {
+    fail(prepared.refusal);
+  }
+  writeFileSync(changelogPath, prepared.changelog);
+  console.log(extractReleaseNotes(prepared.changelog, version) ?? "");
 }
 
 function printReleaseNotes(versionArgument: string | undefined) {
-  const changelog = existsSync(changelogPath)
-    ? readFileSync(changelogPath, "utf8")
-    : "";
-  const releaseNotes = extractReleaseNotes(changelog, versionArgument ?? "");
+  const changelog = readChangelog();
+  const releaseNotes =
+    versionArgument === undefined
+      ? readChangelogSection(changelog)
+      : extractReleaseNotes(changelog, versionArgument);
   console.log(
-    releaseNotes ?? fail(`CHANGELOG.md has no section for ${versionArgument}`),
+    releaseNotes ??
+      fail(
+        `CHANGELOG.md has no section for ${versionArgument ?? "[Unreleased]"}`,
+      ),
   );
 }
 

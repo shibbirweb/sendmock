@@ -26,7 +26,7 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 
 - Pull requests go into `develop`, the beta line. `main` only takes merges from `develop` when a stable release is promoted.
 - Start every change on a new branch from the latest `develop` (`feat/*`, `fix/*`, `docs/*`, `chore/*`). Never commit straight to `develop` or `main`.
-- Never edit `CHANGELOG.md`, a version number or a GitHub release's notes by hand: the Prepare release workflow writes the changelog section and the version, and the publish workflows copy that section into the release word for word and read it back ([docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md#the-changelog)). The pull request title becomes the release note, so write it for users in the commit format (`feat:[TICKET] ...`, `fix:[TICKET] ...`); use `chore:` for changes users should not read about.
+- **Every user-visible change adds a line under `## [Unreleased]` in `CHANGELOG.md`, in the same pull request**, written for users (what it does and where to find it). Release notes come only from the changelog: a beta's GitHub release is the `[Unreleased]` section, a stable's is the section Prepare release dates, and the publish workflows copy it word for word ([docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md#the-changelog)). Never edit a version number, a dated changelog section or a GitHub release's notes by hand. Pull request titles still drive the version bump, so keep the commit format (`feat:[TICKET] ...`, `fix:[TICKET] ...`, `chore:` for changes users do not see).
 - Releases are cut by workflows, never by hand. See [docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md).
 
 ## Commits and pull requests
