@@ -41,7 +41,7 @@ Need a beta build, Docker Compose, Homebrew on Linux or a binary to download you
 
 ### Install with AI
 
-Rather let your AI coding agent do it? It checks your computer, asks whether you want Docker or the binary (and explains both in plain words), and shows every command before it runs it.
+Rather let your AI coding agent do it? It checks your computer, asks whether you want Docker, npx or bunx, or the binary (and explains each in plain words), and shows every command before it runs it.
 
 1. Open your AI agent (Claude Code, Codex, Cursor, Gemini CLI or another one that can run commands) in a terminal on this computer, and allow it to run commands.
 2. Copy this prompt and paste it into the agent:
@@ -51,10 +51,11 @@ Rather let your AI coding agent do it? It checks your computer, asks whether you
 
    Follow these steps and talk to me in plain, simple words:
 
-   1. Before you install anything, check this computer and tell me what you found: the operating system and CPU (for example macOS on Apple silicon, Windows on x64, Linux on ARM), whether Docker is installed and running, whether Homebrew is installed, and whether SendMock is already installed (`sendmock --version`).
+   1. Before you install anything, check this computer and tell me what you found: the operating system and CPU (for example macOS on Apple silicon, Windows on x64, Linux on ARM), whether Docker is installed and running, whether Homebrew is installed, whether Node.js (`node --version`) or Bun (`bun --version`) is installed, and whether SendMock is already installed (`sendmock --version`).
 
    2. Ask me how I want to run SendMock, and recommend one based on what you found:
       - Docker: SendMock runs in a container, nothing is installed on my computer, and it is easy to remove. Good if I already use Docker or Docker Compose. Docker must be running.
+      - npx or bunx: runs SendMock straight from npm with nothing installed. Needs Node.js 18 or newer (npx) or Bun (bunx); the first run downloads it into their cache, later runs start at once. Good for trying SendMock, or if I already use Node.js or Bun.
       - The binary: one small program installed on my computer. It starts instantly and does not need Docker.
 
    3. Ask me whether I want the stable version (recommended) or the beta (newest features first).
@@ -66,13 +67,17 @@ Rather let your AI coding agent do it? It checks your computer, asks whether you
       - Linux or macOS without Homebrew, beta: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta`
       - Windows (PowerShell), stable: `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`
       - Windows (PowerShell), beta: `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta`
+      - npx (Node.js), stable: `npx sendmock`
+      - npx (Node.js), beta: `npx sendmock@beta`
+      - bunx (Bun), stable: `bunx sendmock`
+      - bunx (Bun), beta: `bunx sendmock@beta`
       - Docker, stable: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock`
       - Docker, beta: `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock:beta`
       The full steps are on https://shibbirweb.github.io/sendmock/docs/install/. Before you run each command, show it to me, say in one sentence what it does, and wait for my OK.
 
    5. If a download fails because SendMock has no release yet, stop and tell me so. I can try the live demo instead: https://shibbirweb.github.io/sendmock/demo/
 
-   6. When it is installed, start SendMock so it keeps running after you finish (in the background, or give me the command to run in a new terminal), and check that it works: open http://127.0.0.1:8025. Then tell me the web UI address, the SMTP settings for my app (host 127.0.0.1, port 1025, no username, password or TLS) and how to stop SendMock.
+   6. When it is installed, start SendMock so it keeps running after you finish (in the background, or give me the command to run in a new terminal; with npx or bunx, that command is the one that starts it), and check that it works: open http://127.0.0.1:8025. Then tell me the web UI address, the SMTP settings for my app (host 127.0.0.1, port 1025, no username, password or TLS) and how to stop SendMock.
 
    Do not change any other settings on this computer, and ask me before you install anything else.
    ```

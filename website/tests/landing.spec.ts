@@ -345,7 +345,9 @@ test("WS-09.4 the quick start's AI tab shows an agent window with the whole prom
   await expect(conversation).toContainText(
     "Before you install anything, check this computer",
   );
-  await expect(conversation).toContainText("Docker or the binary?");
+  await expect(conversation).toContainText(
+    "Docker, npx or bunx, or the binary?",
+  );
   await expect(conversation).toContainText("Run command");
   await expect(conversation).toContainText("SendMock is running");
   await expect(
