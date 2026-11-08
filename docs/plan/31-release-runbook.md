@@ -39,7 +39,7 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 | `RELEASE_TOKEN` | A fine-grained token with contents and pull request write on this repository | The release and promote pull requests do not start CI by themselves |
 | `NPM_TOKEN` | An npm granular access token with read and write on all packages, for the first beta only (npm sets a trusted publisher only on a package that exists); delete it once the trusted publishers are set (step 6) | The first beta cannot create the npm packages |
 | `DOCKERHUB_USERNAME` | The Docker Hub user | The image is only on GHCR |
-| `DOCKERHUB_TOKEN` | A Docker Hub access token | The image is only on GHCR |
+| `DOCKERHUB_TOKEN` | A Docker Hub personal access token with read and write; the Docker job creates the public repository `shibbirweb/sendmock` before its first push, and stops if it exists but is private | The image is only on GHCR |
 | `HOMEBREW_TAP_TOKEN` | A token with contents write on `shibbirweb/homebrew-tap` | No Homebrew formula |
 | `SCOOP_BUCKET_TOKEN` | A token with contents write on `shibbirweb/scoop-bucket` | No Scoop manifest |
 | `PACKAGES_GPG_PRIVATE_KEY` | An unprotected signing key for the APT and YUM repository (see below); the website publishes its public half | No APT or YUM repository |

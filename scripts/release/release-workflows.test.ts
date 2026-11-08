@@ -170,6 +170,27 @@ describe("Docker edge", () => {
     );
   });
 
+  test("DS-02.5 the Docker Hub repository is made public before the first push to it", () => {
+    const manifestSteps = (
+      dockerEdgeWorkflow.jobs.manifest as { steps?: { name?: string; run?: string }[] }
+    ).steps ?? [];
+    const stepNames = manifestSteps.map((step) => step.name ?? "");
+    const repositoryStep = manifestSteps.find((step) =>
+      step.run?.includes("scripts/docker-hub-repository.sh"),
+    );
+
+    expect(repositoryStep?.name).toBe("The Docker Hub repository exists and is public");
+    expect(stepNames.indexOf("Log in to Docker Hub")).toBeLessThan(
+      stepNames.indexOf("The Docker Hub repository exists and is public"),
+    );
+    expect(stepNames.indexOf("The Docker Hub repository exists and is public")).toBeLessThan(
+      stepNames.indexOf("The tags for both platforms"),
+    );
+    expect(readFileSync(join(import.meta.dir, "../docker-hub-repository.sh"), "utf8")).toContain(
+      "is_private: false",
+    );
+  });
+
   test("a published beta or stable gets its Docker tags, Homebrew formula and Linux packages", () => {
     const releaseJobs = readWorkflow("release.yml").jobs as Record<
       string,
