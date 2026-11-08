@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
   extractReleaseNotes,
+  changelogHeader,
   insertChangelogSection,
   renderChangelogSection,
 } from "./changelog";
@@ -54,6 +55,15 @@ describe("renderChangelogSection (DS-05.4)", () => {
 });
 
 describe("insertChangelogSection", () => {
+  test("DS-05.4 the first release into a file with only its header writes it as into no file", () => {
+    const firstSection =
+      "## 0.1.0-beta.1 - 2026-11-10\n\n### Added\n\n- Inbox (#48)\n";
+    const changelog = insertChangelogSection(changelogHeader, firstSection);
+
+    expect(changelog).toBe(insertChangelogSection(null, firstSection));
+    expect(changelog.match(/# Changelog/g)).toHaveLength(1);
+  });
+
   test("DS-05.4 creates the file and puts each new section on top", () => {
     const firstChangelog = insertChangelogSection(
       null,

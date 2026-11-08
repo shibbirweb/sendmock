@@ -191,7 +191,7 @@ Every stable goes through at least one beta, so the beta channel always tries a 
 
 #### The changelog
 
-- `CHANGELOG.md` at the repository root is **written by the Prepare release workflow only**. Each release adds one section at the top, built from the pull requests merged into `develop` since the last tag:
+- `CHANGELOG.md` at the repository root is **written by the Prepare release workflow only**. It is in the repository from 2026-11-08 with only its header (the text the workflow writes), so it is there to read before the first release; the first release adds its section under that header (`insertChangelogSection` treats a header-only file as an empty one). Each release adds one section at the top, built from the pull requests merged into `develop` since the last tag:
 
   | Pull request title | Changelog group |
   | --- | --- |

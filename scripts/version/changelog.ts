@@ -4,7 +4,7 @@ import {
   toReleaseNote,
 } from "./change-kind";
 
-const changelogHeader = [
+export const changelogHeader = [
   "# Changelog",
   "",
   "Every SendMock release, newest first. The Prepare release workflow writes this file from the titles of the merged pull requests; do not edit it by hand.",
@@ -51,12 +51,12 @@ export function insertChangelogSection(
   existingChangelog: string | null,
   section: string,
 ): string {
+  // A file with only its header (committed before the first release) has no section to keep.
+  const firstSectionIndex = existingChangelog?.indexOf("\n## ") ?? -1;
   const previousSections =
-    existingChangelog === null
+    existingChangelog === null || firstSectionIndex === -1
       ? ""
-      : existingChangelog.slice(
-          Math.max(existingChangelog.indexOf("\n## "), 0),
-        );
+      : existingChangelog.slice(firstSectionIndex);
   const trimmedPreviousSections = previousSections.trim();
   return [changelogHeader, section.trimEnd(), "", trimmedPreviousSections]
     .join("\n")
