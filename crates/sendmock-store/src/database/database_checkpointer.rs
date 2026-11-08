@@ -16,8 +16,11 @@ pub struct CheckpointProgress {
 
 /// How often the background thread copies the write-ahead log into the database file.
 const BACKGROUND_CHECKPOINT_INTERVAL: Duration = Duration::from_secs(1);
-/// About 4 MiB of 4 KiB pages: a longer log is cut back once it has been copied.
+/// About 4 MiB of 4 KiB pages: a longer log is cut back once writes pause.
 const LOG_FRAMES_BEFORE_TRUNCATE: i64 = 1024;
+/// About 256 MiB: a log this long is cut back even while writes keep coming, so a flood that
+/// never pauses cannot fill the disk.
+const LOG_FRAMES_LIMIT_UNDER_LOAD: i64 = 65_536;
 
 /// A connection of its own for copying the write-ahead log into the database file. A passive
 /// checkpoint never takes the write lock, so the copy and its sync run beside ingest instead of
@@ -42,8 +45,9 @@ impl DatabaseCheckpointer {
         std::thread::Builder::new()
             .name("sendmock-checkpoint".to_owned())
             .spawn(move || {
+                let mut previous_log_frame_count = None;
                 std::thread::sleep(BACKGROUND_CHECKPOINT_INTERVAL);
-                while checkpoint_while_open(&open_connection) {
+                while checkpoint_while_open(&open_connection, &mut previous_log_frame_count) {
                     std::thread::sleep(BACKGROUND_CHECKPOINT_INTERVAL);
                 }
             })
@@ -69,44 +73,62 @@ impl DatabaseCheckpointer {
     }
 }
 
-/// One checkpoint while the database is open; answers whether it still is. A busy or failed
-/// checkpoint is left for the next one.
-fn checkpoint_while_open(open_connection: &Weak<Mutex<Connection>>) -> bool {
+/// One checkpoint pass while the database is open; answers whether it still is. A busy or
+/// failed checkpoint is left for the next pass. `previous_log_frame_count` is the log's length
+/// after the last pass, which tells whether writes have paused since.
+fn checkpoint_while_open(
+    open_connection: &Weak<Mutex<Connection>>,
+    previous_log_frame_count: &mut Option<i64>,
+) -> bool {
     let Some(connection) = open_connection.upgrade() else {
         return false;
     };
     let connection = connection.lock().unwrap_or_else(PoisonError::into_inner);
-    let checkpoint_started_at = Instant::now();
+    let passive_started_at = Instant::now();
     let checkpoint_progress = connection.query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |row| {
         Ok(CheckpointProgress {
             log_frame_count: row.get(1)?,
             checkpointed_frame_count: row.get(2)?,
         })
     });
+    let passive_duration = passive_started_at.elapsed();
+    let mut truncate_duration = Duration::ZERO;
     if let Ok(checkpoint_progress) = checkpoint_progress {
-        let is_whole_log_copied =
-            checkpoint_progress.checkpointed_frame_count == checkpoint_progress.log_frame_count;
-        if is_whole_log_copied && checkpoint_progress.log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE
-        {
+        if should_truncate(checkpoint_progress, *previous_log_frame_count) {
+            let truncate_started_at = Instant::now();
             let _ = truncate_copied_log(&connection);
+            truncate_duration = truncate_started_at.elapsed();
         }
+        *previous_log_frame_count = Some(checkpoint_progress.log_frame_count);
     }
-    let checkpoint_duration = checkpoint_started_at.elapsed();
-    if checkpoint_duration > SLOW_DATABASE_WORK {
+    if passive_duration + truncate_duration > SLOW_DATABASE_WORK {
         tracing::warn!(
-            checkpoint_ms = duration_ms(checkpoint_duration),
+            passive_ms = duration_ms(passive_duration),
+            truncate_ms = duration_ms(truncate_duration),
             "a write-ahead log checkpoint was slow"
         );
     }
     true
 }
 
-/// Beside steady writes a passive checkpoint seldom copies the whole log, so the writer never
-/// starts it over and it keeps growing. Once a passive pass has copied all of it, a truncating
-/// checkpoint has nothing to copy or sync and only cuts the file, so it holds writers for a
-/// moment; it is tried without waiting, and skipped while a write or an older read is in the
-/// way. It is never tried with frames left, since copying and syncing them under the write
-/// lock made SMTP writes time out on a slow disk.
+/// A truncating checkpoint takes SQLite's write lock and copies and syncs whatever was written
+/// since the passive pass before it cuts the file; on a slow disk that held SMTP writes for
+/// seconds. A passive pass reports the whole log copied even under steady writes, so the log
+/// is only cut once writes have paused (it did not grow since the last pass), or when it has
+/// grown past the limit under a flood that never pauses.
+fn should_truncate(
+    checkpoint_progress: CheckpointProgress,
+    previous_log_frame_count: Option<i64>,
+) -> bool {
+    let log_frame_count = checkpoint_progress.log_frame_count;
+    let is_whole_log_copied = checkpoint_progress.checkpointed_frame_count == log_frame_count;
+    let have_writes_paused = previous_log_frame_count == Some(log_frame_count);
+    is_whole_log_copied
+        && (log_frame_count >= LOG_FRAMES_LIMIT_UNDER_LOAD
+            || (have_writes_paused && log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE))
+}
+
+/// Tried without waiting, and skipped while a write or an older read is in the way.
 fn truncate_copied_log(connection: &Connection) -> rusqlite::Result<()> {
     connection.busy_timeout(Duration::ZERO)?;
     let checkpoint_result = connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
@@ -142,7 +164,7 @@ mod tests {
         let database_folder = tempfile::tempdir()?;
         let shared_connection = Arc::new(Mutex::new(open_wal_database(&database_folder)?));
 
-        let is_still_open = checkpoint_while_open(&Arc::downgrade(&shared_connection));
+        let is_still_open = checkpoint_while_open(&Arc::downgrade(&shared_connection), &mut None);
 
         let connection = shared_connection
             .lock()
@@ -153,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn a_long_log_is_cut_back_once_it_is_copied() -> Result<(), Box<dyn std::error::Error>> {
+    fn a_long_log_is_cut_back_once_writes_pause() -> Result<(), Box<dyn std::error::Error>> {
         let database_folder = tempfile::tempdir()?;
         let connection = open_wal_database(&database_folder)?;
         connection.execute_batch(
@@ -164,12 +186,44 @@ mod tests {
         let log_path = database_folder.path().join("sendmock.db-wal");
         let log_size_before = std::fs::metadata(&log_path)?.len();
         let shared_connection = Arc::new(Mutex::new(connection));
+        let mut previous_log_frame_count = None;
 
-        checkpoint_while_open(&Arc::downgrade(&shared_connection));
+        checkpoint_while_open(
+            &Arc::downgrade(&shared_connection),
+            &mut previous_log_frame_count,
+        );
+        let log_size_after_first_pass = std::fs::metadata(&log_path)?.len();
+        checkpoint_while_open(
+            &Arc::downgrade(&shared_connection),
+            &mut previous_log_frame_count,
+        );
 
         assert!(log_size_before > 4 * 1024 * 1024, "{log_size_before}");
+        assert_eq!(log_size_after_first_pass, log_size_before);
         assert_eq!(std::fs::metadata(&log_path)?.len(), 0);
         Ok(())
+    }
+
+    #[test]
+    fn the_log_is_cut_only_when_copied_and_writes_paused_or_past_the_limit() {
+        let copied = |log_frame_count| CheckpointProgress {
+            log_frame_count,
+            checkpointed_frame_count: log_frame_count,
+        };
+        let partly_copied = CheckpointProgress {
+            log_frame_count: 5000,
+            checkpointed_frame_count: 4000,
+        };
+
+        assert!(should_truncate(copied(5000), Some(5000)));
+        assert!(!should_truncate(copied(5000), Some(4000)));
+        assert!(!should_truncate(copied(5000), None));
+        assert!(!should_truncate(copied(500), Some(500)));
+        assert!(!should_truncate(partly_copied, Some(5000)));
+        assert!(should_truncate(
+            copied(LOG_FRAMES_LIMIT_UNDER_LOAD),
+            Some(1000)
+        ));
     }
 
     #[test]
@@ -181,7 +235,7 @@ mod tests {
 
         drop(shared_connection);
 
-        assert!(!checkpoint_while_open(&open_connection));
+        assert!(!checkpoint_while_open(&open_connection, &mut None));
         Ok(())
     }
 }

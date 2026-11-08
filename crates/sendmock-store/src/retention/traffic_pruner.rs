@@ -1,10 +1,8 @@
 use std::sync::Arc;
-use std::time::Duration;
 
 use rusqlite::params;
 
 use super::prunable_table::PrunableTable;
-use crate::database::BUSY_TIMEOUT;
 use crate::{Database, StoreError};
 
 /// Rows deleted per write; small enough that a waiting ingest write is never held long.
@@ -72,9 +70,8 @@ impl TrafficPruner {
             .await
     }
 
-    /// Gives the pages pruning freed back to the file system and trims the write-ahead log, so
-    /// the files on disk stay the same size under continuous traffic instead of keeping their
-    /// largest size.
+    /// Gives the pages pruning freed back to the file system, so the files on disk stay the same
+    /// size under continuous traffic instead of keeping their largest size.
     pub async fn reclaim_free_pages(&self) -> Result<(), StoreError> {
         // A database made without incremental auto-vacuum keeps its free pages; stop when
         // the count no longer falls rather than loop forever.
@@ -91,29 +88,19 @@ impl TrafficPruner {
                 })
                 .await?;
             if remaining_free_pages == 0 || remaining_free_pages >= previous_free_pages {
-                return self.truncate_write_ahead_log().await;
+                return self.copy_write_ahead_log().await;
             }
             previous_free_pages = remaining_free_pages;
         }
     }
 
-    /// Copies the write-ahead log into the database and cuts it back to nothing, which also
-    /// lets the vacuum above shrink the database file. With a reader still on the log it is
-    /// skipped until the next prune: waiting for the reader would hold every ingest write.
-    async fn truncate_write_ahead_log(&self) -> Result<(), StoreError> {
-        // The copy and its sync can take seconds on a slow disk, so they run first, beside
-        // ingest; the truncate in the writer's queue then has almost nothing left to copy.
+    /// Copies the write-ahead log into the database file beside ingest; a copy of the whole log
+    /// also cuts the database file down to what the vacuum left. The log itself is cut back by
+    /// the background checkpoints once writes pause: cutting it here, in the writer's queue,
+    /// copied and synced the frames written since and held SMTP writes for seconds on Windows.
+    async fn copy_write_ahead_log(&self) -> Result<(), StoreError> {
         self.database.checkpoint_without_blocking_writes().await?;
-        self.database
-            .write(|connection| {
-                connection.busy_timeout(Duration::ZERO)?;
-                let checkpoint_result =
-                    connection.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
-                connection.busy_timeout(BUSY_TIMEOUT)?;
-                checkpoint_result?;
-                Ok(())
-            })
-            .await
+        Ok(())
     }
 
     async fn delete_in_batches(
