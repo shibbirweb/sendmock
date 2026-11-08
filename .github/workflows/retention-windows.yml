@@ -1,0 +1,72 @@
+# Issue 171: the retention load test (PL-08.2) stalls on about half of the Windows CI runs and
+# is skipped on Windows until the cause is found. This samples it many times on Windows runners,
+# half of them with a Microsoft Defender exclusion for the temporary folder the test's database
+# lives in, so the two halves show whether Defender's scanning explains the stalls. A failing run
+# prints the slowest SMTP step and the server's slow write and checkpoint warnings. Each job
+# reports its count as an annotation and passes, since it measures a known issue.
+name: Retention on Windows
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-store/src/database/**
+      - crates/sendmock-store/src/retention/**
+      - crates/sendmock/tests/retention_under_load.rs
+      - .github/workflows/retention-windows.yml
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    name: Sample ${{ matrix.sample_group }} (Defender exclusion ${{ matrix.has_defender_exclusion }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sample_group: [1, 2, 3]
+        has_defender_exclusion: [false, true]
+    env:
+      RUNS_PER_JOB: 3
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: retention-windows
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+
+      - name: Build the test once
+        run: cargo nextest run -p sendmock --test retention_under_load --locked --no-run
+
+      - name: Defender's state, and the exclusion for this half
+        shell: pwsh
+        env:
+          HAS_DEFENDER_EXCLUSION: ${{ matrix.has_defender_exclusion }}
+        run: |
+          Get-MpComputerStatus -ErrorAction SilentlyContinue | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, IsTamperProtected | Format-List
+          if ($env:HAS_DEFENDER_EXCLUSION -eq "true") {
+            Add-MpPreference -ExclusionPath $env:TEMP, $env:RUNNER_TEMP -ErrorAction SilentlyContinue
+            (Get-MpPreference).ExclusionPath | Format-List
+          }
+
+      - name: Run the retention load test several times
+        shell: pwsh
+        run: |
+          $failedRunCount = 0
+          foreach ($runNumber in 1..$env:RUNS_PER_JOB) {
+            cargo nextest run -p sendmock --test retention_under_load --locked --run-ignored ignored-only
+            if ($LASTEXITCODE -ne 0) {
+              $failedRunCount++
+            }
+          }
+          # The counts are the evidence, read from the annotations; a stall is the known issue
+          # being measured, not a new failure, so the job passes either way.
+          Write-Output "::notice title=Retention on Windows::$failedRunCount of $env:RUNS_PER_JOB runs failed (Defender exclusion ${{ matrix.has_defender_exclusion }})"
+          exit 0
