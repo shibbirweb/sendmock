@@ -1,4 +1,5 @@
 import { DownloadIcon } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -9,14 +10,23 @@ export type ManualDownload = {
   archiveFileName: string;
 };
 
+/** A line under a system's downloads, with a docs link for the details. */
+export type DownloadNote = {
+  text: string;
+  linkLabel: string;
+  docsPath: string;
+};
+
 /** The release archives for one system, for readers who skip the installer. */
 export function ManualDownloadLinks({
   platformLabel,
   downloads,
+  downloadNote,
   className,
 }: {
   platformLabel: string;
   downloads: ManualDownload[];
+  downloadNote: DownloadNote | null;
   className?: string;
 }) {
   return (
@@ -42,6 +52,17 @@ export function ManualDownloadLinks({
       >
         All files and checksums
       </a>
+      {downloadNote !== null && (
+        <p className="max-w-md text-center text-xs text-fd-muted-foreground">
+          {downloadNote.text}{" "}
+          <Link
+            href={downloadNote.docsPath}
+            className="underline underline-offset-4 hover:text-fd-foreground"
+          >
+            {downloadNote.linkLabel}
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

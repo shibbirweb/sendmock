@@ -215,6 +215,15 @@ test.describe("the quick start downloads", () => {
       .click();
     await expect(downloads).toContainText("Or download the macOS binary:");
     await expect(page.getByTestId("quick-start-requirement")).toHaveCount(0);
+    await expect(downloads).toContainText(
+      "macOS asks once before it runs an unsigned binary",
+    );
+    await expect(
+      downloads.getByRole("link", { name: "How to allow it" }),
+    ).toHaveAttribute(
+      "href",
+      /\/docs\/troubleshooting#macos-says-it-could-not-verify-sendmock$/,
+    );
     await expect(
       downloads.getByRole("link", { name: "Apple silicon" }),
     ).toHaveAttribute(
@@ -233,6 +242,9 @@ test.describe("the quick start downloads", () => {
       .getByRole("tab", { name: "Windows" })
       .click();
     await expect(downloads).toContainText("Or download the Windows binary:");
+    await expect(
+      downloads.getByRole("link", { name: "How to allow it" }),
+    ).toHaveCount(0);
     await expect(downloads.getByRole("link", { name: "x64" })).toHaveAttribute(
       "href",
       `${releaseUrl}/sendmock-x86_64-pc-windows-msvc.zip`,

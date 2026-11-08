@@ -5,6 +5,16 @@ description: Common problems connecting an app to SendMock and how to fix them.
 
 > **This page fills in as the server ships; the answers below apply from the first beta.**
 
+## macOS says it could not verify sendmock
+
+macOS blocks an unsigned program downloaded with a web browser ("Apple could not verify sendmock is free of malware"). The macOS builds are not signed with an Apple Developer ID yet; installs through Homebrew, the install script, npx or bunx are not affected. Remove the download mark once (use the path where you put `sendmock`):
+
+```bash
+xattr -d com.apple.quarantine /usr/local/bin/sendmock
+```
+
+Or run `sendmock` once, then open **System Settings > Privacy & Security** and click **Open Anyway**.
+
 ## My app cannot connect
 
 - Check SendMock runs: `sendmock health`, or open `http://127.0.0.1:8025`.

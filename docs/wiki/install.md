@@ -582,13 +582,21 @@ Let your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI or another one 
    [Environment]::SetEnvironmentVariable("Path", "$userPath;$PWD\sendmock", "User")
    ```
 
-4. Check that it is installed:
+4. On macOS, if you downloaded the archive with a web browser, let macOS run it. The macOS builds are not signed with an Apple Developer ID yet, so macOS blocks a downloaded copy the first time ("Apple could not verify sendmock is free of malware"). Remove the download mark once:
+
+   ```bash
+   xattr -d com.apple.quarantine /usr/local/bin/sendmock
+   ```
+
+   Or run `sendmock` once, then open **System Settings > Privacy & Security** and click **Open Anyway**. Homebrew, the install script, npx and bunx do not need this step.
+
+5. Check that it is installed:
 
    ```bash
    sendmock --version
    ```
 
-5. Go on to [Start SendMock](#start-sendmock).
+6. Go on to [Start SendMock](#start-sendmock).
 
 Every release also has a `SHA256SUMS` file to check the download, and older versions are on the [releases page](https://github.com/shibbirweb/sendmock/releases).
 

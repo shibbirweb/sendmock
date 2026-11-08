@@ -1,4 +1,4 @@
-import type { ManualDownload } from "./manual-download-links";
+import type { DownloadNote, ManualDownload } from "./manual-download-links";
 import type { PlatformRequirement } from "./platform-requirement-note";
 
 export const sendmockReleasesUrl =
@@ -18,6 +18,8 @@ export type InstallPlatform = {
   /** Docker publishes the ports, so the server binds every interface there. */
   listenHost: string;
   downloads: ManualDownload[];
+  /** Shown under the downloads; macOS needs one while its builds are not notarized. */
+  downloadNote: DownloadNote | null;
   /** What the runner needs on the computer first (Node.js for npx, Bun for bunx), or null. */
   requirement: PlatformRequirement | null;
 };
@@ -48,6 +50,7 @@ export const installPlatforms: InstallPlatform[] = [
       name: "Node.js 18 or newer",
       url: "https://nodejs.org/en/download",
     },
+    downloadNote: null,
   },
   {
     key: "bunx",
@@ -59,6 +62,7 @@ export const installPlatforms: InstallPlatform[] = [
     listenHost: "127.0.0.1",
     downloads: [],
     requirement: { name: "Bun", url: "https://bun.sh/docs/installation" },
+    downloadNote: null,
   },
   {
     key: "docker",
@@ -71,6 +75,7 @@ export const installPlatforms: InstallPlatform[] = [
     listenHost: "0.0.0.0",
     downloads: [],
     requirement: null,
+    downloadNote: null,
   },
   {
     key: "macos",
@@ -89,6 +94,11 @@ export const installPlatforms: InstallPlatform[] = [
       },
     ],
     requirement: null,
+    downloadNote: {
+      text: "Downloaded with a browser? macOS asks once before it runs an unsigned binary.",
+      linkLabel: "How to allow it",
+      docsPath: "/docs/troubleshooting#macos-says-it-could-not-verify-sendmock",
+    },
   },
   {
     key: "windows",
@@ -107,6 +117,7 @@ export const installPlatforms: InstallPlatform[] = [
       },
     ],
     requirement: null,
+    downloadNote: null,
   },
   {
     key: "linux",
@@ -125,5 +136,6 @@ export const installPlatforms: InstallPlatform[] = [
       },
     ],
     requirement: null,
+    downloadNote: null,
   },
 ];

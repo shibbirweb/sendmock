@@ -144,6 +144,7 @@ export function QuickStartSection({
                 key={installPlatform.key}
                 platformLabel={installPlatform.label}
                 downloads={installPlatform.downloads}
+                downloadNote={installPlatform.downloadNote}
                 className={cn("invisible", stackedInGridCellClassName)}
               />
             ) : null,
@@ -171,6 +172,7 @@ export function QuickStartSection({
               <ManualDownloadLinks
                 platformLabel={selectedPlatform.label}
                 downloads={selectedPlatform.downloads}
+                downloadNote={selectedPlatform.downloadNote}
               />
             </div>
           ) : null}
