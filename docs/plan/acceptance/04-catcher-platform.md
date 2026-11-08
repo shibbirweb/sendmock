@@ -111,6 +111,10 @@ Phase 1.
 
 - [x] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration. (#48)
 - [x] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load. (#48)
+- [ ] PL-08.3 `--max-sms` (`SENDMOCK_MAX_SMS`, `max_sms` in `sendmock.toml`) sets the SMS limit as `--max-emails` sets the email limit, with flags over the environment over the file, and a value given at startup overwrites the stored setting.
+  - Added 2026-11-08 (owner request): the plan listed `--max-sms` from the start, but only Settings and the API could set the SMS limit.
+- [ ] PL-08.4 A count limit of 0 keeps that traffic with no count limit (the age limit still applies), through the flags, the file, Settings, the API, the CLI and MCP; while a limit is 0 and no age limit is set, SendMock logs a warning at startup and Settings shows a warning beside the field.
+  - Added 2026-11-08 (owner request): unlimited storage when asked, with a caution; before, the limits took 1 to 1,000,000.
 
 ## PL-09 Demo data
 

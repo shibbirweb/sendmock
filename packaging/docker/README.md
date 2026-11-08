@@ -52,7 +52,6 @@ Apps in the same Compose project reach it at `sendmock:1025` (SMTP) and `http://
 | --- | --- |
 | `latest`, `1`, `1.0`, `1.0.0` | the stable release and its major, minor and exact versions |
 | `beta`, `0.1.0-beta.1` | the newest beta, and each beta version |
-| `edge` | every merge to the `develop` branch |
 | `<any tag>-debug` | the same SendMock on a base with a shell (`/busybox/sh`), for looking inside a running container |
 
 Every image is built for `linux/amd64` and `linux/arm64`, signed with cosign (keyless, from this repository's release workflow), and published with an SBOM and build provenance.

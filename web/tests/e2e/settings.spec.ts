@@ -45,10 +45,28 @@ test("PL-05.2 an invalid value shows a message under its field", async ({
 }) => {
   await page.goto("/settings");
   const retentionForm = page.getByRole("form", { name: "Retention" });
-  await retentionForm.getByLabel("Keep at most").first().fill("0");
+  await retentionForm.getByLabel("Keep at most").first().fill("1000001");
   await retentionForm.getByRole("button", { name: "Save changes" }).click();
 
-  await expect(retentionForm.getByText("Choose 1 to 1,000,000")).toBeVisible();
+  await expect(
+    retentionForm.getByText("Choose 0 (no limit) to 1,000,000"),
+  ).toBeVisible();
+});
+
+test("PL-08.4 a limit of 0 with no age limit shows a warning", async ({
+  page,
+}) => {
+  await page.goto("/settings");
+  const retentionForm = page.getByRole("form", { name: "Retention" });
+  await expect(retentionForm.getByRole("status")).toHaveCount(0);
+
+  await retentionForm.getByLabel("Keep at most").nth(1).fill("0");
+
+  await expect(retentionForm.getByRole("status")).toContainText(
+    "No limit on SMS",
+  );
+  await retentionForm.getByLabel("Keep forever").click();
+  await expect(retentionForm.getByRole("status")).toHaveCount(0);
 });
 
 test("PL-05.4 delete all SMS asks first, then deletes", async ({ page }) => {

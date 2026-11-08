@@ -93,9 +93,9 @@ The skill's evals need no step: CI runs them on every pull request with a script
 gh pr merge 48 --repo shibbirweb/sendmock --merge
 ```
 
-The push to `develop` runs CI, then Docker edge publishes the `edge` image, signs it and runs `docker-published-check.sh` against the registry.
+The push to `develop` runs CI, and the Docker image workflow builds and tests the image and rehearses the signing and SBOM check on a registry on the runner. Nothing is published before a release (owner decision, 2026-11-08); until then this step published an `edge` image, whose published check ticked DS-02.5 on 2026-11-08, and step 6 checks the published beta again.
 
-Check: the Docker edge run on `develop` passes its published check.
+Check: CI and the Docker image workflow pass on `develop`.
 
 Proves: DS-02.5
 
@@ -122,6 +122,28 @@ gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=0.1.0
 ```
 
 Check: the Registry publish run published the npm packages (and the PyPI module, if `PYPI_PUBLISHING` is set) from its plan job's decision, the Release build's service-container job passed, its "Helm chart on GHCR" job installed the chart from `oci://ghcr.io/shibbirweb/charts` without logging in, its "Docker Desktop extension on GHCR" job read the extension image back without logging in, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner. On the repository's Packages page, `sendmock`, `charts/sendmock` and `sendmock-docker-extension` are public; a package a workflow creates takes the repository's visibility, so if one is private, make it public in its settings and run the job again.
+
+The `sendmock` image package on GHCR was deleted on 2026-11-08 (it held the old `edge` images), so this release creates it again, possibly private. Check that anyone can pull the beta without logging in:
+
+1. Log out of GHCR on your machine:
+
+   ```sh
+   docker logout ghcr.io
+   ```
+
+2. Pull the beta from GHCR:
+
+   ```sh
+   docker pull ghcr.io/shibbirweb/sendmock:beta
+   ```
+
+3. Pull it from Docker Hub:
+
+   ```sh
+   docker pull shibbirweb/sendmock:beta
+   ```
+
+4. If the GHCR pull is denied, open GitHub > your profile > **Packages** > `sendmock` > **Package settings** > **Change visibility**, choose **Public**, and pull again.
 
 Then remove the notices that say there is no release yet, in a pull request to `develop`: the "Downloads start with the first beta" lines at the top of `docs/wiki/install.md` and `docs/wiki/getting-started.md`, the "Not released yet" line of `docs/wiki/index.md`, the "first beta is being prepared" paragraph of `README.md`, and the hero's "Not released yet" pill in `website/components/landing/hero-section.tsx`. The website's version banner, `llms.txt` and the changelog page follow the real releases by themselves.
 

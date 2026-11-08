@@ -18,7 +18,9 @@ pub use setting_choices::{
 };
 pub use settings_operations::{GetSettingsOperation, UpdateSettingsOperation};
 pub(crate) use settings_validation::validate_settings_update;
-pub use traffic_retention::{build_ingest_options, prune_traffic, read_ingest_options};
+pub use traffic_retention::{
+    build_ingest_options, list_unbounded_traffic, prune_traffic, read_ingest_options,
+};
 
 use crate::OperationRegistry;
 

@@ -49,16 +49,16 @@ fn validate_limits(update: &AppSettingsUpdate) -> Result<(), OperationError> {
     check_range(
         "max_emails",
         update.max_emails,
-        1,
+        0,
         1_000_000,
-        "Choose 1 to 1,000,000",
+        "Choose 0 (no limit) to 1,000,000",
     )?;
     check_range(
         "max_sms",
         update.max_sms,
-        1,
+        0,
         1_000_000,
-        "Choose 1 to 1,000,000",
+        "Choose 0 (no limit) to 1,000,000",
     )?;
     check_range(
         "max_age_days",
@@ -264,7 +264,7 @@ mod tests {
     fn numbers_out_of_range_name_their_field() {
         assert_field_error(
             AppSettingsUpdate {
-                max_emails: Some(0),
+                max_emails: Some(1_000_001),
                 ..AppSettingsUpdate::default()
             },
             "max_emails",

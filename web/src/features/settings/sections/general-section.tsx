@@ -10,10 +10,12 @@ import {
   SettingsSwitchRow,
 } from "@/features/settings/settings-fields";
 import { useSettingsSectionForm } from "@/features/settings/use-settings-section-form";
+import { RetentionLimitWarning } from "@/features/settings/sections/retention-limit-warning";
 import { useDeleteAllEmails } from "@/lib/api/hooks/use-email-queries";
 import { useDeleteAllSms } from "@/lib/api/hooks/use-sms-queries";
 import { useResetToSeed } from "@/lib/api/hooks/use-system-queries";
 import type { AppSettings } from "@/lib/api/types";
+import { listUnboundedTraffic } from "@/lib/settings/list-unbounded-traffic";
 
 const retentionKeys = ["max_emails", "max_sms", "max_age_days"] as const;
 const defaultMaxAgeDays = 7;
@@ -59,7 +61,7 @@ function RetentionCard({ appSettings }: { appSettings: AppSettings }) {
   return (
     <SettingsSectionCard
       title="Retention"
-      description="Older traffic is pruned when a limit is reached. Configuration is never pruned."
+      description="Older traffic is pruned when a limit is reached; zero means no limit. Configuration is never pruned."
       isDirty={sectionForm.isDirty}
       isSaving={sectionForm.isSaving}
       onSave={sectionForm.saveChanges}
@@ -106,6 +108,9 @@ function RetentionCard({ appSettings }: { appSettings: AppSettings }) {
           }}
         />
       )}
+      <RetentionLimitWarning
+        unboundedTraffic={listUnboundedTraffic(draftValues)}
+      />
     </SettingsSectionCard>
   );
 }

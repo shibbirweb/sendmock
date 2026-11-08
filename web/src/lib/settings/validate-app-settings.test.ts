@@ -56,13 +56,13 @@ describe("validateAppSettingsUpdate", () => {
   test("PL-05.2 rejects out-of-range numbers per field", () => {
     expect(
       validateAppSettingsUpdate({
-        max_emails: 0,
+        max_emails: 1_000_001,
         max_age_days: 5000,
         sms_failure_rate_percent: 120,
         chaos_smtp_command_latency_ms: -1,
       }),
     ).toEqual({
-      max_emails: "Choose 1 to 1,000,000",
+      max_emails: "Choose 0 (no limit) to 1,000,000",
       max_age_days: "Choose 1 to 3,650 days",
       sms_failure_rate_percent: "Choose 0 to 100%",
       chaos_smtp_command_latency_ms: "Choose 0 to 60,000 ms",

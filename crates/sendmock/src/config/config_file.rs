@@ -29,6 +29,7 @@ pub struct ConfigFile {
     pub smtp_starttls: Option<bool>,
     pub smtp_allow_rcpt: Option<String>,
     pub max_emails: Option<u64>,
+    pub max_sms: Option<u64>,
     pub max_age: Option<String>,
     pub update_check: Option<String>,
     pub spamassassin: Option<String>,

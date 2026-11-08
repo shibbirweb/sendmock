@@ -199,12 +199,14 @@ export type ChaosSmtpRejectCode = 421 | 450 | 550 | 552;
 
 export type AppSettings = {
   /**
-   * The most emails kept; the oldest are deleted past it.
+   * The most emails kept; the oldest are deleted past it. 0 keeps every email
+   * (no limit).
    * @example 1000
    */
   max_emails: number;
   /**
-   * The most SMS kept; the oldest are deleted past it.
+   * The most SMS kept (with verifications and push notifications); the oldest
+   * are deleted past it. 0 keeps every SMS (no limit).
    * @example 1000
    */
   max_sms: number;

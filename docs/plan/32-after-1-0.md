@@ -22,6 +22,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) |
 | A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) |
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
+| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -429,3 +430,19 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 **Order:** A14a (connections, starting with SMTP, SendGrid and Twilio, plus Send for real), then A14b (rules), then the remaining providers one by one.
 
 **Not in this part:** receiving real inbound messages from providers (a real Twilio number posting to SendMock is the inbound routes' job), WhatsApp and push to real devices, recipient confirmation by email as Mailtrap does (allowed lists are set by whoever manages the instance), and per-project connections.
+
+## A15. Docs traffic analytics with Google Analytics (WS-11)
+
+**Why (owner request, 2026-11-08, for later):** know how many people read the docs, which pages they read and where they come from, to decide what to write and improve next.
+
+**How others do it:** documentation sites usually load Google Analytics 4 with its `gtag.js` tag (Next.js has `@next/third-parties`, whose `GoogleAnalytics` component loads it after the page is interactive). Visitors in the EU and UK must agree before analytics cookies are set, which Google supports through Consent Mode v2: every storage type starts as `denied` and turns `granted` only on consent. Cookie-free tools (Plausible, Umami, GoatCounter, Cloudflare Web Analytics) need no banner; the owner chose Google Analytics, and they stay the fallback if the banner proves a burden.
+
+**How:**
+
+- **Only where it belongs:** the tag loads only when the build has a measurement ID (`NEXT_PUBLIC_GA_MEASUREMENT_ID`, a repository variable the Website workflow passes to the build), so local builds, pull request previews and forks send nothing. The owner creates the GA4 property and sets the variable.
+- **Consent first:** Consent Mode v2 starts `denied`; a small banner (shadcn, the site's design tokens, respecting reduced motion) asks once, the choice is remembered, and a footer link reopens it. Do Not Track and Global Privacy Control count as a no.
+- **What is sent:** page views with the path and the docs version (`/`, `/next/`, `/v0.x/`), including client-side navigation between pages, and outbound clicks on install commands' copy buttons as events. Nothing typed into the live demo or the API playground (bodies, tokens, addresses) is ever sent, and IP addresses are not stored beyond what GA4 does by default.
+- **Cost:** the script loads after the page is interactive and must keep the website's Lighthouse scores and budgets; the dependency is justified in the pull request.
+- **Privacy page:** a short page says what is collected, by whom, for how long and how to opt out; the footer and the README link it.
+
+**Not in this part:** analytics in the SendMock app itself (the web UI on users' machines never phones home), heatmaps and session recordings, and A/B tests.

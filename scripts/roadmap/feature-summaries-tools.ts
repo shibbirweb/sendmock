@@ -206,6 +206,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "Deeper docs: a page per screen explaining every control and text, kept true by a crawl of the UI.",
     outcome: 'Answer any "what does this button do" question from the docs.',
   },
+  "WS-11": {
+    summary:
+      "Google Analytics 4 on the docs website, behind a consent banner, counting page views per docs version and install-command copies.",
+    outcome:
+      "See how many people read the docs, which pages and from where, to decide what to improve next.",
+  },
   "PY-01": {
     summary:
       "Payment safety: only documented test cards are accepted, and no card number or CVC is ever stored.",

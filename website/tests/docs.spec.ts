@@ -222,6 +222,23 @@ test("hovering a docs sidebar icon shows its label", async ({ page }) => {
   await expect(tooltip).toHaveCSS("opacity", "1");
 });
 
+type FetchedTarget = { status: number; elementIds: Set<string> };
+
+/** The `id` attributes of a page's HTML, with the entities an id can hold decoded. */
+function readElementIds(pageHtml: string): Set<string> {
+  return new Set(
+    [...pageHtml.matchAll(/\sid="([^"]*)"/g)].map((idMatch) =>
+      (idMatch[1] ?? "")
+        .replaceAll("&quot;", '"')
+        .replaceAll("&#x27;", "'")
+        .replaceAll("&#39;", "'")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&amp;", "&"),
+    ),
+  );
+}
+
 test("WS-03.3 every internal link in the docs leads to a page and an existing anchor", async ({
   page,
 }) => {
@@ -229,6 +246,18 @@ test("WS-03.3 every internal link in the docs leads to a page and an existing an
   const pagesToVisit = ["/docs/"];
   const visitedPaths = new Set<string>();
   const brokenLinks: string[] = [];
+  // Every page links the whole sidebar, so each target is fetched once and its ids kept.
+  const fetchedTargets = new Map<string, Promise<FetchedTarget>>();
+  const fetchTarget = (targetPath: string): Promise<FetchedTarget> => {
+    const fetchedTarget =
+      fetchedTargets.get(targetPath) ??
+      page.request.get(targetPath).then(async (targetResponse) => ({
+        status: targetResponse.status(),
+        elementIds: readElementIds(await targetResponse.text()),
+      }));
+    fetchedTargets.set(targetPath, fetchedTarget);
+    return fetchedTarget;
+  };
 
   while (pagesToVisit.length > 0) {
     const pagePath = pagesToVisit.shift() ?? "";
@@ -266,30 +295,20 @@ test("WS-03.3 every internal link in the docs leads to a page and an existing an
         continue;
       }
       const [targetPath = "", targetAnchor] = linkTarget.split("#");
-      const targetResponse = await page.request.get(targetPath);
-      if (targetResponse.status() !== 200) {
+      const fetchedTarget = await fetchTarget(targetPath);
+      if (fetchedTarget.status !== 200) {
         brokenLinks.push(
-          `${pagePath} links to ${targetPath} (${targetResponse.status()})`,
+          `${pagePath} links to ${targetPath} (${fetchedTarget.status})`,
         );
         continue;
       }
-      if (targetAnchor !== undefined) {
-        const anchorExists = await page.evaluate(
-          async ({ path, anchor }) => {
-            const html = await (await fetch(path)).text();
-            return (
-              new DOMParser()
-                .parseFromString(html, "text/html")
-                .getElementById(anchor) !== null
-            );
-          },
-          { path: targetPath, anchor: targetAnchor },
+      if (
+        targetAnchor !== undefined &&
+        !fetchedTarget.elementIds.has(decodeURIComponent(targetAnchor))
+      ) {
+        brokenLinks.push(
+          `${pagePath} links to a missing #${targetAnchor} on ${targetPath}`,
         );
-        if (!anchorExists) {
-          brokenLinks.push(
-            `${pagePath} links to a missing #${targetAnchor} on ${targetPath}`,
-          );
-        }
       }
       if (targetPath.startsWith("/docs") && !visitedPaths.has(targetPath)) {
         pagesToVisit.push(targetPath);

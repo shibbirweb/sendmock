@@ -8,6 +8,7 @@ use crate::cli_arguments::ServeArguments;
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct StartupSettingsConfig {
     pub max_emails: Option<u64>,
+    pub max_sms: Option<u64>,
     pub max_age_days: Option<u32>,
     pub update_check_mode: Option<UpdateCheckMode>,
     /// `host:port` of a spamd, from `--spamassassin`.
@@ -53,6 +54,7 @@ impl StartupSettingsConfig {
         };
         Ok(Self {
             max_emails: serve_arguments.max_emails.or(config_file.max_emails),
+            max_sms: serve_arguments.max_sms.or(config_file.max_sms),
             max_age_days,
             update_check_mode,
             spamassassin_address: resolve_spamassassin_address(serve_arguments, config_file)?,
@@ -172,6 +174,7 @@ mod tests {
             retention_config.ok(),
             Some(StartupSettingsConfig {
                 max_emails: Some(50),
+                max_sms: None,
                 max_age_days: Some(3),
                 update_check_mode: None,
                 spamassassin_address: None,
@@ -179,6 +182,31 @@ mod tests {
                 relay_recipient_allowlist: None,
             })
         );
+    }
+
+    // AC: PL-08.3
+    #[test]
+    fn the_sms_limit_comes_from_the_flag_over_the_file() {
+        let from_flag = StartupSettingsConfig::resolve(
+            &ServeArguments {
+                max_sms: Some(0),
+                ..ServeArguments::default()
+            },
+            &ConfigFile {
+                max_sms: Some(300),
+                ..ConfigFile::default()
+            },
+        );
+        let from_file = StartupSettingsConfig::resolve(
+            &ServeArguments::default(),
+            &ConfigFile {
+                max_sms: Some(300),
+                ..ConfigFile::default()
+            },
+        );
+
+        assert_eq!(from_flag.ok().and_then(|config| config.max_sms), Some(0));
+        assert_eq!(from_file.ok().and_then(|config| config.max_sms), Some(300));
     }
 
     // AC: PL-05.10
