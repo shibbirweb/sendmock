@@ -244,7 +244,10 @@ test.describe("the quick start downloads", () => {
     await expect(downloads).toContainText("Or download the Windows binary:");
     await expect(
       downloads.getByRole("link", { name: "How to allow it" }),
-    ).toHaveCount(0);
+    ).toHaveAttribute(
+      "href",
+      /\/docs\/troubleshooting#windows-protected-your-pc$/,
+    );
     await expect(downloads.getByRole("link", { name: "x64" })).toHaveAttribute(
       "href",
       `${releaseUrl}/sendmock-x86_64-pc-windows-msvc.zip`,

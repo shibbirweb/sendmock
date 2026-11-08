@@ -18,7 +18,7 @@ export type InstallPlatform = {
   /** Docker publishes the ports, so the server binds every interface there. */
   listenHost: string;
   downloads: ManualDownload[];
-  /** Shown under the downloads; macOS needs one while its builds are not notarized. */
+  /** Shown under the downloads; macOS and Windows need one while their builds are not signed. */
   downloadNote: DownloadNote | null;
   /** What the runner needs on the computer first (Node.js for npx, Bun for bunx), or null. */
   requirement: PlatformRequirement | null;
@@ -117,7 +117,11 @@ export const installPlatforms: InstallPlatform[] = [
       },
     ],
     requirement: null,
-    downloadNote: null,
+    downloadNote: {
+      text: "Downloaded with a browser? Windows may ask once before it runs an unsigned program.",
+      linkLabel: "How to allow it",
+      docsPath: "/docs/troubleshooting#windows-protected-your-pc",
+    },
   },
   {
     key: "linux",
