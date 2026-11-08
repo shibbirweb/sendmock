@@ -69,13 +69,25 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
+      # No registry-url: setup-node would write an `_authToken=${NODE_AUTH_TOKEN}` line, and an
+      # empty one makes npm skip the OIDC exchange.
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
 
       - name: npm with trusted publishing
         run: npm install -g npm@11
+
+      # npm sets a trusted publisher only on an existing package, so the first beta publishes
+      # with NPM_TOKEN; once the owner has set the trusted publishers and deleted the secret, no
+      # token is written and npm uses OIDC.
+      - name: The first publish's token, while NPM_TOKEN is set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            npm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+          fi
 
       - name: The release's archives, from the run that built and tested them
         uses: actions/download-artifact@v7
@@ -186,10 +198,17 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
 
       - name: npm with trusted publishing
         run: npm install -g npm@11
+
+      - name: The first publish's token, while NPM_TOKEN is set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            npm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+          fi
 
       - name: Build and publish
         working-directory: testcontainers/node

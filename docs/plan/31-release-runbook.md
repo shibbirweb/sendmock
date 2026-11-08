@@ -37,6 +37,7 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 | Secret | What it is | Without it |
 |--------|------------|------------|
 | `RELEASE_TOKEN` | A fine-grained token with contents and pull request write on this repository | The release and promote pull requests do not start CI by themselves |
+| `NPM_TOKEN` | An npm granular access token with read and write on all packages, for the first beta only (npm sets a trusted publisher only on a package that exists); delete it once the trusted publishers are set (step 6) | The first beta cannot create the npm packages |
 | `DOCKERHUB_USERNAME` | The Docker Hub user | The image is only on GHCR |
 | `DOCKERHUB_TOKEN` | A Docker Hub access token | The image is only on GHCR |
 | `HOMEBREW_TAP_TOKEN` | A token with contents write on `shibbirweb/homebrew-tap` | No Homebrew formula |
@@ -61,7 +62,7 @@ gpg --quick-gen-key "SendMock packages" ed25519 sign never
 gpg --armor --export-secret-keys "SendMock packages" | gh secret set PACKAGES_GPG_PRIVATE_KEY --repo shibbirweb/sendmock
 ```
 
-npm, PyPI and crates.io publish through trusted publishing, all from one top-level workflow, `registry-publish.yml` (registries cannot trust a called workflow, [30](30-phase-5.md) W18): on each registry, add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher of every package (on npm: `sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`; on PyPI: `sendmock-testcontainers`, as a pending publisher; on crates.io: every workspace crate), then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
+npm, PyPI and crates.io publish through trusted publishing, all from one top-level workflow, `registry-publish.yml`. npm is the exception for the first beta only: its packages do not exist yet and npm sets a trusted publisher only on an existing package, so set `NPM_TOKEN` and `NPM_PUBLISHING` now and the npm trusted publishers after the first beta (step 6) (registries cannot trust a called workflow, [30](30-phase-5.md) W18): on PyPI (`sendmock-testcontainers`, as a pending publisher) and crates.io (every workspace crate), add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher, then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
 
 ```sh
 gh variable set NPM_PUBLISHING --body true --repo shibbirweb/sendmock
@@ -118,6 +119,12 @@ gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=0.1.0
 ```
 
 Check: the Registry publish run published the npm packages (and the PyPI module, if `PYPI_PUBLISHING` is set) from its plan job's decision, the Release build's service-container job passed, its "Helm chart on GHCR" job installed the chart from `oci://ghcr.io/shibbirweb/charts` without logging in, its "Docker Desktop extension on GHCR" job read the extension image back without logging in, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner. On the repository's Packages page, `sendmock`, `charts/sendmock` and `sendmock-docker-extension` are public; a package a workflow creates takes the repository's visibility, so if one is private, make it public in its settings and run the job again.
+
+Then move npm to trusted publishing: on each of the eight npm packages (`sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`), open **Settings > Trusted Publisher**, choose GitHub Actions, and enter `shibbirweb`, `sendmock`, `registry-publish.yml` and no environment; then delete the token:
+
+```sh
+gh secret delete NPM_TOKEN --repo shibbirweb/sendmock
+```
 
 Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5, DS-03.8
 

@@ -100,6 +100,19 @@ describe("the Registry publish workflow", () => {
     }
   });
 
+  test("DS-03.8 npm uses OIDC unless the first publish's NPM_TOKEN is set", () => {
+    for (const jobName of ["npm", "testcontainers-node"]) {
+      const jobSteps = registryWorkflow.jobs[jobName]?.steps ?? [];
+      const setupNode = jobSteps.find((step) => step.uses?.startsWith("actions/setup-node@"));
+      const runText = jobSteps.map((step) => step.run ?? "").join("\n");
+
+      // An empty `_authToken=${NODE_AUTH_TOKEN}` line from registry-url makes npm skip OIDC.
+      expect(setupNode?.with?.["registry-url"], jobName).toBeUndefined();
+      expect(runText, jobName).toContain('if [ -n "$NPM_TOKEN" ]; then');
+      expect(runText, jobName).toContain("npm install -g npm@11");
+    }
+  });
+
   test("DS-03.8 downloads the release's own artifacts from the run that built them", () => {
     const artifactDownloads = Object.values(registryWorkflow.jobs)
       .flatMap((job) => job.steps ?? [])
