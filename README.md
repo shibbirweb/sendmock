@@ -54,6 +54,38 @@ The first beta is being prepared. Until it is published, try the [live demo](htt
 
 SendMock listens on `127.0.0.1` only, so nothing outside your machine can reach it. `sendmock --demo` starts it with sample data to look around, `sendmock --help` lists the flags, and `sendmock help --all` every command.
 
+## Send your first message
+
+Each example shows up in the web UI at once.
+
+**Email over SMTP**, the way most apps and mail libraries send:
+
+```bash
+printf 'From: app@example.com\r\nTo: user@example.com\r\nSubject: Your code is 482913\r\n\r\nWelcome!\r\n' | curl -s smtp://127.0.0.1:1025 --mail-from app@example.com --mail-rcpt user@example.com -T -
+```
+
+**Email over the REST API:**
+
+```bash
+curl -s http://127.0.0.1:8025/api/v1/send -H "Content-Type: application/json" -d '{"from": "app@example.com", "to": ["user@example.com"], "subject": "Welcome", "html": "<p>Your code is <b>482913</b></p>"}'
+```
+
+**SMS over the REST API:**
+
+```bash
+curl -s http://127.0.0.1:8025/api/v1/sms -H "Content-Type: application/json" -d '{"from": "+15550001111", "to": "+15550002222", "body": "Your code is 482913"}'
+```
+
+**Through your provider's SDK:** keep your Twilio, Vonage, SendGrid, Mailgun, Postmark, Resend, SES, Stripe, FCM or Expo code and change its base URL to `http://127.0.0.1:8025/providers/<provider>`, for example `http://127.0.0.1:8025/providers/twilio`.
+
+For more, see the docs:
+
+- [Email](https://shibbirweb.github.io/sendmock/docs/mail/): attachments, outcomes such as bounces, replies, and the provider APIs.
+- [SMS](https://shibbirweb.github.io/sendmock/docs/sms/): Twilio and Vonage SDKs, delivery status, test numbers and replies.
+- [Push notifications](https://shibbirweb.github.io/sendmock/docs/push/), [payments](https://shibbirweb.github.io/sendmock/docs/payments/) and [webhooks](https://shibbirweb.github.io/sendmock/docs/webhooks/).
+- [Providers](https://shibbirweb.github.io/sendmock/docs/providers/): every emulated provider API and its base URL.
+- [REST API reference](https://shibbirweb.github.io/sendmock/api/): every endpoint, with a playground.
+
 ## Use it from an AI agent
 
 SendMock ships an MCP server and a skill, so an agent in Claude Code, Codex, Cursor, Gemini CLI or VS Code can read the codes your app sent, set up webhooks and check what happened:
@@ -93,10 +125,6 @@ You need [Rust](https://rustup.rs) and [Bun](https://bun.sh).
    ```
 
 3. Open <http://127.0.0.1:8025>.
-
-## Project status
-
-Every feature planned for 1.0 is built and tested in CI; the first beta and then 1.0 follow the [release runbook](docs/plan/31-release-runbook.md). Progress is tracked in [docs/plan/PROGRESS.md](docs/plan/PROGRESS.md) and on the [roadmap](https://github.com/shibbirweb/sendmock/issues/170).
 
 ## Contributing
 
