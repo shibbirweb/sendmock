@@ -1,0 +1,44 @@
+title: "[Show] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Show how you use SendMock: a test setup, a CI pipeline, a seed file, a webhook template or an AI agent workflow. Others learn from real setups.
+  - type: textarea
+    id: what
+    attributes:
+      label: What you built
+      description: A sentence or two on what it does and why.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it works
+      description: The setup, a code snippet, a config file or screenshots. Remove secrets first.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which parts of SendMock it uses
+      multiple: true
+      options:
+        - Email
+        - SMS and Verify
+        - WhatsApp
+        - Push notifications
+        - Payments
+        - Webhooks
+        - HTTP catcher
+        - CLI
+        - REST API
+        - MCP and AI agents
+        - Docker, CI or Kubernetes
+        - Seed files and scenarios
+        - Other
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: A repository, blog post or video, if you have one.

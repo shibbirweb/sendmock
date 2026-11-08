@@ -1,0 +1,56 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Ideas with a clear problem and real use get built first.
+
+        - Check the [roadmap](https://github.com/shibbirweb/sendmock/issues/170) and the existing ideas; upvote one that matches instead of opening a new one.
+        - Asking for a new provider API? Reply on [Which provider should SendMock emulate next?](https://github.com/shibbirweb/sendmock/discussions/192), or use the [provider request form](https://github.com/shibbirweb/sendmock/issues/new?template=provider_request.yml).
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is hard or impossible today, and when do you run into it?
+      placeholder: When I test password resets in CI, I cannot ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like
+      description: How it could work in the web UI, the CLI, the REST API or MCP. Rough is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today instead
+      description: Workarounds, scripts or other tools you use for this now.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      multiple: true
+      options:
+        - Email
+        - SMS and Verify
+        - WhatsApp
+        - Push notifications
+        - Payments
+        - Webhooks
+        - HTTP catcher
+        - Web UI
+        - CLI
+        - REST API
+        - MCP and AI agents
+        - Install and distribution
+        - Docs and website
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: references
+    attributes:
+      label: Links
+      description: Provider API docs, a similar tool, or a related issue.
