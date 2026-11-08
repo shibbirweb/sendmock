@@ -1,9 +1,9 @@
-# Publishes the Testcontainers modules under the release's version (DS-06, plan 30 W3b). Release
-# build calls it after the GitHub release is published. Each registry is skipped until the
-# owner sets it up: npm and PyPI with trusted publishing (the repository variables
-# NPM_PUBLISHING and PYPI_PUBLISHING), NuGet with NUGET_API_KEY, Maven Central with
+# Publishes the Testcontainers modules that use stored secrets under the release's version
+# (DS-06, plan 30 W3b). Release build calls it after the GitHub release is published. Each
+# registry is skipped until the owner sets it up: NuGet with NUGET_API_KEY, Maven Central with
 # MAVEN_CENTRAL_USERNAME, MAVEN_CENTRAL_TOKEN and MAVEN_SIGNING_KEY. The Go module needs no
-# registry: its tag is enough for `go get`.
+# registry: its tag is enough for `go get`. The npm and PyPI modules use trusted publishing,
+# so they publish from registry-publish.yml, a top-level workflow (plan 30 W18).
 name: Testcontainers publish
 
 on:
@@ -23,54 +23,6 @@ permissions:
   contents: read
 
 jobs:
-  node:
-    name: npm (sendmock-testcontainers)
-    if: vars.NPM_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ inputs.commit_sha }}
-      - uses: oven-sh/setup-bun@v2
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-      - name: npm with trusted publishing
-        run: npm install -g npm@11
-      - name: Build and publish
-        working-directory: testcontainers/node
-        run: |
-          bun install
-          bun run build
-          npm publish --access public --tag "${{ inputs.channel == 'beta' && 'beta' || 'latest' }}"
-
-  python:
-    name: PyPI (sendmock-testcontainers)
-    if: vars.PYPI_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ inputs.commit_sha }}
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-      - name: Build the wheel and the source archive
-        working-directory: testcontainers/python
-        run: |
-          pip install --quiet build
-          python -m build
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: testcontainers/python/dist
-
   dotnet:
     name: NuGet (SendMock.Testcontainers)
     runs-on: ubuntu-latest

@@ -101,7 +101,7 @@ jobs:
         with:
           name: release-web-dist
           path: web/dist
-          retention-days: 1
+          retention-days: 7
 
   build:
     name: Build ${{ matrix.target }}
@@ -883,80 +883,6 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: ${manifest_name} ${VERSION}"
           git push
 
-  # The npm packages with npm trusted publishing (GitHub OIDC, no stored token), when the owner
-  # has set the repository variable NPM_PUBLISHING to true after linking the packages to this
-  # workflow on npm (DS-03.1).
-  npm:
-    name: npm packages
-    needs: [plan, publish]
-    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable') && vars.NPM_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
-
-      - uses: oven-sh/setup-bun@v2
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-
-      - name: npm with trusted publishing
-        run: npm install -g npm@11
-
-      - uses: actions/download-artifact@v7
-        with:
-          name: release-files
-          path: dist
-
-      - name: Publish the platform packages, then the launcher
-        env:
-          VERSION: ${{ needs.plan.outputs.version }}
-        run: |
-          dist_tag="latest"
-          if [ "$RELEASE_CHANNEL" = "beta" ]; then dist_tag="beta"; fi
-          bun scripts/release/npm-packages.ts "$VERSION" dist npm-packages
-          for package_directory in npm-packages/*/; do
-            if [ "$(basename "$package_directory")" != "sendmock" ]; then
-              npm publish "$package_directory" --access public --tag "$dist_tag"
-            fi
-          done
-          npm publish npm-packages/sendmock --access public --tag "$dist_tag"
-
-  # The server in the official MCP registry for a stable, once the npm package and the image it
-  # names are published (the registry checks both claim its name); GitHub OIDC proves the
-  # io.github.shibbirweb namespace, so no token is kept (AI-05.6).
-  mcp-registry:
-    name: MCP registry
-    needs: [plan, npm, docker]
-    if: inputs.publish && inputs.channel == 'stable'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
-
-      - uses: ./.github/actions/install-mcp-publisher
-
-      - name: server.json names this release
-        env:
-          VERSION: ${{ needs.plan.outputs.version }}
-        run: |
-          grep -q "ghcr.io/shibbirweb/sendmock:$VERSION\"" server.json
-
-      - name: Publish to the MCP registry
-        run: |
-          mcp-publisher login github-oidc
-          mcp-publisher publish server.json
-
   # The Testcontainers modules under the release's version, each registry once the owner sets
   # it up (DS-06, plan 30 W3b).
   testcontainers:
@@ -964,48 +890,12 @@ jobs:
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     permissions:
       contents: write
-      id-token: write
     uses: ./.github/workflows/testcontainers-publish.yml
     secrets: inherit
     with:
       commit_sha: ${{ inputs.commit_sha || github.sha }}
       version: ${{ needs.plan.outputs.version }}
       channel: ${{ inputs.channel }}
-
-  # The crates on crates.io for a stable, with crates.io trusted publishing (GitHub OIDC, no
-  # stored token), when the owner has set the repository variable CRATES_PUBLISHING to true
-  # after adding this workflow as each crate's trusted publisher (DS-03.1).
-  crates-publish:
-    name: crates.io
-    needs: [plan, publish]
-    if: inputs.publish && inputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
-
-      - uses: actions/download-artifact@v7
-        with:
-          name: release-web-dist
-          path: web/dist
-
-      - name: Toolchain
-        run: rustup toolchain install
-
-      - name: Put the UI and the skill inside the crates that embed them
-        run: sh scripts/release/stage-crate-files.sh
-
-      - uses: rust-lang/crates-io-auth-action@v1
-        id: crates-io-auth
-
-      - name: Publish every crate in dependency order
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
-        run: cargo publish --workspace --locked --allow-dirty
 
   # A stable on WinGet: wingetcreate opens the pull request to microsoft/winget-pkgs from the
   # owner's fork, when WINGET_TOKEN is set (DS-03.4).

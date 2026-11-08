@@ -36,6 +36,7 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 - [x] DS-03.5 From 1.0 the AUR (`sendmock-bin`, `sendmock-beta-bin`), COPR and Nixpkgs packages follow each release and install a working binary. (#48)
 - [x] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow. (#48)
 - [ ] DS-03.7 (added 2026-11-07, owner request) `npx sendmock` runs the stable and `npx sendmock@beta` the beta with no install first, on macOS, Linux and Windows, and so do `bunx sendmock`, `pnpm dlx sendmock` and `yarn dlx sendmock`; the install page shows them as their own way to run SendMock, the release workflow runs it from the packed packages before publishing, and the Install channels workflow runs the published package through test cases 2 to 8.
+- [ ] DS-03.8 (added 2026-11-08, owner request) npm, PyPI and crates.io are published from one top-level workflow, `registry-publish.yml`, the only workflow registered as their trusted publisher; it runs after a beta or stable release and publishes only when that run published the release.
 
 ## DS-04 Release workflows
 

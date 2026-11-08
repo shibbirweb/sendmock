@@ -45,9 +45,17 @@ describe("Testcontainers publish", () => {
       "dotnet",
       "go",
       "java",
-      "node",
-      "python",
     ]);
+    // npm and PyPI use trusted publishing, which only works from a top-level workflow.
+    const registryJobNames = Object.keys(
+      (
+        Bun.YAML.parse(
+          readFileSync(".github/workflows/registry-publish.yml", "utf8"),
+        ) as { jobs: Record<string, unknown> }
+      ).jobs,
+    );
+    expect(registryJobNames).toContain("testcontainers-node");
+    expect(registryJobNames).toContain("testcontainers-python");
     expect(readFileSync(".github/workflows/release.yml", "utf8")).toContain(
       "uses: ./.github/workflows/testcontainers-publish.yml",
     );

@@ -200,7 +200,7 @@ describe("Docker edge", () => {
   });
 
   test("AI-05.6 a published stable goes to the MCP registry after the npm package and the image", () => {
-    const releaseJobs = readWorkflow("release.yml").jobs as Record<
+    const registryJobs = readWorkflow("registry-publish.yml").jobs as Record<
       string,
       {
         if?: string;
@@ -209,19 +209,21 @@ describe("Docker edge", () => {
         steps?: { uses?: string; run?: string }[];
       }
     >;
-    const registryJob = releaseJobs["mcp-registry"];
+    const registryJob = registryJobs["mcp-registry"];
+    const registryRunText = registryJob?.steps
+      ?.map((step) => step.run ?? "")
+      .join("\n");
 
     expect(registryJob?.if).toBe(
-      "inputs.publish && inputs.channel == 'stable'",
+      "needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'",
     );
-    expect(registryJob?.needs).toEqual(["plan", "npm", "docker"]);
+    expect(registryJob?.needs).toEqual(["plan", "npm"]);
     expect(registryJob?.permissions?.["id-token"]).toBe("write");
     expect(registryJob?.steps?.map((step) => step.uses ?? "")).toContain(
       "./.github/actions/install-mcp-publisher",
     );
-    expect(
-      registryJob?.steps?.map((step) => step.run ?? "").join("\n"),
-    ).toContain("mcp-publisher login github-oidc");
+    expect(registryRunText).toContain("docker buildx imagetools inspect");
+    expect(registryRunText).toContain("mcp-publisher login github-oidc");
   });
 });
 

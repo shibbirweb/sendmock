@@ -61,7 +61,7 @@ gpg --quick-gen-key "SendMock packages" ed25519 sign never
 gpg --armor --export-secret-keys "SendMock packages" | gh secret set PACKAGES_GPG_PRIVATE_KEY --repo shibbirweb/sendmock
 ```
 
-npm, PyPI and crates.io publish through trusted publishing: on each registry, add this repository's `release.yml` (and `testcontainers-publish.yml` for npm and PyPI) as a trusted publisher, then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
+npm, PyPI and crates.io publish through trusted publishing, all from one top-level workflow, `registry-publish.yml` (registries cannot trust a called workflow, [30](30-phase-5.md) W18): on each registry, add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher of every package (on npm: `sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`; on PyPI: `sendmock-testcontainers`, as a pending publisher; on crates.io: every workspace crate), then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
 
 ```sh
 gh variable set NPM_PUBLISHING --body true --repo shibbirweb/sendmock
@@ -109,17 +109,17 @@ Then open the release pull request:
 gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=minor -f dry_run=false
 ```
 
-Merge the release pull request once its CI passes. Publish beta then tags the version and runs the Release build, which publishes every channel whose secret is set.
+Merge the release pull request once its CI passes. Publish beta then tags the version and runs the Release build, which publishes every channel whose secret is set; when it finishes, Registry publish sends the release to npm and PyPI.
 
-When the release is out, install it through the channels that publish at once (replace `0.1.0-beta.1` with the version):
+When Registry publish has finished, install the release through the channels that publish at once (replace `0.1.0-beta.1` with the version):
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=0.1.0-beta.1 -f channel=beta -f channels=after-publish
 ```
 
-Check: the Release build's service-container job passed, its "Helm chart on GHCR" job installed the chart from `oci://ghcr.io/shibbirweb/charts` without logging in, its "Docker Desktop extension on GHCR" job read the extension image back without logging in, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner. On the repository's Packages page, `sendmock`, `charts/sendmock` and `sendmock-docker-extension` are public; a package a workflow creates takes the repository's visibility, so if one is private, make it public in its settings and run the job again.
+Check: the Registry publish run published the npm packages (and the PyPI module, if `PYPI_PUBLISHING` is set) from its plan job's decision, the Release build's service-container job passed, its "Helm chart on GHCR" job installed the chart from `oci://ghcr.io/shibbirweb/charts` without logging in, its "Docker Desktop extension on GHCR" job read the extension image back without logging in, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner. On the repository's Packages page, `sendmock`, `charts/sendmock` and `sendmock-docker-extension` are public; a package a workflow creates takes the repository's visibility, so if one is private, make it public in its settings and run the job again.
 
-Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5
+Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5, DS-03.8
 
 ## 7. Publish 1.0.0
 
@@ -127,7 +127,7 @@ Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5
 gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=major -f dry_run=false
 ```
 
-Merge the release pull request, then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build, publishes the website's 1.0 docs at `/` and the MCP registry entry. Install it right away:
+Merge the release pull request, then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build and publishes the website's 1.0 docs at `/`; when it finishes, Registry publish sends the release to npm, PyPI and crates.io and publishes the MCP registry entry. Once Registry publish has finished, install it:
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0 -f channel=stable -f channels=after-publish
