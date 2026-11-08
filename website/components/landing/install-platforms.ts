@@ -1,4 +1,5 @@
 import type { ManualDownload } from "./manual-download-links";
+import type { PlatformRequirement } from "./platform-requirement-note";
 
 export const sendmockReleasesUrl =
   "https://github.com/shibbirweb/sendmock/releases";
@@ -17,6 +18,8 @@ export type InstallPlatform = {
   /** Docker publishes the ports, so the server binds every interface there. */
   listenHost: string;
   downloads: ManualDownload[];
+  /** What the runner needs on the computer first (Node.js for npx, Bun for bunx), or null. */
+  requirement: PlatformRequirement | null;
 };
 
 /** The native installs all leave one `sendmock` binary on the PATH. */
@@ -27,10 +30,48 @@ const binaryPlatformRun = {
 };
 
 /**
- * One install command per platform, then the command that starts the server.
- * Archive names follow docs/plan/09-distribution.md (Release archives).
+ * One install command per platform, then the command that starts the server. The runners that
+ * need no install lead, and npx is the tab every visitor sees first. Archive names follow
+ * docs/plan/09-distribution.md (Release archives).
  */
 export const installPlatforms: InstallPlatform[] = [
+  {
+    key: "npx",
+    label: "npx",
+    prompt: "$",
+    installCommand: "npx sendmock",
+    installedMessage: "✔ Fetched into npm's cache, no install",
+    runCommand: null,
+    listenHost: "127.0.0.1",
+    downloads: [],
+    requirement: {
+      name: "Node.js 18 or newer",
+      url: "https://nodejs.org/en/download",
+    },
+  },
+  {
+    key: "bunx",
+    label: "bunx",
+    prompt: "$",
+    installCommand: "bunx sendmock",
+    installedMessage: "✔ Fetched into Bun's cache, no install",
+    runCommand: null,
+    listenHost: "127.0.0.1",
+    downloads: [],
+    requirement: { name: "Bun", url: "https://bun.sh/docs/installation" },
+  },
+  {
+    key: "docker",
+    label: "Docker",
+    prompt: "$",
+    installCommand: "docker pull ghcr.io/shibbirweb/sendmock",
+    installedMessage: "✔ Pulled ghcr.io/shibbirweb/sendmock:latest",
+    runCommand:
+      "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
+    listenHost: "0.0.0.0",
+    downloads: [],
+    requirement: null,
+  },
   {
     key: "macos",
     label: "macOS",
@@ -47,6 +88,7 @@ export const installPlatforms: InstallPlatform[] = [
         archiveFileName: "sendmock-x86_64-apple-darwin.tar.gz",
       },
     ],
+    requirement: null,
   },
   {
     key: "windows",
@@ -64,6 +106,7 @@ export const installPlatforms: InstallPlatform[] = [
         archiveFileName: "sendmock-aarch64-pc-windows-msvc.zip",
       },
     ],
+    requirement: null,
   },
   {
     key: "linux",
@@ -81,36 +124,6 @@ export const installPlatforms: InstallPlatform[] = [
         archiveFileName: "sendmock-aarch64-unknown-linux-musl.tar.gz",
       },
     ],
-  },
-  {
-    key: "docker",
-    label: "Docker",
-    prompt: "$",
-    installCommand: "docker pull ghcr.io/shibbirweb/sendmock",
-    installedMessage: "✔ Pulled ghcr.io/shibbirweb/sendmock:latest",
-    runCommand:
-      "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
-    listenHost: "0.0.0.0",
-    downloads: [],
-  },
-  {
-    key: "npx",
-    label: "npx",
-    prompt: "$",
-    installCommand: "npx sendmock",
-    installedMessage: "✔ Fetched into npm's cache, no install",
-    runCommand: null,
-    listenHost: "127.0.0.1",
-    downloads: [],
-  },
-  {
-    key: "bunx",
-    label: "bunx",
-    prompt: "$",
-    installCommand: "bunx sendmock",
-    installedMessage: "✔ Fetched into Bun's cache, no install",
-    runCommand: null,
-    listenHost: "127.0.0.1",
-    downloads: [],
+    requirement: null,
   },
 ];

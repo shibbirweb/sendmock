@@ -1,9 +1,7 @@
 "use client";
 
 import { SparklesIcon } from "lucide-react";
-import { useEffect } from "react";
 
-import { detectOperatingSystem } from "@/lib/detect-operating-system";
 import { cn } from "@/lib/utils";
 
 import { AiInstallLinks, AiInstallPromptWindow } from "./ai-install-panel";
@@ -14,6 +12,7 @@ import {
   InstallTerminalPlaceholder,
 } from "./install-terminal";
 import { ManualDownloadLinks } from "./manual-download-links";
+import { PlatformRequirementNote } from "./platform-requirement-note";
 import { quickStartSectionId } from "./quick-start-link";
 import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
@@ -38,17 +37,6 @@ export function QuickStartSection({
   const selectedPlatform =
     installPlatforms[selectedIndex] ?? installPlatforms[0];
 
-  // The site is static, so the visitor's system is known only in the browser.
-  useEffect(() => {
-    const visitorPlatformIndex = installPlatforms.findIndex(
-      (installPlatform) =>
-        installPlatform.key === detectOperatingSystem(navigator.userAgent),
-    );
-    if (visitorPlatformIndex !== -1) {
-      setSelectedIndex(visitorPlatformIndex);
-    }
-  }, [setSelectedIndex]);
-
   return (
     <section
       id={quickStartSectionId}
@@ -59,7 +47,7 @@ export function QuickStartSection({
         headingId="quick-start-heading"
         eyebrow="Quick start"
         title="Install and run"
-        description="One binary for macOS, Windows and Linux, or a Docker image, or let your AI agent install it. Running in under a minute."
+        description="Run it with npx or bunx, use Docker, install one binary for macOS, Windows or Linux, or let your AI agent install it. Running in under a minute."
         className="mb-4"
       />
       <div
@@ -160,6 +148,15 @@ export function QuickStartSection({
               />
             ) : null,
           )}
+          {installPlatforms.map((installPlatform) =>
+            installPlatform.requirement !== null ? (
+              <PlatformRequirementNote
+                key={`${installPlatform.key}-requirement`}
+                requirement={installPlatform.requirement}
+                className={cn("invisible", stackedInGridCellClassName)}
+              />
+            ) : null,
+          )}
           {installPrompt !== null && (
             <AiInstallLinks
               isSelected={isAiTabSelected}
@@ -174,6 +171,16 @@ export function QuickStartSection({
               <ManualDownloadLinks
                 platformLabel={selectedPlatform.label}
                 downloads={selectedPlatform.downloads}
+              />
+            </div>
+          ) : null}
+          {!isAiTabSelected && selectedPlatform.requirement !== null ? (
+            <div
+              data-testid="quick-start-requirement"
+              className={stackedInGridCellClassName}
+            >
+              <PlatformRequirementNote
+                requirement={selectedPlatform.requirement}
               />
             </div>
           ) : null}
