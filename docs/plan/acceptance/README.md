@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 8 / 108 features, 142 / 497 criteria ticked.** The eight U3 gate features are `UI done` since the sign-off on 2026-10-29.
+**Accepted: 113 / 120 features, 562 / 570 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files. UI-07 is still `UI done` from the U3 sign-off on 2026-10-29; its last criterion waits for the owner's review of two screens.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|

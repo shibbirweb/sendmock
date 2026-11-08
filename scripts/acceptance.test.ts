@@ -2,8 +2,11 @@ import { describe, expect, test } from "bun:test";
 
 import {
   collectCriterionReferences,
+  countTickedCriteria,
+  formatStatusLine,
   parseAcceptanceFile,
   parseFeatureStatuses,
+  readStatusLine,
 } from "./acceptance";
 
 describe("parseAcceptanceFile", () => {
@@ -57,5 +60,38 @@ describe("collectCriterionReferences", () => {
     ]);
 
     expect([...(references.get("EM-01.3") ?? [])]).toEqual(["a.rs", "b.test.ts"]);
+  });
+});
+
+describe("the README's status line", () => {
+  test("counts only ticked criteria", () => {
+    expect(
+      countTickedCriteria(
+        ["- [x] EM-01.1 Stored. (#1)", "- [ ] EM-01.2 Catch-all.", "- [x] EM-01.3 Big mail."].join(
+          "\n",
+        ),
+      ),
+    ).toBe(2);
+  });
+
+  test("reads the bold line and formats the one the totals call for", () => {
+    const readmeContent = [
+      "## Status",
+      "",
+      "**Accepted: 2 / 3 features, 7 / 9 criteria ticked.** Some note.",
+    ].join("\n");
+
+    expect(readStatusLine(readmeContent)).toBe(
+      "**Accepted: 2 / 3 features, 7 / 9 criteria ticked.**",
+    );
+    expect(
+      formatStatusLine({
+        acceptedFeatureCount: 2,
+        featureCount: 3,
+        tickedCriterionCount: 7,
+        criterionCount: 9,
+      }),
+    ).toBe("**Accepted: 2 / 3 features, 7 / 9 criteria ticked.**");
+    expect(readStatusLine("## Status\n\nNo totals here.")).toBeNull();
   });
 });
