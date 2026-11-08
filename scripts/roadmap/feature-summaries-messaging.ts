@@ -411,4 +411,28 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Run SendMock natively or behind a load balancer and still have its logs and health where operators look.",
   },
+  "PL-14": {
+    summary:
+      "Optional accounts: each person signs in as themselves, with personal and service tokens and an audit log of who did what.",
+    outcome:
+      "Share one SendMock across a team without a shared password, and know who changed what.",
+  },
+  "PL-15": {
+    summary:
+      "Admin, Developer and Viewer roles, enforced once per operation across the UI, REST, CLI and MCP.",
+    outcome:
+      "Give QA and product owners a read-only seat, and keep instance settings to the people who run it.",
+  },
+  "PL-16": {
+    summary:
+      "Named connections to real email and SMS providers (SMTP, SendGrid, Mailgun, SES, Postmark, Resend, Twilio, Vonage and more), each with its own allowed and blocked recipients, and Send for real on any email or SMS.",
+    outcome:
+      "Get one real copy of a caught message to a real inbox or phone through the provider you choose, never to anyone you did not allow.",
+  },
+  "PL-17": {
+    summary:
+      "Forwarding rules for email and SMS: match messages by project, sender, recipient, content or provider, then forward to their recipients or redirect to fixed ones, with caps, retries and a dry run.",
+    outcome:
+      "Route the messages that matter, such as every OTP to the tester's phone, to real people automatically while everything else stays caught.",
+  },
 };

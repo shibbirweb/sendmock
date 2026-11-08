@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 114 / 123 features, 562 / 593 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 114 / 127 features, 562 / 625 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -132,6 +132,10 @@ On top of its own criteria, a feature is done only when:
 | [PL-11](04-catcher-platform.md#pl-11-prometheus-metrics) | Prometheus metrics | After 1.0 (A12a) | 10 | Not started |
 | [PL-12](04-catcher-platform.md#pl-12-opentelemetry-export) | OpenTelemetry export | After 1.0 (A12b) | 7 | Not started |
 | [PL-13](04-catcher-platform.md#pl-13-log-files-and-readiness) | Log files and readiness | After 1.0 (A12c) | 5 | Not started |
+| [PL-14](04-catcher-platform.md#pl-14-accounts-and-login) | Accounts and login | After 1.0 (A13a) | 10 | Not started |
+| [PL-15](04-catcher-platform.md#pl-15-roles-admin-developer-viewer) | Roles: Admin, Developer, Viewer | After 1.0 (A13b) | 7 | Not started |
+| [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | After 1.0 (A14a) | 7 | Not started |
+| [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | After 1.0 (A14b) | 8 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |

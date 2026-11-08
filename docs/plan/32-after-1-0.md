@@ -20,6 +20,8 @@ Smallest change with the most users first; items that need an outside party (a d
 | A10 | Helm chart and Docker Desktop extension | #162 | to be written |
 | A11 | Official distribution repositories | #169 | needs maintainers ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) |
 | A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) |
+| A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) |
+| A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -353,3 +355,77 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 **Order:** A12a, then A12c (small and independent), then A12b (the largest, and it reuses A12a's families and A12c's log fields).
 
 **Not in this part:** a separate metrics listener, StatsD and Graphite (the OpenTelemetry Collector translates OTLP to both), OTLP over gRPC, histograms of SMTP and API latency (traces carry durations; added if asked), per-project metric labels, and alerting rules (left to each team; the docs give two examples).
+
+## A13. Accounts, login and roles: Admin, Developer, Viewer (PL-14, PL-15)
+
+**Why (owner request, 2026-11-08, for later):** a team that shares one SendMock (in Docker, on Kubernetes, or a CI box everyone can open) today has one shared login: `--ui-auth` (one or more `user:password` lines, all equal) and one `--api-token`. Everyone can change everything, from the relay allowlist to retention, and nobody can tell who did what. Teams want each person to sign in as themselves, and to give QA or a product owner a read-only seat.
+
+**How others do it** (read 2026-11-08):
+
+- **Grafana** ([roles and permissions](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/), [service accounts](https://grafana.com/docs/grafana/latest/administration/service-accounts/)): every user has one basic role (Admin, Editor or Viewer); machines use service accounts that carry a role, and their tokens inherit it, so a token keeps working when the person who made it leaves.
+- **Mailtrap** ([user management](https://help.mailtrap.io/article/65-user-management)): account Owner, Admin and Viewer, where a Viewer sees every project and inbox but cannot add, edit or remove anything; inbox-level Admin and Viewer roles on top.
+- **Mailpit, MailHog, smtp4dev:** one shared HTTP basic auth login, no users or roles. SendMock is the same today.
+- **OWASP** ([password storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)): Argon2id with at least 19 MiB of memory, 2 iterations and 1 lane; session ids in `HttpOnly`, `Secure` (over HTTPS) and `SameSite` cookies, renewed at sign-in, with an idle and an absolute timeout.
+- **Jenkins** (first start): the first admin is created with a one-time setup code printed in the server's log, so whoever reaches an open port first cannot take the instance.
+
+**A13a Accounts and login (PL-14).**
+
+- **Off by default:** a developer's own SendMock stays open with no login, as today. `--auth accounts` (`SENDMOCK_AUTH`, `auth = "accounts"` in `sendmock.toml`) turns accounts on; `--ui-auth` keeps working unchanged as the simple shared login, and the two cannot be set together.
+- **The first admin:** given by `SENDMOCK_ADMIN_USERNAME` and `SENDMOCK_ADMIN_PASSWORD` (or `_FILE` variants for Docker and Kubernetes secrets) on an instance with no users; otherwise the first visit shows a setup page that asks for the one-time setup code SendMock prints in its log at start, as Jenkins does. `sendmock users reset-password <username>` run on the host against the data file (with the server stopped) recovers a lost admin password.
+- **Users:** username, display name, role and password, kept in SQLite. Passwords are hashed with Argon2id at OWASP's parameters, at least 12 characters, and never leave the server, not even as hashes in seed exports (the seed file lists users and roles; their passwords are set again on import).
+- **Sign in and sessions:** a sign-in page in the web UI; a random session id in a `HttpOnly`, `SameSite=Lax` cookie (`Secure` behind HTTPS), renewed at sign-in, ending after 12 hours idle or 7 days at most (`--session-idle-timeout`, `--session-max-age`), and on sign-out or a password or role change. Failed sign-ins are slowed per username and address (five a minute, then a growing wait), and the answer never says whether the username exists. Requests that change something from the browser must carry the UI's own header and a same-origin `Origin`, against cross-site requests.
+- **Tokens:** each user can make personal access tokens that act as them; an Admin can make service tokens that carry a role and belong to no one, for CI and agents (as Grafana's service accounts). A token is shown once, stored as a SHA-256 hash, has an optional expiry and a last-used time, and is revoked on its own. `--api-token` keeps working as a service token with the Admin role.
+- **Every surface:** the REST API, the WebSocket stream and MCP over HTTP take the session cookie or `Authorization: Bearer <token>`; the CLI uses `SENDMOCK_TOKEN`, and `sendmock login` stores a token for a server in the user's config folder. Provider APIs keep checking the provider's own credentials and SMTP its own AUTH, since apps under test cannot sign in to SendMock.
+- **Audit log:** sign-ins, failed sign-ins, user, role and token changes, and every destructive operation are recorded with the user or token, time and address, shown in a new Audit tab on the Logs screen (Admins only) and kept under the retention limits.
+- **Managing users:** Settings > Users and tokens for Admins; Settings > Account for everyone (display name, password, personal tokens, sign out everywhere). The same through REST, `sendmock users ...` and `sendmock tokens ...`, and MCP.
+
+**A13b Roles: Admin, Developer, Viewer (PL-15).**
+
+| Role | Can |
+|---|---|
+| **Viewer** | Read everything: emails, SMS, verifications, push, payments, HTTP requests, webhook deliveries, logs, stats and settings (secrets stay masked, as for everyone). Change nothing; opening an email or SMS does not mark it read for a Viewer, since read state is shared. |
+| **Developer** | Everything a test run needs: send and simulate messages and payments, delete and clear traffic, reset traffic, release email within the configured allowlist, and create, edit and delete webhook endpoints, rules, templates, variables, HTTP bins, scenarios, providers, virtual numbers and projects. |
+| **Admin** | Everything a Developer can, plus the instance: users, roles and tokens, the audit log, retention, the relay and release servers and their allowlist, SMTP chaos and auth settings, the update check, seed import and a full reset that also clears configuration. |
+
+- **One rule in one place:** every operation in the `sendmock-ops` registry declares the role it needs. The default comes from the existing flags (a read-only operation needs Viewer, anything else Developer), and Admin operations say so explicitly. The check runs in the operations layer before the handler, so REST, the CLI, MCP and the WebSocket enforce exactly the same thing; the transport edge maps it to 403, a CLI exit code or an MCP error naming the role needed. A registry snapshot test lists every operation with its role, so a new operation is a deliberate choice that shows up in review.
+- **UI:** controls the role cannot use are shown disabled with "Needs the Developer role" (or Admin), rather than hidden, so people know the feature exists and whom to ask; the top bar shows who is signed in and their role.
+- **MCP:** an agent's tool list only holds the tools its token's role may call, so it does not try the rest.
+- **Changing a role** takes effect on the user's next request; the last Admin cannot be removed or demoted.
+
+**Order:** A13a, then A13b; A13a alone treats every user as an Admin, so it is usable before roles land.
+
+**Not in this part:** single sign-on (OpenID Connect, then SAML) and LDAP, two-factor sign-in, roles per project (a Developer on one project and a Viewer on another, as Mailtrap's inbox roles), custom roles, and email invitations (an Admin sets the first password and shares it).
+
+## A14. Real forwarding: provider connections and routing rules for email and SMS (PL-16, PL-17)
+
+**Why (owner request, 2026-11-08, for later):** SendMock catches everything, which is what tests need, but some messages should still reach a real person: the staging app's password reset to the developer's own inbox, every OTP SMS to the tester's phone, a client's newsletter preview to their real Outlook. Email has part of this today: **Release** (one email, by hand) and **auto-forward rules** (Settings > Email), both through one SMTP relay and only to allowed recipients. SMS has nothing, and neither can pick the provider a message goes out through.
+
+**How others do it** (read 2026-11-08):
+
+- **Mailpit** ([SMTP relaying](https://mailpit.axllent.org/docs/configuration/smtp-relay/)): one relay. Manual release is limited by `allowed-recipients`; `--smtp-relay-all` relays every message to its original recipients, `--smtp-relay-matching` only recipients matching a regular expression; `blocked-recipients` applies everywhere, including automatic relaying, and silently drops those recipients.
+- **Mailtrap** ([automatic forwarding](https://docs.mailtrap.io/email-sandbox/management/automatic-email-forwarding)): per sandbox, forward to addresses whose owners confirmed they want the mail, or to a whole domain verified by a DNS TXT record; it matches To and Cc, ignores Bcc, and sends from its own `forward.mailtrap.info` address.
+- **The providers themselves** (Twilio, Vonage, SendGrid, Mailgun, Amazon SES, Postmark, Resend): each has its own send API, credentials, error codes and rate limits; Twilio and others offer test credentials and magic numbers that never send.
+
+**A14a Real provider connections (PL-16).**
+
+- **Connections:** named, reusable connections to real services, managed in Settings > Connections: for email SMTP (the existing relay becomes the first connection, named `relay`, and its settings keep working), SendGrid, Mailgun, Amazon SES, Postmark and Resend; for SMS Twilio, Vonage, Plivo, Telnyx, Infobip and Amazon SNS. Each provider is a sending adapter (`TwilioSendClient`, `SendGridSendClient`, ...) registered in a real-provider registry beside the emulation adapters, so a new provider is a new type and existing ones are not touched; each translates SendMock's stored message to that provider's request and its answer and errors back.
+- **Who may receive:** every connection has its own allowed recipients (addresses and `*@domain` patterns for email, numbers and `+44*` prefixes for SMS) and blocked recipients, which win everywhere, as in Mailpit. A real send to anyone outside the allowed list is refused before any request leaves. A connection with an empty allowed list sends nothing.
+- **Secrets:** API keys, tokens and passwords are stored on the server, masked in the UI, API answers, logs and MCP results, and written to seed exports only as an environment reference such as `${TWILIO_AUTH_TOKEN}`, never in plain text.
+- **Check before use:** **Test connection** checks the credentials with the provider without sending where its API allows that, and **Send a test** sends one message to an allowed recipient. A connection shows its last success and last error.
+- **One switch for everything real:** `--real-delivery off` (`SENDMOCK_REAL_DELIVERY`) stops every real send from connections, release and rules, whatever is configured, for CI and shared demos; the UI shows a banner while it is off.
+- **By hand:** **Send for real** on any email or SMS (Release, extended to SMS and to every connection) picks a connection and recipients from its allowed list; the message's timeline records it.
+
+**A14b Forwarding rules for email and SMS (PL-17).**
+
+- **Rules:** the existing email auto-forward rules gain the connection they send through and become one rule list with SMS (Settings > Forwarding, with Email and SMS tabs). A rule has a name, an order, on or off, and a filter built with the webhook rules' filter operators (equals, contains, matches, in): project, direction (outgoing or inbound), from, to, subject or body, the provider API the message came in through, tags and headers for email, and the extracted OTP's presence.
+- **Where it goes:** **to the original recipients** (only those on the connection's allowed list; the rest are dropped and noted, as Mailpit does), or **redirect to** fixed recipients, such as "every SMS to +8801XXXXXXXXX" or "every email for `*@client.com` to qa@ourcompany.com". Options: a subject or text prefix (`[SendMock]`), a From address or sender ID the provider accepts, and whether to keep the original Message-ID.
+- **First match or all:** rules run in order; **stop at this rule** ends the list for a matching message, otherwise every matching rule sends.
+- **Limits, against floods and bills:** each rule has a per-minute and per-day cap (defaults 30 and 500), and each connection a per-day cap; past a cap the forward is skipped and recorded, not queued. **Dry run** on a rule shows which of the last 100 messages it would have forwarded, and to whom, without sending.
+- **Reliability:** each forward is an attempt with its status, the provider's message id and its error, retried on network errors and the provider's rate-limit or server errors with the webhook retry policy, never on a refused recipient or bad credentials. Attempts show in the message's timeline and in a Forwards tab on the Logs screen, and fire `email.forwarded`, `sms.forwarded` and `forward.failed` events for webhooks and the event stream.
+- **No loops:** a forwarded email carries `X-SendMock-Forwarded` and is never forwarded again if it comes back, and a rule cannot send to SendMock's own SMTP address or provider APIs.
+- **Every surface:** connections and rules through REST, `sendmock connections ...` and `sendmock forward-rules ...` (the existing `sendmock email forward-rules` commands stay as aliases), MCP and the seed file. With roles ([A13](#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15)), connections and rules are the Admin's, and Send for real is the Developer's within the allowed lists.
+- **Proof without real sends:** CI runs a second SendMock as the "real" provider and forwards to it through each adapter (SendMock emulates every one of these provider APIs), so every adapter is tested against the provider's wire format; an optional workflow, run only when the owner sets the secrets, sends through Twilio's test credentials and a sandbox email account.
+
+**Order:** A14a (connections, starting with SMTP, SendGrid and Twilio, plus Send for real), then A14b (rules), then the remaining providers one by one.
+
+**Not in this part:** receiving real inbound messages from providers (a real Twilio number posting to SendMock is the inbound routes' job), WhatsApp and push to real devices, recipient confirmation by email as Mailtrap does (allowed lists are set by whoever manages the instance), and per-project connections.

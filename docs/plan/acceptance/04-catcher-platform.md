@@ -170,3 +170,55 @@ After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-af
 - [ ] PL-13.3 `GET /api/v1/health/ready` and `sendmock health --ready` answer ready only once the listeners are bound and the database answers a read, and not ready while starting and once shutdown has begun; `GET /api/v1/health` stays the liveness check.
 - [ ] PL-13.4 The Helm chart's readiness probe uses the readiness path, and the tray app starts its server with a log file in its data folder.
 - [ ] PL-13.5 The Monitoring guide page covers health and readiness, logs and how to collect them (Docker logging drivers, the systemd journal, Fluent Bit, Vector, Grafana Alloy), every metric, the Prometheus and OpenTelemetry setups for Docker Compose and Helm and the starter Grafana dashboard, and the configuration reference and the skill list every option.
+
+## PL-14 Accounts and login
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13a).
+
+- [ ] PL-14.1 Without `--auth accounts` SendMock needs no sign-in, as before; `--auth accounts` (`SENDMOCK_AUTH`, `auth = "accounts"` in `sendmock.toml`) turns accounts on, `--ui-auth` keeps working unchanged, and setting both fails at startup with a clear message.
+- [ ] PL-14.2 On an instance with no users, `SENDMOCK_ADMIN_USERNAME` and `SENDMOCK_ADMIN_PASSWORD` (or their `_FILE` variants) create the first Admin; without them the setup page creates it only with the one-time code printed in the log at start, and `sendmock users reset-password` recovers a lost password from the data file.
+- [ ] PL-14.3 Passwords are stored only as Argon2id hashes with at least OWASP's parameters, must be 12 characters or more, and appear in no API answer, log line, MCP result or seed export.
+- [ ] PL-14.4 Signing in sets a new random session id in an `HttpOnly`, `SameSite=Lax` cookie (`Secure` over HTTPS); the session ends after the idle timeout, the absolute timeout, sign-out, or a password or role change.
+- [ ] PL-14.5 Failed sign-ins are slowed per username and address after five a minute, and the answer is the same whether or not the username exists.
+- [ ] PL-14.6 A browser request that changes something is refused without the UI's header and a same-origin `Origin`.
+- [ ] PL-14.7 Personal access tokens act as their user and service tokens carry their own role; each is shown once, stored hashed, can expire, records when it was last used and can be revoked on its own; `--api-token` works as an Admin service token.
+- [ ] PL-14.8 The REST API, the WebSocket stream and MCP over HTTP accept the session cookie or a bearer token and refuse anything else with 401; the CLI signs in with `SENDMOCK_TOKEN` or `sendmock login`; provider APIs and SMTP keep their own credentials.
+- [ ] PL-14.9 Sign-ins, failed sign-ins, user, role and token changes and every destructive operation are recorded with who, when and from where, shown to Admins in the Logs screen's Audit tab, and pruned by retention.
+- [ ] PL-14.10 Admins manage users and tokens in Settings > Users and tokens, everyone manages their own account in Settings > Account, and both work the same through REST, `sendmock users`, `sendmock tokens` and MCP.
+
+## PL-15 Roles: Admin, Developer, Viewer
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13b).
+
+- [ ] PL-15.1 Every operation in the registry declares the role it needs (read-only operations Viewer, others Developer, instance administration Admin), and a snapshot test lists every operation with its role.
+- [ ] PL-15.2 A Viewer can call every read-only operation and nothing else; opening an email or SMS does not mark it read for a Viewer.
+- [ ] PL-15.3 A Developer can send, simulate, delete and reset traffic, release within the allowlist and manage webhooks, rules, templates, variables, bins, scenarios, providers, numbers and projects, but not users, tokens other than their own, the audit log or instance settings.
+- [ ] PL-15.4 An Admin can call every operation, and the last Admin cannot be removed or demoted.
+- [ ] PL-15.5 The role check runs once in the operations layer, so REST answers 403, the CLI exits with its permission code and MCP returns an error naming the role needed, for the same operations.
+- [ ] PL-15.6 The UI shows controls the role cannot use as disabled with the role they need, and shows the signed-in user and role in the top bar.
+- [ ] PL-15.7 MCP lists only the tools the token's role may call, and a role change applies on the user's next request.
+
+## PL-16 Real provider connections
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14a).
+
+- [ ] PL-16.1 Named connections to SMTP, SendGrid, Mailgun, Amazon SES, Postmark and Resend for email and Twilio, Vonage, Plivo, Telnyx, Infobip and Amazon SNS for SMS are created, edited, tested and deleted through the UI, REST, CLI, MCP and the seed file; the existing relay settings become the `relay` connection and keep working.
+- [ ] PL-16.2 Each provider adapter sends the provider's documented request and maps its answer and errors, proven against SendMock's own emulation of that provider.
+- [ ] PL-16.3 A real send to a recipient outside the connection's allowed list, or on its blocked list, is refused before any request leaves; a connection with no allowed recipients sends nothing.
+- [ ] PL-16.4 Connection secrets are masked in the UI, API answers, logs and MCP results, and seed exports hold only environment references.
+- [ ] PL-16.5 Test connection checks the credentials, Send a test sends one message to an allowed recipient, and the connection shows its last success and last error.
+- [ ] PL-16.6 `--real-delivery off` (`SENDMOCK_REAL_DELIVERY`) stops every real send from connections, release and rules, and the UI shows a banner while it is off.
+- [ ] PL-16.7 Send for real on an email or an SMS sends it through a chosen connection to recipients on its allowed list and records it in the message's timeline.
+
+## PL-17 Forwarding rules for email and SMS
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14b).
+
+- [ ] PL-17.1 Email and SMS forwarding rules are listed, created, edited, reordered, switched on and off and deleted through Settings > Forwarding, REST, CLI, MCP and the seed file; the existing email auto-forward rules move over unchanged and their commands keep working.
+- [ ] PL-17.2 A rule's filter matches on project, direction, from, to, subject or body, the provider API used, email tags and headers and the presence of an OTP, with the webhook rules' operators.
+- [ ] PL-17.3 A rule sends to the original recipients that its connection allows (dropping and noting the rest) or redirects to fixed recipients, with the chosen prefix, sender and Message-ID options.
+- [ ] PL-17.4 Rules run in order, a rule marked stop at this rule ends the list for a matching message, and every other matching rule sends.
+- [ ] PL-17.5 Per-rule per-minute and per-day caps and a per-connection per-day cap skip and record forwards past the limit; dry run lists what a rule would have forwarded from the last 100 messages without sending.
+- [ ] PL-17.6 Each forward records its status, provider message id and error, is retried on network, rate-limit and server errors but not on refused recipients or bad credentials, shows in the message's timeline and the Logs screen's Forwards tab, and fires `email.forwarded`, `sms.forwarded` or `forward.failed`.
+- [ ] PL-17.7 A forwarded email that comes back is never forwarded again, and a rule cannot target SendMock's own SMTP address or provider APIs.
+- [ ] PL-17.8 CI forwards email and SMS through every adapter to a second SendMock acting as the real provider.
