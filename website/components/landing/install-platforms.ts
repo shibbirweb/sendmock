@@ -1,3 +1,4 @@
+import type { InstallDocsLink } from "./install-docs-links";
 import type { DownloadNote, ManualDownload } from "./manual-download-links";
 import type { PlatformRequirement } from "./platform-requirement-note";
 
@@ -22,6 +23,8 @@ export type InstallPlatform = {
   downloadNote: DownloadNote | null;
   /** What the runner needs on the computer first (Node.js for npx, Bun for bunx), or null. */
   requirement: PlatformRequirement | null;
+  /** The other ways to install for this tab, each with its full steps in the docs. */
+  docsLinks: InstallDocsLink[];
 };
 
 /** The native installs all leave one `sendmock` binary on the PATH. */
@@ -51,6 +54,9 @@ export const installPlatforms: InstallPlatform[] = [
       url: "https://nodejs.org/en/download",
     },
     downloadNote: null,
+    docsLinks: [
+      { label: "Full npx steps", docsPath: "/docs/install#npx-no-install" },
+    ],
   },
   {
     key: "bunx",
@@ -63,6 +69,9 @@ export const installPlatforms: InstallPlatform[] = [
     downloads: [],
     requirement: { name: "Bun", url: "https://bun.sh/docs/installation" },
     downloadNote: null,
+    docsLinks: [
+      { label: "Full bunx steps", docsPath: "/docs/install#bunx-no-install" },
+    ],
   },
   {
     key: "docker",
@@ -76,6 +85,15 @@ export const installPlatforms: InstallPlatform[] = [
     downloads: [],
     requirement: null,
     downloadNote: null,
+    docsLinks: [
+      { label: "Docker Compose", docsPath: "/docs/install#docker-compose" },
+      { label: "Kubernetes (Helm)", docsPath: "/docs/connect/kubernetes" },
+      {
+        label: "Docker Desktop extension",
+        docsPath: "/docs/install#docker-desktop-extension",
+      },
+      { label: "Docker guide", docsPath: "/docs/connect/docker" },
+    ],
   },
   {
     key: "macos",
@@ -99,6 +117,13 @@ export const installPlatforms: InstallPlatform[] = [
       linkLabel: "How to allow it",
       docsPath: "/docs/troubleshooting#macos-says-it-could-not-verify-sendmock",
     },
+    docsLinks: [
+      { label: "Homebrew", docsPath: "/docs/install#homebrew-macos-and-linux" },
+      {
+        label: "Install script",
+        docsPath: "/docs/install#install-script-linux-and-macos",
+      },
+    ],
   },
   {
     key: "windows",
@@ -122,6 +147,11 @@ export const installPlatforms: InstallPlatform[] = [
       linkLabel: "How to allow it",
       docsPath: "/docs/troubleshooting#windows-protected-your-pc",
     },
+    docsLinks: [
+      { label: "Scoop", docsPath: "/docs/install#scoop-windows" },
+      { label: "WinGet", docsPath: "/docs/install#winget-windows" },
+      { label: "Chocolatey", docsPath: "/docs/install#chocolatey-windows" },
+    ],
   },
   {
     key: "linux",
@@ -141,5 +171,11 @@ export const installPlatforms: InstallPlatform[] = [
     ],
     requirement: null,
     downloadNote: null,
+    docsLinks: [
+      { label: "apt", docsPath: "/docs/install#apt-debian-and-ubuntu" },
+      { label: "dnf", docsPath: "/docs/install#dnf-fedora-rhel-and-similar" },
+      { label: "Nix", docsPath: "/docs/install#nix" },
+      { label: "Homebrew", docsPath: "/docs/install#homebrew-macos-and-linux" },
+    ],
   },
 ];

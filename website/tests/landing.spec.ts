@@ -198,6 +198,13 @@ test.describe("the quick start's platform tabs", () => {
     );
     await expect(terminal).toContainText("SMTP listening on 0.0.0.0:1025");
     await expect(page.getByTestId("quick-start-downloads")).toHaveCount(0);
+    const docsLinks = page.getByTestId("quick-start-docs-links");
+    await expect(
+      docsLinks.getByRole("link", { name: "Docker Compose" }),
+    ).toHaveAttribute("href", /\/docs\/install#docker-compose$/);
+    await expect(
+      docsLinks.getByRole("link", { name: "All install options" }),
+    ).toHaveAttribute("href", /\/docs\/install$/);
   });
 });
 

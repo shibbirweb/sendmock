@@ -11,8 +11,7 @@ import {
   InstallTerminal,
   InstallTerminalPlaceholder,
 } from "./install-terminal";
-import { ManualDownloadLinks } from "./manual-download-links";
-import { PlatformRequirementNote } from "./platform-requirement-note";
+import { PlatformFooter } from "./platform-footer";
 import { quickStartSectionId } from "./quick-start-link";
 import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
@@ -138,54 +137,27 @@ export function QuickStartSection({
           />
         )}
         <div className="row-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)]">
-          {installPlatforms.map((installPlatform) =>
-            installPlatform.downloads.length > 0 ? (
-              <ManualDownloadLinks
-                key={installPlatform.key}
-                platformLabel={installPlatform.label}
-                downloads={installPlatform.downloads}
-                downloadNote={installPlatform.downloadNote}
-                className={cn("invisible", stackedInGridCellClassName)}
-              />
-            ) : null,
-          )}
-          {installPlatforms.map((installPlatform) =>
-            installPlatform.requirement !== null ? (
-              <PlatformRequirementNote
-                key={`${installPlatform.key}-requirement`}
-                requirement={installPlatform.requirement}
-                className={cn("invisible", stackedInGridCellClassName)}
-              />
-            ) : null,
-          )}
+          {installPlatforms.map((installPlatform) => (
+            <PlatformFooter
+              key={installPlatform.key}
+              installPlatform={installPlatform}
+              isPlaceholder
+              className={stackedInGridCellClassName}
+            />
+          ))}
           {installPrompt !== null && (
             <AiInstallLinks
               isSelected={isAiTabSelected}
               className={stackedInGridCellClassName}
             />
           )}
-          {!isAiTabSelected && selectedPlatform.downloads.length > 0 ? (
-            <div
-              data-testid="quick-start-downloads"
+          {!isAiTabSelected && (
+            <PlatformFooter
+              installPlatform={selectedPlatform}
+              isPlaceholder={false}
               className={stackedInGridCellClassName}
-            >
-              <ManualDownloadLinks
-                platformLabel={selectedPlatform.label}
-                downloads={selectedPlatform.downloads}
-                downloadNote={selectedPlatform.downloadNote}
-              />
-            </div>
-          ) : null}
-          {!isAiTabSelected && selectedPlatform.requirement !== null ? (
-            <div
-              data-testid="quick-start-requirement"
-              className={stackedInGridCellClassName}
-            >
-              <PlatformRequirementNote
-                requirement={selectedPlatform.requirement}
-              />
-            </div>
-          ) : null}
+            />
+          )}
         </div>
       </div>
     </section>
