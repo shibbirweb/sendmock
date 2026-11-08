@@ -110,7 +110,7 @@ export function readStatuses(): Map<string, string> {
 }
 
 export function listProvingFiles(featureId: string): string[] {
-  const pattern = `${featureId.replace("-", "-")}\\.[0-9]`;
+  const pattern = `${featureId}\\.[0-9]`;
   try {
     return execSync(
       `git grep -l -E '${pattern}' -- ':!docs' ':!*.md' ':!CHANGELOG*' ':!scripts/acceptance.ts' ':!scripts/acceptance.test.ts'`,

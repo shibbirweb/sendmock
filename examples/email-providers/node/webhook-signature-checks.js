@@ -73,7 +73,10 @@ export async function startSignatureReceiver() {
     request.on("end", () => {
       const providerKey = request.url.slice(1);
       const rawBody = Buffer.concat(bodyChunks).toString("utf8");
-      const providerCheck = providerChecks[providerKey];
+      // Own keys only: a path such as /constructor must not reach Object's built-in methods.
+      const providerCheck = Object.hasOwn(providerChecks, providerKey)
+        ? providerChecks[providerKey]
+        : undefined;
       verifiedProviders.set(providerKey, Boolean(providerCheck?.(rawBody, request.headers)));
       response.writeHead(200);
       response.end();

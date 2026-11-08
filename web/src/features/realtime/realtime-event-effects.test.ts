@@ -6,6 +6,7 @@ import {
   listQueryKeysToRefresh,
 } from "@/features/realtime/realtime-event-effects";
 import { queryKeys } from "@/lib/api/query-keys";
+import type { AppEvent } from "@/lib/api/types";
 
 describe("listQueryKeysToRefresh", () => {
   test("PL-02.1 an email event refreshes email lists and stats", () => {
@@ -31,6 +32,20 @@ describe("listQueryKeysToRefresh", () => {
 });
 
 describe("describeEventForNotification", () => {
+  test("UI-08.3 an event type that names a built-in object method gets no notification", () => {
+    for (const builtInName of ["constructor", "toString", "__proto__"]) {
+      expect(
+        describeEventForNotification({
+          id: "evt_0",
+          type: builtInName as AppEvent["type"],
+          created_at: "2026-10-24T16:00:00Z",
+          data: {},
+        }),
+        builtInName,
+      ).toBeNull();
+    }
+  });
+
   test("UI-08.3 a new email links to it, with its subject", () => {
     expect(
       describeEventForNotification({

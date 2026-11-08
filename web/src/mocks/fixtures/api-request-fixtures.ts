@@ -158,7 +158,7 @@ export function linkApiRequestFixtures(
         candidateMessage.api === apiRequest.api &&
         candidateMessage.direction === "outbound" &&
         apiRequest.request_body.includes(
-          encodeURIComponent(candidateMessage.to_number).replace("%2B", ""),
+          encodeURIComponent(candidateMessage.to_number).replaceAll("%2B", ""),
         ),
     );
     if (smsMessage !== undefined) {

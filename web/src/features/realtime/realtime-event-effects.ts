@@ -100,6 +100,10 @@ const notificationDescribers: Partial<Record<AppEventType, EventDescriber>> = {
 export function describeEventForNotification(
   appEvent: AppEvent,
 ): EventNotification | null {
+  // Own keys only: a type such as "constructor" must not reach Object's built-in methods.
+  if (!Object.hasOwn(notificationDescribers, appEvent.type)) {
+    return null;
+  }
   return notificationDescribers[appEvent.type]?.(appEvent.data) ?? null;
 }
 
