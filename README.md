@@ -33,6 +33,7 @@ Everything works from the web UI, the REST API, the `sendmock` CLI and an MCP se
 | Windows (PowerShell) | `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 \| iex` |
 | Windows (Scoop) | `scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket`, then `scoop install shibbirweb/sendmock` |
 | Any system with Node.js | `npx sendmock` (no install) |
+| Any system with Bun | `bunx sendmock` (no install) |
 | Docker | `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock` |
 
 WinGet, Chocolatey, apt, dnf, the AUR, Nix, Cargo, the beta of each channel, plain binaries, a Helm chart, a Docker Desktop extension and a menu bar app are on the [install page](https://shibbirweb.github.io/sendmock/docs/install/).
