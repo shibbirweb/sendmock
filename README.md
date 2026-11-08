@@ -36,7 +36,7 @@ Everything works from the web UI, the REST API, the `sendmock` CLI and an MCP se
 | Any system with Bun | `bunx sendmock` (no install) |
 | Docker | `docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock` |
 
-WinGet, Chocolatey, apt, dnf, the AUR, Nix, Cargo, the beta of each channel, plain binaries, a Helm chart, a Docker Desktop extension and a menu bar app are on the [install page](https://shibbirweb.github.io/sendmock/docs/install/).
+WinGet, Chocolatey, apt, dnf, Nix, Cargo, the beta of each channel, plain binaries, a Helm chart, a Docker Desktop extension and a menu bar app are on the [install page](https://shibbirweb.github.io/sendmock/docs/install/).
 
 The first beta is being prepared. Until it is published, try the [live demo](https://shibbirweb.github.io/sendmock/demo/) or [run SendMock from source](#run-it-from-source).
 

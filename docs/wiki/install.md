@@ -15,22 +15,83 @@ Every way below installs the same `sendmock`. The table says which systems each 
 
 | Way to install | Systems | Stable | Beta |
 |---|---|---|---|
+| [npx](#npx-no-install) | macOS, Linux, Windows | Yes | Yes |
+| [bunx](#bunx-no-install) | macOS, Linux, Windows | Yes | Yes |
 | [Homebrew](#homebrew-macos-and-linux) | macOS, Linux | Yes | Yes |
 | [Install script (Linux and macOS)](#install-script-linux-and-macos) | macOS, Linux | Yes | Yes |
 | [Install script (Windows)](#install-script-windows) | Windows | Yes | Yes |
 | [apt](#apt-debian-and-ubuntu) | Linux | Yes | Yes |
 | [dnf](#dnf-fedora-rhel-and-similar) | Linux | Yes | Yes |
-| [AUR](#aur-arch-linux) | Linux | Yes | Yes |
-| [COPR](#copr-fedora) | Linux | Yes | No |
 | [Nix](#nix) | Linux, macOS | Yes | No |
 | [Scoop](#scoop-windows) | Windows | Yes | Yes |
 | [WinGet](#winget-windows) | Windows | Yes | No |
 | [Chocolatey](#chocolatey-windows) | Windows | Yes | No |
 | [npm](#npm-projects-with-nodejs) | macOS, Linux, Windows | Yes | Yes |
-| [npx](#npx-no-install) | macOS, Linux, Windows | Yes | Yes |
 | [Cargo](#cargo-rust-developers) | macOS, Linux, Windows | Yes | No |
 | [Docker](#docker) | macOS, Linux, Windows | Yes | Yes |
 | [Binaries](#binaries) | macOS, Linux, Windows | Yes | Yes |
+
+## npx (no install)
+
+Run SendMock straight from npm without installing anything first. You need Node.js 18 or newer (or Bun, pnpm or Yarn). The first run downloads the binary for your computer (under 20 MB) into the package manager's cache; later runs start at once.
+
+1. Start the stable:
+
+   ```bash
+   npx sendmock
+   ```
+
+   Or the beta:
+
+   ```bash
+   npx sendmock@beta
+   ```
+
+2. Any command works the same way, for example the MCP server for an AI agent:
+
+   ```bash
+   npx sendmock mcp
+   ```
+
+3. With another package manager, use its runner instead of `npx`:
+
+   ```bash
+   bunx sendmock
+   ```
+
+   ```bash
+   pnpm dlx sendmock
+   ```
+
+   ```bash
+   yarn dlx sendmock
+   ```
+
+Then go on to [Start SendMock](#start-sendmock).
+
+## bunx (no install)
+
+Run SendMock straight from npm with Bun, without installing anything first. You need [Bun](https://bun.sh). The first run downloads the binary for your computer (under 20 MB) into Bun's cache; later runs start at once.
+
+1. Start the stable:
+
+   ```bash
+   bunx sendmock
+   ```
+
+   Or the beta:
+
+   ```bash
+   bunx sendmock@beta
+   ```
+
+2. Any command works the same way, for example the MCP server for an AI agent:
+
+   ```bash
+   bunx sendmock mcp
+   ```
+
+Then go on to [Start SendMock](#start-sendmock).
 
 ## Homebrew (macOS and Linux)
 
@@ -198,50 +259,6 @@ Our signed repository keeps SendMock up to date with the rest of your system.
 
 `sudo dnf upgrade` installs new releases. Each release also attaches the `.rpm` file, for `sudo dnf install ./sendmock-<version>.x86_64.rpm` without the repository.
 
-## AUR (Arch Linux)
-
-1. Install SendMock with your AUR helper.
-
-   Stable:
-
-   ```bash
-   yay -S sendmock-bin
-   ```
-
-   Beta:
-
-   ```bash
-   yay -S sendmock-beta-bin
-   ```
-
-2. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
-
-   ```bash
-   sendmock --version
-   ```
-
-## COPR (Fedora)
-
-COPR has the stable only; [dnf](#dnf-fedora-rhel-and-similar) has the beta too.
-
-1. Turn on the SendMock COPR project:
-
-   ```bash
-   sudo dnf copr enable shibbirweb/sendmock
-   ```
-
-2. Install SendMock:
-
-   ```bash
-   sudo dnf install sendmock
-   ```
-
-3. Check that it is installed, then go on to [Start SendMock](#start-sendmock):
-
-   ```bash
-   sendmock --version
-   ```
-
 ## Nix
 
 Nixpkgs has the stable once its maintainers have merged it.
@@ -351,44 +368,6 @@ The `sendmock` package runs the right binary for your computer, so a JavaScript 
    ```
 
 3. Start it with `npx sendmock`, or add `"sendmock": "sendmock"` to your `scripts`. Then go on to [Start SendMock](#start-sendmock).
-
-## npx (no install)
-
-Run SendMock straight from npm without installing anything first. You need Node.js 18 or newer (or Bun, pnpm or Yarn). The first run downloads the binary for your computer (under 20 MB) into the package manager's cache; later runs start at once.
-
-1. Start the stable:
-
-   ```bash
-   npx sendmock
-   ```
-
-   Or the beta:
-
-   ```bash
-   npx sendmock@beta
-   ```
-
-2. Any command works the same way, for example the MCP server for an AI agent:
-
-   ```bash
-   npx sendmock mcp
-   ```
-
-3. With another package manager, use its runner instead of `npx`:
-
-   ```bash
-   bunx sendmock
-   ```
-
-   ```bash
-   pnpm dlx sendmock
-   ```
-
-   ```bash
-   yarn dlx sendmock
-   ```
-
-Then go on to [Start SendMock](#start-sendmock).
 
 ## Cargo (Rust developers)
 

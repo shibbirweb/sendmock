@@ -1,6 +1,113 @@
 {
   "channels": [
     {
+      "key": "npx",
+      "name": "npx",
+      "section": "npx (no install)",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "npx sendmock",
+        "npx sendmock@beta",
+        "bunx sendmock",
+        "pnpm dlx sendmock",
+        "yarn dlx sendmock"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "npx runs sendmock from the packed packages with no install"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/npx-bin/sendmock"
+        },
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/npx-bin/sendmock"
+        },
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "npx --yes sendmock@latest version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\"",
+            "beta": "npx --yes sendmock@beta version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\""
+          },
+          "command": "$env:RUNNER_TEMP\\npx-bin\\sendmock.exe"
+        }
+      ]
+    },
+    {
+      "key": "bunx",
+      "name": "bunx",
+      "section": "bunx (no install)",
+      "systems": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "stages": [
+        "stable",
+        "beta"
+      ],
+      "availability": "after-publish",
+      "page_commands": [
+        "bunx sendmock",
+        "bunx sendmock@beta"
+      ],
+      "release_test": {
+        "workflow": "release.yml",
+        "step": "npx runs sendmock from the packed packages with no install"
+      },
+      "installs": [
+        {
+          "runner": "ubuntu-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/bunx-bin\"\nprintf '#!/bin/sh\\nexec bunx sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/bunx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/bunx-bin/sendmock\"\n\"$RUNNER_TEMP/bunx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/bunx-bin\"\nprintf '#!/bin/sh\\nexec bunx sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/bunx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/bunx-bin/sendmock\"\n\"$RUNNER_TEMP/bunx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/bunx-bin/sendmock"
+        },
+        {
+          "runner": "macos-latest",
+          "shell": "bash",
+          "install": {
+            "stable": "mkdir -p \"$RUNNER_TEMP/bunx-bin\"\nprintf '#!/bin/sh\\nexec bunx sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/bunx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/bunx-bin/sendmock\"\n\"$RUNNER_TEMP/bunx-bin/sendmock\" version --json",
+            "beta": "mkdir -p \"$RUNNER_TEMP/bunx-bin\"\nprintf '#!/bin/sh\\nexec bunx sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/bunx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/bunx-bin/sendmock\"\n\"$RUNNER_TEMP/bunx-bin/sendmock\" version --json"
+          },
+          "command": "$RUNNER_TEMP/bunx-bin/sendmock"
+        },
+        {
+          "runner": "windows-latest",
+          "shell": "pwsh",
+          "install": {
+            "stable": "bunx sendmock@latest version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (bun pm cache) -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\bunx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\bunx-bin\\sendmock.exe\"",
+            "beta": "bunx sendmock@beta version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (bun pm cache) -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\bunx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\bunx-bin\\sendmock.exe\""
+          },
+          "command": "$env:RUNNER_TEMP\\bunx-bin\\sendmock.exe"
+        }
+      ]
+    },
+    {
       "key": "homebrew",
       "name": "Homebrew",
       "section": "Homebrew (macOS and Linux)",
@@ -199,6 +306,7 @@
         "beta"
       ],
       "availability": "after-publish",
+      "is_listed": false,
       "page_commands": [
         "yay -S sendmock-bin",
         "yay -S sendmock-beta-bin"
@@ -232,6 +340,7 @@
         "stable"
       ],
       "availability": "later",
+      "is_listed": false,
       "page_commands": [
         "sudo dnf copr enable shibbirweb/sendmock",
         "sudo dnf install sendmock"
@@ -426,61 +535,6 @@
             "beta": "New-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npm-project\" | Out-Null; Set-Location \"$env:RUNNER_TEMP\\npm-project\"; npm init -y | Out-Null\nnpm install --save-dev sendmock@beta"
           },
           "command": "$env:RUNNER_TEMP\\npm-project\\node_modules\\@sendmock\\win32-x64\\sendmock.exe"
-        }
-      ]
-    },
-    {
-      "key": "npx",
-      "name": "npx",
-      "section": "npx (no install)",
-      "systems": [
-        "macos",
-        "linux",
-        "windows"
-      ],
-      "stages": [
-        "stable",
-        "beta"
-      ],
-      "availability": "after-publish",
-      "page_commands": [
-        "npx sendmock",
-        "npx sendmock@beta",
-        "bunx sendmock",
-        "pnpm dlx sendmock",
-        "yarn dlx sendmock"
-      ],
-      "release_test": {
-        "workflow": "release.yml",
-        "step": "npx runs sendmock from the packed packages with no install"
-      },
-      "installs": [
-        {
-          "runner": "ubuntu-latest",
-          "shell": "bash",
-          "install": {
-            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
-            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
-          },
-          "command": "$RUNNER_TEMP/npx-bin/sendmock"
-        },
-        {
-          "runner": "macos-latest",
-          "shell": "bash",
-          "install": {
-            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
-            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
-          },
-          "command": "$RUNNER_TEMP/npx-bin/sendmock"
-        },
-        {
-          "runner": "windows-latest",
-          "shell": "pwsh",
-          "install": {
-            "stable": "npx --yes sendmock@latest version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\"",
-            "beta": "npx --yes sendmock@beta version --json\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\n$fetchedBinary = Get-ChildItem -Path (Join-Path (npm config get cache) \"_npx\") -Recurse -Filter sendmock.exe | Select-Object -First 1\nNew-Item -ItemType Directory -Force \"$env:RUNNER_TEMP\\npx-bin\" | Out-Null\nCopy-Item $fetchedBinary.FullName \"$env:RUNNER_TEMP\\npx-bin\\sendmock.exe\""
-          },
-          "command": "$env:RUNNER_TEMP\\npx-bin\\sendmock.exe"
         }
       ]
     },

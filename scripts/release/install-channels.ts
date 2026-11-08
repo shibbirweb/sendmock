@@ -30,6 +30,11 @@ export type InstallChannel = {
   systems: ("macos" | "linux" | "windows")[];
   stages: ReleaseStage[];
   availability: "after-publish" | "later";
+  /**
+   * False leaves the channel off the install page and out of the install tests while it has no
+   * account to publish to; its packaging and release jobs stay.
+   */
+  is_listed?: boolean;
   page_commands: string[];
   release_test: { workflow: string; step: string };
   installs: ChannelInstall[];
@@ -65,8 +70,12 @@ export function toHeadingAnchor(headingText: string): string {
     .replace(/\s+/g, "-");
 }
 
+export function isListedChannel(channel: InstallChannel): boolean {
+  return channel.is_listed !== false;
+}
+
 export function renderChannelTable(channels: InstallChannel[]): string {
-  const rows = channels.map((channel) => {
+  const rows = channels.filter(isListedChannel).map((channel) => {
     const systems = channel.systems
       .map((system) => systemNames[system])
       .join(", ");
@@ -138,7 +147,12 @@ export function buildChannelMatrix(
     filterKeys.includes(channel.key) ||
     filterKeys.includes(channel.availability);
   return channels
-    .filter((channel) => channel.stages.includes(stage) && isSelected(channel))
+    .filter(
+      (channel) =>
+        isListedChannel(channel) &&
+        channel.stages.includes(stage) &&
+        isSelected(channel),
+    )
     .flatMap((channel) =>
       channel.installs.flatMap((channelInstall) => {
         const installScript = channelInstall.install[stage];

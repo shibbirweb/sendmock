@@ -7,6 +7,7 @@ import {
   installPagePath,
   readInstallChannels,
   readPageSection,
+  isListedChannel,
   renderChannelTable,
   toHeadingAnchor,
   writeChannelTable,
@@ -31,6 +32,8 @@ function readStepNames(workflowFileName: string): string[] {
 describe("install channels", () => {
   test("DS-03.6 the list holds every channel SendMock ships on (plan 09)", () => {
     expect(channels.map((channel) => channel.key)).toEqual([
+      "npx",
+      "bunx",
       "homebrew",
       "install-script-unix",
       "install-script-windows",
@@ -43,7 +46,6 @@ describe("install channels", () => {
       "winget",
       "chocolatey",
       "npm",
-      "npx",
       "cargo",
       "docker",
       "binaries",
@@ -56,8 +58,8 @@ describe("install channels", () => {
     );
   });
 
-  test("DS-03.6 every channel has its section on the install page with its install commands", () => {
-    for (const channel of channels) {
+  test("DS-03.6 every listed channel has its section on the install page with its install commands", () => {
+    for (const channel of channels.filter(isListedChannel)) {
       const section = readPageSection(installPage, channel.section);
       expect({ channel: channel.key, hasSection: section !== null }).toEqual({
         channel: channel.key,
@@ -106,6 +108,61 @@ describe("install channels", () => {
       stableMatrix.find((entry) => entry.name === "Homebrew on macos-latest")
         ?.container,
     ).toBe("");
+  });
+});
+
+describe("channels without an account yet", () => {
+  const unlistedChannels = channels.filter(
+    (channel) => !isListedChannel(channel),
+  );
+
+  test("DS-03.5 the AUR and COPR stay off the install page and out of the install tests", () => {
+    expect(unlistedChannels.map((channel) => channel.key)).toEqual([
+      "aur",
+      "copr",
+    ]);
+    for (const channel of unlistedChannels) {
+      expect(readPageSection(installPage, channel.section)).toBeNull();
+      expect(renderChannelTable(channels)).not.toContain(`[${channel.name}]`);
+      expect(buildChannelMatrix(channels, "stable", channel.key)).toEqual([]);
+    }
+  });
+});
+
+describe("bunx with no install", () => {
+  const bunxChannel = channels.find((channel) => channel.key === "bunx");
+
+  test("DS-03.7 bunx runs the published stable and beta on macOS, Linux and Windows with no install", () => {
+    const stableMatrix = buildChannelMatrix(channels, "stable", "bunx");
+    const betaMatrix = buildChannelMatrix(channels, "beta", "bunx");
+
+    expect(bunxChannel?.systems).toEqual(["macos", "linux", "windows"]);
+    expect(stableMatrix.map((entry) => entry.runner)).toEqual([
+      "ubuntu-latest",
+      "macos-latest",
+      "windows-latest",
+    ]);
+    for (const matrixEntry of stableMatrix) {
+      expect(matrixEntry.script).toContain("bunx sendmock@latest");
+    }
+    for (const matrixEntry of betaMatrix) {
+      expect(matrixEntry.script).toContain("bunx sendmock@beta");
+    }
+  });
+
+  test("DS-03.7 the install page has a bunx section, and the channel table lists npx and bunx first", () => {
+    const section = readPageSection(installPage, "bunx (no install)");
+
+    for (const runCommand of ["bunx sendmock", "bunx sendmock@beta"]) {
+      expect({ runCommand, isShown: section?.includes(runCommand) }).toEqual({
+        runCommand,
+        isShown: true,
+      });
+    }
+    expect(channels.slice(0, 2).map((channel) => channel.key)).toEqual([
+      "npx",
+      "bunx",
+    ]);
   });
 });
 
