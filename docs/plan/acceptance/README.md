@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 113 / 120 features, 562 / 571 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files. UI-07 is still `UI done` from the U3 sign-off on 2026-10-29; its last criterion waits for the owner's review of two screens.
+**Accepted: 114 / 120 features, 562 / 571 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -142,7 +142,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-04](06-ui.md#ui-04-empty-states-and-onboarding) | Empty states and onboarding | Phase U1 | 4 | Accepted |
 | [UI-05](06-ui.md#ui-05-accessibility) | Accessibility | Phase U3 | 4 | Accepted |
 | [UI-06](06-ui.md#ui-06-performance) | Performance | Phase U3 | 3 | Accepted |
-| [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 4 | UI done (2026-10-29) |
+| [UI-07](06-ui.md#ui-07-design-consistency) | Design consistency | Phase U3 | 4 | Accepted |
 | [UI-08](06-ui.md#ui-08-notifications) | Notifications | Phase U3 | 4 | Accepted |
 | [UI-09](06-ui.md#ui-09-contract-freeze) | Contract freeze | Phase U3 | 3 | Accepted |
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | Accepted |
