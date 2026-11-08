@@ -21,6 +21,30 @@ const LOG_FRAMES_BEFORE_TRUNCATE: i64 = 1024;
 /// About 256 MiB: a log this long is cut back even while writes keep coming, so a flood that
 /// never pauses cannot fill the disk.
 const LOG_FRAMES_LIMIT_UNDER_LOAD: i64 = 65_536;
+/// Background passes (seconds) the log must stay the same length before it is cut: cutting a
+/// long log took Windows runners seconds even with nothing to copy, so a short pause between
+/// bursts of mail is not enough.
+const QUIET_PASSES_BEFORE_TRUNCATE: u32 = 5;
+
+/// How long the write-ahead log has stayed the same length, counted in background passes.
+#[derive(Debug, Default)]
+struct LogActivity {
+    last_log_frame_count: Option<i64>,
+    quiet_pass_count: u32,
+}
+
+impl LogActivity {
+    /// Records one pass's log length; answers how many passes in a row it has not grown.
+    fn record_pass(&mut self, log_frame_count: i64) -> u32 {
+        if self.last_log_frame_count == Some(log_frame_count) {
+            self.quiet_pass_count += 1;
+        } else {
+            self.quiet_pass_count = 0;
+        }
+        self.last_log_frame_count = Some(log_frame_count);
+        self.quiet_pass_count
+    }
+}
 
 /// A connection of its own for copying the write-ahead log into the database file. A passive
 /// checkpoint never takes the write lock, so the copy and its sync run beside ingest instead of
@@ -45,9 +69,9 @@ impl DatabaseCheckpointer {
         std::thread::Builder::new()
             .name("sendmock-checkpoint".to_owned())
             .spawn(move || {
-                let mut previous_log_frame_count = None;
+                let mut log_activity = LogActivity::default();
                 std::thread::sleep(BACKGROUND_CHECKPOINT_INTERVAL);
-                while checkpoint_while_open(&open_connection, &mut previous_log_frame_count) {
+                while checkpoint_while_open(&open_connection, &mut log_activity) {
                     std::thread::sleep(BACKGROUND_CHECKPOINT_INTERVAL);
                 }
             })
@@ -74,11 +98,11 @@ impl DatabaseCheckpointer {
 }
 
 /// One checkpoint pass while the database is open; answers whether it still is. A busy or
-/// failed checkpoint is left for the next pass. `previous_log_frame_count` is the log's length
-/// after the last pass, which tells whether writes have paused since.
+/// failed checkpoint is left for the next pass. `log_activity` tells whether writes have
+/// paused long enough to cut the log.
 fn checkpoint_while_open(
     open_connection: &Weak<Mutex<Connection>>,
-    previous_log_frame_count: &mut Option<i64>,
+    log_activity: &mut LogActivity,
 ) -> bool {
     let Some(connection) = open_connection.upgrade() else {
         return false;
@@ -94,12 +118,12 @@ fn checkpoint_while_open(
     let passive_duration = passive_started_at.elapsed();
     let mut truncate_duration = Duration::ZERO;
     if let Ok(checkpoint_progress) = checkpoint_progress {
-        if should_truncate(checkpoint_progress, *previous_log_frame_count) {
+        let quiet_pass_count = log_activity.record_pass(checkpoint_progress.log_frame_count);
+        if should_truncate(checkpoint_progress, quiet_pass_count) {
             let truncate_started_at = Instant::now();
             let _ = truncate_copied_log(&connection);
             truncate_duration = truncate_started_at.elapsed();
         }
-        *previous_log_frame_count = Some(checkpoint_progress.log_frame_count);
     }
     if passive_duration + truncate_duration > SLOW_DATABASE_WORK {
         tracing::warn!(
@@ -114,15 +138,12 @@ fn checkpoint_while_open(
 /// A truncating checkpoint takes SQLite's write lock and copies and syncs whatever was written
 /// since the passive pass before it cuts the file; on a slow disk that held SMTP writes for
 /// seconds. A passive pass reports the whole log copied even under steady writes, so the log
-/// is only cut once writes have paused (it did not grow since the last pass), or when it has
-/// grown past the limit under a flood that never pauses.
-fn should_truncate(
-    checkpoint_progress: CheckpointProgress,
-    previous_log_frame_count: Option<i64>,
-) -> bool {
+/// is only cut once writes have paused for a few passes, or when it has grown past the limit
+/// under a flood that never pauses.
+fn should_truncate(checkpoint_progress: CheckpointProgress, quiet_pass_count: u32) -> bool {
     let log_frame_count = checkpoint_progress.log_frame_count;
     let is_whole_log_copied = checkpoint_progress.checkpointed_frame_count == log_frame_count;
-    let have_writes_paused = previous_log_frame_count == Some(log_frame_count);
+    let have_writes_paused = quiet_pass_count >= QUIET_PASSES_BEFORE_TRUNCATE;
     is_whole_log_copied
         && (log_frame_count >= LOG_FRAMES_LIMIT_UNDER_LOAD
             || (have_writes_paused && log_frame_count >= LOG_FRAMES_BEFORE_TRUNCATE))
@@ -164,7 +185,10 @@ mod tests {
         let database_folder = tempfile::tempdir()?;
         let shared_connection = Arc::new(Mutex::new(open_wal_database(&database_folder)?));
 
-        let is_still_open = checkpoint_while_open(&Arc::downgrade(&shared_connection), &mut None);
+        let is_still_open = checkpoint_while_open(
+            &Arc::downgrade(&shared_connection),
+            &mut LogActivity::default(),
+        );
 
         let connection = shared_connection
             .lock()
@@ -186,20 +210,16 @@ mod tests {
         let log_path = database_folder.path().join("sendmock.db-wal");
         let log_size_before = std::fs::metadata(&log_path)?.len();
         let shared_connection = Arc::new(Mutex::new(connection));
-        let mut previous_log_frame_count = None;
+        let mut log_activity = LogActivity::default();
 
-        checkpoint_while_open(
-            &Arc::downgrade(&shared_connection),
-            &mut previous_log_frame_count,
-        );
-        let log_size_after_first_pass = std::fs::metadata(&log_path)?.len();
-        checkpoint_while_open(
-            &Arc::downgrade(&shared_connection),
-            &mut previous_log_frame_count,
-        );
+        for _ in 0..QUIET_PASSES_BEFORE_TRUNCATE {
+            checkpoint_while_open(&Arc::downgrade(&shared_connection), &mut log_activity);
+        }
+        let log_size_before_last_pass = std::fs::metadata(&log_path)?.len();
+        checkpoint_while_open(&Arc::downgrade(&shared_connection), &mut log_activity);
 
         assert!(log_size_before > 4 * 1024 * 1024, "{log_size_before}");
-        assert_eq!(log_size_after_first_pass, log_size_before);
+        assert_eq!(log_size_before_last_pass, log_size_before);
         assert_eq!(std::fs::metadata(&log_path)?.len(), 0);
         Ok(())
     }
@@ -214,16 +234,23 @@ mod tests {
             log_frame_count: 5000,
             checkpointed_frame_count: 4000,
         };
+        let quiet = QUIET_PASSES_BEFORE_TRUNCATE;
 
-        assert!(should_truncate(copied(5000), Some(5000)));
-        assert!(!should_truncate(copied(5000), Some(4000)));
-        assert!(!should_truncate(copied(5000), None));
-        assert!(!should_truncate(copied(500), Some(500)));
-        assert!(!should_truncate(partly_copied, Some(5000)));
-        assert!(should_truncate(
-            copied(LOG_FRAMES_LIMIT_UNDER_LOAD),
-            Some(1000)
-        ));
+        assert!(should_truncate(copied(5000), quiet));
+        assert!(!should_truncate(copied(5000), quiet - 1));
+        assert!(!should_truncate(copied(500), quiet));
+        assert!(!should_truncate(partly_copied, quiet));
+        assert!(should_truncate(copied(LOG_FRAMES_LIMIT_UNDER_LOAD), 0));
+    }
+
+    #[test]
+    fn quiet_passes_count_up_while_the_log_keeps_its_length() {
+        let mut log_activity = LogActivity::default();
+
+        let quiet_pass_counts = [3000, 3000, 3000, 3200, 3200]
+            .map(|log_frame_count| log_activity.record_pass(log_frame_count));
+
+        assert_eq!(quiet_pass_counts, [0, 1, 2, 0, 1]);
     }
 
     #[test]
@@ -235,7 +262,10 @@ mod tests {
 
         drop(shared_connection);
 
-        assert!(!checkpoint_while_open(&open_connection, &mut None));
+        assert!(!checkpoint_while_open(
+            &open_connection,
+            &mut LogActivity::default()
+        ));
         Ok(())
     }
 }
