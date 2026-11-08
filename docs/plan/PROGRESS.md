@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 114 / 128 accepted (all but AI-05, DS-02, DS-03, DS-09, DS-10 and WS-03, and the planned PL-11 to PL-17 and WS-11), 565 / 633 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 114 / 129 accepted (all but AI-05, DS-02, DS-03, DS-09, DS-10 and WS-03, and the planned PL-11 to PL-17, WS-11 and WS-12), 565 / 637 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -358,7 +358,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] `main` set as default branch
 - [ ] Done-when check: installs and runs via every channel on macOS, Linux, Windows
 
-### After 1.0 (A1 to A15)
+### After 1.0 (A1 to A16)
 
 Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owner decision (2026-11-07), each item planned with its criteria before code.
 
@@ -377,6 +377,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [ ] A13: Accounts, login and roles: Admin, Developer, Viewer (#178, PL-14; #179, PL-15) (planned 2026-11-08, owner request, for later)
 - [ ] A14: Real forwarding: provider connections (#180, PL-16) and forwarding rules for email and SMS (#181, PL-17) (planned 2026-11-08, owner request, for later)
 - [ ] A15: Docs traffic analytics with Google Analytics (#186, WS-11) (planned 2026-11-08, owner request, for later)
+- [ ] A16: Code examples on every docs page, for every task (#197, WS-12) (planned 2026-11-08, owner request, for later)
 
 ---
 
@@ -886,3 +887,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-08 | Docker (#188): the owner deleted the old `edge` images (Docker Hub tags `edge` and `edge-debug`, and the whole `sendmock` package on GHCR). Runbook step 6 now checks that the first beta, which creates the GHCR package again, can be pulled from GHCR and Docker Hub without logging in, and how to make the package public if it is not. |
 | 2026-11-08 | Website (#189): WS-03.3's docs link test fetched each link target again for every link on every page (the whole sidebar on each page) and a second time for anchors, so it took 1.4 to 1.8 minutes against its 2-minute limit and timed out on its first try in 3 of 7 Website runs, passing only on Playwright's CI retry. It now fetches each target once and keeps its status and element ids. |
 | 2026-11-08 | Ticked PL-08.3 and PL-08.4 after CI passed on #187 (merged as `85f7428`): `--max-sms` and the no-limit `0` with its warning are proven, and PL-08 (retention) is Accepted again. |
+| 2026-11-08 | Plan: A16 code examples on every docs page ([32](32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12), owner request, for later), WS-12 new with 4 criteria: the 25 sub-pages without a From your code section, and Push without language tabs, get an example per task in the nine languages, checked by the contract test and run in the cross-language matrix. |

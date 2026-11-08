@@ -23,6 +23,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) |
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
 | A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
+| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -446,3 +447,19 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 - **Privacy page:** a short page says what is collected, by whom, for how long and how to opt out; the footer and the README link it.
 
 **Not in this part:** analytics in the SendMock app itself (the web UI on users' machines never phones home), heatmaps and session recordings, and A/B tests.
+
+## A16. Code examples on every docs page, for every task (WS-12)
+
+**Why (owner request, 2026-11-08, for later):** readers copy code. Today every top-level menu page has one "From your code" section with the screen's most common task in nine languages (WS-08.2), but the 25 sub-pages under them have none: Mail's outcomes, release, replies and forwards, reading and checks, providers and Mailpit pages; SMS's verify, providers, WhatsApp and test numbers pages; Payments' checkout page, flows, gateways, methods and subscriptions; the seven Webhooks pages; HTTP responses; and Providers. Push, a top-level page added after WS-08, has plain snippets instead of the language tabs.
+
+**How others do it:** API-first products (Stripe, Twilio, SendGrid) show a runnable example beside every task, in the reader's chosen language, remembered across pages, with the request and the answer side by side.
+
+**How:**
+
+- **Every page, every task:** each menu and sub-page gets a "From your code" section with one example per task the page explains (not only the most common one), as tabs in the same nine languages: CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#. A page about a provider API shows that provider's own SDK against SendMock where one exists, as the Connect pages do.
+- **Short and complete:** each example runs as written against a default SendMock (`127.0.0.1`, ports 1025 and 8025), with its imports, and shows the answer it gets back; long flows link to the recipe instead of repeating it.
+- **Kept true:** the existing contract check (WS-08.3) covers the new examples: every method, path, JSON key, query name and `sendmock` command must exist. A test lists every page under a menu and fails when one has no "From your code" section or misses a language.
+- **Run for real:** the examples join the cross-language matrix (WS-08.5), so CI runs them against a real `sendmock` binary in every language.
+- **Order:** Push first (it lacks the tabs), then Webhooks, SMS, Mail, Payments, HTTP and Providers, one menu per pull request.
+
+**Not in this part:** examples for languages beyond the nine, and interactive "run in the browser" examples (the API playground covers that).

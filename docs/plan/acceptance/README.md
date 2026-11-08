@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 114 / 128 features, 565 / 633 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 114 / 129 features, 565 / 637 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -176,6 +176,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B) | 4 | Accepted |
 | [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | After 1.0 (A15) | 6 | Not started |
+| [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | After 1.0 (A16) | 4 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Accepted |
 | [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | Accepted |
