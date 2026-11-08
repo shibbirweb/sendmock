@@ -28,7 +28,7 @@ permissions:
 jobs:
   plan:
     name: Channels for ${{ inputs.channel }} ${{ inputs.version }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:

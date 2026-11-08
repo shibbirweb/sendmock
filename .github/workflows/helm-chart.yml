@@ -35,7 +35,7 @@ env:
 jobs:
   chart:
     name: Lint, render and install on kind
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 

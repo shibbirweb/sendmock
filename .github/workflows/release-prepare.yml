@@ -28,7 +28,7 @@ jobs:
   prepare:
     name: Prepare ${{ inputs.bump }}${{ inputs.dry_run && ' (dry run)' || '' }}
     if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       BUMP: ${{ inputs.bump }}
       GITHUB_TOKEN: ${{ github.token }}

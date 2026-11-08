@@ -56,9 +56,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-26.04, variant: plain, build_target: "" }
+          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest, variant: plain, build_target: "" }
           - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm, variant: plain, build_target: "" }
-          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-26.04, variant: debug, build_target: debug }
+          - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest, variant: debug, build_target: debug }
           - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm, variant: debug, build_target: debug }
     steps:
       - uses: actions/checkout@v5
@@ -125,7 +125,7 @@ jobs:
   publish-rehearsal:
     name: Signed, with an SBOM and provenance, under 25 MB (rehearsal on a local registry)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     services:
       registry:
         image: registry:2
@@ -182,7 +182,7 @@ jobs:
     name: Tag, sign and check it (${{ matrix.variant }})
     if: github.event_name == 'push' || inputs.image_tags != ''
     needs: image
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write

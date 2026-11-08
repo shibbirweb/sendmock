@@ -52,7 +52,7 @@ env:
 jobs:
   plan:
     name: Version from the code
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
       docker_tags: ${{ steps.version.outputs.docker_tags }}
@@ -81,7 +81,7 @@ jobs:
 
   web-dist:
     name: Web UI build
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -111,7 +111,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { target: x86_64-unknown-linux-musl, runner: ubuntu-26.04, cross: alpine }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: alpine }
           - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, cross: alpine }
           - { target: aarch64-apple-darwin, runner: macos-latest, cross: cargo }
           - { target: x86_64-apple-darwin, runner: macos-latest, cross: cargo }
@@ -189,7 +189,7 @@ jobs:
         include:
           - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz, npm_platform: darwin-arm64 }
           - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz, npm_platform: darwin-x64 }
-          - { target: x86_64-unknown-linux-musl, runner: ubuntu-26.04, archive: tar.gz, npm_platform: linux-x64, containers: "alpine:3.22 busybox:1.37" }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz, npm_platform: linux-x64, containers: "alpine:3.22 busybox:1.37" }
           - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz, npm_platform: linux-arm64, containers: "alpine:3.22" }
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip, npm_platform: win32-x64 }
           - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip, npm_platform: win32-arm64 }
@@ -388,7 +388,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { target: x86_64-unknown-linux-musl, architecture: amd64, runner: ubuntu-26.04, nfpm_platform: x86_64 }
+          - { target: x86_64-unknown-linux-musl, architecture: amd64, runner: ubuntu-latest, nfpm_platform: x86_64 }
           - { target: aarch64-unknown-linux-musl, architecture: arm64, runner: ubuntu-24.04-arm, nfpm_platform: arm64 }
     env:
       NFPM_VERSION: "2.48.0"
@@ -451,7 +451,7 @@ jobs:
   linux-community-packages:
     name: AUR, COPR and Nix packages
     needs: [plan, test]
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.plan.outputs.version }}
       DOWNLOAD_URL: http://127.0.0.1:8767
@@ -518,7 +518,7 @@ jobs:
   checksums:
     name: SHA256SUMS
     needs: [test, linux-packages, linux-community-packages]
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
         with:
@@ -544,7 +544,7 @@ jobs:
   crates:
     name: crates.io packages
     needs: web-dist
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -602,7 +602,7 @@ jobs:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
     needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, push-sdks, example-apps, crates]
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -691,7 +691,7 @@ jobs:
     name: Helm chart on GHCR
     needs: [plan, docker]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -738,7 +738,7 @@ jobs:
     name: Docker Desktop extension on GHCR
     needs: [plan, docker]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -802,7 +802,7 @@ jobs:
     name: Homebrew formula
     needs: [plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       HAS_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
     steps:
@@ -845,7 +845,7 @@ jobs:
     name: Scoop manifest
     needs: [plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       HAS_BUCKET_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN != '' }}
     steps:
@@ -890,7 +890,7 @@ jobs:
     name: npm packages
     needs: [plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable') && vars.NPM_PUBLISHING == 'true'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -935,7 +935,7 @@ jobs:
     name: MCP registry
     needs: [plan, npm, docker]
     if: inputs.publish && inputs.channel == 'stable'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -979,7 +979,7 @@ jobs:
     name: crates.io
     needs: [plan, publish]
     if: inputs.publish && inputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -1084,7 +1084,7 @@ jobs:
     name: AUR package
     needs: [plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       HAS_AUR_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY != '' }}
     steps:
@@ -1134,7 +1134,7 @@ jobs:
     name: COPR build
     needs: [plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       HAS_COPR_CONFIG: ${{ secrets.COPR_CONFIG != '' }}
     steps:
@@ -1167,7 +1167,7 @@ jobs:
     name: Nix package file
     needs: [plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:

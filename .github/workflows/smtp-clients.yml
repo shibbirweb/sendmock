@@ -32,7 +32,7 @@ permissions:
 jobs:
   binary:
     name: Release binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -63,7 +63,7 @@ jobs:
   client:
     name: ${{ matrix.client }}
     needs: binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:

@@ -36,7 +36,7 @@ permissions:
 jobs:
   sdks:
     name: Six email provider SDKs offline
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026

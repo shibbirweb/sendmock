@@ -37,7 +37,7 @@ permissions:
 jobs:
   binary:
     name: Release binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -68,7 +68,7 @@ jobs:
   app:
     name: ${{ matrix.language }}
     needs: binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -171,7 +171,7 @@ jobs:
   presets:
     name: HTTP presets and their official libraries
     needs: binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -208,7 +208,7 @@ jobs:
   recipes:
     name: Recipe examples (${{ matrix.language }})
     needs: binary
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:

@@ -50,7 +50,7 @@ jobs:
   # PACKAGES_GPG_PRIVATE_KEY (DS-03.3, plan 30 W4).
   package-repository:
     name: APT and YUM repository
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     outputs:
       has_repository: ${{ steps.build.outputs.has_repository }}
     env:
@@ -94,7 +94,7 @@ jobs:
   build:
     name: Build
     needs: package-repository
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     # Playwright's own image has the browser and its system packages, as in ci.yml.
     # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
     container:
@@ -187,7 +187,7 @@ jobs:
     name: Publish to GitHub Pages
     if: github.event_name != 'pull_request'
     needs: build
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write

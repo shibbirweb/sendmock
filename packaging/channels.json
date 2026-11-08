@@ -32,7 +32,7 @@
           "command": "$(brew --prefix)/bin/sendmock"
         },
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"\nbrew install shibbirweb/tap/sendmock",
@@ -65,7 +65,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh",
@@ -142,7 +142,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock",
@@ -175,7 +175,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "container": "fedora:42",
           "shell": "bash",
           "prepare": "dnf install -y -q sudo unzip",
@@ -209,7 +209,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "container": "archlinux:latest",
           "shell": "bash",
           "prepare": "pacman -Syu --noconfirm --needed base-devel git sudo unzip\nuseradd -m aur-builder\necho 'aur-builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/aur-builder",
@@ -242,7 +242,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "container": "fedora:42",
           "shell": "bash",
           "prepare": "dnf install -y -q sudo unzip dnf-plugins-core",
@@ -275,7 +275,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon\n. \"$HOME/.nix-profile/etc/profile.d/nix.sh\"\nnix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#sendmock"
@@ -401,7 +401,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "mkdir -p \"$RUNNER_TEMP/npm-project\" && cd \"$RUNNER_TEMP/npm-project\" && npm init -y > /dev/null\nnpm install --save-dev sendmock",
@@ -456,7 +456,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
@@ -506,7 +506,7 @@
       },
       "installs": [
         {
-          "runner": "ubuntu-26.04",
+          "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
             "stable": "cargo install sendmock --locked"

@@ -29,7 +29,7 @@ permissions:
 jobs:
   compose:
     name: The Compose example
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -70,7 +70,7 @@ jobs:
   service-container:
     name: SendMock as a service container
     if: inputs.image != ''
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     services:
       sendmock:
         image: ${{ inputs.image }}
