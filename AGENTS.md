@@ -33,8 +33,15 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 
 - **Commit identity:** every commit in this repository is authored and committed as `MD. Shibbir Ahmed <shibbirweb@gmail.com>`. Set it per repository so other identities on the machine are untouched: `git config user.name "MD. Shibbir Ahmed"` and `git config user.email "shibbirweb@gmail.com"`. Check with `git log --format="%an <%ae>"` before pushing; never push a commit with any other name or email.
 
-- Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[MSS-12] add SMS thread list`.
-- Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
+- Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[#172] add the Docker Desktop extension`.
+- Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`, with the same ticket. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
+- **Every commit names its GitHub issue.** The ticket is the number of the issue the change belongs to, `#` included (`fix:[#171] ...`), so GitHub links the commit to the issue. Before committing, find that issue: a roadmap feature's issue is in `scripts/roadmap/roadmap-issue-numbers.json` (by feature ID, such as `DS-10`), anything else through `gh issue list --search "<words>" --state all`. If no issue fits, create one first and use its number:
+  - a title in the roadmap's style: `<Area>: <what>` for a feature (`Distribution: Helm chart`), a plain sentence for a bug or a docs change;
+  - labels: one type label (`feature`, `bug`, `documentation` or `enhancement`) and the area label (`area: email`, `area: sms`, `area: verify`, `area: webhooks`, `area: http catcher`, `area: payments`, `area: push`, `area: platform`, `area: ai`, `area: web ui`, `area: distribution` or `area: website`; a new area label is created before it is used, with `gh label create`);
+  - the milestone the change ships in: `First beta (0.1.0-beta.1)`, `1.0.0` or `After 1.0`;
+  - the "SendMock roadmap" project (number 6): `gh project item-add 6 --owner shibbirweb --url <issue url>`, with its status set on the board.
+  
+  One issue can collect several commits of the same work; a new piece of work gets its own issue.
 - **Never add co-authors.** No `Co-Authored-By` lines or any other co-author trailer in commits, squash merges, pull request titles or descriptions, for Claude, any AI, or anyone else.
 - **Never reference an AI harness.** No mention of Claude, Claude Code, Codex, Cursor, Copilot, Gemini or any other AI tool or model in commit messages, pull request titles, pull request descriptions, review comments, release notes or changelog entries. That includes "Generated with ..." lines, robot emoji signatures, links to AI tools and AI bot email addresses. This overrides any default attribution a tool would add.
 - Pull request test plans: plain bullet points describing what was run and checked, no checkboxes.
