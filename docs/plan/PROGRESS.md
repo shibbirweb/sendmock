@@ -13,7 +13,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | none yet (first beta `0.1.0-beta.1` is planned for Phase 1, made with Prepare release `bump: minor`) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 114 / 127 accepted (all but AI-05, DS-02, DS-03, DS-09, DS-10 and WS-03, and the planned PL-11 to PL-17), 563 / 625 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
+| **Feature acceptance** | 113 / 128 accepted (all but AI-05, DS-02, DS-03, DS-09, DS-10, PL-08 and WS-03, and the planned PL-11 to PL-17 and WS-11), 563 / 633 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, DS-02.6, WS-03.1 and the Beta half of WS-03.7 wait for the first merge, beta and stable (steps 5 to 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) for the first beta's Install channels run (step 6) |
 
 **Next up:**
 
@@ -358,7 +358,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] `main` set as default branch
 - [ ] Done-when check: installs and runs via every channel on macOS, Linux, Windows
 
-### After 1.0 (A1 to A14)
+### After 1.0 (A1 to A15)
 
 Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owner decision (2026-11-07), each item planned with its criteria before code.
 
@@ -376,6 +376,7 @@ Plan: [32-after-1-0.md](32-after-1-0.md). Built on `feat/phase-0` in #48 by owne
 - [ ] A12: Monitoring: Prometheus metrics (#175, PL-11), OpenTelemetry export (#176, PL-12), log files and readiness (#177, PL-13) (planned 2026-11-08, owner request)
 - [ ] A13: Accounts, login and roles: Admin, Developer, Viewer (#178, PL-14; #179, PL-15) (planned 2026-11-08, owner request, for later)
 - [ ] A14: Real forwarding: provider connections (#180, PL-16) and forwarding rules for email and SMS (#181, PL-17) (planned 2026-11-08, owner request, for later)
+- [ ] A15: Docs traffic analytics with Google Analytics (#186, WS-11) (planned 2026-11-08, owner request, for later)
 
 ---
 
@@ -879,3 +880,5 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-08 | Plan: A13 accounts, login and roles ([32](32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15), owner request, for later): PL-14 accounts and login (#178, 10 criteria: off by default, `--auth accounts`, the first Admin from environment variables or a setup code in the log as Jenkins does, Argon2id passwords, cookie sessions with OWASP's settings, personal and service tokens as Grafana's service accounts, an audit log) and PL-15 roles (#179, 7 criteria: Admin, Developer and Viewer, each operation declaring the role it needs and checked once in the operations layer for every surface; MCP lists only the allowed tools). |
 | 2026-11-08 | Plan: A14 real forwarding ([32](32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17), owner request, for later), built on today's Release and email auto-forward rules: PL-16 real provider connections (#180, 7 criteria: named SMTP, SendGrid, Mailgun, SES, Postmark, Resend, Twilio, Vonage, Plivo, Telnyx, Infobip and SNS connections as sending adapters, each with allowed and blocked recipients, masked secrets, a test send, a `--real-delivery off` switch, and Send for real on SMS too) and PL-17 forwarding rules for email and SMS (#181, 8 criteria: filters, forward to the original or redirect to fixed recipients, caps and dry run, retries, events, loop guard, CI against a second SendMock as the real provider). |
 | 2026-11-08 | Runbook step 5 done: #48 merged into `develop` (`24514d7`, titled for the first beta's changelog as "SendMock: catch email, SMS, push, payments and webhooks locally, with a web UI, REST API, CLI and MCP server"), all 15 workflows passed on it, and Docker edge's published check passed on `develop` (signed and verified, an SBOM and provenance for amd64 and arm64, 7 MB compressed), ticking DS-02.5. Publish beta, Promote stable and Registry publish ran and skipped, as no release was prepared. Closed #173 and #174. |
+| 2026-11-08 | Plan (owner request): retention ([02](02-architecture.md#retention), PL-08.3 and PL-08.4 new, PL-08 back to In progress): `--max-sms` (`SENDMOCK_MAX_SMS`, `max_sms`), planned from the start but never built, and `0` for no count limit on emails or SMS, as Mailpit's `--max 0`, with a warning at startup and in Settings while nothing bounds the database, and docs that recommend a fixed limit. The docs also say which traffic each limit covers, that push notifications follow the SMS limit and that payments are not pruned. |
+| 2026-11-08 | Plan: A15 docs traffic analytics ([32](32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11), owner request, for later), WS-11 new with 6 criteria: Google Analytics 4 on the docs website only when the build has a measurement ID, Consent Mode v2 with a banner (denied by default, Do Not Track and Global Privacy Control respected), page views per docs version and install-command copies, nothing from the demo or playground, Lighthouse budgets kept, and a privacy page. |

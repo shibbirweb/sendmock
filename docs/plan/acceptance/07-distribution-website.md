@@ -202,3 +202,14 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 - [x] WS-10.2 Each entry says where the control is (an annotated screenshot), what it does and what you see afterwards, what it changes or sends (data, events, webhooks, logs), where its text comes from, how it links to other screens, the same action from the CLI, REST API and MCP, and the errors it can show with what to do. (#48)
 - [x] WS-10.3 A Playwright crawl of the demo lists every control per screen, and a test fails when a control has no entry or an entry names a control that no longer exists. (#48)
 - [x] WS-10.4 The data sources and the CLI, REST API and MCP equivalents are generated from the OpenAPI spec and the surface catalogue, and the annotated screenshots from `bun run screenshots`, so they cannot drift from the code. (#48)
+
+## WS-11 Docs traffic analytics
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11) (A15).
+
+- [ ] WS-11.1 The website loads Google Analytics 4 only when the build has a measurement ID (`NEXT_PUBLIC_GA_MEASUREMENT_ID`); local builds, pull request previews and forks load no analytics script.
+- [ ] WS-11.2 Consent Mode v2 starts with every storage type denied; nothing is stored or sent before the visitor accepts the banner, the choice is remembered and can be changed from the footer, and Do Not Track or Global Privacy Control count as a no.
+- [ ] WS-11.3 After consent, every page view is recorded with its path and docs version, including client-side navigation between docs pages, and copying an install command is recorded as an event.
+- [ ] WS-11.4 Nothing typed into the live demo or the API playground (request bodies, tokens, addresses, phone numbers) is ever sent to analytics.
+- [ ] WS-11.5 The script loads after the page is interactive, and the website keeps its Lighthouse scores and budgets.
+- [ ] WS-11.6 A privacy page says what is collected, by whom, for how long and how to opt out, and the footer and the README link it.
