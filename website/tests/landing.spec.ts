@@ -544,8 +544,9 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
   // The quick start shows every line at once instead of typing it.
   const terminal = page.getByTestId("quick-start-terminal");
   // Whichever tab opens first (Playwright's desktop Chrome reports Windows, so it is that
-  // system's), its first command and its last line show together.
-  await expect(terminal).toContainText(/^(\$|PS>) \S/);
+  // system's), its first command and its last line show together. The copy button's label
+  // comes first in the text, so the prompt is not anchored to the start.
+  await expect(terminal).toContainText(/(\$|PS>) \S/);
   await expect(terminal).toContainText(
     /Web UI and API on http:\/\/[\d.]+:8025/,
   );
