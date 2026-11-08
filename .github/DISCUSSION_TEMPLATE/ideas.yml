@@ -6,7 +6,7 @@ body:
         Thanks for the idea. Ideas with a clear problem and real use get built first.
 
         - Check the [roadmap](https://github.com/shibbirweb/sendmock/issues/170) and the existing ideas; upvote one that matches instead of opening a new one.
-        - Asking for a new provider API? Reply on [Which provider should SendMock emulate next?](https://github.com/shibbirweb/sendmock/discussions/192), or use the [provider request form](https://github.com/shibbirweb/sendmock/issues/new?template=provider_request.yml).
+        - Asking for a new provider API? Post it in [Provider requests](https://github.com/shibbirweb/sendmock/discussions/new?category=provider-requests) instead.
   - type: textarea
     id: problem
     attributes:

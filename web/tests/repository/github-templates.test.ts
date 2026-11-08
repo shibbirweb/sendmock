@@ -144,11 +144,14 @@ describe("GitHub templates", () => {
     ]);
   });
 
-  test("UI-10.2 Q&A, Ideas and Show and tell have discussion forms with a required field", () => {
+  test("UI-10.2 every discussion category people post in has a form with a required field", () => {
     const discussionFormFiles = readdirSync(discussionTemplateDirectory).sort();
 
     expect(discussionFormFiles).toEqual([
+      "ai-agents-and-mcp.yml",
+      "docker-ci-and-kubernetes.yml",
       "ideas.yml",
+      "provider-requests.yml",
       "q-a.yml",
       "show-and-tell.yml",
     ]);
