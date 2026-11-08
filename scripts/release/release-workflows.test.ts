@@ -189,6 +189,23 @@ describe("Docker edge", () => {
     expect(readFileSync(join(import.meta.dir, "../docker-hub-repository.sh"), "utf8")).toContain(
       "is_private: false",
     );
+    expect(repositoryStep?.run).toContain("packaging/docker/README.md");
+  });
+
+  test("DS-02.5 the Docker Hub overview fits Docker Hub and links only to absolute URLs", () => {
+    const dockerHubReadme = readFileSync(
+      join(import.meta.dir, "../../packaging/docker/README.md"),
+      "utf8",
+    );
+    const linkTargets = [...dockerHubReadme.matchAll(/\]\(([^)]+)\)/g)].map(
+      (linkMatch) => linkMatch[1] ?? "",
+    );
+
+    expect(dockerHubReadme.length).toBeLessThan(25_000);
+    expect(dockerHubReadme).toContain("docker run --rm -p 1025:1025 -p 8025:8025 shibbirweb/sendmock");
+    for (const linkTarget of linkTargets) {
+      expect(linkTarget).toStartWith("https://");
+    }
   });
 
   test("a published beta or stable gets its Docker tags, Homebrew formula and Linux packages", () => {

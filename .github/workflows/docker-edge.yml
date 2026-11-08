@@ -221,13 +221,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # A push would create the repository with the account's default visibility; a private one
-      # breaks `docker pull` for everyone, so it is created public first.
+      # breaks `docker pull` for everyone, so it is created public first. Its overview page is
+      # packaging/docker/README.md.
       - name: The Docker Hub repository exists and is public
         if: env.HAS_DOCKERHUB_TOKEN == 'true'
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: bash scripts/docker-hub-repository.sh "${DOCKERHUB_IMAGE#docker.io/}"
+        run: bash scripts/docker-hub-repository.sh "${DOCKERHUB_IMAGE#docker.io/}" packaging/docker/README.md
 
       - name: The tags for both platforms
         working-directory: ${{ runner.temp }}/digests
