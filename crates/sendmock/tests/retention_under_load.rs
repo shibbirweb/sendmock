@@ -24,6 +24,15 @@ const SETTLED_WINDOW: Duration = Duration::from_secs(3);
 /// Two prune intervals and more: a prune still running when the round ends, and the next one.
 const SETTLE_DEADLINE: Duration = Duration::from_secs(25);
 const SMTP_STEPS: [&str; 4] = ["MAIL FROM", "RCPT TO", "DATA", "message body"];
+/// The longest one message may take while pruning runs. Windows CI runners get more: with no
+/// lock held, their disks still took 3 to 13 s for a log copy that takes milliseconds
+/// elsewhere, and a message written meanwhile waited 2 to 6 s (issue 171). A stall from a held
+/// lock, which this test is for, took 9 to 54 s there before it was fixed.
+const SLOWEST_MESSAGE_LIMIT: Duration = if cfg!(windows) {
+    Duration::from_secs(10)
+} else {
+    Duration::from_secs(2)
+};
 
 /// The slowest SMTP message of a round, and the step of it that took longest.
 struct SlowestMessage {
@@ -159,10 +168,6 @@ fn read_warning_lines(sendmock: &SendmockProcess) -> String {
 
 // AC: PL-08.2
 #[test]
-#[cfg_attr(
-    windows,
-    ignore = "stalls on shared Windows CI runners: https://github.com/shibbirweb/sendmock/issues/171"
-)]
 fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Result<()> {
     let working_directory = tempfile::tempdir()?;
     let database_path = working_directory.path().join("sendmock.db");
@@ -198,7 +203,7 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
         .max_by_key(|slowest_message| slowest_message.duration)
         .ok_or_else(|| io::Error::other("no round was sent"))?;
     assert!(
-        slowest_message.duration < Duration::from_secs(2),
+        slowest_message.duration < SLOWEST_MESSAGE_LIMIT,
         "one message took {:?}, most of it in {}; server warnings:\n{}",
         slowest_message.duration,
         slowest_message.slowest_step,
