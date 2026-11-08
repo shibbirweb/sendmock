@@ -438,7 +438,19 @@ Good to know:
 
 ## Docker Desktop extension
 
-The extension runs SendMock inside Docker Desktop and adds a **SendMock** tab that shows whether it is running and opens the web UI. SMTP is on `localhost:1025` and the web UI on `http://localhost:8025`, as with `docker run`. Until it is in Docker's Marketplace, build and install it from a clone of the repository:
+The extension runs SendMock inside Docker Desktop and adds a **SendMock** tab that shows whether it is running and opens the web UI. SMTP is on `localhost:1025` and the web UI on `http://localhost:8025`, as with `docker run`. Each release publishes it on GitHub's container registry, and each version runs the SendMock of the same version.
+
+1. Install it into Docker Desktop (answer `y` when Docker asks to confirm an extension that is not from its Marketplace):
+
+   ```bash
+   docker extension install ghcr.io/shibbirweb/sendmock-docker-extension:latest
+   ```
+
+2. Open **SendMock** in Docker Desktop's sidebar, then **Open SendMock**.
+
+For a beta, use its version as the tag instead of `latest`, for example `ghcr.io/shibbirweb/sendmock-docker-extension:0.1.0-beta.1`.
+
+To try changes that are not released yet, build it from a clone of the repository:
 
 1. Get the repository:
 

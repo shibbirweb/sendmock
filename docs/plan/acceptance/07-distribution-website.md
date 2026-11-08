@@ -89,6 +89,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] DS-09.2 Values set the image, resources, persistence for `/data` (a claim, or an empty directory), extra `SENDMOCK_*` settings, the provider port and an optional Ingress for the web UI. (#48)
 - [x] DS-09.3 CI lints and renders the chart with every option and installs it on a kind cluster, where SendMock answers its health check and catches an email sent over SMTP. (#48)
 - [x] DS-09.4 The docs say how to install the chart and change its values. (#48)
+- [ ] DS-09.5 Each beta and stable release pushes the chart to `oci://ghcr.io/shibbirweb/charts` with the release's version, and it installs from there without logging in, running that version of SendMock.
 
 ## DS-10 Docker Desktop extension
 
@@ -98,6 +99,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] DS-10.2 Its dashboard tab shows whether SendMock answers and opens the web UI. (#48)
 - [x] DS-10.3 CI builds the extension image and checks its labels and metadata. (#48)
 - [x] DS-10.4 The docs say how to install the extension. (#48)
+- [ ] DS-10.5 Each beta and stable release pushes the extension image for `linux/amd64` and `linux/arm64` to `ghcr.io/shibbirweb/sendmock-docker-extension:<version>`, readable without logging in, with its backend pinned to the SendMock image of the same version.
 
 ---
 

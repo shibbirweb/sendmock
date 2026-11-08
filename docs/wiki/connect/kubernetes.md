@@ -3,31 +3,43 @@ title: Kubernetes
 description: Run one shared SendMock in a Kubernetes cluster with the Helm chart, and point the cluster's apps at it.
 ---
 
-> The chart is in [`packaging/helm/sendmock`](https://github.com/shibbirweb/sendmock/tree/develop/packaging/helm/sendmock). See [Docker](./docker.md) for Compose.
+> Each release publishes the chart to `oci://ghcr.io/shibbirweb/charts`; its source is in [`packaging/helm/sendmock`](https://github.com/shibbirweb/sendmock/tree/develop/packaging/helm/sendmock). See [Docker](./docker.md) for Compose.
 
-The Helm chart runs one SendMock for a team or a CI cluster: SMTP on port 1025, the web UI and API on 8025, health probes on `/api/v1/health`, as the image's non-root user with a read-only root file system.
+The Helm chart runs one SendMock for a team or a CI cluster: SMTP on port 1025, the web UI and API on 8025, health probes on `/api/v1/health`, as the image's non-root user with a read-only root file system. Each chart version runs the SendMock image of the same version.
 
 ## Install
 
-1. Get the chart (from a clone of the repository):
+1. Install the chart from GitHub's container registry, keeping the data on a volume:
 
    ```bash
-   git clone https://github.com/shibbirweb/sendmock.git
+   helm install sendmock oci://ghcr.io/shibbirweb/charts/sendmock --set persistence.enabled=true
    ```
 
-2. Install it, keeping the data on a volume:
-
-   ```bash
-   helm install sendmock sendmock/packaging/helm/sendmock --set persistence.enabled=true
-   ```
-
-3. Reach the web UI from your machine:
+2. Reach the web UI from your machine:
 
    ```bash
    kubectl port-forward service/sendmock 8025:8025 1025:1025
    ```
 
-4. Open http://127.0.0.1:8025.
+3. Open http://127.0.0.1:8025.
+
+Helm installs the newest stable version. Add `--version 0.1.0-beta.1` (or any released version) to pick one, or `--devel` for the newest beta.
+
+## Install from a clone
+
+To try chart changes that are not released yet:
+
+1. Get the repository:
+
+   ```bash
+   git clone https://github.com/shibbirweb/sendmock.git
+   ```
+
+2. Install the chart from it:
+
+   ```bash
+   helm install sendmock sendmock/packaging/helm/sendmock --set persistence.enabled=true
+   ```
 
 ## Point apps at it
 

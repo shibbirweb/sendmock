@@ -126,9 +126,9 @@ When the release is out, install it through the channels that publish at once (r
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=0.1.0-beta.1 -f channel=beta -f channels=after-publish
 ```
 
-Check: the Release build's service-container job passed, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner.
+Check: the Release build's service-container job passed, its "Helm chart on GHCR" job installed the chart from `oci://ghcr.io/shibbirweb/charts` without logging in, its "Docker Desktop extension on GHCR" job read the extension image back without logging in, the Install channels run passed (its `npx` channel runs `npx sendmock@<version>` with no install), and `/next/` on the website shows the Beta banner. On the repository's Packages page, `sendmock`, `charts/sendmock` and `sendmock-docker-extension` are public; a package a workflow creates takes the repository's visibility, so if one is private, make it public in its settings and run the job again.
 
-Proves: DS-02.6, DS-03.7, WS-03.7
+Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5
 
 ## 7. Publish 1.0.0
 

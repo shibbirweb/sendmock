@@ -12,6 +12,12 @@ const metadata = JSON.parse(
 };
 const composeText = readFileSync(`${extensionFolder}/docker-compose.yaml`, "utf8");
 const dashboardPage = readFileSync(`${extensionFolder}/ui/index.html`, "utf8");
+const releaseJobs = (
+  Bun.YAML.parse(readFileSync(".github/workflows/release.yml", "utf8")) as {
+    jobs: Record<string, { if?: string; needs?: string[] }>;
+  }
+).jobs;
+const releaseWorkflowText = readFileSync(".github/workflows/release.yml", "utf8");
 
 /** The labels Docker Desktop requires before it lists an extension. */
 const requiredLabels = [
@@ -66,5 +72,20 @@ describe("Docker Desktop extension", () => {
 
     expect(extensionSection).toContain("docker build -t sendmock-docker-extension:0.0.1 packaging/docker-desktop");
     expect(extensionSection).toContain("docker extension install sendmock-docker-extension:0.0.1");
+    expect(extensionSection).toContain("docker extension install ghcr.io/shibbirweb/sendmock-docker-extension:");
+  });
+
+  test("DS-10.5 each beta and stable release pushes the image for both platforms, its backend pinned to the version", () => {
+    expect(releaseJobs["docker-extension"]?.if).toBe(
+      "inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')",
+    );
+    expect(releaseJobs["docker-extension"]?.needs).toEqual(["plan", "docker"]);
+    expect(composeText).toMatch(/image: ghcr\.io\/shibbirweb\/sendmock$/m);
+    expect(releaseWorkflowText).toContain(
+      "image: ghcr.io/shibbirweb/sendmock:$VERSION",
+    );
+    expect(releaseWorkflowText).toContain("EXTENSION_IMAGE: ghcr.io/shibbirweb/sendmock-docker-extension");
+    expect(releaseWorkflowText).toContain('test "$platforms" = "linux/amd64 linux/arm64"');
+    expect(releaseWorkflowText).toContain("docker logout ghcr.io");
   });
 });

@@ -685,6 +685,118 @@ jobs:
     with:
       image: ghcr.io/shibbirweb/sendmock:${{ needs.plan.outputs.version }}
 
+  # The Helm chart as an OCI artifact on GHCR, then installed from there logged out, on a kind
+  # cluster that pulls the image the docker job just pushed (DS-09.5).
+  helm-chart:
+    name: Helm chart on GHCR
+    needs: [plan, docker]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: azure/setup-helm@v4
+
+      - name: Package the chart and push it to GHCR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REGISTRY_USER: ${{ github.actor }}
+        run: |
+          helm package packaging/helm/sendmock --destination chart-package
+          test -f "chart-package/sendmock-$VERSION.tgz" || { echo "::error::the chart's version is not $VERSION"; exit 1; }
+          echo "$GH_TOKEN" | helm registry login ghcr.io --username "$REGISTRY_USER" --password-stdin
+          helm push "chart-package/sendmock-$VERSION.tgz" oci://ghcr.io/shibbirweb/charts
+          helm registry logout ghcr.io
+
+      - uses: helm/kind-action@v1
+
+      # AC: DS-09.5
+      - name: Installed from GHCR without logging in, SendMock runs this version
+        run: |
+          helm install sendmock oci://ghcr.io/shibbirweb/charts/sendmock --version "$VERSION" --wait --timeout 5m
+          kubectl port-forward service/sendmock 8025:8025 > port-forward.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8025/api/v1/info | jq -e --arg version "$VERSION" '.version == $version'
+
+      - name: Pod log
+        if: failure()
+        run: kubectl logs deployment/sendmock --tail=100 || true
+
+  # The Docker Desktop extension image on GHCR, its backend pinned to the SendMock image of the
+  # same version, read back logged out (DS-10.5).
+  docker-extension:
+    name: Docker Desktop extension on GHCR
+    needs: [plan, docker]
+    if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      EXTENSION_IMAGE: ghcr.io/shibbirweb/sendmock-docker-extension
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - name: Pin the backend to this version of SendMock
+        run: |
+          sed -i "s#image: ghcr.io/shibbirweb/sendmock\$#image: ghcr.io/shibbirweb/sendmock:$VERSION#" packaging/docker-desktop/docker-compose.yaml
+          grep -q "image: ghcr.io/shibbirweb/sendmock:$VERSION\$" packaging/docker-desktop/docker-compose.yaml
+
+      - name: The tags, with latest for stable only
+        id: tags
+        run: |
+          image_tags="$EXTENSION_IMAGE:$VERSION"
+          if [ "$RELEASE_CHANNEL" = "stable" ]; then
+            image_tags="$image_tags,$EXTENSION_IMAGE:latest"
+          fi
+          echo "image_tags=$image_tags" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build for both platforms and push
+        uses: docker/build-push-action@v6
+        with:
+          context: packaging/docker-desktop
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.tags.outputs.image_tags }}
+          labels: org.opencontainers.image.version=${{ env.VERSION }}
+
+      # AC: DS-10.5
+      - name: Read back without logging in, both platforms and the version label
+        run: |
+          docker logout ghcr.io
+          platforms=$(docker buildx imagetools inspect "$EXTENSION_IMAGE:$VERSION" --format '{{json .Manifest}}' \
+            | jq -r '[.manifests[].platform | select(.os == "linux") | "\(.os)/\(.architecture)"] | sort | join(" ")')
+          test "$platforms" = "linux/amd64 linux/arm64" || { echo "::error::platforms are $platforms"; exit 1; }
+          docker pull --quiet --platform linux/amd64 "$EXTENSION_IMAGE:$VERSION"
+          image_version=$(docker inspect "$EXTENSION_IMAGE:$VERSION" --format '{{index .Config.Labels "org.opencontainers.image.version"}}')
+          test "$image_version" = "$VERSION" || { echo "::error::the version label is $image_version"; exit 1; }
+          container_id=$(docker create "$EXTENSION_IMAGE:$VERSION" /none)
+          docker cp "$container_id:/docker-compose.yaml" published-compose.yaml
+          grep -q "image: ghcr.io/shibbirweb/sendmock:$VERSION\$" published-compose.yaml
+
   # The formula in the tap, when the owner has set HOMEBREW_TAP_TOKEN (DS-03.1).
   homebrew:
     name: Homebrew formula

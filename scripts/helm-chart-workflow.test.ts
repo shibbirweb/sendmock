@@ -6,6 +6,12 @@ const workflowText = readFileSync(".github/workflows/helm-chart.yml", "utf8");
 const deploymentTemplate = readFileSync(`${chartFolder}/templates/deployment.yaml`, "utf8");
 const serviceTemplate = readFileSync(`${chartFolder}/templates/service.yaml`, "utf8");
 const valuesText = readFileSync(`${chartFolder}/values.yaml`, "utf8");
+const releaseJobs = (
+  Bun.YAML.parse(readFileSync(".github/workflows/release.yml", "utf8")) as {
+    jobs: Record<string, { if?: string; needs?: string[] }>;
+  }
+).jobs;
+const releaseWorkflowText = readFileSync(".github/workflows/release.yml", "utf8");
 
 describe("Helm chart", () => {
   test("DS-09.1 the chart runs as the image's non-root user with health probes and SMTP and HTTP services", () => {
@@ -37,5 +43,18 @@ describe("Helm chart", () => {
 
     expect(dockerPage).toContain("helm install sendmock");
     expect(dockerPage).toContain("--set persistence.enabled=true");
+  });
+
+  test("DS-09.5 each beta and stable release pushes the chart to GHCR and installs it from there logged out", () => {
+    expect(releaseJobs["helm-chart"]?.if).toBe(
+      "inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')",
+    );
+    expect(releaseJobs["helm-chart"]?.needs).toEqual(["plan", "docker"]);
+    expect(releaseWorkflowText).toContain("helm push \"chart-package/sendmock-$VERSION.tgz\" oci://ghcr.io/shibbirweb/charts");
+    expect(releaseWorkflowText).toContain("helm registry logout ghcr.io");
+    expect(releaseWorkflowText).toContain(
+      "helm install sendmock oci://ghcr.io/shibbirweb/charts/sendmock --version \"$VERSION\"",
+    );
+    expect(releaseWorkflowText).toContain("'.version == $version'");
   });
 });
