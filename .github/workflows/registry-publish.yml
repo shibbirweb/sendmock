@@ -34,9 +34,10 @@ jobs:
       version: ${{ steps.decision.outputs.version }}
       channel: ${{ steps.decision.outputs.channel }}
     steps:
+      # The default branch, never the commit of the run that triggered this one: a fork's pull
+      # request from a branch named develop also runs CI and then Publish beta, and its code must
+      # never run here, where the plan decides what the OIDC jobs publish.
       - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
 
       - uses: oven-sh/setup-bun@v2
 
@@ -50,6 +51,20 @@ jobs:
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RELEASE_RUN_ID/jobs?per_page=100" \
             --jq '.jobs[] | {name, conclusion}' > "$RUNNER_TEMP/run-jobs.jsonl"
           bun scripts/release/registry-publish-plan.ts "$WORKFLOW_NAME" "$RUNNER_TEMP/run-jobs.jsonl"
+
+      # Only the release workflows create `v*` tags here, and the Release tags ruleset stops them
+      # moving, so a tag on exactly this commit proves the run released this repository's code.
+      - name: The release tag is this repository's and points at the released commit
+        if: steps.decision.outputs.should_publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.decision.outputs.tag_name }}
+        run: |
+          tagged_commit="$(gh api "repos/$GITHUB_REPOSITORY/commits/refs/tags/$TAG_NAME" --jq .sha)"
+          if [ "$tagged_commit" != "$COMMIT_SHA" ]; then
+            echo "::error::$TAG_NAME points at $tagged_commit, not at $COMMIT_SHA; publishing nothing"
+            exit 1
+          fi
 
   # The launcher and its platform packages, with the `latest` or `beta` dist-tag (DS-03.1,
   # DS-03.7), once the owner has made this workflow each package's trusted publisher.
@@ -65,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: oven-sh/setup-bun@v2
 
@@ -126,7 +141,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: ./.github/actions/install-mcp-publisher
 
@@ -155,7 +170,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - name: The web UI the release embedded
         uses: actions/download-artifact@v7
@@ -191,7 +206,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: oven-sh/setup-bun@v2
 
@@ -233,7 +248,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: actions/setup-python@v6
         with:
@@ -262,7 +277,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.COMMIT_SHA }}
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: actions/setup-dotnet@v5
         with:

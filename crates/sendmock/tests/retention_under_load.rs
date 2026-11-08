@@ -33,6 +33,19 @@ const SLOWEST_MESSAGE_LIMIT: Duration = if cfg!(windows) {
 } else {
     Duration::from_secs(2)
 };
+/// The coverage job's instrumented build runs several times slower: a single write took 1.7 s
+/// and a message 3.1 s there with no lock held, on a busy runner (issue 199). Still well under
+/// the 9 s a held-lock stall took.
+const COVERAGE_BUILD_MESSAGE_LIMIT: Duration = Duration::from_secs(6);
+
+/// The limit for this run: the coverage job sets `SENDMOCK_COVERAGE_BUILD`.
+fn slowest_message_limit() -> Duration {
+    if std::env::var_os("SENDMOCK_COVERAGE_BUILD").is_some() {
+        SLOWEST_MESSAGE_LIMIT.max(COVERAGE_BUILD_MESSAGE_LIMIT)
+    } else {
+        SLOWEST_MESSAGE_LIMIT
+    }
+}
 
 /// The slowest SMTP message of a round, and the step of it that took longest.
 struct SlowestMessage {
@@ -203,7 +216,7 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
         .max_by_key(|slowest_message| slowest_message.duration)
         .ok_or_else(|| io::Error::other("no round was sent"))?;
     assert!(
-        slowest_message.duration < SLOWEST_MESSAGE_LIMIT,
+        slowest_message.duration < slowest_message_limit(),
         "one message took {:?}, most of it in {}; server warnings:\n{}",
         slowest_message.duration,
         slowest_message.slowest_step,
