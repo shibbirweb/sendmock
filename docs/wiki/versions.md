@@ -10,7 +10,7 @@ Every SendMock release keeps its own docs, so the steps and screenshots you read
 | Docs | Address | Read them when you run |
 | --- | --- | --- |
 | **Stable** | `/docs/` | the latest stable release (Homebrew `sendmock`, Docker `latest`, the default install script) |
-| **Beta (next)** | `/next/docs/` | a beta (Homebrew `sendmock-beta`, Docker `beta` or `edge`, `--channel beta`) or a build of `develop` |
+| **Beta (next)** | `/next/docs/` | a beta (Homebrew `sendmock-beta`, Docker `beta`, `--channel beta`) or a build of `develop` |
 | **Older versions** | `/v0.2/docs/`, `/v0.1/docs/`, ... | an older stable minor version; each shows the newest patch of that minor |
 
 Beta and older docs show a banner at the top of every page, with a link to the latest stable docs.

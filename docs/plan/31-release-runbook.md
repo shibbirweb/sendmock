@@ -93,9 +93,9 @@ The skill's evals need no step: CI runs them on every pull request with a script
 gh pr merge 48 --repo shibbirweb/sendmock --merge
 ```
 
-The push to `develop` runs CI, then Docker edge publishes the `edge` image, signs it and runs `docker-published-check.sh` against the registry.
+The push to `develop` runs CI, and the Docker image workflow builds and tests the image and rehearses the signing and SBOM check on a registry on the runner. Nothing is published before a release (owner decision, 2026-11-08); until then this step published an `edge` image, whose published check ticked DS-02.5 on 2026-11-08, and step 6 checks the published beta again.
 
-Check: the Docker edge run on `develop` passes its published check.
+Check: CI and the Docker image workflow pass on `develop`.
 
 Proves: DS-02.5
 

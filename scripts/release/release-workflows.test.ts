@@ -145,7 +145,7 @@ describe("Release build", () => {
   });
 });
 
-describe("Docker edge", () => {
+describe("Docker image", () => {
   const dockerEdgeWorkflow = readWorkflow("docker-edge.yml") as Workflow & {
     on: { push?: { branches?: string[] } };
   };
@@ -163,11 +163,18 @@ describe("Docker edge", () => {
     });
   });
 
-  test("pushes edge for pushes to develop, and other tags only when Release build calls it", () => {
-    expect(dockerEdgeWorkflow.on.push?.branches).toEqual(["develop"]);
-    expect(dockerEdgeWorkflow.jobs.manifest?.if).toBe(
-      "github.event_name == 'push' || inputs.image_tags != ''",
+  test("DS-02.5 publishes only when Release build calls it; a push to develop builds, tests and rehearses", () => {
+    const workflowText = readFileSync(
+      join(import.meta.dir, "../../.github/workflows/docker-edge.yml"),
+      "utf8",
     );
+
+    expect(dockerEdgeWorkflow.on.push?.branches).toEqual(["develop"]);
+    expect(dockerEdgeWorkflow.jobs.manifest?.if).toBe("inputs.image_tags != ''");
+    expect(dockerEdgeWorkflow.jobs["publish-rehearsal"]?.if).toBe(
+      "inputs.image_tags == ''",
+    );
+    expect(workflowText).toContain("IS_PUBLISHING: ${{ inputs.image_tags != '' }}");
   });
 
   test("DS-02.5 the Docker Hub repository is made public before the first push to it", () => {

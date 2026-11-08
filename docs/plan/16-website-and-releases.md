@@ -225,7 +225,7 @@ bun scripts/version.ts notes 0.4.0     # print a version's section (the release 
 | `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) with its changelog section as the body and calls `release.yml` |
 | `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); runs the binary tests on every platform before anything is published ([09](09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)); version comes from the code and must match the tag |
 | `registry-publish.yml` (Registry publish) | "Publish beta" or "Publish stable" finished | If that run published a release: npm (launcher, platform packages, `sendmock-testcontainers`), PyPI (`sendmock-testcontainers`), crates.io and the MCP registry for a stable, all with GitHub OIDC; the only workflow registered as trusted publisher, since registries cannot trust a called workflow (plan 30 W18) |
-| `docker-edge.yml` | push to `develop` | Builds and pushes the `edge` image for people who want every merge |
+| `docker-edge.yml` (Docker image) | push to `develop`, pull requests, and Release build | Builds and tests the image on every push and pull request without publishing; publishes the release tags only when Release build calls it (owner decision, 2026-11-08: nothing is published before a release) |
 | `website.yml` | see [Versioned builds](#versioned-builds) | Builds all doc versions and deploys GitHub Pages |
 | `wiki.yml` (optional) | push to `main` touching `docs/wiki` | Mirrors docs to the GitHub wiki |
 
@@ -248,7 +248,7 @@ flowchart LR
 | Channel | Beta (from `develop`) | Stable (from `main`) |
 |---------|------------------------|----------------------|
 | GitHub Releases | pre-release `vX.Y.Z-beta.N` with binaries and checksums, and the rolling `beta` pre-release moved to the same files (fixed download links, [09](09-distribution.md#release-archives)) | release `vX.Y.Z` marked latest |
-| Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` (plus `edge` on every `develop` push) | `latest`, `X`, `X.Y`, `X.Y.Z` |
+| Docker (GHCR + Docker Hub) | `beta`, `X.Y.Z-beta.N` | `latest`, `X`, `X.Y`, `X.Y.Z` |
 | Homebrew tap | `sendmock-beta` formula | `sendmock` formula |
 | Scoop bucket | `sendmock-beta` manifest | `sendmock` manifest |
 | `.deb` and `.rpm` (release assets) | attached to the pre-release | attached to the release |

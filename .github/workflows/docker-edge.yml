@@ -1,10 +1,10 @@
-# The images: `edge` on every push to develop, and the release tags (`beta` and the version,
-# or `latest`, the version, major.minor and major) when Release build calls it; for linux/amd64
-# and linux/arm64, each built and tested on its own runner, then joined under the tags, signed
-# and checked (docs/plan/09-distribution.md). Every tag has a `-debug` twin built on
-# distroless's debug base. Pull requests that change the image build and test it without
-# pushing, and rehearse the published-image check on a registry on the runner.
-name: Docker edge
+# The images are published only by a release: the release tags (`beta` and the version, or
+# `latest`, the version, major.minor and major) when Release build calls this workflow, for
+# linux/amd64 and linux/arm64, each built and tested on its own runner, then joined under the
+# tags, signed and checked (docs/plan/09-distribution.md). Every tag has a `-debug` twin built on
+# distroless's debug base. Pushes to develop and pull requests that change the image build and
+# test it without publishing, and rehearse the published-image check on a registry on the runner.
+name: Docker image
 
 on:
   workflow_call:
@@ -40,8 +40,8 @@ concurrency:
 env:
   GHCR_IMAGE: ghcr.io/shibbirweb/sendmock
   DOCKERHUB_IMAGE: docker.io/shibbirweb/sendmock
-  # Pushes to develop publish `edge`; a release call publishes its own tags.
-  IS_PUBLISHING: ${{ github.event_name == 'push' || inputs.image_tags != '' }}
+  # Only a release call publishes; pushes to develop and pull requests build and test.
+  IS_PUBLISHING: ${{ inputs.image_tags != '' }}
   IMAGE_TAGS: ${{ inputs.image_tags || 'edge' }}
   RELEASE_CHANNEL: ${{ inputs.channel || 'edge' }}
 
@@ -124,7 +124,7 @@ jobs:
   # here, then checked by the same script the manifest job runs after a real push.
   publish-rehearsal:
     name: Signed, with an SBOM and provenance, under 25 MB (rehearsal on a local registry)
-    if: github.event_name == 'pull_request'
+    if: inputs.image_tags == ''
     runs-on: ubuntu-latest
     services:
       registry:
@@ -180,7 +180,7 @@ jobs:
 
   manifest:
     name: Tag, sign and check it (${{ matrix.variant }})
-    if: github.event_name == 'push' || inputs.image_tags != ''
+    if: inputs.image_tags != ''
     needs: image
     runs-on: ubuntu-latest
     permissions:

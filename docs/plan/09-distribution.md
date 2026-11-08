@@ -146,7 +146,7 @@ Docker is a first-class release channel, not an afterthought: many teams run the
 
 ### Tags
 
-Stable (from `main`): `latest`, `1`, `1.4`, `1.4.2`. Beta (from `develop`): `beta`, `1.5.0-beta.2`. `edge`: every push to `develop`. Plus `-debug` variants based on `distroless/static:debug` with a shell for troubleshooting.
+Stable (from `main`): `latest`, `1`, `1.4`, `1.4.2`. Beta (from `develop`): `beta`, `1.5.0-beta.2`. No `edge` tag: images are published only by a release (owner decision, 2026-11-08; until then every push to `develop` published `edge`). Pushes to `develop` and pull requests build and test the image, and rehearse the signing and SBOM check on a registry on the runner, without publishing. Plus `-debug` variants based on `distroless/static:debug` with a shell for troubleshooting.
 
 ### Usage
 
