@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -53,6 +54,52 @@ describe("version files (DS-05.1)", () => {
       "1.0.0",
     ]);
     expect(rewritten).toContain('serde = { version = "1" }');
+  });
+
+  test("DS-05.1 writes the version of a crate whose name has a digit, such as sendmock-pop3", () => {
+    const workspaceWithCrates = `${cargoToml}\n[workspace.dependencies]\nsendmock-pop3 = { path = "crates/sendmock-pop3", version = "=0.3.1" }\n`;
+    const lockWithDigitCrate = `${cargoLock}\n[[package]]\nname = "sendmock-pop3"\nversion = "0.3.1"\n`;
+
+    expect(
+      readInternalDependencyVersions(
+        writeWorkspaceVersion(workspaceWithCrates, "1.0.0"),
+      ),
+    ).toEqual(["1.0.0"]);
+    expect(
+      readLockedCrateVersions(
+        writeLockedCrateVersions(lockWithDigitCrate, "1.0.0"),
+      ),
+    ).toEqual(["1.0.0", "1.0.0", "1.0.0"]);
+  });
+
+  test("DS-05.1 every internal crate of this repository is found in Cargo.toml and Cargo.lock", () => {
+    const repositoryRoot = join(import.meta.dir, "../..");
+    const workspaceManifest = readFileSync(
+      join(repositoryRoot, "Cargo.toml"),
+      "utf8",
+    );
+    const workspaceLock = readFileSync(
+      join(repositoryRoot, "Cargo.lock"),
+      "utf8",
+    );
+    const internalDependencyCount = (
+      workspaceManifest.match(/\nsendmock[^ ]* = \{ path = "crates\//g) ?? []
+    ).length;
+    const lockedCrateCount = (
+      workspaceLock.match(
+        /\[\[package\]\]\nname = "sendmock[^"]*"\nversion = "[^"]+"\nsource/g,
+      ) ?? []
+    ).length;
+    const workspaceCrateCount =
+      (workspaceLock.match(/\[\[package\]\]\nname = "sendmock[^"]*"\n/g) ?? [])
+        .length - lockedCrateCount;
+
+    expect(readInternalDependencyVersions(workspaceManifest)).toHaveLength(
+      internalDependencyCount,
+    );
+    expect(readLockedCrateVersions(workspaceLock)).toHaveLength(
+      workspaceCrateCount,
+    );
   });
 
   test("DS-05.2 names the files that disagree with Cargo.toml", () => {
