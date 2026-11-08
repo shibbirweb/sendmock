@@ -5,50 +5,76 @@ import { parseChangelog } from "./parse-changelog";
 const changelogMarkdown = [
   "# Changelog",
   "",
-  "Every SendMock release, newest first.",
+  "All notable changes to SendMock are documented in this file.",
   "",
-  "## 0.1.0-beta.2 - 2026-11-08",
-  "",
-  "### Fixed",
-  "",
-  "- Keep the toast position after a reload (#41)",
-  "",
-  "## 0.1.0-beta.1 - 2026-11-01",
+  "## [Unreleased]",
   "",
   "### Added",
   "",
-  "- Catch email over SMTP (#50)",
-  "- Show the OTP beside each email (#51)",
+  "- **Webhooks:** replay a delivery from the log.",
+  "",
+  "## [0.2.0] - 2026-11-08",
+  "",
+  "### Fixed",
+  "",
+  "- Keep the toast position after a reload.",
+  "",
+  "## [0.1.0] - 2026-11-01",
+  "",
+  "### Added",
+  "",
+  "- Catch email over SMTP.",
+  "- Show the OTP beside each email.",
+  "",
+  "[0.1.0]: https://github.com/shibbirweb/sendmock/releases/tag/v0.1.0",
   "",
 ].join("\n");
 
 describe("parseChangelog", () => {
-  test("reads each release with its groups and linked pull requests, newest first", () => {
+  test("DS-05.4 reads [Unreleased] first, then each dated release with its groups", () => {
     expect(parseChangelog(changelogMarkdown)).toEqual([
       {
-        version: "0.1.0-beta.2",
-        releaseDate: "2026-11-08",
+        version: "Unreleased",
+        releaseDate: "",
         groups: [
           {
-            heading: "Fixed",
+            heading: "Added",
             entries: [
               {
-                text: "Keep the toast position after a reload",
-                pullRequestNumber: 41,
+                text: "**Webhooks:** replay a delivery from the log.",
+                pullRequestNumber: null,
               },
             ],
           },
         ],
       },
       {
-        version: "0.1.0-beta.1",
+        version: "0.2.0",
+        releaseDate: "2026-11-08",
+        groups: [
+          {
+            heading: "Fixed",
+            entries: [
+              {
+                text: "Keep the toast position after a reload.",
+                pullRequestNumber: null,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        version: "0.1.0",
         releaseDate: "2026-11-01",
         groups: [
           {
             heading: "Added",
             entries: [
-              { text: "Catch email over SMTP", pullRequestNumber: 50 },
-              { text: "Show the OTP beside each email", pullRequestNumber: 51 },
+              { text: "Catch email over SMTP.", pullRequestNumber: null },
+              {
+                text: "Show the OTP beside each email.",
+                pullRequestNumber: null,
+              },
             ],
           },
         ],
@@ -56,7 +82,12 @@ describe("parseChangelog", () => {
     ]);
   });
 
-  test("reads a missing or empty changelog as no releases", () => {
+  test("DS-05.4 leaves out an empty [Unreleased] and reads a missing changelog as nothing", () => {
+    expect(
+      parseChangelog(
+        "# Changelog\n\n## [Unreleased]\n\n## [0.2.0] - 2026-11-08\n\n### Fixed\n\n- A fix.\n",
+      ).map((release) => release.version),
+    ).toEqual(["0.2.0"]);
     expect(parseChangelog("")).toEqual([]);
   });
 });

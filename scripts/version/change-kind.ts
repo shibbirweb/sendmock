@@ -15,11 +15,3 @@ export function classifyChange(pullRequestTitle: string): ChangeKind {
   }
   return prefixMatch[1] === "feat" ? "feature" : "fix";
 }
-
-/** `feat:[U3] add Inbox` becomes `Add Inbox`: no prefix or ticket, first letter capitalised. */
-export function toReleaseNote(pullRequestTitle: string): string {
-  const withoutPrefix = pullRequestTitle
-    .replace(releaseNotePrefixPattern, "")
-    .trim();
-  return withoutPrefix.charAt(0).toUpperCase() + withoutPrefix.slice(1);
-}

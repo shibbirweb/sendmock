@@ -133,7 +133,7 @@ export function readReleaseBody(changelog: string, version: string): string {
   const releaseNotes = extractReleaseNotes(changelog, version);
   if (releaseNotes === null) {
     throw new Error(
-      `CHANGELOG.md has no section for ${version}; Prepare release writes it.`,
+      `CHANGELOG.md has no section for ${version}: a beta needs [Unreleased], a stable its dated section.`,
     );
   }
   return releaseNotes;

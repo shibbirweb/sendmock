@@ -1,13 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-test("the changelog page says there are no releases until the first one", async ({
+test("DS-05.4 the changelog page shows what the newest beta holds, and no stable release yet", async ({
   page,
 }) => {
   await page.goto("/changelog/");
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Changelog");
+  const unreleased = page
+    .getByTestId("changelog-release")
+    .filter({ has: page.getByRole("heading", { name: /^Unreleased/ }) });
+  await expect(unreleased).toContainText("in the newest beta");
+  await expect(unreleased.getByRole("listitem").first()).toBeVisible();
+  // The Markdown of an entry is formatted, not shown as asterisks.
+  await expect(unreleased.locator("strong").first()).toBeVisible();
+  await expect(unreleased).not.toContainText("**");
   await expect(page.getByTestId("changelog-empty")).toContainText(
-    "No releases yet",
+    "No stable release yet",
   );
 });
 

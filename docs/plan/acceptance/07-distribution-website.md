@@ -55,8 +55,10 @@ Phase 0.
 - [x] DS-05.1 `scripts/version.ts` computes the next version from tags and commits and syncs it into every file that carries it. (#48)
 - [x] DS-05.2 CI fails when version files disagree. (#48)
 - [x] DS-05.3 The Prepare release workflow takes `bump` (`beta`, `patch`, `minor`, `major`, `stable`) and `dry_run`, works out the version as the table in plan 16 says, and refuses a version that is not newer than the one in progress or a `stable` with untried changes on top of its beta. (#48)
-- [x] DS-05.4 `CHANGELOG.md` is written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag, grouped into Breaking changes, Added and Fixed, each line the title without prefix and ticket with its PR linked; `docs:`, `test:`, `chore:`, `ci:` and `refactor:` pull requests are left out, and a stable section collects its betas. (#48)
-- [x] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word. (#48)
+- [x] DS-05.4 `CHANGELOG.md` follows Keep a Changelog: every user-visible change adds a line under `## [Unreleased]` by hand; Prepare release refuses a beta while `[Unreleased]` is empty, and for a stable release turns `## [Unreleased]` into `## [x.y.z] - YYYY-MM-DD` with an empty `[Unreleased]` above it. (#212)
+  - Changed 2026-11-09 (owner decision, #212): was "written only by the Prepare release workflow: one new section per release from the pull requests merged since the last tag". The first beta's notes from pull request titles read badly and could not be fixed after merging, so the changelog is kept by hand as nibtree keeps it.
+- [x] DS-05.5 Every GitHub release and pre-release body is its `CHANGELOG.md` section word for word: a beta's is the `[Unreleased]` section at its release commit, a stable's its dated section. (#212)
+  - Changed 2026-11-09 (#212): betas take `[Unreleased]`, since betas no longer get a dated section of their own.
 
 ## DS-06 Test harness integration
 
