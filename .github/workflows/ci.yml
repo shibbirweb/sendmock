@@ -364,6 +364,10 @@ jobs:
       - name: The skill's evals are well formed, their seeds and traffic apply (AI-05.7)
         run: bun scripts/skill-evals.ts check sendmock-binary/sendmock
 
+      # A scripted agent replays each case's tool calls through `sendmock mcp`; no model is called.
+      - name: The skill's evals pass with the scripted agent (AI-05.7)
+        run: bun scripts/skill-evals.ts run sendmock-binary/sendmock
+
       - name: The installed plugin has this version, the MCP server and the binary's skill
         run: |
           sendmock serve --db memory > sendmock.log 2>&1 &

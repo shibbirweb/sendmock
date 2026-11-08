@@ -1,6 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 
+import type { ScriptedToolCall } from "./scripted-agent";
+
 /** Traffic sent to SendMock before the agent starts, as the app would send it. */
 export type BeforeRequest = {
   path: string;
@@ -26,11 +28,14 @@ export type EvalCase = {
   graders: MarkdownFile[];
   seedPath: string | null;
   setup: CaseSetup;
+  /** The tool calls the scripted agent makes in place of a model; null when the file is missing. */
+  scriptedCalls: ScriptedToolCall[] | null;
 };
 
 /** The file beside `claude plugin eval`'s own files that holds SendMock's part of a case. */
 export const caseSetupFileName = "sendmock-eval.json";
 export const caseSeedFileName = "seed.toml";
+export const scriptedRunFileName = "scripted-run.json";
 
 export function parseMarkdownFile(
   name: string,
@@ -51,6 +56,18 @@ export function parseCaseSetup(setupJson: string | null): CaseSetup {
   }
   const setup = JSON.parse(setupJson) as Partial<CaseSetup>;
   return { before: setup.before ?? [], checks: setup.checks ?? [] };
+}
+
+export function parseScriptedCalls(
+  scriptedRunJson: string | null,
+): ScriptedToolCall[] | null {
+  if (scriptedRunJson === null) {
+    return null;
+  }
+  const scriptedRun = JSON.parse(scriptedRunJson) as {
+    tool_calls?: ScriptedToolCall[];
+  };
+  return scriptedRun.tool_calls ?? [];
 }
 
 function readOptionalText(filePath: string): string | null {
@@ -82,6 +99,9 @@ export function readEvalCase(directory: string): EvalCase {
       ),
     seedPath: existsSync(seedPath) ? seedPath : null,
     setup: parseCaseSetup(readOptionalText(join(directory, caseSetupFileName))),
+    scriptedCalls: parseScriptedCalls(
+      readOptionalText(join(directory, scriptedRunFileName)),
+    ),
   };
 }
 

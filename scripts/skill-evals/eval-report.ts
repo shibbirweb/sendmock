@@ -1,9 +1,9 @@
 import type { EndStateResult } from "./end-state";
-import type { PluginEvalResult } from "./plugin-eval-run";
+import type { ScriptedRunResult } from "./grade-transcript";
 
 export type CaseOutcome = {
   caseName: string;
-  pluginEval: PluginEvalResult;
+  scriptedRun: ScriptedRunResult;
   endState: EndStateResult[];
   setupError: string | null;
 };
@@ -11,25 +11,25 @@ export type CaseOutcome = {
 export function isCasePassed(outcome: CaseOutcome, threshold: number): boolean {
   return (
     outcome.setupError === null &&
-    outcome.pluginEval.runError === null &&
-    (outcome.pluginEval.score ?? 0) >= threshold &&
+    outcome.scriptedRun.runError === null &&
+    (outcome.scriptedRun.score ?? 0) >= threshold &&
     outcome.endState.every((result) => result.isPassed)
   );
 }
 
 function renderCaseSection(outcome: CaseOutcome, threshold: number): string[] {
   const verdict = isCasePassed(outcome, threshold) ? "passed" : "failed";
-  const scoreText = outcome.pluginEval.score?.toFixed(2) ?? "none";
+  const scoreText = outcome.scriptedRun.score?.toFixed(2) ?? "none";
   return [
     `### ${outcome.caseName}: ${verdict} (score ${scoreText})`,
     "",
     ...(outcome.setupError === null
       ? []
       : [`- Setup failed: ${outcome.setupError}`]),
-    ...(outcome.pluginEval.runError === null
+    ...(outcome.scriptedRun.runError === null
       ? []
-      : [`- Run error: ${outcome.pluginEval.runError}`]),
-    ...outcome.pluginEval.graderVerdicts.map(
+      : [`- Run error: ${outcome.scriptedRun.runError}`]),
+    ...outcome.scriptedRun.graderVerdicts.map(
       (graderVerdict) =>
         `- Grader ${graderVerdict.name}: ${graderVerdict.isPassed ? "passed" : "failed"}${graderVerdict.explanation === "" ? "" : `, ${graderVerdict.explanation}`}`,
     ),

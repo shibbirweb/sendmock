@@ -50,7 +50,6 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 | `MAVEN_CENTRAL_USERNAME` | The Sonatype user token name | No Java Testcontainers module |
 | `MAVEN_CENTRAL_TOKEN` | The Sonatype user token | No Java Testcontainers module |
 | `MAVEN_SIGNING_KEY` | The armoured GPG key Maven Central checks | No Java Testcontainers module |
-| `ANTHROPIC_API_KEY` | An API key for the skill evals | The Skill evals workflow cannot run |
 
 Make the packages signing key:
 
@@ -78,19 +77,11 @@ gh variable set CRATES_PUBLISHING --body true --repo shibbirweb/sendmock
 
 Check: `bun scripts/release-readiness.ts` lists no missing secret or variable for the channels you want in 1.0.
 
-## 4. Review the last two screens and run the skill evals
+## 4. Review the last two screens
 
 Review the Subscriptions and API reference screens, the two added after the design sign-off, against the checklist in [18](18-phase-u3.md#w1-and-w6-design-review), and sign off their rows in the [review table](18-phase-u3.md#review-table). UI-07 then becomes `Accepted`.
 
-Run the skill evals once:
-
-```sh
-gh workflow run skill-evals.yml --repo shibbirweb/sendmock
-```
-
-Check: the run passes every case.
-
-Proves: AI-05.7
+The skill's evals need no step: CI runs them on every pull request with a scripted agent, so no model and no API key are involved (AI-05.7, changed 2026-11-08).
 
 ## 5. Merge #48 into `develop`
 

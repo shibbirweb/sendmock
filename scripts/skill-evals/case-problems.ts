@@ -1,17 +1,10 @@
 import type { EvalCase, MarkdownFile } from "./eval-case";
+import { deterministicGraderTypes } from "./grade-transcript";
 import { findReadOperation, type ReadOperation } from "./openapi-reads";
 
 /** How Claude Code names the tools of the plugin's `sendmock` MCP server. */
 export const pluginToolPrefix = "mcp__plugin_sendmock_sendmock__";
 
-const graderTypes = new Set([
-  "regex",
-  "tool_used",
-  "tool_order",
-  "file_exists",
-  "llm",
-  "baseline",
-]);
 const promptFields = new Set([
   "description",
   "tags",
@@ -30,6 +23,8 @@ const builtInTools = new Set(["Skill", "Read", "Glob", "Grep", "TodoWrite"]);
 export type CaseContext = {
   mcpToolNames: string[];
   readOperations: ReadOperation[];
+  /** The plugin's SKILL.md: a scripted call must use a tool the skill tells the agent about. */
+  skillText: string;
 };
 
 function findToolProblem(
@@ -70,15 +65,51 @@ function findGraderProblems(
   context: CaseContext,
 ): string[] {
   const graderType = grader.frontmatter.type;
-  if (typeof graderType !== "string" || !graderTypes.has(graderType)) {
-    return [`grader ${grader.name} has an unknown type ${String(graderType)}`];
-  }
-  if (graderType === "llm" && grader.body === "") {
-    return [`grader ${grader.name} has no criteria`];
+  if (typeof graderType !== "string" || !deterministicGraderTypes.has(graderType)) {
+    return [
+      `grader ${grader.name} has the type ${String(graderType)}; the scripted run grades only regex, tool_used and tool_order`,
+    ];
   }
   return listGraderTools(grader).flatMap((toolName) => {
     const toolProblem = findToolProblem(toolName, context);
     return toolProblem === null ? [] : [`grader ${grader.name} ${toolProblem}`];
+  });
+}
+
+function findScriptedCallProblem(
+  toolName: string,
+  context: CaseContext,
+): string | null {
+  if (toolName === "Skill") {
+    return null;
+  }
+  if (!toolName.startsWith(pluginToolPrefix)) {
+    return `calls ${toolName}; a scripted run calls only Skill and SendMock's MCP tools`;
+  }
+  const mcpToolName = toolName.slice(pluginToolPrefix.length);
+  if (!context.mcpToolNames.includes(mcpToolName)) {
+    return `calls ${mcpToolName}, which the MCP server does not list`;
+  }
+  return context.skillText.includes(mcpToolName)
+    ? null
+    : `calls ${mcpToolName}, which the skill does not name`;
+}
+
+function findScriptedRunProblems(
+  evalCase: EvalCase,
+  context: CaseContext,
+): string[] {
+  if (evalCase.scriptedCalls === null) {
+    return ["the case has no scripted-run.json"];
+  }
+  if (evalCase.scriptedCalls.length === 0) {
+    return ["the scripted run makes no calls"];
+  }
+  return evalCase.scriptedCalls.flatMap((scriptedCall, callIndex) => {
+    const callProblem = findScriptedCallProblem(String(scriptedCall.tool), context);
+    return callProblem === null
+      ? []
+      : [`scripted call ${callIndex + 1} ${callProblem}`];
   });
 }
 
@@ -97,7 +128,7 @@ function findCheckProblems(evalCase: EvalCase, context: CaseContext): string[] {
   });
 }
 
-/** What makes a case unable to run or unable to fail, before any model is called (AI-05.7). */
+/** What makes a case unable to run or unable to fail, before it is run (AI-05.7). */
 export function findCaseProblems(
   evalCase: EvalCase,
   context: CaseContext,
@@ -107,9 +138,7 @@ export function findCaseProblems(
   );
   const checksTheOutcome =
     evalCase.setup.checks.length > 0 ||
-    evalCase.graders.some((grader) =>
-      ["regex", "llm"].includes(String(grader.frontmatter.type)),
-    );
+    evalCase.graders.some((grader) => grader.frontmatter.type === "regex");
   return [
     ...(evalCase.prompt.body === "" ? ["prompt.md has no prompt"] : []),
     ...unknownFields.map(
@@ -119,11 +148,12 @@ export function findCaseProblems(
     ...(checksTheOutcome
       ? []
       : [
-          "nothing checks the outcome: add an end-state check or a regex or llm grader",
+          "nothing checks the outcome: add an end-state check or a regex grader",
         ]),
     ...evalCase.graders.flatMap((grader) =>
       findGraderProblems(grader, context),
     ),
     ...findCheckProblems(evalCase, context),
+    ...findScriptedRunProblems(evalCase, context),
   ];
 }

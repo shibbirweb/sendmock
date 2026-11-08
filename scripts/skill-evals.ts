@@ -2,17 +2,18 @@
 /**
  * The skill's evals (docs/plan/30-phase-5.md, W9c; AI-05.7). Each case under plugin/evals is a
  * `claude plugin eval` case plus SendMock's part: `seed.toml` and `sendmock-eval.json` (the
- * traffic to send before the run and the API reads to check after it).
+ * traffic to send before the run and the API reads to check after it), and `scripted-run.json`
+ * (the tool calls a scripted agent makes in place of a model: no model is called in tests).
  *
  *     bun scripts/skill-evals.ts check <sendmock-binary>
  *         every case is well formed, its seed and traffic apply, its reads answer
- *     bun scripts/skill-evals.ts run <sendmock-binary> [--case <name>] [--model <id>]
- *         [--judge-model <id>] [--threshold <0..1>] [--output <dir>]
- *         runs each case with Claude Code (needs ANTHROPIC_API_KEY) and checks its end state
+ *     bun scripts/skill-evals.ts run <sendmock-binary> [--case <name>] [--threshold <0..1>]
+ *         replays each case's scripted run through `sendmock mcp`, grades it and checks its
+ *         end state
  */
 
 import { appendFileSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
 import {
@@ -20,6 +21,7 @@ import {
   findCaseProblems,
 } from "./skill-evals/case-problems";
 import { checkEndState } from "./skill-evals/end-state";
+import { gradeTranscript } from "./skill-evals/grade-transcript";
 import { type EvalCase, listEvalCases } from "./skill-evals/eval-case";
 import {
   type CaseOutcome,
@@ -27,7 +29,8 @@ import {
   renderEvalReport,
 } from "./skill-evals/eval-report";
 import { listReadOperations } from "./skill-evals/openapi-reads";
-import { runPluginEval } from "./skill-evals/plugin-eval-run";
+import { McpSession } from "./skill-evals/mcp-session";
+import { runScriptedAgent } from "./skill-evals/scripted-agent";
 import {
   listMcpToolNames,
   sendBeforeRequests,
@@ -36,16 +39,17 @@ import {
 
 const repositoryRoot = join(import.meta.dir, "..");
 const evalsDirectory = join(repositoryRoot, "plugin/evals");
+const skillText = readFileSync(
+  join(repositoryRoot, "plugin/skills/sendmock/SKILL.md"),
+  "utf8",
+);
 
 const { values: options, positionals } = parseArgs({
   args: process.argv.slice(2),
   allowPositionals: true,
   options: {
     case: { type: "string" },
-    model: { type: "string" },
-    "judge-model": { type: "string" },
     threshold: { type: "string", default: "1" },
-    output: { type: "string", default: "skill-eval-results" },
   },
 });
 const [command, binaryArgument] = positionals;
@@ -65,6 +69,7 @@ async function readCaseContext(): Promise<CaseContext> {
   try {
     return {
       mcpToolNames: await listMcpToolNames(binaryPath),
+      skillText,
       readOperations: listReadOperations(
         readFileSync(join(repositoryRoot, "docs/api/openapi.yaml"), "utf8"),
       ),
@@ -118,18 +123,20 @@ async function checkCases(evalCases: EvalCase[]) {
 async function runCase(evalCase: EvalCase): Promise<CaseOutcome> {
   const outcome: CaseOutcome = {
     caseName: evalCase.name,
-    pluginEval: { score: null, runError: null, graderVerdicts: [] },
+    scriptedRun: { score: null, runError: null, graderVerdicts: [] },
     endState: [],
     setupError: null,
   };
   const sendmock = await startSendmock(binaryPath, evalCase.seedPath);
+  const mcpSession = await McpSession.start(binaryPath);
   try {
     await sendBeforeRequests(sendmock.baseUrl, evalCase.setup.before);
-    outcome.pluginEval = await runPluginEval(evalCase, {
-      outputDirectory: resolve(options.output, evalCase.name),
-      model: options.model ?? null,
-      judgeModel: options["judge-model"] ?? null,
+    const transcript = await runScriptedAgent(evalCase.scriptedCalls ?? [], {
+      readSkill: () => skillText,
+      callMcpTool: (toolName, toolInput) =>
+        mcpSession.callTool(toolName, toolInput),
     });
+    outcome.scriptedRun = gradeTranscript(evalCase.graders, transcript);
     outcome.endState = await checkEndState(
       evalCase.setup.checks,
       sendmock.readJson,
@@ -137,13 +144,13 @@ async function runCase(evalCase: EvalCase): Promise<CaseOutcome> {
   } catch (caseError) {
     outcome.setupError = String((caseError as Error).message);
   } finally {
+    await mcpSession.close();
     await sendmock.stop();
   }
   return outcome;
 }
 
 async function runCases(evalCases: EvalCase[]) {
-  process.env.PATH = `${dirname(binaryPath)}:${process.env.PATH ?? ""}`;
   const threshold = Number(options.threshold);
   const outcomes: CaseOutcome[] = [];
   for (const evalCase of evalCases) {

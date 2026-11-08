@@ -1,6 +1,7 @@
 import type { Subprocess } from "bun";
 
 import type { BeforeRequest } from "./eval-case";
+import { McpSession } from "./mcp-session";
 
 /** The address the plugin's MCP server reaches by default (`sendmock mcp` without flags). */
 export const defaultBaseUrl = "http://127.0.0.1:8025";
@@ -86,52 +87,10 @@ export async function sendBeforeRequests(
 
 /** The tools `sendmock mcp` lists with its default toolsets, as the plugin starts it. */
 export async function listMcpToolNames(binaryPath: string): Promise<string[]> {
-  const mcpProcess = Bun.spawn([binaryPath, "mcp"], {
-    stdin: "pipe",
-    stdout: "pipe",
-    stderr: "inherit",
-  });
-  const messages = [
-    {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2025-06-18",
-        capabilities: {},
-        clientInfo: { name: "skill-evals", version: "1" },
-      },
-    },
-    { jsonrpc: "2.0", method: "notifications/initialized" },
-    { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
-  ];
-  mcpProcess.stdin.write(
-    messages.map((message) => JSON.stringify(message)).join("\n") + "\n",
-  );
-  mcpProcess.stdin.flush();
-  const toolNames = await readToolNames(mcpProcess.stdout);
-  mcpProcess.kill();
-  return toolNames;
-}
-
-async function readToolNames(
-  output: ReadableStream<Uint8Array>,
-): Promise<string[]> {
-  const decoder = new TextDecoder();
-  let pendingText = "";
-  for await (const chunk of output) {
-    pendingText += decoder.decode(chunk, { stream: true });
-    const lines = pendingText.split("\n");
-    pendingText = lines.pop() ?? "";
-    for (const line of lines) {
-      const message = JSON.parse(line) as {
-        id?: number;
-        result?: { tools?: { name: string }[] };
-      };
-      if (message.id === 2) {
-        return (message.result?.tools ?? []).map((tool) => tool.name);
-      }
-    }
+  const mcpSession = await McpSession.start(binaryPath);
+  try {
+    return await mcpSession.listToolNames();
+  } finally {
+    await mcpSession.close();
   }
-  throw new Error("sendmock mcp closed before it listed its tools");
 }
