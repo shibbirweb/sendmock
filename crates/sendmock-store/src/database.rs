@@ -6,6 +6,8 @@ mod database_writer;
 pub(crate) use connection_settings::BUSY_TIMEOUT;
 pub use database_checkpointer::CheckpointProgress;
 
+use std::time::Duration;
+
 use rusqlite::Connection;
 
 use crate::migration::apply_migrations;
@@ -18,6 +20,12 @@ use database_readers::DatabaseReaders;
 use database_writer::DatabaseWriter;
 
 const READ_CONNECTION_COUNT: usize = 4;
+/// Database work longer than this is logged as a warning.
+const SLOW_DATABASE_WORK: Duration = Duration::from_secs(1);
+
+fn duration_ms(duration: Duration) -> u64 {
+    u64::try_from(duration.as_millis()).unwrap_or(u64::MAX)
+}
 
 /// The SQLite database: one writer that applies writes in order and a pool of readers.
 pub struct Database {

@@ -148,6 +148,25 @@ jobs:
           fi
           cargo nextest run --workspace --locked
 
+      # The retention load test is skipped on Windows until issue 171 is found. This runs it
+      # twice without failing the job, so the slowest SMTP step and the server's slow write and
+      # checkpoint warnings land in the log, with Defender's state beside them.
+      - name: Retention load test on Windows (issue 171, never fails the job)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Get-MpComputerStatus -ErrorAction SilentlyContinue | Select-Object AntivirusEnabled, RealTimeProtectionEnabled | Format-List
+          $failedRunCount = 0
+          foreach ($runNumber in 1..2) {
+            cargo nextest run -p sendmock --test retention_under_load --locked --run-ignored ignored-only
+            if ($LASTEXITCODE -ne 0) {
+              $failedRunCount++
+            }
+          }
+          Write-Output "retention load test: $failedRunCount of 2 runs failed"
+          exit $failedRunCount
+
       - uses: oven-sh/setup-bun@v2
         if: failure()
 

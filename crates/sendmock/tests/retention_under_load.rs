@@ -18,6 +18,18 @@ const SENDING_ROUND: Duration = Duration::from_secs(11);
 const PRUNE_WAIT: Duration = Duration::from_secs(30);
 /// The `journal_size_limit` file databases are opened with.
 const WAL_SIZE_LIMIT_BYTES: u64 = 4 * 1024 * 1024;
+/// Longer than the background checkpoint's 1 second interval: while a vacuum is still under
+/// way, each checkpoint shrinks the database file, so the size cannot hold still this long.
+const SETTLED_WINDOW: Duration = Duration::from_secs(3);
+/// Two prune intervals and more: a prune still running when the round ends, and the next one.
+const SETTLE_DEADLINE: Duration = Duration::from_secs(25);
+const SMTP_STEPS: [&str; 4] = ["MAIL FROM", "RCPT TO", "DATA", "message body"];
+
+/// The slowest SMTP message of a round, and the step of it that took longest.
+struct SlowestMessage {
+    duration: Duration,
+    slowest_step: &'static str,
+}
 
 /// Sends one line (or nothing, for the greeting) and answers the reply's code.
 fn exchange(reader: &mut BufReader<TcpStream>, line: Option<&str>) -> io::Result<u16> {
@@ -39,22 +51,40 @@ fn exchange(reader: &mut BufReader<TcpStream>, line: Option<&str>) -> io::Result
 }
 
 /// Sends mail over one connection for a whole round; answers the slowest message.
-fn send_mail_for_a_round(smtp_addr: &str, message_body: &str) -> io::Result<Duration> {
+fn send_mail_for_a_round(smtp_addr: &str, message_body: &str) -> io::Result<SlowestMessage> {
     let mut reader = BufReader::new(TcpStream::connect(smtp_addr)?);
     exchange(&mut reader, None)?;
     exchange(&mut reader, Some("EHLO load.test"))?;
+    let smtp_lines = [
+        "MAIL FROM:<app@shop.test>",
+        "RCPT TO:<load@example.test>",
+        "DATA",
+        message_body,
+    ];
     let round_started_at = Instant::now();
-    let mut slowest_message = Duration::ZERO;
+    let mut slowest_message = SlowestMessage {
+        duration: Duration::ZERO,
+        slowest_step: SMTP_STEPS[0],
+    };
     while round_started_at.elapsed() < SENDING_ROUND {
-        let message_started_at = Instant::now();
-        let reply_codes = [
-            exchange(&mut reader, Some("MAIL FROM:<app@shop.test>"))?,
-            exchange(&mut reader, Some("RCPT TO:<load@example.test>"))?,
-            exchange(&mut reader, Some("DATA"))?,
-            exchange(&mut reader, Some(message_body))?,
-        ];
+        let mut step_durations = [Duration::ZERO; 4];
+        let mut reply_codes = [0; 4];
+        for (step_index, smtp_line) in smtp_lines.iter().enumerate() {
+            let step_started_at = Instant::now();
+            reply_codes[step_index] = exchange(&mut reader, Some(smtp_line))?;
+            step_durations[step_index] = step_started_at.elapsed();
+        }
         assert_eq!(reply_codes, [250, 250, 354, 250]);
-        slowest_message = slowest_message.max(message_started_at.elapsed());
+        let message_duration: Duration = step_durations.iter().sum();
+        if message_duration > slowest_message.duration {
+            let slowest_step_index = (0..SMTP_STEPS.len())
+                .max_by_key(|step_index| step_durations[*step_index])
+                .unwrap_or_default();
+            slowest_message = SlowestMessage {
+                duration: message_duration,
+                slowest_step: SMTP_STEPS[slowest_step_index],
+            };
+        }
     }
     exchange(&mut reader, Some("QUIT"))?;
     Ok(slowest_message)
@@ -88,19 +118,43 @@ fn database_size_bytes(database_path: &Path) -> u64 {
         .sum()
 }
 
-/// The size once the retention task has finished vacuuming and trimming the log: two equal
-/// readings half a second apart.
+/// The size once the retention task has finished vacuuming and trimming the log: unchanged
+/// for a whole settled window.
 fn wait_for_settled_size(database_path: &Path) -> u64 {
-    let deadline = Instant::now() + Duration::from_secs(10);
-    let mut previous_size = database_size_bytes(database_path);
-    loop {
+    let deadline = Instant::now() + SETTLE_DEADLINE;
+    let mut settled_size = database_size_bytes(database_path);
+    let mut unchanged_since = Instant::now();
+    while unchanged_since.elapsed() < SETTLED_WINDOW && Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(500));
         let current_size = database_size_bytes(database_path);
-        if current_size == previous_size || Instant::now() > deadline {
+        if current_size != settled_size {
+            settled_size = current_size;
+            unchanged_since = Instant::now();
+        }
+    }
+    settled_size
+}
+
+/// Waits for the size to come down to `size_limit_bytes`; answers the last size read.
+fn wait_for_size_at_most(database_path: &Path, size_limit_bytes: u64) -> u64 {
+    let deadline = Instant::now() + SETTLE_DEADLINE;
+    loop {
+        let current_size = database_size_bytes(database_path);
+        if current_size <= size_limit_bytes || Instant::now() > deadline {
             return current_size;
         }
-        previous_size = current_size;
+        std::thread::sleep(Duration::from_millis(500));
     }
+}
+
+/// The server's warnings, such as slow database writes and checkpoints, for a failure message.
+fn read_warning_lines(sendmock: &SendmockProcess) -> String {
+    sendmock
+        .read_printed_lines(Duration::from_millis(200))
+        .into_iter()
+        .filter(|printed_line| printed_line.contains("WARN"))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 // AC: PL-08.2
@@ -133,19 +187,27 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
     let size_after_first_round = wait_for_settled_size(&database_path);
     let slowest_in_second_round = send_mail_for_a_round(&ready_addresses.smtp_addr, &message_body)?;
     wait_until_pruned(&ready_addresses.http_addr)?;
-    let size_after_second_round = wait_for_settled_size(&database_path);
-
-    let slowest_message = slowest_in_first_round.max(slowest_in_second_round);
-    assert!(
-        slowest_message < Duration::from_secs(2),
-        "{slowest_message:?}"
-    );
     // The write-ahead log may sit anywhere up to its 4 MiB limit, depending on whether the last
     // checkpoint could run; growth beyond that and a quarter means pruning is not keeping up.
+    let size_limit_bytes =
+        size_after_first_round + size_after_first_round / 4 + WAL_SIZE_LIMIT_BYTES;
+    let size_after_second_round = wait_for_size_at_most(&database_path, size_limit_bytes);
+
+    let slowest_message = [slowest_in_first_round, slowest_in_second_round]
+        .into_iter()
+        .max_by_key(|slowest_message| slowest_message.duration)
+        .ok_or_else(|| io::Error::other("no round was sent"))?;
     assert!(
-        size_after_second_round
-            <= size_after_first_round + size_after_first_round / 4 + WAL_SIZE_LIMIT_BYTES,
-        "{size_after_first_round} bytes after the first round, {size_after_second_round} after the second"
+        slowest_message.duration < Duration::from_secs(2),
+        "one message took {:?}, most of it in {}; server warnings:\n{}",
+        slowest_message.duration,
+        slowest_message.slowest_step,
+        read_warning_lines(&sendmock)
+    );
+    assert!(
+        size_after_second_round <= size_limit_bytes,
+        "{size_after_first_round} bytes after the first round, {size_after_second_round} after the second; server warnings:\n{}",
+        read_warning_lines(&sendmock)
     );
     Ok(())
 }

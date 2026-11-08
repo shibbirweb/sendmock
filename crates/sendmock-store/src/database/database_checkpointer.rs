@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex, PoisonError, Weak};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use rusqlite::Connection;
 
-use super::BUSY_TIMEOUT;
+use super::{BUSY_TIMEOUT, SLOW_DATABASE_WORK, duration_ms};
 use crate::StoreError;
 
 /// How far a checkpoint got: frames in the write-ahead log and how many of them are now in
@@ -76,6 +76,7 @@ fn checkpoint_while_open(open_connection: &Weak<Mutex<Connection>>) -> bool {
         return false;
     };
     let connection = connection.lock().unwrap_or_else(PoisonError::into_inner);
+    let checkpoint_started_at = Instant::now();
     let checkpoint_progress = connection.query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |row| {
         Ok(CheckpointProgress {
             log_frame_count: row.get(1)?,
@@ -89,6 +90,13 @@ fn checkpoint_while_open(open_connection: &Weak<Mutex<Connection>>) -> bool {
         {
             let _ = truncate_copied_log(&connection);
         }
+    }
+    let checkpoint_duration = checkpoint_started_at.elapsed();
+    if checkpoint_duration > SLOW_DATABASE_WORK {
+        tracing::warn!(
+            checkpoint_ms = duration_ms(checkpoint_duration),
+            "a write-ahead log checkpoint was slow"
+        );
     }
     true
 }

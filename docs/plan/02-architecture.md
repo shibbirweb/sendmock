@@ -357,6 +357,7 @@ Layers (transport, operations, domain, storage), SOLID as applied to Rust traits
 
 - SMTP sessions are cheap tokio tasks; `DATA` is streamed into a bounded buffer with a configurable max size (default 25 MB).
 - SQLite runs in WAL mode; writes go through a single writer task to avoid lock contention; reads use a small pool.
+- A thread of its own copies the write-ahead log into the database file every second (a passive checkpoint), so no ingest write waits for the copy and its sync. A write that waits in the writer's queue or runs for more than a second, and a checkpoint that takes more than a second, are logged as warnings with their timings (`queue_wait_ms`, `run_ms`, `checkpoint_ms`), so a slow disk shows up in the log instead of as an unexplained SMTP stall (issue #171).
 - Raw email is parsed once on ingest for indexed fields; full parse for display happens on demand and is cached in a small LRU.
 - Webhook dispatcher uses a bounded concurrency limit (default 8) and persists the queue, so restarts do not lose pending retries.
 
