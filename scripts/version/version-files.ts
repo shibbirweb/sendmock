@@ -76,10 +76,11 @@ export function writeTextVersion(
 
 const workspaceVersionPattern =
   /(\[workspace\.package\][^[]*?\nversion = ")([^"]+)(")/;
+// Crate names may hold digits (sendmock-pop3), so a letters-only pattern skipped them.
 const internalDependencyVersionPattern =
-  /(\nsendmock(?:-[a-z]+)? = \{ path = "crates\/[a-z-]+", version = "=)([^"]+)(")/g;
+  /(\nsendmock(?:-[a-z0-9]+)? = \{ path = "crates\/[a-z0-9-]+", version = "=)([^"]+)(")/g;
 const workspaceCrateVersionPattern =
-  /(\[\[package\]\]\nname = "sendmock(?:-[a-z]+)?"\nversion = ")([^"]+)(")/g;
+  /(\[\[package\]\]\nname = "sendmock(?:-[a-z0-9]+)?"\nversion = ")([^"]+)(")/g;
 
 export type VersionedFileReading = { filePath: string; version: string | null };
 
