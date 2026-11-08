@@ -206,10 +206,10 @@ test.describe("the quick start's platform tabs", () => {
     const docsLinks = page.getByTestId("quick-start-docs-links");
     await expect(
       docsLinks.getByRole("link", { name: "Docker Compose" }),
-    ).toHaveAttribute("href", /\/docs\/install#docker-compose$/);
+    ).toHaveAttribute("href", /\/docs\/install\/?#docker-compose$/);
     await expect(
       docsLinks.getByRole("link", { name: "All install options" }),
-    ).toHaveAttribute("href", /\/docs\/install$/);
+    ).toHaveAttribute("href", /\/docs\/install\/?$/);
   });
 });
 
@@ -234,7 +234,7 @@ test.describe("the quick start downloads", () => {
       downloads.getByRole("link", { name: "How to allow it" }),
     ).toHaveAttribute(
       "href",
-      /\/docs\/troubleshooting#macos-says-it-could-not-verify-sendmock$/,
+      /\/docs\/troubleshooting\/?#macos-says-it-could-not-verify-sendmock$/,
     );
     await expect(
       downloads.getByRole("link", { name: "Apple silicon" }),
@@ -258,7 +258,7 @@ test.describe("the quick start downloads", () => {
       downloads.getByRole("link", { name: "How to allow it" }),
     ).toHaveAttribute(
       "href",
-      /\/docs\/troubleshooting#windows-protected-your-pc$/,
+      /\/docs\/troubleshooting\/?#windows-protected-your-pc$/,
     );
     await expect(downloads.getByRole("link", { name: "x64" })).toHaveAttribute(
       "href",
@@ -298,6 +298,24 @@ test.describe("the quick start for a Windows visitor", () => {
     await expect(page.getByTestId("quick-start-terminal")).toContainText(
       `PS> irm ${releaseUrl}/install.ps1 | iex`,
     );
+  });
+
+  test("WS-02.1 hovering the copy button shows what it copies at once", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const terminal = page.getByTestId("quick-start-terminal");
+    const tooltip = terminal
+      .locator("span[aria-hidden='true']")
+      .filter({ hasText: "Copy the install command" });
+    const readOpacity = () =>
+      tooltip.evaluate((element) => getComputedStyle(element).opacity);
+
+    expect(await readOpacity()).toBe("0");
+    await terminal
+      .getByRole("button", { name: "Copy the install command" })
+      .hover();
+    await expect.poll(readOpacity).toBe("1");
   });
 
   test("WS-02.1 the copy button copies the install command without its prompt", async ({
@@ -525,10 +543,11 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
 
   // The quick start shows every line at once instead of typing it.
   const terminal = page.getByTestId("quick-start-terminal");
-  // Playwright's desktop Chrome reports Windows, so its tab (PS>) may open first.
-  await expect(terminal).toContainText(/(\$|PS>) sendmock/);
+  // Whichever tab opens first (Playwright's desktop Chrome reports Windows, so it is that
+  // system's), its first command and its last line show together.
+  await expect(terminal).toContainText(/^(\$|PS>) \S/);
   await expect(terminal).toContainText(
-    "Web UI and API on http://127.0.0.1:8025",
+    /Web UI and API on http:\/\/[\d.]+:8025/,
   );
   // The tickers show their final values without counting.
   await expect(page.getByTestId("number-ticker")).toHaveText([
