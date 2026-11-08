@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -88,5 +88,9 @@ describe("bundle budget", () => {
         scriptPath.includes("mock"),
       ),
     ).toBe(false);
+  });
+
+  test("UI-12.3 the live build leaves out the mock service worker", () => {
+    expect(existsSync(join(distDirectory, "mockServiceWorker.js"))).toBe(false);
   });
 });
