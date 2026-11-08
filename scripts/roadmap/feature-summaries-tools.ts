@@ -212,6 +212,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "See how many people read the docs, which pages and from where, to decide what to improve next.",
   },
+  "WS-12": {
+    summary:
+      "A From your code section on every docs page, sub-pages included, with an example for each task in nine languages, checked against the API and run in CI.",
+    outcome:
+      "Copy working code for any task straight from the page that explains it.",
+  },
   "PY-01": {
     summary:
       "Payment safety: only documented test cards are accepted, and no card number or CVC is ever stored.",

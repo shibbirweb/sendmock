@@ -213,3 +213,12 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 - [ ] WS-11.4 Nothing typed into the live demo or the API playground (request bodies, tokens, addresses, phone numbers) is ever sent to analytics.
 - [ ] WS-11.5 The script loads after the page is interactive, and the website keeps its Lighthouse scores and budgets.
 - [ ] WS-11.6 A privacy page says what is collected, by whom, for how long and how to opt out, and the footer and the README link it.
+
+## WS-12 Code examples on every page
+
+After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12) (A16).
+
+- [ ] WS-12.1 Every docs page under a menu, sub-pages included, has a "From your code" section with an example for each task it explains, as tabs in CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#; a test fails when a page has no such section or misses a language.
+- [ ] WS-12.2 Each example runs as written against a default SendMock, with its imports, and shows the answer it gets back; pages about a provider API use that provider's SDK where one exists.
+- [ ] WS-12.3 The contract check covers every new example: each method, path, JSON key, query name and `sendmock` command exists.
+- [ ] WS-12.4 The cross-language matrix runs every new example against a real `sendmock` binary in CI.

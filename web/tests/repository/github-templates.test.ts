@@ -6,6 +6,10 @@ import { parse } from "yaml";
 
 const githubDirectory = join(import.meta.dir, "../../../.github");
 const issueTemplateDirectory = join(githubDirectory, "ISSUE_TEMPLATE");
+const discussionTemplateDirectory = join(
+  githubDirectory,
+  "DISCUSSION_TEMPLATE",
+);
 
 type IssueFormField = {
   type: string;
@@ -133,16 +137,63 @@ describe("GitHub templates", () => {
     expect(
       issueConfig.contact_links.map((contactLink) => contactLink.url),
     ).toEqual([
-      "https://github.com/shibbirweb/sendmock/discussions",
+      "https://github.com/shibbirweb/sendmock/discussions/new?category=q-a",
+      "https://github.com/shibbirweb/sendmock/discussions/new?category=ideas",
       "https://shibbirweb.github.io/sendmock/docs/",
       "https://github.com/shibbirweb/sendmock/security/advisories/new",
     ]);
+  });
+
+  test("UI-10.2 Q&A, Ideas and Show and tell have discussion forms with a required field", () => {
+    const discussionFormFiles = readdirSync(discussionTemplateDirectory).sort();
+
+    expect(discussionFormFiles).toEqual([
+      "ideas.yml",
+      "q-a.yml",
+      "show-and-tell.yml",
+    ]);
+    for (const formFile of discussionFormFiles) {
+      const discussionForm = parse(
+        readFileSync(join(discussionTemplateDirectory, formFile), "utf8"),
+      ) as {
+        body: (IssueFormField & { validations?: { required?: boolean } })[];
+      };
+      const fieldIds = discussionForm.body
+        .filter((formField) => formField.id !== undefined)
+        .map((formField) => formField.id);
+
+      expect(new Set(fieldIds).size, formFile).toBe(fieldIds.length);
+      for (const formField of discussionForm.body) {
+        expect(fieldTypes.has(formField.type), formFile).toBe(true);
+      }
+      expect(
+        discussionForm.body.some(
+          (formField) => formField.validations?.required === true,
+        ),
+        formFile,
+      ).toBe(true);
+    }
+  });
+
+  test("UI-10.2 the Q&A form asks how SendMock runs and has posters remove secrets", () => {
+    const questionForm = readFileSync(
+      join(discussionTemplateDirectory, "q-a.yml"),
+      "utf8",
+    );
+
+    expect(questionForm).toContain("- npx or bunx");
+    expect(questionForm).toContain(
+      "I removed secrets and personal data from what I pasted.",
+    );
   });
 
   test("the templates never use the em-dash character", () => {
     const templateFiles = [
       ...readdirSync(issueTemplateDirectory).map((fileName) =>
         join(issueTemplateDirectory, fileName),
+      ),
+      ...readdirSync(discussionTemplateDirectory).map((fileName) =>
+        join(discussionTemplateDirectory, fileName),
       ),
       ...[
         "pull_request_template.md",

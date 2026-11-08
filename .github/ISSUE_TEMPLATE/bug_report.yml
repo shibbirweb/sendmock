@@ -19,16 +19,20 @@ body:
     id: channel
     attributes:
       label: Channel
-      description: stable, beta, edge or dev.
+      description: stable, beta or dev (a build from source).
   - type: dropdown
     id: install_method
     attributes:
       label: How you run SendMock
       options:
-        - Binary
-        - Docker
+        - npx or bunx
+        - Docker or Docker Compose
+        - Kubernetes (Helm)
         - Homebrew
-        - Built from source
+        - Scoop, WinGet or Chocolatey
+        - apt or dnf
+        - Install script or binary
+        - Cargo or built from source
         - Live demo (website)
         - Other
     validations:

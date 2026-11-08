@@ -1,0 +1,88 @@
+title: "[Help] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for asking. Answers come faster with the details below.
+
+        - Search the [docs](https://shibbirweb.github.io/sendmock/docs/), the [FAQ](https://github.com/shibbirweb/sendmock/discussions/191) and the existing discussions first.
+        - Found a bug? [Open an issue](https://github.com/shibbirweb/sendmock/issues/new/choose) instead.
+        - Never post secrets: API keys, passwords, tokens or real customer data.
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      description: The goal, not only the step that fails. For example "my sign-up test should read the OTP from the SMS".
+    validations:
+      required: true
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What happened instead?
+      description: What you tried, what you expected and what you saw.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      multiple: true
+      options:
+        - Email (SMTP, provider APIs)
+        - SMS and Verify
+        - WhatsApp
+        - Push notifications
+        - Payments
+        - Webhooks
+        - HTTP catcher
+        - Web UI
+        - CLI
+        - REST API
+        - MCP and AI agents
+        - Install and setup
+        - Docker, CI or Kubernetes
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SendMock version
+      description: "`sendmock --version`, or Settings > About."
+      placeholder: 0.1.0-beta.1
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: How you run SendMock
+      options:
+        - npx or bunx
+        - Docker or Docker Compose
+        - Kubernetes (Helm)
+        - Homebrew
+        - Scoop, WinGet or Chocolatey
+        - apt or dnf
+        - Install script or binary
+        - Cargo or built from source
+        - Live demo (website)
+        - Other
+  - type: input
+    id: provider
+    attributes:
+      label: Provider or SDK
+      description: If it involves a provider API, which one and which SDK version.
+      placeholder: twilio-node 5.3, SendGrid v3 API, Stripe Python SDK
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, request or code
+      description: The relevant part only. Remove secrets first.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before posting
+      options:
+        - label: I searched the docs and the existing discussions.
+          required: true
+        - label: I removed secrets and personal data from what I pasted.
+          required: true
