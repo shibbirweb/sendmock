@@ -29,7 +29,7 @@ export type InstallPlatform = {
 
 /** The native installs all leave one `sendmock` binary on the PATH. */
 const binaryPlatformRun = {
-  installedMessage: "✔ Installed sendmock (one 12 MB binary)",
+  installedMessage: "✔ Installed sendmock (one binary, under 20 MB)",
   runCommand: "sendmock",
   listenHost: "127.0.0.1",
 };

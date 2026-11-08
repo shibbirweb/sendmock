@@ -11,7 +11,15 @@ This first run uses only what SendMock ships with. Nothing needs to be configure
 
 1. Install SendMock. Pick your system:
 
-   ```bash tab="macOS" tab-group="os"
+   ```bash tab="npx" tab-group="os"
+   npx sendmock
+   ```
+
+   ```bash tab="bunx"
+   bunx sendmock
+   ```
+
+   ```bash tab="macOS"
    brew install shibbirweb/tap/sendmock
    ```
 
@@ -35,7 +43,7 @@ This first run uses only what SendMock ships with. Nothing needs to be configure
    sendmock
    ```
 
-   With Docker, the container from step 1 is already running, so skip this step.
+   With npx, bunx or Docker, the command in step 1 already started it, so skip this step. npx needs [Node.js](https://nodejs.org/en/download) 18 or newer and bunx needs [Bun](https://bun.sh/docs/installation).
 
 Need a beta build, Docker Compose, Homebrew on Linux or a binary to download yourself? [Install](./install.md) has every way to install, step by step: [macOS](./install.md#homebrew-macos-and-linux), [Linux](./install.md#install-script-linux-and-macos), [Windows](./install.md#install-script-windows), [Docker](./install.md#docker) and [Binaries](./install.md#binaries).
 

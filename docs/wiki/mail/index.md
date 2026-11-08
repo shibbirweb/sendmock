@@ -244,3 +244,5 @@ public class MailTests
 - [Logs](../logs.md): the SMTP session behind each email.
 - [Webhooks](../webhooks/index.md): send email events to your app.
 - [Recipe: inbound email](../recipes/inbound-email.md)
+- [Read the mail over POP3](../configuration.md#read-the-mail-over-pop3---pop3-addr): a mail client or a mailbox-polling feature reads what SendMock caught.
+- [Coming from Mailpit](./coming-from-mailpit.md): SendMock answers Mailpit's API, so tools written for it keep working.

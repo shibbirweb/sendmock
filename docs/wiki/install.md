@@ -31,6 +31,8 @@ Every way below installs the same `sendmock`. The table says which systems each 
 | [Docker](#docker) | macOS, Linux, Windows | Yes | Yes |
 | [Binaries](#binaries) | macOS, Linux, Windows | Yes | Yes |
 
+Running one SendMock for a team or a CI cluster? The Helm chart runs it in Kubernetes: see [Kubernetes](./connect/kubernetes.md). Docker Desktop users can add the [Docker Desktop extension](#docker-desktop-extension) instead of a `docker run` line.
+
 ## npx (no install)
 
 Run SendMock straight from npm without installing anything first. You need Node.js 18 or newer (or Bun, pnpm or Yarn). The first run downloads the binary for your computer (under 20 MB) into the package manager's cache; later runs start at once.
