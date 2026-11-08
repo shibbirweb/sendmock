@@ -6,7 +6,8 @@ type SamplingWorkflow = {
   jobs: {
     sample?: {
       "runs-on"?: string;
-      strategy?: { matrix?: { has_defender_exclusion?: boolean[] } };
+      strategy?: { matrix?: { sample_group?: number[] } };
+      env?: { RUNS_PER_JOB?: number };
       steps?: { run?: string }[];
     };
   };
@@ -17,14 +18,14 @@ const samplingWorkflow = Bun.YAML.parse(
 ) as SamplingWorkflow;
 
 describe("Retention on Windows workflow (issue 171)", () => {
-  test("PL-08.2 samples the skipped retention load test on Windows, with and without a Defender exclusion", () => {
+  test("PL-08.2 samples the skipped retention load test 30 times on Windows runners", () => {
     const sampleJob = samplingWorkflow.jobs.sample;
     const stepCommands = (sampleJob?.steps ?? []).map((step) => step.run ?? "").join("\n");
+    const sampleGroupCount = sampleJob?.strategy?.matrix?.sample_group?.length ?? 0;
 
     expect(sampleJob?.["runs-on"]).toBe("windows-latest");
-    expect(sampleJob?.strategy?.matrix?.has_defender_exclusion).toEqual([false, true]);
+    expect(sampleGroupCount * (sampleJob?.env?.RUNS_PER_JOB ?? 0)).toBe(30);
     expect(stepCommands).toContain("--test retention_under_load --locked --run-ignored ignored-only");
-    expect(stepCommands).toContain("Add-MpPreference -ExclusionPath");
   });
 
   test("PL-08.2 runs when the database, retention or the test change", () => {
