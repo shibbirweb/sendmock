@@ -520,7 +520,8 @@
     "number": 124,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvEEk",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "UI-08": {
     "number": 125,
@@ -776,7 +777,8 @@
     "number": 161,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvIiU",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "DS-09": {
     "number": 162,
@@ -823,7 +825,8 @@
     "number": 168,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvJL8",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "later-official-repositories": {
     "number": 169,
@@ -837,6 +840,21 @@
   "DS-10": {
     "number": 172,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhG2MQc",
+    "isFieldsSet": true
+  },
+  "PL-11": {
+    "number": 175,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhG7ncs",
+    "isFieldsSet": true
+  },
+  "PL-12": {
+    "number": 176,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhG7nkM",
+    "isFieldsSet": true
+  },
+  "PL-13": {
+    "number": 177,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhG7nqk",
     "isFieldsSet": true
   }
 }

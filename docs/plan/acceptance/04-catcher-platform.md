@@ -133,3 +133,40 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] PL-10.6 Events carry `project` in their data, and a webhook rule can filter on it. (#48)
 - [x] PL-10.7 The UI shows a project switcher, kept in the URL, once a second project exists; it filters Mail, SMS and Verify; Settings > Projects manages projects and shows how to send to each. (#48)
 - [x] PL-10.8 The seed file exports and imports projects, and reset keeps them. (#48)
+
+## PL-11 Prometheus metrics
+
+After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12a).
+
+- [ ] PL-11.1 Without `--metrics`, `GET /metrics` answers 404; `--metrics`, `SENDMOCK_METRICS=true` or `metrics = true` in `sendmock.toml` turn it on, with flags over the environment over the file.
+- [ ] PL-11.2 When on, `GET /metrics` answers the Prometheus text format (`text/plain; version=0.0.4`) with `# HELP` and `# TYPE` for every family, and `promtool check metrics` finds no problem in it.
+- [ ] PL-11.3 The gauges report what is stored now: emails, unread emails, SMS, unread SMS, pending verifications, HTTP requests, push notifications, payments, webhook deliveries waiting for a retry and the database size in bytes; they fall after a delete, a reset or retention pruning, and a scrape never waits on the writer queue.
+- [ ] PL-11.4 `sendmock_events_total{type}` counts every event published since start, one series per event type, equal to the events the event stream sent; `sendmock_smtp_rejected_total` counts refused SMTP messages; the counters only rise while the process runs.
+- [ ] PL-11.5 `sendmock_build_info{version}` is 1, `process_start_time_seconds` is the start time, and on Linux `process_resident_memory_bytes` is the resident memory.
+- [ ] PL-11.6 With `--ui-auth` or `--api-token`, `/metrics` needs the same credentials as the API (basic auth or the bearer token); its labels hold only event type names and the version, never an address, a number, message content or a secret.
+- [ ] PL-11.7 `GET /api/v1/metrics`, `sendmock metrics --json` and the MCP `sendmock_stats` tool with `view: metrics` answer the same families and values as `/metrics`, whether or not `--metrics` is on.
+- [ ] PL-11.8 While metrics is on, Settings > Connection shows the scrape URL and a copyable `prometheus.yml` job with the auth lines the instance needs, and `/api/v1/info` carries `metrics_path` (null when off).
+- [ ] PL-11.9 The Helm chart's `metrics.enabled` turns metrics on and adds the scrape annotations, and `metrics.serviceMonitor.enabled` renders a ServiceMonitor; CI renders both and scrapes `/metrics` on the kind cluster.
+- [ ] PL-11.10 `examples/monitoring/` runs SendMock with Prometheus in Docker Compose; CI sends an email and finds `sendmock_events_total{type="email.received"}` at 1 through Prometheus's query API.
+
+## PL-12 OpenTelemetry export
+
+After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12b).
+
+- [ ] PL-12.1 Without an OTLP endpoint variable, or with `OTEL_SDK_DISABLED=true`, nothing is exported and no exporter runs; `OTEL_EXPORTER_OTLP_ENDPOINT` (or a per-signal endpoint) turns export on over OTLP `http/protobuf`.
+- [ ] PL-12.2 `OTEL_SERVICE_NAME` (default `sendmock`), `OTEL_RESOURCE_ATTRIBUTES`, `OTEL_EXPORTER_OTLP_HEADERS` and `OTEL_METRIC_EXPORT_INTERVAL` work as the OpenTelemetry specification defines them, and header values are masked wherever SendMock shows its settings or logs.
+- [ ] PL-12.3 Every log line reaches the collector as a log record with its level, target and fields, and still goes to stdout.
+- [ ] PL-12.4 The collector receives the same metric families and values as `/metrics`.
+- [ ] PL-12.5 SMTP sessions, REST and provider API requests, webhook delivery attempts, status callbacks and releases each make a span with the operation id and outcome; an incoming `traceparent` header continues the caller's trace; no span holds message content, an address, a number or a secret.
+- [ ] PL-12.6 The binary with OpenTelemetry stays inside the size and idle memory budgets of the distribution plan, or OpenTelemetry ships only in the Docker image and an `-otel` binary, as the plan records with the measured numbers.
+- [ ] PL-12.7 CI runs the OpenTelemetry Collector with its file exporter next to SendMock, sends an email, an SMS and a webhook, and finds the log records, metric points and spans (with the caller's `traceparent` kept) in its output.
+
+## PL-13 Log files and readiness
+
+After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12c).
+
+- [ ] PL-13.1 `--log-file <path>` (`SENDMOCK_LOG_FILE`, `log_file` in `sendmock.toml`) also writes the logs to that file in the chosen format, rotated daily or past `--log-file-max-size` (default 10 MB), keeping `--log-file-keep` files (default 7); stdout is unchanged.
+- [ ] PL-13.2 JSON log lines keep their fields and add `trace_id` and `span_id` while a span is active, and the docs list every field.
+- [ ] PL-13.3 `GET /api/v1/health/ready` and `sendmock health --ready` answer ready only once the listeners are bound and the database answers a read, and not ready while starting and once shutdown has begun; `GET /api/v1/health` stays the liveness check.
+- [ ] PL-13.4 The Helm chart's readiness probe uses the readiness path, and the tray app starts its server with a log file in its data folder.
+- [ ] PL-13.5 The Monitoring guide page covers health and readiness, logs and how to collect them (Docker logging drivers, the systemd journal, Fluent Bit, Vector, Grafana Alloy), every metric, the Prometheus and OpenTelemetry setups for Docker Compose and Helm and the starter Grafana dashboard, and the configuration reference and the skill list every option.

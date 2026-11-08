@@ -393,4 +393,22 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Share one SendMock across apps or developers without reading each other's messages.",
   },
+  "PL-11": {
+    summary:
+      "An opt-in Prometheus `/metrics` endpoint: stored messages, events by type, SMTP rejections, database size and process facts, also as JSON, CLI and MCP.",
+    outcome:
+      "Watch a shared or CI SendMock on the Prometheus and Grafana dashboards the team already uses.",
+  },
+  "PL-12": {
+    summary:
+      "OpenTelemetry export of logs, metrics and traces over OTLP, set up with the standard `OTEL_*` variables.",
+    outcome:
+      "Send SendMock's logs, metrics and traces to any collector or vendor, and follow a test's request into SendMock.",
+  },
+  "PL-13": {
+    summary:
+      "Rotating log files, trace ids in JSON logs, a readiness check and a Monitoring guide covering every way to collect logs and metrics.",
+    outcome:
+      "Run SendMock natively or behind a load balancer and still have its logs and health where operators look.",
+  },
 };

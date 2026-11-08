@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 114 / 120 features, 562 / 571 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 114 / 123 features, 562 / 593 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -129,6 +129,9 @@ On top of its own criteria, a feature is done only when:
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 2 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
 | [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | Accepted |
+| [PL-11](04-catcher-platform.md#pl-11-prometheus-metrics) | Prometheus metrics | After 1.0 (A12a) | 10 | Not started |
+| [PL-12](04-catcher-platform.md#pl-12-opentelemetry-export) | OpenTelemetry export | After 1.0 (A12b) | 7 | Not started |
+| [PL-13](04-catcher-platform.md#pl-13-log-files-and-readiness) | Log files and readiness | After 1.0 (A12c) | 5 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
