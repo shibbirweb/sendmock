@@ -1,9 +1,9 @@
 # Publishes the Testcontainers modules that use stored secrets under the release's version
-# (DS-06, plan 30 W3b). Release build calls it after the GitHub release is published. Each
-# registry is skipped until the owner sets it up: NuGet with NUGET_API_KEY, Maven Central with
-# MAVEN_CENTRAL_USERNAME, MAVEN_CENTRAL_TOKEN and MAVEN_SIGNING_KEY. The Go module needs no
-# registry: its tag is enough for `go get`. The npm and PyPI modules use trusted publishing,
-# so they publish from registry-publish.yml, a top-level workflow (plan 30 W18).
+# (DS-06, plan 30 W3b). Release build calls it after the GitHub release is published. Maven
+# Central is skipped until the owner sets MAVEN_CENTRAL_USERNAME, MAVEN_CENTRAL_TOKEN and
+# MAVEN_SIGNING_KEY. The Go module needs no registry: its tag is enough for `go get`. The npm,
+# PyPI and NuGet modules use trusted publishing, so they publish from registry-publish.yml, a
+# top-level workflow (plan 30 W18).
 name: Testcontainers publish
 
 on:
@@ -23,29 +23,6 @@ permissions:
   contents: read
 
 jobs:
-  dotnet:
-    name: NuGet (SendMock.Testcontainers)
-    runs-on: ubuntu-latest
-    env:
-      HAS_NUGET_KEY: ${{ secrets.NUGET_API_KEY != '' }}
-    steps:
-      - uses: actions/checkout@v5
-        if: env.HAS_NUGET_KEY == 'true'
-        with:
-          ref: ${{ inputs.commit_sha }}
-      - uses: actions/setup-dotnet@v5
-        if: env.HAS_NUGET_KEY == 'true'
-        with:
-          dotnet-version: "8.0.x"
-      - name: Pack and push
-        if: env.HAS_NUGET_KEY == 'true'
-        working-directory: testcontainers/dotnet
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          dotnet pack SendMock.Testcontainers --configuration Release --output out
-          dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-
   java:
     name: Maven Central (io.github.shibbirweb:sendmock-testcontainers)
     runs-on: ubuntu-latest

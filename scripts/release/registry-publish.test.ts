@@ -92,10 +92,18 @@ describe("the Registry publish workflow", () => {
       "mcp-registry",
       "npm",
       "plan",
+      "testcontainers-dotnet",
       "testcontainers-node",
       "testcontainers-python",
     ]);
-    for (const jobName of ["npm", "crates", "mcp-registry", "testcontainers-node", "testcontainers-python"]) {
+    for (const jobName of [
+      "npm",
+      "crates",
+      "mcp-registry",
+      "testcontainers-dotnet",
+      "testcontainers-node",
+      "testcontainers-python",
+    ]) {
       expect(registryWorkflow.jobs[jobName]?.permissions?.["id-token"], jobName).toBe("write");
     }
   });
@@ -113,6 +121,17 @@ describe("the Registry publish workflow", () => {
     }
   });
 
+  test("DS-03.8 NuGet trades the OIDC token for a short-lived key, with no stored one", () => {
+    const dotnetSteps = registryWorkflow.jobs["testcontainers-dotnet"]?.steps ?? [];
+    const pushRun = dotnetSteps.map((step) => step.run ?? "").join("\n");
+
+    expect(dotnetSteps.map((step) => step.uses ?? "")).toContain("NuGet/login@v1");
+    expect(pushRun).toContain("dotnet nuget push");
+    expect(
+      readFileSync(join(workflowsDirectory, "registry-publish.yml"), "utf8"),
+    ).not.toContain("secrets.NUGET_API_KEY");
+  });
+
   test("DS-03.8 downloads the release's own artifacts from the run that built them", () => {
     const artifactDownloads = Object.values(registryWorkflow.jobs)
       .flatMap((job) => job.steps ?? [])
@@ -127,10 +146,12 @@ describe("the Registry publish workflow", () => {
     }
   });
 
-  test("DS-03.8 no other workflow publishes to npm, PyPI or crates.io", () => {
+  test("DS-03.8 no other workflow publishes to npm, PyPI, NuGet or crates.io", () => {
     const trustedPublishingCommands = [
       "npm publish",
       "pypa/gh-action-pypi-publish",
+      "dotnet nuget push",
+      "NuGet/login",
       "crates-io-auth-action",
       // `cargo publish --dry-run` in Release build checks the packages; only a real publish
       // needs a registry token.

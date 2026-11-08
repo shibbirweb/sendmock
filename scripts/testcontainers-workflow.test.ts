@@ -41,12 +41,8 @@ describe("Testcontainers publish", () => {
     })[]) {
       expect(moduleEntry.pack?.length ?? 0).toBeGreaterThan(0);
     }
-    expect(Object.keys(publishWorkflow.jobs).sort()).toEqual([
-      "dotnet",
-      "go",
-      "java",
-    ]);
-    // npm and PyPI use trusted publishing, which only works from a top-level workflow.
+    expect(Object.keys(publishWorkflow.jobs).sort()).toEqual(["go", "java"]);
+    // npm, PyPI and NuGet use trusted publishing, which only works from a top-level workflow.
     const registryJobNames = Object.keys(
       (
         Bun.YAML.parse(
@@ -56,6 +52,7 @@ describe("Testcontainers publish", () => {
     );
     expect(registryJobNames).toContain("testcontainers-node");
     expect(registryJobNames).toContain("testcontainers-python");
+    expect(registryJobNames).toContain("testcontainers-dotnet");
     expect(readFileSync(".github/workflows/release.yml", "utf8")).toContain(
       "uses: ./.github/workflows/testcontainers-publish.yml",
     );

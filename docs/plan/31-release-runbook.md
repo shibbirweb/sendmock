@@ -47,7 +47,6 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 | `CHOCOLATEY_API_KEY` | The Chocolatey API key | No Chocolatey push |
 | `AUR_SSH_PRIVATE_KEY` | The AUR account's SSH key | No AUR update |
 | `COPR_CONFIG` | The COPR API configuration (`~/.config/copr`) | No COPR build |
-| `NUGET_API_KEY` | The NuGet API key | No .NET Testcontainers module |
 | `MAVEN_CENTRAL_USERNAME` | The Sonatype user token name | No Java Testcontainers module |
 | `MAVEN_CENTRAL_TOKEN` | The Sonatype user token | No Java Testcontainers module |
 | `MAVEN_SIGNING_KEY` | The armoured GPG key Maven Central checks | No Java Testcontainers module |
@@ -62,7 +61,7 @@ gpg --quick-gen-key "SendMock packages" ed25519 sign never
 gpg --armor --export-secret-keys "SendMock packages" | gh secret set PACKAGES_GPG_PRIVATE_KEY --repo shibbirweb/sendmock
 ```
 
-npm, PyPI and crates.io publish through trusted publishing, all from one top-level workflow, `registry-publish.yml`. npm is the exception for the first beta only: its packages do not exist yet and npm sets a trusted publisher only on an existing package, so set `NPM_TOKEN` and `NPM_PUBLISHING` now and the npm trusted publishers after the first beta (step 6) (registries cannot trust a called workflow, [30](30-phase-5.md) W18): on PyPI (`sendmock-testcontainers`, as a pending publisher) and crates.io (every workspace crate), add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher, then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
+npm, PyPI and crates.io publish through trusted publishing, all from one top-level workflow, `registry-publish.yml`. npm is the exception for the first beta only: its packages do not exist yet and npm sets a trusted publisher only on an existing package, so set `NPM_TOKEN` and `NPM_PUBLISHING` now and the npm trusted publishers after the first beta (step 6) (registries cannot trust a called workflow, [30](30-phase-5.md) W18): on PyPI (`sendmock-testcontainers`, as a pending publisher), NuGet (a trusted publishing policy for `SendMock.Testcontainers`, user `shibbirweb`) and crates.io (every workspace crate), add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher, then set its variable, `NPM_PUBLISHING`, `PYPI_PUBLISHING`, `NUGET_PUBLISHING` or `CRATES_PUBLISHING`, to `true`:
 
 ```sh
 gh variable set NPM_PUBLISHING --body true --repo shibbirweb/sendmock
@@ -70,6 +69,10 @@ gh variable set NPM_PUBLISHING --body true --repo shibbirweb/sendmock
 
 ```sh
 gh variable set PYPI_PUBLISHING --body true --repo shibbirweb/sendmock
+```
+
+```sh
+gh variable set NUGET_PUBLISHING --body true --repo shibbirweb/sendmock
 ```
 
 ```sh

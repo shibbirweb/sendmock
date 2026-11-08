@@ -1,5 +1,5 @@
 # Publishes to the registries that log in with GitHub OIDC (trusted publishing): npm, PyPI,
-# crates.io and the official MCP registry. Registries check the workflow file named in the OIDC
+# NuGet, crates.io and the official MCP registry. Registries check the workflow file named in the OIDC
 # token and cannot trust a called workflow, so these jobs live in this top-level workflow, the
 # one file registered as trusted publisher on each registry (docs/plan/30-phase-5.md, W18). It
 # runs after "Publish beta" or "Publish stable" and only when that run published a release.
@@ -248,3 +248,35 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: testcontainers/python/dist
+
+  # The .NET Testcontainers module (DS-06): NuGet/login trades the OIDC token for a short-lived
+  # key under the owner's trusted publishing policy for SendMock.Testcontainers.
+  testcontainers-dotnet:
+    name: NuGet (SendMock.Testcontainers)
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && vars.NUGET_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: shibbirweb
+
+      - name: Pack and push
+        working-directory: testcontainers/dotnet
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet pack SendMock.Testcontainers --configuration Release --output out
+          dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
