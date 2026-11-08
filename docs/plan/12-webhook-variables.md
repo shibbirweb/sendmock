@@ -149,7 +149,7 @@ The endpoint editor and manual composer offer:
 | Mode | Use |
 |------|-----|
 | **Template** | a built-in service template (Twilio, SendGrid, Slack, ...) or a saved custom template ([13-webhook-templates.md](13-webhook-templates.md)), plus an optional "Extra fields" table merged in, each value a template |
-| **Fields** | key/value rows; each value is a template with a type (text, number, boolean, JSON, file for multipart). Encoded as JSON, `x-www-form-urlencoded` or `multipart/form-data`. SendMock handles quoting and escaping, so users cannot produce invalid JSON. Nested keys via dot notation (`user.email`). |
+| **Fields** | key/value rows; each value is a template with a type (text, number, boolean, JSON, file for multipart). Encoded as JSON, `x-www-form-urlencoded` or `multipart/form-data`. SendMock handles quoting and escaping, so users cannot produce invalid JSON. Nested keys via dot notation (`user.email`). Phase 3 builds JSON and form; `multipart/form-data` with file fields comes in Phase 4 (WH-07.16). |
 | **Raw** | free-text template with a content type (JSON, XML, plain text, HTML, custom). JSON raw bodies are validated after rendering and show a warning if invalid. |
 | **None** | no body (for GET or pure ping requests) |
 

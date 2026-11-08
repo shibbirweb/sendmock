@@ -1,0 +1,14 @@
+# SendMock as a service: `systemctl enable --now sendmock`. Not started on install, since
+# most people run it in a terminal while they develop. Listens on 127.0.0.1 only.
+[Unit]
+Description=SendMock, the local catcher for email, SMS, payments and webhooks
+After=network.target
+
+[Service]
+DynamicUser=yes
+StateDirectory=sendmock
+ExecStart=/usr/bin/sendmock --db /var/lib/sendmock/sendmock.db
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

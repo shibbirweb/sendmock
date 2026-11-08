@@ -91,6 +91,35 @@ describe("renderEndpointRequest", () => {
     expect(previewResult.body).toBe("Subject=Your+verification+code");
   });
 
+  test("WH-07.16 Fields mode can encode multipart with a file fetched from a URL", () => {
+    const previewResult = renderPreview({
+      body_mode: "fields",
+      fields_encoding: "multipart",
+      body_fields: [
+        {
+          name: "subject",
+          value_type: "text",
+          value: "{{ data.subject }}",
+        },
+        {
+          name: "invoice",
+          value_type: "file",
+          value: "https://files.app.test/invoices/42.pdf",
+        },
+      ],
+    });
+
+    expect(previewResult.headers["content-type"]).toBe(
+      "multipart/form-data; boundary=sendmock-fields-boundary",
+    );
+    expect(previewResult.body).toContain(
+      'name="subject"\r\n\r\nYour verification code\r\n',
+    );
+    expect(previewResult.body).toContain(
+      'name="invoice"; filename="42.pdf"\r\nX-Sendmock-File-Url: https://files.app.test/invoices/42.pdf\r\n',
+    );
+  });
+
   test("WH-07.14 a field that renders the wrong type is an error on that field", () => {
     const previewResult = renderPreview({
       body_mode: "fields",

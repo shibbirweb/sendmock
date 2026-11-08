@@ -43,7 +43,7 @@ test("UI-07.4 every screen sets its own tab title, the open item first", async (
   await expect(page).toHaveTitle("+8801722222222 · SMS · SendMock");
 });
 
-test("UI-07.2 every screen shows an error with Try again when the API fails, and recovers", async ({
+test("UI-02.3 UI-07.2 every screen shows an error with Try again when the API fails, and recovers", async ({
   page,
 }) => {
   // It visits every screen and waits for each, like the accessibility scans.
@@ -74,7 +74,7 @@ test("UI-07.2 every screen shows an error with Try again when the API fails, and
   ).toBeVisible();
 });
 
-test("UI-07.2 every screen shows a skeleton while its data loads", async ({
+test("UI-02.3 UI-07.2 every screen shows a skeleton while its data loads", async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -98,7 +98,7 @@ test("UI-07.2 every screen shows a skeleton while its data loads", async ({
   }
 });
 
-test("UI-07.2 traffic screens show an empty state with the empty data set", async ({
+test("UI-02.3 UI-07.2 traffic screens show an empty state with the empty data set", async ({
   page,
 }) => {
   await page.getByRole("button", { name: "Demo controls" }).click();
@@ -117,5 +117,27 @@ test("UI-07.2 traffic screens show an empty state with the empty data set", asyn
   for (const [screenPath, emptyText] of emptyTexts) {
     await navigateInApp(page, screenPath);
     await expect(screenContent(page).getByText(emptyText)).toBeVisible();
+  }
+});
+
+test("UI-02.3 every screen renders the large data set", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.getByRole("button", { name: "Demo controls" }).click();
+  await page.getByLabel("Data set").click();
+  await page.getByRole("option", { name: /Large/ }).click();
+  await page.getByRole("slider", { name: "Latency" }).press("Home");
+  await page.keyboard.press("Escape");
+
+  for (const screen of screensWithData) {
+    await navigateInApp(page, screen.path);
+    await expect(page).toHaveTitle(screen.title);
+    await expect(
+      screenContent(page).locator('[data-slot="skeleton"]'),
+      `${screen.path} finishes loading`,
+    ).toHaveCount(0, { timeout: 15_000 });
+    await expect(
+      screenContent(page).getByText("Could not load"),
+      `${screen.path} shows no error`,
+    ).toHaveCount(0);
   }
 });

@@ -46,7 +46,7 @@ const templateEndpoints = tagEndpoints("Webhook templates", [
       {
         name: "endpoints",
         description:
-          "detach: move endpoints that use it to native JSON instead of failing.",
+          "detach: endpoints that use it keep their own copy of it instead of failing.",
         schema: "string",
         example: "detach",
       },

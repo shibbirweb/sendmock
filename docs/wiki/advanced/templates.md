@@ -3,7 +3,7 @@ title: Create and edit templates
 description: Edit a built-in template, clone one, write your own, keep revisions, and share templates with your team.
 ---
 
-> Works in your install from Phase 3 (custom templates) and Phase 4 (import, export and the templates folder). Try it in the [demo](/demo/webhooks/templates) today.
+> Try it in the [demo](/demo/webhooks/templates).
 
 A template is the shape of a webhook request. When no built-in matches what your app expects, change one or write your own.
 
@@ -32,7 +32,29 @@ A template is the shape of a webhook request. When no built-in matches what your
 
 ## What a custom template has
 
-Name, description, the **events** it fits (the gallery and endpoint picker only offer it for those), its **required variables** (endpoints show them as **Missing** until set), method, content type, headers, query and body, and the body mode (Fields, Raw or None). Inside `{{ }}`, suggestions list every value, function and filter; the reference panel explains each.
+Name, description, the **events** it fits (the gallery and endpoint picker only offer it for those), its **required variables** (endpoints show them as **Missing** until set), method, content type, headers, query and body, and the body mode (Fields, Raw or None). Inside `{{ }}`, suggestions list every value, function and filter; the reference panel explains each. Every filter is also listed in [Template filters](../reference/template-filters.md).
+
+## Fake data and Postman aliases
+
+Besides the context, variables and `uuid()`, `random_int()` and the other generated values, templates can call fake data:
+
+| Function | Gives |
+| --- | --- |
+| `fake.name()`, `fake.first_name()`, `fake.last_name()` | a person's name |
+| `fake.email()`, `fake.username()`, `fake.company()` | an address at a test domain, a username, a company |
+| `fake.address()`, `fake.city()`, `fake.country_code()` | a street address, a city, a two-letter country code |
+| `fake.ip()`, `fake.user_agent()`, `fake.url()` | an address from the documentation range, a browser user agent, a URL at a test domain |
+| `fake.word()`, `fake.sentence()`, `fake.paragraph()`, `lorem(words)` | placeholder text |
+
+Requests brought over from Postman keep working: `{{$randomUUID}}`, `{{$guid}}`, `{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$randomInt}}`, `{{$randomEmail}}`, `{{$randomFirstName}}`, `{{$randomFullName}}`, `{{$randomCompanyName}}`, `{{$randomCity}}`, `{{$randomIP}}`, `{{$randomUrl}}`, `{{$randomLoremSentence}}` and the like become the matching function before rendering.
+
+## Provider signatures
+
+The built-in provider templates sign their requests as the providers do, so your app's check passes unchanged: Twilio's `X-Twilio-Signature`, Mailgun's `signature` block (with your `mailgun_signing_key` variable), Resend's Svix headers (with your `resend_signing_secret`, a `whsec_` key), and Stripe, Razorpay, Paddle and SSLCommerz signatures. SendGrid signs its event webhook with a key pair it keeps; SendMock signs with a published test key pair, so set your app's SendGrid verification key to:
+
+```text
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEdZuCtJsfc9vqpbyG5Cknr4QqZWrFTIOUqVuAy9/FtZ3CdY7v0Xd+IwjfbPzxo6nvA60JYfvGMr5ifaJ0Hd5OAA==
+```
 
 ## Revisions
 

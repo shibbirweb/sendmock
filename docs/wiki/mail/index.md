@@ -3,7 +3,7 @@ title: Inbox
 description: Catch every email your app sends over SMTP or a provider API, read it, check it, and simulate what happens next.
 ---
 
-> Try it in the [demo](/demo/mail). Works in your install from Phase 1 (SMTP and the native API), Phase 3 (outcome events) and Phase 4 (provider APIs, checks, replies and release).
+> Try it in the [demo](/demo/mail).
 
 Every email your app sends lands in **Mail > Inbox**, whatever the recipient, and nothing is delivered to a real inbox. **Mail** opens the inbox; [Mail > Providers](./providers.md) lists the email APIs SendMock answers.
 
@@ -59,6 +59,8 @@ Newest first, with sender, subject, snippet, time, an unread dot, an attachment 
 - **Extracted panel:** one-time codes and links, each with copy and open buttons.
 - **Tabs:** HTML, Text, Source, Headers, Attachments, MIME, Checks, Timeline and Template data. Each is explained in [Reading and checks](./reading-and-checks.md).
 - **Actions:** mark read or unread, **Simulate** (Delivered, Hard bounce, Soft bounce, Spam complaint, Unsubscribe; see [Outcomes](./outcomes.md)), **Reply**, **Reply all**, **Forward** (see [Replies and forwards](./replies-and-forwards.md)), tag, download `.eml`, **Send to webhook**, **Release to real SMTP** (see [Release](./release.md)) and delete.
+
+Every control and text, one by one: [Inbox in depth](../deeper/mail/inbox.md).
 
 ## Customize
 
@@ -237,10 +239,10 @@ public class MailTests
 | delete one | [`sendmock email delete <emailId>`](/cli/email/#email-delete) | [`DELETE /api/v1/emails/{emailId}`](/api/email/#deleteEmailsByEmailId) | [`sendmock_email_delete`](/mcp/email/#sendmock_email_delete) |
 | delete everything | [`sendmock email delete-all --yes`](/cli/email/#email-delete-all) | [`DELETE /api/v1/emails`](/api/email/#deleteEmails) | [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all) |
 
-The email commands and tools arrive in Phase 1.
-
 ## Related
 
 - [Logs](../logs.md): the SMTP session behind each email.
 - [Webhooks](../webhooks/index.md): send email events to your app.
 - [Recipe: inbound email](../recipes/inbound-email.md)
+- [Read the mail over POP3](../configuration.md#read-the-mail-over-pop3---pop3-addr): a mail client or a mailbox-polling feature reads what SendMock caught.
+- [Coming from Mailpit](./coming-from-mailpit.md): SendMock answers Mailpit's API, so tools written for it keep working.

@@ -1,5 +1,7 @@
 import { http, HttpResponse } from "msw";
 
+import { apiEndpoints } from "@/lib/api/endpoint-registry";
+import { buildOperationId } from "@/lib/api/endpoint-registry/operation-id";
 import type { AppInfo, HealthStatus } from "@/lib/api/types";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
 import { mockDatabase } from "@/mocks/db/mock-database";
@@ -8,7 +10,7 @@ import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
 import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
 
 /** What `/info` reports; Docker binds every interface instead of loopback. */
-function buildMockAppInfo(): AppInfo {
+export function buildMockAppInfo(): AppInfo {
   const mockConditions = readMockConditions();
   const isRunningInContainer = mockConditions.isRunningInContainer;
   const listenHost = isRunningInContainer ? "0.0.0.0" : "127.0.0.1";
@@ -23,9 +25,14 @@ function buildMockAppInfo(): AppInfo {
     smtp_address: `${listenHost}:1025`,
     http_address: `${listenHost}:8025`,
     provider_address: null,
+    catcher_address: null,
+    pop3_address: null,
     database_path: "(in-browser demo data)",
     database_size_bytes: 0,
     is_container: isRunningInContainer,
+    available_operations: apiEndpoints.map((apiEndpoint) =>
+      buildOperationId(apiEndpoint.method, apiEndpoint.path),
+    ),
   };
 }
 

@@ -168,5 +168,12 @@ describe("listFieldsForEvents", () => {
     expect(fieldKeys(["sms.status"])).not.toContain("subject");
     expect(fieldKeys(["email.opened"])).toContain("open_count");
     expect(fieldKeys(["verify.started"])).toEqual([]);
+    expect(fieldKeys(["push.sent"])).toEqual([
+      "body",
+      "project",
+      "token",
+      "title",
+      "provider",
+    ]);
   });
 });

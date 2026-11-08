@@ -18,7 +18,7 @@ Two things that work together:
 | Styling | Tailwind CSS v4 + shadcn/ui | same tokens as the app UI (`web/`) so the site and app look like one product |
 | Animated components | **Magic UI** (React + Tailwind + Motion, installed through the shadcn CLI registry) | landing page, feature sections, playground polish |
 | AI-assisted building | **Magic UI MCP server** in the repo's `.mcp.json` | lets Claude Code / Cursor pull Magic UI components correctly (installer: `@magicuidesign/cli`; exact Claude Code command to verify) |
-| Hosting | GitHub Pages via Actions (`actions/upload-pages-artifact`, `actions/deploy-pages`) | `https://<owner>.github.io/<repo>/`, custom domain later |
+| Hosting | GitHub Pages via Actions (`actions/upload-pages-artifact`, `actions/deploy-pages`) | `https://shibbirweb.github.io/sendmock/`, custom domain later |
 | Diagrams | Mermaid | architecture, release flow |
 
 Animations respect `prefers-reduced-motion` (Magic UI components are wrapped so they render a static state when reduced motion is on) and are kept out of the docs reading area so they never slow down reference pages.
@@ -191,7 +191,7 @@ Every stable goes through at least one beta, so the beta channel always tries a 
 
 #### The changelog
 
-- `CHANGELOG.md` at the repository root is **written by the Prepare release workflow only**. Each release adds one section at the top, built from the pull requests merged into `develop` since the last tag:
+- `CHANGELOG.md` at the repository root is **written by the Prepare release workflow only**. It is in the repository from 2026-11-08 with only its header (the text the workflow writes), so it is there to read before the first release; the first release adds its section under that header (`insertChangelogSection` treats a header-only file as an empty one). Each release adds one section at the top, built from the pull requests merged into `develop` since the last tag:
 
   | Pull request title | Changelog group |
   | --- | --- |
@@ -224,6 +224,7 @@ bun scripts/version.ts notes 0.4.0     # print a version's section (the release 
 | `stable-promote.yml` | CI finished on `develop` | If `develop` holds an untagged stable version: opens the `develop` -> `main` PR (merge commit, never squash) |
 | `stable-publish.yml` | CI finished on `main` | If `main` holds an untagged stable version: creates the GitHub **release** (marked latest) with its changelog section as the body and calls `release.yml` |
 | `release.yml` | called by the publish workflows, a manual release, or "Run workflow" to rebuild | Builds all targets, checksums, Docker images, package manager updates for the right channel (table below); runs the binary tests on every platform before anything is published ([09](09-distribution.md#binary-tests-on-every-platform-decided-2026-10-27)); version comes from the code and must match the tag |
+| `registry-publish.yml` (Registry publish) | "Publish beta" or "Publish stable" finished | If that run published a release: npm (launcher, platform packages, `sendmock-testcontainers`), PyPI (`sendmock-testcontainers`), crates.io and the MCP registry for a stable, all with GitHub OIDC; the only workflow registered as trusted publisher, since registries cannot trust a called workflow (plan 30 W18) |
 | `docker-edge.yml` | push to `develop` | Builds and pushes the `edge` image for people who want every merge |
 | `website.yml` | see [Versioned builds](#versioned-builds) | Builds all doc versions and deploys GitHub Pages |
 | `wiki.yml` (optional) | push to `main` touching `docs/wiki` | Mirrors docs to the GitHub wiki |
@@ -279,8 +280,8 @@ flowchart LR
 - **Surfaces:** `GET /api/v1/updates` (`409` while the mode is `off`, `502` "Could not check for updates" when GitHub cannot be reached), `sendmock update check`, MCP `sendmock_update_check`; the mode is a setting (`update_check_mode`, replacing the boolean `is_update_check_enabled`). The answer (`UpdateCheckResult`) carries the running version, channel and install method, whether the channel is checked at all (`is_channel_checked`, false for edge and dev), the offered release (`available_release`: version, `published_at`, `release_notes_markdown`, `release_url` and `upgrade_command`, null when the method is unknown), `checked_at` and `is_from_cache`.
 - **When:** the mode select, the notification and the upgrade command are UI work on mock data (U3); the real check ships with the first beta (Phase 1), since that is the first version anyone can update from.
 - **Upgrade commands follow the running platform (decided 2026-10-28, owner feedback F18):** the server builds the command for the operating system it runs on (detected at run time, never guessed from the browser), the channel and the install method, and every command is one the [Install page](../wiki/install.md) gives for that platform and channel:
-  - Install script on macOS and Linux: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`, with `-s -- --channel beta` for beta.
-  - Install script on Windows (PowerShell): `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`, and `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1))) -Channel beta` for beta.
+  - Install script on macOS and Linux: `curl -fsSL https://github.com/shibbirweb/sendmock/releases/latest/download/install.sh | sh`, and `curl -fsSL https://github.com/shibbirweb/sendmock/releases/download/beta/install.sh | sh -s -- --channel beta` for beta.
+  - Install script on Windows (PowerShell): `irm https://github.com/shibbirweb/sendmock/releases/latest/download/install.ps1 | iex`, and `& ([scriptblock]::Create((irm https://github.com/shibbirweb/sendmock/releases/download/beta/install.ps1))) -Channel beta` for beta.
   - Homebrew (macOS and Linux only): `brew upgrade shibbirweb/tap/sendmock`, or `sendmock-beta`.
   - Scoop (Windows only): `scoop update sendmock`, or `sendmock-beta`.
   - Docker (any platform, multi-arch image): `docker pull ghcr.io/shibbirweb/sendmock:<version>`.

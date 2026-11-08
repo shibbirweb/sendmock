@@ -183,3 +183,33 @@ describe("input docs (WS-07.1)", () => {
     expect(missingDocs).toEqual([]);
   });
 });
+
+describe("example values the server accepts (WS-04.2)", () => {
+  test("WS-04.2 every base64 example in a request body is valid base64, so the playground's default body is accepted", () => {
+    const strictBase64Pattern =
+      /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+    const base64Examples = [...collectInputObjects()].flatMap(
+      ([objectName, objectSchema]) =>
+        Object.entries(objectSchema.properties ?? {})
+          .filter(([, propertySchema]) =>
+            /base64/i.test(propertySchema.description ?? ""),
+          )
+          .flatMap(([propertyName, propertySchema]) =>
+            (propertySchema.examples ?? []).map((exampleValue) => ({
+              field: `${objectName}.${propertyName}`,
+              exampleValue,
+            })),
+          ),
+    );
+    const invalidExamples = base64Examples
+      .filter(
+        ({ exampleValue }) =>
+          typeof exampleValue !== "string" ||
+          !strictBase64Pattern.test(exampleValue),
+      )
+      .map(({ field, exampleValue }) => `${field}: ${String(exampleValue)}`);
+
+    expect(base64Examples.length).toBeGreaterThanOrEqual(2);
+    expect(invalidExamples).toEqual([]);
+  });
+});

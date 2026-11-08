@@ -6,6 +6,7 @@ import {
   pageOf,
   pageQueryParameters,
   partialOf,
+  projectQueryParameter,
   tagEndpoints,
   typeRef,
 } from "./endpoint-definition";
@@ -53,6 +54,7 @@ const smsEndpoints = tagEndpoints("SMS", [
         schema: "string",
         example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       },
+      projectQueryParameter("messages"),
     ],
     response: pageOf("SmsMessage"),
   },
@@ -76,6 +78,7 @@ const smsEndpoints = tagEndpoints("SMS", [
     method: "GET",
     path: "/api/v1/sms/threads",
     summary: "Conversations, one per contact and your number.",
+    queryParameters: [projectQueryParameter("messages")],
     response: listOf("SmsThread"),
   },
   {
@@ -107,6 +110,13 @@ const smsEndpoints = tagEndpoints("SMS", [
     response: null,
     successStatus: 204,
     errorStatuses: [404, 409],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/sms/{smsId}/opens",
+    summary: "Every recorded read of an outbound message, oldest first.",
+    response: listOf("OpenRecord"),
+    errorStatuses: [404],
   },
   {
     method: "POST",
@@ -142,12 +152,13 @@ function buildOutcomeRuleEndpoints(
 ): AreaEndpoint[] {
   const rulesPath = `/api/v1/outcome-rules/${ruleKind}`;
   const channelLabel = ruleKind === "email" ? "email" : "SMS";
+  const capitalizedChannelLabel = ruleKind === "email" ? "Email" : "SMS";
 
   return [
     {
       method: "GET",
       path: rulesPath,
-      summary: `${channelLabel} outcome rules, checked from top to bottom.`,
+      summary: `${capitalizedChannelLabel} outcome rules, checked from top to bottom.`,
       response: listOf(ruleTypeName),
     },
     {

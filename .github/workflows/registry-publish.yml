@@ -1,0 +1,282 @@
+# Publishes to the registries that log in with GitHub OIDC (trusted publishing): npm, PyPI,
+# NuGet, crates.io and the official MCP registry. Registries check the workflow file named in the OIDC
+# token and cannot trust a called workflow, so these jobs live in this top-level workflow, the
+# one file registered as trusted publisher on each registry (docs/plan/30-phase-5.md, W18). It
+# runs after "Publish beta" or "Publish stable" and only when that run published a release.
+name: Registry publish
+
+on:
+  workflow_run:
+    workflows: [Publish beta, Publish stable]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: registry-publish
+  cancel-in-progress: false
+
+env:
+  COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+  RELEASE_RUN_ID: ${{ github.event.workflow_run.id }}
+
+jobs:
+  plan:
+    name: Did that run publish a release?
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      should_publish: ${{ steps.decision.outputs.should_publish }}
+      tag_name: ${{ steps.decision.outputs.tag_name }}
+      version: ${{ steps.decision.outputs.version }}
+      channel: ${{ steps.decision.outputs.channel }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      # Any channel of the release may have failed after the GitHub release went out; the
+      # registries still get it, so the gate is the publish job, not the whole run.
+      - id: decision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RELEASE_RUN_ID/jobs?per_page=100" \
+            --jq '.jobs[] | {name, conclusion}' > "$RUNNER_TEMP/run-jobs.jsonl"
+          bun scripts/release/registry-publish-plan.ts "$WORKFLOW_NAME" "$RUNNER_TEMP/run-jobs.jsonl"
+
+  # The launcher and its platform packages, with the `latest` or `beta` dist-tag (DS-03.1,
+  # DS-03.7), once the owner has made this workflow each package's trusted publisher.
+  npm:
+    name: npm packages
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      # No registry-url: setup-node would write an `_authToken=${NODE_AUTH_TOKEN}` line, and an
+      # empty one makes npm skip the OIDC exchange.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: npm with trusted publishing
+        run: npm install -g npm@11
+
+      # npm sets a trusted publisher only on an existing package, so the first beta publishes
+      # with NPM_TOKEN; once the owner has set the trusted publishers and deleted the secret, no
+      # token is written and npm uses OIDC.
+      - name: The first publish's token, while NPM_TOKEN is set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            npm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+          fi
+
+      - name: The release's archives, from the run that built and tested them
+        uses: actions/download-artifact@v7
+        with:
+          name: release-files
+          path: dist
+          run-id: ${{ env.RELEASE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Publish the platform packages, then the launcher
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+          CHANNEL: ${{ needs.plan.outputs.channel }}
+        run: |
+          dist_tag="latest"
+          if [ "$CHANNEL" = "beta" ]; then dist_tag="beta"; fi
+          bun scripts/release/npm-packages.ts "$VERSION" dist npm-packages
+          for package_directory in npm-packages/*/; do
+            if [ "$(basename "$package_directory")" != "sendmock" ]; then
+              npm publish "$package_directory" --access public --tag "$dist_tag"
+            fi
+          done
+          npm publish npm-packages/sendmock --access public --tag "$dist_tag"
+
+  # The server in the official MCP registry for a stable, once the npm package and the image it
+  # names are published (the registry checks both claim its name); GitHub OIDC proves the
+  # io.github.shibbirweb namespace, so no token is kept (AI-05.6).
+  mcp-registry:
+    name: MCP registry
+    needs: [plan, npm]
+    if: needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: ./.github/actions/install-mcp-publisher
+
+      - name: server.json names this release, and its image is published
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          grep -q "ghcr.io/shibbirweb/sendmock:$VERSION\"" server.json
+          docker buildx imagetools inspect "ghcr.io/shibbirweb/sendmock:$VERSION" > /dev/null
+
+      - name: Publish to the MCP registry
+        run: |
+          mcp-publisher login github-oidc
+          mcp-publisher publish server.json
+
+  # The crates on crates.io for a stable (`cargo install sendmock`, DS-03.1).
+  crates:
+    name: crates.io
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - name: The web UI the release embedded
+        uses: actions/download-artifact@v7
+        with:
+          name: release-web-dist
+          path: web/dist
+          run-id: ${{ env.RELEASE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Toolchain
+        run: rustup toolchain install
+
+      - name: Put the UI and the skill inside the crates that embed them
+        run: sh scripts/release/stage-crate-files.sh
+
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: crates-io-auth
+
+      - name: Publish every crate in dependency order
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
+        run: cargo publish --workspace --locked --allow-dirty
+
+  # The Node Testcontainers module (DS-06).
+  testcontainers-node:
+    name: npm (sendmock-testcontainers)
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: npm with trusted publishing
+        run: npm install -g npm@11
+
+      - name: The first publish's token, while NPM_TOKEN is set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            npm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+          fi
+
+      - name: Build and publish
+        working-directory: testcontainers/node
+        env:
+          CHANNEL: ${{ needs.plan.outputs.channel }}
+        run: |
+          dist_tag="latest"
+          if [ "$CHANNEL" = "beta" ]; then dist_tag="beta"; fi
+          bun install
+          bun run build
+          npm publish --access public --tag "$dist_tag"
+
+  # The Python Testcontainers module (DS-06).
+  testcontainers-python:
+    name: PyPI (sendmock-testcontainers)
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && vars.PYPI_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Build the wheel and the source archive
+        working-directory: testcontainers/python
+        run: |
+          pip install --quiet build
+          python -m build
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: testcontainers/python/dist
+
+  # The .NET Testcontainers module (DS-06): NuGet/login trades the OIDC token for a short-lived
+  # key under the owner's trusted publishing policy for SendMock.Testcontainers.
+  testcontainers-dotnet:
+    name: NuGet (SendMock.Testcontainers)
+    needs: plan
+    if: needs.plan.outputs.should_publish == 'true' && vars.NUGET_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: shibbirweb
+
+      - name: Pack and push
+        working-directory: testcontainers/dotnet
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet pack SendMock.Testcontainers --configuration Release --output out
+          dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate

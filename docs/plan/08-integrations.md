@@ -158,7 +158,7 @@ const email = await res.json();
 ```yaml
 services:
   sendmock:
-    image: ghcr.io/<owner>/sendmock:1
+    image: ghcr.io/shibbirweb/sendmock:1
     ports:
       - "8025:8025"   # UI, API, MCP
       - "1025:1025"   # SMTP

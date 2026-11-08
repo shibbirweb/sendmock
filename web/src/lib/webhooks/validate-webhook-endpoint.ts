@@ -55,12 +55,27 @@ function findFixedValueError(bodyField: EndpointBodyField): string | null {
       return `${bodyField.name} must be valid JSON`;
     }
   }
+  if (
+    bodyField.value_type === "file" &&
+    !/^https?:\/\/\S+$/i.test(fieldValue)
+  ) {
+    return `${bodyField.name} must be an http or https URL to the file`;
+  }
 
   return null;
 }
 
 /** Fields mode always encodes a valid body: named, unique fields whose fixed values fit their type (WH-07.14). */
-function findBodyFieldsError(bodyFields: EndpointBodyField[]): string | null {
+function findBodyFieldsError(
+  bodyFields: EndpointBodyField[],
+  fieldsEncoding: WebhookEndpointInput["fields_encoding"],
+): string | null {
+  const fileField = bodyFields.find(
+    (bodyField) => bodyField.value_type === "file",
+  );
+  if (fileField !== undefined && fieldsEncoding !== "multipart") {
+    return `${fileField.name} is a file: use the Multipart encoding`;
+  }
   const fieldNames = bodyFields.map((bodyField) => bodyField.name);
   if (fieldNames.some((fieldName) => fieldName === "")) {
     return "Every field needs a name";
@@ -98,7 +113,10 @@ export function validateWebhookEndpointInput(
   }
   const bodyFieldsError =
     endpointInput.body_mode === "fields"
-      ? findBodyFieldsError(endpointInput.body_fields)
+      ? findBodyFieldsError(
+          endpointInput.body_fields,
+          endpointInput.fields_encoding,
+        )
       : null;
   if (bodyFieldsError !== null) {
     fieldErrors.body_fields = bodyFieldsError;

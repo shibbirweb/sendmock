@@ -77,7 +77,7 @@ Built-in templates ship inside the binary as TOML files (`crates/sendmock-webhoo
 ```toml
 id = "twilio.inbound_sms"
 name = "Twilio: inbound SMS"
-category = "sms-provider"          # email-provider | sms-provider | chat | automation | generic | custom
+category = "sms-provider"          # email-provider | sms-provider | payment-provider | chat | automation | generic | custom
 service = "twilio"
 description = "Form-encoded POST that Twilio sends when your number receives an SMS."
 events = ["sms.inbound"]

@@ -3,6 +3,7 @@ import {
   createRootRouteWithContext,
   type ErrorComponentProps,
   Link,
+  retainSearchParams,
 } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/layout/app-shell";
@@ -12,7 +13,17 @@ export type RouterContext = {
   queryClient: QueryClient;
 };
 
+/** `?project=` stays in the URL from screen to screen, like the top bar's choice (PL-10.7). */
+type RootSearch = { project?: string };
+
 export const Route = createRootRouteWithContext<RouterContext>()({
+  validateSearch: (search: Record<string, unknown>): RootSearch => ({
+    project:
+      typeof search.project === "string" && search.project !== ""
+        ? search.project
+        : undefined,
+  }),
+  search: { middlewares: [retainSearchParams(["project"])] },
   component: AppShell,
   notFoundComponent: NotFoundPage,
   errorComponent: RouteErrorPage,

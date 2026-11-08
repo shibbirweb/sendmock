@@ -98,10 +98,12 @@ The review table: each row is filled during the pass (`OK`, or the fix made), an
 | Gateways | `/payments/gateways` | OK | The preview pickers fill their columns instead of a long payment name running into the next one | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The tabs stay in view while the form scrolls (W4) | Owner, 2026-10-29 |
 | Methods | `/payments/methods` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
 | Flows | `/payments/flows` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | The variables table drops its Example column on phones (W4) | Owner, 2026-10-29 |
+| Subscriptions | `/payments/subscriptions` | OK | OK | OK | OK (`screen-states.spec.ts`) | OK | OK (`screen-states.spec.ts`) | OK (axe in both themes, mock and live) | Added in Phase 4 (W11e), after the U3 sign-off | Owner, 2026-11-08 |
 | Test checkout | `/pay/{session}` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK | Pay successfully is the only filled button in Test controls | Owner, 2026-10-29 |
 | Numbers | `/numbers` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
 | Scenarios | `/scenarios` | OK (owner sign-off, W11) | OK (owner sign-off, W11) | OK (owner sign-off, W11) | Not applicable: the screen loads nothing until a scenario is run | Not applicable: the screen loads nothing until a scenario is run | Not applicable: the screen loads nothing until a scenario is run | OK (axe in both themes; owner sign-off, W11) | Added in W14 after the W6 pass; reviewed at the W11 sign-off | Owner, 2026-10-29 |
 | Logs | `/logs` | OK | OK | OK | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
+| API reference | `/api-reference` | OK | OK | OK | OK (`screen-states.spec.ts`) | Not applicable: the reference always lists every operation | OK (`screen-states.spec.ts`) | OK (axe in both themes, mock and live) | Added in Phase 4 (W12b), after the U3 sign-off | Owner, 2026-11-08 |
 | Settings | `/settings` (every section) | Delete all emails and Delete all SMS are red like Reset to seed (they were outline) | OK | Keep forever reads "Turn off to delete traffic after a number of days." (it pointed at an age field that is hidden while on) | OK (W1 test) | OK (W1 test) | OK (W1 test) | OK |  | Owner, 2026-10-29 |
 
 #### Pass (W6)

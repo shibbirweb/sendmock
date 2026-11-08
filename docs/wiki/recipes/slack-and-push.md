@@ -3,7 +3,7 @@ title: Slack and push
 description: Point your app's Slack webhook and push notification calls at the HTTP Catcher, so nothing reaches real people, and see each one previewed.
 ---
 
-> Works in your install from Phase 4 (Slack, Discord, Telegram, FCM) and Phase 5 (Teams, Google Chat, Expo, OneSignal). Try it in the [demo](/demo/http) today.
+> Try it in the [demo](/demo/http).
 
 **The situation:** your app posts to Slack when an order fails and sends push notifications when it ships. During development these reach the real team channel and real phones.
 

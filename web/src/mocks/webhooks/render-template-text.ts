@@ -1,5 +1,14 @@
 import { faker } from "@faker-js/faker/locale/en";
 
+import { resolveTemplateConditions } from "@/mocks/webhooks/render-template-conditions";
+import { resolveTemplateLoops } from "@/mocks/webhooks/render-template-loops";
+import { extractTemplateSets } from "@/mocks/webhooks/render-template-sets";
+import { argumentFilters } from "@/mocks/webhooks/template-argument-filters";
+import {
+  fakeTemplateFunctions,
+  rewritePostmanAliases,
+} from "@/mocks/webhooks/template-fake-functions";
+
 /** Values a template can read: `event`, `data`, `vars`, `endpoint`, ... */
 export type TemplateContext = Record<string, unknown>;
 
@@ -120,6 +129,7 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   mailgun_signature: () =>
     faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase(),
   svix_signature: () => `v1,${faker.string.alphanumeric(43)}=`,
+  sendgrid_signature: () => btoa(faker.string.alphanumeric(70)),
   uuid: () => faker.string.uuid(),
   random_hex: ([lengthText]) =>
     faker.string
@@ -128,30 +138,101 @@ const templateFunctions: Record<string, (argumentTexts: string[]) => string> = {
   now_iso: () => new Date().toISOString(),
   stripe_signature: () =>
     `t=${Math.floor(Date.now() / 1000)},v1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
+  razorpay_signature: () =>
+    faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase(),
+  whatsapp_signature: () =>
+    `sha256=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
+  paddle_signature: () =>
+    `ts=${Math.floor(Date.now() / 1000)};h1=${faker.string.hexadecimal({ length: 64, prefix: "" }).toLowerCase()}`,
+  sslcommerz_verify_sign: () =>
+    faker.string.hexadecimal({ length: 32, prefix: "" }).toLowerCase(),
+  ...fakeTemplateFunctions,
 };
 
-function stripEmailPrefix(eventType: string): string {
-  return eventType.replace(/^email\./, "");
+/** SendMock's outcome, then SendGrid's, SES's, Resend's, Mailgun's, Postmark's and Brevo's names. */
+const providerEventNames: Record<string, string[]> = {
+  received: [
+    "processed",
+    "Send",
+    "email.sent",
+    "accepted",
+    "Delivery",
+    "request",
+  ],
+  delivered: [
+    "delivered",
+    "Delivery",
+    "email.delivered",
+    "delivered",
+    "Delivery",
+    "delivered",
+  ],
+  deferred: [
+    "deferred",
+    "DeliveryDelay",
+    "email.delivery_delayed",
+    "failed",
+    "Bounce",
+    "deferred",
+  ],
+  bounced: [
+    "bounce",
+    "Bounce",
+    "email.bounced",
+    "failed",
+    "Bounce",
+    "hard_bounce",
+  ],
+  complained: [
+    "spamreport",
+    "Complaint",
+    "email.complained",
+    "complained",
+    "SpamComplaint",
+    "spam",
+  ],
+  opened: ["open", "Open", "email.opened", "opened", "Open", "opened"],
+  clicked: ["click", "Click", "email.clicked", "clicked", "Click", "click"],
+  unsubscribed: [
+    "unsubscribe",
+    "Subscription",
+    "email.unsubscribed",
+    "unsubscribed",
+    "SubscriptionChange",
+    "unsubscribed",
+  ],
+};
+
+function nameForProvider(eventType: string, providerIndex: number): string {
+  const providerNames = providerEventNames[eventType.replace(/^email\./, "")];
+  return providerNames?.[providerIndex] ?? eventType;
 }
 
 const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
   json: (filterInput) => JSON.stringify(filterInput, null, 2),
   urlencode: (filterInput) => encodeURIComponent(String(filterInput)),
+  length: (filterInput) =>
+    Array.isArray(filterInput) || typeof filterInput === "string"
+      ? filterInput.length
+      : Object.keys(filterInput ?? {}).length,
   lower: (filterInput) => String(filterInput).toLowerCase(),
+  unix: (filterInput) =>
+    Math.floor(Date.parse(String(filterInput)) / 1000) || 0,
   upper: (filterInput) => String(filterInput).toUpperCase(),
-  sendgrid_event: (filterInput) => stripEmailPrefix(String(filterInput)),
-  ses_type: (filterInput) => {
-    const outcome = stripEmailPrefix(String(filterInput));
-    return outcome.charAt(0).toUpperCase() + outcome.slice(1);
-  },
-  resend_type: (filterInput) =>
-    `email.${stripEmailPrefix(String(filterInput))}`,
+  sendgrid_event: (filterInput) => nameForProvider(String(filterInput), 0),
+  ses_type: (filterInput) => nameForProvider(String(filterInput), 1),
+  resend_type: (filterInput) => nameForProvider(String(filterInput), 2),
+  mailgun_event: (filterInput) => nameForProvider(String(filterInput), 3),
+  postmark_record_type: (filterInput) =>
+    nameForProvider(String(filterInput), 4),
+  brevo_event: (filterInput) => nameForProvider(String(filterInput), 5),
 };
 
 /** Names the renderer understands; the reference lists exactly these. */
 export const supportedFunctionNames = Object.keys(templateFunctions);
 export const supportedFilterNames = [
   ...Object.keys(templateFilters),
+  ...Object.keys(argumentFilters),
   "default",
 ];
 
@@ -193,7 +274,7 @@ function evaluateOperand(
     return stringMatch[1] ?? "";
   }
 
-  const callMatch = /^([a-z_]+)\((.*)\)$/i.exec(operandText);
+  const callMatch = /^([a-z_]+(?:\.[a-z_]+)?)\((.*)\)$/i.exec(operandText);
   if (callMatch !== null) {
     const functionName = callMatch[1] ?? "";
     const templateFunction = templateFunctions[functionName];
@@ -243,6 +324,25 @@ function evaluateExpression(
       continue;
     }
 
+    const argumentFilterMatch = /^([a-z_]+)\((.*)\)$/.exec(filterText);
+    const argumentFilter = argumentFilters[argumentFilterMatch?.[1] ?? ""];
+    if (argumentFilterMatch !== null && argumentFilter !== undefined) {
+      const filterArguments = splitTopLevel(argumentFilterMatch[2] ?? "", ",")
+        .map((argumentText) =>
+          evaluateOperand(argumentText.trim(), templateContext, renderProblems),
+        )
+        .map((argumentValue) =>
+          typeof argumentValue === "symbol" ? "" : String(argumentValue),
+        );
+      if (
+        currentValue !== missingValue &&
+        currentValue !== reportedMissingValue
+      ) {
+        currentValue = argumentFilter(currentValue, filterArguments);
+      }
+      continue;
+    }
+
     const templateFilter = templateFilters[filterText];
     if (templateFilter === undefined) {
       reportProblem(renderProblems, "error", `Unknown filter: ${filterText}`);
@@ -274,15 +374,33 @@ function evaluateExpression(
 }
 
 /**
- * Renders `{{ ... }}` expressions leniently, as the preview does: an
+ * Renders `{% for %}` and `{% if %}` blocks, then `{{ ... }}` expressions leniently, as the preview does: an
  * undefined value renders empty and is reported as a warning (WH-08.4);
  * unknown names and unbalanced braces are errors (WH-09.7).
  * A small stand-in for the backend's template engine.
  */
 export function renderTemplateText(
-  templateText: string,
-  templateContext: TemplateContext,
+  conditionalTemplateText: string,
+  givenContext: TemplateContext,
 ): RenderOutcome {
+  const { remainingText, assignments } = extractTemplateSets(
+    rewritePostmanAliases(conditionalTemplateText),
+  );
+  const templateContext: TemplateContext = { ...givenContext };
+  for (const { variableName, expressionText } of assignments) {
+    templateContext[variableName] = renderTemplateText(
+      `{{ ${expressionText} }}`,
+      templateContext,
+    ).renderedText;
+  }
+  const readContextValue = (pathText: string) => {
+    const contextValue = readPath(templateContext, pathText);
+    return contextValue === missingValue ? undefined : contextValue;
+  };
+  const templateText = resolveTemplateConditions(
+    resolveTemplateLoops(remainingText, readContextValue),
+    readContextValue,
+  );
   const renderProblems: RenderProblems = {
     warnings: [],
     errors: [],

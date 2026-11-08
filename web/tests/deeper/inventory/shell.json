@@ -1,0 +1,33 @@
+{
+  "order": 0,
+  "path": "shell",
+  "states": {
+    "normal": [
+      "link: SendMock Mail · SMS · Payments",
+      "link: Overview",
+      "link: Mail",
+      "link: SMS",
+      "link: Push",
+      "link: HTTP Catcher",
+      "link: Webhooks",
+      "link: Payments",
+      "link: Numbers",
+      "link: Scenarios",
+      "link: Logs",
+      "link: Settings",
+      "link: Documentation",
+      "link: Report an issue",
+      "link: Request a feature",
+      "link: Report a security issue",
+      "link: Star on GitHub",
+      "status: Live · demo data, version #.#.#-dev",
+      "button: Toggle Sidebar",
+      "button: Search or jump to... ⌘K",
+      "button: Demo controls",
+      "button: Keyboard shortcuts",
+      "button: Help",
+      "button: Change theme",
+      "button: Notifications"
+    ]
+  }
+}

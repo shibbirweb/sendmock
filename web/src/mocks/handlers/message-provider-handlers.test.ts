@@ -74,7 +74,7 @@ describe("email and SMS provider API", () => {
     expect(JSON.stringify(providers)).not.toContain("SG.test_key_123");
   });
 
-  test("SM-16.1 lists the five SMS built-ins and the demo's custom provider", async () => {
+  test("SM-16.1 lists the SMS built-ins and the demo's custom provider", async () => {
     const providers = await readJson<MessageProviderDefinition[]>(
       await callApi("GET", "/sms/providers"),
     );
@@ -85,6 +85,13 @@ describe("email and SMS provider API", () => {
       "vonage",
       "plivo",
       "messagebird",
+      "infobip",
+      "telnyx",
+      "sinch",
+      "africastalking",
+      "sns",
+      "vonage_verify",
+      "whatsapp_cloud",
       "sslwireless",
     ]);
     expect(
@@ -219,8 +226,8 @@ describe("email and SMS provider API", () => {
 
   test("SM-16.2 an SMS provider is added from blank with one send request", async () => {
     const createResponse = await callApi("POST", "/sms/providers", {
-      name: "Africa's Talking",
-      key: "africastalking",
+      name: "Termii",
+      key: "termii",
       start_from: null,
     });
     const createdProvider =

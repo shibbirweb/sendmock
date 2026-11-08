@@ -1,0 +1,104 @@
+{
+  "doc_url": "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/x-www-form-urlencoded",
+  "documented_example": {
+    "AccountSid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "From": "+15017250604",
+    "MessageSid": "SM1342fe1b2c904d1ab04f0fc7a58abca9",
+    "MessageStatus": "sent",
+    "SmsSid": "SM1342fe1b2c904d1ab04f0fc7a58abca9",
+    "SmsStatus": "sent"
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "AccountSid",
+      "From",
+      "MessageSid",
+      "MessageStatus",
+      "SmsSid",
+      "SmsStatus"
+    ],
+    "properties": {
+      "AccountSid": {
+        "type": "string",
+        "pattern": "^AC[0-9a-zA-Z]{32}$"
+      },
+      "ApiVersion": {
+        "const": "2010-04-01"
+      },
+      "ErrorCode": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "From": {
+        "type": "string",
+        "pattern": "^(\\+[1-9][0-9]{6,14}|[A-Za-z0-9 ]{1,11})$"
+      },
+      "MessageSid": {
+        "type": "string",
+        "pattern": "^(SM|MM)[0-9a-zA-Z]{32}$"
+      },
+      "MessageStatus": {
+        "enum": [
+          "accepted",
+          "scheduled",
+          "canceled",
+          "queued",
+          "sending",
+          "sent",
+          "failed",
+          "delivered",
+          "undelivered",
+          "receiving",
+          "received",
+          "read"
+        ]
+      },
+      "MessagingServiceSid": {
+        "type": "string",
+        "pattern": "^MG[0-9a-zA-Z]{32}$"
+      },
+      "RawDlrDoneDate": {
+        "type": "string",
+        "pattern": "^[0-9]{10}$"
+      },
+      "SmsSid": {
+        "type": "string",
+        "pattern": "^(SM|MM)[0-9a-zA-Z]{32}$"
+      },
+      "SmsStatus": {
+        "type": "string"
+      },
+      "To": {
+        "type": "string",
+        "pattern": "^\\+[1-9][0-9]{6,14}$"
+      }
+    },
+    "additionalProperties": false,
+    "if": {
+      "properties": {
+        "MessageStatus": {
+          "enum": [
+            "failed",
+            "undelivered"
+          ]
+        }
+      }
+    },
+    "then": {
+      "required": [
+        "ErrorCode"
+      ]
+    },
+    "else": {
+      "not": {
+        "required": [
+          "ErrorCode"
+        ]
+      }
+    }
+  }
+}

@@ -19,6 +19,7 @@ export const paymentEventTypes: PaymentEventType[] = [
   "payment.refunded",
   "payment.partially_refunded",
   "payment.dispute_opened",
+  "payment.dispute_updated",
   "payment.dispute_closed",
   "checkout.completed",
   "checkout.expired",
@@ -37,42 +38,84 @@ function nameEvents(
 }
 
 const stripeBody = `{
-  "id": "evt_{{ random_string(24) }}",
+  "id": "{{ event.id }}",
   "object": "event",
-  "type": "{{ event.name }}",
+  "api_version": "2025-03-31.basil",
   "created": {{ event.created }},
   "data": {
-    "object": {
-      "id": "{{ payment.reference }}",
-      "amount": {{ payment.amount_minor }},
-      "currency": "{{ payment.currency | lower }}",
-      "status": "{{ payment.status }}"
-    }
-  }
+    "object": {{ event.object | json }}
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "{{ event.name }}"
 }`;
 
 const paypalBody = `{
-  "id": "WH-{{ random_string(17) | upper }}",
+  "id": "WH-{{ event.id | replace("evt_", "") | upper }}",
+  "event_version": "1.0",
+  "create_time": "{{ now_iso() }}",
+  "resource_type": "{{ event.type | payment_event("paypal_resource_type") }}",
+  "resource_version": "2.0",
   "event_type": "{{ event.name }}",
-  "resource": {
-    "id": "{{ payment.reference }}",
-    "amount": {
-      "currency_code": "{{ payment.currency }}",
-      "value": "{{ payment.amount_major }}"
-    },
-    "status": "{{ payment.status | upper }}"
-  }
+  "summary": "{{ event.type | payment_event("paypal_summary") }}",
+  "resource": {{ event.object | json }}
 }`;
 
+/** The fields SSLCommerz posts in its IPN and its redirects, in its order. */
+const sslcommerzTransactionFields = [
+  "status",
+  "tran_date",
+  "tran_id",
+  "val_id",
+  "amount",
+  "store_amount",
+  "currency",
+  "bank_tran_id",
+  "card_type",
+  "card_no",
+  "card_issuer",
+  "card_brand",
+  "card_issuer_country",
+  "card_issuer_country_code",
+  "currency_type",
+  "currency_amount",
+  "currency_rate",
+  "base_fair",
+  "value_a",
+  "value_b",
+  "value_c",
+  "value_d",
+  "risk_level",
+  "risk_title",
+  "verify_key",
+];
+
+const sslcommerzVerifySign =
+  "{{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}";
+
 const sslcommerzBody = [
-  "tran_id={{ payment.reference | urlencode }}",
-  'val_id={{ payment.provider_ids.val_id | default("") | urlencode }}',
-  "amount={{ payment.amount_major }}",
-  "currency={{ payment.currency }}",
-  "status={{ event.name }}",
-  "verify_key=amount%2Ccurrency%2Cstatus%2Ctran_id%2Cval_id",
-  "verify_sign={{ random_hex(32) }}",
+  ...sslcommerzTransactionFields.map(
+    (fieldName) => `${fieldName}={{ event.object.${fieldName} | urlencode }}`,
+  ),
+  `verify_sign=${sslcommerzVerifySign}`,
 ].join("&");
+
+const sslcommerzRedirectFields: ShippedGateway["redirect_fields"] = [
+  ...sslcommerzTransactionFields.map((fieldName) => ({
+    name: fieldName,
+    template: `{{ event.object.${fieldName} }}`,
+    send_on: "always" as const,
+  })),
+  {
+    name: "verify_sign",
+    template: sslcommerzVerifySign,
+    send_on: "always",
+  },
+];
 
 const bkashBody = `{
   "paymentID": "{{ payment.reference }}",
@@ -80,6 +123,31 @@ const bkashBody = `{
   "transactionStatus": "{{ event.name }}",
   "amount": "{{ payment.amount_major }}",
   "currency": "{{ payment.currency }}"
+}`;
+
+/** Razorpay's webhook: the entities nest under `payload`, named by `contains`. */
+const razorpayBody = `{
+  "entity": "event",
+  "account_id": "acc_SendMock000001",
+  "event": "{{ event.name }}",
+  "contains": {{ event.object.contains | json }},
+  "payload": {{ event.object.payload | json }},
+  "created_at": {{ event.created }}
+}`;
+
+const razorpayCheckoutFields = [
+  "razorpay_payment_id",
+  "razorpay_order_id",
+  "razorpay_signature",
+];
+
+/** Paddle's notification: the transaction or adjustment as `data`. */
+const paddleBody = `{
+  "event_id": "{{ event.id }}",
+  "event_type": "{{ event.name }}",
+  "occurred_at": "{{ event.object.occurred_at }}",
+  "notification_id": "{{ event.id | replace("evt_", "ntf_") }}",
+  "data": {{ event.object.data | json }}
 }`;
 
 const nativeBody = `{
@@ -134,6 +202,7 @@ const shippedGateways: ShippedGateway[] = [
       "payment.refunded": "charge.refunded",
       "payment.partially_refunded": "charge.refunded",
       "payment.dispute_opened": "charge.dispute.created",
+      "payment.dispute_updated": "charge.dispute.updated",
       "payment.dispute_closed": "charge.dispute.closed",
       "checkout.completed": "checkout.session.completed",
       "checkout.expired": "checkout.session.expired",
@@ -170,13 +239,12 @@ const shippedGateways: ShippedGateway[] = [
     ],
     notification_content_type: "json",
     event_names: nameEvents({
-      "payment.authorized": "PAYMENT.AUTHORIZATION.CREATED",
       "payment.succeeded": "PAYMENT.CAPTURE.COMPLETED",
       "payment.failed": "PAYMENT.CAPTURE.DENIED",
-      "payment.canceled": "PAYMENT.AUTHORIZATION.VOIDED",
       "payment.refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.partially_refunded": "PAYMENT.CAPTURE.REFUNDED",
       "payment.dispute_opened": "CUSTOMER.DISPUTE.CREATED",
+      "payment.dispute_updated": "CUSTOMER.DISPUTE.UPDATED",
       "payment.dispute_closed": "CUSTOMER.DISPUTE.RESOLVED",
       "checkout.completed": "CHECKOUT.ORDER.APPROVED",
       "checkout.expired": "CHECKOUT.ORDER.VOIDED",
@@ -185,7 +253,12 @@ const shippedGateways: ShippedGateway[] = [
     notification_headers: [
       { name: "paypal-transmission-id", template: "{{ uuid() }}" },
       { name: "paypal-transmission-time", template: "{{ now_iso() }}" },
-      { name: "paypal-transmission-sig", template: "{{ random_string(88) }}" },
+      { name: "paypal-transmission-sig", template: "{{ random_string(344) }}" },
+      {
+        name: "paypal-cert-url",
+        template:
+          "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77",
+      },
       { name: "paypal-auth-algo", template: "SHA256withRSA" },
     ],
   },
@@ -199,29 +272,7 @@ const shippedGateways: ShippedGateway[] = [
       { name: "store_passwd", value: "sendm0000000001@ssl", is_secret: true },
     ],
     redirect_method: "POST",
-    redirect_fields: [
-      {
-        name: "tran_id",
-        template: "{{ payment.reference }}",
-        send_on: "always",
-      },
-      {
-        name: "val_id",
-        template: '{{ payment.provider_ids.val_id | default("") }}',
-        send_on: "always",
-      },
-      {
-        name: "amount",
-        template: "{{ payment.amount_major }}",
-        send_on: "always",
-      },
-      {
-        name: "currency",
-        template: "{{ payment.currency }}",
-        send_on: "always",
-      },
-      { name: "status", template: "{{ redirect.status }}", send_on: "always" },
-    ],
+    redirect_fields: sslcommerzRedirectFields,
     notification_content_type: "form",
     event_names: nameEvents({
       "payment.succeeded": "VALID",
@@ -275,6 +326,90 @@ const shippedGateways: ShippedGateway[] = [
     notification_headers: [],
   },
   {
+    key: "razorpay",
+    name: "Razorpay",
+    accent: "#3395ff",
+    method_keys: ["card"],
+    credentials: [
+      { name: "key_id", value: "rzp_test_SendMock0001", is_secret: false },
+      {
+        name: "key_secret",
+        value: "sendmockRazorpayKeySecret01",
+        is_secret: true,
+      },
+      {
+        name: "webhook_secret",
+        value: "sendmock_razorpay_webhook_secret",
+        is_secret: true,
+      },
+    ],
+    redirect_method: "POST",
+    redirect_fields: razorpayCheckoutFields.map((fieldName) => ({
+      name: fieldName,
+      template: `{{ event.object.${fieldName} }}`,
+      send_on: "success" as const,
+    })),
+    notification_content_type: "json",
+    event_names: nameEvents({
+      "payment.authorized": "payment.authorized",
+      "payment.succeeded": "payment.captured",
+      "payment.failed": "payment.failed",
+      "payment.refunded": "refund.processed",
+      "payment.partially_refunded": "refund.processed",
+      "payment.dispute_opened": "payment.dispute.created",
+      "payment.dispute_updated": "payment.dispute.under_review",
+      "payment.dispute_closed": "payment.dispute.closed",
+      "checkout.completed": "order.paid",
+    }),
+    notification_body: razorpayBody,
+    notification_headers: [
+      {
+        name: "x-razorpay-signature",
+        template: "{{ razorpay_signature(merchant.webhook_secret) }}",
+      },
+      { name: "x-razorpay-event-id", template: "{{ event.id }}" },
+    ],
+  },
+  {
+    key: "paddle",
+    name: "Paddle",
+    accent: "#fddd35",
+    method_keys: ["card"],
+    credentials: [
+      {
+        name: "api_key",
+        value: "pdl_sdbx_apikey_sendmock_SendMockPaddleKey01",
+        is_secret: true,
+      },
+      {
+        name: "notification_secret",
+        value: "pdl_ntfset_sendmock_SendMockPaddleSecret01",
+        is_secret: true,
+      },
+    ],
+    redirect_method: "GET",
+    redirect_fields: [
+      { name: "_ptxn", template: "{{ payment.reference }}", send_on: "always" },
+    ],
+    notification_content_type: "json",
+    event_names: nameEvents({
+      "payment.created": "transaction.created",
+      "payment.succeeded": "transaction.completed",
+      "payment.failed": "transaction.payment_failed",
+      "payment.canceled": "transaction.canceled",
+      "payment.refunded": "adjustment.created",
+      "payment.partially_refunded": "adjustment.created",
+      "checkout.completed": "transaction.paid",
+    }),
+    notification_body: paddleBody,
+    notification_headers: [
+      {
+        name: "paddle-signature",
+        template: "{{ paddle_signature(merchant.notification_secret) }}",
+      },
+    ],
+  },
+  {
     key: "native",
     name: "Native",
     accent: "#0d9488",
@@ -318,5 +453,7 @@ export const builtinPaymentProviders: BuiltinPaymentProvider[] = [
   "paypal",
   "sslcommerz",
   "bkash",
+  "razorpay",
+  "paddle",
   "native",
 ];

@@ -49,7 +49,7 @@ One type serves both areas, `MessageProviderDefinition` (`web/src/lib/api/types/
 | `outcome_error_codes` | map (SMS) | the provider's error code for each delivery outcome, so the magic test numbers fail with its own codes |
 | `is_builtin`, `is_modified`, `is_removed`, `message_count_24h` | read only | shown on the list and the sheet |
 
-**Message parts** a mapping or rule can name: email `from`, `to`, `cc`, `bcc`, `reply_to`, `subject`, `text`, `html`, `attachments`, `headers`, `tags`, `template_id`, `template_data`; SMS `from`, `to`, `body`, `media_urls`, `messaging_service`, `status_callback_url`.
+**Message parts** a mapping or rule can name: email `from`, `to`, `cc`, `bcc`, `reply_to`, `subject`, `text`, `html`, `attachments`, `headers`, `tags`, `template_id`, `template_data`, `raw` (a whole MIME message in base64, such as SES v2's `Content.Raw.Data`: it is stored as sent, and the parts the request leaves out are read from its headers and body); SMS `from`, `to`, `body`, `media_urls`, `messaging_service`, `status_callback_url`.
 
 **Templates** (bodies, headers, the message id) use the webhook template engine with its filters, and read:
 
@@ -102,7 +102,7 @@ The built-ins are definitions that reproduce the requests, responses and errors 
 ## 5. Rules
 
 - **Keys:** lowercase letters, digits and `_`, 2 to 32 characters, unique in the area. `native` is reserved.
-- **Paths:** must start with `/`, may use `{name}` parts, and must not start with `/api/` or `/providers/`. Two enabled providers in one area may not answer the same method and path unless their hosts differ. A save that would clash is refused and names the other provider.
+- **Paths:** must start with `/`, may use `{name}` parts, and must not start with `/api/`, `/projects/` or `/providers/` (`/projects/` since [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5, where it picks a project). Two enabled providers in one area may not answer the same method and path unless their hosts differ. A save that would clash is refused and names the other provider.
 - **Removing a built-in** keeps its definition; Restore brings it back as it was (edited or not). Reset to default works on removed built-ins too.
 - **Disabling** keeps a provider listed but answers nothing, like a removed one.
 - **Deleting a custom provider** asks first, naming how many messages it caught; those messages keep its key and name as text.

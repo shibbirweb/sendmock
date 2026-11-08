@@ -54,6 +54,9 @@ jobs:
       - name: GitHub issue forms and community files (UI-10.2)
         run: bun run test:repository
 
+      - name: Deeper docs inventory parser (WS-10.3)
+        run: bun run test:deeper
+
 
   # The end-to-end suite is most of the run time, so four jobs share it
   # (Playwright --shard) and run next to the checks above.
@@ -85,11 +88,17 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: End-to-end tests (production build, mock mode)
-        run: bun run test:e2e --shard=${{ matrix.shard }}/4
+        run: bun run test:e2e --project=chromium --shard=${{ matrix.shard }}/4
+
+      # The timing budgets (UI-06) need the runner to themselves, so they run after the
+      # shard's other tests, with one worker, on one shard only.
+      - name: End-to-end timing budgets
+        if: matrix.shard == 1
+        run: bun run test:e2e --project=timing --workers=1
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report-${{ matrix.shard }}
           path: web/playwright-report
@@ -105,6 +114,280 @@ jobs:
       - name: Every shard passed
         run: test "${{ needs.web-e2e.result }}" = "success"
 
+  rust:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      # macOS allows 256 open files by default; the SMTP load test holds 1000 sockets.
+      - name: Tests
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" != "Windows" ]; then
+            ulimit -n 4096
+          fi
+          cargo nextest run --workspace --locked
+
+      - uses: oven-sh/setup-bun@v2
+        if: failure()
+
+      - name: Failed tests as annotations
+        if: failure()
+        shell: bash
+        run: bun scripts/nextest-failures.ts target/nextest/default/junit.xml
+
+  rust-coverage:
+    name: Rust coverage and file size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain from rust-toolchain.toml, with the coverage tools
+        run: |
+          rustup toolchain install
+          rustup component add llvm-tools-preview
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest,cargo-llvm-cov
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: File size (500-line limit, 300-line warning)
+        run: bun scripts/rust-file-lines.ts
+
+      # The SMTP load test holds 1000 sockets, as in the Tests step above.
+      - name: Coverage
+        run: |
+          ulimit -n 4096
+          cargo llvm-cov nextest --workspace --locked --json --summary-only --output-path coverage.json
+
+      - name: Failed tests as annotations
+        if: failure()
+        run: bun scripts/nextest-failures.ts "$(find target -name junit.xml -path '*nextest*' | head -n 1)"
+
+      - name: Coverage gate (80% overall, 90% operations and domain; table on the job page)
+        run: bun scripts/rust-coverage.ts coverage.json
+
+  # The live UI the binary embeds, built once and shared with every smoke test job.
+  web-dist:
+    name: Web UI build for the binary
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build (live mode, no mock layer)
+        env:
+          VITE_API_MODE: live
+        run: bun run build
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: web-dist
+          path: web/dist
+          retention-days: 1
+
+  # The Phase 0 done-when check: a release binary serves the API and the embedded UI.
+  binary-smoke:
+    name: Binary smoke test (${{ matrix.os }})
+    needs: web-dist
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: web-dist
+          path: web/dist
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Release build with the UI embedded
+        run: cargo build --release --locked -p sendmock
+
+      - name: Start it, check the API and the UI, stop it
+        run: bun scripts/binary-smoke-test.ts target/release/sendmock
+
+      # The budgets are set for Linux x64, the CI benchmark machine (DS-07).
+      - name: Performance budgets (size, cold start, idle memory, SMTP ingest)
+        if: matrix.os == 'ubuntu-latest'
+        run: bun scripts/performance-budget.ts target/release/sendmock
+
+      # The live UI suite runs against this binary in the Playwright image.
+      - uses: actions/upload-artifact@v6
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: sendmock-linux
+          path: target/release/sendmock
+          retention-days: 1
+
+  # The live UI build against a real binary (UI-12.2): every screen shows its data or
+  # Not available yet, and no screen calls an operation the binary does not serve.
+  web-live:
+    name: Web UI against the binary
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: Install Bun
+        run: npm install -g bun
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Live UI tests
+        env:
+          SENDMOCK_BINARY: ../sendmock-binary/sendmock
+        run: |
+          chmod +x ../sendmock-binary/sendmock
+          bun run test:live
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report-live
+          path: web/playwright-report
+          retention-days: 7
+
+  # The Claude Code plugin installs from this repository's marketplace with the skill the
+  # binary serves and the MCP server (AI-05.5). No API key is needed to validate or install.
+  claude-plugin:
+    name: Claude Code plugin
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_VERSION: 2.1.318
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: The plugin's skill is the repository's skill
+        run: bun scripts/plugin-skill.ts check
+
+      - name: Install Claude Code and SendMock
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash -s "$CLAUDE_CODE_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          chmod +x sendmock-binary/sendmock
+          echo "$GITHUB_WORKSPACE/sendmock-binary" >> "$GITHUB_PATH"
+
+      - name: The plugin and the marketplace pass claude plugin validate
+        run: |
+          claude --version
+          claude plugin validate plugin --strict
+          claude plugin validate . --strict
+
+      - name: Install the plugin from the repository's marketplace
+        run: |
+          claude plugin marketplace add "$GITHUB_WORKSPACE"
+          claude plugin install sendmock@sendmock
+          claude plugin details sendmock
+          claude plugin list --json > plugin-list.json
+
+      - name: The skill's evals are well formed, their seeds and traffic apply (AI-05.7)
+        run: bun scripts/skill-evals.ts check sendmock-binary/sendmock
+
+      # A scripted agent replays each case's tool calls through `sendmock mcp`; no model is called.
+      - name: The skill's evals pass with the scripted agent (AI-05.7)
+        run: bun scripts/skill-evals.ts run sendmock-binary/sendmock
+
+      - name: The installed plugin has this version, the MCP server and the binary's skill
+        run: |
+          sendmock serve --db memory > sendmock.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if sendmock health > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+          sendmock ai skill --output skill-from-binary.md
+          bun scripts/plugin-installed-check.ts plugin-list.json skill-from-binary.md
+
+  # server.json passes the official MCP registry's own validation (AI-05.6).
+  mcp-registry:
+    name: MCP registry manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./.github/actions/install-mcp-publisher
+
+      - name: mcp-publisher validate
+        run: mcp-publisher validate server.json
+
+  # One check for the rulesets to require, whatever the number of operating systems.
+  rust-result:
+    name: Rust
+    if: always()
+    needs: [rust, rust-coverage, binary-smoke, web-live, claude-plugin]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every Rust job passed
+        run: |
+          test "${{ needs.rust.result }}" = "success"
+          test "${{ needs.rust-coverage.result }}" = "success"
+          test "${{ needs.binary-smoke.result }}" = "success"
+          test "${{ needs.web-live.result }}" = "success"
+          test "${{ needs.claude-plugin.result }}" = "success"
+
   acceptance:
     name: Acceptance traceability
     runs-on: ubuntu-latest
@@ -116,8 +399,16 @@ jobs:
       - name: Script tests
         run: bun test scripts/
 
+      - name: The install scripts are POSIX sh and valid PowerShell
+        run: |
+          shellcheck --shell=sh scripts/install/install.sh scripts/release-tests/install-script.sh
+          pwsh -NoProfile -Command '$failed = $false; foreach ($scriptPath in "scripts/install/install.ps1", "scripts/release-tests/install-script.ps1") { $parseErrors = $null; [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref] $null, [ref] $parseErrors) | Out-Null; foreach ($parseError in $parseErrors) { Write-Host "${scriptPath}: $parseError"; $failed = $true } }; if ($failed) { exit 1 }'
+
       - name: Criteria named by tests exist, accepted features are proven
         run: bun scripts/acceptance.ts
+
+      - name: Every file carries the same version (DS-05.2)
+        run: bun scripts/version.ts check
 
   website:
     name: Website

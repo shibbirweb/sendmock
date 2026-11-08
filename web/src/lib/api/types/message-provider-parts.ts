@@ -37,6 +37,7 @@ export type ProviderMessagePart =
   | "tags"
   | "template_id"
   | "template_data"
+  | "raw"
   | "body"
   | "media_urls"
   | "messaging_service"

@@ -1,0 +1,69 @@
+# The Docker Desktop extension (DS-10): built for linux/amd64 and linux/arm64 as Docker requires
+# for publishing, with every required label and a metadata.json whose icon, Compose file and
+# dashboard tab are in the image. Runs on changes to the extension or this workflow.
+name: Docker Desktop extension
+
+on:
+  pull_request:
+    paths:
+      - packaging/docker-desktop/**
+      - .github/workflows/docker-desktop-extension.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - packaging/docker-desktop/**
+      - .github/workflows/docker-desktop-extension.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extension:
+    name: Build and check the extension image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-qemu-action@v4
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build for both platforms Docker publishes extensions on
+        uses: docker/build-push-action@v7
+        with:
+          context: packaging/docker-desktop
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build for inspection
+        uses: docker/build-push-action@v7
+        with:
+          context: packaging/docker-desktop
+          load: true
+          tags: sendmock-docker-extension:0.0.0
+
+      - name: Every required label is set
+        run: |
+          labels=$(docker inspect sendmock-docker-extension:0.0.0 --format '{{json .Config.Labels}}')
+          for label in org.opencontainers.image.title org.opencontainers.image.description \
+            org.opencontainers.image.vendor com.docker.desktop.extension.api.version \
+            com.docker.desktop.extension.icon com.docker.extension.screenshots \
+            com.docker.extension.detailed-description com.docker.extension.publisher-url \
+            com.docker.extension.changelog; do
+            value=$(echo "$labels" | jq -r --arg label "$label" '.[$label] // empty')
+            test -n "$value" || { echo "::error::missing label $label"; exit 1; }
+          done
+          echo "$labels" | jq -e '."com.docker.extension.screenshots" | fromjson | length >= 1' > /dev/null
+
+      - name: metadata.json names files the image has
+        run: |
+          container_id=$(docker create sendmock-docker-extension:0.0.0 /none)
+          docker cp "$container_id:/" extension-files
+          jq -e '.icon and .vm.composefile and .ui."dashboard-tab".src' extension-files/metadata.json > /dev/null
+          test -f "extension-files/$(jq -r .icon extension-files/metadata.json)"
+          test -f "extension-files/$(jq -r .vm.composefile extension-files/metadata.json)"
+          test -f "extension-files$(jq -r '.ui."dashboard-tab".root' extension-files/metadata.json)/$(jq -r '.ui."dashboard-tab".src' extension-files/metadata.json)"
+          grep -q '"8025:8025"' extension-files/docker-compose.yaml
+          grep -q '"1025:1025"' extension-files/docker-compose.yaml

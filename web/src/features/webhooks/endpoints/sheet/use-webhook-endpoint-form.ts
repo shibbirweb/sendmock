@@ -45,7 +45,7 @@ export type WebhookEndpointFormValues = {
   fieldRows: NameValueRow[];
   bodyMode: EndpointBodyMode;
   bodyFieldRows: BodyFieldRow[];
-  fieldsEncoding: "json" | "form";
+  fieldsEncoding: "json" | "form" | "multipart";
   rawContentType: string;
   rawBody: string;
   renderMode: RenderMode;

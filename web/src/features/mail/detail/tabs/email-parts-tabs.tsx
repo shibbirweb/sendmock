@@ -92,6 +92,24 @@ function MimePartNode({
         <span className="text-xs text-muted-foreground">
           {partDetails.join(" · ")}
         </span>
+        {mimePart.children.length === 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7"
+            asChild
+            aria-label={`Download part ${mimePart.part_id}`}
+          >
+            <a
+              href={toAppUrl(
+                `/api/v1/emails/${emailId}/mime/${mimePart.part_id}`,
+              )}
+              download={mimePart.filename ?? `part-${mimePart.part_id}`}
+            >
+              <DownloadIcon />
+            </a>
+          </Button>
+        )}
       </div>
       {mimePart.children.length > 0 && (
         <ul className="ml-3 grid gap-1 border-l pl-3">

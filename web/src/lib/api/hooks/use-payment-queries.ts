@@ -11,6 +11,7 @@ import type {
   CheckoutCompleteRequest,
   CheckoutSession,
   PageOf,
+  PaymentCreateRequest,
   PaymentDetail,
   PaymentListFilters,
   PaymentSimulateRequest,
@@ -64,6 +65,16 @@ function usePaymentMutation<MutationInput>(
       void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
     },
   });
+}
+
+/** Creates a payment and pays it with a test card, without a checkout page (PY-02.1). */
+export function useCreatePayment() {
+  return usePaymentMutation((createRequest: PaymentCreateRequest) =>
+    requestApi<PaymentDetail>("/payments", {
+      method: "POST",
+      requestBody: createRequest,
+    }),
+  );
 }
 
 /** Runs a Simulate action; the updated payment comes back at once (PY-09.3). */

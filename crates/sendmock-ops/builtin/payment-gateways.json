@@ -1,0 +1,538 @@
+[
+  {
+    "key": "stripe",
+    "name": "Stripe",
+    "accent": "#635bff",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [
+      {
+        "name": "secret_key",
+        "value": "sk_test_sendmock000000000000",
+        "is_secret": true
+      },
+      {
+        "name": "webhook_secret",
+        "value": "whsec_sendmock0000000000000",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "session_id",
+        "template": "{{ payment.reference }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "payment_intent.created",
+      "payment.authorized": "payment_intent.amount_capturable_updated",
+      "payment.succeeded": "payment_intent.succeeded",
+      "payment.failed": "payment_intent.payment_failed",
+      "payment.canceled": "payment_intent.canceled",
+      "payment.refunded": "charge.refunded",
+      "payment.partially_refunded": "charge.refunded",
+      "payment.dispute_opened": "charge.dispute.created",
+      "payment.dispute_updated": "charge.dispute.updated",
+      "payment.dispute_closed": "charge.dispute.closed",
+      "checkout.completed": "checkout.session.completed",
+      "checkout.expired": "checkout.session.expired"
+    },
+    "notification_body": "{\n  \"id\": \"{{ event.id }}\",\n  \"object\": \"event\",\n  \"api_version\": \"2025-03-31.basil\",\n  \"created\": {{ event.created }},\n  \"data\": {\n    \"object\": {{ event.object | json }}\n  },\n  \"livemode\": false,\n  \"pending_webhooks\": 1,\n  \"request\": {\n    \"id\": null,\n    \"idempotency_key\": null\n  },\n  \"type\": \"{{ event.name }}\"\n}",
+    "notification_headers": [
+      {
+        "name": "stripe-signature",
+        "template": "{{ stripe_signature(merchant.webhook_secret) }}"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "paypal",
+    "name": "PayPal",
+    "accent": "#ffc439",
+    "method_keys": [
+      "paypal_account"
+    ],
+    "credentials": [
+      {
+        "name": "client_id",
+        "value": "AZsendmockSandboxClient01",
+        "is_secret": false
+      },
+      {
+        "name": "client_secret",
+        "value": "EKsendmockSandboxSecret01",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "token",
+        "template": "{{ payment.reference }}",
+        "send_on": "always"
+      },
+      {
+        "name": "PayerID",
+        "template": "TESTPAYER01",
+        "send_on": "success"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "",
+      "payment.authorized": "",
+      "payment.succeeded": "PAYMENT.CAPTURE.COMPLETED",
+      "payment.failed": "PAYMENT.CAPTURE.DENIED",
+      "payment.canceled": "",
+      "payment.refunded": "PAYMENT.CAPTURE.REFUNDED",
+      "payment.partially_refunded": "PAYMENT.CAPTURE.REFUNDED",
+      "payment.dispute_opened": "CUSTOMER.DISPUTE.CREATED",
+      "payment.dispute_updated": "CUSTOMER.DISPUTE.UPDATED",
+      "payment.dispute_closed": "CUSTOMER.DISPUTE.RESOLVED",
+      "checkout.completed": "CHECKOUT.ORDER.APPROVED",
+      "checkout.expired": "CHECKOUT.ORDER.VOIDED"
+    },
+    "notification_body": "{\n  \"id\": \"WH-{{ event.id | replace(\"evt_\", \"\") | upper }}\",\n  \"event_version\": \"1.0\",\n  \"create_time\": \"{{ now_iso() }}\",\n  \"resource_type\": \"{{ event.type | payment_event(\"paypal_resource_type\") }}\",\n  \"resource_version\": \"2.0\",\n  \"event_type\": \"{{ event.name }}\",\n  \"summary\": \"{{ event.type | payment_event(\"paypal_summary\") }}\",\n  \"resource\": {{ event.object | json }}\n}",
+    "notification_headers": [
+      {
+        "name": "paypal-transmission-id",
+        "template": "{{ uuid() }}"
+      },
+      {
+        "name": "paypal-transmission-time",
+        "template": "{{ now_iso() }}"
+      },
+      {
+        "name": "paypal-transmission-sig",
+        "template": "{{ random_string(344) }}"
+      },
+      {
+        "name": "paypal-cert-url",
+        "template": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77"
+      },
+      {
+        "name": "paypal-auth-algo",
+        "template": "SHA256withRSA"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "sslcommerz",
+    "name": "SSLCommerz",
+    "accent": "#1e5bb8",
+    "method_keys": [
+      "card",
+      "bkash",
+      "nagad",
+      "rocket",
+      "dbbl",
+      "city",
+      "brac"
+    ],
+    "credentials": [
+      {
+        "name": "store_id",
+        "value": "sendm0000000001",
+        "is_secret": false
+      },
+      {
+        "name": "store_passwd",
+        "value": "sendm0000000001@ssl",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "POST",
+    "redirect_fields": [
+      {
+        "name": "status",
+        "template": "{{ event.object.status }}",
+        "send_on": "always"
+      },
+      {
+        "name": "tran_date",
+        "template": "{{ event.object.tran_date }}",
+        "send_on": "always"
+      },
+      {
+        "name": "tran_id",
+        "template": "{{ event.object.tran_id }}",
+        "send_on": "always"
+      },
+      {
+        "name": "val_id",
+        "template": "{{ event.object.val_id }}",
+        "send_on": "always"
+      },
+      {
+        "name": "amount",
+        "template": "{{ event.object.amount }}",
+        "send_on": "always"
+      },
+      {
+        "name": "store_amount",
+        "template": "{{ event.object.store_amount }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency",
+        "template": "{{ event.object.currency }}",
+        "send_on": "always"
+      },
+      {
+        "name": "bank_tran_id",
+        "template": "{{ event.object.bank_tran_id }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_type",
+        "template": "{{ event.object.card_type }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_no",
+        "template": "{{ event.object.card_no }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer",
+        "template": "{{ event.object.card_issuer }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_brand",
+        "template": "{{ event.object.card_brand }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer_country",
+        "template": "{{ event.object.card_issuer_country }}",
+        "send_on": "always"
+      },
+      {
+        "name": "card_issuer_country_code",
+        "template": "{{ event.object.card_issuer_country_code }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_type",
+        "template": "{{ event.object.currency_type }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_amount",
+        "template": "{{ event.object.currency_amount }}",
+        "send_on": "always"
+      },
+      {
+        "name": "currency_rate",
+        "template": "{{ event.object.currency_rate }}",
+        "send_on": "always"
+      },
+      {
+        "name": "base_fair",
+        "template": "{{ event.object.base_fair }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_a",
+        "template": "{{ event.object.value_a }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_b",
+        "template": "{{ event.object.value_b }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_c",
+        "template": "{{ event.object.value_c }}",
+        "send_on": "always"
+      },
+      {
+        "name": "value_d",
+        "template": "{{ event.object.value_d }}",
+        "send_on": "always"
+      },
+      {
+        "name": "risk_level",
+        "template": "{{ event.object.risk_level }}",
+        "send_on": "always"
+      },
+      {
+        "name": "risk_title",
+        "template": "{{ event.object.risk_title }}",
+        "send_on": "always"
+      },
+      {
+        "name": "verify_key",
+        "template": "{{ event.object.verify_key }}",
+        "send_on": "always"
+      },
+      {
+        "name": "verify_sign",
+        "template": "{{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "form",
+    "event_names": {
+      "payment.created": "",
+      "payment.authorized": "",
+      "payment.succeeded": "VALID",
+      "payment.failed": "FAILED",
+      "payment.canceled": "CANCELLED",
+      "payment.refunded": "REFUNDED",
+      "payment.partially_refunded": "REFUNDED",
+      "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
+      "payment.dispute_closed": "",
+      "checkout.completed": "",
+      "checkout.expired": "EXPIRED"
+    },
+    "notification_body": "status={{ event.object.status | urlencode }}&tran_date={{ event.object.tran_date | urlencode }}&tran_id={{ event.object.tran_id | urlencode }}&val_id={{ event.object.val_id | urlencode }}&amount={{ event.object.amount | urlencode }}&store_amount={{ event.object.store_amount | urlencode }}&currency={{ event.object.currency | urlencode }}&bank_tran_id={{ event.object.bank_tran_id | urlencode }}&card_type={{ event.object.card_type | urlencode }}&card_no={{ event.object.card_no | urlencode }}&card_issuer={{ event.object.card_issuer | urlencode }}&card_brand={{ event.object.card_brand | urlencode }}&card_issuer_country={{ event.object.card_issuer_country | urlencode }}&card_issuer_country_code={{ event.object.card_issuer_country_code | urlencode }}&currency_type={{ event.object.currency_type | urlencode }}&currency_amount={{ event.object.currency_amount | urlencode }}&currency_rate={{ event.object.currency_rate | urlencode }}&base_fair={{ event.object.base_fair | urlencode }}&value_a={{ event.object.value_a | urlencode }}&value_b={{ event.object.value_b | urlencode }}&value_c={{ event.object.value_c | urlencode }}&value_d={{ event.object.value_d | urlencode }}&risk_level={{ event.object.risk_level | urlencode }}&risk_title={{ event.object.risk_title | urlencode }}&verify_key={{ event.object.verify_key | urlencode }}&verify_sign={{ sslcommerz_verify_sign(merchant.store_passwd, event.object) }}",
+    "notification_headers": [],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "bkash",
+    "name": "bKash",
+    "accent": "#e2136e",
+    "method_keys": [
+      "bkash"
+    ],
+    "credentials": [
+      {
+        "name": "app_key",
+        "value": "sendmock-bkash-app-key",
+        "is_secret": false
+      },
+      {
+        "name": "app_secret",
+        "value": "sendmock-bkash-app-secret",
+        "is_secret": true
+      },
+      {
+        "name": "username",
+        "value": "sandboxTokenizedUser02",
+        "is_secret": false
+      },
+      {
+        "name": "password",
+        "value": "sandboxTokenizedUser02@12345",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "paymentID",
+        "template": "{{ payment.reference }}",
+        "send_on": "always"
+      },
+      {
+        "name": "status",
+        "template": "{{ redirect.status }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "",
+      "payment.authorized": "",
+      "payment.succeeded": "success",
+      "payment.failed": "failure",
+      "payment.canceled": "cancel",
+      "payment.refunded": "refunded",
+      "payment.partially_refunded": "refunded",
+      "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
+      "payment.dispute_closed": "",
+      "checkout.completed": "",
+      "checkout.expired": "cancel"
+    },
+    "notification_body": "{\n  \"paymentID\": \"{{ payment.reference }}\",\n  \"trxID\": \"{{ payment.provider_ids.trx_id | default(\"\") }}\",\n  \"transactionStatus\": \"{{ event.name }}\",\n  \"amount\": \"{{ payment.amount_major }}\",\n  \"currency\": \"{{ payment.currency }}\"\n}",
+    "notification_headers": [],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "razorpay",
+    "name": "Razorpay",
+    "accent": "#3395ff",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [
+      {
+        "name": "key_id",
+        "value": "rzp_test_SendMock0001",
+        "is_secret": false
+      },
+      {
+        "name": "key_secret",
+        "value": "sendmockRazorpayKeySecret01",
+        "is_secret": true
+      },
+      {
+        "name": "webhook_secret",
+        "value": "sendmock_razorpay_webhook_secret",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "POST",
+    "redirect_fields": [
+      {
+        "name": "razorpay_payment_id",
+        "template": "{{ event.object.razorpay_payment_id }}",
+        "send_on": "success"
+      },
+      {
+        "name": "razorpay_order_id",
+        "template": "{{ event.object.razorpay_order_id }}",
+        "send_on": "success"
+      },
+      {
+        "name": "razorpay_signature",
+        "template": "{{ event.object.razorpay_signature }}",
+        "send_on": "success"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "",
+      "payment.authorized": "payment.authorized",
+      "payment.succeeded": "payment.captured",
+      "payment.failed": "payment.failed",
+      "payment.canceled": "",
+      "payment.refunded": "refund.processed",
+      "payment.partially_refunded": "refund.processed",
+      "payment.dispute_opened": "payment.dispute.created",
+      "payment.dispute_updated": "payment.dispute.under_review",
+      "payment.dispute_closed": "payment.dispute.closed",
+      "checkout.completed": "order.paid",
+      "checkout.expired": ""
+    },
+    "notification_body": "{\n  \"entity\": \"event\",\n  \"account_id\": \"acc_SendMock000001\",\n  \"event\": \"{{ event.name }}\",\n  \"contains\": {{ event.object.contains | json }},\n  \"payload\": {{ event.object.payload | json }},\n  \"created_at\": {{ event.created }}\n}",
+    "notification_headers": [
+      {
+        "name": "x-razorpay-signature",
+        "template": "{{ razorpay_signature(merchant.webhook_secret) }}"
+      },
+      {
+        "name": "x-razorpay-event-id",
+        "template": "{{ event.id }}"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "paddle",
+    "name": "Paddle",
+    "accent": "#fddd35",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "pdl_sdbx_apikey_sendmock_SendMockPaddleKey01",
+        "is_secret": true
+      },
+      {
+        "name": "notification_secret",
+        "value": "pdl_ntfset_sendmock_SendMockPaddleSecret01",
+        "is_secret": true
+      }
+    ],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "_ptxn",
+        "template": "{{ payment.reference }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "transaction.created",
+      "payment.authorized": "",
+      "payment.succeeded": "transaction.completed",
+      "payment.failed": "transaction.payment_failed",
+      "payment.canceled": "transaction.canceled",
+      "payment.refunded": "adjustment.created",
+      "payment.partially_refunded": "adjustment.created",
+      "payment.dispute_opened": "",
+      "payment.dispute_updated": "",
+      "payment.dispute_closed": "",
+      "checkout.completed": "transaction.paid",
+      "checkout.expired": ""
+    },
+    "notification_body": "{\n  \"event_id\": \"{{ event.id }}\",\n  \"event_type\": \"{{ event.name }}\",\n  \"occurred_at\": \"{{ event.object.occurred_at }}\",\n  \"notification_id\": \"{{ event.id | replace(\"evt_\", \"ntf_\") }}\",\n  \"data\": {{ event.object.data | json }}\n}",
+    "notification_headers": [
+      {
+        "name": "paddle-signature",
+        "template": "{{ paddle_signature(merchant.notification_secret) }}"
+      }
+    ],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  },
+  {
+    "key": "native",
+    "name": "Native",
+    "accent": "#0d9488",
+    "method_keys": [
+      "card"
+    ],
+    "credentials": [],
+    "redirect_method": "GET",
+    "redirect_fields": [
+      {
+        "name": "payment_id",
+        "template": "{{ payment.id }}",
+        "send_on": "always"
+      },
+      {
+        "name": "outcome",
+        "template": "{{ redirect.outcome }}",
+        "send_on": "always"
+      }
+    ],
+    "notification_content_type": "json",
+    "event_names": {
+      "payment.created": "payment.created",
+      "payment.authorized": "payment.authorized",
+      "payment.succeeded": "payment.succeeded",
+      "payment.failed": "payment.failed",
+      "payment.canceled": "payment.canceled",
+      "payment.refunded": "payment.refunded",
+      "payment.partially_refunded": "payment.partially_refunded",
+      "payment.dispute_opened": "payment.dispute_opened",
+      "payment.dispute_updated": "payment.dispute_updated",
+      "payment.dispute_closed": "payment.dispute_closed",
+      "checkout.completed": "checkout.completed",
+      "checkout.expired": "checkout.expired"
+    },
+    "notification_body": "{\n  \"type\": \"{{ event.type }}\",\n  \"data\": {\n    \"id\": \"{{ payment.id }}\",\n    \"amount_minor\": {{ payment.amount_minor }},\n    \"currency\": \"{{ payment.currency }}\",\n    \"status\": \"{{ payment.status }}\"\n  }\n}",
+    "notification_headers": [],
+    "is_enabled": true,
+    "is_builtin": true,
+    "notification_endpoint_id": null
+  }
+]

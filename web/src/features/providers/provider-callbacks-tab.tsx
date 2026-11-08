@@ -3,6 +3,7 @@ import * as React from "react";
 import { FormField } from "@/components/common/form-field";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/features/providers/option-select";
+import { WhatsappCallbackCheck } from "@/features/providers/whatsapp-callback-check";
 import {
   smsOutcomes,
   statusesByArea,
@@ -116,6 +117,7 @@ export function ProviderCallbacksTab({
           }
         />
       )}
+      {providerInput.key === "whatsapp_cloud" && <WhatsappCallbackCheck />}
     </div>
   );
 }

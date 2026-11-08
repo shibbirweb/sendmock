@@ -32,5 +32,8 @@ export function buildDefaultSettings(): AppSettings {
     payment_default_currency: "USD",
     payment_outcome_profile: "interactive",
     payment_random_success_rate_percent: 80,
+    verify_default_code_length: 6,
+    verify_default_ttl_seconds: 600,
+    verify_fixed_code: null,
   };
 }

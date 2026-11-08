@@ -1,0 +1,79 @@
+{
+  "order": 5,
+  "path": "/sms/verify",
+  "states": {
+    "normal": [
+      "heading: Verify",
+      "link: Read the Verify guide",
+      "paragraph: Twilio Verify emulation: every code your app requests, its attempts and expiry, and controls to force any outcome.",
+      "tab: Verifications",
+      "tab: Services",
+      "button: All",
+      "button: Pending",
+      "button: Approved",
+      "button: Failed",
+      "textbox: Search verifications",
+      "columnheader: To",
+      "columnheader: Channel",
+      "columnheader: Service",
+      "columnheader: Code",
+      "columnheader: Status",
+      "columnheader: Attempts",
+      "columnheader: Time",
+      "each item, link: …",
+      "each item, button: Copy code #"
+    ],
+    "A verification is open": [
+      "heading: Verification",
+      "paragraph: Code, attempts and everything that happened to it.",
+      "button: Copy code",
+      "link: Open the message",
+      "heading: Force a state",
+      "button: Approve",
+      "button: Cancel",
+      "button: Expire",
+      "button: Max attempts",
+      "paragraph: Your app sees the new state on its next check or fetch.",
+      "button: Close"
+    ],
+    "Services tab": [
+      "paragraph: Code length, an optional fixed code and how long codes stay valid.",
+      "button: New service",
+      "columnheader: Name",
+      "columnheader: SID",
+      "columnheader: Expires after",
+      "columnheader: Actions",
+      "each item, button: Copy SID of Acme …",
+      "each item, button: Edit Acme …",
+      "each item, button: Delete Acme …"
+    ],
+    "New Verify service dialog": [
+      "heading: New Verify service",
+      "paragraph: Apps start verifications against a service by its SID.",
+      "textbox: Name",
+      "combobox: Code length",
+      "spinbutton: Expires after (minutes)",
+      "textbox: Fixed code (optional)",
+      "paragraph: Leave empty for a random code. A fixed code makes tests deterministic.",
+      "button: Cancel",
+      "button: Create service",
+      "button: Close"
+    ],
+    "empty": [
+      "paragraph: No verifications yet",
+      "paragraph: Start one from your app with the Twilio Verify API. The code shows up here and in the SMS screen.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy Twilio base URL",
+      "button: Copy Start a verification",
+      "link: More snippets",
+      "button: Start a sample verification"
+    ],
+    "failing": [
+      "alert: Could not load verifications. Try again",
+      "paragraph: Could not load verifications.",
+      "button: Try again"
+    ]
+  }
+}

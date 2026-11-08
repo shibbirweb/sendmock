@@ -3,7 +3,7 @@ title: Create a payment flow
 description: Compose the steps a checkout asks for from the step catalogue, label them, and use the flow in a method.
 ---
 
-> Works in your install from Phase 3P. Try it in the [demo](/demo/payments/flows) today.
+> Try it in the [demo](/demo/payments/flows).
 
 A flow is the order of steps on the checkout page. Build one when your provider's checkout differs from the built-ins: a QR code to scan, a PIN before the OTP, a voucher then a confirm.
 

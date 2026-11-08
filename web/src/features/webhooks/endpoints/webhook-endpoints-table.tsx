@@ -14,6 +14,7 @@ import { useIsDockerLoopbackUrl } from "@/features/webhooks/endpoints/docker-hos
 import { SuccessSparkline } from "@/features/webhooks/endpoints/success-sparkline";
 import type { WebhookEndpoint } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
+import { CreatedByBadge } from "@/components/common/created-by-badge";
 
 export type EndpointRowActions = {
   onToggleEnabled: (
@@ -78,7 +79,10 @@ function EndpointRow({
       className={cn(!webhookEndpoint.is_enabled && "text-muted-foreground")}
     >
       <TableCell className="max-w-48 font-medium">
-        <span className="block truncate">{webhookEndpoint.name}</span>
+        <span className="block truncate">
+          {webhookEndpoint.name}
+          <CreatedByBadge createdBy={webhookEndpoint.created_by} />
+        </span>
         <span className="block truncate font-mono text-[11px] font-normal text-muted-foreground md:hidden">
           {webhookEndpoint.url}
         </span>

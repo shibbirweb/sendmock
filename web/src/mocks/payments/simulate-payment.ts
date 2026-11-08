@@ -4,7 +4,6 @@ import type {
   PaymentMethod,
   PaymentSimulateAction,
   PaymentSimulateRequest,
-  PaymentTimelineKind,
 } from "@/lib/api/types";
 import { formatMinorAmount } from "@/lib/payments/format-money";
 import {
@@ -15,6 +14,12 @@ import {
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { buildPaymentRedirect } from "@/mocks/payments/build-payment-redirect";
 import { findGatewayRecord } from "@/mocks/payments/payment-gateway-record";
+import {
+  answerDisputeStep,
+  openDisputeStep,
+  resolveDisputeStep,
+} from "@/mocks/payments/simulate-dispute-steps";
+import { addTimeline } from "@/mocks/payments/payment-timeline";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
 
 export type SimulationResult =
@@ -26,14 +31,7 @@ export type PaymentDatabase = Pick<
   "webhookEndpoints" | "webhookDeliveries" | "paymentGateways"
 >;
 
-export function addTimeline(
-  paymentDetail: PaymentDetail,
-  kind: PaymentTimelineKind,
-  description: string,
-  createdAt: string,
-) {
-  paymentDetail.timeline.push({ kind, description, created_at: createdAt });
-}
+export { addTimeline } from "@/mocks/payments/payment-timeline";
 
 export function finishCheckout(
   mockDatabase: PaymentDatabase,
@@ -83,6 +81,27 @@ function readDefaultTestMethod(paymentDetail: PaymentDetail): PaymentMethod {
       };
 }
 
+/** A manual-capture payment is paid: the money is held until a capture or void. */
+function authorizeStep(
+  mockDatabase: PaymentDatabase,
+  paymentDetail: PaymentDetail,
+  hadCheckout: boolean,
+  createdAt: string,
+): PaymentEventType[] {
+  paymentDetail.status = "authorized";
+  addTimeline(
+    paymentDetail,
+    "authorized",
+    `Authorized ${money(paymentDetail, paymentDetail.amount_minor)}`,
+    createdAt,
+  );
+  finishCheckout(mockDatabase, paymentDetail, "success", createdAt);
+
+  return hadCheckout
+    ? ["checkout.completed", "payment.authorized"]
+    : ["payment.authorized"];
+}
+
 const succeedStep: SimulationStep = (
   mockDatabase,
   paymentDetail,
@@ -96,6 +115,9 @@ const succeedStep: SimulationStep = (
       paymentDetail.provider === "bkash" ? "bkash" : "card";
   }
   const isCapture = simulateRequest.action === "capture";
+  if (!isCapture && paymentDetail.capture_method === "manual") {
+    return authorizeStep(mockDatabase, paymentDetail, hadCheckout, createdAt);
+  }
   paymentDetail.status = "succeeded";
   paymentDetail.captured_minor = paymentDetail.amount_minor;
   addTimeline(
@@ -130,35 +152,6 @@ const refundStep: SimulationStep = (
   );
 
   return [isFull ? "payment.refunded" : "payment.partially_refunded"];
-};
-
-const resolveDisputeStep: SimulationStep = (
-  _mockDatabase,
-  paymentDetail,
-  simulateRequest,
-  createdAt,
-) => {
-  const isWon = simulateRequest.dispute_outcome !== "lost";
-  paymentDetail.dispute = {
-    status: isWon ? "won" : "lost",
-    reason: paymentDetail.dispute?.reason ?? "fraudulent",
-  };
-  if (isWon) {
-    paymentDetail.status =
-      paymentDetail.refunded_minor > 0 ? "partially_refunded" : "succeeded";
-  } else {
-    // A lost dispute returns the money to the customer.
-    paymentDetail.refunded_minor = paymentDetail.captured_minor;
-    paymentDetail.status = "refunded";
-  }
-  addTimeline(
-    paymentDetail,
-    "dispute_closed",
-    `Dispute ${isWon ? "won" : "lost"}`,
-    createdAt,
-  );
-
-  return ["payment.dispute_closed"];
 };
 
 /** One step per action; each changes the payment and names the events it fires. */
@@ -196,17 +189,8 @@ const simulationSteps: Record<PaymentSimulateAction, SimulationStep> = {
     return ["payment.canceled"];
   },
   refund: refundStep,
-  dispute: (_mockDatabase, paymentDetail, _simulateRequest, createdAt) => {
-    paymentDetail.status = "disputed";
-    paymentDetail.dispute = { status: "needs_response", reason: "fraudulent" };
-    addTimeline(
-      paymentDetail,
-      "dispute_opened",
-      "Dispute opened: fraudulent",
-      createdAt,
-    );
-    return ["payment.dispute_opened"];
-  },
+  dispute: openDisputeStep,
+  answer_dispute: answerDisputeStep,
   resolve_dispute: resolveDisputeStep,
 };
 

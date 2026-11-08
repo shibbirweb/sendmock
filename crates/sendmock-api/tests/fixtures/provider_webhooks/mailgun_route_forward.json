@@ -1,0 +1,24 @@
+{
+  "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/x-www-form-urlencoded",
+  "documented_example": {
+    "recipient": "bob@sandbox.mailgun.org",
+    "sender": "alice@example.com",
+    "subject": "Re: Sample POST request",
+    "body-plain": "Hi Bob, I posted it.",
+    "timestamp": "1529006854",
+    "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+    "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+  },
+  "schema": {
+    "type": "object",
+    "required": ["recipient", "sender", "subject", "body-plain", "timestamp", "token", "signature"],
+    "properties": {
+      "timestamp": { "type": "string", "pattern": "^[0-9]{10}$" },
+      "token": { "type": "string", "pattern": "^[0-9a-f]{50}$" },
+      "signature": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const emailList = "section[aria-label='Email list']";
 const mailRowHeightPx = 84;
@@ -38,48 +38,53 @@ test("UI-06.2 with 5,000 emails the list keeps only the visible rows in the page
   expect(await emailLinks.count()).toBeLessThan(maximumRenderedRows);
 });
 
+/** Clicks the email row at `rowIndex` and answers how long the detail took to show. */
+async function measureEmailOpenMs(page: Page, rowIndex: number) {
+  return page.evaluate(
+    async ({ listSelector, linkIndex }) => {
+      const emailLink = document
+        .querySelector(listSelector)
+        ?.querySelectorAll("a")
+        .item(linkIndex);
+      if (emailLink === undefined || emailLink === null) {
+        throw new Error(`No email row ${linkIndex}`);
+      }
+      const emailHref = emailLink.getAttribute("href") ?? "";
+      const clickedAtMs = performance.now();
+      emailLink.click();
+
+      return new Promise<number>((resolve) => {
+        const waitForDetail = () => {
+          const isDetailShown =
+            window.location.href.includes(emailHref.split("?")[0] ?? "") &&
+            document.querySelector("main h2") !== null &&
+            document.querySelector("[role='tabpanel']") !== null;
+          if (isDetailShown) {
+            resolve(performance.now() - clickedAtMs);
+            return;
+          }
+          requestAnimationFrame(waitForDetail);
+        };
+        waitForDetail();
+      });
+    },
+    { listSelector: emailList, linkIndex: rowIndex },
+  );
+}
+
 test("UI-06.2 with 5,000 emails an email opens in under 200 ms", async ({
   page,
 }) => {
+  // The first open also loads the detail view's code once; it is not what the budget measures.
+  await measureEmailOpenMs(page, 1);
   const openDurationsMs: number[] = [];
-
-  for (const rowIndex of [2, 5, 8]) {
-    const openDurationMs = await page.evaluate(
-      async ({ listSelector, linkIndex }) => {
-        const emailLink = document
-          .querySelector(listSelector)
-          ?.querySelectorAll("a")
-          .item(linkIndex);
-        if (emailLink === undefined || emailLink === null) {
-          throw new Error(`No email row ${linkIndex}`);
-        }
-        const emailHref = emailLink.getAttribute("href") ?? "";
-        const clickedAtMs = performance.now();
-        emailLink.click();
-
-        return new Promise<number>((resolve) => {
-          const waitForDetail = () => {
-            const isDetailShown =
-              window.location.href.includes(emailHref.split("?")[0] ?? "") &&
-              document.querySelector("main h2") !== null &&
-              document.querySelector("[role='tabpanel']") !== null;
-            if (isDetailShown) {
-              resolve(performance.now() - clickedAtMs);
-              return;
-            }
-            requestAnimationFrame(waitForDetail);
-          };
-          waitForDetail();
-        });
-      },
-      { listSelector: emailList, linkIndex: rowIndex },
-    );
-    openDurationsMs.push(openDurationMs);
+  for (const rowIndex of [2, 4, 6, 8, 10]) {
+    openDurationsMs.push(await measureEmailOpenMs(page, rowIndex));
   }
 
-  // The median of three, so one slow frame on a busy machine does not decide it.
+  // The median of five, so a slow frame or two on a busy runner does not decide it.
   const medianOpenDurationMs = [...openDurationsMs].sort(
     (firstDuration, secondDuration) => firstDuration - secondDuration,
-  )[1];
+  )[2];
   expect(medianOpenDurationMs).toBeLessThan(200);
 });

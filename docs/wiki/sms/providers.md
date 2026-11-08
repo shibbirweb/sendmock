@@ -3,9 +3,9 @@ title: Providers
 description: The SMS APIs SendMock answers like the real provider. Change a built-in, remove the ones you do not use, or add your own.
 ---
 
-> Try it in the [demo](/demo/sms/providers). The screen works today; requests to the provider APIs are answered from Phase 2 (Twilio, Verify, Vonage) and Phase 4 (the rest and your own).
+> Try it in the [demo](/demo/sms/providers).
 
-An SMS provider is one API SendMock answers like the real one: Twilio, Twilio Verify, Vonage, Plivo, MessageBird, or one you add. The demo already has one you could add yourself: **SSL Wireless**, a regional vendor, added from blank. Providers are data, not code, like [payment gateways](../payments/gateways.md), and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
+An SMS provider is one API SendMock answers like the real one: Twilio, Twilio Verify, Vonage, Vonage Verify, Plivo, MessageBird, Infobip, Telnyx, Sinch, Africa's Talking, Amazon SNS, WhatsApp Cloud, or one you add. The demo already has one you could add yourself: **SSL Wireless**, a regional vendor, added from blank. Providers are data, not code, like [payment gateways](../payments/gateways.md), and **Reset to default** brings a built-in back. The full list is on [Supported providers](../providers.md).
 
 ![The SMS Providers screen](../images/sms-providers.jpg)
 
@@ -50,6 +50,8 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 | **Preview** | a sample request, the message SendMock would store, the answer it would give, the problems, and what templates can read |
 | **Try it** | the base URLs and a `curl` command for this provider |
 
+
+Every control and text, one by one: [SMS providers in depth](../deeper/sms/providers.md).
 ## Customize
 
 The full walkthrough, adding Africa's Talking from its API docs: [Advanced: create an SMS provider](../advanced/sms-provider.md).

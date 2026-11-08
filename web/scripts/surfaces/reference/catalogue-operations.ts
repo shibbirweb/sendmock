@@ -22,6 +22,11 @@ export type CatalogueOperation = {
 const readOnlyActionPattern =
   /\/(preview|render|test|validate|link-check|spam-check)$/;
 
+/** Action POSTs the pattern matches that send a real request and store a delivery. */
+const sendingActionPaths = new Set([
+  "/api/v1/webhooks/endpoints/{endpointId}/test",
+]);
+
 export function listCatalogueOperations(
   specDocument: SpecDocument,
   surfaceCatalogue: Record<string, OperationSurfaces>,
@@ -88,7 +93,9 @@ export function describeOutput(entry: SpecOperationEntry): string | null {
 export function isReadOnlyOperation(entry: SpecOperationEntry): boolean {
   return (
     entry.method === "GET" ||
-    (entry.method === "POST" && readOnlyActionPattern.test(entry.path))
+    (entry.method === "POST" &&
+      readOnlyActionPattern.test(entry.path) &&
+      !sendingActionPaths.has(entry.path))
   );
 }
 

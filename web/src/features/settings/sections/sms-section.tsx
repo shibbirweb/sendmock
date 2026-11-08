@@ -1,4 +1,5 @@
 import { RadioCardGroup } from "@/components/common/radio-card-group";
+import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { Slider } from "@/components/ui/slider";
 import {
   sendmockAfterSendNumbers,
@@ -8,6 +9,7 @@ import {
 import { MagicReferenceTable } from "@/features/settings/reference/magic-reference-table";
 import { SmsOutcomeRulesCard } from "@/features/settings/outcome-rules/sms-outcome-rules-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
+import { VerifyDefaultsCard } from "@/features/settings/sections/verify-defaults-card";
 import { SettingsSwitchRow } from "@/features/settings/settings-fields";
 import { useSettingsSectionForm } from "@/features/settings/use-settings-section-form";
 import type { AppSettings, SmsSimulationProfile } from "@/lib/api/types";
@@ -104,7 +106,14 @@ export function SmsSection({ appSettings }: { appSettings: AppSettings }) {
           }}
         />
       </SettingsSectionCard>
-      <SmsOutcomeRulesCard appSettings={appSettings} />
+      <VerifyDefaultsCard appSettings={appSettings} />
+      <FeatureAvailabilityGate
+        operationKey="GET /api/v1/outcome-rules/sms"
+        featureName="Outcome numbers"
+        description="Numbers that fail, stay queued or reply, to test how your app reacts."
+      >
+        <SmsOutcomeRulesCard appSettings={appSettings} />
+      </FeatureAvailabilityGate>
       <SettingsSectionCard
         title="Magic numbers"
         description={

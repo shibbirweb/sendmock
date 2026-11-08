@@ -4,6 +4,7 @@ import {
   useOpenEmail,
   useUpdateEmail,
 } from "@/lib/api/hooks/use-email-queries";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import { useAppSettings } from "@/lib/api/hooks/use-system-queries";
 import type { EmailDetail } from "@/lib/api/types";
 
@@ -13,6 +14,9 @@ import type { EmailDetail } from "@/lib/api/types";
  */
 export function useEmailOpenTracking(email: EmailDetail | undefined) {
   const { data: appSettings } = useAppSettings();
+  const isOpenServed = useOperationAvailability(
+    "POST /api/v1/emails/{emailId}/open",
+  ).isAvailable;
   const openEmail = useOpenEmail();
   const updateEmail = useUpdateEmail();
   const trackedEmailIdRef = React.useRef<string | null>(null);
@@ -34,10 +38,11 @@ export function useEmailOpenTracking(email: EmailDetail | undefined) {
 
     const isFirstOpen = email.open_count === 0;
     const shouldFireOpen =
+      isOpenServed &&
       appSettings.fire_opened_events_on_view &&
       (isFirstOpen || appSettings.opened_event_mode === "every_open");
     if (shouldFireOpen) {
       sendOpen({ emailId: email.id, openSource: "ui" });
     }
-  }, [email, appSettings, sendOpen, sendUpdate]);
+  }, [email, appSettings, isOpenServed, sendOpen, sendUpdate]);
 }

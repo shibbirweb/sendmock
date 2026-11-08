@@ -314,32 +314,31 @@ test("WS-06.4 advanced create an email provider: Mailjet from blank to a saved p
   ).toContainText("Custom");
 });
 
-test("WS-06.4 advanced create an SMS provider: Africa's Talking from blank to a saved provider", async ({
+test("WS-06.4 advanced create an SMS provider: Clickatell from blank to a saved provider", async ({
   page,
 }) => {
   const providerSheet = await addBlankProvider(
     page,
     "/sms/providers",
-    "Africa's Talking",
-    "africastalking",
+    "Clickatell",
+    "clickatell",
   );
-  await providerSheet.getByLabel("Host").fill("api.africastalking.com");
+  await providerSheet.getByLabel("Host").fill("platform.clickatell.com");
   await providerSheet.getByRole("tab", { name: "Requests" }).click();
-  await providerSheet.getByLabel("Request 1 path").fill("/version1/messaging");
-  await providerSheet
-    .getByRole("combobox", { name: "Request 1 format" })
-    .click();
-  await page.getByRole("option", { name: "Form", exact: true }).click();
+  await providerSheet.getByLabel("Request 1 path").fill("/messages");
   await mapParts(page, providerSheet, [
-    ["to", "to"],
-    ["body", "message"],
+    ["to", "to[*]"],
+    ["body", "content"],
     ["from", "from"],
   ]);
   await providerSheet.getByRole("tab", { name: "Responses" }).click();
+  await providerSheet.getByLabel("Message id").fill("{{ random_hex(16) }}");
+  await providerSheet.getByLabel("Success response status").fill("202");
   await providerSheet
-    .getByLabel("Message id")
-    .fill("ATXid_{{ random_hex(32) }}");
-  await providerSheet.getByLabel("Success response status").fill("201");
+    .getByLabel("Success response body")
+    .fill(
+      '{"messages": [{"apiMessageId": "{{ message.provider_id }}", "accepted": true, "to": "{{ message.to }}", "error": null}], "error": null}',
+    );
 
   await providerSheet.getByRole("tab", { name: "Preview" }).click();
   await expect(
@@ -347,12 +346,10 @@ test("WS-06.4 advanced create an SMS provider: Africa's Talking from blank to a 
   ).toContainText("+15551234567");
   await expect(
     providerSheet.getByTestId("provider-preview-response"),
-  ).toContainText("201");
+  ).toContainText("202");
   await providerSheet.getByRole("button", { name: "Save provider" }).click();
   await expect(providerSheet).toBeHidden();
   await expect(
-    page
-      .getByTestId("message-provider-row")
-      .filter({ hasText: "Africa's Talking" }),
+    page.getByTestId("message-provider-row").filter({ hasText: "Clickatell" }),
   ).toContainText("Custom");
 });

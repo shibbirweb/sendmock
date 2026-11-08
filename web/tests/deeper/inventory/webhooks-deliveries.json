@@ -1,0 +1,54 @@
+{
+  "order": 13,
+  "path": "/webhooks/deliveries",
+  "states": {
+    "normal": [
+      "heading: Deliveries",
+      "link: Read the Deliveries guide",
+      "heading: Webhook deliveries",
+      "paragraph: Every request SendMock sent to your endpoints, live, with replay and retry controls.",
+      "button: All",
+      "button: Succeeded",
+      "button: Failed",
+      "button: Pending",
+      "combobox: Endpoint filter",
+      "combobox: Event filter",
+      "columnheader: Time",
+      "columnheader: Event",
+      "columnheader: Endpoint",
+      "columnheader: Trigger",
+      "columnheader: Status",
+      "columnheader: Duration",
+      "columnheader: Attempt",
+      "each item, link: …",
+      "button: Load more"
+    ],
+    "A delivery is open": [
+      "heading: Delivery",
+      "paragraph: The request SendMock sent and what your endpoint answered.",
+      "link: Your Acme verification code is #. It expires in # minutes.",
+      "button: Copy as cURL",
+      "button: Replay",
+      "button: Edit and replay",
+      "button: Save",
+      "heading: Request POST",
+      "heading: Request headers",
+      "heading: Request body",
+      "button: Copy request body",
+      "heading: Response #",
+      "heading: Response headers",
+      "heading: Response body",
+      "button: Copy response body",
+      "button: Close"
+    ],
+    "empty": [
+      "paragraph: No deliveries yet",
+      "paragraph: Deliveries appear here when a rule sends an event to an endpoint, or when you send a test from Endpoints."
+    ],
+    "failing": [
+      "alert: Could not load the deliveries. Try again",
+      "paragraph: Could not load the deliveries.",
+      "button: Try again"
+    ]
+  }
+}

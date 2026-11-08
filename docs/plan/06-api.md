@@ -8,6 +8,8 @@ The contract is [docs/api/openapi.yaml](../api/openapi.yaml), frozen in Phase U3
 
 The spec covers every endpoint: the ones the UI uses, the `/catch/{binPath}` capture URL, and (since U3 W14, [20](20-surface-parity.md)) the ones that were planned for the CLI and MCP only: the test-automation helpers (`/wait/*`, `/otp`, `/links`), `GET /emails/latest`, `POST /emails/inbound`, `POST /send/raw`, `/tag-rules`, `/forward-rules`, the outcome tests, the payments test cards ([17](17-payments.md#api-sendmock-native)), `GET /events/recent`, `/integrations/{stack}`, `/scenarios` and `/ai`. Every operation also names its CLI command, MCP tool and UI place in the surface catalogue (`web/src/lib/api/surface-catalogue`), written into the spec as `x-sendmock-cli`, `x-sendmock-mcp` and `x-sendmock-ui`. Earlier ideas that the existing endpoints already answer are dropped: an email's HTML is in `GET /emails/{emailId}` (`html_body`), opens are in its timeline (and `opened_at` on an SMS), and rendering without sending is `POST /webhooks/endpoints/preview`. The realtime stream (`/ws`, SSE `/events`) is not described by OpenAPI; `GET /events/recent` is its polling twin.
 
+Aliases: `GET /api/v1/sms/send?from=&to=&body=` runs `POST /api/v1/sms` from the query string, for apps written for regional vendors' query-string APIs; it is logged like the POST and left out of OpenAPI (one `operationId` per operation). Every `POST`, `PUT` and `PATCH` also takes `application/x-www-form-urlencoded` bodies.
+
 Auth: none by default; when `--ui-auth` is set, the same basic auth (or an API token from settings) protects the API.
 
 CORS: `--cors-origins` (default: the official docs site origin, so the website's API playground can reach a local instance after the user clicks Connect; set to empty to disable). See [16-website-and-releases.md](16-website-and-releases.md#api-playground).
@@ -19,13 +21,14 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/emails` | list, cursor pagination (`?cursor=&limit=`), filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
 | GET | `/emails/{emailId}` | parsed message (headers, text, html, attachments meta, extracted data) |
 | GET | `/emails/{emailId}/raw` | original `.eml` |
+| GET | `/emails/{emailId}/mime/{partId}` | download one MIME part, decoded, by its position in the MIME tree (`1.2`) |
 | GET | `/emails/{emailId}/html` | sanitised HTML for preview iframe |
 | GET | `/emails/{emailId}/attachments/{attachmentIndex}` | download attachment |
 | PATCH | `/emails/{emailId}` | mark read/unread, set tags |
-| POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api" }` (default `api`) |
-| GET | `/emails/{emailId}/opens` | open history |
+| POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api", "user_agent"? }` (default `api`); a `ui` open the opened-events settings leave out records nothing and still answers 204 |
+| GET | `/emails/{emailId}/opens` | open history, oldest first: `opened_at`, `source`, `user_agent` |
 | DELETE | `/emails/{emailId}` | delete one |
-| DELETE | `/emails` | delete all (or by filter) |
+| DELETE | `/emails` | delete all, or only those matching the list's filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
 | GET | `/emails/latest` | newest message, optionally filtered by `to` |
 | POST | `/send` | native HTTP send (JSON, with base64 `attachments`, see [03-email.md](03-email.md#native-send-attachments)); provider-compatible send APIs live under `/providers/*` and the provider port ([03-email.md](03-email.md#http-send-apis)) |
 | POST | `/emails/{emailId}/simulate` | simulate `delivered`, `deferred`, `bounced` (hard/soft), `complained`, `unsubscribed` |
@@ -59,8 +62,8 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/sms/{smsId}/media/{mediaIndex}` | one stored media file (MMS or WhatsApp), with its content type |
 | GET | `/sms/threads` | conversations grouped by number pair |
 | POST | `/sms/{smsId}/status` | manually set status (manual profile) |
-| POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 for inbound) |
-| GET | `/sms/{smsId}/opens` | open history |
+| POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 `inbound_sms` for inbound); same body and settings as the email open |
+| GET | `/sms/{smsId}/opens` | read history, oldest first |
 | POST | `/sms/inbound` | simulate incoming SMS |
 | POST | `/sms/{smsId}/reply-webhook/resend` | send an inbound message's reply webhook again (Twilio-style request URL, fallback and TwiML replies) |
 | DELETE | `/sms/{smsId}`, `/sms` | delete one / all |
@@ -97,7 +100,7 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 
 ## Payments
 
-Native payments, hosted checkout, simulate actions, resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
+Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute` with `dispute_evidence`, the dispute's `under_review` status and `evidence`, and the `payment.dispute_updated` event; and subscriptions at `/payments/subscriptions` with advance and cancel and the `subscription.*` events), resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
 
 ## Logs
 
@@ -111,7 +114,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET/POST/PATCH/DELETE | `/webhooks/endpoints` | manage endpoints (URL, `query_params`, headers, `body_mode` with its fields, raw body or template, `render_mode`); the list adds `delivery_count_24h` and `success_history` (24 hourly success rates, `null` for hours without deliveries) |
-| POST | `/webhooks/endpoints/preview` | render an unsaved endpoint request (URL, query params, headers, body in any mode, render mode) against the sample or `email_id` / `sms_id`, with optional send-time `variables`; returns the rendered request and problems, each with where it comes from and, for templates, its line and column |
+| POST | `/webhooks/endpoints/preview` | render an unsaved endpoint request (URL, query params, headers, body in any mode, render mode) against the sample or `email_id` / `sms_id`, with optional send-time `variables`; with `endpoint_id` alone it renders that saved endpoint as stored (`sendmock webhook render --endpoint-id <endpointId>`); returns the rendered request and problems, each with where it comes from and, for templates, its line and column |
 | POST | `/webhooks/endpoints/{endpointId}/test` | send `test.ping` |
 | POST | `/webhooks/endpoints/{endpointId}/send` | manual send: `email_id` or `sms_id` (or neither for the sample), optional `template_id` (format for this send), `request` (a hand-written request: method, URL, query params, headers, body mode and render mode, replacing the endpoint's), `variables` (send-time overrides) and `body` (an edited body, sent as written); returns the `manual` delivery, `render_failed` when rendering stops it |
 | GET | `/webhooks/metrics?range=24h\|7d&endpoint_id=` | delivery health for the range: totals (deliveries, success rate, p50 / p95 latency, retries, render failures), hourly or daily buckets (succeeded, retrying, failed, p50 / p95), per-endpoint metrics, top failure codes and recent failures |
@@ -120,7 +123,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
 | GET | `/webhooks/deliveries` | delivery log, newest first and paged: `status` (comma-separated), `endpoint_id`, `event_type` |
 | GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
-| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables, or with `body` and `headers` to send an edited request; returns the new delivery |
+| POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables (`409 gateway_notification` for a payment gateway's notification, which is resent from the payment), or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |
 | GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables; values are checked per kind and secrets are always returned masked (an empty value on `PATCH` keeps the stored secret); a Fixed random variable carries its `fixed_value` |
 | POST | `/webhooks/variables/preview` | what a variable resolves to against the sample message: `{ "kind": ..., "value": ... }`, returns the value, warnings and errors |
@@ -129,7 +132,7 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | GET | `/webhooks/template-reference` | context fields (path, type, description, example, children) for `?events=`, plus functions and filters, for the reference panel and `{{` suggestions |
 | GET/POST/PATCH/DELETE | `/webhooks/templates` | built-in and custom payload templates, plus `render`, `revisions`, `export`, `import` (see [13-webhook-templates.md](13-webhook-templates.md)) |
 | GET | `/webhooks/templates/{templateId}` | one template: request shape (method, content type, header and body templates), required variables, doc link and verified date |
-| POST | `/webhooks/templates/{templateId}/render` | render against `{ "email_id": ... }`, `{ "sms_id": ... }` or `{}` for the built-in sample, optionally with an unsaved `draft`; returns headers, body, warnings and errors |
+| POST | `/webhooks/templates/{templateId}/render` | render against `{ "email_id": ... }`, `{ "sms_id": ... }`, `{ "payment_id": ... }` (as the event its latest state stands for, e.g. `payment.succeeded`) or `{}` for the built-in sample, optionally with an unsaved `draft`; returns headers, body, warnings and errors |
 | PATCH | `/webhooks/templates/{templateId}` | edit `method`, `content_type`, `header_templates`, `body_template` (built-in and custom; file templates are read-only), and for custom templates `name`, `description`, `events`, `required_variables`; each save keeps a revision; `422` with the errors when it does not render; an edited built-in gets `is_modified` |
 | POST | `/webhooks/templates/{templateId}/reset` | restore a modified built-in to the shipped default |
 | POST | `/webhooks/templates/{templateId}/clone` | custom copy: `{ "name": ... }` |
@@ -145,6 +148,8 @@ Native payments, hosted checkout, simulate actions, resend IPN, test cards and `
 | POST | `/webhooks/saved/{savedId}/template` | save as a custom template: `{ "name": ... }`; returns the template |
 | POST | `/webhooks/endpoints/{endpointId}/rotate-secret` | rotate the Standard Webhooks secret with an overlap window (`{ "overlap_hours": 24 }`); the response carries the new masked secret and `previous_secret_expires_at` |
 | GET | `/webhooks/endpoints/{endpointId}/secret` | reveal the plain secret (the reveal is written to the API request log); everywhere else secrets are masked |
+
+Fields bodies (Phase 4, WH-07.16): `fields_encoding` also takes `multipart` (`multipart/form-data`), and a body field's `value_type` also takes `file`, whose value is a URL template. The stored request writes a file field as a part with an `X-Sendmock-File-Url` header and no content; the sender fetches the URL when it sends the request (each attempt), names the part after the URL's last path segment, takes the content type from the answer, and sends the bytes. Inbound routes use the same placeholder for an email's attachments, pointing at `GET /api/v1/emails/{emailId}/attachments/{attachmentIndex}`.
 
 Manual send and replay accept `"variables": { ... }` overrides and `"rerender": true|false`. Details in [12-webhook-variables.md](12-webhook-variables.md).
 
@@ -164,7 +169,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/events/recent?since=&type=&limit=` | the latest events, newest first: the polling twin of the realtime stream |
 | GET | `/integrations/{stack}?channel=&host=` | copy-ready settings for a stack (Laravel, Django, Express, ...), as Settings > Connection shows them |
 | POST | `/scenarios/validate`, `/scenarios/run` | check or run a scenario file ([14](14-ai-integration.md#scenarios)); the run answers a step-by-step report |
-| GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration; the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
+| GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration, for the installed binary and through npx (`npx_install_command`, `npx_mcp_config`, added 2026-11-07 for AI-05.9); the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
 | POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
@@ -179,9 +184,33 @@ These make SendMock useful from any test framework without polling loops:
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, email and SMS options, opened events, chaos toggles, OTP patterns; `PATCH` takes only the changed keys and returns field-level errors for invalid values |
-| GET | `/info` | version, uptime, listeners, counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
+| GET | `/info` | version, uptime, listeners (`provider_address`, `catcher_address`, the catch-all catcher port added in Phase 5, and `pop3_address`, added after 1.0 as A6, each null when off), counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
+
+## Projects
+
+Built after 1.0 as [32](32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10) A5 (PL-10).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/projects` | every project, `default` first, each with `key`, `name`, `created_at` and its `email_count`, `sms_count` and `verification_count` |
+| POST | `/projects` | add a project (`key`: lowercase letters, digits and dashes, 1 to 40 characters, starting with a letter or digit; `name`); `409 project_exists` when the key is taken |
+| PATCH | `/projects/{projectKey}` | rename a project (`name`); the key never changes, since apps send it |
+| DELETE | `/projects/{projectKey}` | delete a project and its emails, SMS and verifications; `409 default_project` for `default` |
+
+Requests that capture traffic name their project in the `X-SendMock-Project` header (an unknown key answers `404 project_not_found`); without it they go to `default`. Over SMTP, an AUTH username that is a project's key picks that project. Every email, SMS and verification shows its `project`. Lists and lookups of captured traffic take an optional `project` query parameter.
+
+## Push
+
+Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01). The provider APIs (FCM HTTP v1, Expo's push send and receipts, OneSignal's create notification) are answered on the provider port and under `/providers/<key>/`, like the SMS and email providers; these endpoints read what they stored.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/push` | notifications, newest first, with `project`, `device_token`, `provider` and `status` filters |
+| DELETE | `/push` | delete every notification, or those the same filters match |
+| GET/DELETE | `/push/{pushId}` | one notification with its request and answer; delete it |
+| GET | `/wait/push` | wait for a notification to a `device_token` (and `project`) since a time; `408` on timeout |
 
 ## Realtime
 
@@ -193,4 +222,5 @@ These make SendMock useful from any test framework without polling loops:
 - Times: RFC 3339 UTC strings in JSON.
 - Pagination: opaque `next_cursor` (ULID based).
 - Versioning: breaking changes go to `/api/v2`; `v1` stays stable once 1.0 ships.
-- Mailpit-compatible aliases (`/api/v1/messages`, `/api/v1/message/{ID}`) are a stretch goal to ease migration of existing test suites.
+- `POST /emails/{emailId}/clicks` (`url`, optional `user_agent`) records a click and fires `email.clicked`; `GET /emails/{emailId}/clicks` lists them; the email detail gains `click_count` (added 2026-11-07, [32](32-after-1-0.md#a2-emailclicked-link-click-tracking-em-20) A2, EM-20).
+- Mailpit-compatible aliases (`/api/v1/messages`, `/api/v1/message/{ID}`, `/api/v1/search`, `/api/v1/tags`, `/view/{ID}.html`) ease migration of existing test suites: built after 1.0 as [32](32-after-1-0.md#a1-mailpit-api-compatibility-em-19) A1 (EM-19). They are compatibility routes, like the provider APIs, not operations, and are not in this spec.

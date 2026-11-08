@@ -30,14 +30,14 @@ This lets developers build and test the whole payment flow, including IPN handle
 
 ### 2. Direct API (server-side) payments
 
-Payment intents / orders created and confirmed via API with **test cards or test wallets**, e.g. Stripe `POST /v1/payment_intents` + `confirm` with `pm_card_visa` or a test card number; the outcome follows the test card table below.
+Payment intents / orders created and confirmed via API with **test cards or test wallets**, e.g. Stripe `POST /v1/payment_intents` + `confirm` with a test PaymentMethod such as `pm_card_visa` or `tok_chargeDeclined`, which stands for a card of the test card table below and gets that card's outcome. A raw card number sent to Stripe's API is refused, as Stripe refuses it, and kept nowhere.
 
 ### 3. After-payment operations
 
-- **Authorize then capture** (manual capture), **void / cancel**.
+- **Authorize then capture** (manual capture), **void / cancel**: a payment with `capture_method: manual` (Stripe's `capture_method=manual`, or `capture_method` on `POST /payments/checkout`) is `authorized` once paid, fires `payment.authorized`, and is then captured in whole or in part, or voided.
 - **Refunds**: full and partial, instant or pending then succeeded/failed.
-- **Disputes / chargebacks**: open, needs response, won, lost.
-- **Subscriptions** (Stripe-style): create, trial, renew (simulated clock advance), payment failure and dunning, cancel. (Phase 4+)
+- **Disputes / chargebacks**: open (`needs_response`), answered with evidence (`under_review`), then won or lost. Answering fires `payment.dispute_updated`, which each gateway names in its own words (Stripe `charge.dispute.updated`, PayPal `CUSTOMER.DISPUTE.UPDATED`, Razorpay `payment.dispute.under_review`).
+- **Subscriptions** (Stripe-style): create (with an optional trial), renew when the subscription's own clock is advanced (the test card is charged as a payment through the gateway), payment failure (`past_due`), cancel now or at the period end. Statuses: `trialing`, `active`, `past_due`, `canceled`. The Payments > Subscriptions screen lists them with Advance to renewal and Cancel. (Phase 4)
 - All available from the UI ("Simulate" menu on a payment), REST API, CLI and MCP.
 
 ## Provider emulation
@@ -50,7 +50,7 @@ Served on the provider port at the real paths (same mechanism as SMS and email p
 | **PayPal** | Orders v2 (create, approve via checkout page, capture), Refunds | Webhooks (`CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED`, ...) with verify-webhook-signature endpoint; classic IPN form post with `_notify-validate` postback | 3P |
 | **SSLCommerz** | Session init (`gwprocess/v4/api.php`), order validation API, refund API, transaction query | IPN POST with `val_id`, `status` (`VALID`, `FAILED`, `CANCELLED`), `verify_sign`, `verify_key`; success/fail/cancel POST redirects | 3P |
 | **bKash** (tokenized checkout) | grant token, create payment, execute payment, query, refund | callback redirect with `paymentID` and `status` (`success`, `failure`, `cancel`) | 4 |
-| **Razorpay** | Orders, payments capture, refunds; checkout handler signature (`razorpay_signature`) | Webhooks (`payment.captured`, `payment.failed`, `refund.processed`) with `X-Razorpay-Signature` | 4 |
+| **Razorpay** | Orders, payments capture, refunds; checkout handler signature (`razorpay_signature`); Checkout's `callback_url` comes from the order's `notes.callback_url` | Webhooks (`payment.captured`, `payment.failed`, `refund.processed`) with `X-Razorpay-Signature` | 4 |
 | **Paddle** (Billing) | transactions, subscriptions (basic) | Webhooks with `Paddle-Signature` | 4 |
 | Nagad, ShurjoPay, aamarPay, Paystack, Flutterwave, Mollie, Square, Lemon Squeezy | init + callback + IPN shapes | provider formats | later |
 | **Native** | `POST /api/v1/payments` (simple JSON) and `POST /api/v1/payments/checkout` (hosted page) | native `payment.*` events | 3P |
@@ -149,7 +149,7 @@ Gateways and payment methods are data, not code, so a developer can emulate a ga
 
 Native events (also usable in webhook rules and the realtime stream):
 
-`payment.created`, `payment.authorized`, `payment.succeeded`, `payment.failed`, `payment.canceled`, `payment.refunded`, `payment.partially_refunded`, `payment.dispute_opened`, `payment.dispute_closed`, `checkout.completed`, `checkout.expired`, `subscription.created`, `subscription.renewed`, `subscription.payment_failed`, `subscription.canceled`.
+`payment.created`, `payment.authorized`, `payment.succeeded`, `payment.failed`, `payment.canceled`, `payment.refunded`, `payment.partially_refunded`, `payment.dispute_opened`, `payment.dispute_updated`, `payment.dispute_closed`, `checkout.completed`, `checkout.expired`, `subscription.created`, `subscription.renewed`, `subscription.payment_failed`, `subscription.canceled`.
 
 Provider deliveries use the provider's own event names and payloads through built-in **payment templates** (Stripe event, PayPal webhook, PayPal IPN, SSLCommerz IPN, bKash callback, Razorpay webhook, Paddle webhook), see [13-webhook-templates.md](13-webhook-templates.md).
 
@@ -189,10 +189,10 @@ Provider deliveries use the provider's own event names and payloads through buil
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/payments` | create a payment (native) |
-| POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included |
+| POST | `/payments` | create and pay a payment with a test card, as an app's server does without a checkout page (`provider`, `amount_minor`, `currency`, `card_number`, optional `customer_email`, `line_items`, `capture_method`); answers `201` with the payment and the card's outcome, or `422` for a card the test table does not list |
+| POST | `/payments/checkout` | create a hosted checkout session (native); `provider` picks the gateway, so the Gateways screen opens a test checkout of any gateway, custom ones included; `capture_method: manual` authorizes it and waits for a capture or void |
 | GET | `/payments`, `/payments/{paymentId}` | list (newest first, paged; `status`, `provider`, `currency` filters), detail with timeline, redirects and linked notification deliveries |
-| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
+| POST | `/payments/{paymentId}/simulate` | `succeed`, `decline` (reason), `refund` (amount), `dispute`, `answer_dispute` (`dispute_evidence`, while the dispute needs a response), `resolve_dispute` (won/lost), `expire`, `capture`, `void`; an action the status does not allow, or a refund above what is left, returns `409` / `422` |
 | POST | `/payments/{paymentId}/notify` | resend the IPN / webhook |
 | GET | `/payments/test-cards` | the test card and wallet tables |
 | GET/POST/PATCH/DELETE | `/payments/gateways` | gateways; `POST` takes `{ "name", "key", "start_from" }`; built-ins cannot be deleted |
@@ -208,6 +208,10 @@ Provider deliveries use the provider's own event names and payloads through buil
 | GET | `/payments/flow-variables` | the variables step labels can use, with what each becomes and an example |
 | GET | `/checkout-sessions/{sessionId}` | what the test checkout page shows: merchant, order, provider theme and the session state (open, needs 3-D Secure, pending, completed, failed, canceled, expired) with the redirect once finished |
 | POST | `/checkout-sessions/{sessionId}/complete` | the page's actions: `pay` (with a test card or test wallet, OTP and PIN), `decline` (reason), `cancel`, `delay`, `require_three_ds`, `three_ds_approve`, `three_ds_fail`; `422` "Use a test card" for a real card number (never stored), `409` for a closed session |
+| GET/POST | `/payments/subscriptions` | subscriptions, newest first; `POST` takes the gateway, customer, plan name, amount, currency, interval (`day`, `week`, `month`, `year`), trial days and the test card that pays each renewal (Phase 4) |
+| GET | `/payments/subscriptions/{subscriptionId}` | one subscription with its timeline and renewal payments |
+| POST | `/payments/subscriptions/{subscriptionId}/advance` | the subscription's own clock moves to the next renewal: the card is charged as a payment through the gateway (`subscription.renewed`, or `subscription.payment_failed` and `past_due`); one cancelled at period end ends (`subscription.canceled`); `409` once canceled |
+| POST | `/payments/subscriptions/{subscriptionId}/cancel` | now (`subscription.canceled`), or `at_period_end` |
 | GET | `/wait/payment?status=succeeded&timeout=10s` | wait helper for tests |
 
 CLI and MCP: every payment operation has a command and a tool, listed in [14-ai-integration.md](14-ai-integration.md#command-tree) from the [surface catalogue](20-surface-parity.md); for example `sendmock payments simulate` and `sendmock_payment_simulate`, and `sendmock payments checkout complete` and `sendmock_checkout_complete` to finish a test checkout from a script or an agent.

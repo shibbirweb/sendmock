@@ -42,7 +42,7 @@ export type InlineSmsMedia = {
   filename: string;
   /**
    * The file bytes, base64 encoded.
-   * @example "/9j/4AAQSkZJRgABAQ"
+   * @example "/9j/4AAQSkZJRgABAQ=="
    */
   content: string;
   /**
@@ -84,6 +84,11 @@ export type SmsMessage = {
   in_reply_to_sms_id: Ulid | null;
   created_at: IsoTimestamp;
   updated_at: IsoTimestamp;
+  /**
+   * The project the message was sent to: `default` unless the sender named another (PL-10).
+   * @example "default"
+   */
+  project: string;
 };
 
 /** A verb of the TwiML an app answered with (SM-09.7). */
@@ -94,9 +99,15 @@ export type TwimlVerb =
       to: string | null;
       from: string | null;
       status_callback: string | null;
+      /** Requested once the reply is sent, with `method`. */
+      action: string | null;
+      method: TwimlMethod;
       media_urls: string[];
     }
-  | { verb: "Redirect"; url: string };
+  | { verb: "Redirect"; url: string; method: TwimlMethod };
+
+/** How a TwiML `action` or `<Redirect>` URL is requested; `POST` by default. */
+export type TwimlMethod = "GET" | "POST";
 
 /** The outcome of an inbound message's reply webhook, for the bubble (SM-09.7). */
 export type SmsReplyWebhookResult = {
@@ -165,6 +176,8 @@ export type SmsListFilters = PageRequest & {
   status?: SmsStatus;
   direction?: SmsDirection;
   thread_id?: string;
+  /** Only this project's items (its key); every project's when not set (PL-10). */
+  project?: string;
 };
 
 /** Body of POST /api/v1/sms (native send). */

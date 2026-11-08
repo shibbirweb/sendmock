@@ -16,6 +16,16 @@ import {
 import { listRecentMockEvents } from "@/mocks/realtime/mock-event-bus";
 
 /** Recent events, integration snippets, scenarios and AI agent setup (UI-11.5). */
+/** The project an event's data names: its email's, SMS's or verification's. */
+function readEventProject(eventData: unknown): string | null {
+  return typeof eventData === "object" &&
+    eventData !== null &&
+    "project" in eventData &&
+    typeof eventData.project === "string"
+    ? eventData.project
+    : null;
+}
+
 export const automationHandlers = [
   http.get("*/api/v1/events/recent", async ({ request }) => {
     await applyMockConditions();
@@ -23,6 +33,7 @@ export const automationHandlers = [
     const sinceMs = Date.parse(eventQuery.get("since") ?? "");
     const eventType = eventQuery.get("type");
     const limit = Number(eventQuery.get("limit") ?? 50) || 50;
+    const projectKey = eventQuery.get("project");
 
     return HttpResponse.json(
       listRecentMockEvents()
@@ -32,7 +43,10 @@ export const automationHandlers = [
               Date.parse(appEvent.created_at) > sinceMs) &&
             (eventType === null ||
               eventType === "" ||
-              appEvent.type === eventType),
+              appEvent.type === eventType) &&
+            (projectKey === null ||
+              projectKey === "" ||
+              readEventProject(appEvent.data) === projectKey),
         )
         .slice(0, limit),
     );

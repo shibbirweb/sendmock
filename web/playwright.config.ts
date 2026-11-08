@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const e2ePort = 5180;
+const timingSpecs = /performance\.spec\.ts$/;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -17,6 +18,14 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: timingSpecs,
+    },
+    {
+      // Timing budgets run on their own with one worker (CI runs them after the shard), so
+      // another test's work on the same runner cannot push them over.
+      name: "timing",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: timingSpecs,
     },
   ],
   webServer: {

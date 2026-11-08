@@ -123,6 +123,27 @@ export function validateAppSettingsUpdate(
     "Choose 0 to 60,000 ms",
   );
 
+  checkRange(
+    fieldErrors,
+    settingsUpdate,
+    "verify_default_code_length",
+    [4, 10],
+    "Choose 4 to 10 digits",
+  );
+  checkRange(
+    fieldErrors,
+    settingsUpdate,
+    "verify_default_ttl_seconds",
+    [60, 86_400],
+    "Choose 60 to 86,400 seconds",
+  );
+  if (
+    typeof settingsUpdate.verify_fixed_code === "string" &&
+    !/^\d{4,10}$/.test(settingsUpdate.verify_fixed_code)
+  ) {
+    fieldErrors.verify_fixed_code =
+      "Use 4 to 10 digits, or leave it empty for random codes";
+  }
   if (
     settingsUpdate.chaos_smtp_reject_code !== undefined &&
     !chaosSmtpRejectCodes.includes(settingsUpdate.chaos_smtp_reject_code)

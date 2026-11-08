@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sendmock.fullname" . }}
+  labels:
+    {{- include "sendmock.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "sendmock.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.service.httpPort }}
+      targetPort: http
+    - name: smtp
+      port: {{ .Values.service.smtpPort }}
+      targetPort: smtp
+    {{- if .Values.providerPort.enabled }}
+    - name: provider
+      port: {{ .Values.providerPort.port }}
+      targetPort: provider
+    {{- end }}

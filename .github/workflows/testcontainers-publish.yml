@@ -1,0 +1,72 @@
+# Publishes the Testcontainers modules that use stored secrets under the release's version
+# (DS-06, plan 30 W3b). Release build calls it after the GitHub release is published. Maven
+# Central is skipped until the owner sets MAVEN_CENTRAL_USERNAME, MAVEN_CENTRAL_TOKEN and
+# MAVEN_SIGNING_KEY. The Go module needs no registry: its tag is enough for `go get`. The npm,
+# PyPI and NuGet modules use trusted publishing, so they publish from registry-publish.yml, a
+# top-level workflow (plan 30 W18).
+name: Testcontainers publish
+
+on:
+  workflow_call:
+    inputs:
+      commit_sha:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      channel:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  java:
+    name: Maven Central (io.github.shibbirweb:sendmock-testcontainers)
+    runs-on: ubuntu-latest
+    env:
+      HAS_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.HAS_CENTRAL_TOKEN == 'true'
+        with:
+          ref: ${{ inputs.commit_sha }}
+      - uses: actions/setup-java@v5
+        if: env.HAS_CENTRAL_TOKEN == 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.MAVEN_SIGNING_KEY }}
+      - name: Sign and publish
+        if: env.HAS_CENTRAL_TOKEN == 'true'
+        working-directory: testcontainers/java
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+        run: mvn --batch-mode -P release -DskipTests deploy
+
+  go:
+    name: Go module tag (testcontainers/go/v${{ inputs.version }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.commit_sha }}
+      # A Go module in a subfolder is versioned by a tag with the folder in front.
+      - name: Tag the Go module at the release commit
+        env:
+          GO_TAG: testcontainers/go/v${{ inputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$GO_TAG" > /dev/null; then
+            echo "$GO_TAG already exists."
+            exit 0
+          fi
+          git tag "$GO_TAG" "${{ inputs.commit_sha }}"
+          git push origin "refs/tags/$GO_TAG"

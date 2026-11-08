@@ -21,6 +21,7 @@ on:
       - "docs/wiki/**"
       - "scripts/build-pages-site.ts"
       - "scripts/build-docs-versions.ts"
+      - "scripts/release/package-repository.sh"
       - ".github/workflows/website.yml"
   pull_request:
     paths:
@@ -44,8 +45,55 @@ permissions:
   contents: read
 
 jobs:
+  # Our signed APT and YUM repository under /packages/, rebuilt on every deploy from the newest
+  # stable and the newest beta release's .deb and .rpm files, once the owner has set
+  # PACKAGES_GPG_PRIVATE_KEY (DS-03.3, plan 30 W4).
+  package-repository:
+    name: APT and YUM repository
+    runs-on: ubuntu-latest
+    outputs:
+      has_repository: ${{ steps.build.outputs.has_repository }}
+    env:
+      HAS_SIGNING_KEY: ${{ secrets.PACKAGES_GPG_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        if: github.event_name != 'pull_request' && env.HAS_SIGNING_KEY == 'true'
+
+      - name: Download the newest stable and beta packages and build the repository
+        id: build
+        if: github.event_name != 'pull_request' && env.HAS_SIGNING_KEY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGNING_KEY: ${{ secrets.PACKAGES_GPG_PRIVATE_KEY }}
+        run: |
+          sudo apt-get install -y -qq apt-utils createrepo-c > /dev/null
+          echo "$SIGNING_KEY" | gpg --batch --import
+          releases_json="$(gh release list --exclude-drafts --limit 100 --json tagName,isPrerelease)"
+          stable_tag="$(echo "$releases_json" | jq -r '[.[] | select(.isPrerelease | not) | select(.tagName | test("^v[0-9]"))][0].tagName // empty')"
+          beta_tag="$(echo "$releases_json" | jq -r '[.[] | select(.tagName | test("^v[0-9].*-beta"))][0].tagName // empty')"
+          for channel in stable beta; do
+            mkdir -p "channels/$channel"
+            channel_tag="$stable_tag"
+            if [ "$channel" = "beta" ]; then channel_tag="$beta_tag"; fi
+            if [ -n "$channel_tag" ]; then
+              gh release download "$channel_tag" --dir "channels/$channel" --pattern '*.deb' --pattern '*.rpm'
+            fi
+          done
+          if ls channels/*/*.deb > /dev/null 2>&1; then
+            sh scripts/release/package-repository.sh channels package-repository "https://shibbirweb.github.io/${{ github.event.repository.name }}/packages"
+            echo "has_repository=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/upload-artifact@v6
+        if: steps.build.outputs.has_repository == 'true'
+        with:
+          name: package-repository
+          path: package-repository
+          retention-days: 1
+
   build:
     name: Build
+    needs: package-repository
     runs-on: ubuntu-latest
     # Playwright's own image has the browser and its system packages, as in ci.yml.
     # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
@@ -121,6 +169,13 @@ jobs:
           # The checkout belongs to another user than the container's root.
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           bun scripts/build-docs-versions.ts
+
+      - name: Our APT and YUM repository at /packages/
+        if: github.event_name != 'pull_request' && needs.package-repository.outputs.has_repository == 'true'
+        uses: actions/download-artifact@v7
+        with:
+          name: package-repository
+          path: website/out/packages
 
       - name: Upload
         if: github.event_name != 'pull_request'

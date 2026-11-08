@@ -49,7 +49,10 @@ export function useEndpointRequestPreview(
   );
   const renderRequest = fixedRenderRequest ?? toRenderRequest(pickedOption);
   const renderRequestText = JSON.stringify(renderRequest);
-  const previewRequest = React.useMemo<EndpointPreviewRequest>(() => {
+  // The editor always sends its settings, so the shown result names its parts from them.
+  const previewRequest = React.useMemo<
+    EndpointPreviewRequest & { endpoint: WebhookEndpointInput }
+  >(() => {
     const debouncedInput = JSON.parse(debouncedInputText) as {
       endpointInput: WebhookEndpointInput;
       variables: Record<string, string>;

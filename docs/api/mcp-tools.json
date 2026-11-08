@@ -567,6 +567,205 @@
       ]
     },
     {
+      "name": "sendmock_email_click",
+      "toolset": "email",
+      "summary": "Record a click on one of the email's links and fire email.clicked.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "postEmailsByEmailIdClicks",
+          "summary": "Record a click on one of the email's links and fire email.clicked.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The link that was clicked; one of the email's links (`extracted.links`).",
+          "example": "https://app.test/verify?token=abc123"
+        },
+        {
+          "name": "source",
+          "input": {
+            "name": "source",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "ui",
+            "manual",
+            "api"
+          ],
+          "description": "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.",
+          "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The link that was clicked; one of the email's links (`extracted.links`).",
+            "examples": [
+              "https://app.test/verify?token=abc123"
+            ]
+          },
+          "source": {
+            "$ref": "#/$defs/OpenSource",
+            "description": "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.",
+            "examples": [
+              "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+            ]
+          }
+        },
+        "required": [
+          "email_id",
+          "url"
+        ],
+        "$defs": {
+          "OpenSource": {
+            "type": "string",
+            "enum": [
+              "ui",
+              "manual",
+              "api"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "url": "https://app.test/verify?token=abc123",
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+      },
+      "output": null,
+      "cli": [
+        "sendmock email click <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > click a link in the preview, or Simulate click"
+      ]
+    },
+    {
+      "name": "sendmock_email_clicks",
+      "toolset": "email",
+      "summary": "Every recorded click on the email's links, newest first.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/clicks",
+          "operation_id": "getEmailsByEmailIdClicks",
+          "summary": "Every recorded click on the email's links, newest first.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "email_id"
+        ]
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "EmailClickRecord[]",
+      "cli": [
+        "sendmock email clicks <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > Timeline (clicked entries)"
+      ]
+    },
+    {
       "name": "sendmock_email_delete",
       "toolset": "email",
       "summary": "Delete one email.",
@@ -631,7 +830,7 @@
     {
       "name": "sendmock_email_delete_all",
       "toolset": "email",
-      "summary": "Delete every email.",
+      "summary": "Delete every email, or only those that match the filters.",
       "area": "Email",
       "area_slug": "email",
       "operations": [
@@ -639,7 +838,7 @@
           "method": "DELETE",
           "path": "/api/v1/emails",
           "operation_id": "deleteEmails",
-          "summary": "Delete every email.",
+          "summary": "Delete every email, or only those that match the filters.",
           "area_slug": "email",
           "selector": null
         }
@@ -650,12 +849,208 @@
         "destructive_hint": true,
         "idempotent_hint": true
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "query",
+          "input": {
+            "name": "query",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Search text; supports from:, to: and tag: prefixes.",
+          "example": "to:user@example.test reset"
+        },
+        {
+          "name": "from",
+          "input": {
+            "name": "from",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Sender contains.",
+          "example": "no-reply@shop.test"
+        },
+        {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A recipient contains.",
+          "example": "user@example.test"
+        },
+        {
+          "name": "tag",
+          "input": {
+            "name": "tag",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Has this tag.",
+          "example": "signup"
+        },
+        {
+          "name": "is_unread",
+          "input": {
+            "name": "is_unread",
+            "location": "query"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only unread.",
+          "example": true
+        },
+        {
+          "name": "has_attachment",
+          "input": {
+            "name": "has_attachment",
+            "location": "query"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only with attachments.",
+          "example": true
+        },
+        {
+          "name": "source",
+          "input": {
+            "name": "source",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+          "example": "smtp"
+        },
+        {
+          "name": "direction",
+          "input": {
+            "name": "direction",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "outbound",
+            "inbound"
+          ],
+          "description": "Outbound from your app or inbound to it.",
+          "example": "outbound"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search text; supports from:, to: and tag: prefixes.",
+            "examples": [
+              "to:user@example.test reset"
+            ]
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender contains.",
+            "examples": [
+              "no-reply@shop.test"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "description": "A recipient contains.",
+            "examples": [
+              "user@example.test"
+            ]
+          },
+          "tag": {
+            "type": "string",
+            "description": "Has this tag.",
+            "examples": [
+              "signup"
+            ]
+          },
+          "is_unread": {
+            "type": "boolean",
+            "description": "Only unread.",
+            "examples": [
+              true
+            ]
+          },
+          "has_attachment": {
+            "type": "boolean",
+            "description": "Only with attachments.",
+            "examples": [
+              true
+            ]
+          },
+          "source": {
+            "$ref": "#/$defs/EmailSource",
+            "description": "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid.",
+            "examples": [
+              "smtp"
+            ]
+          },
+          "direction": {
+            "$ref": "#/$defs/EmailDirection",
+            "description": "Outbound from your app or inbound to it.",
+            "examples": [
+              "outbound"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          }
+        },
+        "$defs": {
+          "EmailDirection": {
+            "type": "string",
+            "enum": [
+              "outbound",
+              "inbound"
+            ],
+            "description": "`outbound`: mail your app sent; `inbound`: mail coming in to your app."
+          },
+          "EmailSource": {
+            "type": "string",
+            "description": "How an email reached SendMock: a transport (`smtp`, `sendmail`, `native_api`, `verify`, `simulated`) or the key of the email provider whose API it was sent through (`sendgrid`, or a custom provider's key; docs/plan/22).",
+            "examples": [
+              "sendgrid"
+            ]
+          }
+        }
       },
-      "example_arguments": {},
+      "example_arguments": {
+        "query": "to:user@example.test reset",
+        "from": "no-reply@shop.test"
+      },
       "output": null,
       "cli": [
         "sendmock email delete-all --yes"
@@ -1116,6 +1511,18 @@
           "allowed_values": null,
           "description": "Subject contains.",
           "example": "Reset your password"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -1134,6 +1541,13 @@
             "examples": [
               "Reset your password"
             ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
           }
         },
         "required": [
@@ -1142,7 +1556,8 @@
       },
       "example_arguments": {
         "to": "user@example.test",
-        "subject": "Reset your password"
+        "subject": "Reset your password",
+        "project": "shop"
       },
       "output": "EmailDetail",
       "cli": [
@@ -1299,6 +1714,18 @@
           ],
           "description": "Outbound from your app or inbound to it.",
           "example": "outbound"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -1372,6 +1799,13 @@
             "description": "Outbound from your app or inbound to it.",
             "examples": [
               "outbound"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -1517,6 +1951,18 @@
           ],
           "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
           "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
         }
       ],
       "input_schema": {
@@ -1534,6 +1980,13 @@
             "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
             "examples": [
               "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
           }
         },
@@ -1553,7 +2006,8 @@
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "source": "api"
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
       },
       "output": null,
       "cli": [
@@ -1561,6 +2015,68 @@
       ],
       "ui": [
         "Mail > open email (opening it fires the open)"
+      ]
+    },
+    {
+      "name": "sendmock_email_opens",
+      "toolset": "email",
+      "summary": "Every recorded open of the email, oldest first.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/{emailId}/opens",
+          "operation_id": "getEmailsByEmailIdOpens",
+          "summary": "Every recorded open of the email, oldest first.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "email_id",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The email's ID, from `GET /api/v1/emails`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "email_id"
+        ]
+      },
+      "example_arguments": {
+        "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "OpenRecord[]",
+      "cli": [
+        "sendmock email opens <emailId>"
+      ],
+      "ui": [
+        "Mail > open email > Timeline (opened entries)"
       ]
     },
     {
@@ -2384,6 +2900,7 @@
               "tags",
               "template_id",
               "template_data",
+              "raw",
               "body",
               "media_urls",
               "messaging_service",
@@ -3467,6 +3984,7 @@
               "tags",
               "template_id",
               "template_data",
+              "raw",
               "body",
               "media_urls",
               "messaging_service",
@@ -4740,6 +5258,18 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -4771,6 +5301,13 @@
             "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
             "examples": [
               "10s"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         }
@@ -4845,6 +5382,18 @@
           "allowed_values": null,
           "description": "At most this many (default 50).",
           "example": 50
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only events about this project's emails, SMS and verifications (its key); every event when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -4869,6 +5418,13 @@
             "description": "At most this many (default 50).",
             "examples": [
               50
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only events about this project's emails, SMS and verifications (its key); every event when not set.",
+            "examples": [
+              "shop"
             ]
           }
         }
@@ -5026,7 +5582,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -5475,7 +6031,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -6587,7 +7143,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -8072,6 +8628,18 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's emails (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -8090,6 +8658,13 @@
             "examples": [
               "10s"
             ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's emails (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
           }
         },
         "required": [
@@ -8098,7 +8673,8 @@
       },
       "example_arguments": {
         "to": "user@example.test",
-        "timeout": "10s"
+        "timeout": "10s",
+        "project": "shop"
       },
       "output": "LinksLookup",
       "cli": [
@@ -9433,6 +10009,18 @@
           "allowed_values": null,
           "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -9457,6 +10045,13 @@
             "description": "Waits up to this long for one to arrive, e.g. 10s (at most 60s); 408 on timeout. Without it the answer is immediate.",
             "examples": [
               "10s"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -9886,7 +10481,7 @@
     {
       "name": "sendmock_outcome_rule_list",
       "toolset": "rules",
-      "summary": "email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
+      "summary": "Email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
       "operations": [
@@ -9894,7 +10489,7 @@
           "method": "GET",
           "path": "/api/v1/outcome-rules/email",
           "operation_id": "getOutcomeRulesEmail",
-          "summary": "email outcome rules, checked from top to bottom.",
+          "summary": "Email outcome rules, checked from top to bottom.",
           "area_slug": "outcome-rules",
           "selector": {
             "input": "channel",
@@ -9929,7 +10524,7 @@
             "email",
             "sms"
           ],
-          "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+          "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
           "example": "email"
         }
       ],
@@ -9942,7 +10537,7 @@
               "email",
               "sms"
             ],
-            "description": "Picks what to do. `email`: email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
+            "description": "Picks what to do. `email`: Email outcome rules, checked from top to bottom. `sms`: SMS outcome rules, checked from top to bottom.",
             "examples": [
               "email"
             ]
@@ -10560,6 +11155,232 @@
       ]
     },
     {
+      "name": "sendmock_payment_create",
+      "toolset": "payments",
+      "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments",
+          "operation_id": "postPayments",
+          "summary": "Create a payment and pay it with a test card, as an app's server does without a checkout page.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The gateway key, e.g. `stripe` or `sslcommerz`.",
+          "example": "stripe"
+        },
+        {
+          "name": "amount_minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.",
+          "example": 1999
+        },
+        {
+          "name": "currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Three letters, stored in capitals; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "name": "card_number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.",
+          "example": "4242424242424242"
+        },
+        {
+          "name": "customer_email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The customer's email.",
+          "example": "user@example.test"
+        },
+        {
+          "name": "line_items",
+          "input": {
+            "name": "line_items",
+            "location": "body"
+          },
+          "type": "object[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "What is being bought.",
+          "example": [
+            {
+              "name": "T-shirt",
+              "quantity": 1,
+              "unit_amount_minor": 1999
+            }
+          ]
+        },
+        {
+          "name": "capture_method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "automatic"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The gateway key, e.g. `stripe` or `sslcommerz`.",
+            "examples": [
+              "stripe"
+            ]
+          },
+          "amount_minor": {
+            "type": "number",
+            "description": "The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.",
+            "examples": [
+              1999
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "Three letters, stored in capitals; Settings > Payments' default currency when left out.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "card_number": {
+            "type": "string",
+            "description": "A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.",
+            "examples": [
+              "4242424242424242"
+            ]
+          },
+          "customer_email": {
+            "type": "string",
+            "description": "The customer's email.",
+            "examples": [
+              "user@example.test"
+            ]
+          },
+          "line_items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unit_amount_minor": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "quantity",
+                "unit_amount_minor"
+              ]
+            },
+            "description": "What is being bought.",
+            "examples": [
+              [
+                {
+                  "name": "T-shirt",
+                  "quantity": 1,
+                  "unit_amount_minor": 1999
+                }
+              ]
+            ]
+          },
+          "capture_method": {
+            "$ref": "#/$defs/PaymentCaptureMethod",
+            "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+            "examples": [
+              "automatic"
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "amount_minor",
+          "card_number"
+        ],
+        "$defs": {
+          "PaymentCaptureMethod": {
+            "type": "string",
+            "enum": [
+              "automatic",
+              "manual"
+            ],
+            "description": "`manual` holds the money as `authorized` until it is captured or voided."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider": "stripe",
+        "amount_minor": 1999,
+        "card_number": "4242424242424242",
+        "currency": "USD",
+        "customer_email": "user@example.test"
+      },
+      "output": "PaymentDetail",
+      "cli": [
+        "sendmock payments create"
+      ],
+      "ui": [
+        "Payments > New payment"
+      ]
+    },
+    {
       "name": "sendmock_payment_create_checkout",
       "toolset": "payments",
       "summary": "Start a hosted checkout on a gateway and get its payment page URL.",
@@ -10647,6 +11468,21 @@
               "unit_amount_minor": 1999
             }
           ]
+        },
+        {
+          "name": "capture_method",
+          "input": {
+            "name": "capture_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "automatic",
+            "manual"
+          ],
+          "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+          "example": "manual"
         }
       ],
       "input_schema": {
@@ -10711,12 +11547,29 @@
                 }
               ]
             ]
+          },
+          "capture_method": {
+            "$ref": "#/$defs/PaymentCaptureMethod",
+            "description": "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out.",
+            "examples": [
+              "manual"
+            ]
           }
         },
         "required": [
           "provider",
           "amount_minor"
-        ]
+        ],
+        "$defs": {
+          "PaymentCaptureMethod": {
+            "type": "string",
+            "enum": [
+              "automatic",
+              "manual"
+            ],
+            "description": "`manual` holds the money as `authorized` until it is captured or voided."
+          }
+        }
       },
       "example_arguments": {
         "provider": "stripe",
@@ -12270,24 +13123,6 @@
           "type": "string",
           "is_required": true,
           "allowed_values": [
-            "email.received",
-            "email.inbound",
-            "email.opened",
-            "email.delivered",
-            "email.deferred",
-            "email.bounced",
-            "email.complained",
-            "email.unsubscribed",
-            "email.released",
-            "email.deleted",
-            "sms.sent",
-            "sms.status",
-            "sms.opened",
-            "sms.inbound",
-            "verify.started",
-            "verify.checked",
-            "verify.expired",
-            "http.captured",
             "payment.created",
             "payment.authorized",
             "payment.succeeded",
@@ -12296,12 +13131,10 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
-            "checkout.expired",
-            "webhook.delivered",
-            "webhook.failed",
-            "test.ping"
+            "checkout.expired"
           ],
           "description": "The native event to render the notification for.",
           "example": "payment.succeeded"
@@ -12414,43 +13247,6 @@
           "redirect_outcome"
         ],
         "$defs": {
-          "AppEventType": {
-            "type": "string",
-            "enum": [
-              "email.received",
-              "email.inbound",
-              "email.opened",
-              "email.delivered",
-              "email.deferred",
-              "email.bounced",
-              "email.complained",
-              "email.unsubscribed",
-              "email.released",
-              "email.deleted",
-              "sms.sent",
-              "sms.status",
-              "sms.opened",
-              "sms.inbound",
-              "verify.started",
-              "verify.checked",
-              "verify.expired",
-              "http.captured",
-              "payment.created",
-              "payment.authorized",
-              "payment.succeeded",
-              "payment.failed",
-              "payment.canceled",
-              "payment.refunded",
-              "payment.partially_refunded",
-              "payment.dispute_opened",
-              "payment.dispute_closed",
-              "checkout.completed",
-              "checkout.expired",
-              "webhook.delivered",
-              "webhook.failed",
-              "test.ping"
-            ]
-          },
           "GatewayCredential": {
             "type": "object",
             "properties": {
@@ -12543,7 +13339,21 @@
             "description": "A field sent back to the app on redirect, from a template."
           },
           "PaymentEventType": {
-            "$ref": "#/$defs/AppEventType",
+            "type": "string",
+            "enum": [
+              "payment.created",
+              "payment.authorized",
+              "payment.succeeded",
+              "payment.failed",
+              "payment.canceled",
+              "payment.refunded",
+              "payment.partially_refunded",
+              "payment.dispute_opened",
+              "payment.dispute_updated",
+              "payment.dispute_closed",
+              "checkout.completed",
+              "checkout.expired"
+            ],
             "description": "A native event a payment notification can carry."
           },
           "PaymentGatewayInput": {
@@ -12643,60 +13453,6 @@
               "event_names": {
                 "type": "object",
                 "properties": {
-                  "email.received": {
-                    "type": "string"
-                  },
-                  "email.inbound": {
-                    "type": "string"
-                  },
-                  "email.opened": {
-                    "type": "string"
-                  },
-                  "email.delivered": {
-                    "type": "string"
-                  },
-                  "email.deferred": {
-                    "type": "string"
-                  },
-                  "email.bounced": {
-                    "type": "string"
-                  },
-                  "email.complained": {
-                    "type": "string"
-                  },
-                  "email.unsubscribed": {
-                    "type": "string"
-                  },
-                  "email.released": {
-                    "type": "string"
-                  },
-                  "email.deleted": {
-                    "type": "string"
-                  },
-                  "sms.sent": {
-                    "type": "string"
-                  },
-                  "sms.status": {
-                    "type": "string"
-                  },
-                  "sms.opened": {
-                    "type": "string"
-                  },
-                  "sms.inbound": {
-                    "type": "string"
-                  },
-                  "verify.started": {
-                    "type": "string"
-                  },
-                  "verify.checked": {
-                    "type": "string"
-                  },
-                  "verify.expired": {
-                    "type": "string"
-                  },
-                  "http.captured": {
-                    "type": "string"
-                  },
                   "payment.created": {
                     "type": "string"
                   },
@@ -12721,6 +13477,9 @@
                   "payment.dispute_opened": {
                     "type": "string"
                   },
+                  "payment.dispute_updated": {
+                    "type": "string"
+                  },
                   "payment.dispute_closed": {
                     "type": "string"
                   },
@@ -12729,36 +13488,9 @@
                   },
                   "checkout.expired": {
                     "type": "string"
-                  },
-                  "webhook.delivered": {
-                    "type": "string"
-                  },
-                  "webhook.failed": {
-                    "type": "string"
-                  },
-                  "test.ping": {
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "email.received",
-                  "email.inbound",
-                  "email.opened",
-                  "email.delivered",
-                  "email.deferred",
-                  "email.bounced",
-                  "email.complained",
-                  "email.unsubscribed",
-                  "email.released",
-                  "email.deleted",
-                  "sms.sent",
-                  "sms.status",
-                  "sms.opened",
-                  "sms.inbound",
-                  "verify.started",
-                  "verify.checked",
-                  "verify.expired",
-                  "http.captured",
                   "payment.created",
                   "payment.authorized",
                   "payment.succeeded",
@@ -12767,12 +13499,10 @@
                   "payment.refunded",
                   "payment.partially_refunded",
                   "payment.dispute_opened",
+                  "payment.dispute_updated",
                   "payment.dispute_closed",
                   "checkout.completed",
-                  "checkout.expired",
-                  "webhook.delivered",
-                  "webhook.failed",
-                  "test.ping"
+                  "checkout.expired"
                 ],
                 "description": "The gateway's name for each native event; blank sends nothing.",
                 "examples": [
@@ -13285,60 +14015,6 @@
           "event_names": {
             "type": "object",
             "properties": {
-              "email.received": {
-                "type": "string"
-              },
-              "email.inbound": {
-                "type": "string"
-              },
-              "email.opened": {
-                "type": "string"
-              },
-              "email.delivered": {
-                "type": "string"
-              },
-              "email.deferred": {
-                "type": "string"
-              },
-              "email.bounced": {
-                "type": "string"
-              },
-              "email.complained": {
-                "type": "string"
-              },
-              "email.unsubscribed": {
-                "type": "string"
-              },
-              "email.released": {
-                "type": "string"
-              },
-              "email.deleted": {
-                "type": "string"
-              },
-              "sms.sent": {
-                "type": "string"
-              },
-              "sms.status": {
-                "type": "string"
-              },
-              "sms.opened": {
-                "type": "string"
-              },
-              "sms.inbound": {
-                "type": "string"
-              },
-              "verify.started": {
-                "type": "string"
-              },
-              "verify.checked": {
-                "type": "string"
-              },
-              "verify.expired": {
-                "type": "string"
-              },
-              "http.captured": {
-                "type": "string"
-              },
               "payment.created": {
                 "type": "string"
               },
@@ -13363,6 +14039,9 @@
               "payment.dispute_opened": {
                 "type": "string"
               },
+              "payment.dispute_updated": {
+                "type": "string"
+              },
               "payment.dispute_closed": {
                 "type": "string"
               },
@@ -13371,36 +14050,9 @@
               },
               "checkout.expired": {
                 "type": "string"
-              },
-              "webhook.delivered": {
-                "type": "string"
-              },
-              "webhook.failed": {
-                "type": "string"
-              },
-              "test.ping": {
-                "type": "string"
               }
             },
             "required": [
-              "email.received",
-              "email.inbound",
-              "email.opened",
-              "email.delivered",
-              "email.deferred",
-              "email.bounced",
-              "email.complained",
-              "email.unsubscribed",
-              "email.released",
-              "email.deleted",
-              "sms.sent",
-              "sms.status",
-              "sms.opened",
-              "sms.inbound",
-              "verify.started",
-              "verify.checked",
-              "verify.expired",
-              "http.captured",
               "payment.created",
               "payment.authorized",
               "payment.succeeded",
@@ -13409,12 +14061,10 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
-              "checkout.expired",
-              "webhook.delivered",
-              "webhook.failed",
-              "test.ping"
+              "checkout.expired"
             ],
             "description": "The gateway's name for each native event; blank sends nothing.",
             "examples": [
@@ -15021,12 +15671,13 @@
             "decline",
             "refund",
             "dispute",
+            "answer_dispute",
             "resolve_dispute",
             "expire",
             "capture",
             "void"
           ],
-          "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
+          "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
           "example": "refund"
         },
         {
@@ -15074,6 +15725,18 @@
           ],
           "description": "For `resolve_dispute`: `won` or `lost`.",
           "example": "won"
+        },
+        {
+          "name": "dispute_evidence",
+          "input": {
+            "name": "dispute_evidence",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "For `answer_dispute`: the evidence sent to the bank.",
+          "example": "Signed delivery receipt attached."
         }
       ],
       "input_schema": {
@@ -15088,7 +15751,7 @@
           },
           "action": {
             "$ref": "#/$defs/PaymentSimulateAction",
-            "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
+            "description": "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`.",
             "examples": [
               "refund"
             ]
@@ -15117,6 +15780,13 @@
             "examples": [
               "won"
             ]
+          },
+          "dispute_evidence": {
+            "type": "string",
+            "description": "For `answer_dispute`: the evidence sent to the bank.",
+            "examples": [
+              "Signed delivery receipt attached."
+            ]
           }
         },
         "required": [
@@ -15142,6 +15812,7 @@
               "decline",
               "refund",
               "dispute",
+              "answer_dispute",
               "resolve_dispute",
               "expire",
               "capture",
@@ -15351,6 +16022,831 @@
       ],
       "ui": [
         "Payments (new and changed payments appear live)"
+      ]
+    },
+    {
+      "name": "sendmock_project_create",
+      "toolset": "core",
+      "summary": "Add a project that apps can send traffic to by its key.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/projects",
+          "operation_id": "postProjects",
+          "summary": "Add a project that apps can send traffic to by its key.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "key",
+          "input": {
+            "name": "key",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.",
+          "example": "shop"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the project, shown in the UI.",
+            "examples": [
+              "Shop"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ]
+      },
+      "example_arguments": {
+        "key": "shop",
+        "name": "Shop"
+      },
+      "output": "Project",
+      "cli": [
+        "sendmock projects create"
+      ],
+      "ui": [
+        "Settings > Projects > New project"
+      ]
+    },
+    {
+      "name": "sendmock_project_delete",
+      "toolset": "core",
+      "summary": "Delete a project with its emails, SMS and verifications.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "deleteProjectsByProjectKey",
+          "summary": "Delete a project with its emails, SMS and verifications.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project_key",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "description": "The project's key, from the list of projects.",
+            "examples": [
+              "shop"
+            ]
+          }
+        },
+        "required": [
+          "project_key"
+        ]
+      },
+      "example_arguments": {
+        "project_key": "shop"
+      },
+      "output": null,
+      "cli": [
+        "sendmock projects delete <projectKey>"
+      ],
+      "ui": [
+        "Settings > Projects > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_project_list",
+      "toolset": "core",
+      "summary": "Every project, default first, with the traffic each holds.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "operation_id": "getProjects",
+          "summary": "Every project, default first, with the traffic each holds.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "Project[]",
+      "cli": [
+        "sendmock projects list"
+      ],
+      "ui": [
+        "Settings > Projects"
+      ]
+    },
+    {
+      "name": "sendmock_project_update",
+      "toolset": "core",
+      "summary": "Rename a project; its key stays the same.",
+      "area": "Projects",
+      "area_slug": "projects",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/projects/{projectKey}",
+          "operation_id": "patchProjectsByProjectKey",
+          "summary": "Rename a project; its key stays the same.",
+          "area_slug": "projects",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project_key",
+          "input": {
+            "name": "projectKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The project's key, from the list of projects.",
+          "example": "shop"
+        },
+        {
+          "name": "name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the project, shown in the UI.",
+          "example": "Shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "description": "The project's key, from the list of projects.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the project, shown in the UI.",
+            "examples": [
+              "Shop"
+            ]
+          }
+        },
+        "required": [
+          "project_key",
+          "name"
+        ]
+      },
+      "example_arguments": {
+        "project_key": "shop",
+        "name": "Shop"
+      },
+      "output": "Project",
+      "cli": [
+        "sendmock projects update <projectKey>"
+      ],
+      "ui": [
+        "Settings > Projects > Rename"
+      ]
+    },
+    {
+      "name": "sendmock_push_delete",
+      "toolset": "core",
+      "summary": "Delete one push notification.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "deletePushByPushId",
+          "summary": "Delete one push notification.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "push_id",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "push_id": {
+            "type": "string",
+            "description": "The notification's id, from `GET /api/v1/push`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "push_id"
+        ]
+      },
+      "example_arguments": {
+        "push_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock push delete <pushId>"
+      ],
+      "ui": [
+        "Push > open a notification > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_push_delete_all",
+      "toolset": "core",
+      "summary": "Delete every push notification, or one project's.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/push",
+          "operation_id": "deletePush",
+          "summary": "Delete every push notification, or one project's.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "device_token": {
+            "type": "string",
+            "description": "Only notifications to this device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/PushProvider",
+            "description": "fcm, expo or onesignal.",
+            "examples": [
+              "fcm"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/PushStatus",
+            "description": "sent or failed.",
+            "examples": [
+              "sent"
+            ]
+          }
+        },
+        "$defs": {
+          "PushProvider": {
+            "type": "string",
+            "enum": [
+              "fcm",
+              "expo",
+              "onesignal"
+            ]
+          },
+          "PushStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "project": "shop",
+        "device_token": "dQw4w9WgXcQ:APA91bE1"
+      },
+      "output": null,
+      "cli": [
+        "sendmock push clear"
+      ],
+      "ui": [
+        "Push > Clear all"
+      ]
+    },
+    {
+      "name": "sendmock_push_get",
+      "toolset": "core",
+      "summary": "One push notification with its request and answer.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "getPushByPushId",
+          "summary": "One push notification with its request and answer.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "push_id",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "push_id": {
+            "type": "string",
+            "description": "The notification's id, from `GET /api/v1/push`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "push_id"
+        ]
+      },
+      "example_arguments": {
+        "push_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PushNotification",
+      "cli": [
+        "sendmock push show <pushId>"
+      ],
+      "ui": [
+        "Push > open a notification"
+      ]
+    },
+    {
+      "name": "sendmock_push_list",
+      "toolset": "core",
+      "summary": "Push notifications, newest first, with filters.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/push",
+          "operation_id": "getPush",
+          "summary": "Push notifications, newest first, with filters.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "cursor",
+          "input": {
+            "name": "cursor",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The next_cursor of the previous page.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "limit",
+          "input": {
+            "name": "limit",
+            "location": "query"
+          },
+          "type": "integer",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Items per page, 1 to 200 (default 50).",
+          "example": 50
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications to this device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "fcm",
+            "expo",
+            "onesignal"
+          ],
+          "description": "fcm, expo or onesignal.",
+          "example": "fcm"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "sent",
+            "failed"
+          ],
+          "description": "sent or failed.",
+          "example": "sent"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "The next_cursor of the previous page.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Items per page, 1 to 200 (default 50).",
+            "examples": [
+              50
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "device_token": {
+            "type": "string",
+            "description": "Only notifications to this device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "provider": {
+            "$ref": "#/$defs/PushProvider",
+            "description": "fcm, expo or onesignal.",
+            "examples": [
+              "fcm"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/PushStatus",
+            "description": "sent or failed.",
+            "examples": [
+              "sent"
+            ]
+          }
+        },
+        "$defs": {
+          "PushProvider": {
+            "type": "string",
+            "enum": [
+              "fcm",
+              "expo",
+              "onesignal"
+            ]
+          },
+          "PushStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "cursor": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "limit": 50
+      },
+      "output": "PageOf_PushNotification",
+      "cli": [
+        "sendmock push list"
+      ],
+      "ui": [
+        "Push"
+      ]
+    },
+    {
+      "name": "sendmock_push_wait",
+      "toolset": "core",
+      "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/wait/push",
+          "operation_id": "getWaitPush",
+          "summary": "Wait until a matching push notification arrives; 408 on timeout.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "device_token",
+          "input": {
+            "name": "device_token",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The device token.",
+          "example": "dQw4w9WgXcQ:APA91bE1"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's notifications (its key); every project's when not set.",
+          "example": "shop"
+        },
+        {
+          "name": "since",
+          "input": {
+            "name": "since",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only notifications sent after this time (default: 30 s ago).",
+          "example": "2026-11-07T10:00:00Z"
+        },
+        {
+          "name": "timeout",
+          "input": {
+            "name": "timeout",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
+          "example": "10s"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "device_token": {
+            "type": "string",
+            "description": "The device token.",
+            "examples": [
+              "dQw4w9WgXcQ:APA91bE1"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's notifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          },
+          "since": {
+            "type": "string",
+            "description": "Only notifications sent after this time (default: 30 s ago).",
+            "examples": [
+              "2026-11-07T10:00:00Z"
+            ]
+          },
+          "timeout": {
+            "type": "string",
+            "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
+            "examples": [
+              "10s"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "device_token": "dQw4w9WgXcQ:APA91bE1",
+        "project": "shop"
+      },
+      "output": "PushNotification",
+      "cli": [
+        "sendmock push wait"
+      ],
+      "ui": [
+        "Push (new notifications appear live)"
       ]
     },
     {
@@ -16271,6 +17767,42 @@
           "allowed_values": null,
           "description": "Used by the `random` outcome profile.",
           "example": 80
+        },
+        {
+          "name": "verify_default_code_length",
+          "input": {
+            "name": "verify_default_code_length",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+          "example": 6
+        },
+        {
+          "name": "verify_default_ttl_seconds",
+          "input": {
+            "name": "verify_default_ttl_seconds",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+          "example": 600
+        },
+        {
+          "name": "verify_fixed_code",
+          "input": {
+            "name": "verify_fixed_code",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+          "example": "123456"
         }
       ],
       "input_schema": {
@@ -16508,6 +18040,30 @@
             "description": "Used by the `random` outcome profile.",
             "examples": [
               80
+            ]
+          },
+          "verify_default_code_length": {
+            "type": "number",
+            "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+            "examples": [
+              6
+            ]
+          },
+          "verify_default_ttl_seconds": {
+            "type": "number",
+            "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+            "examples": [
+              600
+            ]
+          },
+          "verify_fixed_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+            "examples": [
+              "123456"
             ]
           }
         },
@@ -16859,6 +18415,18 @@
           "allowed_values": null,
           "description": "Only this conversation.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -16918,6 +18486,13 @@
             "description": "Only this conversation.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -17004,6 +18579,18 @@
           ],
           "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
           "example": "api"
+        },
+        {
+          "name": "user_agent",
+          "input": {
+            "name": "user_agent",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+          "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
         }
       ],
       "input_schema": {
@@ -17021,6 +18608,13 @@
             "description": "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`.",
             "examples": [
               "api"
+            ]
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
+            "examples": [
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
           }
         },
@@ -17040,7 +18634,8 @@
       },
       "example_arguments": {
         "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "source": "api"
+        "source": "api",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
       },
       "output": null,
       "cli": [
@@ -17048,6 +18643,68 @@
       ],
       "ui": [
         "SMS > message menu > Simulate read"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opens",
+      "toolset": "sms",
+      "summary": "Every recorded read of an outbound message, oldest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/{smsId}/opens",
+          "operation_id": "getSmsBySmsIdOpens",
+          "summary": "Every recorded read of an outbound message, oldest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "sms_id",
+          "input": {
+            "name": "smsId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The SMS's ID, from `GET /api/v1/sms`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sms_id": {
+            "type": "string",
+            "description": "The SMS's ID, from `GET /api/v1/sms`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "sms_id"
+        ]
+      },
+      "example_arguments": {
+        "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "OpenRecord[]",
+      "cli": [
+        "sendmock sms opens <smsId>"
+      ],
+      "ui": [
+        "SMS > message ticks (read)"
       ]
     },
     {
@@ -17871,6 +19528,7 @@
               "tags",
               "template_id",
               "template_data",
+              "raw",
               "body",
               "media_urls",
               "messaging_service",
@@ -18954,6 +20612,7 @@
               "tags",
               "template_id",
               "template_data",
+              "raw",
               "body",
               "media_urls",
               "messaging_service",
@@ -19373,7 +21032,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
@@ -19442,7 +21101,7 @@
               [
                 {
                   "filename": "photo.jpg",
-                  "content": "/9j/4AAQSkZJRgABAQ",
+                  "content": "/9j/4AAQSkZJRgABAQ==",
                   "content_type": "image/jpeg"
                 }
               ]
@@ -19469,7 +21128,7 @@
                 "type": "string",
                 "description": "The file bytes, base64 encoded.",
                 "examples": [
-                  "/9j/4AAQSkZJRgABAQ"
+                  "/9j/4AAQSkZJRgABAQ=="
                 ]
               },
               "content_type": {
@@ -19730,7 +21389,7 @@
           "example": [
             {
               "filename": "photo.jpg",
-              "content": "/9j/4AAQSkZJRgABAQ",
+              "content": "/9j/4AAQSkZJRgABAQ==",
               "content_type": "image/jpeg"
             }
           ]
@@ -19784,7 +21443,7 @@
               [
                 {
                   "filename": "photo.jpg",
-                  "content": "/9j/4AAQSkZJRgABAQ",
+                  "content": "/9j/4AAQSkZJRgABAQ==",
                   "content_type": "image/jpeg"
                 }
               ]
@@ -19811,7 +21470,7 @@
                 "type": "string",
                 "description": "The file bytes, base64 encoded.",
                 "examples": [
-                  "/9j/4AAQSkZJRgABAQ"
+                  "/9j/4AAQSkZJRgABAQ=="
                 ]
               },
               "content_type": {
@@ -19873,12 +21532,35 @@
         "destructive_hint": false,
         "idempotent_hint": false
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          }
+        }
       },
-      "example_arguments": {},
+      "example_arguments": {
+        "project": "shop"
+      },
       "output": "SmsThread[]",
       "cli": [
         "sendmock sms threads"
@@ -19957,6 +21639,18 @@
           "allowed_values": null,
           "description": "How long to wait, e.g. 10s (default 10s, at most 60s).",
           "example": "10s"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -19989,6 +21683,13 @@
             "examples": [
               "10s"
             ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
           }
         }
       },
@@ -20002,6 +21703,65 @@
       ],
       "ui": [
         "SMS (new messages appear live)"
+      ]
+    },
+    {
+      "name": "sendmock_sms_whatsapp_verify_webhook",
+      "toolset": "sms",
+      "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+      "area": "SMS providers",
+      "area_slug": "sms-providers",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/sms/whatsapp-cloud/verify-webhook",
+          "operation_id": "postSmsWhatsappCloudVerifyWebhook",
+          "summary": "Send Meta's callback URL check to the app and report whether it answered the challenge.",
+          "area_slug": "sms-providers",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.",
+          "example": "http://127.0.0.1:3000/whatsapp/webhook"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.",
+            "examples": [
+              "http://127.0.0.1:3000/whatsapp/webhook"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "url": "http://127.0.0.1:3000/whatsapp/webhook"
+      },
+      "output": "WhatsappWebhookVerification",
+      "cli": [
+        "sendmock sms whatsapp-cloud verify-webhook"
+      ],
+      "ui": [
+        "SMS > Providers > WhatsApp Cloud > Verify callback URL"
       ]
     },
     {
@@ -20120,6 +21880,470 @@
       "ui": [
         "Sidebar > live connection dot",
         "Settings > About"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_advance",
+      "toolset": "core",
+      "summary": "Move the subscription's clock to its next renewal and charge it.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/advance",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdAdvance",
+          "summary": "Move the subscription's clock to its next renewal and charge it.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions advance <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Advance to renewal"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_cancel",
+      "toolset": "core",
+      "summary": "Cancel the subscription now or at the end of its period.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}/cancel",
+          "operation_id": "postPaymentsSubscriptionsBySubscriptionIdCancel",
+          "summary": "Cancel the subscription now or at the end of its period.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "at_period_end",
+          "input": {
+            "name": "at_period_end",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "End at the next advance instead of now.",
+          "example": false
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "at_period_end": {
+            "type": "boolean",
+            "description": "End at the next advance instead of now.",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "at_period_end": false
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions cancel <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Cancel"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_create",
+      "toolset": "core",
+      "summary": "Start a subscription on a gateway, with an optional trial.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "postPaymentsSubscriptions",
+          "summary": "Start a subscription on a gateway, with an optional trial.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The gateway's key.",
+          "example": "stripe"
+        },
+        {
+          "name": "customer_email",
+          "input": {
+            "name": "customer_email",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Who pays.",
+          "example": "sam@example.test"
+        },
+        {
+          "name": "plan_name",
+          "input": {
+            "name": "plan_name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The plan's name, shown on each renewal's payment.",
+          "example": "Pro monthly"
+        },
+        {
+          "name": "amount_minor",
+          "input": {
+            "name": "amount_minor",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The amount of each renewal in minor units.",
+          "example": 1500
+        },
+        {
+          "name": "currency",
+          "input": {
+            "name": "currency",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "ISO 4217 code; Settings > Payments' default currency when left out.",
+          "example": "USD"
+        },
+        {
+          "name": "interval",
+          "input": {
+            "name": "interval",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "description": "How often it renews: `day`, `week`, `month` or `year`.",
+          "example": "month"
+        },
+        {
+          "name": "trial_days",
+          "input": {
+            "name": "trial_days",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Days before the first charge; none charges at once.",
+          "example": 7
+        },
+        {
+          "name": "card_number",
+          "input": {
+            "name": "card_number",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The test card that pays each renewal; `4242424242424242` when left out.",
+          "example": "4000000000009995"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The gateway's key.",
+            "examples": [
+              "stripe"
+            ]
+          },
+          "customer_email": {
+            "type": "string",
+            "description": "Who pays.",
+            "examples": [
+              "sam@example.test"
+            ]
+          },
+          "plan_name": {
+            "type": "string",
+            "description": "The plan's name, shown on each renewal's payment.",
+            "examples": [
+              "Pro monthly"
+            ]
+          },
+          "amount_minor": {
+            "type": "number",
+            "description": "The amount of each renewal in minor units.",
+            "examples": [
+              1500
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 code; Settings > Payments' default currency when left out.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "interval": {
+            "$ref": "#/$defs/SubscriptionInterval",
+            "description": "How often it renews: `day`, `week`, `month` or `year`.",
+            "examples": [
+              "month"
+            ]
+          },
+          "trial_days": {
+            "type": "number",
+            "description": "Days before the first charge; none charges at once.",
+            "examples": [
+              7
+            ]
+          },
+          "card_number": {
+            "type": "string",
+            "description": "The test card that pays each renewal; `4242424242424242` when left out.",
+            "examples": [
+              "4000000000009995"
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "customer_email",
+          "plan_name",
+          "amount_minor",
+          "interval"
+        ],
+        "$defs": {
+          "SubscriptionInterval": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "description": "How often a subscription renews."
+          }
+        }
+      },
+      "example_arguments": {
+        "provider": "stripe",
+        "customer_email": "sam@example.test",
+        "plan_name": "Pro monthly",
+        "amount_minor": 1500,
+        "interval": "month",
+        "currency": "USD",
+        "trial_days": 7
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions create"
+      ],
+      "ui": [
+        "Payments > Subscriptions > New subscription"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_get",
+      "toolset": "core",
+      "summary": "One subscription with its timeline and renewal payments.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+          "operation_id": "getPaymentsSubscriptionsBySubscriptionId",
+          "summary": "One subscription with its timeline and renewal payments.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": "PaymentSubscription",
+      "cli": [
+        "sendmock payments subscriptions show <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > open subscription"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_list",
+      "toolset": "core",
+      "summary": "Subscriptions, newest first.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "getPaymentsSubscriptions",
+          "summary": "Subscriptions, newest first.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "PaymentSubscription[]",
+      "cli": [
+        "sendmock payments subscriptions list"
+      ],
+      "ui": [
+        "Payments > Subscriptions"
       ]
     },
     {
@@ -20256,7 +22480,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -20696,7 +22920,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -21081,6 +23305,18 @@
           ],
           "description": "How the code was sent.",
           "example": "sms"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's verifications (its key); every project's when not set.",
+          "example": "shop"
         }
       ],
       "input_schema": {
@@ -21119,6 +23355,13 @@
             "description": "How the code was sent.",
             "examples": [
               "sms"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's verifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
             ]
           }
         },
@@ -21726,6 +23969,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -21737,9 +23981,12 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -21749,9 +23996,14 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -21806,6 +24058,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -21817,9 +24070,12 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -21829,9 +24085,14 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -22344,9 +24605,10 @@
           "is_required": true,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {
@@ -22524,9 +24786,10 @@
             "type": "string",
             "enum": [
               "json",
-              "form"
+              "form",
+              "multipart"
             ],
-            "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+            "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
             "examples": [
               "json"
             ]
@@ -22579,7 +24842,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -22594,7 +24858,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -23110,7 +25374,7 @@
       ],
       "aliases": [],
       "annotations": {
-        "read_only_hint": true,
+        "read_only_hint": false,
         "destructive_hint": false,
         "idempotent_hint": false
       },
@@ -23394,9 +25658,10 @@
           "is_required": false,
           "allowed_values": [
             "json",
-            "form"
+            "form",
+            "multipart"
           ],
-          "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+          "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
           "example": "json"
         },
         {
@@ -23581,9 +25846,10 @@
             "type": "string",
             "enum": [
               "json",
-              "form"
+              "form",
+              "multipart"
             ],
-            "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+            "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
             "examples": [
               "json"
             ]
@@ -23620,7 +25886,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -23635,7 +25902,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -23891,9 +26158,9 @@
             "location": "body"
           },
           "type": "WebhookEndpointInput",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The endpoint settings to render, saved or not.",
+          "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
           "example": {
             "name": "Orders app",
             "url": "http://localhost:3000/webhooks/sendmock",
@@ -23948,7 +26215,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "A saved endpoint's own variables are used too.",
+          "description": "A saved endpoint's own variables are used too; alone, its stored settings are rendered.",
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
@@ -24007,7 +26274,7 @@
         "properties": {
           "endpoint": {
             "$ref": "#/$defs/WebhookEndpointInput",
-            "description": "The endpoint settings to render, saved or not.",
+            "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
             "examples": [
               {
                 "name": "Orders app",
@@ -24057,7 +26324,7 @@
           },
           "endpoint_id": {
             "$ref": "#/$defs/Ulid",
-            "description": "A saved endpoint's own variables are used too.",
+            "description": "A saved endpoint's own variables are used too; alone, its stored settings are rendered.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
             ]
@@ -24096,9 +26363,6 @@
             ]
           }
         },
-        "required": [
-          "endpoint"
-        ],
         "$defs": {
           "BodyFieldType": {
             "type": "string",
@@ -24106,7 +26370,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -24121,7 +26386,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -24348,9 +26613,10 @@
                 "type": "string",
                 "enum": [
                   "json",
-                  "form"
+                  "form",
+                  "multipart"
                 ],
-                "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
                 "examples": [
                   "json"
                 ]
@@ -24400,55 +26666,10 @@
           }
         }
       },
-      "example_arguments": {
-        "endpoint": {
-          "name": "Orders app",
-          "url": "http://localhost:3000/webhooks/sendmock",
-          "method": "POST",
-          "headers": {
-            "Authorization": "Bearer {{ vars.app_token }}"
-          },
-          "extra_fields": {
-            "environment": "local"
-          },
-          "template_id": "native",
-          "template_mode": "linked",
-          "timeout_ms": 10000,
-          "retry_policy": {
-            "max_attempts": 5,
-            "backoff_seconds": [
-              1,
-              5,
-              30,
-              120,
-              600
-            ],
-            "retry_on_client_errors": false
-          },
-          "is_enabled": true,
-          "query_params": [
-            {
-              "name": "X-Source",
-              "value": "sendmock-{{ event.type }}"
-            }
-          ],
-          "body_mode": "template",
-          "body_fields": [
-            {
-              "name": "user.email",
-              "value_type": "text",
-              "value": "{{ data.to[0].address }}"
-            }
-          ],
-          "fields_encoding": "json",
-          "raw_content_type": "application/json",
-          "raw_body": "{\"text\": \"New email: {{ data.subject }}\"}",
-          "render_mode": "strict"
-        }
-      },
+      "example_arguments": {},
       "output": "EndpointPreviewResult",
       "cli": [
-        "sendmock webhook render --endpoint <endpointId>"
+        "sendmock webhook render --endpoint-id <endpointId>"
       ],
       "ui": [
         "Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview"
@@ -24513,6 +26734,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -24524,9 +26746,12 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -24536,9 +26761,14 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -24651,6 +26881,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -24662,9 +26893,12 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -24674,9 +26908,14 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -24687,7 +26926,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -25081,6 +27320,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -25092,9 +27332,12 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -25104,9 +27347,14 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -25181,6 +27429,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -25192,9 +27441,12 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -25204,9 +27456,14 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -25217,7 +27474,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -25389,6 +27646,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -25400,9 +27658,12 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -25412,9 +27673,14 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -25531,6 +27797,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -25542,9 +27809,12 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -25554,9 +27824,14 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -25567,7 +27842,7 @@
             "properties": {
               "field": {
                 "type": "string",
-                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`.",
+                "description": "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`.",
                 "examples": [
                   "subject"
                 ]
@@ -26421,7 +28696,8 @@
               "text",
               "number",
               "boolean",
-              "json"
+              "json",
+              "file"
             ]
           },
           "EndpointBodyField": {
@@ -26436,7 +28712,7 @@
               },
               "value_type": {
                 "$ref": "#/$defs/BodyFieldType",
-                "description": "How the rendered value is encoded: `text`, `number`, `boolean` or `json`.",
+                "description": "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only).",
                 "examples": [
                   "text"
                 ]
@@ -26663,9 +28939,10 @@
                 "type": "string",
                 "enum": [
                   "json",
-                  "form"
+                  "form",
+                  "multipart"
                 ],
-                "description": "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).",
+                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
                 "examples": [
                   "json"
                 ]
@@ -26916,7 +29193,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "detach: move endpoints that use it to native JSON instead of failing.",
+          "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
           "example": "detach"
         }
       ],
@@ -26932,7 +29209,7 @@
           },
           "endpoints": {
             "type": "string",
-            "description": "detach: move endpoints that use it to native JSON instead of failing.",
+            "description": "detach: endpoints that use it keep their own copy of it instead of failing.",
             "examples": [
               "detach"
             ]
@@ -27169,7 +29446,7 @@
     },
     {
       "name": "sendmock_webhook_template_list",
-      "toolset": "templates",
+      "toolset": "webhooks",
       "summary": "Built-in and custom payload templates.",
       "area": "Webhook templates",
       "area_slug": "webhook-templates",
@@ -27334,6 +29611,18 @@
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         },
         {
+          "name": "payment_id",
+          "input": {
+            "name": "payment_id",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "A payment, as the data of the event its latest state stands for.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
           "name": "draft",
           "input": {
             "name": "draft",
@@ -27380,6 +29669,13 @@
           "http_request_id": {
             "$ref": "#/$defs/Ulid",
             "description": "A captured HTTP request, as the data of an `http.captured` event.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "payment_id": {
+            "$ref": "#/$defs/Ulid",
+            "description": "A payment, as the data of the event its latest state stands for.",
             "examples": [
               "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
             ]
@@ -27753,6 +30049,7 @@
             "email.received",
             "email.inbound",
             "email.opened",
+            "email.clicked",
             "email.delivered",
             "email.deferred",
             "email.bounced",
@@ -27764,9 +30061,12 @@
             "sms.status",
             "sms.opened",
             "sms.inbound",
+            "sms.reply_webhook",
             "verify.started",
             "verify.checked",
             "verify.expired",
+            "push.sent",
+            "push.failed",
             "http.captured",
             "payment.created",
             "payment.authorized",
@@ -27776,9 +30076,14 @@
             "payment.refunded",
             "payment.partially_refunded",
             "payment.dispute_opened",
+            "payment.dispute_updated",
             "payment.dispute_closed",
             "checkout.completed",
             "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
             "test.ping"
@@ -27955,6 +30260,7 @@
               "email.received",
               "email.inbound",
               "email.opened",
+              "email.clicked",
               "email.delivered",
               "email.deferred",
               "email.bounced",
@@ -27966,9 +30272,12 @@
               "sms.status",
               "sms.opened",
               "sms.inbound",
+              "sms.reply_webhook",
               "verify.started",
               "verify.checked",
               "verify.expired",
+              "push.sent",
+              "push.failed",
               "http.captured",
               "payment.created",
               "payment.authorized",
@@ -27978,9 +30287,14 @@
               "payment.refunded",
               "payment.partially_refunded",
               "payment.dispute_opened",
+              "payment.dispute_updated",
               "payment.dispute_closed",
               "checkout.completed",
               "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
               "test.ping"
@@ -28828,6 +31142,50 @@
       },
       "cli": "sendmock ai skill",
       "ui": "Settings > Connection > AI agents > Download the skill"
+    },
+    {
+      "uri": "sendmock://emails/{emailId}/mime/{partId}",
+      "slug": "resource-emails-emailid-mime-partid",
+      "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+      "mime_type": "application/octet-stream",
+      "area": "Email",
+      "area_slug": "email",
+      "parameters": [
+        {
+          "name": "emailId",
+          "input": {
+            "name": "emailId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The email's ID, from `GET /api/v1/emails`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "partId",
+          "input": {
+            "name": "partId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The part's position in the MIME tree, as `GET /emails/{emailId}/mime` numbers it, e.g. `1.2`.",
+          "example": "1.2"
+        }
+      ],
+      "operation": {
+        "method": "GET",
+        "path": "/api/v1/emails/{emailId}/mime/{partId}",
+        "operation_id": "getEmailsByEmailIdMimeByPartId",
+        "summary": "Download one MIME part, decoded, by its position in the MIME tree.",
+        "area_slug": "email",
+        "selector": null
+      },
+      "cli": "sendmock email mime-part <emailId> <partId>",
+      "ui": "Mail > open email > MIME, download a part"
     },
     {
       "uri": "sendmock://emails/{emailId}/raw",

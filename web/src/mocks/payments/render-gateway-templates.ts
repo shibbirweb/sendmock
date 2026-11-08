@@ -9,6 +9,10 @@ import {
   renderTemplateText,
   type TemplateContext,
 } from "@/mocks/webhooks/render-template-text";
+import {
+  buildProviderEventObject,
+  buildProviderRedirectObject,
+} from "@/mocks/payments/stripe/build-stripe-event-object";
 
 type RedirectOutcome = PaymentRedirect["outcome"];
 
@@ -45,10 +49,15 @@ export type GatewayRenderOptions = {
  * `redirect` and `merchant`.
  */
 export function buildGatewayContext(
-  paymentGateway: Pick<PaymentGatewayInput, "credentials" | "event_names">,
+  paymentGateway: Pick<
+    PaymentGatewayInput,
+    "key" | "credentials" | "event_names"
+  >,
   paymentDetail: PaymentDetail,
   renderOptions: GatewayRenderOptions,
 ): TemplateContext {
+  const eventName = paymentGateway.event_names[renderOptions.eventType] ?? "";
+
   return {
     payment: {
       id: paymentDetail.id,
@@ -70,8 +79,13 @@ export function buildGatewayContext(
     event: {
       id: renderOptions.eventId,
       type: renderOptions.eventType,
-      name: paymentGateway.event_names[renderOptions.eventType] ?? "",
+      name: eventName,
       created: renderOptions.timestampSeconds,
+      object: buildProviderEventObject(
+        paymentGateway.key,
+        paymentDetail,
+        eventName,
+      ),
     },
     redirect: {
       outcome: renderOptions.redirectOutcome,
@@ -120,11 +134,26 @@ export function renderGatewayRedirect(
   paymentDetail: PaymentDetail,
   renderOptions: GatewayRenderOptions,
 ): RenderedRedirect {
-  const templateContext = buildGatewayContext(
+  const gatewayContext = buildGatewayContext(
     paymentGateway,
     paymentDetail,
     renderOptions,
   );
+  const redirectStatus =
+    paymentGateway.event_names[
+      redirectOutcomeEvents[renderOptions.redirectOutcome]
+    ] ?? "";
+  const templateContext: TemplateContext = {
+    ...gatewayContext,
+    event: {
+      ...(gatewayContext.event as Record<string, unknown>),
+      object: buildProviderRedirectObject(
+        paymentGateway.key,
+        paymentDetail,
+        redirectStatus,
+      ),
+    },
+  };
   const problems: GatewayTemplateProblem[] = [];
   const fields = Object.fromEntries(
     paymentGateway.redirect_fields

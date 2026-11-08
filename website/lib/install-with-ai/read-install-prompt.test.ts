@@ -32,7 +32,7 @@ describe("extractInstallPrompt", () => {
     ].map((commandMatch) => commandMatch[1] ?? "");
     const pageOutsidePrompt = installPage.replace(installPrompt, "");
 
-    expect(promptCommands).toHaveLength(8);
+    expect(promptCommands).toHaveLength(12);
     for (const promptCommand of promptCommands) {
       expect(pageOutsidePrompt).toContain(promptCommand);
     }
@@ -47,6 +47,8 @@ describe("extractInstallPrompt", () => {
       "before you install anything, check this computer",
       "whether docker is installed and running",
       "whether homebrew is installed",
+      "whether node.js (`node --version`) or bun (`bun --version`) is installed",
+      "npx or bunx: runs sendmock straight from npm with nothing installed",
       "sendmock --version",
       "docker: sendmock runs in a container",
       "the binary: one small program",

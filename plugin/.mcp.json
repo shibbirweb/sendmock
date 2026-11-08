@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sendmock": {
+      "command": "sendmock",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "before": [
+    {
+      "path": "/providers/twilio/2010-04-01/Accounts/AC11111111111111111111111111111111/Messages.json",
+      "form": {
+        "To": "+15551234567",
+        "From": "+15550001111",
+        "Body": "Your Shop verification code is 739104. It expires in 10 minutes."
+      }
+    }
+  ]
+}

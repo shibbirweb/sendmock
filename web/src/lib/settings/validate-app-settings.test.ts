@@ -94,6 +94,31 @@ describe("validateAppSettingsUpdate", () => {
   });
 });
 
+describe("Verify defaults", () => {
+  test("VF-01.2 checks the default code length, lifetime and the fixed code", () => {
+    expect(
+      validateAppSettingsUpdate({
+        verify_default_code_length: 8,
+        verify_default_ttl_seconds: 300,
+        verify_fixed_code: "24682468",
+      }),
+    ).toEqual({});
+    expect(
+      validateAppSettingsUpdate({
+        verify_default_code_length: 12,
+        verify_default_ttl_seconds: 30,
+        verify_fixed_code: "12ab",
+      }),
+    ).toEqual({
+      verify_default_code_length: "Choose 4 to 10 digits",
+      verify_default_ttl_seconds: "Choose 60 to 86,400 seconds",
+      verify_fixed_code:
+        "Use 4 to 10 digits, or leave it empty for random codes",
+    });
+    expect(validateAppSettingsUpdate({ verify_fixed_code: null })).toEqual({});
+  });
+});
+
 describe("findOtpMatch", () => {
   test("EM-05.5 returns the first matching pattern and its code", () => {
     expect(

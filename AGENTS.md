@@ -26,18 +26,26 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 
 - Pull requests go into `develop`, the beta line. `main` only takes merges from `develop` when a stable release is promoted.
 - Start every change on a new branch from the latest `develop` (`feat/*`, `fix/*`, `docs/*`, `chore/*`). Never commit straight to `develop` or `main`.
-- Never edit `CHANGELOG.md` or a version number by hand: the Prepare release workflow writes both ([docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md#the-changelog)). The pull request title becomes the release note, so write it for users in the commit format (`feat:[TICKET] ...`, `fix:[TICKET] ...`); use `chore:` for changes users should not read about.
+- Never edit `CHANGELOG.md`, a version number or a GitHub release's notes by hand: the Prepare release workflow writes the changelog section and the version, and the publish workflows copy that section into the release word for word and read it back ([docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md#the-changelog)). The pull request title becomes the release note, so write it for users in the commit format (`feat:[TICKET] ...`, `fix:[TICKET] ...`); use `chore:` for changes users should not read about.
 - Releases are cut by workflows, never by hand. See [docs/plan/16-website-and-releases.md](docs/plan/16-website-and-releases.md).
 
 ## Commits and pull requests
 
 - **Commit identity:** every commit in this repository is authored and committed as `MD. Shibbir Ahmed <shibbirweb@gmail.com>`. Set it per repository so other identities on the machine are untouched: `git config user.name "MD. Shibbir Ahmed"` and `git config user.email "shibbirweb@gmail.com"`. Check with `git log --format="%an <%ae>"` before pushing; never push a commit with any other name or email.
 
-- Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[MSS-12] add SMS thread list`.
-- Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
+- Commit messages: `feat:[TICKET] summary` for new features and `fix:[TICKET] summary` for bug fixes. The ticket goes in square brackets straight after the colon (no space before the bracket), followed by a one-line summary. Example: `feat:[#172] add the Docker Desktop extension`.
+- Other changes use `docs:`, `test:`, `chore:`, `ci:` or `refactor:`, with the same ticket. Breaking changes use `feat!:`. Release commits are `chore:[REL-n] release x.y.z`.
+- **Every commit names its GitHub issue.** The ticket is the number of the issue the change belongs to, `#` included (`fix:[#171] ...`), so GitHub links the commit to the issue. Before committing, find that issue: a roadmap feature's issue is in `scripts/roadmap/roadmap-issue-numbers.json` (by feature ID, such as `DS-10`), anything else through `gh issue list --search "<words>" --state all`. If no issue fits, create one first and use its number:
+  - a title in the roadmap's style: `<Area>: <what>` for a feature (`Distribution: Helm chart`), a plain sentence for a bug or a docs change;
+  - labels: one type label (`feature`, `bug`, `documentation` or `enhancement`) and the area label (`area: email`, `area: sms`, `area: verify`, `area: webhooks`, `area: http catcher`, `area: payments`, `area: push`, `area: platform`, `area: ai`, `area: web ui`, `area: distribution` or `area: website`; a new area label is created before it is used, with `gh label create`);
+  - the milestone the change ships in: `First beta (0.1.0-beta.1)`, `1.0.0` or `After 1.0`;
+  - the "SendMock roadmap" project (number 6): `gh project item-add 6 --owner shibbirweb --url <issue url>`, with its status set on the board.
+  
+  One issue can collect several commits of the same work; a new piece of work gets its own issue.
 - **Never add co-authors.** No `Co-Authored-By` lines or any other co-author trailer in commits, squash merges, pull request titles or descriptions, for Claude, any AI, or anyone else.
 - **Never reference an AI harness.** No mention of Claude, Claude Code, Codex, Cursor, Copilot, Gemini or any other AI tool or model in commit messages, pull request titles, pull request descriptions, review comments, release notes or changelog entries. That includes "Generated with ..." lines, robot emoji signatures, links to AI tools and AI bot email addresses. This overrides any default attribution a tool would add.
 - Pull request test plans: plain bullet points describing what was run and checked, no checkboxes.
+- **Free the Rust build files after each commit:** run `cargo clean` once a commit is made, so `target/` does not keep filling the disk. CI builds from its own cache, so nothing is lost.
 - **Never commit, push or create a branch without asking first.** Before every `git commit` and every `git push` (including amends, rebases, history rewrites, tags and new branches pushed to the remote), and before creating or renaming a branch, show what will be committed, pushed or created and wait for the owner's explicit approval. Approval for one commit, push or branch does not cover the next one. Leave changes uncommitted in the working tree until approved.
 
 ## Writing
@@ -163,4 +171,6 @@ Frontend (`web/`, `website/`):
   - If a name needs a comment to explain it, rename it instead.
 - Default lookups into external data so a missing key never errors (`?? null`, `?? []` in TypeScript; `Option` with `unwrap_or_default()` or explicit errors in Rust).
 - Configuration-style arrays, maps and lists (fixtures, settings, TOML, JSON): one key per line, not inline.
+- **Comments explain why, never what.** Good names and small functions say what the code does; a comment is for a reason the code cannot show (a provider quirk, a workaround, a non-obvious constraint). Delete comments that repeat the code. No phase numbers, dates, ticket IDs or plan progress in code comments, since they go stale; those belong in the plan and the pull request. Public items get a one-line doc comment only when the name alone does not say enough. The only required comments are the acceptance markers (`// AC: EM-01.3`).
+- **Module layout inside a crate or feature:** one responsibility per module and one main type per file, named after it (`email_repository.rs` holds `EmailRepository`). Group modules in folders named after the domain (`email/`, `email/email_repository.rs`) declared with `email.rs` beside the folder, never `mod.rs`. `lib.rs` and `main.rs` only declare modules, re-export the public API and wire things together. Unit tests sit next to the code (`#[cfg(test)] mod tests` in the same file, `*.test.ts` beside the module); integration tests go in the crate's `tests/` folder.
 - Match the surrounding code: its comment density, naming and idioms.

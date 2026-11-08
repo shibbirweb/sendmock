@@ -21,6 +21,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ConnectionStatus } from "@/features/connection/connection-status";
+import {
+  SidebarChildPhaseLabel,
+  SidebarPhaseBadge,
+} from "@/features/availability/sidebar-phase-badge";
 import { SidebarCommunityLinks } from "@/features/help/sidebar-community-links";
 import { cn } from "@/lib/utils";
 import { useAppStats } from "@/lib/api/hooks/use-system-queries";
@@ -136,6 +140,12 @@ export function AppSidebar() {
                       )}
                     </Link>
                   </SidebarMenuButton>
+                  <SidebarPhaseBadge
+                    navigationItem={navigationItem}
+                    className={cn(
+                      navigationItem.children !== undefined && "right-7",
+                    )}
+                  />
                   {readSectionBadgeCount(navigationItem.path, appStats) > 0 && (
                     <SidebarMenuBadge
                       className={cn(
@@ -162,6 +172,9 @@ export function AppSidebar() {
                               <Link to={childItem.path}>
                                 <childItem.icon />
                                 <span>{childItem.title}</span>
+                                <SidebarChildPhaseLabel
+                                  navigationItem={childItem}
+                                />
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>

@@ -3,7 +3,7 @@ title: OTP patterns
 description: Teach SendMock your app's code format, so codes are extracted from every email and SMS.
 ---
 
-> Works in your install from Phase 1. Try it in the [demo](/demo/settings?section=otp) today.
+> Try it in the [demo](/demo/settings?section=otp).
 
 SendMock finds one-time codes with regular expressions. The defaults catch the usual "Your code is 482913". If your app writes codes another way (`ABC-123`, a code in a link, an 8-letter token), add a pattern.
 

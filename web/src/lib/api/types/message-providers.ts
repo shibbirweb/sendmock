@@ -186,3 +186,31 @@ export type MessageProviderPreview = {
 
 /** GET .../providers/{providerKey}/credentials/{credentialName}. */
 export type ProviderCredentialReveal = { name: string; value: string };
+
+/** Body of POST /api/v1/sms/whatsapp-cloud/verify-webhook. */
+export type WhatsappWebhookVerificationRequest = {
+  /**
+   * The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.
+   * @example "http://127.0.0.1:3000/whatsapp/webhook"
+   */
+  url?: string;
+};
+
+/** What the app answered Meta's callback URL check (SM-18.4). */
+export type WhatsappWebhookVerification = {
+  /** The URL called, with the check's query. */
+  url: string;
+  /**
+   * The `hub.challenge` sent, which the app must answer as its whole body.
+   * @example "1158201444"
+   */
+  challenge: string;
+  /** True when the app answered `200` with exactly the challenge, as Meta requires. */
+  is_verified: boolean;
+  /** @example 200 */
+  status_code: number | null;
+  /** The app's answer body. */
+  answer: string | null;
+  /** Why there was no answer, such as a refused connection. */
+  error: string | null;
+};

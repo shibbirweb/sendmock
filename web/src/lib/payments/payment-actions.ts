@@ -29,7 +29,8 @@ export const declineReasons: { reason: DeclineReason; label: string }[] = [
 
 /** What the Simulate menu offers for a payment, by its status (PY-09.3). */
 export function listSimulateActions(
-  paymentDetail: Pick<PaymentDetail, "status" | "checkout_url">,
+  paymentDetail: Pick<PaymentDetail, "status" | "checkout_url"> &
+    Partial<Pick<PaymentDetail, "dispute">>,
 ): PaymentSimulateAction[] {
   switch (paymentDetail.status) {
     case "requires_payment":
@@ -43,7 +44,9 @@ export function listSimulateActions(
     case "partially_refunded":
       return ["refund", "dispute"];
     case "disputed":
-      return ["resolve_dispute"];
+      return paymentDetail.dispute?.status === "needs_response"
+        ? ["answer_dispute", "resolve_dispute"]
+        : ["resolve_dispute"];
     default:
       return [];
   }

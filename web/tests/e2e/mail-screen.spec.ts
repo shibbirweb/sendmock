@@ -31,6 +31,31 @@ test("EM-03.4 search filters narrow the list and chips toggle them", async ({
   await expect(passwordResetSubject).toBeHidden();
 });
 
+test("EM-03.5 with a search on, delete removes only the matching emails", async ({
+  page,
+}) => {
+  const listPanel = page.locator(emailList);
+  const passwordResetSubject = listPanel.getByText("Reset your password", {
+    exact: true,
+  });
+  await page.getByLabel("Search emails").fill("from:billing");
+  await expect(page).toHaveURL(/q=from%3Abilling/);
+  await expect(listPanel.getByText("Invoice INV-2026-0042")).toBeVisible();
+
+  await page.getByRole("button", { name: "Delete matching emails" }).click();
+  await expect(
+    page.getByRole("alertdialog", { name: "Delete the matching emails?" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Delete matching", exact: true })
+    .click();
+  await expect(listPanel.getByText("Invoice INV-2026-0042")).toBeHidden();
+
+  await page.getByLabel("Search emails").fill("");
+  await expect(page).not.toHaveURL(/q=/);
+  await expect(passwordResetSubject).toBeVisible();
+});
+
 test("EM-05.4 an opened email shows its code with a copy button", async ({
   page,
 }) => {
@@ -120,4 +145,28 @@ test("EM-16.2 notification permission is requested only when turned on", async (
     .getByRole("button", { name: "Notify me about new emails" })
     .click();
   await expect.poll(readRequestCount).toBe(1);
+});
+
+test("EM-12.4 tags are added and removed in the email detail", async ({
+  page,
+}) => {
+  await page
+    .locator(emailList)
+    .getByText("Your verification code")
+    .first()
+    .click();
+  const header = page
+    .locator("header")
+    .filter({ has: page.getByRole("heading", { level: 2 }) });
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByLabel("Tags", { exact: true }).fill("Needs-Review");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect(header.getByText("needs-review", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByRole("button", { name: "Remove needs-review" }).click();
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect(header.getByText("needs-review", { exact: true })).toBeHidden();
 });

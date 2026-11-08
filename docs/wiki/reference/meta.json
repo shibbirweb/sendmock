@@ -1,0 +1,10 @@
+{
+  "title": "Reference",
+  "pages": [
+    "index",
+    "configuration-flags",
+    "magic-numbers",
+    "template-filters",
+    "webhook-templates"
+  ]
+}

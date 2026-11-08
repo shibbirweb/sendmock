@@ -8,6 +8,7 @@ export const appScreens = [
   { path: "/sms", title: "SMS · SendMock" },
   { path: "/sms/verify", title: "Verify · SendMock" },
   { path: "/sms/providers", title: "Providers · SMS · SendMock" },
+  { path: "/push", title: "Push · SendMock" },
   { path: "/http", title: "HTTP Catcher · SendMock" },
   { path: "/webhooks/overview", title: "Overview · Webhooks · SendMock" },
   { path: "/webhooks/endpoints", title: "Endpoints · Webhooks · SendMock" },
@@ -25,10 +26,15 @@ export const appScreens = [
   { path: "/payments/gateways", title: "Gateways · Payments · SendMock" },
   { path: "/payments/methods", title: "Methods · Payments · SendMock" },
   { path: "/payments/flows", title: "Flows · Payments · SendMock" },
+  {
+    path: "/payments/subscriptions",
+    title: "Subscriptions · Payments · SendMock",
+  },
   { path: "/numbers", title: "Numbers · SendMock" },
   // Loads nothing when it opens: the API is called by Validate and Run.
   { path: "/scenarios", title: "Scenarios · SendMock", loadsDataOnOpen: false },
   { path: "/logs", title: "Logs · SendMock" },
+  { path: "/api-reference", title: "API reference · SendMock" },
   { path: "/settings", title: "General · Settings · SendMock" },
 ];
 

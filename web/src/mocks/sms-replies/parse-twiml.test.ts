@@ -3,15 +3,16 @@ import { describe, expect, test } from "vitest";
 import { parseTwiml } from "@/mocks/sms-replies/parse-twiml";
 
 describe("parseTwiml", () => {
-  test("SM-09.7 reads Message verbs with their attributes, Body and Media, and Redirect", () => {
+  test("SM-09.7 reads Message verbs with their attributes, Body and Media, and Redirect with its method", () => {
     expect(
       parseTwiml(`<Response>
-        <Message statusCallback="http://localhost:8000/sms/status">Thanks!</Message>
+        <Message statusCallback="http://localhost:8000/sms/status" action="/sms/sent" method="get">Thanks!</Message>
         <Message to="+15005550006" from="+15550001111">
           <Body>Your ticket</Body>
           <Media>https://example.com/ticket.png</Media>
         </Message>
-        <Redirect>http://localhost:8000/sms/next</Redirect>
+        <Redirect method="GET">http://localhost:8000/sms/next</Redirect>
+        <Redirect>http://localhost:8000/sms/last</Redirect>
       </Response>`),
     ).toEqual({
       isValid: true,
@@ -22,6 +23,8 @@ describe("parseTwiml", () => {
           to: null,
           from: null,
           status_callback: "http://localhost:8000/sms/status",
+          action: "/sms/sent",
+          method: "GET",
           media_urls: [],
         },
         {
@@ -30,9 +33,20 @@ describe("parseTwiml", () => {
           to: "+15005550006",
           from: "+15550001111",
           status_callback: null,
+          action: null,
+          method: "POST",
           media_urls: ["https://example.com/ticket.png"],
         },
-        { verb: "Redirect", url: "http://localhost:8000/sms/next" },
+        {
+          verb: "Redirect",
+          url: "http://localhost:8000/sms/next",
+          method: "GET",
+        },
+        {
+          verb: "Redirect",
+          url: "http://localhost:8000/sms/last",
+          method: "POST",
+        },
       ],
     });
   });

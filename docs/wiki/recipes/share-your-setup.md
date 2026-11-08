@@ -3,7 +3,7 @@ title: Share your setup
 description: Export your endpoints, rules, templates, numbers and settings as a seed file, commit it, and give your team and CI the same SendMock.
 ---
 
-> Works in your install from Phase 3 (the full seed file). Try it in the [demo](/demo/settings?section=seed) today.
+> Try it in the [demo](/demo/settings?section=seed).
 
 **The situation:** you set up endpoints, rules, numbers and a Verify service. A teammate, and your CI, should start with exactly the same, and every test run should start clean.
 

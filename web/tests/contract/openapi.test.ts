@@ -9,9 +9,17 @@ import {
   renderOpenApiYaml,
 } from "../../scripts/build-openapi";
 
+type OpenApiOperation = {
+  operationId: string;
+  "x-sendmock-cli"?: string;
+  "x-sendmock-mcp"?: string | null;
+  "x-sendmock-mcp-exempt"?: string;
+  "x-sendmock-ui"?: string;
+};
+
 type OpenApiDocument = {
   openapi: string;
-  paths: Record<string, Record<string, { operationId: string }>>;
+  paths: Record<string, Record<string, OpenApiOperation>>;
   components: { schemas: Record<string, unknown> };
 };
 
@@ -58,6 +66,23 @@ describe("docs/api/openapi.yaml", () => {
           !componentNames.has(reference.replace("#/components/schemas/", "")),
       ),
     ).toEqual([]);
+  });
+
+  test("UI-11.3 every operation names its CLI command, MCP tool and place in the app", () => {
+    const operations = Object.values(committedDocument.paths).flatMap(
+      (pathItem) => Object.values(pathItem),
+    );
+    const operationsMissingASurface = operations
+      .filter(
+        (operation) =>
+          !operation["x-sendmock-cli"] ||
+          !operation["x-sendmock-ui"] ||
+          (!operation["x-sendmock-mcp"] && !operation["x-sendmock-mcp-exempt"]),
+      )
+      .map((operation) => operation.operationId);
+
+    expect(operations.length).toBeGreaterThan(200);
+    expect(operationsMissingASurface).toEqual([]);
   });
 
   test("UI-09.3 is valid OpenAPI 3.1", async () => {

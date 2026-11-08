@@ -147,4 +147,15 @@ describe("CLI and MCP references (WS-07.5)", () => {
       "sendmock thing other: the override names colour, which is not an input",
     ]);
   });
+
+  test("WS-07.5 the webhook endpoint test send is not read only, while dry-run tests are", () => {
+    const mcpReference = readCommittedJson<McpReference>(mcpToolsFilePath);
+    const readIsReadOnly = (toolName: string) =>
+      mcpReference.tools.find((tool) => tool.name === toolName)?.annotations
+        .read_only_hint;
+
+    expect(readIsReadOnly("sendmock_webhook_endpoint_test")).toBe(false);
+    expect(readIsReadOnly("sendmock_outcome_rule_test")).toBe(true);
+    expect(readIsReadOnly("sendmock_inbound_route_test")).toBe(true);
+  });
 });

@@ -25,7 +25,7 @@ export type TemplateMode = "linked" | "detached";
 
 /** How an endpoint builds its body (WH-07.14). */
 export type EndpointBodyMode = "template" | "fields" | "raw" | "none";
-export type BodyFieldType = "text" | "number" | "boolean" | "json";
+export type BodyFieldType = "text" | "number" | "boolean" | "json" | "file";
 export type RenderMode = "strict" | "lenient";
 
 /** A query param or header: a name and a template value. */
@@ -50,7 +50,8 @@ export type EndpointBodyField = {
    */
   name: string;
   /**
-   * How the rendered value is encoded: `text`, `number`, `boolean` or `json`.
+   * How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL
+   * fetched when the request is sent, for `multipart` only).
    * @example "text"
    */
   value_type: BodyFieldType;
@@ -140,10 +141,11 @@ export type WebhookEndpoint = {
    */
   body_fields: EndpointBodyField[];
   /**
-   * How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`).
+   * How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart`
+   * (`multipart/form-data`, where `file` fields are fetched from their URL when sent).
    * @example "json"
    */
-  fields_encoding: "json" | "form";
+  fields_encoding: "json" | "form" | "multipart";
   /**
    * The content type of `raw` mode.
    * @example "application/json"
@@ -193,11 +195,11 @@ export type WebhookEndpointInput = Pick<
 /** Body of POST /api/v1/webhooks/endpoints/preview (WH-07.15). */
 export type EndpointPreviewRequest = {
   /**
-   * The endpoint settings to render, saved or not.
+   * The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
    */
-  endpoint: WebhookEndpointInput;
+  endpoint?: WebhookEndpointInput;
   /**
-   * A saved endpoint's own variables are used too.
+   * A saved endpoint's own variables are used too; alone, its stored settings are rendered.
    * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
    */
   endpoint_id?: Ulid;

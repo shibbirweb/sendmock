@@ -3,7 +3,7 @@ title: Responses
 description: Choose how a bin answers, with a default reply and rules by method and path with templated bodies, delays and failure rates.
 ---
 
-> Try it in the [demo](/demo/http). Works in your install from Phase 4.
+> Try it in the [demo](/demo/http).
 
 Each bin answers every request. The answer decides what your app sees: success, a rate limit, a server error, or a slow reply that hits your timeout.
 

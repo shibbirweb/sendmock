@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -82,11 +82,15 @@ describe("bundle budget", () => {
     expect(bundleMeasurement.distBytes).toBeLessThan(distBudgetBytes);
   });
 
-  test("UI-06.3 the live build ships no mock layer", () => {
+  test("UI-06.3 UI-12.3 the live build ships no mock layer", () => {
     expect(
       bundleMeasurement.initialScriptPaths.some((scriptPath) =>
         scriptPath.includes("mock"),
       ),
     ).toBe(false);
+  });
+
+  test("UI-12.3 the live build leaves out the mock service worker", () => {
+    expect(existsSync(join(distDirectory, "mockServiceWorker.js"))).toBe(false);
   });
 });

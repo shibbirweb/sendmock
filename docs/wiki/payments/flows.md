@@ -3,7 +3,7 @@ title: Flows
 description: The steps a checkout page asks for, in order, built from a catalogue of step types, with your own labels.
 ---
 
-> Try it in the [demo](/demo/payments/flows). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments/flows).
 
 A flow is the sequence of steps a customer goes through for one kind of method: a card form; or an account number, then an OTP, then a PIN; or a QR code to scan. Methods use flows, so changing a flow changes every method that runs it.
 
@@ -73,6 +73,8 @@ A built-in shows **Modified** and **Reset to default**; it cannot be deleted. A 
 
 A step type SendMock cannot show yet needs code (a checkout component and a server check); ask for it with a provider request issue.
 
+
+Every control and text, one by one: [Flows in depth](../deeper/payments/flows.md).
 ## Customize
 
 Compose a QR wallet flow from scratch: [Advanced: payment flow](../advanced/payment-flow.md).

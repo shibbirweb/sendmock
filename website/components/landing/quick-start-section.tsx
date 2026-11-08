@@ -1,19 +1,21 @@
 "use client";
 
 import { SparklesIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { detectOperatingSystem } from "@/lib/detect-operating-system";
+
 import { cn } from "@/lib/utils";
 
 import { AiInstallLinks, AiInstallPromptWindow } from "./ai-install-panel";
 import { CopyCommandButton } from "./copy-command-button";
-import { installPlatforms } from "./install-platforms";
+import { installPlatforms, orderInstallPlatforms } from "./install-platforms";
 import {
   InstallTerminal,
   InstallTerminalPlaceholder,
 } from "./install-terminal";
-import { ManualDownloadLinks } from "./manual-download-links";
+import { PlatformFooter } from "./platform-footer";
+import { quickStartSectionId } from "./quick-start-link";
 import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
@@ -30,34 +32,36 @@ export function QuickStartSection({
 }: {
   installPrompt: string | null;
 }) {
-  const aiTabIndex = installPrompt === null ? -1 : installPlatforms.length;
+  const [orderedPlatforms, setOrderedPlatforms] = useState(installPlatforms);
+  const aiTabIndex = installPrompt === null ? -1 : orderedPlatforms.length;
   const { selectedIndex, setSelectedIndex, moveSelection, tabId, panelId } =
-    useArrowKeyTabs(installPlatforms.length + (installPrompt === null ? 0 : 1));
+    useArrowKeyTabs(orderedPlatforms.length + (installPrompt === null ? 0 : 1));
   const isAiTabSelected = selectedIndex === aiTabIndex;
   const selectedPlatform =
-    installPlatforms[selectedIndex] ?? installPlatforms[0];
+    orderedPlatforms[selectedIndex] ?? orderedPlatforms[0];
 
-  // The site is static, so the visitor's system is known only in the browser.
+  // The site is static, so the visitor's system is known only in the browser; its tab moves
+  // to the front and, being first, is the one selected.
   useEffect(() => {
-    const visitorPlatformIndex = installPlatforms.findIndex(
-      (installPlatform) =>
-        installPlatform.key === detectOperatingSystem(navigator.userAgent),
+    setOrderedPlatforms(
+      orderInstallPlatforms(
+        installPlatforms,
+        detectOperatingSystem(navigator.userAgent),
+      ),
     );
-    if (visitorPlatformIndex !== -1) {
-      setSelectedIndex(visitorPlatformIndex);
-    }
-  }, [setSelectedIndex]);
+  }, []);
 
   return (
     <section
+      id={quickStartSectionId}
       aria-labelledby="quick-start-heading"
-      className="flex flex-col items-center gap-6 px-4 py-20"
+      className="flex scroll-mt-16 flex-col items-center gap-6 px-4 py-20"
     >
       <SectionHeading
         headingId="quick-start-heading"
         eyebrow="Quick start"
         title="Install and run"
-        description="One binary for macOS, Windows and Linux, or a Docker image, or let your AI agent install it. Running in under a minute."
+        description="Run it with npx or bunx, use Docker, install one binary for macOS, Windows or Linux, or let your AI agent install it. Running in under a minute."
         className="mb-4"
       />
       <div
@@ -66,7 +70,7 @@ export function QuickStartSection({
         onKeyDown={moveSelection}
         className="flex flex-wrap justify-center gap-0.5 rounded-full border bg-fd-card p-1 sm:gap-1"
       >
-        {installPlatforms.map((installPlatform, platformIndex) => (
+        {orderedPlatforms.map((installPlatform, platformIndex) => (
           <button
             key={installPlatform.key}
             id={tabId(platformIndex)}
@@ -117,7 +121,7 @@ export function QuickStartSection({
         aria-labelledby={tabId(selectedIndex)}
         className="grid w-full max-w-2xl grid-cols-[minmax(0,1fr)]"
       >
-        {installPlatforms.map((installPlatform) => (
+        {orderedPlatforms.map((installPlatform) => (
           <InstallTerminalPlaceholder
             key={installPlatform.key}
             installPlatform={installPlatform}
@@ -148,33 +152,27 @@ export function QuickStartSection({
           />
         )}
         <div className="row-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)]">
-          {installPlatforms.map((installPlatform) =>
-            installPlatform.downloads.length > 0 ? (
-              <ManualDownloadLinks
-                key={installPlatform.key}
-                platformLabel={installPlatform.label}
-                downloads={installPlatform.downloads}
-                className={cn("invisible", stackedInGridCellClassName)}
-              />
-            ) : null,
-          )}
+          {orderedPlatforms.map((installPlatform) => (
+            <PlatformFooter
+              key={installPlatform.key}
+              installPlatform={installPlatform}
+              isPlaceholder
+              className={stackedInGridCellClassName}
+            />
+          ))}
           {installPrompt !== null && (
             <AiInstallLinks
               isSelected={isAiTabSelected}
               className={stackedInGridCellClassName}
             />
           )}
-          {!isAiTabSelected && selectedPlatform.downloads.length > 0 ? (
-            <div
-              data-testid="quick-start-downloads"
+          {!isAiTabSelected && (
+            <PlatformFooter
+              installPlatform={selectedPlatform}
+              isPlaceholder={false}
               className={stackedInGridCellClassName}
-            >
-              <ManualDownloadLinks
-                platformLabel={selectedPlatform.label}
-                downloads={selectedPlatform.downloads}
-              />
-            </div>
-          ) : null}
+            />
+          )}
         </div>
       </div>
     </section>

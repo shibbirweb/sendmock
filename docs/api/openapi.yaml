@@ -45,6 +45,8 @@ tags:
   - name: Saved deliveries
   - name: Webhook templates
   - name: Webhook variables
+  - name: Projects
+  - name: Push
 paths:
   /api/v1/health:
     get:
@@ -492,6 +494,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -541,6 +550,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -737,6 +753,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -774,6 +797,13 @@ paths:
           schema:
             type: string
           example: 10s
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -818,6 +848,13 @@ paths:
           schema:
             type: integer
           example: 50
+        - name: project
+          in: query
+          required: false
+          description: Only events about this project's emails, SMS and verifications (its key); every event when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -1048,6 +1085,13 @@ paths:
           schema:
             $ref: "#/components/schemas/EmailDirection"
           example: outbound
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -1062,9 +1106,73 @@ paths:
       x-sendmock-ui: Mail
     delete:
       operationId: deleteEmails
-      summary: Delete every email.
+      summary: Delete every email, or only those that match the filters.
       tags:
         - Email
+      parameters:
+        - name: query
+          in: query
+          required: false
+          description: "Search text; supports from:, to: and tag: prefixes."
+          schema:
+            type: string
+          example: to:user@example.test reset
+        - name: from
+          in: query
+          required: false
+          description: Sender contains.
+          schema:
+            type: string
+          example: no-reply@shop.test
+        - name: to
+          in: query
+          required: false
+          description: A recipient contains.
+          schema:
+            type: string
+          example: user@example.test
+        - name: tag
+          in: query
+          required: false
+          description: Has this tag.
+          schema:
+            type: string
+          example: signup
+        - name: is_unread
+          in: query
+          required: false
+          description: Only unread.
+          schema:
+            type: boolean
+          example: true
+        - name: has_attachment
+          in: query
+          required: false
+          description: Only with attachments.
+          schema:
+            type: boolean
+          example: true
+        - name: source
+          in: query
+          required: false
+          description: "How it arrived: smtp, sendmail, native_api, verify, simulated, or an email provider's key, e.g. sendgrid."
+          schema:
+            $ref: "#/components/schemas/EmailSource"
+          example: smtp
+        - name: direction
+          in: query
+          required: false
+          description: Outbound from your app or inbound to it.
+          schema:
+            $ref: "#/components/schemas/EmailDirection"
+          example: outbound
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "204":
           description: No content.
@@ -1094,6 +1202,13 @@ paths:
           schema:
             type: string
           example: Reset your password
+        - name: project
+          in: query
+          required: false
+          description: Only this project's emails (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -1322,6 +1437,42 @@ paths:
       x-sendmock-cli: sendmock email mime <emailId>
       x-sendmock-mcp: sendmock_email_mime
       x-sendmock-ui: Mail > open email > MIME
+  /api/v1/emails/{emailId}/mime/{partId}:
+    get:
+      operationId: getEmailsByEmailIdMimeByPartId
+      summary: Download one MIME part, decoded, by its position in the MIME tree.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        - name: partId
+          in: path
+          required: true
+          description: The part's position in the MIME tree, as `GET /emails/{emailId}/mime` numbers it, e.g. `1.2`.
+          schema:
+            type: string
+          example: "1.2"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mime-part <emailId> <partId>
+      x-sendmock-mcp: sendmock://emails/{emailId}/mime/{partId}
+      x-sendmock-ui: Mail > open email > MIME, download a part
   /api/v1/emails/{emailId}/raw:
     get:
       operationId: getEmailsByEmailIdRaw
@@ -1503,6 +1654,97 @@ paths:
       x-sendmock-cli: sendmock email open <emailId>
       x-sendmock-mcp: sendmock_email_open
       x-sendmock-ui: Mail > open email (opening it fires the open)
+  /api/v1/emails/{emailId}/opens:
+    get:
+      operationId: getEmailsByEmailIdOpens
+      summary: Every recorded open of the email, oldest first.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email opens <emailId>
+      x-sendmock-mcp: sendmock_email_opens
+      x-sendmock-ui: Mail > open email > Timeline (opened entries)
+  /api/v1/emails/{emailId}/clicks:
+    post:
+      operationId: postEmailsByEmailIdClicks
+      summary: Record a click on one of the email's links and fire email.clicked.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailClickRequest"
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email click <emailId>
+      x-sendmock-mcp: sendmock_email_click
+      x-sendmock-ui: Mail > open email > click a link in the preview, or Simulate click
+    get:
+      operationId: getEmailsByEmailIdClicks
+      summary: Every recorded click on the email's links, newest first.
+      tags:
+        - Email
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The email's ID, from `GET /api/v1/emails`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailClickRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email clicks <emailId>
+      x-sendmock-mcp: sendmock_email_clicks
+      x-sendmock-ui: Mail > open email > Timeline (clicked entries)
   /api/v1/emails/{emailId}/release:
     post:
       operationId: postEmailsByEmailIdRelease
@@ -2155,6 +2397,13 @@ paths:
           schema:
             type: string
           example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -2211,6 +2460,14 @@ paths:
       summary: Conversations, one per contact and your number.
       tags:
         - SMS
+      parameters:
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -2342,6 +2599,36 @@ paths:
       x-sendmock-cli: sendmock sms open <smsId>
       x-sendmock-mcp: sendmock_sms_open
       x-sendmock-ui: SMS > message menu > Simulate read
+  /api/v1/sms/{smsId}/opens:
+    get:
+      operationId: getSmsBySmsIdOpens
+      summary: Every recorded read of an outbound message, oldest first.
+      tags:
+        - SMS
+      parameters:
+        - name: smsId
+          in: path
+          required: true
+          description: The SMS's ID, from `GET /api/v1/sms`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenRecord"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opens <smsId>
+      x-sendmock-mcp: sendmock_sms_opens
+      x-sendmock-ui: SMS > message ticks (read)
   /api/v1/sms/{smsId}/reply-webhook/resend:
     post:
       operationId: postSmsBySmsIdReplyWebhookResend
@@ -2435,7 +2722,7 @@ paths:
   /api/v1/outcome-rules/email:
     get:
       operationId: getOutcomeRulesEmail
-      summary: email outcome rules, checked from top to bottom.
+      summary: Email outcome rules, checked from top to bottom.
       tags:
         - Outcome rules
       responses:
@@ -2798,6 +3085,13 @@ paths:
           schema:
             $ref: "#/components/schemas/VerifyChannel"
           example: sms
+        - name: project
+          in: query
+          required: false
+          description: Only this project's verifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "200":
           description: OK.
@@ -3704,6 +3998,32 @@ paths:
       x-sendmock-mcp: null
       x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
       x-sendmock-ui: SMS > Providers > provider > General > Reveal
+  /api/v1/sms/whatsapp-cloud/verify-webhook:
+    post:
+      operationId: postSmsWhatsappCloudVerifyWebhook
+      summary: Send Meta's callback URL check to the app and report whether it answered the challenge.
+      tags:
+        - SMS providers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappWebhookVerificationRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappWebhookVerification"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms whatsapp-cloud verify-webhook
+      x-sendmock-mcp: sendmock_sms_whatsapp_verify_webhook
+      x-sendmock-ui: SMS > Providers > WhatsApp Cloud > Verify callback URL
   /api/v1/http/bins:
     get:
       operationId: getHttpBins
@@ -4278,6 +4598,35 @@ paths:
       x-sendmock-cli: sendmock payments list
       x-sendmock-mcp: sendmock_payment_list
       x-sendmock-ui: Payments
+    post:
+      operationId: postPayments
+      summary: Create a payment and pay it with a test card, as an app's server does without a checkout page.
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments create
+      x-sendmock-mcp: sendmock_payment_create
+      x-sendmock-ui: Payments > New payment
   /api/v1/payments/test-cards:
     get:
       operationId: getPaymentsTestCards
@@ -4383,10 +4732,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaymentDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock payments simulate <paymentId> <action>
@@ -4418,6 +4771,149 @@ paths:
       x-sendmock-cli: sendmock payments checkout create
       x-sendmock-mcp: sendmock_payment_create_checkout
       x-sendmock-ui: Payments > Gateways > gateway > Checkout > Open a test checkout
+  /api/v1/payments/subscriptions:
+    get:
+      operationId: getPaymentsSubscriptions
+      summary: Subscriptions, newest first.
+      tags:
+        - Payments
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentSubscription"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions list
+      x-sendmock-mcp: sendmock_subscription_list
+      x-sendmock-ui: Payments > Subscriptions
+    post:
+      operationId: postPaymentsSubscriptions
+      summary: Start a subscription on a gateway, with an optional trial.
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSubscriptionCreateRequest"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions create
+      x-sendmock-mcp: sendmock_subscription_create
+      x-sendmock-ui: Payments > Subscriptions > New subscription
+  /api/v1/payments/subscriptions/{subscriptionId}:
+    get:
+      operationId: getPaymentsSubscriptionsBySubscriptionId
+      summary: One subscription with its timeline and renewal payments.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions show <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_get
+      x-sendmock-ui: Payments > Subscriptions > open subscription
+  /api/v1/payments/subscriptions/{subscriptionId}/advance:
+    post:
+      operationId: postPaymentsSubscriptionsBySubscriptionIdAdvance
+      summary: Move the subscription's clock to its next renewal and charge it.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions advance <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_advance
+      x-sendmock-ui: Payments > Subscriptions > Advance to renewal
+  /api/v1/payments/subscriptions/{subscriptionId}/cancel:
+    post:
+      operationId: postPaymentsSubscriptionsBySubscriptionIdCancel
+      summary: Cancel the subscription now or at the end of its period.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSubscriptionCancelRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSubscription"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions cancel <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_cancel
+      x-sendmock-ui: Payments > Subscriptions > Cancel
   /api/v1/checkout-sessions/{sessionId}:
     get:
       operationId: getCheckoutSessionsBySessionId
@@ -4479,6 +4975,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock payments checkout complete <sessionId> <action>
@@ -5350,7 +5848,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         default:
           $ref: "#/components/responses/Error"
-      x-sendmock-cli: sendmock webhook render --endpoint <endpointId>
+      x-sendmock-cli: sendmock webhook render --endpoint-id <endpointId>
       x-sendmock-mcp: sendmock_webhook_render
       x-sendmock-ui: Webhooks > Endpoints > endpoint > Request preview; Send to webhook > Preview
   /api/v1/webhooks/endpoints/{endpointId}/secret:
@@ -6196,7 +6694,7 @@ paths:
         - name: endpoints
           in: query
           required: false
-          description: "detach: move endpoints that use it to native JSON instead of failing."
+          description: "detach: endpoints that use it keep their own copy of it instead of failing."
           schema:
             type: string
           example: detach
@@ -6626,6 +7124,315 @@ paths:
       x-sendmock-cli: sendmock webhook var preview
       x-sendmock-mcp: sendmock_webhook_variable_preview
       x-sendmock-ui: Webhooks > Variables > variable sheet > Resolves to
+  /api/v1/projects:
+    get:
+      operationId: getProjects
+      summary: Every project, default first, with the traffic each holds.
+      tags:
+        - Projects
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects list
+      x-sendmock-mcp: sendmock_project_list
+      x-sendmock-ui: Settings > Projects
+    post:
+      operationId: postProjects
+      summary: Add a project that apps can send traffic to by its key.
+      tags:
+        - Projects
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects create
+      x-sendmock-mcp: sendmock_project_create
+      x-sendmock-ui: Settings > Projects > New project
+  /api/v1/projects/{projectKey}:
+    patch:
+      operationId: patchProjectsByProjectKey
+      summary: Rename a project; its key stays the same.
+      tags:
+        - Projects
+      parameters:
+        - name: projectKey
+          in: path
+          required: true
+          description: The project's key, from the list of projects.
+          schema:
+            type: string
+          example: shop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects update <projectKey>
+      x-sendmock-mcp: sendmock_project_update
+      x-sendmock-ui: Settings > Projects > Rename
+    delete:
+      operationId: deleteProjectsByProjectKey
+      summary: Delete a project with its emails, SMS and verifications.
+      tags:
+        - Projects
+      parameters:
+        - name: projectKey
+          in: path
+          required: true
+          description: The project's key, from the list of projects.
+          schema:
+            type: string
+          example: shop
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock projects delete <projectKey>
+      x-sendmock-mcp: sendmock_project_delete
+      x-sendmock-ui: Settings > Projects > Delete
+  /api/v1/push:
+    get:
+      operationId: getPush
+      summary: Push notifications, newest first, with filters.
+      tags:
+        - Push
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: The next_cursor of the previous page.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        - name: limit
+          in: query
+          required: false
+          description: Items per page, 1 to 200 (default 50).
+          schema:
+            type: integer
+          example: 50
+        - name: project
+          in: query
+          required: false
+          description: Only this project's notifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
+        - name: device_token
+          in: query
+          required: false
+          description: Only notifications to this device token.
+          schema:
+            type: string
+          example: dQw4w9WgXcQ:APA91bE1
+        - name: provider
+          in: query
+          required: false
+          description: fcm, expo or onesignal.
+          schema:
+            $ref: "#/components/schemas/PushProvider"
+          example: fcm
+        - name: status
+          in: query
+          required: false
+          description: sent or failed.
+          schema:
+            $ref: "#/components/schemas/PushStatus"
+          example: sent
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOf_PushNotification"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push list
+      x-sendmock-mcp: sendmock_push_list
+      x-sendmock-ui: Push
+    delete:
+      operationId: deletePush
+      summary: Delete every push notification, or one project's.
+      tags:
+        - Push
+      parameters:
+        - name: project
+          in: query
+          required: false
+          description: Only this project's notifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
+        - name: device_token
+          in: query
+          required: false
+          description: Only notifications to this device token.
+          schema:
+            type: string
+          example: dQw4w9WgXcQ:APA91bE1
+        - name: provider
+          in: query
+          required: false
+          description: fcm, expo or onesignal.
+          schema:
+            $ref: "#/components/schemas/PushProvider"
+          example: fcm
+        - name: status
+          in: query
+          required: false
+          description: sent or failed.
+          schema:
+            $ref: "#/components/schemas/PushStatus"
+          example: sent
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push clear
+      x-sendmock-mcp: sendmock_push_delete_all
+      x-sendmock-ui: Push > Clear all
+  /api/v1/push/{pushId}:
+    get:
+      operationId: getPushByPushId
+      summary: One push notification with its request and answer.
+      tags:
+        - Push
+      parameters:
+        - name: pushId
+          in: path
+          required: true
+          description: The notification's id, from `GET /api/v1/push`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PushNotification"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push show <pushId>
+      x-sendmock-mcp: sendmock_push_get
+      x-sendmock-ui: Push > open a notification
+    delete:
+      operationId: deletePushByPushId
+      summary: Delete one push notification.
+      tags:
+        - Push
+      parameters:
+        - name: pushId
+          in: path
+          required: true
+          description: The notification's id, from `GET /api/v1/push`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push delete <pushId>
+      x-sendmock-mcp: sendmock_push_delete
+      x-sendmock-ui: Push > open a notification > Delete
+  /api/v1/wait/push:
+    get:
+      operationId: getWaitPush
+      summary: Wait until a matching push notification arrives; 408 on timeout.
+      tags:
+        - Push
+      parameters:
+        - name: device_token
+          in: query
+          required: false
+          description: The device token.
+          schema:
+            type: string
+          example: dQw4w9WgXcQ:APA91bE1
+        - name: project
+          in: query
+          required: false
+          description: Only this project's notifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
+        - name: since
+          in: query
+          required: false
+          description: "Only notifications sent after this time (default: 30 s ago)."
+          schema:
+            type: string
+          example: 2026-11-07T10:00:00Z
+        - name: timeout
+          in: query
+          required: false
+          description: How long to wait, e.g. 10s (default 10s, at most 60s).
+          schema:
+            type: string
+          example: 10s
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PushNotification"
+        "408":
+          $ref: "#/components/responses/Timeout"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push wait
+      x-sendmock-mcp: sendmock_push_wait
+      x-sendmock-ui: Push (new notifications appear live)
 components:
   schemas:
     ActivityBucket:
@@ -6665,6 +7472,12 @@ components:
         instructions_path:
           type: string
           description: Where the skill or instructions go, e.g. `.claude/skills/sendmock/`.
+        npx_install_command:
+          type: string
+          description: The install command for someone who runs SendMock through npx, with nothing installed.
+        npx_mcp_config:
+          type: string
+          description: The MCP configuration that starts SendMock with `npx -y sendmock mcp`.
       required:
         - target
         - name
@@ -6672,6 +7485,8 @@ components:
         - mcp_config_path
         - mcp_config
         - instructions_path
+        - npx_install_command
+        - npx_mcp_config
       description: "One item of GET /api/v1/ai/agents: how to connect an AI agent."
     AiAgentTarget:
       type: string
@@ -6790,6 +7605,7 @@ components:
         - email.received
         - email.inbound
         - email.opened
+        - email.clicked
         - email.delivered
         - email.deferred
         - email.bounced
@@ -6801,9 +7617,12 @@ components:
         - sms.status
         - sms.opened
         - sms.inbound
+        - sms.reply_webhook
         - verify.started
         - verify.checked
         - verify.expired
+        - push.sent
+        - push.failed
         - http.captured
         - payment.created
         - payment.authorized
@@ -6813,9 +7632,14 @@ components:
         - payment.refunded
         - payment.partially_refunded
         - payment.dispute_opened
+        - payment.dispute_updated
         - payment.dispute_closed
         - checkout.completed
         - checkout.expired
+        - subscription.created
+        - subscription.renewed
+        - subscription.payment_failed
+        - subscription.canceled
         - webhook.delivered
         - webhook.failed
         - test.ping
@@ -6836,6 +7660,16 @@ components:
           type:
             - string
             - "null"
+        catcher_address:
+          type:
+            - string
+            - "null"
+          description: The catch-all catcher port (`--catcher-addr`); null when it is off.
+        pop3_address:
+          type:
+            - string
+            - "null"
+          description: The POP3 listener (`--pop3-addr`), which serves the captured mail per project; null when it is off.
         database_path:
           type: string
         database_size_bytes:
@@ -6843,6 +7677,11 @@ components:
         is_container:
           type: boolean
           description: True when SendMock runs in Docker, so the UI defaults to container hostnames.
+        available_operations:
+          type: array
+          items:
+            type: string
+          description: The `operationId`s this binary serves; the UI shows Not available yet for the rest.
       required:
         - version
         - channel
@@ -6850,9 +7689,12 @@ components:
         - smtp_address
         - http_address
         - provider_address
+        - catcher_address
+        - pop3_address
         - database_path
         - database_size_bytes
         - is_container
+        - available_operations
     AppSettings:
       type: object
       properties:
@@ -7018,6 +7860,23 @@ components:
           description: Used by the `random` outcome profile.
           examples:
             - 80
+        verify_default_code_length:
+          type: number
+          description: Digits in each code of a Verify service made without its own code length, 4 to 10.
+          examples:
+            - 6
+        verify_default_ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+          examples:
+            - 600
+        verify_fixed_code:
+          type:
+            - string
+            - "null"
+          description: Sent by every Verify service without its own fixed code; null for random codes.
+          examples:
+            - "123456"
       required:
         - max_emails
         - max_sms
@@ -7048,6 +7907,9 @@ components:
         - payment_default_currency
         - payment_outcome_profile
         - payment_random_success_rate_percent
+        - verify_default_code_length
+        - verify_default_ttl_seconds
+        - verify_fixed_code
     AppSettingsUpdate:
       type: object
       properties:
@@ -7213,6 +8075,23 @@ components:
           description: Used by the `random` outcome profile.
           examples:
             - 80
+        verify_default_code_length:
+          type: number
+          description: Digits in each code of a Verify service made without its own code length, 4 to 10.
+          examples:
+            - 6
+        verify_default_ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds, for a Verify service made without its own TTL.
+          examples:
+            - 600
+        verify_fixed_code:
+          type:
+            - string
+            - "null"
+          description: Sent by every Verify service without its own fixed code; null for random codes.
+          examples:
+            - "123456"
       description: "Body of PATCH /api/v1/settings: only the changed keys."
     AppStats:
       type: object
@@ -7341,6 +8220,7 @@ components:
         - number
         - boolean
         - json
+        - file
     CapturedHttpFile:
       type: object
       properties:
@@ -7810,6 +8690,46 @@ components:
         - is_inline
         - download_url
         - thumbnail_url
+    EmailClickRecord:
+      type: object
+      properties:
+        clicked_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        url:
+          type: string
+        source:
+          $ref: "#/components/schemas/OpenSource"
+        user_agent:
+          type:
+            - string
+            - "null"
+      required:
+        - clicked_at
+        - url
+        - source
+        - user_agent
+      description: One click on an email's link, newest first in `GET /emails/{emailId}/clicks`.
+    EmailClickRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The link that was clicked; one of the email's links (`extracted.links`).
+          examples:
+            - https://app.test/verify?token=abc123
+        source:
+          $ref: "#/components/schemas/OpenSource"
+          description: "Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`."
+          examples:
+            - api
+        user_agent:
+          type: string
+          description: The browser or client that clicked, kept in the click history. The UI sends its own.
+          examples:
+            - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+      required:
+        - url
+      description: Body of `POST /emails/{emailId}/clicks`.
     EmailDeliveryStatus:
       type: string
       enum:
@@ -7868,6 +8788,9 @@ components:
           anyOf:
             - $ref: "#/components/schemas/IsoTimestamp"
             - type: "null"
+        click_count:
+          type: number
+          description: Every recorded click on the email's links (`GET /emails/{emailId}/clicks`).
         smtp_session_id:
           anyOf:
             - $ref: "#/components/schemas/Ulid"
@@ -7931,11 +8854,17 @@ components:
             - $ref: "#/components/schemas/EmailResponseKind"
             - type: "null"
           description: Set on inbound emails made by Reply or Forward, for the list icon.
+        project:
+          type: string
+          description: "The project the email was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - attachment_count
         - attachments
         - bcc
         - cc
+        - click_count
         - delivery_status
         - direction
         - envelope_from
@@ -7950,6 +8879,7 @@ components:
         - message_id
         - open_count
         - opened_at
+        - project
         - received_at
         - reply_to
         - response_kind
@@ -8339,6 +9269,11 @@ components:
             - $ref: "#/components/schemas/EmailResponseKind"
             - type: "null"
           description: Set on inbound emails made by Reply or Forward, for the list icon.
+        project:
+          type: string
+          description: "The project the email was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - id
         - received_at
@@ -8356,6 +9291,7 @@ components:
         - has_otp
         - direction
         - response_kind
+        - project
       description: Fields shown in the mail list.
     EmailTemplateData:
       type: object
@@ -8386,6 +9322,7 @@ components:
       enum:
         - received
         - opened
+        - clicked
         - delivered
         - deferred
         - bounced
@@ -8422,7 +9359,7 @@ components:
             - user.email
         value_type:
           $ref: "#/components/schemas/BodyFieldType"
-          description: "How the rendered value is encoded: `text`, `number`, `boolean` or `json`."
+          description: "How the rendered value is encoded: `text`, `number`, `boolean`, `json`, or `file` (a URL fetched when the request is sent, for `multipart` only)."
           examples:
             - text
         value:
@@ -8486,10 +9423,10 @@ components:
       properties:
         endpoint:
           $ref: "#/components/schemas/WebhookEndpointInput"
-          description: The endpoint settings to render, saved or not.
+          description: The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
         endpoint_id:
           $ref: "#/components/schemas/Ulid"
-          description: A saved endpoint's own variables are used too.
+          description: A saved endpoint's own variables are used too; alone, its stored settings are rendered.
           examples:
             - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         email_id:
@@ -8514,8 +9451,6 @@ components:
           description: Send-time values by variable name (no `vars.`); they win for this render.
           examples:
             - app_token: test-token
-      required:
-        - endpoint
       description: Body of POST /api/v1/webhooks/endpoints/preview.
     EndpointPreviewResult:
       type: object
@@ -8565,7 +9500,7 @@ components:
       properties:
         failure_code:
           type: string
-          description: HTTP status as text (`"500"`), or `"timeout"` / `"connection"`.
+          description: HTTP status as text (`"500"`), `"render_failed"` or `"no_response"`.
         failure_count:
           type: number
       required:
@@ -9321,7 +10256,7 @@ components:
           type: string
           description: The file bytes, base64 encoded.
           examples:
-            - /9j/4AAQSkZJRgABAQ
+            - /9j/4AAQSkZJRgABAQ==
         content_type:
           type: string
           description: Guessed from the file extension when missing.
@@ -10167,7 +11102,28 @@ components:
           description: "Who opened it: `ui` (the SendMock UI), `manual` (a person marking it) or `api` (a script). Defaults to `api`."
           examples:
             - api
+        user_agent:
+          type: string
+          description: The browser or client that opened it, kept in the open history. The UI sends its own.
+          examples:
+            - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
+    OpenRecord:
+      type: object
+      properties:
+        opened_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        source:
+          $ref: "#/components/schemas/OpenSource"
+        user_agent:
+          type:
+            - string
+            - "null"
+      required:
+        - opened_at
+        - source
+        - user_agent
+      description: One open of an email or SMS, oldest first in `GET /emails/{emailId}/opens` and `GET /sms/{smsId}/opens`.
     OpenSource:
       type: string
       enum:
@@ -10308,6 +11264,23 @@ components:
         - items
         - next_cursor
         - total_count
+    PageOf_PushNotification:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PushNotification"
+        next_cursor:
+          type:
+            - string
+            - "null"
+        total_count:
+          type: number
+      required:
+        - items
+        - next_cursor
+        - total_count
     PageOf_SmsMessage:
       type: object
       properties:
@@ -10376,6 +11349,12 @@ components:
         - items
         - next_cursor
         - total_count
+    PaymentCaptureMethod:
+      type: string
+      enum:
+        - automatic
+        - manual
+      description: "`manual` holds the money as `authorized` until it is captured or voided."
     PaymentCheckoutCreateRequest:
       type: object
       properties:
@@ -10419,10 +11398,73 @@ components:
             - - name: T-shirt
                 quantity: 1
                 unit_amount_minor: 1999
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
+          description: "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out."
+          examples:
+            - manual
       required:
         - provider
         - amount_minor
       description: "Body of POST /api/v1/payments/checkout: a hosted test checkout."
+    PaymentCreateRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: The gateway key, e.g. `stripe` or `sslcommerz`.
+          examples:
+            - stripe
+        amount_minor:
+          type: number
+          description: The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.
+          examples:
+            - 1999
+        currency:
+          type: string
+          description: Three letters, stored in capitals; Settings > Payments' default currency when left out.
+          examples:
+            - USD
+        card_number:
+          type: string
+          description: A test card of the card method; its outcome in the test card table decides the payment. A number the table does not list is refused and kept nowhere.
+          examples:
+            - "4242424242424242"
+        customer_email:
+          type: string
+          description: The customer's email.
+          examples:
+            - user@example.test
+        line_items:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              quantity:
+                type: number
+              unit_amount_minor:
+                type: number
+            required:
+              - name
+              - quantity
+              - unit_amount_minor
+          description: What is being bought.
+          examples:
+            - - name: T-shirt
+                quantity: 1
+                unit_amount_minor: 1999
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
+          description: "`manual` authorizes the payment and waits for a capture or void; `automatic` when left out."
+          examples:
+            - automatic
+      required:
+        - provider
+        - amount_minor
+        - card_number
+      description: "Body of POST /api/v1/payments: a payment the app's server pays with a test card."
     PaymentDetail:
       type: object
       properties:
@@ -10469,6 +11511,8 @@ components:
             - type: "null"
         captured_minor:
           type: number
+        capture_method:
+          $ref: "#/components/schemas/PaymentCaptureMethod"
         method_key:
           type:
             - string
@@ -10524,6 +11568,7 @@ components:
       required:
         - amount_minor
         - cancel_url
+        - capture_method
         - captured_minor
         - checkout_url
         - created_at
@@ -10557,15 +11602,35 @@ components:
           type: string
           enum:
             - needs_response
+            - under_review
             - won
             - lost
         reason:
           type: string
+        evidence:
+          type:
+            - string
+            - "null"
+          description: What the merchant answered with; null until the dispute is answered.
       required:
         - status
         - reason
+        - evidence
     PaymentEventType:
-      $ref: "#/components/schemas/AppEventType"
+      type: string
+      enum:
+        - payment.created
+        - payment.authorized
+        - payment.succeeded
+        - payment.failed
+        - payment.canceled
+        - payment.refunded
+        - payment.partially_refunded
+        - payment.dispute_opened
+        - payment.dispute_updated
+        - payment.dispute_closed
+        - checkout.completed
+        - checkout.expired
       description: A native event a payment notification can carry.
     PaymentFlowDefinition:
       type: object
@@ -10822,42 +11887,6 @@ components:
         event_names:
           type: object
           properties:
-            email.received:
-              type: string
-            email.inbound:
-              type: string
-            email.opened:
-              type: string
-            email.delivered:
-              type: string
-            email.deferred:
-              type: string
-            email.bounced:
-              type: string
-            email.complained:
-              type: string
-            email.unsubscribed:
-              type: string
-            email.released:
-              type: string
-            email.deleted:
-              type: string
-            sms.sent:
-              type: string
-            sms.status:
-              type: string
-            sms.opened:
-              type: string
-            sms.inbound:
-              type: string
-            verify.started:
-              type: string
-            verify.checked:
-              type: string
-            verify.expired:
-              type: string
-            http.captured:
-              type: string
             payment.created:
               type: string
             payment.authorized:
@@ -10874,37 +11903,15 @@ components:
               type: string
             payment.dispute_opened:
               type: string
+            payment.dispute_updated:
+              type: string
             payment.dispute_closed:
               type: string
             checkout.completed:
               type: string
             checkout.expired:
               type: string
-            webhook.delivered:
-              type: string
-            webhook.failed:
-              type: string
-            test.ping:
-              type: string
           required:
-            - email.received
-            - email.inbound
-            - email.opened
-            - email.delivered
-            - email.deferred
-            - email.bounced
-            - email.complained
-            - email.unsubscribed
-            - email.released
-            - email.deleted
-            - sms.sent
-            - sms.status
-            - sms.opened
-            - sms.inbound
-            - verify.started
-            - verify.checked
-            - verify.expired
-            - http.captured
             - payment.created
             - payment.authorized
             - payment.succeeded
@@ -10913,12 +11920,10 @@ components:
             - payment.refunded
             - payment.partially_refunded
             - payment.dispute_opened
+            - payment.dispute_updated
             - payment.dispute_closed
             - checkout.completed
             - checkout.expired
-            - webhook.delivered
-            - webhook.failed
-            - test.ping
           description: The gateway's name for each native event; blank sends nothing.
           examples:
             - payment.succeeded: PAYMENT_SUCCESS
@@ -11029,42 +12034,6 @@ components:
         event_names:
           type: object
           properties:
-            email.received:
-              type: string
-            email.inbound:
-              type: string
-            email.opened:
-              type: string
-            email.delivered:
-              type: string
-            email.deferred:
-              type: string
-            email.bounced:
-              type: string
-            email.complained:
-              type: string
-            email.unsubscribed:
-              type: string
-            email.released:
-              type: string
-            email.deleted:
-              type: string
-            sms.sent:
-              type: string
-            sms.status:
-              type: string
-            sms.opened:
-              type: string
-            sms.inbound:
-              type: string
-            verify.started:
-              type: string
-            verify.checked:
-              type: string
-            verify.expired:
-              type: string
-            http.captured:
-              type: string
             payment.created:
               type: string
             payment.authorized:
@@ -11081,37 +12050,15 @@ components:
               type: string
             payment.dispute_opened:
               type: string
+            payment.dispute_updated:
+              type: string
             payment.dispute_closed:
               type: string
             checkout.completed:
               type: string
             checkout.expired:
               type: string
-            webhook.delivered:
-              type: string
-            webhook.failed:
-              type: string
-            test.ping:
-              type: string
           required:
-            - email.received
-            - email.inbound
-            - email.opened
-            - email.delivered
-            - email.deferred
-            - email.bounced
-            - email.complained
-            - email.unsubscribed
-            - email.released
-            - email.deleted
-            - sms.sent
-            - sms.status
-            - sms.opened
-            - sms.inbound
-            - verify.started
-            - verify.checked
-            - verify.expired
-            - http.captured
             - payment.created
             - payment.authorized
             - payment.succeeded
@@ -11120,12 +12067,10 @@ components:
             - payment.refunded
             - payment.partially_refunded
             - payment.dispute_opened
+            - payment.dispute_updated
             - payment.dispute_closed
             - checkout.completed
             - checkout.expired
-            - webhook.delivered
-            - webhook.failed
-            - test.ping
           description: The gateway's name for each native event; blank sends nothing.
           examples:
             - payment.succeeded: PAYMENT_SUCCESS
@@ -11550,6 +12495,7 @@ components:
         - decline
         - refund
         - dispute
+        - answer_dispute
         - resolve_dispute
         - expire
         - capture
@@ -11559,7 +12505,7 @@ components:
       properties:
         action:
           $ref: "#/components/schemas/PaymentSimulateAction"
-          description: "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `resolve_dispute`, `expire`, `capture` or `void`."
+          description: "What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`."
           examples:
             - refund
         decline_reason:
@@ -11580,6 +12526,11 @@ components:
           description: "For `resolve_dispute`: `won` or `lost`."
           examples:
             - won
+        dispute_evidence:
+          type: string
+          description: "For `answer_dispute`: the evidence sent to the bank."
+          examples:
+            - Signed delivery receipt attached.
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -11664,6 +12615,139 @@ components:
         - method_values
         - default_labels
       description: "GET /api/v1/payments/step-types: one entry of the step catalogue."
+    PaymentSubscription:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Ulid"
+        provider:
+          type: string
+          description: The gateway's key.
+        provider_name:
+          type: string
+        customer_email:
+          type: string
+        plan_name:
+          type: string
+        amount_minor:
+          type: number
+        currency:
+          type: string
+        interval:
+          $ref: "#/components/schemas/SubscriptionInterval"
+        status:
+          $ref: "#/components/schemas/SubscriptionStatus"
+        card_last4:
+          type: string
+          description: The last four digits of the test card that pays each renewal.
+        trial_end:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        current_period_start:
+          $ref: "#/components/schemas/IsoTimestamp"
+        current_period_end:
+          $ref: "#/components/schemas/IsoTimestamp"
+        cancel_at_period_end:
+          type: boolean
+          description: True when it ends at the next advance instead of renewing.
+        canceled_at:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        renewal_count:
+          type: number
+        payment_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: The payments charged for it, oldest first.
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubscriptionTimelineEvent"
+      required:
+        - id
+        - provider
+        - provider_name
+        - customer_email
+        - plan_name
+        - amount_minor
+        - currency
+        - interval
+        - status
+        - card_last4
+        - trial_end
+        - current_period_start
+        - current_period_end
+        - cancel_at_period_end
+        - canceled_at
+        - renewal_count
+        - payment_ids
+        - created_at
+        - timeline
+      description: A subscription and its own clock, renewed when advanced.
+    PaymentSubscriptionCancelRequest:
+      type: object
+      properties:
+        at_period_end:
+          type: boolean
+          description: End at the next advance instead of now.
+          examples:
+            - false
+      description: Body of POST /api/v1/payments/subscriptions/{subscriptionId}/cancel.
+    PaymentSubscriptionCreateRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: The gateway's key.
+          examples:
+            - stripe
+        customer_email:
+          type: string
+          description: Who pays.
+          examples:
+            - sam@example.test
+        plan_name:
+          type: string
+          description: The plan's name, shown on each renewal's payment.
+          examples:
+            - Pro monthly
+        amount_minor:
+          type: number
+          description: The amount of each renewal in minor units.
+          examples:
+            - 1500
+        currency:
+          type: string
+          description: ISO 4217 code; Settings > Payments' default currency when left out.
+          examples:
+            - USD
+        interval:
+          $ref: "#/components/schemas/SubscriptionInterval"
+          description: "How often it renews: `day`, `week`, `month` or `year`."
+          examples:
+            - month
+        trial_days:
+          type: number
+          description: Days before the first charge; none charges at once.
+          examples:
+            - 7
+        card_number:
+          type: string
+          description: The test card that pays each renewal; `4242424242424242` when left out.
+          examples:
+            - "4000000000009995"
+      required:
+        - provider
+        - customer_email
+        - plan_name
+        - amount_minor
+        - interval
+      description: Body of POST /api/v1/payments/subscriptions.
     PaymentSummary:
       type: object
       properties:
@@ -11741,10 +12825,77 @@ components:
         - expired
         - refunded
         - dispute_opened
+        - dispute_answered
         - dispute_closed
         - redirected
         - delayed
         - notification_sent
+    Project:
+      type: object
+      properties:
+        key:
+          type: string
+          description: What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.
+          examples:
+            - shop
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+        created_at:
+          type: string
+          examples:
+            - 2026-11-07T10:00:00Z
+        email_count:
+          type: number
+          examples:
+            - 12
+        sms_count:
+          type: number
+          examples:
+            - 4
+        verification_count:
+          type: number
+          examples:
+            - 2
+      required:
+        - key
+        - name
+        - created_at
+        - email_count
+        - sms_count
+        - verification_count
+      description: "A name for captured traffic: the emails, SMS and verifications sent to it."
+    ProjectInput:
+      type: object
+      properties:
+        key:
+          type: string
+          description: What apps send as the SMTP username, the `X-SendMock-Project` header or the `/projects/<key>/` URL prefix. It never changes.
+          examples:
+            - shop
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+      required:
+        - key
+        - name
+      description: Body of POST /api/v1/projects.
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A name for the project, shown in the UI.
+          examples:
+            - Shop
+      required:
+        - name
+      additionalProperties: false
+      description: "Body of PATCH /api/v1/projects/{projectKey}: the new name."
     ProviderCredential:
       type: object
       properties:
@@ -11884,6 +13035,7 @@ components:
         - tags
         - template_id
         - template_data
+        - raw
         - body
         - media_urls
         - messaging_service
@@ -12030,6 +13182,104 @@ components:
         - max_length
         - error_kind
       description: A check on a request, and the error it answers when the check fails.
+    PushNotification:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Ulid"
+        provider:
+          $ref: "#/components/schemas/PushProvider"
+          examples:
+            - fcm
+        provider_message_id:
+          type: string
+          description: The id the provider's answer named, such as FCM's message name.
+          examples:
+            - projects/shop-app/messages/0:1762500000000000%a1b2c3d4e5f60718
+        device_token:
+          type: string
+          description: The FCM registration token, Expo push token or OneSignal subscription it went to; a topic or condition send shows as `topic:<name>` or `condition:<expression>`.
+          examples:
+            - dQw4w9WgXcQ:APA91bE1
+        platform:
+          type:
+            - string
+            - "null"
+          enum:
+            - android
+            - ios
+            - web
+            - null
+          description: "`android`, `ios` or `web` when the message targets one."
+        title:
+          type:
+            - string
+            - "null"
+          examples:
+            - Your order shipped
+        body:
+          type:
+            - string
+            - "null"
+          examples:
+            - Track it in the app.
+        image_url:
+          type:
+            - string
+            - "null"
+        data:
+          type: object
+          additionalProperties: {}
+          description: The data payload, key to value.
+        status:
+          $ref: "#/components/schemas/PushStatus"
+        error_reason:
+          type:
+            - string
+            - "null"
+        request:
+          description: The request body as the app sent it.
+        response_status:
+          type: number
+          examples:
+            - 200
+        response:
+          description: What SendMock answered, in the provider's shape.
+        project:
+          type: string
+          examples:
+            - default
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - id
+        - provider
+        - provider_message_id
+        - device_token
+        - platform
+        - title
+        - body
+        - image_url
+        - data
+        - status
+        - error_reason
+        - request
+        - response_status
+        - response
+        - project
+        - created_at
+      description: A push notification as the provider's API received it, with what SendMock answered.
+    PushProvider:
+      type: string
+      enum:
+        - fcm
+        - expo
+        - onesignal
+    PushStatus:
+      type: string
+      enum:
+        - sent
+        - failed
     RecentFailedDelivery:
       type: object
       properties:
@@ -12185,7 +13435,7 @@ components:
       properties:
         field:
           type: string
-          description: "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for opens `open_count`, `first_open`, `source`."
+          description: "The message field: for email `from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`; for SMS `from`, `to`, `body`, `status`, `api`; for push `token`, `title`, `body`, `provider`, `status`; for opens `open_count`, `first_open`, `source`."
           examples:
             - subject
         operator:
@@ -12786,6 +14036,11 @@ components:
           $ref: "#/components/schemas/IsoTimestamp"
         updated_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - id
         - provider_id
@@ -12810,6 +14065,7 @@ components:
         - in_reply_to_sms_id
         - created_at
         - updated_at
+        - project
     SmsMessageDetail:
       type: object
       properties:
@@ -12899,6 +14155,11 @@ components:
           $ref: "#/components/schemas/IsoTimestamp"
         updated_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - account
         - api
@@ -12918,6 +14179,7 @@ components:
         - messaging_service_sid
         - open_count
         - opened_at
+        - project
         - provider_id
         - reply_webhook
         - reply_webhook_attempts
@@ -13375,6 +14637,42 @@ components:
         - name
         - score
         - description
+    SubscriptionInterval:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+        - year
+      description: How often a subscription renews.
+    SubscriptionStatus:
+      type: string
+      enum:
+        - trialing
+        - active
+        - past_due
+        - canceled
+    SubscriptionTimelineEvent:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/SubscriptionTimelineKind"
+        description:
+          type: string
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - kind
+        - description
+        - created_at
+    SubscriptionTimelineKind:
+      type: string
+      enum:
+        - created
+        - renewed
+        - payment_failed
+        - cancel_scheduled
+        - canceled
     TagRule:
       type: object
       properties:
@@ -13468,6 +14766,7 @@ components:
       enum:
         - email-provider
         - sms-provider
+        - payment-provider
         - chat
         - automation
         - generic
@@ -13633,6 +14932,11 @@ components:
         http_request_id:
           $ref: "#/components/schemas/Ulid"
           description: A captured HTTP request, as the data of an `http.captured` event.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        payment_id:
+          $ref: "#/components/schemas/Ulid"
+          description: A payment, as the data of the event its latest state stands for.
           examples:
             - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         draft:
@@ -13856,6 +15160,12 @@ components:
         - outcome
         - decline_reason
       description: A test account number or voucher code with its outcome.
+    TwimlMethod:
+      type: string
+      enum:
+        - GET
+        - POST
+      description: How a TwiML `action` or `<Redirect>` URL is requested; `POST` by default.
     TwimlVerb:
       anyOf:
         - type: object
@@ -13877,6 +15187,13 @@ components:
               type:
                 - string
                 - "null"
+            action:
+              type:
+                - string
+                - "null"
+              description: Requested once the reply is sent, with `method`.
+            method:
+              $ref: "#/components/schemas/TwimlMethod"
             media_urls:
               type: array
               items:
@@ -13887,6 +15204,8 @@ components:
             - to
             - from
             - status_callback
+            - action
+            - method
             - media_urls
         - type: object
           properties:
@@ -13895,9 +15214,12 @@ components:
               const: Redirect
             url:
               type: string
+            method:
+              $ref: "#/components/schemas/TwimlMethod"
           required:
             - verb
             - url
+            - method
       description: A verb of the TwiML an app answered with.
     Ulid:
       type: string
@@ -14024,6 +15346,11 @@ components:
             - string
             - "null"
           description: Conversation of the linked SMS, for the "Open message" link.
+        project:
+          type: string
+          description: "The project the verification was started in: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - sid
         - service_sid
@@ -14038,6 +15365,7 @@ components:
         - created_at
         - linked_message_id
         - linked_thread_id
+        - project
     VerificationDetail:
       type: object
       properties:
@@ -14077,6 +15405,11 @@ components:
             - string
             - "null"
           description: Conversation of the linked SMS, for the "Open message" link.
+        project:
+          type: string
+          description: "The project the verification was started in: `default` unless the sender named another."
+          examples:
+            - default
       required:
         - channel
         - check_attempts
@@ -14085,6 +15418,7 @@ components:
         - expires_at
         - linked_message_id
         - linked_thread_id
+        - project
         - send_attempts
         - service_name
         - service_sid
@@ -14590,7 +15924,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:
@@ -14727,7 +16062,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:
@@ -14839,7 +16175,8 @@ components:
           enum:
             - json
             - form
-          description: "How `fields` mode is sent: `json` or `form` (`x-www-form-urlencoded`)."
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
           examples:
             - json
         raw_content_type:
@@ -15327,6 +16664,53 @@ components:
         - random_mode
         - description
       description: Body of POST and PATCH /api/v1/webhooks/variables.
+    WhatsappWebhookVerification:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL called, with the check's query.
+        challenge:
+          type: string
+          description: The `hub.challenge` sent, which the app must answer as its whole body.
+          examples:
+            - "1158201444"
+        is_verified:
+          type: boolean
+          description: True when the app answered `200` with exactly the challenge, as Meta requires.
+        status_code:
+          type:
+            - number
+            - "null"
+          examples:
+            - 200
+        answer:
+          type:
+            - string
+            - "null"
+          description: The app's answer body.
+        error:
+          type:
+            - string
+            - "null"
+          description: Why there was no answer, such as a refused connection.
+      required:
+        - url
+        - challenge
+        - is_verified
+        - status_code
+        - answer
+        - error
+      description: What the app answered Meta's callback URL check.
+    WhatsappWebhookVerificationRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL to check; the WhatsApp Cloud provider's `webhook_url` when left out.
+          examples:
+            - http://127.0.0.1:3000/whatsapp/webhook
+      description: Body of POST /api/v1/sms/whatsapp-cloud/verify-webhook.
   responses:
     BadRequest:
       description: The request is invalid.

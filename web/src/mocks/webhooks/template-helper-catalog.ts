@@ -1,4 +1,5 @@
 import type { TemplateReferenceHelper } from "@/lib/api/types";
+import { fakeFunctionCatalog } from "@/mocks/webhooks/template-fake-functions";
 
 /** Functions templates can call, documented for the reference panel (WH-07.9). */
 export const templateFunctionCatalog: TemplateReferenceHelper[] = [
@@ -23,15 +24,24 @@ export const templateFunctionCatalog: TemplateReferenceHelper[] = [
   },
   {
     name: "mailgun_signature",
-    signature: "mailgun_signature(signing_key)",
+    signature: "mailgun_signature(signing_key, timestamp, token)",
     description: "Mailgun's HMAC signature over timestamp and token.",
     example: "3f1a9c...e07b",
   },
   {
     name: "svix_signature",
-    signature: "svix_signature(signing_secret)",
-    description: "A Svix signature header, as Resend sends it.",
+    signature: "svix_signature(signing_secret, svix_id, svix_timestamp)",
+    description:
+      "A Svix signature header over the rendered body, as Resend sends it.",
     example: "v1,K5oZfzN95Z9UVu1EsfQmfVNQ=",
+  },
+  {
+    name: "sendgrid_signature",
+    signature: "sendgrid_signature(timestamp)",
+    description:
+      "SendGrid's ECDSA event webhook signature over the timestamp and the rendered body, with SendMock's published test key.",
+    example:
+      "MEUCIQCtIHJeH93Y+qpYeWrySphQgpNGNr/U+UyUlBkU6n7RAwIgJTz2C+8a8xonZGi6BpSzoQsbVRamr2nlxFDWYNH3j/0=",
   },
   {
     name: "uuid",
@@ -55,9 +65,38 @@ export const templateFunctionCatalog: TemplateReferenceHelper[] = [
     name: "stripe_signature",
     signature: "stripe_signature(secret)",
     description:
-      "A Stripe-Signature header (t=...,v1=...), as Stripe sends it.",
+      "A Stripe-Signature header (t=...,v1=...) over the rendered body, as Stripe sends it.",
     example: "t=1792914927,v1=5257a869e7ecebeda32a...",
   },
+  {
+    name: "razorpay_signature",
+    signature: "razorpay_signature(secret)",
+    description:
+      "An X-Razorpay-Signature header: the HMAC-SHA256 of the rendered body.",
+    example: "0ea09d611215f3d22f53207c37444d39...",
+  },
+  {
+    name: "whatsapp_signature",
+    signature: "whatsapp_signature(app_secret)",
+    description:
+      "An X-Hub-Signature-256 header (sha256=...): the HMAC-SHA256 of the rendered body with the app secret, as Meta signs WhatsApp webhooks.",
+    example: "sha256=4b1c3d2e9f0a7b6c5d4e3f2a1b0c9d8e...",
+  },
+  {
+    name: "paddle_signature",
+    signature: "paddle_signature(secret)",
+    description:
+      "A Paddle-Signature header (ts=...;h1=...) over the rendered body.",
+    example: "ts=1792914927;h1=b2911e60fc933435...",
+  },
+  {
+    name: "sslcommerz_verify_sign",
+    signature: "sslcommerz_verify_sign(store_password, fields)",
+    description:
+      "SSLCommerz's verify_sign: the MD5 of the named fields and the store password.",
+    example: "44fd62c8ac77ea7f03a9526172a3dec7",
+  },
+  ...fakeFunctionCatalog,
 ];
 
 /** Filters, applied with `| name`, documented for the reference panel (WH-07.9). */
@@ -82,6 +121,33 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     example: "{{ data.body | urlencode }}",
   },
   {
+    name: "mailgun_event",
+    signature: "mailgun_event",
+    description:
+      "The event type in Mailgun's words (accepted, delivered, failed, opened).",
+    example: "{{ event.type | mailgun_event }}",
+  },
+  {
+    name: "postmark_record_type",
+    signature: "postmark_record_type",
+    description:
+      "The event type as Postmark's RecordType (Delivery, Bounce, SpamComplaint, Open).",
+    example: "{{ event.type | postmark_record_type }}",
+  },
+  {
+    name: "brevo_event",
+    signature: "brevo_event",
+    description:
+      "The event type in Brevo's words (delivered, hard_bounce, spam).",
+    example: "{{ event.type | brevo_event }}",
+  },
+  {
+    name: "unix",
+    signature: "unix",
+    description: "A date or ISO timestamp as Unix seconds.",
+    example: "{{ event.created_at | unix }}",
+  },
+  {
     name: "lower",
     signature: "lower",
     description: "Lowercase.",
@@ -92,6 +158,30 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     signature: "upper",
     description: "Uppercase.",
     example: "{{ vars.tenant_id | upper }}",
+  },
+  {
+    name: "length",
+    signature: "length",
+    description: "The number of items in a list, or characters in text.",
+    example: "{{ data.media | length }}",
+  },
+  {
+    name: "replace",
+    signature: "replace(old, new)",
+    description: "Replaces every occurrence of old with new.",
+    example: '{{ data.to_number | replace("+", "") }}',
+  },
+  {
+    name: "regex_extract",
+    signature: "regex_extract(pattern)",
+    description: "The first match of the regular expression, or empty.",
+    example: '{{ data.body | regex_extract("[0-9]{6}") }}',
+  },
+  {
+    name: "date",
+    signature: "date(format)",
+    description: "Formats a time with strftime codes, in UTC.",
+    example: '{{ event.created_at | date("%Y-%m-%d %H:%M:%S") }}',
   },
   {
     name: "sendgrid_event",
@@ -113,5 +203,12 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     description:
       "An event type as Resend names it: email.bounced stays email.bounced.",
     example: "{{ event.type | resend_type }}",
+  },
+  {
+    name: "payment_event",
+    signature: "payment_event(provider)",
+    description:
+      "A payment event as the provider names it: payment.succeeded becomes payment_intent.succeeded for stripe.",
+    example: '{{ event.type | payment_event("stripe") }}',
   },
 ];

@@ -1,0 +1,76 @@
+import type { DeeperEntry, DeeperPage } from "../deeper-types";
+
+const numberListEntries: DeeperEntry[] = [
+  { control: "heading: Numbers", does: "Names the screen, in the header and above the tabs." },
+  {
+    control: "link: Read the Numbers guide",
+    does: "Opens this screen's page in the user guide, in a new tab.",
+    links: "[Numbers](../../numbers.md).",
+  },
+  {
+    control: "paragraph: Fake numbers with inbound webhooks and status callbacks, and the Messaging Services that pool them.",
+    does: "Explains the screen.",
+  },
+  { control: "tab: Numbers", does: "Your app's fake phone numbers.", operationIds: ["getNumbers"] },
+  { control: "tab: Messaging Services", does: "Sender pools, as Twilio's Messaging Services.", operationIds: ["getMessagingServices"] },
+  { control: "paragraph: Fake numbers your app sends from, with their inbound webhooks.", does: "Explains numbers." },
+  { control: "button: Add number", does: "Opens the number editor; in it, adds the number.", operationIds: ["postNumbers"] },
+  { control: "columnheader: Number", does: "The number and its label." },
+  { control: "columnheader: Channels", does: "SMS, WhatsApp or both." },
+  { control: "columnheader: Webhooks", does: "Its inbound webhook URL and fallback." },
+  { control: "columnheader: Messaging Service", does: "The pool it belongs to." },
+  { control: "columnheader: Actions", does: "Copy, Edit and Delete." },
+  { control: "each item, button: Copy +#", does: "Copies the number." },
+  { control: "each item, button: Edit +#", does: "Opens the number's editor." },
+  { control: "each item, button: Delete +#", does: "Deletes the number after you confirm.", operationIds: ["deleteNumbersByNumberId"] },
+  { control: "paragraph: Sender pools for sends with MessagingServiceSid.", does: "Explains Messaging Services: a send with `MessagingServiceSid` picks a sender from the pool." },
+  { control: "button: New service", does: "Adds a Messaging Service.", operationIds: ["postMessagingServices"] },
+  { control: "columnheader: Name", does: "The service's name." },
+  { control: "columnheader: Senders", does: "The numbers in its pool." },
+  { control: "columnheader: Inbound messages", does: "Where its inbound messages go: its own URL, or each number's." },
+  { control: "each item, button: Copy SID of Acme …", does: "Copies the service's `MG...` SID." },
+  { control: "each item, button: Edit Acme …", does: "Opens the service's settings.", operationIds: ["patchMessagingServicesByServiceSid"] },
+  { control: "each item, button: Delete Acme …", does: "Deletes the service after you confirm.", operationIds: ["deleteMessagingServicesByServiceSid"] },
+  {
+    control: "alert: Could not load the numbers. Try again",
+    does: "Shown when the numbers could not be loaded.",
+    errors: "Check SendMock is running, then press Try again.",
+  },
+  { control: "paragraph: Could not load the numbers.", does: "The message inside the alert." },
+  { control: "button: Try again", does: "Loads them again.", operationIds: ["getNumbers"] },
+];
+
+const numberEditorEntries: DeeperEntry[] = [
+  { control: "heading: Add a number", does: "The number editor, for a new number." },
+  { control: "heading: Edit number", does: "The number editor, for an existing number." },
+  { control: "paragraph: A fake number your app owns, set up like a provider console.", does: "Explains the editor." },
+  { control: "textbox: Number", does: "The number in E.164 form, such as `+15550001111`." },
+  { control: "textbox: Label", does: "A name for it." },
+  { control: "checkbox: SMS", does: "It sends and receives SMS." },
+  { control: "checkbox: WhatsApp", does: "It sends and receives WhatsApp messages." },
+  { control: "textbox: Webhook URL", does: "Where an inbound message to the number is posted, as Twilio's reply webhook; the TwiML answer is read." },
+  { control: "paragraph: Leave empty to deliver inbound messages through webhook rules only.", does: "Explains an empty webhook URL." },
+  { control: "combobox: Method", does: "POST or GET for the webhook." },
+  { control: "combobox: Format", does: "The webhook's format, Twilio's by default." },
+  { control: "textbox: Fallback URL", does: "Called when the webhook URL fails." },
+  { control: "paragraph: Called with ErrorCode and ErrorUrl when the webhook URL fails.", does: "Explains the fallback, as Twilio does it." },
+  { control: "textbox: Default status callback", does: "Where status callbacks go for sends that give none." },
+  { control: "paragraph: Used when a send from this number has no StatusCallback.", does: "Explains the default status callback." },
+  { control: "combobox: Messaging Service", does: "The pool the number belongs to, if any." },
+  { control: "button: Cancel", does: "Closes the editor without saving." },
+  { control: "button: Add number", state: "New number editor", does: "Adds the number.", operationIds: ["postNumbers"] },
+  { control: "button: Save changes", does: "Saves the number.", operationIds: ["patchNumbersByNumberId"] },
+  { control: "button: Close", does: "Closes the editor without saving." },
+];
+
+/** Numbers: fake numbers and Messaging Services. */
+export const numbersPage: DeeperPage = {
+  screen: "/numbers",
+  file: "numbers.md",
+  title: "Numbers in depth",
+  description: "Every control and text of Numbers, Messaging Services and the number editor.",
+  guidePage: "numbers.md",
+  guideTitle: "Numbers",
+  intro: "Numbers holds the fake phone numbers your app owns, with their webhooks, and the Messaging Services that pool them.",
+  entries: [...numberListEntries, ...numberEditorEntries],
+};

@@ -35,6 +35,30 @@ function runCommand(
   });
 }
 
+/**
+ * The address a TanStack Router route file serves: a dot separates segments as
+ * a slash does, a trailing `_` only stops nesting in the parent's layout, a
+ * leading `_` (a layout) and `(group)` add no segment, and `index` is the folder.
+ * So `mail_.providers.tsx` serves `mail/providers`.
+ */
+export function toAppRoutePath(routeFilePath: string): string {
+  return routeFilePath
+    .replace(/\.tsx$/, "")
+    .split(/[/.]/)
+    .filter(
+      (routeSegment) =>
+        !routeSegment.startsWith("_") && !/^\(.*\)$/.test(routeSegment),
+    )
+    .map((routeSegment) => routeSegment.replace(/_$/, ""))
+    .filter(
+      (routeSegment, segmentIndex, routeSegments) =>
+        !(
+          routeSegment === "index" && segmentIndex === routeSegments.length - 1
+        ),
+    )
+    .join("/");
+}
+
 /** Route paths of the web app, from its file-based routes (e.g. "webhooks/rules"). */
 function listWebRoutePaths(
   webDirectory: string,
@@ -50,9 +74,9 @@ function listWebRoutePaths(
       return [];
     }
 
-    const routePath = relative(join(webDirectory, "src/routes"), entryPath)
-      .replace(/\.tsx$/, "")
-      .replace(/(^|\/)index$/, "");
+    const routePath = toAppRoutePath(
+      relative(join(webDirectory, "src/routes"), entryPath),
+    );
 
     return routePath === "" ? [] : [routePath];
   });

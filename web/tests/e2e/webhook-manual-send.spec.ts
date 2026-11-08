@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { replaceCodeEditorText } from "./support/code-editor";
+
 const emailList = "section[aria-label='Email list']";
 const threadList = "section[aria-label='Conversation list']";
 
@@ -91,7 +93,7 @@ test("WH-05.6 an edited body is sent as written and the result can be saved", as
   await sendDialog.getByRole("switch", { name: "Edit body" }).click();
   const bodyEditor = sendDialog.getByRole("textbox", { name: "Edited body" });
   await expect(bodyEditor).toContainText("Welcome to Acme");
-  await bodyEditor.fill('{ "note": "edited by hand" }');
+  await replaceCodeEditorText(bodyEditor, '{ "note": "edited by hand" }');
 
   await sendDialog.getByRole("button", { name: "Send", exact: true }).click();
   const sendResult = sendDialog.getByTestId("sent-delivery-result");
@@ -132,14 +134,14 @@ test("WH-05.5 the composer asks for Prompt variables and WH-05.6 errors block se
   const rawEditor = page.getByRole("textbox", { name: "Raw body" });
   await expect(rawEditor).toBeVisible();
   await page.getByLabel("Content type").fill("text/plain");
-  await rawEditor.fill("Reason: {{ vars.reason }}");
+  await replaceCodeEditorText(rawEditor, "Reason: {{ vars.reason }}");
   const renderedBody = page.getByRole("region", { name: "Rendered body" });
   await expect(renderedBody).toContainText("Reason: manual test");
 
   await page.getByLabel("vars.reason").fill("smoke run");
   await expect(renderedBody).toContainText("Reason: smoke run");
 
-  await rawEditor.fill("{{ nope() }}");
+  await replaceCodeEditorText(rawEditor, "{{ nope() }}");
   await expect(
     page.getByText("Fix the errors in the preview to send."),
   ).toBeVisible();

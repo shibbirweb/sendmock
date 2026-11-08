@@ -3,7 +3,7 @@ title: Gateways
 description: The emulated payment providers. What each offers at checkout, its credentials, what it sends back to your app, and your own gateways.
 ---
 
-> Try it in the [demo](/demo/payments/gateways). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments/gateways).
 
 A gateway is one emulated payment provider: Stripe, PayPal, SSLCommerz, bKash, Native, or one you add. Gateways are data, not code: what a gateway offers, what its redirect carries and what its notification looks like are all editable, and **Reset to default** brings a built-in back.
 
@@ -20,7 +20,7 @@ A gateway is one emulated payment provider: Stripe, PayPal, SSLCommerz, bKash, N
 | Gets from | Sends to |
 | --- | --- |
 | [Methods](./methods.md): the ones it offers at checkout, in order | the [checkout page](./checkout-page.md): which methods and steps it shows |
-| your app's API calls at `/providers/<key>/...` on port `8026` | redirects to your app, with the fields set on the **Redirect** tab |
+| your app's API calls at `/providers/<key>/...` on port `8026` (a custom gateway answers [session init and validation](../advanced/payment-gateway.md#6-point-your-app-at-it)) | redirects to your app, with the fields set on the **Redirect** tab |
 | [Settings > Payments](../settings.md#payments): merchant name and currency | notifications to its **notification endpoint** (a [webhooks endpoint](../webhooks/endpoints.md)), logged in [Deliveries](../webhooks/deliveries.md) |
 
 ## Use it
@@ -62,6 +62,8 @@ Plus the template functions and filters, and `uuid()`, `random_hex(length)`, `no
 
 A built-in can be edited and disabled but not deleted; it shows **Modified** once edited, and **Reset to default** (asks first) restores it. A custom gateway can be deleted while no payment uses it.
 
+
+Every control and text, one by one: [Gateways in depth](../deeper/payments/gateways.md).
 ## Customize
 
 The full walkthrough, from the provider's docs to a working checkout and a seed export: [Advanced: create a gateway](../advanced/payment-gateway.md). An AI agent can do it for you: [AI: create a gateway with AI](../ai/payment-gateway-with-ai.md).

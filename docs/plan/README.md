@@ -39,6 +39,14 @@ Think "Mailpit, plus a fake SMS gateway, plus a webhook workbench", in one Rust 
 | 23 | [Promotional video](23-promotional-video.md) | The promotional trailer: goal, audience, length, production, captions and hosting, and its eleven scenes (email, SMS, payment and any-API webhooks, the built-in providers bento, the built-in events, building your own, AI agents, platforms), the motif and the look and feel |
 | 23 | [Phase 0](23-phase-0.md) | Backend foundations: workstreams in order (workspace, Rust CI, config, SQLite, HTTP server with the embedded UI, operation registry, CLI and parity, seed validate, contract tests, version script, release workflows, Docker `edge`, README and licence), the criteria each one ticks and the new dependencies |
 | 24 | [Stage B coverage](24-stage-b-coverage.md) | Every operation the signed-off UI calls, mapped to the Stage B phase that builds it and the phase its screen goes live; the 2026-10-29 audit and what it changed |
+| 25 | [Phase 1](25-phase-1.md) | Email backend and the first beta: the operation framework, email storage and parsing, email operations, the SMTP server, realtime, logs and settings, the sendmail shim and MCP over stdio, the live UI with auth and CORS, cross-language SMTP tests and beta packaging |
+| 26 | [Phase 2](26-phase-2.md) | SMS and Verify backend: SMS storage with encoding and segments, the native SMS API with MMS, delivery simulation with Twilio's test numbers and status callbacks, numbers and Messaging Services, Twilio and Vonage emulation on the provider port, Twilio Verify, the built-in SMS provider definitions, and the SMS screens going live |
+| 27 | [Phase 3](27-phase-3.md) | Webhooks backend: endpoints and signing, rules, deliveries with retries, the composer, templates, variables and inbound routes |
+| 28 | [Phase 3P](28-phase-3p.md) | Payment gateway backend: gateways, methods, flows, the hosted checkout, refunds, disputes and subscriptions |
+| 29 | [Phase 4](29-phase-4.md) | Integrations, fidelity and AI: provider emulation depth, the HTTP Catcher presets, the agent skill and the example apps in eight languages |
+| 30 | [Phase 5](30-phase-5.md) | Distribution and 1.0 stable: install scripts, Docker, package channels, budgets, the acceptance close-out, the website docs and the Deeper pages |
+| 31 | [Release runbook](31-release-runbook.md) | The owner's steps to the 1.0 release, with commands, checks and the criteria each proves; `bun scripts/release-readiness.ts` lists what is still open |
+| 32 | [After 1.0](32-after-1-0.md) | The backlog built after 1.0 (Mailpit API compatibility, click tracking, more SMS and verify providers, multi-project inboxes, POP3, push emulation, WhatsApp, tray app, Helm and Docker Desktop), in order, with a design note per item |
 
 ## Headline decisions
 

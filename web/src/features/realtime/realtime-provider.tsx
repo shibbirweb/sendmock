@@ -7,6 +7,7 @@ import { readNotificationPreferences } from "@/features/notifications/notificati
 import { addNotification } from "@/features/notifications/notification-store";
 import {
   describeEventForNotification,
+  isEventForSelectedProject,
   listQueryKeysToRefresh,
 } from "@/features/realtime/realtime-event-effects";
 import { toast } from "sonner";
@@ -55,7 +56,14 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
           id: appEvent.id,
           createdAt: appEvent.created_at,
         });
-        if (readNotificationPreferences().areToastsShown) {
+        // The provider sits outside the router, so it reads the top bar's choice from the URL.
+        const selectedProjectKey = new URLSearchParams(
+          window.location.search,
+        ).get("project");
+        if (
+          readNotificationPreferences().areToastsShown &&
+          isEventForSelectedProject(appEvent, selectedProjectKey)
+        ) {
           toast(eventNotification.title, {
             description: eventNotification.description,
           });

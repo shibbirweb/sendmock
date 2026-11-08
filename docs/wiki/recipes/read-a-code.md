@@ -3,7 +3,7 @@ title: Read a one-time code
 description: Read a sign-up or login code from an email, an SMS or Twilio Verify, by hand or from a test.
 ---
 
-> Works in your install from Phase 1 (email) and Phase 2 (SMS and Verify). Try it in the [demo](/demo/mail) today.
+> Try it in the [demo](/demo/mail).
 
 **The situation:** your app sends a one-time code by email or SMS. You need the code to finish the flow, by hand while developing and from your end-to-end tests.
 

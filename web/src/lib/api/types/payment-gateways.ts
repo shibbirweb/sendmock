@@ -1,16 +1,31 @@
 import type { Ulid } from "@/lib/api/types/common";
-import type { AppEventType } from "@/lib/api/types/events";
+import type { PaymentCaptureMethod } from "@/lib/api/types/payments";
 import type { TemplateReference } from "@/lib/api/types/webhooks";
 
 /** The gateways SendMock ships; custom gateways have their own keys. */
 export type BuiltinPaymentProvider =
-  "stripe" | "paypal" | "sslcommerz" | "bkash" | "native";
+  | "stripe"
+  | "paypal"
+  | "sslcommerz"
+  | "bkash"
+  | "razorpay"
+  | "paddle"
+  | "native";
 
 /** A native event a payment notification can carry. */
-export type PaymentEventType = Extract<
-  AppEventType,
-  `payment.${string}` | `checkout.${string}`
->;
+export type PaymentEventType =
+  | "payment.created"
+  | "payment.authorized"
+  | "payment.succeeded"
+  | "payment.failed"
+  | "payment.canceled"
+  | "payment.refunded"
+  | "payment.partially_refunded"
+  | "payment.dispute_opened"
+  | "payment.dispute_updated"
+  | "payment.dispute_closed"
+  | "checkout.completed"
+  | "checkout.expired";
 
 /** A merchant credential; a secret's value comes back masked (`••••` and the last 4). */
 export type GatewayCredential = {
@@ -237,4 +252,49 @@ export type PaymentCheckoutCreateRequest = {
    * @example [{"name": "T-shirt", "quantity": 1, "unit_amount_minor": 1999}]
    */
   line_items?: { name: string; quantity: number; unit_amount_minor: number }[];
+  /**
+   * `manual` authorizes the payment and waits for a capture or void; `automatic` when left out.
+   * @example "manual"
+   */
+  capture_method?: PaymentCaptureMethod;
+};
+
+/** Body of POST /api/v1/payments: a payment the app's server pays with a test card (PY-02.1). */
+export type PaymentCreateRequest = {
+  /**
+   * The gateway key, e.g. `stripe` or `sslcommerz`.
+   * @example "stripe"
+   */
+  provider: string;
+  /**
+   * The amount in the currency's minor unit (cents, paisa; JPY has none); 1999 is 19.99.
+   * @example 1999
+   */
+  amount_minor: number;
+  /**
+   * Three letters, stored in capitals; Settings > Payments' default currency when left out.
+   * @example "USD"
+   */
+  currency?: string;
+  /**
+   * A test card of the card method; its outcome in the test card table decides the payment.
+   * A number the table does not list is refused and kept nowhere.
+   * @example "4242424242424242"
+   */
+  card_number: string;
+  /**
+   * The customer's email.
+   * @example "user@example.test"
+   */
+  customer_email?: string;
+  /**
+   * What is being bought.
+   * @example [{"name": "T-shirt", "quantity": 1, "unit_amount_minor": 1999}]
+   */
+  line_items?: { name: string; quantity: number; unit_amount_minor: number }[];
+  /**
+   * `manual` authorizes the payment and waits for a capture or void; `automatic` when left out.
+   * @example "automatic"
+   */
+  capture_method?: PaymentCaptureMethod;
 };

@@ -38,6 +38,7 @@ function readEmailField(email: EmailDetail, fieldKey: string): string[] | null {
     tag: () => email.tags,
     open_count: () => [String(email.open_count)],
     first_open: () => [String(email.open_count === 1)],
+    project: () => [email.project],
   };
 
   return emailFieldReaders[fieldKey]?.() ?? null;
@@ -55,6 +56,7 @@ function readSmsField(
     api: () => [smsMessage.api],
     open_count: () => [String(smsMessage.open_count)],
     first_open: () => [String(smsMessage.open_count === 1)],
+    project: () => [smsMessage.project],
   };
 
   return smsFieldReaders[fieldKey]?.() ?? null;

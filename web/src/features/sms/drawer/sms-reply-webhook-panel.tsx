@@ -2,9 +2,9 @@ import { ChevronRightIcon, RotateCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { RecordedExchange } from "@/features/sms/drawer/recorded-exchange";
 import { ApiError } from "@/lib/api/api-client";
+import { OperationButton } from "@/features/availability/operation-button";
 import { useResendReplyWebhook } from "@/lib/api/hooks/use-sms-queries";
 import type {
   SmsMessageDetail,
@@ -41,12 +41,16 @@ function TwimlVerbList({ twimlVerbs }: { twimlVerbs: TwimlVerb[] }) {
                 {twimlVerb.from !== null && `from ${twimlVerb.from} `}
                 {twimlVerb.status_callback !== null &&
                   `statusCallback ${twimlVerb.status_callback} `}
+                {twimlVerb.action !== null &&
+                  `action ${twimlVerb.method} ${twimlVerb.action} `}
                 {twimlVerb.media_urls.length > 0 &&
                   `${twimlVerb.media_urls.length} media`}
               </span>
             </>
           ) : (
-            <span className="font-mono">{twimlVerb.url}</span>
+            <span className="font-mono">
+              {twimlVerb.method} {twimlVerb.url}
+            </span>
           )}
         </li>
       ))}
@@ -120,7 +124,9 @@ export function SmsReplyWebhookPanel({
                 : "Sent to the number's inbound URL."}
           </p>
         </div>
-        <Button
+        <OperationButton
+          operationKey="POST /api/v1/sms/{smsId}/reply-webhook/resend"
+          actionName="Resend reply webhook"
           variant="outline"
           size="sm"
           disabled={replyWebhook === null || resendReplyWebhook.isPending}
@@ -139,7 +145,7 @@ export function SmsReplyWebhookPanel({
         >
           <RotateCwIcon />
           Resend reply webhook
-        </Button>
+        </OperationButton>
       </div>
       {smsMessage.reply_webhook_attempts.length > 0 && (
         <ol aria-label="Reply webhook attempts" className="grid gap-2">

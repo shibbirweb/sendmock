@@ -9,6 +9,7 @@ import type {
   MessageProviderPreviewRequest,
   PaymentGatewayPreviewRequest,
   PaymentListFilters,
+  PushListFilters,
   RulePreviewRequest,
   TemplateRenderRequest,
   VariablePreviewRequest,
@@ -41,7 +42,8 @@ export const queryKeys = {
   sms: {
     all: ["sms"] as const,
     list: (smsFilters: SmsListFilters) => ["sms", "list", smsFilters] as const,
-    threads: ["sms", "threads"] as const,
+    threads: (projectKey: string | undefined) =>
+      ["sms", "threads", projectKey ?? null] as const,
     detail: (smsId: string) => ["sms", "detail", smsId] as const,
   },
   verify: {
@@ -51,6 +53,12 @@ export const queryKeys = {
     detail: (verificationSid: string) =>
       ["verify", "detail", verificationSid] as const,
     services: ["verify", "services"] as const,
+  },
+  push: {
+    all: ["push"] as const,
+    list: (pushFilters: PushListFilters) =>
+      ["push", "list", pushFilters] as const,
+    detail: (pushId: string) => ["push", "detail", pushId] as const,
   },
   numbers: {
     all: ["numbers"] as const,
@@ -97,6 +105,7 @@ export const queryKeys = {
     methods: ["payments", "methods"] as const,
     flows: ["payments", "flows"] as const,
     gateways: ["payments", "gateways"] as const,
+    subscriptions: ["payments", "subscriptions"] as const,
     gatewayPreview: (previewRequest: PaymentGatewayPreviewRequest) =>
       ["payments", "gateway-preview", previewRequest] as const,
   },
@@ -145,6 +154,7 @@ export const queryKeys = {
     test: (ruleKind: string, testedValue: string, matchField: string) =>
       ["outcome-rules", ruleKind, "test", testedValue, matchField] as const,
   },
+  projects: ["projects"] as const,
   messageRules: {
     tag: ["message-rules", "tag-rules"] as const,
     forward: ["message-rules", "forward-rules"] as const,

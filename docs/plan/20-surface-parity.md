@@ -17,7 +17,7 @@ Feature: **UI-11 Every feature in every way** ([criteria](acceptance/06-ui.md#ui
 1. **Every REST operation has a CLI command and an MCP tool.** One operation, three names, the same input and output.
 2. **Every CLI command and MCP tool has a REST operation**, so scripts in any language can do what the CLI and agents do.
 3. **Every feature has a place in the UI.**
-4. The only gap allowed is a **recorded exemption with a reason**, listed in the catalogue and in [Exemptions](#exemptions). There is one.
+4. The only gap allowed is a **recorded exemption with a reason**, listed in the catalogue and in [Exemptions](#exemptions). There is one kind: revealing a stored secret, which four operations do.
 
 ## The catalogue: one place that names all four
 
@@ -152,7 +152,12 @@ The helpers map to screens that already show the same thing: waits to the live l
 
 | Surface left out | Of | Reason |
 | --- | --- | --- |
-| MCP | revealing an endpoint secret (`GET /webhooks/endpoints/{endpointId}/secret`) or a gateway credential (`GET /payments/gateways/{gatewayKey}/credentials/{credentialName}`) | agents may set secrets but never read them back ([14](14-ai-integration.md#mcp-server)); the CLI and UI reveal them after a confirmation |
+| MCP | revealing a webhook endpoint's signing secret (`GET /webhooks/endpoints/{endpointId}/secret`) | agents may set secrets but never read them back ([14](14-ai-integration.md#mcp-server)); the CLI and UI reveal them after a confirmation |
+| MCP | revealing a payment gateway credential (`GET /payments/gateways/{gatewayKey}/credentials/{credentialName}`) | the same |
+| MCP | revealing an email provider credential (`GET /emails/providers/{providerKey}/credentials/{credentialName}`) | the same |
+| MCP | revealing an SMS provider credential (`GET /sms/providers/{providerKey}/credentials/{credentialName}`) | the same |
+
+The two provider credential reveals came with the configurable providers ([22](22-configurable-providers.md)) and carry the same `mcpExemptReason` in the catalogue; this table caught up with them on 2026-11-08.
 
 `sendmock serve` and `sendmock mcp` start the server and the MCP server themselves, and `sendmock help` prints help, so they are how the other ways exist rather than features of a running instance; they are listed in the CLI tree and not counted as operations.
 

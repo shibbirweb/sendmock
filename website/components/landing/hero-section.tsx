@@ -5,6 +5,8 @@ import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { cn } from "@/lib/utils";
 
+import { QuickStartLink } from "./quick-start-link";
+
 export function HeroSection() {
   return (
     <section className="relative flex flex-col items-center gap-6 overflow-hidden px-4 pt-24 pb-16 text-center">
@@ -20,7 +22,7 @@ export function HeroSection() {
       />
       <div className="rounded-full border bg-fd-card px-4 py-1 text-sm">
         <AnimatedShinyText>
-          In development: UI preview with demo data
+          Not released yet: try the live demo with sample data
         </AnimatedShinyText>
       </div>
       <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
@@ -40,6 +42,7 @@ export function HeroSection() {
             </span>
           </ShimmerButton>
         </DemoLink>
+        <QuickStartLink />
         <Link
           href="/docs"
           className="rounded-full border px-6 py-3 text-sm font-medium hover:bg-fd-accent"

@@ -1,0 +1,49 @@
+{
+  "verified_on": "2026-11-07",
+  "note": "Each provider's documented click event: its event name, where the name and the clicked link sit in the payload (JSON pointers), read from the provider's docs. `message_pointer` names a field that holds the payload as a JSON string (SES inside SNS).",
+  "templates": {
+    "sendgrid.events": {
+      "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
+      "event_pointer": "/0/event",
+      "event_name": "click",
+      "link_pointer": "/0/url"
+    },
+    "mailgun.events": {
+      "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/webhooks/webhook-payloads",
+      "event_pointer": "/event-data/event",
+      "event_name": "clicked",
+      "link_pointer": "/event-data/url"
+    },
+    "postmark.webhooks": {
+      "doc_url": "https://postmarkapp.com/developer/webhooks/click-webhook",
+      "event_pointer": "/RecordType",
+      "event_name": "Click",
+      "link_pointer": "/OriginalLink"
+    },
+    "resend.events": {
+      "doc_url": "https://resend.com/docs/webhooks/emails/clicked",
+      "event_pointer": "/type",
+      "event_name": "email.clicked",
+      "link_pointer": "/data/click/link"
+    },
+    "ses.sns": {
+      "doc_url": "https://docs.aws.amazon.com/ses/latest/dg/event-publishing-retrieving-sns-examples.html",
+      "message_pointer": "/Message",
+      "event_pointer": "/eventType",
+      "event_name": "Click",
+      "link_pointer": "/click/link"
+    },
+    "brevo.events": {
+      "doc_url": "https://developers.brevo.com/docs/transactional-webhooks",
+      "event_pointer": "/event",
+      "event_name": "click",
+      "link_pointer": "/link"
+    },
+    "sparkpost.events": {
+      "doc_url": "https://developers.sparkpost.com/api/webhooks/",
+      "event_pointer": "/0/msys/track_event/type",
+      "event_name": "click",
+      "link_pointer": "/0/msys/track_event/target_link_url"
+    }
+  }
+}

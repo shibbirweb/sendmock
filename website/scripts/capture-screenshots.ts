@@ -4,6 +4,7 @@
  * in web/), then run `bun run screenshots` here; pass another base URL as the
  * argument, and scene names after it to take only those, e.g.
  * `bun run screenshots http://localhost:5173 mail-providers sms-providers`.
+ * The scene name `deeper` takes the Deeper pages' annotated screenshots.
  */
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -11,7 +12,8 @@ import { fileURLToPath } from "node:url";
 
 import { chromium } from "@playwright/test";
 
-import { scenes } from "./screenshot-scenes";
+import { captureDeeperScreenshots } from "./deeper-screenshots";
+import { navigateInApp, scenes } from "./screenshot-scenes";
 
 const appBaseUrl = process.argv[2] ?? "http://localhost:5173";
 const onlySceneNames = process.argv.slice(3);
@@ -69,9 +71,14 @@ for (const colorScheme of ["light", "dark"] as const) {
       copyFileSync(screenshotPath, docsImagePath);
     }
   }
+  const isDeeperWanted =
+    onlySceneNames.length === 0 || onlySceneNames.includes("deeper");
+  if (colorScheme === "light" && isDeeperWanted) {
+    await captureDeeperScreenshots(page, navigateInApp);
+  }
   await page.close();
 }
 await browser.close();
 console.log(
-  "Saved the landing screenshots to public/screenshots/ and the docs shots to docs/wiki/images/.",
+  "Saved the landing screenshots to public/screenshots/, the docs shots to docs/wiki/images/ and the Deeper shots to docs/wiki/deeper/images/.",
 );

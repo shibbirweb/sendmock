@@ -11,6 +11,7 @@ import {
   extractFixtureData,
 } from "@/mocks/fixtures/fixture-helpers";
 import { type ParsedSmsMedia, toSmsMedia } from "@/mocks/fixtures/sms-media";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 type NewSmsMessageSpec = {
   direction: SmsDirection;
@@ -38,6 +39,7 @@ export function buildNewSmsMessage(
 
   return {
     id: smsId,
+    project: defaultProjectKey,
     provider_id: createProviderId("SM"),
     direction: smsSpec.direction,
     channel: smsSpec.channel,

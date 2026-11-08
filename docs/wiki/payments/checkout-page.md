@@ -3,7 +3,7 @@ title: Checkout page
 description: The hosted test checkout page your customer is sent to, its methods and steps, the test controls, and where it sends the browser after.
 ---
 
-> Try it in the [demo](/demo/payments). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments).
 
 When your app creates a hosted checkout, the gateway's answer points the browser at SendMock's test checkout page, `http://127.0.0.1:8025/pay/<sessionId>`. It looks like a gateway's page, uses the gateway's accent colour, and always says **TEST MODE: no real payment**.
 

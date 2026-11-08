@@ -231,3 +231,29 @@ test("Reset puts the request back to the sample", async ({ page }) => {
   );
   await expect(resetButton).toBeDisabled();
 });
+
+test("AI-05.9 an AI agent's setup switches to npx for SendMock with nothing installed", async ({
+  page,
+}) => {
+  await page.goto("/settings?section=connection");
+  await page.getByRole("combobox", { name: "AI agent" }).click();
+  await page.getByRole("option", { name: "Codex" }).click();
+
+  await page
+    .getByRole("radiogroup", { name: "SendMock runs as" })
+    .getByRole("radio", { name: "npx (no install)" })
+    .click();
+
+  await expect(
+    page.getByRole("region", { name: "Install command" }),
+  ).toContainText("npx sendmock ai install --target codex");
+  await expect(
+    page.getByRole("region", { name: "MCP configuration" }),
+  ).toContainText('command = "npx"');
+  await expect(page.getByText("Nothing to install")).toBeVisible();
+
+  await page.getByRole("radio", { name: "Installed" }).click();
+  await expect(
+    page.getByRole("region", { name: "MCP configuration" }),
+  ).toContainText('command = "sendmock"');
+});

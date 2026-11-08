@@ -1,0 +1,12 @@
+{
+  "name": "sendmock-recipe-examples-node",
+  "private": true,
+  "type": "module",
+  "description": "Runs the JavaScript tab of every recipe against SendMock and the stand-in app.",
+  "scripts": {
+    "recipes": "node ../run-recipes.mjs javascript"
+  },
+  "devDependencies": {
+    "vitest": "5.0.5"
+  }
+}

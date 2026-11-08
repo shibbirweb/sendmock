@@ -6,6 +6,7 @@ import {
   formatTomlTable,
   toSecretReference,
 } from "@/mocks/fixtures/seed-toml-format";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 function readEndpointName(
   mockDatabase: MockDatabase,
@@ -40,6 +41,14 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
     otp_patterns: settings.otp_patterns,
   });
   const itemTables = [
+    ...mockDatabase.projects
+      .filter((projectRecord) => projectRecord.key !== defaultProjectKey)
+      .map((projectRecord) =>
+        formatTomlTable("[[projects]]", {
+          key: projectRecord.key,
+          name: projectRecord.name,
+        }),
+      ),
     ...mockDatabase.webhookEndpoints.map((webhookEndpoint) =>
       formatTomlTable("[[webhook.endpoints]]", {
         name: webhookEndpoint.name,
@@ -63,8 +72,11 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         label: virtualNumber.label,
         channels: virtualNumber.channels,
         inbound_url: virtualNumber.inbound_url,
+        inbound_method: virtualNumber.inbound_method,
+        inbound_fallback_url: virtualNumber.inbound_fallback_url,
         inbound_template: virtualNumber.inbound_template_id,
         status_callback: virtualNumber.status_callback_url,
+        messaging_service: virtualNumber.messaging_service_sid,
       }),
     ),
     ...mockDatabase.messagingServices.map((messagingService) =>
@@ -73,6 +85,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
         name: messagingService.friendly_name,
         inbound_mode: messagingService.inbound_mode,
         inbound_url: messagingService.inbound_url,
+        inbound_fallback_url: messagingService.inbound_fallback_url,
       }),
     ),
     ...mockDatabase.smsOutcomeRules.map((outcomeRule) =>
@@ -150,6 +163,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
 /** Seed sections and how the summary names them. */
 const knownSeedSections: Record<string, string> = {
   "[settings]": "Settings",
+  "[[projects]]": "Project",
   "[[webhook.endpoints]]": "Webhook endpoint",
   "[[webhook.rules]]": "Webhook rule",
   "[[webhook.templates]]": "Webhook template",
@@ -164,7 +178,11 @@ const knownSeedSections: Record<string, string> = {
   "[[sms.outcome_rules]]": "Custom outcome number",
   "[[email.outcome_rules]]": "Custom outcome address",
   "[[email.providers]]": "Email provider",
+  "[[email.templates]]": "Email template",
   "[[sms.providers]]": "SMS provider",
+  "[[payments.flows]]": "Payment flow",
+  "[[payments.methods]]": "Payment method",
+  "[[payments.gateways]]": "Payment gateway",
 };
 
 const keyValuePattern = /^[A-Za-z0-9_.-]+\s*=\s*(.+)$/;

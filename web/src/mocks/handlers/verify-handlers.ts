@@ -16,6 +16,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
   includesText,
+  keepRequestedProject,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
@@ -166,8 +167,11 @@ export const verifyHandlers = [
     expireOverdueVerifications();
     const requestUrl = new URL(request.url);
     // The list includes each timeline too; the UI only reads it from the detail.
-    const matchingVerifications = mockDatabase.verifications.filter(
-      (verification) => matchesVerificationFilters(verification, requestUrl),
+    const matchingVerifications = keepRequestedProject(
+      mockDatabase.verifications,
+      requestUrl.searchParams,
+    ).filter((verification) =>
+      matchesVerificationFilters(verification, requestUrl),
     );
 
     return HttpResponse.json(paginateItems(matchingVerifications, requestUrl));

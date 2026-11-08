@@ -81,7 +81,7 @@ test("the docs sidebar links to GitHub and the feature request, bug report and s
   }
 });
 
-test("Getting started installs on macOS, Linux, Windows and Docker with the Install page's commands and links to it", async ({
+test("Getting started installs with npx, bunx, on macOS, Linux, Windows and Docker with the Install page's commands and links to it", async ({
   page,
 }) => {
   const installPage = readFileSync(join(wikiDirectory, "install.md"), "utf8");
@@ -94,6 +94,8 @@ test("Getting started installs on macOS, Linux, Windows and Docker with the Inst
   ].map((tabMatch) => [tabMatch[1] ?? "", (tabMatch[2] ?? "").trim()]);
 
   expect(tabCommands.map(([tabName]) => tabName)).toEqual([
+    "npx",
+    "bunx",
     "macOS",
     "Linux",
     "Windows",
@@ -113,6 +115,8 @@ test("Getting started installs on macOS, Linux, Windows and Docker with the Inst
     ).toContainText(command);
   }
   for (const [linkName, installAnchor] of [
+    ["npx", "#npx-no-install"],
+    ["bunx", "#bunx-no-install"],
     ["macOS", "#homebrew-macos-and-linux"],
     ["Linux", "#install-script-linux-and-macos"],
     ["Windows", "#install-script-windows"],
@@ -188,6 +192,21 @@ test("WS-09.3 llms.txt says what SendMock is, how an agent installs it, and link
       `${wikiPagePath.replace(/\/$/, "")}/)`,
     );
   }
+});
+
+test("AI-06.1 llms-full.txt holds llms.txt and every docs page in full", async ({
+  request,
+}) => {
+  const fullResponse = await request.get("/llms-full.txt");
+  const fullText = await fullResponse.text();
+
+  expect(fullResponse.ok()).toBe(true);
+  expect(fullText.startsWith("# SendMock\n\n> ")).toBe(true);
+  expect(fullText).toContain("# Subscriptions (payments/subscriptions.md)");
+  expect(fullText).toContain("## What it solves");
+  expect(fullText.split("\n---\n").length).toBeGreaterThan(
+    listWikiPagePaths().length,
+  );
 });
 
 test("hovering a docs sidebar icon shows its label", async ({ page }) => {

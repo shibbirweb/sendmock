@@ -3,7 +3,7 @@ title: SSLCommerz and bKash
 description: Pay through SSLCommerz with a test bKash wallet, get the POST redirect and the signed IPN, and validate the payment.
 ---
 
-> Works in your install from Phase 3P (SSLCommerz) and Phase 4 (bKash's own API). Try it in the [demo](/demo/payments/gateways) today.
+> Try it in the [demo](/demo/payments/gateways).
 
 **The situation:** your app sells in Bangladesh through SSLCommerz. Customers pay with cards, mobile wallets (bKash, Nagad, Rocket) or internet banking. You need to test the success, fail and cancel redirects, the IPN with its `verify_sign`, and the order validation call.
 

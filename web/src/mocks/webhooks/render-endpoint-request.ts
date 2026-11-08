@@ -95,6 +95,33 @@ function toTypedValue(
   return renderedValue;
 }
 
+const multipartBoundary = "sendmock-fields-boundary";
+
+/** The name a file part gets: the URL's last path segment. */
+function readFileName(fileUrl: string): string {
+  try {
+    return new URL(fileUrl).pathname.split("/").filter(Boolean).pop() ?? "file";
+  } catch {
+    return "file";
+  }
+}
+
+/**
+ * Text parts as they are; a file part is a placeholder with the URL in
+ * `X-Sendmock-File-Url`, fetched when the request is sent (WH-07.16).
+ */
+function buildMultipartBody(
+  renderedFields: { bodyField: EndpointBodyField; renderedValue: string }[],
+): string {
+  const formParts = renderedFields.map(({ bodyField, renderedValue }) =>
+    bodyField.value_type === "file"
+      ? `--${multipartBoundary}\r\nContent-Disposition: form-data; name="${bodyField.name}"; filename="${readFileName(renderedValue)}"\r\nX-Sendmock-File-Url: ${renderedValue}\r\n\r\n\r\n`
+      : `--${multipartBoundary}\r\nContent-Disposition: form-data; name="${bodyField.name}"\r\n\r\n${renderedValue}\r\n`,
+  );
+
+  return `${formParts.join("")}--${multipartBoundary}--\r\n`;
+}
+
 function renderFieldsBody(
   endpointInput: WebhookEndpointInput,
   templateContext: TemplateContext,
@@ -115,6 +142,12 @@ function renderFieldsBody(
       };
     },
   );
+  if (endpointInput.fields_encoding === "multipart") {
+    return {
+      contentType: `multipart/form-data; boundary=${multipartBoundary}`,
+      body: buildMultipartBody(renderedFields),
+    };
+  }
   if (endpointInput.fields_encoding === "form") {
     return {
       contentType: "application/x-www-form-urlencoded",
@@ -220,7 +253,14 @@ export function renderEndpointRequest(
   mockDatabase: MockDatabase,
   previewRequest: EndpointPreviewRequest,
 ): EndpointPreviewResult | null {
-  const endpointInput = previewRequest.endpoint;
+  const endpointInput =
+    previewRequest.endpoint ??
+    mockDatabase.webhookEndpoints.find(
+      (webhookEndpoint) => webhookEndpoint.id === previewRequest.endpoint_id,
+    );
+  if (endpointInput === undefined) {
+    return null;
+  }
   const templateEvents = mockDatabase.webhookTemplates.find(
     (webhookTemplate) => webhookTemplate.id === endpointInput.template_id,
   )?.events;

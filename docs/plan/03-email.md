@@ -34,9 +34,13 @@ Custom async implementation on tokio. A full MTA library is unnecessary: we only
 | `--smtp-addr` | `SENDMOCK_SMTP_ADDR` | `127.0.0.1:1025` | listen address |
 | `--smtp-max-size` | `SENDMOCK_SMTP_MAX_SIZE` | `25MB` | reject larger messages with 552 |
 | `--smtp-auth` | `SENDMOCK_SMTP_AUTH` | `accept-any` | `accept-any`, `none` (advertise no AUTH), `file:<path>` |
-| `--smtp-tls-cert`, `--smtp-tls-key` | | auto | custom certificate |
-| `--smtp-require-tls` | | off | refuse `MAIL` before `STARTTLS` |
+| `--smtp-starttls` | `SENDMOCK_SMTP_STARTTLS` | off | offer STARTTLS, with a self-signed certificate generated on first run; off by default because many mailers (Symfony Mailer and so Laravel, Nodemailer, Rails, MailKit) upgrade whenever it is offered and then refuse a self-signed certificate |
+| `--smtps-addr` | `SENDMOCK_SMTPS_ADDR` | off | listen address for implicit TLS (SMTPS) |
+| `--smtp-tls-cert`, `--smtp-tls-key` | `SENDMOCK_SMTP_TLS_CERT`, `SENDMOCK_SMTP_TLS_KEY` | generated | custom certificate; turns STARTTLS on |
+| `--smtp-require-tls` | `SENDMOCK_SMTP_REQUIRE_TLS` | off | refuse `MAIL` before `STARTTLS`; turns STARTTLS on |
 | `--smtp-allow-rcpt` | | `*` | glob list; others get 550 (useful to test bounce handling) |
+| `--pop3-addr` | `SENDMOCK_POP3_ADDR` | off | listen address for POP3 read access (added after 1.0, [32](32-after-1-0.md#a6-pop3-read-access-em-21) A6) |
+| `--pop3-auth` | `SENDMOCK_POP3_AUTH` | `accept-any` | `accept-any` or `file:<path>`, the same `user:password` lines as `--smtp-auth`; the username picks the project |
 
 ### SMTP session log
 
@@ -193,7 +197,7 @@ For final checks in real mail clients (Gmail, Outlook, Apple Mail):
 
 - **Release (manual):** "Release" button on an email (or `POST /api/v1/emails/{emailId}/release`) sends it through a configured relay SMTP server to the original or a chosen recipient.
 - **Auto-forward:** rules (same filter builder) that automatically forward matching messages to fixed real addresses, e.g. "everything to `*@qa.app.test` -> `qa-team@company.com`".
-- **Relay config:** `--relay-smtp smtp://user:pass@smtp.example.com:587` or Settings; STARTTLS/implicit TLS; optional `Return-Path` override.
+- **Relay config:** `--relay-smtp smtp://user:pass@smtp.example.com:587` and `--relay-allowlist '*@yourcompany.com'`, or Settings; STARTTLS/implicit TLS; optional `Return-Path` override (later).
 - **Safety:** off by default; a recipient allowlist (glob patterns) is required before anything can be sent out; every release/forward is logged with result and visible in the email timeline.
 
 ## Replies and inbound email

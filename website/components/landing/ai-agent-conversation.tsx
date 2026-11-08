@@ -32,9 +32,12 @@ export function buildConversation(installPrompt: string): ConversationEntry[] {
         <>
           <p className="font-medium">How do you want to run SendMock?</p>
           <p>
-            <span className="font-medium">Docker or the binary?</span> Docker
-            keeps your computer clean and is easy to remove. The binary starts
-            instantly and needs no Docker.
+            <span className="font-medium">
+              Docker, npx or bunx, or the binary?
+            </span>{" "}
+            Docker keeps your computer clean and is easy to remove. npx and bunx
+            run it from npm with nothing installed. The binary starts instantly
+            and needs no Docker.
           </p>
         </>
       ),

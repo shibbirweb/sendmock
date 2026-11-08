@@ -51,8 +51,41 @@ export type OpenEventRequest = {
    * @example "api"
    */
   source?: OpenSource;
+  /**
+   * The browser or client that opened it, kept in the open history. The UI sends its own.
+   * @example "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+   */
+  user_agent?: string;
 };
 
+/** Body of `POST /emails/{emailId}/clicks`. */
+export type EmailClickRequest = {
+  /**
+   * The link that was clicked; one of the email's links (`extracted.links`).
+   * @example "https://app.test/verify?token=abc123"
+   */
+  url: string;
+  /**
+   * Who clicked it: `ui` (a link in the preview), `manual` (Simulate click) or `api` (a script). Defaults to `api`.
+   * @example "api"
+   */
+  source?: OpenSource;
+  /**
+   * The browser or client that clicked, kept in the click history. The UI sends its own.
+   * @example "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+   */
+  user_agent?: string;
+};
+
+/** One click on an email's link, newest first in `GET /emails/{emailId}/clicks`. */
+export type EmailClickRecord = {
+  clicked_at: IsoTimestamp;
+  url: string;
+  source: OpenSource;
+  user_agent: string | null;
+};
+
+/** One open of an email or SMS, oldest first in `GET /emails/{emailId}/opens` and `GET /sms/{smsId}/opens`. */
 export type OpenRecord = {
   opened_at: IsoTimestamp;
   source: OpenSource;

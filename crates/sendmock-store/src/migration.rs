@@ -1,0 +1,161 @@
+mod migration_runner;
+
+pub use migration_runner::apply_migrations;
+
+/// One forward-only schema step, applied once and recorded in `PRAGMA user_version`.
+#[derive(Debug, Clone, Copy)]
+pub struct Migration {
+    pub schema_version: u32,
+    pub sql: &'static str,
+}
+
+pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
+    Migration {
+        schema_version: 1,
+        sql: include_str!("../migrations/0001_init.sql"),
+    },
+    Migration {
+        schema_version: 2,
+        sql: include_str!("../migrations/0002_email.sql"),
+    },
+    Migration {
+        schema_version: 3,
+        sql: include_str!("../migrations/0003_smtp_sessions.sql"),
+    },
+    Migration {
+        schema_version: 4,
+        sql: include_str!("../migrations/0004_api_requests.sql"),
+    },
+    Migration {
+        schema_version: 5,
+        sql: include_str!("../migrations/0005_sms.sql"),
+    },
+    Migration {
+        schema_version: 6,
+        sql: include_str!("../migrations/0006_sms_outcome_rules.sql"),
+    },
+    Migration {
+        schema_version: 7,
+        sql: include_str!("../migrations/0007_numbers.sql"),
+    },
+    Migration {
+        schema_version: 8,
+        sql: include_str!("../migrations/0008_verify.sql"),
+    },
+    Migration {
+        schema_version: 9,
+        sql: include_str!("../migrations/0009_message_providers.sql"),
+    },
+    Migration {
+        schema_version: 10,
+        sql: include_str!("../migrations/0010_webhook_endpoints.sql"),
+    },
+    Migration {
+        schema_version: 11,
+        sql: include_str!("../migrations/0011_webhook_deliveries.sql"),
+    },
+    Migration {
+        schema_version: 12,
+        sql: include_str!("../migrations/0012_webhook_rules.sql"),
+    },
+    Migration {
+        schema_version: 13,
+        sql: include_str!("../migrations/0013_webhook_variables.sql"),
+    },
+    Migration {
+        schema_version: 14,
+        sql: include_str!("../migrations/0014_webhook_templates.sql"),
+    },
+    Migration {
+        schema_version: 15,
+        sql: include_str!("../migrations/0015_detached_endpoint_templates.sql"),
+    },
+    Migration {
+        schema_version: 16,
+        sql: include_str!("../migrations/0016_webhook_delivery_events.sql"),
+    },
+    Migration {
+        schema_version: 17,
+        sql: include_str!("../migrations/0017_saved_webhook_deliveries.sql"),
+    },
+    Migration {
+        schema_version: 18,
+        sql: include_str!("../migrations/0018_email_outcome_rules.sql"),
+    },
+    Migration {
+        schema_version: 19,
+        sql: include_str!("../migrations/0019_message_opens.sql"),
+    },
+    Migration {
+        schema_version: 20,
+        sql: include_str!("../migrations/0020_sms_callback_queue.sql"),
+    },
+    Migration {
+        schema_version: 21,
+        sql: include_str!("../migrations/0021_sms_reply_webhooks.sql"),
+    },
+    Migration {
+        schema_version: 22,
+        sql: include_str!("../migrations/0022_seed_state.sql"),
+    },
+    Migration {
+        schema_version: 23,
+        sql: include_str!("../migrations/0023_payment_definitions.sql"),
+    },
+    Migration {
+        schema_version: 24,
+        sql: include_str!("../migrations/0024_payments.sql"),
+    },
+    Migration {
+        schema_version: 25,
+        sql: include_str!("../migrations/0025_delivery_signing.sql"),
+    },
+    Migration {
+        schema_version: 26,
+        sql: include_str!("../migrations/0026_payment_provider_objects.sql"),
+    },
+    Migration {
+        schema_version: 27,
+        sql: include_str!("../migrations/0027_email_provider_sends.sql"),
+    },
+    Migration {
+        schema_version: 28,
+        sql: include_str!("../migrations/0028_email_local_templates.sql"),
+    },
+    Migration {
+        schema_version: 29,
+        sql: include_str!("../migrations/0029_message_rules.sql"),
+    },
+    Migration {
+        schema_version: 30,
+        sql: include_str!("../migrations/0030_email_responses.sql"),
+    },
+    Migration {
+        schema_version: 31,
+        sql: include_str!("../migrations/0031_inbound_routes.sql"),
+    },
+    Migration {
+        schema_version: 32,
+        sql: include_str!("../migrations/0032_http_catcher.sql"),
+    },
+    Migration {
+        schema_version: 33,
+        sql: include_str!("../migrations/0033_payment_subscriptions.sql"),
+    },
+    Migration {
+        schema_version: 34,
+        sql: include_str!("../migrations/0034_email_clicks.sql"),
+    },
+    Migration {
+        schema_version: 35,
+        sql: include_str!("../migrations/0035_projects.sql"),
+    },
+    Migration {
+        schema_version: 36,
+        sql: include_str!("../migrations/0036_push_notifications.sql"),
+    },
+    Migration {
+        schema_version: 37,
+        sql: include_str!("../migrations/0037_whatsapp_media.sql"),
+    },
+];

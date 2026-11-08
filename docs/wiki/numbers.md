@@ -3,7 +3,7 @@ title: Numbers
 description: Your fake phone numbers and Messaging Services, set up the way you would in a provider's console, for replies and sender pools.
 ---
 
-> Try it in the [demo](/demo/numbers). Works in your install from Phase 3 (number webhooks) and Phase 4 (the full registry).
+> Try it in the [demo](/demo/numbers).
 
 You do not need numbers to send SMS: any `From` is accepted. Numbers matter when the contact **replies**: like a Twilio number, each one says where incoming messages go. Messaging Services group numbers into a **sender pool**.
 
@@ -19,7 +19,7 @@ You do not need numbers to send SMS: any `From` is accepted. Numbers matter when
 
 | Gets from | Sends to |
 | --- | --- |
-| replies typed in an [SMS](./sms/index.md) conversation (`sms.inbound`) | the number's (or its service's) inbound webhook, logged in [Deliveries](./webhooks/deliveries.md); TwiML answers come back into the conversation |
+| replies typed in an [SMS](./sms/index.md) conversation (`sms.inbound`) | the number's (or its service's) inbound webhook, shown in the message details; TwiML answers come back into the conversation |
 | your app's sends with `MessagingServiceSid` | the number the service picks, shown on the message |
 | | each number's default status callback for messages it sends |
 
@@ -60,6 +60,8 @@ A table: name, SID (copy), sender pool (number chips), inbound handling and acti
 
 Delete asks first and leaves the numbers unassigned.
 
+
+Every control and text, one by one: [Numbers in depth](./deeper/numbers.md).
 ## Customize
 
 Two-way SMS and sender pools in depth: [Advanced: numbers and Messaging Services](./advanced/numbers-and-services.md). Numbers and services go into the seed file, so your team gets the same ones.

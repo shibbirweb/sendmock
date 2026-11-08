@@ -3,7 +3,7 @@ title: Built-in prompts
 description: The ready-made MCP prompts SendMock offers your agent, and when to use each.
 ---
 
-> Arrives in Phase 4 with the agent skill. See [AI](./index.md) to set up.
+> See [AI](./index.md) to set up.
 
 Agents that support MCP prompts show these in their prompt picker (in Claude Code, type `/` and look for the `sendmock` entries). Each one runs a whole workflow; the agent skill teaches the same workflows to agents without prompt support.
 

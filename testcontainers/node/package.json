@@ -1,0 +1,30 @@
+{
+  "name": "sendmock-testcontainers",
+  "version": "0.0.0",
+  "description": "Starts SendMock in Docker from a test and gives its SMTP, HTTP and provider addresses.",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shibbirweb/sendmock.git",
+    "directory": "testcontainers/node"
+  },
+  "homepage": "https://shibbirweb.github.io/sendmock/",
+  "type": "module",
+  "exports": {
+    "types": "./dist/sendmock-container.d.ts",
+    "default": "./dist/sendmock-container.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "bun build src/sendmock-container.ts --outdir dist --target node --format esm --packages external && bunx --package typescript@5.9.3 tsc src/sendmock-container.ts --declaration --emitDeclarationOnly --outDir dist --module nodenext --moduleResolution nodenext --target es2022 --skipLibCheck",
+    "test": "node --test 'test/*.test.ts'"
+  },
+  "dependencies": {
+    "testcontainers": "12.2.1"
+  },
+  "files": [
+    "dist"
+  ]
+}

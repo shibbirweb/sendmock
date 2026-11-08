@@ -45,7 +45,10 @@ describe("requestApi", () => {
       "/api/v1/sms/inbound",
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Sendmock-Client": "ui",
+        },
         body: '{"from":"+1","to":"+2","body":"STOP"}',
       }),
     );

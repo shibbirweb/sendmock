@@ -129,7 +129,7 @@ function MessageComposer({
 /**
  * The quick start's AI tab (WS-09.4): an AI coding agent's window, not a plain
  * terminal. Your whole prompt is pasted into the message box and sent, the
- * agent checks the computer and asks Docker or the binary, your answers are
+ * agent checks the computer and asks Docker, npx or bunx, or the binary, your answers are
  * typed and sent, and it asks before running the install. It fills the
  * platform terminals' height and scrolls inside.
  */

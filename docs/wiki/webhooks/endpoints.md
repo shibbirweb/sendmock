@@ -3,7 +3,7 @@ title: Endpoints
 description: Where SendMock sends, with the URL and method, the request's template, the signing secret, retries and variables.
 ---
 
-> Try it in the [demo](/demo/webhooks/endpoints). Works in your install from Phase 3.
+> Try it in the [demo](/demo/webhooks/endpoints).
 
 An endpoint is one destination for webhooks, usually one handler in your app.
 
@@ -48,6 +48,8 @@ With no endpoints yet, the screen offers **Add endpoint** and **Add a catcher en
 | **Retries** | max attempts (1 to 10), the delay before each retry (1 s to 24 h, the last one repeats), **Retry on 4xx**, and the attempt schedule ("attempts at 0 s, 1 s, 6 s, 36 s, ...") |
 | **Variables** | the endpoint's own variables, and the template's required ones with **Missing** until set here or globally; names with token, secret, key or password are stored as secrets |
 
+
+Every control and text, one by one: [Endpoints in depth](../deeper/webhooks/endpoints.md).
 ## Customize
 
 - Your own request shapes: [Advanced: templates](../advanced/templates.md) and [Advanced: request editor](../advanced/request-editor.md).

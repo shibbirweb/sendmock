@@ -3,7 +3,7 @@ title: Methods
 description: What a customer pays with (card, PayPal account, bKash, Nagad, a bank) and the test values that decide the outcome.
 ---
 
-> Try it in the [demo](/demo/payments/methods). Works in your install from Phase 3P.
+> Try it in the [demo](/demo/payments/methods).
 
 A payment method is what the customer picks on the checkout page: a card, a PayPal account, a wallet such as bKash or Nagad, an internet bank. Each method runs one [flow](./flows.md) and holds the test values its steps check.
 
@@ -53,6 +53,8 @@ Name, key and flow (fixed after creation), accent colour, and the test values th
 
 A built-in shows **Reset to default** (asks first). A custom method can be deleted while no payment uses it.
 
+
+Every control and text, one by one: [Methods in depth](../deeper/payments/methods.md).
 ## Customize
 
 Add a new wallet end to end: [Advanced: payment method](../advanced/payment-method.md).

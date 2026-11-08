@@ -1,5 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import {
+  allEmulatedProviderNames,
+  testedLanguageNames,
+} from "../lib/landing-data";
 import { countSpecOperations } from "./support/count-spec-operations";
 
 /** Scrolls the whole page so every in-view animation gets its chance to run. */
@@ -34,19 +38,31 @@ test("WS-02.1 the landing page has the hero, flow, quick start, marquee, bento g
   ).toHaveCount(4);
 });
 
+test("WS-02.1 the hero's Quick start button brings the install terminal into view", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await page.getByRole("link", { name: "Quick start" }).click();
+
+  await expect(page).toHaveURL(/#quick-start$/);
+  await expect(page.getByTestId("quick-start-terminal")).toBeInViewport();
+});
+
 const releaseUrl =
   "https://github.com/shibbirweb/sendmock/releases/latest/download";
 const visitorUserAgents = {
-  macOS:
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Safari/605.1.15",
+  // ChromeOS has no install tab of its own, so the default order shows.
+  unknownSystem:
+    "Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   Windows:
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
 };
 
-test.describe("the quick start on a Mac", () => {
-  test.use({ userAgent: visitorUserAgents.macOS });
+test.describe("the quick start's platform tabs", () => {
+  test.use({ userAgent: visitorUserAgents.unknownSystem });
 
-  test("WS-02.1 the quick start shows the install command for each operating system", async ({
+  test("WS-02.1 the quick start leads with npx for an unknown system and shows the install command for each one", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -57,15 +73,20 @@ test.describe("the quick start on a Mac", () => {
     const terminal = page.getByTestId("quick-start-terminal");
 
     await expect(platformTabs.getByRole("tab")).toHaveText([
+      "npx",
+      "bunx",
+      "Docker",
       "macOS",
       "Windows",
       "Linux",
-      "Docker",
       "AI",
     ]);
     await expect(
-      platformTabs.getByRole("tab", { name: "macOS" }),
+      platformTabs.getByRole("tab", { name: "npx" }),
     ).toHaveAttribute("aria-selected", "true");
+    await expect(terminal).toContainText("$ npx sendmock");
+
+    await platformTabs.getByRole("tab", { name: "macOS" }).click();
     await expect(terminal).toContainText(
       "$ brew install shibbirweb/tap/sendmock",
     );
@@ -96,7 +117,15 @@ test.describe("the quick start on a Mac", () => {
       .getByRole("tabpanel");
     const panelHeights: number[] = [];
 
-    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker", "AI"]) {
+    for (const platformLabel of [
+      "npx",
+      "bunx",
+      "Docker",
+      "macOS",
+      "Windows",
+      "Linux",
+      "AI",
+    ]) {
       await platformTabs.getByRole("tab", { name: platformLabel }).click();
       const panelBox = await panel.boundingBox();
       panelHeights.push(panelBox?.height ?? 0);
@@ -121,6 +150,39 @@ test.describe("the quick start on a Mac", () => {
     await expect(copyButton).toHaveCSS("cursor", "pointer");
   });
 
+  test("WS-02.1 the npx and bunx tabs start SendMock with one command and copy it", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const platformTabs = page.getByRole("tablist", { name: "Your platform" });
+    const terminal = page.getByTestId("quick-start-terminal");
+
+    for (const runner of ["npx", "bunx"]) {
+      await platformTabs.getByRole("tab", { name: runner }).click();
+      await expect(terminal).toContainText(`$ ${runner} sendmock`);
+      await expect(terminal).toContainText("cache, no install");
+      await expect(terminal).toContainText("http://127.0.0.1:8025");
+      await expect(terminal).not.toContainText("$ sendmock");
+      await expect(page.getByTestId("quick-start-downloads")).toHaveCount(0);
+      await expect(page.getByTestId("quick-start-requirement")).toContainText(
+        runner === "npx" ? "Needs Node.js 18 or newer" : "Needs Bun",
+      );
+
+      await terminal
+        .getByRole("button", { name: "Copy the install command" })
+        .click();
+      await expect(
+        terminal.getByRole("button", { name: "Copied" }),
+      ).toBeVisible();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        `${runner} sendmock`,
+      );
+    }
+  });
+
   test("WS-02.1 the Docker tab pulls and runs the image, with no binary downloads", async ({
     page,
   }) => {
@@ -141,12 +203,17 @@ test.describe("the quick start on a Mac", () => {
     );
     await expect(terminal).toContainText("SMTP listening on 0.0.0.0:1025");
     await expect(page.getByTestId("quick-start-downloads")).toHaveCount(0);
+    const docsLinks = page.getByTestId("quick-start-docs-links");
+    await expect(
+      docsLinks.getByRole("link", { name: "Docker Compose" }),
+    ).toHaveAttribute("href", /\/docs\/install\/?#docker-compose$/);
+    await expect(
+      docsLinks.getByRole("link", { name: "All install options" }),
+    ).toHaveAttribute("href", /\/docs\/install\/?$/);
   });
 });
 
-test.describe("the quick start downloads on a Mac", () => {
-  test.use({ userAgent: visitorUserAgents.macOS });
-
+test.describe("the quick start downloads", () => {
   test("WS-02.1 the quick start links the release archives for the chosen system", async ({
     page,
   }) => {
@@ -154,7 +221,21 @@ test.describe("the quick start downloads on a Mac", () => {
     await page.goto("/");
     const downloads = page.getByTestId("quick-start-downloads");
 
+    await page
+      .getByRole("tablist", { name: "Your platform" })
+      .getByRole("tab", { name: "macOS" })
+      .click();
     await expect(downloads).toContainText("Or download the macOS binary:");
+    await expect(page.getByTestId("quick-start-requirement")).toHaveCount(0);
+    await expect(downloads).toContainText(
+      "macOS asks once before it runs an unsigned binary",
+    );
+    await expect(
+      downloads.getByRole("link", { name: "How to allow it" }),
+    ).toHaveAttribute(
+      "href",
+      /\/docs\/troubleshooting\/?#macos-says-it-could-not-verify-sendmock$/,
+    );
     await expect(
       downloads.getByRole("link", { name: "Apple silicon" }),
     ).toHaveAttribute(
@@ -173,6 +254,12 @@ test.describe("the quick start downloads on a Mac", () => {
       .getByRole("tab", { name: "Windows" })
       .click();
     await expect(downloads).toContainText("Or download the Windows binary:");
+    await expect(
+      downloads.getByRole("link", { name: "How to allow it" }),
+    ).toHaveAttribute(
+      "href",
+      /\/docs\/troubleshooting\/?#windows-protected-your-pc$/,
+    );
     await expect(downloads.getByRole("link", { name: "x64" })).toHaveAttribute(
       "href",
       `${releaseUrl}/sendmock-x86_64-pc-windows-msvc.zip`,
@@ -186,23 +273,49 @@ test.describe("the quick start downloads on a Mac", () => {
   });
 });
 
-test.describe("the quick start on Windows", () => {
+test.describe("the quick start for a Windows visitor", () => {
   test.use({ userAgent: visitorUserAgents.Windows });
 
-  test("WS-02.1 the quick start opens on the visitor's operating system", async ({
+  test("WS-02.1 the quick start puts the visitor's own system first and opens on it", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
+    const platformTabs = page.getByRole("tablist", { name: "Your platform" });
 
+    await expect(platformTabs.getByRole("tab")).toHaveText([
+      "Windows",
+      "npx",
+      "bunx",
+      "Docker",
+      "macOS",
+      "Linux",
+      "AI",
+    ]);
     await expect(
-      page
-        .getByRole("tablist", { name: "Your platform" })
-        .getByRole("tab", { name: "Windows" }),
+      platformTabs.getByRole("tab", { name: "Windows" }),
     ).toHaveAttribute("aria-selected", "true");
     await expect(page.getByTestId("quick-start-terminal")).toContainText(
       `PS> irm ${releaseUrl}/install.ps1 | iex`,
     );
+  });
+
+  test("WS-02.1 hovering the copy button shows what it copies at once", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const terminal = page.getByTestId("quick-start-terminal");
+    const tooltip = terminal
+      .locator("span[aria-hidden='true']")
+      .filter({ hasText: "Copy the install command" });
+    const readOpacity = () =>
+      tooltip.evaluate((element) => getComputedStyle(element).opacity);
+
+    expect(await readOpacity()).toBe("0");
+    await terminal
+      .getByRole("button", { name: "Copy the install command" })
+      .hover();
+    await expect.poll(readOpacity).toBe("1");
   });
 
   test("WS-02.1 the copy button copies the install command without its prompt", async ({
@@ -213,6 +326,10 @@ test.describe("the quick start on Windows", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
+    await page
+      .getByRole("tablist", { name: "Your platform" })
+      .getByRole("tab", { name: "Windows" })
+      .click();
     await page
       .getByTestId("quick-start-terminal")
       .getByRole("button", { name: "Copy the install command" })
@@ -290,7 +407,9 @@ test("WS-09.4 the quick start's AI tab shows an agent window with the whole prom
   await expect(conversation).toContainText(
     "Before you install anything, check this computer",
   );
-  await expect(conversation).toContainText("Docker or the binary?");
+  await expect(conversation).toContainText(
+    "Docker, npx or bunx, or the binary?",
+  );
   await expect(conversation).toContainText("Run command");
   await expect(conversation).toContainText("SendMock is running");
   await expect(
@@ -356,8 +475,8 @@ test("WS-02.1 the number ticker counts the providers, languages and API operatio
   await scrollThroughPage(page);
 
   await expect(page.getByTestId("number-ticker")).toHaveText([
-    "15",
-    "8",
+    String(allEmulatedProviderNames.length),
+    String(testedLanguageNames.length),
     String(countSpecOperations()),
   ]);
 });
@@ -424,15 +543,17 @@ test("WS-02.2 with reduced motion every animation is static and the page stays r
 
   // The quick start shows every line at once instead of typing it.
   const terminal = page.getByTestId("quick-start-terminal");
-  // Playwright's desktop Chrome reports Windows, so its tab (PS>) may open first.
-  await expect(terminal).toContainText(/(\$|PS>) sendmock/);
+  // Whichever tab opens first (Playwright's desktop Chrome reports Windows, so it is that
+  // system's), its first command and its last line show together. The copy button's label
+  // comes first in the text, so the prompt is not anchored to the start.
+  await expect(terminal).toContainText(/(\$|PS>) \S/);
   await expect(terminal).toContainText(
-    "Web UI and API on http://127.0.0.1:8025",
+    /Web UI and API on http:\/\/[\d.]+:8025/,
   );
   // The tickers show their final values without counting.
   await expect(page.getByTestId("number-ticker")).toHaveText([
-    "15",
-    "8",
+    String(allEmulatedProviderNames.length),
+    String(testedLanguageNames.length),
     String(countSpecOperations()),
   ]);
   // The feature cards' SMS list shows every message at once.

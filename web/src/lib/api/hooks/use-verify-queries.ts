@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {
@@ -15,11 +16,16 @@ import type {
 export function useVerifications(
   verificationFilters: VerificationListFilters = {},
 ) {
+  const projectFilters = {
+    ...verificationFilters,
+    project: useSelectedProjectKey(),
+  };
+
   return useQuery({
-    queryKey: queryKeys.verify.verifications(verificationFilters),
+    queryKey: queryKeys.verify.verifications(projectFilters),
     queryFn: ({ signal }) =>
       requestApi<PageOf<Verification>>("/verify", {
-        queryParameters: verificationFilters,
+        queryParameters: projectFilters,
         abortSignal: signal,
       }),
   });

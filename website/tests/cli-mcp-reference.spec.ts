@@ -32,19 +32,42 @@ test("WS-07.2 every CLI command has its usage, arguments and flags, an example, 
       await expect(commandEntry.getByTestId("cli-example")).toContainText(
         "sendmock ",
       );
+      await expect(commandEntry).toContainText("Output with --json");
       await expect(
-        commandEntry
-          .getByLabel("Other ways")
-          .locator("a[href^='/api/']")
-          .first(),
-      ).toBeVisible();
+        commandEntry.getByRole("link", { name: "Exit codes" }),
+      ).toHaveAttribute("href", "/cli/#exit-codes");
+      const otherWays = commandEntry.getByLabel("Other ways");
+      await expect(otherWays.locator("a[href^='/api/']").first()).toBeVisible();
+      await expect(otherWays).toContainText("In the app");
     }
     commandCount += entryCount;
   }
   expect(commandCount).toBe(cliReference.commands.length);
 
+  await page.goto("/cli/");
+  const globalFlags = page.getByRole("region", { name: "Global flags" });
+  for (const globalFlag of cliReference.global_flags) {
+    await expect(globalFlags).toContainText(globalFlag.flag);
+  }
+  const exitCodes = page.getByRole("region", { name: "Exit codes" });
+  for (const exitCode of cliReference.exit_codes) {
+    await expect(exitCodes).toContainText(exitCode.meaning);
+  }
+
   await page.goto("/cli/email/");
   const updateEntry = page.locator("#email-update");
+  await expect(
+    updateEntry.getByRole("table", {
+      name: "Arguments of sendmock email update",
+    }),
+  ).toContainText("<emailId>");
+  const updateOtherWays = updateEntry.getByLabel("Other ways");
+  await expect(
+    updateOtherWays.locator("a[href^='/mcp/']").first(),
+  ).toBeVisible();
+  await expect(updateOtherWays).toContainText(
+    "Mail > open email > Mark as read, tags",
+  );
   const flagsTable = updateEntry.getByRole("table", {
     name: "Flags of sendmock email update",
   });
@@ -77,6 +100,10 @@ test("WS-07.3 every MCP tool and resource has its inputs, hints, an example call
         areaPath,
       ).toContainText('"name": "sendmock_');
       await expect(toolEntry).toContainText("Toolset");
+      await expect(toolEntry).toContainText("Result: ");
+      const otherWays = toolEntry.getByLabel("Other ways");
+      await expect(otherWays.locator("a[href^='/api/']").first()).toBeVisible();
+      await expect(otherWays).toContainText("In the app");
     }
     toolCount += entryCount;
     resourceCount += await page.getByTestId("mcp-resource").count();
@@ -94,6 +121,22 @@ test("WS-07.3 every MCP tool and resource has its inputs, hints, an example call
     "One of: html, unsubscribe, links, spam",
   );
   await expect(checkEntry.getByLabel("Annotations")).toHaveText("Read only");
+  await expect(checkEntry).toContainText(
+    "Result: HtmlCheckReport | ListUnsubscribeReport",
+  );
+  await expect(
+    checkEntry.getByLabel("Other ways").getByTestId("operation-selector"),
+  ).toHaveText([
+    "kind: html",
+    "kind: unsubscribe",
+    "kind: links",
+    "kind: spam",
+  ]);
+  const checkOtherWays = checkEntry.getByLabel("Other ways");
+  await expect(
+    checkOtherWays.locator("a[href^='/cli/']").first(),
+  ).toBeVisible();
+  await expect(checkOtherWays).toContainText("Mail > open email > Checks");
   await expect(
     page.locator("#sendmock_email_delete").getByLabel("Annotations"),
   ).toContainText("Destructive");

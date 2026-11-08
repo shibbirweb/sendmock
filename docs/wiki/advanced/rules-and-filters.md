@@ -3,7 +3,7 @@ title: Rules and filters
 description: Exact filters for webhook rules. Groups, not, headers, regex, multi-value fields, and how several rules fire.
 ---
 
-> Works in your install from Phase 3. Try it in the [demo](/demo/webhooks/rules) today.
+> Try it in the [demo](/demo/webhooks/rules).
 
 A rule's filter decides which events reach its endpoint. The builder covers simple cases in one row and complex ones with groups.
 
@@ -19,7 +19,8 @@ A rule's filter decides which events reach its endpoint. The builder covers simp
 | --- | --- |
 | `email.*` | From, To, Cc, Subject, Body, Header (asks for the header name), Has attachment, Tag |
 | `sms.*` | From, To, Body, Status, API |
-| `email.opened`, `sms.opened` | Open count, First open, Source |
+| `email.opened`, `sms.opened` | Open count, First open, Open or click source |
+| `email.clicked` | Clicked link, Click count, First click on the link, Open or click source |
 
 With email and SMS events both ticked, both sets show; a condition on a field the event does not have never matches.
 

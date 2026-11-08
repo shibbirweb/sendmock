@@ -34,6 +34,8 @@ const providerNames: Record<BuiltinPaymentProvider, string> = {
   paypal: "PayPal",
   sslcommerz: "SSLCommerz",
   bkash: "bKash",
+  razorpay: "Razorpay",
+  paddle: "Paddle",
   native: "Native",
 };
 const visa4242: PaymentMethod = {
@@ -338,8 +340,14 @@ export function buildProviderIds(
       payment_intent: `pi_${suffix}`,
     },
     paypal: { order: suffix.slice(0, 10).toUpperCase() },
-    sslcommerz: { tran_id: `TXN${suffix}`, val_id: `VAL${suffix}` },
+    sslcommerz: {
+      tran_id: `TXN${suffix}`,
+      val_id: `VAL${suffix}`,
+      bank_tran_id: `BTX${suffix}`,
+    },
     bkash: { payment_id: `TR00${suffix}`, trx_id: `TRX${suffix.slice(0, 8)}` },
+    razorpay: { order: `order_${suffix}`, payment: `pay_${suffix}` },
+    paddle: { transaction: `txn_${suffix.toLowerCase()}` },
     native: { payment: `pay_${suffix}` },
   };
 
@@ -389,6 +397,7 @@ function buildPayment(paymentSpec: PaymentSpec): PaymentDetail {
     failure_code: null,
     refunded_minor: 0,
     captured_minor: 0,
+    capture_method: startStatus === "authorized" ? "manual" : "automatic",
     method: paymentSpec.method ?? null,
     method_key: readFixtureMethodKey(paymentSpec.method),
     line_items: paymentSpec.lineItems,

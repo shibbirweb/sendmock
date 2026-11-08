@@ -1,4 +1,5 @@
-import { CircleHelpIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { CircleHelpIcon, CodeIcon } from "lucide-react";
 import { Fragment } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import {
 import { useCommunityLinks } from "@/features/help/use-community-links";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
 
-/** Documentation, shortcuts, what's new, feedback and the repository (UI-10.1). */
+/** The API reference, documentation, shortcuts, what's new, feedback and the repository (UI-10.1). */
 export function HelpMenu() {
   const communityLinks = useCommunityLinks();
   const { setShortcutHelpOpen } = useAppOverlays();
@@ -25,6 +26,12 @@ export function HelpMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuItem asChild>
+          <Link to="/api-reference">
+            <CodeIcon />
+            API reference
+          </Link>
+        </DropdownMenuItem>
         {communityLinks.map((communityLink) => (
           <Fragment key={communityLink.key}>
             {communityLink.key === "bug" && <DropdownMenuSeparator />}

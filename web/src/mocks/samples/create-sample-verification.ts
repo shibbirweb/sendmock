@@ -5,6 +5,7 @@ import { mockDatabase } from "@/mocks/db/mock-database";
 import { createProviderId } from "@/mocks/fixtures/fixture-helpers";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { sendOutboundSmsSample } from "@/mocks/samples/create-sample-sms";
+import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 const sampleRecipient = "+14155550100";
 const verifySenderNumber = "+15550002222";
@@ -19,9 +20,9 @@ function findOrCreateVerifyService(): VerifyService {
   const sampleService: VerifyService = {
     sid: createProviderId("VA"),
     friendly_name: "Sample",
-    code_length: 6,
+    code_length: mockDatabase.settings.verify_default_code_length,
     fixed_code: null,
-    ttl_seconds: 600,
+    ttl_seconds: mockDatabase.settings.verify_default_ttl_seconds,
     created_by: "ui",
   };
   mockDatabase.verifyServices.push(sampleService);
@@ -36,7 +37,9 @@ function findOrCreateVerifyService(): VerifyService {
 export function createSampleVerification(): string {
   const verifyService = findOrCreateVerifyService();
   const code =
-    verifyService.fixed_code ?? faker.string.numeric(verifyService.code_length);
+    verifyService.fixed_code ??
+    mockDatabase.settings.verify_fixed_code ??
+    faker.string.numeric(verifyService.code_length);
   const createdAt = new Date().toISOString();
   const codeMessage = sendOutboundSmsSample({
     fromNumber: verifySenderNumber,
@@ -44,6 +47,7 @@ export function createSampleVerification(): string {
     body: `Your ${verifyService.friendly_name} verification code is: ${code}`,
   });
   const verification: VerificationDetail = {
+    project: defaultProjectKey,
     sid: createProviderId("VE"),
     service_sid: verifyService.sid,
     service_name: verifyService.friendly_name,

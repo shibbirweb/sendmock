@@ -15,17 +15,21 @@ type TerminalLine = {
   kind: "command" | "success" | "output";
 };
 
-/** Long commands wrap instead of scrolling sideways, and type faster. */
-const commandLineClassName = "whitespace-pre-wrap break-all";
+/** Long lines wrap instead of widening the terminal past a phone's screen. */
+const wrappingLineClassName = "whitespace-pre-wrap break-all";
 /** The same text classes the terminal gives its typed and animated lines. */
 const lineTextClassName = "text-sm font-normal tracking-tight";
 
 function listTerminalLines(installPlatform: InstallPlatform): TerminalLine[] {
-  const { prompt, listenHost } = installPlatform;
+  const { prompt, listenHost, runCommand } = installPlatform;
+  const runLines: TerminalLine[] =
+    runCommand === null
+      ? []
+      : [{ text: `${prompt} ${runCommand}`, kind: "command" }];
   return [
     { text: `${prompt} ${installPlatform.installCommand}`, kind: "command" },
     { text: installPlatform.installedMessage, kind: "success" },
-    { text: `${prompt} ${installPlatform.runCommand}`, kind: "command" },
+    ...runLines,
     { text: `SMTP listening on ${listenHost}:1025`, kind: "output" },
     { text: `Web UI and API on http://${listenHost}:8025`, kind: "output" },
   ];
@@ -43,7 +47,7 @@ export function InstallTerminal({
         terminalLine.kind === "command" ? (
           <TypingAnimation
             key={lineIndex}
-            className={commandLineClassName}
+            className={wrappingLineClassName}
             duration={25}
           >
             {terminalLine.text}
@@ -51,7 +55,10 @@ export function InstallTerminal({
         ) : (
           <AnimatedSpan
             key={lineIndex}
-            className={cn(terminalLine.kind === "success" && "text-fd-primary")}
+            className={cn(
+              wrappingLineClassName,
+              terminalLine.kind === "success" && "text-fd-primary",
+            )}
           >
             {terminalLine.text}
           </AnimatedSpan>
@@ -80,7 +87,8 @@ export function InstallTerminalPlaceholder({
             key={lineIndex}
             className={cn(
               lineTextClassName,
-              terminalLine.kind === "command" ? commandLineClassName : "grid",
+              wrappingLineClassName,
+              terminalLine.kind !== "command" && "grid",
             )}
           >
             {terminalLine.text}

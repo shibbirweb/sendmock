@@ -5,9 +5,12 @@ import type {
   EmailDetail,
   EmailTimelineEntry,
   HttpBin,
+  EmailClickRecord,
+  OpenRecord,
   HttpResponseRule,
   PaymentDetail,
   MessagingService,
+  PushNotification,
   SavedDelivery,
   SmsMessageDetail,
   SmtpSession,
@@ -59,13 +62,15 @@ import {
   buildStandardEmailFixtures,
 } from "@/mocks/fixtures/email-fixtures";
 import { seedFixtureRandomness } from "@/mocks/fixtures/fixture-helpers";
+import { buildOpenRecordFixtures } from "@/mocks/fixtures/open-record-fixtures";
 import { buildStandardSmsFixtures } from "@/mocks/fixtures/sms-fixtures";
 import { buildSmtpSessionFixtures } from "@/mocks/fixtures/smtp-session-fixtures";
 import {
   buildSavedDeliveryFixtures,
   buildWebhookTemplateFixtures,
-  buildWebhookVariableFixtures,
 } from "@/mocks/fixtures/template-and-variable-fixtures";
+import { buildPushFixtures } from "@/mocks/fixtures/push-fixtures";
+import { buildWebhookVariableFixtures } from "@/mocks/fixtures/webhook-variable-fixtures";
 import {
   buildVerificationFixtures,
   linkVerificationMessages,
@@ -95,6 +100,11 @@ import {
 } from "@/mocks/fixtures/sms-provider-fixtures";
 import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
+import {
+  buildProjectFixtures,
+  type ProjectRecord,
+} from "@/mocks/fixtures/project-fixtures";
+import type { PaymentSubscriptionRecord } from "@/mocks/payments/subscriptions/payment-subscriptions";
 
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
@@ -102,6 +112,10 @@ export type MockDatabase = {
   seedAppliedAt: string;
   emails: EmailDetail[];
   emailTimelines: Map<string, EmailTimelineEntry[]>;
+  /** Each email's and SMS's open history, oldest first, by message id. */
+  messageOpens: Map<string, OpenRecord[]>;
+  /** Each email's click history, newest first, by email id. */
+  emailClicks: Map<string, EmailClickRecord[]>;
   /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
   attachmentContents: Map<string, Uint8Array>;
   /** Bytes of SMS media sent inline, keyed `smsId/index`. */
@@ -128,9 +142,14 @@ export type MockDatabase = {
   paymentMethods: PaymentMethodRecord[];
   paymentFlows: PaymentFlowRecord[];
   paymentGateways: PaymentGatewayRecord[];
+  paymentSubscriptions: PaymentSubscriptionRecord[];
   /** Email and SMS providers, built in and custom (docs/plan/22). */
   messageProviders: MessageProviderRecord[];
   inboundRoutes: InboundRouteRecord[];
+  /** Projects, `default` first (PL-10). */
+  projects: ProjectRecord[];
+  /** Push notifications, newest first (PN-01). */
+  pushNotifications: PushNotification[];
   httpBins: HttpBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
@@ -176,7 +195,9 @@ function buildConfiguration() {
     httpBins,
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
+    paymentSubscriptions: [],
     inboundRoutes: buildInboundRouteFixtures(),
+    projects: buildProjectFixtures(),
     messageProviders: [
       ...buildBuiltinEmailProviders(),
       ...buildBuiltinSmsProviders(),
@@ -211,10 +232,13 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ...configuration,
       emails: [],
       emailTimelines: new Map(),
+      messageOpens: new Map(),
+      emailClicks: new Map(),
       attachmentContents: new Map(),
       smsMediaContents: new Map(),
       smsMessages: [],
       verifications: [],
+      pushNotifications: [],
       webhookDeliveries: [],
       capturedHttpRequests: [],
       httpFileContents: new Map(),
@@ -278,10 +302,13 @@ export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
       ]),
     ),
     smsMessages,
+    messageOpens: buildOpenRecordFixtures([...emails, ...smsMessages]),
+    emailClicks: new Map(),
     verifications: linkVerificationMessages(
       buildVerificationFixtures(configuration.verifyServices),
       smsMessages,
     ),
+    pushNotifications: buildPushFixtures(),
     webhookDeliveries: sortNewestFirst(webhookDeliveries),
     payments: sortNewestFirst(payments),
     httpBins: httpCatcherTraffic.httpBins,
