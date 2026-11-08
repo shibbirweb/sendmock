@@ -137,7 +137,7 @@ describe("Release build", () => {
     expect(testedTargets).toEqual({
       "aarch64-apple-darwin": "macos-latest",
       "x86_64-apple-darwin": "macos-15-intel",
-      "x86_64-unknown-linux-musl": "ubuntu-latest",
+      "x86_64-unknown-linux-musl": "ubuntu-26.04",
       "aarch64-unknown-linux-musl": "ubuntu-24.04-arm",
       "x86_64-pc-windows-msvc": "windows-latest",
       "aarch64-pc-windows-msvc": "windows-11-arm",
@@ -158,7 +158,7 @@ describe("Docker edge", () => {
     );
 
     expect(builtPlatforms).toEqual({
-      "linux/amd64": "ubuntu-latest",
+      "linux/amd64": "ubuntu-26.04",
       "linux/arm64": "ubuntu-24.04-arm",
     });
   });

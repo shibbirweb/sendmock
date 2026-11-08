@@ -118,7 +118,7 @@ describe("npx with no install", () => {
 
     expect(npxChannel?.systems).toEqual(["macos", "linux", "windows"]);
     expect(stableMatrix.map((entry) => entry.runner)).toEqual([
-      "ubuntu-latest",
+      "ubuntu-26.04",
       "macos-latest",
       "windows-latest",
     ]);
@@ -165,7 +165,7 @@ describe("channel matrix", () => {
       buildChannelMatrix(channels, "stable", "winget,cargo").map(
         (entry) => entry.name,
       ),
-    ).toEqual(["WinGet on windows-latest", "Cargo on ubuntu-latest"]);
+    ).toEqual(["WinGet on windows-latest", "Cargo on ubuntu-26.04"]);
     const afterPublishNames = buildChannelMatrix(
       channels,
       "stable",

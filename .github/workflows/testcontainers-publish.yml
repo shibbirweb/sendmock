@@ -26,7 +26,7 @@ jobs:
   node:
     name: npm (sendmock-testcontainers)
     if: vars.NPM_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
@@ -51,7 +51,7 @@ jobs:
   python:
     name: PyPI (sendmock-testcontainers)
     if: vars.PYPI_PUBLISHING == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
@@ -73,7 +73,7 @@ jobs:
 
   dotnet:
     name: NuGet (SendMock.Testcontainers)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     env:
       HAS_NUGET_KEY: ${{ secrets.NUGET_API_KEY != '' }}
     steps:
@@ -96,7 +96,7 @@ jobs:
 
   java:
     name: Maven Central (io.github.shibbirweb:sendmock-testcontainers)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     env:
       HAS_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN != '' }}
     steps:
@@ -123,7 +123,7 @@ jobs:
 
   go:
     name: Go module tag (testcontainers/go/v${{ inputs.version }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:

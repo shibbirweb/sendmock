@@ -20,7 +20,7 @@ describe("Tray app workflow", () => {
     const runCommands = trayJob.steps.map((step) => step.run ?? "").join("\n");
 
     expect(trayJob.strategy.matrix.os).toEqual([
-      "ubuntu-latest",
+      "ubuntu-26.04",
       "macos-latest",
       "windows-latest",
     ]);

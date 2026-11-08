@@ -30,7 +30,7 @@ env:
 jobs:
   image:
     name: Image from this commit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v5
 
@@ -54,7 +54,7 @@ jobs:
   module:
     name: ${{ matrix.module }}
     needs: image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
