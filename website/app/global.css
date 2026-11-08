@@ -106,6 +106,14 @@ pre span[style*="--shiki-dark:#6A737D"] {
   }
 }
 
+/* Links within a page, such as the hero's Quick start, glide to their section; with reduced
+   motion on they jump straight there. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* WS-02.2: with reduced motion on, animations stop and the page stays readable. */
 @media (prefers-reduced-motion: reduce) {
   *,

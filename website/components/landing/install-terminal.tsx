@@ -21,11 +21,15 @@ const commandLineClassName = "whitespace-pre-wrap break-all";
 const lineTextClassName = "text-sm font-normal tracking-tight";
 
 function listTerminalLines(installPlatform: InstallPlatform): TerminalLine[] {
-  const { prompt, listenHost } = installPlatform;
+  const { prompt, listenHost, runCommand } = installPlatform;
+  const runLines: TerminalLine[] =
+    runCommand === null
+      ? []
+      : [{ text: `${prompt} ${runCommand}`, kind: "command" }];
   return [
     { text: `${prompt} ${installPlatform.installCommand}`, kind: "command" },
     { text: installPlatform.installedMessage, kind: "success" },
-    { text: `${prompt} ${installPlatform.runCommand}`, kind: "command" },
+    ...runLines,
     { text: `SMTP listening on ${listenHost}:1025`, kind: "output" },
     { text: `Web UI and API on http://${listenHost}:8025`, kind: "output" },
   ];

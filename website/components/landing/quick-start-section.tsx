@@ -14,6 +14,7 @@ import {
   InstallTerminalPlaceholder,
 } from "./install-terminal";
 import { ManualDownloadLinks } from "./manual-download-links";
+import { quickStartSectionId } from "./quick-start-link";
 import { SectionHeading } from "./section-heading";
 import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 
@@ -50,8 +51,9 @@ export function QuickStartSection({
 
   return (
     <section
+      id={quickStartSectionId}
       aria-labelledby="quick-start-heading"
-      className="flex flex-col items-center gap-6 px-4 py-20"
+      className="flex scroll-mt-16 flex-col items-center gap-6 px-4 py-20"
     >
       <SectionHeading
         headingId="quick-start-heading"

@@ -38,6 +38,17 @@ test("WS-02.1 the landing page has the hero, flow, quick start, marquee, bento g
   ).toHaveCount(4);
 });
 
+test("WS-02.1 the hero's Quick start button brings the install terminal into view", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await page.getByRole("link", { name: "Quick start" }).click();
+
+  await expect(page).toHaveURL(/#quick-start$/);
+  await expect(page.getByTestId("quick-start-terminal")).toBeInViewport();
+});
+
 const releaseUrl =
   "https://github.com/shibbirweb/sendmock/releases/latest/download";
 const visitorUserAgents = {
@@ -65,6 +76,8 @@ test.describe("the quick start on a Mac", () => {
       "Windows",
       "Linux",
       "Docker",
+      "npx",
+      "bunx",
       "AI",
     ]);
     await expect(
@@ -100,7 +113,15 @@ test.describe("the quick start on a Mac", () => {
       .getByRole("tabpanel");
     const panelHeights: number[] = [];
 
-    for (const platformLabel of ["macOS", "Windows", "Linux", "Docker", "AI"]) {
+    for (const platformLabel of [
+      "macOS",
+      "Windows",
+      "Linux",
+      "Docker",
+      "npx",
+      "bunx",
+      "AI",
+    ]) {
       await platformTabs.getByRole("tab", { name: platformLabel }).click();
       const panelBox = await panel.boundingBox();
       panelHeights.push(panelBox?.height ?? 0);
@@ -123,6 +144,36 @@ test.describe("the quick start on a Mac", () => {
 
     await expect(linuxTab).toHaveCSS("cursor", "pointer");
     await expect(copyButton).toHaveCSS("cursor", "pointer");
+  });
+
+  test("WS-02.1 the npx and bunx tabs start SendMock with one command and copy it", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const platformTabs = page.getByRole("tablist", { name: "Your platform" });
+    const terminal = page.getByTestId("quick-start-terminal");
+
+    for (const runner of ["npx", "bunx"]) {
+      await platformTabs.getByRole("tab", { name: runner }).click();
+      await expect(terminal).toContainText(`$ ${runner} sendmock`);
+      await expect(terminal).toContainText("cache, no install");
+      await expect(terminal).toContainText("http://127.0.0.1:8025");
+      await expect(terminal).not.toContainText("$ sendmock");
+      await expect(page.getByTestId("quick-start-downloads")).toHaveCount(0);
+
+      await terminal
+        .getByRole("button", { name: "Copy the install command" })
+        .click();
+      await expect(
+        terminal.getByRole("button", { name: "Copied" }),
+      ).toBeVisible();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        `${runner} sendmock`,
+      );
+    }
   });
 
   test("WS-02.1 the Docker tab pulls and runs the image, with no binary downloads", async ({

@@ -12,7 +12,8 @@ export type InstallPlatform = {
   prompt: string;
   installCommand: string;
   installedMessage: string;
-  runCommand: string;
+  /** Null when the install command also starts the server, as `npx sendmock` does. */
+  runCommand: string | null;
   /** Docker publishes the ports, so the server binds every interface there. */
   listenHost: string;
   downloads: ManualDownload[];
@@ -90,6 +91,26 @@ export const installPlatforms: InstallPlatform[] = [
     runCommand:
       "docker run --rm -p 1025:1025 -p 8025:8025 ghcr.io/shibbirweb/sendmock",
     listenHost: "0.0.0.0",
+    downloads: [],
+  },
+  {
+    key: "npx",
+    label: "npx",
+    prompt: "$",
+    installCommand: "npx sendmock",
+    installedMessage: "✔ Fetched into npm's cache, no install",
+    runCommand: null,
+    listenHost: "127.0.0.1",
+    downloads: [],
+  },
+  {
+    key: "bunx",
+    label: "bunx",
+    prompt: "$",
+    installCommand: "bunx sendmock",
+    installedMessage: "✔ Fetched into Bun's cache, no install",
+    runCommand: null,
+    listenHost: "127.0.0.1",
     downloads: [],
   },
 ];
