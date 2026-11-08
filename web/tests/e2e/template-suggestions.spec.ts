@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { replaceCodeEditorText } from "./support/code-editor";
+
 async function openSlackEditor(page: Page) {
   await page.goto("/webhooks/templates");
   await page
@@ -13,7 +15,7 @@ async function openSlackEditor(page: Page) {
   const bodyField = templateSheet.getByRole("textbox", {
     name: "Body template",
   });
-  await bodyField.fill("");
+  await replaceCodeEditorText(bodyField, "");
   // Suggestions need the reference, which loads with the editor.
   await expect(
     templateSheet.getByRole("button", { name: /^event/ }).first(),

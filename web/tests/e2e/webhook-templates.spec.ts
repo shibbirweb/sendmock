@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 
 import { expect, type Page, test } from "@playwright/test";
 
+import { replaceCodeEditorText } from "./support/code-editor";
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/webhooks/templates");
   await expect(findTemplateCard(page, "Native SendMock JSON")).toBeVisible();
@@ -199,7 +201,8 @@ test("WH-09.7 templates can be edited with a live preview; errors block saving",
   const bodyField = templateSheet.getByRole("textbox", {
     name: "Body template",
   });
-  await bodyField.fill(
+  await replaceCodeEditorText(
+    bodyField,
     '{ "text": "{{ data.subject | shout }} by {{ vars.team }}" }',
   );
 
@@ -213,7 +216,10 @@ test("WH-09.7 templates can be edited with a live preview; errors block saving",
     templateSheet.getByRole("button", { name: "Save template" }),
   ).toBeDisabled();
 
-  await bodyField.fill('{ "text": "New mail: {{ data.subject }}" }');
+  await replaceCodeEditorText(
+    bodyField,
+    '{ "text": "New mail: {{ data.subject }}" }',
+  );
   await expect(templateSheet.getByLabel("Preview errors")).toBeHidden();
   await expect(
     templateSheet.getByRole("region", { name: "Rendered body" }),
@@ -240,9 +246,10 @@ test("WH-09.8 an edited built-in is Modified, used by endpoints, and resets to d
 }) => {
   const templateSheet = await openTemplate(page, "Slack: incoming webhook");
   await templateSheet.getByRole("button", { name: "Edit" }).click();
-  await templateSheet
-    .getByRole("textbox", { name: "Body template" })
-    .fill('{ "text": "{{ data.subject }}" }');
+  await replaceCodeEditorText(
+    templateSheet.getByRole("textbox", { name: "Body template" }),
+    '{ "text": "{{ data.subject }}" }',
+  );
   await expect(
     templateSheet.getByRole("button", { name: "Save template" }),
   ).toBeEnabled();

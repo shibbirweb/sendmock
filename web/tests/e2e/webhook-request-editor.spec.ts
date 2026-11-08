@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { replaceCodeEditorText } from "./support/code-editor";
+
 const endpointName = "Laravel inbound mail";
 
 async function openRequestTab(page: Page) {
@@ -132,9 +134,10 @@ test("WH-07.15 each problem shows under its part and in the editor at its line a
   ).toContainText("Header X-Tenant: Unknown function: nope");
 
   await endpointSheet.getByRole("radio", { name: "Raw" }).click();
-  await endpointSheet
-    .getByRole("textbox", { name: "Raw body" })
-    .fill('{\n"a": "{{ data.subjekt }}"\n}');
+  await replaceCodeEditorText(
+    endpointSheet.getByRole("textbox", { name: "Raw body" }),
+    '{\n"a": "{{ data.subjekt }}"\n}',
+  );
   await expect(
     endpointSheet.getByRole("list", { name: "Body problems" }),
   ).toContainText("Body, line 2 column 7: Undefined variable: data.subjekt");
@@ -146,7 +149,7 @@ test("WH-07.15 each problem shows under its part and in the editor at its line a
 test("WH-07.15 the preview follows a chosen message", async ({ page }) => {
   const { endpointSheet, rawEditor } = await openRawEditor(page);
   await endpointSheet.getByLabel("Content type").fill("text/plain");
-  await rawEditor.fill("{{ data.message_id }}");
+  await replaceCodeEditorText(rawEditor, "{{ data.message_id }}");
   const renderedBody = endpointSheet.getByRole("region", {
     name: "Rendered body",
   });
