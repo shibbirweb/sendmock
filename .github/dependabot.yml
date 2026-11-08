@@ -1,6 +1,7 @@
-# Keeps the GitHub Actions the workflows use up to date, in one pull request a week. Rust and
-# JavaScript dependencies get security updates from Dependabot alerts; their version updates
-# stay manual, since each one needs the binary and bundle budgets checked.
+# Keeps the GitHub Actions the workflows use up to date, in one pull request a week. Every other
+# ecosystem is listed with open-pull-requests-limit 0: no version updates (each one needs the
+# binary and bundle budgets checked), but its security updates take the repository's commit
+# format and label from here instead of Dependabot's own.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -13,6 +14,110 @@ updates:
       github-actions:
         patterns:
           - "*"
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: cargo
+    directories:
+      - "/"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: bun
+    directories:
+      - "/web"
+      - "/website"
+      - "/video"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: npm
+    directories:
+      - "/examples/**"
+      - "/testcontainers/node"
+      - "/packaging/**"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: pip
+    directories:
+      - "/examples/**"
+      - "/testcontainers/python"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: gomod
+    directories:
+      - "/examples/**"
+      - "/testcontainers/go"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: nuget
+    directories:
+      - "/examples/**"
+      - "/testcontainers/dotnet/**"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: maven
+    directories:
+      - "/examples/**"
+      - "/testcontainers/java"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore:[#199]"
+    labels:
+      - dependencies
+
+  - package-ecosystem: composer
+    directories:
+      - "/examples/**"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
     commit-message:
       prefix: "chore:[#199]"
     labels:
