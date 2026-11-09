@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 
 import { buildAurPackage, toPacmanVersion } from "./aur-package";
-import { buildCoprSpec, formatRpmChangelogDate } from "./copr-spec";
+import {
+  buildCoprSpec,
+  formatRpmChangelogDate,
+  toRpmVersion,
+} from "./copr-spec";
 import { parseChecksums } from "./homebrew-formula";
 import { buildNixPackage, toSriHash } from "./nix-package";
 
@@ -44,12 +48,25 @@ describe("COPR spec", () => {
 
     expect(spec).toContain("Version:        1.2.0\n");
     expect(spec).toContain(
-      "Source0:        https://github.com/shibbirweb/sendmock/releases/download/v%{version}/sendmock-x86_64-unknown-linux-musl.tar.gz",
+      "Source0:        https://github.com/shibbirweb/sendmock/releases/download/v1.2.0/sendmock-x86_64-unknown-linux-musl.tar.gz",
     );
     expect(spec).toContain("%ifarch aarch64\ntar -xzf %{SOURCE1}\n%endif");
     expect(spec).toContain(
       "* Fri Nov 06 2026 MD. Shibbir Ahmed <shibbirweb@gmail.com> - 1.2.0-1",
     );
+  });
+
+  test("a beta gets a Version rpm sorts before the stable and downloads from the beta's tag", () => {
+    const spec = buildCoprSpec("1.3.0-beta.2", "2026-11-06");
+
+    expect(spec).toContain("Version:        1.3.0~beta.2\n");
+    expect(spec).toContain(
+      "Source0:        https://github.com/shibbirweb/sendmock/releases/download/v1.3.0-beta.2/sendmock-x86_64-unknown-linux-musl.tar.gz",
+    );
+    expect(spec).toContain(
+      "* Fri Nov 06 2026 MD. Shibbir Ahmed <shibbirweb@gmail.com> - 1.3.0~beta.2-1",
+    );
+    expect(toRpmVersion("1.3.0")).toBe("1.3.0");
   });
 
   test("refuses a date that is not YYYY-MM-DD", () => {

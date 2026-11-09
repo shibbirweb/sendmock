@@ -37,16 +37,22 @@ export function formatRpmChangelogDate(isoDate: string): string {
   return `${weekdayNames[changelogDate.getUTCDay()]} ${monthNames[changelogDate.getUTCMonth()]} ${dayOfMonth} ${changelogDate.getUTCFullYear()}`;
 }
 
+/** RPM versions cannot hold `-`; `1.1.0~beta.1` sorts before `1.1.0`, as a beta should. */
+export function toRpmVersion(version: string): string {
+  return version.replace(/-beta\.(\d+)$/, "~beta.$1");
+}
+
 export function buildCoprSpec(
   version: string,
   releaseDate: string,
-  downloadUrl = `${repositoryUrl}/releases/download/v%{version}`,
+  downloadUrl = `${repositoryUrl}/releases/download/v${version}`,
 ): string {
+  const rpmVersion = toRpmVersion(version);
   return `# Written by SendMock's Release build for ${version}; changes here are overwritten.
 %global debug_package %{nil}
 
 Name:           sendmock
-Version:        ${version}
+Version:        ${rpmVersion}
 Release:        1%{?dist}
 Summary:        Catch email, SMS, payments and webhooks from any app on your machine
 License:        MIT OR Apache-2.0
@@ -77,7 +83,7 @@ install -Dm755 sendmock %{buildroot}%{_bindir}/sendmock
 %{_bindir}/sendmock
 
 %changelog
-* ${formatRpmChangelogDate(releaseDate)} MD. Shibbir Ahmed <shibbirweb@gmail.com> - ${version}-1
+* ${formatRpmChangelogDate(releaseDate)} MD. Shibbir Ahmed <shibbirweb@gmail.com> - ${rpmVersion}-1
 - SendMock ${version}: ${repositoryUrl}/releases/tag/v${version}
 `;
 }
