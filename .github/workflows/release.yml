@@ -340,7 +340,8 @@ jobs:
 
             Push-Location "$env:RUNNER_TEMP/chocolatey"
             choco pack sendmock.nuspec --limit-output
-            choco install sendmock --source . --yes --no-progress --limit-output
+            # Chocolatey skips pre-release versions, such as a beta, unless --pre is given.
+            choco install sendmock --source . --pre --yes --no-progress --limit-output
             if ($LASTEXITCODE -ne 0) { throw "choco install failed with exit code $LASTEXITCODE" }
             Pop-Location
             $chocolateyVersion = (& "$env:ChocolateyInstall/bin/sendmock.exe" version --json | ConvertFrom-Json).version
