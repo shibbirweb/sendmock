@@ -4,7 +4,7 @@ answers provider SDKs at their real paths."""
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.wait_strategies import HttpWaitStrategy
 
-DEFAULT_IMAGE = "ghcr.io/shibbirweb/sendmock:0.0.0"
+DEFAULT_IMAGE = "ghcr.io/shibbirweb/sendmock:0.1.0-beta.1"
 SMTP_PORT = 1025
 HTTP_PORT = 8025
 PROVIDER_PORT = 8026
