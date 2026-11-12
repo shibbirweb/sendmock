@@ -418,7 +418,7 @@
         {
           "runner": "windows-latest",
           "shell": "pwsh",
-          "prepare": "Invoke-Expression \"& {$(Invoke-RestMethod https://get.scoop.sh)} -RunAsAdmin\"",
+          "prepare": "Invoke-Expression \"& {$(Invoke-RestMethod https://get.scoop.sh)} -RunAsAdmin\"\nAdd-Content -Path $env:GITHUB_PATH -Value \"$env:USERPROFILE\\scoop\\shims\"",
           "install": {
             "stable": "scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket\nscoop install shibbirweb/sendmock",
             "beta": "scoop bucket add shibbirweb https://github.com/shibbirweb/scoop-bucket\nscoop install shibbirweb/sendmock-beta"

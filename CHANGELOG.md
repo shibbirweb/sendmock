@@ -26,3 +26,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 - **Safe by default:** SendMock listens on 127.0.0.1 only, can require a login (`--ui-auth`) or an API token (`--api-token`), and masks secrets in the UI, API answers, logs and seed exports.
 - **Install your way:** `npx sendmock` or `bunx sendmock` with nothing installed, Docker (GHCR and Docker Hub, signed, with an SBOM), Homebrew, Scoop, WinGet, Chocolatey, apt, dnf, Nix, Cargo, an install script or a plain binary for macOS, Linux and Windows on x64 and Arm. A Helm chart, a Docker Desktop extension and a menu bar app are there too.
 - **Docs:** a guide for every screen and setting, a page that explains every control, recipes in nine languages, the API, CLI and MCP references and a live demo, at https://shibbirweb.github.io/sendmock/.
+
+### Fixed
+
+- **apt and dnf beta:** the APT and YUM repository at https://shibbirweb.github.io/sendmock/packages/ is now published with each release, so `apt install sendmock` and `dnf install sendmock` with the beta component work as the [install page](https://shibbirweb.github.io/sendmock/docs/install/) shows.

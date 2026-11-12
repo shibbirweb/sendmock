@@ -7,7 +7,7 @@
 #
 # Set up once: Settings > Pages > Build and deployment > Source: GitHub Actions, then
 # Settings > Environments > github-pages > Deployment branches and tags: allow develop,
-# main and the tags v* (a published release runs on its tag).
+# main and the tags v* (a release published by hand runs on its tag).
 name: Website
 run-name: ${{ github.event_name == 'pull_request' && 'Build the website' || 'Publish the website' }}
 
@@ -35,6 +35,11 @@ on:
   # A new stable release becomes / and the previous minor moves to /vX.Y/.
   release:
     types: [published]
+  # The release workflows publish with GITHUB_TOKEN, whose events start no other workflow, so
+  # the trigger above misses them; this one follows their run instead.
+  workflow_run:
+    workflows: [Publish beta, Publish stable]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -45,11 +50,39 @@ permissions:
   contents: read
 
 jobs:
+  # Publish beta and Publish stable run after every CI run on develop and main; deploy only
+  # when the run published a release, as Registry publish decides.
+  release-check:
+    name: Did that run publish a release?
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      should_deploy: ${{ steps.decision.outputs.should_publish }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - id: decision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          RELEASE_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RELEASE_RUN_ID/jobs?per_page=100" \
+            --jq '.jobs[] | {name, conclusion}' > "$RUNNER_TEMP/run-jobs.jsonl"
+          bun scripts/release/registry-publish-plan.ts "$WORKFLOW_NAME" "$RUNNER_TEMP/run-jobs.jsonl"
+
   # Our signed APT and YUM repository under /packages/, rebuilt on every deploy from the newest
   # stable and the newest beta release's .deb and .rpm files, once the owner has set
   # PACKAGES_GPG_PRIVATE_KEY (DS-03.3, plan 30 W4).
   package-repository:
     name: APT and YUM repository
+    needs: release-check
+    if: ${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}
     runs-on: ubuntu-latest
     outputs:
       has_repository: ${{ steps.build.outputs.has_repository }}

@@ -243,6 +243,15 @@ describe("channel matrix", () => {
     );
   });
 
+  test("Scoop's prepare step puts its shims on the PATH of the steps after it", () => {
+    const scoopEntry = buildChannelMatrix(channels, "beta", "scoop")[0];
+
+    expect(scoopEntry?.prepare).toContain("https://get.scoop.sh");
+    expect(scoopEntry?.prepare).toContain(
+      'Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\\scoop\\shims"',
+    );
+  });
+
   test("heading anchors match the docs site's", () => {
     expect(toHeadingAnchor("dnf (Fedora, RHEL and similar)")).toBe(
       "dnf-fedora-rhel-and-similar",
