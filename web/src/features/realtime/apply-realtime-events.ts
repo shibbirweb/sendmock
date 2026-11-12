@@ -4,7 +4,7 @@ import {
   isEmailSummary,
   placeNewEmailsInLists,
 } from "@/features/realtime/email-list-cache-patch";
-import type { QueryRefresher } from "@/features/realtime/query-refresher";
+import type { QueryRefresher } from "@/lib/api/query-refresher";
 import {
   listEveryRealtimeQueryKey,
   listQueryKeysToRefresh,

@@ -6,7 +6,7 @@ import {
   applyRealtimeEvents,
   refreshAfterReconnect,
 } from "@/features/realtime/apply-realtime-events";
-import type { QueryRefresher } from "@/features/realtime/query-refresher";
+import type { QueryRefresher } from "@/lib/api/query-refresher";
 import { listEveryRealtimeQueryKey } from "@/features/realtime/realtime-event-effects";
 import { queryKeys } from "@/lib/api/query-keys";
 import type {

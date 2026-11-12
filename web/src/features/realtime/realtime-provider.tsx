@@ -11,7 +11,7 @@ import {
   applyRealtimeEvents,
   refreshAfterReconnect,
 } from "@/features/realtime/apply-realtime-events";
-import { createQueryRefresher } from "@/features/realtime/query-refresher";
+import { getQueryRefresher } from "@/lib/api/query-refresher";
 import { createRealtimeEventBatcher } from "@/features/realtime/realtime-event-batcher";
 
 export type RealtimeConnectionState =
@@ -50,7 +50,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let isUnmounted = false;
     let hasConnectedBefore = false;
-    const queryRefresher = createQueryRefresher(queryClient);
+    const queryRefresher = getQueryRefresher(queryClient);
     const toastLimiter = createToastLimiter();
     const eventBatcher = createRealtimeEventBatcher((queuedEvents) => {
       applyRealtimeEvents(queryClient, queryRefresher, queuedEvents);

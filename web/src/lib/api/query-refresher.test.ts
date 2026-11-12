@@ -1,7 +1,10 @@
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { afterEach, describe, expect, test } from "vitest";
 
-import { createQueryRefresher } from "@/features/realtime/query-refresher";
+import {
+  createQueryRefresher,
+  getQueryRefresher,
+} from "@/lib/api/query-refresher";
 
 type PendingRequest = { finish: () => void; signal: AbortSignal };
 
@@ -81,5 +84,27 @@ describe("createQueryRefresher", () => {
 
     expect(watchedQuery.readRequestCount()).toBe(2);
     watchedQuery.stopWatching();
+  });
+
+  test("PL-02.3 a refresh asked while a screen's own request runs is answered by a new request after it, without cancelling", async () => {
+    const watchedQuery = watchControlledQuery(queryClient);
+    const queryRefresher = createQueryRefresher(queryClient);
+
+    queryRefresher.refreshQueries(["emails"]);
+    expect(watchedQuery.readRequestCount()).toBe(1);
+    await finishRequest(watchedQuery.pendingRequests[0]);
+    expect(watchedQuery.readRequestCount()).toBe(2);
+    await finishRequest(watchedQuery.pendingRequests[1]);
+
+    expect(watchedQuery.readRequestCount()).toBe(2);
+    expect(watchedQuery.pendingRequests[0]?.signal.aborted).toBe(false);
+    watchedQuery.stopWatching();
+  });
+
+  test("realtime events and mutations of one query client share one refresher", () => {
+    expect(getQueryRefresher(queryClient)).toBe(getQueryRefresher(queryClient));
+    expect(getQueryRefresher(queryClient)).not.toBe(
+      getQueryRefresher(new QueryClient()),
+    );
   });
 });
