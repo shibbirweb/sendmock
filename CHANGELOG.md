@@ -30,4 +30,4 @@ Write every user-visible change under **Unreleased** in the same pull request th
 ### Fixed
 
 - **Live updates under load:** the mail list keeps showing new mail while an app sends thousands of emails, and toasts and browser notifications show at most one every 2 seconds, saying how many more arrived.
-- **Package repository:** the APT and YUM repository at https://shibbirweb.github.io/sendmock/packages/ is now published with each release, so `dnf install sendmock` with the beta component works as the [install page](https://shibbirweb.github.io/sendmock/docs/install/) shows.
+- **Package repository:** the APT and YUM repository at https://shibbirweb.github.io/sendmock/packages/ is now published with each release, so `apt install sendmock` and `dnf install sendmock` with the beta component work as the [install page](https://shibbirweb.github.io/sendmock/docs/install/) shows.
