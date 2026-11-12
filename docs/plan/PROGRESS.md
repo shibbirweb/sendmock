@@ -13,12 +13,12 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | **Latest release** | `0.1.0-beta.1`, the first beta (2026-11-09, GitHub pre-release published by Publish beta); npm and Maven Central did not take it, so the npm packages (`npx sendmock`) and the Java Testcontainers module ship with the next beta ([#220](https://github.com/shibbirweb/sendmock/issues/220), [#219](https://github.com/shibbirweb/sendmock/issues/219)) |
 | **Blockers** | none |
 | **Live preview** | https://shibbirweb.github.io/sendmock/ (demo at `/demo/`), published from `develop`; with versioned docs, `/` is the Preview and `/next/` the beta docs until the first stable tag |
-| **Feature acceptance** | 116 / 129 accepted (all but AI-05, DS-03, PL-02 and WS-03, and the planned PL-11 to PL-17, WS-11 and WS-12), 568 / 640 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, WS-03.1 and the stable half of WS-03.7 wait for the first merge and stable (steps 5 and 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) and DS-03.8 for the next beta's npm publish (#220), PL-02.3 to PL-02.5 for W19 (#224) |
+| **Feature acceptance** | 117 / 129 accepted (all but AI-05, DS-03 and WS-03, and the planned PL-11 to PL-17, WS-11 and WS-12), 571 / 640 criteria ticked; `bun scripts/release-readiness.ts` prints the rest with the runbook step that proves each. Open: AI-05.7 and the UI-07 review wait for the owner (runbook step 4), DS-02.5, WS-03.1 and the stable half of WS-03.7 wait for the first merge and stable (steps 5 and 7), AI-05.8 for the GitHub MCP Registry listing (step 10), DS-03.7 (`npx sendmock`, W16) and DS-03.8 for the next beta's npm publish (#220) |
 
 **Next up:**
 
 1. Runbook step 6 is nearly done: `0.1.0-beta.1` was released on 2026-11-09 (#214), the notices and ticks are in #222, and the logged-out pulls, package visibility and the `/next/` Beta banner are checked. Left of step 6: fix apt, dnf and Scoop in the Install channels run (#223), then run it again for those channels. npm (with its trusted publishing and deleting `NPM_TOKEN`) and Maven Central wait for the next beta (#220, #219). New work starts on a new branch from `develop`.
-2. **W19, realtime under load (#224, owner report 2026-11-12):** the web UI stops showing new mail while thousands of emails arrive. Batch realtime events, patch list caches from event data as Mailpit does, refetch at most once per flush without cancelling, limit toasts, close lagging clients ([30](30-phase-5.md), PL-02.3 to PL-02.5).
+2. **W19, realtime under load (#224):** built in #225 (PL-02 accepted); the live burst test (`web/tests/live/realtime-burst.spec.ts`) runs in CI's live UI job.
 3. **Phase 5 (distribution and 1.0 stable):** planned in [30](30-phase-5.md) (W1 to W15, design notes, new criteria PL-09 and AI-05.5 to AI-05.7, and the owner steps for accounts, tokens and the release). Build it workstream by workstream, starting with W1 (install scripts).
 
 ### Resume here (2026-11-07)
@@ -79,7 +79,7 @@ Where the project stands, what is done, and what is left. The plan itself is in 
 | 3 | Webhooks backend | Done apart from the beta release | 16 / 17 |
 | 3P | Payment gateway backend | Done apart from the beta release | 8 / 9 |
 | 4 | Integrations, fidelity and AI | Done apart from the beta release ([29](29-phase-4.md)) | 21 / 22 |
-| 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 9 / 18 |
+| 5 | Distribution and 1.0 stable | In progress ([30](30-phase-5.md)); the rest waits for the owner's release ([31](31-release-runbook.md)) | 10 / 18 |
 | A | After 1.0 backlog | In progress ([32](32-after-1-0.md)), on `feat/phase-0` by owner decision | 6 / 11 |
 
 ---
@@ -355,7 +355,7 @@ Plan: [30-phase-5.md](30-phase-5.md). Built on `feat/phase-0` in #48, W1 to W15 
 - [ ] Website docs complete, versioned (`/`, `/next/`, `/v0.x/`)
 - [x] Deeper docs: a page per screen explaining every control and text (what it does, what it changes or sends, where its text comes from, how it links, CLI/API/MCP, errors), kept true by a Playwright crawl ([19](19-user-guide.md#deeper-every-control-explained-planned-2026-10-27-owner-feedback-f17-not-started), WS-10); written screen by screen as each live mode lands
 - [x] Final product name applied everywhere (the product name audit in `scripts/product-name-audit.ts`, W13d) (#48)
-- [ ] Realtime under load: the web UI keeps showing new mail while thousands of emails arrive (W19, PL-02.3 to PL-02.5, added 2026-11-12, owner report, #224)
+- [x] Realtime under load: the web UI keeps showing new mail while thousands of emails arrive (W19, PL-02.3 to PL-02.5, added 2026-11-12, owner report, #224) (#225)
 - [ ] **Release `1.0.0`** (Stable release, Promote stable, Publish stable)
 - [ ] `main` set as default branch
 - [ ] Done-when check: installs and runs via every channel on macOS, Linux, Windows
@@ -903,3 +903,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-12 | Install channels for 0.1.0-beta.1 (run 43263538564): the install scripts and Homebrew passed; npm, npx and bunx failed as expected (#220); apt and dnf failed because `/packages/` was never published (Publish beta publishes the release with `GITHUB_TOKEN`, which does not start the Website workflow's `release` trigger), and Scoop failed because its shims folder was not on the next step's `PATH` ([#223](https://github.com/shibbirweb/sendmock/issues/223)). The Website workflow was run by hand to publish `/packages/`. |
 | 2026-11-12 | Owner report: when an app sends thousands of emails, the web UI stops showing new mail. Cause: every realtime event calls `invalidateQueries` on `["emails"]`, which cancels the list request in flight and starts another, so none finishes; each event also shows a toast, and the server skips events for a lagging WebSocket client silently. Plan: W19 in [30](30-phase-5.md), designed after reading how Mailpit does it (list inserts from the event's data, a `stats` event at most 4 times a second, a 2 second notification pause, slow clients dropped); new criteria PL-02.3 to PL-02.5, so PL-02 is back to In progress ([#224](https://github.com/shibbirweb/sendmock/issues/224)). |
 | 2026-11-12 | npm (#220): the owner replaced `NPM_TOKEN` with a token that can bypass 2FA, so the next beta's Registry publish should publish the npm packages. npm is retiring direct publishing with such tokens (GitHub changelog, 2026-07-31), so trusted publishing stays the lasting fix in #220. |
+| 2026-11-12 | W19 built (#225): the web UI applies realtime events in 250 ms batches, writes new emails straight into the cached email lists (no list request), refreshes other queries at most once per batch without cancelling a request in flight, puts a batch in the bell with one update, shows at most one toast or browser notification every 2 seconds ("and N more"), and refreshes every list once after a reconnect; the server closes a WebSocket client that falls behind (close code 4000, `lagged`) and ends its SSE stream. The mocks now send the whole email summary in `email.received` and `email.inbound`, as the server does. PL-02.3 to PL-02.5 ticked, PL-02 accepted. |

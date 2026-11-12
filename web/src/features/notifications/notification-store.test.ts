@@ -1,11 +1,14 @@
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import {
   addNotification,
+  addNotifications,
   clearNotifications,
   markAllNotificationsRead,
   maxNotifications,
   readNotificationState,
+  useNotifications,
 } from "@/features/notifications/notification-store";
 
 function addEmailNotification(notificationIndex: number) {
@@ -53,5 +56,43 @@ describe("notification store", () => {
     clearNotifications();
 
     expect(readNotificationState().notifications).toEqual([]);
+  });
+
+  test("PL-02.4 a batch of events reaches the bell in one update, newest first", () => {
+    let renderCount = 0;
+    renderHook(() => {
+      renderCount += 1;
+      return useNotifications();
+    });
+    const rendersBefore = renderCount;
+
+    act(() => {
+      addNotifications(
+        [1, 2, 3].map((notificationIndex) => ({
+          id: `evt_${notificationIndex}`,
+          area: "email" as const,
+          title: "New email",
+          description: `Email ${notificationIndex}`,
+          link: null,
+          createdAt: new Date(notificationIndex * 1000).toISOString(),
+        })),
+      );
+    });
+
+    expect(renderCount - rendersBefore).toBe(1);
+    expect(
+      readNotificationState().notifications.map(
+        (notification) => notification.description,
+      ),
+    ).toEqual(["Email 3", "Email 2", "Email 1"]);
+  });
+
+  test("an empty batch changes nothing", () => {
+    addEmailNotification(1);
+    const stateBefore = readNotificationState();
+
+    addNotifications([]);
+
+    expect(readNotificationState()).toBe(stateBefore);
   });
 });

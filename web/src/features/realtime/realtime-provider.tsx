@@ -3,14 +3,16 @@ import * as React from "react";
 
 import { buildRealtimeUrl } from "@/lib/api/api-client";
 import type { AppEvent } from "@/lib/api/types";
-import { readNotificationPreferences } from "@/features/notifications/notification-preferences";
-import { addNotification } from "@/features/notifications/notification-store";
 import {
-  describeEventForNotification,
-  isEventForSelectedProject,
-  listQueryKeysToRefresh,
-} from "@/features/realtime/realtime-event-effects";
-import { toast } from "sonner";
+  announceRealtimeEvents,
+  createToastLimiter,
+} from "@/features/realtime/announce-realtime-events";
+import {
+  applyRealtimeEvents,
+  refreshAfterReconnect,
+} from "@/features/realtime/apply-realtime-events";
+import { createQueryRefresher } from "@/features/realtime/query-refresher";
+import { createRealtimeEventBatcher } from "@/features/realtime/realtime-event-batcher";
 
 export type RealtimeConnectionState =
   "connecting" | "connected" | "disconnected";
@@ -25,9 +27,18 @@ const appEventListeners = new Set<AppEventListener>();
 
 const reconnectDelayMs = 3000;
 
+function parseAppEvent(frameText: string): AppEvent | null {
+  try {
+    return JSON.parse(frameText) as AppEvent;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Keeps one WebSocket to /api/v1/ws open, refreshes the affected queries on
- * every event and reconnects after a short delay when the stream drops.
+ * Keeps one WebSocket to /api/v1/ws open and applies its events in batches (PL-02.3): new
+ * emails go straight into the cached lists, other queries refresh once per batch, and toasts
+ * are limited. After a dropped stream it reconnects and refreshes every list once (PL-02.5).
  */
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
@@ -38,38 +49,18 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     let realtimeSocket: WebSocket | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let isUnmounted = false;
-
-    const handleAppEvent = (appEvent: AppEvent) => {
-      for (const queryKey of listQueryKeysToRefresh(appEvent.type)) {
-        void queryClient.invalidateQueries({ queryKey });
-      }
-
-      for (const appEventListener of appEventListeners) {
-        appEventListener(appEvent);
-      }
-
-      // Every notable event goes to the bell; a toast only when toasts are on (UI-08).
-      const eventNotification = describeEventForNotification(appEvent);
-      if (eventNotification !== null) {
-        addNotification({
-          ...eventNotification,
-          id: appEvent.id,
-          createdAt: appEvent.created_at,
-        });
-        // The provider sits outside the router, so it reads the top bar's choice from the URL.
-        const selectedProjectKey = new URLSearchParams(
-          window.location.search,
-        ).get("project");
-        if (
-          readNotificationPreferences().areToastsShown &&
-          isEventForSelectedProject(appEvent, selectedProjectKey)
-        ) {
-          toast(eventNotification.title, {
-            description: eventNotification.description,
-          });
+    let hasConnectedBefore = false;
+    const queryRefresher = createQueryRefresher(queryClient);
+    const toastLimiter = createToastLimiter();
+    const eventBatcher = createRealtimeEventBatcher((queuedEvents) => {
+      applyRealtimeEvents(queryClient, queryRefresher, queuedEvents);
+      for (const queuedEvent of queuedEvents) {
+        for (const appEventListener of appEventListeners) {
+          appEventListener(queuedEvent);
         }
       }
-    };
+      announceRealtimeEvents(queuedEvents, toastLimiter);
+    });
 
     const connect = () => {
       setConnectionState("connecting");
@@ -77,12 +68,15 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
       realtimeSocket.addEventListener("open", () => {
         setConnectionState("connected");
+        if (hasConnectedBefore) {
+          refreshAfterReconnect(queryRefresher);
+        }
+        hasConnectedBefore = true;
       });
       realtimeSocket.addEventListener("message", (messageEvent) => {
-        try {
-          handleAppEvent(JSON.parse(String(messageEvent.data)) as AppEvent);
-        } catch {
-          // Ignore frames that are not app events.
+        const appEvent = parseAppEvent(String(messageEvent.data));
+        if (appEvent !== null) {
+          eventBatcher.addEvent(appEvent);
         }
       });
       realtimeSocket.addEventListener("close", () => {
@@ -100,6 +94,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       if (reconnectTimer !== null) {
         clearTimeout(reconnectTimer);
       }
+      eventBatcher.dispose();
+      toastLimiter.dispose();
       realtimeSocket?.close();
     };
   }, [queryClient]);

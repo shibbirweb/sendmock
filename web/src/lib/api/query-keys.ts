@@ -20,12 +20,17 @@ import type {
 } from "@/lib/api/types";
 
 /**
- * Query keys for every resource. Realtime events invalidate by the top-level
- * key (e.g. ["emails"]), which refreshes every list and detail below it.
+ * Query keys for every resource. Realtime events refresh by the top-level key
+ * (e.g. ["emails"]), which covers every list and detail below it; new emails
+ * are written into the email lists instead (features/realtime).
  */
 export const queryKeys = {
   emails: {
     all: ["emails"] as const,
+    /** Every one-page email list, whatever its filters. */
+    lists: ["emails", "list"] as const,
+    /** Every scrolling email list, whatever its filters. */
+    infiniteLists: ["emails", "infinite-list"] as const,
     list: (emailFilters: EmailListFilters) =>
       ["emails", "list", emailFilters] as const,
     detail: (emailId: string) => ["emails", "detail", emailId] as const,

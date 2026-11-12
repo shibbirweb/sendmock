@@ -3,6 +3,7 @@ import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import { buildDeliveredSmtpSession } from "@/mocks/fixtures/smtp-session-fixtures";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 
 /**
  * A sample email as if an app sent it over SMTP: the email and the SMTP
@@ -28,11 +29,7 @@ export function createSampleEmail(sampleOptions: SampleOptions = {}): string {
   mockDatabase.emails.unshift(sampleEmail);
   mockDatabase.emailTimelines.set(sampleEmail.id, emailFixture.timeline);
   mockDatabase.smtpSessions.unshift(buildDeliveredSmtpSession(sampleEmail, 0));
-  publishMockEvent("email.received", {
-    id: sampleEmail.id,
-    subject: sampleEmail.subject,
-    from: sampleEmail.from,
-  });
+  publishMockEvent("email.received", toEmailSummary(sampleEmail));
 
   return sampleEmail.id;
 }

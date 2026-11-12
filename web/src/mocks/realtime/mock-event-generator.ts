@@ -8,6 +8,7 @@ import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 
 /** Adds one new email and announces it, like an app sending over SMTP. */
@@ -34,11 +35,7 @@ export function generateSampleEmail() {
 
   mockDatabase.emails.unshift(emailFixture.email);
   mockDatabase.emailTimelines.set(emailFixture.email.id, emailFixture.timeline);
-  publishMockEvent("email.received", {
-    id: emailFixture.email.id,
-    subject: emailFixture.email.subject,
-    from: emailFixture.email.from,
-  });
+  publishMockEvent("email.received", toEmailSummary(emailFixture.email));
 }
 
 /** Adds one new outbound SMS, announces it and moves it towards delivered. */
