@@ -3,7 +3,7 @@ title: Getting started
 description: Install SendMock, explore it with samples, connect your app and get your first webhook, in about 10 minutes.
 ---
 
-> **Downloads start with the first beta.** Until it is published, steps 2, 4 and 5 can be tried in the [live demo](/demo/).
+> **Only the beta is published so far.** In step 1, use the beta command for your system from [Install](./install.md), such as `brew install shibbirweb/tap/sendmock-beta` or the Docker `beta` image; the commands below work from 1.0.0.
 
 This first run uses only what SendMock ships with. Nothing needs to be configured.
 

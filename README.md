@@ -66,7 +66,7 @@ Everything works from the web UI, the REST API, the `sendmock` CLI and an MCP se
 
 WinGet, Chocolatey, apt, dnf, Nix, Cargo, the beta of each channel, plain binaries, a Helm chart, a Docker Desktop extension and a menu bar app are on the [install page](https://shibbirweb.github.io/sendmock/docs/install/).
 
-The first beta is being prepared. Until it is published, try the [live demo](https://shibbirweb.github.io/sendmock/demo/) or [run SendMock from source](#run-it-from-source).
+Only the beta is published so far: use the beta of each channel, such as `brew install shibbirweb/tap/sendmock-beta` or `ghcr.io/shibbirweb/sendmock:beta`, from the [install page](https://shibbirweb.github.io/sendmock/docs/install/). The commands above work from 1.0.0.
 
 ## Quick start
 
