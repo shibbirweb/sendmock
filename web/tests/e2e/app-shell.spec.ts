@@ -254,7 +254,10 @@ test("grouped notification toasts can all be cleared at once", async ({
   await sampleEmailButton.click();
   await page.keyboard.press("Escape");
 
-  const clearAllButton = page.getByRole("button", { name: "Clear all (3)" });
+  // Toasts show at most one every 2 seconds (PL-02.4): the two quick emails after the
+  // first become one toast that says "and 1 more".
+  await expect(page.getByText(/\(and 1 more\)$/)).toBeVisible();
+  const clearAllButton = page.getByRole("button", { name: "Clear all (2)" });
   await expect(clearAllButton).toBeVisible();
   await clearAllButton.click();
   await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);

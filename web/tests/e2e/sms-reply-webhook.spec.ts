@@ -42,9 +42,11 @@ test("SM-09.7 a TwiML answer becomes a reply with a badge pointing at the messag
   await page.getByLabel("Reply as +8801700000000").fill("Is the shop open?");
   await page.getByRole("button", { name: "Send reply" }).click();
 
+  // Exact, so the thread list's "You: Thanks! ..." preview of the same reply does not match.
   await expect(
     page.getByText(
       "Thanks! We got your message and will get back to you soon.",
+      { exact: true },
     ),
   ).toBeVisible();
   await expect(replyWebhookResults(page).last()).toHaveText(

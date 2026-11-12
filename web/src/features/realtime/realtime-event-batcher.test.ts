@@ -15,6 +15,10 @@ function buildEmailEvent(eventNumber: number): AppEvent {
   };
 }
 
+function readEventIds(flushedBatch: AppEvent[] | undefined): string[] {
+  return flushedBatch?.map((appEvent) => appEvent.id) ?? [];
+}
+
 describe("createRealtimeEventBatcher", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -24,7 +28,21 @@ describe("createRealtimeEventBatcher", () => {
     vi.useRealTimers();
   });
 
-  test("PL-02.3 a burst of events is handed over in one flush, oldest first, after the interval", () => {
+  test("PL-02.3 the first event after a quiet moment is applied at once", () => {
+    const flushedBatches: AppEvent[][] = [];
+    const eventBatcher = createRealtimeEventBatcher((queuedEvents) => {
+      flushedBatches.push(queuedEvents);
+    });
+
+    eventBatcher.addEvent(buildEmailEvent(1));
+    expect(flushedBatches.map(readEventIds)).toEqual([["evt_1"]]);
+
+    vi.advanceTimersByTime(realtimeFlushIntervalMs * 4);
+    eventBatcher.addEvent(buildEmailEvent(2));
+    expect(flushedBatches.map(readEventIds)).toEqual([["evt_1"], ["evt_2"]]);
+  });
+
+  test("PL-02.3 the rest of a burst is handed over in one flush, oldest first, after the interval", () => {
     const flushedBatches: AppEvent[][] = [];
     const eventBatcher = createRealtimeEventBatcher((queuedEvents) => {
       flushedBatches.push(queuedEvents);
@@ -34,27 +52,36 @@ describe("createRealtimeEventBatcher", () => {
       eventBatcher.addEvent(buildEmailEvent(eventNumber));
     }
     vi.advanceTimersByTime(realtimeFlushIntervalMs - 1);
-    expect(flushedBatches).toEqual([]);
+    expect(flushedBatches).toHaveLength(1);
 
     vi.advanceTimersByTime(1);
-    expect(flushedBatches).toHaveLength(1);
-    expect(flushedBatches[0]).toHaveLength(1000);
-    expect(flushedBatches[0]?.[0]?.id).toBe("evt_1");
-    expect(flushedBatches[0]?.[999]?.id).toBe("evt_1000");
+    expect(flushedBatches).toHaveLength(2);
+    expect(flushedBatches[1]).toHaveLength(999);
+    expect(flushedBatches[1]?.[0]?.id).toBe("evt_2");
+    expect(flushedBatches[1]?.[998]?.id).toBe("evt_1000");
   });
 
-  test("PL-02.3 a steady stream flushes at most four times a second", () => {
-    let flushCount = 0;
+  test("PL-02.3 a steady stream flushes at most four times in any second", () => {
+    const flushTimesMs: number[] = [];
     const eventBatcher = createRealtimeEventBatcher(() => {
-      flushCount += 1;
+      flushTimesMs.push(Date.now());
     });
 
-    for (let millisecond = 0; millisecond < 1000; millisecond += 1) {
+    for (let millisecond = 0; millisecond < 3000; millisecond += 1) {
       eventBatcher.addEvent(buildEmailEvent(millisecond));
       vi.advanceTimersByTime(1);
     }
 
-    expect(flushCount).toBe(4);
+    const busiestSecondFlushCount = Math.max(
+      ...flushTimesMs.map(
+        (flushTimeMs) =>
+          flushTimesMs.filter(
+            (otherTimeMs) =>
+              otherTimeMs >= flushTimeMs && otherTimeMs < flushTimeMs + 1000,
+          ).length,
+      ),
+    );
+    expect(busiestSecondFlushCount).toBe(4);
   });
 
   test("dispose drops what is queued and stops the flush", () => {
@@ -62,9 +89,10 @@ describe("createRealtimeEventBatcher", () => {
     const eventBatcher = createRealtimeEventBatcher(flushEvents);
 
     eventBatcher.addEvent(buildEmailEvent(1));
+    eventBatcher.addEvent(buildEmailEvent(2));
     eventBatcher.dispose();
     vi.advanceTimersByTime(realtimeFlushIntervalMs * 4);
 
-    expect(flushEvents).not.toHaveBeenCalled();
+    expect(flushEvents).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { navigateInApp } from "./support/app-screens";
+import { clickToastAction } from "./support/toasts";
 
 // Each test follows the "Try it in the demo" steps of one recipe in
 // docs/wiki/recipes/, so a renamed button or changed screen fails here (WS-06.4).
@@ -100,9 +101,11 @@ test("WS-06.4 recipe two-way SMS: a reply gets the app's TwiML answer", async ({
   await page.getByText("+8801700000000", { exact: true }).click();
   await page.getByLabel("Reply as +8801700000000").fill("Is the shop open?");
   await page.getByRole("button", { name: "Send reply" }).click();
+  // Exact, so the thread list's "You: Thanks! ..." preview of the same reply does not match.
   await expect(
     page.getByText(
       "Thanks! We got your message and will get back to you soon.",
+      { exact: true },
     ),
   ).toBeVisible();
   await expect(
@@ -118,7 +121,7 @@ test("WS-06.4 recipe reply by email: the reply is forwarded by a route", async (
   const composer = page.getByRole("region", { name: "Reply as recipient" });
   await composer.getByLabel("Message").fill("Got it, thanks.");
   await composer.getByRole("button", { name: "Send reply" }).click();
-  await page.getByRole("button", { name: "Open" }).click();
+  await clickToastAction(page, "Reply created", "Open");
   await page.getByRole("tab", { name: "Timeline" }).click();
   await expect(page.getByRole("tabpanel")).toContainText(
     "Forwarded by route Replies to no-reply to http://localhost:8000/webhooks/mail/inbound (200)",

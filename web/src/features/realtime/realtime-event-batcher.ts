@@ -10,34 +10,45 @@ export type RealtimeEventBatcher = {
 };
 
 /**
- * Queues realtime events and hands them over together, oldest first, once per interval, so
- * a burst of thousands of events becomes a few flushes instead of one UI update per event.
+ * Applies the first event after a quiet moment at once, so a single email or SMS shows (and
+ * toasts) as soon as it arrives, then hands over the events that follow together, oldest
+ * first, once per interval: a burst of thousands becomes four flushes a second.
  */
 export function createRealtimeEventBatcher(
   flushEvents: (queuedEvents: AppEvent[]) => void,
   flushIntervalMs: number = realtimeFlushIntervalMs,
 ): RealtimeEventBatcher {
   let queuedEvents: AppEvent[] = [];
-  let flushTimer: ReturnType<typeof setTimeout> | null = null;
+  let intervalTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const flushQueuedEvents = () => {
-    flushTimer = null;
+  const startInterval = () => {
+    intervalTimer = setTimeout(endInterval, flushIntervalMs);
+  };
+
+  function endInterval() {
+    intervalTimer = null;
+    if (queuedEvents.length === 0) {
+      return;
+    }
     const eventsToFlush = queuedEvents;
     queuedEvents = [];
     flushEvents(eventsToFlush);
-  };
+    startInterval();
+  }
 
   return {
     addEvent: (appEvent) => {
-      queuedEvents.push(appEvent);
-      if (flushTimer === null) {
-        flushTimer = setTimeout(flushQueuedEvents, flushIntervalMs);
+      if (intervalTimer === null) {
+        flushEvents([appEvent]);
+        startInterval();
+        return;
       }
+      queuedEvents.push(appEvent);
     },
     dispose: () => {
-      if (flushTimer !== null) {
-        clearTimeout(flushTimer);
-        flushTimer = null;
+      if (intervalTimer !== null) {
+        clearTimeout(intervalTimer);
+        intervalTimer = null;
       }
       queuedEvents = [];
     },

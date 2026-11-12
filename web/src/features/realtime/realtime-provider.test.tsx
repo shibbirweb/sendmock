@@ -66,25 +66,31 @@ describe("RealtimeProvider", () => {
     clearNotifications();
   });
 
-  test("PL-02.3 a burst of events refreshes each affected query once per flush", () => {
+  test("PL-02.3 a burst of events refreshes each affected query once per flush, the first at once", async () => {
     const queryClient = new QueryClient();
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
     renderProvider(queryClient);
     const realtimeSocket = readLatestSocket();
+
+    const expectedRefreshCalls = [
+      [{ queryKey: queryKeys.emails.all }, { cancelRefetch: false }],
+      [{ queryKey: queryKeys.system.stats }, { cancelRefetch: false }],
+    ];
 
     act(() => {
       for (let emailNumber = 1; emailNumber <= 2000; emailNumber += 1) {
         realtimeSocket.receiveFrame(buildOpenedEventFrame(emailNumber));
       }
     });
-    expect(invalidateQueries).not.toHaveBeenCalled();
-    act(() => {
-      vi.advanceTimersByTime(realtimeFlushIntervalMs);
+    // The first event is applied at once; the other 1,999 wait for the next flush.
+    expect(invalidateQueries.mock.calls).toEqual(expectedRefreshCalls);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(realtimeFlushIntervalMs);
     });
 
     expect(invalidateQueries.mock.calls).toEqual([
-      [{ queryKey: queryKeys.emails.all }, { cancelRefetch: false }],
-      [{ queryKey: queryKeys.system.stats }, { cancelRefetch: false }],
+      ...expectedRefreshCalls,
+      ...expectedRefreshCalls,
     ]);
   });
 

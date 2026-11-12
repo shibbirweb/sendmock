@@ -1,4 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
+import { clickToastAction } from "./support/toasts";
 
 async function navigateInApp(page: Page, targetPath: string) {
   await page.evaluate((path) => {
@@ -81,7 +82,7 @@ test("WH-12.7 an incoming email runs the matching routes, shown in its timeline 
   const composer = page.getByRole("region", { name: "Reply as recipient" });
   await composer.getByLabel("Message").fill("Got it, thanks.");
   await composer.getByRole("button", { name: "Send reply" }).click();
-  await page.getByRole("button", { name: "Open" }).click();
+  await clickToastAction(page, "Reply created", "Open");
   await page.getByRole("tab", { name: "Timeline" }).click();
   await expect(page.getByRole("tabpanel")).toContainText(
     "Forwarded by route Replies to no-reply to http://localhost:8000/webhooks/mail/inbound (200)",
