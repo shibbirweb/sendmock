@@ -26,7 +26,7 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -78,7 +78,7 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # The image has Node but not unzip, which setup-bun needs, so Bun comes from npm.
       - name: Install Bun
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.shard }}
           path: web/playwright-report
@@ -122,7 +122,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
@@ -160,7 +160,7 @@ jobs:
     name: Rust coverage and file size
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Toolchain from rust-toolchain.toml, with the coverage tools
         run: |
@@ -202,7 +202,7 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -214,7 +214,7 @@ jobs:
           VITE_API_MODE: live
         run: bun run build
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: web-dist
           path: web/dist
@@ -230,9 +230,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: web-dist
           path: web/dist
@@ -256,7 +256,7 @@ jobs:
         run: bun scripts/performance-budget.ts target/release/sendmock
 
       # The live UI suite runs against this binary in the Playwright image.
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: matrix.os == 'ubuntu-latest'
         with:
           name: sendmock-linux
@@ -276,9 +276,9 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: sendmock-linux
           path: sendmock-binary
@@ -298,7 +298,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-live
           path: web/playwright-report
@@ -313,11 +313,11 @@ jobs:
     env:
       CLAUDE_CODE_VERSION: 2.1.318
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: sendmock-linux
           path: sendmock-binary
@@ -369,7 +369,7 @@ jobs:
     name: MCP registry manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/install-mcp-publisher
 
@@ -395,7 +395,7 @@ jobs:
     name: Acceptance traceability
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -420,7 +420,7 @@ jobs:
       run:
         working-directory: website
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 

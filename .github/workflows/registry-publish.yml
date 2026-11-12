@@ -37,7 +37,7 @@ jobs:
       # The default branch, never the commit of the run that triggered this one: a fork's pull
       # request from a branch named develop also runs CI and then Publish beta, and its code must
       # never run here, where the plan decides what the OIDC jobs publish.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -78,7 +78,7 @@ jobs:
       actions: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
@@ -86,7 +86,7 @@ jobs:
 
       # No registry-url: setup-node would write an `_authToken=${NODE_AUTH_TOKEN}` line, and an
       # empty one makes npm skip the OIDC exchange.
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -105,7 +105,7 @@ jobs:
           fi
 
       - name: The release's archives, from the run that built and tested them
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: release-files
           path: dist
@@ -139,7 +139,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
@@ -168,12 +168,12 @@ jobs:
       actions: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - name: The web UI the release embedded
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: release-web-dist
           path: web/dist
@@ -204,13 +204,13 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -246,11 +246,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
@@ -275,11 +275,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.plan.outputs.tag_name }}
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "8.0.x"
 
