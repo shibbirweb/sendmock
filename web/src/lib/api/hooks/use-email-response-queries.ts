@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
+import { getQueryRefresher } from "@/lib/api/query-refresher";
 import type {
   EmailDetail,
   EmailForwardRequest,
@@ -18,8 +19,10 @@ function useEmailResponseMutation<MutationInput>(
   return useMutation({
     mutationFn: mutationRequest,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.emails.all });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
+      // Without cancelling: a live refresh of a list may be running (PL-02.3).
+      const queryRefresher = getQueryRefresher(queryClient);
+      queryRefresher.refreshQueries(queryKeys.emails.all);
+      queryRefresher.refreshQueries(queryKeys.system.stats);
     },
   });
 }

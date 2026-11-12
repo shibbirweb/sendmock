@@ -28,7 +28,9 @@ pub async fn open_event_stream(
     let event_stream =
         ResumableEventStream::open(&operation_context.event_bus, last_event_id.as_deref());
     let server_sent_events = unfold(event_stream, |mut event_stream| async move {
-        let app_event = event_stream.next_event().await?;
+        // A client that fell behind loses the stream; its EventSource reconnects with the
+        // last event id it got.
+        let app_event = event_stream.next_event().await.ok().flatten()?;
         let server_sent_event = Event::default()
             .id(app_event.id.clone())
             .event(app_event.event_type.clone())

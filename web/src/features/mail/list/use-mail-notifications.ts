@@ -1,6 +1,11 @@
 import * as React from "react";
 
 import { matchesNotificationFilter } from "@/features/mail/list/matches-notification-filter";
+import {
+  createNotificationLimiter,
+  describeWithOtherCount,
+  type NotificationLimiter,
+} from "@/features/realtime/notification-limiter";
 import { useAppEventListener } from "@/features/realtime/realtime-provider";
 import type { EmailListFilters, EmailSummary } from "@/lib/api/types";
 
@@ -22,6 +27,34 @@ function storePreference(isEnabled: boolean) {
   }
 }
 
+type NewEmailNotification = { subject: string; eventId: string };
+
+/** At most one browser notification every 2 seconds while mail pours in (PL-02.4). */
+function useNewEmailNotificationLimiter(): NotificationLimiter<NewEmailNotification> {
+  const [notificationLimiter] = React.useState(() =>
+    createNotificationLimiter<NewEmailNotification>(
+      (newEmailNotification, otherCount) => {
+        new Notification("New email", {
+          body: describeWithOtherCount(
+            newEmailNotification.subject,
+            otherCount,
+          ),
+          tag: newEmailNotification.eventId,
+        });
+      },
+    ),
+  );
+
+  React.useEffect(
+    () => () => {
+      notificationLimiter.dispose();
+    },
+    [notificationLimiter],
+  );
+
+  return notificationLimiter;
+}
+
 /**
  * Opt-in browser notifications for new emails (EM-16). Nothing is requested
  * or shown until the user turns them on, and only emails that fit the list's
@@ -36,6 +69,8 @@ export function useMailNotifications(emailFilters: EmailListFilters = {}) {
       Notification.permission === "granted",
   );
 
+  const notificationLimiter = useNewEmailNotificationLimiter();
+
   useAppEventListener((appEvent) => {
     if (!isEnabled || appEvent.type !== "email.received") {
       return;
@@ -45,10 +80,10 @@ export function useMailNotifications(emailFilters: EmailListFilters = {}) {
       return;
     }
 
-    const subject = emailSummary.subject;
-    new Notification("New email", {
-      body: typeof subject === "string" ? subject : "",
-      tag: appEvent.id,
+    notificationLimiter.offerNotification({
+      subject:
+        typeof emailSummary.subject === "string" ? emailSummary.subject : "",
+      eventId: appEvent.id,
     });
   });
 

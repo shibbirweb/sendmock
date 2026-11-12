@@ -9,6 +9,7 @@ type WorkflowStep = {
 };
 type WorkflowJob = {
   if?: string;
+  outputs?: Record<string, string>;
   needs?: string | string[];
   permissions?: Record<string, string>;
   steps: WorkflowStep[];
@@ -18,6 +19,7 @@ type WebsiteWorkflow = {
     push: { branches: string[] };
     pull_request: { paths: string[] };
     release: { types: string[] };
+    workflow_run: { workflows: string[]; types: string[] };
     workflow_dispatch: unknown;
   };
   permissions: Record<string, string>;
@@ -81,5 +83,28 @@ describe("Website workflow", () => {
       .filter(([, workflowJob]) => workflowJob.permissions?.pages === "write")
       .map(([jobName]) => jobName);
     expect(jobsWithPagesWrite).toEqual(["deploy"]);
+  });
+
+  test("deploys after Publish beta or Publish stable publishes a release, which the release trigger never sees", () => {
+    expect(websiteWorkflow.on.workflow_run).toEqual({
+      workflows: ["Publish beta", "Publish stable"],
+      types: ["completed"],
+    });
+
+    const releaseCheck = websiteWorkflow.jobs["release-check"];
+    expect(releaseCheck?.if).toBe("github.event_name == 'workflow_run'");
+    expect(releaseCheck?.outputs?.should_deploy).toBe(
+      "${{ steps.decision.outputs.should_publish }}",
+    );
+    const decisionScript =
+      releaseCheck?.steps.find((step) => step.run !== undefined)?.run ?? "";
+    expect(decisionScript).toContain("scripts/release/registry-publish-plan.ts");
+
+    const packageRepository = websiteWorkflow.jobs["package-repository"];
+    expect(packageRepository?.needs).toBe("release-check");
+    expect(packageRepository?.if).toBe(
+      "${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}",
+    );
+    expect(websiteWorkflow.jobs.build?.needs).toBe("package-repository");
   });
 });

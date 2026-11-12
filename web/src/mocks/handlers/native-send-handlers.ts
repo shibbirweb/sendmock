@@ -17,6 +17,7 @@ import {
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 import {
   type EmailOutcomePlan,
   planEmailOutcome,
@@ -154,10 +155,7 @@ export const nativeSendHandlers = [
     if (outcomePlan !== null) {
       applyPlannedEmailOutcome(storedEmail, outcomePlan);
     }
-    publishMockEvent("email.received", {
-      id: storedEmail.id,
-      subject: storedEmail.subject,
-    });
+    publishMockEvent("email.received", toEmailSummary(storedEmail));
 
     return HttpResponse.json(
       { id: storedEmail.id } satisfies NativeSendResult,

@@ -25,6 +25,21 @@ export function listQueryKeysToRefresh(eventType: AppEventType): QueryKey[] {
   return queryKeysByEventArea[eventArea] ?? [];
 }
 
+/** The keys in their first order, each once (keys are compared by their JSON text). */
+export function removeDuplicateQueryKeys(queryKeys: QueryKey[]): QueryKey[] {
+  const queryKeysByText = new Map<string, QueryKey>();
+  for (const queryKey of queryKeys) {
+    queryKeysByText.set(JSON.stringify(queryKey), queryKey);
+  }
+
+  return [...queryKeysByText.values()];
+}
+
+/** Every query a realtime event can make stale, each key once. */
+export function listEveryRealtimeQueryKey(): QueryKey[] {
+  return removeDuplicateQueryKeys(Object.values(queryKeysByEventArea).flat());
+}
+
 export type EventNotification = Omit<
   AppNotification,
   "id" | "createdAt" | "isRead"

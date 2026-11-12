@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { clickToastAction } from "../e2e/support/toasts";
 import { watchFailedApiCalls } from "./live-api-watch";
 
 test("EM-17.1 EM-17.3 EM-17.5 a live reply as the recipient arrives inbound and links back", async ({
@@ -24,7 +25,7 @@ test("EM-17.1 EM-17.3 EM-17.5 a live reply as the recipient arrives inbound and 
   await expect(composer.getByLabel("Subject")).toHaveValue(`Re: ${subject}`);
   await page.keyboard.type("Where is it?");
   await composer.getByRole("button", { name: "Send reply" }).click();
-  await page.getByRole("button", { name: "Open" }).click();
+  await clickToastAction(page, "Reply created", "Open");
 
   await expect(
     page.getByRole("heading", { level: 2, name: `Re: ${subject}` }),

@@ -11,7 +11,7 @@ SendMock is a local stand-in for all of those services. It runs as one small bin
 2. **See everything your app sent** in a web UI: every email, SMS, verification code, HTTP call and payment.
 3. **Get the answers back** the way the real service would send them: delivery receipts, bounces, inbound replies, payment notifications and webhooks, signed like the provider signs them.
 
-> **Not released yet.** Try the web UI in the [live demo with sample data](/demo/); downloads start with the first beta.
+> **Now in beta.** [Install the beta](./install.md) or try the web UI in the [live demo with sample data](/demo/).
 
 ## What it covers
 

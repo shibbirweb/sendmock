@@ -3,7 +3,7 @@ title: Install
 description: Every way to install SendMock, from install scripts and package managers to Docker and binaries.
 ---
 
-> **Downloads start with the first beta.** Until it is published, build SendMock from source ([Run it from source](https://github.com/shibbirweb/sendmock#run-it-from-source)) or try the [live demo](/demo/).
+> **Only the beta is published so far.** Use the **Beta** command of each way below; the stable commands work from 1.0.0. The npm packages (`npx`, `bunx` and `npm install`) follow with the next beta.
 
 SendMock is one static binary with the web UI built in. Pick one way to install it below and follow its steps; all of them run the same thing.
 

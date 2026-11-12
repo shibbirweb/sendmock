@@ -1,31 +1,9 @@
-import { createConnection, type Socket } from "node:net";
+import { createConnection } from "node:net";
 
 import { expect, test } from "@playwright/test";
 
 import { watchFailedApiCalls } from "./live-api-watch";
-
-/** Reads SMTP replies line by line; a reply ends on the line without a `-` after its code. */
-function readSmtpReplies(smtpSocket: Socket) {
-  let receivedText = "";
-  const waitingReaders: ((replyCode: number) => void)[] = [];
-  smtpSocket.on("data", (dataChunk) => {
-    receivedText += dataChunk.toString("utf8");
-    let lineEnd = receivedText.indexOf("\r\n");
-    while (lineEnd !== -1) {
-      const replyLine = receivedText.slice(0, lineEnd);
-      receivedText = receivedText.slice(lineEnd + 2);
-      if (replyLine[3] !== "-") {
-        waitingReaders.shift()?.(Number(replyLine.slice(0, 3)));
-      }
-      lineEnd = receivedText.indexOf("\r\n");
-    }
-  });
-
-  return () =>
-    new Promise<number>((resolve) => {
-      waitingReaders.push(resolve);
-    });
-}
+import { readSmtpReplies } from "./live-smtp";
 
 /** Sends one message the way an app's mailer does and answers every reply code it got. */
 async function sendOverSmtp(

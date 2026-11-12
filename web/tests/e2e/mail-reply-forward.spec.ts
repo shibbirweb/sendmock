@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { clickToastAction } from "./support/toasts";
 
 const emailList = "section[aria-label='Email list']";
 
@@ -28,7 +29,7 @@ test("EM-17.1 Reply creates an inbound reply linked to the original", async ({
   await page.keyboard.type("Thanks, that worked.");
   await composer.getByRole("button", { name: "Send reply" }).click();
 
-  await page.getByRole("button", { name: "Open" }).click();
+  await clickToastAction(page, "Reply created", "Open");
   await expect(
     page.getByRole("heading", { level: 2, name: "Re: Your verification code" }),
   ).toBeVisible();
@@ -56,7 +57,7 @@ test("EM-17.4 Forward sends the email on with its attachments", async ({
   await expect(composer.getByLabel(/Include attachments/)).toBeChecked();
   await composer.getByRole("button", { name: "Send forward" }).click();
 
-  await page.getByRole("button", { name: "Open" }).click();
+  await clickToastAction(page, "Forward created", "Open");
   await expect(
     page.getByRole("heading", {
       level: 2,

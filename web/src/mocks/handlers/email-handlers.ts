@@ -2,11 +2,11 @@ import { http, HttpResponse } from "msw";
 
 import type {
   EmailDetail,
-  EmailSummary,
   EmailUpdate,
   SimulatedEmailOutcome,
 } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
+import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 import {
   applyMockConditions,
   createNotFoundResponse,
@@ -22,28 +22,6 @@ import {
 } from "@/mocks/opens/record-mock-open";
 import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
-
-function toEmailSummary(email: EmailDetail): EmailSummary {
-  return {
-    id: email.id,
-    received_at: email.received_at,
-    from: email.from,
-    to: email.to,
-    subject: email.subject,
-    snippet: email.snippet,
-    size_bytes: email.size_bytes,
-    attachment_count: email.attachment_count,
-    is_read: email.is_read,
-    tags: email.tags,
-    source: email.source,
-    delivery_status: email.delivery_status,
-    open_count: email.open_count,
-    has_otp: email.has_otp,
-    direction: email.direction,
-    response_kind: email.response_kind,
-    project: email.project,
-  };
-}
 
 function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
   const searchParameters = requestUrl.searchParams;

@@ -20,6 +20,7 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 
 const fallbackRecipient: EmailAddress = {
   name: "",
@@ -77,10 +78,7 @@ function storeEmailResponse(
   mockDatabase.emailTimelines
     .get(originalEmail.id)
     ?.push(buildResponseTimelineEntry(responseEmail));
-  publishMockEvent("email.inbound", {
-    id: responseEmail.id,
-    subject: responseEmail.subject,
-  });
+  publishMockEvent("email.inbound", toEmailSummary(responseEmail));
   // Incoming emails run the inbound routes (WH-12.7).
   if (runInboundRoutes(mockDatabase, responseEmail).length > 0) {
     publishMockEvent("webhook.delivered", { id: responseEmail.id });

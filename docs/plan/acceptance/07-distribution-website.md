@@ -22,8 +22,8 @@ Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening).
 - [x] DS-02.4 Tags follow the channel rules: `edge`, `beta`, `X.Y.Z-beta.N` from `develop`; `latest`, `X`, `X.Y`, `X.Y.Z` from `main`. (#48)
 - [x] DS-02.5 Images are signed (cosign) and carry an SBOM and provenance; the compressed size is under 25 MB. (#48)
   - Waiting (W12d3, 2026-11-07): pull requests rehearse the check on a local registry with a key made in the job; the criterion ticks when `docker-published-check.sh` passes on the first push to `develop` after #48 merges, which publishes `edge` signed by the workflow (W15).
-- [ ] DS-02.6 The Compose example and the GitHub Actions service-container example work as documented.
-  - Waiting (W12d3, 2026-11-07): the Compose example passes on every pull request; the service-container job needs a published image, so it ticks when the Release build runs it on the first beta (W15).
+- [x] DS-02.6 The Compose example and the GitHub Actions service-container example work as documented. (#222)
+  - Proven on 0.1.0-beta.1 (2026-11-09): the Release build's "The Compose example" and "SendMock as a service container" jobs passed against the published image (Publish beta run 42560064575).
 
 ## DS-03 Package managers and install scripts
 
@@ -92,7 +92,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] DS-09.2 Values set the image, resources, persistence for `/data` (a claim, or an empty directory), extra `SENDMOCK_*` settings, the provider port and an optional Ingress for the web UI. (#48)
 - [x] DS-09.3 CI lints and renders the chart with every option and installs it on a kind cluster, where SendMock answers its health check and catches an email sent over SMTP. (#48)
 - [x] DS-09.4 The docs say how to install the chart and change its values. (#48)
-- [ ] DS-09.5 Each beta and stable release pushes the chart to `oci://ghcr.io/shibbirweb/charts` with the release's version, and it installs from there without logging in, running that version of SendMock.
+- [x] DS-09.5 Each beta and stable release pushes the chart to `oci://ghcr.io/shibbirweb/charts` with the release's version, and it installs from there without logging in, running that version of SendMock. (#222)
 
 ## DS-10 Docker Desktop extension
 
@@ -102,7 +102,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] DS-10.2 Its dashboard tab shows whether SendMock answers and opens the web UI. (#48)
 - [x] DS-10.3 CI builds the extension image and checks its labels and metadata. (#48)
 - [x] DS-10.4 The docs say how to install the extension. (#48)
-- [ ] DS-10.5 Each beta and stable release pushes the extension image for `linux/amd64` and `linux/arm64` to `ghcr.io/shibbirweb/sendmock-docker-extension:<version>`, readable without logging in, with its backend pinned to the SendMock image of the same version.
+- [x] DS-10.5 Each beta and stable release pushes the extension image for `linux/amd64` and `linux/arm64` to `ghcr.io/shibbirweb/sendmock-docker-extension:<version>`, readable without logging in, with its backend pinned to the SendMock image of the same version. (#222)
 
 ---
 
@@ -134,7 +134,7 @@ U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27,
 - [x] WS-03.4 The version list is worked out from the git tags: the newest stable tag of the newest minor at `/`, the newest tag of each older minor at `/vX.Y/`, `develop` at `/next/`; beta tags get no docs of their own; with no stable tag yet, `/` is a Preview built from `develop`.
 - [x] WS-03.5 A tagged version is built from that tag's `docs/wiki`, `docs/api` and `web/` (its own demo) with the current website code, without changing the working tree.
 - [x] WS-03.6 The docs sidebar has a version switcher listing every version with the current one marked; picking a version opens the same page in that version.
-- [ ] WS-03.7 (the Preview banner and the demo's docs links are tested; the Beta and older banners with their stable link are proven once the first stable tag exists) Every page of a non-stable version (Beta, Preview, older) shows its banner with a link to the latest stable docs when one exists, and the demo of each version links its guide and Help links to the docs of the same version.
+- [ ] WS-03.7 (the Preview banner and the demo's docs links are tested; the Beta banner shows on every `/next/` page since 0.1.0-beta.1, checked on the published site on 2026-11-12; the older banner and the stable link are proven once the first stable tag exists) Every page of a non-stable version (Beta, Preview, older) shows its banner with a link to the latest stable docs when one exists, and the demo of each version links its guide and Help links to the docs of the same version.
 
 ## WS-04 API playground: Demo mode
 

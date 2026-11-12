@@ -44,10 +44,13 @@ Phase 0 onwards.
 
 ## PL-02 Realtime
 
-Phase 1.
+Phase 1; PL-02.3 to PL-02.5 in Phase 5 (W19).
 
 - [x] PL-02.1 Every event is pushed over WebSocket (`/api/v1/ws`) and SSE (`/api/v1/events`) within 500 ms. (#48)
 - [x] PL-02.2 A client that reconnects resumes without duplicate or missing list entries. (#48)
+- [x] PL-02.3 (added 2026-11-12, owner report: the UI stopped showing new mail while thousands of emails arrived) While 5,000 emails arrive over SMTP as fast as one client sends them, the open mail list shows each new message within 2 seconds of its arrival, the browser asks for each list at most 4 times a second and never cancels a request it started, and the counters show the final totals within 2 seconds of the last message. (#225)
+- [x] PL-02.4 (added 2026-11-12, owner report) During that burst a message opened from the list shows within 2 seconds, and toasts appear at most once every 2 seconds, each saying how many more arrived. (#225)
+- [x] PL-02.5 (added 2026-11-12, owner report) A realtime client that falls behind is disconnected instead of skipping events; after it reconnects the UI refetches each open list once and shows every stored message. (#225)
 
 ## PL-03 Test helpers
 

@@ -145,7 +145,7 @@ The `sendmock` image package on GHCR was deleted on 2026-11-08 (it held the old 
 
 4. If the GHCR pull is denied, open GitHub > your profile > **Packages** > `sendmock` > **Package settings** > **Change visibility**, choose **Public**, and pull again.
 
-Then remove the notices that say there is no release yet, in a pull request to `develop`: the "Downloads start with the first beta" lines at the top of `docs/wiki/install.md` and `docs/wiki/getting-started.md`, the "Not released yet" line of `docs/wiki/index.md`, the "first beta is being prepared" paragraph of `README.md`, and the hero's "Not released yet" pill in `website/components/landing/hero-section.tsx`. The website's version banner, `llms.txt` and the changelog page follow the real releases by themselves.
+Then replace the notices that say there is no release yet, in a pull request to `develop`: the stable commands only work from 1.0.0, so each notice says only the beta is published so far and points to the beta commands. They are the lines at the top of `docs/wiki/install.md` and `docs/wiki/getting-started.md`, the line of `docs/wiki/index.md`, the paragraph under the install table of `README.md`, and the hero's pill in `website/components/landing/hero-section.tsx` ("Now in beta"). The website's version banner, `llms.txt` and the changelog page follow the real releases by themselves.
 
 Then move npm to trusted publishing: on each of the eight npm packages (`sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`), open **Settings > Trusted Publisher**, choose GitHub Actions, and enter `shibbirweb`, `sendmock`, `registry-publish.yml` and no environment; then delete the token:
 
@@ -168,6 +168,8 @@ gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0
 ```
 
 Check: the website serves the 1.0 docs at `/` and the `develop` docs at `/next/`.
+
+Then remove the "Only the beta is published so far" notices of step 6 from `docs/wiki/install.md`, `docs/wiki/getting-started.md` and `README.md`, and change the "Now in beta" line of `docs/wiki/index.md` and the hero's pill, in a pull request to `develop`.
 
 Proves: WS-03.1
 

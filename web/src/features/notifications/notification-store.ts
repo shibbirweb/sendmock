@@ -34,9 +34,22 @@ function setNotificationState(nextState: NotificationState) {
 }
 
 export function addNotification(notification: Omit<AppNotification, "isRead">) {
+  addNotifications([notification]);
+}
+
+/** Adds several at once, oldest first, with one update for the bell however many there are. */
+export function addNotifications(
+  newNotifications: Omit<AppNotification, "isRead">[],
+) {
+  if (newNotifications.length === 0) {
+    return;
+  }
+  const unreadNotifications = newNotifications
+    .map((notification) => ({ ...notification, isRead: false }))
+    .reverse();
   setNotificationState({
     notifications: [
-      { ...notification, isRead: false },
+      ...unreadNotifications,
       ...notificationState.notifications,
     ].slice(0, maxNotifications),
   });
