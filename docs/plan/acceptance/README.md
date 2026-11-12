@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 114 / 129 features, 565 / 637 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 117 / 129 features, 568 / 637 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -156,15 +156,15 @@ On top of its own criteria, a feature is done only when:
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Accepted |
 | [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Accepted |
-| [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | In progress |
+| [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Accepted |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 8 | In progress |
 | [DS-04](07-distribution-website.md#ds-04-release-workflows) | Release workflows | Phase 0 | 5 | Accepted |
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Accepted |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Accepted |
 | [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | After 1.0 (A9) | 5 | Accepted |
-| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 5 | In progress |
-| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 5 | In progress |
+| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 5 | Accepted |
+| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 5 | Accepted |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
