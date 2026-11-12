@@ -36,6 +36,7 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
 | W15 (W15a, W15b) | The 1.0 runbook (W15a) and the done-when check after the owner's release (W15b) | Phase 5 done-when | W1 to W14 |
 | W16 | Run with no install: `npx sendmock` (and `bunx`, `pnpm dlx`, `yarn dlx`) as its own channel, added 2026-11-07 (owner request) | DS-03.7 (new) | W3a, W11 |
 | W17 | Agents start SendMock through npx: `ai install`, `GET /ai/agents` and Settings > Connection give the `npx -y sendmock mcp` form, added 2026-11-07 (owner request) | AI-05.9 (new) | W16 |
+| W19 | Realtime under load: the web UI keeps showing new mail while thousands of emails arrive, added 2026-11-12 (owner report, [#224](https://github.com/shibbirweb/sendmock/issues/224)) | PL-02.3 to PL-02.5 (new) | |
 
 ## Design notes
 
@@ -136,6 +137,18 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
 
 - **AUR and COPR hidden (2026-11-08, owner decision):** the AUR paused new account registration and the owner skipped COPR for now, so neither has an account to publish to. Both stay in `packaging/channels.json` with `"is_listed": false`: the install page's table and sections leave them out and the Install channels workflow does not install them, while their packaging (PKGBUILD, spec) and Release build jobs stay and skip without their secrets. Showing them again is removing that flag and restoring their page sections once the accounts exist.
 
+- **W19 design (realtime under load, 2026-11-12, owner report, [#224](https://github.com/shibbirweb/sendmock/issues/224)):** when an app sends thousands of emails, the web UI stops showing new mail.
+  - **Cause:** `RealtimeProvider` (`web/src/features/realtime/realtime-provider.tsx`) calls `invalidateQueries` for every event. The `["emails"]` key covers every list, every loaded page of the infinite list and the open message's detail, raw and timeline queries, and TanStack Query cancels a refetch in flight before it starts the next one (`cancelRefetch` is true by default). Under a burst each event cancels the last list request, so none finishes. Each event also writes the bell store and shows its own toast. On the server, a WebSocket client more than 1,024 events behind skips them with only a log warning (`RecvError::Lagged` in `resumable_event_stream.rs`), and after a reconnect the UI neither resumes nor refetches.
+  - **How Mailpit does it** (read from `axllent/mailpit` on `develop`, 2026-11-12): the `new` event carries the message summary, and the mailbox view puts it into the list it already holds (`unshift`, then `pop` past the page size, skipping an ID already there) with no request. On a later page it only moves the page offset, and updates the URL at most twice a second. Totals come from a separate `stats` event the server sends at most four times a second (one pending broadcast at a time, 250 ms). Toasts and browser notifications pause for 2 seconds after one is shown. Deletes refetch once, 500 ms after the last. The hub serializes each event once, gives each client a 256-message buffer and drops a client whose buffer is full; the client reconnects after 1 second and reloads the mailbox when it was away more than 5 seconds.
+  - **Client fix** (`web/src/features/realtime/`):
+    1. An event batcher queues events and flushes them every 250 ms, so a burst of thousands becomes four flushes a second.
+    2. Each flush writes the events whose `data` has the list-view fields into the cached first page of the matching lists with `setQueryData`: newest first, IDs already there skipped, trimmed to the page size, as Mailpit does. Each area (email, SMS, HTTP, webhooks, payments, push) registers its own cache patch, so the batcher does not change when an area is added.
+    3. What cannot be patched (the `/stats` counters, filtered or later pages) is invalidated once per flush with `cancelRefetch: false`, so a request in flight always finishes. Invalidation uses the list keys only (`["emails", "list"]`, `["emails", "infinite-list"]`), never the open message's detail, and an infinite list refetches its first page only.
+    4. Bell notifications are added in one store write per flush, and at most one toast shows every 2 seconds, saying how many more arrived ("and 241 more").
+    5. After a reconnect the open lists are refetched once.
+  - **Server fix:** a realtime client that falls behind is closed (close reason `lagged`) instead of skipping events silently; the client reconnects and refetches (step 5). No new event type and no change to the API contract.
+  - **Proof:** Vitest unit tests for the batcher, the cache patches and the toast limit with a fake clock; a Rust test that a lagging WebSocket client is closed; a live Playwright test (`web/tests/live/`) that sends 5,000 emails over SMTP against a release binary while the mail list is open, counts the browser's list requests and checks the list, the counters and a message opened during the burst.
+
 ## Owner steps
 
 Things only the owner can do, in order. The workflows skip a channel whose secret is not set, so each can be done when convenient. [31](31-release-runbook.md) is the same list as a runbook, with the commands, the checks and every secret the workflows read; follow it.
@@ -163,6 +176,10 @@ New and changed criteria for this phase, written before the code ([acceptance](a
   - AI-05.6 `server.json` passes the MCP registry's schema, names the npm package and the image with the version of the release, and the stable release publishes it to the registry.
   - AI-05.7 The skill has evals (a task, a seed, the end state checked through the API); a workflow runs them with Claude Code against a release binary and reports each one, and CI checks every eval is well formed.
   - AI-05.8 (added 2026-11-07, owner request) SendMock is listed in the GitHub MCP Registry (`github.com/mcp`) and installs from it. GitHub's registry is a curated view of the official MCP registry: it takes no submissions of its own, and once a server is listed, each version published to the official registry (AI-05.6) reaches it by itself. Proven after the first stable release: the Install channels workflow reads the listing from the official registry's API, and the owner checks `github.com/mcp` (W15 runbook); if SendMock is not there, the owner asks GitHub to add it (owner step 9).
+- **PL-02 Realtime** (added 2026-11-12, owner report, in [04-catcher-platform.md](acceptance/04-catcher-platform.md)):
+  - PL-02.3 While 5,000 emails arrive over SMTP as fast as one client sends them, the open mail list shows each new message within 2 seconds of its arrival, the browser asks for each list at most 4 times a second and never cancels a request it started, and the counters show the final totals within 2 seconds of the last message.
+  - PL-02.4 During that burst a message opened from the list shows within 2 seconds, and toasts appear at most once every 2 seconds, each saying how many more arrived.
+  - PL-02.5 A realtime client that falls behind is disconnected instead of skipping events; after it reconnects the UI refetches each open list once and shows every stored message.
 - **HC-03** keeps its two criteria: Teams, Google Chat, Expo and OneSignal already ship as presets and are covered by HC-03.1 and HC-03.2 (Expo's and OneSignal's official libraries run in the HTTP presets workflow; Teams and Google Chat have no official library for incoming webhooks, so their replies are checked against the documented shape).
 
 ## As built

@@ -216,6 +216,8 @@ Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01).
 
 `GET /api/v1/ws` (WebSocket). Server pushes event envelopes identical to the native webhook format (`{ id, type, created_at, data }`, with `data` trimmed to list-view fields). The UI uses it to update lists, counters and the delivery log live. A Server-Sent Events fallback at `/api/v1/events` is cheap to add and handy for `curl`.
 
+Under load (W19 in [30](30-phase-5.md), 2026-11-12): the UI batches events and flushes them every 250 ms, writes list-view `data` straight into the cached first page of each list, and refetches what it cannot patch at most once per flush without cancelling a request in flight. A client that falls more than 1,024 events behind is closed with the reason `lagged`, and refetches its lists once after reconnecting.
+
 ## Conventions
 
 - Errors: `{ "error": { "code": "not_found", "message": "..." } }` with proper HTTP status.
