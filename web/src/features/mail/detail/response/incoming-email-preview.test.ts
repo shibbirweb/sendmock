@@ -46,7 +46,7 @@ describe("buildIncomingEmailPreview", () => {
     ).toEqual(["lee@example.test", "kim@example.test"]);
   });
 
-  test("EM-22.3 a forward goes to its To address once it has one", () => {
+  test("EM-22.3 a forward goes to its To address once it has one, case kept for captured groups", () => {
     expect(
       buildIncomingEmailPreview(originalEmail, "forward", formValues).to,
     ).toEqual([]);
@@ -55,6 +55,6 @@ describe("buildIncomingEmailPreview", () => {
         ...formValues,
         forwardToAddress: "Help <Help@Inbound.app.test>",
       }).to,
-    ).toEqual(["help@inbound.app.test"]);
+    ).toEqual(["Help@Inbound.app.test"]);
   });
 });

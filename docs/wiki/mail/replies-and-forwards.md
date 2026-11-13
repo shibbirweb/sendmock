@@ -63,7 +63,7 @@ Step by step: [Recipe: reply by email](../recipes/reply-by-email.md).
 | create an incoming email | [`sendmock email inbound`](/cli/email/#email-inbound) | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | [`sendmock_email_inbound`](/mcp/email/#sendmock_email_inbound) |
 | list routes | [`sendmock route list`](/cli/inbound-routes/#route-list) | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | [`sendmock_inbound_route_list`](/mcp/inbound-routes/#sendmock_inbound_route_list) |
 | see where an incoming email would go | [`sendmock route match`](/cli/inbound-routes/#route-match) | [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch) | [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match) |
-| list the requests an email caused | [`sendmock webhook deliveries list --subject-id <emailId>`](/cli/webhook-deliveries/#webhook-deliveries-list) | [`GET /api/v1/webhooks/deliveries?subject_id=`](/api/webhook-deliveries/#getWebhooksDeliveries) | [`sendmock_webhook_delivery_list`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_list) |
+| list the requests an email caused (`subject_id`) | [`sendmock webhook deliveries list`](/cli/webhook-deliveries/#webhook-deliveries-list) | [`GET /api/v1/webhooks/deliveries`](/api/webhook-deliveries/#getWebhooksDeliveries) | [`sendmock_webhook_delivery_list`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_list) |
 
 ## Related
 

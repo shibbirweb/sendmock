@@ -66,7 +66,7 @@ Ticket routing with named groups, store and notify, and other providers' formats
 | update or reorder | [`sendmock route update <routeId>`](/cli/inbound-routes/#route-update) | [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId) | [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update) |
 | delete | [`sendmock route delete <routeId>`](/cli/inbound-routes/#route-delete) | [`DELETE /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#deleteInboundRoutesByRouteId) | [`sendmock_inbound_route_delete`](/mcp/inbound-routes/#sendmock_inbound_route_delete) |
 | test a filter | [`sendmock route test`](/cli/inbound-routes/#route-test) | [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest) | [`sendmock_inbound_route_test`](/mcp/inbound-routes/#sendmock_inbound_route_test) |
-| see where an email would go | [`sendmock route match --to <address>`](/cli/inbound-routes/#route-match) | [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch) | [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match) |
+| see where an email would go | [`sendmock route match`](/cli/inbound-routes/#route-match) | [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch) | [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match) |
 
 ## Related
 
