@@ -208,6 +208,7 @@ Releases are cut by workflows (`beta.yml`, `beta-publish.yml`, `stable.yml`, `st
 | Metric | Target |
 |--------|--------|
 | Binary size | under 20 MB (stretch: under 12 MB) |
+| Embedded web UI (`dist/` without source maps) | under 2.25 MB (UI-06.3) |
 | Idle RSS | under 30 MB |
 | Cold start to listening | under 200 ms |
 | SMTP ingest | 500+ small messages/s on a laptop |

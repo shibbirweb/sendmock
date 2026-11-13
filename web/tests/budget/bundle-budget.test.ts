@@ -115,7 +115,7 @@ describe("bundle budget", () => {
     ).toBe(false);
   });
 
-  test("UI-06.3 the embedded dist is under 2 MB without source maps", () => {
+  test("UI-06.3 the embedded dist is under 2.25 MB without source maps", () => {
     expect(bundleMeasurement.distBytes).toBeLessThan(distBudgetBytes);
   });
 

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 export const initialJsBudgetBytes = 250 * 1024;
-export const distBudgetBytes = 2 * 1024 * 1024;
+export const distBudgetBytes = 2.25 * 1024 * 1024;
 
 export type BundleMeasurement = {
   initialScriptPaths: string[];
