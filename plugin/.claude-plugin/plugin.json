@@ -1,6 +1,6 @@
 {
   "name": "sendmock",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "displayName": "SendMock",
   "description": "Test and debug email, SMS, payments, HTTP calls and webhooks locally: the SendMock skill and its MCP server.",
   "author": {
