@@ -330,7 +330,8 @@ expression: command_descriptions
       "event"
     ],
     "flags": [
-      "--bounce-type"
+      "--bounce-type",
+      "--webhook"
     ],
     "operations": [
       {
@@ -354,7 +355,8 @@ expression: command_descriptions
     ],
     "flags": [
       "--source",
-      "--user-agent"
+      "--user-agent",
+      "--webhook"
     ],
     "operations": [
       {
@@ -400,7 +402,8 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--url",
-      "--user-agent"
+      "--user-agent",
+      "--webhook"
     ],
     "operations": [
       {
@@ -567,7 +570,8 @@ expression: command_descriptions
       "--from",
       "--include-original",
       "--reply-all",
-      "--subject"
+      "--subject",
+      "--webhook"
     ],
     "operations": [
       {
@@ -595,7 +599,8 @@ expression: command_descriptions
       "--include-attachments",
       "--include-original",
       "--subject",
-      "--to"
+      "--to",
+      "--webhook"
     ],
     "operations": [
       {
@@ -621,7 +626,8 @@ expression: command_descriptions
       "--raw",
       "--subject",
       "--text",
-      "--to"
+      "--to",
+      "--webhook"
     ],
     "operations": [
       {
@@ -1061,7 +1067,8 @@ expression: command_descriptions
       "status"
     ],
     "flags": [
-      "--error-code"
+      "--error-code",
+      "--webhook"
     ],
     "operations": [
       {
@@ -1085,7 +1092,8 @@ expression: command_descriptions
     ],
     "flags": [
       "--source",
-      "--user-agent"
+      "--user-agent",
+      "--webhook"
     ],
     "operations": [
       {
@@ -1132,7 +1140,8 @@ expression: command_descriptions
       "--from",
       "--media",
       "--template-id",
-      "--to"
+      "--to",
+      "--webhook"
     ],
     "operations": [
       {
@@ -1946,7 +1955,8 @@ expression: command_descriptions
       "--decline-reason",
       "--dispute-evidence",
       "--dispute-outcome",
-      "--refund-amount-minor"
+      "--refund-amount-minor",
+      "--webhook"
     ],
     "operations": [
       {
@@ -4872,6 +4882,29 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock webhook rule match",
+    "usage": "sendmock webhook rule match",
+    "aliases": [],
+    "summary": "Which webhooks an event would trigger, before an action fires it.",
+    "arguments": [],
+    "flags": [
+      "--field",
+      "--event-type",
+      "--subject-id"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/match",
+        "operation_id": "postWebhooksRulesMatch",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_match"
+    ]
+  },
+  {
     "command": "sendmock webhook var list",
     "usage": "sendmock webhook var list",
     "aliases": [],
@@ -5498,7 +5531,8 @@ expression: command_descriptions
     "flags": [
       "--html",
       "--subject",
-      "--to"
+      "--to",
+      "--webhook"
     ],
     "operations": [
       {
