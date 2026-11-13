@@ -118,6 +118,8 @@ Phase 1.
   - Added 2026-11-08 (owner request): the plan listed `--max-sms` from the start, but only Settings and the API could set the SMS limit.
 - [x] PL-08.4 A count limit of 0 keeps that traffic with no count limit (the age limit still applies), through the flags, the file, Settings, the API, the CLI and MCP; while a limit is 0 and no age limit is set, SendMock logs a warning at startup and Settings shows a warning beside the field. (#187)
   - Added 2026-11-08 (owner request): unlimited storage when asked, with a caution; before, the limits took 1 to 1,000,000.
+- [x] PL-08.5 When retention deletes traffic, SendMock publishes `traffic.pruned`, which webhook rules cannot pick, and the open lists, counts and stats in the UI refresh on it, so pruned rows leave the page without a reload. (#240)
+  - Added 2026-11-13 (bug #238): since the UI writes new emails straight into its lists, past the email limit the list and its count kept rows that were already deleted until a reload.
 
 ## PL-09 Demo data
 

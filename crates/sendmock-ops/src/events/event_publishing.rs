@@ -56,3 +56,12 @@ pub fn publish_email_deleted(
         json!({ "id": email_id, "deleted_count": deleted_count }),
     );
 }
+
+/// `traffic.pruned`, so live views refetch the lists and counts retention trimmed.
+pub fn publish_traffic_pruned(operation_context: &OperationContext, pruned_count: u64) {
+    publish_event(
+        operation_context,
+        AppEventType::TrafficPruned,
+        json!({ "pruned_count": pruned_count }),
+    );
+}

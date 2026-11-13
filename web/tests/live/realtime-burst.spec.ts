@@ -108,9 +108,9 @@ async function readTopBurstNumber(page: Page, burstLabel: string) {
 
 let maxEmailsBefore: number | null = null;
 
-// Retention prunes past 1,000 emails every 10 s without telling the UI, so a sweep during the
-// burst leaves the list count above what is stored. This test is about keeping up with arrivals,
-// so it runs with retention off.
+// Retention keeps the newest 1,000 emails by default, so a sweep during the burst would lower the
+// count this test waits for. This test is about keeping up with arrivals, so it runs with
+// retention off.
 test.beforeAll(async ({ request }) => {
   const { max_emails: maxEmails } = await (
     await request.get("/api/v1/settings")

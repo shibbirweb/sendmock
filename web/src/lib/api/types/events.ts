@@ -43,6 +43,7 @@ export const appEventTypes = [
   "webhook.delivered",
   "webhook.failed",
   "test.ping",
+  "traffic.pruned",
 ] as const;
 
 export type AppEventType = (typeof appEventTypes)[number];

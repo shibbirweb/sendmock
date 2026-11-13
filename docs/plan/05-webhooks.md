@@ -28,6 +28,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `payment.*`, `checkout.*`, `subscription.*` | payment gateway emulation: created, authorized, succeeded, failed, canceled, refunded, disputes, checkout completed/expired, subscriptions (see [17-payments.md](17-payments.md#events)) |
 | `webhook.failed` | a delivery exhausted retries (useful to chain alerts) |
 | `webhook.delivered` | a delivery attempt finished, whatever the outcome; drives the live deliveries log and cannot be picked in rules, so a delivery never triggers another |
+| `traffic.pruned` | retention deleted traffic past the limits in Settings (`data.pruned_count`); drives the live lists and counts and cannot be picked in rules, like `webhook.delivered` |
 | `test.ping` | "Send test" button on an endpoint |
 
 ## Opened events

@@ -10,9 +10,10 @@ use super::rule_messages::{
 use super::rule_view::{read_rule_events, read_rule_filter};
 use crate::{AppEvent, OperationContext, OperationError};
 
-/// Events that drive a live view only: `webhook.delivered` (a rule on it would loop) and
-/// `sms.reply_webhook` (the result already went with `sms.inbound`'s message).
-const UNRULED_EVENT_TYPES: [&str; 2] = ["webhook.delivered", "sms.reply_webhook"];
+/// Events that drive a live view only: `webhook.delivered` (a rule on it would loop),
+/// `sms.reply_webhook` (the result already went with `sms.inbound`'s message) and
+/// `traffic.pruned` (housekeeping, about no message).
+const UNRULED_EVENT_TYPES: [&str; 3] = ["webhook.delivered", "sms.reply_webhook", "traffic.pruned"];
 
 /// The email or SMS an event is about, with the fields filters read. A payment event is about
 /// its payment, which has no filter fields yet; events about something else, or about a
