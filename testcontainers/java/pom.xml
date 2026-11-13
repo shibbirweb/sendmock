@@ -6,7 +6,7 @@
 
   <groupId>io.github.shibbirweb</groupId>
   <artifactId>sendmock-testcontainers</artifactId>
-  <version>0.1.0-beta.1</version>
+  <version>0.1.0-beta.2</version>
   <name>SendMock Testcontainers module</name>
   <description>Starts SendMock in Docker from a test and gives its SMTP, HTTP and provider addresses.</description>
   <url>https://github.com/shibbirweb/sendmock</url>

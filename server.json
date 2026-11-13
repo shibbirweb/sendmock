@@ -3,7 +3,7 @@
   "name": "io.github.shibbirweb/sendmock",
   "title": "SendMock",
   "description": "Test email, SMS, payments and webhooks locally: read messages, OTPs and webhook deliveries.",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "websiteUrl": "https://shibbirweb.github.io/sendmock/",
   "repository": {
     "url": "https://github.com/shibbirweb/sendmock",
@@ -15,7 +15,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "sendmock",
-      "version": "0.1.0-beta.1",
+      "version": "0.1.0-beta.2",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -46,7 +46,7 @@
     },
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/shibbirweb/sendmock:0.1.0-beta.1",
+      "identifier": "ghcr.io/shibbirweb/sendmock:0.1.0-beta.2",
       "runtimeHint": "docker",
       "transport": {
         "type": "stdio"
