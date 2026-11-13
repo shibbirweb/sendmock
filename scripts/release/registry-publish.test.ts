@@ -153,6 +153,21 @@ describe("the Registry publish workflow", () => {
     }
   });
 
+  test("DS-03.8 names each npm package folder as a path, which npm never reads as a GitHub repository", () => {
+    const npmRunText = (registryWorkflow.jobs.npm?.steps ?? [])
+      .map((step) => step.run ?? "")
+      .join("\n");
+    const publishedFolders = [
+      ...npmRunText.matchAll(/npm publish ("?)([^\s"]+)\1/g),
+    ].map((publishMatch) => publishMatch[2]);
+
+    expect(npmRunText).toContain("for package_directory in ./npm-packages/*/; do");
+    expect(publishedFolders).toEqual([
+      "$package_directory",
+      "./npm-packages/sendmock/",
+    ]);
+  });
+
   test("DS-03.8 NuGet trades the OIDC token for a short-lived key, with no stored one", () => {
     const dotnetSteps = registryWorkflow.jobs["testcontainers-dotnet"]?.steps ?? [];
     const pushRun = dotnetSteps.map((step) => step.run ?? "").join("\n");
