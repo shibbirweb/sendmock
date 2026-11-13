@@ -204,13 +204,13 @@ Our signed repository keeps SendMock up to date with the rest of your system.
    Stable:
 
    ```bash
-   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main" | sudo tee /etc/apt/sources.list.d/sendmock.list
+   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt stable main" | sudo tee /etc/apt/sources.list.d/sendmock.list
    ```
 
    Beta:
 
    ```bash
-   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main" | sudo tee /etc/apt/sources.list.d/sendmock.list
+   echo "deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt beta main" | sudo tee /etc/apt/sources.list.d/sendmock.list
    ```
 
 3. Install SendMock:

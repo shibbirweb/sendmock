@@ -11,12 +11,17 @@ const repositoryScript = readFileSync(
   "utf8",
 );
 const publishedBaseUrl = "https://shibbirweb.github.io/sendmock/packages";
+/**
+ * apt reads its source from the site's custom domain: the github.io address redirects there
+ * over plain http, and apt refuses a redirect from https to http (dnf and curl follow it).
+ */
+const aptSourceBaseUrl = "https://shibbir.me/sendmock/packages";
 
 describe("APT and YUM repository", () => {
   test("DS-03.3 the install page's apt steps are the ones the release test runs", () => {
     for (const suite of ["stable", "beta"]) {
       expect(installPage).toContain(
-        `deb [signed-by=/etc/apt/keyrings/sendmock.gpg] ${publishedBaseUrl}/apt ${suite} main`,
+        `deb [signed-by=/etc/apt/keyrings/sendmock.gpg] ${aptSourceBaseUrl}/apt ${suite} main`,
       );
     }
     expect(installPage).toContain(

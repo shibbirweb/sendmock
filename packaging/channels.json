@@ -238,8 +238,8 @@
       "page_commands": [
         "sudo install -d -m 0755 /etc/apt/keyrings",
         "curl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null",
-        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
-        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
+        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
+        "echo \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list",
         "sudo apt update",
         "sudo apt install sendmock"
       ],
@@ -252,8 +252,8 @@
           "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
-            "stable": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock",
-            "beta": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbirweb.github.io/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock"
+            "stable": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt stable main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock",
+            "beta": "sudo install -d -m 0755 /etc/apt/keyrings\ncurl -fsSL https://shibbirweb.github.io/sendmock/packages/sendmock.gpg | sudo tee /etc/apt/keyrings/sendmock.gpg > /dev/null\necho \"deb [signed-by=/etc/apt/keyrings/sendmock.gpg] https://shibbir.me/sendmock/packages/apt beta main\" | sudo tee /etc/apt/sources.list.d/sendmock.list\nsudo apt-get update\nsudo apt-get install -y sendmock"
           },
           "command": "/usr/bin/sendmock"
         }
