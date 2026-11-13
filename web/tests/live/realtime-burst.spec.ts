@@ -106,8 +106,26 @@ async function readTopBurstNumber(page: Page, burstLabel: string) {
   return Number(rowText.split(" ").at(-1));
 }
 
+let maxEmailsBefore: number | null = null;
+
+// Retention prunes past 1,000 emails every 10 s without telling the UI, so a sweep during the
+// burst leaves the list count above what is stored. This test is about keeping up with arrivals,
+// so it runs with retention off.
+test.beforeAll(async ({ request }) => {
+  const { max_emails: maxEmails } = await (
+    await request.get("/api/v1/settings")
+  ).json();
+  maxEmailsBefore = maxEmails ?? null;
+  await request.patch("/api/v1/settings", { data: { max_emails: 0 } });
+});
+
 test.afterAll(async ({ request }) => {
   await request.delete("/api/v1/emails");
+  if (maxEmailsBefore !== null) {
+    await request.patch("/api/v1/settings", {
+      data: { max_emails: maxEmailsBefore },
+    });
+  }
 });
 
 test("PL-02.3 PL-02.4 while 5,000 emails arrive the list keeps up, asks at most 4 times a second, and the page stays usable", async ({
