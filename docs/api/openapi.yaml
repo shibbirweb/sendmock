@@ -16645,6 +16645,8 @@ components:
         subject_id:
           $ref: "#/components/schemas/Ulid"
           description: The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         data:
           type: object
           additionalProperties:

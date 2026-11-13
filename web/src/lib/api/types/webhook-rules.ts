@@ -143,6 +143,7 @@ export type WebhookRuleMatchRequest = {
   event_type: AppEventType;
   /**
    * The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.
+   * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
    */
   subject_id?: Ulid;
   /**
