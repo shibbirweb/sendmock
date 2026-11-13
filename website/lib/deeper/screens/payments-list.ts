@@ -174,7 +174,7 @@ const paymentDialogEntries: DeeperEntry[] = [
     links: "[Deliveries](../../webhooks/deliveries.md).",
   },
   {
-    control: "menuitem: Refund... No webhook",
+    control: "menuitem: Refund...",
     does: `Opens Refund payment. ${webhookTargetsUnderLabel}`,
   },
   {
@@ -185,7 +185,7 @@ const paymentDialogEntries: DeeperEntry[] = [
     does: "Opens Choose webhooks for the refund: every enabled endpoint with a search box, the endpoints your rules would pick already checked. Its Refund button opens Refund payment, and the refund then sends its event to exactly the checked endpoints.",
   },
   {
-    control: "menuitem: Open dispute No webhook",
+    control: "menuitem: Open dispute",
     does: `Opens a dispute on the payment, as when the customer contests it. ${webhookTargetsUnderLabel}`,
     changes: "Fires `payment.dispute_opened` and the gateway's notification.",
     operationIds: ["postPaymentsByPaymentIdSimulate"],

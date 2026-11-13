@@ -37,4 +37,4 @@ export function describeChangeWebhooks(
 
 /** The line under a simulate menu item's label: the endpoints its event will reach. */
 export const webhookTargetsUnderLabel =
-  "Under the label: the endpoints the event will reach through your webhook rules, or No webhook.";
+  "Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.";

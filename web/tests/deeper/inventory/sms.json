@@ -30,7 +30,7 @@
     ],
     "Message actions menu": [
       "menuitem: Message details",
-      "menuitem: Simulate read No webhook",
+      "menuitem: Simulate read",
       "menuitem: Choose webhooks for Simulate read",
       "menuitem: Send to webhook",
       "menuitem: Copy text",

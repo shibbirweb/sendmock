@@ -25,11 +25,13 @@ test("PY-09.3 a waiting checkout is declined with a reason from the live menu, a
 
   await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
   await expect(
-    page.getByRole("menuitem", { name: "Expire checkout" }),
+    page.getByRole("menuitem", { name: "Expire checkout", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("menuitem", { name: "Refund..." })).toBeHidden();
   await page.getByRole("menuitem", { name: "Decline" }).click();
-  await page.getByRole("menuitem", { name: "Insufficient funds" }).click();
+  await page
+    .getByRole("menuitem", { name: "Insufficient funds", exact: true })
+    .click();
 
   await expect(paymentOverview(paymentDrawer)).toContainText(
     "Failed: insufficient funds",

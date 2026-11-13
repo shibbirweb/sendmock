@@ -8,10 +8,12 @@ import {
   distBudgetBytes,
   initialJsBudgetBytes,
   listInitialScriptPaths,
+  listLargestFiles,
   measureBundle,
 } from "./measure-bundle";
 
 const webDirectory = join(import.meta.dir, "../..");
+const largestFilesShown = 15;
 let distDirectory = "";
 let bundleMeasurement: BundleMeasurement;
 
@@ -40,6 +42,15 @@ beforeAll(() => {
   bundleMeasurement = measureBundle(distDirectory);
   console.log(
     `initial JS ${(bundleMeasurement.initialJsGzipBytes / 1024).toFixed(1)} KB gzipped, dist ${(bundleMeasurement.distBytes / 1024 / 1024).toFixed(2)} MB`,
+  );
+  // CI is where the budget is measured, so its log names what to trim.
+  console.log(
+    listLargestFiles(distDirectory, largestFilesShown)
+      .map(
+        (distFile) =>
+          `${(distFile.sizeBytes / 1024).toFixed(1).padStart(8)} KB  ${distFile.relativePath}`,
+      )
+      .join("\n"),
   );
 }, 120_000);
 

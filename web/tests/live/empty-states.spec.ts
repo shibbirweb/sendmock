@@ -120,7 +120,12 @@ test("UI-04.2 live sample buttons store items through the binary", async ({
   await deleteEveryNumber(request);
   await page.goto("/mail");
 
-  await page.getByRole("button", { name: "Send a sample email" }).click();
+  await page
+    .getByRole("button", {
+      name: "Send a sample email",
+      exact: true,
+    })
+    .click();
   await expect(
     page.locator(emailList).getByText("Hello from SendMock").first(),
   ).toBeVisible();
@@ -129,14 +134,22 @@ test("UI-04.2 live sample buttons store items through the binary", async ({
   await expect(page.getByText("No SMTP sessions yet")).toBeHidden();
 
   await navigateInApp(page, "/sms");
-  await page.getByRole("button", { name: "Send a sample SMS" }).click();
+  await page
+    .getByRole("button", {
+      name: "Send a sample SMS",
+      exact: true,
+    })
+    .click();
   await expect(
     page.getByRole("link", { name: /\+8801700000000/ }),
   ).toBeVisible();
 
   await navigateInApp(page, "/sms/verify");
   await page
-    .getByRole("button", { name: "Start a sample verification" })
+    .getByRole("button", {
+      name: "Start a sample verification",
+      exact: true,
+    })
     .click();
   await expect(
     page.getByRole("row").filter({ hasText: "+14155550100" }),

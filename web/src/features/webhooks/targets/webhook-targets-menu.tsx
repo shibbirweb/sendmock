@@ -74,19 +74,30 @@ export function WebhookTargetsMenuItem({
 }) {
   const openPicker = React.useContext(PickerOpenerContext);
   const webhookTargets = useWebhookTargets(targetEvent);
+  const labelId = React.useId();
+  const targetsHintId = React.useId();
 
   return (
     <div className="flex items-stretch gap-0.5">
+      {/* The action is the item's name and its webhooks the description, so
+          a screen reader announces "Hard bounce", then where it goes. */}
       <DropdownMenuItem
         className="flex-1"
+        aria-labelledby={labelId}
+        aria-describedby={webhookTargets.isShown ? targetsHintId : undefined}
         onSelect={() => {
           onSimulate({});
         }}
       >
         <div className="grid min-w-0 gap-0.5">
-          <span className="flex items-center gap-2">{children}</span>
+          <span id={labelId} className="flex items-center gap-2">
+            {children}
+          </span>
           {webhookTargets.isShown && (
-            <span className="truncate text-xs text-muted-foreground">
+            <span
+              id={targetsHintId}
+              className="truncate text-xs text-muted-foreground"
+            >
               {describeTargets(webhookTargets)}
             </span>
           )}

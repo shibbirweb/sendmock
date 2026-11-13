@@ -306,11 +306,11 @@ Button.
 
 ## Simulate menu
 
-### 47. Refund... No webhook
+### 47. Refund...
 
 Menu item.
 
-- **What it does:** Opens Refund payment. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Opens Refund payment. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 
 ### 48. Choose webhooks for Refund
 
@@ -322,11 +322,11 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 49. Open dispute No webhook
+### 49. Open dispute
 
 Menu item.
 
-- **What it does:** Opens a dispute on the payment, as when the customer contests it. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Opens a dispute on the payment, as when the customer contests it. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `payment.dispute_opened` and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 

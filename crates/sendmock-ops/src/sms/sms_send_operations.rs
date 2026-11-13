@@ -4,8 +4,8 @@ use super::message_sid::generate_message_sid;
 use super::sms_delivery_runner::start_sms_delivery;
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
 use super::sms_ingest::{IncomingSms, store_sms};
-use super::sms_inputs::{InboundSmsRequest, NativeSmsRequest};
-use super::sms_media_intake::{MediaProblem, accept_media};
+use super::sms_inputs::{InboundSmsRequest, InlineSmsMedia, NativeSmsRequest};
+use super::sms_media_intake::{AcceptedMedia, MediaProblem, accept_media};
 use super::sms_send_decision::{decide_outbound_send, describe_rejection};
 use crate::sms_replies::start_reply_webhook;
 use crate::{
@@ -27,6 +27,18 @@ fn require_text(field_name: &str, field_value: &str) -> Result<(), OperationErro
         });
     }
     Ok(())
+}
+
+/// An inbound message's files: a problem with them fails the request, as nothing was stored yet.
+async fn accept_inbound_media(
+    operation_context: &OperationContext,
+    inline_media: &[InlineSmsMedia],
+) -> Result<AcceptedMedia, OperationError> {
+    match accept_media(operation_context, inline_media, &[]).await {
+        Ok(accepted_media) => Ok(accepted_media),
+        Err(MediaProblem::Invalid(operation_error)) => Err(operation_error),
+        Err(MediaProblem::Unfetchable(reason)) => Err(OperationError::Internal(reason)),
+    }
 }
 
 pub struct SendSmsOperation;
@@ -157,19 +169,11 @@ impl Operation for SimulateInboundSmsOperation {
         let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         require_text("from", &input.from)?;
         require_text("to", &input.to)?;
-        let media = match accept_media(
+        let media = accept_inbound_media(
             operation_context,
             input.media.as_deref().unwrap_or_default(),
-            &[],
         )
-        .await
-        {
-            Ok(accepted_media) => accepted_media,
-            Err(MediaProblem::Invalid(operation_error)) => return Err(operation_error),
-            Err(MediaProblem::Unfetchable(reason)) => {
-                return Err(OperationError::Internal(reason));
-            }
-        };
+        .await?;
         let is_whatsapp = input.channel.as_deref() == Some("whatsapp");
         let with_channel = |number: &str| {
             if is_whatsapp && !number.starts_with("whatsapp:") {

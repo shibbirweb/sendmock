@@ -104,18 +104,18 @@
       "button: Delete"
     ],
     "Simulate an event menu": [
-      "menuitem: Open (email.opened) No webhook",
+      "menuitem: Open (email.opened)",
       "menuitem: Choose webhooks for Simulate open",
       "menuitem: Click a link (email.clicked)",
-      "menuitem: Delivered No webhook",
+      "menuitem: Delivered",
       "menuitem: Choose webhooks for Simulate delivered",
-      "menuitem: Hard bounce Webhooks: Team Slack alerts",
+      "menuitem: Hard bounce",
       "menuitem: Choose webhooks for Simulate hard bounce",
-      "menuitem: Soft bounce Webhooks: Team Slack alerts",
+      "menuitem: Soft bounce",
       "menuitem: Choose webhooks for Simulate soft bounce",
-      "menuitem: Spam complaint Webhooks: Team Slack alerts",
+      "menuitem: Spam complaint",
       "menuitem: Choose webhooks for Simulate spam complaint",
-      "menuitem: Unsubscribe No webhook",
+      "menuitem: Unsubscribe",
       "menuitem: Choose webhooks for Simulate unsubscribe"
     ],
     "More actions menu": [

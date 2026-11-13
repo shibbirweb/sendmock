@@ -8704,6 +8704,8 @@ components:
         - auto
         - manual
         - replay
+        - chosen
+      description: "Why a delivery was made: a rule (`auto`), by hand, a replay, or `chosen` for one simulation."
     EmailAddress:
       type: object
       properties:

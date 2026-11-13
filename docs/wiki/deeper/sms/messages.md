@@ -171,11 +171,11 @@ Menu item.
 - **What it does:** Opens the drawer with the message's status history, its original request and its callbacks or reply webhook.
 - **Same action elsewhere:** REST [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId), CLI [`sendmock sms show`](/cli/sms/#sms-show), MCP [`sendmock_sms_get`](/mcp/sms/#sendmock_sms_get)
 
-### 24. Simulate read No webhook
+### 24. Simulate read
 
 Menu item.
 
-- **What it does:** Records that the recipient read the message, as WhatsApp read receipts do. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Records that the recipient read the message, as WhatsApp read receipts do. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `sms.opened` and sends a `read` status callback.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen), CLI [`sendmock sms open`](/cli/sms/#sms-open), MCP [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open)
 

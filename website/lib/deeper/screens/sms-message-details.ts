@@ -13,7 +13,7 @@ export const smsMessageDetailEntries: DeeperEntry[] = [
     operationIds: ["getSmsBySmsId"],
   },
   {
-    control: "menuitem: Simulate read No webhook",
+    control: "menuitem: Simulate read",
     does: `Records that the recipient read the message, as WhatsApp read receipts do. ${webhookTargetsUnderLabel}`,
     changes: "Fires `sms.opened` and sends a `read` status callback.",
     operationIds: ["postSmsBySmsIdOpen"],

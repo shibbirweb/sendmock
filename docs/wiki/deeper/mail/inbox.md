@@ -584,11 +584,11 @@ Button.
 
 ## Simulate an event menu
 
-### 82. Open (email.opened) No webhook
+### 82. Open (email.opened)
 
 Menu item.
 
-- **What it does:** Records an open of the email, as a tracking pixel would. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Records an open of the email, as a tracking pixel would. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.opened` with `first_open` and the open count.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen), CLI [`sendmock email open`](/cli/email/#email-open), MCP [`sendmock_email_open`](/mcp/email/#sendmock_email_open)
 
@@ -610,11 +610,11 @@ Menu item.
 - **What it changes:** Fires `email.clicked` with the link, `first_click` and the click count, and adds it to the Timeline. A link clicked in the HTML preview does the same with `source: "ui"`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/clicks`](/api/email/#postEmailsByEmailIdClicks), CLI [`sendmock email click`](/cli/email/#email-click), MCP [`sendmock_email_click`](/mcp/email/#sendmock_email_click)
 
-### 85. Delivered No webhook
+### 85. Delivered
 
 Menu item.
 
-- **What it does:** Marks the email delivered. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Marks the email delivered. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.delivered` and adds it to the Timeline.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
@@ -628,11 +628,11 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 87. Hard bounce Webhooks: Team Slack alerts
+### 87. Hard bounce
 
 Menu item.
 
-- **What it does:** Bounces the email permanently (550 5.1.1). Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Bounces the email permanently (550 5.1.1). Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.bounced` with a permanent bounce type.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
@@ -646,11 +646,11 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 89. Soft bounce Webhooks: Team Slack alerts
+### 89. Soft bounce
 
 Menu item.
 
-- **What it does:** Defers the email, then bounces it as a temporary failure. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Defers the email, then bounces it as a temporary failure. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.deferred`, then `email.bounced` with a transient bounce type.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
@@ -664,11 +664,11 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 91. Spam complaint Webhooks: Team Slack alerts
+### 91. Spam complaint
 
 Menu item.
 
-- **What it does:** Delivers the email, then records a complaint, as when the recipient marks it as spam. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Delivers the email, then records a complaint, as when the recipient marks it as spam. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.delivered`, then `email.complained`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
@@ -682,11 +682,11 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 93. Unsubscribe No webhook
+### 93. Unsubscribe
 
 Menu item.
 
-- **What it does:** Records an unsubscribe from the email's list. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
+- **What it does:** Records an unsubscribe from the email's list. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.unsubscribed`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 

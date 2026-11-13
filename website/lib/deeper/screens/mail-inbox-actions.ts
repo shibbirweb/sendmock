@@ -67,7 +67,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     links: "[Inbound routes](../../webhooks/inbound-routes.md).",
   },
   {
-    control: "menuitem: Open (email.opened) No webhook",
+    control: "menuitem: Open (email.opened)",
     does: `Records an open of the email, as a tracking pixel would. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.opened` with `first_open` and the open count.",
     operationIds: ["postEmailsByEmailIdOpen"],
@@ -83,7 +83,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     operationIds: ["postEmailsByEmailIdClicks"],
   },
   {
-    control: "menuitem: Delivered No webhook",
+    control: "menuitem: Delivered",
     does: `Marks the email delivered. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.delivered` and adds it to the Timeline.",
     operationIds: ["postEmailsByEmailIdSimulate"],
@@ -93,7 +93,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     "postEmailsByEmailIdSimulate",
   ),
   {
-    control: "menuitem: Hard bounce Webhooks: Team Slack alerts",
+    control: "menuitem: Hard bounce",
     does: `Bounces the email permanently (550 5.1.1). ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.bounced` with a permanent bounce type.",
     operationIds: ["postEmailsByEmailIdSimulate"],
@@ -103,7 +103,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     "postEmailsByEmailIdSimulate",
   ),
   {
-    control: "menuitem: Soft bounce Webhooks: Team Slack alerts",
+    control: "menuitem: Soft bounce",
     does: `Defers the email, then bounces it as a temporary failure. ${webhookTargetsUnderLabel}`,
     changes:
       "Fires `email.deferred`, then `email.bounced` with a transient bounce type.",
@@ -114,7 +114,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     "postEmailsByEmailIdSimulate",
   ),
   {
-    control: "menuitem: Spam complaint Webhooks: Team Slack alerts",
+    control: "menuitem: Spam complaint",
     does: `Delivers the email, then records a complaint, as when the recipient marks it as spam. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.delivered`, then `email.complained`.",
     operationIds: ["postEmailsByEmailIdSimulate"],
@@ -124,7 +124,7 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     "postEmailsByEmailIdSimulate",
   ),
   {
-    control: "menuitem: Unsubscribe No webhook",
+    control: "menuitem: Unsubscribe",
     does: `Records an unsubscribe from the email's list. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.unsubscribed`.",
     operationIds: ["postEmailsByEmailIdSimulate"],

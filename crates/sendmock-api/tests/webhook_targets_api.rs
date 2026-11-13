@@ -287,7 +287,7 @@ async fn a_chosen_simulation_delivers_to_exactly_the_chosen_endpoints() {
         BTreeSet::from(["chosen".to_owned()])
     );
     let (_, rules) = call_api(&app_router, "GET", "/api/v1/webhooks/rules", None).await;
-    assert_eq!(rules["items"].as_array().map(Vec::len), Some(4), "{rules}");
+    assert_eq!(rules.as_array().map(Vec::len), Some(4), "{rules}");
 }
 
 // AC: WH-13.4 WH-13.5

@@ -54,7 +54,12 @@ test("UI-04.2 sample buttons create items the screens can be explored with", asy
   await page.goto("/mail");
   await switchToEmptyDataSet(page);
 
-  await page.getByRole("button", { name: "Send a sample email" }).click();
+  await page
+    .getByRole("button", {
+      name: "Send a sample email",
+      exact: true,
+    })
+    .click();
   await expect(page.getByText("Your verification code").first()).toBeVisible();
   await navigateInApp(page, "/logs");
   await expect(
@@ -62,12 +67,20 @@ test("UI-04.2 sample buttons create items the screens can be explored with", asy
   ).toBeVisible();
 
   await navigateInApp(page, "/sms");
-  await page.getByRole("button", { name: "Send a sample SMS" }).click();
+  await page
+    .getByRole("button", {
+      name: "Send a sample SMS",
+      exact: true,
+    })
+    .click();
   await expect(page.getByRole("link", { name: /\+14155550100/ })).toBeVisible();
 
   await navigateInApp(page, "/sms/verify");
   await page
-    .getByRole("button", { name: "Start a sample verification" })
+    .getByRole("button", {
+      name: "Start a sample verification",
+      exact: true,
+    })
     .click();
   await expect(
     page.getByRole("row").filter({ hasText: "+14155550100" }),
