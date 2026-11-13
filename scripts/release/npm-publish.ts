@@ -14,7 +14,7 @@ export type NpmPackageState = "published" | "new";
 type FetchPackage = (packageUrl: string) => Promise<Response>;
 
 export function buildRegistryPackageUrl(packageName: string): string {
-  return `https://registry.npmjs.org/${packageName.replace("/", "%2f")}`;
+  return `https://registry.npmjs.org/${packageName.replaceAll("/", "%2f")}`;
 }
 
 /** Whether npm has the package, failing on any other answer so a registry outage never stages. */
