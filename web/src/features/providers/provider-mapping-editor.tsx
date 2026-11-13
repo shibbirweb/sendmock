@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/features/providers/option-select";
@@ -86,11 +87,11 @@ export function ProviderMappingEditor({
                 })
               }
             />
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
               size="icon-sm"
-              aria-label={`Remove mapping ${mappingIndex + 1}`}
+              label={`Remove mapping ${mappingIndex + 1}`}
               onClick={() =>
                 updateInput({
                   field_mapping: fieldMapping.filter(
@@ -101,7 +102,7 @@ export function ProviderMappingEditor({
               }
             >
               <Trash2Icon />
-            </Button>
+            </IconButton>
           </div>
         ))}
         <FormFieldError errorMessage={fieldErrors.field_mapping} />
@@ -168,11 +169,11 @@ export function ProviderMappingEditor({
                 changeRule(ruleIndex, { error_kind: errorKind })
               }
             />
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
               size="icon-sm"
-              aria-label={`Remove check ${ruleIndex + 1}`}
+              label={`Remove check ${ruleIndex + 1}`}
               onClick={() =>
                 updateInput({
                   validation_rules: validationRules.filter(
@@ -183,7 +184,7 @@ export function ProviderMappingEditor({
               }
             >
               <Trash2Icon />
-            </Button>
+            </IconButton>
           </div>
         ))}
         <Button

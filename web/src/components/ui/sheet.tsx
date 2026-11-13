@@ -6,7 +6,7 @@ import { cn } from "cn";
 import { useRestoreFocusOnClose } from "@/hooks/use-restore-focus-on-close";
 import { Dialog as SheetPrimitive } from "radix-ui";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { XIcon } from "lucide-react";
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
@@ -76,14 +76,14 @@ function SheetContent({
         {children}
         {showCloseButton && (
           <SheetPrimitive.Close data-slot="sheet-close" asChild>
-            <Button
+            <IconButton
+              label="Close"
               variant="ghost"
               className="absolute top-3 right-3"
               size="icon-sm"
             >
               <XIcon />
-              <span className="sr-only">Close</span>
-            </Button>
+            </IconButton>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>

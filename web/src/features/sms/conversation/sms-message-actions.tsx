@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,17 +48,16 @@ export function SmsMessageActions({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
-            aria-label="Message actions"
+            label="Message actions"
             className={cn(
               "size-7 shrink-0 opacity-0 group-hover/sms-bubble:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
               className,
             )}
           >
             <MoreHorizontalIcon />
-          </Button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={isOutbound ? "end" : "start"}>
           <DropdownMenuItem asChild>

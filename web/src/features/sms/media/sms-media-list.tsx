@@ -1,6 +1,6 @@
 import { DownloadIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   isImageMedia,
   resolveSmsMediaUrl,
@@ -48,15 +48,19 @@ export function SmsMediaList({ mediaItems }: { mediaItems: SmsMedia[] }) {
                 </span>
               )}
             </span>
-            <Button variant="ghost" size="icon-sm" asChild>
+            <IconButton
+              label={`Download ${mediaItem.filename ?? "media"}`}
+              variant="ghost"
+              size="icon-sm"
+              asChild
+            >
               <a
                 href={resolveSmsMediaUrl(mediaItem)}
                 download={mediaItem.filename ?? undefined}
-                aria-label={`Download ${mediaItem.filename ?? "media"}`}
               >
                 <DownloadIcon />
               </a>
-            </Button>
+            </IconButton>
           </li>
         ))}
       </ul>

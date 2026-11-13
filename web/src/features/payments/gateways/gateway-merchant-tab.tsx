@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { FormField } from "@/components/common/form-field";
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -107,21 +108,21 @@ export function GatewayMerchantTab({
                 />
                 Secret
               </label>
-              <Button
+              <IconButton
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Reveal ${credential.name}`}
+                label={`Reveal ${credential.name}`}
                 disabled={!isSavedSecret}
                 onClick={() => setRevealedName(credential.name)}
               >
                 <EyeIcon />
-              </Button>
-              <Button
+              </IconButton>
+              <IconButton
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Remove credential ${credentialIndex + 1}`}
+                label={`Remove credential ${credentialIndex + 1}`}
                 onClick={() =>
                   updateInput({
                     credentials: credentials.filter(
@@ -132,7 +133,7 @@ export function GatewayMerchantTab({
                 }
               >
                 <Trash2Icon />
-              </Button>
+              </IconButton>
             </div>
           );
         })}

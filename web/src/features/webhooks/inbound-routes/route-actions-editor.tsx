@@ -1,6 +1,7 @@
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -152,11 +153,11 @@ export function RouteActionsEditor({
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium">{actionName}</span>
                 <span className="flex gap-1">
-                  <Button
+                  <IconButton
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move ${actionName} up`}
+                    label={`Move ${actionName} up`}
                     disabled={actionIndex === 0}
                     onClick={() =>
                       changeActions(
@@ -169,12 +170,12 @@ export function RouteActionsEditor({
                     }
                   >
                     <ArrowUpIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move ${actionName} down`}
+                    label={`Move ${actionName} down`}
                     disabled={actionIndex === routeActions.length - 1}
                     onClick={() =>
                       changeActions(
@@ -187,12 +188,12 @@ export function RouteActionsEditor({
                     }
                   >
                     <ArrowDownIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Remove ${actionName}`}
+                    label={`Remove ${actionName}`}
                     onClick={() =>
                       changeActions(
                         routeActions.filter(
@@ -203,7 +204,7 @@ export function RouteActionsEditor({
                     }
                   >
                     <Trash2Icon />
-                  </Button>
+                  </IconButton>
                 </span>
               </div>
               <ActionValueInput

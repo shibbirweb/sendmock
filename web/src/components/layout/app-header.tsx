@@ -2,21 +2,18 @@ import { useRouterState } from "@tanstack/react-router";
 import { BookOpenIcon, KeyboardIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import { IconButton, IconTooltip } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   listAllNavigationItems,
   type NavigationItem,
 } from "@/features/navigation/navigation-items";
 import { documentationUrl } from "@/lib/community/community-links";
 import { useAppOverlays } from "@/features/shortcuts/app-overlays-provider";
+import { appShortcuts } from "@/features/shortcuts/shortcut-catalog";
 import { HelpMenu } from "@/features/help/help-menu";
 import { NotificationBell } from "@/features/notifications/notification-bell";
 import { ProjectSwitcher } from "@/features/projects/project-switcher";
@@ -61,26 +58,21 @@ function PageGuideLink({ navigationItem }: { navigationItem: NavigationItem }) {
   const guideLabel = `Read the ${navigationItem.title} guide`;
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="shrink-0 text-muted-foreground hover:text-foreground"
-          asChild
-        >
-          <a
-            href={`${documentationUrl}${navigationItem.docsPath}`}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={guideLabel}
-          >
-            <BookOpenIcon />
-          </a>
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>{guideLabel}</TooltipContent>
-    </Tooltip>
+    <IconButton
+      label={guideLabel}
+      variant="ghost"
+      size="icon-sm"
+      className="shrink-0 text-muted-foreground hover:text-foreground"
+      asChild
+    >
+      <a
+        href={`${documentationUrl}${navigationItem.docsPath}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <BookOpenIcon />
+      </a>
+    </IconButton>
   );
 }
 
@@ -93,7 +85,12 @@ export function AppHeader() {
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
-      <SidebarTrigger />
+      <IconTooltip
+        label="Toggle Sidebar"
+        shortcutKeys={appShortcuts.toggleSidebar.keys}
+      >
+        <SidebarTrigger aria-label="Toggle Sidebar" />
+      </IconTooltip>
       <Separator orientation="vertical" className="mx-1 h-4" />
       <h1 className="min-w-0 truncate text-sm font-medium">
         {currentNavigationItem?.title ??
@@ -118,32 +115,31 @@ export function AppHeader() {
           Search or jump to...
           <Kbd>⌘K</Kbd>
         </Button>
-        <Button
+        <IconButton
           variant="ghost"
-          size="icon"
-          aria-label="Search or jump to"
+          label="Search or jump to"
           className="lg:hidden"
           onClick={() => {
             setCommandPaletteOpen(true);
           }}
         >
           <SearchIcon />
-        </Button>
+        </IconButton>
         {LazyDevToolbar !== null && (
           <React.Suspense fallback={null}>
             <LazyDevToolbar />
           </React.Suspense>
         )}
-        <Button
+        <IconButton
           variant="ghost"
-          size="icon"
-          aria-label="Keyboard shortcuts"
+          label="Keyboard shortcuts"
+          shortcutKeys={appShortcuts.showShortcuts.keys}
           onClick={() => {
             setShortcutHelpOpen(true);
           }}
         >
           <KeyboardIcon />
-        </Button>
+        </IconButton>
         <HelpMenu />
         <ThemeToggle />
         <NotificationBell />

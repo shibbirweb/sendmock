@@ -1,7 +1,7 @@
 import { BracesIcon } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,15 +47,15 @@ export function StepLabelInput({
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
             className="mt-0.5 shrink-0"
-            aria-label={`Insert variable into ${label}`}
+            label={`Insert variable into ${label}`}
           >
             <BracesIcon />
-          </Button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">
           <DropdownMenuLabel>Insert variable</DropdownMenuLabel>

@@ -5,7 +5,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Switch } from "@/components/ui/switch";
 import type { HttpResponseRule } from "@/lib/api/types";
 import { describeResponseRule } from "@/lib/http/describe-response-rule";
@@ -49,49 +49,49 @@ export function ResponseRuleRow({
         </p>
       </div>
       <div className="flex items-center gap-1">
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label={`Move ${responseRule.name} up`}
+          label={`Move ${responseRule.name} up`}
           disabled={isFirst}
           onClick={() => {
             onMove(-1);
           }}
         >
           <ArrowUpIcon />
-        </Button>
-        <Button
+        </IconButton>
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label={`Move ${responseRule.name} down`}
+          label={`Move ${responseRule.name} down`}
           disabled={isLast}
           onClick={() => {
             onMove(1);
           }}
         >
           <ArrowDownIcon />
-        </Button>
+        </IconButton>
         <Switch
           aria-label={`${responseRule.name} enabled`}
           checked={responseRule.is_enabled}
           onCheckedChange={onToggle}
         />
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label={`Edit ${responseRule.name}`}
+          label={`Edit ${responseRule.name}`}
           onClick={onEdit}
         >
           <PencilIcon />
-        </Button>
-        <Button
+        </IconButton>
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label={`Delete ${responseRule.name}`}
+          label={`Delete ${responseRule.name}`}
           onClick={onDelete}
         >
           <Trash2Icon />
-        </Button>
+        </IconButton>
       </div>
     </li>
   );

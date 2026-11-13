@@ -2,7 +2,7 @@ import { SearchIcon, XIcon } from "lucide-react";
 import type * as React from "react";
 
 import { FilterChip } from "@/components/common/filter-chip";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Input } from "@/components/ui/input";
 import type { SmsThreadFilters } from "@/features/sms/threads/filter-sms-threads";
 
@@ -50,17 +50,16 @@ export function SmsThreadFilterBar({
           className="pr-8 pl-8"
         />
         {threadFilters.searchText !== "" && (
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
-            aria-label="Clear search"
+            label="Clear search"
             className="absolute top-1/2 right-1 size-6 -translate-y-1/2"
             onClick={() => {
               onThreadFiltersChange({ ...threadFilters, searchText: "" });
             }}
           >
             <XIcon />
-          </Button>
+          </IconButton>
         )}
       </div>
       <div className="flex flex-wrap gap-1.5">

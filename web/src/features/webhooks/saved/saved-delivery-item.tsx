@@ -9,6 +9,7 @@ import * as React from "react";
 
 import { HttpBodyView } from "@/components/common/http-body-view";
 import { HttpHeadersList } from "@/components/common/http-headers-list";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import type { SavedDelivery } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -89,21 +90,34 @@ export function SavedDeliveryItem({
           </span>
         </button>
         <div className="flex basis-full flex-wrap justify-end gap-1 sm:basis-auto">
-          {actionButtons.map(({ savedAction, label, icon: ActionIcon }) => (
-            <Button
-              key={savedAction}
-              variant={savedAction === "send" ? "outline" : "ghost"}
-              size={savedAction === "send" ? "sm" : "icon-sm"}
-              aria-label={`${label} ${savedDelivery.name}`}
-              title={label}
-              onClick={() => {
-                onAction(savedAction);
-              }}
-            >
-              <ActionIcon />
-              {savedAction === "send" && label}
-            </Button>
-          ))}
+          {actionButtons.map(({ savedAction, label, icon: ActionIcon }) =>
+            savedAction === "send" ? (
+              <Button
+                key={savedAction}
+                variant="outline"
+                size="sm"
+                aria-label={`${label} ${savedDelivery.name}`}
+                onClick={() => {
+                  onAction(savedAction);
+                }}
+              >
+                <ActionIcon />
+                {label}
+              </Button>
+            ) : (
+              <IconButton
+                key={savedAction}
+                label={`${label} ${savedDelivery.name}`}
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => {
+                  onAction(savedAction);
+                }}
+              >
+                <ActionIcon />
+              </IconButton>
+            ),
+          )}
         </div>
       </div>
       {isExpanded && (

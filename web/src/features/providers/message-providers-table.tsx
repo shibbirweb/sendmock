@@ -1,7 +1,7 @@
 import { MoreHorizontalIcon, PencilIcon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,24 +94,24 @@ export function MessageProvidersTable({
             <TableCell>
               <span className="flex items-center justify-end gap-1">
                 {onEdit !== undefined && (
-                  <Button
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Edit ${messageProvider.name}`}
+                    label={`Edit ${messageProvider.name}`}
                     onClick={() => onEdit(messageProvider)}
                   >
                     <PencilIcon />
-                  </Button>
+                  </IconButton>
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
+                    <IconButton
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`More for ${messageProvider.name}`}
+                      label={`More for ${messageProvider.name}`}
                     >
                       <MoreHorizontalIcon />
-                    </Button>
+                    </IconButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {messageProvider.is_builtin && (

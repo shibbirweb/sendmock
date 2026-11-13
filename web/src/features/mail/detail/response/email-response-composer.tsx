@@ -1,6 +1,7 @@
 import { ForwardIcon, ReplyIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
+import { IconButton } from "@/components/common/icon-button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -145,14 +146,14 @@ export function EmailResponseComposer({
         <h3 className="flex-1 text-sm font-semibold">
           {composerHeadings[composerMode]}
         </h3>
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label="Close composer"
+          label="Close composer"
           onClick={closeComposer}
         >
           <XIcon />
-        </Button>
+        </IconButton>
       </div>
       <EmailResponseFields
         email={email}

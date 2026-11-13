@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/features/providers/option-select";
@@ -87,11 +88,11 @@ export function ProviderOperationsEditor({
               })
             }
           />
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove request ${operationIndex + 1}`}
+            label={`Remove request ${operationIndex + 1}`}
             onClick={() =>
               updateInput({
                 operations: operations.filter(
@@ -102,7 +103,7 @@ export function ProviderOperationsEditor({
             }
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       ))}
       <FormFieldError errorMessage={fieldErrors.operations} />

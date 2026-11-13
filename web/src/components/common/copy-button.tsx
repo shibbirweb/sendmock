@@ -1,7 +1,7 @@
 import { CheckIcon, CopyIcon } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { cn } from "@/lib/utils";
 
 /** Icon button that copies text and shows a tick for a moment. */
@@ -17,11 +17,10 @@ export function CopyButton({
   const [isCopied, setIsCopied] = React.useState(false);
 
   return (
-    <Button
+    <IconButton
       variant="ghost"
-      size="icon"
       className={cn("size-7", className)}
-      aria-label={label}
+      label={label}
       onClick={() => {
         void navigator.clipboard.writeText(copyText).then(() => {
           setIsCopied(true);
@@ -32,6 +31,6 @@ export function CopyButton({
       }}
     >
       {isCopied ? <CheckIcon /> : <CopyIcon />}
-    </Button>
+    </IconButton>
   );
 }

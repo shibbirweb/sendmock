@@ -5,8 +5,8 @@ import {
   Trash2Icon,
 } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -75,40 +75,40 @@ export function InboundRoutesTable({
               </TableCell>
               <TableCell>
                 <span className="flex justify-end gap-1">
-                  <Button
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move ${routeName} up`}
+                    label={`Move ${routeName} up`}
                     disabled={routeIndex === 0}
                     onClick={() => onMove(routeIndex, true)}
                   >
                     <ArrowUpIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move ${routeName} down`}
+                    label={`Move ${routeName} down`}
                     disabled={routeIndex === inboundRoutes.length - 1}
                     onClick={() => onMove(routeIndex, false)}
                   >
                     <ArrowDownIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Edit ${routeName}`}
+                    label={`Edit ${routeName}`}
                     onClick={() => onEdit(inboundRoute)}
                   >
                     <PencilIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Delete ${routeName}`}
+                    label={`Delete ${routeName}`}
                     onClick={() => onDelete(inboundRoute)}
                   >
                     <Trash2Icon />
-                  </Button>
+                  </IconButton>
                 </span>
               </TableCell>
             </TableRow>

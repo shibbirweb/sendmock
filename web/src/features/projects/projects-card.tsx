@@ -3,6 +3,7 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { IconButton } from "@/components/common/icon-button";
 import { NamePromptDialog } from "@/components/common/name-prompt-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,23 +47,21 @@ function ProjectRow({
         {project.verification_count}
       </TableCell>
       <TableCell className="text-right">
-        <Button
+        <IconButton
           variant="ghost"
-          size="icon"
-          aria-label={`Rename ${project.name}`}
+          label={`Rename ${project.name}`}
           onClick={onRename}
         >
           <PencilIcon />
-        </Button>
+        </IconButton>
         {project.key !== defaultProjectKey && (
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
-            aria-label={`Delete ${project.name}`}
+            label={`Delete ${project.name}`}
             onClick={onDelete}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         )}
       </TableCell>
     </TableRow>

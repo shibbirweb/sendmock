@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { PencilIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -116,37 +116,37 @@ export function VariablesTable({
             <TableCell>
               <span className="flex justify-end gap-0.5">
                 {isFixedRandom(webhookVariable) && (
-                  <Button
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Regenerate ${webhookVariable.name}`}
+                    label={`Regenerate ${webhookVariable.name}`}
                     onClick={() => {
                       rowActions.onRegenerate(webhookVariable);
                     }}
                   >
                     <RefreshCwIcon />
-                  </Button>
+                  </IconButton>
                 )}
-                <Button
+                <IconButton
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Edit ${webhookVariable.name}`}
+                  label={`Edit ${webhookVariable.name}`}
                   onClick={() => {
                     rowActions.onEdit(webhookVariable);
                   }}
                 >
                   <PencilIcon />
-                </Button>
-                <Button
+                </IconButton>
+                <IconButton
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Delete ${webhookVariable.name}`}
+                  label={`Delete ${webhookVariable.name}`}
                   onClick={() => {
                     rowActions.onDelete(webhookVariable);
                   }}
                 >
                   <Trash2Icon />
-                </Button>
+                </IconButton>
               </span>
             </TableCell>
           </TableRow>

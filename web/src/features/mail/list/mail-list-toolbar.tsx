@@ -1,5 +1,6 @@
 import { BellIcon, BellOffIcon, MailOpenIcon, Trash2Icon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,11 +14,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ImportEmailDialog } from "@/features/mail/list/import-email-dialog";
 import { useMailNotifications } from "@/features/mail/list/use-mail-notifications";
 import type { EmailListFilters } from "@/lib/api/types";
@@ -83,44 +79,33 @@ export function MailListToolbar({
         ) : (
           <>
             {isSupported && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-pressed={isEnabled}
-                    aria-label={
-                      isEnabled
-                        ? "Turn off notifications"
-                        : "Notify me about new emails"
-                    }
-                    onClick={() => {
-                      void toggleNotifications();
-                    }}
-                  >
-                    {isEnabled ? <BellIcon /> : <BellOffIcon />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isEnabled
-                    ? "Notifications on"
-                    : "Notify me about new emails"}
-                </TooltipContent>
-              </Tooltip>
+              <IconButton
+                variant="ghost"
+                aria-pressed={isEnabled}
+                label={
+                  isEnabled
+                    ? "Turn off notifications"
+                    : "Notify me about new emails"
+                }
+                onClick={() => {
+                  void toggleNotifications();
+                }}
+              >
+                {isEnabled ? <BellIcon /> : <BellOffIcon />}
+              </IconButton>
             )}
             <ImportEmailDialog />
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
+                <IconButton
                   variant="ghost"
-                  size="icon"
-                  aria-label={
+                  label={
                     isFiltered ? "Delete matching emails" : "Delete all emails"
                   }
                   disabled={totalEmailCount === 0}
                 >
                   <Trash2Icon />
-                </Button>
+                </IconButton>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>

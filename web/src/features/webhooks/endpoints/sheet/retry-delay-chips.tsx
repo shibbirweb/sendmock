@@ -2,6 +2,7 @@ import { XIcon } from "lucide-react";
 import * as React from "react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -45,12 +46,11 @@ export function RetryDelayChips({
             className="flex items-center gap-1 rounded-full border bg-muted/40 py-0.5 pr-0.5 pl-2.5 font-mono text-xs"
           >
             {formatScheduleSeconds(delaySeconds)}
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
-              size="icon"
               className="size-5 rounded-full"
-              aria-label={`Remove retry delay ${delayIndex + 1}`}
+              label={`Remove retry delay ${delayIndex + 1}`}
               onClick={() => {
                 onChange(
                   delaysSeconds.filter(
@@ -60,7 +60,7 @@ export function RetryDelayChips({
               }}
             >
               <XIcon className="size-3" />
-            </Button>
+            </IconButton>
           </li>
         ))}
       </ol>

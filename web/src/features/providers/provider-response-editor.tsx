@@ -1,5 +1,6 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -69,11 +70,11 @@ export function ProviderResponseEditor({
               changeHeader(headerIndex, { template: changeEvent.target.value })
             }
           />
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove ${responseLabel} header ${headerIndex + 1}`}
+            label={`Remove ${responseLabel} header ${headerIndex + 1}`}
             onClick={() =>
               onChange({
                 ...responseTemplate,
@@ -84,7 +85,7 @@ export function ProviderResponseEditor({
             }
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       ))}
       <Button

@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { useRestoreFocusOnClose } from "@/hooks/use-restore-focus-on-close";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
 
@@ -73,14 +74,14 @@ function DialogContent({
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button
+            <IconButton
+              label="Close"
               variant="ghost"
               className="absolute top-2 right-2"
               size="icon-sm"
             >
               <XIcon />
-              <span className="sr-only">Close</span>
-            </Button>
+            </IconButton>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>

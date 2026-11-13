@@ -13,6 +13,7 @@ import {
 import * as React from "react";
 import { toast } from "sonner";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,6 +35,7 @@ import {
 } from "@/features/availability/operation-button";
 import { EmailResponseButtons } from "@/features/mail/detail/response/email-response-buttons";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
+import { appShortcuts } from "@/features/shortcuts/shortcut-catalog";
 import { buildApiUrl } from "@/lib/api/api-client";
 import {
   useDeleteEmail,
@@ -77,10 +79,9 @@ export function MailDetailActions({
       {isSentByApp && (
         <EmailResponseButtons email={email} onStartResponse={onStartResponse} />
       )}
-      <Button
+      <IconButton
         variant="ghost"
-        size="icon"
-        aria-label={email.is_read ? "Mark as unread" : "Mark as read"}
+        label={email.is_read ? "Mark as unread" : "Mark as read"}
         onClick={() => {
           updateEmail.mutate({
             emailId: email.id,
@@ -89,11 +90,11 @@ export function MailDetailActions({
         }}
       >
         {email.is_read ? <MailIcon /> : <MailOpenIcon />}
-      </Button>
-      <Button
+      </IconButton>
+      <IconButton
         variant="ghost"
-        size="icon"
-        aria-label="Delete email"
+        label="Delete email"
+        shortcutKeys={appShortcuts.deleteOpenItem.keys}
         onClick={() => {
           deleteEmail.mutate(email.id);
           toast("Email deleted");
@@ -104,7 +105,7 @@ export function MailDetailActions({
         }}
       >
         <Trash2Icon />
-      </Button>
+      </IconButton>
       {isSentByApp && !simulateAvailability.isAvailable && (
         <OperationButton
           operationKey="POST /api/v1/emails/{emailId}/simulate"
@@ -156,9 +157,9 @@ export function MailDetailActions({
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="More actions">
+          <IconButton variant="ghost" label="More actions">
             <MoreHorizontalIcon />
-          </Button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>

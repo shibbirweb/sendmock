@@ -2,7 +2,7 @@ import { PaperclipIcon, SendHorizontalIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Textarea } from "@/components/ui/textarea";
 import { ComposerMediaChips } from "@/features/sms/media/composer-media-chips";
 import { useComposerMedia } from "@/features/sms/media/use-composer-media";
@@ -66,15 +66,14 @@ export function SmsInboundComposer({ smsThread }: { smsThread: SmsThread }) {
         onRemove={composerMedia.removeFile}
       />
       <div className="flex items-end gap-2">
-        <Button
+        <IconButton
           type="button"
           variant="ghost"
-          size="icon"
-          aria-label="Attach files"
+          label="Attach files"
           onClick={() => fileInputRef.current?.click()}
         >
           <PaperclipIcon />
-        </Button>
+        </IconButton>
         <input
           ref={fileInputRef}
           type="file"
@@ -102,14 +101,9 @@ export function SmsInboundComposer({ smsThread }: { smsThread: SmsThread }) {
           aria-label={`Reply as ${contactNumber}`}
           className="max-h-40 min-h-9 resize-none"
         />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!canSend}
-          aria-label="Send reply"
-        >
+        <IconButton type="submit" disabled={!canSend} label="Send reply">
           <SendHorizontalIcon />
-        </Button>
+        </IconButton>
       </div>
       <p className="text-[11px] text-muted-foreground">
         Simulates an inbound message from {contactNumber}.{" "}

@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { CircleHelpIcon, CodeIcon } from "lucide-react";
 import { Fragment } from "react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +21,9 @@ export function HelpMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Help">
+        <IconButton variant="ghost" label="Help">
           <CircleHelpIcon />
-        </Button>
+        </IconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuItem asChild>

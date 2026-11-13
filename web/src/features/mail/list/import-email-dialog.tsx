@@ -4,6 +4,7 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,9 +68,9 @@ export function ImportEmailDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Import .eml">
+        <IconButton variant="ghost" label="Import .eml">
           <FileUpIcon />
-        </Button>
+        </IconButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>

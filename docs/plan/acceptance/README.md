@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 118 / 133 features, 577 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 119 / 133 features, 580 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -158,7 +158,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | Accepted |
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Accepted |
 | [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
-| [UI-13](06-ui.md#ui-13-icon-tooltips) | Icon tooltips | Phase 5 (W21) | 3 | Not started |
+| [UI-13](06-ui.md#ui-13-icon-tooltips) | Icon tooltips | Phase 5 (W21) | 3 | Accepted |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Accepted |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Accepted |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 8 | In progress |

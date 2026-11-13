@@ -8,6 +8,7 @@ import {
 import { toast } from "sonner";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -60,11 +61,11 @@ export function GatewayCheckoutTab({
                 {methodIndex + 1}. {readMethodName(methodKey)}
               </span>
               <span className="flex gap-1">
-                <Button
+                <IconButton
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Move ${readMethodName(methodKey)} up`}
+                  label={`Move ${readMethodName(methodKey)} up`}
                   disabled={methodIndex === 0}
                   onClick={() =>
                     updateInput({
@@ -77,12 +78,12 @@ export function GatewayCheckoutTab({
                   }
                 >
                   <ArrowUpIcon />
-                </Button>
-                <Button
+                </IconButton>
+                <IconButton
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Move ${readMethodName(methodKey)} down`}
+                  label={`Move ${readMethodName(methodKey)} down`}
                   disabled={methodIndex === methodKeys.length - 1}
                   onClick={() =>
                     updateInput({
@@ -95,12 +96,12 @@ export function GatewayCheckoutTab({
                   }
                 >
                   <ArrowDownIcon />
-                </Button>
-                <Button
+                </IconButton>
+                <IconButton
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Remove ${readMethodName(methodKey)}`}
+                  label={`Remove ${readMethodName(methodKey)}`}
                   onClick={() =>
                     updateInput({
                       method_keys: methodKeys.filter(
@@ -110,7 +111,7 @@ export function GatewayCheckoutTab({
                   }
                 >
                   <Trash2Icon />
-                </Button>
+                </IconButton>
               </span>
             </li>
           ))}

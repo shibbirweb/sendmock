@@ -2,6 +2,7 @@ import { PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 
 import { FormField } from "@/components/common/form-field";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OptionSelect } from "@/features/providers/option-select";
@@ -80,12 +81,12 @@ export function ProviderResponsesTab({
                 })
               }
             />
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
               size="icon-sm"
               className="ms-auto"
-              aria-label={`Remove error response ${responseIndex + 1}`}
+              label={`Remove error response ${responseIndex + 1}`}
               onClick={() =>
                 updateInput({
                   error_responses: errorResponses.filter(
@@ -95,7 +96,7 @@ export function ProviderResponsesTab({
               }
             >
               <Trash2Icon />
-            </Button>
+            </IconButton>
           </div>
           <ProviderResponseEditor
             responseLabel={`Error response ${responseIndex + 1}`}

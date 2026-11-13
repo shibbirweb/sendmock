@@ -11,22 +11,13 @@ import {
   listShortcutDescriptions,
   type ShortcutDescription,
 } from "@/features/shortcuts/shortcut-catalog";
+import { formatShortcutKey } from "@/lib/keyboard/format-shortcut-key";
 
 const shortcutGroups: ShortcutDescription["group"][] = [
   "General",
+  "Lists and messages",
   "Navigation",
 ];
-
-const isMacPlatform =
-  typeof navigator !== "undefined" && /mac/i.test(navigator.userAgent);
-
-function formatShortcutKey(shortcutKey: string): string {
-  if (shortcutKey === "Mod") {
-    return isMacPlatform ? "⌘" : "Ctrl";
-  }
-
-  return shortcutKey;
-}
 
 export function ShortcutHelpDialog() {
   const { isShortcutHelpOpen, setShortcutHelpOpen } = useAppOverlays();

@@ -1,5 +1,6 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -83,18 +84,18 @@ export function FilterGroupEditor({
         </Select>
         <span>of these</span>
         {!isRootGroup && (
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove ${groupLabel.toLowerCase()}`}
+            label={`Remove ${groupLabel.toLowerCase()}`}
             className="ml-auto"
             onClick={() => {
               removeNode(builderGroup.nodeId);
             }}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         )}
       </div>
       {builderGroup.children.length === 0 && (

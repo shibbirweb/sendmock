@@ -24,6 +24,7 @@ import {
   toInventoryFilePath,
 } from "../deeper/inventory-file";
 import { navigateInApp } from "./support/app-screens";
+import { expectIconTooltips } from "./support/icon-tooltips";
 
 const screenContent = (page: Page) => page.locator("#main-content");
 const appHeader = (page: Page) => page.locator("main header").first();
@@ -120,6 +121,9 @@ async function readDataState(
   await page.goto("/");
   await chooseDataState(page, dataState);
   const stateControls = await readScreenState(page, deeperScreen, dataState);
+  if (dataState === "normal") {
+    await expectIconTooltips(screenContent(page), deeperScreen.path);
+  }
   await page.close();
   return stateControls;
 }
@@ -153,6 +157,10 @@ async function readOverlays(
     await expect(overlayScope).toBeVisible();
     await expect(overlayScope.locator('[data-slot="skeleton"]')).toHaveCount(0);
     const overlayControls = await readControls(overlayScope, true);
+    await expectIconTooltips(
+      overlayScope,
+      `${deeperScreen.path} ${overlay.name}`,
+    );
     controlsByOverlay.set(overlay.name, overlayControls);
     const leftOutControls = new Set([
       ...(overlay.scope === "screen" ? normalControls : []),
@@ -199,6 +207,8 @@ async function crawlShell(browser: Browser): Promise<string[]> {
       ),
     ]),
   ];
+  await expectIconTooltips(page.locator('[data-sidebar="sidebar"]'), "sidebar");
+  await expectIconTooltips(appHeader(page), "header");
   await page.close();
   return shellControls;
 }
@@ -237,7 +247,7 @@ const attachTo =
   (name: string, body: string) =>
     testInfo.attach(name, { body, contentType: "application/json" });
 
-test("WS-10.3 the Deeper inventory lists every control of the sidebar and header", async ({
+test("WS-10.3 UI-13.1 the Deeper inventory lists every control of the sidebar and header, each icon with its tooltip", async ({
   browser,
 }, testInfo) => {
   await checkInventoryFile(
@@ -252,7 +262,7 @@ test("WS-10.3 the Deeper inventory lists every control of the sidebar and header
 });
 
 for (const [screenIndex, deeperScreen] of deeperScreens.entries()) {
-  test(`WS-10.3 the Deeper inventory lists every control and text of ${deeperScreen.path}`, async ({
+  test(`WS-10.3 UI-13.1 the Deeper inventory lists every control and text of ${deeperScreen.path}, each icon with its tooltip`, async ({
     browser,
   }, testInfo) => {
     test.setTimeout(300_000);
