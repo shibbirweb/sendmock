@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
@@ -27,6 +27,19 @@ describe("IconButton", () => {
     expect(await screen.findByRole("tooltip")).toHaveTextContent(
       "Delete email",
     );
+  });
+
+  test("UI-13.1 focus a dialog or menu moves after a click or Enter does not open the tooltip", async () => {
+    renderIconButton();
+    const iconButton = screen.getByRole("button", { name: "Delete email" });
+
+    await userEvent.click(document.body);
+    act(() => {
+      iconButton.focus();
+    });
+
+    expect(iconButton).toHaveFocus();
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   test("UI-13.2 a shortcut from the catalog shows in the tooltip and as aria-keyshortcuts", async () => {

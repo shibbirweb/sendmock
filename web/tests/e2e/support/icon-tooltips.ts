@@ -61,8 +61,13 @@ export async function expectIconTooltips(scope: Locator, stateName: string) {
         `${accessibleName || "(no name)"}: ${tooltipText ?? "no tooltip"}`,
       );
     }
-    await page.mouse.move(0, 0);
-    await expect(tooltip).toHaveCount(0);
+    // Radix closes a tooltip on a pointer move after the one that left its
+    // trigger, so a single jump away leaves it open.
+    await expect(async () => {
+      await page.mouse.move(1, 1);
+      await page.mouse.move(0, 0);
+      await expect(tooltip).toHaveCount(0, { timeout: 250 });
+    }).toPass();
   }
   expect
     .soft(

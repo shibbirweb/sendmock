@@ -11,6 +11,22 @@ import {
   formatAriaKeyShortcuts,
   formatShortcutKey,
 } from "@/lib/keyboard/format-shortcut-key";
+import {
+  trackInputModality,
+  wasFocusMovedByKeyboard,
+} from "@/lib/keyboard/input-modality";
+
+trackInputModality();
+
+/**
+ * A dialog, sheet or menu moves focus by itself when it opens or closes; a
+ * tooltip opened then would stay up and take the Escape meant for the dialog.
+ */
+function openTooltipOnlyForKeyboardFocus(focusEvent: React.FocusEvent) {
+  if (!wasFocusMovedByKeyboard()) {
+    focusEvent.preventDefault();
+  }
+}
 
 type IconTooltipProps = {
   /** The action, shown in the tooltip and used as the accessible name. */
@@ -37,7 +53,9 @@ export function IconTooltip({
 }: IconTooltipProps) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipTrigger asChild onFocus={openTooltipOnlyForKeyboardFocus}>
+        {children}
+      </TooltipTrigger>
       <TooltipContent side={side}>
         {hint === undefined ? label : `${label}. ${hint}`}
         {shortcutKeys !== undefined && (
