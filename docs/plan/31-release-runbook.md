@@ -147,6 +147,8 @@ The `sendmock` image package on GHCR was deleted on 2026-11-08 (it held the old 
 
 Then replace the notices that say there is no release yet, in a pull request to `develop`: the stable commands only work from 1.0.0, so each notice says only the beta is published so far and points to the beta commands. They are the lines at the top of `docs/wiki/install.md` and `docs/wiki/getting-started.md`, the line of `docs/wiki/index.md`, the paragraph under the install table of `README.md`, and the hero's pill in `website/components/landing/hero-section.tsx` ("Now in beta"). The website's version banner, `llms.txt` and the changelog page follow the real releases by themselves.
 
+A package npm does not have yet is staged instead of published (`npm stage publish`, from `scripts/release/npm-publish.ts`), since npm sets a trusted publisher only on an existing package: open it on npmjs.com and approve it with your 2FA. The `sendmock` launcher is staged this way with 0.1.0-beta.3.
+
 Then move npm to trusted publishing: on each of the eight npm packages (`sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`), open **Settings > Trusted Publisher**, choose GitHub Actions, and enter `shibbirweb`, `sendmock`, `registry-publish.yml` and no environment; then delete the token:
 
 ```sh

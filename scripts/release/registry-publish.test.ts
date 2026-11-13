@@ -149,23 +149,26 @@ describe("the Registry publish workflow", () => {
       // An empty `_authToken=${NODE_AUTH_TOKEN}` line from registry-url makes npm skip OIDC.
       expect(setupNode?.with?.["registry-url"], jobName).toBeUndefined();
       expect(runText, jobName).toContain('if [ -n "$NPM_TOKEN" ]; then');
-      expect(runText, jobName).toContain("npm install -g npm@11");
+      expect(runText, jobName).toContain("npm install -g npm@^11.15.0");
     }
   });
 
-  test("DS-03.8 names each npm package folder as a path, which npm never reads as a GitHub repository", () => {
+  test("DS-03.8 every npm package goes through npm-publish.ts, which stages a package's first version", () => {
+    for (const jobName of ["npm", "testcontainers-node"]) {
+      const runText = (registryWorkflow.jobs[jobName]?.steps ?? [])
+        .map((step) => step.run ?? "")
+        .join("\n");
+
+      expect(runText, jobName).toContain("scripts/release/npm-publish.ts");
+      expect(runText, jobName).not.toContain("npm publish");
+    }
     const npmRunText = (registryWorkflow.jobs.npm?.steps ?? [])
       .map((step) => step.run ?? "")
       .join("\n");
-    const publishedFolders = [
-      ...npmRunText.matchAll(/npm publish ("?)([^\s"]+)\1/g),
-    ].map((publishMatch) => publishMatch[2]);
-
     expect(npmRunText).toContain("for package_directory in ./npm-packages/*/; do");
-    expect(publishedFolders).toEqual([
-      "$package_directory",
-      "./npm-packages/sendmock/",
-    ]);
+    expect(npmRunText).toContain(
+      'bun scripts/release/npm-publish.ts ./npm-packages/sendmock/ "$dist_tag"',
+    );
   });
 
   test("DS-03.8 NuGet trades the OIDC token for a short-lived key, with no stored one", () => {
@@ -196,6 +199,7 @@ describe("the Registry publish workflow", () => {
   test("DS-03.8 no other workflow publishes to npm, PyPI, NuGet or crates.io", () => {
     const trustedPublishingCommands = [
       "npm publish",
+      "npm-publish.ts",
       "pypa/gh-action-pypi-publish",
       "dotnet nuget push",
       "NuGet/login",
