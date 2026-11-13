@@ -1,10 +1,12 @@
 import { http, HttpResponse } from "msw";
 
-import type {
-  RulePreviewRequest,
-  WebhookRule,
-  WebhookRuleInput,
-  WebhookRuleMove,
+import {
+  appEventTypes,
+  type RulePreviewRequest,
+  type WebhookRule,
+  type WebhookRuleInput,
+  type WebhookRuleMatchRequest,
+  type WebhookRuleMove,
 } from "@/lib/api/types";
 import { validateWebhookRuleInput } from "@/lib/webhooks/rule-filter/validate-rule-filter";
 import { mockDatabase } from "@/mocks/db/mock-database";
@@ -14,6 +16,7 @@ import {
   createErrorResponse,
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
+import { matchWebhookRules } from "@/mocks/webhooks/match-webhook-rules";
 import { previewRuleFilter } from "@/mocks/webhooks/preview-rule-filter";
 
 function listRulesInOrder(): WebhookRule[] {
@@ -61,6 +64,23 @@ export const webhookRuleHandlers = [
     const previewRequest = (await request.json()) as RulePreviewRequest;
 
     return HttpResponse.json(previewRuleFilter(mockDatabase, previewRequest));
+  }),
+
+  http.post("*/api/v1/webhooks/rules/match", async ({ request }) => {
+    const conditionResponse = await applyMockConditions();
+    if (conditionResponse) {
+      return conditionResponse;
+    }
+    const matchRequest = (await request.json()) as WebhookRuleMatchRequest;
+    if (!appEventTypes.includes(matchRequest.event_type)) {
+      return createErrorResponse(
+        400,
+        "invalid_input",
+        `${matchRequest.event_type} is not an event a rule can listen to`,
+      );
+    }
+
+    return HttpResponse.json(matchWebhookRules(matchRequest));
   }),
 
   http.post("*/api/v1/webhooks/rules", async ({ request }) => {

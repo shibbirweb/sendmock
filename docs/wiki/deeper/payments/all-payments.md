@@ -306,47 +306,67 @@ Button.
 
 ## Simulate menu
 
-### 47. Refund...
+### 47. Refund... No webhook
 
 Menu item.
 
-- **What it does:** Opens Refund payment.
+- **What it does:** Opens Refund payment. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
 
-### 48. Open dispute
+### 48. Choose webhooks for Refund
 
 Menu item.
 
-- **What it does:** Opens a dispute on the payment, as when the customer contests it.
+- **What it does:** Opens Choose webhooks for the refund: every enabled endpoint with a search box, the endpoints your rules would pick already checked. Its Refund button opens Refund payment, and the refund then sends its event to exactly the checked endpoints.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 49. Open dispute No webhook
+
+Menu item.
+
+- **What it does:** Opens a dispute on the payment, as when the customer contests it. Under the label: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `payment.dispute_opened` and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
+### 50. Choose webhooks for Open dispute
+
+Menu item.
+
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
 ## Refund payment dialog
 
-### 49. Refund payment
+### 51. Refund payment
 
 Heading.
 
 - **What it does:** The Refund payment dialog.
 
-### 50. $#.# can be refunded.
+### 52. $#.# can be refunded.
 
 Text.
 
 - **What it does:** How much is left to refund.
 
-### 51. Amount (USD)
+### 53. Amount (USD)
 
 Field.
 
 - **What it does:** How much to refund; less than the whole is a partial refund.
 
-### 52. Cancel
+### 54. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 53. Refund
+### 55. Refund
 
 Button.
 
@@ -354,7 +374,7 @@ Button.
 - **What it changes:** Fires `payment.refunded` or `payment.partially_refunded` and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
-### 54. Close
+### 56. Close
 
 Button.
 
@@ -362,31 +382,31 @@ Button.
 
 ## Answer dispute dialog
 
-### 55. Answer dispute
+### 57. Answer dispute
 
 Heading.
 
 - **What it does:** The Answer dispute dialog.
 
-### 56. The dispute goes under review until it is won or lost.
+### 58. The dispute goes under review until it is won or lost.
 
 Text.
 
 - **What it does:** Explains what answering does.
 
-### 57. Evidence
+### 59. Evidence
 
 Field.
 
 - **What it does:** What you send the card network as evidence.
 
-### 58. Cancel
+### 60. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 59. Send answer
+### 61. Send answer
 
 Button.
 
@@ -394,7 +414,7 @@ Button.
 - **What it changes:** Fires `payment.dispute_updated`.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
-### 60. Close
+### 62. Close
 
 Button.
 
@@ -402,13 +422,13 @@ Button.
 
 ## With no data yet
 
-### 61. No payments yet
+### 63. No payments yet
 
 Text.
 
 - **What it does:** Shown when no payment was made yet.
 
-### 62. Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz.
+### 64. Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz.
 
 Text.
 
@@ -416,20 +436,20 @@ Text.
 
 ## When the data cannot load
 
-### 63. Could not load the payments. Try again
+### 65. Could not load the payments. Try again
 
 Message.
 
 - **What it does:** Shown when the payments could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 64. Could not load the payments.
+### 66. Could not load the payments.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 65. Try again
+### 67. Try again
 
 Button.
 

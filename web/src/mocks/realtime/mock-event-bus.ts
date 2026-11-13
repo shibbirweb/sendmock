@@ -3,6 +3,7 @@ import { ws } from "msw";
 import { buildRealtimeUrl } from "@/lib/api/api-client";
 import type { AppEvent, AppEventType } from "@/lib/api/types";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
+import { readActiveWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 
 /** Intercepts the app's realtime WebSocket so mock events reach the UI. */
 export const realtimeLink = ws.link(buildRealtimeUrl());
@@ -21,7 +22,11 @@ export const realtimeConnectionHandler = realtimeLink.addEventListener(
   },
 );
 
-type MockEventListener = (appEvent: AppEvent) => void;
+/** Listeners get the endpoints the publishing action chose, or null. */
+type MockEventListener = (
+  appEvent: AppEvent,
+  webhookChoice: string[] | null,
+) => void;
 
 const mockEventListeners = new Set<MockEventListener>();
 
@@ -59,7 +64,8 @@ export function publishMockEvent(
   recentEvents.unshift(appEvent);
   recentEvents.length = Math.min(recentEvents.length, recentEventLimit);
   realtimeLink.broadcast(JSON.stringify(appEvent));
+  const webhookChoice = readActiveWebhookChoice();
   for (const mockEventListener of mockEventListeners) {
-    mockEventListener(appEvent);
+    mockEventListener(appEvent, webhookChoice);
   }
 }

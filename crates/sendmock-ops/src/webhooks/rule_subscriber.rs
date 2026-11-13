@@ -2,84 +2,12 @@ use sendmock_store::{WebhookEndpointRecord, WebhookRuleRecord};
 use sendmock_webhooks::{FilterExpression, RuleMessage};
 use tokio::sync::broadcast::error::RecvError;
 
+use super::chosen_delivery::deliver_to_chosen_endpoints;
 use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
-use super::rule_messages::{
-    build_email_rule_message, build_push_rule_message, build_sms_rule_message,
-    with_engagement_event_fields,
-};
+use super::rule_event_subject::{is_ruled_event, load_event_rule_message, read_event_subject_id};
+use super::rule_messages::with_engagement_event_fields;
 use super::rule_view::{read_rule_events, read_rule_filter};
-use crate::{AppEvent, OperationContext, OperationError};
-
-/// Events that drive a live view only: `webhook.delivered` (a rule on it would loop),
-/// `sms.reply_webhook` (the result already went with `sms.inbound`'s message) and
-/// `traffic.pruned` (housekeeping, about no message).
-const UNRULED_EVENT_TYPES: [&str; 3] = ["webhook.delivered", "sms.reply_webhook", "traffic.pruned"];
-
-/// The email or SMS an event is about, with the fields filters read. A payment event is about
-/// its payment, which has no filter fields yet; events about something else, or about a
-/// message that is gone, have no fields, so only filterless rules fire.
-async fn load_event_subject(
-    operation_context: &OperationContext,
-    app_event: &AppEvent,
-) -> Result<(Option<String>, RuleMessage), OperationError> {
-    let Some(subject_id) = app_event.data["id"].as_str().map(str::to_owned) else {
-        return Ok((None, RuleMessage::default()));
-    };
-    if app_event.event_type.starts_with("email.") {
-        let stored_email = operation_context
-            .email_repository
-            .find_email(&subject_id)
-            .await?;
-        return Ok((
-            Some(subject_id),
-            stored_email
-                .as_ref()
-                .map(build_email_rule_message)
-                .unwrap_or_default(),
-        ));
-    }
-    if app_event.event_type.starts_with("sms.") {
-        let stored_sms = operation_context
-            .sms_repository
-            .find_message(&subject_id)
-            .await?;
-        return Ok((
-            Some(subject_id),
-            stored_sms
-                .as_ref()
-                .map(build_sms_rule_message)
-                .unwrap_or_default(),
-        ));
-    }
-    if app_event.event_type.starts_with("push.") {
-        let stored_push = operation_context
-            .push_notifications
-            .find_notification(&subject_id)
-            .await?;
-        return Ok((
-            Some(subject_id),
-            stored_push
-                .as_ref()
-                .map(build_push_rule_message)
-                .unwrap_or_default(),
-        ));
-    }
-    if app_event.event_type.starts_with("payment.") || app_event.event_type.starts_with("checkout.")
-    {
-        return Ok((Some(subject_id), RuleMessage::default()));
-    }
-    Ok((None, read_event_project(app_event)))
-}
-
-/// A verification event has no stored message to read, but its data names its project.
-fn read_event_project(app_event: &AppEvent) -> RuleMessage {
-    match app_event.data["project"].as_str() {
-        Some(project_key) => {
-            RuleMessage::default().with_field("project", vec![project_key.to_owned()])
-        }
-        None => RuleMessage::default(),
-    }
-}
+use crate::{AppEvent, OperationContext, OperationError, RecordedEvent};
 
 /// Whether an enabled rule listens to the event and its filter passes the message.
 fn does_rule_fire(
@@ -132,7 +60,7 @@ pub async fn fire_matching_rules(
     operation_context: &OperationContext,
     app_event: &AppEvent,
 ) -> Result<usize, OperationError> {
-    if UNRULED_EVENT_TYPES.contains(&app_event.event_type.as_str()) {
+    if !is_ruled_event(&app_event.event_type) {
         return Ok(0);
     }
     let stored_rules = operation_context
@@ -145,7 +73,8 @@ pub async fn fire_matching_rules(
     {
         return Ok(0);
     }
-    let (subject_id, stored_message) = load_event_subject(operation_context, app_event).await?;
+    let subject_id = read_event_subject_id(app_event);
+    let stored_message = load_event_rule_message(operation_context, app_event).await?;
     let rule_message = with_engagement_event_fields(stored_message, app_event);
     let firing_rules = find_firing_rules(
         operation_context,
@@ -168,6 +97,24 @@ pub async fn fire_matching_rules(
     Ok(queued_count)
 }
 
+/// Sends an event to the endpoints its action chose, or else to the rule matches.
+pub async fn deliver_recorded_event(
+    operation_context: &OperationContext,
+    recorded_event: &RecordedEvent,
+) -> Result<usize, OperationError> {
+    match &recorded_event.webhook_choice {
+        Some(webhook_choice) => {
+            deliver_to_chosen_endpoints(
+                operation_context,
+                &recorded_event.app_event,
+                webhook_choice,
+            )
+            .await
+        }
+        None => fire_matching_rules(operation_context, &recorded_event.app_event).await,
+    }
+}
+
 /// Listens to the event bus until it closes, firing rules for each event. Ingest only
 /// publishes, so it never waits for rules or deliveries (WH-03.1).
 pub async fn run_webhook_rule_subscriber(operation_context: OperationContext) {
@@ -176,7 +123,7 @@ pub async fn run_webhook_rule_subscriber(operation_context: OperationContext) {
         match event_receiver.recv().await {
             Ok(recorded_event) => {
                 if let Err(rule_error) =
-                    fire_matching_rules(&operation_context, &recorded_event.app_event).await
+                    deliver_recorded_event(&operation_context, &recorded_event).await
                 {
                     tracing::warn!(error = %rule_error, "could not fire webhook rules");
                 }

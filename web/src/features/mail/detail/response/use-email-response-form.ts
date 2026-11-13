@@ -13,7 +13,7 @@ import {
   useForwardEmail,
   useReplyToEmail,
 } from "@/lib/api/hooks/use-email-response-queries";
-import type { EmailDetail } from "@/lib/api/types";
+import type { EmailDetail, WebhookChoice } from "@/lib/api/types";
 import { buildResponseSubject } from "@/lib/email/build-response-subject";
 import {
   buildForwardedMessageBlock,
@@ -124,8 +124,14 @@ export function useEmailResponseForm({
     },
   };
 
-  /** Sends; `hasDestinations` is what Delivers to showed at that moment. */
-  const sendResponse = (hasDestinations: boolean) => {
+  /**
+   * Sends; `hasDestinations` is what Delivers to and Webhooks showed at that
+   * moment, and `webhookChoice` the endpoints chosen for this one send.
+   */
+  const sendResponse = (
+    hasDestinations: boolean,
+    webhookChoice: WebhookChoice,
+  ) => {
     if (!canSend || isSending) {
       return;
     }
@@ -142,6 +148,7 @@ export function useEmailResponseForm({
             body: formValues.messageText,
             include_original: false,
             include_attachments: formValues.shouldIncludeAttachments,
+            ...webhookChoice,
           },
         },
         mutationCallbacks,
@@ -158,6 +165,7 @@ export function useEmailResponseForm({
           subject: formValues.subject,
           reply_all: composerMode === "reply_all",
           include_original: false,
+          ...webhookChoice,
         },
       },
       mutationCallbacks,

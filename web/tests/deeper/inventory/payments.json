@@ -55,8 +55,10 @@
       "button: Close"
     ],
     "Simulate menu": [
-      "menuitem: Refund...",
-      "menuitem: Open dispute"
+      "menuitem: Refund... No webhook",
+      "menuitem: Choose webhooks for Refund",
+      "menuitem: Open dispute No webhook",
+      "menuitem: Choose webhooks for Open dispute"
     ],
     "Refund payment dialog": [
       "heading: Refund payment",

@@ -6,10 +6,16 @@ import { IconButton } from "@/components/common/icon-button";
 import { Textarea } from "@/components/ui/textarea";
 import { ComposerMediaChips } from "@/features/sms/media/composer-media-chips";
 import { useComposerMedia } from "@/features/sms/media/use-composer-media";
+import { useWebhookTargets } from "@/features/webhooks/targets/use-webhook-targets";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useSendInboundSms } from "@/lib/api/hooks/use-sms-queries";
 import type { SmsThread } from "@/lib/api/types";
 import { calculateSmsSegments } from "@/lib/sms/calculate-sms-segments";
 import { stripChannelPrefix } from "@/lib/sms/format-phone-number";
+
+/** Waits for a pause in typing before asking which webhooks the reply reaches. */
+const matchDebounceMs = 300;
 
 /**
  * "Reply as recipient": simulates the other party texting the app, which
@@ -26,6 +32,15 @@ export function SmsInboundComposer({ smsThread }: { smsThread: SmsThread }) {
   const canSend =
     (replyText.trim() !== "" || hasMedia) && !sendInboundSms.isPending;
   const contactNumber = stripChannelPrefix(smsThread.contact_number);
+  const matchedReplyText = useDebouncedValue(replyText, matchDebounceMs);
+  const webhookTargets = useWebhookTargets({
+    eventType: "sms.inbound",
+    data: {
+      from: [smsThread.contact_number],
+      to: [smsThread.app_number],
+      body: [matchedReplyText],
+    },
+  });
 
   const sendReply = async () => {
     if (!canSend) {
@@ -40,6 +55,7 @@ export function SmsInboundComposer({ smsThread }: { smsThread: SmsThread }) {
         body: replyText,
         channel: smsThread.channel,
         media: inlineMedia.length > 0 ? inlineMedia : undefined,
+        ...webhookTargets.webhookChoice,
       },
       {
         onSuccess: () => {
@@ -61,6 +77,10 @@ export function SmsInboundComposer({ smsThread }: { smsThread: SmsThread }) {
         void sendReply();
       }}
     >
+      <WebhookTargets.Row
+        webhookTargets={webhookTargets}
+        actionLabel="the reply"
+      />
       <ComposerMediaChips
         mediaFiles={composerMedia.mediaFiles}
         onRemove={composerMedia.removeFile}

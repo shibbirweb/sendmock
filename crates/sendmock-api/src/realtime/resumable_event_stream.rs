@@ -75,6 +75,7 @@ mod tests {
                 created_at: String::new(),
                 data: json!({}),
             },
+            webhook_choice: None,
         }
     }
 

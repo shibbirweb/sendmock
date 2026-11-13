@@ -15,6 +15,8 @@ import type {
 const matchDebounceMs = 300;
 
 export type InboundDestinations = {
+  /** The incoming email as it will arrive, once typing pauses. */
+  matchRequest: InboundRouteMatchRequest;
   /** The address the incoming email arrives at; empty until Forward has one. */
   recipientAddress: string;
   matchResult: InboundRouteMatchResult | undefined;
@@ -50,6 +52,7 @@ export function useInboundDestinations({
   const matchResult = recipientAddress === "" ? undefined : matchQuery.data;
 
   return {
+    matchRequest,
     recipientAddress,
     matchResult,
     isChecking: recipientAddress !== "" && matchQuery.isPending,

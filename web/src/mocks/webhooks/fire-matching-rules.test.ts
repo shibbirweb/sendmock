@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import type { AppEvent } from "@/lib/api/types";
 import { mockDatabase, replaceMockDatabase } from "@/mocks/db/mock-database";
 import { fireMatchingRules } from "@/mocks/webhooks/fire-matching-rules";
+import { matchWebhookRules } from "@/mocks/webhooks/match-webhook-rules";
 import { buildReplayDelivery } from "@/mocks/webhooks/replay-delivery";
 
 function buildSmsStatusEvent(): AppEvent {
@@ -48,6 +49,73 @@ describe("fireMatchingRules", () => {
     fireMatchingRules(buildSmsStatusEvent());
 
     expect(mockDatabase.webhookDeliveries).toHaveLength(deliveryCountBefore);
+  });
+
+  test("WH-13.4 a chosen action delivers to exactly the chosen enabled endpoints", () => {
+    replaceMockDatabase("standard");
+    const [firstEndpoint, secondEndpoint] = mockDatabase.webhookEndpoints;
+    if (firstEndpoint === undefined || secondEndpoint === undefined) {
+      throw new Error("The fixtures need two endpoints.");
+    }
+    firstEndpoint.is_enabled = true;
+    secondEndpoint.is_enabled = true;
+    const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
+
+    fireMatchingRules(buildSmsStatusEvent(), [
+      firstEndpoint.id,
+      secondEndpoint.id,
+    ]);
+
+    const newDeliveries = mockDatabase.webhookDeliveries.slice(0, 2);
+    expect(mockDatabase.webhookDeliveries).toHaveLength(
+      deliveryCountBefore + 2,
+    );
+    expect(
+      newDeliveries.map((webhookDelivery) => webhookDelivery.endpoint_id),
+    ).toEqual([secondEndpoint.id, firstEndpoint.id]);
+    expect(
+      newDeliveries.every(
+        (webhookDelivery) =>
+          webhookDelivery.trigger === "chosen" &&
+          webhookDelivery.rule_id === null,
+      ),
+    ).toBe(true);
+  });
+
+  test("WH-13.4 an empty choice sends no webhook", () => {
+    replaceMockDatabase("standard");
+    const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
+
+    fireMatchingRules(buildSmsStatusEvent(), []);
+
+    expect(mockDatabase.webhookDeliveries).toHaveLength(deliveryCountBefore);
+  });
+
+  test("WH-13.1 the match names what firing the same event then delivers to", () => {
+    replaceMockDatabase("standard");
+    const smsStatusEvent = buildSmsStatusEvent();
+    const matched = matchWebhookRules({
+      event_type: "sms.status",
+      subject_id: String(smsStatusEvent.data.id),
+    });
+    const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
+
+    fireMatchingRules(smsStatusEvent);
+
+    const newDeliveries = mockDatabase.webhookDeliveries.slice(
+      0,
+      mockDatabase.webhookDeliveries.length - deliveryCountBefore,
+    );
+    expect(matched.webhook_rules.length).toBeGreaterThan(0);
+    expect(
+      newDeliveries
+        .map((webhookDelivery) => webhookDelivery.endpoint_id)
+        .sort(),
+    ).toEqual(
+      matched.webhook_rules
+        .map((matchedRule) => matchedRule.endpoint_id)
+        .sort(),
+    );
   });
 
   test("ignores webhook events so a delivery never triggers another", () => {

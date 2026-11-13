@@ -70,6 +70,17 @@ pub fn validate_rule_events(events: &[String]) -> Result<(), OperationError> {
     }
 }
 
+/// One event an action fires, as `POST /webhooks/rules/match` names it.
+pub fn validate_rule_event(event_type: &str) -> Result<(), OperationError> {
+    if RULE_EVENT_TYPES.contains(&event_type) {
+        return Ok(());
+    }
+    Err(field_error(
+        "event_type",
+        format!("{event_type} is not an event a rule can listen to"),
+    ))
+}
+
 pub fn validate_rule_filter(rule_filter: Option<&RuleFilter>) -> Result<(), OperationError> {
     match rule_filter
         .map(FilterExpression::from)

@@ -149,6 +149,14 @@ const ruleEndpoints = tagEndpoints("Webhook rules", [
     requestBody: typeRef("RulePreviewRequest"),
     response: typeRef("RulePreviewResult"),
   },
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/rules/match",
+    summary:
+      "Which webhooks an event would trigger, before an action fires it.",
+    requestBody: typeRef("WebhookRuleMatchRequest"),
+    response: typeRef("WebhookRuleMatchResult"),
+  },
 ]);
 
 export const webhooksApi: ApiEndpoint[] = [

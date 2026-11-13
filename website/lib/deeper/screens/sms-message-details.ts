@@ -1,4 +1,9 @@
 import type { DeeperEntry } from "../deeper-types";
+import {
+  describeChangeWebhooks,
+  describeChooseWebhooks,
+  webhookTargetsUnderLabel,
+} from "./webhook-target-entries";
 
 /** SMS: a message's menu and its Message details drawer. */
 export const smsMessageDetailEntries: DeeperEntry[] = [
@@ -8,11 +13,15 @@ export const smsMessageDetailEntries: DeeperEntry[] = [
     operationIds: ["getSmsBySmsId"],
   },
   {
-    control: "menuitem: Simulate read",
-    does: "Records that the recipient read the message, as WhatsApp read receipts do.",
+    control: "menuitem: Simulate read No webhook",
+    does: `Records that the recipient read the message, as WhatsApp read receipts do. ${webhookTargetsUnderLabel}`,
     changes: "Fires `sms.opened` and sends a `read` status callback.",
     operationIds: ["postSmsBySmsIdOpen"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate read",
+    "postSmsBySmsIdOpen",
+  ),
   {
     control: "menuitem: Send to webhook",
     does: "Opens the Send to webhook dialog, to deliver this message's event to an endpoint now.",
@@ -72,6 +81,21 @@ export const smsMessageDetailEntries: DeeperEntry[] = [
     does: "Sets the message failed with the chosen error code.",
     changes: "Fires `sms.status` and sends the status callback.",
     operationIds: ["postSmsBySmsIdStatus"],
+  },
+  {
+    control: "link: SMS status callbacks",
+    state: "Message details, Status tab",
+    does: "In the Webhooks row under Set status: an endpoint the `sms.status` event of the status button under the pointer or focus will reach through your rules, named after the endpoint. The heading says which status it previews.",
+    changes: "Opens the endpoint in Webhooks > Endpoints in a new tab, so the drawer stays open.",
+    source: "Your webhook rules for `sms.status`, which can filter on the status.",
+    operationIds: ["postWebhooksRulesMatch"],
+  },
+  {
+    ...describeChangeWebhooks(
+      "setting that status",
+      "The row follows the status button under the pointer or focus, since rules can filter on the status.",
+    ),
+    state: "Message details, Status tab",
   },
   {
     control: "tab: Status",

@@ -9,6 +9,7 @@ import {
 } from "@/features/mail/detail/response/list-inbound-destinations";
 import { SendRepliesToAppForm } from "@/features/mail/detail/response/send-replies-to-app-form";
 import type { InboundDestinations } from "@/features/mail/detail/response/use-inbound-destinations";
+import type { WebhookTarget } from "@/features/webhooks/targets/list-webhook-targets";
 
 function DestinationLink({ destination }: { destination: InboundDestination }) {
   const linkContent = (
@@ -20,6 +21,20 @@ function DestinationLink({ destination }: { destination: InboundDestination }) {
     </>
   );
   const linkClassName = "flex flex-wrap items-baseline gap-x-2 hover:underline";
+
+  if (destination.source.kind === "chosen") {
+    return (
+      <Link
+        to="/webhooks/endpoints"
+        search={{ endpoint: destination.source.endpointId }}
+        target="_blank"
+        rel="noopener"
+        className={linkClassName}
+      >
+        {linkContent}
+      </Link>
+    );
+  }
 
   return destination.source.kind === "route" ? (
     <Link
@@ -47,8 +62,11 @@ function DestinationLink({ destination }: { destination: InboundDestination }) {
  */
 export function EmailDeliversToRow({
   inboundDestinations,
+  chosenTargets,
 }: {
   inboundDestinations: InboundDestinations;
+  /** The endpoints chosen for this send, shown instead of the rule matches. */
+  chosenTargets: WebhookTarget[] | null;
 }) {
   const [isFormOpen, setFormOpen] = React.useState(false);
   const { matchResult, recipientAddress, isChecking } = inboundDestinations;
@@ -56,9 +74,14 @@ export function EmailDeliversToRow({
     return null;
   }
   const destinations =
-    matchResult === undefined ? [] : listInboundDestinations(matchResult);
+    matchResult === undefined
+      ? []
+      : listInboundDestinations(matchResult, chosenTargets);
   const hasNoDestination =
-    matchResult !== undefined && !inboundDestinations.hasDestinations;
+    matchResult !== undefined &&
+    (chosenTargets === null
+      ? !inboundDestinations.hasDestinations
+      : matchResult.routes.length === 0 && chosenTargets.length === 0);
 
   return (
     <div

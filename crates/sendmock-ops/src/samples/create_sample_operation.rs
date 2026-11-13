@@ -23,6 +23,8 @@ pub struct SampleRequest {
     pub subject: Option<String>,
     /// The HTML body of the sample email.
     pub html: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
@@ -47,6 +49,7 @@ impl Operation for CreateSampleOperation {
             cli_usage: "sendmock sample <kind>",
             mcp_tool: "sendmock_sample_send",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -58,6 +61,7 @@ impl Operation for CreateSampleOperation {
         operation_context: &OperationContext,
         input: SampleRequest,
     ) -> Result<CreatedSample, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         if input.kind == "sms" {
             return create_sample_sms(operation_context, input.to).await;
         }

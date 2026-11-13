@@ -50,6 +50,25 @@ Every enabled rule is checked, top to bottom, and **each matching rule creates i
 
 
 Every control and text, one by one: [Rules in depth](../deeper/webhooks/rules.md).
+### On every simulation
+
+Every action that simulates traffic names the webhooks its event will trigger before you run it, so you never have to guess which rules match:
+
+- **Mail:** each item of the **Simulate** menu (open, click, delivered, bounces, complaint, unsubscribe), the **Reply**, **Reply all** and **Forward** composers, and **Import .eml** stored as incoming.
+- **SMS:** **Simulate read** in a message's menu, **Set status** in the message details, and **Reply as recipient**.
+- **Payments:** each item of a payment's **Simulate** menu.
+- **Send a sample** buttons on empty screens.
+
+Composers show a **Webhooks** row above their buttons; menu items show the names under their label, or **No webhook**. Each name opens the endpoint in a new tab, so the form or menu stays as it was.
+
+To send one action somewhere else without changing any rule:
+
+1. Press **Change** in a composer, or **Choose** beside a menu item.
+2. Tick the endpoints that should get it. The rule matches start ticked; untick them all to send no webhook.
+3. Press **Use these** (a composer then sends to them) or the action's own button (a menu item runs at once).
+
+Each chosen endpoint gets one delivery with its own template and secret, marked `chosen` in [Deliveries](./deliveries.md). The choice is for that one action only; the link in the picker opens this screen filtered to the event, to change it for every event of that type. An SMS number's own callback URLs and a payment gateway's notification endpoint still get their requests, and traffic your app sends over SMTP or a provider API always follows the rules.
+
 ## Customize
 
 Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](../advanced/rules-and-filters.md).
@@ -64,6 +83,9 @@ Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](.
 | update | [`sendmock webhook rule update <ruleId>`](/cli/webhook-rules/#webhook-rule-update) | [`PATCH /api/v1/webhooks/rules/{ruleId}`](/api/webhook-rules/#patchWebhooksRulesByRuleId) | [`sendmock_webhook_rule_update`](/mcp/webhook-rules/#sendmock_webhook_rule_update) |
 | move | [`sendmock webhook rule move <ruleId>`](/cli/webhook-rules/#webhook-rule-move) | [`POST /api/v1/webhooks/rules/{ruleId}/move`](/api/webhook-rules/#postWebhooksRulesByRuleIdMove) | [`sendmock_webhook_rule_move`](/mcp/webhook-rules/#sendmock_webhook_rule_move) |
 | preview a filter | [`sendmock webhook rule preview`](/cli/webhook-rules/#webhook-rule-preview) | [`POST /api/v1/webhooks/rules/preview`](/api/webhook-rules/#postWebhooksRulesPreview) | [`sendmock_webhook_rule_preview`](/mcp/webhook-rules/#sendmock_webhook_rule_preview) |
+| which webhooks an event would trigger | [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match) | [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch) | [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match) |
+
+The simulating commands and tools take `--webhook <endpointId>` (repeat it for several) or `webhook_endpoint_ids` to send that one action to exactly those endpoints, for example `sendmock email simulate <emailId> bounced --webhook <endpointId>`.
 
 ## Related
 

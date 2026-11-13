@@ -18,6 +18,8 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 type StoredMessageInput = {
   from: string;
@@ -95,6 +97,12 @@ export const emailImportHandlers = [
   http.post("*/api/v1/emails/inbound", async ({ request }) => {
     await applyMockConditions();
     const inboundRequest = (await request.json()) as EmailInboundRequest;
+    const choiceRefusal = refuseUnavailableEndpoint(
+      inboundRequest.webhook_endpoint_ids,
+    );
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
     const messageParts =
       inboundRequest.raw === undefined
         ? {
@@ -109,11 +117,13 @@ export const emailImportHandlers = [
       return rejectMessage("from and to are required");
     }
 
-    return storeMessage({
-      ...messageParts,
-      source: "simulated",
-      isIncoming: true,
-    });
+    return runWithWebhookChoice(inboundRequest.webhook_endpoint_ids, () =>
+      storeMessage({
+        ...messageParts,
+        source: "simulated",
+        isIncoming: true,
+      }),
+    );
   }),
 
   http.post("*/api/v1/send/raw", async ({ request }) => {

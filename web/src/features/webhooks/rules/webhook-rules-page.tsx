@@ -1,5 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ListFilterIcon, PlusIcon } from "lucide-react";
+import { ListFilterIcon, PlusIcon, XIcon } from "lucide-react";
 
 import { usePageTitle } from "@/hooks/use-page-title";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
@@ -29,7 +29,9 @@ const allEndpoints = "all";
 /** Webhook rules: ordered list, endpoint filter and the rule editor (WH-02). */
 export function WebhookRulesPage() {
   usePageTitle("Rules", "Webhooks");
-  const { endpoint: endpointFilter } = useSearch({ from: "/webhooks/rules" });
+  const { endpoint: endpointFilter, event: eventFilter } = useSearch({
+    from: "/webhooks/rules",
+  });
   const navigate = useNavigate({ from: "/webhooks/rules" });
   const rulesQuery = useWebhookRules();
   const endpointsQuery = useWebhookEndpoints();
@@ -38,9 +40,12 @@ export function WebhookRulesPage() {
   const allRules = rulesQuery.data ?? [];
   const visibleRules = allRules.filter(
     (webhookRule) =>
-      endpointFilter === undefined ||
-      webhookRule.endpoint_id === endpointFilter,
+      (endpointFilter === undefined ||
+        webhookRule.endpoint_id === endpointFilter) &&
+      (eventFilter === undefined ||
+        webhookRule.events.some((ruleEvent) => ruleEvent === eventFilter)),
   );
+  const isFiltered = endpointFilter !== undefined || eventFilter !== undefined;
   const endpointNamesById = new Map(
     webhookEndpoints.map((webhookEndpoint) => [
       webhookEndpoint.id,
@@ -48,7 +53,9 @@ export function WebhookRulesPage() {
     ]),
   );
   const setEndpointFilter = (endpointId: string | undefined) => {
-    void navigate({ search: { endpoint: endpointId } });
+    void navigate({
+      search: (previousSearch) => ({ ...previousSearch, endpoint: endpointId }),
+    });
   };
 
   return (
@@ -98,6 +105,24 @@ export function WebhookRulesPage() {
               ))}
             </SelectContent>
           </Select>
+          {eventFilter !== undefined && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                void navigate({
+                  search: (previousSearch) => ({
+                    ...previousSearch,
+                    event: undefined,
+                  }),
+                });
+              }}
+            >
+              <span className="font-mono text-xs">{eventFilter}</span>
+              <XIcon />
+              <span className="sr-only">Show rules on every event</span>
+            </Button>
+          )}
         </div>
         <div className="min-w-0 rounded-lg border">
           {rulesQuery.isPending && <Skeleton className="m-4 h-24" />}
@@ -126,9 +151,13 @@ export function WebhookRulesPage() {
           )}
           {allRules.length > 0 && visibleRules.length === 0 && (
             <NoMatchState
-              message="This endpoint has no rules."
+              message={
+                eventFilter === undefined
+                  ? "This endpoint has no rules."
+                  : `No rule listens to ${eventFilter} here.`
+              }
               onClearFilter={() => {
-                setEndpointFilter(undefined);
+                void navigate({ search: {} });
               }}
             />
           )}
@@ -136,7 +165,7 @@ export function WebhookRulesPage() {
             <WebhookRulesTable
               webhookRules={visibleRules}
               endpointNamesById={endpointNamesById}
-              canReorder={endpointFilter === undefined}
+              canReorder={!isFiltered}
               rowActions={{
                 onMove: ruleActions.moveRule,
                 onToggleEnabled: ruleActions.toggleEnabled,

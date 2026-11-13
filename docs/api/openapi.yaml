@@ -6229,6 +6229,30 @@ paths:
       x-sendmock-cli: sendmock webhook rule preview
       x-sendmock-mcp: sendmock_webhook_rule_preview
       x-sendmock-ui: Webhooks > Rules > rule sheet > Preview
+  /api/v1/webhooks/rules/match:
+    post:
+      operationId: postWebhooksRulesMatch
+      summary: Which webhooks an event would trigger, before an action fires it.
+      tags:
+        - Webhook rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookRuleMatchRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookRuleMatchResult"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule match
+      x-sendmock-mcp: sendmock_webhook_rule_match
+      x-sendmock-ui: Webhooks row and menu hints on every simulating action
   /api/v1/webhooks/deliveries:
     get:
       operationId: getWebhooksDeliveries
@@ -8759,6 +8783,13 @@ components:
           description: The browser or client that clicked, kept in the click history. The UI sends its own.
           examples:
             - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
         - url
       description: Body of `POST /emails/{emailId}/clicks`.
@@ -8966,6 +8997,13 @@ components:
           description: Forwards the original attachments too (default true).
           examples:
             - true
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
         - to
       description: Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding).
@@ -9012,6 +9050,13 @@ components:
               \r
 
               Hello"
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       description: "Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`."
     EmailOutcomeKind:
       type: string
@@ -9223,6 +9268,13 @@ components:
           description: Quotes the original below an "On ... wrote:" line (default true).
           examples:
             - true
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       description: Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying).
     EmailResponseKind:
       type: string
@@ -10309,10 +10361,17 @@ components:
           items:
             $ref: "#/components/schemas/InlineSmsMedia"
           description: Files sent with the message, as MMS or WhatsApp media.
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
+        - body
         - from
         - to
-        - body
       description: Body of POST /api/v1/sms/inbound (simulate an incoming message).
     InboundWebhookMethod:
       type: string
@@ -10564,7 +10623,7 @@ components:
         - endpoint_id
         - endpoint_name
         - endpoint_url
-      description: An enabled webhook rule on `email.inbound` whose filter passes the email.
+      description: An enabled webhook rule on the event whose filter passes, with its endpoint.
     MessageProviderArea:
       type: string
       enum:
@@ -11255,6 +11314,13 @@ components:
           description: The browser or client that opened it, kept in the open history. The UI sends its own.
           examples:
             - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
     OpenRecord:
       type: object
@@ -12679,6 +12745,13 @@ components:
           description: "For `answer_dispute`: the evidence sent to the bank."
           examples:
             - Signed delivery receipt attached.
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -13725,6 +13798,13 @@ components:
           description: The HTML body of the sample email.
           examples:
             - <p>It works!</p>
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       description: Optional body of POST /api/v1/samples/email (`sendmock email send-test`).
     SaveAsTemplateRequest:
       type: object
@@ -14029,6 +14109,13 @@ components:
           description: "For `bounced` only: a hard bounce (the address does not exist) or a soft one (try again later)."
           examples:
             - hard
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
         - event
     SmsApi:
@@ -14665,6 +14752,13 @@ components:
           description: A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).
           examples:
             - "30003"
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
       required:
         - status
       description: "Body of `POST /sms/{smsId}/status`: a manual status change."
@@ -16538,6 +16632,43 @@ components:
           description: Off rules are kept but skipped.
           examples:
             - true
+    WebhookRuleMatchRequest:
+      type: object
+      properties:
+        event_type:
+          $ref: "#/components/schemas/AppEventType"
+          description: The event the action fires.
+          examples:
+            - email.bounced
+        subject_id:
+          $ref: "#/components/schemas/Ulid"
+          description: The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.
+        data:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.
+          examples:
+            - to:
+                - support@app.test
+              header:x-tenant:
+                - acme
+      required:
+        - event_type
+      description: "Body of POST /api/v1/webhooks/rules/match: the event an action is about to fire."
+    WebhookRuleMatchResult:
+      type: object
+      properties:
+        webhook_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchedWebhookRule"
+          description: The rules that would send, in rule order.
+      required:
+        - webhook_rules
+      description: The webhooks an event would trigger; nothing is stored or sent.
     WebhookRuleMove:
       type: object
       properties:

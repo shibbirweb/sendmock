@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { EndpointTestDialog } from "@/features/webhooks/endpoints/endpoint-test-dialog";
 import { WebhookEndpointSheet } from "@/features/webhooks/endpoints/sheet/webhook-endpoint-sheet";
+import { useOpenSearchedEndpoint } from "@/features/webhooks/endpoints/use-open-searched-endpoint";
 import { useWebhookEndpointActions } from "@/features/webhooks/endpoints/use-webhook-endpoint-actions";
 import { WebhookEndpointsTable } from "@/features/webhooks/endpoints/webhook-endpoints-table";
 import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
@@ -65,6 +66,7 @@ export function WebhookEndpointsPage() {
     openNewEndpointWithTemplate(templateToUse);
     void navigate({ search: {}, replace: true });
   }, [templateToUse, openNewEndpointWithTemplate, navigate]);
+  useOpenSearchedEndpoint(endpointsQuery.data, endpointActions.openSheet);
   const webhookEndpoints = endpointsQuery.data ?? [];
   const templateNamesById = new Map(
     (templatesQuery.data ?? []).map((webhookTemplate) => [

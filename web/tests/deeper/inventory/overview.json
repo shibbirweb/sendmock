@@ -26,7 +26,9 @@
       "paragraph: No failed deliveries. Every webhook got through.",
       "paragraph: Nothing yet. Send an email or SMS from your app, or try a sample.",
       "button: Send a sample email",
-      "button: Send a sample SMS"
+      "button: Choose webhooks for Send a sample email",
+      "button: Send a sample SMS",
+      "button: Choose webhooks for Send a sample SMS"
     ],
     "failing": [
       "alert: Could not load the overview. Check that SendMock is running. Try again",

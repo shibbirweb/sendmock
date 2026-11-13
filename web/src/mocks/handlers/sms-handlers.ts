@@ -24,6 +24,8 @@ import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { applySmsStatus } from "@/mocks/realtime/simulate-sms-delivery";
 import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
 import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 function findSms(smsId: unknown): SmsMessageDetail | undefined {
   return mockDatabase.smsMessages.find((smsMessage) => smsMessage.id === smsId);
@@ -144,9 +146,20 @@ export const smsHandlers = [
       return createNotFoundResponse("SMS");
     }
 
-    const { status, error_code: errorCode } =
-      (await request.json()) as SmsStatusUpdate;
-    applySmsStatus(smsMessage, status, errorCode ?? null);
+    const statusUpdate = (await request.json()) as SmsStatusUpdate;
+    const choiceRefusal = refuseUnavailableEndpoint(
+      statusUpdate.webhook_endpoint_ids,
+    );
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
+    runWithWebhookChoice(statusUpdate.webhook_endpoint_ids, () => {
+      applySmsStatus(
+        smsMessage,
+        statusUpdate.status,
+        statusUpdate.error_code ?? null,
+      );
+    });
 
     return HttpResponse.json(smsMessage);
   }),
@@ -191,17 +204,26 @@ export const smsHandlers = [
       );
     }
 
+    const openRequest = await readOpenEventRequest(request);
+    const choiceRefusal = refuseUnavailableEndpoint(
+      openRequest.webhook_endpoint_ids,
+    );
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
     const recordedOpen = recordMockOpen(
       smsMessage,
-      await readOpenEventRequest(request),
+      openRequest,
       mockDatabase.settings,
       mockDatabase.messageOpens,
     );
     if (recordedOpen) {
-      publishMockEvent(
-        "sms.opened",
-        describeMockOpen(smsMessage, recordedOpen),
-      );
+      runWithWebhookChoice(openRequest.webhook_endpoint_ids, () => {
+        publishMockEvent(
+          "sms.opened",
+          describeMockOpen(smsMessage, recordedOpen),
+        );
+      });
     }
 
     return new HttpResponse(null, { status: 204 });

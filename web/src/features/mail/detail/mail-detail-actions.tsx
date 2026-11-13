@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
   DownloadIcon,
-  EyeIcon,
   FlaskConicalIcon,
   MailIcon,
   MailOpenIcon,
@@ -14,17 +13,14 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { IconButton } from "@/components/common/icon-button";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MailSimulateMenu } from "@/features/mail/detail/mail-simulate-menu";
 import { ReleaseEmailDialog } from "@/features/mail/detail/release-email-dialog";
-import { SimulateClickMenu } from "@/features/mail/detail/simulate-click-menu";
 import {
   canRespondToEmail,
   type EmailComposerMode,
@@ -39,20 +35,10 @@ import { appShortcuts } from "@/features/shortcuts/shortcut-catalog";
 import { buildApiUrl } from "@/lib/api/api-client";
 import {
   useDeleteEmail,
-  useOpenEmail,
-  useSimulateEmailOutcome,
   useUpdateEmail,
 } from "@/lib/api/hooks/use-email-queries";
 import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
-import type { EmailDetail, SimulatedEmailOutcome } from "@/lib/api/types";
-
-const simulatedOutcomes: { label: string; outcome: SimulatedEmailOutcome }[] = [
-  { label: "Delivered", outcome: { event: "delivered" } },
-  { label: "Hard bounce", outcome: { event: "bounced", bounce_type: "hard" } },
-  { label: "Soft bounce", outcome: { event: "bounced", bounce_type: "soft" } },
-  { label: "Spam complaint", outcome: { event: "complained" } },
-  { label: "Unsubscribe", outcome: { event: "unsubscribed" } },
-];
+import type { EmailDetail } from "@/lib/api/types";
 
 export function MailDetailActions({
   email,
@@ -63,8 +49,6 @@ export function MailDetailActions({
 }) {
   const navigate = useNavigate();
   const updateEmail = useUpdateEmail();
-  const openEmail = useOpenEmail();
-  const simulateOutcome = useSimulateEmailOutcome();
   const deleteEmail = useDeleteEmail();
   const [isReleaseDialogOpen, setReleaseDialogOpen] = React.useState(false);
   const [isSendDialogOpen, setSendDialogOpen] = React.useState(false);
@@ -118,42 +102,7 @@ export function MailDetailActions({
         </OperationButton>
       )}
       {isSentByApp && simulateAvailability.isAvailable && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" aria-label="Simulate an event">
-              <FlaskConicalIcon />
-              Simulate
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onSelect={() => {
-                openEmail.mutate({ emailId: email.id, openSource: "manual" });
-                toast("email.opened fired");
-              }}
-            >
-              <EyeIcon />
-              Open (email.opened)
-            </DropdownMenuItem>
-            <SimulateClickMenu email={email} />
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Delivery outcome</DropdownMenuLabel>
-            {simulatedOutcomes.map(({ label, outcome }) => (
-              <DropdownMenuItem
-                key={label}
-                onSelect={() => {
-                  simulateOutcome.mutate({
-                    emailId: email.id,
-                    simulatedOutcome: outcome,
-                  });
-                  toast(`Simulated: ${label.toLowerCase()}`);
-                }}
-              >
-                {label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <MailSimulateMenu email={email} />
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

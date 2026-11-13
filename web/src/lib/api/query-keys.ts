@@ -12,12 +12,13 @@ import type {
   PaymentListFilters,
   PushListFilters,
   RulePreviewRequest,
-  TemplateRenderRequest,
-  VariablePreviewRequest,
   SmsListFilters,
   SmtpSessionListFilters,
+  TemplateRenderRequest,
+  VariablePreviewRequest,
   VerificationListFilters,
   WebhookMetricsQuery,
+  WebhookRuleMatchRequest,
 } from "@/lib/api/types";
 
 /**
@@ -77,6 +78,8 @@ export const queryKeys = {
     rules: ["webhooks", "rules"] as const,
     rulePreview: (previewRequest: RulePreviewRequest) =>
       ["webhooks", "rule-preview", previewRequest] as const,
+    ruleMatch: (matchRequest: WebhookRuleMatchRequest) =>
+      ["webhooks", "rule-match", matchRequest] as const,
     deliveries: (deliveryFilters: DeliveryListFilters) =>
       ["webhooks", "deliveries", deliveryFilters] as const,
     delivery: (deliveryId: string) =>

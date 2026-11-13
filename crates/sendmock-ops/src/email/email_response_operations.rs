@@ -33,6 +33,8 @@ pub struct EmailReplyInput {
     pub reply_all: Option<bool>,
     /// Quotes the original below an "On ... wrote:" line (default true).
     pub include_original: Option<bool>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -50,6 +52,8 @@ pub struct EmailForwardInput {
     pub include_original: Option<bool>,
     /// Forwards the original attachments too (default true).
     pub include_attachments: Option<bool>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 fn invalid_input(field_name: &str, message: &str) -> OperationError {
@@ -97,6 +101,7 @@ impl Operation for ReplyToEmailOperation {
             cli_usage: "sendmock email reply <emailId>",
             mcp_tool: "sendmock_email_reply",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -108,6 +113,7 @@ impl Operation for ReplyToEmailOperation {
         operation_context: &OperationContext,
         input: EmailReplyInput,
     ) -> Result<EmailDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let original_email = find_original(operation_context, &input.email_id).await?;
         let responder = read_responder(&original_email, input.from.as_deref());
         let responder_address = read_bare_address(&responder);
@@ -179,6 +185,7 @@ impl Operation for ForwardEmailOperation {
             cli_usage: "sendmock email forward <emailId>",
             mcp_tool: "sendmock_email_forward",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -190,6 +197,7 @@ impl Operation for ForwardEmailOperation {
         operation_context: &OperationContext,
         input: EmailForwardInput,
     ) -> Result<EmailDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let original_email = find_original(operation_context, &input.email_id).await?;
         if !read_bare_address(&input.to).contains('@') {
             return Err(invalid_input("to", "Enter the address to forward to"));

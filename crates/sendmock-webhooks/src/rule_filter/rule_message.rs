@@ -29,6 +29,14 @@ impl RuleMessage {
         self
     }
 
+    /// Sets one header's values, keeping the others.
+    pub fn with_header(mut self, header_name: &str, values: Vec<String>) -> Self {
+        self.header_values
+            .get_or_insert_with(BTreeMap::new)
+            .insert(header_name.to_ascii_lowercase(), values);
+        self
+    }
+
     /// The field's values, or none when this message has no such field. A missing header is
     /// an empty list on a message that has headers.
     pub fn read_field(&self, field_key: &str) -> Option<Vec<String>> {
@@ -41,5 +49,29 @@ impl RuleMessage {
             });
         }
         self.field_values.get(field_key).cloned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn one_header_can_be_set_without_losing_the_others() {
+        let rule_message = RuleMessage::default()
+            .with_headers(BTreeMap::from([(
+                "X-Tenant".to_owned(),
+                vec!["acme".to_owned()],
+            )]))
+            .with_header("Subject", vec!["Re: Hi".to_owned()]);
+
+        assert_eq!(
+            rule_message.read_field("header:x-tenant"),
+            Some(vec!["acme".to_owned()])
+        );
+        assert_eq!(
+            rule_message.read_field("header:subject"),
+            Some(vec!["Re: Hi".to_owned()])
+        );
     }
 }

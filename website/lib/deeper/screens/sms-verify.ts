@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeChooseWebhooks } from "./webhook-target-entries";
 
 const verificationEntries: DeeperEntry[] = [
   {
@@ -227,6 +228,10 @@ const verifyEmptyAndFailingEntries: DeeperEntry[] = [
     changes: "Fires `verify.started` and stores the SMS with the code.",
     operationIds: ["postSamplesByKind"],
   },
+  describeChooseWebhooks(
+    "button: Choose webhooks for Start a sample verification",
+    "postSamplesByKind",
+  ),
   {
     control: "alert: Could not load verifications. Try again",
     does: "Shown when the verifications could not be loaded.",

@@ -22,6 +22,7 @@
       "link: #:#",
       "img: Undelivered: # Unreachable destination handset",
       "button: Message actions",
+      "button: Change",
       "button: Attach files",
       "textbox: Reply as +#",
       "button: Send reply",
@@ -29,7 +30,8 @@
     ],
     "Message actions menu": [
       "menuitem: Message details",
-      "menuitem: Simulate read",
+      "menuitem: Simulate read No webhook",
+      "menuitem: Choose webhooks for Simulate read",
       "menuitem: Send to webhook",
       "menuitem: Copy text",
       "menuitem: Copy message ID",
@@ -46,6 +48,8 @@
       "button: Delivered",
       "button: Undelivered",
       "button: Failed",
+      "link: SMS status callbacks",
+      "button: Change",
       "tab: Status",
       "tab: Request",
       "tab: Callbacks (#)",
@@ -68,7 +72,8 @@
       "button: Copy Twilio base URL",
       "button: Copy Vonage base URL",
       "link: More snippets",
-      "button: Send a sample SMS"
+      "button: Send a sample SMS",
+      "button: Choose webhooks for Send a sample SMS"
     ],
     "failing": [
       "alert: Could not load conversations. Try again",

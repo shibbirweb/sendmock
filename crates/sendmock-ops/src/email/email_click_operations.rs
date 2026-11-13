@@ -23,6 +23,8 @@ pub struct EmailClickRequest {
     pub source: Option<OpenSource>,
     /// The browser or client that clicked, kept in the click history.
     pub user_agent: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 /// One click on a link of an email, as the click history lists it.
@@ -70,6 +72,7 @@ impl Operation for RecordEmailClickOperation {
             cli_usage: "sendmock email click <emailId>",
             mcp_tool: "sendmock_email_click",
             success_status: SuccessStatus::NoContent,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -80,6 +83,7 @@ impl Operation for RecordEmailClickOperation {
         operation_context: &OperationContext,
         input: EmailClickRequest,
     ) -> Result<NoContent, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let email = find_email_or_not_found(operation_context, &input.email_id).await?;
         if !email.links.contains(&input.url) {
             let email_links = if email.links.is_empty() {

@@ -19,6 +19,7 @@ import type {
   OpenSource,
   PageOf,
   SimulatedEmailOutcome,
+  WebhookChoice,
 } from "@/lib/api/types";
 
 export function useEmailList(emailFilters: EmailListFilters = {}) {
@@ -113,10 +114,18 @@ export function useDeleteAllEmails() {
 
 export function useOpenEmail() {
   return useEmailMutation(
-    ({ emailId, openSource }: { emailId: string; openSource: OpenSource }) =>
+    ({
+      emailId,
+      openSource,
+      webhookChoice,
+    }: {
+      emailId: string;
+      openSource: OpenSource;
+      webhookChoice?: WebhookChoice;
+    }) =>
       requestApi<void>(`/emails/${emailId}/open`, {
         method: "POST",
-        requestBody: buildOpenEventRequest(openSource),
+        requestBody: { ...buildOpenEventRequest(openSource), ...webhookChoice },
       }),
   );
 }
@@ -128,14 +137,20 @@ export function useClickEmailLink() {
       emailId,
       url,
       clickSource,
+      webhookChoice,
     }: {
       emailId: string;
       url: string;
       clickSource: OpenSource;
+      webhookChoice?: WebhookChoice;
     }) =>
       requestApi<void>(`/emails/${emailId}/clicks`, {
         method: "POST",
-        requestBody: { url, ...buildOpenEventRequest(clickSource) },
+        requestBody: {
+          url,
+          ...buildOpenEventRequest(clickSource),
+          ...webhookChoice,
+        },
       }),
   );
 }

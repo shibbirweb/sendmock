@@ -41,4 +41,6 @@ pub struct PaymentSimulateRequest {
     pub dispute_outcome: Option<DisputeOutcome>,
     /// For `answer_dispute`: the evidence sent to the bank.
     pub dispute_evidence: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }

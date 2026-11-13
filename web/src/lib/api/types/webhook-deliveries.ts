@@ -2,7 +2,8 @@ import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
 import type { HttpMethod } from "@/lib/api/types/webhook-endpoints";
 
-export type DeliveryTrigger = "auto" | "manual" | "replay";
+/** Why a delivery was made: a rule (`auto`), by hand, a replay, or `chosen` for one simulation (WH-13.5). */
+export type DeliveryTrigger = "auto" | "manual" | "replay" | "chosen";
 export type DeliveryStatus =
   | "pending"
   | "render_failed"

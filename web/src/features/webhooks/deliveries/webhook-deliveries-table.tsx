@@ -21,6 +21,7 @@ const triggerClassNames: Record<WebhookDelivery["trigger"], string> = {
   auto: "text-muted-foreground",
   manual: "border-primary/40",
   replay: "border-primary/40",
+  chosen: "border-primary/40",
 };
 
 function DeliveryRow({

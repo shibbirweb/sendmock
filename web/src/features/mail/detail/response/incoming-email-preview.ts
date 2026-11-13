@@ -54,3 +54,15 @@ export function buildIncomingEmailPreview(
     headers,
   };
 }
+
+/** The fields rule filters read from the incoming email before it exists (WH-13.1). */
+export function toIncomingRuleFields(
+  matchRequest: InboundRouteMatchRequest,
+): Record<string, string[]> {
+  return {
+    to: matchRequest.to,
+    cc: matchRequest.cc ?? [],
+    subject: [matchRequest.headers?.subject ?? ""],
+    from: [readBareAddress(matchRequest.headers?.from ?? "")],
+  };
+}

@@ -142,6 +142,7 @@ impl Operation for SimulateInboundSmsOperation {
             cli_usage: "sendmock sms inbound",
             mcp_tool: "sendmock_sms_simulate_inbound",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -153,6 +154,7 @@ impl Operation for SimulateInboundSmsOperation {
         operation_context: &OperationContext,
         input: InboundSmsRequest,
     ) -> Result<SmsMessageDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         require_text("from", &input.from)?;
         require_text("to", &input.to)?;
         let media = match accept_media(

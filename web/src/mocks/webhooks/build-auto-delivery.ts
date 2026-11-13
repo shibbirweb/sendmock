@@ -1,6 +1,10 @@
 import { faker } from "@faker-js/faker/locale/en";
 
-import type { AppEvent, WebhookDelivery, WebhookRule } from "@/lib/api/types";
+import type {
+  AppEvent,
+  DeliveryTrigger,
+  WebhookDelivery,
+} from "@/lib/api/types";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
@@ -8,19 +12,22 @@ import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-re
 const mockFailureRate = 0.15;
 
 /**
- * The delivery a matching rule creates for an event: usually answered 200,
- * sometimes 503 with a retry scheduled, so the log shows both.
+ * The delivery a matching rule, or an endpoint chosen for one simulation,
+ * creates for an event: usually answered 200, sometimes 503 with a retry
+ * scheduled, so the log shows both.
  */
 export function buildAutoDelivery({
   appEvent,
-  webhookRule,
+  ruleId,
   endpointRecord,
   subjectId,
+  trigger,
 }: {
   appEvent: AppEvent;
-  webhookRule: WebhookRule;
+  ruleId: string | null;
   endpointRecord: WebhookEndpointRecord;
   subjectId: string | null;
+  trigger: Extract<DeliveryTrigger, "auto" | "chosen">;
 }): WebhookDelivery {
   const hasFailed = faker.number.float() < mockFailureRate;
   const firstRetryDelaySeconds =
@@ -30,11 +37,11 @@ export function buildAutoDelivery({
     id: createMockUlid(),
     endpoint_id: endpointRecord.id,
     endpoint_name: endpointRecord.name,
-    rule_id: webhookRule.id,
+    rule_id: ruleId,
     event_id: appEvent.id,
     event_type: appEvent.type,
     subject_id: subjectId,
-    trigger: "auto",
+    trigger,
     attempt: 1,
     status: hasFailed ? "failed" : "succeeded",
     url: endpointRecord.url,

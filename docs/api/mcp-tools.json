@@ -640,6 +640,20 @@
           "allowed_values": null,
           "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -672,6 +686,18 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -686,6 +712,10 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -1165,6 +1195,20 @@
           "allowed_values": null,
           "description": "Forwards the original attachments too (default true).",
           "example": true
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -1218,12 +1262,30 @@
             "examples": [
               true
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
           "email_id",
           "to"
-        ]
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
@@ -1397,6 +1459,20 @@
           "allowed_values": null,
           "description": "A whole message (RFC 5322); when set, the other fields are ignored.",
           "example": "From: sam@customer.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -1448,6 +1524,24 @@
             "examples": [
               "From: sam@customer.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          }
+        },
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -1963,6 +2057,20 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -1988,6 +2096,18 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -2001,6 +2121,10 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -4415,6 +4539,20 @@
           "allowed_values": null,
           "description": "Quotes the original below an \"On ... wrote:\" line (default true).",
           "example": true
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -4461,11 +4599,29 @@
             "examples": [
               true
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
           "email_id"
-        ]
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
@@ -4946,6 +5102,20 @@
           ],
           "description": "For `bounced` only: a hard bounce (the address does not exist) or a soft one (try again later).",
           "example": "hard"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -4975,6 +5145,18 @@
             "examples": [
               "hard"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -4992,13 +5174,20 @@
               "unsubscribed"
             ],
             "description": "Simulated delivery outcome, null when no outcome was simulated."
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "event": "bounced",
-        "bounce_type": "hard"
+        "bounce_type": "hard",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": null,
       "cli": [
@@ -15863,6 +16052,20 @@
           "allowed_values": null,
           "description": "For `answer_dispute`: the evidence sent to the bank.",
           "example": "Signed delivery receipt attached."
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -15913,6 +16116,18 @@
             "examples": [
               "Signed delivery receipt attached."
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -15944,6 +16159,10 @@
               "capture",
               "void"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -17083,6 +17302,20 @@
           "allowed_values": null,
           "description": "The HTML body of the sample email.",
           "example": "<p>It works!</p>"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -17115,11 +17348,29 @@
             "examples": [
               "<p>It works!</p>"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
           "kind"
-        ]
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
       },
       "example_arguments": {
         "kind": "email",
@@ -18717,6 +18968,20 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -18742,6 +19007,18 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -18755,6 +19032,10 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -21355,6 +21636,20 @@
           "allowed_values": null,
           "description": "A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).",
           "example": "30003"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -21383,6 +21678,18 @@
             "examples": [
               "30003"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -21400,13 +21707,20 @@
               "failed",
               "received"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
       "example_arguments": {
         "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "status": "delivered",
-        "error_code": "30003"
+        "error_code": "30003",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": "SmsMessageDetail",
       "cli": [
@@ -21519,6 +21833,20 @@
               "content_type": "image/jpeg"
             }
           ]
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
         }
       ],
       "input_schema": {
@@ -21574,6 +21902,18 @@
                 }
               ]
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
           }
         },
         "required": [
@@ -21619,6 +21959,10 @@
               "sms",
               "whatsapp"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
           }
         }
       },
@@ -21626,7 +21970,10 @@
         "from": "+8801700000000",
         "to": "+15550001111",
         "body": "STOP",
-        "channel": "sms"
+        "channel": "sms",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": "SmsMessageDetail",
       "cli": [
@@ -27342,6 +27689,222 @@
       ],
       "ui": [
         "Webhooks > Rules"
+      ]
+    },
+    {
+      "name": "sendmock_webhook_rule_match",
+      "toolset": "webhooks",
+      "summary": "Which webhooks an event would trigger, before an action fires it.",
+      "area": "Webhook rules",
+      "area_slug": "webhook-rules",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks/rules/match",
+          "operation_id": "postWebhooksRulesMatch",
+          "summary": "Which webhooks an event would trigger, before an action fires it.",
+          "area_slug": "webhook-rules",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "event_type",
+          "input": {
+            "name": "event_type",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": [
+            "email.received",
+            "email.inbound",
+            "email.opened",
+            "email.clicked",
+            "email.delivered",
+            "email.deferred",
+            "email.bounced",
+            "email.complained",
+            "email.unsubscribed",
+            "email.released",
+            "email.deleted",
+            "sms.sent",
+            "sms.status",
+            "sms.opened",
+            "sms.inbound",
+            "sms.reply_webhook",
+            "verify.started",
+            "verify.checked",
+            "verify.expired",
+            "push.sent",
+            "push.failed",
+            "http.captured",
+            "payment.created",
+            "payment.authorized",
+            "payment.succeeded",
+            "payment.failed",
+            "payment.canceled",
+            "payment.refunded",
+            "payment.partially_refunded",
+            "payment.dispute_opened",
+            "payment.dispute_updated",
+            "payment.dispute_closed",
+            "checkout.completed",
+            "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
+            "webhook.delivered",
+            "webhook.failed",
+            "test.ping",
+            "traffic.pruned"
+          ],
+          "description": "The event the action fires.",
+          "example": "email.bounced"
+        },
+        {
+          "name": "subject_id",
+          "input": {
+            "name": "subject_id",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.",
+          "example": ""
+        },
+        {
+          "name": "data",
+          "input": {
+            "name": "data",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.",
+          "example": {
+            "to": [
+              "support@app.test"
+            ],
+            "header:x-tenant": [
+              "acme"
+            ]
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "event_type": {
+            "$ref": "#/$defs/AppEventType",
+            "description": "The event the action fires.",
+            "examples": [
+              "email.bounced"
+            ]
+          },
+          "subject_id": {
+            "$ref": "#/$defs/Ulid",
+            "description": "The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.",
+            "examples": [
+              ""
+            ]
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.",
+            "examples": [
+              {
+                "to": [
+                  "support@app.test"
+                ],
+                "header:x-tenant": [
+                  "acme"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "event_type"
+        ],
+        "$defs": {
+          "AppEventType": {
+            "type": "string",
+            "enum": [
+              "email.received",
+              "email.inbound",
+              "email.opened",
+              "email.clicked",
+              "email.delivered",
+              "email.deferred",
+              "email.bounced",
+              "email.complained",
+              "email.unsubscribed",
+              "email.released",
+              "email.deleted",
+              "sms.sent",
+              "sms.status",
+              "sms.opened",
+              "sms.inbound",
+              "sms.reply_webhook",
+              "verify.started",
+              "verify.checked",
+              "verify.expired",
+              "push.sent",
+              "push.failed",
+              "http.captured",
+              "payment.created",
+              "payment.authorized",
+              "payment.succeeded",
+              "payment.failed",
+              "payment.canceled",
+              "payment.refunded",
+              "payment.partially_refunded",
+              "payment.dispute_opened",
+              "payment.dispute_updated",
+              "payment.dispute_closed",
+              "checkout.completed",
+              "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
+              "webhook.delivered",
+              "webhook.failed",
+              "test.ping",
+              "traffic.pruned"
+            ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
+      },
+      "example_arguments": {
+        "event_type": "email.bounced"
+      },
+      "output": "WebhookRuleMatchResult",
+      "cli": [
+        "sendmock webhook rule match"
+      ],
+      "ui": [
+        "Webhooks row and menu hints on every simulating action"
       ]
     },
     {

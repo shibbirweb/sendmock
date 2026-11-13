@@ -68,7 +68,8 @@
       "button: Copy Twilio base URL",
       "button: Copy Start a verification",
       "link: More snippets",
-      "button: Start a sample verification"
+      "button: Start a sample verification",
+      "button: Choose webhooks for Start a sample verification"
     ],
     "failing": [
       "alert: Could not load verifications. Try again",

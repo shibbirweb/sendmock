@@ -17,7 +17,7 @@ pub struct WebhookDelivery {
     pub event_type: String,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub subject_id: Option<String>,
-    /// `auto`, `manual` or `replay`.
+    /// `auto` (a rule), `manual`, `replay` or `chosen` (picked for one simulation).
     pub trigger: String,
     pub attempt: u32,
     pub status: String,

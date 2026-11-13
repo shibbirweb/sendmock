@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
 import { OperationMenuItem } from "@/features/availability/operation-button";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import { useDeleteSms, useOpenSms } from "@/lib/api/hooks/use-sms-queries";
 import type { SmsMessage } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -42,10 +44,13 @@ export function SmsMessageActions({
   const openSms = useOpenSms();
   const deleteSms = useDeleteSms();
   const isOutbound = smsMessage.direction === "outbound";
+  const isOpenServed = useOperationAvailability(
+    "POST /api/v1/sms/{smsId}/open",
+  ).isAvailable;
   const [isSendDialogOpen, setSendDialogOpen] = React.useState(false);
 
   return (
-    <>
+    <WebhookTargets.MenuScope>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <IconButton
@@ -73,22 +78,42 @@ export function SmsMessageActions({
           <DropdownMenuSeparator />
           {isOutbound && (
             <>
-              <OperationMenuItem
-                operationKey="POST /api/v1/sms/{smsId}/open"
-                onSelect={() => {
-                  openSms.mutate(
-                    { smsId: smsMessage.id, openSource: "manual" },
-                    {
-                      onSuccess: () => {
-                        toast("Read event fired");
-                      },
+              {isOpenServed ? (
+                <WebhookTargets.MenuItem
+                  targetEvent={{
+                    eventType: "sms.opened",
+                    subjectId: smsMessage.id,
+                    data: {
+                      open_count: [String(smsMessage.open_count + 1)],
+                      first_open: [String(smsMessage.open_count === 0)],
+                      source: ["manual"],
                     },
-                  );
-                }}
-              >
-                <CheckCheckIcon />
-                Simulate read
-              </OperationMenuItem>
+                  }}
+                  actionLabel="Simulate read"
+                  onSimulate={(webhookChoice) => {
+                    openSms.mutate(
+                      {
+                        smsId: smsMessage.id,
+                        openSource: "manual",
+                        webhookChoice,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast("Read event fired");
+                        },
+                      },
+                    );
+                  }}
+                >
+                  <CheckCheckIcon />
+                  Simulate read
+                </WebhookTargets.MenuItem>
+              ) : (
+                <OperationMenuItem operationKey="POST /api/v1/sms/{smsId}/open">
+                  <CheckCheckIcon />
+                  Simulate read
+                </OperationMenuItem>
+              )}
               <DropdownMenuSeparator />
             </>
           )}
@@ -140,6 +165,6 @@ export function SmsMessageActions({
           }}
         />
       )}
-    </>
+    </WebhookTargets.MenuScope>
   );
 }

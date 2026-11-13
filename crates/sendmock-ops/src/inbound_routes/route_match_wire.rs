@@ -4,6 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use super::route_wire::InboundRouteAction;
+pub use crate::webhooks::MatchedWebhookRule;
 
 /// Body of `POST /api/v1/inbound-routes/match`: the email about to arrive.
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -31,16 +32,6 @@ pub struct MatchedInboundRoute {
     pub action_expressions: Vec<String>,
     /// The route calls `stop()`, so no later route runs.
     pub calls_stop: bool,
-}
-
-/// An enabled webhook rule on `email.inbound` whose filter passes the email.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
-pub struct MatchedWebhookRule {
-    pub rule_id: String,
-    pub rule_name: String,
-    pub endpoint_id: String,
-    pub endpoint_name: String,
-    pub endpoint_url: String,
 }
 
 /// Where an incoming email would go; nothing is stored or sent.

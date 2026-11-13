@@ -112,3 +112,50 @@ export type RulePreviewResult = {
   /** Newest first. */
   items: RulePreviewItem[];
 };
+
+/** An enabled webhook rule on the event whose filter passes, with its endpoint (WH-13.1). */
+export type MatchedWebhookRule = {
+  rule_id: Ulid;
+  /**
+   * The rule's name.
+   * @example "Replies to my app"
+   */
+  rule_name: string;
+  endpoint_id: Ulid;
+  /**
+   * The endpoint's name.
+   * @example "Local app"
+   */
+  endpoint_name: string;
+  /**
+   * Where the rule sends.
+   * @example "http://localhost:8000/webhooks/sendmock"
+   */
+  endpoint_url: string;
+};
+
+/** Body of POST /api/v1/webhooks/rules/match: the event an action is about to fire (WH-13.1). */
+export type WebhookRuleMatchRequest = {
+  /**
+   * The event the action fires.
+   * @example "email.bounced"
+   */
+  event_type: AppEventType;
+  /**
+   * The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.
+   */
+  subject_id?: Ulid;
+  /**
+   * Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.
+   * @example {"to":["support@app.test"],"header:x-tenant":["acme"]}
+   */
+  data?: Record<string, string[]>;
+};
+
+/** The webhooks an event would trigger; nothing is stored or sent. */
+export type WebhookRuleMatchResult = {
+  /**
+   * The rules that would send, in rule order.
+   */
+  webhook_rules: MatchedWebhookRule[];
+};

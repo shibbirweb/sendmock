@@ -17,6 +17,8 @@ pub enum DeliveryTrigger {
     /// Sent by hand: Send test, Send to webhook, the composer.
     Manual,
     Replay,
+    /// The action that fired the event chose the endpoint instead of the rules (WH-13.5).
+    Chosen,
 }
 
 impl DeliveryTrigger {
@@ -25,6 +27,7 @@ impl DeliveryTrigger {
             Self::Automatic => "auto",
             Self::Manual => "manual",
             Self::Replay => "replay",
+            Self::Chosen => "chosen",
         }
     }
 }

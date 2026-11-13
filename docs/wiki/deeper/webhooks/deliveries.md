@@ -99,7 +99,7 @@ Column.
 
 Column.
 
-- **What it does:** What started it: a rule, a test, a manual send, a replay or a saved delivery.
+- **What it does:** What started it: a rule, a test, a manual send, a replay, a saved delivery, or an endpoint chosen for one simulation.
 
 ### 15. Status
 

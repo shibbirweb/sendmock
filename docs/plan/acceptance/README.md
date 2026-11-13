@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 119 / 133 features, 580 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 120 / 133 features, 585 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -117,7 +117,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | Accepted |
 | [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 3 | Accepted |
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
-| [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Not started |
+| [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Accepted |
 | [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Not started |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |

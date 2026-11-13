@@ -1,4 +1,9 @@
-import type { IsoTimestamp, PageRequest, Ulid } from "@/lib/api/types/common";
+import type {
+  IsoTimestamp,
+  PageRequest,
+  Ulid,
+  WebhookChoice,
+} from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
 import type { PaymentFlowDefinition } from "@/lib/api/types/payment-flows";
 import type { DeliveryStatus } from "@/lib/api/types/webhooks";
@@ -278,7 +283,7 @@ export type PaymentSimulateAction =
   | "void";
 
 /** Body of POST /api/v1/payments/{paymentId}/simulate (PY-09.3). */
-export type PaymentSimulateRequest = {
+export type PaymentSimulateRequest = WebhookChoice & {
   /**
    * What happens to the payment: `succeed`, `decline`, `refund`, `dispute`, `answer_dispute`, `resolve_dispute`, `expire`, `capture` or `void`.
    * @example "refund"

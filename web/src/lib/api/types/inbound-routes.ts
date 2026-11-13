@@ -1,4 +1,5 @@
 import type { IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type { MatchedWebhookRule } from "@/lib/api/types/webhook-rules";
 
 /** Which incoming emails a route takes (Mailgun's filters, WH-12). */
 export type InboundRouteFilter =
@@ -166,27 +167,6 @@ export type MatchedInboundRoute = {
   action_expressions: string[];
   /** The route calls `stop()`, so no later route runs. */
   calls_stop: boolean;
-};
-
-/** An enabled webhook rule on `email.inbound` whose filter passes the email. */
-export type MatchedWebhookRule = {
-  rule_id: Ulid;
-  /**
-   * The rule's name.
-   * @example "Replies to my app"
-   */
-  rule_name: string;
-  endpoint_id: Ulid;
-  /**
-   * The endpoint's name.
-   * @example "Local app"
-   */
-  endpoint_name: string;
-  /**
-   * Where the rule sends.
-   * @example "http://localhost:8000/webhooks/sendmock"
-   */
-  endpoint_url: string;
 };
 
 /** Where an incoming email would go; nothing is stored or sent. */

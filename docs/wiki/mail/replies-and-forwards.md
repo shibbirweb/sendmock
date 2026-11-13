@@ -36,6 +36,8 @@ When nothing would receive it, the row says **Nothing receives this yet**. To se
 
 The new route shows in the row and in Webhooks > Inbound routes, where **More options** opens the full editor.
 
+Below it, the **Webhooks** row names the endpoints the email's `email.inbound` will reach through [webhook rules](../webhooks/rules.md#on-every-simulation), each opening in a new tab. **Change** picks other endpoints for this one reply or forward; **Delivers to** then lists them as "Chosen" in place of the rule matches, and **Use the rules** goes back.
+
 ## After sending
 
 The toast lists each webhook request the email caused, with its URL and status. The status moves from pending to the HTTP status (or the error) as the request is answered, and each line opens the request in [Deliveries](../webhooks/deliveries.md). **Open** jumps to the new email, whose header lists the same requests. When nothing received it, both say so and link to Webhooks > Inbound routes.

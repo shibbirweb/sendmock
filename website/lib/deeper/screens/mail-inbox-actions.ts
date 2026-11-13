@@ -1,4 +1,9 @@
 import type { DeeperEntry } from "../deeper-types";
+import {
+  describeChangeWebhooks,
+  describeChooseWebhooks,
+  webhookTargetsUnderLabel,
+} from "./webhook-target-entries";
 
 /** Mail: the reply and forward composers, the menus and the dialogs of an open email. */
 export const mailInboxActionEntries: DeeperEntry[] = [
@@ -38,6 +43,10 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     operationIds: ["postInboundRoutesMatch", "postInboundRoutes"],
     links: "[Inbound routes](../../webhooks/inbound-routes.md).",
   },
+  describeChangeWebhooks(
+    "the reply or forward's `email.inbound`",
+    "It checks again as you edit the Forward address, subject or message.",
+  ),
   {
     control: "button: Send reply",
     does: "Stores the reply as an incoming email with `In-Reply-To` and `References` set. It can be sent as prefilled, edited or with an empty message box. A notice says it was created, lists each webhook request it caused with its URL and status (moving from pending to the answer), each linking to the delivery, and offers Open to read it.",
@@ -58,11 +67,15 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     links: "[Inbound routes](../../webhooks/inbound-routes.md).",
   },
   {
-    control: "menuitem: Open (email.opened)",
-    does: "Records an open of the email, as a tracking pixel would.",
+    control: "menuitem: Open (email.opened) No webhook",
+    does: `Records an open of the email, as a tracking pixel would. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.opened` with `first_open` and the open count.",
     operationIds: ["postEmailsByEmailIdOpen"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate open",
+    "postEmailsByEmailIdOpen",
+  ),
   {
     control: "menuitem: Click a link (email.clicked)",
     does: "Lists the email's links; choosing one records a click on it, as a provider's click tracking would. Shown when the email has links.",
@@ -70,36 +83,56 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     operationIds: ["postEmailsByEmailIdClicks"],
   },
   {
-    control: "menuitem: Delivered",
-    does: "Marks the email delivered.",
+    control: "menuitem: Delivered No webhook",
+    does: `Marks the email delivered. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.delivered` and adds it to the Timeline.",
     operationIds: ["postEmailsByEmailIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate delivered",
+    "postEmailsByEmailIdSimulate",
+  ),
   {
-    control: "menuitem: Hard bounce",
-    does: "Bounces the email permanently (550 5.1.1).",
+    control: "menuitem: Hard bounce Webhooks: Team Slack alerts",
+    does: `Bounces the email permanently (550 5.1.1). ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.bounced` with a permanent bounce type.",
     operationIds: ["postEmailsByEmailIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate hard bounce",
+    "postEmailsByEmailIdSimulate",
+  ),
   {
-    control: "menuitem: Soft bounce",
-    does: "Defers the email, then bounces it as a temporary failure.",
+    control: "menuitem: Soft bounce Webhooks: Team Slack alerts",
+    does: `Defers the email, then bounces it as a temporary failure. ${webhookTargetsUnderLabel}`,
     changes:
       "Fires `email.deferred`, then `email.bounced` with a transient bounce type.",
     operationIds: ["postEmailsByEmailIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate soft bounce",
+    "postEmailsByEmailIdSimulate",
+  ),
   {
-    control: "menuitem: Spam complaint",
-    does: "Delivers the email, then records a complaint, as when the recipient marks it as spam.",
+    control: "menuitem: Spam complaint Webhooks: Team Slack alerts",
+    does: `Delivers the email, then records a complaint, as when the recipient marks it as spam. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.delivered`, then `email.complained`.",
     operationIds: ["postEmailsByEmailIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate spam complaint",
+    "postEmailsByEmailIdSimulate",
+  ),
   {
-    control: "menuitem: Unsubscribe",
-    does: "Records an unsubscribe from the email's list.",
+    control: "menuitem: Unsubscribe No webhook",
+    does: `Records an unsubscribe from the email's list. ${webhookTargetsUnderLabel}`,
     changes: "Fires `email.unsubscribed`.",
     operationIds: ["postEmailsByEmailIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Simulate unsubscribe",
+    "postEmailsByEmailIdSimulate",
+  ),
   {
     control: "menuitem: Download .eml",
     does: "Downloads the raw message as an `.eml` file.",

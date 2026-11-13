@@ -110,6 +110,7 @@ export const emailSurfaces: SurfaceCatalogue = {
     cli: "sendmock email open <emailId>",
     mcp: "sendmock_email_open",
     ui: "Mail > open email (opening it fires the open)",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "GET /api/v1/emails/{emailId}/opens": {
     phase: "3",
@@ -122,6 +123,7 @@ export const emailSurfaces: SurfaceCatalogue = {
     cli: "sendmock email click <emailId>",
     mcp: "sendmock_email_click",
     ui: "Mail > open email > click a link in the preview, or Simulate click",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "GET /api/v1/emails/{emailId}/clicks": {
     phase: "A2",
@@ -140,24 +142,28 @@ export const emailSurfaces: SurfaceCatalogue = {
     cli: "sendmock email simulate <emailId> <event>",
     mcp: "sendmock_email_simulate",
     ui: "Mail > open email > Simulate",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/emails/{emailId}/reply": {
     phase: "4",
     cli: "sendmock email reply <emailId>",
     mcp: "sendmock_email_reply",
     ui: "Mail > open email > Reply, Reply all",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/emails/{emailId}/forward": {
     phase: "4",
     cli: "sendmock email forward <emailId>",
     mcp: "sendmock_email_forward",
     ui: "Mail > open email > Forward",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/emails/inbound": {
     phase: "4",
     cli: "sendmock email inbound",
     mcp: "sendmock_email_inbound",
     ui: "Mail > Import .eml > Incoming to your app",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/send": {
     phase: "1",

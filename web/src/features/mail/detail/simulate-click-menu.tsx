@@ -2,11 +2,11 @@ import { MousePointerClickIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  DropdownMenuItem,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
 import { useClickEmailLink } from "@/lib/api/hooks/use-email-queries";
 import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import type { EmailDetail } from "@/lib/api/types";
@@ -33,20 +33,28 @@ export function SimulateClickMenu({ email }: { email: EmailDetail }) {
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent className="max-w-80">
         {email.extracted.links.map((emailLink) => (
-          <DropdownMenuItem
+          <WebhookTargets.MenuItem
             key={emailLink}
-            title={emailLink}
-            onSelect={() => {
+            targetEvent={{
+              eventType: "email.clicked",
+              subjectId: email.id,
+              data: { url: [emailLink], source: ["manual"] },
+            }}
+            actionLabel="Simulate click"
+            onSimulate={(webhookChoice) => {
               clickEmailLink.mutate({
                 emailId: email.id,
                 url: emailLink,
                 clickSource: "manual",
+                webhookChoice,
               });
               toast("email.clicked fired");
             }}
           >
-            <span className="truncate">{emailLink}</span>
-          </DropdownMenuItem>
+            <span className="truncate" title={emailLink}>
+              {emailLink}
+            </span>
+          </WebhookTargets.MenuItem>
         ))}
       </DropdownMenuSubContent>
     </DropdownMenuSub>

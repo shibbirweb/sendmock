@@ -1086,6 +1086,17 @@ async fn prepare_webhook_rule_samples(
             vec![json!({ "events": ["email.received"], "filter": null })],
         ),
         (
+            "postWebhooksRulesMatch",
+            vec![
+                json!({ "event_type": "email.received" }),
+                json!({
+                    "event_type": "email.bounced",
+                    "subject_id": "01JZ0000000000000000000000",
+                    "data": { "subject": ["Your receipt"], "header:x-tenant": ["acme"] },
+                }),
+            ],
+        ),
+        (
             "deleteWebhooksRulesByRuleId",
             vec![json!({ "rule_id": deleted_rule_id })],
         ),

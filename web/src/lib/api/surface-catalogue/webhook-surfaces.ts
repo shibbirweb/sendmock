@@ -114,4 +114,11 @@ export const webhookSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_webhook_rule_preview",
     ui: "Webhooks > Rules > rule sheet > Preview",
   },
+  "POST /api/v1/webhooks/rules/match": {
+    phase: "5",
+    cli: "sendmock webhook rule match",
+    mcp: "sendmock_webhook_rule_match",
+    ui: "Webhooks row and menu hints on every simulating action",
+    cliFlags: { data: "--field" },
+  },
 };

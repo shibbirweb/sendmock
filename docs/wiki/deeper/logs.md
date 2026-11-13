@@ -346,22 +346,32 @@ Button.
 - **What it does:** Stores a sample email.
 - **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
 
+### 53. Choose webhooks for Send a sample email
+
+Button.
+
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
 ## When the data cannot load
 
-### 53. Could not load the SMTP log. Try again
+### 54. Could not load the SMTP log. Try again
 
 Message.
 
 - **What it does:** Shown when the log could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 54. Could not load the SMTP log.
+### 55. Could not load the SMTP log.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 55. Try again
+### 56. Try again
 
 Button.
 

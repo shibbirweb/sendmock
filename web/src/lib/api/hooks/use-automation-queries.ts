@@ -13,6 +13,7 @@ import type {
   OutcomeTestResult,
   ScenarioReport,
   ScenarioValidation,
+  WebhookChoice,
 } from "@/lib/api/types";
 
 export function useValidateScenario() {
@@ -90,9 +91,12 @@ export function useImportEmail() {
     mutationFn: ({
       rawMessage,
       importedKind,
+      webhookChoice,
     }: {
       rawMessage: string;
       importedKind: ImportedEmailKind;
+      /** For incoming mail only; mail your app sends always follows the rules. */
+      webhookChoice?: WebhookChoice;
     }) =>
       importedKind === "sent"
         ? requestApi<NativeSendResult>("/send/raw", {
@@ -104,7 +108,7 @@ export function useImportEmail() {
           })
         : requestApi<NativeSendResult>("/emails/inbound", {
             method: "POST",
-            requestBody: { raw: rawMessage },
+            requestBody: { raw: rawMessage, ...webhookChoice },
           }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.emails.all });

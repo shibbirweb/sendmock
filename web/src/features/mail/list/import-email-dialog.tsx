@@ -18,6 +18,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { readRawRuleFields } from "@/features/mail/list/read-raw-rule-fields";
+import { useWebhookTargets } from "@/features/webhooks/targets/use-webhook-targets";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ApiError } from "@/lib/api/api-client";
 import {
   type ImportedEmailKind,
@@ -39,6 +43,9 @@ const importedKindOptions = [
   },
 ];
 
+/** Waits for a pause in typing before asking which webhooks the email reaches. */
+const matchDebounceMs = 300;
+
 /** Mail > Import .eml: store a raw message as sent or as incoming (UI-11.6). */
 export function ImportEmailDialog() {
   const navigate = useNavigate();
@@ -48,6 +55,10 @@ export function ImportEmailDialog() {
   const [rawMessage, setRawMessage] = React.useState("");
   const [importedKind, setImportedKind] =
     React.useState<ImportedEmailKind>("sent");
+  const webhookTargets = useWebhookTargets({
+    eventType: "email.inbound",
+    data: readRawRuleFields(useDebouncedValue(rawMessage, matchDebounceMs)),
+  });
   const errorMessage =
     importEmail.error instanceof ApiError
       ? importEmail.error.message
@@ -85,7 +96,11 @@ export function ImportEmailDialog() {
           onSubmit={(submitEvent) => {
             submitEvent.preventDefault();
             importEmail.mutate(
-              { rawMessage, importedKind },
+              {
+                rawMessage,
+                importedKind,
+                webhookChoice: webhookTargets.webhookChoice,
+              },
               {
                 onSuccess: (importedEmail) => {
                   setOpen(false);
@@ -142,6 +157,12 @@ export function ImportEmailDialog() {
               }}
             />
           </div>
+          {importedKind === "incoming" && (
+            <WebhookTargets.Row
+              webhookTargets={webhookTargets}
+              actionLabel="the imported email"
+            />
+          )}
           <DialogFooter>
             <Button
               type="submit"

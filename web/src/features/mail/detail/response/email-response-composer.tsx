@@ -23,7 +23,8 @@ import {
 import { EmailDeliversToRow } from "@/features/mail/detail/response/email-delivers-to-row";
 import { EmailResponseFields } from "@/features/mail/detail/response/email-response-fields";
 import { useEmailResponseForm } from "@/features/mail/detail/response/use-email-response-form";
-import { useInboundDestinations } from "@/features/mail/detail/response/use-inbound-destinations";
+import { useEmailResponseTargets } from "@/features/mail/detail/response/use-email-response-targets";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
 import type { EmailDetail } from "@/lib/api/types";
 
 type EmailResponseComposerProps = {
@@ -89,13 +90,16 @@ export function EmailResponseComposer({
     isSending,
     sendResponse,
   } = useEmailResponseForm({ email, composerMode, onSent: onClose });
-  const inboundDestinations = useInboundDestinations({
+  const { inboundDestinations, webhookTargets } = useEmailResponseTargets({
     email,
     composerMode,
     formValues,
   });
   const sendWithDestinations = () => {
-    sendResponse(inboundDestinations.hasDestinations);
+    sendResponse(
+      inboundDestinations.hasDestinations || webhookTargets.targets.length > 0,
+      webhookTargets.webhookChoice,
+    );
   };
   const isForward = composerMode === "forward";
 
@@ -190,7 +194,18 @@ export function EmailResponseComposer({
           </Label>
         </div>
       )}
-      <EmailDeliversToRow inboundDestinations={inboundDestinations} />
+      <EmailDeliversToRow
+        inboundDestinations={inboundDestinations}
+        chosenTargets={
+          webhookTargets.chosenEndpointIds === null
+            ? null
+            : webhookTargets.targets
+        }
+      />
+      <WebhookTargets.Row
+        webhookTargets={webhookTargets}
+        actionLabel={isForward ? "the forward" : "the reply"}
+      />
       <div className="flex flex-wrap items-center gap-2">
         <Button disabled={!canSend || isSending} onClick={sendWithDestinations}>
           {isForward ? <ForwardIcon /> : <ReplyIcon />}

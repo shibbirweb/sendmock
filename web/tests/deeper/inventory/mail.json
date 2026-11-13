@@ -81,6 +81,7 @@
       "textbox: Subject",
       "textbox: Message",
       "link: http://localhost:#/webhooks/mail/stored Route Keep everything else",
+      "button: Change",
       "button: Send reply",
       "button: Cancel",
       "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
@@ -93,6 +94,7 @@
       "textbox: Subject",
       "textbox: Message",
       "checkbox: Include attachments (#)",
+      "button: Change",
       "button: Send forward",
       "button: Cancel",
       "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."
@@ -102,13 +104,19 @@
       "button: Delete"
     ],
     "Simulate an event menu": [
-      "menuitem: Open (email.opened)",
+      "menuitem: Open (email.opened) No webhook",
+      "menuitem: Choose webhooks for Simulate open",
       "menuitem: Click a link (email.clicked)",
-      "menuitem: Delivered",
-      "menuitem: Hard bounce",
-      "menuitem: Soft bounce",
-      "menuitem: Spam complaint",
-      "menuitem: Unsubscribe"
+      "menuitem: Delivered No webhook",
+      "menuitem: Choose webhooks for Simulate delivered",
+      "menuitem: Hard bounce Webhooks: Team Slack alerts",
+      "menuitem: Choose webhooks for Simulate hard bounce",
+      "menuitem: Soft bounce Webhooks: Team Slack alerts",
+      "menuitem: Choose webhooks for Simulate soft bounce",
+      "menuitem: Spam complaint Webhooks: Team Slack alerts",
+      "menuitem: Choose webhooks for Simulate spam complaint",
+      "menuitem: Unsubscribe No webhook",
+      "menuitem: Choose webhooks for Simulate unsubscribe"
     ],
     "More actions menu": [
       "menuitem: Download .eml",
@@ -167,7 +175,8 @@
       "button: Copy SMTP host",
       "button: Copy SMTP port",
       "link: More snippets",
-      "button: Send a sample email"
+      "button: Send a sample email",
+      "button: Choose webhooks for Send a sample email"
     ],
     "failing": [
       "alert: Could not load emails. Try again",
