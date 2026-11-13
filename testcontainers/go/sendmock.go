@@ -11,7 +11,7 @@ import (
 )
 
 // DefaultImage is the image used when Run is given none.
-const DefaultImage = "ghcr.io/shibbirweb/sendmock:0.1.0-beta.2"
+const DefaultImage = "ghcr.io/shibbirweb/sendmock:0.1.0-beta.3"
 
 const (
 	smtpPort     = "1025/tcp"
