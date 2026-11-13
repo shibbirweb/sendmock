@@ -118,6 +118,7 @@ pub use rule_operations::{
     ListWebhookRulesOperation, UpdateWebhookRuleOperation,
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
+pub(crate) use rule_subscriber::find_firing_rules;
 pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
 pub(crate) use rule_validation::{validate_rule, validate_rule_filter};
 pub use rule_view::WebhookRule;

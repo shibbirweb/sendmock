@@ -30,6 +30,7 @@ export function buildTestDelivery(
     trigger: "manual",
     attempt: 1,
     status: "succeeded",
+    url: endpointRecord.url,
     request: {
       method: endpointRecord.method,
       url: endpointRecord.url,

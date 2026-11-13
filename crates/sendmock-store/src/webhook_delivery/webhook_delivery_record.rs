@@ -54,6 +54,8 @@ pub struct WebhookDeliveryFilter {
     pub statuses: Vec<String>,
     pub endpoint_id: Option<String>,
     pub event_type: Option<String>,
+    /// Only deliveries about this email, SMS or other message.
+    pub subject_id: Option<String>,
     pub created_after_unix_ms: Option<i64>,
 }
 

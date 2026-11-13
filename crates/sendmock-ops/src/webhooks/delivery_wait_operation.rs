@@ -70,6 +70,7 @@ async fn build_wait_filter(
         },
         endpoint_id,
         event_type: input.event.clone(),
+        subject_id: None,
         created_after_unix_ms: Some(since_unix_ms),
     })
 }

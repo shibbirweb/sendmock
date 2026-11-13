@@ -42,6 +42,21 @@ export function useWebhookDeliveries(
   });
 }
 
+/**
+ * The webhook requests an email or SMS caused (EM-22.5); webhook events
+ * refetch it, so statuses move without polling.
+ */
+export function useSubjectDeliveries(subjectId: string) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.subjectDeliveries(subjectId),
+    queryFn: ({ signal }) =>
+      requestApi<PageOf<WebhookDelivery>>("/webhooks/deliveries", {
+        queryParameters: { subject_id: subjectId, limit: deliveryPageSize },
+        abortSignal: signal,
+      }),
+  });
+}
+
 /** Delivery health for a range and an optional endpoint (WH-11.3); waits until served (UI-12). */
 export function useWebhookMetrics(metricsQuery: WebhookMetricsQuery) {
   const isQueryable = useIsOperationQueryable("GET /api/v1/webhooks/metrics");

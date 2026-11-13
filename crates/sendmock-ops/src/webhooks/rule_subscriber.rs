@@ -1,4 +1,4 @@
-use sendmock_store::WebhookRuleRecord;
+use sendmock_store::{WebhookEndpointRecord, WebhookRuleRecord};
 use sendmock_webhooks::{FilterExpression, RuleMessage};
 use tokio::sync::broadcast::error::RecvError;
 
@@ -100,6 +100,32 @@ fn does_rule_fire(
         .is_none_or(|filter_expression| filter_expression.matches(rule_message)))
 }
 
+/// Each enabled rule on the event whose filter passes the message, with its enabled endpoint,
+/// in rule order. Dispatch and the match preview both read this (WH-02.1, EM-22.2).
+pub async fn find_firing_rules(
+    operation_context: &OperationContext,
+    stored_rules: Vec<WebhookRuleRecord>,
+    event_type: &str,
+    rule_message: &RuleMessage,
+) -> Result<Vec<(WebhookRuleRecord, WebhookEndpointRecord)>, OperationError> {
+    let mut firing_rules = Vec::new();
+    for stored_rule in stored_rules {
+        if !does_rule_fire(&stored_rule, event_type, rule_message)? {
+            continue;
+        }
+        let Some(stored_endpoint) = operation_context
+            .webhook_endpoint_repository
+            .find_endpoint(&stored_rule.endpoint_id)
+            .await?
+            .filter(|stored_endpoint| stored_endpoint.is_enabled)
+        else {
+            continue;
+        };
+        firing_rules.push((stored_rule, stored_endpoint));
+    }
+    Ok(firing_rules)
+}
+
 /// Queues one delivery per enabled rule that fires, in rule order, to enabled endpoints
 /// (WH-02.1, WH-02.4). Answers how many were queued.
 pub async fn fire_matching_rules(
@@ -121,19 +147,15 @@ pub async fn fire_matching_rules(
     }
     let (subject_id, stored_message) = load_event_subject(operation_context, app_event).await?;
     let rule_message = with_engagement_event_fields(stored_message, app_event);
-    let mut queued_count = 0;
-    for stored_rule in stored_rules {
-        if !does_rule_fire(&stored_rule, &app_event.event_type, &rule_message)? {
-            continue;
-        }
-        let Some(stored_endpoint) = operation_context
-            .webhook_endpoint_repository
-            .find_endpoint(&stored_rule.endpoint_id)
-            .await?
-            .filter(|stored_endpoint| stored_endpoint.is_enabled)
-        else {
-            continue;
-        };
+    let firing_rules = find_firing_rules(
+        operation_context,
+        stored_rules,
+        &app_event.event_type,
+        &rule_message,
+    )
+    .await?;
+    let queued_count = firing_rules.len();
+    for (stored_rule, stored_endpoint) in firing_rules {
         let delivery_order = DeliveryOrder {
             app_event: app_event.clone(),
             subject_id: subject_id.clone(),
@@ -142,7 +164,6 @@ pub async fn fire_matching_rules(
             send_time_values: serde_json::Map::new(),
         };
         enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order).await?;
-        queued_count += 1;
     }
     Ok(queued_count)
 }

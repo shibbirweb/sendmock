@@ -10,6 +10,8 @@ import { queryKeys } from "@/lib/api/query-keys";
 import type {
   InboundRoute,
   InboundRouteInput,
+  InboundRouteMatchRequest,
+  InboundRouteMatchResult,
   InboundRouteTestRequest,
   InboundRouteTestResult,
 } from "@/lib/api/types";
@@ -119,5 +121,23 @@ export function useInboundRouteTest(testRequest: InboundRouteTestRequest) {
         abortSignal: signal,
       }),
     placeholderData: keepPreviousData,
+  });
+}
+
+/** Where an incoming email would go (EM-22.2); a route change refetches it. */
+export function useInboundRouteMatch(
+  matchRequest: InboundRouteMatchRequest,
+  isEnabled: boolean,
+) {
+  return useQuery({
+    queryKey: queryKeys.inboundRoutes.match(matchRequest),
+    queryFn: ({ signal }) =>
+      requestApi<InboundRouteMatchResult>("/inbound-routes/match", {
+        method: "POST",
+        requestBody: matchRequest,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
+    enabled: isEnabled,
   });
 }

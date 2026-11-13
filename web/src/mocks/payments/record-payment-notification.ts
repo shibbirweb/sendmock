@@ -66,6 +66,7 @@ export function recordPaymentNotification(
     trigger: "auto",
     attempt: 1,
     status: "succeeded",
+    url: endpointRecord.url,
     request: {
       method: "POST",
       url: endpointRecord.url,

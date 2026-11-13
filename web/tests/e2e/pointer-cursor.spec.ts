@@ -32,11 +32,11 @@ test("buttons, tabs, links and menu items show the pointer cursor", async ({
 test("disabled buttons keep the default cursor", async ({ page }) => {
   await page.goto("/mail");
   await page.locator("section[aria-label='Email list'] a").first().click();
-  await page.getByRole("button", { name: "Reply", exact: true }).click();
+  await page.getByRole("button", { name: "Forward", exact: true }).click();
 
   expect(
     await page
-      .getByRole("button", { name: "Send reply" })
+      .getByRole("button", { name: "Send forward" })
       .evaluate((element) => getComputedStyle(element).cursor),
   ).not.toBe("pointer");
 });

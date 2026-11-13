@@ -4363,9 +4363,9 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The reply text, above the quoted original.",
+          "description": "The reply text, above the quoted original; empty or left out sends no text of its own.",
           "example": "Thanks, that fixed it!"
         },
         {
@@ -4429,7 +4429,7 @@
           },
           "body": {
             "type": "string",
-            "description": "The reply text, above the quoted original.",
+            "description": "The reply text, above the quoted original; empty or left out sends no text of its own.",
             "examples": [
               "Thanks, that fixed it!"
             ]
@@ -4464,15 +4464,13 @@
           }
         },
         "required": [
-          "email_id",
-          "body"
+          "email_id"
         ]
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "body": "Thanks, that fixed it!",
-        "from": "user@example.test",
-        "subject": "Re: Ticket #318 updated"
+        "from": "user@example.test"
       },
       "output": "EmailDetail",
       "cli": [
@@ -8010,6 +8008,134 @@
       ],
       "ui": [
         "Webhooks > Inbound routes"
+      ]
+    },
+    {
+      "name": "sendmock_inbound_route_match",
+      "toolset": "rules",
+      "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+      "area": "Inbound routes",
+      "area_slug": "inbound-routes",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/inbound-routes/match",
+          "operation_id": "postInboundRoutesMatch",
+          "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+          "area_slug": "inbound-routes",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The recipients the incoming email would have.",
+          "example": [
+            "support@inbound.app.test"
+          ]
+        },
+        {
+          "name": "cc",
+          "input": {
+            "name": "cc",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Copied recipients; routes read them like `to`.",
+          "example": [
+            "lee@example.test"
+          ]
+        },
+        {
+          "name": "headers",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Headers by name.",
+          "example": {
+            "subject": "Re: Your receipt",
+            "from": "sam@example.test"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The recipients the incoming email would have.",
+            "examples": [
+              [
+                "support@inbound.app.test"
+              ]
+            ]
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Copied recipients; routes read them like `to`.",
+            "examples": [
+              [
+                "lee@example.test"
+              ]
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Headers by name.",
+            "examples": [
+              {
+                "subject": "Re: Your receipt",
+                "from": "sam@example.test"
+              }
+            ]
+          }
+        },
+        "required": [
+          "to"
+        ]
+      },
+      "example_arguments": {
+        "to": [
+          "support@inbound.app.test"
+        ],
+        "cc": [
+          "lee@example.test"
+        ]
+      },
+      "output": "InboundRouteMatchResult",
+      "cli": [
+        "sendmock route match"
+      ],
+      "ui": [
+        "Mail > Reply, Reply all, Forward > Delivers to"
       ]
     },
     {
@@ -24011,6 +24137,18 @@
           ],
           "description": "Only this event.",
           "example": "email.received"
+        },
+        {
+          "name": "subject_id",
+          "input": {
+            "name": "subject_id",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
         }
       ],
       "input_schema": {
@@ -24049,6 +24187,13 @@
             "description": "Only this event.",
             "examples": [
               "email.received"
+            ]
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
             ]
           }
         },

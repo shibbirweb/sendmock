@@ -37,6 +37,7 @@ export function buildAutoDelivery({
     trigger: "auto",
     attempt: 1,
     status: hasFailed ? "failed" : "succeeded",
+    url: endpointRecord.url,
     request: {
       method: endpointRecord.method,
       url: endpointRecord.url,

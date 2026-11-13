@@ -47,6 +47,10 @@ Routes by priority (lower runs first) with move up and down, description, the ex
 
 Matching routes run by priority until one calls Stop. The forward is Mailgun's `multipart/form-data` with `recipient`, `sender`, `subject`, `body-plain`, `stripped-text` (the new text without the quoted original), `stripped-signature`, `body-html`, attachments, `message-headers`, and `timestamp`, `token` and `signature` (signed with the webhook signing key). Your app answering `406` rejects the message without retries; other errors are retried.
 
+### Before an email arrives
+
+The Reply and Forward composers in Mail show **Delivers to**: the routes (and webhook rules on `email.inbound`) the email would run, with each URL, checked by the same matcher a real incoming email goes through. When nothing matches, **Send replies to your app** there creates a route to your app's URL in one step. Each route in that row opens here with its editor.
+
 
 Every control and text, one by one: [Inbound routes in depth](../deeper/webhooks/inbound-routes.md).
 ## Customize
@@ -62,6 +66,7 @@ Ticket routing with named groups, store and notify, and other providers' formats
 | update or reorder | [`sendmock route update <routeId>`](/cli/inbound-routes/#route-update) | [`PATCH /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#patchInboundRoutesByRouteId) | [`sendmock_inbound_route_update`](/mcp/inbound-routes/#sendmock_inbound_route_update) |
 | delete | [`sendmock route delete <routeId>`](/cli/inbound-routes/#route-delete) | [`DELETE /api/v1/inbound-routes/{routeId}`](/api/inbound-routes/#deleteInboundRoutesByRouteId) | [`sendmock_inbound_route_delete`](/mcp/inbound-routes/#sendmock_inbound_route_delete) |
 | test a filter | [`sendmock route test`](/cli/inbound-routes/#route-test) | [`POST /api/v1/inbound-routes/test`](/api/inbound-routes/#postInboundRoutesTest) | [`sendmock_inbound_route_test`](/mcp/inbound-routes/#sendmock_inbound_route_test) |
+| see where an email would go | [`sendmock route match --to <address>`](/cli/inbound-routes/#route-match) | [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch) | [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match) |
 
 ## Related
 

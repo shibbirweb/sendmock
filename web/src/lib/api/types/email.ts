@@ -255,10 +255,11 @@ export type NativeSendRequest = {
 /** Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying). */
 export type EmailReplyRequest = {
   /**
-   * The reply text, above the quoted original.
+   * The reply text, above the quoted original; empty or left out sends no
+   * text of its own.
    * @example "Thanks, that fixed it!"
    */
-  body: string;
+  body?: string;
   /**
    * Who replies; defaults to the original recipient.
    * @example "user@example.test"

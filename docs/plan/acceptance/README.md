@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 117 / 133 features, 572 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 118 / 133 features, 577 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -81,7 +81,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | After 1.0 (A1) | 6 | Accepted |
 | [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | After 1.0 (A2) | 6 | Accepted |
 | [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | After 1.0 (A6) | 6 | Accepted |
-| [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Not started |
+| [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Accepted |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |

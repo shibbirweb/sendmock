@@ -19,8 +19,10 @@ import {
   composerHeadings,
   type EmailComposerMode,
 } from "@/features/mail/detail/response/email-composer-mode";
+import { EmailDeliversToRow } from "@/features/mail/detail/response/email-delivers-to-row";
 import { EmailResponseFields } from "@/features/mail/detail/response/email-response-fields";
 import { useEmailResponseForm } from "@/features/mail/detail/response/use-email-response-form";
+import { useInboundDestinations } from "@/features/mail/detail/response/use-inbound-destinations";
 import type { EmailDetail } from "@/lib/api/types";
 
 type EmailResponseComposerProps = {
@@ -86,6 +88,14 @@ export function EmailResponseComposer({
     isSending,
     sendResponse,
   } = useEmailResponseForm({ email, composerMode, onSent: onClose });
+  const inboundDestinations = useInboundDestinations({
+    email,
+    composerMode,
+    formValues,
+  });
+  const sendWithDestinations = () => {
+    sendResponse(inboundDestinations.hasDestinations);
+  };
   const isForward = composerMode === "forward";
 
   // Replies start typing above the quote; forwards start in the To field.
@@ -122,7 +132,7 @@ export function EmailResponseComposer({
           (keyboardEvent.metaKey || keyboardEvent.ctrlKey)
         ) {
           keyboardEvent.preventDefault();
-          sendResponse();
+          sendWithDestinations();
         }
       }}
     >
@@ -179,8 +189,9 @@ export function EmailResponseComposer({
           </Label>
         </div>
       )}
+      <EmailDeliversToRow inboundDestinations={inboundDestinations} />
       <div className="flex flex-wrap items-center gap-2">
-        <Button disabled={!canSend || isSending} onClick={sendResponse}>
+        <Button disabled={!canSend || isSending} onClick={sendWithDestinations}>
           {isForward ? <ForwardIcon /> : <ReplyIcon />}
           {isForward ? "Send forward" : "Send reply"}
         </Button>

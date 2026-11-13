@@ -65,6 +65,7 @@ export function buildManualDelivery(
     return {
       ...deliveryBase,
       status: "render_failed",
+      url: null,
       request: null,
       response: null,
       duration_ms: null,
@@ -77,6 +78,7 @@ export function buildManualDelivery(
   return {
     ...deliveryBase,
     status: "succeeded",
+    url: previewResult.url,
     request: {
       method: previewResult.method,
       url: previewResult.url,

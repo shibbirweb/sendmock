@@ -121,3 +121,82 @@ export type InboundRouteTestResult = {
   checked_count: number;
   matches: InboundRouteMatch[];
 };
+
+/** Body of POST /api/v1/inbound-routes/match: the email about to arrive (EM-22.2). */
+export type InboundRouteMatchRequest = {
+  /**
+   * The recipients the incoming email would have.
+   * @example ["support@inbound.app.test"]
+   */
+  to: string[];
+  /**
+   * Copied recipients; routes read them like `to`.
+   * @example ["lee@example.test"]
+   */
+  cc?: string[];
+  /**
+   * Headers by name.
+   * @example {"subject":"Re: Your receipt","from":"sam@example.test"}
+   */
+  headers?: Record<string, string>;
+};
+
+/** A route that would run, with its actions as they would run (named groups filled in). */
+export type MatchedInboundRoute = {
+  route_id: Ulid;
+  /**
+   * Lower runs first.
+   * @example 10
+   */
+  priority: number;
+  /**
+   * The route's name.
+   * @example "Ticket replies to the helpdesk"
+   */
+  description: string;
+  /** The filter in Mailgun syntax, e.g. `match_recipient("support@.*")`. */
+  expression: string;
+  /** The recipient or header value that matched. */
+  matched_value: string;
+  /**
+   * What the route would do, in order.
+   */
+  actions: InboundRouteAction[];
+  /** Each action in Mailgun syntax, e.g. `forward("http://...")`. */
+  action_expressions: string[];
+  /** The route calls `stop()`, so no later route runs. */
+  calls_stop: boolean;
+};
+
+/** An enabled webhook rule on `email.inbound` whose filter passes the email. */
+export type MatchedWebhookRule = {
+  rule_id: Ulid;
+  /**
+   * The rule's name.
+   * @example "Replies to my app"
+   */
+  rule_name: string;
+  endpoint_id: Ulid;
+  /**
+   * The endpoint's name.
+   * @example "Local app"
+   */
+  endpoint_name: string;
+  /**
+   * Where the rule sends.
+   * @example "http://localhost:8000/webhooks/sendmock"
+   */
+  endpoint_url: string;
+};
+
+/** Where an incoming email would go; nothing is stored or sent. */
+export type InboundRouteMatchResult = {
+  /**
+   * The routes that would run, in run order, ending at one that calls `stop()`.
+   */
+  routes: MatchedInboundRoute[];
+  /**
+   * The webhook rules on `email.inbound` that would send, in rule order.
+   */
+  webhook_rules: MatchedWebhookRule[];
+};

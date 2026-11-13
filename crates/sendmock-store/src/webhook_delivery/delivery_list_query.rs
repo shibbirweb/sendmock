@@ -17,6 +17,7 @@ fn build_conditions(filter: &WebhookDeliveryFilter) -> (String, Vec<SqlValue>) {
     for (condition, filter_value) in [
         ("endpoint_id = ?", &filter.endpoint_id),
         ("event_type = ?", &filter.event_type),
+        ("subject_id = ?", &filter.subject_id),
     ] {
         if let Some(filter_value) = filter_value {
             conditions.push(condition.to_owned());

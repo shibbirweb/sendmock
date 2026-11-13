@@ -97,10 +97,6 @@ export const emailResponseHandlers = [
     }
 
     const replyRequest = (await request.json()) as EmailReplyRequest;
-    if ((replyRequest.body ?? "").trim() === "") {
-      return createErrorResponse(400, "validation_failed", "Write a reply");
-    }
-
     const responder = readResponder(originalEmail, replyRequest.from);
 
     return storeEmailResponse(originalEmail, {
@@ -112,7 +108,7 @@ export const emailResponseHandlers = [
           ? listOtherRecipients(originalEmail, responder)
           : [],
       subject: replyRequest.subject,
-      body: replyRequest.body,
+      body: replyRequest.body ?? "",
       includeOriginalText: replyRequest.include_original ?? true,
       includeAttachments: false,
     });

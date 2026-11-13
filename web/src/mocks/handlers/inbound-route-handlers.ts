@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 
 import type {
   InboundRouteInput,
+  InboundRouteMatchRequest,
   InboundRouteTestRequest,
 } from "@/lib/api/types";
 import { validateInboundRoute } from "@/lib/inbound-routes/validate-inbound-route";
@@ -17,6 +18,7 @@ import {
   sortRoutesByPriority,
   testRouteFilter,
 } from "@/mocks/inbound-routes/inbound-route-record";
+import { matchInboundRoutes } from "@/mocks/inbound-routes/match-inbound-routes";
 
 function findRouteIndex(routeId: unknown): number {
   return mockDatabase.inboundRoutes.findIndex(
@@ -50,6 +52,13 @@ export const inboundRouteHandlers = [
     return HttpResponse.json(
       testRouteFilter(mockDatabase.emails, testRequest.filter),
     );
+  }),
+
+  http.post("*/api/v1/inbound-routes/match", async ({ request }) => {
+    await applyMockConditions();
+    const matchRequest = (await request.json()) as InboundRouteMatchRequest;
+
+    return HttpResponse.json(matchInboundRoutes(matchRequest));
   }),
 
   http.post("*/api/v1/inbound-routes", async ({ request }) => {

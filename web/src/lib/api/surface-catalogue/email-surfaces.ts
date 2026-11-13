@@ -201,4 +201,10 @@ export const emailSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_inbound_route_test",
     ui: "Webhooks > Inbound routes > route sheet > Preview",
   },
+  "POST /api/v1/inbound-routes/match": {
+    phase: "5",
+    cli: "sendmock route match",
+    mcp: "sendmock_inbound_route_match",
+    ui: "Mail > Reply, Reply all, Forward > Delivers to",
+  },
 };

@@ -348,6 +348,7 @@ export function buildWebhookDeliveryFixtures(
       trigger: deliverySpec.trigger ?? "auto",
       attempt: deliverySpec.attempt ?? 1,
       status: deliverySpec.status,
+      url: wasSent ? (webhookEndpoint?.url ?? "") : null,
       request: wasSent
         ? {
             method: "POST",

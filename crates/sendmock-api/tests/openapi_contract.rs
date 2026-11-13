@@ -301,6 +301,17 @@ async fn prepare_inbound_route_samples(
                 json!({ "filter": { "kind": "match_header", "header_name": "subject", "pattern": ".*help" } }),
             ],
         ),
+        (
+            "postInboundRoutesMatch",
+            vec![
+                json!({ "to": ["reply+318@reply.app.test"] }),
+                json!({
+                    "to": ["Support <support@inbound.app.test>"],
+                    "cc": ["lee@example.test"],
+                    "headers": { "subject": "Re: Your receipt", "from": "sam@example.test" },
+                }),
+            ],
+        ),
     ]
 }
 
@@ -782,6 +793,7 @@ async fn prepare_webhook_delivery_samples(
             vec![
                 json!({}),
                 json!({ "status": "failed,pending", "limit": 10 }),
+                json!({ "subject_id": "01JZ0000000000000000000000" }),
             ],
         ),
         (

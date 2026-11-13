@@ -1,13 +1,12 @@
 //! Runs the matching routes on each new incoming email, lowest priority first, until one
 //! calls `stop()` (WH-12.1); each forward and store is logged on the email's timeline.
 
-use sendmock_mail::{
-    decompress_raw_message, fill_captured_groups, match_route_filter, parse_email,
-};
+use sendmock_mail::{decompress_raw_message, fill_captured_groups, parse_email};
 use sendmock_store::{EmailRecord, InboundRouteRecord, TimelineRecord};
 
 use super::route_delivery::queue_route_delivery;
-use super::route_records::{read_route_actions, read_route_filter, to_routable_email};
+use super::route_records::to_routable_email;
+use super::route_selection::{SelectedRoute, select_matching_routes};
 use super::route_wire::InboundRouteAction;
 use crate::email::{is_on_allowlist, release_email};
 use crate::{AppEvent, OperationContext, OperationError};
@@ -92,44 +91,39 @@ pub async fn run_inbound_routes(
         return Ok(());
     }
     let routable_email = to_routable_email(&stored_email);
+    let selected_routes = select_matching_routes(&stored_routes, &routable_email)?;
+    if selected_routes.is_empty() {
+        return Ok(());
+    }
     let routed_email = read_routed_email(operation_context, stored_email, inbound_event).await?;
-    for stored_route in &stored_routes {
-        let filter_rule = read_route_filter(stored_route)?.to_filter_rule();
-        let Some(route_match) = match_route_filter(&filter_rule, &routable_email) else {
-            continue;
-        };
-        let should_stop =
-            run_route_actions(operation_context, &routed_email, stored_route, &route_match).await?;
-        if should_stop {
-            break;
-        }
+    for selected_route in selected_routes {
+        run_route_actions(operation_context, &routed_email, selected_route).await?;
     }
     Ok(())
 }
 
-/// Runs one matched route's actions in order; answers whether it called `stop()`.
+/// Runs one matched route's actions in order.
 async fn run_route_actions(
     operation_context: &OperationContext,
     routed_email: &RoutedEmail,
-    stored_route: &InboundRouteRecord,
-    route_match: &sendmock_mail::RouteFilterMatch,
-) -> Result<bool, OperationError> {
+    selected_route: SelectedRoute<'_>,
+) -> Result<(), OperationError> {
+    let stored_route = selected_route.stored_route;
     let route_run = RouteRun {
         operation_context,
         routed_email,
         stored_route,
-        route_match,
+        route_match: &selected_route.route_match,
         route_name: if stored_route.description.is_empty() {
             "untitled route".to_owned()
         } else {
             stored_route.description.clone()
         },
     };
-    let mut should_stop = false;
-    for route_action in read_route_actions(stored_route)? {
-        should_stop |= route_run.run_action(route_action).await?;
+    for route_action in selected_route.route_actions.iter().cloned() {
+        route_run.run_action(route_action).await?;
     }
-    Ok(should_stop)
+    Ok(())
 }
 
 /// One matched route on one email.
@@ -169,12 +163,11 @@ impl RouteRun<'_> {
         .map(|_| ())
     }
 
-    /// Answers whether the action was `stop()`.
-    async fn run_action(&self, route_action: InboundRouteAction) -> Result<bool, OperationError> {
+    async fn run_action(&self, route_action: InboundRouteAction) -> Result<(), OperationError> {
         let route_name = &self.route_name;
         let captured_groups = &self.route_match.captured_groups;
         match route_action {
-            InboundRouteAction::Stop => return Ok(true),
+            InboundRouteAction::Stop => {}
             InboundRouteAction::ForwardEmail { address } => {
                 let address = fill_captured_groups(&address, captured_groups);
                 forward_to_address(
@@ -211,7 +204,7 @@ impl RouteRun<'_> {
                 }
             }
         }
-        Ok(false)
+        Ok(())
     }
 }
 

@@ -4,6 +4,7 @@ import type {
   EmailListFilters,
   EndpointPreviewRequest,
   HttpRulePreviewRequest,
+  InboundRouteMatchRequest,
   InboundRouteTestRequest,
   MessageProviderArea,
   MessageProviderPreviewRequest,
@@ -80,6 +81,8 @@ export const queryKeys = {
       ["webhooks", "deliveries", deliveryFilters] as const,
     delivery: (deliveryId: string) =>
       ["webhooks", "delivery", deliveryId] as const,
+    subjectDeliveries: (subjectId: string) =>
+      ["webhooks", "subject-deliveries", subjectId] as const,
     templates: ["webhooks", "templates"] as const,
     template: (templateId: string) =>
       ["webhooks", "template", templateId] as const,
@@ -128,6 +131,8 @@ export const queryKeys = {
     all: ["inbound-routes"] as const,
     test: (testRequest: InboundRouteTestRequest) =>
       ["inbound-routes", "test", testRequest] as const,
+    match: (matchRequest: InboundRouteMatchRequest) =>
+      ["inbound-routes", "match", matchRequest] as const,
   },
   httpCatcher: {
     all: ["http-catcher"] as const,

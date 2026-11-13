@@ -80,6 +80,7 @@
       "combobox: From",
       "textbox: Subject",
       "textbox: Message",
+      "link: http://localhost:#/webhooks/mail/stored Route Keep everything else",
       "button: Send reply",
       "button: Cancel",
       "paragraph: Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app."

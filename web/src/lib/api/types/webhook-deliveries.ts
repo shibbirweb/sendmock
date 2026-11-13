@@ -37,6 +37,13 @@ export type WebhookDelivery = {
   trigger: DeliveryTrigger;
   attempt: number;
   status: DeliveryStatus;
+  /**
+   * Where the request goes, known from when it is queued; null only when the
+   * request could not be rendered.
+   * @example "http://localhost:8000/webhooks/mail"
+   */
+  url: string | null;
+  /** The request as sent, signature headers included; null until the attempt runs. */
   request: RecordedHttpRequest | null;
   response: RecordedHttpResponse | null;
   duration_ms: number | null;
@@ -50,6 +57,7 @@ export type DeliveryListFilters = PageRequest & {
   status?: string;
   endpoint_id?: string;
   event_type?: AppEventType;
+  subject_id?: string;
 };
 
 /** One attempt of the same event, for the detail's attempt list. */

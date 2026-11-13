@@ -21,7 +21,24 @@ Open an email your app sent and press:
 - **Reply all** (`Shift+R`, only with more than one recipient): as Reply, with the other recipients in `Cc`.
 - **Forward** (`F`): to an address you type (the inbound domains from Settings are suggested), with `Fwd:`, the forwarded-message block and, by default, the attachments.
 
-The composer opens under the header with the original already in the message box, so you can trim it like any text. `Ctrl+Enter` (`Cmd+Enter` on macOS) sends; `Esc` closes. After sending, a toast offers **Open** to jump to the new email.
+The composer opens under the header with the original already in the message box, so you can trim it like any text. **Send reply** works straight away: send it as prefilled, edited or with an empty message box. **Send forward** waits for a To address. `Ctrl+Enter` (`Cmd+Enter` on macOS) sends; `Esc` closes.
+
+## Where it goes
+
+Above the buttons, **Delivers to** lists everything that will receive the email before you send it: each URL or address an [inbound route](../webhooks/inbound-routes.md) forwards or notifies, in the order the routes run (ending at one that calls `stop()`), and each [webhook rule](../webhooks/rules.md) on `email.inbound` with its endpoint URL. Each line links to its route or rule. For a forward, the row follows the To address as you type.
+
+When nothing would receive it, the row says **Nothing receives this yet**. To send replies to your app in one step:
+
+1. Press **Send replies to your app**.
+2. Enter your app's URL, for example `http://localhost:8000/webhooks/mail`.
+3. Choose **Only mail to** this address (a `match_recipient()` route for exactly this address) or **Every incoming email** (a `catch_all()` route).
+4. Press **Create route**.
+
+The new route shows in the row and in Webhooks > Inbound routes, where **More options** opens the full editor.
+
+## After sending
+
+The toast lists each webhook request the email caused, with its URL and status. The status moves from pending to the HTTP status (or the error) as the request is answered, and each line opens the request in [Deliveries](../webhooks/deliveries.md). **Open** jumps to the new email, whose header lists the same requests. When nothing received it, both say so and link to Webhooks > Inbound routes.
 
 ## What happens next
 
@@ -45,6 +62,8 @@ Step by step: [Recipe: reply by email](../recipes/reply-by-email.md).
 | forward | [`sendmock email forward <emailId>`](/cli/email/#email-forward) | [`POST /api/v1/emails/{emailId}/forward`](/api/email/#postEmailsByEmailIdForward) | [`sendmock_email_forward`](/mcp/email/#sendmock_email_forward) |
 | create an incoming email | [`sendmock email inbound`](/cli/email/#email-inbound) | [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound) | [`sendmock_email_inbound`](/mcp/email/#sendmock_email_inbound) |
 | list routes | [`sendmock route list`](/cli/inbound-routes/#route-list) | [`GET /api/v1/inbound-routes`](/api/inbound-routes/#getInboundRoutes) | [`sendmock_inbound_route_list`](/mcp/inbound-routes/#sendmock_inbound_route_list) |
+| see where an incoming email would go | [`sendmock route match`](/cli/inbound-routes/#route-match) | [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch) | [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match) |
+| list the requests an email caused | [`sendmock webhook deliveries list --subject-id <emailId>`](/cli/webhook-deliveries/#webhook-deliveries-list) | [`GET /api/v1/webhooks/deliveries?subject_id=`](/api/webhook-deliveries/#getWebhooksDeliveries) | [`sendmock_webhook_delivery_list`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_list) |
 
 ## Related
 

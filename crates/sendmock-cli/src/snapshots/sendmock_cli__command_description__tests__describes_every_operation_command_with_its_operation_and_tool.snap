@@ -2863,6 +2863,29 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock route match",
+    "usage": "sendmock route match",
+    "aliases": [],
+    "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+    "arguments": [],
+    "flags": [
+      "--cc",
+      "--headers",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/inbound-routes/match",
+        "operation_id": "postInboundRoutesMatch",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_match"
+    ]
+  },
+  {
     "command": "sendmock http bin list",
     "usage": "sendmock http bin list",
     "aliases": [],
@@ -4429,7 +4452,8 @@ expression: command_descriptions
       "--endpoint-id",
       "--event-type",
       "--limit",
-      "--status"
+      "--status",
+      "--subject-id"
     ],
     "operations": [
       {

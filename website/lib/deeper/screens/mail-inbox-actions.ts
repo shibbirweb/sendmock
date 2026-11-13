@@ -31,17 +31,25 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     does: "Forwards the original attachments too.",
   },
   {
+    control:
+      "link: http://localhost:#/webhooks/mail/stored Route Keep everything else",
+    does: "One line of the Delivers to row: a URL or address that will receive the reply or forward, and the inbound route or webhook rule that sends it there, in the order they run. The row follows the Forward address as you type. When nothing would receive the email, it says \"Nothing receives this yet\" with Send replies to your app, which creates a route to your app's URL (only mail to this address, or every incoming email) in one step.",
+    changes: "Opens that route in Webhooks > Inbound routes, or the rule's endpoint in Webhooks > Rules.",
+    operationIds: ["postInboundRoutesMatch", "postInboundRoutes"],
+    links: "[Inbound routes](../../webhooks/inbound-routes.md).",
+  },
+  {
     control: "button: Send reply",
-    does: "Stores the reply as an incoming email with `In-Reply-To` and `References` set; a notice says it was created, with Open to read it.",
+    does: "Stores the reply as an incoming email with `In-Reply-To` and `References` set. It can be sent as prefilled, edited or with an empty message box. A notice says it was created, lists each webhook request it caused with its URL and status (moving from pending to the answer), each linking to the delivery, and offers Open to read it.",
     changes:
-      "Fires `email.inbound`; inbound routes deliver it to your app, as the provider would.",
-    operationIds: ["postEmailsByEmailIdReply"],
+      "Fires `email.inbound`; inbound routes and webhook rules deliver it to your app, as the provider would.",
+    operationIds: ["postEmailsByEmailIdReply", "getWebhooksDeliveries"],
   },
   {
     control: "button: Send forward",
-    does: "Stores the forward as an incoming email; a notice says it was created, with Open to read it.",
+    does: "Stores the forward as an incoming email, once To holds an address; the notice lists each webhook request it caused, with Open to read it.",
     changes: "Fires `email.inbound` and runs the inbound routes.",
-    operationIds: ["postEmailsByEmailIdForward"],
+    operationIds: ["postEmailsByEmailIdForward", "getWebhooksDeliveries"],
   },
   {
     control:
