@@ -149,7 +149,7 @@ Then replace the notices that say there is no release yet, in a pull request to 
 
 A package npm does not have yet is staged instead of published (`npm stage publish`, from `scripts/release/npm-publish.ts`), since npm sets a trusted publisher only on an existing package: open it on npmjs.com and approve it with your 2FA. The `sendmock` launcher is staged this way with 0.1.0-beta.3.
 
-Then move npm to trusted publishing: on each of the eight npm packages (`sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`), open **Settings > Trusted Publisher**, choose GitHub Actions, and enter `shibbirweb`, `sendmock`, `registry-publish.yml` and no environment; then delete the token:
+Then move npm to trusted publishing: on each of the eight npm packages (`sendmock`, the six `@sendmock/<os>-<cpu>` packages and `sendmock-testcontainers`), open **Settings > Trusted Publisher**, choose GitHub Actions, enter `shibbirweb`, `sendmock`, `registry-publish.yml` and no environment, allow direct publishing (not staged publishing) and turn on **Allow npm dist-tag**; then delete the token. Until 1.0.0, `npm-publish.ts` also moves `latest` to each beta (npm's staging leaves a `0.0.0-stage` placeholder as the first `latest`), which only works with that permission; a refused move is a warning in the run, not a failed release:
 
 ```sh
 gh secret delete NPM_TOKEN --repo shibbirweb/sendmock

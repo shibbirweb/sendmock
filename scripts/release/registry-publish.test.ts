@@ -149,7 +149,8 @@ describe("the Registry publish workflow", () => {
       // An empty `_authToken=${NODE_AUTH_TOKEN}` line from registry-url makes npm skip OIDC.
       expect(setupNode?.with?.["registry-url"], jobName).toBeUndefined();
       expect(runText, jobName).toContain('if [ -n "$NPM_TOKEN" ]; then');
-      expect(runText, jobName).toContain("npm install -g npm@^11.15.0");
+      // 11.21.0 is the first npm 11 whose `npm dist-tag` signs in with OIDC, which moves `latest`.
+      expect(runText, jobName).toContain("npm install -g npm@^11.21.0");
     }
   });
 
