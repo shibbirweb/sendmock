@@ -58,6 +58,25 @@ describe("Testcontainers publish", () => {
     );
   });
 
+  test("DS-06.1 the Java module's Central bundle is built before a release and holds only the version folder", () => {
+    const javaPack =
+      (moduleEntries as (ModuleEntry & { pack?: string })[]).find(
+        (moduleEntry) => moduleEntry.module === "Java",
+      )?.pack ?? "";
+    const centralPluginVersion =
+      /<artifactId>central-publishing-maven-plugin<\/artifactId>\s*<version>(\d+)\.(\d+)\.\d+<\/version>/.exec(
+        readFileSync("testcontainers/java/pom.xml", "utf8"),
+      );
+
+    expect(javaPack).toContain("-DskipUpload deploy");
+    expect(javaPack).toContain(
+      '! grep -v -E "^io/github/shibbirweb/sendmock-testcontainers/[^/]+/[^/]+$"',
+    );
+    // 0.12.0 is the first version that leaves Maven 3.10's maven-metadata-local.xml out.
+    expect(Number(centralPluginVersion?.[1])).toBe(0);
+    expect(Number(centralPluginVersion?.[2])).toBeGreaterThanOrEqual(12);
+  });
+
   test("DS-06.1 each module defaults to the SendMock image of its own version", () => {
     const workspaceVersion =
       /\[workspace\.package\][^[]*?\nversion = "([^"]+)"/.exec(

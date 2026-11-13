@@ -120,12 +120,14 @@ jobs:
           dist_tag="latest"
           if [ "$CHANNEL" = "beta" ]; then dist_tag="beta"; fi
           bun scripts/release/npm-packages.ts "$VERSION" dist npm-packages
-          for package_directory in npm-packages/*/; do
+          # Each folder starts with ./ and ends with /: npm reads `npm-packages/sendmock` as the
+          # GitHub repository npm-packages/sendmock (#220).
+          for package_directory in ./npm-packages/*/; do
             if [ "$(basename "$package_directory")" != "sendmock" ]; then
               npm publish "$package_directory" --access public --tag "$dist_tag"
             fi
           done
-          npm publish npm-packages/sendmock --access public --tag "$dist_tag"
+          npm publish ./npm-packages/sendmock/ --access public --tag "$dist_tag"
 
   # The server in the official MCP registry for a stable, once the npm package and the image it
   # names are published (the registry checks both claim its name); GitHub OIDC proves the
