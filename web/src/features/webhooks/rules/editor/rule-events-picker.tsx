@@ -14,10 +14,11 @@ const eventAreaLabels: Record<string, string> = {
   test: "Test",
 };
 
-/** `webhook.delivered` only drives the live log; a rule on it could loop. */
+/** These drive live views only, and a rule on `webhook.delivered` could loop. */
 const unselectableEvents: AppEventType[] = [
   "webhook.delivered",
   "sms.reply_webhook",
+  "traffic.pruned",
 ];
 
 /** Events grouped by the part before the dot: email, sms, verify, ... */

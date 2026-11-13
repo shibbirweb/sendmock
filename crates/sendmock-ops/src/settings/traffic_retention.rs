@@ -3,6 +3,7 @@ use sendmock_store::PrunableTable;
 
 use super::app_settings::AppSettings;
 use super::otp_extractor_cache::compile_otp_extractor;
+use crate::events::publish_traffic_pruned;
 use crate::{OperationContext, OperationError};
 
 const MILLISECONDS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
@@ -11,7 +12,7 @@ const MILLISECONDS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
 /// rules, templates, saved deliveries, numbers, providers, settings). Mail and its logs, HTTP
 /// requests and finished webhook deliveries keep the newest `max_emails`; SMS, verifications
 /// and push notifications the newest `max_sms`. A limit of 0 keeps every row (only the age
-/// limit applies). Answers how many rows went.
+/// limit applies). Publishes `traffic.pruned` when any row went, and answers how many did.
 pub async fn prune_traffic(operation_context: &OperationContext) -> Result<u64, OperationError> {
     let settings = operation_context.settings_store.current().await?;
     let cutoff_unix_ms = settings.max_age_days.map(|max_age_days| {
@@ -40,6 +41,7 @@ pub async fn prune_traffic(operation_context: &OperationContext) -> Result<u64, 
     pruned_count += traffic_pruner.remove_orphans().await?;
     if pruned_count > 0 {
         traffic_pruner.reclaim_free_pages().await?;
+        publish_traffic_pruned(operation_context, pruned_count);
     }
     Ok(pruned_count)
 }

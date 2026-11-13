@@ -220,6 +220,8 @@ Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01).
 
 Under load (W19 in [30](30-phase-5.md), 2026-11-12): the UI batches events and flushes them every 250 ms, writes list-view `data` straight into the cached first page of each list, and refetches what it cannot patch at most once per flush without cancelling a request in flight. A client that falls more than 1,024 events behind is closed with the reason `lagged`, and refetches its lists once after reconnecting.
 
+Retention (2026-11-13, #238): when the retention task deletes traffic past the limits in Settings, it publishes `traffic.pruned` with `{ "pruned_count": n }`, and the UI refetches every live list and the stats once, since rows it placed in its cache may be gone. The event drives live views only: webhook rules cannot pick it.
+
 ## Conventions
 
 - Errors: `{ "error": { "code": "not_found", "message": "..." } }` with proper HTTP status.

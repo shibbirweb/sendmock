@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   describeEventForNotification,
   isEventForSelectedProject,
+  listEveryRealtimeQueryKey,
   listQueryKeysToRefresh,
 } from "@/features/realtime/realtime-event-effects";
 import { queryKeys } from "@/lib/api/query-keys";
@@ -24,6 +25,15 @@ describe("listQueryKeysToRefresh", () => {
 
   test("PN-01.6 a push event refreshes the Push screen", () => {
     expect(listQueryKeysToRefresh("push.failed")).toEqual([queryKeys.push.all]);
+  });
+
+  test("PL-08.5 pruned traffic refreshes every live list and the stats", () => {
+    const refreshedKeys = listQueryKeysToRefresh("traffic.pruned");
+
+    expect(refreshedKeys).toEqual(listEveryRealtimeQueryKey());
+    expect(refreshedKeys).toContainEqual(queryKeys.emails.all);
+    expect(refreshedKeys).toContainEqual(queryKeys.sms.all);
+    expect(refreshedKeys).toContainEqual(queryKeys.system.stats);
   });
 
   test("an event outside every area refreshes nothing", () => {

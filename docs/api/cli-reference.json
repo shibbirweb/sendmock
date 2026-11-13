@@ -16102,7 +16102,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "Only this event.",
           "example": "email.received"
@@ -17782,7 +17783,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -18075,7 +18077,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types to test, as in the rule.",
           "example": [
@@ -18281,7 +18284,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -19748,7 +19752,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the template is made for.",
           "example": [

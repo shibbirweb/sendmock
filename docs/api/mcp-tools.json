@@ -24006,7 +24006,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "Only this event.",
           "example": "email.received"
@@ -24095,7 +24096,8 @@
               "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
-              "test.ping"
+              "test.ping",
+              "traffic.pruned"
             ]
           }
         }
@@ -26771,7 +26773,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -26918,7 +26921,8 @@
               "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
-              "test.ping"
+              "test.ping",
+              "traffic.pruned"
             ]
           },
           "RuleCondition": {
@@ -27357,7 +27361,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types to test, as in the rule.",
           "example": [
@@ -27466,7 +27471,8 @@
               "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
-              "test.ping"
+              "test.ping",
+              "traffic.pruned"
             ]
           },
           "RuleCondition": {
@@ -27683,7 +27689,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -27834,7 +27841,8 @@
               "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
-              "test.ping"
+              "test.ping",
+              "traffic.pruned"
             ]
           },
           "RuleCondition": {
@@ -30086,7 +30094,8 @@
             "subscription.canceled",
             "webhook.delivered",
             "webhook.failed",
-            "test.ping"
+            "test.ping",
+            "traffic.pruned"
           ],
           "description": "The event types the template is made for.",
           "example": [
@@ -30297,7 +30306,8 @@
               "subscription.canceled",
               "webhook.delivered",
               "webhook.failed",
-              "test.ping"
+              "test.ping",
+              "traffic.pruned"
             ]
           },
           "HttpMethod": {

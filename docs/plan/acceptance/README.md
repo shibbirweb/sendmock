@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 117 / 133 features, 571 / 657 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 117 / 133 features, 572 / 658 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -129,7 +129,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-05](04-catcher-platform.md#pl-05-settings) | Settings | UI in U1, backend per feature phase | 13 | Accepted |
 | [PL-06](04-catcher-platform.md#pl-06-security-defaults) | Security defaults | Phase 0 onwards | 4 | Accepted |
 | [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Accepted |
-| [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 4 | Accepted |
+| [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 5 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
 | [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | Accepted |
 | [PL-11](04-catcher-platform.md#pl-11-prometheus-metrics) | Prometheus metrics | After 1.0 (A12a) | 10 | Not started |

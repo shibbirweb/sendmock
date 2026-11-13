@@ -218,3 +218,63 @@ async fn a_limit_above_one_million_is_refused() {
 
     assert_eq!(status, 400, "{answer}");
 }
+
+async fn list_traffic_pruned_events(fixture: &WebhookSendFixture) -> Vec<Value> {
+    let (status, recent_events) = call_api(
+        &fixture.app_router,
+        "GET",
+        "/api/v1/events/recent?type=traffic.pruned",
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{recent_events}");
+    recent_events.as_array().cloned().unwrap_or_default()
+}
+
+// AC: PL-08.5
+#[tokio::test]
+async fn pruning_publishes_traffic_pruned_only_when_rows_go() {
+    let fixture = build_send_fixture(&[]);
+    for email_number in 1..=3 {
+        let email = json!({ "from": "app@shop.test", "to": ["sam@example.test"], "subject": "Hello", "text": format!("email {email_number}") });
+        post_ok(&fixture, "/api/v1/send", email).await;
+    }
+    let limits = json!({ "max_emails": 1 });
+    call_api(
+        &fixture.app_router,
+        "PATCH",
+        "/api/v1/settings",
+        Some(&limits),
+    )
+    .await;
+
+    let pruned_count = sendmock_ops::prune_traffic(&fixture.operation_context)
+        .await
+        .unwrap_or_else(|prune_error| panic!("pruning: {prune_error}"));
+    sendmock_ops::prune_traffic(&fixture.operation_context)
+        .await
+        .unwrap_or_else(|prune_error| panic!("pruning again: {prune_error}"));
+
+    assert!(pruned_count >= 2, "pruned {pruned_count}");
+    let pruned_events = list_traffic_pruned_events(&fixture).await;
+    assert_eq!(pruned_events.len(), 1, "{pruned_events:?}");
+    assert_eq!(pruned_events[0]["data"]["pruned_count"], pruned_count);
+}
+
+// AC: PL-08.5
+#[tokio::test]
+async fn a_rule_cannot_listen_to_traffic_pruned() {
+    let fixture = build_send_fixture(&[]);
+    let endpoint_id = fixture.create_endpoint(json!({})).await;
+
+    let (status, answer) = call_api(
+        &fixture.app_router,
+        "POST",
+        "/api/v1/webhooks/rules",
+        Some(&json!({ "name": "On prune", "endpoint_id": endpoint_id, "events": ["traffic.pruned"], "filter": null, "is_enabled": true })),
+    )
+    .await;
+
+    assert_eq!(status, 400, "{answer}");
+    assert_eq!(answer["error"]["field"], "events", "{answer}");
+}

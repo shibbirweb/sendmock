@@ -101,6 +101,27 @@ describe("applyRealtimeEvents", () => {
       queryKeys.system.stats,
     ]);
   });
+
+  test("PL-08.5 new emails then a prune in one flush refresh the lists the emails went into", () => {
+    const queryClient = new QueryClient();
+    const listKey = queryKeys.emails.infiniteList({ project: undefined });
+    queryClient.setQueryData<InfiniteData<PageOf<EmailSummary>>>(listKey, {
+      pages: [{ items: [], next_cursor: null, total_count: 0 }],
+      pageParams: [undefined],
+    });
+    const { queryRefresher, refreshedKeys } = createRecordingRefresher();
+
+    applyRealtimeEvents(queryClient, queryRefresher, [
+      buildNewEmailEvent("Kept or pruned"),
+      buildEvent("traffic.pruned", { pruned_count: 1 }),
+    ]);
+
+    expect(refreshedKeys).toContainEqual(queryKeys.emails.all);
+    expect(refreshedKeys).toContainEqual(queryKeys.system.stats);
+    expect(new Set(refreshedKeys.map((key) => JSON.stringify(key))).size).toBe(
+      refreshedKeys.length,
+    );
+  });
 });
 
 describe("refreshAfterReconnect", () => {
