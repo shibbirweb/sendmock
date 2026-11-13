@@ -140,3 +140,22 @@ UI in U2, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhoo
 - [x] WH-12.5 `forward(email)` only sends to addresses on the release allowlist; `store(notify)` posts a `message-url`, and `GET` on it returns the message. (#48)
 - [x] WH-12.6 Routes created through the Mailgun Routes API (`/v3/routes`) on the provider port behave like routes created in the UI. (#48)
 - [x] WH-12.7 Webhooks > Inbound routes lists routes by priority with their expression and actions; the editor builds the filter and actions in Mailgun syntax with a live "matches N of the last 50 incoming emails" preview showing captured groups and regex errors; routes can be reordered and deleted, and an incoming email runs the matching routes in order until `stop()`, each forward shown in its timeline and the delivery log. (#48)
+
+## WH-13 Webhooks shown and chosen on every simulation
+
+Phase 5 (W22), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request). Plan: [05-webhooks.md](../05-webhooks.md#shown-and-chosen-on-every-simulation).
+
+- [ ] WH-13.1 `POST /api/v1/webhooks/rules/match` with an event type and a `subject_id`, or the `data` of a message not stored yet, answers the enabled rules whose events and filter match, in rule order, with each endpoint's id, name and URL; it stores and sends nothing, and its CLI command and MCP tool give the same answer.
+- [ ] WH-13.2 Every UI action that simulates traffic (Mail's Simulate menu, Simulate open and click, Reply, Reply all and Forward, Import .eml as incoming, Send sample, SMS's Simulate status and read and Reply as recipient, Payments' and Push's Simulate actions) names the webhooks its event will trigger, or says No webhook: composers in a Webhooks row, menu items under their label.
+- [ ] WH-13.3 Each webhook name opens `/webhooks/endpoints?endpoint=<endpointId>` in a new tab, which shows that endpoint's details, and the form or menu it was clicked from stays as it was.
+- [ ] WH-13.4 Change (composers) and Choose webhooks (menu items) open a searchable list of every enabled endpoint with a checkbox each, the rule matches checked at first; the action then delivers to exactly the chosen endpoints, one delivery each with its own template and secret, and to none when none is chosen; no rule changes.
+- [ ] WH-13.5 Those operations accept `webhook_endpoint_ids` in the API, a repeatable `--webhook` flag in the CLI and the same parameter in MCP: without it the rules decide, with it only the listed endpoints get a delivery (`trigger: chosen`), and an unknown or disabled endpoint answers `422` naming it.
+
+## WH-14 Webhook payload shown and edited before a simulation
+
+Phase 5 (W23, after W22), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request). Plan: [05-webhooks.md](../05-webhooks.md#shown-and-chosen-on-every-simulation).
+
+- [ ] WH-14.1 `POST /api/v1/webhooks/rules/match` with `include_requests: true` answers, for each matching or chosen endpoint, the request it would send for that event: method, URL, headers with secrets masked and body, rendered with the endpoint's template; nothing is stored or sent.
+- [ ] WH-14.2 Every webhook named by a simulation (WH-13.2) has a Payload button that shows that request, with the body in the code editor.
+- [ ] WH-14.3 The body can be edited for that one action, Reset restores the rendered body, and an edited webhook is marked Edited; sending then delivers the edited body exactly as written.
+- [ ] WH-14.4 The operations accept `webhook_requests` (`endpoint_id`, `body`, `headers`) in the API, CLI and MCP; an edited body is signed over its edited bytes with the endpoint's secret (Standard Webhooks or the provider's own signature), so the receiver's verification passes, and the delivery log keeps the request as sent, marked edited.

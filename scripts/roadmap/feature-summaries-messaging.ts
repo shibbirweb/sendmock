@@ -325,6 +325,18 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
       "Mailgun-style inbound routes that match recipients and headers and forward, store or stop.",
     outcome: "Test inbound-email routing as Mailgun runs it.",
   },
+  "WH-13": {
+    summary:
+      "Every simulation in the UI names the webhooks it will trigger, each opening its endpoint in a new tab, with Change to pick one or several other endpoints for that one action.",
+    outcome:
+      "Know where a simulated email, SMS or payment event goes, and send it to the webhooks you choose.",
+  },
+  "WH-14": {
+    summary:
+      "Each webhook a simulation names shows the request it will send, and its body can be edited for that one action, signed over the edited body.",
+    outcome:
+      "See exactly what your handler will receive, and test it with the payload you need.",
+  },
   "HC-01": {
     summary:
       "An HTTP catcher that captures any request sent to a bin URL or the catch-all port, with headers, body and timing.",
