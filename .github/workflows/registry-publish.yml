@@ -90,8 +90,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: npm with trusted and staged publishing
-        run: npm install -g npm@^11.15.0
+      - name: npm with trusted and staged publishing and OIDC dist-tags
+        run: npm install -g npm@^11.21.0
 
       # npm sets a trusted publisher only on an existing package, so a package's first version
       # is staged with NPM_TOKEN (scripts/release/npm-publish.ts) and approved by the owner; once
@@ -215,8 +215,8 @@ jobs:
         with:
           node-version: 24
 
-      - name: npm with trusted and staged publishing
-        run: npm install -g npm@^11.15.0
+      - name: npm with trusted and staged publishing and OIDC dist-tags
+        run: npm install -g npm@^11.21.0
 
       - name: The first publish's token, while NPM_TOKEN is set
         env:

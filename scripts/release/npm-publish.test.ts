@@ -1,9 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+  buildNpmLatestTagArguments,
   buildNpmPublishArguments,
   buildRegistryPackageUrl,
+  readNpmPackageRecord,
   readNpmPackageState,
+  shouldMoveLatestTag,
   toNpmFolderSpec,
 } from "./npm-publish";
 
@@ -65,5 +68,45 @@ describe("publishing one npm package", () => {
       "./npm-packages/darwin-arm64/",
     );
     expect(toNpmFolderSpec(".")).toBe("./");
+  });
+});
+
+describe("the latest tag before the first stable", () => {
+  test("DS-03.8 reads the version npm's latest tag points at", async () => {
+    const answerWithLatest = async () =>
+      new Response(
+        JSON.stringify({
+          "dist-tags": { latest: "0.0.0-stage", beta: "0.1.0-beta.3" },
+        }),
+        { status: 200 },
+      );
+
+    expect(await readNpmPackageRecord("sendmock", answerWithLatest)).toEqual({
+      state: "published",
+      latestVersion: "0.0.0-stage",
+    });
+    expect(
+      await readNpmPackageRecord("sendmock", async () => new Response("{}")),
+    ).toEqual({ state: "published", latestVersion: null });
+  });
+
+  test("DS-03.8 moves latest to a beta over npm's staging placeholder, an older beta or no latest", () => {
+    expect(shouldMoveLatestTag("beta", "0.0.0-stage")).toBe(true);
+    expect(shouldMoveLatestTag("beta", "0.1.0-beta.2")).toBe(true);
+    expect(shouldMoveLatestTag("beta", null)).toBe(true);
+  });
+
+  test("DS-03.8 never moves latest over a stable, and a stable publish sets latest itself", () => {
+    expect(shouldMoveLatestTag("beta", "1.0.0")).toBe(false);
+    expect(shouldMoveLatestTag("latest", "0.0.0-stage")).toBe(false);
+  });
+
+  test("DS-03.8 moves latest with npm dist-tag add", () => {
+    expect(buildNpmLatestTagArguments("sendmock", "0.1.0-beta.4")).toEqual([
+      "dist-tag",
+      "add",
+      "sendmock@0.1.0-beta.4",
+      "latest",
+    ]);
   });
 });
