@@ -212,3 +212,13 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] EM-21.4 RETR answers the raw message as SendMock received it, dot-stuffed; TOP answers its headers and the first n body lines; UIDL answers each email's id, the same in every session. (#48)
 - [x] EM-21.5 DELE marks a message and RSET clears the marks; QUIT deletes the marked emails as the API does, firing `email.deleted`, and a connection that drops without QUIT deletes nothing. (#48)
 - [x] EM-21.6 `/api/v1/info` and Settings > Connection show the POP3 address when it is on, and Python's `poplib` logs in, lists and retrieves an email SendMock captured over SMTP. (#48)
+
+## EM-22 Where a simulated reply goes
+
+Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request). Plan: [07-ui.md](../07-ui.md#mail) and [05-webhooks.md](../05-webhooks.md#simulating-replies-and-forwards).
+
+- [ ] EM-22.1 Send reply is enabled as soon as the composer opens: sending the prefilled reply unchanged creates the incoming email with the quoted original, an empty message box sends an empty body, and Reply all behaves the same; Forward is enabled once its To holds an address.
+- [ ] EM-22.2 `POST /api/v1/inbound-routes/match` with `to`, `cc` and `headers` answers the inbound routes that would run, in run order with their actions and ending at one that calls `stop()`, and the enabled webhook rules on `email.inbound` whose filter matches, with their endpoint's name and URL; it stores and sends nothing, and `sendmock route match` and `sendmock_inbound_route_match` give the same answer.
+- [ ] EM-22.3 The Reply, Reply all and Forward composers show a "Delivers to" row with each URL or address a matching route forwards or notifies and each matching rule's endpoint URL, each linking to its route or rule, and the row updates when the Forward address changes.
+- [ ] EM-22.4 When nothing would receive the email, the row says "Nothing receives this yet" and Send replies to your app creates, from an app URL and the choice "Only mail to <address>" (default) or "Every incoming email", an inbound route with a `forward` action to that URL, which then shows in the row and in Webhooks > Inbound routes.
+- [ ] EM-22.5 After sending, the toast and the new incoming email's header list each webhook request it caused with its URL and its status, updated live from pending to the HTTP status or error, each linking to the delivery in Webhooks > Deliveries, or say that nothing received it with a link to Webhooks > Inbound routes; `GET /api/v1/webhooks/deliveries?subject_id=<emailId>` answers only that email's deliveries.

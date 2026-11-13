@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 117 / 129 features, 571 / 640 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 117 / 133 features, 571 / 657 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -81,6 +81,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | After 1.0 (A1) | 6 | Accepted |
 | [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | After 1.0 (A2) | 6 | Accepted |
 | [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | After 1.0 (A6) | 6 | Accepted |
+| [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Not started |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |
@@ -116,6 +117,8 @@ On top of its own criteria, a feature is done only when:
 | [WH-10](03-webhooks.md#wh-10-saved-deliveries) | Saved deliveries | UI in U2, backend Phase 3 | 4 | Accepted |
 | [WH-11](03-webhooks.md#wh-11-webhook-metrics) | Webhook metrics | UI in U1/U2, backend Phase 3 | 3 | Accepted |
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
+| [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Not started |
+| [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Not started |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
@@ -155,6 +158,7 @@ On top of its own criteria, a feature is done only when:
 | [UI-10](06-ui.md#ui-10-community-links) | Community links | Phase U3 | 2 | Accepted |
 | [UI-11](06-ui.md#ui-11-every-feature-in-every-way) | Every feature in every way | Phase U3 | 7 | Accepted |
 | [UI-12](06-ui.md#ui-12-not-available-yet) | Not available yet | Phase 1 onwards | 3 | Accepted |
+| [UI-13](06-ui.md#ui-13-icon-tooltips) | Icon tooltips | Phase 5 (W21) | 3 | Not started |
 | [DS-01](07-distribution-website.md#ds-01-single-binary) | Single binary | Phase 0 (build), Phase 5 (all targets) | 5 | Accepted |
 | [DS-02](07-distribution-website.md#ds-02-docker-image) | Docker image | Phase 0 (`edge`), Phase 1 (`beta`), Phase 5 (stable tags, hardening) | 6 | Accepted |
 | [DS-03](07-distribution-website.md#ds-03-package-managers-and-install-scripts) | Package managers and install scripts | Phase 1 (beta Homebrew, `.deb` and `.rpm`), Phase 5 (all) | 8 | In progress |

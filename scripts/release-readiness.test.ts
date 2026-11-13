@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { readCriterionReferences } from "./acceptance";
 import {
+  listFeaturesNotAccepted,
   listUntickedCriterionIds,
   listWorkflowSettings,
   parseRunbookSteps,
@@ -18,12 +19,19 @@ describe("the 1.0 release runbook", () => {
     expect(unnamedSettings).toEqual([]);
   });
 
-  test("names a step for every unticked criterion that no test in the repository proves", () => {
+  test("names a step for every unticked criterion of a started feature that no test proves", () => {
     const provenCriterionIds = readRunbookSteps().flatMap((step) => step.provenCriterionIds);
     const criterionReferences = readCriterionReferences();
+    // A feature not started yet is proven by the tests it is built with, not by an owner step;
+    // release-readiness.ts still lists it among the features not accepted.
+    const notStartedFeatureIds = listFeaturesNotAccepted()
+      .filter((feature) => feature.status === "Not started")
+      .map((feature) => feature.featureId);
     const criteriaWithoutProof = listUntickedCriterionIds().filter(
       (criterionId) =>
-        !provenCriterionIds.includes(criterionId) && !criterionReferences.has(criterionId),
+        !provenCriterionIds.includes(criterionId) &&
+        !criterionReferences.has(criterionId) &&
+        !notStartedFeatureIds.some((featureId) => criterionId.startsWith(`${featureId}.`)),
     );
 
     expect(criteriaWithoutProof).toEqual([]);

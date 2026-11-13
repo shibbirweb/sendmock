@@ -124,6 +124,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Test a feature or a script that reads a mailbox over POP3 against SendMock, without changing it.",
   },
+  "EM-22": {
+    summary:
+      "The Reply and Forward composers send as soon as they open, show which inbound routes and webhook rules will receive the incoming email, create a route to your app's URL in one step when nothing would, and link to each webhook request after sending.",
+    outcome:
+      "Test your app's inbound mail handler from a simulated reply without first learning how inbound routes work.",
+  },
   "PN-01": {
     summary:
       "Push notifications as their own area: FCM, Expo and OneSignal answered as the real services, each notification shown as the phone would, with magic tokens that fail on purpose.",
@@ -318,6 +324,18 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     summary:
       "Mailgun-style inbound routes that match recipients and headers and forward, store or stop.",
     outcome: "Test inbound-email routing as Mailgun runs it.",
+  },
+  "WH-13": {
+    summary:
+      "Every simulation in the UI names the webhooks it will trigger, each opening its endpoint in a new tab, with Change to pick one or several other endpoints for that one action.",
+    outcome:
+      "Know where a simulated email, SMS or payment event goes, and send it to the webhooks you choose.",
+  },
+  "WH-14": {
+    summary:
+      "Each webhook a simulation names shows the request it will send, and its body can be edited for that one action, signed over the edited body.",
+    outcome:
+      "See exactly what your handler will receive, and test it with the payload you need.",
   },
   "HC-01": {
     summary:
