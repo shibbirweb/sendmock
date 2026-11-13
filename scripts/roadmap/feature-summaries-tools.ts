@@ -97,6 +97,11 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "A newer UI against an older binary explains itself instead of failing.",
   },
+  "UI-13": {
+    summary:
+      "Every icon-only button, link and toggle shows a tooltip naming its action, and its shortcut when it has one, on hover and on keyboard focus.",
+    outcome: "Know what an icon does before clicking it.",
+  },
   "DS-01": {
     summary:
       "A single self-contained binary for macOS, Linux and Windows on x64 and arm64, with the web UI embedded.",

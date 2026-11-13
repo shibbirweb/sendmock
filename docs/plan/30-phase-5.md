@@ -37,6 +37,8 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
 | W16 | Run with no install: `npx sendmock` (and `bunx`, `pnpm dlx`, `yarn dlx`) as its own channel, added 2026-11-07 (owner request) | DS-03.7 (new) | W3a, W11 |
 | W17 | Agents start SendMock through npx: `ai install`, `GET /ai/agents` and Settings > Connection give the `npx -y sendmock mcp` form, added 2026-11-07 (owner request) | AI-05.9 (new) | W16 |
 | W19 | Realtime under load: the web UI keeps showing new mail while thousands of emails arrive, added 2026-11-12 (owner report, [#224](https://github.com/shibbirweb/sendmock/issues/224)) | PL-02.3 to PL-02.5 (new) | |
+| W20 | Where a simulated reply goes: Send reply enabled as prefilled, a "Delivers to" row in the Reply and Forward composers, a one-step route to your app's URL, and links to each webhook request after sending, added 2026-11-13 (owner request, [#233](https://github.com/shibbirweb/sendmock/issues/233)), for the next beta | EM-22 (new) | |
+| W21 | Icon tooltips: every icon-only button, link and toggle names its action in a tooltip, with its shortcut, added 2026-11-13 (owner request, [#234](https://github.com/shibbirweb/sendmock/issues/234)), for the next beta | UI-13 (new) | |
 
 ## Design notes
 
@@ -149,6 +151,18 @@ All on `feat/phase-0` in #48, a commit per workstream, as for Phases 1 to 4. Lar
     5. After a reconnect the open lists are refetched once.
   - **Server fix:** a realtime client that falls behind is closed (close reason `lagged`) instead of skipping events silently; the client reconnects and refetches (step 5). No new event type and no change to the API contract.
   - **Proof:** Vitest unit tests for the batcher, the cache patches and the toast limit with a fake clock; a Rust test that a lagging WebSocket client is closed; a live Playwright test (`web/tests/live/`) that sends 5,000 emails over SMTP against a release binary while the mail list is open, counts the browser's list requests and checks the list, the counters and a message opened during the burst.
+- **W20 design (where a simulated reply goes, 2026-11-13, owner request, [#233](https://github.com/shibbirweb/sendmock/issues/233)):** after Reply as recipient, the owner could not tell where the reply would go, had to find Webhooks > Inbound routes alone, and the Send reply button stayed disabled until the message box was edited.
+  - **Send:** `use-email-response-form.ts` drops the `hasDraftChanges` and non-empty rules for Reply and Reply all. The reply operation (`crates/sendmock-ops/src/email/email_response_operations.rs`) stops refusing an empty `body` ("Write a reply"), and `body` becomes optional in `EmailReplyRequest`, defaulting to empty, so the API, CLI and MCP accept the same. Forward keeps its address check.
+  - **Delivers to:** a new operation `matchInboundRoutes` (`POST /inbound-routes/match`, [06](06-api.md#email)) runs the route filters and the `email.inbound` rule filters against the recipients and headers the email would have, without storing or sending anything, in the domain's route matcher (the same code that routes a real incoming email, so the preview never disagrees with what happens). The composer calls it through a `useInboundDestinations` hook, debounced on the Forward address.
+  - **One-step setup:** the inline form creates the route through the existing `createInboundRoute`, with `match_recipient("^<escaped address>$")` or `catch_all()` and `forward("<url>")`, then refetches the match.
+  - **After sending:** `GET /webhooks/deliveries` gains a `subject_id` filter; the toast and the incoming email's header read it for the new email and follow the realtime `webhook.delivered` and `webhook.failed` events, so the status moves from pending to the answer without polling.
+  - **Parity:** `sendmock route match` and `sendmock_inbound_route_match` from the operation registry; the user guide's Reply and Inbound routes pages and the Deeper entries for the composer.
+  - **Proof:** Vitest for the form rule and the hook; a Rust test that the match answers what a real incoming email then does (routes in order, `stop()`, rules); the contract sample; Playwright in mock mode and live: reply unchanged, Delivers to, the one-step route, and the delivery links after sending.
+- **W21 design (icon tooltips, 2026-11-13, owner request, [#234](https://github.com/shibbirweb/sendmock/issues/234)):** about 100 icon-only buttons in `web/src` use the shadcn `Button` with `size="icon"`, and only a few have a tooltip, so icons such as Mark as unread and Delete in the email header say nothing on hover.
+  - **Component:** `components/common/icon-button.tsx` wraps the shadcn `Button` and `Tooltip` and requires `label` (also the `aria-label`) and an optional `shortcut`, shown as "Delete email (D)". Tooltips open on hover and keyboard focus with one shared delay from the `TooltipProvider` at the app root.
+  - **Guard:** an ESLint `no-restricted-syntax` rule fails on `size="icon"` (and its variants) outside `icon-button.tsx`; the Deeper inventory crawl, which already visits every screen, hovers and focuses each icon-only control and fails when no tooltip appears or its text differs from the accessible name.
+  - **Shortcuts:** the label's shortcut comes from the same shortcut list the `?` help reads, so the two never disagree.
+  - **Proof:** a Vitest test for `IconButton`; the lint rule in CI; the crawl in mock mode on every screen (UI-13.1).
 
 ## Owner steps
 

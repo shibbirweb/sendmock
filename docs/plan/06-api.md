@@ -42,6 +42,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/emails/{emailId}/release` | send to a real SMTP relay (`{ "to": [...] }` optional) |
 | POST | `/emails/{emailId}/reply`, `/emails/{emailId}/forward` | reply to or forward an email as its recipient; the result is stored as an inbound email and fires `email.inbound` ([03](03-email.md)) |
 | GET/POST/PATCH/DELETE | `/inbound-routes` | Mailgun-style routes for incoming email, in priority order; `POST /inbound-routes/test` shows which routes match and what runs ([05](05-webhooks.md#email-replies-and-inbound-routes-mailgun-style)) |
+| POST | `/inbound-routes/match` | where an incoming email would go (W20, EM-22): `{ "to": [...], "cc": [...], "headers": { "subject": "..." } }` answers `routes` (each matching route in run order with its actions, ending at one that calls `stop()`) and `webhook_rules` (each enabled rule on `email.inbound` whose filter matches, with its endpoint's name and URL); nothing is sent or stored |
 | GET/POST/PATCH/DELETE | `/tag-rules`, `/forward-rules` | automatic tagging and auto-forward rules (a filter, as in webhook rules, and the tag or the addresses to forward to); `POST /tag-rules/{ruleId}/move` and `/forward-rules/{ruleId}/move` reorder |
 | GET | `/emails/latest?to=&subject=` | the newest email to a recipient (404 when none) |
 | POST | `/emails/inbound` | create an incoming email from fields or raw MIME; fires `email.inbound` ([05](05-webhooks.md#simulating-replies-and-forwards)) |
@@ -121,7 +122,7 @@ Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute
 | GET/POST/PATCH/DELETE | `/webhooks/rules` | manage rules |
 | POST | `/webhooks/rules/preview` | which of the last 50 messages a filter would match: body `{ "events": [...], "filter": {...} }`, returns `checked_count`, `match_count` and the messages with `is_match` |
 | POST | `/webhooks/rules/{ruleId}/move` | reorder: `{ "direction": "up" }` or `"down"` |
-| GET | `/webhooks/deliveries` | delivery log, newest first and paged: `status` (comma-separated), `endpoint_id`, `event_type` |
+| GET | `/webhooks/deliveries` | delivery log, newest first and paged: `status` (comma-separated), `endpoint_id`, `event_type`, `subject_id` (the email, SMS or payment that caused it; W20, EM-22) |
 | GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
 | POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables (`409 gateway_notification` for a payment gateway's notification, which is resent from the payment), or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |

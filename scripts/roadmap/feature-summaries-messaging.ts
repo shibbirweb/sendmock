@@ -124,6 +124,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Test a feature or a script that reads a mailbox over POP3 against SendMock, without changing it.",
   },
+  "EM-22": {
+    summary:
+      "The Reply and Forward composers send as soon as they open, show which inbound routes and webhook rules will receive the incoming email, create a route to your app's URL in one step when nothing would, and link to each webhook request after sending.",
+    outcome:
+      "Test your app's inbound mail handler from a simulated reply without first learning how inbound routes work.",
+  },
   "PN-01": {
     summary:
       "Push notifications as their own area: FCM, Expo and OneSignal answered as the real services, each notification shown as the phone would, with magic tokens that fail on purpose.",
