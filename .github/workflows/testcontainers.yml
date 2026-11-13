@@ -63,7 +63,14 @@ jobs:
             language: java
             folder: java
             run: mvn --batch-mode --quiet test
-            pack: mvn --batch-mode --quiet -P release -Dgpg.skip -DskipTests package && ls target/sendmock-testcontainers-*-sources.jar target/sendmock-testcontainers-*-javadoc.jar
+            # Builds the Central bundle as the release does, without uploading it. Central rejects
+            # a bundle with any file outside the version folder (Maven 3.10 added one, #219).
+            pack: >-
+              mvn --batch-mode --quiet -P release -Dgpg.skip -DskipTests -DskipUpload deploy &&
+              ls target/sendmock-testcontainers-*-sources.jar target/sendmock-testcontainers-*-javadoc.jar &&
+              unzip -Z1 target/central-publishing/central-bundle.zip > "$RUNNER_TEMP/central-bundle-files.txt" &&
+              grep -q -E "/sendmock-testcontainers-[^/]+\.pom$" "$RUNNER_TEMP/central-bundle-files.txt" &&
+              ! grep -v -E "^io/github/shibbirweb/sendmock-testcontainers/[^/]+/[^/]+$" "$RUNNER_TEMP/central-bundle-files.txt"
           - module: Node
             language: node
             folder: node
