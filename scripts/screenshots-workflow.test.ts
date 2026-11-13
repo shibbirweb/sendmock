@@ -2,13 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 type WorkflowStep = { name?: string; uses?: string; run?: string; with?: Record<string, string> };
-type WorkflowTriggers = Record<string, { inputs?: Record<string, { default?: string }> } | null>;
+type WorkflowTriggers = Record<
+  string,
+  { inputs?: Record<string, { default?: string }>; types?: string[] } | null
+>;
 type ScreenshotsWorkflow = {
   on?: WorkflowTriggers;
   true?: WorkflowTriggers;
   permissions: Record<string, string>;
   jobs: {
     screenshots: {
+      if: string;
       container: { image: string };
       env: Record<string, string>;
       steps: WorkflowStep[];
@@ -31,9 +35,19 @@ function findStepIndex(isWanted: (step: WorkflowStep) => boolean): number {
 
 describe("Screenshots workflow", () => {
   test("WS-10.5 starts only by hand, for every scene or the named ones", () => {
-    expect(Object.keys(triggers)).toEqual(["workflow_dispatch"]);
+    expect(Object.keys(triggers).sort()).toEqual(["pull_request", "workflow_dispatch"]);
     expect(triggers.workflow_dispatch?.inputs?.scenes?.default).toBe("");
     expect(job.env.SCENES).toBe("${{ inputs.scenes }}");
+  });
+
+  test("WS-10.5 a pull request asks for a run with the screenshots label, on its own branch", () => {
+    const checkoutStep = steps.find((step) => step.uses?.startsWith("actions/checkout"));
+
+    expect(triggers.pull_request?.types).toEqual(["labeled"]);
+    expect(job.if).toBe(
+      "github.event_name == 'workflow_dispatch' || github.event.label.name == 'screenshots'",
+    );
+    expect(checkoutStep?.with?.ref).toBe("${{ github.event.pull_request.head.sha || github.ref }}");
   });
 
   test("WS-10.5 checks the scene names before any of them reach a command", () => {

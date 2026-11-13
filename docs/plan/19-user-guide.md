@@ -419,11 +419,17 @@ A later layer of the guide, for readers who want to know exactly what each thing
 
 - `bun run screenshots` (website) gains a scene per menu and sub-page that has its own screen (about 25), written to `docs/wiki/images/<page>.jpg` in the light theme, as today's four are.
 - Images stay JPEG at quality 80; the total added is expected around 2.5 MB, checked when the scenes are added.
-- Since 2026-11-13 (W24, WS-10.5) the screenshots are taken by the **Screenshots** workflow, not on a laptop. It commits nothing; the images come back as an artifact to review and commit.
+- Since 2026-11-13 (W24, WS-10.5) the screenshots are taken by the **Screenshots** workflow, not on a laptop. It commits nothing; the images come back as an artifact to review and commit. A pull request asks for a run with the `screenshots` label; a manual run, which can name scenes, works once the workflow is on `develop`.
 
 ### Retaking the screenshots
 
-1. Start the workflow on your branch. Leave out `-f scenes=...` to take every scene; name scenes to take only those (`deeper` is the Deeper pages' annotated shots):
+1. Start the workflow. On a pull request, add the `screenshots` label, which takes every scene on the pull request's branch (to run it again, remove the label and add it again):
+
+   ```bash
+   gh pr edit <number> --add-label screenshots
+   ```
+
+   Or start it by hand for a branch, once the workflow is on `develop`. Leave out `-f scenes=...` to take every scene; name scenes to take only those (`deeper` is the Deeper pages' annotated shots):
 
    ```bash
    gh workflow run screenshots.yml --ref <branch> -f scenes=deeper

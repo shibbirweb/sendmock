@@ -2,14 +2,18 @@
 # the landing shots (website/public/screenshots/), the user guide shots (docs/wiki/images/)
 # and the annotated Deeper shots (docs/wiki/deeper/images/).
 #
-# Started by hand only: the demo's data and times differ on every run, so the images never
-# match byte for byte and a check on every pull request would always report a change.
+# Started on demand only: the demo's data and times differ on every run, so the images never
+# match byte for byte and a check on every pull request would always report a change. GitHub
+# starts a workflow by hand only once its file is on the default branch, so a pull request
+# asks for a run with the `screenshots` label (every scene, on the pull request's branch);
+# remove the label and add it again for another run.
 #
 # It commits nothing. Every commit in this repository is made by the owner after review, and a
 # push made with GITHUB_TOKEN would not start CI on the branch. The images come back as the
 # `screenshots` artifact, laid out as the repository:
 #
-#   gh workflow run screenshots.yml --ref <branch> -f scenes=deeper
+#   gh pr edit <number> --add-label screenshots
+#   gh workflow run screenshots.yml --ref <branch> -f scenes=deeper   (once the file is on develop)
 #   gh run download <run id> -n screenshots
 name: Screenshots
 
@@ -21,6 +25,8 @@ on:
         required: false
         default: ""
         type: string
+  pull_request:
+    types: [labeled]
 
 concurrency:
   group: screenshots-${{ github.ref }}
@@ -32,6 +38,8 @@ permissions:
 jobs:
   screenshots:
     name: Take the screenshots
+    # Any other label added to a pull request starts the workflow too; only this one runs it.
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'screenshots'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Playwright's own image has the browser and its system packages, as in ci.yml.
@@ -42,6 +50,7 @@ jobs:
     env:
       APP_URL: http://127.0.0.1:5180
       # Read from the environment, never pasted into a script, so the input cannot run commands.
+      # A label run has no inputs, so it takes every scene.
       SCENES: ${{ inputs.scenes }}
     steps:
       # Without git, checkout downloads files with no history, and the summary needs git status.
@@ -52,7 +61,11 @@ jobs:
             apt-get install --yes --no-install-recommends git
           fi
 
+      # A pull request run takes the branch as it is, not its merge with the base branch, so
+      # the images can be committed to the branch.
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: Check the scene names
         shell: bash
