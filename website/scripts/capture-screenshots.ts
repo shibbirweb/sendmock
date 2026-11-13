@@ -5,6 +5,7 @@
  * argument, and scene names after it to take only those, e.g.
  * `bun run screenshots http://localhost:5173 mail-providers sms-providers`.
  * The scene name `deeper` takes the Deeper pages' annotated screenshots.
+ * The committed images come from the Screenshots workflow (WS-10.5), which runs this script in CI.
  */
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";

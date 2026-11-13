@@ -204,6 +204,7 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 - [x] WS-10.2 Each entry says where the control is (an annotated screenshot), what it does and what you see afterwards, what it changes or sends (data, events, webhooks, logs), where its text comes from, how it links to other screens, the same action from the CLI, REST API and MCP, and the errors it can show with what to do. (#48)
 - [x] WS-10.3 A Playwright crawl of the demo lists every control per screen, and a test fails when a control has no entry or an entry names a control that no longer exists. (#48)
 - [x] WS-10.4 The data sources and the CLI, REST API and MCP equivalents are generated from the OpenAPI spec and the surface catalogue, and the annotated screenshots from `bun run screenshots`, so they cannot drift from the code. (#48)
+- [ ] WS-10.5 The Screenshots workflow, started by hand for any branch with every scene or the named ones, photographs the mock-mode app in CI and uploads the landing, user guide and Deeper images as one artifact laid out as the repository; it commits nothing, so the owner reviews and commits the images. (added 2026-11-13, owner choice, #242)
 
 ## WS-11 Docs traffic analytics
 
