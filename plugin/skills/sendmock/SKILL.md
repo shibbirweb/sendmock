@@ -5,7 +5,7 @@ description: Test and debug email, SMS, payments, HTTP calls and webhooks locall
 
 # SendMock
 
-Written for SendMock 0.1.0-beta.1. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
+Written for SendMock 0.1.0-beta.2. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
 
 ## First step
 
