@@ -128,10 +128,12 @@ export function writeChannelTable(pageText: string, table: string): string {
   );
 }
 
+// An install may change into its own folder (npm installs into a new project), so the check
+// names the script from the checkout instead of the current folder.
 function buildCheckLine(shell: string, command: string): string {
   return shell === "pwsh"
-    ? `bun scripts/release/check-installed.ts "${command}" $env:VERSION $env:RELEASE_CHANNEL\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }`
-    : `bun scripts/release/check-installed.ts "${command}" "$VERSION" "$RELEASE_CHANNEL"`;
+    ? `bun "$env:GITHUB_WORKSPACE/scripts/release/check-installed.ts" "${command}" $env:VERSION $env:RELEASE_CHANNEL\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }`
+    : `bun "$GITHUB_WORKSPACE/scripts/release/check-installed.ts" "${command}" "$VERSION" "$RELEASE_CHANNEL"`;
 }
 
 /** One job per channel and runner that installs the stage, then runs test cases 2 to 8. */

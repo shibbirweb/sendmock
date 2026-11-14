@@ -97,7 +97,7 @@ describe("install channels", () => {
     expect(stableMatrix.length).toBeGreaterThan(15);
     for (const matrixEntry of stableMatrix) {
       expect(matrixEntry.script).toContain(
-        "bun scripts/release/check-installed.ts",
+        "/scripts/release/check-installed.ts",
       );
     }
     expect(
@@ -108,6 +108,28 @@ describe("install channels", () => {
       stableMatrix.find((entry) => entry.name === "Homebrew on macos-latest")
         ?.container,
     ).toBe("");
+  });
+
+  test("DS-03.6 the check finds its script from the checkout after an install changes folder", () => {
+    const npmMatrix = buildChannelMatrix(channels, "beta", "npm");
+
+    expect(npmMatrix.map((entry) => entry.shell)).toEqual([
+      "bash",
+      "bash",
+      "pwsh",
+    ]);
+    for (const matrixEntry of npmMatrix) {
+      expect(matrixEntry.script).toContain("npm-project");
+      expect(matrixEntry.script).not.toContain(
+        "bun scripts/release/check-installed.ts",
+      );
+    }
+    expect(npmMatrix[0]?.script).toContain(
+      'bun "$GITHUB_WORKSPACE/scripts/release/check-installed.ts"',
+    );
+    expect(npmMatrix[2]?.script).toContain(
+      'bun "$env:GITHUB_WORKSPACE/scripts/release/check-installed.ts"',
+    );
   });
 });
 
@@ -185,6 +207,24 @@ describe("npx with no install", () => {
     }
     for (const matrixEntry of betaMatrix) {
       expect(matrixEntry.script).toContain("npx --yes sendmock@beta");
+    }
+  });
+
+  // npm exec dies on SIGTERM without passing it on (npm 10 and 11), so a stop sent to npx leaves
+  // SendMock running and reports exit code 143; case 8 runs on the binary npx fetched instead.
+  test("DS-03.7 the npx check runs cases 3 to 8 on the binary npx fetched, not through npx", () => {
+    const betaMatrix = buildChannelMatrix(channels, "beta", "npx");
+
+    for (const matrixEntry of betaMatrix) {
+      const [installScript = "", checkLine = ""] =
+        matrixEntry.script.split(/\n(?=bun )/);
+      expect(installScript).toStartWith(
+        "npx --yes sendmock@beta version --json",
+      );
+      expect(installScript).toContain("_npx");
+      expect(installScript).not.toContain("exec npx");
+      expect(checkLine).toContain("npx-bin");
+      expect(checkLine).not.toContain("npx --yes");
     }
   });
 
