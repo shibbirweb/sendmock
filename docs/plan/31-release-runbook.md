@@ -165,11 +165,35 @@ Proves: DS-02.6, DS-03.7, WS-03.7, DS-09.5, DS-10.5, DS-03.8
 
 ## 7. Publish 1.0.0
 
+Every stable goes through at least one beta ([16](16-website-and-releases.md#the-bump-choices)), so 1.0.0 takes two releases (changed 2026-11-14: this step first ran `bump=major` once, but from a beta that makes `1.0.0-beta.1`, and `bump=stable` would finish `0.1.0`).
+
+First the 1.0 beta. Check the version and the notes with a dry run, then make it:
+
+```sh
+gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=major -f dry_run=true
+```
+
 ```sh
 gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=major -f dry_run=false
 ```
 
-Merge the release pull request, then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build and publishes the website's 1.0 docs at `/`; when it finishes, Registry publish sends the release to npm, PyPI and crates.io and publishes the MCP registry entry. Once Registry publish has finished, install it:
+Merge the release pull request (`chore:[REL-n] release 1.0.0-beta.1`). Publish beta releases `1.0.0-beta.1` to the beta channels, and Registry publish sends it to npm and PyPI (crates.io takes only a stable). Once Registry publish has finished, install it:
+
+```sh
+gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0-beta.1 -f channel=beta -f channels=after-publish
+```
+
+Then 1.0.0. Only docs, tests, CI changes and chores may land after `1.0.0-beta.1`: a `feat:` or `fix:` makes Prepare release refuse `stable` and needs another beta first. Check with a dry run, then make it:
+
+```sh
+gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=stable -f dry_run=true
+```
+
+```sh
+gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=stable -f dry_run=false
+```
+
+Merge the release pull request (`chore:[REL-n] release 1.0.0`), then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build and publishes the website's 1.0 docs at `/`; when it finishes, Registry publish sends the release to npm, PyPI and crates.io and publishes the MCP registry entry. Once Registry publish has finished, install it:
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0 -f channel=stable -f channels=after-publish
