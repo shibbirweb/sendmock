@@ -8,7 +8,7 @@ members = [
 
 [workspace.package]
 # The version is the source of truth that scripts/version.ts syncs into every other file.
-version = "0.1.0-beta.3"
+version = "0.1.0-beta.4"
 edition = "2024"
 rust-version = "1.98"
 license = "MIT OR Apache-2.0"
@@ -18,18 +18,18 @@ homepage = "https://shibbirweb.github.io/sendmock/"
 # Internal crates carry the exact workspace version, as crates.io needs a version beside the path
 # and the crates are released together (scripts/version.ts writes it).
 [workspace.dependencies]
-sendmock-api = { path = "crates/sendmock-api", version = "=0.1.0-beta.3" }
-sendmock-cli = { path = "crates/sendmock-cli", version = "=0.1.0-beta.3" }
-sendmock-core = { path = "crates/sendmock-core", version = "=0.1.0-beta.3" }
-sendmock-mail = { path = "crates/sendmock-mail", version = "=0.1.0-beta.3" }
-sendmock-mcp = { path = "crates/sendmock-mcp", version = "=0.1.0-beta.3" }
-sendmock-ops = { path = "crates/sendmock-ops", version = "=0.1.0-beta.3" }
-sendmock-smtp = { path = "crates/sendmock-smtp", version = "=0.1.0-beta.3" }
-sendmock-sms = { path = "crates/sendmock-sms", version = "=0.1.0-beta.3" }
-sendmock-payments = { path = "crates/sendmock-payments", version = "=0.1.0-beta.3" }
-sendmock-pop3 = { path = "crates/sendmock-pop3", version = "=0.1.0-beta.3" }
-sendmock-store = { path = "crates/sendmock-store", version = "=0.1.0-beta.3" }
-sendmock-webhooks = { path = "crates/sendmock-webhooks", version = "=0.1.0-beta.3" }
+sendmock-api = { path = "crates/sendmock-api", version = "=0.1.0-beta.4" }
+sendmock-cli = { path = "crates/sendmock-cli", version = "=0.1.0-beta.4" }
+sendmock-core = { path = "crates/sendmock-core", version = "=0.1.0-beta.4" }
+sendmock-mail = { path = "crates/sendmock-mail", version = "=0.1.0-beta.4" }
+sendmock-mcp = { path = "crates/sendmock-mcp", version = "=0.1.0-beta.4" }
+sendmock-ops = { path = "crates/sendmock-ops", version = "=0.1.0-beta.4" }
+sendmock-smtp = { path = "crates/sendmock-smtp", version = "=0.1.0-beta.4" }
+sendmock-sms = { path = "crates/sendmock-sms", version = "=0.1.0-beta.4" }
+sendmock-payments = { path = "crates/sendmock-payments", version = "=0.1.0-beta.4" }
+sendmock-pop3 = { path = "crates/sendmock-pop3", version = "=0.1.0-beta.4" }
+sendmock-store = { path = "crates/sendmock-store", version = "=0.1.0-beta.4" }
+sendmock-webhooks = { path = "crates/sendmock-webhooks", version = "=0.1.0-beta.4" }
 
 axum = "0.8"
 chrono = { version = "0.4", default-features = false, features = [
