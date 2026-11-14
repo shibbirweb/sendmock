@@ -19,6 +19,8 @@ type Workflow = {
     string,
     {
       if?: string;
+      uses?: string;
+      with?: Record<string, string>;
       strategy?: { matrix?: { include?: Record<string, string>[] } };
     }
   >;
@@ -83,9 +85,18 @@ describe("Release build", () => {
   });
 
   test("DS-01.1 builds macOS arm64 and x64, static Linux x64 and arm64, and Windows x64 and arm64", () => {
+    const buildArchivesWorkflow = readWorkflow("build-archives.yml");
     const builtTargets = (
-      releaseWorkflow.jobs.build?.strategy?.matrix?.include ?? []
+      buildArchivesWorkflow.jobs.build?.strategy?.matrix?.include ?? []
     ).map((entry) => entry.target);
+
+    expect(releaseWorkflow.jobs.build?.uses).toBe(
+      "./.github/workflows/build-archives.yml",
+    );
+    expect(releaseWorkflow.jobs.build?.with).toEqual({
+      commit_sha: "${{ inputs.commit_sha || github.sha }}",
+      channel: "${{ inputs.channel || 'dev' }}",
+    });
 
     expect(builtTargets.sort()).toEqual([
       "aarch64-apple-darwin",

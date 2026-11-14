@@ -104,6 +104,16 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] DS-10.4 The docs say how to install the extension. (#48)
 - [x] DS-10.5 Each beta and stable release pushes the extension image for `linux/amd64` and `linux/arm64` to `ghcr.io/shibbirweb/sendmock-docker-extension:<version>`, readable without logging in, with its backend pinned to the SendMock image of the same version. (#222)
 
+## DS-11 Test builds of every pull request
+
+Phase 5 (W25), for the next beta, added 2026-11-14 (owner request). Plan: [09-distribution.md](../09-distribution.md#test-builds-of-every-pull-request-planned-2026-11-14-owner-request-ds-11).
+
+- [x] DS-11.1 Every pull request, into any branch, and every push to `develop` and `main` runs the Test builds workflow, which builds the six release targets from that commit with the web UI embedded, through the same build workflow the release uses, and publishes nothing (no release, tag, package or image); a newer push to the same pull request cancels the older run. (#246)
+- [x] DS-11.2 Each target is kept as its own workflow artifact, `sendmock-<target triple>`, holding the release archive and its `.sha256` file, uploaded only after the archive's tests pass on its own operating system and CPU, and kept 14 days for a pull request and 30 days for `develop` and `main`. (#246)
+- [x] DS-11.3 Each test build's `sendmock version` reports the version in the code and the `dev` channel. (#246)
+- [x] DS-11.4 The run summary lists every target with its archive name, size, SHA-256 and download link; a pull request from this repository gets one comment with the same list and the commit, updated on each push and never duplicated, and a pull request from a fork gets the summary only. (#246)
+- [x] DS-11.5 The install page says, as numbered steps, how to download a test build from a pull request or from `develop`, check its SHA-256 and run it, including that downloading needs a GitHub login and the macOS quarantine step. (#246)
+
 ---
 
 ## WS-01 Site and deployment
