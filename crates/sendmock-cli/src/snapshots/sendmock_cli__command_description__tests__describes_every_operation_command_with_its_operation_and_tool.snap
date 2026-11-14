@@ -331,7 +331,8 @@ expression: command_descriptions
     ],
     "flags": [
       "--bounce-type",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -356,7 +357,8 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -403,7 +405,8 @@ expression: command_descriptions
       "--source",
       "--url",
       "--user-agent",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -571,7 +574,8 @@ expression: command_descriptions
       "--include-original",
       "--reply-all",
       "--subject",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -600,7 +604,8 @@ expression: command_descriptions
       "--include-original",
       "--subject",
       "--to",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -627,7 +632,8 @@ expression: command_descriptions
       "--subject",
       "--text",
       "--to",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1068,7 +1074,8 @@ expression: command_descriptions
     ],
     "flags": [
       "--error-code",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1093,7 +1100,8 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1141,7 +1149,8 @@ expression: command_descriptions
       "--media",
       "--template-id",
       "--to",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1956,7 +1965,8 @@ expression: command_descriptions
       "--dispute-evidence",
       "--dispute-outcome",
       "--refund-amount-minor",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -4890,7 +4900,9 @@ expression: command_descriptions
     "flags": [
       "--field",
       "--event-type",
-      "--subject-id"
+      "--include-requests",
+      "--subject-id",
+      "--webhook"
     ],
     "operations": [
       {
@@ -5532,7 +5544,8 @@ expression: command_descriptions
       "--html",
       "--subject",
       "--to",
-      "--webhook"
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
