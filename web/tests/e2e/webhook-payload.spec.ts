@@ -90,7 +90,9 @@ test("WH-14.3 an edited payload is marked Edited, Reset restores it, and it is d
   await replaceCodeEditorText(bodyEditor, editedBody);
   await payloadDialog.getByRole("button", { name: "Use this payload" }).click();
   await expect(webhooksRow.getByText("Edited", { exact: true })).toBeVisible();
-  await messageDrawer.getByRole("button", { name: "Delivered" }).click();
+  await messageDrawer
+    .getByRole("button", { name: "Delivered", exact: true })
+    .click();
   await expect(page.getByText("Status set to Delivered")).toBeVisible();
 
   await page.keyboard.press("Escape");

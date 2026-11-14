@@ -2,6 +2,7 @@ import type { DeeperEntry } from "../deeper-types";
 import {
   describeChangeWebhooks,
   describeChooseWebhooks,
+  describeWebhookPayload,
   webhookTargetsUnderLabel,
 } from "./webhook-target-entries";
 
@@ -86,9 +87,15 @@ export const smsMessageDetailEntries: DeeperEntry[] = [
     control: "link: SMS status callbacks",
     state: "Message details, Status tab",
     does: "In the Webhooks row under Set status: an endpoint the `sms.status` event of the status button under the pointer or focus will reach through your rules, named after the endpoint. The heading says which status it previews.",
-    changes: "Opens the endpoint in Webhooks > Endpoints in a new tab, so the drawer stays open.",
-    source: "Your webhook rules for `sms.status`, which can filter on the status.",
+    changes:
+      "Opens the endpoint in Webhooks > Endpoints in a new tab, so the drawer stays open.",
+    source:
+      "Your webhook rules for `sms.status`, which can filter on the status.",
     operationIds: ["postWebhooksRulesMatch"],
+  },
+  {
+    ...describeWebhookPayload("SMS status callbacks", "postSmsBySmsIdStatus"),
+    state: "Message details, Status tab",
   },
   {
     ...describeChangeWebhooks(

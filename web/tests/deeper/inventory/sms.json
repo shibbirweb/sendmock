@@ -49,6 +49,7 @@
       "button: Undelivered",
       "button: Failed",
       "link: SMS status callbacks",
+      "button: Payload to SMS status callbacks",
       "button: Change",
       "tab: Status",
       "tab: Request",

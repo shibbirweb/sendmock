@@ -273,7 +273,7 @@ async fn an_edited_body_is_delivered_byte_for_byte_with_a_standard_webhooks_sign
     .await;
     let sent_delivery = send_first_delivery(&fixture, &email_id).await;
 
-    assert_eq!(status, 200, "{simulated}");
+    assert_eq!(status, 204, "{simulated}");
     let sent_request = last_sent_request(&fixture);
     assert_eq!(sent_request.body, EDITED_BODY);
     assert_eq!(read_header(&sent_request, "x-edited"), "yes");
@@ -303,7 +303,7 @@ async fn a_providers_signature_is_computed_over_the_edited_body_for_a_chosen_end
     .await;
     let sent_delivery = send_first_delivery(&fixture, &email_id).await;
 
-    assert_eq!(status, 200, "{simulated}");
+    assert_eq!(status, 204, "{simulated}");
     let sent_request = last_sent_request(&fixture);
     assert_eq!(sent_request.body, EDITED_BODY);
     assert_eq!(
@@ -326,7 +326,7 @@ async fn without_an_edit_the_rendered_request_is_sent_and_not_marked_edited() {
     let (status, _) = simulate_bounce(&fixture, &email_id, json!({})).await;
     let sent_delivery = send_first_delivery(&fixture, &email_id).await;
 
-    assert_eq!(status, 200);
+    assert_eq!(status, 204);
     let sent_body: Value =
         serde_json::from_str(&last_sent_request(&fixture).body).unwrap_or(Value::Null);
     assert_eq!(sent_body["type"], "email.bounced");

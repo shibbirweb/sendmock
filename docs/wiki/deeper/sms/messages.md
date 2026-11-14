@@ -293,7 +293,17 @@ Link.
 - **Where its text comes from:** Your webhook rules for `sms.status`, which can filter on the status.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 41. Change
+### 41. Payload to SMS status callbacks
+
+Button.
+
+- **What it does:** Payload opens the request the webhook will send (method, URL, headers with secrets masked, and the body in the code editor), rendered with the endpoint's template; editing the body marks it Edited, Reset puts back the rendered body, and Use this payload keeps the edit for this one action. Beside a one-click action such as Send a sample, the dialog's confirm button runs the action at once with the edited payload.
+- **What it changes:** An edited body is sent exactly as written and signed over those bytes with the endpoint's secret; the delivery shows `edited` in Webhooks > Deliveries. Without an edit, ids and times are made again when the action runs.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+- **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus), CLI [`sendmock sms status`](/cli/sms/#sms-status), MCP [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status)
+
+### 42. Change
 
 Button.
 
@@ -303,25 +313,25 @@ Button.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 - **Same action elsewhere:** REST [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints), CLI [`sendmock webhook endpoint list`](/cli/webhook-endpoints/#webhook-endpoint-list), MCP [`sendmock_webhook_endpoint_list`](/mcp/webhook-endpoints/#sendmock_webhook_endpoint_list)
 
-### 42. Status
+### 43. Status
 
 Tab.
 
 - **What it does:** Every status the message went through, with the time of each.
 
-### 43. Request
+### 44. Request
 
 Tab.
 
 - **What it does:** The request your app sent to create the message, exactly as received.
 
-### 44. Callbacks (#)
+### 45. Callbacks (#)
 
 Tab.
 
 - **What it does:** Each status callback sent to your app: the URL, the request, the answer and retries.
 
-### 45. Close
+### 46. Close
 
 Button.
 
@@ -329,13 +339,13 @@ Button.
 
 ## Message details, Request tab
 
-### 46. Copy request JSON
+### 47. Copy request JSON
 
 Button.
 
 - **What it does:** Copies the original request.
 
-### 47. Open in request log
+### 48. Open in request log
 
 Link.
 
@@ -344,7 +354,7 @@ Link.
 
 ## Message details, Callbacks tab
 
-### 48. Sent to http://localhost:#/sms/status
+### 49. Sent to http://localhost:#/sms/status
 
 Text.
 
@@ -352,19 +362,19 @@ Text.
 
 ## With no data yet
 
-### 49. No SMS yet
+### 50. No SMS yet
 
 Text.
 
 - **What it does:** Shown when there is no SMS at all, with how to connect your app.
 
-### 50. Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.
+### 51. Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.
 
 Text.
 
 - **What it does:** Explains the ways in: the native API, or a provider SDK with its base URL changed.
 
-### 51. This machine
+### 52. This machine
 
 Choice.
 
@@ -372,44 +382,44 @@ Choice.
 - **What it changes:** Shared with Settings > Connection and remembered in the browser.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 52. Docker host
+### 53. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host.
 
-### 53. Compose
+### 54. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project.
 
-### 54. Copy Native API
+### 55. Copy Native API
 
 Button.
 
 - **What it does:** Copies the native send URL, `POST /api/v1/sms`.
 
-### 55. Copy Twilio base URL
+### 56. Copy Twilio base URL
 
 Button.
 
 - **What it does:** Copies the base URL to give Twilio's SDK.
 
-### 56. Copy Vonage base URL
+### 57. Copy Vonage base URL
 
 Button.
 
 - **What it does:** Copies the base URL to give Vonage's SDK.
 
-### 57. More snippets
+### 58. More snippets
 
 Link.
 
 - **What it does:** Opens Settings > Connection, with the settings for every language.
 - **Links to:** [Settings](../../settings.md).
 
-### 58. Send a sample SMS
+### 59. Send a sample SMS
 
 Button.
 
@@ -417,7 +427,7 @@ Button.
 - **What it changes:** Fires `sms.sent` and starts the delivery simulation.
 - **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
 
-### 59. Choose webhooks for Send a sample SMS
+### 60. Choose webhooks for Send a sample SMS
 
 Button.
 
@@ -429,20 +439,20 @@ Button.
 
 ## When the data cannot load
 
-### 60. Could not load conversations. Try again
+### 61. Could not load conversations. Try again
 
 Message.
 
 - **What it does:** Shown when the conversations could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 61. Could not load conversations.
+### 62. Could not load conversations.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 62. Try again
+### 63. Try again
 
 Button.
 
