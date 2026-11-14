@@ -3,7 +3,7 @@ use rusqlite::{Connection, Row, params_from_iter};
 
 use super::{WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord};
 
-pub const DELIVERY_COLUMNS: &str = "id, endpoint_id, endpoint_name, rule_id, event_id, event_type, subject_id, trigger, attempt, status, retry_policy, rendered_request, sent_request, response, duration_ms, error_message, next_attempt_at, created_at, event, is_signed";
+pub const DELIVERY_COLUMNS: &str = "id, endpoint_id, endpoint_name, rule_id, event_id, event_type, subject_id, trigger, attempt, status, retry_policy, rendered_request, sent_request, response, duration_ms, error_message, next_attempt_at, created_at, event, is_signed, is_edited";
 
 /// The filter as SQL conditions joined with AND, with their parameters in the same order.
 fn build_conditions(filter: &WebhookDeliveryFilter) -> (String, Vec<SqlValue>) {
@@ -17,6 +17,7 @@ fn build_conditions(filter: &WebhookDeliveryFilter) -> (String, Vec<SqlValue>) {
     for (condition, filter_value) in [
         ("endpoint_id = ?", &filter.endpoint_id),
         ("event_type = ?", &filter.event_type),
+        ("subject_id = ?", &filter.subject_id),
     ] {
         if let Some(filter_value) = filter_value {
             conditions.push(condition.to_owned());
@@ -95,5 +96,6 @@ pub fn read_delivery_row(row: &Row<'_>) -> rusqlite::Result<WebhookDeliveryRecor
         created_at_unix_ms: row.get(17)?,
         event_json: row.get(18)?,
         is_signed: row.get(19)?,
+        is_edited: row.get(20)?,
     })
 }

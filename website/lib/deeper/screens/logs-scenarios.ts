@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeChooseWebhooks } from "./webhook-target-entries";
 
 const logEntries: DeeperEntry[] = [
   { control: "heading: Logs", does: "Names the screen, in the header and above the tabs." },
@@ -65,6 +66,7 @@ const logEntries: DeeperEntry[] = [
   { control: "button: Copy SMTP port", does: "Copies the SMTP port." },
   { control: "link: More snippets", does: "Opens Settings > Connection.", links: "[Settings](../../settings.md)." },
   { control: "button: Send a sample email", does: "Stores a sample email.", operationIds: ["postSamplesByKind"] },
+  describeChooseWebhooks("button: Choose webhooks for Send a sample email", "postSamplesByKind"),
   {
     control: "alert: Could not load the SMTP log. Try again",
     does: "Shown when the log could not be loaded.",

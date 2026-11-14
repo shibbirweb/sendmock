@@ -62,7 +62,8 @@
       "button: Copy SMTP host",
       "button: Copy SMTP port",
       "link: More snippets",
-      "button: Send a sample email"
+      "button: Send a sample email",
+      "button: Choose webhooks for Send a sample email"
     ],
     "failing": [
       "alert: Could not load the SMTP log. Try again",

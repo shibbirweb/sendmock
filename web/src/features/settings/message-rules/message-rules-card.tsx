@@ -8,6 +8,7 @@ import {
 import * as React from "react";
 
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -98,10 +99,10 @@ export function MessageRulesCard({ ruleKind }: { ruleKind: MessageRuleKind }) {
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <Button
+                    <IconButton
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Move ${messageRule.name} up`}
+                      label={`Move ${messageRule.name} up`}
                       disabled={ruleIndex === 0}
                       onClick={() => {
                         moveMessageRule.mutate({
@@ -111,11 +112,11 @@ export function MessageRulesCard({ ruleKind }: { ruleKind: MessageRuleKind }) {
                       }}
                     >
                       <ArrowUpIcon />
-                    </Button>
-                    <Button
+                    </IconButton>
+                    <IconButton
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Move ${messageRule.name} down`}
+                      label={`Move ${messageRule.name} down`}
                       disabled={ruleIndex === messageRules.length - 1}
                       onClick={() => {
                         moveMessageRule.mutate({
@@ -125,23 +126,23 @@ export function MessageRulesCard({ ruleKind }: { ruleKind: MessageRuleKind }) {
                       }}
                     >
                       <ArrowDownIcon />
-                    </Button>
-                    <Button
+                    </IconButton>
+                    <IconButton
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Edit ${messageRule.name}`}
+                      label={`Edit ${messageRule.name}`}
                       onClick={() => openSheet(messageRule)}
                     >
                       <PencilIcon />
-                    </Button>
-                    <Button
+                    </IconButton>
+                    <IconButton
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Delete ${messageRule.name}`}
+                      label={`Delete ${messageRule.name}`}
                       onClick={() => setDeletedRule(messageRule)}
                     >
                       <Trash2Icon />
-                    </Button>
+                    </IconButton>
                   </div>
                 </TableCell>
               </TableRow>

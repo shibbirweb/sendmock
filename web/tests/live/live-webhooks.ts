@@ -145,6 +145,7 @@ export type LiveDelivery = {
   status: string;
   event_type: string;
   trigger: string;
+  is_edited: boolean;
 };
 
 /** The endpoint's deliveries, newest first. */

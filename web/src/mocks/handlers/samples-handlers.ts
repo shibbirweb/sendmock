@@ -9,6 +9,8 @@ import { createSampleEmail } from "@/mocks/samples/create-sample-email";
 import { createSampleHttpRequest } from "@/mocks/samples/create-sample-http-request";
 import { createSampleSms } from "@/mocks/samples/create-sample-sms";
 import { createSampleVerification } from "@/mocks/samples/create-sample-verification";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 /** One creator per sample kind; each returns the new item's ID. Only email reads options. */
 const sampleCreators: Record<
@@ -47,9 +49,16 @@ export const samplesHandlers = [
     } catch {
       // No options: the sample uses its defaults.
     }
+    const choiceRefusal = refuseUnavailableEndpoint(sampleOptions);
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
+    const sampleKind = params.kind;
     const createdSample: CreatedSample = {
-      kind: params.kind,
-      id: sampleCreators[params.kind](sampleOptions),
+      kind: sampleKind,
+      id: runWithWebhookChoice(sampleOptions, () =>
+        sampleCreators[sampleKind](sampleOptions),
+      ),
     };
 
     return HttpResponse.json(createdSample, { status: 201 });

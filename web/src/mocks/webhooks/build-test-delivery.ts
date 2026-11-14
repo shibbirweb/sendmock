@@ -30,6 +30,7 @@ export function buildTestDelivery(
     trigger: "manual",
     attempt: 1,
     status: "succeeded",
+    url: endpointRecord.url,
     request: {
       method: endpointRecord.method,
       url: endpointRecord.url,
@@ -50,5 +51,6 @@ export function buildTestDelivery(
     error_message: null,
     next_attempt_at: null,
     created_at: new Date().toISOString(),
+    is_edited: false,
   };
 }

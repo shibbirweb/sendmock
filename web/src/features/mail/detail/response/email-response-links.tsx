@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ForwardIcon, InboxIcon, ReplyIcon } from "lucide-react";
 
+import { EmailWebhookRequests } from "@/features/mail/detail/response/email-webhook-requests";
 import type { EmailDetail, EmailResponseKind } from "@/lib/api/types";
 import { formatRelativeTime } from "@/lib/format/format-values";
 
@@ -37,9 +38,10 @@ function EmailResponseOrigin({ email }: { email: EmailDetail }) {
       )}
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <InboxIcon className="size-3.5 shrink-0" />
-        An incoming email (<code>email.inbound</code>). Inbound routes deliver
-        it to your app; they arrive with the webhook screens.
+        An incoming email (<code>email.inbound</code>). Webhook requests it
+        caused:
       </p>
+      <EmailWebhookRequests emailId={email.id} />
     </div>
   );
 }

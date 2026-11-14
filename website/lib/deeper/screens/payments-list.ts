@@ -1,4 +1,8 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import {
+  describeChooseWebhooks,
+  webhookTargetsUnderLabel,
+} from "./webhook-target-entries";
 
 const paymentListEntries: DeeperEntry[] = [
   {
@@ -171,14 +175,25 @@ const paymentDialogEntries: DeeperEntry[] = [
   },
   {
     control: "menuitem: Refund...",
-    does: "Opens Refund payment.",
+    does: `Opens Refund payment. ${webhookTargetsUnderLabel}`,
+  },
+  {
+    ...describeChooseWebhooks(
+      "menuitem: Choose webhooks for Refund",
+      "postPaymentsByPaymentIdSimulate",
+    ),
+    does: "Opens Choose webhooks for the refund: every enabled endpoint with a search box, the endpoints your rules would pick already checked. Its Refund button opens Refund payment, and the refund then sends its event to exactly the checked endpoints.",
   },
   {
     control: "menuitem: Open dispute",
-    does: "Opens a dispute on the payment, as when the customer contests it.",
+    does: `Opens a dispute on the payment, as when the customer contests it. ${webhookTargetsUnderLabel}`,
     changes: "Fires `payment.dispute_opened` and the gateway's notification.",
     operationIds: ["postPaymentsByPaymentIdSimulate"],
   },
+  describeChooseWebhooks(
+    "menuitem: Choose webhooks for Open dispute",
+    "postPaymentsByPaymentIdSimulate",
+  ),
   { control: "heading: Refund payment", does: "The Refund payment dialog." },
   {
     control: "paragraph: $#.# can be refunded.",

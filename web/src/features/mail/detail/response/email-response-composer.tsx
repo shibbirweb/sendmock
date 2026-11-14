@@ -1,6 +1,7 @@
 import { ForwardIcon, ReplyIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
+import { IconButton } from "@/components/common/icon-button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,8 +20,11 @@ import {
   composerHeadings,
   type EmailComposerMode,
 } from "@/features/mail/detail/response/email-composer-mode";
+import { EmailDeliversToRow } from "@/features/mail/detail/response/email-delivers-to-row";
 import { EmailResponseFields } from "@/features/mail/detail/response/email-response-fields";
 import { useEmailResponseForm } from "@/features/mail/detail/response/use-email-response-form";
+import { useEmailResponseTargets } from "@/features/mail/detail/response/use-email-response-targets";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
 import type { EmailDetail } from "@/lib/api/types";
 
 type EmailResponseComposerProps = {
@@ -86,6 +90,17 @@ export function EmailResponseComposer({
     isSending,
     sendResponse,
   } = useEmailResponseForm({ email, composerMode, onSent: onClose });
+  const { inboundDestinations, webhookTargets } = useEmailResponseTargets({
+    email,
+    composerMode,
+    formValues,
+  });
+  const sendWithDestinations = () => {
+    sendResponse(
+      inboundDestinations.hasDestinations || webhookTargets.targets.length > 0,
+      webhookTargets.webhookChoice,
+    );
+  };
   const isForward = composerMode === "forward";
 
   // Replies start typing above the quote; forwards start in the To field.
@@ -122,7 +137,7 @@ export function EmailResponseComposer({
           (keyboardEvent.metaKey || keyboardEvent.ctrlKey)
         ) {
           keyboardEvent.preventDefault();
-          sendResponse();
+          sendWithDestinations();
         }
       }}
     >
@@ -135,14 +150,14 @@ export function EmailResponseComposer({
         <h3 className="flex-1 text-sm font-semibold">
           {composerHeadings[composerMode]}
         </h3>
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-sm"
-          aria-label="Close composer"
+          label="Close composer"
           onClick={closeComposer}
         >
           <XIcon />
-        </Button>
+        </IconButton>
       </div>
       <EmailResponseFields
         email={email}
@@ -179,8 +194,20 @@ export function EmailResponseComposer({
           </Label>
         </div>
       )}
+      <EmailDeliversToRow
+        inboundDestinations={inboundDestinations}
+        chosenTargets={
+          webhookTargets.chosenEndpointIds === null
+            ? null
+            : webhookTargets.targets
+        }
+      />
+      <WebhookTargets.Row
+        webhookTargets={webhookTargets}
+        actionLabel={isForward ? "the forward" : "the reply"}
+      />
       <div className="flex flex-wrap items-center gap-2">
-        <Button disabled={!canSend || isSending} onClick={sendResponse}>
+        <Button disabled={!canSend || isSending} onClick={sendWithDestinations}>
           {isForward ? <ForwardIcon /> : <ReplyIcon />}
           {isForward ? "Send forward" : "Send reply"}
         </Button>

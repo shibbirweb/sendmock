@@ -2,6 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 /*
+ * Tailwind turns any word in a scanned file into a utility, and test specs, crawl inventories,
+ * fixtures and the generated API document are full of words that are class names too. None of
+ * them style the UI, and each stray utility counts against the embedded UI's budget (UI-06.3).
+ */
+@source not "../tests";
+@source not "./mocks/fixtures";
+@source not "./mocks/generated";
+/*
  * Geist's Latin and Latin Extended subsets only: the UI is written in English, and text in other
  * scripts (a Cyrillic subject, a Vietnamese name) falls back to the system font through
  * unicode-range. The Cyrillic and Vietnamese subsets would add about 30 KB to the binary's

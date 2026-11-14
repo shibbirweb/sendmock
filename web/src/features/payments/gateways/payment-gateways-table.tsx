@@ -1,7 +1,7 @@
 import { PencilIcon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -86,14 +86,14 @@ export function PaymentGatewaysTable({
               />
             </TableCell>
             <TableCell>
-              <Button
+              <IconButton
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Edit ${paymentGateway.name}`}
+                label={`Edit ${paymentGateway.name}`}
                 onClick={() => onEdit(paymentGateway)}
               >
                 <PencilIcon />
-              </Button>
+              </IconButton>
             </TableCell>
           </TableRow>
         ))}

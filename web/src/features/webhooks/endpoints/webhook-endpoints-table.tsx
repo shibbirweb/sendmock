@@ -1,6 +1,6 @@
 import { ContainerIcon, PencilIcon, SendIcon, Trash2Icon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -115,36 +115,36 @@ function EndpointRow({
       </TableCell>
       <TableCell>
         <span className="flex justify-end gap-0.5">
-          <Button
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Send test to ${webhookEndpoint.name}`}
+            label={`Send test to ${webhookEndpoint.name}`}
             onClick={() => {
               rowActions.onSendTest(webhookEndpoint);
             }}
           >
             <SendIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Edit ${webhookEndpoint.name}`}
+            label={`Edit ${webhookEndpoint.name}`}
             onClick={() => {
               rowActions.onEdit(webhookEndpoint);
             }}
           >
             <PencilIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Delete ${webhookEndpoint.name}`}
+            label={`Delete ${webhookEndpoint.name}`}
             onClick={() => {
               rowActions.onDelete(webhookEndpoint);
             }}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </span>
       </TableCell>
     </TableRow>

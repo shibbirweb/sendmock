@@ -2,6 +2,8 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use super::webhook_choice::WebhookChoice;
+
 /// The events SendMock publishes so far; webhook rules use the same names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppEventType {
@@ -116,4 +118,6 @@ pub struct RecordedEvent {
     pub sequence: u64,
     pub created_at_unix_ms: i64,
     pub app_event: AppEvent,
+    /// The endpoints the publishing action chose; none means the rules decide.
+    pub webhook_choice: Option<WebhookChoice>,
 }

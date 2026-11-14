@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { CopyButton } from "@/components/common/copy-button";
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { QueryErrorState } from "@/components/common/query-error-state";
@@ -142,26 +143,26 @@ export function MessagingServicesPanel() {
                   </TableCell>
                   <TableCell>
                     <span className="flex justify-end gap-1">
-                      <Button
+                      <IconButton
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={`Edit ${messagingService.friendly_name}`}
+                        label={`Edit ${messagingService.friendly_name}`}
                         onClick={() => {
                           openServiceSheet(messagingService);
                         }}
                       >
                         <PencilIcon />
-                      </Button>
-                      <Button
+                      </IconButton>
+                      <IconButton
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={`Delete ${messagingService.friendly_name}`}
+                        label={`Delete ${messagingService.friendly_name}`}
                         onClick={() => {
                           setDeletedService(messagingService);
                         }}
                       >
                         <Trash2Icon />
-                      </Button>
+                      </IconButton>
                     </span>
                   </TableCell>
                 </TableRow>

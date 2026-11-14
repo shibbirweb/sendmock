@@ -1,6 +1,7 @@
 import { ChevronRightIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import { IconTooltip } from "@/components/common/icon-button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
@@ -98,22 +99,24 @@ function FieldBranch({
   return (
     <li className="grid gap-0.5">
       <div className="flex items-start gap-0.5">
-        <button
-          type="button"
-          aria-expanded={isOpen}
-          aria-label={`${isOpen ? "Collapse" : "Expand"} ${field.path}`}
-          className="mt-1 rounded-sm p-0.5 hover:bg-muted"
-          onClick={() => {
-            setExpanded((wasExpanded) => !wasExpanded);
-          }}
-        >
-          <ChevronRightIcon
-            className={cn(
-              "size-3.5 transition-transform",
-              isOpen && "rotate-90",
-            )}
-          />
-        </button>
+        <IconTooltip label={`${isOpen ? "Collapse" : "Expand"} ${field.path}`}>
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            aria-label={`${isOpen ? "Collapse" : "Expand"} ${field.path}`}
+            className="mt-1 rounded-sm p-0.5 hover:bg-muted"
+            onClick={() => {
+              setExpanded((wasExpanded) => !wasExpanded);
+            }}
+          >
+            <ChevronRightIcon
+              className={cn(
+                "size-3.5 transition-transform",
+                isOpen && "rotate-90",
+              )}
+            />
+          </button>
+        </IconTooltip>
         <div className="min-w-0 flex-1">{entry}</div>
       </div>
       {isOpen && (

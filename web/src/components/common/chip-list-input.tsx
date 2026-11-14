@@ -1,6 +1,7 @@
 import { XIcon } from "lucide-react";
 import * as React from "react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -41,12 +42,11 @@ export function ChipListInput({
               className="flex items-center gap-1 rounded-full border bg-muted/40 py-0.5 pr-0.5 pl-2.5 font-mono text-xs"
             >
               {listValue}
-              <Button
+              <IconButton
                 type="button"
                 variant="ghost"
-                size="icon"
                 className="size-5 rounded-full"
-                aria-label={`Remove ${listValue}`}
+                label={`Remove ${listValue}`}
                 onClick={() => {
                   onChange(
                     values.filter(
@@ -56,7 +56,7 @@ export function ChipListInput({
                 }}
               >
                 <XIcon className="size-3" />
-              </Button>
+              </IconButton>
             </li>
           ))}
         </ul>

@@ -1,9 +1,4 @@
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { IconButton } from "@/components/common/icon-button";
 import { useCommunityLinks } from "@/features/help/use-community-links";
 
 /** The Help menu links that sit in the sidebar footer, as icons. */
@@ -27,30 +22,24 @@ export function SidebarCommunityLinks() {
       className="flex items-center gap-0.5 px-1 group-data-[collapsible=icon]:hidden"
     >
       {sidebarLinks.map((communityLink) => (
-        <Tooltip key={communityLink.key}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground hover:text-foreground"
-              asChild
-            >
-              <a
-                href={communityLink.href ?? undefined}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={communityLink.label}
-              >
-                <communityLink.Icon />
-              </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            {communityLink.hint === undefined
-              ? communityLink.label
-              : `${communityLink.label}. ${communityLink.hint}`}
-          </TooltipContent>
-        </Tooltip>
+        <IconButton
+          key={communityLink.key}
+          label={communityLink.label}
+          hint={communityLink.hint}
+          tooltipSide="top"
+          variant="ghost"
+          size="icon-sm"
+          className="text-muted-foreground hover:text-foreground"
+          asChild
+        >
+          <a
+            href={communityLink.href ?? undefined}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <communityLink.Icon />
+          </a>
+        </IconButton>
       ))}
     </nav>
   );

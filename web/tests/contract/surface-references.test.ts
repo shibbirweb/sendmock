@@ -157,5 +157,6 @@ describe("CLI and MCP references (WS-07.5)", () => {
     expect(readIsReadOnly("sendmock_webhook_endpoint_test")).toBe(false);
     expect(readIsReadOnly("sendmock_outcome_rule_test")).toBe(true);
     expect(readIsReadOnly("sendmock_inbound_route_test")).toBe(true);
+    expect(readIsReadOnly("sendmock_inbound_route_match")).toBe(true);
   });
 });

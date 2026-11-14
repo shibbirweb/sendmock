@@ -21,6 +21,7 @@ const triggerClassNames: Record<WebhookDelivery["trigger"], string> = {
   auto: "text-muted-foreground",
   manual: "border-primary/40",
   replay: "border-primary/40",
+  chosen: "border-primary/40",
 };
 
 function DeliveryRow({
@@ -55,6 +56,11 @@ function DeliveryRow({
         >
           {webhookDelivery.trigger}
         </span>
+        {webhookDelivery.is_edited && (
+          <span className="ml-1 rounded border border-primary/40 px-1.5 text-[11px]">
+            edited
+          </span>
+        )}
       </TableCell>
       <TableCell>
         <DeliveryStatusBadge webhookDelivery={webhookDelivery} />

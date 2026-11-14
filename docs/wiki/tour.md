@@ -49,6 +49,8 @@ The bottom of the sidebar has icon links to the docs, **Report an issue**, **Req
 - **Help menu**: the docs, keyboard shortcuts, what's new, **Report an issue**, **Request a feature**, private security reporting and the repository.
 - **Theme** (`T`): light, dark or follow the system.
 
+Every button or link that shows only an icon, here and on every screen, names its action in a tooltip when you hover or focus it, with its key when it has one (for example **Delete email** `D`).
+
 Every control of the sidebar and the header, one by one: [Sidebar and header in depth](./deeper/app-shell.md).
 
 ## Keys that work in lists
@@ -59,7 +61,7 @@ Every control of the sidebar and the header, one by one: [Sidebar and header in 
 | `Enter` | open the selected item |
 | `D` | delete the open item |
 | `/` | focus the search |
-| `?` | show every shortcut |
+| `?` | show every shortcut, grouped as General, Lists and messages, and Navigation |
 | `R`, `Shift+R`, `F` | reply, reply all, forward as the recipient (Mail) |
 
 ## Empty screens

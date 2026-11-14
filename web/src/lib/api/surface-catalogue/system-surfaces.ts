@@ -60,6 +60,7 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_sample_send",
     mcpAliases: ["sendmock_email_send_test"],
     ui: "Empty screens > Send a sample email, SMS, verification or request",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "GET /api/v1/seed/status": {
     phase: "3",

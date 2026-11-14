@@ -3,7 +3,7 @@ import { SearchIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
 import { FilterChip } from "@/components/common/filter-chip";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Input } from "@/components/ui/input";
 import {
   mailSearchChips,
@@ -88,17 +88,16 @@ export function MailSearchBar({
           className="pr-8 pl-8"
         />
         {draftSearchText !== "" && (
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
-            aria-label="Clear search"
+            label="Clear search"
             className="absolute top-1/2 right-1 size-6 -translate-y-1/2"
             onClick={() => {
               updateSearchText("");
             }}
           >
             <XIcon />
-          </Button>
+          </IconButton>
         )}
       </div>
       <div className="flex flex-wrap gap-1.5">

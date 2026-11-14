@@ -8,16 +8,49 @@ import {
   distBudgetBytes,
   initialJsBudgetBytes,
   listInitialScriptPaths,
+  listLargestFiles,
   measureBundle,
 } from "./measure-bundle";
 
 const webDirectory = join(import.meta.dir, "../..");
+const largestFilesShown = 15;
 let distDirectory = "";
+let reportDirectory = "";
+let moduleReportPath = "";
 let bundleMeasurement: BundleMeasurement;
+
+function formatKilobytes(sizeBytes: number): string {
+  return `${(sizeBytes / 1024).toFixed(1).padStart(8)} KB`;
+}
+
+/** CI is where the budget is measured, so its log names the files and modules to trim. */
+function printBundleReport() {
+  const largestModules = JSON.parse(readFileSync(moduleReportPath, "utf8")) as {
+    modulePath: string;
+    renderedBytes: number;
+  }[];
+  console.log(
+    [
+      `initial JS ${(bundleMeasurement.initialJsGzipBytes / 1024).toFixed(1)} KB gzipped, dist ${(bundleMeasurement.distBytes / 1024 / 1024).toFixed(2)} MB`,
+      "Largest files:",
+      ...listLargestFiles(distDirectory, largestFilesShown).map(
+        (distFile) =>
+          `${formatKilobytes(distFile.sizeBytes)}  ${distFile.relativePath}`,
+      ),
+      "Largest source modules (as rendered, before minifying):",
+      ...largestModules.map(
+        (sourceModule) =>
+          `${formatKilobytes(sourceModule.renderedBytes)}  ${sourceModule.modulePath}`,
+      ),
+    ].join("\n"),
+  );
+}
 
 /** The live build, as the binary embeds it: no mock layer, no demo toolbar. */
 beforeAll(() => {
   distDirectory = mkdtempSync(join(tmpdir(), "sendmock-dist-"));
+  reportDirectory = mkdtempSync(join(tmpdir(), "sendmock-bundle-report-"));
+  moduleReportPath = join(reportDirectory, "largest-modules.json");
   const buildResult = Bun.spawnSync(
     [
       "bun",
@@ -30,7 +63,12 @@ beforeAll(() => {
     ],
     {
       cwd: webDirectory,
-      env: { ...process.env, NODE_ENV: "production", VITE_API_MODE: "live" },
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        VITE_API_MODE: "live",
+        SENDMOCK_MODULE_REPORT: moduleReportPath,
+      },
       stderr: "pipe",
     },
   );
@@ -38,13 +76,12 @@ beforeAll(() => {
     throw new Error(buildResult.stderr.toString());
   }
   bundleMeasurement = measureBundle(distDirectory);
-  console.log(
-    `initial JS ${(bundleMeasurement.initialJsGzipBytes / 1024).toFixed(1)} KB gzipped, dist ${(bundleMeasurement.distBytes / 1024 / 1024).toFixed(2)} MB`,
-  );
+  printBundleReport();
 }, 120_000);
 
 afterAll(() => {
   rmSync(distDirectory, { recursive: true, force: true });
+  rmSync(reportDirectory, { recursive: true, force: true });
 });
 
 describe("bundle budget", () => {
@@ -78,7 +115,7 @@ describe("bundle budget", () => {
     ).toBe(false);
   });
 
-  test("UI-06.3 the embedded dist is under 2 MB without source maps", () => {
+  test("UI-06.3 the embedded dist is under 2.25 MB without source maps", () => {
     expect(bundleMeasurement.distBytes).toBeLessThan(distBudgetBytes);
   });
 

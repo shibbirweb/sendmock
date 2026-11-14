@@ -66,18 +66,24 @@ function countBusiestSecond(listRequests: ListRequest[]): number {
 /** Records every toast the page shows, with when it appeared. */
 async function recordShownToasts(page: Page) {
   await page.addInitScript(() => {
+    const toastSelector = "[data-sonner-toast]";
     const shownToasts: { shownAtMs: number; text: string }[] = [];
     Object.assign(window, { shownToasts });
     new MutationObserver((mutationRecords) => {
       for (const mutationRecord of mutationRecords) {
         for (const addedNode of mutationRecord.addedNodes) {
-          if (
-            addedNode instanceof HTMLElement &&
-            addedNode.matches("[data-sonner-toast]")
-          ) {
+          if (!(addedNode instanceof HTMLElement)) {
+            continue;
+          }
+          // Sonner mounts its toast list only once a toast exists, so the first toast
+          // after an empty list arrives inside the added list, not as the added node.
+          const addedToasts = addedNode.matches(toastSelector)
+            ? [addedNode]
+            : Array.from(addedNode.querySelectorAll(toastSelector));
+          for (const addedToast of addedToasts) {
             shownToasts.push({
               shownAtMs: Date.now(),
-              text: addedNode.textContent ?? "",
+              text: addedToast.textContent ?? "",
             });
           }
         }

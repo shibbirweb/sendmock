@@ -22,8 +22,9 @@ const FALLBACK_RESPONDER: &str = "recipient@example.com";
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct EmailReplyInput {
     pub email_id: String,
-    /// The reply text, above the quoted original.
-    pub body: String,
+    /// The reply text, above the quoted original; empty or left out sends no text of
+    /// its own.
+    pub body: Option<String>,
     /// Who replies; defaults to the original recipient.
     pub from: Option<String>,
     /// Defaults to `Re: <original subject>`.
@@ -32,6 +33,8 @@ pub struct EmailReplyInput {
     pub reply_all: Option<bool>,
     /// Quotes the original below an "On ... wrote:" line (default true).
     pub include_original: Option<bool>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -49,6 +52,8 @@ pub struct EmailForwardInput {
     pub include_original: Option<bool>,
     /// Forwards the original attachments too (default true).
     pub include_attachments: Option<bool>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 fn invalid_input(field_name: &str, message: &str) -> OperationError {
@@ -96,6 +101,7 @@ impl Operation for ReplyToEmailOperation {
             cli_usage: "sendmock email reply <emailId>",
             mcp_tool: "sendmock_email_reply",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -107,10 +113,8 @@ impl Operation for ReplyToEmailOperation {
         operation_context: &OperationContext,
         input: EmailReplyInput,
     ) -> Result<EmailDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let original_email = find_original(operation_context, &input.email_id).await?;
-        if input.body.trim().is_empty() {
-            return Err(invalid_input("body", "Write a reply"));
-        }
         let responder = read_responder(&original_email, input.from.as_deref());
         let responder_address = read_bare_address(&responder);
         let reply_recipient = original_email
@@ -134,7 +138,7 @@ impl Operation for ReplyToEmailOperation {
             to: vec![format_address(reply_recipient)],
             cc: other_recipients,
             subject: input.subject,
-            body: input.body,
+            body: input.body.unwrap_or_default(),
             includes_original_text: input.include_original.unwrap_or(true),
             attachments: Vec::new(),
         };
@@ -181,6 +185,7 @@ impl Operation for ForwardEmailOperation {
             cli_usage: "sendmock email forward <emailId>",
             mcp_tool: "sendmock_email_forward",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -192,6 +197,7 @@ impl Operation for ForwardEmailOperation {
         operation_context: &OperationContext,
         input: EmailForwardInput,
     ) -> Result<EmailDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let original_email = find_original(operation_context, &input.email_id).await?;
         if !read_bare_address(&input.to).contains('@') {
             return Err(invalid_input("to", "Enter the address to forward to"));

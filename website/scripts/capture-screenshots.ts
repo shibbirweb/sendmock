@@ -5,6 +5,7 @@
  * argument, and scene names after it to take only those, e.g.
  * `bun run screenshots http://localhost:5173 mail-providers sms-providers`.
  * The scene name `deeper` takes the Deeper pages' annotated screenshots.
+ * The committed images come from the Screenshots workflow (WS-10.5), which runs this script in CI.
  */
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -36,11 +37,12 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
   await page.goto(appBaseUrl);
   await page.getByText("Activity, last 24 hours").waitFor();
-  // Live demo traffic raises toasts; they are not part of the product shot.
-  // Hidden rather than removed: React still owns the toaster and crashes the
-  // page when a removed node gets its next toast.
+  // Live demo traffic raises toasts; they and their Clear all button are not
+  // part of the product shot. Hidden rather than removed: React still owns the
+  // toaster and crashes the page when a removed node gets its next toast.
   await page.addStyleTag({
-    content: "[data-sonner-toaster] { display: none !important; }",
+    content:
+      "[data-sonner-toaster], [data-toast-clear-all] { display: none !important; }",
   });
   const themeScenes = scenes.filter(
     (scene) =>

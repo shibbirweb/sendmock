@@ -5,7 +5,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -48,28 +48,28 @@ function RuleRow({
     >
       <TableCell className="w-0">
         <span className="flex gap-0.5">
-          <Button
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Move ${webhookRule.name} up`}
+            label={`Move ${webhookRule.name} up`}
             disabled={!canReorder || isFirst}
             onClick={() => {
               rowActions.onMove(webhookRule, "up");
             }}
           >
             <ArrowUpIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Move ${webhookRule.name} down`}
+            label={`Move ${webhookRule.name} down`}
             disabled={!canReorder || isLast}
             onClick={() => {
               rowActions.onMove(webhookRule, "down");
             }}
           >
             <ArrowDownIcon />
-          </Button>
+          </IconButton>
         </span>
       </TableCell>
       <TableCell className="max-w-56">
@@ -109,26 +109,26 @@ function RuleRow({
       </TableCell>
       <TableCell className="w-0">
         <span className="flex gap-0.5">
-          <Button
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Edit ${webhookRule.name}`}
+            label={`Edit ${webhookRule.name}`}
             onClick={() => {
               rowActions.onEdit(webhookRule);
             }}
           >
             <PencilIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             variant="ghost"
             size="icon-sm"
-            aria-label={`Delete ${webhookRule.name}`}
+            label={`Delete ${webhookRule.name}`}
             onClick={() => {
               rowActions.onDelete(webhookRule);
             }}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </span>
       </TableCell>
     </TableRow>

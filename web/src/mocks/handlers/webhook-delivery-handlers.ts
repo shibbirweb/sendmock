@@ -31,13 +31,15 @@ function matchesDeliveryFilters(
   const statusFilter = requestUrl.searchParams.get("status");
   const endpointFilter = requestUrl.searchParams.get("endpoint_id");
   const eventFilter = requestUrl.searchParams.get("event_type");
+  const subjectFilter = requestUrl.searchParams.get("subject_id");
 
   return (
     (statusFilter === null ||
       statusFilter.split(",").includes(webhookDelivery.status)) &&
     (endpointFilter === null ||
       webhookDelivery.endpoint_id === endpointFilter) &&
-    (eventFilter === null || webhookDelivery.event_type === eventFilter)
+    (eventFilter === null || webhookDelivery.event_type === eventFilter) &&
+    (subjectFilter === null || webhookDelivery.subject_id === subjectFilter)
   );
 }
 

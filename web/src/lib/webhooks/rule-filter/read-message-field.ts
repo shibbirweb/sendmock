@@ -5,11 +5,20 @@ import type {
 } from "@/lib/api/types";
 import { headerFieldPrefix } from "@/lib/webhooks/rule-filter/rule-fields";
 
-/** What a filter is checked against: an email, an SMS or a captured HTTP request. */
+/**
+ * What a filter is checked against: an email, an SMS, a captured HTTP request,
+ * or field values given for a message not stored yet, which win over the
+ * stored message they sit on (WH-13.1).
+ */
 export type RuleMessage =
   | { messageKind: "email"; email: EmailDetail }
   | { messageKind: "sms"; smsMessage: SmsMessage }
-  | { messageKind: "http"; capturedRequest: CapturedHttpRequest };
+  | { messageKind: "http"; capturedRequest: CapturedHttpRequest }
+  | {
+      messageKind: "fields";
+      fieldValues: Record<string, string[]>;
+      storedMessage: RuleMessage | null;
+    };
 
 function stripHtmlTags(htmlBody: string): string {
   return htmlBody
@@ -90,6 +99,29 @@ export function readMessageField(
   if (ruleMessage.messageKind === "sms") {
     return readSmsField(ruleMessage.smsMessage, fieldKey);
   }
+  if (ruleMessage.messageKind === "fields") {
+    return readGivenField(ruleMessage, fieldKey);
+  }
 
   return readHttpField(ruleMessage.capturedRequest, fieldKey);
+}
+
+/** A given value wins; header names compare without case, as on a message. */
+function readGivenField(
+  givenFields: Extract<RuleMessage, { messageKind: "fields" }>,
+  fieldKey: string,
+): string[] | null {
+  const givenEntry = Object.entries(givenFields.fieldValues).find(
+    ([givenKey]) =>
+      givenKey === fieldKey ||
+      (fieldKey.startsWith(headerFieldPrefix) &&
+        givenKey.toLowerCase() === fieldKey.toLowerCase()),
+  );
+  if (givenEntry !== undefined) {
+    return givenEntry[1];
+  }
+
+  return givenFields.storedMessage === null
+    ? null
+    : readMessageField(givenFields.storedMessage, fieldKey);
 }

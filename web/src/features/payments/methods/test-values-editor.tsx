@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -92,11 +93,11 @@ export function TestValuesEditor<Value extends TestValue>({
               ))}
             </SelectContent>
           </Select>
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove ${rowLabel.toLowerCase()} ${rowIndex + 1}`}
+            label={`Remove ${rowLabel.toLowerCase()} ${rowIndex + 1}`}
             onClick={() => {
               onChange(
                 testValues.filter((_, valueIndex) => valueIndex !== rowIndex),
@@ -104,7 +105,7 @@ export function TestValuesEditor<Value extends TestValue>({
             }}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       ))}
       <Button

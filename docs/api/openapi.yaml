@@ -2054,6 +2054,30 @@ paths:
       x-sendmock-cli: sendmock route test
       x-sendmock-mcp: sendmock_inbound_route_test
       x-sendmock-ui: Webhooks > Inbound routes > route sheet > Preview
+  /api/v1/inbound-routes/match:
+    post:
+      operationId: postInboundRoutesMatch
+      summary: "Where an incoming email would go: the routes and webhook rules it would run."
+      tags:
+        - Inbound routes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InboundRouteMatchRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InboundRouteMatchResult"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock route match
+      x-sendmock-mcp: sendmock_inbound_route_match
+      x-sendmock-ui: Mail > Reply, Reply all, Forward > Delivers to
   /api/v1/tag-rules:
     get:
       operationId: getTagRules
@@ -6205,6 +6229,30 @@ paths:
       x-sendmock-cli: sendmock webhook rule preview
       x-sendmock-mcp: sendmock_webhook_rule_preview
       x-sendmock-ui: Webhooks > Rules > rule sheet > Preview
+  /api/v1/webhooks/rules/match:
+    post:
+      operationId: postWebhooksRulesMatch
+      summary: Which webhooks an event would trigger, before an action fires it.
+      tags:
+        - Webhook rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookRuleMatchRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookRuleMatchResult"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook rule match
+      x-sendmock-mcp: sendmock_webhook_rule_match
+      x-sendmock-ui: Webhooks row and menu hints on every simulating action; Payload on each webhook
   /api/v1/webhooks/deliveries:
     get:
       operationId: getWebhooksDeliveries
@@ -6247,6 +6295,13 @@ paths:
           schema:
             $ref: "#/components/schemas/AppEventType"
           example: email.received
+        - name: subject_id
+          in: query
+          required: false
+          description: Only the deliveries an email, SMS or other message caused, by its ID.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9E
       responses:
         "200":
           description: OK.
@@ -8649,6 +8704,8 @@ components:
         - auto
         - manual
         - replay
+        - chosen
+      description: "Why a delivery was made: a rule (`auto`), by hand, a replay, or `chosen` for one simulation."
     EmailAddress:
       type: object
       properties:
@@ -8728,6 +8785,18 @@ components:
           description: The browser or client that clicked, kept in the click history. The UI sends its own.
           examples:
             - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
         - url
       description: Body of `POST /emails/{emailId}/clicks`.
@@ -8935,6 +9004,18 @@ components:
           description: Forwards the original attachments too (default true).
           examples:
             - true
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
         - to
       description: Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding).
@@ -8981,6 +9062,18 @@ components:
               \r
 
               Hello"
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       description: "Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`."
     EmailOutcomeKind:
       type: string
@@ -9169,7 +9262,7 @@ components:
       properties:
         body:
           type: string
-          description: The reply text, above the quoted original.
+          description: The reply text, above the quoted original; empty or left out sends no text of its own.
           examples:
             - Thanks, that fixed it!
         from:
@@ -9192,8 +9285,18 @@ components:
           description: Quotes the original below an "On ... wrote:" line (default true).
           examples:
             - true
-      required:
-        - body
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       description: Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying).
     EmailResponseKind:
       type: string
@@ -10180,6 +10283,51 @@ components:
         - matched_value
         - subject
         - captured_groups
+    InboundRouteMatchRequest:
+      type: object
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+          description: The recipients the incoming email would have.
+          examples:
+            - - support@inbound.app.test
+        cc:
+          type: array
+          items:
+            type: string
+          description: Copied recipients; routes read them like `to`.
+          examples:
+            - - lee@example.test
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Headers by name.
+          examples:
+            - subject: "Re: Your receipt"
+              from: sam@example.test
+      required:
+        - to
+      description: "Body of POST /api/v1/inbound-routes/match: the email about to arrive."
+    InboundRouteMatchResult:
+      type: object
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchedInboundRoute"
+          description: The routes that would run, in run order, ending at one that calls `stop()`.
+        webhook_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchedWebhookRule"
+          description: The webhook rules on `email.inbound` that would send, in rule order.
+      required:
+        - routes
+        - webhook_rules
+      description: Where an incoming email would go; nothing is stored or sent.
     InboundRouteTestRequest:
       type: object
       properties:
@@ -10235,10 +10383,22 @@ components:
           items:
             $ref: "#/components/schemas/InlineSmsMedia"
           description: Files sent with the message, as MMS or WhatsApp media.
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
+        - body
         - from
         - to
-        - body
       description: Body of POST /api/v1/sms/inbound (simulate an incoming message).
     InboundWebhookMethod:
       type: string
@@ -10418,6 +10578,127 @@ components:
           examples:
             - '{"text": "hello"}'
       description: Body of POST /api/v1/webhooks/endpoints/{endpointId}/send; neither id means the sample.
+    MatchedInboundRoute:
+      type: object
+      properties:
+        route_id:
+          $ref: "#/components/schemas/Ulid"
+        priority:
+          type: number
+          description: Lower runs first.
+          examples:
+            - 10
+        description:
+          type: string
+          description: The route's name.
+          examples:
+            - Ticket replies to the helpdesk
+        expression:
+          type: string
+          description: The filter in Mailgun syntax, e.g. `match_recipient("support@.*")`.
+        matched_value:
+          type: string
+          description: The recipient or header value that matched.
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InboundRouteAction"
+          description: What the route would do, in order.
+        action_expressions:
+          type: array
+          items:
+            type: string
+          description: Each action in Mailgun syntax, e.g. `forward("http://...")`.
+        calls_stop:
+          type: boolean
+          description: The route calls `stop()`, so no later route runs.
+      required:
+        - route_id
+        - priority
+        - description
+        - expression
+        - matched_value
+        - actions
+        - action_expressions
+        - calls_stop
+      description: A route that would run, with its actions as they would run (named groups filled in).
+    MatchedWebhookRequest:
+      type: object
+      properties:
+        endpoint_id:
+          $ref: "#/components/schemas/Ulid"
+        endpoint_name:
+          type: string
+          description: The endpoint's name.
+          examples:
+            - Local app
+        event_type:
+          $ref: "#/components/schemas/AppEventType"
+          description: The event the request is for.
+          examples:
+            - email.bounced
+        method:
+          $ref: "#/components/schemas/HttpMethod"
+          examples:
+            - POST
+        url:
+          type: string
+          examples:
+            - http://localhost:8000/webhooks/sendmock
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Secret values are masked.
+        body:
+          type: string
+          description: Values made at send time (ids, timestamps, `fake.*`) are made again when it is sent unless the body is edited.
+          examples:
+            - '{"type":"email.bounced"}'
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/RenderProblem"
+          description: Errors stop a delivery as `render_failed`; warnings render empty.
+      required:
+        - endpoint_id
+        - endpoint_name
+        - event_type
+        - method
+        - url
+        - headers
+        - body
+        - problems
+      description: The request one endpoint would send for the event, rendered with its template as a delivery would be.
+    MatchedWebhookRule:
+      type: object
+      properties:
+        rule_id:
+          $ref: "#/components/schemas/Ulid"
+        rule_name:
+          type: string
+          description: The rule's name.
+          examples:
+            - Replies to my app
+        endpoint_id:
+          $ref: "#/components/schemas/Ulid"
+        endpoint_name:
+          type: string
+          description: The endpoint's name.
+          examples:
+            - Local app
+        endpoint_url:
+          type: string
+          description: Where the rule sends.
+          examples:
+            - http://localhost:8000/webhooks/sendmock
+      required:
+        - rule_id
+        - rule_name
+        - endpoint_id
+        - endpoint_name
+        - endpoint_url
+      description: An enabled webhook rule on the event whose filter passes, with its endpoint.
     MessageProviderArea:
       type: string
       enum:
@@ -11108,6 +11389,18 @@ components:
           description: The browser or client that opened it, kept in the open history. The UI sends its own.
           examples:
             - Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
     OpenRecord:
       type: object
@@ -12532,6 +12825,18 @@ components:
           description: "For `answer_dispute`: the evidence sent to the bank."
           examples:
             - Signed delivery receipt attached.
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -13578,6 +13883,18 @@ components:
           description: The HTML body of the sample email.
           examples:
             - <p>It works!</p>
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       description: Optional body of POST /api/v1/samples/email (`sendmock email send-test`).
     SaveAsTemplateRequest:
       type: object
@@ -13882,6 +14199,18 @@ components:
           description: "For `bounced` only: a hard bounce (the address does not exist) or a soft one (try again later)."
           examples:
             - hard
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
         - event
     SmsApi:
@@ -14518,6 +14847,18 @@ components:
           description: A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).
           examples:
             - "30003"
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookRequestEdit"
+          description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
       required:
         - status
       description: "Body of `POST /sms/{smsId}/status`: a manual status change."
@@ -15720,10 +16061,18 @@ components:
           type: number
         status:
           $ref: "#/components/schemas/DeliveryStatus"
+        url:
+          type:
+            - string
+            - "null"
+          description: Where the request goes, known from when it is queued; null only when the request could not be rendered.
+          examples:
+            - http://localhost:8000/webhooks/mail
         request:
           anyOf:
             - $ref: "#/components/schemas/RecordedHttpRequest"
             - type: "null"
+          description: The request as sent, signature headers included; null until the attempt runs.
         response:
           anyOf:
             - $ref: "#/components/schemas/RecordedHttpResponse"
@@ -15742,6 +16091,9 @@ components:
             - type: "null"
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        is_edited:
+          type: boolean
+          description: Whether the action that sent it edited the body or headers instead of sending the rendered request.
       required:
         - id
         - endpoint_id
@@ -15753,12 +16105,14 @@ components:
         - trigger
         - attempt
         - status
+        - url
         - request
         - response
         - duration_ms
         - error_message
         - next_attempt_at
         - created_at
+        - is_edited
     WebhookDeliveryDetail:
       type: object
       properties:
@@ -15797,10 +16151,18 @@ components:
           type: number
         status:
           $ref: "#/components/schemas/DeliveryStatus"
+        url:
+          type:
+            - string
+            - "null"
+          description: Where the request goes, known from when it is queued; null only when the request could not be rendered.
+          examples:
+            - http://localhost:8000/webhooks/mail
         request:
           anyOf:
             - $ref: "#/components/schemas/RecordedHttpRequest"
             - type: "null"
+          description: The request as sent, signature headers included; null until the attempt runs.
         response:
           anyOf:
             - $ref: "#/components/schemas/RecordedHttpResponse"
@@ -15819,6 +16181,9 @@ components:
             - type: "null"
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
+        is_edited:
+          type: boolean
+          description: Whether the action that sent it edited the body or headers instead of sending the rendered request.
       required:
         - attempt
         - attempts
@@ -15830,6 +16195,7 @@ components:
         - event_id
         - event_type
         - id
+        - is_edited
         - max_attempts
         - next_attempt_at
         - request
@@ -15839,6 +16205,7 @@ components:
         - subject
         - subject_id
         - trigger
+        - url
       description: GET /api/v1/webhooks/deliveries/{deliveryId}.
     WebhookEndpoint:
       type: object
@@ -16258,6 +16625,35 @@ components:
       enum:
         - 24h
         - 7d
+    WebhookRequestEdit:
+      type: object
+      properties:
+        endpoint_id:
+          $ref: "#/components/schemas/Ulid"
+          description: The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.
+          examples:
+            - 01JB7T9Q2RENDPOINT00000000
+        event_type:
+          type: string
+          description: The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.
+          examples:
+            - email.bounced
+        body:
+          type: string
+          description: The body, sent exactly as written and signed over these bytes with the endpoint's secret.
+          examples:
+            - '{"type":"email.bounced","data":{"reason":"edited"}}'
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.
+          examples:
+            - x-tenant: acme
+      required:
+        - endpoint_id
+        - body
+      description: A request edited before an action sends it.
     WebhookRule:
       type: object
       properties:
@@ -16373,6 +16769,62 @@ components:
           description: Off rules are kept but skipped.
           examples:
             - true
+    WebhookRuleMatchRequest:
+      type: object
+      properties:
+        event_type:
+          $ref: "#/components/schemas/AppEventType"
+          description: The event the action fires.
+          examples:
+            - email.bounced
+        subject_id:
+          $ref: "#/components/schemas/Ulid"
+          description: The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        data:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.
+          examples:
+            - to:
+                - support@app.test
+              header:x-tenant:
+                - acme
+        include_requests:
+          type: boolean
+          description: Also render the request each matching endpoint would send for the event, with secrets masked.
+          examples:
+            - true
+        webhook_endpoint_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: With `include_requests`, render these endpoints' requests too, as chosen for the action instead of the rules (IDs from `GET /api/v1/webhooks/endpoints`).
+          examples:
+            - - 01JB7T9Q2RENDPOINT00000000
+      required:
+        - event_type
+      description: "Body of POST /api/v1/webhooks/rules/match: the event an action is about to fire."
+    WebhookRuleMatchResult:
+      type: object
+      properties:
+        webhook_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchedWebhookRule"
+          description: The rules that would send, in rule order.
+        webhook_requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchedWebhookRequest"
+          description: "With `include_requests`: the request each matching or chosen endpoint would send."
+      required:
+        - webhook_rules
+      description: The webhooks an event would trigger; nothing is stored or sent.
     WebhookRuleMove:
       type: object
       properties:

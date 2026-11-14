@@ -102,7 +102,10 @@ export function DeliveryOverview({
         <DeliveryFact label="Endpoint">
           {deliveryDetail.endpoint_name}
         </DeliveryFact>
-        <DeliveryFact label="Trigger">{deliveryDetail.trigger}</DeliveryFact>
+        <DeliveryFact label="Trigger">
+          {deliveryDetail.trigger}
+          {deliveryDetail.is_edited && ", payload edited before sending"}
+        </DeliveryFact>
         <DeliveryFact label="Attempt">
           {deliveryDetail.attempt} of {deliveryDetail.max_attempts}
         </DeliveryFact>

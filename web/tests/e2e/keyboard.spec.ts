@@ -59,6 +59,13 @@ test("UI-05.1 a sheet traps focus and gives it back to the button that opened it
     await page.keyboard.press("Tab");
     await expect(gatewaySheet.locator(":focus")).toHaveCount(1);
   }
+  // Tab can land on an icon button whose tooltip then opens (UI-13); the
+  // tooltip is the top layer, so the first Escape closes it, as WAI-ARIA says.
+  const keyboardTooltip = page.getByRole("tooltip");
+  if (await keyboardTooltip.isVisible()) {
+    await page.keyboard.press("Escape");
+    await expect(keyboardTooltip).toBeHidden();
+  }
   await page.keyboard.press("Escape");
   await expect(gatewaySheet).toBeHidden();
   await expect(editButton).toBeFocused();

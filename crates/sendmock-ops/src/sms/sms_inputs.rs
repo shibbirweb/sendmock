@@ -47,6 +47,8 @@ pub struct InboundSmsRequest {
     pub template_id: Option<String>,
     /// Files sent with the message, as MMS or WhatsApp media.
     pub media: Option<Vec<InlineSmsMedia>>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -72,6 +74,8 @@ pub struct SmsStatusUpdate {
     pub status: String,
     /// A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).
     pub error_code: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, JsonSchema)]

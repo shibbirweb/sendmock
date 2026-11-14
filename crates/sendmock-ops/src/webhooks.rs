@@ -1,3 +1,4 @@
+mod chosen_delivery;
 mod delivery_attempt_recording;
 mod delivery_detail;
 mod delivery_dispatch;
@@ -34,8 +35,12 @@ mod metrics_loading;
 mod metrics_operation;
 mod metrics_view;
 mod request_part_renderer;
+mod rule_event_subject;
 mod rule_filter_wire;
 mod rule_inputs;
+mod rule_match_operation;
+mod rule_match_requests;
+mod rule_match_wire;
 mod rule_messages;
 mod rule_move_operation;
 mod rule_operations;
@@ -70,6 +75,7 @@ mod variable_resolution;
 mod variable_validation;
 mod variable_value_operations;
 mod variable_view;
+mod webhook_choice_input;
 mod webhook_sender;
 mod webhook_template_functions;
 
@@ -111,6 +117,8 @@ pub(crate) use metrics_operation::{build_endpoint_metrics, build_recent_failures
 pub(crate) use metrics_view::{EndpointMetrics, RecentFailedDelivery};
 pub(crate) use request_part_renderer::{RenderProblem, RenderProblemSeverity};
 pub(crate) use rule_filter_wire::RuleFilter;
+pub use rule_match_operation::MatchWebhookRulesOperation;
+pub use rule_match_wire::{MatchedWebhookRule, WebhookRuleMatchRequest, WebhookRuleMatchResult};
 pub(crate) use rule_messages::build_email_rule_message;
 pub use rule_move_operation::MoveWebhookRuleOperation;
 pub use rule_operations::{
@@ -118,7 +126,10 @@ pub use rule_operations::{
     ListWebhookRulesOperation, UpdateWebhookRuleOperation,
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
-pub use rule_subscriber::{fire_matching_rules, run_webhook_rule_subscriber};
+pub(crate) use rule_subscriber::find_firing_rules;
+pub use rule_subscriber::{
+    deliver_recorded_event, fire_matching_rules, run_webhook_rule_subscriber,
+};
 pub(crate) use rule_validation::{validate_rule, validate_rule_filter};
 pub use rule_view::WebhookRule;
 pub use saved_delivery_operations::{
@@ -164,6 +175,7 @@ pub use variable_value_operations::{
     PreviewWebhookVariableOperation, RegenerateWebhookVariableOperation, VariablePreviewResult,
 };
 pub use variable_view::WebhookVariable;
+pub use webhook_choice_input::{WebhookChoiceInput, WebhookRequestEdit};
 pub use webhook_sender::{WebhookSendFailure, WebhookSendResult, WebhookSender};
 pub(crate) use webhook_template_functions::sign_sslcommerz_arguments;
 
@@ -201,6 +213,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteWebhookRuleOperation);
     operation_registry.register(MoveWebhookRuleOperation);
     operation_registry.register(PreviewWebhookRuleOperation);
+    operation_registry.register(MatchWebhookRulesOperation);
     operation_registry.register(ListWebhookVariablesOperation);
     operation_registry.register(CreateWebhookVariableOperation);
     operation_registry.register(UpdateWebhookVariableOperation);

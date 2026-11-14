@@ -64,7 +64,9 @@ test("WS-06.4 recipe bounces and complaints: the tester and Simulate", async ({
     .getByText("Reset your password", { exact: true })
     .click();
   await page.getByRole("button", { name: "Simulate an event" }).click();
-  await page.getByRole("menuitem", { name: "Hard bounce" }).click();
+  await page
+    .getByRole("menuitem", { name: "Hard bounce", exact: true })
+    .click();
   await page.getByRole("tab", { name: "Timeline" }).click();
   await expect(page.getByRole("tabpanel")).toContainText("Simulated bounced");
 });

@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeChooseWebhooks } from "./webhook-target-entries";
 
 const overviewEntries: DeeperEntry[] = [
   { control: "heading: Overview", does: "Names the screen, in the header and above the dashboard." },
@@ -30,7 +31,9 @@ const overviewEntries: DeeperEntry[] = [
   { control: "paragraph: No failed deliveries. Every webhook got through.", does: "Shown in Recent failures when no delivery failed." },
   { control: "paragraph: Nothing yet. Send an email or SMS from your app, or try a sample.", does: "Shown when nothing has arrived yet." },
   { control: "button: Send a sample email", does: "Stores a sample email.", operationIds: ["postSamplesByKind"] },
+  describeChooseWebhooks("button: Choose webhooks for Send a sample email", "postSamplesByKind"),
   { control: "button: Send a sample SMS", does: "Stores a sample SMS.", operationIds: ["postSamplesByKind"] },
+  describeChooseWebhooks("button: Choose webhooks for Send a sample SMS", "postSamplesByKind"),
   {
     control: "alert: Could not load the overview. Check that SendMock is running. Try again",
     does: "Shown when the dashboard could not be loaded.",

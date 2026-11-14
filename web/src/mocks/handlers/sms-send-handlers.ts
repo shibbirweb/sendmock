@@ -15,6 +15,8 @@ import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
 import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
 import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
 import { readRequestProject } from "@/mocks/handlers/request-project";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 const whatsappPrefix = "whatsapp:";
 
@@ -155,6 +157,10 @@ export const smsSendHandlers = [
     }
 
     const inboundSmsRequest = (await request.json()) as InboundSmsRequest;
+    const choiceRefusal = refuseUnavailableEndpoint(inboundSmsRequest);
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
     const inboundMediaResult = parseSmsMedia(inboundSmsRequest);
     if (!inboundMediaResult.isValid) {
       return createErrorResponse(
@@ -176,11 +182,13 @@ export const smsSendHandlers = [
     storeSmsMediaBytes(inboundMessage.id, inboundMediaResult.media);
 
     mockDatabase.smsMessages.unshift(inboundMessage);
-    publishMockEvent("sms.inbound", {
-      id: inboundMessage.id,
-      from_number: inboundMessage.from_number,
-      body: inboundMessage.body,
-      thread_id: `${inboundMessage.to_number}|${inboundMessage.from_number}`,
+    runWithWebhookChoice(inboundSmsRequest, () => {
+      publishMockEvent("sms.inbound", {
+        id: inboundMessage.id,
+        from_number: inboundMessage.from_number,
+        body: inboundMessage.body,
+        thread_id: `${inboundMessage.to_number}|${inboundMessage.from_number}`,
+      });
     });
     sendRepliesFromTwiml(runReplyWebhook(mockDatabase, inboundMessage));
 

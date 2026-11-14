@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "lucide-react";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { SmsContactAvatar } from "@/features/sms/sms-contact-avatar";
 import type { SmsThread } from "@/lib/api/types";
 import { stripChannelPrefix } from "@/lib/sms/format-phone-number";
@@ -14,11 +14,16 @@ export function SmsConversationHeader({ smsThread }: { smsThread: SmsThread }) {
 
   return (
     <header className="flex items-center gap-3 border-b px-4 py-3 sm:px-6">
-      <Button variant="ghost" size="icon" className="-ml-2 md:hidden" asChild>
-        <Link to="/sms" aria-label="Back to the list">
+      <IconButton
+        label="Back to the list"
+        variant="ghost"
+        className="-ml-2 md:hidden"
+        asChild
+      >
+        <Link to="/sms">
           <ArrowLeftIcon />
         </Link>
-      </Button>
+      </IconButton>
       <SmsContactAvatar channel={smsThread.channel} />
       <div className="grid min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1">

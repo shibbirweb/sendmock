@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import type * as React from "react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -78,11 +79,11 @@ export function NameValueRowsEditor({
               },
             })
           )}
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove ${rowLabel.toLowerCase()} ${rowIndex + 1}`}
+            label={`Remove ${rowLabel.toLowerCase()} ${rowIndex + 1}`}
             onClick={() => {
               onChange(
                 rows.filter((existingRow) => existingRow.rowId !== row.rowId),
@@ -90,7 +91,7 @@ export function NameValueRowsEditor({
             }}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       ))}
       <Button

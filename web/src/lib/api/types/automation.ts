@@ -1,4 +1,4 @@
-import type { IsoTimestamp, Ulid } from "@/lib/api/types/common";
+import type { IsoTimestamp, Ulid, WebhookChoice } from "@/lib/api/types/common";
 
 /** Answer of GET /api/v1/otp: the latest code sent to a recipient. */
 export type OtpLookup = {
@@ -19,7 +19,7 @@ export type LinksLookup = {
 };
 
 /** Optional body of POST /api/v1/samples/email (`sendmock email send-test`). */
-export type SampleOptions = {
+export type SampleOptions = WebhookChoice & {
   /**
    * The recipient of the sample email.
    * @example "user@example.test"

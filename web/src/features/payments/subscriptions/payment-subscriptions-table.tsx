@@ -1,6 +1,6 @@
 import { MoreHorizontalIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,14 +102,14 @@ export function PaymentSubscriptionsTable({
             <TableCell>
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`More for ${subscription.customer_email}`}
+                    label={`More for ${subscription.customer_email}`}
                     disabled={listActions(subscription).length === 0}
                   >
                     <MoreHorizontalIcon />
-                  </Button>
+                  </IconButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {listActions(subscription).map((subscriptionAction) => (

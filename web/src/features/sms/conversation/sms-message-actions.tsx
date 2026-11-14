@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
 import { OperationMenuItem } from "@/features/availability/operation-button";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
+import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 import { useDeleteSms, useOpenSms } from "@/lib/api/hooks/use-sms-queries";
 import type { SmsMessage } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -42,23 +44,25 @@ export function SmsMessageActions({
   const openSms = useOpenSms();
   const deleteSms = useDeleteSms();
   const isOutbound = smsMessage.direction === "outbound";
+  const isOpenServed = useOperationAvailability(
+    "POST /api/v1/sms/{smsId}/open",
+  ).isAvailable;
   const [isSendDialogOpen, setSendDialogOpen] = React.useState(false);
 
   return (
-    <>
+    <WebhookTargets.MenuScope>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
-            aria-label="Message actions"
+            label="Message actions"
             className={cn(
               "size-7 shrink-0 opacity-0 group-hover/sms-bubble:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
               className,
             )}
           >
             <MoreHorizontalIcon />
-          </Button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={isOutbound ? "end" : "start"}>
           <DropdownMenuItem asChild>
@@ -74,22 +78,42 @@ export function SmsMessageActions({
           <DropdownMenuSeparator />
           {isOutbound && (
             <>
-              <OperationMenuItem
-                operationKey="POST /api/v1/sms/{smsId}/open"
-                onSelect={() => {
-                  openSms.mutate(
-                    { smsId: smsMessage.id, openSource: "manual" },
-                    {
-                      onSuccess: () => {
-                        toast("Read event fired");
-                      },
+              {isOpenServed ? (
+                <WebhookTargets.MenuItem
+                  targetEvent={{
+                    eventType: "sms.opened",
+                    subjectId: smsMessage.id,
+                    data: {
+                      open_count: [String(smsMessage.open_count + 1)],
+                      first_open: [String(smsMessage.open_count === 0)],
+                      source: ["manual"],
                     },
-                  );
-                }}
-              >
-                <CheckCheckIcon />
-                Simulate read
-              </OperationMenuItem>
+                  }}
+                  actionLabel="Simulate read"
+                  onSimulate={(webhookChoice) => {
+                    openSms.mutate(
+                      {
+                        smsId: smsMessage.id,
+                        openSource: "manual",
+                        webhookChoice,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast("Read event fired");
+                        },
+                      },
+                    );
+                  }}
+                >
+                  <CheckCheckIcon />
+                  Simulate read
+                </WebhookTargets.MenuItem>
+              ) : (
+                <OperationMenuItem operationKey="POST /api/v1/sms/{smsId}/open">
+                  <CheckCheckIcon />
+                  Simulate read
+                </OperationMenuItem>
+              )}
               <DropdownMenuSeparator />
             </>
           )}
@@ -141,6 +165,6 @@ export function SmsMessageActions({
           }}
         />
       )}
-    </>
+    </WebhookTargets.MenuScope>
   );
 }

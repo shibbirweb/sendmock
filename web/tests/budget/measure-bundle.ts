@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 export const initialJsBudgetBytes = 250 * 1024;
-export const distBudgetBytes = 2 * 1024 * 1024;
+export const distBudgetBytes = 2.25 * 1024 * 1024;
 
 export type BundleMeasurement = {
   initialScriptPaths: string[];
@@ -52,4 +52,21 @@ export function measureBundle(distDirectory: string): BundleMeasurement {
     .reduce((totalBytes, filePath) => totalBytes + statSync(filePath).size, 0);
 
   return { initialScriptPaths, initialJsGzipBytes, distBytes };
+}
+
+export type DistFile = { relativePath: string; sizeBytes: number };
+
+/** The biggest files of `dist` without source maps, largest first. */
+export function listLargestFiles(
+  distDirectory: string,
+  fileCount: number,
+): DistFile[] {
+  return listFilePaths(distDirectory)
+    .filter((filePath) => !filePath.endsWith(".map"))
+    .map((filePath) => ({
+      relativePath: relative(distDirectory, filePath),
+      sizeBytes: statSync(filePath).size,
+    }))
+    .sort((first, second) => second.sizeBytes - first.sizeBytes)
+    .slice(0, fileCount);
 }

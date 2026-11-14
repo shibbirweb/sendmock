@@ -203,7 +203,7 @@ async fn the_original_lists_its_replies_and_forwards_on_its_detail_and_timeline(
 
 // AC: EM-17.5
 #[tokio::test]
-async fn incoming_mail_is_not_answered_and_empty_replies_are_refused() {
+async fn incoming_mail_is_not_answered_and_a_forward_needs_an_address() {
     let (app_router, _) = build_test_app();
     let original = send_original(&app_router).await;
     let (_, reply) = respond(
@@ -216,13 +216,6 @@ async fn incoming_mail_is_not_answered_and_empty_replies_are_refused() {
 
     let (reply_again_status, refusal) =
         respond(&app_router, &reply["id"], "reply", json!({ "body": "Hi" })).await;
-    let (empty_status, _) = respond(
-        &app_router,
-        &original["id"],
-        "reply",
-        json!({ "body": " " }),
-    )
-    .await;
     let (no_address_status, _) = respond(
         &app_router,
         &original["id"],
@@ -232,7 +225,39 @@ async fn incoming_mail_is_not_answered_and_empty_replies_are_refused() {
     .await;
 
     assert_eq!(reply_again_status, 409, "{refusal}");
-    assert_eq!([empty_status, no_address_status], [400, 400]);
+    assert_eq!(no_address_status, 400);
+}
+
+// AC: EM-22.1
+#[tokio::test]
+async fn a_reply_with_an_empty_or_missing_body_still_arrives_with_the_quote() {
+    let (app_router, _) = build_test_app();
+    let original = send_original(&app_router).await;
+
+    let (empty_status, empty_reply) =
+        respond(&app_router, &original["id"], "reply", json!({ "body": "" })).await;
+    let (missing_status, missing_reply) = respond(
+        &app_router,
+        &original["id"],
+        "reply",
+        json!({ "reply_all": true }),
+    )
+    .await;
+
+    assert_eq!([empty_status, missing_status], [201, 201], "{empty_reply}");
+    for reply in [&empty_reply, &missing_reply] {
+        assert_eq!(reply["direction"], "inbound", "{reply}");
+        let reply_text = reply["text_body"].as_str().unwrap_or_default();
+        assert!(
+            reply_text.contains("> Thanks for your order"),
+            "{reply_text}"
+        );
+    }
+    assert_eq!(
+        missing_reply["cc"].as_array().map(Vec::len),
+        Some(1),
+        "{missing_reply}"
+    );
 }
 
 // AC: EM-17.2 EM-17.3

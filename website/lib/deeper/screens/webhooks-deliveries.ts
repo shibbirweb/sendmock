@@ -49,7 +49,7 @@ const deliveryListEntries: DeeperEntry[] = [
   { control: "columnheader: Endpoint", does: "Where it went." },
   {
     control: "columnheader: Trigger",
-    does: "What started it: a rule, a test, a manual send, a replay or a saved delivery.",
+    does: "What started it: a rule, a test, a manual send, a replay, a saved delivery, or an endpoint chosen for one simulation.",
   },
   {
     control: "columnheader: Status",

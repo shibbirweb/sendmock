@@ -9,6 +9,7 @@ import {
 import * as React from "react";
 import { toast } from "sonner";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -174,11 +175,11 @@ export function NotificationBell() {
       }}
     >
       <PopoverTrigger asChild>
-        <Button
+        <IconButton
           variant="ghost"
           size="icon-sm"
           className="relative"
-          aria-label={
+          label={
             unreadCount === 0
               ? "Notifications"
               : `Notifications, ${unreadCount} unread`
@@ -194,7 +195,7 @@ export function NotificationBell() {
               {unreadLabel}
             </span>
           )}
-        </Button>
+        </IconButton>
       </PopoverTrigger>
       <PopoverContent
         align="end"

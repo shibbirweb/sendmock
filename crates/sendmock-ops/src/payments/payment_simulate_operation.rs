@@ -86,6 +86,7 @@ impl Operation for SimulatePaymentOperation {
             summary: "Move the payment on: capture, refund, dispute, fail.",
             cli_usage: "sendmock payments simulate <paymentId> <action>",
             mcp_tool: "sendmock_payment_simulate",
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -97,6 +98,7 @@ impl Operation for SimulatePaymentOperation {
         operation_context: &OperationContext,
         input: PaymentSimulateRequest,
     ) -> Result<PaymentDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let mut payment_change = PaymentChange::load(operation_context, &input.payment_id).await?;
         if !list_simulate_actions(&payment_change.payment).contains(&input.action) {
             return Err(OperationError::Conflict {

@@ -1,7 +1,7 @@
 import { Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -128,18 +128,18 @@ export function FilterConditionRow({
             />
           )}
         </div>
-        <Button
+        <IconButton
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label={`Remove condition ${rowNumber}`}
+          label={`Remove condition ${rowNumber}`}
           className="sm:order-last"
           onClick={() => {
             removeNode(builderCondition.nodeId);
           }}
         >
           <Trash2Icon />
-        </Button>
+        </IconButton>
         <div className="col-span-3 grid grid-cols-[9rem_minmax(0,1fr)] gap-2 sm:col-span-2 sm:grid-cols-subgrid">
           <Select
             value={builderCondition.operator}

@@ -1,17 +1,19 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import * as React from "react";
 import { toast } from "sonner";
 
 import {
+  canSendResponse,
   type EmailComposerMode,
   listOriginalRecipients,
 } from "@/features/mail/detail/response/email-composer-mode";
+import { showResponseSentToast } from "@/features/mail/detail/response/show-response-sent-toast";
 import { ApiError } from "@/lib/api/api-client";
 import {
   useForwardEmail,
   useReplyToEmail,
 } from "@/lib/api/hooks/use-email-response-queries";
-import type { EmailDetail } from "@/lib/api/types";
+import type { EmailDetail, WebhookChoice } from "@/lib/api/types";
 import { buildResponseSubject } from "@/lib/email/build-response-subject";
 import {
   buildForwardedMessageBlock,
@@ -77,6 +79,8 @@ export function useEmailResponseForm({
   onSent: () => void;
 }) {
   const navigate = useNavigate();
+  const router = useRouter();
+  const hasDestinationsRef = React.useRef(false);
   const replyToEmail = useReplyToEmail();
   const forwardEmail = useForwardEmail();
   const [initialValues] = React.useState(() =>
@@ -86,10 +90,7 @@ export function useEmailResponseForm({
   const isForward = composerMode === "forward";
   const isSending = replyToEmail.isPending || forwardEmail.isPending;
   const hasDraftChanges = formValues.messageText !== initialValues.messageText;
-  // A reply needs new text; a forward only needs somewhere to go.
-  const canSend = isForward
-    ? formValues.forwardToAddress.includes("@")
-    : hasDraftChanges && formValues.messageText.trim() !== "";
+  const canSend = canSendResponse(composerMode, formValues.forwardToAddress);
 
   const updateFormValues = (
     changedValues: Partial<EmailResponseFormValues>,
@@ -102,17 +103,17 @@ export function useEmailResponseForm({
 
   const handleSent = (createdEmail: EmailDetail) => {
     onSent();
-    toast(isForward ? "Forward created" : "Reply created", {
-      description: "Inbound routes deliver it to your app.",
-      action: {
-        label: "Open",
-        onClick: () => {
-          void navigate({
-            to: "/mail/$emailId",
-            params: { emailId: createdEmail.id },
-            search: (previousSearch) => previousSearch,
-          });
-        },
+    showResponseSentToast({
+      createdEmailId: createdEmail.id,
+      isForward,
+      isExpectingRequests: hasDestinationsRef.current,
+      router,
+      onOpen: () => {
+        void navigate({
+          to: "/mail/$emailId",
+          params: { emailId: createdEmail.id },
+          search: (previousSearch) => previousSearch,
+        });
       },
     });
   };
@@ -123,10 +124,18 @@ export function useEmailResponseForm({
     },
   };
 
-  const sendResponse = () => {
+  /**
+   * Sends; `hasDestinations` is what Delivers to and Webhooks showed at that
+   * moment, and `webhookChoice` the endpoints chosen for this one send.
+   */
+  const sendResponse = (
+    hasDestinations: boolean,
+    webhookChoice: WebhookChoice,
+  ) => {
     if (!canSend || isSending) {
       return;
     }
+    hasDestinationsRef.current = hasDestinations;
 
     if (isForward) {
       forwardEmail.mutate(
@@ -139,6 +148,7 @@ export function useEmailResponseForm({
             body: formValues.messageText,
             include_original: false,
             include_attachments: formValues.shouldIncludeAttachments,
+            ...webhookChoice,
           },
         },
         mutationCallbacks,
@@ -155,6 +165,7 @@ export function useEmailResponseForm({
           subject: formValues.subject,
           reply_all: composerMode === "reply_all",
           include_original: false,
+          ...webhookChoice,
         },
       },
       mutationCallbacks,

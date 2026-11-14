@@ -489,6 +489,47 @@
           "allowed_values": null,
           "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock email click 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --url 'https://app.test/verify?token=abc123' --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -921,6 +962,47 @@
           "allowed_values": null,
           "description": "Forwards the original attachments too (default true).",
           "example": true
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock email forward 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --to support@inbound.app.test --body 'Can you look at this one?' --from user@example.test",
@@ -1430,6 +1512,47 @@
           "allowed_values": null,
           "description": "A whole message (RFC 5322); when set, the other fields are ignored.",
           "example": "From: sam@customer.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock email inbound --from 'Sam <sam@customer.test>' --to support@inbound.app.test",
@@ -1903,6 +2026,47 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock email open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -3010,11 +3174,11 @@
           },
           "type": "string",
           "value_label": "<body>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "The reply text, above the quoted original.",
+          "description": "The reply text, above the quoted original; empty or left out sends no text of its own.",
           "example": "Thanks, that fixed it!"
         },
         {
@@ -3076,9 +3240,50 @@
           "allowed_values": null,
           "description": "Quotes the original below an \"On ... wrote:\" line (default true).",
           "example": true
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
-      "example": "sendmock email reply 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --body 'Thanks, that fixed it!' --from user@example.test --subject 'Re: Ticket #318 updated'",
+      "example": "sendmock email reply 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --body 'Thanks, that fixed it!' --from user@example.test",
       "output": "EmailDetail",
       "exit_codes": [
         0,
@@ -3412,9 +3617,50 @@
           ],
           "description": "For `bounced` only: a hard bounce (the address does not exist) or a soft one (try again later).",
           "example": "hard"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
-      "example": "sendmock email simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D bounced --bounce-type hard",
+      "example": "sendmock email simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D bounced --bounce-type hard --webhook 01JB7T9Q2RENDPOINT00000000",
       "output": null,
       "exit_codes": [
         0,
@@ -10315,6 +10561,47 @@
           "allowed_values": null,
           "description": "For `answer_dispute`: the evidence sent to the bank.",
           "example": "Signed delivery receipt attached."
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock payments simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D refund --decline-reason insufficient_funds --refund-amount-minor 500",
@@ -11737,6 +12024,93 @@
       ]
     },
     {
+      "command": "sendmock route match",
+      "slug": "route-match",
+      "usage": "sendmock route match [flags]",
+      "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+      "area": "Inbound routes",
+      "area_slug": "inbound-routes",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/inbound-routes/match",
+          "operation_id": "postInboundRoutesMatch",
+          "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+          "area_slug": "inbound-routes",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--to",
+          "input": {
+            "name": "to",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<to>",
+          "is_required": true,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The recipients the incoming email would have.",
+          "example": [
+            "support@inbound.app.test"
+          ]
+        },
+        {
+          "flag": "--cc",
+          "input": {
+            "name": "cc",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<cc>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Copied recipients; routes read them like `to`.",
+          "example": [
+            "lee@example.test"
+          ]
+        },
+        {
+          "flag": "--headers",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<headers>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Headers by name.",
+          "example": {
+            "subject": "Re: Your receipt",
+            "from": "sam@example.test"
+          }
+        }
+      ],
+      "example": "sendmock route match --to support@inbound.app.test --cc lee@example.test",
+      "output": "InboundRouteMatchResult",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_inbound_route_match"
+      ],
+      "ui": [
+        "Mail > Reply, Reply all, Forward > Delivers to"
+      ]
+    },
+    {
       "command": "sendmock route test",
       "slug": "route-test",
       "usage": "sendmock route test [flags]",
@@ -11985,6 +12359,47 @@
           "allowed_values": null,
           "description": "The HTML body of the sample email.",
           "example": "<p>It works!</p>"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock sample email --to user@example.test --subject 'Hello from SendMock'",
@@ -13118,9 +13533,50 @@
               "content_type": "image/jpeg"
             }
           ]
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
-      "example": "sendmock sms inbound --from +8801700000000 --to +15550001111 --body STOP --channel sms",
+      "example": "sendmock sms inbound --from +8801700000000 --to +15550001111 --body STOP --channel sms --webhook 01JB7T9Q2RENDPOINT00000000",
       "output": "SmsMessageDetail",
       "exit_codes": [
         0,
@@ -13440,6 +13896,47 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "example": "sendmock sms open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -15046,9 +15543,50 @@
           "allowed_values": null,
           "description": "A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).",
           "example": "30003"
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "flag": "--webhook-requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "value_label": "<webhook-requests>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
-      "example": "sendmock sms status 01JB7T9Q2R5W8X3Y6Z1A4B7C9D delivered --error-code 30003",
+      "example": "sendmock sms status 01JB7T9Q2R5W8X3Y6Z1A4B7C9D delivered --error-code 30003 --webhook 01JB7T9Q2RENDPOINT00000000",
       "output": "SmsMessageDetail",
       "exit_codes": [
         0,
@@ -16107,6 +16645,21 @@
           ],
           "description": "Only this event.",
           "example": "email.received"
+        },
+        {
+          "flag": "--subject-id",
+          "input": {
+            "name": "subject_id",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<subject-id>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
         }
       ],
       "example": "sendmock webhook deliveries list --cursor 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --limit 50",
@@ -17936,6 +18489,168 @@
       ],
       "ui": [
         "Webhooks > Rules"
+      ]
+    },
+    {
+      "command": "sendmock webhook rule match",
+      "slug": "webhook-rule-match",
+      "usage": "sendmock webhook rule match [flags]",
+      "summary": "Which webhooks an event would trigger, before an action fires it.",
+      "area": "Webhook rules",
+      "area_slug": "webhook-rules",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks/rules/match",
+          "operation_id": "postWebhooksRulesMatch",
+          "summary": "Which webhooks an event would trigger, before an action fires it.",
+          "area_slug": "webhook-rules",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--event-type",
+          "input": {
+            "name": "event_type",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<event-type>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "email.received",
+            "email.inbound",
+            "email.opened",
+            "email.clicked",
+            "email.delivered",
+            "email.deferred",
+            "email.bounced",
+            "email.complained",
+            "email.unsubscribed",
+            "email.released",
+            "email.deleted",
+            "sms.sent",
+            "sms.status",
+            "sms.opened",
+            "sms.inbound",
+            "sms.reply_webhook",
+            "verify.started",
+            "verify.checked",
+            "verify.expired",
+            "push.sent",
+            "push.failed",
+            "http.captured",
+            "payment.created",
+            "payment.authorized",
+            "payment.succeeded",
+            "payment.failed",
+            "payment.canceled",
+            "payment.refunded",
+            "payment.partially_refunded",
+            "payment.dispute_opened",
+            "payment.dispute_updated",
+            "payment.dispute_closed",
+            "checkout.completed",
+            "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
+            "webhook.delivered",
+            "webhook.failed",
+            "test.ping",
+            "traffic.pruned"
+          ],
+          "description": "The event the action fires.",
+          "example": "email.bounced"
+        },
+        {
+          "flag": "--subject-id",
+          "input": {
+            "name": "subject_id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<subject-id>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "flag": "--field",
+          "input": {
+            "name": "data",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<field>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.",
+          "example": {
+            "to": [
+              "support@app.test"
+            ],
+            "header:x-tenant": [
+              "acme"
+            ]
+          }
+        },
+        {
+          "flag": "--include-requests",
+          "input": {
+            "name": "include_requests",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Also render the request each matching endpoint would send for the event, with secrets masked.",
+          "example": true
+        },
+        {
+          "flag": "--webhook",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<webhook>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "With `include_requests`, render these endpoints' requests too, as chosen for the action instead of the rules (IDs from `GET /api/v1/webhooks/endpoints`).",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        }
+      ],
+      "example": "sendmock webhook rule match --event-type email.bounced --include-requests --webhook 01JB7T9Q2RENDPOINT00000000",
+      "output": "WebhookRuleMatchResult",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_webhook_rule_match"
+      ],
+      "ui": [
+        "Webhooks row and menu hints on every simulating action; Payload on each webhook"
       ]
     },
     {

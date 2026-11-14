@@ -14,6 +14,8 @@ pub struct DeliveryListInput {
     pub endpoint_id: Option<String>,
     /// Only this event.
     pub event_type: Option<String>,
+    /// Only the deliveries an email, SMS or other message caused, by its ID.
+    pub subject_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

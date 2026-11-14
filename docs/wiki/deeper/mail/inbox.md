@@ -448,21 +448,42 @@ Field.
 
 - **What it does:** The raw message to store, or (in a composer) the body of the reply or forward.
 
-### 64. Send reply
+### 64. http://localhost:#/webhooks/mail/stored Route Keep everything else
+
+Link.
+
+- **What it does:** One line of the Delivers to row: a URL or address that will receive the reply or forward, and the inbound route or webhook rule that sends it there, in the order they run. The row follows the Forward address as you type. When nothing would receive the email, it says "Nothing receives this yet" with Send replies to your app, which creates a route to your app's URL (only mail to this address, or every incoming email) in one step.
+- **What it changes:** Opens that route in Webhooks > Inbound routes, or the rule's endpoint in Webhooks > Rules.
+- **Links to:** [Inbound routes](../../webhooks/inbound-routes.md).
+- **Same action elsewhere:** REST [`POST /api/v1/inbound-routes/match`](/api/inbound-routes/#postInboundRoutesMatch), CLI [`sendmock route match`](/cli/inbound-routes/#route-match), MCP [`sendmock_inbound_route_match`](/mcp/inbound-routes/#sendmock_inbound_route_match)
+- **Same action elsewhere:** REST [`POST /api/v1/inbound-routes`](/api/inbound-routes/#postInboundRoutes), CLI [`sendmock route create`](/cli/inbound-routes/#route-create), MCP [`sendmock_inbound_route_create`](/mcp/inbound-routes/#sendmock_inbound_route_create)
+
+### 65. Change
 
 Button.
 
-- **What it does:** Stores the reply as an incoming email with `In-Reply-To` and `References` set; a notice says it was created, with Open to read it.
-- **What it changes:** Fires `email.inbound`; inbound routes deliver it to your app, as the provider would.
-- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/reply`](/api/email/#postEmailsByEmailIdReply), CLI [`sendmock email reply`](/cli/email/#email-reply), MCP [`sendmock_email_reply`](/mcp/email/#sendmock_email_reply)
+- **What it does:** In the Webhooks row: the endpoints the reply or forward's `email.inbound` will reach through your rules (or No webhook), each name opening the endpoint in a new tab with Payload beside it, and Change. Payload opens the request the webhook will send (method, URL, headers with secrets masked, and the body in the code editor), rendered with the endpoint's template; editing the body marks it Edited, Reset puts back the rendered body, and Use this payload keeps the edit for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Use these keeps the checked endpoints for this send, marked "chosen for this action", and Use the rules goes back to what the rules pick. It checks again as you edit the Forward address, subject or message.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`, sent exactly as written and signed over those bytes. Your rules stay as they are.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+- **Same action elsewhere:** REST [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints), CLI [`sendmock webhook endpoint list`](/cli/webhook-endpoints/#webhook-endpoint-list), MCP [`sendmock_webhook_endpoint_list`](/mcp/webhook-endpoints/#sendmock_webhook_endpoint_list)
 
-### 65. Cancel
+### 66. Send reply
+
+Button.
+
+- **What it does:** Stores the reply as an incoming email with `In-Reply-To` and `References` set. It can be sent as prefilled, edited or with an empty message box. A notice says it was created, lists each webhook request it caused with its URL and status (moving from pending to the answer), each linking to the delivery, and offers Open to read it.
+- **What it changes:** Fires `email.inbound`; inbound routes and webhook rules deliver it to your app, as the provider would.
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/reply`](/api/email/#postEmailsByEmailIdReply), CLI [`sendmock email reply`](/cli/email/#email-reply), MCP [`sendmock_email_reply`](/mcp/email/#sendmock_email_reply)
+- **Same action elsewhere:** REST [`GET /api/v1/webhooks/deliveries`](/api/webhook-deliveries/#getWebhooksDeliveries), CLI [`sendmock webhook deliveries list`](/cli/webhook-deliveries/#webhook-deliveries-list), MCP [`sendmock_webhook_delivery_list`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_list)
+
+### 67. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or composer without doing anything.
 
-### 66. Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app.
+### 68. Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app.
 
 Text.
 
@@ -471,63 +492,74 @@ Text.
 
 ## Forwarding
 
-### 67. Forward as recipient
+### 69. Forward as recipient
 
 Heading.
 
 - **What it does:** The forward composer: you forward the email as the person it was sent to.
 
-### 68. Close composer
+### 70. Close composer
 
 Button.
 
 - **What it does:** Closes the composer without sending.
 
-### 69. From
+### 71. From
 
 Drop-down.
 
 - **What it does:** Which recipient of the original email the reply or forward comes from.
 
-### 70. To
+### 72. To
 
 Drop-down.
 
 - **What it does:** Where the forward goes: an address your app receives mail on (an inbound domain or route).
 
-### 71. Subject
+### 73. Subject
 
 Field.
 
 - **What it does:** The subject, prefilled with `Re:` or `Fwd:` and the original subject.
 
-### 72. Message
+### 74. Message
 
 Field.
 
 - **What it does:** The raw message to store, or (in a composer) the body of the reply or forward.
 
-### 73. Include attachments (#)
+### 75. Include attachments (#)
 
 Checkbox.
 
 - **What it does:** Forwards the original attachments too.
 
-### 74. Send forward
+### 76. Change
 
 Button.
 
-- **What it does:** Stores the forward as an incoming email; a notice says it was created, with Open to read it.
+- **What it does:** In the Webhooks row: the endpoints the reply or forward's `email.inbound` will reach through your rules (or No webhook), each name opening the endpoint in a new tab with Payload beside it, and Change. Payload opens the request the webhook will send (method, URL, headers with secrets masked, and the body in the code editor), rendered with the endpoint's template; editing the body marks it Edited, Reset puts back the rendered body, and Use this payload keeps the edit for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Use these keeps the checked endpoints for this send, marked "chosen for this action", and Use the rules goes back to what the rules pick. It checks again as you edit the Forward address, subject or message.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`, sent exactly as written and signed over those bytes. Your rules stay as they are.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+- **Same action elsewhere:** REST [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints), CLI [`sendmock webhook endpoint list`](/cli/webhook-endpoints/#webhook-endpoint-list), MCP [`sendmock_webhook_endpoint_list`](/mcp/webhook-endpoints/#sendmock_webhook_endpoint_list)
+
+### 77. Send forward
+
+Button.
+
+- **What it does:** Stores the forward as an incoming email, once To holds an address; the notice lists each webhook request it caused, with Open to read it.
 - **What it changes:** Fires `email.inbound` and runs the inbound routes.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/forward`](/api/email/#postEmailsByEmailIdForward), CLI [`sendmock email forward`](/cli/email/#email-forward), MCP [`sendmock_email_forward`](/mcp/email/#sendmock_email_forward)
+- **Same action elsewhere:** REST [`GET /api/v1/webhooks/deliveries`](/api/webhook-deliveries/#getWebhooksDeliveries), CLI [`sendmock webhook deliveries list`](/cli/webhook-deliveries/#webhook-deliveries-list), MCP [`sendmock_webhook_delivery_list`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_list)
 
-### 75. Cancel
+### 78. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or composer without doing anything.
 
-### 76. Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app.
+### 79. Creates an incoming email ( email.inbound ). Inbound routes deliver it to your app.
 
 Text.
 
@@ -536,14 +568,14 @@ Text.
 
 ## Emails are selected
 
-### 77. Mark read
+### 80. Mark read
 
 Button.
 
 - **What it does:** Marks every selected email as read.
 - **Same action elsewhere:** REST [`PATCH /api/v1/emails/{emailId}`](/api/email/#patchEmailsByEmailId), CLI [`sendmock email update`](/cli/email/#email-update), MCP [`sendmock_email_update`](/mcp/email/#sendmock_email_update)
 
-### 78. Delete
+### 81. Delete
 
 Button.
 
@@ -552,15 +584,25 @@ Button.
 
 ## Simulate an event menu
 
-### 79. Open (email.opened)
+### 82. Open (email.opened)
 
 Menu item.
 
-- **What it does:** Records an open of the email, as a tracking pixel would.
+- **What it does:** Records an open of the email, as a tracking pixel would. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.opened` with `first_open` and the open count.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen), CLI [`sendmock email open`](/cli/email/#email-open), MCP [`sendmock_email_open`](/mcp/email/#sendmock_email_open)
 
-### 80. Click a link (email.clicked)
+### 83. Choose webhooks for Simulate open
+
+Menu item.
+
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/open`](/api/email/#postEmailsByEmailIdOpen), CLI [`sendmock email open`](/cli/email/#email-open), MCP [`sendmock_email_open`](/mcp/email/#sendmock_email_open)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 84. Click a link (email.clicked)
 
 Menu item.
 
@@ -568,62 +610,112 @@ Menu item.
 - **What it changes:** Fires `email.clicked` with the link, `first_click` and the click count, and adds it to the Timeline. A link clicked in the HTML preview does the same with `source: "ui"`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/clicks`](/api/email/#postEmailsByEmailIdClicks), CLI [`sendmock email click`](/cli/email/#email-click), MCP [`sendmock_email_click`](/mcp/email/#sendmock_email_click)
 
-### 81. Delivered
+### 85. Delivered
 
 Menu item.
 
-- **What it does:** Marks the email delivered.
+- **What it does:** Marks the email delivered. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.delivered` and adds it to the Timeline.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
-### 82. Hard bounce
+### 86. Choose webhooks for Simulate delivered
 
 Menu item.
 
-- **What it does:** Bounces the email permanently (550 5.1.1).
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 87. Hard bounce
+
+Menu item.
+
+- **What it does:** Bounces the email permanently (550 5.1.1). Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.bounced` with a permanent bounce type.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
-### 83. Soft bounce
+### 88. Choose webhooks for Simulate hard bounce
 
 Menu item.
 
-- **What it does:** Defers the email, then bounces it as a temporary failure.
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 89. Soft bounce
+
+Menu item.
+
+- **What it does:** Defers the email, then bounces it as a temporary failure. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.deferred`, then `email.bounced` with a transient bounce type.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
-### 84. Spam complaint
+### 90. Choose webhooks for Simulate soft bounce
 
 Menu item.
 
-- **What it does:** Delivers the email, then records a complaint, as when the recipient marks it as spam.
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 91. Spam complaint
+
+Menu item.
+
+- **What it does:** Delivers the email, then records a complaint, as when the recipient marks it as spam. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.delivered`, then `email.complained`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
-### 85. Unsubscribe
+### 92. Choose webhooks for Simulate spam complaint
 
 Menu item.
 
-- **What it does:** Records an unsubscribe from the email's list.
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
+### 93. Unsubscribe
+
+Menu item.
+
+- **What it does:** Records an unsubscribe from the email's list. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 - **What it changes:** Fires `email.unsubscribed`.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
 
+### 94. Choose webhooks for Simulate unsubscribe
+
+Menu item.
+
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/simulate`](/api/email/#postEmailsByEmailIdSimulate), CLI [`sendmock email simulate`](/cli/email/#email-simulate), MCP [`sendmock_email_simulate`](/mcp/email/#sendmock_email_simulate)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
 ## More actions menu
 
-### 86. Download .eml
+### 95. Download .eml
 
 Menu item.
 
 - **What it does:** Downloads the raw message as an `.eml` file.
 - **Same action elsewhere:** REST [`GET /api/v1/emails/{emailId}/raw`](/api/email/#getEmailsByEmailIdRaw), CLI [`sendmock email raw`](/cli/email/#email-raw)
 
-### 87. Release to real SMTP
+### 96. Release to real SMTP
 
 Menu item.
 
 - **What it does:** Opens the Release dialog, to send this email to a real inbox through your relay.
 
-### 88. Send to webhook
+### 97. Send to webhook
 
 Menu item.
 
@@ -631,31 +723,31 @@ Menu item.
 
 ## Release dialog
 
-### 89. Release to real SMTP
+### 98. Release to real SMTP
 
 Heading.
 
 - **What it does:** The Release dialog.
 
-### 90. Sends this email through your relay server so you can check it in a real inbox. Only recipients on the relay allowlist are accepted.
+### 99. Sends this email through your relay server so you can check it in a real inbox. Only recipients on the relay allowlist are accepted.
 
 Text.
 
 - **What it does:** Explains what Release does and its safety rule.
 
-### 91. Recipients (comma separated)
+### 100. Recipients (comma separated)
 
 Field.
 
 - **What it does:** Who to send it to, prefilled with the original recipients.
 
-### 92. Cancel
+### 101. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or composer without doing anything.
 
-### 93. Release
+### 102. Release
 
 Button.
 
@@ -664,7 +756,7 @@ Button.
 - **Errors:** Refused until `--relay-smtp` and `--relay-allowlist` are set; a recipient outside the allowlist is refused by name.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/{emailId}/release`](/api/email/#postEmailsByEmailIdRelease), CLI [`sendmock email release`](/cli/email/#email-release), MCP [`sendmock_email_release`](/mcp/email/#sendmock_email_release)
 
-### 94. Close
+### 103. Close
 
 Button.
 
@@ -672,99 +764,99 @@ Button.
 
 ## Send to webhook dialog
 
-### 95. Send to webhook
+### 104. Send to webhook
 
 Heading.
 
 - **What it does:** The Send to webhook dialog.
 
-### 96. Sends "Welcome to Acme: here is what is new this week" to an endpoint now.
+### 105. Sends "Welcome to Acme: here is what is new this week" to an endpoint now.
 
 Text.
 
 - **What it does:** Names the email the webhook is about.
 
-### 97. Endpoint
+### 106. Endpoint
 
 Drop-down.
 
 - **What it does:** The webhook endpoint to send to.
 - **Links to:** [Endpoints](../../webhooks/endpoints.md).
 
-### 98. Format
+### 107. Format
 
 Drop-down.
 
 - **What it does:** The template the request is rendered with: the endpoint's own, or another for this send only.
 
-### 99. A template here is used for this send only.
+### 108. A template here is used for this send only.
 
 Text.
 
 - **What it does:** Explains that the endpoint keeps its template.
 
-### 100. vars.reason
+### 109. vars.reason
 
 Field.
 
 - **What it does:** A variable the chosen template asks for on manual sends (here `reason`), filled in for this send.
 - **Links to:** [Variables](../../webhooks/variables.md).
 
-### 101. Asked for on manual sends.
+### 110. Asked for on manual sends.
 
 Text.
 
 - **What it does:** Explains why the variable is asked for.
 
-### 102. None. A value here wins over the endpoint and global value of that name, for this send only.
+### 111. None. A value here wins over the endpoint and global value of that name, for this send only.
 
 Text.
 
 - **What it does:** The variable overrides for this send; none yet.
 
-### 103. Add override
+### 112. Add override
 
 Button.
 
 - **What it does:** Adds a variable value for this send only.
 
-### 104. Edit body
+### 113. Edit body
 
 Switch.
 
 - **What it does:** Lets you change the rendered body by hand before sending.
 
-### 105. Copy rendered URL
+### 114. Copy rendered URL
 
 Button.
 
 - **What it does:** Copies the URL the request goes to, after its template variables are filled in.
 
-### 106. Rendered headers
+### 115. Rendered headers
 
 Heading.
 
 - **What it does:** The headers the request will carry, signature included.
 
-### 107. Rendered body
+### 116. Rendered body
 
 Heading.
 
 - **What it does:** The body the request will carry.
 
-### 108. Copy rendered body
+### 117. Copy rendered body
 
 Button.
 
 - **What it does:** Copies the rendered body.
 
-### 109. Cancel
+### 118. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or composer without doing anything.
 
-### 110. Send
+### 119. Send
 
 Button.
 
@@ -773,7 +865,7 @@ Button.
 - **Errors:** A template that does not render, or a required variable left empty, is refused with the reason.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/endpoints/{endpointId}/send`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSend), CLI [`sendmock webhook send`](/cli/webhook-endpoints/#webhook-send), MCP [`sendmock_webhook_send`](/mcp/webhook-endpoints/#sendmock_webhook_send)
 
-### 111. Close
+### 120. Close
 
 Button.
 
@@ -781,19 +873,19 @@ Button.
 
 ## Import .eml dialog
 
-### 112. Import .eml
+### 121. Import .eml
 
 Heading.
 
 - **What it does:** The Import .eml dialog: stores a whole message, headers and all.
 
-### 113. Store a whole message, headers and all, from a file or pasted text.
+### 122. Store a whole message, headers and all, from a file or pasted text.
 
 Text.
 
 - **What it does:** Explains what the dialog does.
 
-### 114. Sent by your app As if your app sent it, like the sendmail shim (POST /send/raw).
+### 123. Sent by your app As if your app sent it, like the sendmail shim (POST /send/raw).
 
 Choice.
 
@@ -801,7 +893,7 @@ Choice.
 - **What it changes:** Fires `email.received`.
 - **Same action elsewhere:** REST [`POST /api/v1/send/raw`](/api/email/#postSendRaw), CLI [`sendmock sendmail`](/cli/email/#sendmail), MCP [`sendmock_email_send_raw`](/mcp/email/#sendmock_email_send_raw)
 
-### 115. Incoming to your app As a reply or new mail to your app; inbound routes deliver it.
+### 124. Incoming to your app As a reply or new mail to your app; inbound routes deliver it.
 
 Choice.
 
@@ -809,26 +901,26 @@ Choice.
 - **What it changes:** Fires `email.inbound` and runs the inbound routes.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/inbound`](/api/email/#postEmailsInbound), CLI [`sendmock email inbound`](/cli/email/#email-inbound), MCP [`sendmock_email_inbound`](/mcp/email/#sendmock_email_inbound)
 
-### 116. Message
+### 125. Message
 
 Field.
 
 - **What it does:** The raw message to store, or (in a composer) the body of the reply or forward.
 
-### 117. Upload a .eml file
+### 126. Upload a .eml file
 
 Button.
 
 - **What it does:** Reads a `.eml` file from your computer into the Message field.
 
-### 118. Import
+### 127. Import
 
 Button.
 
 - **What it does:** Stores the message; a notice says it was imported, with Open to read it.
 - **Errors:** A message that cannot be parsed is refused with the reason; fix the headers and try again.
 
-### 119. Close
+### 128. Close
 
 Button.
 
@@ -836,25 +928,25 @@ Button.
 
 ## Delete all emails dialog
 
-### 120. Delete all emails?
+### 129. Delete all emails?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every email (or every email the filter shows).
 
-### 121. This removes all # captured emails. It cannot be undone.
+### 130. This removes all # captured emails. It cannot be undone.
 
 Text.
 
 - **What it does:** Says how many emails will be deleted.
 
-### 122. Cancel
+### 131. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or composer without doing anything.
 
-### 123. Delete all
+### 132. Delete all
 
 Button.
 
@@ -863,19 +955,19 @@ Button.
 
 ## With no data yet
 
-### 124. No emails yet
+### 133. No emails yet
 
 Text.
 
 - **What it does:** Shown when there is no email at all, with how to connect your app.
 
-### 125. Point your app's SMTP settings at SendMock and send something. No auth or TLS needed.
+### 134. Point your app's SMTP settings at SendMock and send something. No auth or TLS needed.
 
 Text.
 
 - **What it does:** Explains the first step: SendMock accepts any SMTP login, so only the host and port matter.
 
-### 126. This machine
+### 135. This machine
 
 Choice.
 
@@ -884,38 +976,38 @@ Choice.
 - **Where its text comes from:** The ports come from `GET /api/v1/info`.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 127. Docker host
+### 136. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host (`host.docker.internal`).
 
-### 128. Compose
+### 137. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project (the `sendmock` service name).
 
-### 129. Copy SMTP host
+### 138. Copy SMTP host
 
 Button.
 
 - **What it does:** Copies the SMTP host for the chosen location.
 
-### 130. Copy SMTP port
+### 139. Copy SMTP port
 
 Button.
 
 - **What it does:** Copies the SMTP port the running SendMock listens on.
 
-### 131. More snippets
+### 140. More snippets
 
 Link.
 
 - **What it does:** Opens Settings > Connection, with the settings for every language and framework.
 - **Links to:** [Settings](../../settings.md).
 
-### 132. Send a sample email
+### 141. Send a sample email
 
 Button.
 
@@ -923,22 +1015,32 @@ Button.
 - **What it changes:** Stores an email and fires `email.received`, which your webhook rules can deliver.
 - **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
 
+### 142. Choose webhooks for Send a sample email
+
+Button.
+
+- **What it does:** Opens Choose webhooks for this one action. Choose webhooks lists every enabled endpoint with a search box, the endpoints your rules would pick already checked, each checked one with Payload to see and edit its request, and says how many are chosen (or that no webhook will be sent). Its confirm button, named after the action, runs it once and sends the event to exactly the checked endpoints; Cancel runs nothing.
+- **What it changes:** The chosen deliveries show `chosen` as their Trigger in Webhooks > Deliveries, and an edited payload `edited`. Your rules stay as they are; the dialog's rules link opens them in a new tab.
+- **Links to:** [Webhook rules](../../webhooks/rules.md).
+- **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
+
 ## When the data cannot load
 
-### 133. Could not load emails. Try again
+### 143. Could not load emails. Try again
 
 Message.
 
 - **What it does:** Shown when the list could not be loaded, for example because SendMock stopped.
 - **Errors:** Check SendMock is running (the status at the bottom of the sidebar), then press Try again.
 
-### 134. Could not load emails.
+### 144. Could not load emails.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 135. Try again
+### 145. Try again
 
 Button.
 

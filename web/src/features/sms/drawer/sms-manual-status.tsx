@@ -15,6 +15,8 @@ import {
   manualSmsErrorCodes,
   smsStatusLabels,
 } from "@/features/sms/sms-labels";
+import { useWebhookTargets } from "@/features/webhooks/targets/use-webhook-targets";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
 import { useSetSmsStatus } from "@/lib/api/hooks/use-sms-queries";
 import type { SmsMessage, SmsStatus } from "@/lib/api/types";
 
@@ -28,12 +30,25 @@ const defaultErrorCode = "30003";
 export function SmsManualStatus({ smsMessage }: { smsMessage: SmsMessage }) {
   const setSmsStatus = useSetSmsStatus();
   const [errorCode, setErrorCode] = React.useState(defaultErrorCode);
+  // Rules can filter on the status, so the row previews the button in reach.
+  const [previewedStatus, setPreviewedStatus] =
+    React.useState<SmsStatus>("delivered");
+  const webhookTargets = useWebhookTargets({
+    eventType: "sms.status",
+    subjectId: smsMessage.id,
+    data: { status: [previewedStatus] },
+  });
   const errorCodeFieldId = React.useId();
 
   const applyManualStatus = (smsStatus: SmsStatus) => {
     const appliedErrorCode = smsStatus === "delivered" ? null : errorCode;
     setSmsStatus.mutate(
-      { smsId: smsMessage.id, smsStatus, errorCode: appliedErrorCode },
+      {
+        smsId: smsMessage.id,
+        smsStatus,
+        errorCode: appliedErrorCode,
+        webhookChoice: webhookTargets.webhookChoice,
+      },
       {
         onSuccess: () => {
           toast(`Status set to ${smsStatusLabels[smsStatus]}`);
@@ -80,6 +95,12 @@ export function SmsManualStatus({ smsMessage }: { smsMessage: SmsMessage }) {
             variant={manualStatus === "delivered" ? "default" : "outline"}
             size="sm"
             disabled={setSmsStatus.isPending}
+            onPointerEnter={() => {
+              setPreviewedStatus(manualStatus);
+            }}
+            onFocus={() => {
+              setPreviewedStatus(manualStatus);
+            }}
             onClick={() => {
               applyManualStatus(manualStatus);
             }}
@@ -88,6 +109,11 @@ export function SmsManualStatus({ smsMessage }: { smsMessage: SmsMessage }) {
           </Button>
         ))}
       </div>
+      <WebhookTargets.Row
+        webhookTargets={webhookTargets}
+        actionLabel={`setting ${smsStatusLabels[previewedStatus]}`}
+        heading={`Webhooks for ${smsStatusLabels[previewedStatus]}:`}
+      />
     </section>
   );
 }

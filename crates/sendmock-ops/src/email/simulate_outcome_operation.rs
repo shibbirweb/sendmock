@@ -34,6 +34,8 @@ pub struct SimulatedEmailOutcome {
     pub event: SimulatedDeliveryEvent,
     /// For `bounced` only: hard (the default) or soft.
     pub bounce_type: Option<SimulatedBounceType>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 impl SimulatedEmailOutcome {
@@ -68,6 +70,7 @@ impl Operation for SimulateEmailOutcomeOperation {
             cli_usage: "sendmock email simulate <emailId> <event>",
             mcp_tool: "sendmock_email_simulate",
             success_status: SuccessStatus::NoContent,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -78,6 +81,7 @@ impl Operation for SimulateEmailOutcomeOperation {
         operation_context: &OperationContext,
         input: SimulatedEmailOutcome,
     ) -> Result<NoContent, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let stored_email = find_email_or_not_found(operation_context, &input.email_id).await?;
         let recipient_address = stored_email
             .to

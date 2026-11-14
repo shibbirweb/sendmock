@@ -21,6 +21,8 @@ import {
 import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { toEmailSummary } from "@/mocks/fixtures/email-summary";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 const fallbackRecipient: EmailAddress = {
   name: "",
@@ -97,25 +99,27 @@ export const emailResponseHandlers = [
     }
 
     const replyRequest = (await request.json()) as EmailReplyRequest;
-    if ((replyRequest.body ?? "").trim() === "") {
-      return createErrorResponse(400, "validation_failed", "Write a reply");
+    const choiceRefusal = refuseUnavailableEndpoint(replyRequest);
+    if (choiceRefusal) {
+      return choiceRefusal;
     }
-
     const responder = readResponder(originalEmail, replyRequest.from);
 
-    return storeEmailResponse(originalEmail, {
-      kind: "reply",
-      from: responder,
-      to: [originalEmail.reply_to[0] ?? originalEmail.from],
-      cc:
-        replyRequest.reply_all === true
-          ? listOtherRecipients(originalEmail, responder)
-          : [],
-      subject: replyRequest.subject,
-      body: replyRequest.body,
-      includeOriginalText: replyRequest.include_original ?? true,
-      includeAttachments: false,
-    });
+    return runWithWebhookChoice(replyRequest, () =>
+      storeEmailResponse(originalEmail, {
+        kind: "reply",
+        from: responder,
+        to: [originalEmail.reply_to[0] ?? originalEmail.from],
+        cc:
+          replyRequest.reply_all === true
+            ? listOtherRecipients(originalEmail, responder)
+            : [],
+        subject: replyRequest.subject,
+        body: replyRequest.body ?? "",
+        includeOriginalText: replyRequest.include_original ?? true,
+        includeAttachments: false,
+      }),
+    );
   }),
 
   http.post("*/api/v1/emails/:emailId/forward", async ({ params, request }) => {
@@ -126,6 +130,10 @@ export const emailResponseHandlers = [
     }
 
     const forwardRequest = (await request.json()) as EmailForwardRequest;
+    const choiceRefusal = refuseUnavailableEndpoint(forwardRequest);
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
     const forwardRecipient = parseEmailAddress(forwardRequest.to ?? "");
     if (!forwardRecipient.address.includes("@")) {
       return createErrorResponse(
@@ -135,15 +143,17 @@ export const emailResponseHandlers = [
       );
     }
 
-    return storeEmailResponse(originalEmail, {
-      kind: "forward",
-      from: readResponder(originalEmail, forwardRequest.from),
-      to: [forwardRecipient],
-      cc: [],
-      subject: forwardRequest.subject,
-      body: forwardRequest.body ?? "",
-      includeOriginalText: forwardRequest.include_original ?? true,
-      includeAttachments: forwardRequest.include_attachments ?? true,
-    });
+    return runWithWebhookChoice(forwardRequest, () =>
+      storeEmailResponse(originalEmail, {
+        kind: "forward",
+        from: readResponder(originalEmail, forwardRequest.from),
+        to: [forwardRecipient],
+        cc: [],
+        subject: forwardRequest.subject,
+        body: forwardRequest.body ?? "",
+        includeOriginalText: forwardRequest.include_original ?? true,
+        includeAttachments: forwardRequest.include_attachments ?? true,
+      }),
+    );
   }),
 ];

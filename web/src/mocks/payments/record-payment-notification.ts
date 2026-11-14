@@ -66,6 +66,7 @@ export function recordPaymentNotification(
     trigger: "auto",
     attempt: 1,
     status: "succeeded",
+    url: endpointRecord.url,
     request: {
       method: "POST",
       url: endpointRecord.url,
@@ -88,6 +89,7 @@ export function recordPaymentNotification(
     error_message: null,
     next_attempt_at: null,
     created_at: createdAt,
+    is_edited: false,
   };
   mockDatabase.webhookDeliveries.unshift(notificationDelivery);
   paymentDetail.notifications.push({

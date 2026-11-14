@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -164,11 +165,11 @@ export function EndpointFieldsBody({
                 updateRow(bodyFieldRow.rowId, { fieldValue });
               }}
             />
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
               size="icon-sm"
-              aria-label={`Remove field ${rowIndex + 1}`}
+              label={`Remove field ${rowIndex + 1}`}
               onClick={() => {
                 onChange({
                   bodyFieldRows: bodyFieldRows.filter(
@@ -178,7 +179,7 @@ export function EndpointFieldsBody({
               }}
             >
               <Trash2Icon />
-            </Button>
+            </IconButton>
           </div>
         ))}
         <Button

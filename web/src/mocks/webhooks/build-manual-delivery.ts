@@ -60,11 +60,13 @@ export function buildManualDelivery(
     attempt: 1,
     next_attempt_at: null,
     created_at: new Date(timestampSeconds * 1000).toISOString(),
+    is_edited: false,
   };
   if (blockingErrors.length > 0) {
     return {
       ...deliveryBase,
       status: "render_failed",
+      url: null,
       request: null,
       response: null,
       duration_ms: null,
@@ -77,6 +79,7 @@ export function buildManualDelivery(
   return {
     ...deliveryBase,
     status: "succeeded",
+    url: previewResult.url,
     request: {
       method: previewResult.method,
       url: previewResult.url,

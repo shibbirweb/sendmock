@@ -12,6 +12,8 @@ import type {
   RulePreviewResult,
   WebhookRule,
   WebhookRuleInput,
+  WebhookRuleMatchRequest,
+  WebhookRuleMatchResult,
 } from "@/lib/api/types";
 
 function useRuleMutation<MutationInput, MutationResult>(
@@ -82,5 +84,26 @@ export function useRulePreview(
       }),
     enabled: isEnabled,
     placeholderData: keepPreviousData,
+  });
+}
+
+/**
+ * Which webhooks an event would trigger, before the action fires it
+ * (WH-13.1); a rule or endpoint change refetches it.
+ */
+export function useWebhookRuleMatch(
+  matchRequest: WebhookRuleMatchRequest,
+  isEnabled: boolean,
+) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.ruleMatch(matchRequest),
+    queryFn: ({ signal }) =>
+      requestApi<WebhookRuleMatchResult>("/webhooks/rules/match", {
+        method: "POST",
+        requestBody: matchRequest,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
+    enabled: isEnabled,
   });
 }

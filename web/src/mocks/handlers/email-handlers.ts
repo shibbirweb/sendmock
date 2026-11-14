@@ -22,6 +22,8 @@ import {
 } from "@/mocks/opens/record-mock-open";
 import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
   const searchParameters = requestUrl.searchParams;
@@ -144,9 +146,14 @@ export const emailHandlers = [
       return createNotFoundResponse("Email");
     }
 
+    const openRequest = await readOpenEventRequest(request);
+    const choiceRefusal = refuseUnavailableEndpoint(openRequest);
+    if (choiceRefusal) {
+      return choiceRefusal;
+    }
     const recordedOpen = recordMockOpen(
       email,
-      await readOpenEventRequest(request),
+      openRequest,
       mockDatabase.settings,
       mockDatabase.messageOpens,
     );
@@ -156,7 +163,9 @@ export const emailHandlers = [
         at: recordedOpen.openRecord.opened_at,
         detail: openTimelineDetails[recordedOpen.openRecord.source],
       });
-      publishMockEvent("email.opened", describeMockOpen(email, recordedOpen));
+      runWithWebhookChoice(openRequest, () => {
+        publishMockEvent("email.opened", describeMockOpen(email, recordedOpen));
+      });
     }
 
     return new HttpResponse(null, { status: 204 });
@@ -182,11 +191,17 @@ export const emailHandlers = [
       }
 
       const simulatedOutcome = (await request.json()) as SimulatedEmailOutcome;
-      applyEmailOutcome(
-        email,
-        simulatedOutcome.event,
-        `Simulated ${simulatedOutcome.event}`,
-      );
+      const choiceRefusal = refuseUnavailableEndpoint(simulatedOutcome);
+      if (choiceRefusal) {
+        return choiceRefusal;
+      }
+      runWithWebhookChoice(simulatedOutcome, () => {
+        applyEmailOutcome(
+          email,
+          simulatedOutcome.event,
+          `Simulated ${simulatedOutcome.event}`,
+        );
+      });
 
       return new HttpResponse(null, { status: 204 });
     },

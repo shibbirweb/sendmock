@@ -174,7 +174,6 @@ impl Operation for PreviewWebhookEndpointOperation {
             &endpoint_input.request_settings,
         )
         .await?;
-        let send_time_values = to_send_time_values(input.variables);
         let preview_delivery_id = operation_context.id_generator.generate_id().to_string();
         let preview_request_id = operation_context.id_generator.generate_id().to_string();
         let rendered_delivery = render_delivery_request(
@@ -188,10 +187,11 @@ impl Operation for PreviewWebhookEndpointOperation {
                 delivery_trigger: DeliveryTrigger::Manual,
                 rule_id: None,
                 request_id: &preview_request_id,
-                send_time_values: &send_time_values,
+                send_time_values: &to_send_time_values(input.variables),
             },
             &endpoint_input.request_settings,
             detached_template.as_ref(),
+            None,
         )
         .await?;
         let shown_request = mask_request_secrets(

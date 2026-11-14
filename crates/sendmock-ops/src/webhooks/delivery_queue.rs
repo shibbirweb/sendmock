@@ -7,7 +7,7 @@ use super::delivery_template_context::DeliveryContextDetails;
 use super::endpoint_settings::RetryPolicy;
 use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblemSeverity;
-use crate::{AppEvent, OperationContext, OperationError};
+use crate::{AppEvent, EditedWebhookRequest, OperationContext, OperationError};
 
 /// Why a delivery was made.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -17,6 +17,8 @@ pub enum DeliveryTrigger {
     /// Sent by hand: Send test, Send to webhook, the composer.
     Manual,
     Replay,
+    /// The action that fired the event chose the endpoint instead of the rules (WH-13.5).
+    Chosen,
 }
 
 impl DeliveryTrigger {
@@ -25,6 +27,7 @@ impl DeliveryTrigger {
             Self::Automatic => "auto",
             Self::Manual => "manual",
             Self::Replay => "replay",
+            Self::Chosen => "chosen",
         }
     }
 }
@@ -103,6 +106,7 @@ pub fn build_first_attempt(
         next_attempt_at_unix_ms: (!has_render_errors).then_some(now_unix_ms),
         created_at_unix_ms: now_unix_ms,
         is_signed: true,
+        is_edited: false,
     })
 }
 
@@ -130,6 +134,7 @@ pub async fn render_planned_delivery(
         },
         &request_plan.request_settings,
         request_plan.detached_template.as_ref(),
+        request_plan.edited_body.as_deref(),
     )
     .await?;
     request_plan.apply_edited_body(&mut rendered_delivery);
@@ -195,6 +200,47 @@ pub async fn enqueue_webhook_delivery(
         &request_plan,
     )
     .await?;
+    queue_first_attempt(operation_context, new_delivery).await
+}
+
+/// Queues a delivery whose request the action edited (WH-14.4): the edited body takes the
+/// template's place before the headers render, so a provider's signature header signs it, the
+/// edited headers go over the rendered ones, and the delivery is marked edited. The sender
+/// adds the Standard Webhooks headers over the edited body as for any delivery. Without an
+/// edit, the rendered request is queued.
+pub async fn enqueue_edited_webhook_delivery(
+    operation_context: &OperationContext,
+    stored_endpoint: &WebhookEndpointRecord,
+    delivery_order: DeliveryOrder,
+    edited_request: Option<&EditedWebhookRequest>,
+) -> Result<WebhookDeliveryRecord, OperationError> {
+    let Some(edited_request) = edited_request else {
+        return enqueue_webhook_delivery(operation_context, stored_endpoint, delivery_order).await;
+    };
+    let mut request_plan = DeliveryRequestPlan::from_endpoint(stored_endpoint)?;
+    request_plan.edited_body = Some(edited_request.body.clone());
+    let delivery_id = operation_context.id_generator.generate_id().to_string();
+    let mut rendered_delivery = render_planned_delivery(
+        operation_context,
+        stored_endpoint,
+        &delivery_order,
+        &request_plan,
+        &delivery_id,
+    )
+    .await?;
+    rendered_delivery
+        .request
+        .headers
+        .extend(edited_request.headers.clone());
+    let mut new_delivery = build_first_attempt(
+        stored_endpoint,
+        delivery_order,
+        delivery_id,
+        &request_plan.request_settings.retry_policy,
+        &rendered_delivery,
+        operation_context.clock.now_unix_ms(),
+    )?;
+    new_delivery.is_edited = true;
     queue_first_attempt(operation_context, new_delivery).await
 }
 

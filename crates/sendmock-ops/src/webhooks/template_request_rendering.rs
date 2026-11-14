@@ -46,11 +46,14 @@ fn with_body_fields(template_context: &Value, body_fields: Value) -> Value {
 }
 
 /// Renders a template's body and headers; the problems are tagged `body` and `header.<n>`.
+/// An edited body replaces the template's own before the headers render, so the signature
+/// functions sign the body that is sent.
 pub fn render_template_request(
     template_draft: &TemplateDraft,
     template_context: &Value,
     template_functions: &dyn TemplateFunctions,
     render_mode: TemplateRenderMode,
+    edited_body: Option<&str>,
 ) -> (RenderedTemplateRequest, Vec<RenderProblem>) {
     let content_type = &template_draft.content_type;
     let body_escape = if content_type.contains("json") {
@@ -64,7 +67,10 @@ pub fn render_template_request(
         render_mode,
         problems: Vec::new(),
     };
-    let body = body_renderer.render_part(&template_draft.body_template, "body", body_escape);
+    let body = match edited_body {
+        Some(edited_body) => edited_body.to_owned(),
+        None => body_renderer.render_part(&template_draft.body_template, "body", body_escape),
+    };
     let body_fields = if content_type.contains("x-www-form-urlencoded") {
         read_form_fields(&body)
     } else {

@@ -1,6 +1,6 @@
 import { LaptopIcon, MoonIcon, SunIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { appShortcuts } from "@/features/shortcuts/shortcut-catalog";
 import {
   type ThemePreference,
   useTheme,
@@ -31,9 +32,13 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Change theme">
+        <IconButton
+          variant="ghost"
+          label="Change theme"
+          shortcutKeys={appShortcuts.switchTheme.keys}
+        >
           <CurrentThemeIcon />
-        </Button>
+        </IconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuRadioGroup

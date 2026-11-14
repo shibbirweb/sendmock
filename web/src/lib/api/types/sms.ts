@@ -3,6 +3,7 @@ import type {
   IsoTimestamp,
   PageRequest,
   Ulid,
+  WebhookChoice,
 } from "@/lib/api/types/common";
 import type {
   RecordedHttpRequest,
@@ -219,7 +220,7 @@ export type NativeSmsRequest = {
 };
 
 /** Body of POST /api/v1/sms/inbound (simulate an incoming message). */
-export type InboundSmsRequest = {
+export type InboundSmsRequest = WebhookChoice & {
   /**
    * Who texts your app: the user's number.
    * @example "+8801700000000"
@@ -252,7 +253,7 @@ export type InboundSmsRequest = {
 };
 
 /** Body of `POST /sms/{smsId}/status`: a manual status change. */
-export type SmsStatusUpdate = {
+export type SmsStatusUpdate = WebhookChoice & {
   /**
    * The new status; fires the status callback and the matching event.
    * @example "delivered"

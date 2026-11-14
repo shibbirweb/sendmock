@@ -31,3 +31,14 @@ export function readReplyRecipient(
 ): EmailAddress {
   return email.reply_to[0] ?? email.from;
 }
+
+/**
+ * A reply can go as prefilled, edited or empty; a forward needs an address
+ * to go to (EM-22.1).
+ */
+export function canSendResponse(
+  composerMode: EmailComposerMode,
+  forwardToAddress: string,
+): boolean {
+  return composerMode === "forward" ? forwardToAddress.includes("@") : true;
+}

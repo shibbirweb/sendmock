@@ -10,6 +10,7 @@ import {
 import * as React from "react";
 import { toast } from "sonner";
 
+import { IconTooltip } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { buildPreviewDocument } from "@/features/mail/detail/preview/build-preview-document";
@@ -92,15 +93,21 @@ export function EmailHtmlPreview({ email }: { email: EmailDetail }) {
           }}
           aria-label="Preview width"
         >
-          <ToggleGroupItem value="desktop" aria-label="Desktop width">
-            <MonitorIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="tablet" aria-label="Tablet width">
-            <TabletIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="mobile" aria-label="Mobile width">
-            <SmartphoneIcon />
-          </ToggleGroupItem>
+          <IconTooltip label="Desktop width">
+            <ToggleGroupItem value="desktop" aria-label="Desktop width">
+              <MonitorIcon />
+            </ToggleGroupItem>
+          </IconTooltip>
+          <IconTooltip label="Tablet width">
+            <ToggleGroupItem value="tablet" aria-label="Tablet width">
+              <TabletIcon />
+            </ToggleGroupItem>
+          </IconTooltip>
+          <IconTooltip label="Mobile width">
+            <ToggleGroupItem value="mobile" aria-label="Mobile width">
+              <SmartphoneIcon />
+            </ToggleGroupItem>
+          </IconTooltip>
         </ToggleGroup>
         <Button
           variant="outline"

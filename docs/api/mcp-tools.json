@@ -640,6 +640,41 @@
           "allowed_values": null,
           "description": "The browser or client that clicked, kept in the click history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -672,6 +707,37 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -686,6 +752,53 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -1165,6 +1278,41 @@
           "allowed_values": null,
           "description": "Forwards the original attachments too (default true).",
           "example": true
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -1218,12 +1366,92 @@
             "examples": [
               true
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
           "email_id",
           "to"
-        ]
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
+          }
+        }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
@@ -1397,6 +1625,41 @@
           "allowed_values": null,
           "description": "A whole message (RFC 5322); when set, the other fields are ignored.",
           "example": "From: sam@customer.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -1448,6 +1711,86 @@
             "examples": [
               "From: sam@customer.test\r\nTo: support@inbound.app.test\r\nSubject: Hi\r\n\r\nHello"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
+          }
+        },
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -1963,6 +2306,41 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -1988,6 +2366,37 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -2001,6 +2410,53 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -4363,9 +4819,9 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The reply text, above the quoted original.",
+          "description": "The reply text, above the quoted original; empty or left out sends no text of its own.",
           "example": "Thanks, that fixed it!"
         },
         {
@@ -4415,6 +4871,41 @@
           "allowed_values": null,
           "description": "Quotes the original below an \"On ... wrote:\" line (default true).",
           "example": true
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -4429,7 +4920,7 @@
           },
           "body": {
             "type": "string",
-            "description": "The reply text, above the quoted original.",
+            "description": "The reply text, above the quoted original; empty or left out sends no text of its own.",
             "examples": [
               "Thanks, that fixed it!"
             ]
@@ -4461,18 +4952,96 @@
             "examples": [
               true
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
-          "email_id",
-          "body"
-        ]
+          "email_id"
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
+          }
+        }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "body": "Thanks, that fixed it!",
-        "from": "user@example.test",
-        "subject": "Re: Ticket #318 updated"
+        "from": "user@example.test"
       },
       "output": "EmailDetail",
       "cli": [
@@ -4948,6 +5517,41 @@
           ],
           "description": "For `bounced` only: a hard bounce (the address does not exist) or a soft one (try again later).",
           "example": "hard"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -4977,6 +5581,37 @@
             "examples": [
               "hard"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -4994,13 +5629,63 @@
               "unsubscribed"
             ],
             "description": "Simulated delivery outcome, null when no outcome was simulated."
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
       "example_arguments": {
         "email_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "event": "bounced",
-        "bounce_type": "hard"
+        "bounce_type": "hard",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": null,
       "cli": [
@@ -8010,6 +8695,134 @@
       ],
       "ui": [
         "Webhooks > Inbound routes"
+      ]
+    },
+    {
+      "name": "sendmock_inbound_route_match",
+      "toolset": "rules",
+      "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+      "area": "Inbound routes",
+      "area_slug": "inbound-routes",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/inbound-routes/match",
+          "operation_id": "postInboundRoutesMatch",
+          "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+          "area_slug": "inbound-routes",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The recipients the incoming email would have.",
+          "example": [
+            "support@inbound.app.test"
+          ]
+        },
+        {
+          "name": "cc",
+          "input": {
+            "name": "cc",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Copied recipients; routes read them like `to`.",
+          "example": [
+            "lee@example.test"
+          ]
+        },
+        {
+          "name": "headers",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Headers by name.",
+          "example": {
+            "subject": "Re: Your receipt",
+            "from": "sam@example.test"
+          }
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The recipients the incoming email would have.",
+            "examples": [
+              [
+                "support@inbound.app.test"
+              ]
+            ]
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Copied recipients; routes read them like `to`.",
+            "examples": [
+              [
+                "lee@example.test"
+              ]
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Headers by name.",
+            "examples": [
+              {
+                "subject": "Re: Your receipt",
+                "from": "sam@example.test"
+              }
+            ]
+          }
+        },
+        "required": [
+          "to"
+        ]
+      },
+      "example_arguments": {
+        "to": [
+          "support@inbound.app.test"
+        ],
+        "cc": [
+          "lee@example.test"
+        ]
+      },
+      "output": "InboundRouteMatchResult",
+      "cli": [
+        "sendmock route match"
+      ],
+      "ui": [
+        "Mail > Reply, Reply all, Forward > Delivers to"
       ]
     },
     {
@@ -15737,6 +16550,41 @@
           "allowed_values": null,
           "description": "For `answer_dispute`: the evidence sent to the bank.",
           "example": "Signed delivery receipt attached."
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -15787,6 +16635,37 @@
             "examples": [
               "Signed delivery receipt attached."
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -15818,6 +16697,53 @@
               "capture",
               "void"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -16957,6 +17883,41 @@
           "allowed_values": null,
           "description": "The HTML body of the sample email.",
           "example": "<p>It works!</p>"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -16989,11 +17950,91 @@
             "examples": [
               "<p>It works!</p>"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
           "kind"
-        ]
+        ],
+        "$defs": {
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
+          }
+        }
       },
       "example_arguments": {
         "kind": "email",
@@ -18591,6 +19632,41 @@
           "allowed_values": null,
           "description": "The browser or client that opened it, kept in the open history. The UI sends its own.",
           "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -18616,6 +19692,37 @@
             "examples": [
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -18629,6 +19736,53 @@
               "manual",
               "api"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -21229,6 +22383,41 @@
           "allowed_values": null,
           "description": "A Twilio error code for `failed` or `undelivered`, e.g. `30003` (unreachable).",
           "example": "30003"
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -21257,6 +22446,37 @@
             "examples": [
               "30003"
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -21274,13 +22494,63 @@
               "failed",
               "received"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
       "example_arguments": {
         "sms_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "status": "delivered",
-        "error_code": "30003"
+        "error_code": "30003",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": "SmsMessageDetail",
       "cli": [
@@ -21393,6 +22663,41 @@
               "content_type": "image/jpeg"
             }
           ]
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        },
+        {
+          "name": "webhook_requests",
+          "input": {
+            "name": "webhook_requests",
+            "location": "body"
+          },
+          "type": "WebhookRequestEdit[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+          "example": [
+            {
+              "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+              "event_type": "email.bounced",
+              "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+              "headers": {
+                "x-tenant": "acme"
+              }
+            }
+          ]
         }
       ],
       "input_schema": {
@@ -21448,6 +22753,37 @@
                 }
               ]
             ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "Send this action's webhooks to exactly these endpoints (IDs from `GET /api/v1/webhooks/endpoints`) instead of the ones the rules pick; an empty list sends none. Leave it out to let the rules decide.",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          },
+          "webhook_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/WebhookRequestEdit"
+            },
+            "description": "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.",
+            "examples": [
+              [
+                {
+                  "endpoint_id": "01JB7T9Q2RENDPOINT00000000",
+                  "event_type": "email.bounced",
+                  "body": "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}",
+                  "headers": {
+                    "x-tenant": "acme"
+                  }
+                }
+              ]
+            ]
           }
         },
         "required": [
@@ -21493,6 +22829,53 @@
               "sms",
               "whatsapp"
             ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          },
+          "WebhookRequestEdit": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "$ref": "#/$defs/Ulid",
+                "description": "The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.",
+                "examples": [
+                  "01JB7T9Q2RENDPOINT00000000"
+                ]
+              },
+              "event_type": {
+                "type": "string",
+                "description": "The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.",
+                "examples": [
+                  "email.bounced"
+                ]
+              },
+              "body": {
+                "type": "string",
+                "description": "The body, sent exactly as written and signed over these bytes with the endpoint's secret.",
+                "examples": [
+                  "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.",
+                "examples": [
+                  {
+                    "x-tenant": "acme"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "endpoint_id",
+              "body"
+            ],
+            "description": "A request edited before an action sends it."
           }
         }
       },
@@ -21500,7 +22883,10 @@
         "from": "+8801700000000",
         "to": "+15550001111",
         "body": "STOP",
-        "channel": "sms"
+        "channel": "sms",
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
       },
       "output": "SmsMessageDetail",
       "cli": [
@@ -24011,6 +25397,18 @@
           ],
           "description": "Only this event.",
           "example": "email.received"
+        },
+        {
+          "name": "subject_id",
+          "input": {
+            "name": "subject_id",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
         }
       ],
       "input_schema": {
@@ -24049,6 +25447,13 @@
             "description": "Only this event.",
             "examples": [
               "email.received"
+            ]
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
             ]
           }
         },
@@ -27197,6 +28602,271 @@
       ],
       "ui": [
         "Webhooks > Rules"
+      ]
+    },
+    {
+      "name": "sendmock_webhook_rule_match",
+      "toolset": "webhooks",
+      "summary": "Which webhooks an event would trigger, before an action fires it.",
+      "area": "Webhook rules",
+      "area_slug": "webhook-rules",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks/rules/match",
+          "operation_id": "postWebhooksRulesMatch",
+          "summary": "Which webhooks an event would trigger, before an action fires it.",
+          "area_slug": "webhook-rules",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "event_type",
+          "input": {
+            "name": "event_type",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": [
+            "email.received",
+            "email.inbound",
+            "email.opened",
+            "email.clicked",
+            "email.delivered",
+            "email.deferred",
+            "email.bounced",
+            "email.complained",
+            "email.unsubscribed",
+            "email.released",
+            "email.deleted",
+            "sms.sent",
+            "sms.status",
+            "sms.opened",
+            "sms.inbound",
+            "sms.reply_webhook",
+            "verify.started",
+            "verify.checked",
+            "verify.expired",
+            "push.sent",
+            "push.failed",
+            "http.captured",
+            "payment.created",
+            "payment.authorized",
+            "payment.succeeded",
+            "payment.failed",
+            "payment.canceled",
+            "payment.refunded",
+            "payment.partially_refunded",
+            "payment.dispute_opened",
+            "payment.dispute_updated",
+            "payment.dispute_closed",
+            "checkout.completed",
+            "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
+            "webhook.delivered",
+            "webhook.failed",
+            "test.ping",
+            "traffic.pruned"
+          ],
+          "description": "The event the action fires.",
+          "example": "email.bounced"
+        },
+        {
+          "name": "subject_id",
+          "input": {
+            "name": "subject_id",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "data",
+          "input": {
+            "name": "data",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.",
+          "example": {
+            "to": [
+              "support@app.test"
+            ],
+            "header:x-tenant": [
+              "acme"
+            ]
+          }
+        },
+        {
+          "name": "include_requests",
+          "input": {
+            "name": "include_requests",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Also render the request each matching endpoint would send for the event, with secrets masked.",
+          "example": true
+        },
+        {
+          "name": "webhook_endpoint_ids",
+          "input": {
+            "name": "webhook_endpoint_ids",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "With `include_requests`, render these endpoints' requests too, as chosen for the action instead of the rules (IDs from `GET /api/v1/webhooks/endpoints`).",
+          "example": [
+            "01JB7T9Q2RENDPOINT00000000"
+          ]
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "event_type": {
+            "$ref": "#/$defs/AppEventType",
+            "description": "The event the action fires.",
+            "examples": [
+              "email.bounced"
+            ]
+          },
+          "subject_id": {
+            "$ref": "#/$defs/Ulid",
+            "description": "The email, SMS, payment or push notification the event is about; its stored fields are what the rule filters read.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter fields by name, for a message not stored yet or the values the event changes; they win over the stored message's.",
+            "examples": [
+              {
+                "to": [
+                  "support@app.test"
+                ],
+                "header:x-tenant": [
+                  "acme"
+                ]
+              }
+            ]
+          },
+          "include_requests": {
+            "type": "boolean",
+            "description": "Also render the request each matching endpoint would send for the event, with secrets masked.",
+            "examples": [
+              true
+            ]
+          },
+          "webhook_endpoint_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
+            "description": "With `include_requests`, render these endpoints' requests too, as chosen for the action instead of the rules (IDs from `GET /api/v1/webhooks/endpoints`).",
+            "examples": [
+              [
+                "01JB7T9Q2RENDPOINT00000000"
+              ]
+            ]
+          }
+        },
+        "required": [
+          "event_type"
+        ],
+        "$defs": {
+          "AppEventType": {
+            "type": "string",
+            "enum": [
+              "email.received",
+              "email.inbound",
+              "email.opened",
+              "email.clicked",
+              "email.delivered",
+              "email.deferred",
+              "email.bounced",
+              "email.complained",
+              "email.unsubscribed",
+              "email.released",
+              "email.deleted",
+              "sms.sent",
+              "sms.status",
+              "sms.opened",
+              "sms.inbound",
+              "sms.reply_webhook",
+              "verify.started",
+              "verify.checked",
+              "verify.expired",
+              "push.sent",
+              "push.failed",
+              "http.captured",
+              "payment.created",
+              "payment.authorized",
+              "payment.succeeded",
+              "payment.failed",
+              "payment.canceled",
+              "payment.refunded",
+              "payment.partially_refunded",
+              "payment.dispute_opened",
+              "payment.dispute_updated",
+              "payment.dispute_closed",
+              "checkout.completed",
+              "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
+              "webhook.delivered",
+              "webhook.failed",
+              "test.ping",
+              "traffic.pruned"
+            ]
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
+      },
+      "example_arguments": {
+        "event_type": "email.bounced",
+        "include_requests": true,
+        "webhook_endpoint_ids": [
+          "01JB7T9Q2RENDPOINT00000000"
+        ]
+      },
+      "output": "WebhookRuleMatchResult",
+      "cli": [
+        "sendmock webhook rule match"
+      ],
+      "ui": [
+        "Webhooks row and menu hints on every simulating action; Payload on each webhook"
       ]
     },
     {

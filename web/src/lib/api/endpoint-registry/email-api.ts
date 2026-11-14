@@ -327,6 +327,14 @@ const inboundRouteEndpoints = tagEndpoints("Inbound routes", [
     requestBody: typeRef("InboundRouteTestRequest"),
     response: typeRef("InboundRouteTestResult"),
   },
+  {
+    method: "POST",
+    path: "/api/v1/inbound-routes/match",
+    summary:
+      "Where an incoming email would go: the routes and webhook rules it would run.",
+    requestBody: typeRef("InboundRouteMatchRequest"),
+    response: typeRef("InboundRouteMatchResult"),
+  },
 ]);
 
 export const emailApi: ApiEndpoint[] = [

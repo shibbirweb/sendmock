@@ -5,17 +5,12 @@ import type {
   EmailTimelineEntry,
   WebhookDelivery,
 } from "@/lib/api/types";
-import {
-  fillCapturedGroups,
-  matchRouteFilter,
-} from "@/lib/inbound-routes/match-route-filter";
+import { fillCapturedGroups } from "@/lib/inbound-routes/match-route-filter";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
 import type { InboundRouteRecord } from "@/mocks/fixtures/inbound-route-fixtures";
-import {
-  sortRoutesByPriority,
-  toRoutableEmail,
-} from "@/mocks/inbound-routes/inbound-route-record";
+import { toRoutableEmail } from "@/mocks/inbound-routes/inbound-route-record";
+import { selectMatchingRoutes } from "@/mocks/inbound-routes/select-matching-routes";
 import { answerMockAppPost } from "@/mocks/sms-replies/mock-app-responses";
 
 type RouteDatabase = Pick<
@@ -89,6 +84,7 @@ function recordRouteDelivery(
     trigger: "auto",
     attempt: 1,
     status: isSucceeded ? "succeeded" : "failed",
+    url: requestUrl,
     request: {
       method: "POST",
       url: requestUrl,
@@ -112,6 +108,7 @@ function recordRouteDelivery(
       mockAnswer.kind === "connection_error" ? mockAnswer.message : null,
     next_attempt_at: null,
     created_at: new Date(createdAtMs).toISOString(),
+    is_edited: false,
   };
   mockDatabase.webhookDeliveries.unshift(routeDelivery);
 
@@ -143,16 +140,14 @@ export function runInboundRoutes(
   const addTimeline = (timelineEntry: Omit<EmailTimelineEntry, "at">) => {
     timeline.push({ ...timelineEntry, at: new Date(nowMs).toISOString() });
   };
-  for (const routeRecord of sortRoutesByPriority(mockDatabase.inboundRoutes)) {
-    const filterMatch = matchRouteFilter(routeRecord.filter, routableEmail);
-    if (!filterMatch.isMatch) {
-      continue;
-    }
+  for (const filterMatch of selectMatchingRoutes(
+    mockDatabase.inboundRoutes,
+    routableEmail,
+  )) {
+    const routeRecord = filterMatch.routeRecord;
     const routeName = routeRecord.description || "untitled route";
-    let shouldStop = false;
     for (const routeAction of routeRecord.actions) {
       if (routeAction.kind === "stop") {
-        shouldStop = true;
         continue;
       }
       if (routeAction.kind === "forward_email") {
@@ -204,9 +199,6 @@ export function runInboundRoutes(
         kind: "webhook_sent",
         detail: `${routeAction.kind === "store" ? "Stored and notified" : "Forwarded"} by route ${routeName} to ${targetUrl} (${routeDelivery.response?.status_code ?? routeDelivery.error_message ?? "no answer"})`,
       });
-    }
-    if (shouldStop) {
-      break;
     }
   }
   mockDatabase.emailTimelines.set(email.id, timeline);

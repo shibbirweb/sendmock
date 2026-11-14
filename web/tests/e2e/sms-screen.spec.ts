@@ -77,7 +77,9 @@ test("SM-10.3 simulate read fires even on a failed message", async ({
   );
 
   await page.getByRole("button", { name: "Message actions" }).first().click();
-  await page.getByRole("menuitem", { name: "Simulate read" }).click();
+  await page
+    .getByRole("menuitem", { name: "Simulate read", exact: true })
+    .click();
 
   await expect(page.getByText("Read event fired")).toBeVisible();
   await expect(failedTick).toBeVisible();

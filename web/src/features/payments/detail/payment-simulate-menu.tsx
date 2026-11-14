@@ -6,14 +6,12 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PaymentSimulateItems } from "@/features/payments/detail/payment-simulate-items";
+import { WebhookTargets } from "@/features/webhooks/targets/webhook-targets";
 import { AnswerDisputeDialog } from "@/features/payments/detail/answer-dispute-dialog";
 import { RefundPaymentDialog } from "@/features/payments/detail/refund-payment-dialog";
 import { ApiError } from "@/lib/api/api-client";
@@ -21,19 +19,12 @@ import {
   useResendPaymentNotification,
   useSimulatePayment,
 } from "@/lib/api/hooks/use-payment-queries";
-import type { PaymentDetail, PaymentSimulateRequest } from "@/lib/api/types";
-import {
-  declineReasons,
-  listSimulateActions,
-} from "@/lib/payments/payment-actions";
-
-const actionLabels: Record<string, string> = {
-  succeed: "Succeed",
-  capture: "Capture",
-  void: "Void authorization",
-  dispute: "Open dispute",
-  expire: "Expire checkout",
-};
+import type {
+  PaymentDetail,
+  PaymentSimulateRequest,
+  WebhookChoice,
+} from "@/lib/api/types";
+import { listSimulateActions } from "@/lib/payments/payment-actions";
 
 /** Only the actions the payment's status allows (PY-09.3). */
 export function PaymentSimulateMenu({
@@ -48,6 +39,8 @@ export function PaymentSimulateMenu({
   const [isRefundOpen, setRefundOpen] = React.useState(false);
   const [isAnswerOpen, setAnswerOpen] = React.useState(false);
   const [dialogOpeningCount, setDialogOpeningCount] = React.useState(0);
+  // The webhooks chosen for the Refund or Answer dispute the dialog will send.
+  const pendingChoiceRef = React.useRef<WebhookChoice>({});
   const openDialog = (setDialogOpen: (isOpen: boolean) => void) => {
     setDialogOpeningCount((openingCount) => openingCount + 1);
     setDialogOpen(true);
@@ -79,104 +72,38 @@ export function PaymentSimulateMenu({
     <div className="flex flex-wrap gap-2">
       {/* Not modal: a live update re-renders the drawer as the menu closes, and a modal
           menu could leave the page locked for the next one. */}
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button size="sm" disabled={availableActions.length === 0}>
-            <FlaskConicalIcon />
-            Simulate
-            <ChevronDownIcon />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          {availableActions.map((simulateAction) => {
-            if (simulateAction === "decline") {
-              return (
-                <DropdownMenuSub key={simulateAction}>
-                  <DropdownMenuSubTrigger>Decline</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {declineReasons.map((declineReason) => (
-                      <DropdownMenuItem
-                        key={declineReason.reason}
-                        onSelect={() => {
-                          runAction({
-                            action: "decline",
-                            decline_reason: declineReason.reason,
-                          });
-                        }}
-                      >
-                        {declineReason.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              );
-            }
-            if (simulateAction === "resolve_dispute") {
-              return (
-                <DropdownMenuSub key={simulateAction}>
-                  <DropdownMenuSubTrigger>
-                    Resolve dispute
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        runAction({
-                          action: "resolve_dispute",
-                          dispute_outcome: "won",
-                        })
-                      }
-                    >
-                      Won
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        runAction({
-                          action: "resolve_dispute",
-                          dispute_outcome: "lost",
-                        })
-                      }
-                    >
-                      Lost
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              );
-            }
-            if (simulateAction === "answer_dispute") {
-              return (
-                <DropdownMenuItem
-                  key={simulateAction}
-                  onSelect={() => openDialog(setAnswerOpen)}
-                >
-                  Answer dispute...
-                </DropdownMenuItem>
-              );
-            }
-            if (simulateAction === "refund") {
-              return (
-                <DropdownMenuItem
-                  key={simulateAction}
-                  onSelect={() => openDialog(setRefundOpen)}
-                >
-                  Refund...
-                </DropdownMenuItem>
-              );
-            }
-            return (
-              <DropdownMenuItem
-                key={simulateAction}
-                onSelect={() => runAction({ action: simulateAction })}
-              >
-                {actionLabels[simulateAction] ?? simulateAction}
-              </DropdownMenuItem>
-            );
-          })}
-          {availableActions.length > 0 && <DropdownMenuSeparator />}
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-            Changes fire the provider's notification
-          </DropdownMenuLabel>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <WebhookTargets.MenuScope>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" disabled={availableActions.length === 0}>
+              <FlaskConicalIcon />
+              Simulate
+              <ChevronDownIcon />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <PaymentSimulateItems
+              paymentDetail={paymentDetail}
+              availableActions={availableActions}
+              handlers={{
+                onRun: (simulateRequest, webhookChoice) => {
+                  runAction({ ...simulateRequest, ...webhookChoice });
+                },
+                onOpenDialog: (simulateAction, webhookChoice) => {
+                  pendingChoiceRef.current = webhookChoice;
+                  openDialog(
+                    simulateAction === "refund" ? setRefundOpen : setAnswerOpen,
+                  );
+                },
+              }}
+            />
+            {availableActions.length > 0 && <DropdownMenuSeparator />}
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              Changes fire the provider's notification
+            </DropdownMenuLabel>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </WebhookTargets.MenuScope>
       <Button
         size="sm"
         variant="outline"
@@ -204,7 +131,11 @@ export function PaymentSimulateMenu({
           isRefunding={simulatePayment.isPending}
           onRefund={(refundAmountMinor) => {
             runAction(
-              { action: "refund", refund_amount_minor: refundAmountMinor },
+              {
+                action: "refund",
+                refund_amount_minor: refundAmountMinor,
+                ...pendingChoiceRef.current,
+              },
               () => {
                 setRefundOpen(false);
               },
@@ -220,7 +151,11 @@ export function PaymentSimulateMenu({
           isAnswering={simulatePayment.isPending}
           onAnswer={(disputeEvidence) => {
             runAction(
-              { action: "answer_dispute", dispute_evidence: disputeEvidence },
+              {
+                action: "answer_dispute",
+                dispute_evidence: disputeEvidence,
+                ...pendingChoiceRef.current,
+              },
               () => {
                 setAnswerOpen(false);
               },

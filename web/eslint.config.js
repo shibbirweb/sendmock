@@ -7,6 +7,15 @@ import tseslint from "typescript-eslint";
 
 import { rawColourPatternSources } from "./src/lib/design/raw-colour-patterns.ts";
 
+// UI-13.3: a button showing only an icon is built with IconButton, which
+// requires the label its tooltip and accessible name show.
+const iconButtonRestriction = {
+  selector:
+    "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'][value.value=/^icon/]",
+  message:
+    "Use IconButton from @/components/common/icon-button for icon-only buttons; it requires a label and shows it as a tooltip.",
+};
+
 export default defineConfig([
   // Generated code: shadcn components and the TanStack route tree.
   globalIgnores([
@@ -76,6 +85,7 @@ export default defineConfig([
     rules: {
       "no-restricted-syntax": [
         "error",
+        iconButtonRestriction,
         ...rawColourPatternSources.flatMap((patternSource) => [
           {
             selector: `Literal[value=/${patternSource}/]`,
@@ -89,6 +99,12 @@ export default defineConfig([
           },
         ]),
       ],
+    },
+  },
+  {
+    files: ["src/features/mail/detail/preview/email-html-preview.tsx"],
+    rules: {
+      "no-restricted-syntax": ["error", iconButtonRestriction],
     },
   },
   {

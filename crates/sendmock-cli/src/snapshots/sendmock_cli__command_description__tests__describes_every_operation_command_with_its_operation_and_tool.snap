@@ -330,7 +330,9 @@ expression: command_descriptions
       "event"
     ],
     "flags": [
-      "--bounce-type"
+      "--bounce-type",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -354,7 +356,9 @@ expression: command_descriptions
     ],
     "flags": [
       "--source",
-      "--user-agent"
+      "--user-agent",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -400,7 +404,9 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--url",
-      "--user-agent"
+      "--user-agent",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -567,7 +573,9 @@ expression: command_descriptions
       "--from",
       "--include-original",
       "--reply-all",
-      "--subject"
+      "--subject",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -595,7 +603,9 @@ expression: command_descriptions
       "--include-attachments",
       "--include-original",
       "--subject",
-      "--to"
+      "--to",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -621,7 +631,9 @@ expression: command_descriptions
       "--raw",
       "--subject",
       "--text",
-      "--to"
+      "--to",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1061,7 +1073,9 @@ expression: command_descriptions
       "status"
     ],
     "flags": [
-      "--error-code"
+      "--error-code",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1085,7 +1099,9 @@ expression: command_descriptions
     ],
     "flags": [
       "--source",
-      "--user-agent"
+      "--user-agent",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1132,7 +1148,9 @@ expression: command_descriptions
       "--from",
       "--media",
       "--template-id",
-      "--to"
+      "--to",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -1946,7 +1964,9 @@ expression: command_descriptions
       "--decline-reason",
       "--dispute-evidence",
       "--dispute-outcome",
-      "--refund-amount-minor"
+      "--refund-amount-minor",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {
@@ -2860,6 +2880,29 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_inbound_route_test"
+    ]
+  },
+  {
+    "command": "sendmock route match",
+    "usage": "sendmock route match",
+    "aliases": [],
+    "summary": "Where an incoming email would go: the routes and webhook rules it would run.",
+    "arguments": [],
+    "flags": [
+      "--cc",
+      "--headers",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/inbound-routes/match",
+        "operation_id": "postInboundRoutesMatch",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_inbound_route_match"
     ]
   },
   {
@@ -4429,7 +4472,8 @@ expression: command_descriptions
       "--endpoint-id",
       "--event-type",
       "--limit",
-      "--status"
+      "--status",
+      "--subject-id"
     ],
     "operations": [
       {
@@ -4845,6 +4889,31 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_webhook_rule_preview"
+    ]
+  },
+  {
+    "command": "sendmock webhook rule match",
+    "usage": "sendmock webhook rule match",
+    "aliases": [],
+    "summary": "Which webhooks an event would trigger, before an action fires it.",
+    "arguments": [],
+    "flags": [
+      "--field",
+      "--event-type",
+      "--include-requests",
+      "--subject-id",
+      "--webhook"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/rules/match",
+        "operation_id": "postWebhooksRulesMatch",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_rule_match"
     ]
   },
   {
@@ -5474,7 +5543,9 @@ expression: command_descriptions
     "flags": [
       "--html",
       "--subject",
-      "--to"
+      "--to",
+      "--webhook",
+      "--webhook-requests"
     ],
     "operations": [
       {

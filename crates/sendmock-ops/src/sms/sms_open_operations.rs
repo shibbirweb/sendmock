@@ -20,6 +20,8 @@ pub struct SmsOpenRequest {
     pub source: Option<OpenSource>,
     /// The browser or client that read it, kept in the open history.
     pub user_agent: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 /// Only a message your app sent can be read by its recipient (SM-10.2).
@@ -53,6 +55,7 @@ impl Operation for RecordSmsOpenOperation {
             cli_usage: "sendmock sms open <smsId>",
             mcp_tool: "sendmock_sms_open",
             success_status: SuccessStatus::NoContent,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -63,6 +66,7 @@ impl Operation for RecordSmsOpenOperation {
         operation_context: &OperationContext,
         input: SmsOpenRequest,
     ) -> Result<NoContent, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         find_outbound_sms(operation_context, &input.sms_id).await?;
         let open_source = input.source.unwrap_or_default();
         let sms_open = build_open_record(operation_context, open_source, input.user_agent)?;

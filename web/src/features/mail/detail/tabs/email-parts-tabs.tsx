@@ -1,6 +1,6 @@
 import { DownloadIcon, FileIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEmailMimeTree } from "@/lib/api/hooks/use-email-detail-queries";
 import { buildApiUrl } from "@/lib/api/api-client";
@@ -48,11 +48,10 @@ export function EmailAttachmentsTab({ email }: { email: EmailDetail }) {
                 {attachment.is_inline && " · inline"}
               </span>
             </div>
-            <Button
+            <IconButton
               variant="ghost"
-              size="icon"
               asChild
-              aria-label={`Download ${attachment.filename}`}
+              label={`Download ${attachment.filename}`}
             >
               <a
                 href={toAppUrl(attachment.download_url)}
@@ -60,7 +59,7 @@ export function EmailAttachmentsTab({ email }: { email: EmailDetail }) {
               >
                 <DownloadIcon />
               </a>
-            </Button>
+            </IconButton>
           </div>
         </li>
       ))}
@@ -93,12 +92,11 @@ function MimePartNode({
           {partDetails.join(" · ")}
         </span>
         {mimePart.children.length === 0 && (
-          <Button
+          <IconButton
             variant="ghost"
-            size="icon"
             className="size-7"
             asChild
-            aria-label={`Download part ${mimePart.part_id}`}
+            label={`Download part ${mimePart.part_id}`}
           >
             <a
               href={toAppUrl(
@@ -108,7 +106,7 @@ function MimePartNode({
             >
               <DownloadIcon />
             </a>
-          </Button>
+          </IconButton>
         )}
       </div>
       {mimePart.children.length > 0 && (

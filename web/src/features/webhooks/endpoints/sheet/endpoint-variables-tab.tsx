@@ -3,6 +3,7 @@ import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,24 +39,24 @@ function EndpointVariableRow({
       <span className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">
         {webhookVariable.value}
       </span>
-      <Button
+      <IconButton
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label={`Edit ${webhookVariable.name}`}
+        label={`Edit ${webhookVariable.name}`}
         onClick={onEdit}
       >
         <PencilIcon />
-      </Button>
-      <Button
+      </IconButton>
+      <IconButton
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label={`Delete ${webhookVariable.name}`}
+        label={`Delete ${webhookVariable.name}`}
         onClick={onDelete}
       >
         <Trash2Icon />
-      </Button>
+      </IconButton>
     </li>
   );
 }

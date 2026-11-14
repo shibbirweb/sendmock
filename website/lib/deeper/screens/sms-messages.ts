@@ -1,5 +1,9 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { smsMessageDetailEntries } from "./sms-message-details";
+import {
+  describeChangeWebhooks,
+  describeChooseWebhooks,
+} from "./webhook-target-entries";
 
 const smsListEntries: DeeperEntry[] = [
   { control: "heading: SMS", does: "Names the open screen in the header." },
@@ -85,6 +89,10 @@ const smsListEntries: DeeperEntry[] = [
     changes: "Fires `sms.sent` and starts the delivery simulation.",
     operationIds: ["postSamplesByKind"],
   },
+  describeChooseWebhooks(
+    "button: Choose webhooks for Send a sample SMS",
+    "postSamplesByKind",
+  ),
   {
     control: "alert: Could not load conversations. Try again",
     does: "Shown when the conversations could not be loaded.",
@@ -129,6 +137,13 @@ const smsConversationEntries: DeeperEntry[] = [
   {
     control: "button: Message actions",
     does: "Opens the message's menu: details, Simulate read, Send to webhook, copy and delete.",
+  },
+  {
+    ...describeChangeWebhooks(
+      "the reply's `sms.inbound`",
+      "It checks again after a pause in typing, since rules can filter on the text.",
+    ),
+    state: "A conversation is open",
   },
   {
     control: "button: Attach files",

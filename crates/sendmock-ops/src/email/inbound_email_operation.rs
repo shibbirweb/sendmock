@@ -25,6 +25,8 @@ pub struct EmailInboundRequest {
     pub html: Option<String>,
     /// A whole message (RFC 5322); when set, the other fields are ignored.
     pub raw: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 fn refuse_without_sender_and_recipient() -> OperationError {
@@ -49,6 +51,7 @@ impl Operation for ReceiveInboundEmailOperation {
             cli_usage: "sendmock email inbound",
             mcp_tool: "sendmock_email_inbound",
             success_status: SuccessStatus::Created,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -59,6 +62,7 @@ impl Operation for ReceiveInboundEmailOperation {
         operation_context: &OperationContext,
         input: EmailInboundRequest,
     ) -> Result<NativeSendResult, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let stored_email = match input.raw {
             Some(raw_message) => {
                 let parsed_email = parse_email(raw_message.as_bytes());

@@ -32,6 +32,13 @@ const deliveryEndpoints = tagEndpoints("Webhook deliveries", [
         schema: typeRef("AppEventType"),
         example: "email.received",
       },
+      {
+        name: "subject_id",
+        description:
+          "Only the deliveries an email, SMS or other message caused, by its ID.",
+        schema: "string",
+        example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9E",
+      },
     ],
     response: pageOf("WebhookDelivery"),
   },

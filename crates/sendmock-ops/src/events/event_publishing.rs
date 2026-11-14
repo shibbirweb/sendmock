@@ -22,6 +22,7 @@ pub fn publish_event(
             created_at: format_rfc3339(created_at_unix_ms),
             data,
         },
+        webhook_choice: operation_context.request.webhook_choice.clone(),
     })
 }
 

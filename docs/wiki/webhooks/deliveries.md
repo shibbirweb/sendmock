@@ -34,7 +34,7 @@ Every request SendMock sends to your app is logged here: rule deliveries, status
 
 ### The log
 
-A live table, newest first, 50 rows at a time ("Showing 50 of N", more as you scroll or press **Load more**): time, event, endpoint, trigger (auto, manual or replay), status (the status code, or failed, exhausted, render failed, pending, cancelled with the error on hover), duration and attempt ("2 / 5"). Chips (All, Succeeded, Failed, Pending), an endpoint picker and an event picker narrow it; `?status=failed&endpoint=<id>` opens it filtered.
+A live table, newest first, 50 rows at a time ("Showing 50 of N", more as you scroll or press **Load more**): time, event, endpoint, trigger (auto, manual, replay, or chosen when a simulation picked the endpoint, with `edited` when the simulation sent an edited payload), status (the status code, or failed, exhausted, render failed, pending, cancelled with the error on hover), duration and attempt ("2 / 5"). Chips (All, Succeeded, Failed, Pending), an endpoint picker and an event picker narrow it; `?status=failed&endpoint=<id>` opens it filtered.
 
 ### The delivery drawer
 

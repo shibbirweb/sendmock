@@ -19,6 +19,8 @@ import { readGatewayName } from "@/mocks/payments/payment-gateway-record";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
 import { simulatePayment } from "@/mocks/payments/simulate-payment";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 function findPayment(paymentId: unknown): PaymentDetail | undefined {
   return mockDatabase.payments.find((payment) => payment.id === paymentId);
@@ -122,6 +124,10 @@ export const paymentHandlers = [
       }
 
       const simulateRequest = (await request.json()) as PaymentSimulateRequest;
+      const choiceRefusal = refuseUnavailableEndpoint(simulateRequest);
+      if (choiceRefusal) {
+        return choiceRefusal;
+      }
       const simulationResult = simulatePayment(
         mockDatabase,
         paymentDetail,
@@ -136,7 +142,9 @@ export const paymentHandlers = [
           simulationResult.message,
         );
       }
-      publishPaymentChange(paymentDetail);
+      runWithWebhookChoice(simulateRequest, () => {
+        publishPaymentChange(paymentDetail);
+      });
 
       return HttpResponse.json(presentPayment(paymentDetail));
     },

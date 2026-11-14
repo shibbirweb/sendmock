@@ -21,6 +21,8 @@ pub struct EmailOpenRequest {
     pub source: Option<OpenSource>,
     /// The browser or client that opened it, kept in the open history.
     pub user_agent: Option<String>,
+    #[serde(flatten)]
+    pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
 pub struct RecordEmailOpenOperation;
@@ -38,6 +40,7 @@ impl Operation for RecordEmailOpenOperation {
             cli_usage: "sendmock email open <emailId>",
             mcp_tool: "sendmock_email_open",
             success_status: SuccessStatus::NoContent,
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -48,6 +51,7 @@ impl Operation for RecordEmailOpenOperation {
         operation_context: &OperationContext,
         input: EmailOpenRequest,
     ) -> Result<NoContent, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         find_email_or_not_found(operation_context, &input.email_id).await?;
         let open_source = input.source.unwrap_or_default();
         let email_open = build_open_record(operation_context, open_source, input.user_agent)?;

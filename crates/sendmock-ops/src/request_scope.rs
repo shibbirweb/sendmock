@@ -1,4 +1,4 @@
-use crate::RequestClient;
+use crate::{RequestClient, WebhookChoice};
 
 /// What one request says about itself: who sent it and which project its traffic goes to.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -8,6 +8,8 @@ pub struct RequestScope {
     /// Where the request's emails, SMS and verifications are stored: `default`, or the
     /// project it named.
     pub project_key: String,
+    /// The webhook endpoints this request's events go to instead of the rule matches.
+    pub webhook_choice: Option<WebhookChoice>,
 }
 
 impl Default for RequestScope {
@@ -15,6 +17,7 @@ impl Default for RequestScope {
         Self {
             client: RequestClient::default(),
             project_key: sendmock_store::DEFAULT_PROJECT_KEY.to_owned(),
+            webhook_choice: None,
         }
     }
 }

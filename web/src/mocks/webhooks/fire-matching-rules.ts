@@ -1,4 +1,4 @@
-import type { AppEvent } from "@/lib/api/types";
+import type { AppEvent, AppEventType } from "@/lib/api/types";
 import { evaluateRuleFilter } from "@/lib/webhooks/rule-filter/evaluate-rule-filter";
 import type { RuleMessage } from "@/lib/webhooks/rule-filter/read-message-field";
 import { mockDatabase } from "@/mocks/db/mock-database";
@@ -6,22 +6,34 @@ import {
   publishMockEvent,
   subscribeToMockEvents,
 } from "@/mocks/realtime/mock-event-bus";
+import type { ActiveWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 import { buildAutoDelivery } from "@/mocks/webhooks/build-auto-delivery";
+import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
-/** The email or SMS an event is about, looked up by the event's `id`. */
-function findEventMessage(appEvent: AppEvent): RuleMessage | null {
-  const subjectId = appEvent.data.id;
-  if (typeof subjectId !== "string") {
+/**
+ * Webhook events and the connection ping never reach rules or a chosen
+ * endpoint, so a rule on `webhook.delivered` cannot loop in the mock.
+ */
+export function isRuledEvent(eventType: string): boolean {
+  return !eventType.startsWith("webhook.") && eventType !== "test.ping";
+}
+
+/** The email or SMS an event is about, by its id. */
+export function findSubjectMessage(
+  eventType: string,
+  subjectId: string | undefined,
+): RuleMessage | null {
+  if (subjectId === undefined) {
     return null;
   }
-  if (appEvent.type.startsWith("email.")) {
+  if (eventType.startsWith("email.")) {
     const email = mockDatabase.emails.find(
       (existingEmail) => existingEmail.id === subjectId,
     );
 
     return email === undefined ? null : { messageKind: "email", email };
   }
-  if (appEvent.type.startsWith("sms.")) {
+  if (eventType.startsWith("sms.")) {
     const smsMessage = mockDatabase.smsMessages.find(
       (existingMessage) => existingMessage.id === subjectId,
     );
@@ -33,54 +45,117 @@ function findEventMessage(appEvent: AppEvent): RuleMessage | null {
 }
 
 /**
- * Creates a delivery for every enabled rule that matches an event, in rule
- * order, as the backend's delivery engine does. Webhook events are skipped
- * so a rule on `webhook.delivered` cannot loop in the mock.
+ * Each enabled rule on the event whose filter passes the message, with its
+ * enabled endpoint, in rule order. Firing and the match previews both read
+ * this (EM-22.2, WH-13.1).
  */
-export function fireMatchingRules(appEvent: AppEvent) {
-  if (appEvent.type.startsWith("webhook.") || appEvent.type === "test.ping") {
-    return;
-  }
-
-  const eventMessage = findEventMessage(appEvent);
-  const subjectId =
-    typeof appEvent.data.id === "string" ? appEvent.data.id : null;
-  const matchingRules = [...mockDatabase.webhookRules]
+export function findFiringRules(
+  eventType: AppEventType,
+  eventMessage: RuleMessage | null,
+) {
+  return [...mockDatabase.webhookRules]
     .sort((firstRule, secondRule) => firstRule.order - secondRule.order)
     .filter(
       (webhookRule) =>
         webhookRule.is_enabled &&
-        webhookRule.events.includes(appEvent.type) &&
+        webhookRule.events.includes(eventType) &&
         (webhookRule.filter === null ||
           (eventMessage !== null &&
             evaluateRuleFilter(webhookRule.filter, eventMessage))),
-    );
+    )
+    .flatMap((webhookRule) => {
+      const endpointRecord = mockDatabase.webhookEndpoints.find(
+        (existingEndpoint) => existingEndpoint.id === webhookRule.endpoint_id,
+      );
 
-  for (const webhookRule of matchingRules) {
-    const endpointRecord = mockDatabase.webhookEndpoints.find(
-      (existingEndpoint) => existingEndpoint.id === webhookRule.endpoint_id,
-    );
-    if (endpointRecord === undefined || !endpointRecord.is_enabled) {
-      continue;
-    }
+      return endpointRecord === undefined || !endpointRecord.is_enabled
+        ? []
+        : [{ webhookRule, endpointRecord }];
+    });
+}
 
+/** Where an event goes: the endpoints its action chose, or the rule matches. */
+function listEventTargets(
+  appEvent: AppEvent,
+  subjectId: string | undefined,
+  chosenEndpointIds: string[] | null,
+): { ruleId: string | null; endpointRecord: WebhookEndpointRecord }[] {
+  if (chosenEndpointIds !== null) {
+    return chosenEndpointIds.flatMap((endpointId) => {
+      const endpointRecord = mockDatabase.webhookEndpoints.find(
+        (existingEndpoint) => existingEndpoint.id === endpointId,
+      );
+
+      return endpointRecord === undefined || !endpointRecord.is_enabled
+        ? []
+        : [{ ruleId: null, endpointRecord }];
+    });
+  }
+
+  return findFiringRules(
+    appEvent.type,
+    findSubjectMessage(appEvent.type, subjectId),
+  ).map(({ webhookRule, endpointRecord }) => ({
+    ruleId: webhookRule.id,
+    endpointRecord,
+  }));
+}
+
+/** The action's edit of its request for this event to one endpoint (WH-14.4). */
+function findEditedRequest(
+  webhookChoice: ActiveWebhookChoice | null,
+  endpointId: string,
+  eventType: string,
+) {
+  return (
+    webhookChoice?.editedRequests.find(
+      (editedRequest) =>
+        editedRequest.endpoint_id === endpointId &&
+        (editedRequest.event_type === undefined ||
+          editedRequest.event_type === eventType),
+    ) ?? null
+  );
+}
+
+/**
+ * Creates a delivery for every enabled rule that matches an event, in rule
+ * order, as the backend's delivery engine does; or, when the action chose
+ * endpoints, one for each of those instead (WH-13.4), each with the action's
+ * edited payload when it has one (WH-14.4).
+ */
+export function fireMatchingRules(
+  appEvent: AppEvent,
+  webhookChoice: ActiveWebhookChoice | null = null,
+) {
+  if (!isRuledEvent(appEvent.type)) {
+    return;
+  }
+
+  const subjectId =
+    typeof appEvent.data.id === "string" ? appEvent.data.id : undefined;
+  for (const { ruleId, endpointRecord } of listEventTargets(
+    appEvent,
+    subjectId,
+    webhookChoice?.endpointIds ?? null,
+  )) {
     const autoDelivery = buildAutoDelivery({
       appEvent,
-      webhookRule,
+      ruleId,
       endpointRecord,
-      subjectId,
+      subjectId: subjectId ?? null,
+      trigger: ruleId === null ? "chosen" : "auto",
+      editedRequest: findEditedRequest(
+        webhookChoice,
+        endpointRecord.id,
+        appEvent.type,
+      ),
     });
     mockDatabase.webhookDeliveries.unshift(autoDelivery);
     publishMockEvent("webhook.delivered", {
       id: autoDelivery.id,
       endpoint_name: autoDelivery.endpoint_name,
     });
-    // A failure is announced too, except for deliveries a webhook event
-    // caused, so rules on webhook.failed cannot loop.
-    if (
-      autoDelivery.status === "failed" &&
-      !appEvent.type.startsWith("webhook.")
-    ) {
+    if (autoDelivery.status === "failed") {
       publishMockEvent("webhook.failed", {
         id: autoDelivery.id,
         endpoint_name: autoDelivery.endpoint_name,

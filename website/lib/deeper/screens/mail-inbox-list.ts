@@ -1,4 +1,5 @@
 import type { DeeperEntry } from "../deeper-types";
+import { describeChooseWebhooks } from "./webhook-target-entries";
 
 /** Mail: the list, its filters, selection, the empty and failing states, and the list dialogs. */
 export const mailInboxListEntries: DeeperEntry[] = [
@@ -147,6 +148,10 @@ export const mailInboxListEntries: DeeperEntry[] = [
       "Stores an email and fires `email.received`, which your webhook rules can deliver.",
     operationIds: ["postSamplesByKind"],
   },
+  describeChooseWebhooks(
+    "button: Choose webhooks for Send a sample email",
+    "postSamplesByKind",
+  ),
   {
     control: "alert: Could not load emails. Try again",
     does: "Shown when the list could not be loaded, for example because SendMock stopped.",

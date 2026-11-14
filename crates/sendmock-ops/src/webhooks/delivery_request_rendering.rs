@@ -41,12 +41,14 @@ impl RenderedDeliveryRequest {
 }
 
 /// Renders an endpoint's request for one event, as a queued delivery or the preview does.
-/// `detached_template` is the endpoint's own copy of its template, used while detached.
+/// `detached_template` is the endpoint's own copy of its template, used while detached;
+/// `edited_body` is a body typed for this send.
 pub async fn render_delivery_request(
     operation_context: &OperationContext,
     details: &DeliveryContextDetails<'_>,
     request_settings: &EndpointRequestSettings,
     detached_template: Option<&TemplateDraft>,
+    edited_body: Option<&str>,
 ) -> Result<RenderedDeliveryRequest, OperationError> {
     let endpoint_template = if request_settings.body_mode == EndpointBodyMode::Template {
         Some(
@@ -82,6 +84,7 @@ pub async fn render_delivery_request(
             url_template: details.endpoint_url,
             request_settings,
             endpoint_template: endpoint_template.as_ref(),
+            edited_body,
         },
         details.app_event,
         operation_context.instance_details.version,

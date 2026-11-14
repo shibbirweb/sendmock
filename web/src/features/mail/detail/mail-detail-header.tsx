@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { EmailTagsEditor } from "@/features/mail/detail/email-tags-editor";
 import { MailDetailActions } from "@/features/mail/detail/mail-detail-actions";
 import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
@@ -50,15 +50,16 @@ export function MailDetailHeader({
     <header className="grid gap-3 border-b px-4 py-4 sm:px-6">
       {/* The subject keeps 14rem; on narrow screens the actions wrap below it. */}
       <div className="flex flex-wrap items-start gap-2">
-        <Button variant="ghost" size="icon" className="-ml-2 md:hidden" asChild>
-          <Link
-            to="/mail"
-            search={(previousSearch) => previousSearch}
-            aria-label="Back to the list"
-          >
+        <IconButton
+          label="Back to the list"
+          variant="ghost"
+          className="-ml-2 md:hidden"
+          asChild
+        >
+          <Link to="/mail" search={(previousSearch) => previousSearch}>
             <ArrowLeftIcon />
           </Link>
-        </Button>
+        </IconButton>
         <h2 className="min-w-0 flex-1 basis-56 text-lg leading-snug font-semibold break-words">
           {email.subject || "(no subject)"}
         </h2>

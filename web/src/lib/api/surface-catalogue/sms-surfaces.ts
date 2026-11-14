@@ -49,6 +49,7 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock sms open <smsId>",
     mcp: "sendmock_sms_open",
     ui: "SMS > message menu > Simulate read",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "GET /api/v1/sms/{smsId}/opens": {
     phase: "3",
@@ -67,12 +68,14 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock sms status <smsId> <status>",
     mcp: "sendmock_sms_set_status",
     ui: "SMS > Message details > Set status",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/sms/inbound": {
     phase: "2",
     cli: "sendmock sms inbound",
     mcp: "sendmock_sms_simulate_inbound",
     ui: "SMS > conversation > Reply as recipient",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "GET /api/v1/verify": {
     phase: "2",

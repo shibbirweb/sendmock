@@ -97,11 +97,13 @@ test("PY-09.3 a waiting checkout can be declined with a reason, and the result s
   const paymentDrawer = await openPayment(page, "Nadia Islam");
   await paymentDrawer.getByRole("button", { name: "Simulate" }).click();
   await expect(
-    page.getByRole("menuitem", { name: "Expire checkout" }),
+    page.getByRole("menuitem", { name: "Expire checkout", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("menuitem", { name: "Refund..." })).toBeHidden();
   await page.getByRole("menuitem", { name: "Decline" }).click();
-  await page.getByRole("menuitem", { name: "Insufficient funds" }).click();
+  await page
+    .getByRole("menuitem", { name: "Insufficient funds", exact: true })
+    .click();
 
   const overview = paymentDrawer.getByRole("region", {
     name: "Payment overview",

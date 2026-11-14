@@ -3,8 +3,8 @@ import * as React from "react";
 
 import { FormField } from "@/components/common/form-field";
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { StepLabelInput } from "@/features/payments/flows/step-label-input";
 import type { PaymentFlowStep } from "@/lib/api/types";
 import {
@@ -97,35 +97,35 @@ export function FlowStepCard({
           </span>
         </div>
         <div className="flex shrink-0 gap-1">
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Move ${stepName} up`}
+            label={`Move ${stepName} up`}
             disabled={stepIndex === 0}
             onClick={() => onMove(stepIndex - 1)}
           >
             <ArrowUpIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Move ${stepName} down`}
+            label={`Move ${stepName} down`}
             disabled={stepIndex === stepCount - 1}
             onClick={() => onMove(stepIndex + 1)}
           >
             <ArrowDownIcon />
-          </Button>
-          <Button
+          </IconButton>
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove ${stepName}`}
+            label={`Remove ${stepName}`}
             onClick={onRemove}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

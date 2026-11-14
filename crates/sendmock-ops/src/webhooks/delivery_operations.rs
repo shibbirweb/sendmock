@@ -52,6 +52,7 @@ impl Operation for ListWebhookDeliveriesOperation {
             statuses: read_status_list(input.status.as_deref()),
             endpoint_id: input.endpoint_id,
             event_type: input.event_type,
+            subject_id: input.subject_id,
             created_after_unix_ms: None,
         };
         let page_size = input

@@ -1,3 +1,4 @@
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { MailPlusIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
@@ -29,6 +30,27 @@ export function InboundRoutesPage() {
     null,
   );
   const inboundRoutes = routesQuery.data ?? [];
+  const { route: linkedRouteId } = useSearch({
+    from: "/webhooks/inbound-routes",
+  });
+  const navigate = useNavigate({ from: "/webhooks/inbound-routes" });
+  const linkedRoute = inboundRoutes.find(
+    (inboundRoute) => inboundRoute.id === linkedRouteId,
+  );
+  const [openedLinkedRouteId, setOpenedLinkedRouteId] = React.useState<
+    string | null
+  >(null);
+  // A linked route opens once, as soon as its list has loaded.
+  if (linkedRoute !== undefined && openedLinkedRouteId !== linkedRoute.id) {
+    setOpenedLinkedRouteId(linkedRoute.id);
+    setEditedRoute(linkedRoute);
+  }
+  const closeRouteSheet = () => {
+    setEditedRoute(undefined);
+    if (linkedRouteId !== undefined) {
+      void navigate({ search: {}, replace: true });
+    }
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -83,7 +105,7 @@ export function InboundRoutesPage() {
         <InboundRouteSheet
           key={editedRoute?.id ?? "new"}
           inboundRoute={editedRoute}
-          onClose={() => setEditedRoute(undefined)}
+          onClose={closeRouteSheet}
         />
       )}
       <ConfirmDeleteDialog

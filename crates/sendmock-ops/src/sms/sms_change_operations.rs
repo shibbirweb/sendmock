@@ -116,6 +116,7 @@ impl Operation for SetSmsStatusOperation {
             summary: "Set a delivery status by hand and fire its callback.",
             cli_usage: "sendmock sms status <smsId> <status>",
             mcp_tool: "sendmock_sms_set_status",
+            cli_flag_names: &[("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -125,6 +126,7 @@ impl Operation for SetSmsStatusOperation {
         operation_context: &OperationContext,
         input: SmsStatusUpdate,
     ) -> Result<SmsMessageDetail, OperationError> {
+        let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         if !SMS_STATUSES.contains(&input.status.as_str()) {
             return Err(OperationError::InvalidInput {
                 message: format!("status must be one of {}", SMS_STATUSES.join(", ")),

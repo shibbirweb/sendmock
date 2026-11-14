@@ -40,6 +40,7 @@ export const paymentSurfaces: SurfaceCatalogue = {
     cli: "sendmock payments simulate <paymentId> <action>",
     mcp: "sendmock_payment_simulate",
     ui: "Payments > payment > Simulate",
+    cliFlags: { webhook_endpoint_ids: "--webhook" },
   },
   "POST /api/v1/payments/checkout": {
     phase: "3P",

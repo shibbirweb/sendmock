@@ -22,6 +22,11 @@ const imageUsers = [
     jobName: "build",
     packageFile: "website/package.json",
   },
+  {
+    workflowFile: "screenshots.yml",
+    jobName: "screenshots",
+    packageFile: "website/package.json",
+  },
 ];
 
 function readImageVersion(

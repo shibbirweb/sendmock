@@ -8,7 +8,7 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -112,10 +112,10 @@ export function OutcomeRulesTable({
               </TableCell>
               <TableCell>
                 <span className="flex justify-end gap-0.5">
-                  <Button
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move rule ${ruleRow.position} up`}
+                    label={`Move rule ${ruleRow.position} up`}
                     disabled={rowIndex === 0}
                     onClick={() =>
                       moveOutcomeRule.mutate({
@@ -125,11 +125,11 @@ export function OutcomeRulesTable({
                     }
                   >
                     <ArrowUpIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Move rule ${ruleRow.position} down`}
+                    label={`Move rule ${ruleRow.position} down`}
                     disabled={rowIndex === ruleRows.length - 1}
                     onClick={() =>
                       moveOutcomeRule.mutate({
@@ -139,23 +139,23 @@ export function OutcomeRulesTable({
                     }
                   >
                     <ArrowDownIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Edit rule ${ruleRow.position}`}
+                    label={`Edit rule ${ruleRow.position}`}
                     onClick={() => onEdit(ruleRow.ruleId)}
                   >
                     <PencilIcon />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Delete rule ${ruleRow.position}`}
+                    label={`Delete rule ${ruleRow.position}`}
                     onClick={() => setDeletedRow(ruleRow)}
                   >
                     <Trash2Icon />
-                  </Button>
+                  </IconButton>
                 </span>
               </TableCell>
             </TableRow>

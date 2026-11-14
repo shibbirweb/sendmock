@@ -1,6 +1,7 @@
 import { PlusIcon, Trash2Icon } from "lucide-react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { RadioCardGroup } from "@/components/common/radio-card-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,12 +112,12 @@ export function GatewayRedirectTab({
                 <SelectItem value="success">Only on success</SelectItem>
               </SelectContent>
             </Select>
-            <Button
+            <IconButton
               type="button"
               variant="ghost"
               size="icon-sm"
               className="mt-0.5"
-              aria-label={`Remove redirect field ${fieldIndex + 1}`}
+              label={`Remove redirect field ${fieldIndex + 1}`}
               onClick={() =>
                 updateInput({
                   redirect_fields: redirectFields.filter(
@@ -127,7 +128,7 @@ export function GatewayRedirectTab({
               }
             >
               <Trash2Icon />
-            </Button>
+            </IconButton>
           </div>
         ))}
         <FormFieldError errorMessage={fieldErrors.redirect_fields} />

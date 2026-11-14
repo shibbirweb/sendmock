@@ -5,16 +5,20 @@ import { WebhookEndpointsPage } from "@/features/webhooks/endpoints/webhook-endp
 export type WebhookEndpointsSearchParams = {
   /** Opens the add sheet with this template chosen ("Use in new endpoint"). */
   template?: string;
+  /** Opens this endpoint's sheet, e.g. from a simulation's Webhooks row (WH-13.3). */
+  endpoint?: string;
 };
+
+function readSearchText(searchValue: unknown): string | undefined {
+  return typeof searchValue === "string" ? searchValue : undefined;
+}
 
 export const Route = createFileRoute("/webhooks/endpoints")({
   validateSearch: (
     searchParams: Record<string, unknown>,
   ): WebhookEndpointsSearchParams => ({
-    template:
-      typeof searchParams.template === "string"
-        ? searchParams.template
-        : undefined,
+    template: readSearchText(searchParams.template),
+    endpoint: readSearchText(searchParams.endpoint),
   }),
   component: WebhookEndpointsPage,
 });

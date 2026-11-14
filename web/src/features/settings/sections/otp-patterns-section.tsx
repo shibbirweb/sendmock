@@ -2,6 +2,7 @@ import { PlusIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 
 import { FormFieldError } from "@/components/common/form-field-error";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,11 +98,11 @@ export function OtpPatternsSection({
                   replacePattern(patternIndex, changeEvent.target.value);
                 }}
               />
-              <Button
+              <IconButton
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Remove pattern ${patternIndex + 1}`}
+                label={`Remove pattern ${patternIndex + 1}`}
                 onClick={() => {
                   updateDraft({
                     otp_patterns: otpPatterns.filter(
@@ -111,7 +112,7 @@ export function OtpPatternsSection({
                 }}
               >
                 <Trash2Icon />
-              </Button>
+              </IconButton>
             </li>
           );
         })}

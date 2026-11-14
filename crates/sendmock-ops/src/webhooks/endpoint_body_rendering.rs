@@ -182,6 +182,7 @@ pub fn render_endpoint_body(
     request_settings: &EndpointRequestSettings,
     endpoint_template: Option<&EndpointTemplate>,
     app_event: &AppEvent,
+    edited_body: Option<&str>,
 ) -> Result<RenderedBody, OperationError> {
     match request_settings.body_mode {
         EndpointBodyMode::None => Ok(RenderedBody {
@@ -200,6 +201,7 @@ pub fn render_endpoint_body(
                 endpoint_template,
                 &request_settings.extra_fields,
                 app_event,
+                edited_body,
             )
         }
     }

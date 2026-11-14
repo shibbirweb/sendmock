@@ -1,6 +1,6 @@
 import { FileIcon, XIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/common/icon-button";
 import type { ComposerMediaFile } from "@/features/sms/media/use-composer-media";
 import { formatBytes } from "@/lib/format/format-values";
 
@@ -36,16 +36,15 @@ export function ComposerMediaChips({
           <span className="text-muted-foreground">
             {formatBytes(file.size)}
           </span>
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
-            size="icon"
             className="size-6"
-            aria-label={`Remove ${file.name}`}
+            label={`Remove ${file.name}`}
             onClick={() => onRemove(fileId)}
           >
             <XIcon className="size-3.5" />
-          </Button>
+          </IconButton>
         </li>
       ))}
     </ul>

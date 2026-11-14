@@ -13,6 +13,7 @@ import type {
   SmsMessageDetail,
   SmsStatus,
   SmsThread,
+  WebhookChoice,
 } from "@/lib/api/types";
 
 export function useSmsList(smsFilters: SmsListFilters = {}) {
@@ -79,14 +80,20 @@ export function useSetSmsStatus() {
       smsId,
       smsStatus,
       errorCode = null,
+      webhookChoice,
     }: {
       smsId: string;
       smsStatus: SmsStatus;
       errorCode?: string | null;
+      webhookChoice?: WebhookChoice;
     }) =>
       requestApi<SmsMessage>(`/sms/${smsId}/status`, {
         method: "POST",
-        requestBody: { status: smsStatus, error_code: errorCode },
+        requestBody: {
+          status: smsStatus,
+          error_code: errorCode,
+          ...webhookChoice,
+        },
       }),
   );
 }
@@ -102,10 +109,18 @@ export function useResendReplyWebhook() {
 
 export function useOpenSms() {
   return useSmsMutation(
-    ({ smsId, openSource }: { smsId: string; openSource: OpenSource }) =>
+    ({
+      smsId,
+      openSource,
+      webhookChoice,
+    }: {
+      smsId: string;
+      openSource: OpenSource;
+      webhookChoice?: WebhookChoice;
+    }) =>
       requestApi<void>(`/sms/${smsId}/open`, {
         method: "POST",
-        requestBody: buildOpenEventRequest(openSource),
+        requestBody: { ...buildOpenEventRequest(openSource), ...webhookChoice },
       }),
   );
 }

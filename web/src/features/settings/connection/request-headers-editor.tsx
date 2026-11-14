@@ -1,5 +1,6 @@
 import { KeyRoundIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { HeaderRow } from "@/features/settings/connection/use-request-customization";
@@ -60,15 +61,15 @@ export function RequestHeadersEditor({
               })
             }
           />
-          <Button
+          <IconButton
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={`Remove header ${rowIndex + 1}`}
+            label={`Remove header ${rowIndex + 1}`}
             onClick={() => onRemove(headerRow.rowId)}
           >
             <Trash2Icon />
-          </Button>
+          </IconButton>
         </div>
       ))}
       <div className="flex flex-wrap gap-2">

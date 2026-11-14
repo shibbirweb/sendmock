@@ -1,4 +1,4 @@
-import { rmSync } from "node:fs";
+import { rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -27,6 +27,40 @@ function omitMockServiceWorker(): Plugin {
   };
 }
 
+/** How many source modules the size report names. */
+const reportedModuleCount = 30;
+
+/**
+ * The budget test builds the live UI in CI and sets SENDMOCK_MODULE_REPORT to a path outside
+ * `dist`; the largest source modules are written there, so the CI log says what to trim.
+ */
+function reportLargestModules(reportPath: string): Plugin {
+  return {
+    name: "sendmock:report-largest-modules",
+    apply: "build",
+    generateBundle(_outputOptions, bundle) {
+      const moduleSizes = Object.values(bundle).flatMap((bundleOutput) =>
+        bundleOutput.type === "chunk"
+          ? Object.entries(bundleOutput.modules).map(
+              ([modulePath, renderedModule]) => ({
+                modulePath: modulePath
+                  .replace(import.meta.dirname, "")
+                  .replace(/^.*node_modules\//, "node_modules/"),
+                renderedBytes: renderedModule.renderedLength,
+              }),
+            )
+          : [],
+      );
+      const largestModules = moduleSizes
+        .sort((first, second) => second.renderedBytes - first.renderedBytes)
+        .slice(0, reportedModuleCount);
+      writeFileSync(reportPath, JSON.stringify(largestModules, null, 2));
+    },
+  };
+}
+
+const moduleReportPath = process.env.SENDMOCK_MODULE_REPORT;
+
 export default defineConfig({
   base: basePath,
   // `VITE_API_MODE=live bun run dev` talks to a local `cargo run`, with hot reload.
@@ -52,6 +86,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     ...(isMockBuild ? [] : [omitMockServiceWorker()]),
+    ...(moduleReportPath ? [reportLargestModules(moduleReportPath)] : []),
   ],
   resolve: {
     alias: {

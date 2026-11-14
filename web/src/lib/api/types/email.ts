@@ -4,6 +4,7 @@ import type {
   IsoTimestamp,
   PageRequest,
   Ulid,
+  WebhookChoice,
 } from "@/lib/api/types/common";
 
 /** How the message reached SendMock. */
@@ -162,7 +163,7 @@ export type EmailUpdate = {
   tags?: string[];
 };
 
-export type SimulatedEmailOutcome = {
+export type SimulatedEmailOutcome = WebhookChoice & {
   /**
    * The delivery event to simulate; it is added to the timeline and fires its webhook.
    * @example "bounced"
@@ -253,12 +254,13 @@ export type NativeSendRequest = {
 };
 
 /** Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying). */
-export type EmailReplyRequest = {
+export type EmailReplyRequest = WebhookChoice & {
   /**
-   * The reply text, above the quoted original.
+   * The reply text, above the quoted original; empty or left out sends no
+   * text of its own.
    * @example "Thanks, that fixed it!"
    */
-  body: string;
+  body?: string;
   /**
    * Who replies; defaults to the original recipient.
    * @example "user@example.test"
@@ -282,7 +284,7 @@ export type EmailReplyRequest = {
 };
 
 /** Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding). */
-export type EmailForwardRequest = {
+export type EmailForwardRequest = WebhookChoice & {
   /**
    * Where the email is forwarded, e.g. your app's inbound address.
    * @example "support@inbound.app.test"
@@ -330,7 +332,7 @@ export type EmailReleaseRequest = {
 };
 
 /** Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`. */
-export type EmailInboundRequest = {
+export type EmailInboundRequest = WebhookChoice & {
   /**
    * The sender, as an address or `Name <address>`.
    * @example "Sam <sam@customer.test>"

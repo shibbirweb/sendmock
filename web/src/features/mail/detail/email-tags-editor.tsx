@@ -3,6 +3,7 @@ import * as React from "react";
 import { toast } from "sonner";
 
 import { ChipListInput } from "@/components/common/chip-list-input";
+import { IconButton } from "@/components/common/icon-button";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -45,9 +46,9 @@ export function EmailTagsEditor({ email }: { email: EmailDetail }) {
       }}
     >
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label="Edit tags">
+        <IconButton variant="ghost" size="icon-sm" label="Edit tags">
           <PencilIcon />
-        </Button>
+        </IconButton>
       </PopoverTrigger>
       <PopoverContent align="start" className="grid w-72 gap-3">
         <label htmlFor={inputId} className="text-sm font-medium">
