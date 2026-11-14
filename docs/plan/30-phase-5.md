@@ -201,7 +201,7 @@ Things only the owner can do, in order. The workflows skip a channel whose secre
 4. Review the Subscriptions and API reference screens, the two added after the Stage A design sign-off, and sign off their rows in the review table of [18](18-phase-u3.md#review-table) (UI-07.3).
 5. Merge #48 into `develop`, then run Prepare release with `bump: minor` for the first beta, and once it is published run the Install channels workflow with that version, `beta` and `after-publish`.
 6. Open the Nixpkgs pull request with `packaging/nix/package.nix` once a stable exists.
-7. Run Prepare release with `bump: stable` (or `major` for `1.0.0`), merge the release PR, merge the promote PR into `main`; run Install channels with `after-publish` right away, and with every channel once WinGet, Chocolatey, COPR and Nixpkgs have taken the version.
+7. Run Prepare release with `bump: major` (from the 0.1 betas this makes `1.0.0-beta.1`), merge its release PR and install it, then with `bump: stable` for `1.0.0` (changed 2026-11-14: `major` alone makes a beta, and every stable goes through one); merge the release PR, merge the promote PR into `main`; run Install channels with `after-publish` right away, and with every channel once WinGet, Chocolatey, COPR and Nixpkgs have taken the version.
 8. Set `main` as the default branch.
 9. After the first stable is in the official MCP registry (AI-05.6), look for SendMock on `github.com/mcp`. GitHub's MCP Registry is curated from the official registry and has no submission form of its own: if it is not listed within a few days, ask for it through GitHub's community discussions for the MCP Registry, naming `io.github.shibbirweb/sendmock`. Once listed, later versions follow from the official registry (AI-05.8).
 
