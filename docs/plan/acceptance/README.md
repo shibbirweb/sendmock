@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 119 / 133 features, 585 / 659 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 120 / 133 features, 586 / 659 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -178,7 +178,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-07](07-distribution-website.md#ws-07-cli-and-mcp-reference) | CLI and MCP reference | Phase U3 | 5 | Accepted |
 | [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Accepted |
 | [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
-| [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B; W24 the Screenshots workflow) | 5 | In progress |
+| [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B; W24 the Screenshots workflow) | 5 | Accepted |
 | [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | After 1.0 (A15) | 6 | Not started |
 | [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | After 1.0 (A16) | 4 | Not started |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
