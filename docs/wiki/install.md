@@ -31,7 +31,7 @@ Every way below installs the same `sendmock`. The table says which systems each 
 | [Docker](#docker) | macOS, Linux, Windows | Yes | Yes |
 | [Binaries](#binaries) | macOS, Linux, Windows | Yes | Yes |
 
-Running one SendMock for a team or a CI cluster? The Helm chart runs it in Kubernetes: see [Kubernetes](./connect/kubernetes.md). Docker Desktop users can add the [Docker Desktop extension](#docker-desktop-extension) instead of a `docker run` line.
+Running one SendMock for a team or a CI cluster? The Helm chart runs it in Kubernetes: see [Kubernetes](./connect/kubernetes.md). Docker Desktop users can add the [Docker Desktop extension](#docker-desktop-extension) instead of a `docker run` line. To try a change before it is released, download a [test build](#try-a-build-that-is-not-released-yet) from its pull request.
 
 ## npx (no install)
 
@@ -609,6 +609,70 @@ Let your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI or another one 
 6. Go on to [Start SendMock](#start-sendmock).
 
 Every release also has a `SHA256SUMS` file to check the download, and older versions are on the [releases page](https://github.com/shibbirweb/sendmock/releases).
+
+## Try a build that is not released yet
+
+Every pull request, and every change merged into `develop` or `main`, builds SendMock for each system above, tests each build on its own system, and keeps it on the workflow run: 14 days for a pull request, 30 days for `develop` and `main`. Use one to try a change before it is released. These builds report the `dev` channel and are not for everyday use.
+
+1. Sign in to GitHub. Downloading a build from a workflow run needs a GitHub account (any account works).
+
+2. Find the build.
+
+   For a pull request, open it and find the comment **Test builds of** followed by the commit. It lists each system with a download link, the size and the SHA-256.
+
+   For `develop` or `main`, open the [Test builds workflow](https://github.com/shibbirweb/sendmock/actions/workflows/test-builds.yml), choose the newest run on that branch, and find the same list in its summary.
+
+3. Download the build for your system (named as in the [Binaries](#binaries) table, for example `sendmock-aarch64-apple-darwin`), then unzip the download. It holds the archive and its `.sha256` file.
+
+   Or download it with the [GitHub CLI](https://cli.github.com), which unzips it for you, using the run's number from its address:
+
+   ```bash
+   gh run download <run id> --repo shibbirweb/sendmock --name sendmock-aarch64-apple-darwin
+   ```
+
+4. Check the archive against its `.sha256` file.
+
+   macOS and Linux:
+
+   ```bash
+   shasum -a 256 -c sendmock-*.sha256
+   ```
+
+   Windows (PowerShell), where both lines must show the same value:
+
+   ```powershell
+   (Get-FileHash .\sendmock-*.zip -Algorithm SHA256).Hash.ToLower()
+   ```
+
+   ```powershell
+   (Get-Content .\sendmock-*.zip.sha256).Split(" ")[0]
+   ```
+
+5. Unpack it as in step 2 of [Binaries](#binaries).
+
+6. On macOS, remove the download mark from the unpacked binary:
+
+   ```bash
+   xattr -d com.apple.quarantine ./sendmock
+   ```
+
+   On Windows, if "Windows protected your PC" appears, choose **More info**, then **Run anyway**.
+
+7. Check that it is the test build. It prints the version and the `dev` channel:
+
+   ```bash
+   ./sendmock --version
+   ```
+
+   On Windows, run `.\sendmock\sendmock.exe --version`.
+
+8. Start it with an in-memory database, so it stays apart from the data of a SendMock you have installed:
+
+   ```bash
+   ./sendmock serve --db memory
+   ```
+
+   If an installed SendMock is already running, stop it first, since both use ports 1025 and 8025.
 
 ## Menu bar and tray app
 

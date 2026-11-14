@@ -36,6 +36,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/release.yml
+      - .github/workflows/build-archives.yml
       - packaging/**
       - scripts/release/**
       - scripts/release-tests/**
@@ -79,105 +80,13 @@ jobs:
             echo "docker_tags=$(bun scripts/release/release.ts docker-tags "$version" "$RELEASE_CHANNEL")" >> "$GITHUB_OUTPUT"
           fi
 
-  web-dist:
-    name: Web UI build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Build the UI the binaries embed (live mode, no mock layer)
-        working-directory: web
-        env:
-          VITE_API_MODE: live
-        run: |
-          bun install --frozen-lockfile
-          bun run build
-
-      - uses: actions/upload-artifact@v6
-        with:
-          name: release-web-dist
-          path: web/dist
-          retention-days: 7
-
+  # The web UI and the six archives, built as the test builds of every pull request build them.
   build:
-    name: Build ${{ matrix.target }}
-    needs: web-dist
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, cross: alpine }
-          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, cross: alpine }
-          - { target: aarch64-apple-darwin, runner: macos-latest, cross: cargo }
-          - { target: x86_64-apple-darwin, runner: macos-latest, cross: cargo }
-          - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
-          - { target: aarch64-pc-windows-msvc, runner: windows-latest, cross: cargo }
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ env.COMMIT_SHA }}
-
-      - uses: actions/download-artifact@v7
-        with:
-          name: release-web-dist
-          path: web/dist
-
-      - name: Toolchain and target
-        run: |
-          rustup toolchain install
-          rustup target add ${{ matrix.target }}
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.target }}
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Build
-        shell: bash
-        env:
-          SENDMOCK_RELEASE_CHANNEL: ${{ env.RELEASE_CHANNEL }}
-          BUILD_TARGET: ${{ matrix.target }}
-        # The static Linux binaries are built natively on Alpine, like the Docker image: built
-        # with cargo-zigbuild they idled with about 10 MB more heap, over the memory budget. The
-        # image's own toolchain builds them; the one rust-toolchain.toml names would be downloaded.
-        run: |
-          if [ "${{ matrix.cross }}" = "alpine" ]; then
-            mkdir -p "$HOME/.cargo/registry" "$HOME/.cargo/git"
-            docker run --rm \
-              --volume "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
-              --workdir "$GITHUB_WORKSPACE" \
-              --volume "$HOME/.cargo/registry:/usr/local/cargo/registry" \
-              --volume "$HOME/.cargo/git:/usr/local/cargo/git" \
-              --env SENDMOCK_RELEASE_CHANNEL \
-              --env BUILD_TARGET \
-              --env HOST_OWNER="$(id -u):$(id -g)" \
-              rust:1.98-alpine \
-              sh -euc 'apk add --no-cache gcc musl-dev
-                export RUSTUP_TOOLCHAIN="$(rustup default | cut -d " " -f 1)"
-                cargo build --release --locked -p sendmock --target "$BUILD_TARGET"
-                chown -R "$HOST_OWNER" target /usr/local/cargo/registry /usr/local/cargo/git'
-          else
-            cargo build --release --locked -p sendmock --target "$BUILD_TARGET"
-          fi
-
-      - name: Pack the archive and its checksum
-        shell: bash
-        run: |
-          binary="target/${{ matrix.target }}/release/sendmock"
-          if [[ "${{ matrix.target }}" == *windows* ]]; then binary="$binary.exe"; fi
-          bun scripts/release/package-archive.ts ${{ matrix.target }} "$binary" dist
-
-      - uses: actions/upload-artifact@v6
-        with:
-          name: archive-${{ matrix.target }}
-          path: dist
-          retention-days: 3
+    name: Build
+    uses: ./.github/workflows/build-archives.yml
+    with:
+      commit_sha: ${{ inputs.commit_sha || github.sha }}
+      channel: ${{ inputs.channel || 'dev' }}
 
   test:
     name: Test ${{ matrix.target }}
@@ -544,7 +453,7 @@ jobs:
   # `cargo install sendmock` works once the stable is published (DS-03.1).
   crates:
     name: crates.io packages
-    needs: web-dist
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

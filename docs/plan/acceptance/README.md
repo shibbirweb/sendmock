@@ -169,7 +169,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | After 1.0 (A9) | 5 | Accepted |
 | [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 5 | Accepted |
 | [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 5 | Accepted |
-| [DS-11](07-distribution-website.md#ds-11-test-builds-of-every-pull-request) | Test builds of every pull request | Phase 5 (W25) | 5 | Not started |
+| [DS-11](07-distribution-website.md#ds-11-test-builds-of-every-pull-request) | Test builds of every pull request | Phase 5 (W25) | 5 | In progress |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
 | [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |

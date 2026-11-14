@@ -1,0 +1,117 @@
+# Test builds of every pull request (docs/plan/09-distribution.md, Test builds of every pull
+# request; DS-11): the six release targets built as a release builds them, each archive tested
+# on its own operating system and CPU, then attached to the run and linked from its summary and
+# a pull request comment, so anyone can download and try a change before it is released.
+name: Test builds
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+
+# A newer push to a pull request replaces its test builds; develop and main keep each one.
+concurrency:
+  group: test-builds-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  # A pull request's own head commit, not GitHub's merge commit, so the build is the commit shown.
+  COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  version:
+    name: Version from the code
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Read the version
+        id: version
+        run: echo "version=$(bun scripts/version.ts show)" >> "$GITHUB_OUTPUT"
+
+  # AC: DS-11.1
+  build:
+    name: Build
+    uses: ./.github/workflows/build-archives.yml
+    with:
+      commit_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      channel: dev
+
+  test:
+    name: Test ${{ matrix.target }}
+    needs: [version, build]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-apple-darwin, runner: macos-latest, archive: tar.gz }
+          - { target: x86_64-apple-darwin, runner: macos-15-intel, archive: tar.gz }
+          - { target: x86_64-unknown-linux-musl, runner: ubuntu-latest, archive: tar.gz }
+          - { target: aarch64-unknown-linux-musl, runner: ubuntu-24.04-arm, archive: tar.gz }
+          - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip }
+          - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist
+
+      - uses: oven-sh/setup-bun@v2
+
+      # AC: DS-11.2 DS-11.3
+      - name: "Test cases 1 to 8: checksum and layout, version and dev channel, listeners, health, UI, an email and an SMS, a restart, a clean stop"
+        shell: bash
+        run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.version.outputs.version }} dev
+
+      # AC: DS-11.2
+      - name: Attach the tested archive to the run
+        uses: actions/upload-artifact@v6
+        with:
+          name: sendmock-${{ matrix.target }}
+          path: dist
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 30 }}
+
+  # AC: DS-11.4
+  report:
+    name: Links in the summary and the pull request
+    needs: [version, test]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: sendmock-*
+          path: test-builds
+
+      - name: List the test builds, and comment on a pull request from this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+          RETENTION_DAYS: ${{ github.event_name == 'pull_request' && 14 || 30 }}
+          # Empty for a push, and for a fork, whose token cannot comment.
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.number || '' }}
+        run: bun scripts/test-builds-report.ts test-builds
