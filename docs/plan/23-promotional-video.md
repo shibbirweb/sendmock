@@ -139,6 +139,18 @@ Owner request: a social preview image for the GitHub repository, the picture sho
 
 2. Upload it on GitHub: the repository's **Settings**, **General**, **Social preview**, **Edit**, **Upload an image**. The file is about 410 KB, under GitHub's 1 MB limit.
 
+### README video card (2026-11-14)
+
+Owner request: the README's link to the trailer looked like a screenshot, not a video. GitHub cannot play YouTube inside a README, so the link stays a picture, and the picture now says it is a video: the still `SendMockReadmeVideoCard` (`video/src/thumbnail/readme-video-card.tsx`, 1280 by 720) is the YouTube thumbnail under a soft dark scrim, with the landing page's play button (the brand gradient, a soft glow, no ring) in the middle and a YouTube-style `2:01` badge in the corner. The README links it to the video and its alt text says "Play the video" with the length.
+
+1. Render it in `video/`:
+
+   ```bash
+   bunx remotion still src/index.ts SendMockReadmeVideoCard out/sendmock-readme-video-card.jpg --image-format=jpeg --jpeg-quality=88
+   ```
+
+2. Copy it to `docs/wiki/images/video-tour.jpg` (about 80 KB), the file the README shows.
+
 ### Sound effects (2026-10-29)
 
 Owner direction: no background music. Instead, every change in the picture makes its own short sound: a click when a control is pressed, a swoosh when data is sent, a soft blip when it lands, a success chime or a gentle error tone for the outcome, typing while text is typed, a pop when something appears, a swipe for each page of the app tour, a whoosh for each scene transition and a soft reveal for the logo and the closing line. The earlier composed music (`bun run music`) was removed.

@@ -79,6 +79,12 @@ gh variable set NUGET_PUBLISHING --body true --repo shibbirweb/sendmock
 gh variable set CRATES_PUBLISHING --body true --repo shibbirweb/sendmock
 ```
 
+crates.io is the same exception as npm, for the first stable: its crates do not exist yet and crates.io sets a trusted publisher only on an existing crate. So before 1.0.0, create a crates.io API token (Account Settings, API Tokens, New Token) with the scopes `publish-new` and `publish-update`, limited to the crates `sendmock*`, with a short expiry, and save it as `CARGO_REGISTRY_TOKEN`; the crates.io job publishes with it while it is set, and with the OIDC token once it is deleted (step 7):
+
+```sh
+gh secret set CARGO_REGISTRY_TOKEN --repo shibbirweb/sendmock
+```
+
 Check: `bun scripts/release-readiness.ts` lists no missing secret or variable for the channels you want in 1.0.
 
 ## 4. Review the last two screens
@@ -169,7 +175,13 @@ Merge the release pull request, then the promote pull request into `main` that P
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0 -f channel=stable -f channels=after-publish
 ```
 
-Check: the website serves the 1.0 docs at `/` and the `develop` docs at `/next/`.
+Check: the website serves the 1.0 docs at `/` and the `develop` docs at `/next/`, and crates.io has every workspace crate at `1.0.0`.
+
+Then, on crates.io, add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher of each of the 14 crates (each crate's Settings, Trusted Publishing), and delete the first publish's token:
+
+```sh
+gh secret delete CARGO_REGISTRY_TOKEN --repo shibbirweb/sendmock
+```
 
 Then remove the "Only the beta is published so far" notices of step 6 from `docs/wiki/install.md`, `docs/wiki/getting-started.md` and `README.md`, and change the "Now in beta" line of `docs/wiki/index.md` and the hero's pill, in a pull request to `develop`.
 

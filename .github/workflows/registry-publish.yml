@@ -168,6 +168,8 @@ jobs:
       contents: read
       actions: read
       id-token: write
+    env:
+      HAS_FIRST_PUBLISH_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -181,19 +183,25 @@ jobs:
           run-id: ${{ env.RELEASE_RUN_ID }}
           github-token: ${{ github.token }}
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: Toolchain
         run: rustup toolchain install
 
       - name: Put the UI and the skill inside the crates that embed them
         run: sh scripts/release/stage-crate-files.sh
 
+      # crates.io sets a trusted publisher only on a crate that exists, so the first release
+      # publishes with CARGO_REGISTRY_TOKEN; once the owner has set the trusted publishers and
+      # deleted the secret, the OIDC token is used.
       - uses: rust-lang/crates-io-auth-action@v1
         id: crates-io-auth
+        if: env.HAS_FIRST_PUBLISH_TOKEN != 'true'
 
       - name: Publish every crate in dependency order
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.crates-io-auth.outputs.token }}
-        run: cargo publish --workspace --locked --allow-dirty
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN || steps.crates-io-auth.outputs.token }}
+        run: bun scripts/release/crates-publish.ts
 
   # The Node Testcontainers module (DS-06).
   testcontainers-node:

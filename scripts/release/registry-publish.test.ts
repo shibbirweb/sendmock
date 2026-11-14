@@ -14,7 +14,14 @@ type RegistryWorkflow = {
       if?: string;
       needs?: string[] | string;
       permissions?: Record<string, string>;
-      steps?: { uses?: string; run?: string; with?: Record<string, string> }[];
+      env?: Record<string, string>;
+      steps?: {
+        uses?: string;
+        run?: string;
+        if?: string;
+        with?: Record<string, string>;
+        env?: Record<string, string>;
+      }[];
     }
   >;
 };
@@ -152,6 +159,20 @@ describe("the Registry publish workflow", () => {
       // 11.21.0 is the first npm 11 whose `npm dist-tag` signs in with OIDC, which moves `latest`.
       expect(runText, jobName).toContain("npm install -g npm@^11.21.0");
     }
+  });
+
+  test("DS-03.8 crates.io uses OIDC unless the first publish's CARGO_REGISTRY_TOKEN is set", () => {
+    const cratesJob = registryWorkflow.jobs.crates;
+    const cratesSteps = cratesJob?.steps ?? [];
+    const oidcStep = cratesSteps.find((step) => step.uses?.startsWith("rust-lang/crates-io-auth-action@"));
+    const publishStep = cratesSteps.find((step) => step.run?.includes("crates-publish.ts"));
+
+    expect(cratesJob?.env?.HAS_FIRST_PUBLISH_TOKEN).toBe("${{ secrets.CARGO_REGISTRY_TOKEN != '' }}");
+    expect(oidcStep?.if).toBe("env.HAS_FIRST_PUBLISH_TOKEN != 'true'");
+    expect(publishStep?.env?.CARGO_REGISTRY_TOKEN).toBe(
+      "${{ secrets.CARGO_REGISTRY_TOKEN || steps.crates-io-auth.outputs.token }}",
+    );
+    expect(publishStep?.run).toBe("bun scripts/release/crates-publish.ts");
   });
 
   test("DS-03.8 every npm package goes through npm-publish.ts, which stages a package's first version", () => {
