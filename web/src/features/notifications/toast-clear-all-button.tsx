@@ -33,6 +33,7 @@ export function ToastClearAllButton({
 
   return (
     <div
+      data-toast-clear-all=""
       className={cn(
         "pointer-events-none fixed z-[999999999]",
         horizontalClassNames[horizontalSide],

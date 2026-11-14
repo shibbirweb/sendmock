@@ -37,11 +37,12 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
   await page.goto(appBaseUrl);
   await page.getByText("Activity, last 24 hours").waitFor();
-  // Live demo traffic raises toasts; they are not part of the product shot.
-  // Hidden rather than removed: React still owns the toaster and crashes the
-  // page when a removed node gets its next toast.
+  // Live demo traffic raises toasts; they and their Clear all button are not
+  // part of the product shot. Hidden rather than removed: React still owns the
+  // toaster and crashes the page when a removed node gets its next toast.
   await page.addStyleTag({
-    content: "[data-sonner-toaster] { display: none !important; }",
+    content:
+      "[data-sonner-toaster], [data-toast-clear-all] { display: none !important; }",
   });
   const themeScenes = scenes.filter(
     (scene) =>
