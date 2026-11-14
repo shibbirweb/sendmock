@@ -6,6 +6,7 @@ import {
   publishMockEvent,
   subscribeToMockEvents,
 } from "@/mocks/realtime/mock-event-bus";
+import type { ActiveWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 import { buildAutoDelivery } from "@/mocks/webhooks/build-auto-delivery";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
 
@@ -77,10 +78,10 @@ export function findFiringRules(
 function listEventTargets(
   appEvent: AppEvent,
   subjectId: string | undefined,
-  webhookChoice: string[] | null,
+  chosenEndpointIds: string[] | null,
 ): { ruleId: string | null; endpointRecord: WebhookEndpointRecord }[] {
-  if (webhookChoice !== null) {
-    return webhookChoice.flatMap((endpointId) => {
+  if (chosenEndpointIds !== null) {
+    return chosenEndpointIds.flatMap((endpointId) => {
       const endpointRecord = mockDatabase.webhookEndpoints.find(
         (existingEndpoint) => existingEndpoint.id === endpointId,
       );
@@ -100,14 +101,31 @@ function listEventTargets(
   }));
 }
 
+/** The action's edit of its request for this event to one endpoint (WH-14.4). */
+function findEditedRequest(
+  webhookChoice: ActiveWebhookChoice | null,
+  endpointId: string,
+  eventType: string,
+) {
+  return (
+    webhookChoice?.editedRequests.find(
+      (editedRequest) =>
+        editedRequest.endpoint_id === endpointId &&
+        (editedRequest.event_type === undefined ||
+          editedRequest.event_type === eventType),
+    ) ?? null
+  );
+}
+
 /**
  * Creates a delivery for every enabled rule that matches an event, in rule
  * order, as the backend's delivery engine does; or, when the action chose
- * endpoints, one for each of those instead (WH-13.4).
+ * endpoints, one for each of those instead (WH-13.4), each with the action's
+ * edited payload when it has one (WH-14.4).
  */
 export function fireMatchingRules(
   appEvent: AppEvent,
-  webhookChoice: string[] | null = null,
+  webhookChoice: ActiveWebhookChoice | null = null,
 ) {
   if (!isRuledEvent(appEvent.type)) {
     return;
@@ -118,14 +136,19 @@ export function fireMatchingRules(
   for (const { ruleId, endpointRecord } of listEventTargets(
     appEvent,
     subjectId,
-    webhookChoice,
+    webhookChoice?.endpointIds ?? null,
   )) {
     const autoDelivery = buildAutoDelivery({
       appEvent,
       ruleId,
       endpointRecord,
       subjectId: subjectId ?? null,
-      trigger: webhookChoice === null ? "auto" : "chosen",
+      trigger: ruleId === null ? "chosen" : "auto",
+      editedRequest: findEditedRequest(
+        webhookChoice,
+        endpointRecord.id,
+        appEvent.type,
+      ),
     });
     mockDatabase.webhookDeliveries.unshift(autoDelivery);
     publishMockEvent("webhook.delivered", {

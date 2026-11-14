@@ -51,6 +51,8 @@ export type WebhookDelivery = {
   error_message: string | null;
   next_attempt_at: IsoTimestamp | null;
   created_at: IsoTimestamp;
+  /** Whether the action that sent it edited the body or headers instead of sending the rendered request (WH-14.4). */
+  is_edited: boolean;
 };
 
 /** Query of GET /api/v1/webhooks/deliveries; `status` takes a comma-separated list. */

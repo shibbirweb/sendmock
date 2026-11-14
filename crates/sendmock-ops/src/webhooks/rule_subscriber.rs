@@ -3,11 +3,11 @@ use sendmock_webhooks::{FilterExpression, RuleMessage};
 use tokio::sync::broadcast::error::RecvError;
 
 use super::chosen_delivery::deliver_to_chosen_endpoints;
-use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
+use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_edited_webhook_delivery};
 use super::rule_event_subject::{is_ruled_event, load_event_rule_message, read_event_subject_id};
 use super::rule_messages::with_engagement_event_fields;
 use super::rule_view::{read_rule_events, read_rule_filter};
-use crate::{AppEvent, OperationContext, OperationError, RecordedEvent};
+use crate::{AppEvent, OperationContext, OperationError, RecordedEvent, WebhookChoice};
 
 /// Whether an enabled rule listens to the event and its filter passes the message.
 fn does_rule_fire(
@@ -60,6 +60,16 @@ pub async fn fire_matching_rules(
     operation_context: &OperationContext,
     app_event: &AppEvent,
 ) -> Result<usize, OperationError> {
+    fire_rules_with_edits(operation_context, app_event, None).await
+}
+
+/// The rule matches, each with the action's edited request to its endpoint when there is one
+/// (WH-14.4).
+async fn fire_rules_with_edits(
+    operation_context: &OperationContext,
+    app_event: &AppEvent,
+    webhook_choice: Option<&WebhookChoice>,
+) -> Result<usize, OperationError> {
     if !is_ruled_event(&app_event.event_type) {
         return Ok(0);
     }
@@ -92,7 +102,16 @@ pub async fn fire_matching_rules(
             delivery_trigger: DeliveryTrigger::Automatic,
             send_time_values: serde_json::Map::new(),
         };
-        enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order).await?;
+        let edited_request = webhook_choice.and_then(|webhook_choice| {
+            webhook_choice.find_edited_request(&stored_endpoint.endpoint_id, &app_event.event_type)
+        });
+        enqueue_edited_webhook_delivery(
+            operation_context,
+            &stored_endpoint,
+            delivery_order,
+            edited_request,
+        )
+        .await?;
     }
     Ok(queued_count)
 }
@@ -102,16 +121,21 @@ pub async fn deliver_recorded_event(
     operation_context: &OperationContext,
     recorded_event: &RecordedEvent,
 ) -> Result<usize, OperationError> {
-    match &recorded_event.webhook_choice {
-        Some(webhook_choice) => {
+    let webhook_choice = recorded_event.webhook_choice.as_ref();
+    match webhook_choice.and_then(|webhook_choice| webhook_choice.endpoint_ids.as_deref()) {
+        Some(chosen_endpoint_ids) => {
             deliver_to_chosen_endpoints(
                 operation_context,
                 &recorded_event.app_event,
-                webhook_choice,
+                chosen_endpoint_ids,
+                webhook_choice.unwrap_or(&WebhookChoice::default()),
             )
             .await
         }
-        None => fire_matching_rules(operation_context, &recorded_event.app_event).await,
+        None => {
+            fire_rules_with_edits(operation_context, &recorded_event.app_event, webhook_choice)
+                .await
+        }
     }
 }
 

@@ -39,6 +39,7 @@ mod rule_event_subject;
 mod rule_filter_wire;
 mod rule_inputs;
 mod rule_match_operation;
+mod rule_match_requests;
 mod rule_match_wire;
 mod rule_messages;
 mod rule_move_operation;
@@ -174,7 +175,7 @@ pub use variable_value_operations::{
     PreviewWebhookVariableOperation, RegenerateWebhookVariableOperation, VariablePreviewResult,
 };
 pub use variable_view::WebhookVariable;
-pub use webhook_choice_input::WebhookChoiceInput;
+pub use webhook_choice_input::{WebhookChoiceInput, WebhookRequestEdit};
 pub use webhook_sender::{WebhookSendFailure, WebhookSendResult, WebhookSender};
 pub(crate) use webhook_template_functions::sign_sslcommerz_arguments;
 

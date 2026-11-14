@@ -89,6 +89,7 @@ export function recordPaymentNotification(
     error_message: null,
     next_attempt_at: null,
     created_at: createdAt,
+    is_edited: false,
   };
   mockDatabase.webhookDeliveries.unshift(notificationDelivery);
   paymentDetail.notifications.push({

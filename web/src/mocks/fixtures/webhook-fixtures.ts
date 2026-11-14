@@ -387,6 +387,7 @@ export function buildWebhookDeliveryFixtures(
           ? minutesAgo(-1)
           : null,
       created_at: minutesAgo(deliverySpec.minutesAgo),
+      is_edited: false,
     };
   });
 }

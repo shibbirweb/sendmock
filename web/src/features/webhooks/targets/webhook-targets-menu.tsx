@@ -5,6 +5,7 @@ import {
   useWebhookTargets,
   type WebhookTargetEvent,
 } from "@/features/webhooks/targets/use-webhook-targets";
+import { toWebhookChoice } from "@/features/webhooks/targets/webhook-request-edits";
 import {
   type WebhookTargetsPickerRequest,
   WebhookTargetsPicker,
@@ -58,8 +59,9 @@ function describeTargets(
 
 /**
  * A simulate menu item that names the webhooks its event will trigger under
- * its label, with Choose beside it to send to others for this action only
- * (WH-13.2, WH-13.4). Picking the item itself lets the rules decide.
+ * its label, with Choose beside it to send to others, or to see and edit
+ * their payloads, for this action only (WH-13.2, WH-13.4, WH-14.2). Picking
+ * the item itself lets the rules decide and sends the rendered payloads.
  */
 export function WebhookTargetsMenuItem({
   targetEvent,
@@ -110,11 +112,18 @@ export function WebhookTargetsMenuItem({
           onSelect={() => {
             openPicker({
               actionLabel,
-              eventType: targetEvent.eventType,
+              targetEvent,
               initialEndpointIds: webhookTargets.matchedEndpointIds,
+              initialRequestEdits: [],
               confirmLabel: actionLabel,
-              onConfirm: (endpointIds) => {
-                onSimulate({ webhook_endpoint_ids: endpointIds });
+              onConfirm: (pickerChoice) => {
+                onSimulate(
+                  toWebhookChoice({
+                    chosenEndpointIds: pickerChoice.endpointIds,
+                    targetEndpointIds: pickerChoice.endpointIds,
+                    requestEdits: pickerChoice.requestEdits,
+                  }),
+                );
               },
             });
           }}

@@ -2,6 +2,11 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import type { WebhookTargetsState } from "@/features/webhooks/targets/use-webhook-targets";
+import {
+  type WebhookPayloadRequest,
+  WebhookPayloadDialog,
+} from "@/features/webhooks/targets/webhook-payload-dialog";
+import { findRequestEdit } from "@/features/webhooks/targets/webhook-request-edits";
 import { WebhookTargetLinks } from "@/features/webhooks/targets/webhook-target-links";
 import {
   type WebhookTargetsPickerRequest,
@@ -10,8 +15,8 @@ import {
 
 /**
  * "Webhooks" above a composer's buttons: the endpoints the action's event
- * will reach, with Change to pick others for this action only (WH-13.2,
- * WH-13.4).
+ * will reach, each with its Payload to see and edit, and Change to pick
+ * others, for this action only (WH-13.2, WH-13.4, WH-14.2).
  */
 export function WebhookTargetsRow({
   webhookTargets,
@@ -25,6 +30,8 @@ export function WebhookTargetsRow({
 }) {
   const [pickerRequest, setPickerRequest] =
     React.useState<WebhookTargetsPickerRequest | null>(null);
+  const [payloadRequest, setPayloadRequest] =
+    React.useState<WebhookPayloadRequest | null>(null);
   if (!webhookTargets.isShown) {
     return null;
   }
@@ -41,7 +48,33 @@ export function WebhookTargetsRow({
         {webhookTargets.isChecking ? (
           <span className="text-xs text-muted-foreground">Checking...</span>
         ) : (
-          <WebhookTargetLinks targets={webhookTargets.targets} />
+          <WebhookTargetLinks
+            targets={webhookTargets.targets}
+            payloadControls={{
+              editedEndpointIds: webhookTargets.requestEdits.map(
+                (requestEdit) => requestEdit.endpoint_id,
+              ),
+              openPayload: (webhookTarget) => {
+                setPayloadRequest({
+                  targetEvent: webhookTargets.targetEvent,
+                  endpointId: webhookTarget.endpointId,
+                  endpointName: webhookTarget.endpointName,
+                  editedBody:
+                    findRequestEdit(
+                      webhookTargets.requestEdits,
+                      webhookTarget.endpointId,
+                    )?.body ?? null,
+                  confirmLabel: "Use this payload",
+                  onConfirm: (requestEdit) => {
+                    webhookTargets.saveRequestEdit(
+                      webhookTarget.endpointId,
+                      requestEdit,
+                    );
+                  },
+                });
+              },
+            }}
+          />
         )}
         {isChosen && (
           <span className="text-xs text-muted-foreground">
@@ -66,12 +99,13 @@ export function WebhookTargetsRow({
             onClick={() => {
               setPickerRequest({
                 actionLabel,
-                eventType: webhookTargets.eventType,
+                targetEvent: webhookTargets.targetEvent,
                 initialEndpointIds:
                   webhookTargets.chosenEndpointIds ??
                   webhookTargets.matchedEndpointIds,
+                initialRequestEdits: webhookTargets.requestEdits,
                 confirmLabel: "Use these",
-                onConfirm: webhookTargets.chooseEndpoints,
+                onConfirm: webhookTargets.applyChoice,
               });
             }}
           >
@@ -83,6 +117,12 @@ export function WebhookTargetsRow({
         pickerRequest={pickerRequest}
         onClose={() => {
           setPickerRequest(null);
+        }}
+      />
+      <WebhookPayloadDialog
+        payloadRequest={payloadRequest}
+        onClose={() => {
+          setPayloadRequest(null);
         }}
       />
     </div>

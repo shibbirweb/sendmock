@@ -99,15 +99,13 @@ export const emailResponseHandlers = [
     }
 
     const replyRequest = (await request.json()) as EmailReplyRequest;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      replyRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(replyRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
     const responder = readResponder(originalEmail, replyRequest.from);
 
-    return runWithWebhookChoice(replyRequest.webhook_endpoint_ids, () =>
+    return runWithWebhookChoice(replyRequest, () =>
       storeEmailResponse(originalEmail, {
         kind: "reply",
         from: responder,
@@ -132,9 +130,7 @@ export const emailResponseHandlers = [
     }
 
     const forwardRequest = (await request.json()) as EmailForwardRequest;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      forwardRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(forwardRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -147,7 +143,7 @@ export const emailResponseHandlers = [
       );
     }
 
-    return runWithWebhookChoice(forwardRequest.webhook_endpoint_ids, () =>
+    return runWithWebhookChoice(forwardRequest, () =>
       storeEmailResponse(originalEmail, {
         kind: "forward",
         from: readResponder(originalEmail, forwardRequest.from),

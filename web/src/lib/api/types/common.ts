@@ -51,6 +51,34 @@ export type WebhookChoice = {
    * @example ["01JB7T9Q2RENDPOINT00000000"]
    */
   webhook_endpoint_ids?: Ulid[];
+  /**
+   * Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.
+   */
+  webhook_requests?: WebhookRequestEdit[];
+};
+
+/** A request edited before an action sends it (WH-14.4). */
+export type WebhookRequestEdit = {
+  /**
+   * The endpoint the edited request goes to; when `webhook_endpoint_ids` is given, it must be one of them.
+   * @example "01JB7T9Q2RENDPOINT00000000"
+   */
+  endpoint_id: Ulid;
+  /**
+   * The event the edit is for, as `POST /api/v1/webhooks/rules/match` named it; left out, every event this action sends to the endpoint.
+   * @example "email.bounced"
+   */
+  event_type?: string;
+  /**
+   * The body, sent exactly as written and signed over these bytes with the endpoint's secret.
+   * @example "{\"type\":\"email.bounced\",\"data\":{\"reason\":\"edited\"}}"
+   */
+  body: string;
+  /**
+   * Headers to set or change, by name; the others are sent as rendered. Signature headers are made by the sender.
+   * @example {"x-tenant":"acme"}
+   */
+  headers?: Record<string, string>;
 };
 
 /** Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`. */

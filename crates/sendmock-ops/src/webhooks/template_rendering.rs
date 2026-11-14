@@ -122,6 +122,7 @@ pub async fn render_template_draft(
         &delivery_context.template_context,
         &template_functions,
         TemplateRenderMode::Lenient,
+        None,
     );
     problems.extend(delivery_context.variable_problems);
     Ok(TemplateRenderResult {

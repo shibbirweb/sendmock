@@ -35,15 +35,20 @@ export function readChosenEndpointIds(
     .map((webhookEndpoint) => webhookEndpoint.id);
 }
 
-/** One endpoint in the picker: its checkbox, its name opening it in a new tab, and its URL. */
+/**
+ * One endpoint in the picker: its checkbox, its name opening it in a new tab,
+ * its URL, and its payload controls once checked (WH-14.2).
+ */
 export function EndpointChoice({
   webhookEndpoint,
   isChecked,
   onCheckedChange,
+  payloadControls,
 }: {
   webhookEndpoint: WebhookEndpoint;
   isChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
+  payloadControls?: React.ReactNode;
 }) {
   const checkboxId = React.useId();
 
@@ -58,7 +63,7 @@ export function EndpointChoice({
           onCheckedChange(checkedState === true);
         }}
       />
-      <div className="grid min-w-0 gap-0.5">
+      <div className="grid min-w-0 flex-1 gap-0.5">
         <Link
           to="/webhooks/endpoints"
           search={{ endpoint: webhookEndpoint.id }}
@@ -75,6 +80,11 @@ export function EndpointChoice({
           {webhookEndpoint.url}
         </label>
       </div>
+      {isChecked && payloadControls !== undefined && (
+        <div className="flex shrink-0 items-center gap-1">
+          {payloadControls}
+        </div>
+      )}
     </li>
   );
 }

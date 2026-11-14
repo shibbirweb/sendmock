@@ -155,7 +155,7 @@ Phase 5 (W22), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 
 Phase 5 (W23, after W22), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request). Plan: [05-webhooks.md](../05-webhooks.md#shown-and-chosen-on-every-simulation).
 
-- [ ] WH-14.1 `POST /api/v1/webhooks/rules/match` with `include_requests: true` answers, for each matching or chosen endpoint, the request it would send for that event: method, URL, headers with secrets masked and body, rendered with the endpoint's template; nothing is stored or sent.
-- [ ] WH-14.2 Every webhook named by a simulation (WH-13.2) has a Payload button that shows that request, with the body in the code editor.
-- [ ] WH-14.3 The body can be edited for that one action, Reset restores the rendered body, and an edited webhook is marked Edited; sending then delivers the edited body exactly as written.
-- [ ] WH-14.4 The operations accept `webhook_requests` (`endpoint_id`, `body`, `headers`) in the API, CLI and MCP; an edited body is signed over its edited bytes with the endpoint's secret (Standard Webhooks or the provider's own signature), so the receiver's verification passes, and the delivery log keeps the request as sent, marked edited.
+- [x] WH-14.1 `POST /api/v1/webhooks/rules/match` with `include_requests: true` answers, for each matching or chosen endpoint, the request it would send for that event: method, URL, headers with secrets masked and body, rendered with the endpoint's template; nothing is stored or sent. (#241)
+- [x] WH-14.2 Every webhook named by a simulation (WH-13.2) has a Payload button that shows that request, with the body in the code editor. (#241)
+- [x] WH-14.3 The body can be edited for that one action, Reset restores the rendered body, and an edited webhook is marked Edited; sending then delivers the edited body exactly as written. (#241)
+- [x] WH-14.4 The operations accept `webhook_requests` (`endpoint_id`, `body`, `headers`) in the API, CLI and MCP; an edited body is signed over its edited bytes with the endpoint's secret (Standard Webhooks or the provider's own signature), so the receiver's verification passes, and the delivery log keeps the request as sent, marked edited. (#241)

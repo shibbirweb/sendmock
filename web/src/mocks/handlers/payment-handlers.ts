@@ -124,9 +124,7 @@ export const paymentHandlers = [
       }
 
       const simulateRequest = (await request.json()) as PaymentSimulateRequest;
-      const choiceRefusal = refuseUnavailableEndpoint(
-        simulateRequest.webhook_endpoint_ids,
-      );
+      const choiceRefusal = refuseUnavailableEndpoint(simulateRequest);
       if (choiceRefusal) {
         return choiceRefusal;
       }
@@ -144,7 +142,7 @@ export const paymentHandlers = [
           simulationResult.message,
         );
       }
-      runWithWebhookChoice(simulateRequest.webhook_endpoint_ids, () => {
+      runWithWebhookChoice(simulateRequest, () => {
         publishPaymentChange(paymentDetail);
       });
 

@@ -157,9 +157,7 @@ export const smsSendHandlers = [
     }
 
     const inboundSmsRequest = (await request.json()) as InboundSmsRequest;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      inboundSmsRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(inboundSmsRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -184,7 +182,7 @@ export const smsSendHandlers = [
     storeSmsMediaBytes(inboundMessage.id, inboundMediaResult.media);
 
     mockDatabase.smsMessages.unshift(inboundMessage);
-    runWithWebhookChoice(inboundSmsRequest.webhook_endpoint_ids, () => {
+    runWithWebhookChoice(inboundSmsRequest, () => {
       publishMockEvent("sms.inbound", {
         id: inboundMessage.id,
         from_number: inboundMessage.from_number,

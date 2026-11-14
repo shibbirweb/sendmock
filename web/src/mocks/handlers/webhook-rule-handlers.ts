@@ -18,6 +18,7 @@ import {
 } from "@/mocks/handlers/handler-utils";
 import { matchWebhookRules } from "@/mocks/webhooks/match-webhook-rules";
 import { previewRuleFilter } from "@/mocks/webhooks/preview-rule-filter";
+import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
 function listRulesInOrder(): WebhookRule[] {
   return [...mockDatabase.webhookRules].sort(
@@ -78,6 +79,13 @@ export const webhookRuleHandlers = [
         "invalid_input",
         `${matchRequest.event_type} is not an event a rule can listen to`,
       );
+    }
+    const choiceRefusal =
+      matchRequest.include_requests === true
+        ? refuseUnavailableEndpoint(matchRequest)
+        : null;
+    if (choiceRefusal) {
+      return choiceRefusal;
     }
 
     return HttpResponse.json(matchWebhookRules(matchRequest));

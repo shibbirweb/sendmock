@@ -34,6 +34,7 @@ fn pending_delivery(delivery_id: &str, due_at_unix_ms: i64) -> WebhookDeliveryRe
         next_attempt_at_unix_ms: Some(due_at_unix_ms),
         created_at_unix_ms: due_at_unix_ms,
         is_signed: true,
+        is_edited: false,
     }
 }
 

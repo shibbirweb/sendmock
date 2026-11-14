@@ -56,6 +56,11 @@ function DeliveryRow({
         >
           {webhookDelivery.trigger}
         </span>
+        {webhookDelivery.is_edited && (
+          <span className="ml-1 rounded border border-primary/40 px-1.5 text-[11px]">
+            edited
+          </span>
+        )}
       </TableCell>
       <TableCell>
         <DeliveryStatusBadge webhookDelivery={webhookDelivery} />

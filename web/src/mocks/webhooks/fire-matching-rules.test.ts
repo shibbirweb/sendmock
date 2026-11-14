@@ -61,10 +61,10 @@ describe("fireMatchingRules", () => {
     secondEndpoint.is_enabled = true;
     const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
 
-    fireMatchingRules(buildSmsStatusEvent(), [
-      firstEndpoint.id,
-      secondEndpoint.id,
-    ]);
+    fireMatchingRules(buildSmsStatusEvent(), {
+      endpointIds: [firstEndpoint.id, secondEndpoint.id],
+      editedRequests: [],
+    });
 
     const newDeliveries = mockDatabase.webhookDeliveries.slice(0, 2);
     expect(mockDatabase.webhookDeliveries).toHaveLength(
@@ -82,11 +82,106 @@ describe("fireMatchingRules", () => {
     ).toBe(true);
   });
 
+  test("WH-14.3 an edited payload is delivered exactly as written and marked edited", () => {
+    replaceMockDatabase("standard");
+    const [chosenEndpoint, otherEndpoint] = mockDatabase.webhookEndpoints;
+    if (chosenEndpoint === undefined || otherEndpoint === undefined) {
+      throw new Error("The fixtures need two endpoints.");
+    }
+    chosenEndpoint.is_enabled = true;
+    otherEndpoint.is_enabled = true;
+    const editedBody = '{"edited":true,"note":"  kept as typed "}';
+
+    fireMatchingRules(buildSmsStatusEvent(), {
+      endpointIds: [chosenEndpoint.id, otherEndpoint.id],
+      editedRequests: [
+        {
+          endpoint_id: chosenEndpoint.id,
+          event_type: "sms.status",
+          body: editedBody,
+          headers: { "x-tenant": "acme" },
+        },
+      ],
+    });
+
+    const [otherDelivery, chosenDelivery] = mockDatabase.webhookDeliveries;
+    expect(chosenDelivery?.request?.body).toBe(editedBody);
+    expect(chosenDelivery?.request?.headers["x-tenant"]).toBe("acme");
+    expect(chosenDelivery?.is_edited).toBe(true);
+    expect(otherDelivery?.request?.body).not.toBe(editedBody);
+    expect(otherDelivery?.is_edited).toBe(false);
+  });
+
+  test("WH-14.4 an edit for another event leaves this one rendered", () => {
+    replaceMockDatabase("standard");
+    const [chosenEndpoint] = mockDatabase.webhookEndpoints;
+    if (chosenEndpoint === undefined) {
+      throw new Error("The fixtures need an endpoint.");
+    }
+    chosenEndpoint.is_enabled = true;
+
+    fireMatchingRules(buildSmsStatusEvent(), {
+      endpointIds: [chosenEndpoint.id],
+      editedRequests: [
+        {
+          endpoint_id: chosenEndpoint.id,
+          event_type: "sms.opened",
+          body: "edited",
+        },
+      ],
+    });
+
+    expect(mockDatabase.webhookDeliveries[0]?.is_edited).toBe(false);
+  });
+
+  test("WH-14.1 the match renders each endpoint's request and stores nothing", () => {
+    replaceMockDatabase("standard");
+    const [chosenEndpoint] = mockDatabase.webhookEndpoints;
+    if (chosenEndpoint === undefined) {
+      throw new Error("The fixtures need an endpoint.");
+    }
+    chosenEndpoint.is_enabled = true;
+    const smsStatusEvent = buildSmsStatusEvent();
+    const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
+
+    const matched = matchWebhookRules({
+      event_type: "sms.status",
+      subject_id: String(smsStatusEvent.data.id),
+      include_requests: true,
+      webhook_endpoint_ids: [chosenEndpoint.id],
+    });
+
+    const shownEndpointIds = (matched.webhook_requests ?? []).map(
+      (matchedRequest) => matchedRequest.endpoint_id,
+    );
+    expect(shownEndpointIds).toContain(chosenEndpoint.id);
+    for (const matchedRule of matched.webhook_rules) {
+      expect(shownEndpointIds).toContain(matchedRule.endpoint_id);
+    }
+    const chosenRequest = matched.webhook_requests?.find(
+      (matchedRequest) => matchedRequest.endpoint_id === chosenEndpoint.id,
+    );
+    expect(chosenRequest?.event_type).toBe("sms.status");
+    expect(chosenRequest?.method).toBe(chosenEndpoint.method);
+    expect(mockDatabase.webhookDeliveries).toHaveLength(deliveryCountBefore);
+  });
+
+  test("WH-14.1 the match leaves requests out unless asked", () => {
+    replaceMockDatabase("standard");
+
+    const matched = matchWebhookRules({ event_type: "sms.status" });
+
+    expect(matched.webhook_requests).toBeUndefined();
+  });
+
   test("WH-13.4 an empty choice sends no webhook", () => {
     replaceMockDatabase("standard");
     const deliveryCountBefore = mockDatabase.webhookDeliveries.length;
 
-    fireMatchingRules(buildSmsStatusEvent(), []);
+    fireMatchingRules(buildSmsStatusEvent(), {
+      endpointIds: [],
+      editedRequests: [],
+    });
 
     expect(mockDatabase.webhookDeliveries).toHaveLength(deliveryCountBefore);
   });

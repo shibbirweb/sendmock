@@ -44,6 +44,9 @@ pub struct WebhookDelivery {
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub next_attempt_at: Option<String>,
     pub created_at: String,
+    /// Whether the action that sent it edited the body or headers instead of sending the
+    /// rendered request.
+    pub is_edited: bool,
 }
 
 fn read_recorded_request(request_json: Option<&str>) -> Option<RecordedHttpRequest> {
@@ -85,6 +88,7 @@ impl From<WebhookDeliveryRecord> for WebhookDelivery {
                 .filter(|_| is_scheduled)
                 .map(format_rfc3339),
             created_at: format_rfc3339(stored_delivery.created_at_unix_ms),
+            is_edited: stored_delivery.is_edited,
         }
     }
 }

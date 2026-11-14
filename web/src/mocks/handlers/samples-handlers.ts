@@ -49,16 +49,14 @@ export const samplesHandlers = [
     } catch {
       // No options: the sample uses its defaults.
     }
-    const choiceRefusal = refuseUnavailableEndpoint(
-      sampleOptions.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(sampleOptions);
     if (choiceRefusal) {
       return choiceRefusal;
     }
     const sampleKind = params.kind;
     const createdSample: CreatedSample = {
       kind: sampleKind,
-      id: runWithWebhookChoice(sampleOptions.webhook_endpoint_ids, () =>
+      id: runWithWebhookChoice(sampleOptions, () =>
         sampleCreators[sampleKind](sampleOptions),
       ),
     };

@@ -118,7 +118,7 @@ export const webhookSurfaces: SurfaceCatalogue = {
     phase: "5",
     cli: "sendmock webhook rule match",
     mcp: "sendmock_webhook_rule_match",
-    ui: "Webhooks row and menu hints on every simulating action",
-    cliFlags: { data: "--field" },
+    ui: "Webhooks row and menu hints on every simulating action; Payload on each webhook",
+    cliFlags: { data: "--field", webhook_endpoint_ids: "--webhook" },
   },
 };

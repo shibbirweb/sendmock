@@ -51,6 +51,7 @@ fn render_draft_body(
     part_renderer: &mut RequestPartRenderer,
     template_draft: &TemplateDraft,
     extra_fields: &BTreeMap<String, String>,
+    edited_body: Option<&str>,
 ) -> RenderedBody {
     let folded_draft = fold_endpoint_overrides(template_draft, &BTreeMap::new(), extra_fields);
     let (rendered_request, template_problems) = render_template_request(
@@ -58,6 +59,7 @@ fn render_draft_body(
         part_renderer.template_context,
         part_renderer.template_functions,
         part_renderer.render_mode,
+        edited_body,
     );
     part_renderer
         .problems
@@ -82,11 +84,14 @@ fn render_draft_body(
     }
 }
 
+/// An edited body reaches a payload template's headers, which may sign it; the other modes
+/// put it in place after rendering.
 pub fn render_template_body(
     part_renderer: &mut RequestPartRenderer,
     endpoint_template: &EndpointTemplate,
     extra_fields: &BTreeMap<String, String>,
     app_event: &AppEvent,
+    edited_body: Option<&str>,
 ) -> Result<RenderedBody, OperationError> {
     match endpoint_template {
         EndpointTemplate::NativeEvent => {
@@ -96,6 +101,7 @@ pub fn render_template_body(
             part_renderer,
             template_draft,
             extra_fields,
+            edited_body,
         )),
         EndpointTemplate::Missing { template_id } => {
             part_renderer.problems.push(RenderProblem::error(

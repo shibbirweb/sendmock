@@ -61,9 +61,9 @@ pub use email::{
     complete_email_intake, find_recipient_refusal,
 };
 pub use events::{
-    AppEvent, AppEventType, EventBus, GetRecentEventsOperation, RecentEventFilter,
-    RecentEventsInput, RecordedEvent, WebhookChoice, publish_email_deleted, publish_email_inbound,
-    publish_email_received, publish_event,
+    AppEvent, AppEventType, EditedWebhookRequest, EventBus, GetRecentEventsOperation,
+    RecentEventFilter, RecentEventsInput, RecordedEvent, WebhookChoice, publish_email_deleted,
+    publish_email_inbound, publish_email_received, publish_event,
 };
 pub use http_catcher::{
     CapturedHttpRequest, CatchAnswer, HttpBin, HttpMockResponse, IncomingHttpRequest,
@@ -157,13 +157,13 @@ pub use webhooks::{
     DeliveryOrder, DeliveryTrigger, EndpointPreviewResult, FileTemplateLibrary,
     LoadedTemplateDirectory, ResolvedVariables, RevealedEndpointSecret, SavedDelivery,
     TemplateRenderResult, TemplateRevision, VariablePreviewResult, WebhookChoiceInput,
-    WebhookDelivery, WebhookDeliveryDetail, WebhookEndpoint, WebhookRule, WebhookRuleMatchRequest,
-    WebhookRuleMatchResult, WebhookSendFailure, WebhookSendResult, WebhookSender,
-    WebhookTemplateDetail, WebhookTemplateSummary, WebhookVariable, build_event_template_context,
-    build_sample_template_context, deliver_recorded_event, enqueue_webhook_delivery,
-    fire_matching_rules, load_template_directory, read_environment_variables,
-    resolve_template_variables, run_due_deliveries, run_webhook_dispatcher,
-    run_webhook_rule_subscriber,
+    WebhookDelivery, WebhookDeliveryDetail, WebhookEndpoint, WebhookRequestEdit, WebhookRule,
+    WebhookRuleMatchRequest, WebhookRuleMatchResult, WebhookSendFailure, WebhookSendResult,
+    WebhookSender, WebhookTemplateDetail, WebhookTemplateSummary, WebhookVariable,
+    build_event_template_context, build_sample_template_context, deliver_recorded_event,
+    enqueue_webhook_delivery, fire_matching_rules, load_template_directory,
+    read_environment_variables, resolve_template_variables, run_due_deliveries,
+    run_webhook_dispatcher, run_webhook_rule_subscriber,
 };
 
 /// Every operation this build of SendMock serves.

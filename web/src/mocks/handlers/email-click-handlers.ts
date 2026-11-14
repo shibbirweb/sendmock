@@ -33,9 +33,7 @@ export const emailClickHandlers = [
       return createNotFoundResponse("Email");
     }
     const clickRequest = (await request.json()) as EmailClickRequest;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      clickRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(clickRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -57,7 +55,7 @@ export const emailClickHandlers = [
       at: recordedClick.clickRecord.clicked_at,
       detail: `${clickTimelineDetails[recordedClick.clickRecord.source]}: ${recordedClick.clickRecord.url}`,
     });
-    runWithWebhookChoice(clickRequest.webhook_endpoint_ids, () => {
+    runWithWebhookChoice(clickRequest, () => {
       publishMockEvent(
         "email.clicked",
         describeMockClick(email, recordedClick),

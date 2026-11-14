@@ -4,6 +4,7 @@ import type {
   AppEvent,
   DeliveryTrigger,
   WebhookDelivery,
+  WebhookRequestEdit,
 } from "@/lib/api/types";
 import { createMockUlid } from "@/mocks/fixtures/fixture-helpers";
 import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
@@ -11,10 +12,24 @@ import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-re
 /** Share of automatic deliveries the mock receiver answers with 503. */
 const mockFailureRate = 0.15;
 
+/** The body every mock endpoint sends for an event. */
+export function renderMockEventBody(appEvent: AppEvent): string {
+  return JSON.stringify(
+    {
+      type: appEvent.type,
+      timestamp: appEvent.created_at,
+      data: appEvent.data,
+    },
+    null,
+    2,
+  );
+}
+
 /**
  * The delivery a matching rule, or an endpoint chosen for one simulation,
  * creates for an event: usually answered 200, sometimes 503 with a retry
- * scheduled, so the log shows both.
+ * scheduled, so the log shows both. An edited request is sent as written and
+ * marked edited (WH-14.4).
  */
 export function buildAutoDelivery({
   appEvent,
@@ -22,12 +37,14 @@ export function buildAutoDelivery({
   endpointRecord,
   subjectId,
   trigger,
+  editedRequest = null,
 }: {
   appEvent: AppEvent;
   ruleId: string | null;
   endpointRecord: WebhookEndpointRecord;
   subjectId: string | null;
   trigger: Extract<DeliveryTrigger, "auto" | "chosen">;
+  editedRequest?: WebhookRequestEdit | null;
 }): WebhookDelivery {
   const hasFailed = faker.number.float() < mockFailureRate;
   const firstRetryDelaySeconds =
@@ -56,16 +73,9 @@ export function buildAutoDelivery({
         "webhook-signature": `v1,${faker.string.alphanumeric(43)}=`,
         "webhook-attempt": "1",
         ...endpointRecord.headers,
+        ...editedRequest?.headers,
       },
-      body: JSON.stringify(
-        {
-          type: appEvent.type,
-          timestamp: appEvent.created_at,
-          data: appEvent.data,
-        },
-        null,
-        2,
-      ),
+      body: editedRequest?.body ?? renderMockEventBody(appEvent),
     },
     response: {
       status_code: hasFailed ? 503 : 200,
@@ -79,5 +89,6 @@ export function buildAutoDelivery({
       ? new Date(Date.now() + firstRetryDelaySeconds * 1000).toISOString()
       : null,
     created_at: new Date().toISOString(),
+    is_edited: editedRequest !== null,
   };
 }

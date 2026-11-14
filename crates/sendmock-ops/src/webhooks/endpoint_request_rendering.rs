@@ -86,6 +86,8 @@ pub struct EndpointRequestSource<'source> {
     pub request_settings: &'source EndpointRequestSettings,
     /// The payload template of Template mode; None in the other body modes.
     pub endpoint_template: Option<&'source EndpointTemplate>,
+    /// A body typed for this send, which a payload template's signature headers sign.
+    pub edited_body: Option<&'source str>,
 }
 
 /// Renders the whole request; the problems stay on the part renderer. Headers layer as the
@@ -103,6 +105,7 @@ pub fn render_endpoint_request(
         request_settings,
         request_source.endpoint_template,
         app_event,
+        request_source.edited_body,
     )?;
     let mut default_headers = BTreeMap::from([(
         "user-agent".to_owned(),

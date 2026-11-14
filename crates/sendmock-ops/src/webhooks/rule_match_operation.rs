@@ -2,10 +2,16 @@ use std::collections::BTreeMap;
 
 use sendmock_webhooks::{HEADER_FIELD_PREFIX, RuleMessage};
 
+use sendmock_store::{WebhookEndpointRecord, WebhookRuleRecord};
+
 use super::rule_event_subject::{is_ruled_event, load_subject_rule_message};
-use super::rule_match_wire::{MatchedWebhookRule, WebhookRuleMatchRequest, WebhookRuleMatchResult};
+use super::rule_match_requests::{build_matched_event, render_matched_request};
+use super::rule_match_wire::{
+    MatchedWebhookRequest, MatchedWebhookRule, WebhookRuleMatchRequest, WebhookRuleMatchResult,
+};
 use super::rule_subscriber::find_firing_rules;
 use super::rule_validation::validate_rule_event;
+use super::webhook_choice_input::check_endpoint_can_be_chosen;
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
 
 pub struct MatchWebhookRulesOperation;
@@ -24,12 +30,13 @@ impl Operation for MatchWebhookRulesOperation {
             cli_usage: "sendmock webhook rule match",
             mcp_tool: "sendmock_webhook_rule_match",
             // `--data` is every command's JSON body flag.
-            cli_flag_names: &[("data", "field")],
+            cli_flag_names: &[("data", "field"), ("webhook_endpoint_ids", "webhook")],
             ..OperationDefinition::DEFAULTS
         }
     }
 
-    /// The rule matcher dispatch runs, with nothing stored or sent (WH-13.1).
+    /// The rule matcher dispatch runs, and with `include_requests` each endpoint's rendered
+    /// request, with nothing stored or sent (WH-13.1, WH-14.1).
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -39,6 +46,7 @@ impl Operation for MatchWebhookRulesOperation {
         if !is_ruled_event(&input.event_type) {
             return Ok(WebhookRuleMatchResult {
                 webhook_rules: Vec::new(),
+                webhook_requests: input.include_requests.unwrap_or_default().then(Vec::new),
             });
         }
         let stored_message = match &input.subject_id {
@@ -47,29 +55,92 @@ impl Operation for MatchWebhookRulesOperation {
             }
             None => RuleMessage::default(),
         };
-        let rule_message = overlay_event_fields(stored_message, input.data.unwrap_or_default());
+        let rule_message =
+            overlay_event_fields(stored_message, input.data.clone().unwrap_or_default());
         let stored_rules = operation_context
             .webhook_rule_repository
             .list_rules()
             .await?;
-        let webhook_rules = find_firing_rules(
+        let firing_rules = find_firing_rules(
             operation_context,
             stored_rules,
             &input.event_type,
             &rule_message,
         )
-        .await?
-        .into_iter()
-        .map(|(stored_rule, stored_endpoint)| MatchedWebhookRule {
-            rule_id: stored_rule.rule_id,
-            rule_name: stored_rule.name,
-            endpoint_id: stored_endpoint.endpoint_id,
-            endpoint_name: stored_endpoint.name,
-            endpoint_url: stored_endpoint.url,
+        .await?;
+        let webhook_requests = if input.include_requests.unwrap_or_default() {
+            Some(render_action_requests(operation_context, &input, &firing_rules).await?)
+        } else {
+            None
+        };
+        let webhook_rules = firing_rules
+            .into_iter()
+            .map(|(stored_rule, stored_endpoint)| MatchedWebhookRule {
+                rule_id: stored_rule.rule_id,
+                rule_name: stored_rule.name,
+                endpoint_id: stored_endpoint.endpoint_id,
+                endpoint_name: stored_endpoint.name,
+                endpoint_url: stored_endpoint.url,
+            })
+            .collect();
+        Ok(WebhookRuleMatchResult {
+            webhook_rules,
+            webhook_requests,
         })
-        .collect();
-        Ok(WebhookRuleMatchResult { webhook_rules })
     }
+}
+
+/// The request of each matching endpoint, then of each chosen one not already shown.
+async fn render_action_requests(
+    operation_context: &OperationContext,
+    input: &WebhookRuleMatchRequest,
+    firing_rules: &[(WebhookRuleRecord, WebhookEndpointRecord)],
+) -> Result<Vec<MatchedWebhookRequest>, OperationError> {
+    let matched_event = build_matched_event(
+        operation_context,
+        &input.event_type,
+        input.subject_id.as_deref(),
+    )
+    .await?;
+    let mut webhook_requests: Vec<MatchedWebhookRequest> = Vec::new();
+    for (stored_rule, stored_endpoint) in firing_rules {
+        if webhook_requests
+            .iter()
+            .any(|shown_request| shown_request.endpoint_id == stored_endpoint.endpoint_id)
+        {
+            continue;
+        }
+        webhook_requests.push(
+            render_matched_request(
+                operation_context,
+                stored_endpoint,
+                &matched_event,
+                Some(&stored_rule.rule_id),
+            )
+            .await?,
+        );
+    }
+    for endpoint_id in input.webhook_endpoint_ids.iter().flatten() {
+        check_endpoint_can_be_chosen(operation_context, endpoint_id).await?;
+        if webhook_requests
+            .iter()
+            .any(|shown_request| &shown_request.endpoint_id == endpoint_id)
+        {
+            continue;
+        }
+        let Some(stored_endpoint) = operation_context
+            .webhook_endpoint_repository
+            .find_endpoint(endpoint_id)
+            .await?
+        else {
+            continue;
+        };
+        webhook_requests.push(
+            render_matched_request(operation_context, &stored_endpoint, &matched_event, None)
+                .await?,
+        );
+    }
+    Ok(webhook_requests)
 }
 
 /// The fields the caller gave win over the stored message's; `header:<name>` sets a header.

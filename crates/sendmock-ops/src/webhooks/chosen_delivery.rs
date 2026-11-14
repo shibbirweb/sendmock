@@ -1,13 +1,14 @@
-use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_webhook_delivery};
+use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, enqueue_edited_webhook_delivery};
 use super::rule_event_subject::{is_ruled_event, read_event_subject_id};
 use crate::{AppEvent, OperationContext, OperationError, WebhookChoice};
 
-/// Queues one delivery per chosen endpoint, each with its own template and secret, and none
-/// for the rule matches (WH-13.4). An endpoint disabled or deleted since the action was
-/// checked is skipped. Answers how many were queued.
+/// Queues one delivery per chosen endpoint, each with its own template and secret (or the
+/// action's edited request), and none for the rule matches (WH-13.4, WH-14.4). An endpoint
+/// disabled or deleted since the action was checked is skipped. Answers how many were queued.
 pub async fn deliver_to_chosen_endpoints(
     operation_context: &OperationContext,
     app_event: &AppEvent,
+    chosen_endpoint_ids: &[String],
     webhook_choice: &WebhookChoice,
 ) -> Result<usize, OperationError> {
     if !is_ruled_event(&app_event.event_type) {
@@ -15,7 +16,7 @@ pub async fn deliver_to_chosen_endpoints(
     }
     let subject_id = read_event_subject_id(app_event);
     let mut queued_count = 0;
-    for endpoint_id in &webhook_choice.endpoint_ids {
+    for endpoint_id in chosen_endpoint_ids {
         let Some(stored_endpoint) = operation_context
             .webhook_endpoint_repository
             .find_endpoint(endpoint_id)
@@ -31,7 +32,14 @@ pub async fn deliver_to_chosen_endpoints(
             delivery_trigger: DeliveryTrigger::Chosen,
             send_time_values: serde_json::Map::new(),
         };
-        enqueue_webhook_delivery(operation_context, &stored_endpoint, delivery_order).await?;
+        let edited_request = webhook_choice.find_edited_request(endpoint_id, &app_event.event_type);
+        enqueue_edited_webhook_delivery(
+            operation_context,
+            &stored_endpoint,
+            delivery_order,
+            edited_request,
+        )
+        .await?;
         queued_count += 1;
     }
     Ok(queued_count)

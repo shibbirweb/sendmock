@@ -11,7 +11,7 @@ pub use event_publishing::{
     publish_traffic_pruned,
 };
 pub use get_recent_events_operation::{GetRecentEventsOperation, RecentEventsInput};
-pub use webhook_choice::WebhookChoice;
+pub use webhook_choice::{EditedWebhookRequest, WebhookChoice};
 
 use crate::OperationRegistry;
 

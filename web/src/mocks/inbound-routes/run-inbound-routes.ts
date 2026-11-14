@@ -108,6 +108,7 @@ function recordRouteDelivery(
       mockAnswer.kind === "connection_error" ? mockAnswer.message : null,
     next_attempt_at: null,
     created_at: new Date(createdAtMs).toISOString(),
+    is_edited: false,
   };
   mockDatabase.webhookDeliveries.unshift(routeDelivery);
 

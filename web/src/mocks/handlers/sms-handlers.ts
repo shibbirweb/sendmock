@@ -147,13 +147,11 @@ export const smsHandlers = [
     }
 
     const statusUpdate = (await request.json()) as SmsStatusUpdate;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      statusUpdate.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(statusUpdate);
     if (choiceRefusal) {
       return choiceRefusal;
     }
-    runWithWebhookChoice(statusUpdate.webhook_endpoint_ids, () => {
+    runWithWebhookChoice(statusUpdate, () => {
       applySmsStatus(
         smsMessage,
         statusUpdate.status,
@@ -205,9 +203,7 @@ export const smsHandlers = [
     }
 
     const openRequest = await readOpenEventRequest(request);
-    const choiceRefusal = refuseUnavailableEndpoint(
-      openRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(openRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -218,7 +214,7 @@ export const smsHandlers = [
       mockDatabase.messageOpens,
     );
     if (recordedOpen) {
-      runWithWebhookChoice(openRequest.webhook_endpoint_ids, () => {
+      runWithWebhookChoice(openRequest, () => {
         publishMockEvent(
           "sms.opened",
           describeMockOpen(smsMessage, recordedOpen),

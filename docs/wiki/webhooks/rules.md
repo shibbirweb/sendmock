@@ -69,6 +69,18 @@ To send one action somewhere else without changing any rule:
 
 Each chosen endpoint gets one delivery with its own template and secret, marked `chosen` in [Deliveries](./deliveries.md). The choice is for that one action only; the link in the picker opens this screen filtered to the event, to change it for every event of that type. An SMS number's own callback URLs and a payment gateway's notification endpoint still get their requests, and traffic your app sends over SMTP or a provider API always follows the rules.
 
+### See and edit the payload
+
+Each webhook in a **Webhooks** row, and each ticked endpoint in the picker, has a **Payload** button that shows the request it will send: method, URL, headers (secrets masked) and body, rendered with the endpoint's template for the event about to fire.
+
+To send one action with a different body:
+
+1. Press **Payload** beside the webhook.
+2. Change the body in the editor. The webhook is marked **Edited**; **Reset** puts back the rendered body.
+3. Press **Use this payload**, then run the action as usual (beside **Send a sample**, the dialog's own button runs it at once).
+
+The edited body is sent exactly as written, and its signature (Standard Webhooks, or the provider's own such as Razorpay's) is computed over the edited bytes with the endpoint's secret, so your app's verification still passes. The delivery is marked `edited` in [Deliveries](./deliveries.md). The edit is for that one action only. Without an edit, ids, timestamps and `fake.*` values are made again when the action runs, so they differ from the ones shown. Picking a menu item directly sends the rendered payloads; open **Choose** to edit them first.
+
 ## Customize
 
 Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](../advanced/rules-and-filters.md).
@@ -86,6 +98,8 @@ Grouped filters, `not`, header fields and regex: [Advanced: rules and filters](.
 | which webhooks an event would trigger | [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match) | [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch) | [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match) |
 
 The simulating commands and tools take `--webhook <endpointId>` (repeat it for several) or `webhook_endpoint_ids` to send that one action to exactly those endpoints, for example `sendmock email simulate <emailId> bounced --webhook <endpointId>`.
+
+To see the payloads first, ask the match for them with `include_requests` (`sendmock webhook rule match --event-type email.bounced --subject-id <emailId> --include-requests`). To send an edited body, the same operations take `webhook_requests`, a list of `{ "endpoint_id": ..., "event_type": ..., "body": ..., "headers": {...} }` (`--webhook-requests '<json>'` in the CLI); an edit of an endpoint left out of `webhook_endpoint_ids` is refused with `422`.
 
 ## Related
 

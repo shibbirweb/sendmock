@@ -1,5 +1,9 @@
 import type { CreatedBy, IsoTimestamp, Ulid } from "@/lib/api/types/common";
 import type { AppEventType } from "@/lib/api/types/events";
+import type {
+  HttpMethod,
+  RenderProblem,
+} from "@/lib/api/types/webhook-endpoints";
 
 export type RuleFilterOperator =
   "equals" | "contains" | "starts_with" | "matches" | "regex" | "exists";
@@ -151,6 +155,48 @@ export type WebhookRuleMatchRequest = {
    * @example {"to":["support@app.test"],"header:x-tenant":["acme"]}
    */
   data?: Record<string, string[]>;
+  /**
+   * Also render the request each matching endpoint would send for the event, with secrets masked (WH-14.1).
+   * @example true
+   */
+  include_requests?: boolean;
+  /**
+   * With `include_requests`, render these endpoints' requests too, as chosen for the action instead of the rules (IDs from `GET /api/v1/webhooks/endpoints`).
+   * @example ["01JB7T9Q2RENDPOINT00000000"]
+   */
+  webhook_endpoint_ids?: Ulid[];
+};
+
+/** The request one endpoint would send for the event, rendered with its template as a delivery would be (WH-14.1). */
+export type MatchedWebhookRequest = {
+  endpoint_id: Ulid;
+  /**
+   * The endpoint's name.
+   * @example "Local app"
+   */
+  endpoint_name: string;
+  /**
+   * The event the request is for.
+   * @example "email.bounced"
+   */
+  event_type: AppEventType;
+  /**
+   * @example "POST"
+   */
+  method: HttpMethod;
+  /**
+   * @example "http://localhost:8000/webhooks/sendmock"
+   */
+  url: string;
+  /** Secret values are masked. */
+  headers: Record<string, string>;
+  /**
+   * Values made at send time (ids, timestamps, `fake.*`) are made again when it is sent unless the body is edited.
+   * @example "{\"type\":\"email.bounced\"}"
+   */
+  body: string;
+  /** Errors stop a delivery as `render_failed`; warnings render empty. */
+  problems: RenderProblem[];
 };
 
 /** The webhooks an event would trigger; nothing is stored or sent. */
@@ -159,4 +205,8 @@ export type WebhookRuleMatchResult = {
    * The rules that would send, in rule order.
    */
   webhook_rules: MatchedWebhookRule[];
+  /**
+   * With `include_requests`: the request each matching or chosen endpoint would send.
+   */
+  webhook_requests?: MatchedWebhookRequest[];
 };

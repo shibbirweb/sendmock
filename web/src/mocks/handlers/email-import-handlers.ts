@@ -97,9 +97,7 @@ export const emailImportHandlers = [
   http.post("*/api/v1/emails/inbound", async ({ request }) => {
     await applyMockConditions();
     const inboundRequest = (await request.json()) as EmailInboundRequest;
-    const choiceRefusal = refuseUnavailableEndpoint(
-      inboundRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(inboundRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -117,7 +115,7 @@ export const emailImportHandlers = [
       return rejectMessage("from and to are required");
     }
 
-    return runWithWebhookChoice(inboundRequest.webhook_endpoint_ids, () =>
+    return runWithWebhookChoice(inboundRequest, () =>
       storeMessage({
         ...messageParts,
         source: "simulated",

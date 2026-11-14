@@ -33,6 +33,8 @@ pub struct WebhookDeliveryRecord {
     /// Whether each attempt gets the endpoint's Standard Webhooks headers; a payment
     /// gateway's notification carries its provider's own signature instead.
     pub is_signed: bool,
+    /// Whether the body or headers were edited for this send instead of rendered.
+    pub is_edited: bool,
 }
 
 /// How an attempt ended.

@@ -147,9 +147,7 @@ export const emailHandlers = [
     }
 
     const openRequest = await readOpenEventRequest(request);
-    const choiceRefusal = refuseUnavailableEndpoint(
-      openRequest.webhook_endpoint_ids,
-    );
+    const choiceRefusal = refuseUnavailableEndpoint(openRequest);
     if (choiceRefusal) {
       return choiceRefusal;
     }
@@ -165,7 +163,7 @@ export const emailHandlers = [
         at: recordedOpen.openRecord.opened_at,
         detail: openTimelineDetails[recordedOpen.openRecord.source],
       });
-      runWithWebhookChoice(openRequest.webhook_endpoint_ids, () => {
+      runWithWebhookChoice(openRequest, () => {
         publishMockEvent("email.opened", describeMockOpen(email, recordedOpen));
       });
     }
@@ -193,13 +191,11 @@ export const emailHandlers = [
       }
 
       const simulatedOutcome = (await request.json()) as SimulatedEmailOutcome;
-      const choiceRefusal = refuseUnavailableEndpoint(
-        simulatedOutcome.webhook_endpoint_ids,
-      );
+      const choiceRefusal = refuseUnavailableEndpoint(simulatedOutcome);
       if (choiceRefusal) {
         return choiceRefusal;
       }
-      runWithWebhookChoice(simulatedOutcome.webhook_endpoint_ids, () => {
+      runWithWebhookChoice(simulatedOutcome, () => {
         applyEmailOutcome(
           email,
           simulatedOutcome.event,

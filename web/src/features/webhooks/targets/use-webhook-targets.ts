@@ -4,12 +4,17 @@ import {
   listWebhookTargets,
   type WebhookTarget,
 } from "@/features/webhooks/targets/list-webhook-targets";
+import {
+  replaceRequestEdit,
+  toWebhookChoice,
+} from "@/features/webhooks/targets/webhook-request-edits";
 import { useIsOperationQueryable } from "@/lib/api/hooks/use-operation-availability";
 import { useWebhookEndpoints } from "@/lib/api/hooks/use-webhook-queries";
 import { useWebhookRuleMatch } from "@/lib/api/hooks/use-webhook-rule-queries";
 import type {
   AppEventType,
   WebhookChoice,
+  WebhookRequestEdit,
   WebhookRuleMatchRequest,
 } from "@/lib/api/types";
 
@@ -24,6 +29,7 @@ export type WebhookTargetEvent = {
 
 export type WebhookTargetsState = {
   eventType: AppEventType;
+  targetEvent: WebhookTargetEvent;
   /** False on a SendMock that cannot answer the match; nothing is shown. */
   isShown: boolean;
   isChecking: boolean;
@@ -33,8 +39,23 @@ export type WebhookTargetsState = {
   /** Null while the rules decide; else the endpoints chosen for this action. */
   chosenEndpointIds: string[] | null;
   chooseEndpoints: (endpointIds: string[] | null) => void;
+  /** Payloads edited for this action, by endpoint (WH-14.3). */
+  requestEdits: WebhookRequestEdit[];
+  /** Keeps an edit for its endpoint, or removes it with null. */
+  saveRequestEdit: (
+    endpointId: string,
+    requestEdit: WebhookRequestEdit | null,
+  ) => void;
+  /** Sets the chosen endpoints and their edits at once, as the picker confirms. */
+  applyChoice: (pickerChoice: WebhookPickerChoice) => void;
   /** Spread into the action's request body. */
   webhookChoice: WebhookChoice;
+};
+
+/** What the picker confirms: the endpoints, and the payloads edited for them. */
+export type WebhookPickerChoice = {
+  endpointIds: string[];
+  requestEdits: WebhookRequestEdit[];
 };
 
 /** Which webhooks a simulation will trigger, and the choice for this one action (WH-13.2, WH-13.4). */
@@ -54,6 +75,9 @@ export function useWebhookTargets(
   const [chosenEndpointIds, setChosenEndpointIds] = React.useState<
     string[] | null
   >(null);
+  const [requestEdits, setRequestEdits] = React.useState<WebhookRequestEdit[]>(
+    [],
+  );
   const targets = listWebhookTargets({
     matchResult: matchQuery.data,
     chosenEndpointIds,
@@ -62,6 +86,7 @@ export function useWebhookTargets(
 
   return {
     eventType: targetEvent.eventType,
+    targetEvent,
     isShown: isMatchServed,
     isChecking: isMatchServed && matchQuery.isPending,
     targets,
@@ -74,9 +99,22 @@ export function useWebhookTargets(
     ],
     chosenEndpointIds,
     chooseEndpoints: setChosenEndpointIds,
-    webhookChoice:
-      chosenEndpointIds === null
-        ? {}
-        : { webhook_endpoint_ids: chosenEndpointIds },
+    requestEdits,
+    saveRequestEdit: (endpointId, requestEdit) => {
+      setRequestEdits((previousEdits) =>
+        replaceRequestEdit(previousEdits, endpointId, requestEdit),
+      );
+    },
+    applyChoice: (pickerChoice) => {
+      setChosenEndpointIds(pickerChoice.endpointIds);
+      setRequestEdits(pickerChoice.requestEdits);
+    },
+    webhookChoice: toWebhookChoice({
+      chosenEndpointIds,
+      targetEndpointIds: targets.map(
+        (webhookTarget) => webhookTarget.endpointId,
+      ),
+      requestEdits,
+    }),
   };
 }

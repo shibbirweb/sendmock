@@ -5,6 +5,11 @@ import {
   useWebhookTargets,
   type WebhookTargetEvent,
 } from "@/features/webhooks/targets/use-webhook-targets";
+import {
+  type WebhookPayloadRequest,
+  WebhookPayloadDialog,
+} from "@/features/webhooks/targets/webhook-payload-dialog";
+import { toWebhookChoice } from "@/features/webhooks/targets/webhook-request-edits";
 import { WebhookTargetLinks } from "@/features/webhooks/targets/webhook-target-links";
 import {
   type WebhookTargetsPickerRequest,
@@ -14,7 +19,8 @@ import type { WebhookChoice } from "@/lib/api/types";
 
 /**
  * Under a one-click action such as Send sample: the webhooks its event will
- * trigger, and Choose to run it once with others (WH-13.2, WH-13.4).
+ * trigger, Payload to run it once with an edited payload, and Choose to run
+ * it once with others (WH-13.2, WH-13.4, WH-14.2).
  */
 export function WebhookTargetsInline({
   targetEvent,
@@ -28,6 +34,8 @@ export function WebhookTargetsInline({
   const webhookTargets = useWebhookTargets(targetEvent);
   const [pickerRequest, setPickerRequest] =
     React.useState<WebhookTargetsPickerRequest | null>(null);
+  const [payloadRequest, setPayloadRequest] =
+    React.useState<WebhookPayloadRequest | null>(null);
   if (!webhookTargets.isShown) {
     return null;
   }
@@ -42,7 +50,28 @@ export function WebhookTargetsInline({
       {webhookTargets.isChecking ? (
         <span>Checking...</span>
       ) : (
-        <WebhookTargetLinks targets={webhookTargets.targets} />
+        <WebhookTargetLinks
+          targets={webhookTargets.targets}
+          payloadControls={{
+            editedEndpointIds: [],
+            openPayload: (webhookTarget) => {
+              setPayloadRequest({
+                targetEvent,
+                endpointId: webhookTarget.endpointId,
+                endpointName: webhookTarget.endpointName,
+                editedBody: null,
+                confirmLabel: actionLabel,
+                onConfirm: (requestEdit) => {
+                  onRun(
+                    requestEdit === null
+                      ? {}
+                      : { webhook_requests: [requestEdit] },
+                  );
+                },
+              });
+            },
+          }}
+        />
       )}
       <Button
         size="xs"
@@ -51,11 +80,18 @@ export function WebhookTargetsInline({
         onClick={() => {
           setPickerRequest({
             actionLabel,
-            eventType: targetEvent.eventType,
+            targetEvent,
             initialEndpointIds: webhookTargets.matchedEndpointIds,
+            initialRequestEdits: [],
             confirmLabel: actionLabel,
-            onConfirm: (endpointIds) => {
-              onRun({ webhook_endpoint_ids: endpointIds });
+            onConfirm: (pickerChoice) => {
+              onRun(
+                toWebhookChoice({
+                  chosenEndpointIds: pickerChoice.endpointIds,
+                  targetEndpointIds: pickerChoice.endpointIds,
+                  requestEdits: pickerChoice.requestEdits,
+                }),
+              );
             },
           });
         }}
@@ -66,6 +102,12 @@ export function WebhookTargetsInline({
         pickerRequest={pickerRequest}
         onClose={() => {
           setPickerRequest(null);
+        }}
+      />
+      <WebhookPayloadDialog
+        payloadRequest={payloadRequest}
+        onClose={() => {
+          setPayloadRequest(null);
         }}
       />
     </div>

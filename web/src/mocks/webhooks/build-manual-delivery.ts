@@ -60,6 +60,7 @@ export function buildManualDelivery(
     attempt: 1,
     next_attempt_at: null,
     created_at: new Date(timestampSeconds * 1000).toISOString(),
+    is_edited: false,
   };
   if (blockingErrors.length > 0) {
     return {

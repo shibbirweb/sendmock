@@ -116,5 +116,6 @@ fn build_route_delivery(
         next_attempt_at_unix_ms: Some(now_unix_ms),
         created_at_unix_ms: now_unix_ms,
         is_signed: false,
+        is_edited: false,
     })
 }
