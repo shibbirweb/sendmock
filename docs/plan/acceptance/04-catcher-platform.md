@@ -114,6 +114,7 @@ Phase 1.
 
 - [x] PL-08.1 Count and age limits prune traffic (emails, SMS, verifications, HTTP requests, logs, deliveries) and never configuration. (#48)
 - [x] PL-08.2 Pruning does not block ingest; the DB size stays stable under continuous load. (#48)
+  - Proof changed 2026-11-14 (owner decision, #250): on Windows CI runners the load test only reports the slowest SMTP message instead of failing on it. A single write ran 12 s there with no lock held (`synchronous = NORMAL`, so the write does not wait for the disk) while a checkpoint copied the log, as long as the held-lock stalls the time limit is meant to catch, so message time cannot tell them apart on that disk. Linux and macOS run the same write path and keep the 2 s limit; the prune and size checks still fail on every system, and Windows gets 60 s to prune.
 - [x] PL-08.3 `--max-sms` (`SENDMOCK_MAX_SMS`, `max_sms` in `sendmock.toml`) sets the SMS limit as `--max-emails` sets the email limit, with flags over the environment over the file, and a value given at startup overwrites the stored setting. (#187)
   - Added 2026-11-08 (owner request): the plan listed `--max-sms` from the start, but only Settings and the API could set the SMS limit.
 - [x] PL-08.4 A count limit of 0 keeps that traffic with no count limit (the age limit still applies), through the flags, the file, Settings, the API, the CLI and MCP; while a limit is 0 and no age limit is set, SendMock logs a warning at startup and Settings shows a warning beside the field. (#187)
