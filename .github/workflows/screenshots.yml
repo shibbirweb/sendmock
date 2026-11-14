@@ -63,7 +63,7 @@ jobs:
 
       # A pull request run takes the branch as it is, not its merge with the base branch, so
       # the images can be committed to the branch.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
@@ -125,7 +125,7 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: screenshots
           path: |

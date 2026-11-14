@@ -62,7 +62,7 @@ jobs:
     outputs:
       should_deploy: ${{ steps.decision.outputs.should_publish }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -89,7 +89,7 @@ jobs:
     env:
       HAS_SIGNING_KEY: ${{ secrets.PACKAGES_GPG_PRIVATE_KEY != '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: github.event_name != 'pull_request' && env.HAS_SIGNING_KEY == 'true'
 
       - name: Download the newest stable and beta packages and build the repository
@@ -117,7 +117,7 @@ jobs:
             echo "has_repository=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: steps.build.outputs.has_repository == 'true'
         with:
           name: package-repository
@@ -143,7 +143,7 @@ jobs:
             apt-get install --yes --no-install-recommends git
           fi
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name != 'pull_request' && 'develop' || '' }}
           fetch-depth: 0
@@ -205,14 +205,14 @@ jobs:
 
       - name: Our APT and YUM repository at /packages/
         if: github.event_name != 'pull_request' && needs.package-repository.outputs.has_repository == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: package-repository
           path: website/out/packages
 
       - name: Upload
         if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: website/out
 
@@ -229,4 +229,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

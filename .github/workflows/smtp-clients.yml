@@ -34,7 +34,7 @@ jobs:
     name: Release binary
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -54,7 +54,7 @@ jobs:
       - name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: sendmock-for-clients
           path: target/release/sendmock
@@ -130,9 +130,9 @@ jobs:
       # POP3 is off by default; the poplib client reads the mail through it (EM-21.6).
       SENDMOCK_POP3_ADDR: 127.0.0.1:1110
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: sendmock-for-clients
           path: sendmock-binary
@@ -156,17 +156,17 @@ jobs:
           php-version: "8.3"
           tools: composer
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         if: matrix.language == 'node'
         with:
           node-version: "22"
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         if: matrix.language == 'python'
         with:
           python-version: "3.13"
 
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         if: matrix.language == 'go'
         with:
           go-version: "1.23"
@@ -182,7 +182,7 @@ jobs:
         with:
           ruby-version: "3.3"
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         if: matrix.language == 'dotnet'
         with:
           dotnet-version: "8.0.x"

@@ -37,7 +37,7 @@ jobs:
     name: Lint, render and install on kind
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: azure/setup-helm@v5
 
