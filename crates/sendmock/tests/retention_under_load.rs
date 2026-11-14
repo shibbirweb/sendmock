@@ -15,7 +15,14 @@ use support::sendmock_process::{SendmockProcess, sendmock_command};
 const MAX_EMAILS: u64 = 100;
 /// Longer than the retention task's 10 second interval, so a prune runs while mail arrives.
 const SENDING_ROUND: Duration = Duration::from_secs(11);
-const PRUNE_WAIT: Duration = Duration::from_secs(30);
+/// How long the mail may stay over the limit once a round ends. A prune pass still giving pages
+/// back and copying the log when the round ends delays the next pass; on Windows CI runners that
+/// copy alone took 3 to 13 s under load, and the pass after the second round once missed 30 s.
+const PRUNE_WAIT: Duration = if cfg!(windows) {
+    Duration::from_secs(60)
+} else {
+    Duration::from_secs(30)
+};
 /// The `journal_size_limit` file databases are opened with.
 const WAL_SIZE_LIMIT_BYTES: u64 = 4 * 1024 * 1024;
 /// Longer than the background checkpoint's 1 second interval: while a vacuum is still under
@@ -120,15 +127,21 @@ fn read_email_count(http_addr: &str) -> io::Result<u64> {
     Ok(email_page["total_count"].as_u64().unwrap_or_default())
 }
 
-fn wait_until_pruned(http_addr: &str) -> io::Result<()> {
+fn wait_until_pruned(sendmock: &SendmockProcess, http_addr: &str) -> io::Result<()> {
     let deadline = Instant::now() + PRUNE_WAIT;
-    while read_email_count(http_addr)? > MAX_EMAILS {
+    loop {
+        let email_count = read_email_count(http_addr)?;
+        if email_count <= MAX_EMAILS {
+            return Ok(());
+        }
         if Instant::now() > deadline {
-            return Err(io::Error::other("the retention task never pruned the mail"));
+            return Err(io::Error::other(format!(
+                "the retention task never pruned the mail: {email_count} emails after {PRUNE_WAIT:?}; server warnings:\n{}",
+                read_warning_lines(sendmock)
+            )));
         }
         std::thread::sleep(Duration::from_millis(250));
     }
-    Ok(())
 }
 
 /// The database and its write-ahead log together, the space SendMock takes on disk.
@@ -201,10 +214,10 @@ fn pruning_keeps_the_database_size_stable_and_never_holds_up_smtp() -> io::Resul
     );
 
     let slowest_in_first_round = send_mail_for_a_round(&ready_addresses.smtp_addr, &message_body)?;
-    wait_until_pruned(&ready_addresses.http_addr)?;
+    wait_until_pruned(&sendmock, &ready_addresses.http_addr)?;
     let size_after_first_round = wait_for_settled_size(&database_path);
     let slowest_in_second_round = send_mail_for_a_round(&ready_addresses.smtp_addr, &message_body)?;
-    wait_until_pruned(&ready_addresses.http_addr)?;
+    wait_until_pruned(&sendmock, &ready_addresses.http_addr)?;
     // The write-ahead log may sit anywhere up to its 4 MiB limit, depending on whether the last
     // checkpoint could run; growth beyond that and a quarter means pruning is not keeping up.
     let size_limit_bytes =
