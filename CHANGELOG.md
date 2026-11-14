@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-14
+
 ### Added
 
 - SendMock catches the email, SMS, push notifications, payments and webhooks your app sends while you develop and test, and shows them in a web UI at http://127.0.0.1:8025. Your app talks to it over SMTP and the providers' own HTTP APIs, so nothing reaches a real inbox, phone or payment provider. `sendmock --demo` starts it with sample data to look around.
