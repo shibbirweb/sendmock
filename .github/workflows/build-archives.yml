@@ -22,7 +22,7 @@ jobs:
     name: Web UI build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha }}
 
@@ -36,7 +36,7 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: release-web-dist
           path: web/dist
@@ -57,11 +57,11 @@ jobs:
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
           - { target: aarch64-pc-windows-msvc, runner: windows-latest, cross: cargo }
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha }}
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: release-web-dist
           path: web/dist
@@ -112,7 +112,7 @@ jobs:
           if [[ "${{ matrix.target }}" == *windows* ]]; then binary="$binary.exe"; fi
           bun scripts/release/package-archive.ts ${{ matrix.target }} "$binary" dist
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: archive-${{ matrix.target }}
           path: dist

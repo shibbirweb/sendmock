@@ -54,7 +54,7 @@ jobs:
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
       STRIPE_DELIVERIES_PATH: ${{ github.workspace }}/stripe-deliveries.json
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -76,7 +76,7 @@ jobs:
 
       - uses: ./.github/actions/start-sendmock-offline
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -93,7 +93,7 @@ jobs:
         working-directory: examples/payments/stripe-php
         run: composer install --no-interaction --no-progress && php verify.php
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 

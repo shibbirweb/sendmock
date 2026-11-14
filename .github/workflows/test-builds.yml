@@ -28,7 +28,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
@@ -61,11 +61,11 @@ jobs:
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip }
           - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip }
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: archive-${{ matrix.target }}
           path: dist
@@ -79,7 +79,7 @@ jobs:
 
       # AC: DS-11.2
       - name: Attach the tested archive to the run
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: sendmock-${{ matrix.target }}
           path: dist
@@ -96,13 +96,13 @@ jobs:
       actions: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: sendmock-*
           path: test-builds
