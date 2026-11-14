@@ -1,0 +1,10 @@
+{
+  "name": "sendmock/example-webhooks-php-standard-webhooks",
+  "description": "Verifies a native SendMock webhook with the official Standard Webhooks PHP library.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "standard-webhooks/standard-webhooks": "1.0.2"
+  }
+}

@@ -1,0 +1,10 @@
+SendMock is starting. To reach it from this machine:
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} service/{{ include "sendmock.fullname" . }} 8025:{{ .Values.service.httpPort }} 1025:{{ .Values.service.smtpPort }}
+
+Then open http://127.0.0.1:8025, and point apps in the cluster at
+{{ include "sendmock.fullname" . }}.{{ .Release.Namespace }}.svc port {{ .Values.service.smtpPort }} for SMTP.
+{{- if .Values.ingress.enabled }}
+
+The web UI is also at http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.host }}/
+{{- end }}

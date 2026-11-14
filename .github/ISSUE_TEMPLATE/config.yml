@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/shibbirweb/sendmock/discussions/new?category=q-a
+    about: How do I...? Questions go to Discussions, where answers help the next person too.
+  - name: Share an idea
+    url: https://github.com/shibbirweb/sendmock/discussions/new?category=ideas
+    about: Ideas and feature wishes start in Discussions, where others can upvote them.
+  - name: Read the docs
+    url: https://shibbirweb.github.io/sendmock/docs/
+    about: Install, connect your app and every feature.
+  - name: Report a security issue
+    url: https://github.com/shibbirweb/sendmock/security/advisories/new
+    about: Report vulnerabilities privately; please do not open a public issue.

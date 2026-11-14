@@ -1,0 +1,13 @@
+# The extension's backend: SendMock itself, with SMTP and the web UI on the host's ports and its
+# data on a volume that outlives the extension's restarts.
+services:
+  sendmock:
+    image: ghcr.io/shibbirweb/sendmock
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - sendmock-data:/data
+
+volumes:
+  sendmock-data:

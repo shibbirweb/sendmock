@@ -1,0 +1,15 @@
+{
+  "name": "sendmock-example-email-providers-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-sesv2": "3.1153.0",
+    "@getbrevo/brevo": "6.2.0",
+    "@sendgrid/client": "8.1.6",
+    "@sendgrid/eventwebhook": "8.0.0",
+    "@sendgrid/mail": "8.1.6",
+    "mailgun.js": "14.1.0",
+    "postmark": "5.1.0",
+    "resend": "6.34.1"
+  }
+}

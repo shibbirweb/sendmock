@@ -1,0 +1,24 @@
+{
+  "title": "Advanced",
+  "pages": [
+    "index",
+    "payment-gateway",
+    "payment-method",
+    "payment-flow",
+    "email-provider",
+    "sms-provider",
+    "templates",
+    "request-editor",
+    "variables",
+    "rules-and-filters",
+    "inbound-routes",
+    "catcher-responses",
+    "email-outcome-addresses",
+    "sms-outcome-numbers",
+    "otp-patterns",
+    "numbers-and-services",
+    "chaos",
+    "seed-file",
+    "scenarios"
+  ]
+}

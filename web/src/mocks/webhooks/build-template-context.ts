@@ -1,0 +1,290 @@
+import type {
+  AppEventType,
+  CapturedHttpRequest,
+  EmailDetail,
+  PaymentStatus,
+  SmsMessage,
+  TemplateRenderRequest,
+  WebhookTemplateSummary,
+} from "@/lib/api/types";
+import type { MockDatabase } from "@/mocks/db/mock-database";
+import {
+  samplePaymentEventData,
+  toPaymentEventData,
+} from "@/mocks/payments/payment-event-data";
+import type { TemplateContext } from "@/mocks/webhooks/render-template-text";
+
+type ContextSubject = {
+  eventType: AppEventType;
+  data: Record<string, unknown>;
+  label: string;
+};
+
+function toEmailData(email: EmailDetail): Record<string, unknown> {
+  return {
+    id: email.id,
+    message_id: email.message_id,
+    from: email.from,
+    to: email.to,
+    cc: email.cc,
+    subject: email.subject,
+    text_body: email.text_body,
+    html_body: email.html_body,
+    tags: email.tags,
+    extracted: email.extracted,
+    headers: email.headers,
+    // The mock keeps no file bytes, so content is empty; the binary inlines files up to 1 MB.
+    attachments: email.attachments.map((attachment) => ({
+      index: attachment.index,
+      filename: attachment.filename,
+      content_type: attachment.content_type,
+      size_bytes: attachment.size_bytes,
+      content_id: attachment.content_id,
+      url: `http://127.0.0.1:8025${attachment.download_url}`,
+      content_base64: "",
+    })),
+  };
+}
+
+function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
+  return {
+    id: smsMessage.id,
+    provider_id: smsMessage.provider_id,
+    channel: smsMessage.channel,
+    from_number: smsMessage.from_number,
+    to_number: smsMessage.to_number,
+    body: smsMessage.body,
+    encoding: smsMessage.encoding,
+    segments: smsMessage.segments,
+    media: smsMessage.media,
+    status: smsMessage.status,
+    error_code: smsMessage.error_code,
+    messaging_service_sid: smsMessage.messaging_service_sid,
+    extracted: smsMessage.extracted,
+  };
+}
+
+function parseJsonBody(bodyText: string): unknown {
+  try {
+    return JSON.parse(bodyText) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function toHttpRequestData(
+  capturedRequest: CapturedHttpRequest,
+): Record<string, unknown> {
+  return {
+    id: capturedRequest.id,
+    bin: capturedRequest.bin_name,
+    method: capturedRequest.method,
+    url: capturedRequest.url,
+    path: capturedRequest.path,
+    query: capturedRequest.query,
+    headers: capturedRequest.headers,
+    body: capturedRequest.body,
+    json: parseJsonBody(capturedRequest.body),
+  };
+}
+
+/** A fixed example for each kind of event, used when no message is picked. */
+export function buildSampleSubject(eventType: AppEventType): ContextSubject {
+  if (eventType.startsWith("sms.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: {
+        provider_id: "SM00000000000000000000000000000001",
+        channel: "sms",
+        from_number: "+15550001111",
+        to_number: "+14155550100",
+        body: "Your Acme code is 482913",
+        encoding: "GSM-7",
+        segments: 1,
+        media: [],
+        status: "delivered",
+        error_code: null,
+        messaging_service_sid: null,
+        extracted: { otp: ["482913"], links: [] },
+      },
+    };
+  }
+  if (eventType.startsWith("http.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: {
+        bin: "slack",
+        method: "POST",
+        url: "http://127.0.0.1:8025/catch/slack",
+        path: "/catch/slack",
+        query: {},
+        headers: { "content-type": "application/json" },
+        body: '{"text":"Deploy finished"}',
+        json: { text: "Deploy finished" },
+      },
+    };
+  }
+  if (eventType.startsWith("payment.") || eventType.startsWith("checkout.")) {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: samplePaymentEventData,
+    };
+  }
+  if (eventType === "webhook.failed") {
+    return {
+      eventType,
+      label: "Built-in sample",
+      data: {
+        endpoint_name: "Laravel inbound mail",
+        error_message: "HTTP 500",
+      },
+    };
+  }
+
+  return {
+    eventType,
+    label: "Built-in sample",
+    data: {
+      message_id: "<sample@sendmock.local>",
+      from: { name: "Acme App", address: "no-reply@acme.test" },
+      to: [{ name: "", address: "you@example.com" }],
+      cc: [],
+      subject: "Your verification code",
+      text_body: "Your verification code is 739104.",
+      html_body: null,
+      tags: [],
+      extracted: { otp: ["739104"], links: [] },
+    },
+  };
+}
+
+/** The event a payment's latest state stands for, for a preview against it. */
+function readPaymentEventType(paymentStatus: PaymentStatus): AppEventType {
+  const eventTypes: Partial<Record<PaymentStatus, AppEventType>> = {
+    authorized: "payment.authorized",
+    succeeded: "payment.succeeded",
+    failed: "payment.failed",
+    canceled: "payment.canceled",
+    refunded: "payment.refunded",
+    partially_refunded: "payment.partially_refunded",
+    disputed: "payment.dispute_opened",
+  };
+
+  return eventTypes[paymentStatus] ?? "payment.created";
+}
+
+function findContextSubject(
+  mockDatabase: MockDatabase,
+  webhookTemplate: WebhookTemplateSummary,
+  renderRequest: TemplateRenderRequest,
+): ContextSubject | null {
+  if (renderRequest.email_id !== undefined) {
+    const email = mockDatabase.emails.find(
+      (existingEmail) => existingEmail.id === renderRequest.email_id,
+    );
+    return email === undefined
+      ? null
+      : {
+          eventType: "email.received",
+          data: toEmailData(email),
+          label: email.subject || "(no subject)",
+        };
+  }
+  if (renderRequest.sms_id !== undefined) {
+    const smsMessage = mockDatabase.smsMessages.find(
+      (existingMessage) => existingMessage.id === renderRequest.sms_id,
+    );
+    return smsMessage === undefined
+      ? null
+      : {
+          eventType:
+            smsMessage.direction === "inbound" ? "sms.inbound" : "sms.status",
+          data: toSmsData(smsMessage),
+          label: smsMessage.body,
+        };
+  }
+
+  if (renderRequest.http_request_id !== undefined) {
+    const capturedRequest = mockDatabase.capturedHttpRequests.find(
+      (existingRequest) => existingRequest.id === renderRequest.http_request_id,
+    );
+    return capturedRequest === undefined
+      ? null
+      : {
+          eventType: "http.captured",
+          data: toHttpRequestData(capturedRequest),
+          label: `${capturedRequest.method} ${capturedRequest.path}`,
+        };
+  }
+
+  if (renderRequest.payment_id !== undefined) {
+    const paymentDetail = mockDatabase.payments.find(
+      (existingPayment) => existingPayment.id === renderRequest.payment_id,
+    );
+    return paymentDetail === undefined
+      ? null
+      : {
+          eventType: readPaymentEventType(paymentDetail.status),
+          data: toPaymentEventData(paymentDetail),
+          label: `${paymentDetail.provider_name} ${paymentDetail.provider_reference}`,
+        };
+  }
+
+  return buildSampleSubject(webhookTemplate.events[0] ?? "email.received");
+}
+
+/** What a template sees: event, data, global variables and the endpoint (WH-08.4). */
+export function buildTemplateContext(
+  mockDatabase: MockDatabase,
+  webhookTemplate: WebhookTemplateSummary,
+  renderRequest: TemplateRenderRequest,
+): {
+  templateContext: TemplateContext;
+  renderedAgainst: string;
+  eventType: AppEventType;
+} | null {
+  const contextSubject = findContextSubject(
+    mockDatabase,
+    webhookTemplate,
+    renderRequest,
+  );
+  if (contextSubject === null) {
+    return null;
+  }
+
+  const globalVariables = Object.fromEntries(
+    mockDatabase.webhookVariables
+      .filter((webhookVariable) => webhookVariable.scope === "global")
+      .map((webhookVariable) => [webhookVariable.name, webhookVariable.value]),
+  );
+
+  return {
+    renderedAgainst: contextSubject.label,
+    eventType: contextSubject.eventType,
+    templateContext: {
+      event: {
+        id: "evt_preview",
+        type: contextSubject.eventType,
+        created_at: new Date().toISOString(),
+      },
+      data: contextSubject.data,
+      vars: globalVariables,
+      endpoint: {
+        name: "Preview",
+        url: "http://localhost:8000/webhooks/preview",
+      },
+      delivery: {
+        id: "01PREVIEWDELIVERY000000000",
+        attempt: 1,
+        trigger: "manual",
+      },
+      rule: { id: null, name: null },
+      sendmock: { version: "0.0.0-dev", http_url: "http://127.0.0.1:8025" },
+      request_id: "01PREVIEWREQUEST0000000000",
+      body_fields: {},
+    },
+  };
+}

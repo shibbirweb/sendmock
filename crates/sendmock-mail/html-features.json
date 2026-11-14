@@ -1,0 +1,22 @@
+{
+  "source": "https://www.caniemail.com",
+  "verified_on": "2026-11-05",
+  "clients": ["Apple Mail", "Gmail", "Outlook (Windows)", "Outlook.com", "Yahoo Mail", "Samsung Email"],
+  "features": [
+    { "feature": "CSS display: flex", "pattern": "display\\s*:\\s*(inline-)?flex", "support": [100, 100, 0, 100, 100, 100] },
+    { "feature": "CSS display: grid", "pattern": "display\\s*:\\s*(inline-)?grid", "support": [100, 0, 0, 0, 0, 100] },
+    { "feature": "CSS position", "pattern": "position\\s*:\\s*(absolute|fixed|relative|sticky)", "support": [100, 0, 0, 0, 0, 100] },
+    { "feature": "CSS background-image", "pattern": "background(-image)?\\s*:[^;\"]*url\\(", "support": [100, 100, 0, 50, 100, 100] },
+    { "feature": "CSS border-radius", "pattern": "border-radius\\s*:", "support": [100, 100, 0, 100, 100, 100] },
+    { "feature": "CSS max-width", "pattern": "max-width\\s*:", "support": [100, 100, 0, 100, 100, 100] },
+    { "feature": "CSS box-shadow", "pattern": "box-shadow\\s*:", "support": [100, 0, 0, 100, 100, 100] },
+    { "feature": "CSS variables", "pattern": "var\\(--", "support": [100, 0, 0, 100, 0, 100] },
+    { "feature": "CSS rgba() colors", "pattern": "rgba\\(", "support": [100, 100, 0, 100, 100, 100] },
+    { "feature": "@media queries", "pattern": "@media", "support": [100, 50, 0, 100, 100, 100] },
+    { "feature": "@font-face web fonts", "pattern": "@font-face", "support": [100, 0, 0, 0, 0, 100] },
+    { "feature": "<svg> images", "pattern": "<svg[\\s>]", "support": [100, 0, 0, 0, 0, 100] },
+    { "feature": "<video> elements", "pattern": "<video[\\s>]", "support": [100, 0, 0, 0, 0, 100] },
+    { "feature": "<form> elements", "pattern": "<form[\\s>]", "support": [100, 0, 0, 50, 50, 100] },
+    { "feature": "srcset on images", "pattern": "srcset\\s*=", "support": [100, 0, 0, 0, 0, 100] }
+  ]
+}

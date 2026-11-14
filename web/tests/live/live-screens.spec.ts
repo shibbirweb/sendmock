@@ -1,0 +1,122 @@
+import { expect, test } from "@playwright/test";
+
+import { settingsSectionIds } from "../../src/features/settings/settings-sections";
+import { watchFailedApiCalls } from "./live-api-watch";
+
+for (const sectionId of settingsSectionIds) {
+  test(`UI-12.2 Settings > ${sectionId} works on the live binary without failing calls`, async ({
+    page,
+  }) => {
+    const failedApiCalls = watchFailedApiCalls(page);
+
+    await page.goto(`/settings?section=${sectionId}`);
+    await page.waitForLoadState("networkidle");
+
+    await expect(
+      page.getByRole("heading", { name: "Settings", level: 2 }),
+    ).toBeVisible();
+    expect(failedApiCalls).toEqual([]);
+  });
+}
+
+test("UI-12.2 an email opens with every tab and no failing calls", async ({
+  page,
+  request,
+}) => {
+  const sendResponse = await request.post("/api/v1/send", {
+    data: {
+      from: "App <app@shop.test>",
+      to: ["sam@example.test"],
+      subject: "Live check",
+      text: "Your code is 482913. https://shop.test/verify",
+      html: "<p>Your code is <b>482913</b>. <a href='https://shop.test/verify'>Verify</a></p>",
+    },
+  });
+  expect(sendResponse.status()).toBe(201);
+  const { id: emailId } = (await sendResponse.json()) as { id: string };
+  const failedApiCalls = watchFailedApiCalls(page);
+
+  await page.goto(`/mail/${emailId}`);
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { name: "Live check" })).toBeVisible();
+  for (const detailTab of await page.getByRole("tab").all()) {
+    if (await detailTab.isEnabled()) {
+      await detailTab.click();
+      await page.waitForLoadState("networkidle");
+    }
+  }
+
+  expect(failedApiCalls).toEqual([]);
+});
+
+test("UI-12.2 served buttons are enabled, and the AI agents card shows the binary's setups", async ({
+  page,
+  request,
+}) => {
+  const sendResponse = await request.post("/api/v1/send", {
+    data: {
+      from: "app@shop.test",
+      to: ["sam@example.test"],
+      subject: "Buttons",
+      text: "Hello",
+    },
+  });
+  const { id: emailId } = (await sendResponse.json()) as { id: string };
+
+  await page.goto(`/mail/${emailId}`);
+
+  for (const actionName of ["Reply", "Forward", "Simulate an event"]) {
+    await expect(
+      page.getByRole("button", { name: actionName, exact: true }),
+    ).toBeEnabled();
+  }
+  await expect(
+    page.getByRole("tab", { name: "Checks", exact: true }),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Mark as unread" }),
+  ).toBeEnabled();
+  await page.goto("/settings?section=connection");
+  await expect(
+    page.getByText("sendmock ai install --target claude-code"),
+  ).toBeVisible();
+});
+
+test("EM-12.4 a live email's tags are added and removed in the detail", async ({
+  page,
+  request,
+}) => {
+  const sendResponse = await request.post("/api/v1/send", {
+    data: {
+      from: "app@shop.test",
+      to: ["sam@example.test"],
+      subject: "Tag me",
+      text: "Hello",
+    },
+  });
+  const { id: emailId } = (await sendResponse.json()) as { id: string };
+  const failedApiCalls = watchFailedApiCalls(page);
+  await page.goto(`/mail/${emailId}`);
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByLabel("Tags", { exact: true }).fill("Live-QA");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect
+    .poll(async () => {
+      const emailResponse = await request.get(`/api/v1/emails/${emailId}`);
+      return ((await emailResponse.json()) as { tags: string[] }).tags;
+    })
+    .toEqual(["live-qa"]);
+
+  await page.getByRole("button", { name: "Edit tags" }).click();
+  await page.getByRole("button", { name: "Remove live-qa" }).click();
+  await page.getByRole("button", { name: "Save tags" }).click();
+  await expect
+    .poll(async () => {
+      const emailResponse = await request.get(`/api/v1/emails/${emailId}`);
+      return ((await emailResponse.json()) as { tags: string[] }).tags;
+    })
+    .toEqual([]);
+  expect(failedApiCalls).toEqual([]);
+});

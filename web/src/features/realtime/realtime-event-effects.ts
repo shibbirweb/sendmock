@@ -1,0 +1,152 @@
+import type { QueryKey } from "@tanstack/react-query";
+
+import { queryKeys } from "@/lib/api/query-keys";
+import type {
+  AppNotification,
+  NotificationLink,
+} from "@/features/notifications/notification-store";
+import type { AppEvent, AppEventType } from "@/lib/api/types";
+
+/** Which cached queries an event makes stale, by the event's area prefix. */
+const queryKeysByEventArea: Record<string, QueryKey[]> = {
+  email: [queryKeys.emails.all, queryKeys.system.stats],
+  sms: [queryKeys.sms.all, queryKeys.system.stats],
+  verify: [queryKeys.verify.all, queryKeys.sms.all, queryKeys.system.stats],
+  push: [queryKeys.push.all],
+  http: [queryKeys.httpCatcher.all, queryKeys.system.stats],
+  webhook: [queryKeys.webhooks.all, queryKeys.system.stats],
+  payment: [queryKeys.payments.all, queryKeys.system.stats],
+  checkout: [queryKeys.payments.all, queryKeys.system.stats],
+};
+
+export function listQueryKeysToRefresh(eventType: AppEventType): QueryKey[] {
+  // Retention may have deleted rows of any kind that the lists hold or placed in their cache.
+  if (eventType === "traffic.pruned") {
+    return listEveryRealtimeQueryKey();
+  }
+  const eventArea = eventType.split(".")[0] ?? "";
+
+  return queryKeysByEventArea[eventArea] ?? [];
+}
+
+/** The keys in their first order, each once (keys are compared by their JSON text). */
+export function removeDuplicateQueryKeys(queryKeys: QueryKey[]): QueryKey[] {
+  const queryKeysByText = new Map<string, QueryKey>();
+  for (const queryKey of queryKeys) {
+    queryKeysByText.set(JSON.stringify(queryKey), queryKey);
+  }
+
+  return [...queryKeysByText.values()];
+}
+
+/** Every query a realtime event can make stale, each key once. */
+export function listEveryRealtimeQueryKey(): QueryKey[] {
+  return removeDuplicateQueryKeys(Object.values(queryKeysByEventArea).flat());
+}
+
+export type EventNotification = Omit<
+  AppNotification,
+  "id" | "createdAt" | "isRead"
+>;
+
+function readText(eventData: Record<string, unknown>, fieldName: string) {
+  const fieldValue = eventData[fieldName];
+
+  return typeof fieldValue === "string" ? fieldValue : "";
+}
+
+function linkToEmail(
+  eventData: Record<string, unknown>,
+): NotificationLink | null {
+  const emailId = readText(eventData, "id");
+
+  return emailId === "" ? null : { kind: "email", emailId };
+}
+
+function linkToThread(
+  eventData: Record<string, unknown>,
+): NotificationLink | null {
+  const threadId = readText(eventData, "thread_id");
+
+  return threadId === "" ? null : { kind: "sms", threadId };
+}
+
+type EventDescriber = (eventData: Record<string, unknown>) => EventNotification;
+
+/** One description per event worth a notification (UI-08); others stay quiet. */
+const notificationDescribers: Partial<Record<AppEventType, EventDescriber>> = {
+  "email.received": (eventData) => ({
+    area: "email",
+    title: "New email",
+    description: readText(eventData, "subject"),
+    link: linkToEmail(eventData),
+  }),
+  "email.inbound": (eventData) => ({
+    area: "email",
+    title: "Incoming email",
+    description: readText(eventData, "subject"),
+    link: linkToEmail(eventData),
+  }),
+  "sms.sent": (eventData) => ({
+    area: "sms",
+    title: `New SMS to ${readText(eventData, "to_number")}`,
+    description: readText(eventData, "body"),
+    link: linkToThread(eventData),
+  }),
+  "sms.inbound": (eventData) => ({
+    area: "sms",
+    title: `Inbound SMS from ${readText(eventData, "from_number") || "a contact"}`,
+    description: readText(eventData, "body"),
+    link: linkToThread(eventData),
+  }),
+  "webhook.failed": (eventData) => {
+    const deliveryId = readText(eventData, "id");
+    return {
+      area: "webhook",
+      title: "Webhook delivery failed",
+      description: [
+        readText(eventData, "endpoint_name"),
+        readText(eventData, "event_type"),
+      ]
+        .filter((descriptionPart) => descriptionPart !== "")
+        .join(", "),
+      link: deliveryId === "" ? null : { kind: "delivery", deliveryId },
+    };
+  },
+};
+
+/** A notification for events worth telling the user about, else null. */
+export function describeEventForNotification(
+  appEvent: AppEvent,
+): EventNotification | null {
+  // Own keys only: a type such as "constructor" must not reach Object's built-in methods.
+  if (!Object.hasOwn(notificationDescribers, appEvent.type)) {
+    return null;
+  }
+  return notificationDescribers[appEvent.type]?.(appEvent.data) ?? null;
+}
+
+/**
+ * Whether a live toast for this event fits the project picked in the top bar: events about
+ * another project's traffic stay in the bell without a toast (PL-10.7). Events about nothing
+ * in a project, such as a webhook delivery, always fit.
+ */
+export function isEventForSelectedProject(
+  appEvent: AppEvent,
+  selectedProjectKey: string | null,
+): boolean {
+  const eventData: unknown = appEvent.data;
+  const eventProject =
+    typeof eventData === "object" &&
+    eventData !== null &&
+    "project" in eventData &&
+    typeof eventData.project === "string"
+      ? eventData.project
+      : null;
+
+  return (
+    selectedProjectKey === null ||
+    eventProject === null ||
+    eventProject === selectedProjectKey
+  );
+}

@@ -1,0 +1,62 @@
+{
+  "order": 7,
+  "path": "/push",
+  "states": {
+    "normal": [
+      "heading: Push",
+      "link: Read the Push guide",
+      "paragraph: Every push notification your app sends through FCM, Expo or OneSignal, as the phone would show it.",
+      "button: All",
+      "button: FCM",
+      "button: Expo",
+      "button: OneSignal",
+      "button: Sent",
+      "button: Failed",
+      "textbox: Filter by device token",
+      "button: Clear all",
+      "columnheader: Notification",
+      "columnheader: Device token",
+      "columnheader: Provider",
+      "columnheader: Status",
+      "columnheader: Time",
+      "each item, link: …"
+    ],
+    "A notification is open": [
+      "heading: Push notification",
+      "paragraph: As the phone shows it, with its data, the request and the answer.",
+      "radio: iOS",
+      "radio: Android",
+      "paragraph: Flash sale",
+      "paragraph: #% off everything until midnight.",
+      "heading: Data",
+      "heading: Request",
+      "button: Copy request",
+      "heading: Answer (#)",
+      "button: Copy answer (#)",
+      "button: Delete",
+      "button: Close"
+    ],
+    "Clear all dialog": [
+      "heading: Clear every push notification?",
+      "paragraph: Every notification this list shows is deleted; tests waiting for one see only new ones.",
+      "button: Keep them",
+      "button: Clear all"
+    ],
+    "empty": [
+      "paragraph: No push notifications yet",
+      "paragraph: Point your app's FCM, Expo or OneSignal SDK at SendMock and send one. It shows up here as the phone would show it.",
+      "radio: This machine",
+      "radio: Docker host",
+      "radio: Compose",
+      "button: Copy FCM base URL",
+      "button: Copy EXPO_BASE_URL",
+      "button: Copy OneSignal base URL",
+      "link: More snippets"
+    ],
+    "failing": [
+      "alert: Could not load push notifications. Try again",
+      "paragraph: Could not load push notifications.",
+      "button: Try again"
+    ]
+  }
+}

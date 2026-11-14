@@ -1,0 +1,48 @@
+title: "[Docker/CI] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions about running SendMock in Docker, Docker Compose, CI pipelines or Kubernetes.
+
+        - Start with [Docker](https://shibbirweb.github.io/sendmock/docs/connect/docker/), [Kubernetes](https://shibbirweb.github.io/sendmock/docs/connect/kubernetes/) and the [FAQ](https://github.com/shibbirweb/sendmock/discussions/191).
+        - Never post secrets: tokens, passwords or private registry credentials.
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where SendMock runs
+      options:
+        - docker run
+        - Docker Compose
+        - GitHub Actions service container
+        - GitLab CI, CircleCI or another CI
+        - Kubernetes (Helm)
+        - Testcontainers
+        - Docker Desktop extension
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What you are trying to do, and what happens
+      description: The goal, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Your configuration
+      description: The relevant part of your compose file, workflow, Helm values or command. Remove secrets first.
+      render: yaml
+  - type: input
+    id: version
+    attributes:
+      label: SendMock version or image tag
+      placeholder: ghcr.io/shibbirweb/sendmock:0.1.0-beta.1
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: SendMock's log and your CI or container output, the relevant part only.
+      render: shell

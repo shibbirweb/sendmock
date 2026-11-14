@@ -1,0 +1,13 @@
+# What each example installs or builds when it runs.
+vendor/
+composer.lock
+node_modules/
+bun.lock
+laravel-app/
+target/
+Cargo.lock
+bin/
+obj/
+__pycache__/
+.pytest_cache/
+Gemfile.lock

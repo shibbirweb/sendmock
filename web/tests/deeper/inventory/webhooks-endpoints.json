@@ -1,0 +1,133 @@
+{
+  "order": 10,
+  "path": "/webhooks/endpoints",
+  "states": {
+    "normal": [
+      "heading: Endpoints",
+      "link: Read the Endpoints guide",
+      "heading: Webhook endpoints",
+      "paragraph: Where SendMock sends webhooks: URL, template, secret and retry policy.",
+      "button: Add endpoint",
+      "columnheader: Name",
+      "columnheader: URL",
+      "columnheader: Template",
+      "columnheader: # h",
+      "columnheader: Success, # h",
+      "columnheader: On",
+      "columnheader: Actions",
+      "each item, switch: … enabled",
+      "each item, button: Send test to …",
+      "each item, button: Edit …",
+      "each item, button: Delete …"
+    ],
+    "New endpoint editor": [
+      "heading: Add an endpoint",
+      "paragraph: Where SendMock sends webhooks, in which format, and how it retries.",
+      "tab: General",
+      "tab: Request",
+      "tab: Security",
+      "tab: Retries",
+      "tab: Variables",
+      "paragraph: The signing secret and variables can be set once the endpoint is added.",
+      "textbox: Name",
+      "combobox: Method",
+      "textbox: URL",
+      "textbox: Timeout (seconds)",
+      "paragraph: # to # seconds. A slower answer counts as a timeout and is retried.",
+      "paragraph: A disabled endpoint keeps its rules but receives nothing.",
+      "switch: Enabled",
+      "button: Cancel",
+      "button: Add endpoint",
+      "button: Close"
+    ],
+    "Endpoint editor, General tab": [
+      "heading: Laravel inbound mail",
+      "paragraph: Where SendMock sends webhooks, in which format, and how it retries.",
+      "tab: General",
+      "tab: Request",
+      "tab: Security",
+      "tab: Retries",
+      "tab: Variables",
+      "textbox: Name",
+      "combobox: Method",
+      "textbox: URL",
+      "textbox: Timeout (seconds)",
+      "paragraph: # to # seconds. A slower answer counts as a timeout and is retried.",
+      "paragraph: A disabled endpoint keeps its rules but receives nothing.",
+      "switch: Enabled",
+      "button: Send test",
+      "button: Close",
+      "button: Save changes"
+    ],
+    "Endpoint editor, Request tab": [
+      "paragraph: None. Added to the URL, URL-encoded.",
+      "button: Add query param",
+      "paragraph: None besides Content-Type and the signature headers.",
+      "button: Add header",
+      "radio: Template",
+      "radio: Fields",
+      "radio: Raw",
+      "radio: None",
+      "combobox: Template",
+      "paragraph: Postmark: inbound payload, matching the provider's documented format.",
+      "paragraph: Based on Postmark: inbound rev #. Built-in templates are always linked: edit them on the Templates screen, or clone one for a separate copy.",
+      "radio: Linked Follows template updates; overrides go on top.",
+      "radio: Detached A private copy that never changes on its own.",
+      "paragraph: None. Added to what the template sends; values accept {{ }} templates.",
+      "button: Add field",
+      "paragraph: Keep this endpoint's template and overrides, as last saved, as a template of your own.",
+      "button: Save as template",
+      "radio: Strict An undefined value stops the delivery as render failed.",
+      "radio: Lenient An undefined value renders empty, with a warning.",
+      "combobox: Preview with",
+      "button: Copy rendered URL",
+      "heading: Rendered headers",
+      "heading: Rendered body",
+      "button: Copy rendered body"
+    ],
+    "Endpoint editor, Security tab": [
+      "button: Reveal",
+      "combobox: Overlap after rotating",
+      "paragraph: Both secrets sign during the overlap, so you can test a rolling update.",
+      "button: Rotate secret"
+    ],
+    "Endpoint editor, Retries tab": [
+      "textbox: Max attempts",
+      "paragraph: # to #, counting the first try.",
+      "paragraph: # second to # hours, used in order; the last one repeats.",
+      "each item, button: Remove retry delay #",
+      "textbox: Delay before each retry",
+      "button: Add delay",
+      "paragraph: #xx answers, timeouts and connection errors always retry.",
+      "switch: Retry on #xx",
+      "paragraph: Attempts at # s, # s, # s, # s, # m # s."
+    ],
+    "Endpoint editor, Variables tab": [
+      "heading: Endpoint variables",
+      "button: Add variable",
+      "paragraph: Used as {{ vars.name }} by this endpoint only; they win over global variables of the same name. Number, JSON, Dynamic, Random and the other kinds are on the Variables screen .",
+      "link: Variables screen",
+      "paragraph: No endpoint variables."
+    ],
+    "Test sent dialog": [
+      "heading: Test sent to Laravel inbound mail",
+      "paragraph: A test.ping event, signed like a real delivery.",
+      "heading: Signed headers",
+      "heading: Response body",
+      "link: Open delivery",
+      "button: Done",
+      "button: Close"
+    ],
+    "Delete endpoint dialog": [
+      "heading: Delete Laravel inbound mail?",
+      "paragraph: Its # rule and its variables go with it. Past deliveries stay in the log.",
+      "button: Keep it",
+      "button: Delete"
+    ],
+    "failing": [
+      "alert: Could not load the endpoints. Try again",
+      "paragraph: Could not load the endpoints.",
+      "button: Try again"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "order": 14,
+  "path": "/webhooks/composer",
+  "states": {
+    "normal": [
+      "heading: Composer",
+      "link: Read the Composer guide",
+      "paragraph: Write a webhook request by hand, start from any template, and send it to an endpoint.",
+      "combobox: Send to",
+      "paragraph: Its secret signs the request.",
+      "combobox: Preset",
+      "paragraph: A template fills the method, headers and body, ready to edit.",
+      "combobox: Method",
+      "textbox: URL",
+      "paragraph: Leave empty to use the endpoint's URL.",
+      "paragraph: None. Added to the URL, URL-encoded.",
+      "button: Add query param",
+      "paragraph: None besides Content-Type and the signature headers.",
+      "button: Add header",
+      "radio: Template",
+      "radio: Fields",
+      "radio: Raw",
+      "radio: None",
+      "combobox: Content type",
+      "button: Insert",
+      "textbox: Raw body",
+      "paragraph: Type {{ to see what you can use; hover a value to see an example.",
+      "radio: Strict An undefined value stops the delivery as render failed.",
+      "radio: Lenient An undefined value renders empty, with a warning.",
+      "textbox: vars.reason",
+      "paragraph: Asked for on manual sends.",
+      "paragraph: None. A value here wins over the endpoint and global value of that name, for this send only.",
+      "button: Add override",
+      "combobox: Preview with",
+      "button: Copy rendered URL",
+      "heading: Rendered headers",
+      "heading: Rendered body",
+      "button: Copy rendered body",
+      "button: Send"
+    ],
+    "failing": [
+      "alert: Could not load the endpoints to send to. Try again",
+      "paragraph: Could not load the endpoints to send to.",
+      "button: Try again"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+title: "[AI] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions about using SendMock from AI coding agents through the MCP server, the CLI or the agent skill.
+
+        - Start with [AI](https://shibbirweb.github.io/sendmock/docs/ai/) and the [MCP reference](https://shibbirweb.github.io/sendmock/mcp/).
+        - Never post API keys or tokens.
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      options:
+        - Claude Code
+        - Codex
+        - Cursor
+        - Gemini CLI
+        - VS Code (GitHub Copilot)
+        - Another MCP client
+    validations:
+      required: true
+  - type: dropdown
+    id: setup
+    attributes:
+      label: How the agent reaches SendMock
+      options:
+        - sendmock ai install
+        - npx or bunx (npx -y sendmock mcp)
+        - Claude Code plugin
+        - MCP over HTTP (/mcp)
+        - Registered by hand
+        - Not sure
+  - type: textarea
+    id: goal
+    attributes:
+      label: What you asked the agent to do, and what happened
+      description: The prompt or task, the tool calls it made, and what went wrong.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SendMock version
+      description: "`sendmock --version`"
+      placeholder: 0.1.0-beta.1
+  - type: textarea
+    id: config
+    attributes:
+      label: MCP configuration or error
+      description: The MCP server entry or the error the agent showed. Remove secrets first.
+      render: json

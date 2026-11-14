@@ -1,0 +1,339 @@
+# An app's test in each of eight languages uses SendMock's API with the language's own HTTP
+# client: it sends an email and reads its code, sends an SMS and waits for it, and captures an
+# outgoing HTTP call, against a release binary (the Phase 4 done-when check). Runs on changes
+# to the API or the examples, and from Release build before anything is published.
+name: Example apps
+
+on:
+  pull_request:
+    paths:
+      - crates/**
+      - examples/apps/**
+      - examples/http-presets/**
+      - examples/recipes/**
+      - examples/playground-snippets/**
+      - docs/wiki/recipes/**
+      - docs/wiki/connect/**
+      - .github/workflows/example-apps.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/**
+      - examples/apps/**
+      - examples/http-presets/**
+      - examples/recipes/**
+      - examples/playground-snippets/**
+      - docs/wiki/recipes/**
+      - docs/wiki/connect/**
+      - .github/workflows/example-apps.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  binary:
+    name: Release binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: sendmock-for-example-apps
+          path: target/release/sendmock
+          retention-days: 1
+
+  app:
+    name: ${{ matrix.language }}
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: PHP
+            folder: php
+            setup: php
+            run: php smoke.php
+          - language: Node
+            folder: node
+            setup: node
+            run: node smoke.mjs
+          - language: Python
+            folder: python
+            setup: python
+            run: python smoke.py
+          - language: Go
+            folder: go
+            setup: go
+            run: go run .
+          - language: Java
+            folder: java
+            setup: java
+            run: java SmokeTest.java
+          - language: Rust
+            folder: rust
+            setup: rust
+            run: cargo run --quiet
+          - language: Ruby
+            folder: ruby
+            setup: ruby
+            run: ruby smoke.rb
+          - language: .NET
+            folder: dotnet
+            setup: dotnet
+            run: dotnet run
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - name: Start SendMock with its default settings
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - uses: shivammathur/setup-php@v2
+        if: matrix.setup == 'php'
+        with:
+          php-version: "8.3"
+
+      - uses: actions/setup-node@v5
+        if: matrix.setup == 'node'
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v6
+        if: matrix.setup == 'python'
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-go@v6
+        if: matrix.setup == 'go'
+        with:
+          go-version: "1.23"
+
+      - uses: actions/setup-java@v5
+        if: matrix.setup == 'java'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: ruby/setup-ruby@v1
+        if: matrix.setup == 'ruby'
+        with:
+          ruby-version: "3.3"
+
+      - uses: actions/setup-dotnet@v5
+        if: matrix.setup == 'dotnet'
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: The ${{ matrix.language }} app's test
+        working-directory: examples/apps/${{ matrix.folder }}
+        run: ${{ matrix.run }}
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
+
+  presets:
+    name: HTTP presets and their official libraries
+    needs: binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Start SendMock with its default settings
+        run: |
+          chmod +x sendmock-binary/sendmock
+          ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          cat sendmock.log
+          exit 1
+
+      - name: Slack, Expo, OneSignal and FCM's official libraries accept the presets' replies
+        working-directory: examples/http-presets/node
+        run: bun install && node done-when.js
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
+
+  recipes:
+    name: Recipe examples (${{ matrix.language }})
+    needs: binary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript
+            folder: node
+          - language: python
+            folder: .
+          - language: go
+            folder: .
+          - language: ruby
+            folder: .
+          - language: cli
+            folder: .
+          - language: rust
+            folder: .
+          - language: java
+            folder: .
+          - language: csharp
+            folder: .
+          - language: php
+            folder: .
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-for-example-apps
+          path: sendmock-binary
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - if: matrix.language == 'python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - if: matrix.language == 'python'
+        run: pip install pytest requests
+
+      - if: matrix.language == 'go'
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.22"
+
+      - if: matrix.language == 'ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - if: matrix.language == 'ruby'
+        run: gem install rspec
+
+      - if: matrix.language == 'java'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: JUnit 5 and Jackson for the Java examples
+        if: matrix.language == 'java'
+        run: |
+          mkdir -p "$RUNNER_TEMP/java-jars" && cd "$RUNNER_TEMP/java-jars"
+          for jar_path in \
+            org/junit/platform/junit-platform-console-standalone/1.11.3/junit-platform-console-standalone-1.11.3.jar \
+            com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar \
+            com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar \
+            com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar; do
+            curl -fsSLO "https://repo1.maven.org/maven2/$jar_path"
+          done
+          echo "JUNIT_CONSOLE_JAR=$PWD/junit-platform-console-standalone-1.11.3.jar" >> "$GITHUB_ENV"
+          echo "JAVA_TEST_CLASSPATH=$(ls "$PWD"/*.jar | paste -sd: -)" >> "$GITHUB_ENV"
+
+      - if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - if: matrix.language == 'php'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - name: A Laravel app with Pest for the PHP examples
+        if: matrix.language == 'php'
+        run: |
+          composer create-project laravel/laravel "$RUNNER_TEMP/laravel-app" --no-interaction --prefer-dist --quiet
+          cd "$RUNNER_TEMP/laravel-app"
+          composer require pestphp/pest pestphp/pest-plugin-laravel --dev --with-all-dependencies --no-interaction --quiet
+          printf '<?php\n\nuses(Tests\\TestCase::class)->in('"'"'Feature'"'"');\n' > tests/Pest.php
+          cp "$GITHUB_WORKSPACE/examples/recipes/php/stand-in-routes.php" routes/web.php
+          echo "LARAVEL_APP_FOLDER=$PWD" >> "$GITHUB_ENV"
+
+      - name: Start SendMock with the recipes' seed and the stand-in app
+        run: |
+          chmod +x sendmock-binary/sendmock
+          echo "$PWD/sendmock-binary" >> "$GITHUB_PATH"
+          ./sendmock-binary/sendmock --db memory --provider-addr 127.0.0.1:8026 --seed examples/recipes/sendmock.seed.toml > sendmock.log 2>&1 &
+          node examples/recipes/stand-in-app.mjs > stand-in-app.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && curl -fsS -o /dev/null -X POST http://localhost:3000/reset-password -H "content-type: application/json" -d '{"link":"/reset-password?token=ready"}' && exit 0
+            sleep 1
+          done
+          cat sendmock.log stand-in-app.log
+          exit 1
+
+      - name: Every recipe's example runs against SendMock
+        working-directory: examples/recipes/${{ matrix.folder }}
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/recipe-target
+        run: |
+          if [ -f package.json ]; then bun install; fi
+          node "$GITHUB_WORKSPACE/examples/recipes/run-recipes.mjs" ${{ matrix.language }}
+
+      # AC: WS-04.2
+      - name: The API playground's snippets run against SendMock as the playground shows them
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/recipe-target
+        run: node examples/playground-snippets/run-playground-snippets.mjs ${{ matrix.language }}
+
+      - name: SendMock and stand-in app logs
+        if: failure()
+        run: cat sendmock.log stand-in-app.log

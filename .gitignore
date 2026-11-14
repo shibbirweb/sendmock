@@ -1,0 +1,23 @@
+# Rust build output
+/target/
+
+# Copies a published crate carries, staged before packaging (scripts/release/stage-crate-files.sh)
+/crates/sendmock-api/web-dist/
+/crates/sendmock-ops/skill/
+
+.DS_Store
+
+# Python bytecode from the examples
+__pycache__/
+
+# Testcontainers module builds
+testcontainers/node/node_modules/
+testcontainers/node/dist/
+testcontainers/python/dist/
+testcontainers/dotnet/out/
+testcontainers/java/target/
+testcontainers/dotnet/**/bin/
+testcontainers/dotnet/**/obj/
+/plugin/evals/results/
+/skill-eval-results/
+/crates/sendmock/release-channel

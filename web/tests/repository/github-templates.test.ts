@@ -1,0 +1,236 @@
+import { describe, expect, test } from "bun:test";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+import { parse } from "yaml";
+
+const githubDirectory = join(import.meta.dir, "../../../.github");
+const issueTemplateDirectory = join(githubDirectory, "ISSUE_TEMPLATE");
+const discussionTemplateDirectory = join(
+  githubDirectory,
+  "DISCUSSION_TEMPLATE",
+);
+
+type IssueFormField = {
+  type: string;
+  id?: string;
+  attributes: { label?: string; value?: string; options?: unknown[] };
+};
+type IssueForm = {
+  name: string;
+  description: string;
+  labels?: string[];
+  body: IssueFormField[];
+};
+
+const fieldTypes = new Set([
+  "markdown",
+  "input",
+  "textarea",
+  "dropdown",
+  "checkboxes",
+]);
+const issueFormFiles = readdirSync(issueTemplateDirectory).filter(
+  (fileName) => fileName.endsWith(".yml") && fileName !== "config.yml",
+);
+
+function readIssueForm(fileName: string): IssueForm {
+  return parse(
+    readFileSync(join(issueTemplateDirectory, fileName), "utf8"),
+  ) as IssueForm;
+}
+
+/** The labels CONTRIBUTING.md documents, from its Labels table. */
+function readDocumentedLabels(): Set<string> {
+  const contributingText = readFileSync(
+    join(githubDirectory, "CONTRIBUTING.md"),
+    "utf8",
+  );
+  return new Set(
+    [...contributingText.matchAll(/^\| `([a-z0-9-]+)` \|/gm)].map(
+      (labelMatch) => labelMatch[1] ?? "",
+    ),
+  );
+}
+
+describe("GitHub templates", () => {
+  test("UI-10.2 has the issue forms, PR template and community files", () => {
+    expect(issueFormFiles.sort()).toEqual([
+      "bug_report.yml",
+      "docs.yml",
+      "feature_request.yml",
+      "provider_request.yml",
+    ]);
+    for (const fileName of [
+      "ISSUE_TEMPLATE/config.yml",
+      "pull_request_template.md",
+      "SECURITY.md",
+      "CONTRIBUTING.md",
+      "CODE_OF_CONDUCT.md",
+    ]) {
+      expect(existsSync(join(githubDirectory, fileName)), fileName).toBe(true);
+    }
+  });
+
+  test("UI-10.2 every issue form is a valid GitHub issue form with documented labels", () => {
+    const documentedLabels = readDocumentedLabels();
+    for (const fileName of issueFormFiles) {
+      const issueForm = readIssueForm(fileName);
+      expect(issueForm.name, fileName).toBeTruthy();
+      expect(issueForm.description, fileName).toBeTruthy();
+      expect(issueForm.body.length, fileName).toBeGreaterThan(0);
+      for (const label of issueForm.labels ?? []) {
+        expect(documentedLabels.has(label), `${fileName}: label ${label}`).toBe(
+          true,
+        );
+      }
+      const fieldIds = issueForm.body.flatMap((formField) =>
+        formField.id ? [formField.id] : [],
+      );
+      expect(new Set(fieldIds).size, `${fileName}: unique ids`).toBe(
+        fieldIds.length,
+      );
+      for (const formField of issueForm.body) {
+        expect(
+          fieldTypes.has(formField.type),
+          `${fileName}: ${formField.type}`,
+        ).toBe(true);
+        if (formField.type === "markdown") {
+          expect(formField.attributes.value, fileName).toBeTruthy();
+          continue;
+        }
+        expect(formField.id ?? "", fileName).toMatch(/^[a-z0-9_-]+$/);
+        expect(
+          formField.attributes.label,
+          `${fileName}: ${formField.id}`,
+        ).toBeTruthy();
+        if (formField.type === "dropdown" || formField.type === "checkboxes") {
+          expect(
+            formField.attributes.options?.length ?? 0,
+            `${fileName}: ${formField.id}`,
+          ).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  test("UI-10.2 the bug and feature forms take the fields the app pre-fills", () => {
+    for (const fileName of ["bug_report.yml", "feature_request.yml"]) {
+      const inputIds = readIssueForm(fileName)
+        .body.filter((formField) => formField.type === "input")
+        .map((formField) => formField.id);
+      expect(inputIds, fileName).toEqual(
+        expect.arrayContaining(["version", "channel", "os", "browser"]),
+      );
+    }
+  });
+
+  test("UI-10.2 config.yml turns off blank issues and links questions, docs and security", () => {
+    const issueConfig = parse(
+      readFileSync(join(issueTemplateDirectory, "config.yml"), "utf8"),
+    ) as {
+      blank_issues_enabled: boolean;
+      contact_links: { url: string }[];
+    };
+
+    expect(issueConfig.blank_issues_enabled).toBe(false);
+    expect(
+      issueConfig.contact_links.map((contactLink) => contactLink.url),
+    ).toEqual([
+      "https://github.com/shibbirweb/sendmock/discussions/new?category=q-a",
+      "https://github.com/shibbirweb/sendmock/discussions/new?category=ideas",
+      "https://shibbirweb.github.io/sendmock/docs/",
+      "https://github.com/shibbirweb/sendmock/security/advisories/new",
+    ]);
+  });
+
+  test("UI-10.2 every discussion category people post in has a form with a required field", () => {
+    const discussionFormFiles = readdirSync(discussionTemplateDirectory).sort();
+
+    expect(discussionFormFiles).toEqual([
+      "ai-agents-and-mcp.yml",
+      "docker-ci-and-kubernetes.yml",
+      "ideas.yml",
+      "provider-requests.yml",
+      "q-a.yml",
+      "show-and-tell.yml",
+    ]);
+    for (const formFile of discussionFormFiles) {
+      const discussionForm = parse(
+        readFileSync(join(discussionTemplateDirectory, formFile), "utf8"),
+      ) as {
+        body: (IssueFormField & { validations?: { required?: boolean } })[];
+      };
+      const fieldIds = discussionForm.body
+        .filter((formField) => formField.id !== undefined)
+        .map((formField) => formField.id);
+
+      expect(new Set(fieldIds).size, formFile).toBe(fieldIds.length);
+      for (const formField of discussionForm.body) {
+        expect(fieldTypes.has(formField.type), formFile).toBe(true);
+      }
+      expect(
+        discussionForm.body.some(
+          (formField) => formField.validations?.required === true,
+        ),
+        formFile,
+      ).toBe(true);
+    }
+  });
+
+  test("UI-10.2 the Q&A form asks how SendMock runs and has posters remove secrets", () => {
+    const questionForm = readFileSync(
+      join(discussionTemplateDirectory, "q-a.yml"),
+      "utf8",
+    );
+
+    expect(questionForm).toContain("- npx or bunx");
+    expect(questionForm).toContain(
+      "I removed secrets and personal data from what I pasted.",
+    );
+  });
+
+  test("the templates never use the em-dash character", () => {
+    const templateFiles = [
+      ...readdirSync(issueTemplateDirectory).map((fileName) =>
+        join(issueTemplateDirectory, fileName),
+      ),
+      ...readdirSync(discussionTemplateDirectory).map((fileName) =>
+        join(discussionTemplateDirectory, fileName),
+      ),
+      ...[
+        "pull_request_template.md",
+        "SECURITY.md",
+        "CONTRIBUTING.md",
+        "CODE_OF_CONDUCT.md",
+      ].map((fileName) => join(githubDirectory, fileName)),
+    ];
+    for (const templateFile of templateFiles) {
+      expect(
+        readFileSync(templateFile, "utf8").includes("—"),
+        templateFile,
+      ).toBe(false);
+    }
+  });
+});
+
+describe("surface parity workflow", () => {
+  type Workflow = {
+    on: { push?: { branches?: string[] }; pull_request?: unknown };
+    jobs: Record<string, { steps: { run?: string }[] }>;
+  };
+  const workflowPath = join(githubDirectory, "workflows/parity.yml");
+
+  test("UI-11.7 runs the parity check and tests on pull requests and pushes to develop and main", () => {
+    expect(existsSync(workflowPath)).toBe(true);
+    const workflow = parse(readFileSync(workflowPath, "utf8")) as Workflow;
+    const commands = Object.values(workflow.jobs).flatMap((workflowJob) =>
+      workflowJob.steps.map((workflowStep) => workflowStep.run ?? ""),
+    );
+
+    expect(workflow.on.pull_request).not.toBeUndefined();
+    expect(workflow.on.push?.branches).toEqual(["develop", "main"]);
+    expect(commands).toContain("bun run parity");
+    expect(commands).toContain("bun run test:parity");
+  });
+});

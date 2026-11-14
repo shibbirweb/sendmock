@@ -1,0 +1,101 @@
+{
+  "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/inbound-sms",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "api-key": "abcd1234",
+    "msisdn": "447700900001",
+    "to": "447700900000",
+    "messageId": "0A0000000123ABCD1",
+    "text": "Hello world",
+    "type": "text",
+    "keyword": "HELLO",
+    "message-timestamp": "2020-01-01 12:00:00"
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "type",
+      "to",
+      "msisdn",
+      "messageId",
+      "message-timestamp"
+    ],
+    "properties": {
+      "api-key": {
+        "type": "string"
+      },
+      "msisdn": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{6,14}$"
+      },
+      "to": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{6,14}$"
+      },
+      "messageId": {
+        "type": "string",
+        "pattern": "^[0-9A-Za-z-]+$"
+      },
+      "text": {
+        "type": "string"
+      },
+      "type": {
+        "enum": [
+          "text",
+          "unicode",
+          "binary"
+        ]
+      },
+      "keyword": {
+        "type": "string"
+      },
+      "message-timestamp": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
+      },
+      "timestamp": {
+        "type": "string"
+      },
+      "nonce": {
+        "type": "string"
+      },
+      "concat": {
+        "const": "true"
+      },
+      "concat-ref": {
+        "type": "string"
+      },
+      "concat-total": {
+        "type": "string"
+      },
+      "concat-part": {
+        "type": "string"
+      },
+      "data": {
+        "type": "string"
+      },
+      "udh": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "if": {
+      "properties": {
+        "type": {
+          "enum": [
+            "text",
+            "unicode"
+          ]
+        }
+      }
+    },
+    "then": {
+      "required": [
+        "text",
+        "keyword"
+      ]
+    }
+  }
+}

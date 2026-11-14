@@ -1,0 +1,42 @@
+# SendMock keeps its data in one SQLite database, so it runs as a single replica.
+image:
+  repository: ghcr.io/shibbirweb/sendmock
+  # The chart's appVersion when empty.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 8025
+  smtpPort: 1025
+
+# The provider port answers provider SDKs (Twilio, SendGrid, FCM, ...) at their real paths.
+providerPort:
+  enabled: false
+  port: 8026
+
+# Without persistence the data lives in an emptyDir and goes with the pod.
+persistence:
+  enabled: false
+  size: 1Gi
+  # The cluster's default storage class when empty.
+  storageClass: ""
+  accessMode: ReadWriteOnce
+
+# Extra settings as SENDMOCK_* variables, for example SENDMOCK_MAX_EMAILS: "5000".
+env: {}
+
+# The web UI and API from outside the cluster.
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: sendmock.local
+  # For example: [{ secretName: sendmock-tls, hosts: [sendmock.local] }]
+  tls: []
+
+resources: {}
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

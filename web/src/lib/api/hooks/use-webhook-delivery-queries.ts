@@ -1,0 +1,136 @@
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+import { requestApi } from "@/lib/api/api-client";
+import { useIsOperationQueryable } from "@/lib/api/hooks/use-operation-availability";
+import { queryKeys } from "@/lib/api/query-keys";
+import type {
+  DeliveryListFilters,
+  DeliveryReplayRequest,
+  PageOf,
+  SavedDelivery,
+  WebhookDelivery,
+  WebhookDeliveryDetail,
+  WebhookMetrics,
+  WebhookMetricsQuery,
+} from "@/lib/api/types";
+
+/** Rows per page; the delivery log grows with every event (WH-03.7). */
+const deliveryPageSize = 50;
+
+export function useWebhookDeliveries(
+  deliveryFilters: DeliveryListFilters = {},
+) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.webhooks.deliveries(deliveryFilters),
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam, signal }) =>
+      requestApi<PageOf<WebhookDelivery>>("/webhooks/deliveries", {
+        queryParameters: {
+          ...deliveryFilters,
+          cursor: pageParam,
+          limit: deliveryPageSize,
+        },
+        abortSignal: signal,
+      }),
+    getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
+  });
+}
+
+/**
+ * The webhook requests an email or SMS caused (EM-22.5); webhook events
+ * refetch it, so statuses move without polling.
+ */
+export function useSubjectDeliveries(subjectId: string) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.subjectDeliveries(subjectId),
+    queryFn: ({ signal }) =>
+      requestApi<PageOf<WebhookDelivery>>("/webhooks/deliveries", {
+        queryParameters: { subject_id: subjectId, limit: deliveryPageSize },
+        abortSignal: signal,
+      }),
+  });
+}
+
+/** Delivery health for a range and an optional endpoint (WH-11.3); waits until served (UI-12). */
+export function useWebhookMetrics(metricsQuery: WebhookMetricsQuery) {
+  const isQueryable = useIsOperationQueryable("GET /api/v1/webhooks/metrics");
+
+  return useQuery({
+    queryKey: queryKeys.webhooks.metrics(metricsQuery),
+    queryFn: ({ signal }) =>
+      requestApi<WebhookMetrics>("/webhooks/metrics", {
+        queryParameters: metricsQuery,
+        abortSignal: signal,
+      }),
+    placeholderData: keepPreviousData,
+    enabled: isQueryable,
+  });
+}
+
+export function useWebhookDelivery(deliveryId: string) {
+  return useQuery({
+    queryKey: queryKeys.webhooks.delivery(deliveryId),
+    queryFn: ({ signal }) =>
+      requestApi<WebhookDeliveryDetail>(`/webhooks/deliveries/${deliveryId}`, {
+        abortSignal: signal,
+      }),
+  });
+}
+
+function useDeliveryMutation<MutationInput, MutationResult>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<MutationResult>,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: mutationRequest,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
+    },
+  });
+}
+
+/** Replays as-is, re-rendered, or with an edited body and headers (WH-05.2). */
+export function useReplayDelivery() {
+  return useDeliveryMutation(
+    ({
+      deliveryId,
+      replayRequest,
+    }: {
+      deliveryId: string;
+      replayRequest: DeliveryReplayRequest;
+    }) =>
+      requestApi<WebhookDelivery>(`/webhooks/deliveries/${deliveryId}/replay`, {
+        method: "POST",
+        requestBody: replayRequest,
+      }),
+  );
+}
+
+export function useCancelDeliveryRetries() {
+  return useDeliveryMutation((deliveryId: string) =>
+    requestApi<WebhookDeliveryDetail>(
+      `/webhooks/deliveries/${deliveryId}/cancel`,
+      {
+        method: "POST",
+      },
+    ),
+  );
+}
+
+export function useSaveDelivery() {
+  return useDeliveryMutation(
+    ({ deliveryId, savedName }: { deliveryId: string; savedName: string }) =>
+      requestApi<SavedDelivery>("/webhooks/saved", {
+        method: "POST",
+        requestBody: { name: savedName, delivery_id: deliveryId },
+      }),
+  );
+}

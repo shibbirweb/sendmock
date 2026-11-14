@@ -1,0 +1,36 @@
+{
+  "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": [
+    {
+      "email": "example@test.com",
+      "timestamp": 1513299569,
+      "smtp-id": "<14c5d75ce93.dfd.64b469@ismtpd-555>",
+      "event": "delivered",
+      "category": "cat facts",
+      "sg_event_id": "sg_event_id",
+      "sg_message_id": "sg_message_id"
+    }
+  ],
+  "schema": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+      "type": "object",
+      "required": ["email", "timestamp", "event", "sg_event_id", "sg_message_id"],
+      "properties": {
+        "email": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+$" },
+        "timestamp": { "type": "integer", "minimum": 0 },
+        "smtp-id": { "type": "string", "pattern": "^<.+>$" },
+        "event": {
+          "enum": ["processed", "dropped", "delivered", "deferred", "bounce", "open", "click", "spamreport", "unsubscribe", "group_unsubscribe", "group_resubscribe"]
+        },
+        "category": { "type": ["string", "array"] },
+        "sg_event_id": { "type": "string", "minLength": 1 },
+        "sg_message_id": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

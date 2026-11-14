@@ -1,0 +1,78 @@
+import type { DeeperEntry } from "../deeper-types";
+
+function ruleRowEntries(
+  ruleName: string,
+  ruleKind: string,
+  operationArea: "TagRules" | "ForwardRules",
+): DeeperEntry[] {
+  return [
+    { control: `switch: ${ruleName} enabled`, does: `Turns the ${ruleKind} on or off (here the demo's "${ruleName}").`, operationIds: [`patch${operationArea}ByRuleId`] },
+    { control: `button: Move ${ruleName} up`, does: "Runs the rule earlier.", operationIds: [`post${operationArea}ByRuleIdMove`] },
+    { control: `button: Move ${ruleName} down`, does: "Runs the rule later.", operationIds: [`post${operationArea}ByRuleIdMove`] },
+    { control: `button: Edit ${ruleName}`, does: "Opens the rule's editor: its name, its filter and what it does.", operationIds: [`patch${operationArea}ByRuleId`] },
+    { control: `button: Delete ${ruleName}`, does: "Deletes the rule after you confirm.", operationIds: [`delete${operationArea}ByRuleId`] },
+  ];
+}
+
+const magicAddresses = ["success", "bounce", "complaint", "ooto", "suppressionlist"];
+
+/** Settings > Email. */
+export const settingsEmailEntries: DeeperEntry[] = [
+  { control: "heading: Receiving and delivery outcomes", does: "How arriving mail is tagged and what happens to it next." },
+  { control: "paragraph: user+invoice@app.test gets the tag invoice.", does: "An example of plus-address tagging." },
+  { control: "switch: Tag by plus address", does: "Tags an email with the part after `+` in its recipient." },
+  { control: "paragraph: Off: the SES simulator and SendMock addresses below behave like any other address.", does: "Explains Magic addresses." },
+  { control: "switch: Magic addresses", does: "Whether the magic addresses decide an outcome.", links: "[Magic numbers and addresses](../reference/magic-numbers.md)." },
+  { control: "radio: Off No delivery events unless you simulate one or use a magic address.", does: "No delivery outcome by itself." },
+  { control: "radio: Auto-delivered Every email gets email.delivered after a short delay.", does: "Every email is delivered after a short delay." },
+  { control: "radio: Realistic A delay, plus the bounce and complaint rates below.", does: "Delivered after a delay, with some bounces and complaints at the rates you set." },
+  { control: "button: Remove inbound.app.test", does: "Removes an inbound domain (here the demo's)." },
+  { control: "button: Remove reply.app.test", does: "Removes an inbound domain (here the demo's reply domain)." },
+  { control: "textbox: Inbound domains", does: "A domain whose mail counts as incoming." },
+  { control: "button: Add", does: "Adds the inbound domain." },
+  { control: "paragraph: Mail for these domains is incoming (replies, support inboxes) and fires email.inbound.", does: "Explains inbound domains.", links: "[Inbound routes](../webhooks/inbound-routes.md)." },
+  { control: "textbox: SpamAssassin address", does: "The `host:port` of a running `spamd` for the spam check." },
+  { control: "paragraph: host:port of a running spamd. Leave empty to turn the spam check off.", does: "Explains the SpamAssassin address." },
+  { control: "heading: Release to real SMTP", does: "The relay that Release and auto-forward send through.", links: "[Release](../mail/release.md)." },
+  { control: "paragraph: Release and auto-forward send through this relay, and only to allowed recipients.", does: "Explains the relay." },
+  { control: "textbox: Relay SMTP URL", does: "The relay, such as `smtp://user:password@smtp.example.com:587`." },
+  { control: "paragraph: The password is stored and shown masked.", does: "Explains the masking." },
+  { control: "textbox: Allowed recipients", does: "Globs of addresses Release may send to, such as `*@yourcompany.com`." },
+  { control: "paragraph: Release stays off until at least one pattern is added.", does: "Explains the safety rule." },
+  { control: "heading: Tag rules", does: "Rules that tag arriving emails.", operationIds: ["getTagRules"] },
+  { control: "paragraph: Add a tag to arriving emails that match a filter, in this order. Tags show in the list and the tag: search.", does: "Explains tag rules." },
+  { control: "columnheader: Rule", does: "The rule's name." },
+  { control: "columnheader: When", does: "Its filter, in words." },
+  { control: "columnheader: Tag", does: "The tag it adds." },
+  { control: "columnheader: Enabled", does: "Whether it runs." },
+  { control: "columnheader: Actions", does: "Move, Edit and Delete." },
+  ...ruleRowEntries("Billing mail", "tag rule", "TagRules"),
+  { control: "button: Add rule", does: "Adds a tag or forward rule.", operationIds: ["postTagRules", "postForwardRules"] },
+  { control: "heading: Auto-forward rules", does: "Rules that send a real copy of arriving emails.", operationIds: ["getForwardRules"] },
+  { control: "paragraph: Release a real copy of arriving emails that match a filter, through the relay above and only to allowed recipients.", does: "Explains auto-forward." },
+  { control: "columnheader: Forward to", does: "Where the copy goes." },
+  ...ruleRowEntries("QA inbox to the team", "forward rule", "ForwardRules"),
+  { control: "heading: Custom outcome addresses", does: "Your own addresses with a fixed delivery outcome.", operationIds: ["getOutcomeRulesEmail"] },
+  { control: "paragraph: Your own test addresses. The first enabled match wins, before the magic addresses and the profile.", does: "Explains the order outcomes are decided in.", links: "[Advanced: email outcome addresses](../advanced/email-outcome-addresses.md)." },
+  { control: "columnheader: #", does: "The rule's place." },
+  { control: "columnheader: Address", does: "The address or pattern." },
+  { control: "columnheader: Outcome", does: "What happens to mail for it." },
+  { control: "columnheader: On", does: "Whether it is on." },
+  { control: "switch: Rule # enabled", does: "Turns the rule on or off.", operationIds: ["patchOutcomeRulesEmailByRuleId"] },
+  { control: "button: Move rule # up", does: "Checks the rule earlier.", operationIds: ["postOutcomeRulesEmailByRuleIdMove"] },
+  { control: "button: Move rule # down", does: "Checks the rule later.", operationIds: ["postOutcomeRulesEmailByRuleIdMove"] },
+  { control: "button: Edit rule #", does: "Opens the rule's editor.", operationIds: ["patchOutcomeRulesEmailByRuleId"] },
+  { control: "button: Delete rule #", does: "Deletes the rule after you confirm.", operationIds: ["deleteOutcomeRulesEmailByRuleId"] },
+  { control: "button: Add address", does: "Adds an outcome address.", operationIds: ["postOutcomeRulesEmail"] },
+  { control: "textbox: Test an address", does: "Shows which rule, magic address or profile decides an address's outcome.", operationIds: ["postOutcomeRulesEmailTest"] },
+  { control: "paragraph: Magic address: Hard bounce (# #.#.#)", does: "The answer for the address tested (here a magic address that bounces)." },
+  { control: "heading: Magic addresses", does: "The built-in test addresses." },
+  { control: "paragraph: Send to these to get a delivery outcome without touching any setting. Built in and read-only.", does: "Explains magic addresses." },
+  { control: "heading: Recipients", does: "The magic addresses and what each does." },
+  { control: "columnheader: Recipient", does: "The address." },
+  { control: "columnheader: Code", does: "The SMTP code or outcome it gives." },
+  ...magicAddresses.map((localPart): DeeperEntry => ({
+    control: `button: Copy ${localPart}@simulator.amazonses.com`,
+    does: `Copies the Amazon SES simulator address \`${localPart}@simulator.amazonses.com\`.`,
+  })),
+];

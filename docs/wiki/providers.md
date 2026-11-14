@@ -1,0 +1,61 @@
+---
+title: Supported providers
+description: The provider APIs SendMock ships with, by product area. Each is a built-in you can change, remove or add to.
+---
+
+> Try them in the [demo](/demo/mail/providers).
+
+SendMock ships with these providers **built in**. Each answers at the provider's real path, with the provider's real response and error shapes, so your app or its official SDK keeps working when you point it at SendMock. Plain SMTP works for every email library.
+
+They are a starting point, not a fixed list:
+
+- **Change a built-in** when your account differs from the default: another field name, path or response.
+- **Remove** the ones you do not use.
+- **Add your own** for a provider that is not listed, starting blank or from the closest built-in.
+- **Reset to default** brings a changed or removed built-in back.
+
+## Email (6 built in)
+
+| Provider | What the built-in answers | Read more |
+| --- | --- | --- |
+| SendGrid | `POST /v3/mail/send` | [Mail](./mail/index.md) |
+| Mailgun | `POST /v3/{domain}/messages` | [Mail](./mail/index.md) |
+| Postmark | `POST /email`, `/email/batch` and `/email/withTemplate` | [Mail](./mail/index.md) |
+| Resend | `POST /emails` and `/emails/batch` | [Mail](./mail/index.md) |
+| Amazon SES | `POST /v2/email/outbound-emails` | [Mail](./mail/index.md) |
+| Brevo | `POST /v3/smtp/email` | [Mail](./mail/index.md) |
+
+## SMS (11 built in)
+
+| Provider | What the built-in answers | Read more |
+| --- | --- | --- |
+| Twilio | the Messages API, Messaging Services, status callbacks and WhatsApp addresses | [SMS](./sms/index.md) |
+| Twilio Verify | send and check verification codes | [Verify](./sms/verify.md) |
+| Vonage | `POST /sms/json` and delivery receipts | [SMS](./sms/index.md) |
+| Plivo | `POST /v1/Account/{auth_id}/Message/` | [SMS](./sms/index.md) |
+| MessageBird | `POST /messages` | [SMS](./sms/index.md) |
+| Infobip | `POST /sms/2/text/advanced` and delivery reports to `notifyUrl` | [SMS](./sms/index.md) |
+| Telnyx | `POST /v2/messages` and `message.sent` / `message.finalized` webhooks to `webhook_url` | [SMS](./sms/index.md) |
+| Sinch | `POST /xms/v1/{service_plan_id}/batches` and delivery reports to `callback_url` | [SMS](./sms/index.md) |
+| Africa's Talking | `POST /version1/messaging` (delivery reports through a webhook rule with the Africa's Talking template, since the real callback is set on the account) | [SMS](./sms/index.md) |
+| Amazon SNS | `Publish` to a `PhoneNumber` (the Query API: a form posted to `/`, an XML answer); SNS logs delivery status to CloudWatch, so there are no callbacks | [SMS](./sms/index.md) |
+| WhatsApp Cloud | Meta's WhatsApp Business Cloud API: `POST /{version}/{phone_number_id}/messages` for every message type, read receipts, and Graph's errors | [Replies and WhatsApp](./sms/replies-and-whatsapp.md#whatsapp-cloud-api) |
+| Vonage Verify | Verify v2: start a verification (`POST /v2/verify`), check its code and cancel it; each brand gets its own verify service | [Verify](./sms/verify.md) |
+
+## Payments (4 built in)
+
+| Provider | What the built-in answers | Read more |
+| --- | --- | --- |
+| Stripe | Checkout Sessions, PaymentIntents, Refunds and signed webhook events | [Gateways](./payments/gateways.md) |
+| PayPal | Orders, IPN postback and webhook signature verification | [Gateways](./payments/gateways.md) |
+| SSLCommerz | session init, order validation, refunds and the signed IPN | [Gateways](./payments/gateways.md) |
+| bKash | tokenized checkout: grant token, create, execute, query and refund | [Gateways](./payments/gateways.md) |
+
+That is 15 built-in provider APIs; the landing page counts this list.
+
+## Add or change a provider
+
+- **Payment gateways:** see [Advanced: create a gateway](./advanced/payment-gateway.md), or open a built-in on the [Gateways](./payments/gateways.md) screen to change it.
+- **Email providers:** [Mail > Providers](./mail/providers.md), and the walkthrough [Advanced: create an email provider](./advanced/email-provider.md).
+- **SMS providers:** [SMS > Providers](./sms/providers.md), and the walkthrough [Advanced: create an SMS provider](./advanced/sms-provider.md).
+- **The shape of the webhooks SendMock sends** (Slack, Discord, Telnyx and more): see [Advanced: templates](./advanced/templates.md).

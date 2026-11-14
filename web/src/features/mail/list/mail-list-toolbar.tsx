@@ -1,0 +1,140 @@
+import { BellIcon, BellOffIcon, MailOpenIcon, Trash2Icon } from "lucide-react";
+
+import { IconButton } from "@/components/common/icon-button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ImportEmailDialog } from "@/features/mail/list/import-email-dialog";
+import { useMailNotifications } from "@/features/mail/list/use-mail-notifications";
+import type { EmailListFilters } from "@/lib/api/types";
+
+type MailListToolbarProps = {
+  /** The list's current search; notifications only come for emails that fit it. */
+  emailFilters: EmailListFilters;
+  loadedEmailCount: number;
+  totalEmailCount: number;
+  checkedEmailCount: number;
+  onToggleAllChecked: (isChecked: boolean) => void;
+  onMarkCheckedRead: () => void;
+  onDeleteChecked: () => void;
+  /** A search or filter is on, so the delete removes only the matching emails. */
+  isFiltered: boolean;
+  onDeleteAll: () => void;
+};
+
+export function MailListToolbar({
+  emailFilters,
+  loadedEmailCount,
+  totalEmailCount,
+  checkedEmailCount,
+  onToggleAllChecked,
+  onMarkCheckedRead,
+  onDeleteChecked,
+  isFiltered,
+  onDeleteAll,
+}: MailListToolbarProps) {
+  const { isSupported, isEnabled, toggleNotifications } =
+    useMailNotifications(emailFilters);
+  const isAllChecked =
+    loadedEmailCount > 0 && checkedEmailCount === loadedEmailCount;
+  const hasChecked = checkedEmailCount > 0;
+
+  return (
+    <div className="flex h-10 items-center gap-2 border-b px-3 text-xs text-muted-foreground">
+      <Checkbox
+        checked={isAllChecked ? true : hasChecked ? "indeterminate" : false}
+        onCheckedChange={(checkedState) => {
+          onToggleAllChecked(checkedState === true);
+        }}
+        aria-label="Select all loaded emails"
+        disabled={loadedEmailCount === 0}
+      />
+      <span>
+        {hasChecked
+          ? `${checkedEmailCount} selected`
+          : `${totalEmailCount} email${totalEmailCount === 1 ? "" : "s"}`}
+      </span>
+      <div className="ml-auto flex items-center gap-1">
+        {hasChecked ? (
+          <>
+            <Button variant="ghost" size="sm" onClick={onMarkCheckedRead}>
+              <MailOpenIcon />
+              Mark read
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onDeleteChecked}>
+              <Trash2Icon />
+              Delete
+            </Button>
+          </>
+        ) : (
+          <>
+            {isSupported && (
+              <IconButton
+                variant="ghost"
+                aria-pressed={isEnabled}
+                label={
+                  isEnabled
+                    ? "Turn off notifications"
+                    : "Notify me about new emails"
+                }
+                onClick={() => {
+                  void toggleNotifications();
+                }}
+              >
+                {isEnabled ? <BellIcon /> : <BellOffIcon />}
+              </IconButton>
+            )}
+            <ImportEmailDialog />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <IconButton
+                  variant="ghost"
+                  label={
+                    isFiltered ? "Delete matching emails" : "Delete all emails"
+                  }
+                  disabled={totalEmailCount === 0}
+                >
+                  <Trash2Icon />
+                </IconButton>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {isFiltered
+                      ? "Delete the matching emails?"
+                      : "Delete all emails?"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {isFiltered
+                      ? `This removes the ${totalEmailCount} emails that match the search; the others stay.`
+                      : `This removes all ${totalEmailCount} captured emails.`}{" "}
+                    It cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={onDeleteAll}
+                  >
+                    {isFiltered ? "Delete matching" : "Delete all"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

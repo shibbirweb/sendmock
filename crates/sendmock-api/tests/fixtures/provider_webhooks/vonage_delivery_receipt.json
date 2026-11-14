@@ -1,0 +1,93 @@
+{
+  "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "err-code": "0",
+    "message-timestamp": "2018-10-25 12:10:29",
+    "messageId": "0B00000127FDBC63",
+    "msisdn": "447547232824",
+    "network-code": "23410",
+    "price": "0.03330000",
+    "scts": "1810251310",
+    "status": "delivered",
+    "to": "Vonage"
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "err-code",
+      "message-timestamp",
+      "messageId",
+      "msisdn",
+      "network-code",
+      "price",
+      "scts",
+      "status",
+      "to"
+    ],
+    "properties": {
+      "msisdn": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{6,14}$"
+      },
+      "to": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9]{1,15}$"
+      },
+      "network-code": {
+        "type": "string",
+        "pattern": "^[0-9]{5,6}$"
+      },
+      "messageId": {
+        "type": "string",
+        "pattern": "^[0-9A-Za-z-]+$"
+      },
+      "price": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.[0-9]+$"
+      },
+      "status": {
+        "enum": [
+          "accepted",
+          "delivered",
+          "buffered",
+          "expired",
+          "failed",
+          "rejected",
+          "unknown"
+        ]
+      },
+      "scts": {
+        "type": "string",
+        "pattern": "^[0-9]{10}$"
+      },
+      "err-code": {
+        "type": "string",
+        "pattern": "^[0-9]{1,2}$"
+      },
+      "api-key": {
+        "type": "string"
+      },
+      "client-ref": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "message-timestamp": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
+      },
+      "timestamp": {
+        "type": "string"
+      },
+      "nonce": {
+        "type": "string"
+      },
+      "sig": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,136 @@
+# Retakes the screenshots from the mock-mode web app (WS-10.5, docs/plan/30-phase-5.md W24):
+# the landing shots (website/public/screenshots/), the user guide shots (docs/wiki/images/)
+# and the annotated Deeper shots (docs/wiki/deeper/images/).
+#
+# Started on demand only: the demo's data and times differ on every run, so the images never
+# match byte for byte and a check on every pull request would always report a change. GitHub
+# starts a workflow by hand only once its file is on the default branch, so a pull request
+# asks for a run with the `screenshots` label (every scene, on the pull request's branch);
+# remove the label and add it again for another run.
+#
+# It commits nothing. Every commit in this repository is made by the owner after review, and a
+# push made with GITHUB_TOKEN would not start CI on the branch. The images come back as the
+# `screenshots` artifact, laid out as the repository:
+#
+#   gh pr edit <number> --add-label screenshots
+#   gh workflow run screenshots.yml --ref <branch> -f scenes=deeper   (once the file is on develop)
+#   gh run download <run id> -n screenshots
+name: Screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenes:
+        description: "Scene names to take, separated by spaces (for example: deeper). Empty takes every scene."
+        required: false
+        default: ""
+        type: string
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    name: Take the screenshots
+    # Any other label added to a pull request starts the workflow too; only this one runs it.
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'screenshots'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Playwright's own image has the browser and its system packages, as in ci.yml.
+    # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      APP_URL: http://127.0.0.1:5180
+      # Read from the environment, never pasted into a script, so the input cannot run commands.
+      # A label run has no inputs, so it takes every scene.
+      SCENES: ${{ inputs.scenes }}
+    steps:
+      # Without git, checkout downloads files with no history, and the summary needs git status.
+      - name: Install git
+        run: |
+          if ! command -v git >/dev/null; then
+            apt-get update
+            apt-get install --yes --no-install-recommends git
+          fi
+
+      # A pull request run takes the branch as it is, not its merge with the base branch, so
+      # the images can be committed to the branch.
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+      - name: Check the scene names
+        shell: bash
+        run: |
+          if [[ ! "$SCENES" =~ ^[a-z0-9\ -]*$ ]]; then
+            echo "::error::Scene names use lowercase letters, digits and hyphens, separated by spaces."
+            exit 1
+          fi
+
+      # The image has Node but not unzip, which setup-bun needs, so Bun comes from npm.
+      - name: Install Bun
+        run: npm install -g bun
+
+      - name: Install web app
+        working-directory: web
+        run: bun install --frozen-lockfile
+
+      - name: Install website
+        working-directory: website
+        run: bun install --frozen-lockfile
+
+      # One step builds, serves and photographs, so the preview server lives exactly as long
+      # as the capture needs it.
+      - name: Serve the mock-mode app and take the screenshots
+        shell: bash
+        run: |
+          cd web
+          bun --bun vite build
+          bun --bun vite preview --host 127.0.0.1 --port 5180 --strictPort &
+          for _ in $(seq 1 60); do
+            if bun -e "await fetch(process.env.APP_URL)" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          cd ../website
+          # Each checked scene name becomes its own argument; none for every scene.
+          read -r -a scene_names <<< "$SCENES"
+          bun run screenshots "$APP_URL" "${scene_names[@]}"
+
+      - name: List the changed images
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          changed_images=$(git status --porcelain -- website/public/screenshots docs/wiki/images docs/wiki/deeper/images)
+          {
+            echo "## Screenshots"
+            echo
+            if [ -z "$changed_images" ]; then
+              echo "No image changed."
+            else
+              echo "Changed images (apply with \`gh run download ${GITHUB_RUN_ID} -n screenshots\` at the repository root):"
+              echo
+              echo '```'
+              echo "$changed_images"
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: screenshots
+          path: |
+            website/public/screenshots
+            docs/wiki/images
+            docs/wiki/deeper/images
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,28 @@
+{
+  "doc_url": "https://postmarkapp.com/developer/webhooks/delivery-webhook",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "MessageID": "883953f4-6105-42a2-a16a-77a8eac79483",
+    "Recipient": "john@example.com",
+    "DeliveredAt": "2019-11-05T16:33:54.9070259Z",
+    "Details": "Test delivery webhook details",
+    "Tag": "welcome-email",
+    "ServerID": 23,
+    "Metadata": { "a_key": "a_value" },
+    "RecordType": "Delivery",
+    "MessageStream": "outbound"
+  },
+  "schema": {
+    "type": "object",
+    "required": ["RecordType", "MessageID", "MessageStream", "ServerID", "Metadata"],
+    "properties": {
+      "RecordType": { "enum": ["Delivery", "Bounce", "SpamComplaint", "Open", "Click", "SubscriptionChange"] },
+      "MessageID": { "type": "string", "minLength": 1 },
+      "MessageStream": { "type": "string" },
+      "ServerID": { "type": "integer" },
+      "Metadata": { "type": "object" }
+    }
+  }
+}

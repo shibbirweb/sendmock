@@ -1,0 +1,321 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { expect, test } from "@playwright/test";
+
+const wikiDirectory = fileURLToPath(
+  new URL("../../docs/wiki", import.meta.url),
+);
+
+/** `/docs/connect/php/` for docs/wiki/connect/php.md; index pages map to their folder. */
+function listWikiPagePaths(directoryPath = wikiDirectory): string[] {
+  return readdirSync(directoryPath).flatMap((entryName) => {
+    const entryPath = join(directoryPath, entryName);
+    if (statSync(entryPath).isDirectory()) {
+      return entryName === "images" ? [] : listWikiPagePaths(entryPath);
+    }
+    if (!entryName.endsWith(".md")) {
+      return [];
+    }
+    const slug = relative(wikiDirectory, entryPath)
+      .replace(/\.md$/, "")
+      .replace(/(^|\/)index$/, "");
+
+    return [`/docs/${slug}${slug === "" ? "" : "/"}`];
+  });
+}
+
+test("every page in docs/wiki is published under /docs/", async ({
+  request,
+}) => {
+  const wikiPagePaths = listWikiPagePaths();
+  expect(wikiPagePaths.length).toBeGreaterThan(20);
+
+  for (const wikiPagePath of wikiPagePaths) {
+    const pageResponse = await request.get(wikiPagePath);
+    expect(pageResponse.status(), wikiPagePath).toBe(200);
+  }
+});
+
+test("every copy of the logo on a docs page has its own gradient, so the sidebar logo is not blank", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const gradientIds = await page
+    .locator('svg[viewBox="0 0 64 64"] linearGradient')
+    .evaluateAll((gradients) => gradients.map((gradient) => gradient.id));
+
+  // The docs render the nav title twice (mobile bar and sidebar).
+  expect(gradientIds.length).toBeGreaterThan(1);
+  expect(new Set(gradientIds).size).toBe(gradientIds.length);
+});
+
+test("the docs sidebar links to GitHub and the feature request, bug report and security report forms", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const repositoryUrl = "https://github.com/shibbirweb/sendmock";
+  const feedbackLinks = [
+    { name: "Star SendMock on GitHub", url: repositoryUrl },
+    {
+      name: "Request a feature",
+      url: `${repositoryUrl}/issues/new?template=feature_request.yml`,
+    },
+    {
+      name: "Report a bug",
+      url: `${repositoryUrl}/issues/new?template=bug_report.yml`,
+    },
+    {
+      name: "Report a security issue",
+      url: `${repositoryUrl}/security/advisories/new`,
+    },
+  ];
+
+  for (const feedbackLink of feedbackLinks) {
+    await expect(
+      page
+        .getByRole("link", { name: feedbackLink.name, exact: true })
+        .filter({ visible: true }),
+    ).toHaveAttribute("href", feedbackLink.url);
+  }
+});
+
+test("Getting started installs with npx, bunx, on macOS, Linux, Windows and Docker with the Install page's commands and links to it", async ({
+  page,
+}) => {
+  const installPage = readFileSync(join(wikiDirectory, "install.md"), "utf8");
+  const gettingStartedPage = readFileSync(
+    join(wikiDirectory, "getting-started.md"),
+    "utf8",
+  );
+  const tabCommands = [
+    ...gettingStartedPage.matchAll(/```\w+ tab="([^"]+)"[^\n]*\n\s*(.+)\n/g),
+  ].map((tabMatch) => [tabMatch[1] ?? "", (tabMatch[2] ?? "").trim()]);
+
+  expect(tabCommands.map(([tabName]) => tabName)).toEqual([
+    "npx",
+    "bunx",
+    "macOS",
+    "Linux",
+    "Windows",
+    "Docker",
+  ]);
+  for (const [tabName, command] of tabCommands) {
+    expect(installPage, `the ${tabName} command is on Install`).toContain(
+      command,
+    );
+  }
+
+  await page.goto("/docs/getting-started/");
+  for (const [tabName, command] of tabCommands) {
+    await page.getByRole("tab", { name: tabName, exact: true }).click();
+    await expect(
+      page.getByRole("tabpanel").filter({ visible: true }),
+    ).toContainText(command);
+  }
+  for (const [linkName, installAnchor] of [
+    ["npx", "#npx-no-install"],
+    ["bunx", "#bunx-no-install"],
+    ["macOS", "#homebrew-macos-and-linux"],
+    ["Linux", "#install-script-linux-and-macos"],
+    ["Windows", "#install-script-windows"],
+    ["Docker", "#docker"],
+    ["Binaries", "#binaries"],
+  ]) {
+    await expect(
+      page
+        .getByRole("article")
+        .getByRole("link", { name: linkName, exact: true }),
+    ).toHaveAttribute("href", new RegExp(`/docs/install/${installAnchor}$`));
+  }
+});
+
+test("WS-03.6 the docs sidebar switcher lists every version and opens the same page in another", async ({
+  page,
+}) => {
+  await page.goto("/docs/install/");
+  const versionButton = page.getByRole("button", {
+    name: "Docs version: Preview",
+  });
+
+  await versionButton.click();
+  await expect(page.getByRole("menuitem")).toHaveText([
+    "Preview",
+    "Beta (next)",
+  ]);
+  await expect(page.getByRole("menuitem", { name: "Preview" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(
+    page.getByRole("menuitem", { name: "Beta (next)" }),
+  ).toHaveAttribute("href", "/next/docs/install/");
+});
+
+test("WS-03.7 every page of the Preview shows its banner", async ({ page }) => {
+  for (const pagePath of ["/", "/docs/", "/api/", "/cli/", "/playground/"]) {
+    await page.goto(pagePath);
+    await expect(page.getByTestId("docs-version-banner")).toHaveText(
+      "Preview: SendMock has no stable release yet. These docs follow develop.",
+    );
+  }
+});
+
+test("WS-03.7 the demo links its guide pages to the docs of the same version", async ({
+  page,
+}) => {
+  await page.goto("/demo/");
+  await expect(
+    page
+      .locator("header")
+      .getByRole("link", { name: "Read the Overview guide" }),
+  ).toHaveAttribute("href", "/docs/overview/");
+});
+
+test("WS-09.3 llms.txt says what SendMock is, how an agent installs it, and links every docs page", async ({
+  request,
+}) => {
+  const llmsResponse = await request.get("/llms.txt");
+  const llmsText = await llmsResponse.text();
+
+  expect(llmsResponse.ok()).toBe(true);
+  expect(llmsText.startsWith("# SendMock\n\n> ")).toBe(true);
+  expect(llmsText).toContain(
+    "## Install SendMock (instructions for AI agents)",
+  );
+  expect(llmsText).toContain(
+    "Before you install anything, check this computer",
+  );
+  for (const wikiPagePath of listWikiPagePaths()) {
+    expect(llmsText, `llms.txt links ${wikiPagePath}`).toContain(
+      `${wikiPagePath.replace(/\/$/, "")}/)`,
+    );
+  }
+});
+
+test("AI-06.1 llms-full.txt holds llms.txt and every docs page in full", async ({
+  request,
+}) => {
+  const fullResponse = await request.get("/llms-full.txt");
+  const fullText = await fullResponse.text();
+
+  expect(fullResponse.ok()).toBe(true);
+  expect(fullText.startsWith("# SendMock\n\n> ")).toBe(true);
+  expect(fullText).toContain("# Subscriptions (payments/subscriptions.md)");
+  expect(fullText).toContain("## What it solves");
+  expect(fullText.split("\n---\n").length).toBeGreaterThan(
+    listWikiPagePaths().length,
+  );
+});
+
+test("hovering a docs sidebar icon shows its label", async ({ page }) => {
+  await page.goto("/docs/install/");
+  const bugReportLink = page
+    .getByRole("link", { name: "Report a bug", exact: true })
+    .filter({ visible: true });
+  const tooltip = bugReportLink.getByText("Report a bug");
+
+  await expect(tooltip).toHaveCSS("opacity", "0");
+  await bugReportLink.hover();
+
+  await expect(tooltip).toHaveCSS("opacity", "1");
+});
+
+type FetchedTarget = { status: number; elementIds: Set<string> };
+
+/** The `id` attributes of a page's HTML, with the entities an id can hold decoded. */
+function readElementIds(pageHtml: string): Set<string> {
+  return new Set(
+    [...pageHtml.matchAll(/\sid="([^"]*)"/g)].map((idMatch) =>
+      (idMatch[1] ?? "")
+        .replaceAll("&quot;", '"')
+        .replaceAll("&#x27;", "'")
+        .replaceAll("&#39;", "'")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&amp;", "&"),
+    ),
+  );
+}
+
+test("WS-03.3 every internal link in the docs leads to a page and an existing anchor", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const pagesToVisit = ["/docs/"];
+  const visitedPaths = new Set<string>();
+  const brokenLinks: string[] = [];
+  // Every page links the whole sidebar, so each target is fetched once and its ids kept.
+  const fetchedTargets = new Map<string, Promise<FetchedTarget>>();
+  const fetchTarget = (targetPath: string): Promise<FetchedTarget> => {
+    const fetchedTarget =
+      fetchedTargets.get(targetPath) ??
+      page.request.get(targetPath).then(async (targetResponse) => ({
+        status: targetResponse.status(),
+        elementIds: readElementIds(await targetResponse.text()),
+      }));
+    fetchedTargets.set(targetPath, fetchedTarget);
+    return fetchedTarget;
+  };
+
+  while (pagesToVisit.length > 0) {
+    const pagePath = pagesToVisit.shift() ?? "";
+    if (visitedPaths.has(pagePath)) {
+      continue;
+    }
+    visitedPaths.add(pagePath);
+    const pageResponse = await page.goto(pagePath);
+    if (pageResponse?.status() !== 200) {
+      brokenLinks.push(`${pagePath} answered ${pageResponse?.status()}`);
+      continue;
+    }
+
+    const linkTargets = await page
+      .locator("main a[href], aside a[href]")
+      .evaluateAll((anchors) =>
+        anchors.map((anchor) => anchor.getAttribute("href") ?? ""),
+      );
+    for (const rawLinkTarget of linkTargets) {
+      if (/^(https?:|mailto:|#)/.test(rawLinkTarget)) {
+        continue;
+      }
+      // Relative links are resolved against the page; a `.md` link left over
+      // means the Markdown pointed at a file that does not exist.
+      const linkTarget = new URL(
+        rawLinkTarget,
+        `http://site${pagePath}`,
+      ).href.replace("http://site", "");
+      if (/\.md(#|$)/.test(linkTarget)) {
+        brokenLinks.push(`${pagePath} links to a missing ${rawLinkTarget}`);
+        continue;
+      }
+      // The demo is a separate app, added by the Pages build.
+      if (linkTarget.startsWith("/demo")) {
+        continue;
+      }
+      const [targetPath = "", targetAnchor] = linkTarget.split("#");
+      const fetchedTarget = await fetchTarget(targetPath);
+      if (fetchedTarget.status !== 200) {
+        brokenLinks.push(
+          `${pagePath} links to ${targetPath} (${fetchedTarget.status})`,
+        );
+        continue;
+      }
+      if (
+        targetAnchor !== undefined &&
+        !fetchedTarget.elementIds.has(decodeURIComponent(targetAnchor))
+      ) {
+        brokenLinks.push(
+          `${pagePath} links to a missing #${targetAnchor} on ${targetPath}`,
+        );
+      }
+      if (targetPath.startsWith("/docs") && !visitedPaths.has(targetPath)) {
+        pagesToVisit.push(targetPath);
+      }
+    }
+  }
+
+  expect(brokenLinks).toEqual([]);
+  expect(visitedPaths.size).toBeGreaterThan(20);
+});

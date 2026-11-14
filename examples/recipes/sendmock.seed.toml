@@ -1,0 +1,66 @@
+# The setup the recipe examples expect, as a reader would have built it from each recipe's steps.
+
+[[verify.services]]
+sid = "VA00000000000000000000000000000001"
+name = "Login"
+code_length = 6
+ttl_seconds = 600
+
+[[numbers]]
+number = "+15550001111"
+label = "Support line"
+channels = ["sms"]
+inbound_url = "http://127.0.0.1:3000/sms/inbound"
+inbound_method = "POST"
+inbound_template = "twilio.inbound_sms"
+
+[[webhook.endpoints]]
+name = "Bounce handler"
+url = "http://127.0.0.1:8025/catch/bounce-handler"
+
+[[webhook.endpoints]]
+name = "Postmark inbound"
+url = "http://127.0.0.1:8025/catch/postmark-inbound"
+template = "postmark.inbound"
+
+[[webhook.endpoints]]
+name = "Order handler that is down"
+url = "http://127.0.0.1:3000/handler-that-is-down"
+
+[webhook.endpoints.retry_policy]
+max_attempts = 1
+backoff_seconds = [
+  1,
+]
+retry_on_client_errors = false
+
+[[webhook.rules]]
+name = "Bounces"
+endpoint = "Bounce handler"
+events = [
+  "email.bounced",
+]
+
+[[webhook.rules]]
+name = "Support inbox"
+endpoint = "Postmark inbound"
+events = [
+  "email.received",
+]
+
+[webhook.rules.filter]
+field = "to"
+operator = "matches"
+value = "support@*"
+
+[[webhook.rules]]
+name = "Orders inbox"
+endpoint = "Order handler that is down"
+events = [
+  "email.received",
+]
+
+[webhook.rules.filter]
+field = "to"
+operator = "matches"
+value = "orders@*"

@@ -1,0 +1,902 @@
+{
+  "steps": [
+    {
+      "operation_id": "postHttpBins",
+      "input": {
+        "name": "slack",
+        "preset": "slack"
+      }
+    },
+    {
+      "operation_id": "postHttpBins",
+      "input": {
+        "name": "discord",
+        "preset": "discord"
+      }
+    },
+    {
+      "operation_id": "postHttpBins",
+      "input": {
+        "name": "push",
+        "preset": "fcm"
+      }
+    },
+    {
+      "operation_id": "postHttpBins",
+      "input": {
+        "name": "analytics",
+        "preset": null
+      }
+    },
+    {
+      "operation_id": "postHttpBins",
+      "input": {
+        "name": "uploads",
+        "preset": null
+      }
+    },
+    {
+      "operation_id": "postWebhooksEndpoints",
+      "input": {
+        "name": "Laravel inbound mail",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "postmark.inbound",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 5,
+          "backoff_seconds": [
+            1,
+            5,
+            30,
+            120,
+            600
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+        "url": "http://{{http_address}}/catch/demo-laravel-inbound-mail",
+        "is_enabled": true
+      },
+      "save_as": "endpoint_0"
+    },
+    {
+      "operation_id": "postWebhooksEndpoints",
+      "input": {
+        "name": "SMS status callbacks",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "twilio.status_callback",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 5,
+          "backoff_seconds": [
+            1,
+            5,
+            30,
+            120,
+            600
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+        "url": "http://{{http_address}}/catch/demo-sms-status-callbacks",
+        "is_enabled": true
+      },
+      "save_as": "endpoint_1"
+    },
+    {
+      "operation_id": "postWebhooksEndpoints",
+      "input": {
+        "name": "Team Slack alerts",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "slack.incoming_webhook",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 5,
+          "backoff_seconds": [
+            1,
+            5,
+            30,
+            120,
+            600
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+        "url": "http://{{http_address}}/catch/demo-team-slack-alerts",
+        "is_enabled": true
+      },
+      "save_as": "endpoint_2"
+    },
+    {
+      "operation_id": "postWebhooksEndpoints",
+      "input": {
+        "name": "Everything as native JSON",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "native",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 5,
+          "backoff_seconds": [
+            1,
+            5,
+            30,
+            120,
+            600
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+        "url": "http://{{http_address}}/catch/demo-everything-as-native-json",
+        "is_enabled": true
+      },
+      "save_as": "endpoint_3"
+    },
+    {
+      "operation_id": "postWebhooksEndpoints",
+      "input": {
+        "name": "Shop payments",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "native",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 5,
+          "backoff_seconds": [
+            1,
+            5,
+            30,
+            120,
+            600
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+        "url": "http://{{http_address}}/catch/demo-shop-payments",
+        "is_enabled": true
+      },
+      "save_as": "endpoint_4"
+    },
+    {
+      "operation_id": "postWebhooksRules",
+      "input": {
+        "name": "Support inbox to Laravel",
+        "endpoint_id": "{{saved.endpoint_0.id}}",
+        "events": [
+          "email.received"
+        ],
+        "filter": {
+          "field": "to",
+          "operator": "matches",
+          "value": "*@inbound.local"
+        },
+        "is_enabled": true
+      }
+    },
+    {
+      "operation_id": "postWebhooksRules",
+      "input": {
+        "name": "SMS delivery status",
+        "endpoint_id": "{{saved.endpoint_1.id}}",
+        "events": [
+          "sms.status"
+        ],
+        "filter": null,
+        "is_enabled": true
+      }
+    },
+    {
+      "operation_id": "postWebhooksRules",
+      "input": {
+        "name": "Bounces and complaints to Slack",
+        "endpoint_id": "{{saved.endpoint_2.id}}",
+        "events": [
+          "email.bounced",
+          "email.complained"
+        ],
+        "filter": {
+          "any": [
+            {
+              "field": "to",
+              "operator": "matches",
+              "value": "*@example.com"
+            },
+            {
+              "field": "tag",
+              "operator": "equals",
+              "value": "billing"
+            }
+          ]
+        },
+        "is_enabled": true
+      }
+    },
+    {
+      "operation_id": "postWebhooksRules",
+      "input": {
+        "name": "Mirror everything",
+        "endpoint_id": "{{saved.endpoint_3.id}}",
+        "events": [
+          "email.received",
+          "sms.sent",
+          "sms.inbound"
+        ],
+        "filter": null,
+        "is_enabled": false
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Yundt Inc <no-reply@pertinent-affiliate.test>",
+        "to": [
+          "Kira Parisian <jacob95@example.com>"
+        ],
+        "cc": [],
+        "subject": "Receipt #043426",
+        "text": "Audacia abscido aequus subseco doloremque terminatio coaegresco verumtamen. Subito thermae sopor dignissimos at decumbo iure. Commodi umerus subnecto vespillo aufero facilis adinventitias victus sono.\nAut celo desino coniuratio nobis titulus. Depono vehemens reprehenderit aptus arma canis arbitro. Audio conqueror conscendo volubilis.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Renner, Abernathy and Gutkowski <no-reply@key-flight.test>",
+        "to": [
+          "Burnice McKenzie <kylee_hudson34@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Soap order has shipped",
+        "text": "Defero demonstro aspernatur terreo illum cotidie calamitas usus. Denuo minima recusandae depono annus inventore omnis. Tactus capto cenaculum umerus contra provident synagoga adulescens cubitum sui.\nAntiquus aestas voveo tibi tero abscido utrum vivo cibus sum. Carpo usque virtus benigne terga tabesco xiphias adopto convoco. Suasoria amor tumultus textor casus cauda vobis arca.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Block, Lynch and Heidenreich <no-reply@uneven-gloom.test>",
+        "to": [
+          "Dr. Demarco Feil <aurelie_hessel@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Progressive incremental generative AI",
+        "text": "Vester torrens crapula pectus non doloremque accusator perspiciatis vitium. Adfectus aequus tergum. Reiciendis custodia varietas claudeo adsuesco ventosus varietas.\nInfit cariosus summa confero amiculum asporto vulticulus acer. Recusandae tabella acer veritas conspergo trucido dedico auxilium terebro quia. Succurro bestia aperiam adficio quas tollo ultra aeger bardus.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Pollich - Powlowski <no-reply@monthly-roadway.test>",
+        "to": [
+          "Summer Lemke <jada67@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Sharable interactive software",
+        "text": "Tricesimus desparatus avaritia aegrus. Cursim causa terebro eos virga cumque. Facere comptus coerceo conor soleo libero.\nCarbo ars celebrer comedo vitium. Uterque placeat contabesco vox. Adinventitias bellicus adficio acerbitas avaritia contra nisi tres.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Halvorson - Wintheiser-Shields <no-reply@lined-fax.test>",
+        "to": [
+          "Loy Wolf PhD <ruby.runolfsson@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Computer order has shipped",
+        "text": "Viridis derelinquo undique cunabula tamdiu voluptates vado labore appono. Adulatio ocer adinventitias amor votum. Sollers ambulo debitis admiratio inflammatio decipio temeritas absconditus crustulum.\nVirtus incidunt deprecator qui perspiciatis suppono laborum audentia vere patrocinor. Adfero claro spes ademptio adstringo. Quam venio soleo volva deprimo campana carmen corrumpo audentia custodia.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Klocko LLC <no-reply@moist-convection.test>",
+        "to": [
+          "Ms. Lizzie Yundt <belle.cremin3@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Towels order has shipped",
+        "text": "Veniam vestrum voluptas clamo currus auditor acceptus dignissimos argumentum calco. Depulso atque vulticulus damnatio. Vomica antiquus una vilicus tunc adicio laudantium vesco uxor.\nTredecim caste ducimus acervus deleniti acies rem vestigium. Solum aggero tego vero conqueror bellicus tabgo. Nostrum patrocinor deleo voco sponte voro aqua adulescens.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Gutmann and Sons <no-reply@possible-dulcimer.test>",
+        "to": [
+          "Anika Hickle <brook.rogahn8@example.com>"
+        ],
+        "cc": [],
+        "subject": "Invitation: deliver integrated methodologies",
+        "text": "Celer solio absconditus virgo cupiditate viriliter subvenio vesco despecto. Ab acervus certus accusamus voluptatum despecto eius avarus. Denuo demergo cimentarius unde cuppedia apostolus astrum cado.\nCeno cupiditate compono. Suus amiculum cimentarius. Excepturi traho cras absens tutamen cui.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Quigley-Wolff and Sons <no-reply@livid-gradient.test>",
+        "to": [
+          "Loyce Doyle-Pouros <river47@example.com>"
+        ],
+        "cc": [],
+        "subject": "Receipt #796250",
+        "text": "Sursum patria thesis volubilis combibo vergo cultura provident. Ambitus facilis speciosus certus aspicio tactus capitulus defaeco aegrus decerno. Quis tripudio dedico dens defungo cibo aeternus cumque.\nVicinus natus decipio deprimo accusantium vulgaris cubicularis eligendi. Demulceo vulgo canto vestigium adfectus supplanto barba. Catena thymum paulatim casus.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Pouros, Treutel and Cassin <no-reply@blaring-substitution.test>",
+        "to": [
+          "Liza Orn <trace_johns@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Face to face full-range database",
+        "text": "Coaegresco contego charisma soluta tepidus crebro. Adipisci a deripio asperiores pecto curto numquam. Vitiosus amitto tego adulatio aegrus.\nTui aduro talio carpo cupiditate clam sursum creta comitatus. Solvo depulso terebro speciosus. Vestrum suppellex accedo.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Trantow, McLaughlin and Lehner <no-reply@average-knuckle.test>",
+        "to": [
+          "Lorenzo Hane <antwon73@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Towels order has shipped",
+        "text": "Nobis aliqua arx deprimo tandem decens usitas tener comburo. Laboriosam expedita solum pectus conicio coniuratio caput communis thymbra adeo. Dedico tenetur canis sui ulciscor voluptatem quod.\nAbsorbeo attero doloremque victoria theatrum harum antea modi. Hic audax video. Ipsum utilis reprehenderit sub.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Mosciski - Kulas <no-reply@ultimate-gift.test>",
+        "to": [
+          "Lou Wuckert <garrett22@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Monitored AI-powered artificial intelligence",
+        "text": "Cupiditate ambulo delectus sonitus voluptas vesper termes ter. Color catena possimus corrigo dens provident aggredior carus. Beneficium vergo stultus.\nUtpote beatus spiculum tergum corrigo condico. Crux aperio deinde videlicet provident. Copiose xiphias terreo ipsum cubitum deorsum deorsum vita.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Mosciski - Gleichner <no-reply@short-term-relative.test>",
+        "to": [
+          "Rosemary Cassin <juan.tremblay26@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Smart client-server standardization",
+        "text": "Thymum ciminatio subiungo traho certus somniculosus terebro. Tumultus tristis bardus denique. Decumbo trepide conculco tutis conqueror cruciamentum suffoco commodi laborum.\nArto textilis volubilis. Aperte eius virgo ver statim vinco. Ab ver bene abutor curatio undique conforto.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Mann LLC <no-reply@nervous-tusk.test>",
+        "to": [
+          "Norberto Larson <nils_hand4@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Towels order has shipped",
+        "text": "Hic patria ustilo cedo. Impedit conventus acsi aetas quod triumphus cubo sapiente deprimo constans. Adopto curatio demergo voluptates vallum deleo coepi alo bis adsidue.\nAdmoveo suus adsum tabella spiculum conatus. Demulceo vitium artificiose derideo cursim peior vehemens celebrer. Itaque suadeo pax.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Strosin, Lemke and Volkman <no-reply@naughty-guidance.test>",
+        "to": [
+          "Leah Koch <oral88@example.com>"
+        ],
+        "cc": [],
+        "subject": "Receipt #560388",
+        "text": "Dedecor aegre vel ventus asperiores. Aeger corrigo voluptates admitto. Utor cohibeo viriliter molestias dolorum facilis tendo vero spiritus aduro.\nAmissio optio conscendo debitis statua coepi colo. Tersus crebro itaque deficio textus quisquam mollitia uter carus. Adstringo bonus animadverto ancilla aperio delectatio temptatio summa terror.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Jacobs - Homenick <no-reply@shabby-granny.test>",
+        "to": [
+          "Mr. Vern Ernser <leon_tromp@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Sausages order has shipped",
+        "text": "Sequi ambulo utroque possimus. Cupio quod repellendus distinctio veritas color deprecator. Angulus crur cur claustrum cumque.\nDemonstro aliquid sodalitas crepusculum. Sperno aegrotatio auctus. Attero celebrer antepono terebro.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Harvey - Vandervort <no-reply@authorized-vestment.test>",
+        "to": [
+          "Wilburn Lehner <antwan_west@example.com>"
+        ],
+        "cc": [],
+        "subject": "Receipt #243473",
+        "text": "Celo ullam peior suadeo defetiscor cervus crapula. Turbo patior ara. Corrupti utrum contra vespillo canto a eos trucido bestia.\nAnnus amo caelestis absens adipiscor provident. Tempore appello tollo autus strenuus voluptas terreo. Crustulum somniculosus dicta turpis vallum ipsum.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Wilderman - Sipes <no-reply@cautious-fisherman.test>",
+        "to": [
+          "Ernest Jacobson <ophelia87@example.com>"
+        ],
+        "cc": [],
+        "subject": "Weekly digest: Customer-focused methodical implementation",
+        "text": "Consequatur quisquam virga adstringo conforto vorax thymbra sperno. Supplanto vergo acceptus debeo bestia peccatus sollicito valetudo. Auditor carbo cupio vito aer cubo vaco repellat viduo.\nVicinus balbus adeo tempus nobis desino talis. Cuppedia cimentarius ago curiositas demo conqueror minus. Torrens sopor tyrannus decor videlicet mollitia bos vulticulus.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Schimmel and Sons <no-reply@concerned-knuckle.test>",
+        "to": [
+          "Judd Lockman <skylar_schaefer63@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your Cheese order has shipped",
+        "text": "Cultellus tollo viridis amaritudo cauda. Cupressus cimentarius depono. Facere abbas adduco magni stillicidium candidus tener quisquam.\nThermae nobis vilitas patrocinor capitulus aegre. Vulpes usitas voluptates. Somnus tactus terra.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Legacy System <legacy@old.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Broken HTML sample",
+        "text": "Unclosed tags bold italic cell",
+        "html": "<div><p>Unclosed tags <b>bold <i>italic<table><tr><td>cell",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "This is an intentionally very long subject line that keeps going to make sure the list truncates it nicely without breaking the layout of the row",
+        "text": "Long subject test.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "Yuki <yuki@example.com>"
+        ],
+        "cc": [],
+        "subject": "ご注文ありがとうございます",
+        "text": "ご注文を承りました。発送までしばらくお待ちください。",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "سارة <sara@example.com>"
+        ],
+        "cc": [],
+        "subject": "تم تأكيد حجزك",
+        "text": "شكرا لك! تم تأكيد حجزك ليوم الخميس.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "রহিম উদ্দিন <rahim.bn@example.com>"
+        ],
+        "cc": [],
+        "subject": "আপনার অর্ডার নিশ্চিত হয়েছে",
+        "text": "ধন্যবাদ! আপনার অর্ডার #10293 নিশ্চিত হয়েছে এবং শীঘ্রই পাঠানো হবে।",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Cron <cron@server.test>",
+        "to": [
+          "Ops <ops@acme.test>"
+        ],
+        "cc": [],
+        "subject": "Nightly backup finished",
+        "text": "Backup completed in 4m 12s. 1,204 files, 3.2 GB.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme Promotions <promo@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Last chance: 30% off annual plans",
+        "text": "Upgrade today and save 30%.",
+        "html": "<p>Upgrade today and save 30%.</p>",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "unknown-user@example.com"
+        ],
+        "cc": [],
+        "subject": "Your weekly report is ready",
+        "text": "Your weekly report is ready to download.",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme Billing <billing@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Invoice INV-2026-0042",
+        "text": "Please find your invoice for October attached. Amount due: $49.00.",
+        "tags": [
+          "billing"
+        ]
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme Newsletter <news@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Welcome to Acme: here is what is new this week",
+        "text": "Welcome aboard Three new features shipped this week. Read the blog",
+        "html": "<table width=\"100%\" style=\"background:#f4f4f5;padding:24px\"><tr><td><h1 style=\"color:#18181b\">Welcome aboard</h1><p>Three new features shipped this week.</p><img src=\"cid:hero-image\" alt=\"Hero\"><p><a href=\"https://acme.test/blog\">Read the blog</a></p></td></tr></table>",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Reset your password",
+        "text": "Hi Rahim, Click the link below to reset your password. Reset password",
+        "html": "<p>Hi Rahim,</p><p>Click the link below to reset your password.</p><p><a href=\"https://acme.test/reset?token=9f8e7d6c\">Reset password</a></p><img src=\"https://tracking.acme.test/open.gif\" width=\"1\" height=\"1\">",
+        "tags": []
+      }
+    },
+    {
+      "operation_id": "postSend",
+      "input": {
+        "from": "Acme App <no-reply@acme.test>",
+        "to": [
+          "Rahim Uddin <rahim@example.com>"
+        ],
+        "cc": [],
+        "subject": "Your verification code",
+        "text": "Verify your account Your verification code is 482913 . It expires in 10 minutes.",
+        "html": "<h2>Verify your account</h2><p>Your verification code is <strong>482913</strong>. It expires in 10 minutes.</p>",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    {
+      "operation_id": "postSmsInbound",
+      "input": {
+        "from": "whatsapp:+8801722222222",
+        "to": "whatsapp:+15550003333",
+        "body": "This is the gate, please leave it with the guard.",
+        "channel": "whatsapp"
+      }
+    },
+    {
+      "operation_id": "postSmsInbound",
+      "input": {
+        "from": "whatsapp:+8801722222222",
+        "to": "whatsapp:+15550003333",
+        "body": "Thanks! Can you deliver after 5pm?",
+        "channel": "whatsapp"
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "whatsapp:+15550003333",
+        "to": "whatsapp:+8801722222222",
+        "body": "Hi Karim, your Acme order is out for delivery today."
+      }
+    },
+    {
+      "operation_id": "postSmsInbound",
+      "input": {
+        "from": "+61400000000",
+        "to": "+15550002222",
+        "body": "STOP",
+        "channel": "sms"
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550002222",
+        "to": "+61400000000",
+        "body": "Acme weekly tips: try keyboard shortcuts in the dashboard."
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550002222",
+        "to": "+447700900123",
+        "body": "Booked for Thursday. Show this code at the door."
+      }
+    },
+    {
+      "operation_id": "postSmsInbound",
+      "input": {
+        "from": "+447700900123",
+        "to": "+15550002222",
+        "body": "YES",
+        "channel": "sms"
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550002222",
+        "to": "+447700900123",
+        "body": "Acme: reply YES to confirm your booking for Thursday."
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550001111",
+        "to": "+15005550104",
+        "body": "Reminder: your appointment is tomorrow at 10:00."
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550001111",
+        "to": "+15005550101",
+        "body": "Your order #10293 has shipped."
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550002222",
+        "to": "+14155550123",
+        "body": "Acme alert: your scheduled export finished. 1,204 rows were exported to reports/october.csv. Download it within 7 days from the Exports page in your dashboard, or reply STOP to stop these alerts."
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550001111",
+        "to": "+8801711111111",
+        "body": "আপনার Acme যাচাইকরণ কোড 739201। কোডটি ১০ মিনিটের মধ্যে ব্যবহার করুন। এই কোড কারও সাথে শেয়ার করবেন না।"
+      }
+    },
+    {
+      "operation_id": "postSms",
+      "input": {
+        "from": "+15550001111",
+        "to": "+8801700000000",
+        "body": "Your Acme verification code is 482913. It expires in 10 minutes."
+      }
+    },
+    {
+      "operation_id": "postSamplesByKind",
+      "input": {
+        "kind": "verification"
+      }
+    },
+    {
+      "operation_id": "postSamplesByKind",
+      "input": {
+        "kind": "http"
+      }
+    },
+    {
+      "operation_id": "postPaymentsCheckout",
+      "input": {
+        "provider": "stripe",
+        "amount_minor": 4999,
+        "currency": "USD",
+        "customer_email": "rahim@example.com"
+      },
+      "save_as": "checkout_0"
+    },
+    {
+      "operation_id": "postCheckoutSessionsBySessionIdComplete",
+      "input": {
+        "session_id": "{{saved.checkout_0.id}}",
+        "action": "pay",
+        "method_key": "card",
+        "card": {
+          "number": "4242424242424242",
+          "exp_month": 12,
+          "exp_year": 2034,
+          "cvc": "123",
+          "holder_name": "Rahim Uddin"
+        }
+      }
+    },
+    {
+      "operation_id": "postPaymentsCheckout",
+      "input": {
+        "provider": "stripe",
+        "amount_minor": 1250,
+        "currency": "EUR",
+        "customer_email": "rahim@example.com"
+      },
+      "save_as": "checkout_1"
+    },
+    {
+      "operation_id": "postCheckoutSessionsBySessionIdComplete",
+      "input": {
+        "session_id": "{{saved.checkout_1.id}}",
+        "action": "pay",
+        "method_key": "card",
+        "card": {
+          "number": "4242424242424242",
+          "exp_month": 12,
+          "exp_year": 2034,
+          "cvc": "123",
+          "holder_name": "Rahim Uddin"
+        }
+      }
+    },
+    {
+      "operation_id": "postPaymentsCheckout",
+      "input": {
+        "provider": "stripe",
+        "amount_minor": 8900,
+        "currency": "USD",
+        "customer_email": "rahim@example.com"
+      },
+      "save_as": "checkout_2"
+    },
+    {
+      "operation_id": "postCheckoutSessionsBySessionIdComplete",
+      "input": {
+        "session_id": "{{saved.checkout_2.id}}",
+        "action": "decline",
+        "method_key": "card",
+        "card": {
+          "number": "4242424242424242",
+          "exp_month": 12,
+          "exp_year": 2034,
+          "cvc": "123",
+          "holder_name": "Rahim Uddin"
+        },
+        "decline_reason": "insufficient_funds"
+      }
+    },
+    {
+      "operation_id": "postPaymentsCheckout",
+      "input": {
+        "provider": "sslcommerz",
+        "amount_minor": 150000,
+        "currency": "BDT",
+        "customer_email": "rahim@example.com"
+      },
+      "save_as": "checkout_3"
+    },
+    {
+      "operation_id": "postCheckoutSessionsBySessionIdComplete",
+      "input": {
+        "session_id": "{{saved.checkout_3.id}}",
+        "action": "pay",
+        "method_key": "card",
+        "card": {
+          "number": "4242424242424242",
+          "exp_month": 12,
+          "exp_year": 2034,
+          "cvc": "123",
+          "holder_name": "Rahim Uddin"
+        }
+      }
+    },
+    {
+      "operation_id": "postPaymentsCheckout",
+      "input": {
+        "provider": "stripe",
+        "amount_minor": 2000,
+        "currency": "USD",
+        "customer_email": "rahim@example.com"
+      },
+      "save_as": "checkout_4"
+    }
+  ]
+}

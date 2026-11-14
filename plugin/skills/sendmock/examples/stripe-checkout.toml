@@ -1,0 +1,19 @@
+name = "stripe-checkout"
+
+[[steps]]
+run = "payment.create.checkout"
+with = { provider = "stripe", amount_minor = 1500, currency = "USD" }
+save = "payment"
+
+[[steps]]
+run = "checkout.complete"
+with = { sessionId = "{{ payment.id }}", action = "pay", method_key = "card", card = { number = "4242424242424242", exp_month = 12, exp_year = 2034, cvc = "123", holder_name = "Test Buyer" } }
+
+[[steps]]
+run = "payment.get"
+with = { paymentId = "{{ payment.id }}" }
+save = "paid"
+
+[[steps]]
+run = "assert"
+with = { that = "{{ paid.status }} == succeeded" }

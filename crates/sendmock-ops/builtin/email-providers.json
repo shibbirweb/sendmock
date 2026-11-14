@@ -1,0 +1,827 @@
+[
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "SG.test_key_123",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "sendgrid",
+    "name": "SendGrid",
+    "area": "email",
+    "accent": "#1a82e2",
+    "host": "api.sendgrid.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v3/mail/send",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from.email"
+      },
+      {
+        "part": "to",
+        "source": "personalizations[*].to[*].email"
+      },
+      {
+        "part": "cc",
+        "source": "personalizations[*].cc[*].email"
+      },
+      {
+        "part": "subject",
+        "source": "subject"
+      },
+      {
+        "part": "text",
+        "source": "content[type=text/plain].value"
+      },
+      {
+        "part": "html",
+        "source": "content[type=text/html].value"
+      },
+      {
+        "part": "attachments",
+        "source": "attachments"
+      },
+      {
+        "part": "template_id",
+        "source": "template_id"
+      },
+      {
+        "part": "template_data",
+        "source": "personalizations[0].dynamic_template_data"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "from",
+        "check": "email_address",
+        "max_length": null,
+        "error_kind": "invalid_value"
+      },
+      {
+        "part": "to",
+        "check": "email_address",
+        "max_length": null,
+        "error_kind": "invalid_value"
+      }
+    ],
+    "success_response": {
+      "status": 202,
+      "headers": [
+        {
+          "name": "X-Message-Id",
+          "template": "{{ message.provider_id }}"
+        }
+      ],
+      "body": ""
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"message\": \"The {{ error.part }} field is required.\", \"field\": \"{{ error.part }}\", \"help\": null}]}"
+      },
+      {
+        "kind": "invalid_value",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"message\": \"Does not contain a valid address.\", \"field\": \"{{ error.part }}\", \"help\": null}]}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"errors\": [{\"message\": \"The provided authorization grant is invalid, expired, or revoked\", \"field\": null, \"help\": null}]}"
+      }
+    ],
+    "message_id_template": "{{ random_hex(22) }}",
+    "callback_template_key": "sendgrid.events",
+    "status_names": {
+      "delivered": "delivered",
+      "bounced": "bounce",
+      "complained": "spamreport",
+      "opened": "open",
+      "clicked": "click"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "key-test123",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "mailgun",
+    "name": "Mailgun",
+    "area": "email",
+    "accent": "#f06b66",
+    "host": "api.mailgun.net",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v3/{domain}/messages",
+        "request_format": "multipart"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "cc",
+        "source": "cc"
+      },
+      {
+        "part": "subject",
+        "source": "subject"
+      },
+      {
+        "part": "text",
+        "source": "text"
+      },
+      {
+        "part": "html",
+        "source": "html"
+      },
+      {
+        "part": "attachments",
+        "source": "attachment"
+      },
+      {
+        "part": "tags",
+        "source": "o:tag"
+      },
+      {
+        "part": "headers",
+        "source": "h:*"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"id\": \"{{ message.provider_id }}\", \"message\": \"Queued. Thank you.\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message\": \"'{{ error.part }}' parameter is missing\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message\": \"Forbidden\"}"
+      }
+    ],
+    "message_id_template": "<{{ now_unix() }}.{{ random_hex(16) }}@{{ request.path_params.domain }}>",
+    "callback_template_key": null,
+    "status_names": {
+      "delivered": "delivered",
+      "bounced": "failed",
+      "complained": "complained",
+      "opened": "opened",
+      "clicked": "clicked"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "server_token",
+        "value": "pm-test-token",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "postmark",
+    "name": "Postmark",
+    "area": "email",
+    "accent": "#ffde00",
+    "host": "api.postmarkapp.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/email",
+        "request_format": "json"
+      },
+      {
+        "kind": "send_batch",
+        "method": "POST",
+        "path": "/email/batch",
+        "request_format": "json"
+      },
+      {
+        "kind": "send_with_template",
+        "method": "POST",
+        "path": "/email/withTemplate",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "From"
+      },
+      {
+        "part": "to",
+        "source": "To"
+      },
+      {
+        "part": "cc",
+        "source": "Cc"
+      },
+      {
+        "part": "bcc",
+        "source": "Bcc"
+      },
+      {
+        "part": "subject",
+        "source": "Subject"
+      },
+      {
+        "part": "text",
+        "source": "TextBody"
+      },
+      {
+        "part": "html",
+        "source": "HtmlBody"
+      },
+      {
+        "part": "attachments",
+        "source": "Attachments"
+      },
+      {
+        "part": "tags",
+        "source": "Tag"
+      },
+      {
+        "part": "template_id",
+        "source": "TemplateId"
+      },
+      {
+        "part": "template_data",
+        "source": "TemplateModel"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"To\": \"{{ message.to }}\", \"SubmittedAt\": \"{{ now_iso() }}\", \"MessageID\": \"{{ message.provider_id }}\", \"ErrorCode\": 0, \"Message\": \"OK\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 422,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"ErrorCode\": 300, \"Message\": \"Invalid email request\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"ErrorCode\": 10, \"Message\": \"No Account or Server API tokens were supplied in the HTTP headers.\"}"
+      }
+    ],
+    "message_id_template": "{{ uuid() }}",
+    "callback_template_key": null,
+    "status_names": {
+      "delivered": "Delivery",
+      "bounced": "Bounce",
+      "complained": "SpamComplaint",
+      "opened": "Open",
+      "clicked": "Click"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "re_test_123",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "resend",
+    "name": "Resend",
+    "area": "email",
+    "accent": "#000000",
+    "host": "api.resend.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/emails",
+        "request_format": "json"
+      },
+      {
+        "kind": "send_batch",
+        "method": "POST",
+        "path": "/emails/batch",
+        "request_format": "json"
+      },
+      {
+        "kind": "fetch",
+        "method": "GET",
+        "path": "/emails/{id}",
+        "request_format": "query"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "from"
+      },
+      {
+        "part": "to",
+        "source": "to"
+      },
+      {
+        "part": "cc",
+        "source": "cc"
+      },
+      {
+        "part": "bcc",
+        "source": "bcc"
+      },
+      {
+        "part": "reply_to",
+        "source": "reply_to"
+      },
+      {
+        "part": "subject",
+        "source": "subject"
+      },
+      {
+        "part": "text",
+        "source": "text"
+      },
+      {
+        "part": "html",
+        "source": "html"
+      },
+      {
+        "part": "attachments",
+        "source": "attachments"
+      },
+      {
+        "part": "tags",
+        "source": "tags"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "subject",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"id\": \"{{ message.provider_id }}\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 422,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"statusCode\": 422, \"message\": \"Missing `{{ error.part }}` field.\", \"name\": \"missing_required_field\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"statusCode\": 401, \"message\": \"Missing API key in the authorization header.\", \"name\": \"missing_api_key\"}"
+      },
+      {
+        "kind": "not_found",
+        "status": 404,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"statusCode\": 404, \"message\": \"Email not found\", \"name\": \"not_found\"}"
+      }
+    ],
+    "message_id_template": "{{ uuid() }}",
+    "callback_template_key": "resend.events",
+    "status_names": {
+      "delivered": "email.delivered",
+      "bounced": "email.bounced",
+      "complained": "email.complained",
+      "opened": "email.opened",
+      "clicked": "email.clicked"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "access_key_id",
+        "value": "AKIATEST123",
+        "is_secret": false
+      },
+      {
+        "name": "secret_access_key",
+        "value": "ses-test-secret",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "ses",
+    "name": "Amazon SES",
+    "area": "email",
+    "accent": "#ff9900",
+    "host": "email.us-east-1.amazonaws.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v2/email/outbound-emails",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "FromEmailAddress"
+      },
+      {
+        "part": "to",
+        "source": "Destination.ToAddresses"
+      },
+      {
+        "part": "cc",
+        "source": "Destination.CcAddresses"
+      },
+      {
+        "part": "bcc",
+        "source": "Destination.BccAddresses"
+      },
+      {
+        "part": "reply_to",
+        "source": "ReplyToAddresses"
+      },
+      {
+        "part": "subject",
+        "source": "Content.Simple.Subject.Data"
+      },
+      {
+        "part": "text",
+        "source": "Content.Simple.Body.Text.Data"
+      },
+      {
+        "part": "html",
+        "source": "Content.Simple.Body.Html.Data"
+      },
+      {
+        "part": "raw",
+        "source": "Content.Raw.Data"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 200,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"MessageId\": \"{{ message.provider_id }}\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message\": \"Missing required field {{ error.part }}\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 403,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"message\": \"The security token included in the request is invalid.\"}"
+      }
+    ],
+    "message_id_template": "0100{{ random_hex(12) }}-{{ uuid() }}-000000",
+    "callback_template_key": "ses.sns",
+    "status_names": {
+      "delivered": "Delivery",
+      "bounced": "Bounce",
+      "complained": "Complaint",
+      "opened": "Open",
+      "clicked": "Click"
+    }
+  },
+  {
+    "is_enabled": true,
+    "check_credentials": false,
+    "credentials": [
+      {
+        "name": "api_key",
+        "value": "xkeysib-test123",
+        "is_secret": true
+      }
+    ],
+    "outcome_error_codes": {},
+    "is_builtin": true,
+    "is_removed": false,
+    "key": "brevo",
+    "name": "Brevo",
+    "area": "email",
+    "accent": "#0b996e",
+    "host": "api.brevo.com",
+    "operations": [
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v3/smtp/email",
+        "request_format": "json"
+      }
+    ],
+    "field_mapping": [
+      {
+        "part": "from",
+        "source": "sender.email"
+      },
+      {
+        "part": "to",
+        "source": "to[*].email"
+      },
+      {
+        "part": "cc",
+        "source": "cc[*].email"
+      },
+      {
+        "part": "bcc",
+        "source": "bcc[*].email"
+      },
+      {
+        "part": "reply_to",
+        "source": "replyTo.email"
+      },
+      {
+        "part": "subject",
+        "source": "subject"
+      },
+      {
+        "part": "text",
+        "source": "textContent"
+      },
+      {
+        "part": "html",
+        "source": "htmlContent"
+      },
+      {
+        "part": "attachments",
+        "source": "attachment"
+      },
+      {
+        "part": "tags",
+        "source": "tags"
+      },
+      {
+        "part": "template_id",
+        "source": "templateId"
+      },
+      {
+        "part": "template_data",
+        "source": "params"
+      }
+    ],
+    "validation_rules": [
+      {
+        "part": "from",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      },
+      {
+        "part": "to",
+        "check": "required",
+        "max_length": null,
+        "error_kind": "missing_field"
+      }
+    ],
+    "success_response": {
+      "status": 201,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "template": "application/json"
+        }
+      ],
+      "body": "{\"messageId\": \"{{ message.provider_id }}\"}"
+    },
+    "error_responses": [
+      {
+        "kind": "missing_field",
+        "status": 400,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": \"missing_parameter\", \"message\": \"{{ error.part }} is missing\"}"
+      },
+      {
+        "kind": "unauthorized",
+        "status": 401,
+        "headers": [
+          {
+            "name": "Content-Type",
+            "template": "application/json"
+          }
+        ],
+        "body": "{\"code\": \"unauthorized\", \"message\": \"Key not found\"}"
+      }
+    ],
+    "message_id_template": "<{{ random_hex(24) }}@smtp-relay.mailin.fr>",
+    "callback_template_key": null,
+    "status_names": {
+      "delivered": "delivered",
+      "bounced": "hard_bounce",
+      "complained": "spam",
+      "opened": "opened",
+      "clicked": "click"
+    }
+  }
+]

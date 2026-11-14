@@ -1,0 +1,15 @@
+name = "reply-by-email"
+
+[[steps]]
+run = "sample.send"
+with = { kind = "email", to = "ticket@example.test", subject = "Ticket 42 updated" }
+save = "sample"
+
+[[steps]]
+run = "email.reply"
+with = { emailId = "{{ sample.id }}", body = "Thanks, that fixed it." }
+save = "reply"
+
+[[steps]]
+run = "email.timeline"
+with = { emailId = "{{ sample.id }}" }

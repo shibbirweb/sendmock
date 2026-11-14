@@ -1,0 +1,129 @@
+import { Link } from "@tanstack/react-router";
+import {
+  ArrowLeftIcon,
+  EyeIcon,
+  ForwardIcon,
+  ReplyIcon,
+  ScrollTextIcon,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { IconButton } from "@/components/common/icon-button";
+import { EmailTagsEditor } from "@/features/mail/detail/email-tags-editor";
+import { MailDetailActions } from "@/features/mail/detail/mail-detail-actions";
+import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
+import { EmailResponseLinks } from "@/features/mail/detail/response/email-response-links";
+import { EmailOutcomeBadge } from "@/features/mail/email-outcome-badge";
+import {
+  isEmailTransportSource,
+  labelEmailSource,
+} from "@/features/mail/mail-labels";
+import { ProviderBadge } from "@/features/providers/provider-badge";
+import type { EmailAddress, EmailDetail } from "@/lib/api/types";
+import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
+
+function formatAddressList(emailAddresses: EmailAddress[]): string {
+  return emailAddresses
+    .map((emailAddress) =>
+      emailAddress.name
+        ? `${emailAddress.name} <${emailAddress.address}>`
+        : emailAddress.address,
+    )
+    .join(", ");
+}
+
+export function MailDetailHeader({
+  email,
+  onStartResponse,
+}: {
+  email: EmailDetail;
+  onStartResponse: (composerMode: EmailComposerMode) => void;
+}) {
+  const addressRows = [
+    { label: "From", value: formatAddressList([email.from]) },
+    { label: "To", value: formatAddressList(email.to) },
+    { label: "Cc", value: formatAddressList(email.cc) },
+    { label: "Bcc", value: formatAddressList(email.bcc) },
+  ].filter((addressRow) => addressRow.value !== "");
+
+  return (
+    <header className="grid gap-3 border-b px-4 py-4 sm:px-6">
+      {/* The subject keeps 14rem; on narrow screens the actions wrap below it. */}
+      <div className="flex flex-wrap items-start gap-2">
+        <IconButton
+          label="Back to the list"
+          variant="ghost"
+          className="-ml-2 md:hidden"
+          asChild
+        >
+          <Link to="/mail" search={(previousSearch) => previousSearch}>
+            <ArrowLeftIcon />
+          </Link>
+        </IconButton>
+        <h2 className="min-w-0 flex-1 basis-56 text-lg leading-snug font-semibold break-words">
+          {email.subject || "(no subject)"}
+        </h2>
+        <MailDetailActions email={email} onStartResponse={onStartResponse} />
+      </div>
+      <dl className="grid grid-cols-[3rem_1fr] gap-x-2 gap-y-0.5 text-sm">
+        {addressRows.map((addressRow) => (
+          <div key={addressRow.label} className="contents">
+            <dt className="text-muted-foreground">{addressRow.label}</dt>
+            <dd className="min-w-0 break-words">{addressRow.value}</dd>
+          </div>
+        ))}
+        <dt className="text-muted-foreground">Date</dt>
+        <dd>
+          <time dateTime={email.received_at}>
+            {formatDateTime(email.received_at)}
+          </time>
+        </dd>
+      </dl>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {email.direction === "inbound" && (
+          <Badge variant="secondary">
+            {email.response_kind === "forward" ? (
+              <ForwardIcon />
+            ) : (
+              <ReplyIcon />
+            )}
+            Inbound
+          </Badge>
+        )}
+        {email.smtp_session_id === null ? (
+          isEmailTransportSource(email.source) ? (
+            <Badge variant="outline">{labelEmailSource(email.source)}</Badge>
+          ) : (
+            <ProviderBadge providerArea="email" providerKey={email.source} />
+          )
+        ) : (
+          <Badge variant="outline" asChild>
+            <Link
+              to="/logs"
+              search={{ session: email.smtp_session_id }}
+              title="Open the SMTP session that delivered this email"
+            >
+              {labelEmailSource(email.source)}
+              <ScrollTextIcon />
+            </Link>
+          </Badge>
+        )}
+        {email.tags.map((tagName) => (
+          <Badge key={tagName} variant="secondary">
+            {tagName}
+          </Badge>
+        ))}
+        <EmailTagsEditor email={email} />
+        <EmailOutcomeBadge deliveryStatus={email.delivery_status} />
+        {email.open_count > 0 && email.opened_at !== null && (
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <EyeIcon className="size-3.5" />
+            Opened {email.open_count} time{email.open_count === 1 ? "" : "s"},
+            first {formatRelativeTime(email.opened_at)}
+          </span>
+        )}
+      </div>
+      <EmailResponseLinks email={email} />
+    </header>
+  );
+}

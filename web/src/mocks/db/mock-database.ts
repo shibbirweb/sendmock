@@ -1,0 +1,327 @@
+import type {
+  ApiRequestLogEntry,
+  AppSettings,
+  CapturedHttpRequest,
+  EmailDetail,
+  EmailTimelineEntry,
+  HttpBin,
+  EmailClickRecord,
+  OpenRecord,
+  HttpResponseRule,
+  PaymentDetail,
+  MessagingService,
+  PushNotification,
+  SavedDelivery,
+  SmsMessageDetail,
+  SmtpSession,
+  VerificationDetail,
+  SmsOutcomeRule,
+  EmailOutcomeRule,
+  VerifyService,
+  VirtualNumber,
+  WebhookDelivery,
+  WebhookRule,
+  TemplateRevision,
+  WebhookTemplateSummary,
+  WebhookVariable,
+} from "@/lib/api/types";
+import {
+  buildHttpBinFixtures,
+  buildHttpResponseRuleFixtures,
+} from "@/mocks/fixtures/http-catcher-fixtures";
+import {
+  buildMessageRuleFixtures,
+  type MessageRuleSets,
+} from "@/mocks/fixtures/message-rule-fixtures";
+import { buildPaymentFixtures } from "@/mocks/fixtures/payment-fixtures";
+import {
+  buildInboundRouteFixtures,
+  type InboundRouteRecord,
+} from "@/mocks/fixtures/inbound-route-fixtures";
+import { runReplyWebhook } from "@/mocks/sms-replies/run-reply-webhook";
+import {
+  buildBuiltinPaymentGateways,
+  type PaymentGatewayRecord,
+} from "@/mocks/fixtures/payment-gateway-fixtures";
+import {
+  buildBuiltinPaymentFlows,
+  type PaymentFlowRecord,
+} from "@/mocks/fixtures/payment-flow-fixtures";
+import {
+  buildBuiltinPaymentMethods,
+  type PaymentMethodRecord,
+} from "@/mocks/fixtures/payment-method-fixtures";
+import { buildDefaultSettings } from "@/mocks/fixtures/settings-fixtures";
+import { buildHttpCatcherTraffic } from "@/mocks/http/build-http-catcher-traffic";
+import {
+  buildApiRequestLogFixtures,
+  linkApiRequestFixtures,
+} from "@/mocks/fixtures/api-request-fixtures";
+import {
+  buildLargeEmailFixtures,
+  buildStandardEmailFixtures,
+} from "@/mocks/fixtures/email-fixtures";
+import { seedFixtureRandomness } from "@/mocks/fixtures/fixture-helpers";
+import { buildOpenRecordFixtures } from "@/mocks/fixtures/open-record-fixtures";
+import { buildStandardSmsFixtures } from "@/mocks/fixtures/sms-fixtures";
+import { buildSmtpSessionFixtures } from "@/mocks/fixtures/smtp-session-fixtures";
+import {
+  buildSavedDeliveryFixtures,
+  buildWebhookTemplateFixtures,
+} from "@/mocks/fixtures/template-and-variable-fixtures";
+import { buildPushFixtures } from "@/mocks/fixtures/push-fixtures";
+import { buildWebhookVariableFixtures } from "@/mocks/fixtures/webhook-variable-fixtures";
+import {
+  buildVerificationFixtures,
+  linkVerificationMessages,
+  buildVerifyServiceFixtures,
+} from "@/mocks/fixtures/verify-fixtures";
+import {
+  buildMessagingServiceFixtures,
+  buildVirtualNumberFixtures,
+} from "@/mocks/fixtures/number-fixtures";
+import {
+  buildEmailOutcomeRuleFixtures,
+  buildSmsOutcomeRuleFixtures,
+} from "@/mocks/fixtures/outcome-rule-fixtures";
+import {
+  buildWebhookDeliveryFixtures,
+  buildWebhookEndpointFixtures,
+  buildWebhookRuleFixtures,
+  linkDeliverySubjects,
+  paymentEndpointName,
+} from "@/mocks/fixtures/webhook-fixtures";
+import { buildTemplateRevisionFixtures } from "@/mocks/fixtures/template-revision-fixtures";
+import { buildBuiltinEmailProviders } from "@/mocks/fixtures/email-provider-fixtures";
+import type { MessageProviderRecord } from "@/mocks/fixtures/message-provider-builder";
+import {
+  buildBuiltinSmsProviders,
+  buildExampleCustomSmsProvider,
+} from "@/mocks/fixtures/sms-provider-fixtures";
+import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
+import type { WebhookEndpointRecord } from "@/mocks/webhooks/webhook-endpoint-record";
+import {
+  buildProjectFixtures,
+  type ProjectRecord,
+} from "@/mocks/fixtures/project-fixtures";
+import type { PaymentSubscriptionRecord } from "@/mocks/payments/subscriptions/payment-subscriptions";
+
+/** In-memory state behind the mock API. Lists are kept newest first. */
+export type MockDatabase = {
+  /** When the seed state was last applied (creation, reset or seed apply). */
+  seedAppliedAt: string;
+  emails: EmailDetail[];
+  emailTimelines: Map<string, EmailTimelineEntry[]>;
+  /** Each email's and SMS's open history, oldest first, by message id. */
+  messageOpens: Map<string, OpenRecord[]>;
+  /** Each email's click history, newest first, by email id. */
+  emailClicks: Map<string, EmailClickRecord[]>;
+  /** Bytes of attachments sent through the native API, keyed `emailId/index`. */
+  attachmentContents: Map<string, Uint8Array>;
+  /** Bytes of SMS media sent inline, keyed `smsId/index`. */
+  smsMediaContents: Map<string, Uint8Array>;
+  smsMessages: SmsMessageDetail[];
+  verifyServices: VerifyService[];
+  verifications: VerificationDetail[];
+  virtualNumbers: VirtualNumber[];
+  messagingServices: MessagingService[];
+  smsOutcomeRules: SmsOutcomeRule[];
+  emailOutcomeRules: EmailOutcomeRule[];
+  messageRules: MessageRuleSets;
+  webhookEndpoints: WebhookEndpointRecord[];
+  webhookRules: WebhookRule[];
+  webhookDeliveries: WebhookDelivery[];
+  webhookTemplates: WebhookTemplateSummary[];
+  /** Request shapes of custom templates; built-in ones come from the fixtures. */
+  customTemplateDefinitions: Map<string, TemplateDefinition>;
+  /** Saved versions of custom and edited built-in templates, newest first. */
+  templateRevisions: Map<string, TemplateRevision[]>;
+  webhookVariables: WebhookVariable[];
+  savedDeliveries: SavedDelivery[];
+  payments: PaymentDetail[];
+  paymentMethods: PaymentMethodRecord[];
+  paymentFlows: PaymentFlowRecord[];
+  paymentGateways: PaymentGatewayRecord[];
+  paymentSubscriptions: PaymentSubscriptionRecord[];
+  /** Email and SMS providers, built in and custom (docs/plan/22). */
+  messageProviders: MessageProviderRecord[];
+  inboundRoutes: InboundRouteRecord[];
+  /** Projects, `default` first (PL-10). */
+  projects: ProjectRecord[];
+  /** Push notifications, newest first (PN-01). */
+  pushNotifications: PushNotification[];
+  httpBins: HttpBin[];
+  /** Each bin's response rules in order, by bin id. */
+  httpResponseRules: Map<string, HttpResponseRule[]>;
+  capturedHttpRequests: CapturedHttpRequest[];
+  /** Uploaded file contents by `<requestId>:<fileIndex>`. */
+  httpFileContents: Map<string, string>;
+  smtpSessions: SmtpSession[];
+  apiRequestLog: ApiRequestLogEntry[];
+  settings: AppSettings;
+};
+
+export type MockDataSize = "standard" | "large" | "empty";
+
+const largeDataSetEmailCount = 5000;
+const largeDataSetApiRequestCount = 2000;
+
+function sortNewestFirst<ItemType extends { id: string }>(
+  items: ItemType[],
+): ItemType[] {
+  return [...items].sort((firstItem, secondItem) =>
+    secondItem.id.localeCompare(firstItem.id),
+  );
+}
+
+function buildConfiguration() {
+  const virtualNumbers = buildVirtualNumberFixtures();
+  const verifyServices = buildVerifyServiceFixtures();
+  const webhookEndpoints = buildWebhookEndpointFixtures();
+  const httpBins = buildHttpBinFixtures();
+  const responseRulesByBinName = buildHttpResponseRuleFixtures();
+
+  return {
+    virtualNumbers,
+    messagingServices: buildMessagingServiceFixtures(virtualNumbers),
+    verifyServices,
+    webhookEndpoints,
+    webhookRules: buildWebhookRuleFixtures(webhookEndpoints),
+    webhookTemplates: buildWebhookTemplateFixtures(),
+    customTemplateDefinitions: new Map(),
+    templateRevisions: buildTemplateRevisionFixtures(),
+    webhookVariables: buildWebhookVariableFixtures(),
+    savedDeliveries: buildSavedDeliveryFixtures(),
+    httpBins,
+    paymentMethods: buildBuiltinPaymentMethods(),
+    paymentFlows: buildBuiltinPaymentFlows(),
+    paymentSubscriptions: [],
+    inboundRoutes: buildInboundRouteFixtures(),
+    projects: buildProjectFixtures(),
+    messageProviders: [
+      ...buildBuiltinEmailProviders(),
+      ...buildBuiltinSmsProviders(),
+      buildExampleCustomSmsProvider(),
+    ],
+    paymentGateways: buildBuiltinPaymentGateways(
+      webhookEndpoints.find(
+        (webhookEndpoint) => webhookEndpoint.name === paymentEndpointName,
+      )?.id ?? null,
+    ),
+    httpResponseRules: new Map(
+      httpBins.map((httpBin) => [
+        httpBin.id,
+        responseRulesByBinName[httpBin.name] ?? [],
+      ]),
+    ),
+    smsOutcomeRules: buildSmsOutcomeRuleFixtures(),
+    emailOutcomeRules: buildEmailOutcomeRuleFixtures(),
+    messageRules: buildMessageRuleFixtures(),
+    settings: buildDefaultSettings(),
+    seedAppliedAt: new Date().toISOString(),
+  };
+}
+
+/** Builds a fresh database. "empty" keeps configuration but no traffic, like `reset` with an empty seed. */
+export function createMockDatabase(mockDataSize: MockDataSize): MockDatabase {
+  seedFixtureRandomness();
+  const configuration = buildConfiguration();
+
+  if (mockDataSize === "empty") {
+    return {
+      ...configuration,
+      emails: [],
+      emailTimelines: new Map(),
+      messageOpens: new Map(),
+      emailClicks: new Map(),
+      attachmentContents: new Map(),
+      smsMediaContents: new Map(),
+      smsMessages: [],
+      verifications: [],
+      pushNotifications: [],
+      webhookDeliveries: [],
+      capturedHttpRequests: [],
+      httpFileContents: new Map(),
+      payments: [],
+      smtpSessions: [],
+      apiRequestLog: [],
+    };
+  }
+
+  const emailFixtures =
+    mockDataSize === "large"
+      ? buildLargeEmailFixtures(largeDataSetEmailCount)
+      : buildStandardEmailFixtures();
+  const smsMessages = sortNewestFirst(buildStandardSmsFixtures());
+  const emails = sortNewestFirst(
+    emailFixtures.map((emailFixture) => emailFixture.email),
+  );
+  const smtpSessions = buildSmtpSessionFixtures(emails);
+  const apiRequestLog = buildApiRequestLogFixtures(
+    mockDataSize === "large" ? largeDataSetApiRequestCount : 0,
+  );
+  linkApiRequestFixtures(apiRequestLog, emails, smsMessages);
+  const webhookDeliveries = linkDeliverySubjects(
+    buildWebhookDeliveryFixtures(configuration.webhookEndpoints),
+    emails.map((email) => email.id),
+    smsMessages.map((smsMessage) => smsMessage.id),
+  );
+  // Payment notifications are deliveries too, added to the same log.
+  const payments = buildPaymentFixtures({
+    webhookEndpoints: configuration.webhookEndpoints,
+    webhookDeliveries,
+    paymentGateways: configuration.paymentGateways,
+  });
+  const httpCatcherTraffic = buildHttpCatcherTraffic(
+    configuration.httpBins,
+    configuration.httpResponseRules,
+    configuration.webhookVariables,
+  );
+
+  // Inbound fixtures went to their reply webhooks as they arrived (SM-09.7);
+  // run last, so the seeded randomness of the other fixtures stays the same.
+  smsMessages
+    .filter((smsMessage) => smsMessage.direction === "inbound")
+    .forEach((inboundMessage) => {
+      runReplyWebhook(
+        { ...configuration, smsMessages },
+        inboundMessage,
+        Date.parse(inboundMessage.created_at),
+      );
+    });
+
+  return {
+    ...configuration,
+    emails,
+    attachmentContents: new Map(),
+    smsMediaContents: new Map(),
+    emailTimelines: new Map(
+      emailFixtures.map((emailFixture) => [
+        emailFixture.email.id,
+        emailFixture.timeline,
+      ]),
+    ),
+    smsMessages,
+    messageOpens: buildOpenRecordFixtures([...emails, ...smsMessages]),
+    emailClicks: new Map(),
+    verifications: linkVerificationMessages(
+      buildVerificationFixtures(configuration.verifyServices),
+      smsMessages,
+    ),
+    pushNotifications: buildPushFixtures(),
+    webhookDeliveries: sortNewestFirst(webhookDeliveries),
+    payments: sortNewestFirst(payments),
+    httpBins: httpCatcherTraffic.httpBins,
+    capturedHttpRequests: sortNewestFirst(httpCatcherTraffic.capturedRequests),
+    httpFileContents: httpCatcherTraffic.fileContents,
+    smtpSessions,
+    apiRequestLog,
+  };
+}
+
+/** The single shared instance used by every mock handler. */
+export let mockDatabase: MockDatabase = createMockDatabase("standard");
+
+export function replaceMockDatabase(mockDataSize: MockDataSize) {
+  mockDatabase = createMockDatabase(mockDataSize);
+}

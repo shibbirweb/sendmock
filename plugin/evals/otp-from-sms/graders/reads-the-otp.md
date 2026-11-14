@@ -1,0 +1,6 @@
+---
+type: tool_used
+tool: mcp__plugin_sendmock_sendmock__sendmock_otp_get
+input_match: '15551234567'
+weight: 0.5
+---

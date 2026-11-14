@@ -1,0 +1,26 @@
+{
+  "binary_size_bytes": {
+    "label": "Release binary size",
+    "unit": "bytes",
+    "kind": "maximum",
+    "limit": 20971520
+  },
+  "cold_start_ms": {
+    "label": "Cold start to listening",
+    "unit": "ms",
+    "kind": "maximum",
+    "limit": 200
+  },
+  "idle_memory_bytes": {
+    "label": "Idle memory (RSS)",
+    "unit": "bytes",
+    "kind": "maximum",
+    "limit": 31457280
+  },
+  "smtp_ingest_messages_per_second": {
+    "label": "SMTP ingest",
+    "unit": "messages/s",
+    "kind": "minimum",
+    "limit": 500
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "sendmock-example-http-presets-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@onesignal/node-onesignal": "5.19.0",
+    "@slack/webhook": "8.0.1",
+    "expo-server-sdk": "7.2.0",
+    "firebase-admin": "14.5.0"
+  }
+}

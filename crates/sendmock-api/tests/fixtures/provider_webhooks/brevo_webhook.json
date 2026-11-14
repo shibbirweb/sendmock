@@ -1,0 +1,28 @@
+{
+  "doc_url": "https://developers.brevo.com/docs/transactional-webhooks",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "event": "delivered",
+    "email": "example@domain.com",
+    "id": 26224,
+    "date": "YYYY-MM-DD HH:mm:ss",
+    "ts": 1598634509,
+    "message-id": "<201798300811.5787683@relay.domain.com>",
+    "ts_event": 1598034509,
+    "subject": "Subject Line",
+    "tag": "[\"transactionalTag\"]"
+  },
+  "schema": {
+    "type": "object",
+    "required": ["event", "email", "id", "date", "ts", "message-id", "ts_event"],
+    "properties": {
+      "event": { "enum": ["request", "delivered", "hard_bounce", "soft_bounce", "blocked", "spam", "invalid_email", "deferred", "click", "opened", "unique_opened", "unsubscribed", "error"] },
+      "email": { "type": "string", "minLength": 1 },
+      "id": { "type": "integer" },
+      "ts": { "type": "integer" },
+      "ts_event": { "type": "integer" }
+    }
+  }
+}

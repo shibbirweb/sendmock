@@ -1,0 +1,43 @@
+{
+  "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
+  "verified_on": "2026-11-05",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "signature": {
+      "timestamp": "1529006854",
+      "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+      "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+    },
+    "event-data": {
+      "event": "opened",
+      "timestamp": 1529006854.329574,
+      "id": "DACSsAdVSeGpLid7TN03WA",
+      "recipient": "alice@example.com"
+    }
+  },
+  "schema": {
+    "type": "object",
+    "required": ["signature", "event-data"],
+    "properties": {
+      "signature": {
+        "type": "object",
+        "required": ["timestamp", "token", "signature"],
+        "properties": {
+          "timestamp": { "type": "string", "pattern": "^[0-9]{10}$" },
+          "token": { "type": "string", "minLength": 1 },
+          "signature": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      },
+      "event-data": {
+        "type": "object",
+        "required": ["event", "timestamp", "id", "recipient"],
+        "properties": {
+          "event": { "enum": ["accepted", "rejected", "delivered", "failed", "opened", "clicked", "unsubscribed", "complained", "stored"] },
+          "timestamp": { "type": "number" },
+          "recipient": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

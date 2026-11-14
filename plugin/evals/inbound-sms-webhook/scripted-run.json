@@ -1,0 +1,54 @@
+{
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "sendmock"
+      }
+    },
+    {
+      "tool": "mcp__plugin_sendmock_sendmock__sendmock_webhook_template_list",
+      "input": {}
+    },
+    {
+      "tool": "mcp__plugin_sendmock_sendmock__sendmock_webhook_endpoint_create",
+      "input": {
+        "name": "App inbound SMS",
+        "url": "http://127.0.0.1:4000/sms/inbound",
+        "is_enabled": true,
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "twilio.inbound_sms",
+        "template_mode": "linked",
+        "timeout_ms": 10000,
+        "retry_policy": {
+          "max_attempts": 1,
+          "backoff_seconds": [
+            1
+          ],
+          "retry_on_client_errors": false
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict"
+      }
+    },
+    {
+      "tool": "mcp__plugin_sendmock_sendmock__sendmock_webhook_rule_create",
+      "input": {
+        "name": "Inbound SMS to the app",
+        "endpoint_id": "{{results.3.id}}",
+        "events": [
+          "sms.inbound"
+        ],
+        "filter": null,
+        "is_enabled": true
+      }
+    }
+  ]
+}

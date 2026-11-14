@@ -1,0 +1,325 @@
+{
+  "native": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"type\": \"{{ event.type }}\",\n  \"timestamp\": \"{{ event.created_at }}\",\n  \"data\": {{ data | json }}\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "twilio.inbound_sms": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {
+      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}",
+      "I-Twilio-Idempotency-Token": "{{ uuid() }}",
+      "User-Agent": "TwilioProxy/1.1"
+    },
+    "body_template": "{% if data.channel == \"whatsapp\" %}ProfileName=WhatsApp%20user&WaId={{ data.from_number | replace(\"+\", \"\") }}&{% endif %}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}{% for media_item in data.media %}&MediaContentType{{ loop.index0 }}={{ media_item.content_type | urlencode }}&MediaUrl{{ loop.index0 }}={{ sendmock.http_url | urlencode }}{{ media_item.url | urlencode }}{% endfor %}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To={% if data.channel == \"whatsapp\" %}whatsapp%3A{% endif %}{{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&NumSegments={{ data.segments | default(\"1\") }}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={% if data.channel == \"whatsapp\" %}whatsapp%3A{% endif %}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01",
+    "doc_url": "https://www.twilio.com/docs/messaging/guides/webhook-request",
+    "verified_on": "2026-11-05"
+  },
+  "twilio.status_callback": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {
+      "X-Twilio-Signature": "{{ twilio_signature(endpoint.url, body_fields, vars.twilio_auth_token) }}"
+    },
+    "body_template": "SmsSid={{ data.provider_id }}&SmsStatus={% if event.type == \"sms.opened\" %}read{% else %}{{ data.status }}{% endif %}&MessageStatus={% if event.type == \"sms.opened\" %}read{% else %}{{ data.status }}{% endif %}&To={{ data.to_number | urlencode }}{% if data.messaging_service_sid %}&MessagingServiceSid={{ data.messaging_service_sid }}{% endif %}&MessageSid={{ data.provider_id }}&AccountSid={{ vars.twilio_account_sid | default(\"AC00000000000000000000000000000000\") }}&From={{ data.from_number | urlencode }}&ApiVersion=2010-04-01{% if data.error_code %}&ErrorCode={{ data.error_code }}{% endif %}",
+    "doc_url": "https://www.twilio.com/docs/messaging/guides/track-outbound-message-status",
+    "verified_on": "2026-11-05"
+  },
+  "vonage.inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"msisdn\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n  \"to\": \"{{ data.to_number | replace(\"+\", \"\") }}\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"text\": \"{{ data.body }}\",\n  \"type\": \"{% if data.encoding == \"UCS-2\" %}unicode{% else %}text{% endif %}\",\n  \"keyword\": \"{{ data.body | regex_extract(\"^[^ ]+\") | upper }}\",\n  \"api-key\": \"{{ vars.vonage_api_key | default(\"vonage-key\") }}\",\n  \"message-timestamp\": \"{{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") }}\"\n}",
+    "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/inbound-sms",
+    "verified_on": "2026-11-05"
+  },
+  "vonage.dlr": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"msisdn\": \"{{ data.to_number | replace(\"+\", \"\") }}\",\n  \"to\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n  \"network-code\": \"23410\",\n  \"messageId\": \"{{ data.provider_id }}\",\n  \"price\": \"0.03330000\",\n  \"status\": \"{{ data.status }}\",\n  \"scts\": \"{{ event.created_at | date(\"%y%m%d%H%M\") }}\",\n  \"err-code\": \"{{ data.error_code | default(\"0\") }}\",\n  \"api-key\": \"{{ vars.vonage_api_key | default(\"vonage-key\") }}\",\n  \"message-timestamp\": \"{{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") }}\"\n}",
+    "doc_url": "https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts",
+    "verified_on": "2026-11-05"
+  },
+  "plivo.inbound": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "From={{ data.from_number | urlencode }}&To={{ data.to_number | urlencode }}&Text={{ data.body | urlencode }}&MessageUUID={{ data.provider_id }}",
+    "doc_url": "https://www.plivo.com/docs/messaging/concepts/receive-sms",
+    "verified_on": "2026-09-30"
+  },
+  "africastalking.sms": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "{% if event.type == \"sms.inbound\" %}from={{ data.from_number | urlencode }}&to={{ data.to_number | urlencode }}&text={{ data.body | urlencode }}&date={{ event.created_at | urlencode }}&id={{ data.provider_id }}&linkId={{ event.id }}{% else %}id={{ data.provider_id }}&status={% if data.status == \"delivered\" %}Success{% else %}{% if data.status == \"failed\" %}Failed{% else %}{% if data.status == \"undelivered\" %}Rejected{% else %}Sent{% endif %}{% endif %}{% endif %}&phoneNumber={{ data.to_number | urlencode }}&networkCode=62120&retryCount=0{% endif %}",
+    "doc_url": "https://developers.africastalking.com/docs/sms/notifications",
+    "verified_on": "2026-09-30"
+  },
+  "sinch.sms": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{% if event.type == \"sms.inbound\" %}{\n  \"type\": \"mo_text\",\n  \"id\": \"{{ data.provider_id }}\",\n  \"from\": \"{{ data.from_number }}\",\n  \"to\": \"{{ data.to_number }}\",\n  \"body\": \"{{ data.body }}\",\n  \"received_at\": \"{{ event.created_at }}\"\n}{% else %}{\n  \"type\": \"recipient_delivery_report_sms\",\n  \"batch_id\": \"{{ data.provider_id }}\",\n  \"recipient\": \"{{ data.to_number }}\",\n  \"code\": 0,\n  \"status\": \"{% if data.status == \"delivered\" %}Delivered{% else %}{% if data.status == \"failed\" %}Failed{% else %}{% if data.status == \"undelivered\" %}Rejected{% else %}Dispatched{% endif %}{% endif %}{% endif %}\",\n  \"at\": \"{{ event.created_at }}\"\n}{% endif %}",
+    "doc_url": "https://developers.sinch.com/docs/sms/api-reference/sms/tag/Webhooks/",
+    "verified_on": "2026-09-30"
+  },
+  "infobip.dlr": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"results\": [\n    {\n      \"messageId\": \"{{ data.provider_id }}\",\n      \"to\": \"{{ data.to_number }}\",\n      \"sentAt\": \"{{ event.created_at }}\",\n      \"doneAt\": \"{{ event.created_at }}\",\n      \"smsCount\": 1,\n      \"status\": { \"groupId\": 3, \"groupName\": \"{% if data.status == \"delivered\" %}DELIVERED{% else %}{% if data.status == \"failed\" %}UNDELIVERABLE{% else %}{% if data.status == \"undelivered\" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}\", \"id\": 5, \"name\": \"{% if data.status == \"delivered\" %}DELIVERED{% else %}{% if data.status == \"failed\" %}UNDELIVERABLE{% else %}{% if data.status == \"undelivered\" %}REJECTED{% else %}PENDING{% endif %}{% endif %}{% endif %}\", \"description\": \"Message status from SendMock\" },\n      \"error\": { \"groupId\": 0, \"groupName\": \"OK\", \"id\": 0, \"name\": \"NO_ERROR\", \"description\": \"No Error\", \"permanent\": false }\n    }\n  ]\n}",
+    "doc_url": "https://www.infobip.com/docs/api/channels/sms/sms-messaging/logs-and-status-reports/receive-outbound-sms-message-report",
+    "verified_on": "2026-09-30"
+  },
+  "telnyx.message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"data\": {\n    \"event_type\": \"{% if event.type == \"sms.inbound\" %}message.received{% else %}{% if data.status == \"sent\" %}message.sent{% else %}message.finalized{% endif %}{% endif %}\",\n    \"id\": \"{{ uuid() }}\",\n    \"occurred_at\": \"{{ event.created_at }}\",\n    \"record_type\": \"event\",\n    \"payload\": {\n      \"id\": \"{{ data.provider_id }}\",\n      \"record_type\": \"message\",\n      \"direction\": \"{% if event.type == \"sms.inbound\" %}inbound{% else %}outbound{% endif %}\",\n      \"type\": \"SMS\",\n      \"from\": { \"phone_number\": \"{{ data.from_number }}\" },\n      \"to\": [{ \"phone_number\": \"{{ data.to_number }}\"{% if event.type == \"sms.status\" %}, \"status\": \"{{ data.status }}\"{% endif %} }],\n      \"text\": \"{{ data.body }}\",\n      \"errors\": []\n    }\n  },\n  \"meta\": { \"attempt\": 1 }\n}",
+    "doc_url": "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "mailgun.routes": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
+    "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
+    "verified_on": "2026-09-30"
+  },
+  "mailgun.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}{\n  \"signature\": {\n    \"timestamp\": \"{{ mailgun_timestamp }}\",\n    \"token\": \"{{ mailgun_token }}\",\n    \"signature\": \"{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}\"\n  },\n  \"event-data\": {\n    \"id\": \"{{ event.id }}\",\n    \"timestamp\": {{ mailgun_timestamp }},\n    \"event\": \"{{ event.type | mailgun_event }}\",\n    \"recipient\": \"{{ data.to[0].address }}\",{% if event.type == \"email.clicked\" %}\n    \"url\": \"{{ data.url }}\",{% endif %}\n    \"message\": {\n      \"headers\": {\n        \"message-id\": \"{{ data.message_id | default(data.id) }}\",\n        \"from\": \"{{ data.from.address }}\",\n        \"to\": \"{{ data.to[0].address }}\",\n        \"subject\": \"{{ data.subject }}\"\n      }\n    }\n  }\n}",
+    "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
+    "verified_on": "2026-09-30"
+  },
+  "postmark.webhooks": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"RecordType\": \"{{ event.type | postmark_record_type }}\",\n  \"MessageStream\": \"outbound\",\n  \"MessageID\": \"{{ data.message_id | default(data.id) }}\",\n  \"Recipient\": \"{{ data.to[0].address }}\",\n  \"Email\": \"{{ data.to[0].address }}\",\n  \"Tag\": \"\",\n  \"DeliveredAt\": \"{{ event.created_at }}\",\n  \"BouncedAt\": \"{{ event.created_at }}\",\n  \"ReceivedAt\": \"{{ event.created_at }}\",\n  \"Details\": \"\",\n  \"Metadata\": {},\n  \"ServerID\": 23{% if event.type == \"email.clicked\" %},\n  \"OriginalLink\": \"{{ data.url }}\",\n  \"ClickLocation\": \"HTML\",\n  \"Platform\": \"Desktop\",\n  \"UserAgent\": \"{% if data.user_agent %}{{ data.user_agent }}{% endif %}\"{% endif %}\n}",
+    "doc_url": "https://postmarkapp.com/developer/webhooks/webhooks-overview",
+    "verified_on": "2026-09-30"
+  },
+  "brevo.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"event\": \"{{ event.type | brevo_event }}\",\n  \"email\": \"{{ data.to[0].address }}\",\n  \"id\": 26224,\n  \"date\": \"{{ event.created_at }}\",\n  \"ts\": {{ event.created_at | unix }},\n  \"message-id\": \"{{ data.message_id | default(data.id) }}\",\n  \"ts_event\": {{ event.created_at | unix }},\n  \"subject\": \"{{ data.subject }}\",\n  \"tag\": \"\"{% if event.type == \"email.clicked\" %},\n  \"link\": \"{{ data.url }}\",\n  \"user_agent\": \"{% if data.user_agent %}{{ data.user_agent }}{% endif %}\"{% endif %}\n}",
+    "doc_url": "https://developers.brevo.com/docs/transactional-webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "sparkpost.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "[\n  {\n    \"msys\": {\n      \"{% if event.type == \"email.clicked\" %}track_event{% else %}{% if event.type == \"email.opened\" %}track_event{% else %}message_event{% endif %}{% endif %}\": {\n        \"type\": \"{{ event.type | sendgrid_event }}\",\n        \"event_id\": \"{{ event.id }}\",\n        \"message_id\": \"{{ data.message_id | default(data.id) }}\",\n        \"rcpt_to\": \"{{ data.to[0].address }}\",\n        \"friendly_from\": \"{{ data.from.address }}\",\n        \"subject\": \"{{ data.subject }}\",\n        \"timestamp\": \"{{ event.created_at | unix }}\"{% if event.type == \"email.clicked\" %},\n        \"target_link_url\": \"{{ data.url }}\"{% endif %}\n      }\n    }\n  }\n]",
+    "doc_url": "https://developers.sparkpost.com/api/webhooks/",
+    "verified_on": "2026-09-30"
+  },
+  "sendgrid.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Twilio-Email-Event-Webhook-Timestamp": "{{ event.created_at | unix }}",
+      "X-Twilio-Email-Event-Webhook-Signature": "{{ sendgrid_signature(event.created_at | unix) }}"
+    },
+    "body_template": "[\n  {\n    \"email\": \"{{ data.to[0].address }}\",\n    \"timestamp\": {{ event.created_at | unix }},\n    \"smtp-id\": \"<{{ data.message_id | default(data.id) }}>\",\n    \"event\": \"{{ event.type | sendgrid_event }}\",{% if event.type == \"email.clicked\" %}\n    \"url\": \"{{ data.url }}\",\n    \"url_offset\": { \"index\": 0, \"type\": \"html\" },{% endif %}\n    \"category\": [],\n    \"sg_event_id\": \"{{ event.id }}\",\n    \"sg_message_id\": \"{{ data.message_id | default(data.id) }}.filter0001.1-1\"\n  }\n]",
+    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/event",
+    "verified_on": "2026-09-30"
+  },
+  "ses.sns": {
+    "method": "POST",
+    "content_type": "text/plain; charset=UTF-8",
+    "header_templates": {
+      "x-amz-sns-message-type": "Notification",
+      "x-amz-sns-message-id": "{{ event.id }}",
+      "x-amz-sns-topic-arn": "arn:aws:sns:us-east-1:123456789012:sendmock-ses"
+    },
+    "body_template": "{\n  \"Type\": \"Notification\",\n  \"MessageId\": \"{{ event.id }}\",\n  \"TopicArn\": \"arn:aws:sns:us-east-1:123456789012:sendmock-ses\",\n  \"Message\": \"{\\\"{% if event.type == \"email.clicked\" %}eventType{% else %}notificationType{% endif %}\\\":\\\"{{ event.type | ses_type }}\\\",{% if event.type == \"email.clicked\" %}\\\"click\\\":{\\\"ipAddress\\\":\\\"127.0.0.1\\\",\\\"link\\\":\\\"{{ data.url }}\\\",\\\"linkTags\\\":{},\\\"timestamp\\\":\\\"{{ data.clicked_at }}\\\",\\\"userAgent\\\":\\\"{% if data.user_agent %}{{ data.user_agent }}{% endif %}\\\"},{% endif %}\\\"mail\\\":{\\\"timestamp\\\":\\\"{{ event.created_at }}\\\",\\\"messageId\\\":\\\"{{ data.message_id | default(data.id) }}\\\",\\\"source\\\":\\\"{{ data.from.address }}\\\",\\\"destination\\\":[\\\"{{ data.to[0].address }}\\\"]}}\",\n  \"Timestamp\": \"{{ event.created_at }}\",\n  \"SignatureVersion\": \"1\",\n  \"Signature\": \"{{ random_string(344) }}\",\n  \"SigningCertURL\": \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-sendmock.pem\",\n  \"UnsubscribeURL\": \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:123456789012:sendmock-ses\"\n}",
+    "doc_url": "https://docs.aws.amazon.com/ses/latest/dg/notification-contents.html",
+    "verified_on": "2026-09-30"
+  },
+  "resend.events": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "svix-id": "{{ event.id }}",
+      "svix-timestamp": "{{ event.created_at | unix }}",
+      "svix-signature": "{{ svix_signature(vars.resend_signing_secret, event.id, event.created_at | unix) }}"
+    },
+    "body_template": "{\n  \"type\": \"{{ event.type | resend_type }}\",\n  \"created_at\": \"{{ event.created_at }}\",\n  \"data\": {\n    \"created_at\": \"{{ event.created_at }}\",\n    \"email_id\": \"{{ data.message_id | default(data.id) }}\",\n    \"from\": \"{{ data.from.address }}\",\n    \"to\": [\"{{ data.to[0].address }}\"],\n    \"subject\": \"{{ data.subject }}\"{% if event.type == \"email.clicked\" %},\n    \"click\": {\n      \"ipAddress\": \"127.0.0.1\",\n      \"link\": \"{{ data.url }}\",\n      \"timestamp\": \"{{ data.clicked_at }}\",\n      \"userAgent\": \"{% if data.user_agent %}{{ data.user_agent }}{% endif %}\"\n    }{% endif %}\n  }\n}",
+    "doc_url": "https://resend.com/docs/dashboard/webhooks/event-types",
+    "verified_on": "2026-09-30"
+  },
+  "slack.incoming_webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"text\": \"New {{ event.type }}: {{ data.subject | default(data.body) }}\",\n  \"blocks\": [\n    { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"*{{ data.subject | default(\"SMS\") }}*\\nFrom {{ data.from.address | default(data.from_number) }}\" } }\n  ]\n}",
+    "doc_url": "https://api.slack.com/messaging/webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "discord.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"embeds\": [\n    { \"title\": \"{{ data.subject | default(\"New message\") }}\", \"description\": \"{{ data.text_body | default(data.body) }}\" }\n  ]\n}",
+    "doc_url": "https://discord.com/developers/docs/resources/webhook",
+    "verified_on": "2026-09-30"
+  },
+  "teams.adaptive_card": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"type\": \"message\",\n  \"attachments\": [\n    { \"contentType\": \"application/vnd.microsoft.card.adaptive\", \"content\": { \"type\": \"AdaptiveCard\", \"body\": [{ \"type\": \"TextBlock\", \"text\": \"{{ data.subject }}\" }] } }\n  ]\n}",
+    "doc_url": "https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "telegram.send_message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"chat_id\": \"{{ vars.telegram_chat_id }}\",\n  \"text\": \"{{ data.subject | default(data.body) }}\"\n}",
+    "doc_url": "https://core.telegram.org/bots/api#sendmessage",
+    "verified_on": "2026-09-30"
+  },
+  "google_chat.message": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"text\": \"New {{ event.type }}: {{ data.subject | default(data.body) }}\"\n}",
+    "doc_url": "https://developers.google.com/workspace/chat/quickstart/webhooks",
+    "verified_on": "2026-09-30"
+  },
+  "n8n.flat_json": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"event\": \"{{ event.type }}\",\n  \"from\": \"{{ data.from.address | default(data.from_number) }}\",\n  \"to\": \"{{ data.to[0].address | default(data.to_number) }}\",\n  \"subject\": \"{{ data.subject | default(\"\") }}\",\n  \"text\": \"{{ data.text_body | default(data.body) }}\"\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "custom.tenant_inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Tenant": "{{ vars.tenant_id }}"
+    },
+    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\"\n}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "custom.ops_alert": {
+    "method": "POST",
+    "content_type": "text/plain",
+    "header_templates": {},
+    "body_template": "Delivery to {{ data.endpoint_name }} failed: {{ data.error_message }}",
+    "doc_url": null,
+    "verified_on": null
+  },
+  "sendgrid.inbound_parse": {
+    "method": "POST",
+    "content_type": "multipart/form-data; boundary=xYzZY",
+    "header_templates": {},
+    "body_template": "--xYzZY\r\nContent-Disposition: form-data; name=\"from\"\r\n\r\n{{ data.from.address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"to\"\r\n\r\n{{ data.to[0].address }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"subject\"\r\n\r\n{{ data.subject }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\n{{ data.text_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"html\"\r\n\r\n{{ data.html_body | default('') }}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"envelope\"\r\n\r\n{\"to\":[\"{{ data.to[0].address }}\"],\"from\":\"{{ data.from.address }}\"}\r\n--xYzZY\r\nContent-Disposition: form-data; name=\"attachments\"\r\n\r\n{{ data.attachments | length }}\r\n{% for attachment in data.attachments %}--xYzZY\r\nContent-Disposition: form-data; name=\"attachment{{ loop.index }}\"; filename=\"{{ attachment.filename }}\"\r\nX-Sendmock-File-Url: {{ attachment.url }}\r\n\r\n{% endfor %}--xYzZY--\r\n",
+    "doc_url": "https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "postmark.inbound": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {},
+    "body_template": "{\n  \"From\": \"{{ data.from.address }}\",\n  \"FromName\": \"{{ data.from.name }}\",\n  \"To\": \"{{ data.to[0].address }}\",\n  \"Subject\": \"{{ data.subject }}\",\n  \"TextBody\": \"{{ data.text_body }}\",\n  \"MessageID\": \"{{ data.message_id | default(data.id) }}\",\n  \"Attachments\": [{% for attachment in data.attachments %}{\"Name\": \"{{ attachment.filename }}\", \"Content\": \"{{ attachment.content_base64 | default('') }}\", \"ContentType\": \"{{ attachment.content_type }}\", \"ContentLength\": {{ attachment.size_bytes }}, \"ContentID\": \"{{ attachment.content_id | default('') }}\"}{% if not loop.last %}, {% endif %}{% endfor %}]\n}",
+    "doc_url": "https://postmarkapp.com/developer/webhooks/inbound-webhook",
+    "verified_on": "2026-09-30"
+  },
+  "stripe.event": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "Stripe-Signature": "{{ stripe_signature(vars.stripe_webhook_secret) }}",
+      "User-Agent": "Stripe/1.0 (+https://stripe.com/docs/webhooks)"
+    },
+    "body_template": "{\n  \"id\": \"evt_{{ random_string(24) }}\",\n  \"object\": \"event\",\n  \"api_version\": \"2024-06-20\",\n  \"created\": {{ event.created_at | date(\"%s\") }},\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{ data.provider_ids.payment_intent | default(data.provider_reference) }}\",\n      \"object\": \"payment_intent\",\n      \"amount\": {{ data.amount_minor }},\n      \"amount_received\": {{ data.captured_minor | default(\"0\") }},\n      \"currency\": \"{{ data.currency | lower }}\",\n      \"last_payment_error\": {% if data.failure_code %}{\"type\": \"card_error\", \"code\": \"card_declined\", \"decline_code\": \"{{ data.failure_code }}\"}{% else %}null{% endif %},\n      \"livemode\": false,\n      \"metadata\": {{ data.metadata | json }},\n      \"receipt_email\": {% if data.customer_email %}\"{{ data.customer_email }}\"{% else %}null{% endif %},\n      \"status\": \"{{ event.type | payment_event(\"stripe_status\") }}\"\n    }\n  },\n  \"livemode\": false,\n  \"pending_webhooks\": 1,\n  \"request\": {\n    \"id\": null,\n    \"idempotency_key\": null\n  },\n  \"type\": \"{{ event.type | payment_event(\"stripe\") }}\"\n}",
+    "doc_url": "https://docs.stripe.com/api/events/object",
+    "verified_on": "2026-11-05"
+  },
+  "paypal.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "PAYPAL-TRANSMISSION-ID": "{{ uuid() }}",
+      "PAYPAL-TRANSMISSION-TIME": "{{ now_iso() }}",
+      "PAYPAL-TRANSMISSION-SIG": "{{ random_string(88) }}",
+      "PAYPAL-CERT-URL": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-a5cafa77",
+      "PAYPAL-AUTH-ALGO": "SHA256withRSA"
+    },
+    "body_template": "{\n  \"id\": \"WH-{{ random_string(17) | upper }}\",\n  \"event_version\": \"1.0\",\n  \"create_time\": \"{{ event.created_at }}\",\n  \"resource_type\": \"capture\",\n  \"resource_version\": \"2.0\",\n  \"event_type\": \"{{ event.type | payment_event(\"paypal\") }}\",\n  \"summary\": \"Payment {{ event.type | payment_event(\"paypal_status\") | lower }}: {{ data.amount_major }} {{ data.currency }}\",\n  \"resource\": {\n    \"id\": \"{{ data.provider_ids.capture | default(data.provider_reference) }}\",\n    \"status\": \"{{ event.type | payment_event(\"paypal_status\") }}\",\n    \"amount\": {\n      \"currency_code\": \"{{ data.currency }}\",\n      \"value\": \"{{ data.amount_major }}\"\n    },\n    \"final_capture\": true,\n    \"supplementary_data\": {\n      \"related_ids\": {\n        \"order_id\": \"{{ data.provider_ids.order | default(data.provider_reference) }}\"\n      }\n    },\n    \"create_time\": \"{{ data.created_at }}\",\n    \"update_time\": \"{{ event.created_at }}\"\n  }\n}",
+    "doc_url": "https://developer.paypal.com/api/rest/webhooks/event-names/",
+    "verified_on": "2026-11-05"
+  },
+  "paypal.ipn": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "mc_gross={{ data.amount_major }}&protection_eligibility=Eligible&payment_date={{ event.created_at | date(\"%H:%M:%S %b %d, %Y UTC\") | urlencode }}&payment_status={{ event.type | payment_event(\"paypal_ipn\") }}&charset=UTF-8&mc_fee=0.00&notify_version=3.9&payer_status=verified&business={{ vars.paypal_business_email | default(\"merchant@example.com\") | urlencode }}&quantity=1&payer_email={{ data.customer_email | default(\"buyer@example.com\") | urlencode }}&txn_id={{ data.provider_reference }}&payment_type=instant&receiver_email={{ vars.paypal_business_email | default(\"merchant@example.com\") | urlencode }}&txn_type=web_accept&item_name={{ data.provider_name | urlencode }}%20test%20order&mc_currency={{ data.currency }}&test_ipn=1&custom={{ data.id }}&payer_id={{ random_string(13) | upper }}&verify_sign={{ random_string(56) }}&ipn_track_id={{ random_hex(13) }}",
+    "doc_url": "https://developer.paypal.com/api/nvp-soap/ipn/IPNandPDTVariables/",
+    "verified_on": "2026-11-05"
+  },
+  "sslcommerz.ipn": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "status={{ event.type | payment_event(\"sslcommerz\") }}&tran_date={{ event.created_at | date(\"%Y-%m-%d %H:%M:%S\") | urlencode }}&tran_id={{ data.provider_ids.tran_id | default(data.provider_reference) | urlencode }}&val_id={{ data.provider_ids.val_id | default(\"\") | urlencode }}&amount={{ data.amount_major }}&store_amount={{ data.amount_major }}&currency={{ data.currency }}&bank_tran_id={{ random_hex(16) }}&card_type={{ data.method_key | default(\"\") | upper }}&currency_type={{ data.currency }}&currency_amount={{ data.amount_major }}&currency_rate=1.0000&risk_level=0&risk_title=Safe&verify_sign={{ sslcommerz_verify_sign(vars.sslcommerz_store_password, {\"amount\": data.amount_major, \"currency\": data.currency, \"status\": event.type | payment_event(\"sslcommerz\"), \"tran_id\": data.provider_ids.tran_id | default(data.provider_reference), \"val_id\": data.provider_ids.val_id | default(\"\")}) }}&verify_key=amount%2Ccurrency%2Cstatus%2Ctran_id%2Cval_id",
+    "doc_url": "https://developer.sslcommerz.com/doc/v4/#ipn",
+    "verified_on": "2026-11-05"
+  },
+  "bkash.callback": {
+    "method": "POST",
+    "content_type": "application/x-www-form-urlencoded",
+    "header_templates": {},
+    "body_template": "paymentID={{ data.provider_ids.payment_id | default(data.provider_reference) | urlencode }}&status={{ event.type | payment_event(\"bkash\") }}&signature={{ random_hex(32) }}&apiVersion=1.2.0-beta",
+    "doc_url": "https://developer.bka.sh/docs/create-payment-2",
+    "verified_on": "2026-11-05"
+  },
+  "razorpay.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Razorpay-Signature": "{{ razorpay_signature(vars.razorpay_webhook_secret) }}",
+      "X-Razorpay-Event-Id": "{{ event.id }}"
+    },
+    "body_template": "{\n  \"entity\": \"event\",\n  \"account_id\": \"acc_{{ random_string(14) }}\",\n  \"event\": \"{{ event.type | payment_event(\"razorpay\") }}\",\n  \"contains\": [\"payment\"],\n  \"payload\": {\n    \"payment\": {\n      \"entity\": {\n        \"id\": \"{{ data.provider_ids.payment | default(data.provider_reference) }}\",\n        \"entity\": \"payment\",\n        \"amount\": {{ data.amount_minor }},\n        \"currency\": \"{{ data.currency }}\",\n        \"status\": \"{{ event.type | payment_event(\"razorpay_status\") }}\",\n        \"order_id\": {% if data.provider_ids.order %}\"{{ data.provider_ids.order }}\"{% else %}null{% endif %},\n        \"method\": \"{{ data.method_key | default(\"card\") }}\",\n        \"captured\": {% if event.type == \"payment.succeeded\" %}true{% else %}false{% endif %},\n        \"email\": \"{{ data.customer_email | default(\"\") }}\",\n        \"error_code\": {% if data.failure_code %}\"BAD_REQUEST_ERROR\"{% else %}null{% endif %},\n        \"error_reason\": {% if data.failure_code %}\"{{ data.failure_code }}\"{% else %}null{% endif %},\n        \"created_at\": {{ data.created_at | date(\"%s\") }}\n      }\n    }\n  },\n  \"created_at\": {{ event.created_at | date(\"%s\") }}\n}",
+    "doc_url": "https://razorpay.com/docs/webhooks/payloads/payments/",
+    "verified_on": "2026-11-05"
+  },
+  "paddle.webhook": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "Paddle-Signature": "{{ paddle_signature(vars.paddle_webhook_secret) }}"
+    },
+    "body_template": "{\n  \"event_id\": \"evt_{{ random_string(26) | lower }}\",\n  \"event_type\": \"{{ event.type | payment_event(\"paddle\") }}\",\n  \"occurred_at\": \"{{ event.created_at }}\",\n  \"notification_id\": \"ntf_{{ random_string(26) | lower }}\",\n  \"data\": {\n    \"id\": \"{{ data.provider_ids.transaction | default(data.provider_reference) }}\",\n    \"status\": \"{{ event.type | payment_event(\"paddle_status\") }}\",\n    \"origin\": \"web\",\n    \"currency_code\": \"{{ data.currency }}\",\n    \"created_at\": \"{{ data.created_at }}\",\n    \"custom_data\": {{ data.metadata | json }},\n    \"details\": {\n      \"totals\": {\n        \"total\": \"{{ data.amount_minor }}\",\n        \"currency_code\": \"{{ data.currency }}\"\n      }\n    }\n  }\n}",
+    "doc_url": "https://developer.paddle.com/webhooks/transactions/transaction-completed",
+    "verified_on": "2026-11-05"
+  },
+  "whatsapp.cloud": {
+    "method": "POST",
+    "content_type": "application/json",
+    "header_templates": {
+      "X-Hub-Signature-256": "{{ whatsapp_signature(vars.whatsapp_cloud_app_secret) }}"
+    },
+    "body_template": "{\n  \"object\": \"whatsapp_business_account\",\n  \"entry\": [{\n    \"id\": \"{{ vars.whatsapp_cloud_business_account_id }}\",\n    \"changes\": [{\n      \"field\": \"messages\",\n      \"value\": {\n        \"messaging_product\": \"whatsapp\",\n        \"metadata\": {\n          \"display_phone_number\": \"{% if event.type == \"sms.inbound\" %}{{ data.to_number | replace(\"+\", \"\") }}{% else %}{{ data.from_number | replace(\"+\", \"\") }}{% endif %}\",\n          \"phone_number_id\": \"{{ vars.whatsapp_cloud_phone_number_id }}\"\n        },\n{% if event.type == \"sms.inbound\" %}        \"contacts\": [{ \"profile\": { \"name\": \"{{ data.from_number }}\" }, \"wa_id\": \"{{ data.from_number | replace(\"+\", \"\") }}\" }],\n        \"messages\": [{\n          \"from\": \"{{ data.from_number | replace(\"+\", \"\") }}\",\n          \"id\": \"{{ data.provider_id }}\",\n          \"timestamp\": \"{{ event.created_at | unix }}\",\n          \"type\": \"text\",\n          \"text\": { \"body\": \"{{ data.body }}\" }\n        }]\n{% else %}        \"statuses\": [{\n          \"id\": \"{{ data.provider_id }}\",\n          \"status\": \"{{ data.status }}\",\n          \"timestamp\": \"{{ event.created_at | unix }}\",\n          \"recipient_id\": \"{{ data.to_number | replace(\"+\", \"\") }}\"{% if data.status == \"failed\" %},\n          \"errors\": [{ \"code\": 131026, \"title\": \"Message undeliverable\", \"message\": \"Message undeliverable\", \"error_data\": { \"details\": \"Message failed to send because the recipient could not be reached (SendMock outcome {{ data.error_code }}).\" } }]{% endif %}\n        }]\n{% endif %}      }\n    }]\n  }]\n}",
+    "doc_url": "https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components",
+    "verified_on": "2026-11-08"
+  }
+}

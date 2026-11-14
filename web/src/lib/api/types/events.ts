@@ -1,0 +1,58 @@
+import type { IsoTimestamp } from "@/lib/api/types/common";
+
+/** Every event SendMock publishes; the same names are used by webhook rules. */
+export const appEventTypes = [
+  "email.received",
+  "email.inbound",
+  "email.opened",
+  "email.clicked",
+  "email.delivered",
+  "email.deferred",
+  "email.bounced",
+  "email.complained",
+  "email.unsubscribed",
+  "email.released",
+  "email.deleted",
+  "sms.sent",
+  "sms.status",
+  "sms.opened",
+  "sms.inbound",
+  "sms.reply_webhook",
+  "verify.started",
+  "verify.checked",
+  "verify.expired",
+  "push.sent",
+  "push.failed",
+  "http.captured",
+  "payment.created",
+  "payment.authorized",
+  "payment.succeeded",
+  "payment.failed",
+  "payment.canceled",
+  "payment.refunded",
+  "payment.partially_refunded",
+  "payment.dispute_opened",
+  "payment.dispute_updated",
+  "payment.dispute_closed",
+  "checkout.completed",
+  "checkout.expired",
+  "subscription.created",
+  "subscription.renewed",
+  "subscription.payment_failed",
+  "subscription.canceled",
+  "webhook.delivered",
+  "webhook.failed",
+  "test.ping",
+  "traffic.pruned",
+] as const;
+
+export type AppEventType = (typeof appEventTypes)[number];
+
+/** Envelope pushed over the realtime WebSocket and sent in native webhooks. */
+export type AppEvent = {
+  id: string;
+  type: AppEventType;
+  created_at: IsoTimestamp;
+  /** Trimmed to list-view fields of the subject (email, SMS, delivery, ...). */
+  data: Record<string, unknown>;
+};

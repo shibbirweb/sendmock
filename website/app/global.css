@@ -1,0 +1,139 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Logo gradient, shared with the app (web/src/index.css). */
+:root {
+  --brand-from: #0d9488;
+  --brand-to: #10b981;
+  /* Brand-coloured text: dark enough for WCAG AA (4.5:1) on the light surfaces. */
+  --brand-text: #0f766e;
+}
+
+.dark {
+  --brand-from: #2dd4bf;
+  --brand-to: #34d399;
+  --brand-text: #2dd4bf;
+}
+
+/* Fumadocs' neutral muted text (#737373) is 4.3:1 on its light background;
+   this darker grey passes WCAG AA (4.5:1) there and on the card and secondary
+   surfaces. Dark mode keeps Fumadocs' value. */
+:root:not(.dark) {
+  --color-fd-muted-foreground: #5f5f5f;
+}
+
+/* Shiki's GitHub themes write code comments in #6A737D in both themes, below
+   WCAG AA on the code background; these comment colours pass (4.5:1 and up).
+   The colours are inline styles, so only !important overrides them. */
+:root {
+  --code-comment-light: #57606a;
+  --code-comment-dark: #959da5;
+}
+
+pre span[style*="--shiki-light:#6A737D"] {
+  --shiki-light: var(--code-comment-light) !important;
+}
+
+pre span[style*="--shiki-dark:#6A737D"] {
+  --shiki-dark: var(--code-comment-dark) !important;
+}
+
+@theme inline {
+  --animate-shiny-text: shiny-text 8s infinite;
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
+    alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes shiny-text {
+    0%,
+    90%,
+    100% {
+      background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+    30%,
+    60% {
+      background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
+  @keyframes shimmer-slide {
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+    0% {
+      transform: translateZ(0) rotate(0);
+    }
+    15%,
+    35% {
+      transform: translateZ(0) rotate(90deg);
+    }
+    65%,
+    85% {
+      transform: translateZ(0) rotate(270deg);
+    }
+    100% {
+      transform: translateZ(0) rotate(360deg);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+/* Tailwind v4 gives buttons the default cursor; clickable controls show the pointer. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Links within a page, such as the hero's Quick start, glide to their section; with reduced
+   motion on they jump straight there. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* WS-02.2: with reduced motion on, animations stop and the page stays readable. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* An empty line in a code block is an empty span with no height; keep its line. */
+figure.shiki code .line > span:empty::before,
+figure.shiki code .line:empty::before {
+  content: "\200b";
+}
+
+/* Plain-text blocks (the Install with AI prompt) wrap instead of scrolling sideways;
+   they are the only code blocks without syntax colours. */
+figure.shiki:not(:has(code span[style])) pre {
+  width: 100%;
+  white-space: pre-wrap;
+}

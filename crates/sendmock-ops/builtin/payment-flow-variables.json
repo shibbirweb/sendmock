@@ -1,0 +1,44 @@
+[
+  {
+    "name": "method",
+    "token": "{method}",
+    "description": "The payment method's name",
+    "example": "bKash"
+  },
+  {
+    "name": "amount",
+    "token": "{amount}",
+    "description": "The amount to pay, in the currency's format",
+    "example": "BDT 1,200.00"
+  },
+  {
+    "name": "currency",
+    "token": "{currency}",
+    "description": "The currency code",
+    "example": "BDT"
+  },
+  {
+    "name": "merchant",
+    "token": "{merchant}",
+    "description": "The merchant name shown on checkout pages",
+    "example": "Acme Shop"
+  },
+  {
+    "name": "gateway",
+    "token": "{gateway}",
+    "description": "The gateway's name",
+    "example": "SSLCommerz"
+  },
+  {
+    "name": "reference",
+    "token": "{reference}",
+    "description": "The payment reference the customer quotes",
+    "example": "SM-8F2KD9XL"
+  },
+  {
+    "name": "customer_email",
+    "token": "{customer_email}",
+    "description": "The customer's email, or empty when there is none",
+    "example": "ruma@example.com"
+  }
+]

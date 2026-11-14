@@ -1,0 +1,121 @@
+[
+  {
+    "key": "card",
+    "name": "Card",
+    "picker_tab": "Cards",
+    "steps": [
+      {
+        "type": "card_form",
+        "title": "",
+        "field_label": "Card number",
+        "hint": "",
+        "button_label": "Pay {amount}"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "wallet",
+    "name": "Wallet",
+    "picker_tab": "Mobile banking",
+    "steps": [
+      {
+        "type": "account_number",
+        "title": "",
+        "field_label": "Your {method} account number",
+        "hint": "",
+        "button_label": "Confirm"
+      },
+      {
+        "type": "otp",
+        "title": "",
+        "field_label": "Verification code",
+        "hint": "",
+        "button_label": "Confirm"
+      },
+      {
+        "type": "pin",
+        "title": "",
+        "field_label": "PIN",
+        "hint": "",
+        "button_label": "Confirm and pay"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "bank",
+    "name": "Bank",
+    "picker_tab": "Net banking",
+    "steps": [
+      {
+        "type": "confirm",
+        "title": "",
+        "field_label": "",
+        "hint": "You will confirm the payment in {method}.",
+        "button_label": "Pay with {method}"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "account",
+    "name": "Account",
+    "picker_tab": "Accounts",
+    "steps": [
+      {
+        "type": "signed_in_account",
+        "title": "",
+        "field_label": "",
+        "hint": "Signed in as the test account",
+        "button_label": "Approve and pay {amount}"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "qr",
+    "name": "QR",
+    "picker_tab": "Scan to pay",
+    "steps": [
+      {
+        "type": "qr_code",
+        "title": "Scan to pay",
+        "field_label": "",
+        "hint": "Open {method} and scan the code.",
+        "button_label": "I have paid"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "bank_transfer",
+    "name": "Bank transfer",
+    "picker_tab": "Bank transfer",
+    "steps": [
+      {
+        "type": "reference_code",
+        "title": "Pay by transfer",
+        "field_label": "",
+        "hint": "Send {amount} with this reference.",
+        "button_label": "I have paid"
+      }
+    ],
+    "is_builtin": true
+  },
+  {
+    "key": "voucher",
+    "name": "Voucher",
+    "picker_tab": "Vouchers",
+    "steps": [
+      {
+        "type": "voucher_code",
+        "title": "",
+        "field_label": "Voucher code",
+        "hint": "",
+        "button_label": "Redeem {amount}"
+      }
+    ],
+    "is_builtin": true
+  }
+]

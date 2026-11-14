@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sendmock.fullname" . }}
+  labels:
+    {{- include "sendmock.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  # One SQLite database: the old pod stops before the new one starts.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "sendmock.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sendmock.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      containers:
+        - name: sendmock
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: SENDMOCK_HTTP_ADDR
+              value: "0.0.0.0:8025"
+            - name: SENDMOCK_SMTP_ADDR
+              value: "0.0.0.0:1025"
+            {{- if .Values.providerPort.enabled }}
+            - name: SENDMOCK_PROVIDER_ADDR
+              value: "0.0.0.0:8026"
+            {{- end }}
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8025
+            - name: smtp
+              containerPort: 1025
+            {{- if .Values.providerPort.enabled }}
+            - name: provider
+              containerPort: 8026
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 5
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            # SQLite writes temporary files here; the root file system is read-only.
+            - name: tmp
+              mountPath: /tmp
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "sendmock.fullname" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: tmp
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,12 @@
+{
+  "name": "sendmock-example-payments-paypal-node",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@paypal/paypal-server-sdk": "2.5.0",
+    "axios": "1.12.2"
+  },
+  "overrides": {
+    "axios": "1.12.2"
+  }
+}

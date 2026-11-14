@@ -1,0 +1,22 @@
+[package]
+name = "sendmock-pop3"
+description = "The SendMock POP3 listener."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+sendmock-core.workspace = true
+sendmock-ops.workspace = true
+
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+sendmock-store.workspace = true
+
+[lints]
+workspace = true

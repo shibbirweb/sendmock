@@ -1,0 +1,64 @@
+# The tray app (DS-08) with its GUI: built, linted and tested on Linux, macOS and Windows, with
+# the GTK and AppIndicator libraries tray-icon needs on Linux. The workspace's own Rust jobs test
+# the tray's library without the GUI. Also checks the sendmock binary itself pulls in no GUI
+# crate. Runs on changes to the tray crate, the lock file or this workflow.
+name: Tray app
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-tray/**
+      - Cargo.lock
+      - .github/workflows/tray-app.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-tray/**
+      - Cargo.lock
+      - .github/workflows/tray-app.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tray:
+    name: Tray app (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: GTK, AppIndicator and xdo for tray-icon
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Lint the tray app with its GUI
+        run: cargo clippy -p sendmock-tray --all-targets --features gui --locked -- -D warnings
+
+      - name: Test the tray app
+        run: cargo test -p sendmock-tray --features gui --locked
+
+      - name: Release build of the tray app
+        run: cargo build -p sendmock-tray --features gui --release --locked
+
+      - name: The sendmock binary has no GUI dependency
+        shell: bash
+        run: |
+          gui_crates=$(cargo tree -p sendmock -e normal --locked | grep -E "tray-icon|tao |muda|gtk" || true)
+          if [ -n "$gui_crates" ]; then
+            echo "::error::sendmock depends on GUI crates: $gui_crates"
+            exit 1
+          fi

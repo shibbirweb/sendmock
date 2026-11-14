@@ -1,0 +1,35 @@
+{
+  "order": 22,
+  "path": "/payments/subscriptions",
+  "states": {
+    "normal": [
+      "heading: Subscriptions",
+      "link: Read the Subscriptions guide",
+      "paragraph: Each subscription keeps its own clock: advance it to charge the next renewal through its gateway, or cancel it.",
+      "button: New subscription",
+      "paragraph: No subscriptions yet",
+      "paragraph: Start one with New subscription, or POST /api/v#/payments/subscriptions, to test renewals, failed payments and cancellations."
+    ],
+    "New subscription dialog": [
+      "heading: New subscription",
+      "paragraph: Without a trial the first period is charged at once.",
+      "combobox: Gateway",
+      "combobox: Interval",
+      "textbox: Customer email",
+      "textbox: Plan name",
+      "textbox: Amount",
+      "textbox: Currency",
+      "textbox: Trial days",
+      "textbox: Test card",
+      "button: Cancel",
+      "button: Start subscription",
+      "button: Close"
+    ],
+    "empty": [],
+    "failing": [
+      "alert: Could not load the subscriptions. Try again",
+      "paragraph: Could not load the subscriptions.",
+      "button: Try again"
+    ]
+  }
+}

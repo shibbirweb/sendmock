@@ -1,0 +1,203 @@
+[
+  {
+    "test_cards": [
+      {
+        "number": "4242424242424242",
+        "outcome": "succeed",
+        "decline_reason": null
+      },
+      {
+        "number": "5555555555554444",
+        "outcome": "succeed",
+        "decline_reason": null
+      },
+      {
+        "number": "4000000000000002",
+        "outcome": "decline",
+        "decline_reason": "generic_decline"
+      },
+      {
+        "number": "4000000000009995",
+        "outcome": "decline",
+        "decline_reason": "insufficient_funds"
+      },
+      {
+        "number": "4000000000000069",
+        "outcome": "decline",
+        "decline_reason": "expired_card"
+      },
+      {
+        "number": "4000000000000127",
+        "outcome": "decline",
+        "decline_reason": "incorrect_cvc"
+      },
+      {
+        "number": "4000002500003155",
+        "outcome": "three_ds",
+        "decline_reason": null
+      },
+      {
+        "number": "4000000000000259",
+        "outcome": "succeed_then_dispute",
+        "decline_reason": null
+      }
+    ],
+    "test_numbers": [],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "card",
+    "name": "Card",
+    "flow": "card",
+    "accent": "#635bff"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "sb-buyer@personal.example.com",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "paypal_account",
+    "name": "PayPal account",
+    "flow": "account",
+    "accent": "#ffc439"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [
+      {
+        "number": "01770000001",
+        "outcome": "succeed",
+        "decline_reason": null
+      },
+      {
+        "number": "01770000002",
+        "outcome": "decline",
+        "decline_reason": "insufficient_funds"
+      },
+      {
+        "number": "01770000003",
+        "outcome": "wrong_pin",
+        "decline_reason": null
+      }
+    ],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "bkash",
+    "name": "bKash",
+    "flow": "wallet",
+    "accent": "#e2136e"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [
+      {
+        "number": "01880000001",
+        "outcome": "succeed",
+        "decline_reason": null
+      },
+      {
+        "number": "01880000002",
+        "outcome": "decline",
+        "decline_reason": "insufficient_funds"
+      },
+      {
+        "number": "01880000003",
+        "outcome": "wrong_pin",
+        "decline_reason": null
+      }
+    ],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "nagad",
+    "name": "Nagad",
+    "flow": "wallet",
+    "accent": "#f6921e"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [
+      {
+        "number": "01990000001",
+        "outcome": "succeed",
+        "decline_reason": null
+      },
+      {
+        "number": "01990000002",
+        "outcome": "decline",
+        "decline_reason": "insufficient_funds"
+      },
+      {
+        "number": "01990000003",
+        "outcome": "wrong_pin",
+        "decline_reason": null
+      }
+    ],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "rocket",
+    "name": "Rocket",
+    "flow": "wallet",
+    "accent": "#8c3494"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "dbbl",
+    "name": "DBBL Nexus",
+    "flow": "bank",
+    "accent": "#0b6e4f"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "city",
+    "name": "City Touch",
+    "flow": "bank",
+    "accent": "#d71920"
+  },
+  {
+    "test_cards": [],
+    "test_numbers": [],
+    "otp": "123456",
+    "pin": "12121",
+    "default_outcome": "succeed",
+    "test_account": "",
+    "is_enabled": true,
+    "is_builtin": true,
+    "key": "brac",
+    "name": "BRAC iBanking",
+    "flow": "bank",
+    "accent": "#1f4e9c"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "before": [
+    {
+      "path": "/api/v1/send",
+      "json": {
+        "from": "Shop <no-reply@shop.test>",
+        "to": [
+          "sam@example.test"
+        ],
+        "subject": "Your sign-in code",
+        "text": "Hi Sam, your sign-in code is 482913. It expires in 10 minutes."
+      }
+    }
+  ]
+}

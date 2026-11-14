@@ -1,0 +1,5 @@
+{"id":"PVTSSF_lAHOAiP0Xc4BqkKVzho6xe8","name":"Status","options":[{"id":"74a5a236","name":"Later"},{"id":"c0bbbbf9","name":"In progress"},{"id":"ebb7fde4","name":"Done"}]}
+{"id":"PVTSSF_lAHOAiP0Xc4BqkKVzho6xkY","name":"Area","options":[{"id":"0f864a39","name":"Email"},{"id":"4f91cac7","name":"SMS"},{"id":"bd5ef2ac","name":"Verify"},{"id":"6e9e35d8","name":"Webhooks"},{"id":"a777a32e","name":"HTTP catcher"},{"id":"ddf5d52b","name":"Platform"},{"id":"489559ff","name":"AI"},{"id":"1ff9a65e","name":"Web UI"},{"id":"66b23078","name":"Distribution"},{"id":"5cff2648","name":"Website"},{"id":"590d1797","name":"Payments"}]}
+{"id":"PVTSSF_lAHOAiP0Xc4BqkKVzho6xlQ","name":"Target","options":[{"id":"fdac422b","name":"1.0"},{"id":"0f24b605","name":"After 1.0"}]}
+{"id":"PVTF_lAHOAiP0Xc4BqkKVzho6xlg","name":"Feature ID","options":null}
+{"id":"PVTF_lAHOAiP0Xc4BqkKVzho6xmo","name":"Criteria met","options":null}

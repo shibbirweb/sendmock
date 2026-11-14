@@ -1,0 +1,518 @@
+[
+  {
+    "id": "native",
+    "name": "Native SendMock JSON",
+    "service": "SendMock",
+    "category": "generic",
+    "events": [
+      "email.received",
+      "sms.sent",
+      "sms.inbound",
+      "sms.status",
+      "http.captured",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "checkout.completed"
+    ],
+    "description": "Native SendMock JSON payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "twilio.inbound_sms",
+    "name": "Twilio: inbound SMS",
+    "service": "Twilio",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound"
+    ],
+    "description": "Twilio: inbound SMS payload, matching the provider's documented format.",
+    "required_variables": [
+      "twilio_auth_token"
+    ]
+  },
+  {
+    "id": "twilio.status_callback",
+    "name": "Twilio: status callback",
+    "service": "Twilio",
+    "category": "sms-provider",
+    "events": [
+      "sms.status",
+      "sms.opened"
+    ],
+    "description": "Twilio: status callback payload, matching the provider's documented format.",
+    "required_variables": [
+      "twilio_auth_token"
+    ]
+  },
+  {
+    "id": "vonage.inbound",
+    "name": "Vonage: inbound SMS",
+    "service": "Vonage",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound"
+    ],
+    "description": "Vonage: inbound SMS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "vonage.dlr",
+    "name": "Vonage: delivery receipt",
+    "service": "Vonage",
+    "category": "sms-provider",
+    "events": [
+      "sms.status"
+    ],
+    "description": "Vonage: delivery receipt payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "plivo.inbound",
+    "name": "Plivo: inbound message",
+    "service": "Plivo",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Plivo: inbound message payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "telnyx.message",
+    "name": "Telnyx: message events",
+    "service": "Telnyx",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Telnyx: message events payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "whatsapp.cloud",
+    "name": "WhatsApp Cloud: messages and statuses",
+    "service": "WhatsApp Cloud",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "WhatsApp Cloud: messages and statuses payload, matching the provider's documented format.",
+    "required_variables": [
+      "whatsapp_cloud_app_secret"
+    ]
+  },
+  {
+    "id": "mailgun.routes",
+    "name": "Mailgun: routes (inbound)",
+    "service": "Mailgun",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Mailgun: routes (inbound) payload, matching the provider's documented format.",
+    "required_variables": [
+      "mailgun_signing_key"
+    ]
+  },
+  {
+    "id": "mailgun.events",
+    "name": "Mailgun: event webhooks",
+    "service": "Mailgun",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Mailgun: event webhooks payload, matching the provider's documented format.",
+    "required_variables": [
+      "mailgun_signing_key"
+    ]
+  },
+  {
+    "id": "postmark.webhooks",
+    "name": "Postmark: delivery, bounce, spam and open webhooks",
+    "service": "Postmark",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Postmark: delivery, bounce, spam and open webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "brevo.events",
+    "name": "Brevo: transactional webhooks",
+    "service": "Brevo",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Brevo: transactional webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sendgrid.inbound_parse",
+    "name": "SendGrid: Inbound Parse",
+    "service": "SendGrid",
+    "category": "email-provider",
+    "events": [
+      "email.received"
+    ],
+    "description": "SendGrid: Inbound Parse payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sendgrid.events",
+    "name": "SendGrid: Event Webhook",
+    "service": "SendGrid",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "SendGrid: Event Webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "postmark.inbound",
+    "name": "Postmark: inbound",
+    "service": "Postmark",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Postmark: inbound payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "ses.sns",
+    "name": "Amazon SES via SNS",
+    "service": "Amazon SES",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Amazon SES via SNS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "resend.events",
+    "name": "Resend: webhook events",
+    "service": "Resend",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "Resend: webhook events payload, matching the provider's documented format.",
+    "required_variables": [
+      "resend_signing_secret"
+    ]
+  },
+  {
+    "id": "slack.incoming_webhook",
+    "name": "Slack: incoming webhook",
+    "service": "Slack",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "email.bounced",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Slack: incoming webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "discord.webhook",
+    "name": "Discord: webhook embed",
+    "service": "Discord",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Discord: webhook embed payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "teams.adaptive_card",
+    "name": "Microsoft Teams: Adaptive Card",
+    "service": "Microsoft Teams",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "webhook.failed"
+    ],
+    "description": "Microsoft Teams: Adaptive Card payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "telegram.send_message",
+    "name": "Telegram: bot message",
+    "service": "Telegram",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "sms.inbound"
+    ],
+    "description": "Telegram: bot message payload, matching the provider's documented format.",
+    "required_variables": [
+      "telegram_bot_token",
+      "telegram_chat_id"
+    ]
+  },
+  {
+    "id": "africastalking.sms",
+    "name": "Africa's Talking: SMS notifications",
+    "service": "Africa's Talking",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Africa's Talking: SMS notifications payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sinch.sms",
+    "name": "Sinch: delivery reports and inbound SMS",
+    "service": "Sinch",
+    "category": "sms-provider",
+    "events": [
+      "sms.inbound",
+      "sms.status"
+    ],
+    "description": "Sinch: delivery reports and inbound SMS payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "infobip.dlr",
+    "name": "Infobip: delivery reports",
+    "service": "Infobip",
+    "category": "sms-provider",
+    "events": [
+      "sms.status"
+    ],
+    "description": "Infobip: delivery reports payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sparkpost.events",
+    "name": "SparkPost: event webhooks",
+    "service": "SparkPost",
+    "category": "email-provider",
+    "events": [
+      "email.received",
+      "email.opened",
+      "email.clicked",
+      "email.delivered",
+      "email.bounced",
+      "email.complained"
+    ],
+    "description": "SparkPost: event webhooks payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "google_chat.message",
+    "name": "Google Chat: incoming webhook",
+    "service": "Google Chat",
+    "category": "chat",
+    "events": [
+      "email.received",
+      "email.bounced",
+      "sms.inbound",
+      "webhook.failed"
+    ],
+    "description": "Google Chat: incoming webhook payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "n8n.flat_json",
+    "name": "n8n / Zapier / Make: flat JSON",
+    "service": "Automation",
+    "category": "automation",
+    "events": [
+      "email.received",
+      "sms.sent",
+      "sms.inbound"
+    ],
+    "description": "n8n / Zapier / Make: flat JSON payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "stripe.event",
+    "name": "Stripe: webhook event",
+    "service": "Stripe",
+    "category": "payment-provider",
+    "events": [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed",
+      "checkout.completed",
+      "checkout.expired"
+    ],
+    "description": "Stripe: webhook event payload, matching the provider's documented format.",
+    "required_variables": [
+      "stripe_webhook_secret"
+    ]
+  },
+  {
+    "id": "paypal.webhook",
+    "name": "PayPal: webhook event",
+    "service": "PayPal",
+    "category": "payment-provider",
+    "events": [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed",
+      "checkout.completed",
+      "checkout.expired"
+    ],
+    "description": "PayPal: webhook event payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "paypal.ipn",
+    "name": "PayPal: IPN",
+    "service": "PayPal",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed"
+    ],
+    "description": "PayPal: IPN payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "sslcommerz.ipn",
+    "name": "SSLCommerz: IPN",
+    "service": "SSLCommerz",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "checkout.expired"
+    ],
+    "description": "SSLCommerz: IPN payload, matching the provider's documented format.",
+    "required_variables": [
+      "sslcommerz_store_password"
+    ]
+  },
+  {
+    "id": "bkash.callback",
+    "name": "bKash: callback",
+    "service": "bKash",
+    "category": "payment-provider",
+    "events": [
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled"
+    ],
+    "description": "bKash: callback payload, matching the provider's documented format.",
+    "required_variables": []
+  },
+  {
+    "id": "razorpay.webhook",
+    "name": "Razorpay: webhook",
+    "service": "Razorpay",
+    "category": "payment-provider",
+    "events": [
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "payment.dispute_opened",
+      "payment.dispute_updated",
+      "payment.dispute_closed",
+      "checkout.completed"
+    ],
+    "description": "Razorpay: webhook payload, matching the provider's documented format.",
+    "required_variables": [
+      "razorpay_webhook_secret"
+    ]
+  },
+  {
+    "id": "paddle.webhook",
+    "name": "Paddle: webhook",
+    "service": "Paddle",
+    "category": "payment-provider",
+    "events": [
+      "payment.created",
+      "payment.authorized",
+      "payment.succeeded",
+      "payment.failed",
+      "payment.canceled",
+      "payment.refunded",
+      "payment.partially_refunded",
+      "checkout.completed"
+    ],
+    "description": "Paddle: webhook payload, matching the provider's documented format.",
+    "required_variables": [
+      "paddle_webhook_secret"
+    ]
+  }
+]

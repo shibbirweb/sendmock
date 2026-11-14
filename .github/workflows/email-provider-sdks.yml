@@ -1,0 +1,78 @@
+# The email providers' official Node SDKs (SendGrid, Mailgun, Postmark, Resend, SES v2 and
+# Brevo) send to a SendMock release binary that cannot reach the network, each pointed at the
+# provider port by its own base URL setting, and every message is read back through the API
+# (EM-08.5). Runs on changes to the provider runtime, the email code or the example, and from
+# Release build before anything is published.
+name: Email provider SDKs
+
+on:
+  pull_request:
+    paths:
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/email/**
+      - crates/sendmock-ops/builtin/**
+      - crates/sendmock-mail/**
+      - examples/email-providers/**
+      - .github/actions/**
+      - .github/workflows/email-provider-sdks.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/sendmock-ops/src/providers/**
+      - crates/sendmock-ops/src/email/**
+      - crates/sendmock-ops/builtin/**
+      - crates/sendmock-mail/**
+      - examples/email-providers/**
+      - .github/actions/**
+      - .github/workflows/email-provider-sdks.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  sdks:
+    name: Six email provider SDKs offline
+    runs-on: ubuntu-latest
+    env:
+      SENDMOCK_URL: http://127.0.0.1:8025
+      SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: ./.github/actions/start-sendmock-offline
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Send with SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs
+        working-directory: examples/email-providers/node
+        run: bun install && node done-when.js
+
+      - uses: ./.github/actions/check-sendmock-offline
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock.log
