@@ -157,6 +157,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "A Docker Desktop extension that runs SendMock and opens its web UI from Docker Desktop's dashboard.",
     outcome: "Start SendMock with one click in Docker Desktop.",
   },
+  "DS-11": {
+    summary:
+      "Every pull request and every push to develop and main builds SendMock for each operating system and CPU, tests each build, and attaches it to the workflow run, linked from the run summary and a comment on the pull request.",
+    outcome:
+      "Download and try a change on your own computer before it is merged or released.",
+  },
   "WS-01": {
     summary:
       "The website, built and tested on every pull request and published to GitHub Pages, with the live demo at `/demo/`.",
