@@ -11,6 +11,11 @@ import {
   socialPreviewWidth,
 } from "./thumbnail/github-social-preview";
 import {
+  ReadmeVideoCard,
+  readmeVideoCardHeight,
+  readmeVideoCardWidth,
+} from "./thumbnail/readme-video-card";
+import {
   thumbnailHeight,
   thumbnailWidth,
   YoutubeThumbnail,
@@ -40,6 +45,12 @@ export function RemotionRoot() {
         component={GithubSocialPreview}
         width={socialPreviewWidth}
         height={socialPreviewHeight}
+      />
+      <Still
+        id="SendMockReadmeVideoCard"
+        component={ReadmeVideoCard}
+        width={readmeVideoCardWidth}
+        height={readmeVideoCardHeight}
       />
     </>
   );
