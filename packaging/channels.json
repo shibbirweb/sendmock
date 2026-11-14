@@ -30,8 +30,8 @@
           "runner": "ubuntu-latest",
           "shell": "bash",
           "install": {
-            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
-            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+            "stable": "npx --yes sendmock@latest version --json\nfetched_binary=\"$(find \"$(npm config get cache)/_npx\" -type f -name sendmock -perm -u+x | head -n 1)\"\nmkdir -p \"$RUNNER_TEMP/npx-bin\"\ncp \"$fetched_binary\" \"$RUNNER_TEMP/npx-bin/sendmock\"",
+            "beta": "npx --yes sendmock@beta version --json\nfetched_binary=\"$(find \"$(npm config get cache)/_npx\" -type f -name sendmock -perm -u+x | head -n 1)\"\nmkdir -p \"$RUNNER_TEMP/npx-bin\"\ncp \"$fetched_binary\" \"$RUNNER_TEMP/npx-bin/sendmock\""
           },
           "command": "$RUNNER_TEMP/npx-bin/sendmock"
         },
@@ -39,8 +39,8 @@
           "runner": "macos-latest",
           "shell": "bash",
           "install": {
-            "stable": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@latest \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json",
-            "beta": "mkdir -p \"$RUNNER_TEMP/npx-bin\"\nprintf '#!/bin/sh\\nexec npx --yes sendmock@beta \"$@\"\\n' > \"$RUNNER_TEMP/npx-bin/sendmock\"\nchmod +x \"$RUNNER_TEMP/npx-bin/sendmock\"\n\"$RUNNER_TEMP/npx-bin/sendmock\" version --json"
+            "stable": "npx --yes sendmock@latest version --json\nfetched_binary=\"$(find \"$(npm config get cache)/_npx\" -type f -name sendmock -perm -u+x | head -n 1)\"\nmkdir -p \"$RUNNER_TEMP/npx-bin\"\ncp \"$fetched_binary\" \"$RUNNER_TEMP/npx-bin/sendmock\"",
+            "beta": "npx --yes sendmock@beta version --json\nfetched_binary=\"$(find \"$(npm config get cache)/_npx\" -type f -name sendmock -perm -u+x | head -n 1)\"\nmkdir -p \"$RUNNER_TEMP/npx-bin\"\ncp \"$fetched_binary\" \"$RUNNER_TEMP/npx-bin/sendmock\""
           },
           "command": "$RUNNER_TEMP/npx-bin/sendmock"
         },
