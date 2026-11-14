@@ -39,7 +39,7 @@ No message reaches a real inbox, phone or provider unless you set up a real rela
 
 **Watch the video:** SendMock: Test Email, SMS and Payment Webhooks on Localhost
 
-[![SendMock: Test Email, SMS and Payment Webhooks on Localhost, on YouTube](https://img.youtube.com/vi/OHR7pVFGTl4/maxresdefault.jpg)](https://youtu.be/OHR7pVFGTl4)
+[![Play the video: SendMock: Test Email, SMS and Payment Webhooks on Localhost (2:01, on YouTube)](docs/wiki/images/video-tour.jpg)](https://youtu.be/OHR7pVFGTl4)
 
 ## What it catches
 
