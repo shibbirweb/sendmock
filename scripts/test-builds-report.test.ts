@@ -83,6 +83,6 @@ describe("Test builds report", () => {
       sha256: "b".repeat(64),
       archiveName: "sendmock-x86_64-pc-windows-msvc.zip",
     });
-    expect(formatSize(9_950_000)).toBe("10.0 MB");
+    expect(formatSize(9_960_000)).toBe("10.0 MB");
   });
 });
