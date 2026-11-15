@@ -121,7 +121,7 @@ gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=minor -f 
 
 Merge the release pull request once its CI passes. Publish beta then tags the version and runs the Release build, which publishes every channel whose secret is set; when it finishes, Registry publish sends the release to npm and PyPI.
 
-When Registry publish has finished, install the release through the channels that publish at once (replace `0.1.0-beta.1` with the version):
+When Registry publish has finished, and after it the Website workflow's "Publish the website" run (it publishes the APT and YUM repository; before it ends, apt and dnf still get the previous version), install the release through the channels that publish at once (replace `0.1.0-beta.1` with the version):
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=0.1.0-beta.1 -f channel=beta -f channels=after-publish
@@ -177,7 +177,7 @@ gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=major -f 
 gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=major -f dry_run=false
 ```
 
-Merge the release pull request (`chore:[REL-n] release 1.0.0-beta.1`). Publish beta releases `1.0.0-beta.1` to the beta channels, and Registry publish sends it to npm and PyPI (crates.io takes only a stable). Once Registry publish has finished, install it:
+Merge the release pull request (`chore:[REL-n] release 1.0.0-beta.1`). Publish beta releases `1.0.0-beta.1` to the beta channels, and Registry publish sends it to npm and PyPI (crates.io takes only a stable). Once Registry publish has finished, and after it the Website workflow's "Publish the website" run (it publishes the APT and YUM repository; before it ends, apt and dnf still get the previous version), install it:
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0-beta.1 -f channel=beta -f channels=after-publish
@@ -193,7 +193,7 @@ gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=stable -f
 gh workflow run release-prepare.yml --repo shibbirweb/sendmock -f bump=stable -f dry_run=false
 ```
 
-Merge the release pull request (`chore:[REL-n] release 1.0.0`), then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build and publishes the website's 1.0 docs at `/`; when it finishes, Registry publish sends the release to npm, PyPI and crates.io and publishes the MCP registry entry. Once Registry publish has finished, install it:
+Merge the release pull request (`chore:[REL-n] release 1.0.0`), then the promote pull request into `main` that Promote stable opens. Publish stable tags `v1.0.0`, runs the Release build and publishes the website's 1.0 docs at `/`; when it finishes, Registry publish sends the release to npm, PyPI and crates.io and publishes the MCP registry entry. Once Registry publish has finished, and after it the Website workflow's "Publish the website" run (it publishes the APT and YUM repository; before it ends, apt and dnf still get the previous version), install it:
 
 ```sh
 gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0 -f channel=stable -f channels=after-publish
