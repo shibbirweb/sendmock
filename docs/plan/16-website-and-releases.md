@@ -189,6 +189,8 @@ The Prepare release workflow has one choice, `bump`, plus a dry-run switch:
 
 Every stable goes through at least one beta, so the beta channel always tries a version first.
 
+The release scripts read every `v*` tag, not only the tags reachable from the current branch (fixed 2026-11-15, #270). A stable's tag sits on the merge commit on `main`, which `develop` never contains, so reading only reachable tags made `develop` see `1.0.0` as unreleased: Stable promote opened a promote pull request after every push to `develop` (#265), and Prepare release would have made `0.0.1-beta.1` instead of `1.0.1-beta.1`. Only the release workflows can create `v*` tags (the Release tags ruleset), so no other tag needs keeping out, and `main` is never merged back into `develop`.
+
 #### The changelog
 
 **Changed 2026-11-09 (owner decision, #212):** SendMock keeps its changelog by hand, as nibtree does, in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format. Until then Prepare release wrote one line per merged pull request title, and the first beta's notes would have been 27 such lines starting with a logo tweak; titles cannot be fixed once merged.
