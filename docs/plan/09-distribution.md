@@ -88,7 +88,7 @@ Every channel has a **beta** track (from `develop`) and a **stable** track (from
 | Chocolatey | community package, later |
 | AUR, COPR, Nixpkgs | community packages for Arch, Fedora and Nix, later |
 | Docker | `ghcr.io/shibbirweb/sendmock` and Docker Hub; multi-arch; see [Docker](#docker) |
-| Cargo | `cargo install sendmock` (requires prebuilt UI in the crate package) |
+| Cargo | `cargo install sendmock` (requires prebuilt UI in the crate package); every published crate has a README for its crates.io page (DS-03.9, planned 2026-11-15, owner request, from the release after 1.0.0) |
 | npm | the `sendmock` package runs the right binary for the computer, as a dev dependency in a JavaScript project or with no install at all through `npx sendmock` (added 2026-11-07, owner request; also `bunx`, `pnpm dlx` and `yarn dlx`) |
 
 Optional later: a macOS menu-bar / system tray launcher.

@@ -6,8 +6,10 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+readme = "README.md"
 # skill is the agent skill copied in before packaging (scripts/release/stage-crate-files.sh).
 include = [
+    "README.md",
     "build.rs",
     "builtin/**/*",
     "src/**/*",
