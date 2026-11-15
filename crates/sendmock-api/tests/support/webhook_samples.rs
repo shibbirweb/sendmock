@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use serde_json::{Value, json};
 
 use super::test_app::call_api;
@@ -61,4 +63,19 @@ pub async fn send_email(app_router: &axum::Router, recipient: &str, subject: &st
     .await;
     assert!(status == 200 || status == 201, "{status} {sent_email}");
     sent_email["id"].as_str().unwrap_or_default().to_owned()
+}
+
+/// Waits up to two seconds for `delivery_count` queued deliveries, since rules fire from a
+/// background subscriber, and answers the deliveries found by then.
+pub async fn wait_for_deliveries(app_router: &axum::Router, delivery_count: usize) -> Vec<Value> {
+    let mut deliveries = Vec::new();
+    for _ in 0..200 {
+        let (_, page) = call_api(app_router, "GET", "/api/v1/webhooks/deliveries", None).await;
+        deliveries = page["items"].as_array().cloned().unwrap_or_default();
+        if deliveries.len() >= delivery_count {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    deliveries
 }
