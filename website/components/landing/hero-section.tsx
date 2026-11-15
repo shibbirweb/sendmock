@@ -22,7 +22,7 @@ export function HeroSection() {
       />
       <div className="rounded-full border bg-fd-card px-4 py-1 text-sm">
         <AnimatedShinyText>
-          Now in beta: try the live demo with sample data
+          SendMock 1.0 is out: try the live demo with sample data
         </AnimatedShinyText>
       </div>
       <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">

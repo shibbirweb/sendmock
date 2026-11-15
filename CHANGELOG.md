@@ -8,6 +8,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Fixed
+
+- **crates.io pages:** every SendMock crate on crates.io now has a README. `sendmock-tray` shows how to install and start the tray app (`cargo install sendmock-tray --features gui --locked`), and each library crate says what it does, that it is an internal part of SendMock without a stable API, and how to install SendMock.
+
 ## [1.0.0] - 2026-11-14
 
 ### Added
