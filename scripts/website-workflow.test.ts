@@ -16,7 +16,7 @@ type WorkflowJob = {
 };
 type WebsiteWorkflow = {
   on: {
-    push: { branches: string[] };
+    push: { branches: string[]; paths: string[] };
     pull_request: { paths: string[] };
     release: { types: string[] };
     workflow_run: { workflows: string[]; types: string[] };
@@ -68,7 +68,9 @@ describe("Website workflow", () => {
 
   test("WS-01.1 only the deploy job may publish to GitHub Pages, after the build", () => {
     const deployJob = websiteWorkflow.jobs.deploy;
-    expect(deployJob?.if).toBe("github.event_name != 'pull_request'");
+    expect(deployJob?.if).toBe(
+      "${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' }}",
+    );
     expect(deployJob?.needs).toBe("build");
     expect(deployJob?.permissions).toEqual({
       pages: "write",
@@ -98,7 +100,9 @@ describe("Website workflow", () => {
     );
     const decisionScript =
       releaseCheck?.steps.find((step) => step.run !== undefined)?.run ?? "";
-    expect(decisionScript).toContain("scripts/release/registry-publish-plan.ts");
+    expect(decisionScript).toContain(
+      "scripts/release/registry-publish-plan.ts",
+    );
 
     const packageRepository = websiteWorkflow.jobs["package-repository"];
     expect(packageRepository?.needs).toBe("release-check");
@@ -106,5 +110,19 @@ describe("Website workflow", () => {
       "${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}",
     );
     expect(websiteWorkflow.jobs.build?.needs).toBe("package-repository");
+  });
+
+  test("a skipped release check does not skip the build and deploy on pull requests and pushes", () => {
+    expect(websiteWorkflow.jobs.build?.if).toBe(
+      "${{ !cancelled() && needs.package-repository.result == 'success' }}",
+    );
+    expect(websiteWorkflow.jobs.deploy?.if).toContain(
+      "needs.build.result == 'success'",
+    );
+  });
+
+  test("a changelog change builds and tests the site, so a release pull request runs the changelog test", () => {
+    expect(websiteWorkflow.on.pull_request.paths).toContain("CHANGELOG.md");
+    expect(websiteWorkflow.on.push.paths).toContain("CHANGELOG.md");
   });
 });

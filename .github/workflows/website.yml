@@ -19,6 +19,7 @@ on:
       - "website/**"
       - "docs/api/**"
       - "docs/wiki/**"
+      - "CHANGELOG.md"
       - "scripts/build-pages-site.ts"
       - "scripts/build-docs-versions.ts"
       - "scripts/release/package-repository.sh"
@@ -29,6 +30,7 @@ on:
       - "website/**"
       - "docs/api/**"
       - "docs/wiki/**"
+      - "CHANGELOG.md"
       - "scripts/build-pages-site.ts"
       - "scripts/build-docs-versions.ts"
       - ".github/workflows/website.yml"
@@ -127,6 +129,9 @@ jobs:
   build:
     name: Build
     needs: package-repository
+    # Without its own condition a job is skipped when any job before it was skipped, and the
+    # release check is skipped on every pull request and push.
+    if: ${{ !cancelled() && needs.package-repository.result == 'success' }}
     runs-on: ubuntu-latest
     # Playwright's own image has the browser and its system packages, as in ci.yml.
     # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
@@ -218,7 +223,7 @@ jobs:
 
   deploy:
     name: Publish to GitHub Pages
-    if: github.event_name != 'pull_request'
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
