@@ -9,6 +9,14 @@ on:
   workflow_run:
     workflows: [Publish beta, Publish stable]
     types: [completed]
+  # Sends a release the registries missed again. Re-running a failed run would reuse its old
+  # workflow file, so a fix to this file only reaches that release through a new run.
+  workflow_dispatch:
+    inputs:
+      release_run_id:
+        description: ID of the Publish beta or Publish stable run that released the version
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -18,12 +26,13 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
-  RELEASE_RUN_ID: ${{ github.event.workflow_run.id }}
+  RELEASE_RUN_ID: ${{ github.event.workflow_run.id || inputs.release_run_id }}
 
 jobs:
   plan:
     name: Did that run publish a release?
+    # Run by hand, it publishes only from the default branch's workflow file, never a branch's.
+    if: github.event_name != 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,6 +42,7 @@ jobs:
       tag_name: ${{ steps.decision.outputs.tag_name }}
       version: ${{ steps.decision.outputs.version }}
       channel: ${{ steps.decision.outputs.channel }}
+      release_branch: ${{ steps.decision.outputs.release_branch }}
     steps:
       # The default branch, never the commit of the run that triggered this one: a fork's pull
       # request from a branch named develop also runs CI and then Publish beta, and its code must
@@ -46,23 +56,31 @@ jobs:
       - id: decision
         env:
           GH_TOKEN: ${{ github.token }}
-          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
         run: |
+          if ! [[ "$RELEASE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::release_run_id is not a workflow run ID; publishing nothing"
+            exit 1
+          fi
+          workflow_name="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RELEASE_RUN_ID" --jq .name)"
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RELEASE_RUN_ID/jobs?per_page=100" \
             --jq '.jobs[] | {name, conclusion}' > "$RUNNER_TEMP/run-jobs.jsonl"
-          bun scripts/release/registry-publish-plan.ts "$WORKFLOW_NAME" "$RUNNER_TEMP/run-jobs.jsonl"
+          bun scripts/release/registry-publish-plan.ts "$workflow_name" "$RUNNER_TEMP/run-jobs.jsonl"
 
       # Only the release workflows create `v*` tags here, and the Release tags ruleset stops them
-      # moving, so a tag on exactly this commit proves the run released this repository's code.
-      - name: The release tag is this repository's and points at the released commit
+      # moving. A publish workflow releases the commit of a successful push CI run on its branch,
+      # so the tag must point at one. The publish run's own head commit cannot stand in for it: a
+      # `workflow_run` run is recorded on the default branch head, which is never a stable's commit.
+      - name: The release tag is this repository's and points at a commit CI passed on its branch
         if: steps.decision.outputs.should_publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.decision.outputs.tag_name }}
+          RELEASE_BRANCH: ${{ steps.decision.outputs.release_branch }}
         run: |
           tagged_commit="$(gh api "repos/$GITHUB_REPOSITORY/commits/refs/tags/$TAG_NAME" --jq .sha)"
-          if [ "$tagged_commit" != "$COMMIT_SHA" ]; then
-            echo "::error::$TAG_NAME points at $tagged_commit, not at $COMMIT_SHA; publishing nothing"
+          passed_ci_run_count="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$tagged_commit&branch=$RELEASE_BRANCH&event=push&status=success&per_page=1" --jq .total_count)"
+          if [ "$passed_ci_run_count" = "0" ]; then
+            echo "::error::$TAG_NAME points at $tagged_commit, which has no successful push CI run on $RELEASE_BRANCH; publishing nothing"
             exit 1
           fi
 
