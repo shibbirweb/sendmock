@@ -201,6 +201,12 @@ gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0
 
 Check: the website serves the 1.0 docs at `/` and the `develop` docs at `/next/`, and crates.io has every workspace crate at `1.0.0`.
 
+If Registry publish failed or skipped its publish jobs and the cause is fixed on `develop`, send the release again from the Publish run that released it (re-running the failed run would use its old workflow file):
+
+```sh
+gh workflow run registry-publish.yml --repo shibbirweb/sendmock --ref develop -f release_run_id=<Publish stable run ID>
+```
+
 Then, on crates.io, add this repository (`shibbirweb/sendmock`) with the workflow file `registry-publish.yml` and no environment as the trusted publisher of each of the 14 crates (each crate's Settings, Trusted Publishing), and delete the first publish's token:
 
 ```sh

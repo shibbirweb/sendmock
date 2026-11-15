@@ -8,7 +8,8 @@
  *
  * The jobs file holds one JSON object per line with each job's `name` and `conclusion`, as
  * `gh api --paginate .../runs/<run id>/jobs --jq '.jobs[] | {name, conclusion}'` prints them.
- * Writes `should_publish`, `tag_name`, `version` and `channel` to `$GITHUB_OUTPUT` when set.
+ * Writes `should_publish`, `tag_name`, `version`, `channel` and `release_branch` to
+ * `$GITHUB_OUTPUT` when set.
  */
 
 import { appendFileSync, readFileSync } from "node:fs";
@@ -22,11 +23,18 @@ export type RegistryPublishPlan =
       tagName: string;
       version: string;
       channel: "beta" | "stable";
+      releaseBranch: "develop" | "main";
     };
 
 const channelsByWorkflowName: Record<string, "beta" | "stable"> = {
   "Publish beta": "beta",
   "Publish stable": "stable",
+};
+
+/** The branch whose CI run each channel's publish workflow releases from. */
+const releaseBranchesByChannel: Record<"beta" | "stable", "develop" | "main"> = {
+  beta: "develop",
+  stable: "main",
 };
 
 /** The publish job of `release.yml`, as it is named inside the publish workflow's `release` job. */
@@ -59,7 +67,13 @@ export function planRegistryPublish(
       reason: `${tagName} does not belong to the ${channel} channel`,
     };
   }
-  return { shouldPublish: true, tagName, version, channel };
+  return {
+    shouldPublish: true,
+    tagName,
+    version,
+    channel,
+    releaseBranch: releaseBranchesByChannel[channel],
+  };
 }
 
 export function parseRunJobs(jobLines: string): RunJob[] {
@@ -76,6 +90,7 @@ function writeOutputs(registryPublishPlan: RegistryPublishPlan) {
         `tag_name=${registryPublishPlan.tagName}`,
         `version=${registryPublishPlan.version}`,
         `channel=${registryPublishPlan.channel}`,
+        `release_branch=${registryPublishPlan.releaseBranch}`,
       ]
     : ["should_publish=false"];
   const outputPath = process.env.GITHUB_OUTPUT;
