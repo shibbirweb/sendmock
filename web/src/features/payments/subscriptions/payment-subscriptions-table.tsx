@@ -1,5 +1,9 @@
 import { MoreHorizontalIcon } from "lucide-react";
 
+import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
 import { IconButton } from "@/components/common/icon-button";
 import {
   DropdownMenu,
@@ -16,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SubscriptionStatusBadge } from "@/features/payments/subscriptions/subscription-status-badge";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import type { PaymentSubscription } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format/format-values";
 import { formatMinorAmount } from "@/lib/payments/format-money";
@@ -41,9 +46,11 @@ function listActions(subscription: PaymentSubscription): SubscriptionAction[] {
 /** Every subscription with its plan, status, period and renewals (PY-07.4). */
 export function PaymentSubscriptionsTable({
   subscriptions,
+  checkedSubscriptions,
   onAction,
 }: {
   subscriptions: PaymentSubscription[];
+  checkedSubscriptions: CheckedItems;
   onAction: (
     subscription: PaymentSubscription,
     subscriptionAction: SubscriptionAction,
@@ -53,6 +60,7 @@ export function PaymentSubscriptionsTable({
     <Table aria-label="Subscriptions">
       <TableHeader>
         <TableRow>
+          <CheckColumnHead />
           <TableHead>Customer</TableHead>
           <TableHead>Plan</TableHead>
           <TableHead>Status</TableHead>
@@ -63,7 +71,13 @@ export function PaymentSubscriptionsTable({
       </TableHeader>
       <TableBody>
         {subscriptions.map((subscription) => (
-          <TableRow key={subscription.id} data-testid="subscription-row">
+          <CheckableTableRow
+            key={subscription.id}
+            itemId={subscription.id}
+            itemLabel={`subscription for ${subscription.customer_email}`}
+            checkedItems={checkedSubscriptions}
+            data-testid="subscription-row"
+          >
             <TableCell className="text-sm">
               <span className="grid">
                 <span>{subscription.customer_email}</span>
@@ -125,7 +139,7 @@ export function PaymentSubscriptionsTable({
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
-          </TableRow>
+          </CheckableTableRow>
         ))}
       </TableBody>
     </Table>

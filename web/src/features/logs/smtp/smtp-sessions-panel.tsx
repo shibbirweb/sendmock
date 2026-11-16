@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { SearchIcon, ServerIcon } from "lucide-react";
 import * as React from "react";
 
+import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
+import { CheckedListToolbar } from "@/components/common/checked-list-toolbar";
 import { FilterChip } from "@/components/common/filter-chip";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { Input } from "@/components/ui/input";
@@ -24,7 +29,12 @@ import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
 import { SampleButton } from "@/features/onboarding/sample-button";
 import { SmtpResultBadge } from "@/features/logs/smtp/smtp-result-badge";
-import { useSmtpSessions } from "@/lib/api/hooks/use-logs-queries";
+import { type CheckedItems, useCheckedItems } from "@/hooks/use-checked-items";
+import {
+  useDeleteSmtpSession,
+  useDeleteSmtpSessions,
+  useSmtpSessions,
+} from "@/lib/api/hooks/use-logs-queries";
 import type { SmtpSession } from "@/lib/api/types";
 import {
   formatDateTime,
@@ -33,13 +43,26 @@ import {
 } from "@/lib/format/format-values";
 import { cn } from "@/lib/utils";
 
-function SmtpSessionRow({ smtpSession }: { smtpSession: SmtpSession }) {
+const smtpSessionNoun = { one: "SMTP session", many: "SMTP sessions" };
+
+function SmtpSessionRow({
+  smtpSession,
+  checkedSessions,
+}: {
+  smtpSession: SmtpSession;
+  checkedSessions: CheckedItems;
+}) {
   const isFailed = smtpSession.result !== "delivered";
   const durationMs =
     Date.parse(smtpSession.ended_at) - Date.parse(smtpSession.started_at);
 
   return (
-    <TableRow className={cn("relative", isFailed && "bg-destructive/5")}>
+    <CheckableTableRow
+      itemId={smtpSession.id}
+      itemLabel={`SMTP session from ${smtpSession.helo_name}`}
+      checkedItems={checkedSessions}
+      className={cn(isFailed && "bg-destructive/5")}
+    >
       <TableCell className="whitespace-nowrap text-muted-foreground">
         <time
           dateTime={smtpSession.started_at}
@@ -91,7 +114,7 @@ function SmtpSessionRow({ smtpSession }: { smtpSession: SmtpSession }) {
       <TableCell className="hidden whitespace-nowrap tabular-nums sm:table-cell">
         {formatDurationMs(durationMs)}
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
@@ -104,13 +127,27 @@ export function SmtpSessionsPanel() {
     smtpResultFilters.find(
       (filterOption) => filterOption.resultFilter === resultFilter,
     )?.results ?? null;
-  const sessionsQuery = useSmtpSessions({
+  const sessionFilters = {
     result: selectedResults?.join(","),
     query: searchText.trim() || undefined,
-  });
-  const loadedPages = sessionsQuery.data?.pages ?? [];
-  const smtpSessions = loadedPages.flatMap((loadedPage) => loadedPage.items);
-  const totalCount = loadedPages[0]?.total_count ?? 0;
+  };
+  const sessionsQuery = useSmtpSessions(sessionFilters);
+  const smtpSessions = React.useMemo(
+    () =>
+      sessionsQuery.data?.pages.flatMap((loadedPage) => loadedPage.items) ?? [],
+    [sessionsQuery.data],
+  );
+  const totalCount = sessionsQuery.data?.pages[0]?.total_count ?? 0;
+  const isFiltered = resultFilter !== "all" || searchText !== "";
+  const checkedSessions = useCheckedItems(
+    React.useMemo(
+      () => smtpSessions.map((smtpSession) => smtpSession.id),
+      [smtpSessions],
+    ),
+    `${resultFilter}|${searchText}`,
+  );
+  const deleteSession = useDeleteSmtpSession();
+  const deleteSessions = useDeleteSmtpSessions();
   const { fetchNextPage } = sessionsQuery;
   const loadNextPage = React.useCallback(() => {
     void fetchNextPage();
@@ -146,6 +183,20 @@ export function SmtpSessionsPanel() {
         </div>
       </div>
       <div className="min-w-0 rounded-lg border">
+        <CheckedListToolbar
+          itemNoun={smtpSessionNoun}
+          checkedItems={checkedSessions}
+          loadedItemCount={smtpSessions.length}
+          totalItemCount={totalCount}
+          isFiltered={isFiltered}
+          deleteAllKeepsNote="The emails those sessions delivered stay in Mail."
+          onDeleteItem={(sessionId) => {
+            deleteSession.mutate(sessionId);
+          }}
+          onDeleteAll={() => {
+            deleteSessions.mutate(sessionFilters);
+          }}
+        />
         {sessionsQuery.isPending && (
           <div className="grid gap-2 p-4">
             <Skeleton className="h-8 w-full" />
@@ -160,7 +211,7 @@ export function SmtpSessionsPanel() {
         )}
         {sessionsQuery.isSuccess &&
           smtpSessions.length === 0 &&
-          (resultFilter !== "all" || searchText !== "" ? (
+          (isFiltered ? (
             <NoMatchState
               message="No SMTP sessions match this filter or search."
               onClearFilter={() => {
@@ -182,6 +233,7 @@ export function SmtpSessionsPanel() {
           <Table>
             <TableHeader>
               <TableRow>
+                <CheckColumnHead />
                 <TableHead>Time</TableHead>
                 <TableHead>Client</TableHead>
                 <TableHead className="hidden md:table-cell">TLS</TableHead>
@@ -196,6 +248,7 @@ export function SmtpSessionsPanel() {
                 <SmtpSessionRow
                   key={smtpSession.id}
                   smtpSession={smtpSession}
+                  checkedSessions={checkedSessions}
                 />
               ))}
             </TableBody>

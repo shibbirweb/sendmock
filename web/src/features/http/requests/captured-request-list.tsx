@@ -1,8 +1,15 @@
+import * as React from "react";
+
 import { HttpStatusBadge } from "@/components/common/http-status-badge";
+import { ListRowCheckbox } from "@/components/common/list-row-checkbox";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CapturedRequestToolbar } from "@/features/http/requests/captured-request-toolbar";
 import { HttpMethodBadge } from "@/features/http/requests/http-method-badge";
+import { useCapturedRequestActions } from "@/features/http/requests/use-captured-request-actions";
+import { isRowCheckKey } from "@/features/shortcuts/is-row-check-key";
 import { useCatchUrl } from "@/features/http/use-catch-url";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import { useCapturedHttpRequests } from "@/lib/api/hooks/use-http-catcher-queries";
 import type { CapturedHttpRequest, HttpBin } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -13,33 +20,58 @@ function CapturedRequestRow({
   capturedRequest,
   isShowingBin,
   isSelected,
+  checkedRequests,
   onSelect,
 }: {
   capturedRequest: CapturedHttpRequest;
   isShowingBin: boolean;
   isSelected: boolean;
+  checkedRequests: CheckedItems;
   onSelect: () => void;
 }) {
   const pathInBin = readPathInBin(
     capturedRequest.path,
     capturedRequest.bin_name,
   );
+  const isUnread = !capturedRequest.is_read;
 
   return (
-    <li>
+    <li
+      className={cn(
+        "group/list-row flex items-center gap-2 border-b pl-3 hover:bg-muted/60",
+        isSelected && "bg-muted",
+      )}
+      onKeyDown={(keyEvent) => {
+        if (isRowCheckKey(keyEvent)) {
+          keyEvent.preventDefault();
+          checkedRequests.toggleItemChecked(capturedRequest.id);
+        }
+      }}
+    >
+      <ListRowCheckbox
+        itemLabel={`${capturedRequest.method} request to ${pathInBin}`}
+        isChecked={checkedRequests.isItemChecked(capturedRequest.id)}
+        isAnyChecked={checkedRequests.checkedItemCount > 0}
+        onCheckedChange={(isChecked) => {
+          checkedRequests.setItemChecked(capturedRequest.id, isChecked);
+        }}
+      />
       <button
         type="button"
         aria-current={isSelected ? "true" : undefined}
         data-testid="captured-request"
-        className={cn(
-          "flex w-full items-center gap-2 border-b px-3 py-2.5 text-left text-sm hover:bg-muted/60 focus-visible:bg-muted focus-visible:outline-none",
-          isSelected && "bg-muted",
-        )}
+        className="flex min-w-0 flex-1 items-center gap-2 py-2.5 pr-3 text-left text-sm focus-visible:bg-muted focus-visible:outline-none"
         onClick={onSelect}
       >
         <HttpMethodBadge method={capturedRequest.method} />
         <span className="grid min-w-0 flex-1 gap-0.5">
-          <span className="truncate font-mono text-xs">
+          <span
+            className={cn(
+              "truncate font-mono text-xs",
+              isUnread && "font-semibold",
+            )}
+          >
+            {isUnread && <span className="sr-only">Unread: </span>}
             {isShowingBin ? `${capturedRequest.bin_name} ` : ""}
             {pathInBin}
           </span>
@@ -79,9 +111,18 @@ export function CapturedRequestList({
   onSelect: (requestId: string) => void;
 }) {
   const requestsQuery = useCapturedHttpRequests(selectedBin?.id ?? null);
-  const capturedRequests =
-    requestsQuery.data?.pages.flatMap((requestPage) => requestPage.items) ?? [];
+  const capturedRequests = React.useMemo(
+    () =>
+      requestsQuery.data?.pages.flatMap((requestPage) => requestPage.items) ??
+      [],
+    [requestsQuery.data],
+  );
   const totalCount = requestsQuery.data?.pages[0]?.total_count ?? 0;
+  const requestActions = useCapturedRequestActions({
+    capturedRequests,
+    selectedBin,
+    selectedRequestId,
+  });
 
   if (requestsQuery.isPending) {
     return (
@@ -97,18 +138,32 @@ export function CapturedRequestList({
       <p className="p-6 text-sm text-destructive">Could not load requests.</p>
     );
   }
+  const listToolbar = (
+    <CapturedRequestToolbar
+      loadedRequestCount={capturedRequests.length}
+      totalRequestCount={totalCount}
+      selectedBin={selectedBin}
+      requestActions={requestActions}
+    />
+  );
   if (capturedRequests.length === 0) {
-    return selectedBin === null ? (
-      <p className="p-6 text-center text-sm text-muted-foreground">
-        No requests caught yet.
-      </p>
-    ) : (
-      <EmptyBinMessage binName={selectedBin.name} />
+    return (
+      <>
+        {listToolbar}
+        {selectedBin === null ? (
+          <p className="p-6 text-center text-sm text-muted-foreground">
+            No requests caught yet.
+          </p>
+        ) : (
+          <EmptyBinMessage binName={selectedBin.name} />
+        )}
+      </>
     );
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      {listToolbar}
       <ul aria-label="Captured requests">
         {capturedRequests.map((capturedRequest) => (
           <CapturedRequestRow
@@ -116,6 +171,7 @@ export function CapturedRequestList({
             capturedRequest={capturedRequest}
             isShowingBin={selectedBin === null}
             isSelected={capturedRequest.id === selectedRequestId}
+            checkedRequests={requestActions.checkedRequests}
             onSelect={() => {
               onSelect(capturedRequest.id);
             }}

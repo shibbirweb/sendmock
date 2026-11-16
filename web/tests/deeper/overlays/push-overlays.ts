@@ -13,9 +13,11 @@ async function openNotification(page: Page) {
 export const pushOverlays: DeeperOverlay[] = [
   { name: "A notification is open", open: openNotification, scope: "dialog" },
   {
-    name: "Clear all dialog",
+    name: "Delete all dialog",
     open: async (page) => {
-      await page.getByRole("button", { name: "Clear all" }).click();
+      await page
+        .getByRole("button", { name: "Delete all push notifications" })
+        .click();
     },
     scope: "dialog",
   },

@@ -13,14 +13,17 @@ import { useSettingsSectionForm } from "@/features/settings/use-settings-section
 import { RetentionLimitWarning } from "@/features/settings/sections/retention-limit-warning";
 import { useDeleteAllEmails } from "@/lib/api/hooks/use-email-queries";
 import { useDeleteAllSms } from "@/lib/api/hooks/use-sms-queries";
-import { useResetToSeed } from "@/lib/api/hooks/use-system-queries";
+import {
+  useDeleteAllTraffic,
+  useResetToSeed,
+} from "@/lib/api/hooks/use-system-queries";
 import type { AppSettings } from "@/lib/api/types";
 import { listUnboundedTraffic } from "@/lib/settings/list-unbounded-traffic";
 
 const retentionKeys = ["max_emails", "max_sms", "max_age_days"] as const;
 const defaultMaxAgeDays = 7;
 
-type DangerAction = "delete-emails" | "delete-sms" | "reset";
+type DangerAction = "delete-traffic" | "delete-emails" | "delete-sms" | "reset";
 
 const dangerActionTexts: Record<
   DangerAction,
@@ -31,6 +34,13 @@ const dangerActionTexts: Record<
     doneMessage: string;
   }
 > = {
+  "delete-traffic": {
+    title: "Delete all traffic?",
+    consequence:
+      "Every email, SMS, verification, push notification, captured HTTP request, finished webhook delivery, payment, subscription and log entry goes, in every project. Settings, providers, bins, endpoints, rules, services and the rest of the configuration stay.",
+    confirmLabel: "Delete all traffic",
+    doneMessage: "All traffic deleted",
+  },
   "delete-emails": {
     title: "Delete all emails?",
     consequence:
@@ -119,6 +129,7 @@ function DangerZoneCard() {
   const deleteAllEmails = useDeleteAllEmails();
   const deleteAllSms = useDeleteAllSms();
   const resetToSeed = useResetToSeed();
+  const deleteAllTraffic = useDeleteAllTraffic();
   const [pendingAction, setPendingAction] = React.useState<DangerAction | null>(
     null,
   );
@@ -130,7 +141,9 @@ function DangerZoneCard() {
       },
     };
 
-    if (confirmedAction === "delete-emails") {
+    if (confirmedAction === "delete-traffic") {
+      deleteAllTraffic.mutate(undefined, mutationCallbacks);
+    } else if (confirmedAction === "delete-emails") {
       deleteAllEmails.mutate(undefined, mutationCallbacks);
     } else if (confirmedAction === "delete-sms") {
       deleteAllSms.mutate(undefined, mutationCallbacks);
@@ -146,6 +159,13 @@ function DangerZoneCard() {
       className="border-destructive/40"
     >
       <div className="flex flex-wrap gap-2">
+        <Button
+          variant="destructive"
+          onClick={() => setPendingAction("delete-traffic")}
+        >
+          <Trash2Icon />
+          Delete all traffic
+        </Button>
         <Button
           variant="destructive"
           onClick={() => setPendingAction("delete-emails")}
@@ -171,6 +191,7 @@ function DangerZoneCard() {
           title={dangerActionTexts[pendingAction].title}
           consequence={dangerActionTexts[pendingAction].consequence}
           confirmLabel={dangerActionTexts[pendingAction].confirmLabel}
+          isDestructive
           onConfirm={() => runDangerAction(pendingAction)}
           onClose={() => setPendingAction(null)}
         />

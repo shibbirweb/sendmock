@@ -2,6 +2,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import * as React from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import { MailListItem } from "@/features/mail/list/mail-list-item";
 import { useMailListKeyboard } from "@/features/mail/list/use-mail-list-keyboard";
 import type { EmailSummary } from "@/lib/api/types";
@@ -14,8 +15,7 @@ const loadMoreThresholdRows = 10;
 type MailVirtualListProps = {
   emails: EmailSummary[];
   selectedEmailId: string | undefined;
-  checkedEmailIds: Set<string>;
-  onCheckedChange: (emailId: string, isChecked: boolean) => void;
+  checkedEmails: CheckedItems;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadNextPage: () => void;
@@ -30,8 +30,7 @@ type MailVirtualListProps = {
 export function MailVirtualList({
   emails,
   selectedEmailId,
-  checkedEmailIds,
-  onCheckedChange,
+  checkedEmails,
   hasNextPage,
   isFetchingNextPage,
   onLoadNextPage,
@@ -80,6 +79,7 @@ export function MailVirtualList({
     searchInputRef,
     scrollToEmailIndex,
     onDeleteEmail,
+    onToggleCheckedEmail: checkedEmails.toggleItemChecked,
   });
 
   return (
@@ -112,9 +112,10 @@ export function MailVirtualList({
                 <MailListItem
                   email={email}
                   isSelected={email.id === selectedEmailId}
-                  isChecked={checkedEmailIds.has(email.id)}
+                  isChecked={checkedEmails.isItemChecked(email.id)}
+                  isAnyChecked={checkedEmails.checkedItemCount > 0}
                   onCheckedChange={(isChecked) => {
-                    onCheckedChange(email.id, isChecked);
+                    checkedEmails.setItemChecked(email.id, isChecked);
                   }}
                 />
               )}

@@ -134,3 +134,22 @@ export function useSaveDelivery() {
       }),
   );
 }
+
+/** Deletes a finished delivery; the server answers 409 while it is queued or retrying. */
+export function useDeleteDelivery() {
+  return useDeliveryMutation((deliveryId: string) =>
+    requestApi<void>(`/webhooks/deliveries/${deliveryId}`, {
+      method: "DELETE",
+    }),
+  );
+}
+
+/** Deletes every finished delivery the filters match; queued and retrying ones stay. */
+export function useDeleteDeliveries() {
+  return useDeliveryMutation((deliveryFilters: DeliveryListFilters) =>
+    requestApi<void>("/webhooks/deliveries", {
+      method: "DELETE",
+      queryParameters: deliveryFilters,
+    }),
+  );
+}

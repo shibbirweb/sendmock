@@ -30,8 +30,8 @@ export function usePushNotification(pushId: string) {
   });
 }
 
-function usePushMutation<MutationInput>(
-  mutationRequest: (mutationInput: MutationInput) => Promise<void>,
+function usePushMutation<MutationInput, MutationResult>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<MutationResult>,
 ) {
   const queryClient = useQueryClient();
 
@@ -39,6 +39,7 @@ function usePushMutation<MutationInput>(
     mutationFn: mutationRequest,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.push.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
     },
   });
 }
@@ -58,5 +59,15 @@ export function useDeletePushNotifications() {
       method: "DELETE",
       queryParameters: { ...pushFilters, project: projectKey },
     }),
+  );
+}
+
+export function useUpdatePushNotification() {
+  return usePushMutation(
+    ({ pushId, isRead }: { pushId: string; isRead: boolean }) =>
+      requestApi<PushNotification>(`/push/${pushId}`, {
+        method: "PATCH",
+        requestBody: { is_read: isRead },
+      }),
   );
 }

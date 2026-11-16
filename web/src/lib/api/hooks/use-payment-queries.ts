@@ -133,3 +133,33 @@ export function useCompleteCheckout(sessionId: string) {
     },
   });
 }
+
+function usePaymentDeleteMutation<MutationInput>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<void>,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: mutationRequest,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.payments.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
+    },
+  });
+}
+
+export function useDeletePayment() {
+  return usePaymentDeleteMutation((paymentId: string) =>
+    requestApi<void>(`/payments/${paymentId}`, { method: "DELETE" }),
+  );
+}
+
+/** Deletes every payment the filters match, with their events, refunds and checkouts. */
+export function useDeletePayments() {
+  return usePaymentDeleteMutation((paymentFilters: PaymentListFilters) =>
+    requestApi<void>("/payments", {
+      method: "DELETE",
+      queryParameters: paymentFilters,
+    }),
+  );
+}

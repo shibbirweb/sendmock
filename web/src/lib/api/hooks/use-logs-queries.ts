@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { requestApi } from "@/lib/api/api-client";
 import { queryKeys } from "@/lib/api/query-keys";
@@ -65,4 +70,49 @@ export function useApiRequest(requestId: string) {
         abortSignal: signal,
       }),
   });
+}
+
+function useLogsMutation<MutationInput>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<void>,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: mutationRequest,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.logs.all });
+    },
+  });
+}
+
+export function useDeleteSmtpSession() {
+  return useLogsMutation((sessionId: string) =>
+    requestApi<void>(`/logs/smtp/${sessionId}`, { method: "DELETE" }),
+  );
+}
+
+/** Deletes every SMTP session the filters match. */
+export function useDeleteSmtpSessions() {
+  return useLogsMutation((sessionFilters: SmtpSessionListFilters) =>
+    requestApi<void>("/logs/smtp", {
+      method: "DELETE",
+      queryParameters: sessionFilters,
+    }),
+  );
+}
+
+export function useDeleteApiRequest() {
+  return useLogsMutation((requestId: string) =>
+    requestApi<void>(`/logs/http/${requestId}`, { method: "DELETE" }),
+  );
+}
+
+/** Deletes every API request log entry the filters match. */
+export function useDeleteApiRequests() {
+  return useLogsMutation((requestFilters: ApiRequestLogFilters) =>
+    requestApi<void>("/logs/http", {
+      method: "DELETE",
+      queryParameters: requestFilters,
+    }),
+  );
 }

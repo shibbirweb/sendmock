@@ -75,6 +75,14 @@ function readSectionBadgeCount(
     return appStats?.unread_sms_count ?? 0;
   }
 
+  if (sectionPath === "/push") {
+    return appStats?.unread_push_count ?? 0;
+  }
+
+  if (sectionPath === "/http") {
+    return appStats?.unread_http_request_count ?? 0;
+  }
+
   return 0;
 }
 

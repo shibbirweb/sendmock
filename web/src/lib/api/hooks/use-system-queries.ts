@@ -68,6 +68,18 @@ export function useResetToSeed() {
   });
 }
 
+/** Deletes every captured item in every project and keeps the configuration. */
+export function useDeleteAllTraffic() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => requestApi<void>("/traffic", { method: "DELETE" }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries();
+    },
+  });
+}
+
 /** The server keeps an update check for 24 hours, so the UI does too. */
 const updateCheckIntervalMs = 24 * 60 * 60 * 1000;
 

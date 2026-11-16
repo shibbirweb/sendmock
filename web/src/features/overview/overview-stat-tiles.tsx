@@ -52,7 +52,7 @@ const statTileDefinitions: StatTileDefinition[] = [
     icon: MessageSquareIcon,
     readValue: (appStats) => String(appStats.sms_count),
     readDetail: (appStats) =>
-      `${appStats.sms_today} today, ${appStats.unread_sms_count} inbound`,
+      `${appStats.sms_today} today, ${appStats.unread_sms_count} unread`,
   },
   {
     title: "Verifications",
