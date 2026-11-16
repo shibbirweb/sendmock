@@ -43,10 +43,6 @@ describe("Website workflow", () => {
     expect(websiteWorkflow.on.release.types).toEqual(["published"]);
     expect(websiteWorkflow.on).toHaveProperty("workflow_dispatch");
 
-    const pullRequestBuild = findBuildStep(
-      "Build website with the demo at /demo/",
-    );
-    expect(pullRequestBuild?.if).toBe("github.event_name == 'pull_request'");
     for (const testStepName of [
       "Unit tests (snippets, docs versions)",
       "Landing, docs and API playground tests (WS-02, WS-03.3, WS-04)",
@@ -54,10 +50,9 @@ describe("Website workflow", () => {
       expect(findBuildStep(testStepName)?.if).toBeUndefined();
     }
 
-    const versionsBuild = findBuildStep(
-      "Build every docs version, each with its demo",
-    );
-    expect(versionsBuild?.if).toBe("github.event_name != 'pull_request'");
+    expect(
+      findBuildStep("Build every docs version, each with its demo")?.if,
+    ).toBeUndefined();
     expect(findBuildStep("Upload")?.uses).toStartWith(
       "actions/upload-pages-artifact@",
     );
@@ -110,6 +105,23 @@ describe("Website workflow", () => {
       "${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}",
     );
     expect(websiteWorkflow.jobs.build?.needs).toBe("package-repository");
+  });
+
+  test("WS-03.1 every build, pull requests included, tests the versioned site before it is uploaded", () => {
+    const stepNames = buildSteps.map((step) => step.name);
+    const versionedTests = findBuildStep(
+      "Versioned site tests (WS-03.1, WS-03.7)",
+    );
+    expect(versionedTests?.if).toBeUndefined();
+    expect(versionedTests?.run).toBe("bun run test:versioned");
+    expect(
+      stepNames.indexOf("Versioned site tests (WS-03.1, WS-03.7)"),
+    ).toBeGreaterThan(
+      stepNames.indexOf("Build every docs version, each with its demo"),
+    );
+    expect(stepNames.indexOf("Upload")).toBeGreaterThan(
+      stepNames.indexOf("Versioned site tests (WS-03.1, WS-03.7)"),
+    );
   });
 
   test("a skipped release check does not skip the build and deploy on pull requests and pushes", () => {

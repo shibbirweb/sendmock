@@ -4,6 +4,8 @@ const websitePort = 5192;
 
 export default defineConfig({
   testDir: "./tests",
+  // The versioned site has its own config (playwright.versioned.config.ts).
+  testIgnore: "versioned-site/**",
   expect: { timeout: 10_000 },
   fullyParallel: true,
   // The playground sweep is heavy; more workers starve the landing animations.

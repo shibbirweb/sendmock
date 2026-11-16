@@ -65,17 +65,31 @@ pub async fn send_email(app_router: &axum::Router, recipient: &str, subject: &st
     sent_email["id"].as_str().unwrap_or_default().to_owned()
 }
 
-/// Waits up to two seconds for `delivery_count` queued deliveries, since rules fire from a
-/// background subscriber, and answers the deliveries found by then.
+/// How long a test waits for a background task to queue deliveries; a slow CI runner can take
+/// a few seconds, and a passing test stops waiting as soon as they are there.
+const DELIVERY_WAIT_TIMEOUT: Duration = Duration::from_secs(10);
+const DELIVERY_POLL_INTERVAL: Duration = Duration::from_millis(10);
+
+/// Waits for `delivery_count` queued deliveries, since rules fire from a background subscriber,
+/// and answers the deliveries found by then.
 pub async fn wait_for_deliveries(app_router: &axum::Router, delivery_count: usize) -> Vec<Value> {
-    let mut deliveries = Vec::new();
-    for _ in 0..200 {
-        let (_, page) = call_api(app_router, "GET", "/api/v1/webhooks/deliveries", None).await;
-        deliveries = page["items"].as_array().cloned().unwrap_or_default();
-        if deliveries.len() >= delivery_count {
-            break;
+    wait_for_deliveries_at(app_router, "/api/v1/webhooks/deliveries", delivery_count).await
+}
+
+/// Waits for `delivery_count` deliveries in the list at `deliveries_path` (which may filter it)
+/// and answers the deliveries found by then.
+pub async fn wait_for_deliveries_at(
+    app_router: &axum::Router,
+    deliveries_path: &str,
+    delivery_count: usize,
+) -> Vec<Value> {
+    let wait_deadline = tokio::time::Instant::now() + DELIVERY_WAIT_TIMEOUT;
+    loop {
+        let (_, page) = call_api(app_router, "GET", deliveries_path, None).await;
+        let deliveries = page["items"].as_array().cloned().unwrap_or_default();
+        if deliveries.len() >= delivery_count || tokio::time::Instant::now() >= wait_deadline {
+            return deliveries;
         }
-        tokio::time::sleep(Duration::from_millis(10)).await;
+        tokio::time::sleep(DELIVERY_POLL_INTERVAL).await;
     }
-    deliveries
 }
