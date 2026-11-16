@@ -47,6 +47,7 @@ fn render_page_header(title: &str, description: &str) -> String {
 mod tests {
     use super::*;
 
+    // AC: WS-03.2
     #[test]
     fn configuration_flags_page_matches_the_serve_flags() {
         check_reference_page(
@@ -55,6 +56,7 @@ mod tests {
         );
     }
 
+    // AC: WS-03.2
     #[test]
     fn magic_numbers_page_matches_the_simulation() {
         check_reference_page(
@@ -63,6 +65,7 @@ mod tests {
         );
     }
 
+    // AC: WS-03.2
     #[test]
     fn template_filters_page_matches_the_filter_catalogue() {
         check_reference_page(
@@ -71,6 +74,7 @@ mod tests {
         );
     }
 
+    // AC: WS-03.2
     #[test]
     fn webhook_templates_page_matches_the_template_catalogue() {
         check_reference_page(
