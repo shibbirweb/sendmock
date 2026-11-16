@@ -3,8 +3,6 @@ title: Docs versions
 description: Which docs to read for the SendMock you run, the beta docs, and how to switch between versions.
 ---
 
-> **No stable release yet.** Until the first one, the main docs are a **Preview** that follows `develop`, the same as the beta docs.
-
 Every SendMock release keeps its own docs, so the steps and screenshots you read match the version you run.
 
 | Docs | Address | Read them when you run |
@@ -14,6 +12,11 @@ Every SendMock release keeps its own docs, so the steps and screenshots you read
 | **Older versions** | `/v0.2/docs/`, `/v0.1/docs/`, ... | an older stable minor version; each shows the newest patch of that minor |
 
 Beta and older docs show a banner at the top of every page, with a link to the latest stable docs.
+
+Under the **Version** menu, every version has two links of its own:
+
+- **What's new in vX.Y** (in the beta docs, **What's new in the beta**): the release notes of that version, every patch of it, newest first.
+- **Upgrade guide**: how to upgrade on each install channel, and what to change for that version, if anything.
 
 ## Switch to another version
 

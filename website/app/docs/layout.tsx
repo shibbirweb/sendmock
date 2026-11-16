@@ -11,7 +11,11 @@ import {
   securityReportUrl,
 } from "@/lib/community-links";
 import { IconWithTooltip } from "@/components/docs/icon-with-tooltip";
+import { VersionNotesLinks } from "@/components/docs/version-notes-links";
 import { VersionSwitcher } from "@/components/docs/version-switcher";
+import { loadChangelog } from "@/lib/changelog/load-changelog";
+import { describeWhatsNewLabel } from "@/lib/changelog/version-notes";
+import { currentDocsVersion } from "@/lib/current-docs-version";
 import { baseOptions } from "@/lib/layout.shared";
 import { source } from "@/lib/source";
 
@@ -80,7 +84,19 @@ export default function Layout({ children }: { children: ReactNode }) {
     <DocsLayout
       tree={source.getPageTree()}
       {...sharedOptions}
-      sidebar={{ banner: <VersionSwitcher /> }}
+      sidebar={{
+        banner: (
+          <div>
+            <VersionSwitcher />
+            <VersionNotesLinks
+              whatsNewLabel={describeWhatsNewLabel(
+                loadChangelog(),
+                currentDocsVersion?.kind,
+              )}
+            />
+          </div>
+        ),
+      }}
       links={[
         ...(sharedOptions.links ?? []).filter(
           (linkItem) => !("url" in linkItem && linkItem.url === repositoryUrl),

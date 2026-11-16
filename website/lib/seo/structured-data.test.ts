@@ -158,7 +158,7 @@ describe("structured data", () => {
 });
 
 describe("the sitemap's pages", () => {
-  test("WS-13.3 lists home, every docs page and the references, without the playground", () => {
+  test("WS-13.3 lists home, every docs page with What's new and the upgrade guide, and the references, without the playground", () => {
     const pagePaths = listSitemapPagePaths({
       docsPagePaths: ["/docs", "/docs/install"],
       apiTagSlugs: ["mail"],
@@ -170,6 +170,8 @@ describe("the sitemap's pages", () => {
       "/",
       "/docs",
       "/docs/install",
+      "/docs/whats-new",
+      "/docs/upgrade",
       "/api",
       "/api/mail",
       "/cli",

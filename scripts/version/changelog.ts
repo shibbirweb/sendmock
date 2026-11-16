@@ -5,6 +5,8 @@
  */
 
 const unreleasedHeading = "## [Unreleased]";
+/** What a user must change to upgrade; the website's Upgrade guide shows it (WS-14.3). */
+const upgradeNotesHeading = "### Upgrade notes";
 
 function isBetaVersion(version: string): boolean {
   return version.includes("-beta.");
@@ -52,6 +54,33 @@ export function readChangelogSection(
     .trim();
 }
 
+/**
+ * A new major (2.0.0 and later, its betas too) breaks something, so the reader needs to know
+ * what to change; 1.0.0 had nothing to upgrade from.
+ */
+function isNewMajorVersion(version: string): boolean {
+  const majorMatch = /^(\d+)\.0\.0(?:-|$)/.exec(version);
+  return majorMatch !== null && Number(majorMatch[1]) >= 2;
+}
+
+/** Whether `[Unreleased]` has an `### Upgrade notes` group with at least one entry. */
+export function hasUnreleasedUpgradeNotes(changelog: string): boolean {
+  const unreleasedLines = (readChangelogSection(changelog) ?? "").split("\n");
+  const notesHeadingIndex = unreleasedLines.findIndex(
+    (line) => line.trim() === upgradeNotesHeading,
+  );
+  if (notesHeadingIndex === -1) {
+    return false;
+  }
+  const linesAfterHeading = unreleasedLines.slice(notesHeadingIndex + 1);
+  const nextGroupOffset = linesAfterHeading.findIndex((line) =>
+    line.startsWith("### "),
+  );
+  return linesAfterHeading
+    .slice(0, nextGroupOffset === -1 ? undefined : nextGroupOffset)
+    .some((line) => line.startsWith("- "));
+}
+
 /** Whether `[Unreleased]` holds at least one entry, which every release needs. */
 export function hasUnreleasedEntries(changelog: string): boolean {
   return (readChangelogSection(changelog) ?? "")
@@ -90,6 +119,7 @@ export function dateUnreleasedSection(
 /**
  * Prepares `CHANGELOG.md` for a release of `version`: a beta needs entries under
  * `[Unreleased]` and changes nothing; a stable needs them too and gets its dated section.
+ * A new major also needs upgrade notes.
  * Answers the new file text, or why the release is refused.
  */
 export function prepareChangelogForRelease(
@@ -106,6 +136,11 @@ export function prepareChangelogForRelease(
     return {
       refusal:
         "CHANGELOG.md has nothing under [Unreleased]. Describe what the release holds there first, merge that, and run Prepare release again.",
+    };
+  }
+  if (isNewMajorVersion(version) && !hasUnreleasedUpgradeNotes(changelog)) {
+    return {
+      refusal: `${version} is a new major version, so [Unreleased] needs an "${upgradeNotesHeading}" group that says what users must change. Add it, merge that, and run Prepare release again.`,
     };
   }
   if (isBetaVersion(version)) {

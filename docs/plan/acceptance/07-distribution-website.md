@@ -242,11 +242,21 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a20-search-engines-and-link-previews-ws-13) (A20). The site is served at https://shibbir.me/sendmock/ (the user site shibbirweb.github.io owns that domain); its `robots.txt` belongs to the portfolio at the domain root.
 
-- [ ] WS-13.1 Every page of the site root (home, docs, API, CLI, MCP, changelog, playground) has its own title and meta description and names itself canonical with an absolute URL under https://shibbir.me/sendmock/ that ends in `/`.
-- [ ] WS-13.2 Every page of `/next/` and of each older version names the same page of the site root as canonical, or is `noindex, follow` when the site root has no such page; the versions have no sitemap.
-- [ ] WS-13.3 `sitemap.xml` at the site root lists every current page except the playground and the demo, with absolute URLs ending in `/`, each served by the site.
-- [ ] WS-13.4 Every page has Open Graph tags (site name SendMock, type website, its URL, title, description and a 1200x630 image) and a `summary_large_image` Twitter card, with absolute image URLs; the landing page and the docs have their own image.
-- [ ] WS-13.5 The landing page has JSON-LD for SendMock as free `DeveloperApplication` software (operating systems, licence, repository and npm and Docker Hub pages), its author the portfolio's Person (`https://shibbir.me#person`).
-- [ ] WS-13.6 Docs pages have `TechArticle` and `BreadcrumbList` JSON-LD, and API, CLI and MCP area pages `WebPage` and `BreadcrumbList`; every JSON-LD block parses.
-- [ ] WS-13.7 The demo and the 404 page are `noindex`, and every page has one `h1` and alt text on every image.
-- [ ] WS-13.8 Lighthouse scores 100 for SEO on the landing, docs, API, CLI and changelog pages.
+- [x] WS-13.1 Every page of the site root (home, docs, API, CLI, MCP, changelog, playground) has its own title and meta description and names itself canonical with an absolute URL under https://shibbir.me/sendmock/ that ends in `/`.
+- [x] WS-13.2 Every page of `/next/` and of each older version names the same page of the site root as canonical, or is `noindex, follow` when the site root has no such page; the versions have no sitemap.
+- [x] WS-13.3 `sitemap.xml` at the site root lists every current page except the playground and the demo, with absolute URLs ending in `/`, each served by the site.
+- [x] WS-13.4 Every page has Open Graph tags (site name SendMock, type website, its URL, title, description and a 1200x630 image) and a `summary_large_image` Twitter card, with absolute image URLs; the landing page and the docs have their own image.
+- [x] WS-13.5 The landing page has JSON-LD for SendMock as free `DeveloperApplication` software (operating systems, licence, repository and npm and Docker Hub pages), its author the portfolio's Person (`https://shibbir.me#person`).
+- [x] WS-13.6 Docs pages have `TechArticle` and `BreadcrumbList` JSON-LD, and API, CLI and MCP area pages `WebPage` and `BreadcrumbList`; every JSON-LD block parses.
+- [x] WS-13.7 The demo and the 404 page are `noindex`, and every page has one `h1` and alt text on every image.
+- [x] WS-13.8 Lighthouse scores 100 for SEO on the landing, docs, API, CLI and changelog pages.
+
+## WS-14 What's new and Upgrade guide
+
+After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a21-whats-new-and-upgrade-guide-in-the-docs-sidebar-ws-14) (A21).
+
+- [ ] WS-14.1 Every docs version's sidebar shows, under the Version menu, a "What's new in vX.Y" link (in the beta docs, "What's new in the beta") and an "Upgrade guide" link, both opening that version's page.
+- [ ] WS-14.2 What's new lists the releases of the version's minor from its changelog, newest first (in the beta docs, what the newest beta holds), and links the full changelog.
+- [ ] WS-14.3 The Upgrade guide shows the version's upgrade notes from the changelog, or says nothing needs changing, then numbered one-command steps for every install channel, the beta channel's in the beta docs, each linking its Install section.
+- [ ] WS-14.4 Prepare release refuses a new major version, and its betas, when `[Unreleased]` has no `### Upgrade notes`.
+

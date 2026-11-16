@@ -241,6 +241,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Find SendMock's docs in search engines and share links that show a proper preview.",
   },
+  "WS-14": {
+    summary:
+      "What's new and Upgrade guide links under the docs Version menu, on every docs version: the version's release notes, upgrade steps for every install channel and what to change.",
+    outcome:
+      "See what a version changed and how to upgrade to it without leaving the docs.",
+  },
   "PY-01": {
     summary:
       "Payment safety: only documented test cards are accepted, and no card number or CVC is ever stored.",

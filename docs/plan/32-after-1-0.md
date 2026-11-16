@@ -28,6 +28,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) |
 | A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) |
 | A20 | Search engines and link previews for the website | #293 | WS-13 (new) |
+| A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -631,4 +632,16 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 - **Tests:** unit tests for the helpers, `website/tests/versioned-site/seo-export.spec.ts` over every page of the versioned export, and Lighthouse's SEO category at 100 on six pages.
 
 **After it ships:** once `https://shibbir.me/sendmock/sitemap.xml` answers, the portfolio adds `Sitemap: https://shibbir.me/sendmock/sitemap.xml` to its `robots.txt`.
+
+## A21. What's new and Upgrade guide in the docs sidebar (WS-14)
+
+**Why (owner request, 2026-11-16):** the docs sidebar has the Version menu but no quick way to see what changed in that version or how to move to it. Readers who just upgraded, or are about to, look for both first.
+
+**How:**
+
+- **Two links under the Version menu**, on every docs version (`/`, `/next/` and each older version): **What's new in vX.Y** (on `/next/` and the Preview: **What's new in the beta**) and **Upgrade guide** (`components/docs/version-notes-links.tsx`).
+- **What's new** (`/docs/whats-new/`): the version's releases from the `CHANGELOG.md` it is built with. Each version is built from its tag with today's website code, and its newest dated release is that version, so a stable or older version shows every release of its minor, newest first; develop's builds show `[Unreleased]` (`lib/changelog/version-notes.ts`). The changelog page's release rendering moved to `components/changelog/release-section.tsx` for both pages.
+- **Upgrade guide** (`/docs/upgrade/`): what to change for this version, from a new `### Upgrade notes` group in the changelog (the release notes carry it too), or a plain "nothing to change" when there is none; then numbered steps, one command each, for every install channel (`lib/upgrade/upgrade-channels.ts`), with the beta channel's commands in the beta docs, and a link to each channel's Install section.
+- **Always there:** both pages come from the website code, so every version has them, older tags included. Prepare release refuses a new major (2.0.0 and later, its betas too) whose `[Unreleased]` has no upgrade notes (`scripts/version/changelog.ts`).
+- Both pages are in the sitemap, with a canonical, TechArticle and breadcrumb like every docs page (WS-13).
 

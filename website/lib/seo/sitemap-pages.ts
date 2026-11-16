@@ -15,6 +15,8 @@ export function listSitemapPagePaths(sitemapSources: SitemapSources): string[] {
   const pagePaths = [
     "/",
     ...sitemapSources.docsPagePaths,
+    "/docs/whats-new",
+    "/docs/upgrade",
     "/api",
     ...sitemapSources.apiTagSlugs.map((tagSlug) => `/api/${tagSlug}`),
     "/cli",
