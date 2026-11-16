@@ -52,6 +52,13 @@ const areaOrder = [
 ];
 const featureIssues = issues.filter((issue) => issue.target === "1.0");
 const backlogIssues = issues.filter((issue) => issue.target === "After 1.0");
+const releaseTargets = [
+  ...new Set(
+    issues
+      .map((issue) => issue.target)
+      .filter((target) => target !== "1.0" && target !== "After 1.0"),
+  ),
+].sort((left, right) => left.localeCompare(right, "en", { numeric: true }));
 const countWith = (status: string) =>
   featureIssues.filter((issue) => issue.status === status).length;
 const taskLine = (issue: FeatureIssue) =>
@@ -93,6 +100,14 @@ const overviewBody = [
       "",
     ];
   }),
+  ...releaseTargets.flatMap((releaseTarget) => [
+    `### Planned for ${releaseTarget}`,
+    "",
+    `Everything in this release, features and bug fixes: ${searchLink(`milestone ${releaseTarget}`, `is:issue milestone:"${releaseTarget}"`)}.`,
+    "",
+    ...issues.filter((issue) => issue.target === releaseTarget).map(taskLine),
+    "",
+  ]),
   "### After 1.0",
   "",
   ...backlogIssues.map(taskLine),

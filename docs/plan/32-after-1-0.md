@@ -24,7 +24,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
 | A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
 | A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) |
-| A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) |
+| A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new), ships in 1.1.0 |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -466,6 +466,8 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 **Not in this part:** examples for languages beyond the nine, and interactive "run in the browser" examples (the API playground covers that).
 
 ## A17. List actions on every traffic screen: select, mark read or unread, delete, delete all (UI-14)
+
+**Release:** ships in **1.1.0**, the next stable minor, with the fix for bug #278 (owner decision, 2026-11-16; see [16](16-website-and-releases.md#roadmap-placement)).
 
 **Why (owner request, 2026-11-16):** Mail's list has a toolbar: a checkbox on each row and a select-all checkbox, Mark read and Delete for the checked emails, and Delete all (or Delete matching while a filter is on). No other screen has it. SMS's conversation list has only its search and channel chips, so a conversation cannot be marked unread, several cannot be deleted at once, and the only way to empty SMS is Settings > General. The HTTP Catcher can only clear one bin, Push only clear everything, and Verify, webhook deliveries, Payments and the Logs cannot be emptied at all, short of Reset to seed, which also throws away the configuration. The owner asked for the same actions on every service.
 

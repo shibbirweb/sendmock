@@ -21,7 +21,8 @@ export type FeatureIssue = {
   body: string;
   labels: string[];
   status: "Done" | "In progress" | "Later";
-  target: "1.0" | "After 1.0";
+  /** "1.0", "After 1.0" or the release a planned feature ships in, such as "1.1.0". */
+  target: string;
   area: string;
   isClosed: boolean;
   criteriaSummary: string;
@@ -60,6 +61,16 @@ function describeIntro(introLines: string[]): {
   return { phase, designLinks };
 }
 
+// A feature's intro starts with when it ships: "After 1.0, ..." for the backlog
+// (acceptance/01-email.md EM-19), a release such as "1.1.0 (A17), ..." once one is chosen,
+// and a phase name for the work that led to 1.0.
+function readTarget(phase: string): string {
+  if (phase.startsWith("After 1.0")) {
+    return "After 1.0";
+  }
+  return phase.match(/^(\d+\.\d+\.\d+)\b/)?.[1] ?? "1.0";
+}
+
 function buildFeatureIssue(
   feature: Feature,
   acceptanceStatus: string,
@@ -82,10 +93,7 @@ function buildFeatureIssue(
     : isStarted
       ? "In progress"
       : "Later";
-  // Features planned after 1.0 say so first in their intro (acceptance/01-email.md EM-19).
-  const target: FeatureIssue["target"] = intro.phase.startsWith("After 1.0")
-    ? "After 1.0"
-    : "1.0";
+  const target = readTarget(intro.phase);
   const statusDetail = isDone
     ? "Every criterion is met and proven by automated tests that pass in CI."
     : status === "In progress" && tickedCount === criteriaCount
