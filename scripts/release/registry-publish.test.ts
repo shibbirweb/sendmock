@@ -9,7 +9,12 @@ const workflowsDirectory = join(import.meta.dir, "../../.github/workflows");
 type RegistryWorkflow = {
   on: {
     workflow_run?: { workflows?: string[]; types?: string[] };
-    workflow_dispatch?: { inputs?: Record<string, { required?: boolean; type?: string }> };
+    workflow_dispatch?: {
+      inputs?: Record<
+        string,
+        { required?: boolean; type?: string; default?: string; options?: string[] }
+      >;
+    };
   };
   env?: Record<string, string>;
   jobs: Record<
@@ -162,7 +167,7 @@ describe("the Registry publish workflow", () => {
 
   test("DS-03.8 every publishing job checks out the verified release tag", () => {
     for (const [jobName, job] of Object.entries(registryWorkflow.jobs)) {
-      if (jobName === "plan") {
+      if (jobName === "plan" || jobName === "crates-handoff") {
         continue;
       }
       const checkout = (job.steps ?? []).find((step) =>
@@ -177,6 +182,7 @@ describe("the Registry publish workflow", () => {
   test("DS-03.8 holds every trusted publishing job, each with an OIDC token", () => {
     expect(Object.keys(registryWorkflow.jobs).sort()).toEqual([
       "crates",
+      "crates-handoff",
       "mcp-registry",
       "npm",
       "plan",
@@ -222,6 +228,41 @@ describe("the Registry publish workflow", () => {
       "${{ secrets.CARGO_REGISTRY_TOKEN || steps.crates-io-auth.outputs.token }}",
     );
     expect(publishStep?.run).toBe("bun scripts/release/crates-publish.ts");
+  });
+
+  // crates.io trusted publishing refuses a token from a `workflow_run` run, so a stable reaches
+  // crates.io through a hand-started run of this file that sends only the crates.
+  test("DS-03.8 crates.io publishes only from a hand-started run, which a workflow_run run starts for a stable", () => {
+    const registriesInput = registryWorkflow.on.workflow_dispatch?.inputs?.registries;
+    const handoffJob = registryWorkflow.jobs["crates-handoff"];
+    const handoffRun = (handoffJob?.steps ?? []).map((step) => step.run ?? "").join("\n");
+
+    expect(registriesInput?.type).toBe("choice");
+    expect(registriesInput?.default).toBe("all");
+    expect(registriesInput?.options).toEqual(["all", "crates"]);
+    expect(registryWorkflow.jobs.crates?.if).toStartWith(
+      "github.event_name == 'workflow_dispatch' && ",
+    );
+    expect(handoffJob?.if).toBe(
+      "github.event_name == 'workflow_run' && needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'",
+    );
+    expect(handoffJob?.permissions).toEqual({ actions: "write" });
+    expect(handoffRun).toContain('gh workflow run registry-publish.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH"');
+    expect(handoffRun).toContain('-f release_run_id="$RELEASE_RUN_ID" -f registries=crates');
+  });
+
+  test("DS-03.8 a crates-only run skips every other registry", () => {
+    for (const jobName of [
+      "npm",
+      "mcp-registry",
+      "testcontainers-dotnet",
+      "testcontainers-node",
+      "testcontainers-python",
+    ]) {
+      expect(registryWorkflow.jobs[jobName]?.if, jobName).toStartWith(
+        "inputs.registries != 'crates' && ",
+      );
+    }
   });
 
   test("DS-03.8 every npm package goes through npm-publish.ts, which stages a package's first version", () => {

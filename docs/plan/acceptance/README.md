@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 124 / 135 features, 609 / 674 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 124 / 137 features, 609 / 692 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -119,6 +119,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
 | [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Accepted |
 | [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Accepted |
+| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | After 1.0 (A19) | 9 | Not started |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
@@ -139,6 +140,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-15](04-catcher-platform.md#pl-15-roles-admin-developer-viewer) | Roles: Admin, Developer, Viewer | After 1.0 (A13b) | 7 | Not started |
 | [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | After 1.0 (A14a) | 7 | Not started |
 | [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | After 1.0 (A14b) | 8 | Not started |
+| [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | After 1.0 (A18) | 9 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |

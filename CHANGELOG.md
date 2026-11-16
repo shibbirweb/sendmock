@@ -8,6 +8,11 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Fixed
+
+- **`cargo install sendmock`:** each stable release reaches crates.io again. 1.1.0 was released everywhere else but not to crates.io.
+- **APT and YUM repositories:** the website deploy, which also publishes the `apt` and `dnf` repositories, no longer stops at the docs of an older version (`/v1.0/`), so `apt install sendmock` and `dnf install sendmock` get the newest stable.
+
 ## [1.1.0] - 2026-11-16
 
 ### Added
