@@ -8,6 +8,8 @@
 [![npm downloads](https://img.shields.io/npm/dm/sendmock?label=npm%20downloads)](https://www.npmjs.com/package/sendmock)
 [![crates.io downloads](https://img.shields.io/crates/d/sendmock?label=crates.io%20downloads)](https://crates.io/crates/sendmock)
 [![Docker pulls](https://img.shields.io/docker/pulls/shibbirweb/sendmock?label=docker%20pulls)](https://hub.docker.com/r/shibbirweb/sendmock)
+[![GHCR](https://ghcr-badge.egpl.dev/shibbirweb/sendmock/latest_tag?ignore=sha256-*,latest,edge,beta,*-debug,?.?,?.??,?&label=ghcr)](https://github.com/shibbirweb/sendmock/pkgs/container/sendmock)
+[![GHCR pulls](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2Fshibbirweb%2Fsendmock%2Fsendmock.json&query=%24.downloads&label=ghcr%20pulls&color=blue)](https://github.com/shibbirweb/sendmock/pkgs/container/sendmock)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#license)
 [![Docs](https://img.shields.io/badge/docs-shibbirweb.github.io%2Fsendmock-informational)](https://shibbirweb.github.io/sendmock/docs/)
 [![Live demo](https://img.shields.io/badge/demo-try%20it%20in%20your%20browser-success)](https://shibbirweb.github.io/sendmock/demo/)
