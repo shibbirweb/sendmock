@@ -137,7 +137,8 @@ Every release keeps its own docs, so what a reader sees matches the version they
 - Every build gets `NEXT_PUBLIC_DOCS_VERSION` (its own key) and `NEXT_PUBLIC_DOCS_VERSIONS` (the whole list as JSON), so each version's switcher lists all versions. Because every deploy rebuilds every version, a new release shows up in old versions' switchers too.
 - The demo of each version gets `VITE_DOCS_URL` (`<base>/docs/`, `<base>/next/docs/`, ...), so the in-app guide links (F11) and the Help menu open the docs of the same version.
 - Each version has its own static search index under its own path, so search only finds pages of the version being read.
-- Pull requests build only the working tree (as the Preview `/`) to catch broken pages; deploys build every version.
+- Pull requests and deploys build every version, and `bun run test:versioned` (`website/playwright.versioned.config.ts`) tests the result under the Pages base path before it is uploaded: `/` is the newest stable with no banner, `/next/` and older minors show their banner with a link to the stable docs, the switcher lists every version and links the same page in each, and each demo links its guides to its own version's docs (WS-03.1, WS-03.7). The expected versions come from the git tags through `resolveDocsVersions`, so the tests need no change per release. (Changed 2026-11-16: pull requests built only the working tree, so the versioned site was never tested before a deploy.)
+- The Build and deploy jobs carry their own conditions (`needs.package-repository.result == 'success'`, `needs.build.result == 'success'`): GitHub skips a job without one whenever any job before it was skipped, and the release check is skipped on every pull request and push (#273).
 
 #### The switcher and banner
 
