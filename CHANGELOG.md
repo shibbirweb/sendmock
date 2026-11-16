@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-16
+
 ### Added
 
 - **Website in search and link previews:** every page of https://shibbir.me/sendmock/ has a canonical link, Open Graph and Twitter card tags with a preview image, and structured data, and `sitemap.xml` lists every current page. Older docs versions and `/next/` point search engines to the current pages.
