@@ -128,6 +128,31 @@ async fn an_email_queues_one_delivery_per_matching_enabled_rule_in_order() {
 }
 
 #[tokio::test]
+async fn an_email_sent_before_the_subscriber_task_first_runs_still_fires_its_rule() {
+    let (app_router, operation_context) =
+        build_test_app_with(|operation_context| operation_context);
+    let endpoint_id = create_endpoint(&app_router, "Early app").await;
+    create_rule(
+        &app_router,
+        &rule_input(
+            "All mail",
+            &endpoint_id,
+            json!(["email.received"]),
+            Value::Null,
+        ),
+    )
+    .await;
+
+    let subscriber_task = run_webhook_rule_subscriber(operation_context.clone());
+    send_email(&app_router, "ann@example.com", "Sent before the first poll").await;
+    let subscriber = tokio::spawn(subscriber_task);
+    let deliveries = wait_for_deliveries(&app_router, 1).await;
+    subscriber.abort();
+
+    assert_eq!(deliveries.len(), 1);
+}
+
+#[tokio::test]
 async fn a_disabled_endpoint_receives_nothing() {
     let (app_router, operation_context) =
         build_test_app_with(|operation_context| operation_context);

@@ -139,26 +139,32 @@ pub async fn deliver_recorded_event(
     }
 }
 
-/// Listens to the event bus until it closes, firing rules for each event. Ingest only
-/// publishes, so it never waits for rules or deliveries (WH-03.1).
-pub async fn run_webhook_rule_subscriber(operation_context: OperationContext) {
+/// Subscribes to the event bus now and returns the listener that fires rules for each event
+/// until the bus closes. Subscribing here rather than on the first poll means an event
+/// published before the task first runs is still delivered. Ingest only publishes, so it never
+/// waits for rules or deliveries (WH-03.1).
+pub fn run_webhook_rule_subscriber(
+    operation_context: OperationContext,
+) -> impl Future<Output = ()> + Send + 'static {
     let mut event_receiver = operation_context.event_bus.subscribe();
-    loop {
-        match event_receiver.recv().await {
-            Ok(recorded_event) => {
-                if let Err(rule_error) =
-                    deliver_recorded_event(&operation_context, &recorded_event).await
-                {
-                    tracing::warn!(error = %rule_error, "could not fire webhook rules");
+    async move {
+        loop {
+            match event_receiver.recv().await {
+                Ok(recorded_event) => {
+                    if let Err(rule_error) =
+                        deliver_recorded_event(&operation_context, &recorded_event).await
+                    {
+                        tracing::warn!(error = %rule_error, "could not fire webhook rules");
+                    }
                 }
+                Err(RecvError::Lagged(skipped_count)) => {
+                    tracing::warn!(
+                        skipped_count,
+                        "webhook rules fell behind and skipped events"
+                    );
+                }
+                Err(RecvError::Closed) => return,
             }
-            Err(RecvError::Lagged(skipped_count)) => {
-                tracing::warn!(
-                    skipped_count,
-                    "webhook rules fell behind and skipped events"
-                );
-            }
-            Err(RecvError::Closed) => return,
         }
     }
 }
