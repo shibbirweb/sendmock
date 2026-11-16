@@ -37,6 +37,7 @@ Phase 1 (beta Homebrew, release `.deb` and `.rpm`), Phase 5 (all, including our 
 - [x] DS-03.6 Every channel in [09](../09-distribution.md#package-channels-by-stage-decided-2026-10-27) that SendMock ships on is listed with its install command on the install page and checked by a smoke test in the release workflow. (#48)
 - [x] DS-03.7 (added 2026-11-07, owner request) `npx sendmock` runs the stable and `npx sendmock@beta` the beta with no install first, on macOS, Linux and Windows, and so do `bunx sendmock`, `pnpm dlx sendmock` and `yarn dlx sendmock`; the install page shows them as their own way to run SendMock, the release workflow runs it from the packed packages before publishing, and the Install channels workflow runs the published package through test cases 2 to 8. (#48, #253) Proven on `0.1.0-beta.4` by Install channels run 43608233556 (npx, bunx and npm on macOS, Linux and Windows, as the plan set for the first beta); the 1.0.0 run repeats it for the stable.
 - [x] DS-03.8 (added 2026-11-08, owner request) npm, PyPI and crates.io are published from one top-level workflow, `registry-publish.yml`, the only workflow registered as their trusted publisher; it runs after a beta or stable release and publishes only when that run published the release. (#48, #231, #239) Proven on `0.1.0-beta.4`: Registry publish run 43586812290 published the eight npm packages, `sendmock-testcontainers` and PyPI through OIDC from `registry-publish.yml` (the owner deleted `NPM_TOKEN`), and run 43609456180, after a run that published nothing, skipped every publish job. Owner decision (2026-11-14): ticked now; crates.io publishes only with a stable, so its half is proven by the 1.0.0 release (runbook step 7).
+- [x] DS-03.9 (added 2026-11-15, owner request, #266) Every crate published to crates.io shows a README on its page: the `sendmock` crate the repository's `README.md`, `sendmock-tray` how to install and start the tray app, and each library crate what it does, that it is an internal part of SendMock without a stable Rust API, and how to install SendMock. 1.0.0 went out without them (a published version cannot change), so they show from the next release. Proven by `scripts/release/crates-publish.test.ts`.
 
 ## DS-04 Release workflows
 
@@ -138,13 +139,13 @@ Phase U3.
 
 U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
 
-- [ ] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher.
+- [x] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher. (#276)
 - [x] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift. (#48)
 - [x] WS-03.3 The link checker finds no broken internal links; search works on the static site. (#48)
 - [x] WS-03.4 The version list is worked out from the git tags: the newest stable tag of the newest minor at `/`, the newest tag of each older minor at `/vX.Y/`, `develop` at `/next/`; beta tags get no docs of their own; with no stable tag yet, `/` is a Preview built from `develop`.
 - [x] WS-03.5 A tagged version is built from that tag's `docs/wiki`, `docs/api` and `web/` (its own demo) with the current website code, without changing the working tree.
 - [x] WS-03.6 The docs sidebar has a version switcher listing every version with the current one marked; picking a version opens the same page in that version.
-- [ ] WS-03.7 (the Preview banner and the demo's docs links are tested; the Beta banner shows on every `/next/` page since 0.1.0-beta.1, checked on the published site on 2026-11-12; the older banner and the stable link are proven once the first stable tag exists) Every page of a non-stable version (Beta, Preview, older) shows its banner with a link to the latest stable docs when one exists, and the demo of each version links its guide and Help links to the docs of the same version.
+- [x] WS-03.7 Every page of a non-stable version (Beta, Preview, older) shows its banner with a link to the latest stable docs when one exists, and the demo of each version links its guide and Help links to the docs of the same version. (#276)
 
 ## WS-04 API playground: Demo mode
 

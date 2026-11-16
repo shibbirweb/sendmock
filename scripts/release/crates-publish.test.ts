@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   type CratesPublisher,
@@ -187,5 +189,58 @@ describe("publishing the workspace crates", () => {
         buildCrate("sendmock-b", ["sendmock-a"]),
       ]),
     ).toThrow("cycle");
+  });
+});
+
+type CrateManifest = {
+  package?: { name?: string; readme?: string; publish?: boolean; include?: string[] };
+};
+
+const cratesDirectory = join(import.meta.dir, "../../crates");
+
+function readPublishedCrateManifests(): { crateDirectory: string; manifest: CrateManifest }[] {
+  return readdirSync(cratesDirectory)
+    .map((crateFolderName) => join(cratesDirectory, crateFolderName))
+    .filter((crateDirectory) => existsSync(join(crateDirectory, "Cargo.toml")))
+    .map((crateDirectory) => ({
+      crateDirectory,
+      manifest: Bun.TOML.parse(
+        readFileSync(join(crateDirectory, "Cargo.toml"), "utf8"),
+      ) as CrateManifest,
+    }))
+    .filter(({ manifest }) => manifest.package?.publish !== false);
+}
+
+describe("the crates' pages on crates.io", () => {
+  test("DS-03.9 every published crate names a README that exists and is packaged with it", () => {
+    const publishedCrates = readPublishedCrateManifests();
+
+    expect(publishedCrates.length).toBeGreaterThan(0);
+    for (const { crateDirectory, manifest } of publishedCrates) {
+      const crateName = manifest.package?.name ?? crateDirectory;
+      const readmePath = manifest.package?.readme ?? null;
+      const includePatterns = manifest.package?.include ?? null;
+
+      expect(readmePath, crateName).not.toBeNull();
+      expect(existsSync(join(crateDirectory, readmePath ?? "")), crateName).toBe(true);
+      // Cargo copies a README from outside the crate on its own, but one inside it only when
+      // an `include` list names it.
+      if (includePatterns !== null && !(readmePath ?? "").startsWith("../")) {
+        expect(includePatterns, crateName).toContain(readmePath);
+      }
+    }
+  });
+
+  test("DS-03.9 every crate README starts with the crate's name and links to SendMock", () => {
+    for (const { crateDirectory, manifest } of readPublishedCrateManifests()) {
+      const crateName = manifest.package?.name ?? "";
+      if (crateName === "sendmock") {
+        continue;
+      }
+      const readmeText = readFileSync(join(crateDirectory, "README.md"), "utf8");
+
+      expect(readmeText.startsWith(`# ${crateName}\n`), crateName).toBe(true);
+      expect(readmeText, crateName).toContain("https://crates.io/crates/sendmock");
+    }
   });
 });

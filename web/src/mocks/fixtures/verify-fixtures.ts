@@ -8,6 +8,7 @@ import type {
 } from "@/lib/api/types";
 import { createProviderId, minutesAgo } from "@/mocks/fixtures/fixture-helpers";
 import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 export function buildVerifyServiceFixtures(): VerifyService[] {
   return [
@@ -214,7 +215,7 @@ export function linkVerificationMessages(
     return {
       ...verification,
       linked_message_id: codeMessage.id,
-      linked_thread_id: `${codeMessage.from_number}|${codeMessage.to_number}`,
+      linked_thread_id: readSmsThreadId(codeMessage),
     };
   });
 }

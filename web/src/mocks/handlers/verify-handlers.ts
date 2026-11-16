@@ -20,6 +20,10 @@ import {
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import {
+  publishTrafficCleared,
+  readRequestedProjectKey,
+} from "@/mocks/realtime/publish-traffic-cleared";
 
 type FinalVerificationStatus = Exclude<VerificationStatus, "pending">;
 
@@ -177,6 +181,28 @@ export const verifyHandlers = [
     return HttpResponse.json(paginateItems(matchingVerifications, requestUrl));
   }),
 
+  http.delete("*/api/v1/verify", async ({ request }) => {
+    await applyMockConditions();
+    const requestUrl = new URL(request.url);
+    const deletedSids = new Set(
+      keepRequestedProject(mockDatabase.verifications, requestUrl.searchParams)
+        .filter((verification) =>
+          matchesVerificationFilters(verification, requestUrl),
+        )
+        .map((verification) => verification.sid),
+    );
+    mockDatabase.verifications = mockDatabase.verifications.filter(
+      (verification) => !deletedSids.has(verification.sid),
+    );
+    publishTrafficCleared(
+      ["verification"],
+      readRequestedProjectKey(requestUrl.searchParams),
+      deletedSids.size,
+    );
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   http.get("*/api/v1/verify/:verificationSid", async ({ params }) => {
     await applyMockConditions();
     expireOverdueVerifications();
@@ -185,6 +211,15 @@ export const verifyHandlers = [
     return verification
       ? HttpResponse.json(verification)
       : createNotFoundResponse("Verification");
+  }),
+
+  http.delete("*/api/v1/verify/:verificationSid", async ({ params }) => {
+    await applyMockConditions();
+    mockDatabase.verifications = mockDatabase.verifications.filter(
+      (verification) => verification.sid !== params.verificationSid,
+    );
+
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.post(

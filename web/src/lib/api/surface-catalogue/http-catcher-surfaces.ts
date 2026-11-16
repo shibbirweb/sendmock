@@ -56,13 +56,25 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     phase: "4",
     cli: "sendmock http clear",
     mcp: "sendmock_http_clear",
-    ui: "HTTP Catcher > bin > Clear requests",
+    ui: "HTTP Catcher > bin or All requests > Delete all",
   },
   "GET /api/v1/http/requests/{requestId}": {
     phase: "4",
     cli: "sendmock http show <requestId>",
     mcp: "sendmock_http_get",
     ui: "HTTP Catcher > open a request",
+  },
+  "PATCH /api/v1/http/requests/{requestId}": {
+    phase: "A17",
+    cli: "sendmock http update <requestId>",
+    mcp: "sendmock_http_update",
+    ui: "HTTP Catcher > select requests > Mark read or Mark unread",
+  },
+  "DELETE /api/v1/http/requests/{requestId}": {
+    phase: "A17",
+    cli: "sendmock http delete <requestId>",
+    mcp: "sendmock_http_delete",
+    ui: "HTTP Catcher > select requests > Delete",
   },
   "GET /api/v1/http/requests/{requestId}/files/{fileIndex}": {
     phase: "4",

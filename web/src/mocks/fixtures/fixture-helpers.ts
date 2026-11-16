@@ -26,6 +26,9 @@ export function createProviderId(prefix: string): string {
   );
 }
 
+/** Fixture messages older than this count as already looked at, so the demo is not all unread. */
+export const olderThanReadMinutes = 120;
+
 export function minutesAgo(minutes: number): string {
   return new Date(Date.now() - minutes * 60_000).toISOString();
 }

@@ -95,3 +95,10 @@ export function keepRequestedProject<TrafficItem extends { project: string }>(
     ? trafficItems
     : trafficItems.filter((trafficItem) => trafficItem.project === projectKey);
 }
+
+/** The `is_read` of a read-state PATCH body, or null when it is missing or not a boolean. */
+export function readIsReadUpdate(requestBody: unknown): boolean | null {
+  const isRead = (requestBody as { is_read?: unknown } | null)?.is_read;
+
+  return typeof isRead === "boolean" ? isRead : null;
+}

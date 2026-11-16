@@ -165,7 +165,18 @@ export type CapturedHttpRequest = {
   matched_rule_name: string | null;
   is_simulated_failure: boolean;
   duration_ms: number;
+  /** Requests arrive unread; opening one marks it read. */
+  is_read: boolean;
   created_at: IsoTimestamp;
+};
+
+/** Body of PATCH /api/v1/http/requests/{requestId}. */
+export type CapturedHttpRequestUpdate = {
+  /**
+   * Marks the request read (true) or unread (false).
+   * @example false
+   */
+  is_read: boolean;
 };
 
 /** Body of POST /api/v1/http/requests/{requestId}/forward (HC-01.5). */

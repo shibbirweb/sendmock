@@ -142,12 +142,12 @@ Link.
 
 - **What it does:** Opens the SendMock repository on GitHub in a new tab.
 
-### 18. Live · demo data, version #.#.#-dev
+### 18. Live · demo data, version #.#.#-beta.#
 
 Status.
 
 - **What it does:** Shows whether the app is connected to SendMock's realtime stream (Live, Connecting, or Offline, retrying), where the data comes from (the server, or demo data on the website demo) and the app's version.
-- **Where its text comes from:** The connection state of the realtime stream, and the version the app was built with.
+- **Where its text comes from:** The connection state of the realtime stream, and the version the running server reports in `GET /api/v1/info`; the demo shows its own.
 - **Errors:** Offline, retrying means the realtime stream dropped: the app keeps trying, and screens still load when you open them. If it stays offline, check SendMock is still running.
 
 ### 19. Toggle Sidebar

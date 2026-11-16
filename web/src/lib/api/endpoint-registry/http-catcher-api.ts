@@ -116,6 +116,21 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
     errorStatuses: [404],
   },
   {
+    method: "PATCH",
+    path: "/api/v1/http/requests/{requestId}",
+    summary: "Mark a captured request read or unread.",
+    requestBody: typeRef("CapturedHttpRequestUpdate"),
+    response: typeRef("CapturedHttpRequest"),
+    errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/http/requests/{requestId}",
+    summary: "Delete one captured request with its uploaded files.",
+    response: null,
+    successStatus: 204,
+  },
+  {
     method: "GET",
     path: "/api/v1/http/requests/{requestId}/files/{fileIndex}",
     summary: "Download a file uploaded in a captured request.",

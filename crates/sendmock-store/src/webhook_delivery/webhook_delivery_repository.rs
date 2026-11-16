@@ -25,6 +25,10 @@ impl WebhookDeliveryRepository {
         Self { database }
     }
 
+    pub(super) fn database(&self) -> &Database {
+        &self.database
+    }
+
     pub async fn insert_delivery(
         &self,
         new_delivery: WebhookDeliveryRecord,

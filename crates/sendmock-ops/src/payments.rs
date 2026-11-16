@@ -9,6 +9,7 @@ mod payment_catalogue;
 mod payment_change;
 mod payment_create_operation;
 mod payment_definition_store;
+mod payment_delete_operations;
 mod payment_event_data;
 mod payment_flow_catalogue;
 mod payment_flow_operations;
@@ -45,6 +46,7 @@ pub(crate) use gateway_template_rendering::{
 pub(crate) use payment_catalogue::{find_payment, read_payment_document};
 pub(crate) use payment_change::PaymentChange;
 pub use payment_create_operation::CreatePaymentOperation;
+pub use payment_delete_operations::{DeletePaymentOperation, DeletePaymentsOperation};
 pub(crate) use payment_event_data::{build_sample_payment_event_data, load_payment_event};
 pub use payment_flow_operations::{
     CreatePaymentFlowOperation, DeletePaymentFlowOperation, GetPaymentFlowOperation,
@@ -125,6 +127,8 @@ pub fn register_payment_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(RevealGatewayCredentialOperation);
     operation_registry.register(PreviewPaymentGatewayOperation);
     operation_registry.register(ListPaymentsOperation);
+    operation_registry.register(DeletePaymentsOperation);
+    operation_registry.register(DeletePaymentOperation);
     operation_registry.register(ListPaymentTestValuesOperation);
     operation_registry.register(CreatePaymentOperation);
     operation_registry.register(CreatePaymentCheckoutOperation);

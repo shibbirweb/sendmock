@@ -64,7 +64,7 @@ When every OneSignal recipient is refused, the answer is `{ "id": "", "errors": 
 
 - **Filters:** a chip per provider (All, FCM, Expo, OneSignal), **Sent** and **Failed**, and a device token filter (exact match).
 - **The table:** the notification's title (or its body when it has none), the device token, the provider, the status and the time. FCM topic and condition sends show as `topic:<name>` and `condition:<expression>`, OneSignal aliases as `<label>:<id>` and segment sends as `segment:<names>`.
-- **Clear all:** deletes every notification the filters show, after asking.
+- **List toolbar:** tick notifications (or **x** on a focused row) to **Mark read**, **Mark unread** or **Delete** them; **Delete all** deletes every notification the filters show, after asking. New notifications arrive unread, opening one marks it read, and the sidebar counts the unread ones.
 
 ### The notification drawer
 
@@ -83,6 +83,7 @@ Every control and text, one by one: [Push in depth](./deeper/push.md).
 | --- | --- | --- | --- |
 | list | [`sendmock push list`](/cli/push/#push-list) | [`GET /api/v1/push`](/api/push/#getPush) | [`sendmock_push_list`](/mcp/push/#sendmock_push_list) |
 | one notification | [`sendmock push show <pushId>`](/cli/push/#push-show) | [`GET /api/v1/push/{pushId}`](/api/push/#getPushByPushId) | [`sendmock_push_get`](/mcp/push/#sendmock_push_get) |
+| mark read or unread | [`sendmock push update <pushId>`](/cli/push/#push-update) | [`PATCH /api/v1/push/{pushId}`](/api/push/#patchPushByPushId) | [`sendmock_push_update`](/mcp/push/#sendmock_push_update) |
 | wait for one | [`sendmock push wait`](/cli/push/#push-wait) | [`GET /api/v1/wait/push`](/api/push/#getWaitPush) | [`sendmock_push_wait`](/mcp/push/#sendmock_push_wait) |
 | delete one | [`sendmock push delete <pushId>`](/cli/push/#push-delete) | [`DELETE /api/v1/push/{pushId}`](/api/push/#deletePushByPushId) | [`sendmock_push_delete`](/mcp/push/#sendmock_push_delete) |
 | clear | [`sendmock push clear`](/cli/push/#push-clear) | [`DELETE /api/v1/push`](/api/push/#deletePush) | [`sendmock_push_delete_all`](/mcp/push/#sendmock_push_delete_all) |

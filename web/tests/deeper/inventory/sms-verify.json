@@ -13,6 +13,9 @@
       "button: Approved",
       "button: Failed",
       "textbox: Search verifications",
+      "checkbox: Select all loaded verifications",
+      "button: Delete all verifications",
+      "columnheader: Select",
       "columnheader: To",
       "columnheader: Channel",
       "columnheader: Service",
@@ -20,6 +23,7 @@
       "columnheader: Status",
       "columnheader: Attempts",
       "columnheader: Time",
+      "each item, checkbox: Select verification for …",
       "each item, link: …",
       "each item, button: Copy code #"
     ],

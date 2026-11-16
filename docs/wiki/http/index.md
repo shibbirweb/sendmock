@@ -51,7 +51,7 @@ The screen has three columns like Mail (bins, requests, detail), stacked on phon
 | OneSignal | `{"id": ..., "recipients": 1}` |
 | Generic JSON API | an echo with a generated `id` |
 
-The bin header shows its catch URL with a copy button, **Clear requests** and **Delete bin** (both ask first).
+The bin header shows its catch URL with a copy button and **Delete bin** (asks first). Above the requests, the list toolbar ticks requests (or **x** on a focused row) to **Mark read**, **Mark unread** or **Delete** them, and **Delete all** empties the bin, or every bin on All requests, after asking; the bins and their rules stay. New requests arrive unread, opening one marks it read, and the sidebar counts the unread ones.
 
 ### Requests
 
@@ -231,6 +231,8 @@ public class HttpTests
 | delete a bin | [`sendmock http bin delete <binId>`](/cli/http-catcher/#http-bin-delete) | [`DELETE /api/v1/http/bins/{binId}`](/api/http-catcher/#deleteHttpBinsByBinId) | [`sendmock_http_bin_delete`](/mcp/http-catcher/#sendmock_http_bin_delete) |
 | requests | [`sendmock http list`](/cli/http-catcher/#http-list) | [`GET /api/v1/http/requests`](/api/http-catcher/#getHttpRequests) | [`sendmock_http_list`](/mcp/http-catcher/#sendmock_http_list) |
 | one request | [`sendmock http show <requestId>`](/cli/http-catcher/#http-show) | [`GET /api/v1/http/requests/{requestId}`](/api/http-catcher/#getHttpRequestsByRequestId) | [`sendmock_http_get`](/mcp/http-catcher/#sendmock_http_get) |
+| mark a request read or unread | [`sendmock http update <requestId>`](/cli/http-catcher/#http-update) | [`PATCH /api/v1/http/requests/{requestId}`](/api/http-catcher/#patchHttpRequestsByRequestId) | [`sendmock_http_update`](/mcp/http-catcher/#sendmock_http_update) |
+| delete one request | [`sendmock http delete <requestId>`](/cli/http-catcher/#http-delete) | [`DELETE /api/v1/http/requests/{requestId}`](/api/http-catcher/#deleteHttpRequestsByRequestId) | [`sendmock_http_delete`](/mcp/http-catcher/#sendmock_http_delete) |
 | wait in a test | [`sendmock http wait`](/cli/test-helpers/#http-wait) | [`GET /api/v1/wait/http`](/api/test-helpers/#getWaitHttp) | [`sendmock_http_wait`](/mcp/test-helpers/#sendmock_http_wait) |
 | send a test request | [`sendmock http send <bin>`](/cli/http-catcher/#http-send) | [`POST /catch/{binPath}`](/api/http-catcher/#postCatchByBinPath) | [`sendmock_http_send`](/mcp/http-catcher/#sendmock_http_send) |
 | forward | [`sendmock http forward <requestId>`](/cli/http-catcher/#http-forward) | [`POST /api/v1/http/requests/{requestId}/forward`](/api/http-catcher/#postHttpRequestsByRequestIdForward) | [`sendmock_http_forward`](/mcp/http-catcher/#sendmock_http_forward) |

@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeListToolbar, describeUnreadDot } from "./list-toolbar-entries";
 
 const binListEntries: DeeperEntry[] = [
   { control: "heading: HTTP Catcher", does: "Names the open screen in the header." },
@@ -53,7 +54,6 @@ const binDetailEntries: DeeperEntry[] = [
     operationIds: ["getHttpBinsByBinIdResponses"],
   },
   { control: "button: Copy catch URL", does: "Copies the bin's catch URL, `/catch/<bin>/...`, to point your app at." },
-  { control: "button: Clear requests", does: "Deletes the bin's captured requests.", operationIds: ["deleteHttpRequests"] },
   { control: "button: Delete bin", does: "Deletes the bin and its requests, after you confirm.", operationIds: ["deleteHttpBinsByBinId"] },
   { control: "each item, button: POST / # minutes ago #", does: "A request in this bin; shows it." },
   { control: "button: Copy URL", does: "Copies the full URL the request was sent to." },
@@ -103,5 +103,17 @@ export const httpCatcherPage: DeeperPage = {
   guidePage: "http/index.md",
   guideTitle: "HTTP Catcher",
   intro: "The HTTP Catcher keeps every request your app sends to a bin's catch URL, and answers as the service it stands in for.",
-  entries: [...binListEntries, ...binDetailEntries],
+  entries: [
+    ...binListEntries,
+    ...binDetailEntries,
+    ...describeListToolbar({
+      itemsName: "requests",
+      rowCheckboxNames: ["Select POST request to …", "Select POST request to /"],
+      hasReadState: true,
+      isTable: false,
+      keepsNote: "On a bin only its requests go; on All requests every bin's. Bins, catch URLs and rules stay.",
+      deleteAllOperationId: "deleteHttpRequests",
+    }),
+    describeUnreadDot("captured request"),
+  ],
 };

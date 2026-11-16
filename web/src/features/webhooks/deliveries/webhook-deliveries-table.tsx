@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router";
 
 import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
+import {
   Table,
   TableBody,
   TableCell,
@@ -9,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DeliveryStatusBadge } from "@/features/webhooks/deliveries/delivery-status-badge";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import type { WebhookDelivery } from "@/lib/api/types";
 import {
   formatDateTime,
@@ -26,11 +31,17 @@ const triggerClassNames: Record<WebhookDelivery["trigger"], string> = {
 
 function DeliveryRow({
   webhookDelivery,
+  checkedDeliveries,
 }: {
   webhookDelivery: WebhookDelivery;
+  checkedDeliveries: CheckedItems;
 }) {
   return (
-    <TableRow className="relative">
+    <CheckableTableRow
+      itemId={webhookDelivery.id}
+      itemLabel={`${webhookDelivery.event_type} delivery to ${webhookDelivery.endpoint_name}`}
+      checkedItems={checkedDeliveries}
+    >
       <TableCell className="whitespace-nowrap">
         <Link
           to="/webhooks/deliveries"
@@ -73,20 +84,23 @@ function DeliveryRow({
       <TableCell className="hidden text-right text-xs tabular-nums md:table-cell">
         {webhookDelivery.attempt}
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
 /** The delivery log; each row opens its detail (WH-03.7). */
 export function WebhookDeliveriesTable({
   webhookDeliveries,
+  checkedDeliveries,
 }: {
   webhookDeliveries: WebhookDelivery[];
+  checkedDeliveries: CheckedItems;
 }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          <CheckColumnHead />
           <TableHead>Time</TableHead>
           <TableHead>Event</TableHead>
           <TableHead className="hidden sm:table-cell">Endpoint</TableHead>
@@ -105,6 +119,7 @@ export function WebhookDeliveriesTable({
           <DeliveryRow
             key={webhookDelivery.id}
             webhookDelivery={webhookDelivery}
+            checkedDeliveries={checkedDeliveries}
           />
         ))}
       </TableBody>

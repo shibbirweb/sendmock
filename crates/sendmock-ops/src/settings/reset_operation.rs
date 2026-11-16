@@ -57,7 +57,7 @@ async fn delete_all_traffic(operation_context: &OperationContext) -> Result<u64,
         .await?;
     operation_context
         .sms_repository
-        .delete_all_messages()
+        .delete_all_messages(None)
         .await?;
     operation_context
         .verification_repository

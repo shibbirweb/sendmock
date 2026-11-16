@@ -41,13 +41,27 @@ Button.
 
 - **What it does:** Opens New subscription.
 
-### 5. No subscriptions yet
+### 5. Select all loaded subscriptions
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be deleted together. X ticks the open or focused row.
+
+### 6. Delete all subscriptions
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. The payments they charged stay in Payments.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/payments/subscriptions`](/api/payments/#deletePaymentsSubscriptions), CLI [`sendmock payments subscriptions delete-all`](/cli/payments/#payments-subscriptions-delete-all), MCP [`sendmock_subscription_delete_all`](/mcp/payments/#sendmock_subscription_delete_all)
+
+### 7. No subscriptions yet
 
 Text.
 
 - **What it does:** Shown while there is none.
 
-### 6. Start one with New subscription, or POST /api/v#/payments/subscriptions, to test renewals, failed payments and cancellations.
+### 8. Start one with New subscription, or POST /api/v#/payments/subscriptions, to test renewals, failed payments and cancellations.
 
 Text.
 
@@ -55,73 +69,73 @@ Text.
 
 ## New subscription dialog
 
-### 7. New subscription
+### 9. New subscription
 
 Heading.
 
 - **What it does:** The New subscription dialog.
 
-### 8. Without a trial the first period is charged at once.
+### 10. Without a trial the first period is charged at once.
 
 Text.
 
 - **What it does:** Explains the first charge.
 
-### 9. Gateway
+### 11. Gateway
 
 Drop-down.
 
 - **What it does:** The gateway renewals are charged through.
 
-### 10. Interval
+### 12. Interval
 
 Drop-down.
 
 - **What it does:** How often it renews: daily, weekly, monthly or yearly.
 
-### 11. Customer email
+### 13. Customer email
 
 Field.
 
 - **What it does:** The customer's email.
 
-### 12. Plan name
+### 14. Plan name
 
 Field.
 
 - **What it does:** The plan's name.
 
-### 13. Amount
+### 15. Amount
 
 Field.
 
 - **What it does:** What each period costs.
 
-### 14. Currency
+### 16. Currency
 
 Field.
 
 - **What it does:** The currency code.
 
-### 15. Trial days
+### 17. Trial days
 
 Field.
 
 - **What it does:** Free days before the first charge.
 
-### 16. Test card
+### 18. Test card
 
 Field.
 
 - **What it does:** The test card renewals use; a declining card makes renewals fail.
 
-### 17. Cancel
+### 19. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 18. Start subscription
+### 20. Start subscription
 
 Button.
 
@@ -129,7 +143,7 @@ Button.
 - **What it changes:** Fires `subscription.created`, and a payment for the first period when there is no trial.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/subscriptions`](/api/payments/#postPaymentsSubscriptions), CLI [`sendmock payments subscriptions create`](/cli/payments/#payments-subscriptions-create), MCP [`sendmock_subscription_create`](/mcp/payments/#sendmock_subscription_create)
 
-### 19. Close
+### 21. Close
 
 Button.
 
@@ -137,20 +151,20 @@ Button.
 
 ## When the data cannot load
 
-### 20. Could not load the subscriptions. Try again
+### 22. Could not load the subscriptions. Try again
 
 Message.
 
 - **What it does:** Shown when the subscriptions could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 21. Could not load the subscriptions.
+### 23. Could not load the subscriptions.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 22. Try again
+### 24. Try again
 
 Button.
 

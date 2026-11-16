@@ -4,9 +4,8 @@ import {
   type RealtimeConnectionState,
   useRealtimeConnectionState,
 } from "@/features/realtime/realtime-provider";
+import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
 import { cn } from "@/lib/utils";
-
-const appVersion = import.meta.env.VITE_APP_VERSION ?? "0.0.0-dev";
 
 const connectionLabels: Record<RealtimeConnectionState, string> = {
   connecting: "Connecting",
@@ -20,10 +19,12 @@ const connectionDotClasses: Record<RealtimeConnectionState, string> = {
   disconnected: "bg-destructive",
 };
 
-/** Sidebar footer: realtime connection state, data source and app version. */
+/** Sidebar footer: realtime connection state, data source and the server's version. */
 export function ConnectionStatus() {
   const { state: sidebarState } = useSidebar();
   const connectionState = useRealtimeConnectionState();
+  // The running server's version, as Settings > About shows it; none until /info answers.
+  const serverVersion = useAppInfo().data?.version ?? null;
   const isSidebarCollapsed = sidebarState === "collapsed";
   const dataSourceLabel = apiMode === "mock" ? "demo data" : "server";
   const connectionLabel = `${connectionLabels[connectionState]} · ${dataSourceLabel}`;
@@ -31,7 +32,11 @@ export function ConnectionStatus() {
   return (
     <div
       className="flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground"
-      title={`${connectionLabel}, version ${appVersion}`}
+      title={
+        serverVersion === null
+          ? connectionLabel
+          : `${connectionLabel}, version ${serverVersion}`
+      }
       role="status"
     >
       <span
@@ -45,7 +50,7 @@ export function ConnectionStatus() {
       {!isSidebarCollapsed && (
         <span className="flex w-full justify-between gap-2">
           <span className="truncate">{connectionLabel}</span>
-          <span>v{appVersion}</span>
+          {serverVersion !== null && <span>v{serverVersion}</span>}
         </span>
       )}
     </div>

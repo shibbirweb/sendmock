@@ -2,10 +2,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SearchIcon, ShieldCheckIcon } from "lucide-react";
 import * as React from "react";
 
+import { CheckedListToolbar } from "@/components/common/checked-list-toolbar";
 import { FilterChip } from "@/components/common/filter-chip";
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCheckedItems } from "@/hooks/use-checked-items";
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { ConnectHint } from "@/features/onboarding/connect-hint";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
@@ -16,8 +19,14 @@ import {
   type VerificationStatusFilter,
   verificationStatusFilters,
 } from "@/features/verify/verify-labels";
-import { useVerifications } from "@/lib/api/hooks/use-verify-queries";
+import {
+  useDeleteVerification,
+  useDeleteVerifications,
+  useVerifications,
+} from "@/lib/api/hooks/use-verify-queries";
 import { queryKeys } from "@/lib/api/query-keys";
+
+const verificationNoun = { one: "verification", many: "verifications" };
 
 function VerificationsEmptyState({
   isFiltered,
@@ -57,11 +66,26 @@ export function VerificationsPanel() {
     verificationStatusFilters.find(
       (filterOption) => filterOption.statusFilter === statusFilter,
     )?.statuses ?? null;
-  const verificationsQuery = useVerifications({
+  const verificationFilters = {
     status: selectedStatuses?.join(","),
     to: recipientSearch.trim() || undefined,
-  });
-  const verifications = verificationsQuery.data?.items ?? [];
+  };
+  const verificationsQuery = useVerifications(verificationFilters);
+  const verifications = React.useMemo(
+    () => verificationsQuery.data?.items ?? [],
+    [verificationsQuery.data],
+  );
+  const projectKey = useSelectedProjectKey();
+  const isFiltered = statusFilter !== "all" || recipientSearch !== "";
+  const checkedVerifications = useCheckedItems(
+    React.useMemo(
+      () => verifications.map((verification) => verification.sid),
+      [verifications],
+    ),
+    `${statusFilter}|${recipientSearch}|${projectKey ?? ""}`,
+  );
+  const deleteVerification = useDeleteVerification();
+  const deleteVerifications = useDeleteVerifications();
   const hasPendingVerification = verifications.some(
     (verification) => verification.status === "pending",
   );
@@ -100,6 +124,21 @@ export function VerificationsPanel() {
         </div>
       </div>
       <div className="min-w-0 rounded-lg border">
+        <CheckedListToolbar
+          itemNoun={verificationNoun}
+          checkedItems={checkedVerifications}
+          loadedItemCount={verifications.length}
+          totalItemCount={verificationsQuery.data?.total_count ?? 0}
+          isFiltered={isFiltered}
+          projectKey={projectKey}
+          deleteAllKeepsNote="Verify services stay."
+          onDeleteItem={(verificationSid) => {
+            deleteVerification.mutate(verificationSid);
+          }}
+          onDeleteAll={() => {
+            deleteVerifications.mutate(verificationFilters);
+          }}
+        />
         {verificationsQuery.isPending && (
           <div className="grid gap-2 p-4">
             <Skeleton className="h-8 w-full" />
@@ -116,7 +155,7 @@ export function VerificationsPanel() {
         {verificationsQuery.isSuccess &&
           (verifications.length === 0 ? (
             <VerificationsEmptyState
-              isFiltered={statusFilter !== "all" || recipientSearch !== ""}
+              isFiltered={isFiltered}
               onClearFilter={() => {
                 setStatusFilter("all");
                 setRecipientSearch("");
@@ -125,6 +164,7 @@ export function VerificationsPanel() {
           ) : (
             <VerificationTable
               verifications={verifications}
+              checkedVerifications={checkedVerifications}
               currentTimeMs={currentTimeMs}
               onCodeExpired={refreshVerifications}
             />

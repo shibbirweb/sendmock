@@ -13,12 +13,16 @@
       "button: Sent",
       "button: Failed",
       "textbox: Filter by device token",
-      "button: Clear all",
+      "checkbox: Select all loaded push notifications",
+      "button: Delete all push notifications",
+      "columnheader: Select",
       "columnheader: Notification",
       "columnheader: Device token",
       "columnheader: Provider",
       "columnheader: Status",
       "columnheader: Time",
+      "each item, checkbox: Select push to …",
+      "each item, img: Unread",
       "each item, link: …"
     ],
     "A notification is open": [
@@ -36,11 +40,11 @@
       "button: Delete",
       "button: Close"
     ],
-    "Clear all dialog": [
-      "heading: Clear every push notification?",
-      "paragraph: Every notification this list shows is deleted; tests waiting for one see only new ones.",
-      "button: Keep them",
-      "button: Clear all"
+    "Delete all dialog": [
+      "heading: Delete all # push notifications?",
+      "paragraph: Settings and configuration stay. This cannot be undone.",
+      "button: Cancel",
+      "button: Delete all"
     ],
     "empty": [
       "paragraph: No push notifications yet",

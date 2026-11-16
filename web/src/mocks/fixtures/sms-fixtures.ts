@@ -14,6 +14,7 @@ import {
   extractFixtureData,
   minutesAgo,
   minutesAgoInMs,
+  olderThanReadMinutes,
 } from "@/mocks/fixtures/fixture-helpers";
 import { buildSmsCallbackAttempt } from "@/mocks/fixtures/sms-callback-builder";
 import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
@@ -135,6 +136,7 @@ function buildSmsMessage(smsSpec: SmsFixtureSpec): SmsMessageDetail {
     extracted: extractFixtureData(smsSpec.body),
     opened_at: openCount > 0 ? minutesAgo(smsSpec.minutesAgo - 1) : null,
     open_count: openCount,
+    is_read: isOutbound || smsSpec.minutesAgo > olderThanReadMinutes,
     reply_webhook: null,
     in_reply_to_sms_id: null,
     created_at: minutesAgo(smsSpec.minutesAgo),

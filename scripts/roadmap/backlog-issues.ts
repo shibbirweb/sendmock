@@ -1,7 +1,7 @@
 // The after-1.0 backlog from docs/plan/11-roadmap.md, as issues.
 import type { FeatureIssue } from "./build-feature-issues";
 
-const blobBase = "https://github.com/shibbirweb/sendmock/blob/feat/phase-0";
+const blobBase = "https://github.com/shibbirweb/sendmock/blob/develop";
 const roadmapLink = `[After 1.0 (backlog)](${blobBase}/docs/plan/11-roadmap.md#after-10-backlog)`;
 
 type BacklogItem = {

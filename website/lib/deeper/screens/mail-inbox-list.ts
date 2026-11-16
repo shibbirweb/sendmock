@@ -47,7 +47,7 @@ export const mailInboxListEntries: DeeperEntry[] = [
   },
   {
     control: "checkbox: Select all loaded emails",
-    does: "Selects every email loaded in the list, or clears the selection. Selected emails can be marked read or deleted together.",
+    does: "Selects every email loaded in the list, or clears the selection. Selected emails can be marked read, marked unread or deleted together; X ticks the open email.",
   },
   {
     control: "button: Notify me about new emails",
@@ -68,7 +68,7 @@ export const mailInboxListEntries: DeeperEntry[] = [
   },
   {
     control: "each item, checkbox: Select email from …",
-    does: "Selects this email for Mark read or Delete.",
+    does: "Selects this email for Mark read, Mark unread or Delete.",
   },
   {
     control: "each item, img: Unread",
@@ -99,8 +99,13 @@ export const mailInboxListEntries: DeeperEntry[] = [
     operationIds: ["patchEmailsByEmailId"],
   },
   {
+    control: "button: Mark unread",
+    does: "Marks every selected email as unread.",
+    operationIds: ["patchEmailsByEmailId"],
+  },
+  {
     control: "button: Delete",
-    does: "Deletes every selected email at once, without asking, and says how many were deleted.",
+    does: "Asks how many to delete, then deletes every selected email and says how many were deleted.",
     operationIds: ["deleteEmailsByEmailId"],
   },
   {
@@ -209,13 +214,12 @@ export const mailInboxListEntries: DeeperEntry[] = [
     does: "Closes the dialog without doing anything.",
   },
   {
-    control: "heading: Delete all emails?",
-    does: "The confirmation before deleting every email (or every email the filter shows).",
+    control: "heading: Delete all # emails?",
+    does: "The confirmation before deleting every email (or every email the filter shows); the number is how many go.",
   },
   {
-    control:
-      "paragraph: This removes all # captured emails. It cannot be undone.",
-    does: "Says how many emails will be deleted.",
+    control: "paragraph: Settings and configuration stay. This cannot be undone.",
+    does: "Says what stays.",
   },
   {
     control: "button: Cancel",

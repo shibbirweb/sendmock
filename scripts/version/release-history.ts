@@ -26,9 +26,13 @@ function runGit(gitArguments: string[], repositoryRoot: string): string {
   return gitResult.stdout.toString();
 }
 
-/** Release tags (`v0.4.0-beta.2`) reachable from HEAD, oldest first. */
+/**
+ * Every release tag (`v0.4.0-beta.2`), oldest first. Not only those reachable from HEAD: a
+ * stable's tag sits on the merge commit on `main`, which `develop` never contains, and only
+ * the release workflows can create `v*` tags, so no other tag needs keeping out.
+ */
 export function readReleaseTags(repositoryRoot: string): SemanticVersion[] {
-  return runGit(["tag", "--list", "v*", "--merged", "HEAD"], repositoryRoot)
+  return runGit(["tag", "--list", "v*"], repositoryRoot)
     .split("\n")
     .map((tagName) => parseVersion(tagName))
     .filter((version): version is SemanticVersion => version !== null)

@@ -43,6 +43,18 @@ pub struct VerificationListInput {
     pub project: Option<String>,
 }
 
+/// `DELETE /api/v1/verify`: the list's filters without paging.
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct VerificationFilterQuery {
+    /// One status, or several separated by commas.
+    pub status: Option<String>,
+    /// Part of the recipient's number or address.
+    pub to: Option<String>,
+    pub channel: Option<String>,
+    /// Only this project's verifications (its key); every project's when not set.
+    pub project: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct VerificationReference {
     /// The verification SID, `VE...`, from `GET /api/v1/verify`.

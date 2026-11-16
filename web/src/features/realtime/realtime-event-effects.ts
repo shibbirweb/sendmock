@@ -20,8 +20,8 @@ const queryKeysByEventArea: Record<string, QueryKey[]> = {
 };
 
 export function listQueryKeysToRefresh(eventType: AppEventType): QueryKey[] {
-  // Retention may have deleted rows of any kind that the lists hold or placed in their cache.
-  if (eventType === "traffic.pruned") {
+  // Retention or a delete all may have removed rows of any kind that the lists hold or cached.
+  if (eventType === "traffic.pruned" || eventType === "traffic.cleared") {
     return listEveryRealtimeQueryKey();
   }
   const eventArea = eventType.split(".")[0] ?? "";

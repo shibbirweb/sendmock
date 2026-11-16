@@ -9,14 +9,10 @@ import {
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { publishTrafficCleared } from "@/mocks/realtime/publish-traffic-cleared";
 import { buildDeliveryDetail } from "@/mocks/webhooks/delivery-detail";
+import { isDeliveryInFlight } from "@/mocks/webhooks/is-delivery-in-flight";
 import { buildReplayDelivery } from "@/mocks/webhooks/replay-delivery";
-
-const retryingStatuses: WebhookDelivery["status"][] = [
-  "pending",
-  "in_flight",
-  "failed",
-];
 
 function findDelivery(deliveryId: unknown) {
   return mockDatabase.webhookDeliveries.find(
@@ -43,15 +39,6 @@ function matchesDeliveryFilters(
   );
 }
 
-/** A failed delivery still retries while it has a next attempt time. */
-function isRetrying(webhookDelivery: WebhookDelivery): boolean {
-  return (
-    retryingStatuses.includes(webhookDelivery.status) &&
-    (webhookDelivery.status !== "failed" ||
-      webhookDelivery.next_attempt_at !== null)
-  );
-}
-
 /** Delivery log, detail, replay and cancel (WH-03, WH-05). */
 export const webhookDeliveryHandlers = [
   http.get("*/api/v1/webhooks/deliveries", async ({ request }) => {
@@ -66,6 +53,49 @@ export const webhookDeliveryHandlers = [
       HttpResponse.json(paginateItems(matchingDeliveries, requestUrl))
     );
   }),
+
+  http.delete("*/api/v1/webhooks/deliveries", async ({ request }) => {
+    await applyMockConditions();
+    const requestUrl = new URL(request.url);
+    const deletedIds = new Set(
+      mockDatabase.webhookDeliveries
+        .filter(
+          (webhookDelivery) =>
+            !isDeliveryInFlight(webhookDelivery) &&
+            matchesDeliveryFilters(webhookDelivery, requestUrl),
+        )
+        .map((webhookDelivery) => webhookDelivery.id),
+    );
+    mockDatabase.webhookDeliveries = mockDatabase.webhookDeliveries.filter(
+      (webhookDelivery) => !deletedIds.has(webhookDelivery.id),
+    );
+    publishTrafficCleared(["webhook_delivery"], null, deletedIds.size);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.delete(
+    "*/api/v1/webhooks/deliveries/:deliveryId",
+    async ({ params }) => {
+      await applyMockConditions();
+      const webhookDelivery = findDelivery(params.deliveryId);
+      if (
+        webhookDelivery !== undefined &&
+        isDeliveryInFlight(webhookDelivery)
+      ) {
+        return createErrorResponse(
+          409,
+          "delivery_in_flight",
+          "This delivery is queued or waiting for a retry; cancel it first",
+        );
+      }
+      mockDatabase.webhookDeliveries = mockDatabase.webhookDeliveries.filter(
+        (storedDelivery) => storedDelivery.id !== params.deliveryId,
+      );
+
+      return new HttpResponse(null, { status: 204 });
+    },
+  ),
 
   http.get("*/api/v1/webhooks/deliveries/:deliveryId", async ({ params }) => {
     const conditionResponse = await applyMockConditions();
@@ -117,7 +147,7 @@ export const webhookDeliveryHandlers = [
       if (!webhookDelivery) {
         return createNotFoundResponse("Delivery");
       }
-      if (!isRetrying(webhookDelivery)) {
+      if (!isDeliveryInFlight(webhookDelivery)) {
         return createErrorResponse(
           409,
           "not_retrying",

@@ -6,7 +6,7 @@ import {
   ReplyIcon,
 } from "lucide-react";
 
-import { Checkbox } from "@/components/ui/checkbox";
+import { ListRowCheckbox } from "@/components/common/list-row-checkbox";
 import { labelEmailSource } from "@/features/mail/mail-labels";
 import { EmailOutcomeBadge } from "@/features/mail/email-outcome-badge";
 import type { EmailSummary } from "@/lib/api/types";
@@ -17,6 +17,7 @@ type MailListItemProps = {
   email: EmailSummary;
   isSelected: boolean;
   isChecked: boolean;
+  isAnyChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
 };
 
@@ -25,6 +26,7 @@ export function MailListItem({
   email,
   isSelected,
   isChecked,
+  isAnyChecked,
   onCheckedChange,
 }: MailListItemProps) {
   const senderLabel = email.from.name || email.from.address;
@@ -32,21 +34,16 @@ export function MailListItem({
   return (
     <div
       className={cn(
-        "group/mail-row relative flex h-full gap-2 border-b px-3 py-2.5 hover:bg-muted/60",
+        "group/list-row relative flex h-full gap-2 border-b px-3 py-2.5 hover:bg-muted/60",
         isSelected && "bg-muted",
       )}
     >
       <div className="flex w-4 shrink-0 flex-col items-center gap-2 pt-0.5">
-        <Checkbox
-          checked={isChecked}
-          onCheckedChange={(checkedState) => {
-            onCheckedChange(checkedState === true);
-          }}
-          aria-label={`Select email from ${senderLabel}`}
-          className={cn(
-            "relative z-10 opacity-0 group-hover/mail-row:opacity-100 focus-visible:opacity-100",
-            isChecked && "opacity-100",
-          )}
+        <ListRowCheckbox
+          itemLabel={`email from ${senderLabel}`}
+          isChecked={isChecked}
+          isAnyChecked={isAnyChecked}
+          onCheckedChange={onCheckedChange}
         />
         {!email.is_read && (
           <span

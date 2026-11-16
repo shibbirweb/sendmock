@@ -1,7 +1,9 @@
 import { CreditCardIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 
+import { useCheckedItems } from "@/hooks/use-checked-items";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { CheckedListToolbar } from "@/components/common/checked-list-toolbar";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
@@ -13,7 +15,13 @@ import { NewPaymentDialog } from "@/features/payments/new-payment/new-payment-di
 import { PaymentFilters } from "@/features/payments/payment-filters";
 import { PaymentsTable } from "@/features/payments/payments-table";
 import { usePaymentsSearch } from "@/features/payments/use-payments-search";
-import { usePayments } from "@/lib/api/hooks/use-payment-queries";
+import {
+  useDeletePayment,
+  useDeletePayments,
+  usePayments,
+} from "@/lib/api/hooks/use-payment-queries";
+
+const paymentNoun = { one: "payment", many: "payments" };
 
 /** Test payments: list, filters, paging and the detail drawer (PY-09.1). */
 export function PaymentsPage() {
@@ -21,10 +29,21 @@ export function PaymentsPage() {
   const paymentsSearch = usePaymentsSearch();
   const paymentsQuery = usePayments(paymentsSearch.listFilters);
   const [isNewOpen, setNewOpen] = React.useState(false);
-  const loadedPages = paymentsQuery.data?.pages ?? [];
-  const paymentSummaries = loadedPages.flatMap(
-    (loadedPage) => loadedPage.items,
+  const paymentSummaries = React.useMemo(
+    () =>
+      paymentsQuery.data?.pages.flatMap((loadedPage) => loadedPage.items) ?? [],
+    [paymentsQuery.data],
   );
+  const totalCount = paymentsQuery.data?.pages[0]?.total_count ?? 0;
+  const checkedPayments = useCheckedItems(
+    React.useMemo(
+      () => paymentSummaries.map((paymentSummary) => paymentSummary.id),
+      [paymentSummaries],
+    ),
+    JSON.stringify(paymentsSearch.listFilters),
+  );
+  const deletePayment = useDeletePayment();
+  const deletePayments = useDeletePayments();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -44,6 +63,20 @@ export function PaymentsPage() {
         </header>
         <PaymentFilters paymentsSearch={paymentsSearch} />
         <div className="min-w-0 rounded-lg border">
+          <CheckedListToolbar
+            itemNoun={paymentNoun}
+            checkedItems={checkedPayments}
+            loadedItemCount={paymentSummaries.length}
+            totalItemCount={totalCount}
+            isFiltered={paymentsSearch.hasFilters}
+            deleteAllKeepsNote="Each payment's events, refunds and checkout go with it; subscriptions, gateways, methods and flows stay."
+            onDeleteItem={(paymentId) => {
+              deletePayment.mutate(paymentId);
+            }}
+            onDeleteAll={() => {
+              deletePayments.mutate(paymentsSearch.listFilters);
+            }}
+          />
           {paymentsQuery.isPending && <Skeleton className="m-4 h-32" />}
           {paymentsQuery.isError && (
             <QueryErrorState
@@ -67,10 +100,13 @@ export function PaymentsPage() {
             ))}
           {paymentSummaries.length > 0 && (
             <>
-              <PaymentsTable paymentSummaries={paymentSummaries} />
+              <PaymentsTable
+                paymentSummaries={paymentSummaries}
+                checkedPayments={checkedPayments}
+              />
               <LoadMoreRows
                 shownCount={paymentSummaries.length}
-                totalCount={loadedPages[0]?.total_count ?? 0}
+                totalCount={totalCount}
                 hasNextPage={paymentsQuery.hasNextPage}
                 isFetchingNextPage={paymentsQuery.isFetchingNextPage}
                 onLoadMore={() => {

@@ -7,7 +7,11 @@ import { parseRunJobs, planRegistryPublish } from "./registry-publish-plan";
 const workflowsDirectory = join(import.meta.dir, "../../.github/workflows");
 
 type RegistryWorkflow = {
-  on: { workflow_run?: { workflows?: string[]; types?: string[] } };
+  on: {
+    workflow_run?: { workflows?: string[]; types?: string[] };
+    workflow_dispatch?: { inputs?: Record<string, { required?: boolean; type?: string }> };
+  };
+  env?: Record<string, string>;
   jobs: Record<
     string,
     {
@@ -43,6 +47,21 @@ describe("the registry publish plan", () => {
       tagName: "v0.2.0-beta.1",
       version: "0.2.0-beta.1",
       channel: "beta",
+      releaseBranch: "develop",
+    });
+  });
+
+  test("DS-03.8 names the branch each channel releases from, main for a stable", () => {
+    expect(
+      planRegistryPublish("Publish stable", [
+        { name: "release / Publish v1.0.0", conclusion: "success" },
+      ]),
+    ).toEqual({
+      shouldPublish: true,
+      tagName: "v1.0.0",
+      version: "1.0.0",
+      channel: "stable",
+      releaseBranch: "main",
     });
   });
 
@@ -102,13 +121,43 @@ describe("the Registry publish workflow", () => {
     expect(planCheckout?.with?.ref).toBeUndefined();
   });
 
-  test("DS-03.8 publishes only when the release tag points at the released commit", () => {
+  test("DS-03.8 publishes only when the release tag points at a commit CI passed on its branch", () => {
     const tagCheck = (registryWorkflow.jobs.plan?.steps ?? []).find((step) =>
       step.run?.includes("commits/refs/tags/$TAG_NAME"),
     );
 
-    expect(tagCheck?.run).toContain('"$tagged_commit" != "$COMMIT_SHA"');
+    expect(tagCheck?.env?.RELEASE_BRANCH).toBe("${{ steps.decision.outputs.release_branch }}");
+    expect(tagCheck?.run).toContain(
+      "actions/workflows/ci.yml/runs?head_sha=$tagged_commit&branch=$RELEASE_BRANCH&event=push&status=success",
+    );
+    expect(tagCheck?.run).toContain('if [ "$passed_ci_run_count" = "0" ]; then');
     expect(tagCheck?.run).toContain("exit 1");
+  });
+
+  // A workflow_run run is recorded on the default branch head, so its head_sha is develop's
+  // latest commit, never the merge commit on main that a stable tag points at.
+  test("DS-03.8 never compares the tag with the publish run's head commit", () => {
+    const workflowText = readFileSync(join(workflowsDirectory, "registry-publish.yml"), "utf8");
+
+    expect(workflowText).not.toContain("workflow_run.head_sha");
+  });
+
+  test("DS-03.8 sends a missed release again by hand, from the default branch only", () => {
+    const releaseRunIdInput = registryWorkflow.on.workflow_dispatch?.inputs?.release_run_id;
+    const decisionStep = (registryWorkflow.jobs.plan?.steps ?? []).find((step) =>
+      step.run?.includes("registry-publish-plan.ts"),
+    );
+    const decisionRun = decisionStep?.run ?? "";
+
+    expect(releaseRunIdInput?.required).toBe(true);
+    expect(registryWorkflow.env?.RELEASE_RUN_ID).toBe(
+      "${{ github.event.workflow_run.id || inputs.release_run_id }}",
+    );
+    expect(registryWorkflow.jobs.plan?.if).toBe(
+      "github.event_name != 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch",
+    );
+    expect(decisionRun).toContain('if ! [[ "$RELEASE_RUN_ID" =~ ^[0-9]+$ ]]; then');
+    expect(decisionRun).toContain('actions/runs/$RELEASE_RUN_ID" --jq .name');
   });
 
   test("DS-03.8 every publishing job checks out the verified release tag", () => {

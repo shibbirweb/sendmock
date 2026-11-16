@@ -9,6 +9,7 @@ mod push_api;
 mod push_inputs;
 mod push_operations;
 mod push_store;
+mod push_update_operation;
 mod push_views;
 
 pub(crate) use push_api::answer_push_api;
@@ -17,6 +18,7 @@ use push_operations::{
     DeletePushOperation, DeletePushesOperation, GetPushOperation, ListPushesOperation,
     WaitPushOperation,
 };
+use push_update_operation::UpdatePushOperation;
 pub use push_views::PushNotification;
 
 use crate::OperationRegistry;
@@ -25,6 +27,7 @@ pub fn register_push_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ListPushesOperation);
     operation_registry.register(GetPushOperation);
     operation_registry.register(DeletePushOperation);
+    operation_registry.register(UpdatePushOperation);
     operation_registry.register(DeletePushesOperation);
     operation_registry.register(WaitPushOperation);
 }

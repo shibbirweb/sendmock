@@ -103,8 +103,8 @@ pub use verify::{
     VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,
 };
 pub use webhook_delivery::{
-    DeliveryAttemptResult, DeliveryOutcomeFilter, DeliveryOutcomeRecord, WebhookDeliveryFilter,
-    WebhookDeliveryPage, WebhookDeliveryRecord, WebhookDeliveryRepository,
+    DeliveryAttemptResult, DeliveryDeleteOutcome, DeliveryOutcomeFilter, DeliveryOutcomeRecord,
+    WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord, WebhookDeliveryRepository,
 };
 pub use webhook_endpoint::{
     WebhookEndpointRecord, WebhookEndpointRepository, WebhookSecretRotation,

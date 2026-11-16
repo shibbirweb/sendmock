@@ -8,6 +8,7 @@ import {
   minutesAgo,
   minutesAgoInMs,
 } from "@/mocks/fixtures/fixture-helpers";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 type ApiRequestSpec = Omit<
   ApiRequestLogEntry,
@@ -166,7 +167,7 @@ export function linkApiRequestFixtures(
       apiRequest.linked_message = {
         kind: "sms",
         id: smsMessage.id,
-        sms_thread_id: `${smsMessage.from_number}|${smsMessage.to_number}`,
+        sms_thread_id: readSmsThreadId(smsMessage),
       };
     }
   }

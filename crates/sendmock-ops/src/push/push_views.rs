@@ -40,6 +40,8 @@ pub struct PushNotification {
     /// What SendMock answered, in the provider's shape.
     pub response: Value,
     pub project: String,
+    /// Notifications arrive unread; opening one marks it read.
+    pub is_read: bool,
     pub created_at: String,
 }
 
@@ -62,6 +64,7 @@ impl From<PushNotificationRecord> for PushNotification {
             error_reason: push_record.error_reason,
             response_status: push_record.response_status,
             project: push_record.project_key,
+            is_read: push_record.is_read,
         }
     }
 }

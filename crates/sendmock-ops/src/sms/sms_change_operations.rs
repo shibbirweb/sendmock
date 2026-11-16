@@ -2,11 +2,12 @@ use sendmock_store::SmsStatusChangeRecord;
 use serde_json::json;
 
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
-use super::sms_inputs::{SmsReference, SmsStatusUpdate};
+use super::sms_inputs::{SmsProjectQuery, SmsReference, SmsStatusUpdate};
 use super::sms_views::SmsMessage;
 use super::status_callback::send_status_callback;
+use crate::events::publish_traffic_cleared;
 use crate::{
-    AppEventType, HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
+    AppEventType, HttpMethod, NoContent, Operation, OperationContext, OperationDefinition,
     OperationError, SuccessStatus, publish_event,
 };
 
@@ -64,7 +65,7 @@ impl Operation for DeleteSmsOperation {
 pub struct DeleteAllSmsOperation;
 
 impl Operation for DeleteAllSmsOperation {
-    type Input = NoInput;
+    type Input = SmsProjectQuery;
     type Output = NoContent;
 
     fn definition(&self) -> OperationDefinition {
@@ -72,7 +73,7 @@ impl Operation for DeleteAllSmsOperation {
             operation_id: "deleteSms",
             method: HttpMethod::Delete,
             path: "/api/v1/sms",
-            summary: "Delete every message.",
+            summary: "Delete every message, or one project's.",
             is_destructive: true,
             cli_usage: "sendmock sms delete-all --yes",
             mcp_tool: "sendmock_sms_delete_all",
@@ -84,20 +85,25 @@ impl Operation for DeleteAllSmsOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        _input: NoInput,
+        input: SmsProjectQuery,
     ) -> Result<NoContent, OperationError> {
-        if operation_context
+        let deleted_count = operation_context
             .sms_repository
-            .delete_all_messages()
-            .await?
-            > 0
-        {
+            .delete_all_messages(input.project.clone())
+            .await?;
+        if deleted_count > 0 {
             publish_event(
                 operation_context,
                 AppEventType::SmsStatus,
                 json!({ "id": null, "status": "deleted" }),
             );
         }
+        publish_traffic_cleared(
+            operation_context,
+            &["sms"],
+            input.project.as_deref(),
+            deleted_count,
+        );
         Ok(NoContent)
     }
 }

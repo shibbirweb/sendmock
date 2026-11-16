@@ -112,10 +112,10 @@ export const appShellPage: DeeperPage = {
       does: "Opens the SendMock repository on GitHub in a new tab.",
     },
     {
-      control: "status: Live · demo data, version #.#.#-dev",
+      control: "status: Live · demo data, version #.#.#-beta.#",
       does: "Shows whether the app is connected to SendMock's realtime stream (Live, Connecting, or Offline, retrying), where the data comes from (the server, or demo data on the website demo) and the app's version.",
       source:
-        "The connection state of the realtime stream, and the version the app was built with.",
+        "The connection state of the realtime stream, and the version the running server reports in `GET /api/v1/info`; the demo shows its own.",
       errors:
         "Offline, retrying means the realtime stream dropped: the app keeps trying, and screens still load when you open them. If it stays offline, check SendMock is still running.",
     },

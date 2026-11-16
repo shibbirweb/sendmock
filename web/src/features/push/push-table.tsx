@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router";
 
 import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
+import {
   Table,
   TableBody,
   TableCell,
@@ -10,20 +14,39 @@ import {
 } from "@/components/ui/table";
 import { pushProviderLabels } from "@/features/push/push-labels";
 import { PushStatusBadge } from "@/features/push/push-status-badge";
+import { UnreadDot } from "@/components/common/unread-dot";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import type { PushNotification } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
+import { cn } from "@/lib/utils";
 
-function PushRow({ pushNotification }: { pushNotification: PushNotification }) {
+function PushRow({
+  pushNotification,
+  checkedPushes,
+}: {
+  pushNotification: PushNotification;
+  checkedPushes: CheckedItems;
+}) {
+  const isUnread = !pushNotification.is_read;
+
   return (
-    <TableRow className="relative">
+    <CheckableTableRow
+      itemId={pushNotification.id}
+      itemLabel={`push to ${pushNotification.device_token}`}
+      checkedItems={checkedPushes}
+    >
       <TableCell className="max-w-40 sm:max-w-64">
+        {isUnread && <UnreadDot className="mr-1.5 inline-block align-middle" />}
         <Link
           to="/push"
           search={(previousSearch) => ({
             ...previousSearch,
             push: pushNotification.id,
           })}
-          className="block truncate font-medium after:absolute after:inset-0 focus-visible:outline-none"
+          className={cn(
+            "block truncate after:absolute after:inset-0 focus-visible:outline-none",
+            isUnread ? "font-semibold" : "font-medium",
+          )}
         >
           {pushNotification.title ?? pushNotification.body ?? "(no text)"}
         </Link>
@@ -46,20 +69,23 @@ function PushRow({ pushNotification }: { pushNotification: PushNotification }) {
           {formatRelativeTime(pushNotification.created_at)}
         </time>
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
 /** Push notifications, newest first; a row opens its drawer. */
 export function PushTable({
   pushNotifications,
+  checkedPushes,
 }: {
   pushNotifications: PushNotification[];
+  checkedPushes: CheckedItems;
 }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          <CheckColumnHead />
           <TableHead>Notification</TableHead>
           <TableHead className="hidden md:table-cell">Device token</TableHead>
           <TableHead className="hidden sm:table-cell">Provider</TableHead>
@@ -72,6 +98,7 @@ export function PushTable({
           <PushRow
             key={pushNotification.id}
             pushNotification={pushNotification}
+            checkedPushes={checkedPushes}
           />
         ))}
       </TableBody>

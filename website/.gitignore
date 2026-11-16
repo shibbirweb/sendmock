@@ -1,6 +1,7 @@
 node_modules
 .next
 out
+.versioned-site
 next-env.d.ts
 .source
 test-results

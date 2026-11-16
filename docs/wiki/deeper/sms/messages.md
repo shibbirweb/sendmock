@@ -53,27 +53,54 @@ Button.
 
 - **What it does:** Shows only WhatsApp conversations (messages sent with `whatsapp:` addresses).
 
-### 7. +# …
+### 7. Select all loaded conversations
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be marked read, marked unread or deleted together. X ticks the open or focused row.
+
+### 8. Delete all conversations
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. With a search or channel on, only the conversations it shows go.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/sms`](/api/sms/#deleteSms), CLI [`sendmock sms delete-all`](/cli/sms/#sms-delete-all), MCP [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all)
+
+### 9. Select conversation with +#
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 10. +# …
 
 Link, in each row.
 
 - **What it does:** Opens the conversation with that number: the other side's number, the last message and when it was sent. `J` and `K` open the next and previous one.
 - **Same action elsewhere:** REST [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads), CLI [`sendmock sms threads`](/cli/sms/#sms-threads), MCP [`sendmock_sms_threads`](/mcp/sms/#sendmock_sms_threads)
 
-### 8. Delivered
+### 11. Delivered
 
 Badge, in each row.
 
 - **What it does:** The last message's status as ticks: sent, delivered or read; a red mark for undelivered or failed.
 - **Where its text comes from:** The message's status, moved on by the delivery simulation or Set status.
 
-### 9. …
+### 12. Unread
+
+Badge, in each row.
+
+- **What it does:** Marks a conversation nobody opened yet. Opening it marks it read; Mark unread puts the dot back, and the sidebar counts the unread ones.
+- **Where its text comes from:** The item's `is_read` field.
+
+### 13. …
 
 Badge, in each row.
 
 - **What it does:** Other markers a conversation can show, such as an unread inbound message or media.
 
-### 10. Select a conversation to read it. Use J and K to move through the list.
+### 14. Select a conversation to read it. Use J and K to move through the list.
 
 Text.
 
@@ -81,37 +108,37 @@ Text.
 
 ## A conversation is open
 
-### 11. +#
+### 15. +#
 
 Heading.
 
 - **What it does:** The other side's phone number.
 
-### 12. Copy phone number
+### 16. Copy phone number
 
 Button.
 
 - **What it does:** Copies that number.
 
-### 13. with +#, # message
+### 17. with +#, # message
 
 Text.
 
 - **What it does:** Your app's number in the conversation and how many messages it holds.
 
-### 14. Today
+### 18. Today
 
 Heading.
 
 - **What it does:** A day separator; messages are grouped by the day they were sent.
 
-### 15. #:#
+### 19. #:#
 
 Link.
 
 - **What it does:** The time a message was sent; opens its Message details.
 
-### 16. Undelivered: # Unreachable destination handset
+### 20. Undelivered: # Unreachable destination handset
 
 Badge.
 
@@ -119,13 +146,13 @@ Badge.
 - **Where its text comes from:** A magic number, your outcome rules, the delivery profile or Set status.
 - **Links to:** [Magic numbers and addresses](../../reference/magic-numbers.md).
 
-### 17. Message actions
+### 21. Message actions
 
 Button.
 
 - **What it does:** Opens the message's menu: details, Simulate read, Send to webhook, copy and delete.
 
-### 18. Change
+### 22. Change
 
 Button.
 
@@ -135,19 +162,19 @@ Button.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 - **Same action elsewhere:** REST [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints), CLI [`sendmock webhook endpoint list`](/cli/webhook-endpoints/#webhook-endpoint-list), MCP [`sendmock_webhook_endpoint_list`](/mcp/webhook-endpoints/#sendmock_webhook_endpoint_list)
 
-### 19. Attach files
+### 23. Attach files
 
 Button.
 
 - **What it does:** Adds images or files to the reply, which then arrives as an MMS with `NumMedia` and `MediaUrl0` in the reply webhook.
 
-### 20. Reply as +#
+### 24. Reply as +#
 
 Field.
 
 - **What it does:** The text of a reply from the other side's phone. `Enter` sends, `Shift`+`Enter` adds a line.
 
-### 21. Send reply
+### 25. Send reply
 
 Button.
 
@@ -156,7 +183,7 @@ Button.
 - **Links to:** [Replies and WhatsApp](../../sms/replies-and-whatsapp.md).
 - **Same action elsewhere:** REST [`POST /api/v1/sms/inbound`](/api/sms/#postSmsInbound), CLI [`sendmock sms inbound`](/cli/sms/#sms-inbound), MCP [`sendmock_sms_simulate_inbound`](/mcp/sms/#sendmock_sms_simulate_inbound)
 
-### 22. Simulates an inbound message from +#. # / #, # segment, GSM-#. Enter sends, Shift+Enter adds a line.
+### 26. Simulates an inbound message from +#. # / #, # segment, GSM-#. Enter sends, Shift+Enter adds a line.
 
 Text.
 
@@ -164,14 +191,14 @@ Text.
 
 ## Message actions menu
 
-### 23. Message details
+### 27. Message details
 
 Menu item.
 
 - **What it does:** Opens the drawer with the message's status history, its original request and its callbacks or reply webhook.
 - **Same action elsewhere:** REST [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId), CLI [`sendmock sms show`](/cli/sms/#sms-show), MCP [`sendmock_sms_get`](/mcp/sms/#sendmock_sms_get)
 
-### 24. Simulate read
+### 28. Simulate read
 
 Menu item.
 
@@ -179,7 +206,7 @@ Menu item.
 - **What it changes:** Fires `sms.opened` and sends a `read` status callback.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen), CLI [`sendmock sms open`](/cli/sms/#sms-open), MCP [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open)
 
-### 25. Choose webhooks for Simulate read
+### 29. Choose webhooks for Simulate read
 
 Menu item.
 
@@ -189,26 +216,26 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/open`](/api/sms/#postSmsBySmsIdOpen), CLI [`sendmock sms open`](/cli/sms/#sms-open), MCP [`sendmock_sms_open`](/mcp/sms/#sendmock_sms_open)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 26. Send to webhook
+### 30. Send to webhook
 
 Menu item.
 
 - **What it does:** Opens the Send to webhook dialog, to deliver this message's event to an endpoint now.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/endpoints/{endpointId}/send`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSend), CLI [`sendmock webhook send`](/cli/webhook-endpoints/#webhook-send), MCP [`sendmock_webhook_send`](/mcp/webhook-endpoints/#sendmock_webhook_send)
 
-### 27. Copy text
+### 31. Copy text
 
 Menu item.
 
 - **What it does:** Copies the message text.
 
-### 28. Copy message ID
+### 32. Copy message ID
 
 Menu item.
 
 - **What it does:** Copies the message's id (Twilio's `SM...` SID for Twilio messages).
 
-### 29. Delete
+### 33. Delete
 
 Menu item.
 
@@ -217,50 +244,50 @@ Menu item.
 
 ## Message details, Status tab
 
-### 30. Message details
+### 34. Message details
 
 Heading.
 
 - **What it does:** The Message details drawer.
 
-### 31. Status history, the original request and status callbacks.
+### 35. Status history, the original request and status callbacks.
 
 Text.
 
 - **What it does:** Explains what the drawer shows.
 
-### 32. Your order ## has shipped.
+### 36. Your order ## has shipped.
 
 Text.
 
 - **What it does:** The message text (here the demo's shipping notice).
 
-### 33. Twilio
+### 37. Twilio
 
 Link.
 
 - **What it does:** The API the message came through; opens SMS > Providers.
 - **Links to:** [SMS > Providers](../../sms/providers.md).
 
-### 34. Copy message ID
+### 38. Copy message ID
 
 Button.
 
 - **What it does:** Copies the message's id.
 
-### 35. Set status
+### 39. Set status
 
 Heading.
 
 - **What it does:** Moves the message to a status by hand, as the carrier would report it.
 
-### 36. Error code for Undelivered and Failed
+### 40. Error code for Undelivered and Failed
 
 Drop-down.
 
 - **What it does:** The provider error code to report with Undelivered or Failed.
 
-### 37. Delivered
+### 41. Delivered
 
 Button.
 
@@ -268,7 +295,7 @@ Button.
 - **What it changes:** Fires `sms.status` and sends the status callback to your app.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus), CLI [`sendmock sms status`](/cli/sms/#sms-status), MCP [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status)
 
-### 38. Undelivered
+### 42. Undelivered
 
 Button.
 
@@ -276,7 +303,7 @@ Button.
 - **What it changes:** Fires `sms.status` and sends the status callback.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus), CLI [`sendmock sms status`](/cli/sms/#sms-status), MCP [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status)
 
-### 39. Failed
+### 43. Failed
 
 Button.
 
@@ -284,7 +311,7 @@ Button.
 - **What it changes:** Fires `sms.status` and sends the status callback.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus), CLI [`sendmock sms status`](/cli/sms/#sms-status), MCP [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status)
 
-### 40. SMS status callbacks
+### 44. SMS status callbacks
 
 Link.
 
@@ -293,7 +320,7 @@ Link.
 - **Where its text comes from:** Your webhook rules for `sms.status`, which can filter on the status.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 41. Payload to SMS status callbacks
+### 45. Payload to SMS status callbacks
 
 Button.
 
@@ -303,7 +330,7 @@ Button.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 - **Same action elsewhere:** REST [`POST /api/v1/sms/{smsId}/status`](/api/sms/#postSmsBySmsIdStatus), CLI [`sendmock sms status`](/cli/sms/#sms-status), MCP [`sendmock_sms_set_status`](/mcp/sms/#sendmock_sms_set_status)
 
-### 42. Change
+### 46. Change
 
 Button.
 
@@ -313,25 +340,25 @@ Button.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 - **Same action elsewhere:** REST [`GET /api/v1/webhooks/endpoints`](/api/webhook-endpoints/#getWebhooksEndpoints), CLI [`sendmock webhook endpoint list`](/cli/webhook-endpoints/#webhook-endpoint-list), MCP [`sendmock_webhook_endpoint_list`](/mcp/webhook-endpoints/#sendmock_webhook_endpoint_list)
 
-### 43. Status
+### 47. Status
 
 Tab.
 
 - **What it does:** Every status the message went through, with the time of each.
 
-### 44. Request
+### 48. Request
 
 Tab.
 
 - **What it does:** The request your app sent to create the message, exactly as received.
 
-### 45. Callbacks (#)
+### 49. Callbacks (#)
 
 Tab.
 
 - **What it does:** Each status callback sent to your app: the URL, the request, the answer and retries.
 
-### 46. Close
+### 50. Close
 
 Button.
 
@@ -339,13 +366,13 @@ Button.
 
 ## Message details, Request tab
 
-### 47. Copy request JSON
+### 51. Copy request JSON
 
 Button.
 
 - **What it does:** Copies the original request.
 
-### 48. Open in request log
+### 52. Open in request log
 
 Link.
 
@@ -354,7 +381,7 @@ Link.
 
 ## Message details, Callbacks tab
 
-### 49. Sent to http://localhost:#/sms/status
+### 53. Sent to http://localhost:#/sms/status
 
 Text.
 
@@ -362,19 +389,19 @@ Text.
 
 ## With no data yet
 
-### 50. No SMS yet
+### 54. No SMS yet
 
 Text.
 
 - **What it does:** Shown when there is no SMS at all, with how to connect your app.
 
-### 51. Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.
+### 55. Send through the SendMock API, or point your Twilio or Vonage SDK at SendMock.
 
 Text.
 
 - **What it does:** Explains the ways in: the native API, or a provider SDK with its base URL changed.
 
-### 52. This machine
+### 56. This machine
 
 Choice.
 
@@ -382,44 +409,44 @@ Choice.
 - **What it changes:** Shared with Settings > Connection and remembered in the browser.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 53. Docker host
+### 57. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host.
 
-### 54. Compose
+### 58. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project.
 
-### 55. Copy Native API
+### 59. Copy Native API
 
 Button.
 
 - **What it does:** Copies the native send URL, `POST /api/v1/sms`.
 
-### 56. Copy Twilio base URL
+### 60. Copy Twilio base URL
 
 Button.
 
 - **What it does:** Copies the base URL to give Twilio's SDK.
 
-### 57. Copy Vonage base URL
+### 61. Copy Vonage base URL
 
 Button.
 
 - **What it does:** Copies the base URL to give Vonage's SDK.
 
-### 58. More snippets
+### 62. More snippets
 
 Link.
 
 - **What it does:** Opens Settings > Connection, with the settings for every language.
 - **Links to:** [Settings](../../settings.md).
 
-### 59. Send a sample SMS
+### 63. Send a sample SMS
 
 Button.
 
@@ -427,7 +454,7 @@ Button.
 - **What it changes:** Fires `sms.sent` and starts the delivery simulation.
 - **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
 
-### 60. Choose webhooks for Send a sample SMS
+### 64. Choose webhooks for Send a sample SMS
 
 Button.
 
@@ -439,20 +466,20 @@ Button.
 
 ## When the data cannot load
 
-### 61. Could not load conversations. Try again
+### 65. Could not load conversations. Try again
 
 Message.
 
 - **What it does:** Shown when the conversations could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 62. Could not load conversations.
+### 66. Could not load conversations.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 63. Try again
+### 67. Try again
 
 Button.
 

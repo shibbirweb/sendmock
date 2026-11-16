@@ -162,4 +162,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 38,
         sql: include_str!("../migrations/0038_delivery_editing.sql"),
     },
+    Migration {
+        schema_version: 39,
+        sql: include_str!("../migrations/0039_read_state.sql"),
+    },
 ];

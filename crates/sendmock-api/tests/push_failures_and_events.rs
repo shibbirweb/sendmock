@@ -4,12 +4,10 @@ mod support {
     pub mod webhook_samples;
 }
 
-use std::time::Duration;
-
 use sendmock_ops::run_webhook_rule_subscriber;
 use serde_json::{Value, json};
 use support::test_app::{build_test_app, build_test_app_with, call_api};
-use support::webhook_samples::{create_endpoint, create_rule};
+use support::webhook_samples::{create_endpoint, create_rule, wait_for_deliveries};
 
 const FCM_SEND_PATH: &str = "/providers/fcm/v1/projects/shop-app/messages:send";
 const EXPO_SEND_PATH: &str = "/providers/expo/--/api/v2/push/send";
@@ -180,20 +178,17 @@ async fn push_events_reach_webhook_rules_filtered_on_the_token_and_title() {
         )
         .await;
     }
-    tokio::time::sleep(Duration::from_millis(200)).await;
+    let deliveries = wait_for_deliveries(&app_router, 2).await;
     subscriber.abort();
 
-    let (_, deliveries) = call_api(&app_router, "GET", "/api/v1/webhooks/deliveries", None).await;
-    let mut event_types: Vec<String> = deliveries["items"]
-        .as_array()
-        .into_iter()
-        .flatten()
+    let mut event_types: Vec<String> = deliveries
+        .iter()
         .filter_map(|delivery| delivery["event_type"].as_str().map(str::to_owned))
         .collect();
     event_types.sort();
     assert_eq!(
         event_types,
         vec!["push.failed", "push.sent"],
-        "{deliveries}"
+        "{deliveries:?}"
     );
 }

@@ -6,7 +6,7 @@ use super::{VerificationFilter, VerificationPage, VerificationRecord};
 pub const VERIFICATION_COLUMNS: &str = "sid, service_sid, service_name, account_sid, to_address, channel, code, status, check_attempts, send_attempts, expires_at, linked_message_id, linked_thread_id, created_at, updated_at, project_key";
 
 /// The filter as SQL conditions joined with AND, with their parameters in the same order.
-fn build_conditions(filter: &VerificationFilter) -> (String, Vec<SqlValue>) {
+pub fn build_conditions(filter: &VerificationFilter) -> (String, Vec<SqlValue>) {
     let mut conditions = vec!["1 = 1".to_owned()];
     let mut parameters: Vec<SqlValue> = Vec::new();
     if !filter.statuses.is_empty() {

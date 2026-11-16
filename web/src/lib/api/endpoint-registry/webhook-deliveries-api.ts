@@ -7,40 +7,50 @@ import {
   typeRef,
 } from "./endpoint-definition";
 
+const deliveryFilterParameters = [
+  {
+    name: "status",
+    description: "succeeded, failed or pending.",
+    schema: "string" as const,
+    example: "failed",
+  },
+  {
+    name: "endpoint_id",
+    description: "Only this endpoint.",
+    schema: "string" as const,
+    example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+  },
+  {
+    name: "event_type",
+    description: "Only this event.",
+    schema: typeRef("AppEventType"),
+    example: "email.received",
+  },
+  {
+    name: "subject_id",
+    description:
+      "Only the deliveries an email, SMS or other message caused, by its ID.",
+    schema: "string" as const,
+    example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9E",
+  },
+];
+
 const deliveryEndpoints = tagEndpoints("Webhook deliveries", [
   {
     method: "GET",
     path: "/api/v1/webhooks/deliveries",
     summary: "Every webhook request sent, newest first.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "status",
-        description: "succeeded, failed or pending.",
-        schema: "string",
-        example: "failed",
-      },
-      {
-        name: "endpoint_id",
-        description: "Only this endpoint.",
-        schema: "string",
-        example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-      },
-      {
-        name: "event_type",
-        description: "Only this event.",
-        schema: typeRef("AppEventType"),
-        example: "email.received",
-      },
-      {
-        name: "subject_id",
-        description:
-          "Only the deliveries an email, SMS or other message caused, by its ID.",
-        schema: "string",
-        example: "01JB7T9Q2R5W8X3Y6Z1A4B7C9E",
-      },
-    ],
+    queryParameters: [...pageQueryParameters, ...deliveryFilterParameters],
     response: pageOf("WebhookDelivery"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/webhooks/deliveries",
+    summary:
+      "Delete every finished delivery, or those the filters match; queued and retrying ones stay.",
+    queryParameters: deliveryFilterParameters,
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",
@@ -48,6 +58,15 @@ const deliveryEndpoints = tagEndpoints("Webhook deliveries", [
     summary: "One delivery: request, response and every attempt.",
     response: typeRef("WebhookDeliveryDetail"),
     errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/webhooks/deliveries/{deliveryId}",
+    summary:
+      "Delete a finished delivery; 409 while it is queued or waiting for a retry.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [409],
   },
   {
     method: "POST",

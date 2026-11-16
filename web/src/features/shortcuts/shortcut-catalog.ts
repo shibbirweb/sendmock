@@ -47,6 +47,11 @@ export const appShortcuts = {
     description: "Delete the open email",
     group: "Lists and messages",
   },
+  toggleCheckedItem: {
+    keys: ["X"],
+    description: "Select or clear the open or focused row",
+    group: "Lists and messages",
+  },
   replyAsRecipient: {
     keys: ["R"],
     description: "Reply as the recipient",

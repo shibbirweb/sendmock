@@ -51,6 +51,13 @@ pub struct InboundSmsRequest {
     pub webhook_choice: crate::webhooks::WebhookChoiceInput,
 }
 
+/// `DELETE /api/v1/sms`.
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct SmsProjectQuery {
+    /// Only this project's messages (its key); every project's when not set.
+    pub project: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct SmsReference {
     /// The SMS's ID, from `GET /api/v1/sms`.

@@ -53,7 +53,7 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 - **0 means no limit.** With no age limit either, a warning shows: the database grows until the disk is full, so a fixed limit is recommended. See [How much is kept](./configuration.md#how-much-is-kept---max-emails---max-sms-and---max-age).
 - Configuration (endpoints, rules, templates, variables, saved deliveries, numbers, providers), deliveries still waiting to be sent and payments are never pruned, and the database file gives the freed space back.
 
-**Danger zone:** **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
+**Danger zone:** **Delete all traffic** (every email, SMS, verification, push notification, captured HTTP request, finished webhook delivery, payment, subscription and log entry, in every project, while settings and configuration stay), **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
 
 ### Seed
 
@@ -262,6 +262,7 @@ public class SettingsTests
 | read | [`sendmock settings get`](/cli/system/#settings-get) | [`GET /api/v1/settings`](/api/system/#getSettings) | [`sendmock_settings_get`](/mcp/system/#sendmock_settings_get) |
 | change, chaos too | [`sendmock settings set`](/cli/system/#settings-set) | [`PATCH /api/v1/settings`](/api/system/#patchSettings) | [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update) |
 | reset to seed | [`sendmock reset --yes`](/cli/system/#reset) | [`POST /api/v1/reset`](/api/system/#postReset) | [`sendmock_reset`](/mcp/system/#sendmock_reset) |
+| delete all traffic, keep the configuration | [`sendmock traffic delete-all --yes`](/cli/system/#traffic-delete-all) | [`DELETE /api/v1/traffic`](/api/system/#deleteTraffic) | [`sendmock_traffic_delete_all`](/mcp/system/#sendmock_traffic_delete_all) |
 | seed status | [`sendmock seed status`](/cli/seed/#seed-status) | [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus) | [`sendmock_seed_status`](/mcp/seed/#sendmock_seed_status) |
 | export the seed | [`sendmock seed export`](/cli/seed/#seed-export) | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | [`sendmock_seed_export`](/mcp/seed/#sendmock_seed_export) |
 | validate a seed file | [`sendmock seed validate <file>`](/cli/seed/#seed-validate) | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | [`sendmock_seed_validate`](/mcp/seed/#sendmock_seed_validate) |

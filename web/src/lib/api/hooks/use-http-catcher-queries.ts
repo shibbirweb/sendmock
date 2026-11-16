@@ -136,12 +136,29 @@ export function useDeleteHttpBin() {
   );
 }
 
+/** Deletes one bin's requests, or every bin's when no bin is given. */
 export function useClearHttpRequests() {
-  return useCatcherMutation((binId: string) =>
+  return useCatcherMutation((binId: string | null) =>
     requestApi<null>("/http/requests", {
       method: "DELETE",
-      queryParameters: { bin_id: binId },
+      queryParameters: { bin_id: binId ?? undefined },
     }),
+  );
+}
+
+export function useUpdateCapturedHttpRequest() {
+  return useCatcherMutation(
+    ({ requestId, isRead }: { requestId: string; isRead: boolean }) =>
+      requestApi<CapturedHttpRequest>(`/http/requests/${requestId}`, {
+        method: "PATCH",
+        requestBody: { is_read: isRead },
+      }),
+  );
+}
+
+export function useDeleteCapturedHttpRequest() {
+  return useCatcherMutation((requestId: string) =>
+    requestApi<null>(`/http/requests/${requestId}`, { method: "DELETE" }),
   );
 }
 

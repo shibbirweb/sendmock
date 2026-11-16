@@ -10,11 +10,12 @@ type MailListKeyboardOptions = {
   searchInputRef: React.RefObject<HTMLInputElement | null>;
   scrollToEmailIndex: (emailIndex: number) => void;
   onDeleteEmail: (emailId: string) => void;
+  onToggleCheckedEmail: (emailId: string) => void;
 };
 
 /**
  * Mail list shortcuts: J / K open the next or previous email, Enter opens the
- * first one, D deletes the open email and / focuses the search box.
+ * first one, D deletes the open email, X ticks it and / focuses the search box.
  */
 export function useMailListKeyboard({
   emails,
@@ -22,6 +23,7 @@ export function useMailListKeyboard({
   searchInputRef,
   scrollToEmailIndex,
   onDeleteEmail,
+  onToggleCheckedEmail,
 }: MailListKeyboardOptions) {
   const navigate = useNavigate();
   const emailIds = React.useMemo(
@@ -52,5 +54,6 @@ export function useMailListKeyboard({
     searchInputRef,
     onOpenItemAt: openEmailAt,
     onDeleteSelectedItem: onDeleteEmail,
+    onToggleCheckedItem: onToggleCheckedEmail,
   });
 }

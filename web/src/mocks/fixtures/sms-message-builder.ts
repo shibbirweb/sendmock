@@ -59,6 +59,7 @@ export function buildNewSmsMessage(
     extracted: extractFixtureData(smsSpec.body),
     opened_at: null,
     open_count: 0,
+    is_read: smsSpec.direction === "outbound",
     reply_webhook: null,
     in_reply_to_sms_id: null,
     created_at: createdAt,

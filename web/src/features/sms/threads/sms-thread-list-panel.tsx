@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 
+import { ListActionToolbar } from "@/components/common/list-action-toolbar";
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useListKeyboardShortcuts } from "@/features/shortcuts/use-list-keyboard-shortcuts";
@@ -11,6 +12,11 @@ import {
 import { SmsThreadEmptyState } from "@/features/sms/threads/sms-thread-empty-state";
 import { SmsThreadFilterBar } from "@/features/sms/threads/sms-thread-filter-bar";
 import { SmsThreadListItem } from "@/features/sms/threads/sms-thread-list-item";
+import { useMarkThreadReadOnOpen } from "@/features/sms/threads/use-mark-thread-read-on-open";
+import {
+  conversationNoun,
+  useSmsThreadActions,
+} from "@/features/sms/threads/use-sms-thread-actions";
 import { useSmsThreads } from "@/lib/api/hooks/use-sms-queries";
 
 const noThreadFilters: SmsThreadFilters = { searchText: "", channel: null };
@@ -50,15 +56,28 @@ export function SmsThreadListPanel({
     [visibleThreadIds, navigate],
   );
 
+  const hasActiveFilter =
+    threadFilters.searchText.trim() !== "" || threadFilters.channel !== null;
+  const threadActions = useSmsThreadActions({
+    visibleThreads,
+    selectedThreadId,
+    selectionResetKey: `${threadFilters.searchText}|${threadFilters.channel ?? ""}`,
+    isFiltered: hasActiveFilter,
+  });
+  const { checkedThreads } = threadActions;
+  useMarkThreadReadOnOpen(
+    visibleThreads.find(
+      (smsThread) => smsThread.thread_id === selectedThreadId,
+    ),
+  );
+
   useListKeyboardShortcuts({
     itemIds: visibleThreadIds,
     selectedItemId: selectedThreadId,
     searchInputRef,
     onOpenItemAt: openThreadAt,
+    onToggleCheckedItem: checkedThreads.toggleItemChecked,
   });
-
-  const hasActiveFilter =
-    threadFilters.searchText.trim() !== "" || threadFilters.channel !== null;
 
   return (
     <>
@@ -66,6 +85,23 @@ export function SmsThreadListPanel({
         threadFilters={threadFilters}
         onThreadFiltersChange={setThreadFilters}
         searchInputRef={searchInputRef}
+      />
+      <ListActionToolbar
+        itemNoun={conversationNoun}
+        loadedItemCount={visibleThreads.length}
+        totalItemCount={visibleThreads.length}
+        checkedItemCount={checkedThreads.checkedItemCount}
+        onToggleAllChecked={checkedThreads.setAllItemsChecked}
+        onMarkCheckedRead={() => {
+          threadActions.markCheckedThreads(true);
+        }}
+        onMarkCheckedUnread={() => {
+          threadActions.markCheckedThreads(false);
+        }}
+        onDeleteChecked={threadActions.deleteCheckedThreads}
+        isFiltered={hasActiveFilter}
+        projectKey={threadActions.projectKey}
+        onDeleteAll={threadActions.deleteAllThreads}
       />
       {threadsQuery.isPending ? (
         <div className="grid gap-3 p-3">
@@ -93,6 +129,11 @@ export function SmsThreadListPanel({
               key={smsThread.thread_id}
               smsThread={smsThread}
               isSelected={smsThread.thread_id === selectedThreadId}
+              isChecked={checkedThreads.isItemChecked(smsThread.thread_id)}
+              isAnyChecked={checkedThreads.checkedItemCount > 0}
+              onCheckedChange={(isChecked) => {
+                checkedThreads.setItemChecked(smsThread.thread_id, isChecked);
+              }}
             />
           ))}
         </ul>

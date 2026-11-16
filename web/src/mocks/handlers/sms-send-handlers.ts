@@ -17,6 +17,7 @@ import { sendRepliesFromTwiml } from "@/mocks/sms-replies/send-twiml-replies";
 import { readRequestProject } from "@/mocks/handlers/request-project";
 import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 const whatsappPrefix = "whatsapp:";
 
@@ -135,14 +136,14 @@ export const smsSendHandlers = [
       linkedMessage: {
         kind: "sms",
         id: outboundMessage.id,
-        sms_thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
+        sms_thread_id: readSmsThreadId(outboundMessage),
       },
     });
     mockDatabase.smsMessages.unshift(outboundMessage);
     publishMockEvent("sms.sent", {
       id: outboundMessage.id,
       to_number: outboundMessage.to_number,
-      thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
+      thread_id: readSmsThreadId(outboundMessage),
       body: outboundMessage.body,
     });
     simulateSmsDelivery(outboundMessage, outcomePlan);
@@ -187,7 +188,7 @@ export const smsSendHandlers = [
         id: inboundMessage.id,
         from_number: inboundMessage.from_number,
         body: inboundMessage.body,
-        thread_id: `${inboundMessage.to_number}|${inboundMessage.from_number}`,
+        thread_id: readSmsThreadId(inboundMessage),
       });
     });
     sendRepliesFromTwiml(runReplyWebhook(mockDatabase, inboundMessage));

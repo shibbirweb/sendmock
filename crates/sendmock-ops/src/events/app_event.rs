@@ -50,6 +50,8 @@ pub enum AppEventType {
     SubscriptionCanceled,
     /// Retention deleted traffic; drives the live lists and counts only.
     TrafficPruned,
+    /// A delete all removed traffic; drives the live lists and counts only.
+    TrafficCleared,
 }
 
 impl AppEventType {
@@ -96,6 +98,7 @@ impl AppEventType {
             Self::SubscriptionPaymentFailed => "subscription.payment_failed",
             Self::SubscriptionCanceled => "subscription.canceled",
             Self::TrafficPruned => "traffic.pruned",
+            Self::TrafficCleared => "traffic.cleared",
         }
     }
 }

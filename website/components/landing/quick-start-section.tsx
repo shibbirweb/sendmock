@@ -23,7 +23,7 @@ import { useArrowKeyTabs } from "./use-arrow-key-tabs";
 const stackedInGridCellClassName = "[grid-area:1/1]";
 
 /**
- * Shows the intended first run; commands go live with the first beta. The AI
+ * Shows the first run on each platform. The AI
  * tab after the platforms holds the Install with AI prompt (WS-09.4), read from
  * the docs on the server; a docs version without it has no AI tab.
  */

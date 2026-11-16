@@ -9,8 +9,12 @@
       "button: All",
       "button: SMS",
       "button: WhatsApp",
+      "checkbox: Select all loaded conversations",
+      "button: Delete all conversations",
+      "each item, checkbox: Select conversation with +#",
       "each item, link: +# …",
       "each item, img: Delivered",
+      "each item, img: Unread",
       "each item, img: …",
       "paragraph: Select a conversation to read it. Use J and K to move through the list."
     ],

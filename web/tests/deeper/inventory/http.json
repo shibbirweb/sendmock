@@ -14,6 +14,10 @@
       "button: analytics # Last # minutes ago",
       "button: uploads # Last # minutes ago",
       "heading: All requests",
+      "checkbox: Select all loaded requests",
+      "button: Delete all requests",
+      "each item, checkbox: Select POST request to …",
+      "each item, img: Unread",
       "each item, button: POST … # minutes ago #",
       "paragraph: Pick a request to see what your app sent and what SendMock answered."
     ],
@@ -22,8 +26,8 @@
       "tab: Requests",
       "tab: Responses",
       "button: Copy catch URL",
-      "button: Clear requests",
       "button: Delete bin",
+      "each item, checkbox: Select POST request to /",
       "each item, button: POST / # minutes ago #"
     ],
     "A request is open": [

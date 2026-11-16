@@ -185,6 +185,17 @@ pub struct PaymentListQuery {
     pub limit: Option<u32>,
 }
 
+/// `DELETE /api/v1/payments`: the list's filters without paging.
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct PaymentFilterQuery {
+    /// One status, or several separated by commas, e.g. `succeeded,refunded`.
+    pub status: Option<String>,
+    /// A gateway's key.
+    pub provider: Option<String>,
+    /// An ISO currency code, e.g. `BDT`.
+    pub currency: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct PaymentReference {
     /// The payment's ID, from `GET /api/v1/payments`.

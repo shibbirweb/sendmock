@@ -79,6 +79,11 @@ export type SmsMessage = {
   extracted: ExtractedData;
   opened_at: IsoTimestamp | null;
   open_count: number;
+  /**
+   * Whether someone looked at it in SendMock: inbound messages arrive unread, messages your
+   * app sent arrive read, and marking a conversation unread marks its newest message unread.
+   */
+  is_read: boolean;
   /** Inbound only: what the number's reply webhook answered; null when it has none. */
   reply_webhook: SmsReplyWebhookResult | null;
   /** A TwiML reply: the inbound message it answers. */
@@ -157,6 +162,15 @@ export type SmsMessageDetail = SmsMessage & {
   callback_attempts: SmsCallbackAttempt[];
   /** Inbound only, oldest first; every Resend adds attempts. */
   reply_webhook_attempts: SmsReplyWebhookAttempt[];
+};
+
+/** Body of PATCH /api/v1/sms/threads/{threadId}. */
+export type SmsThreadUpdate = {
+  /**
+   * True marks every message in the conversation read; false marks its newest message unread.
+   * @example false
+   */
+  is_read: boolean;
 };
 
 /** A conversation between two numbers. */

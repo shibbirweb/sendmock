@@ -16,6 +16,7 @@ export function ConfirmActionDialog({
   consequence,
   confirmLabel,
   cancelLabel = "Cancel",
+  isDestructive = false,
   onConfirm,
   onClose,
 }: {
@@ -25,6 +26,8 @@ export function ConfirmActionDialog({
   consequence: string;
   confirmLabel: string;
   cancelLabel?: string;
+  /** Styles the confirm button as a delete. */
+  isDestructive?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -44,7 +47,10 @@ export function ConfirmActionDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogAction
+            variant={isDestructive ? "destructive" : "default"}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

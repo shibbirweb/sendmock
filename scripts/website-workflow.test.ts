@@ -16,7 +16,7 @@ type WorkflowJob = {
 };
 type WebsiteWorkflow = {
   on: {
-    push: { branches: string[] };
+    push: { branches: string[]; paths: string[] };
     pull_request: { paths: string[] };
     release: { types: string[] };
     workflow_run: { workflows: string[]; types: string[] };
@@ -43,10 +43,6 @@ describe("Website workflow", () => {
     expect(websiteWorkflow.on.release.types).toEqual(["published"]);
     expect(websiteWorkflow.on).toHaveProperty("workflow_dispatch");
 
-    const pullRequestBuild = findBuildStep(
-      "Build website with the demo at /demo/",
-    );
-    expect(pullRequestBuild?.if).toBe("github.event_name == 'pull_request'");
     for (const testStepName of [
       "Unit tests (snippets, docs versions)",
       "Landing, docs and API playground tests (WS-02, WS-03.3, WS-04)",
@@ -54,10 +50,9 @@ describe("Website workflow", () => {
       expect(findBuildStep(testStepName)?.if).toBeUndefined();
     }
 
-    const versionsBuild = findBuildStep(
-      "Build every docs version, each with its demo",
-    );
-    expect(versionsBuild?.if).toBe("github.event_name != 'pull_request'");
+    expect(
+      findBuildStep("Build every docs version, each with its demo")?.if,
+    ).toBeUndefined();
     expect(findBuildStep("Upload")?.uses).toStartWith(
       "actions/upload-pages-artifact@",
     );
@@ -68,7 +63,9 @@ describe("Website workflow", () => {
 
   test("WS-01.1 only the deploy job may publish to GitHub Pages, after the build", () => {
     const deployJob = websiteWorkflow.jobs.deploy;
-    expect(deployJob?.if).toBe("github.event_name != 'pull_request'");
+    expect(deployJob?.if).toBe(
+      "${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' }}",
+    );
     expect(deployJob?.needs).toBe("build");
     expect(deployJob?.permissions).toEqual({
       pages: "write",
@@ -98,7 +95,9 @@ describe("Website workflow", () => {
     );
     const decisionScript =
       releaseCheck?.steps.find((step) => step.run !== undefined)?.run ?? "";
-    expect(decisionScript).toContain("scripts/release/registry-publish-plan.ts");
+    expect(decisionScript).toContain(
+      "scripts/release/registry-publish-plan.ts",
+    );
 
     const packageRepository = websiteWorkflow.jobs["package-repository"];
     expect(packageRepository?.needs).toBe("release-check");
@@ -106,5 +105,36 @@ describe("Website workflow", () => {
       "${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}",
     );
     expect(websiteWorkflow.jobs.build?.needs).toBe("package-repository");
+  });
+
+  test("WS-03.1 every build, pull requests included, tests the versioned site before it is uploaded", () => {
+    const stepNames = buildSteps.map((step) => step.name);
+    const versionedTests = findBuildStep(
+      "Versioned site tests (WS-03.1, WS-03.7)",
+    );
+    expect(versionedTests?.if).toBeUndefined();
+    expect(versionedTests?.run).toBe("bun run test:versioned");
+    expect(
+      stepNames.indexOf("Versioned site tests (WS-03.1, WS-03.7)"),
+    ).toBeGreaterThan(
+      stepNames.indexOf("Build every docs version, each with its demo"),
+    );
+    expect(stepNames.indexOf("Upload")).toBeGreaterThan(
+      stepNames.indexOf("Versioned site tests (WS-03.1, WS-03.7)"),
+    );
+  });
+
+  test("a skipped release check does not skip the build and deploy on pull requests and pushes", () => {
+    expect(websiteWorkflow.jobs.build?.if).toBe(
+      "${{ !cancelled() && needs.package-repository.result == 'success' }}",
+    );
+    expect(websiteWorkflow.jobs.deploy?.if).toContain(
+      "needs.build.result == 'success'",
+    );
+  });
+
+  test("a changelog change builds and tests the site, so a release pull request runs the changelog test", () => {
+    expect(websiteWorkflow.on.pull_request.paths).toContain("CHANGELOG.md");
+    expect(websiteWorkflow.on.push.paths).toContain("CHANGELOG.md");
   });
 });

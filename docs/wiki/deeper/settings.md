@@ -162,21 +162,28 @@ Text.
 
 - **What it does:** Warns that these cannot be undone.
 
-### 25. Delete all emails
+### 25. Delete all traffic
+
+Button.
+
+- **What it does:** Asks first, then deletes every email, SMS, verification, push notification, captured HTTP request, finished webhook delivery, payment, subscription and log entry, in every project; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/traffic`](/api/system/#deleteTraffic), CLI [`sendmock traffic delete-all`](/cli/system/#traffic-delete-all), MCP [`sendmock_traffic_delete_all`](/mcp/system/#sendmock_traffic_delete_all)
+
+### 26. Delete all emails
 
 Button.
 
 - **What it does:** Asks first, then deletes every email.
 - **Same action elsewhere:** REST [`DELETE /api/v1/emails`](/api/email/#deleteEmails), CLI [`sendmock email delete-all`](/cli/email/#email-delete-all), MCP [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all)
 
-### 26. Delete all SMS
+### 27. Delete all SMS
 
 Button.
 
 - **What it does:** Asks first, then deletes every SMS.
 - **Same action elsewhere:** REST [`DELETE /api/v1/sms`](/api/sms/#deleteSms), CLI [`sendmock sms delete-all`](/cli/sms/#sms-delete-all), MCP [`sendmock_sms_delete_all`](/mcp/sms/#sendmock_sms_delete_all)
 
-### 27. Reset to seed
+### 28. Reset to seed
 
 Button.
 
@@ -185,71 +192,71 @@ Button.
 
 ## Seed section
 
-### 28. Seed file
+### 29. Seed file
 
 Heading.
 
 - **What it does:** The seed file SendMock starts from and resets to.
 - **Same action elsewhere:** REST [`GET /api/v1/seed/status`](/api/seed/#getSeedStatus), CLI [`sendmock seed status`](/cli/seed/#seed-status), MCP [`sendmock_seed_status`](/mcp/seed/#sendmock_seed_status)
 
-### 29. The configuration SendMock starts from and resets to, kept in your repository.
+### 30. The configuration SendMock starts from and resets to, kept in your repository.
 
 Text.
 
 - **What it does:** Explains the seed file.
 - **Links to:** [Advanced: seed file](../advanced/seed-file.md).
 
-### 30. ./sendmock.seed.toml applied Month #, #, #:#
+### 31. ./sendmock.seed.toml applied Month #, #, #:#
 
 Text.
 
 - **What it does:** Which seed file was applied, and when.
 
-### 31. # items are not in the seed file yet. Export to keep them after a reset.
+### 32. # items are not in the seed file yet. Export to keep them after a reset.
 
 Text.
 
 - **What it does:** How much configuration a reset would lose.
 
-### 32. Export sendmock.seed.toml
+### 33. Export sendmock.seed.toml
 
 Button.
 
 - **What it does:** Downloads the current configuration as a seed file; secrets are written as `${ENV}` references.
 - **Same action elsewhere:** REST [`GET /api/v1/seed/export`](/api/seed/#getSeedExport), CLI [`sendmock seed export`](/cli/seed/#seed-export), MCP [`sendmock_seed_export`](/mcp/seed/#sendmock_seed_export)
 
-### 33. Apply a seed file
+### 34. Apply a seed file
 
 Heading.
 
 - **What it does:** Loads a seed file into the running SendMock.
 
-### 34. Validate first; applying upserts every item in the file by name or SID.
+### 35. Validate first; applying upserts every item in the file by name or SID.
 
 Text.
 
 - **What it does:** Explains applying.
 
-### 35. Upload file
+### 36. Upload file
 
 Button.
 
 - **What it does:** Reads a seed file from your computer.
 
-### 36. Seed file (TOML)
+### 37. Seed file (TOML)
 
 Field.
 
 - **What it does:** The seed file's text.
 
-### 37. Validate
+### 38. Validate
 
 Button.
 
 - **What it does:** Checks the file without applying it and lists errors with their line.
 - **Same action elsewhere:** REST [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate), CLI [`sendmock seed validate`](/cli/seed/#seed-validate), MCP [`sendmock_seed_validate`](/mcp/seed/#sendmock_seed_validate)
 
-### 38. Apply
+### 39. Apply
 
 Button.
 
@@ -258,94 +265,94 @@ Button.
 
 ## Projects section
 
-### 39. Projects
+### 40. Projects
 
 Heading.
 
 - **What it does:** The projects that keep traffic apart.
 - **Same action elsewhere:** REST [`GET /api/v1/projects`](/api/projects/#getProjects), CLI [`sendmock projects list`](/cli/projects/#projects-list), MCP [`sendmock_project_list`](/mcp/projects/#sendmock_project_list)
 
-### 40. Keep apps' or developers' mail, SMS and codes apart in one SendMock. Settings, providers and webhooks are shared.
+### 41. Keep apps' or developers' mail, SMS and codes apart in one SendMock. Settings, providers and webhooks are shared.
 
 Text.
 
 - **What it does:** Explains what a project holds and what every project shares.
 
-### 41. Name
+### 42. Name
 
 Column.
 
 - **What it does:** The project's name, shown in the top bar picker.
 
-### 42. Key
+### 43. Key
 
 Column.
 
 - **What it does:** What apps send to pick the project; it never changes.
 
-### 43. Emails
+### 44. Emails
 
 Column.
 
 - **What it does:** How many emails the project holds.
 
-### 44. SMS
+### 45. SMS
 
 Column.
 
 - **What it does:** How many SMS the project holds.
 
-### 45. Codes
+### 46. Codes
 
 Column.
 
 - **What it does:** How many verifications the project holds.
 
-### 46. Actions
+### 47. Actions
 
 Column.
 
 - **What it does:** Rename and Delete.
 
-### 47. Rename Default
+### 48. Rename Default
 
 Button.
 
 - **What it does:** Renames a project; its key stays the same, so apps keep sending to it.
 - **Same action elsewhere:** REST [`PATCH /api/v1/projects/{projectKey}`](/api/projects/#patchProjectsByProjectKey), CLI [`sendmock projects update`](/cli/projects/#projects-update), MCP [`sendmock_project_update`](/mcp/projects/#sendmock_project_update)
 
-### 48. New project
+### 49. New project
 
 Button.
 
 - **What it does:** Asks for a key and a name, then adds the project. The key is what apps send.
 - **Same action elsewhere:** REST [`POST /api/v1/projects`](/api/projects/#postProjects), CLI [`sendmock projects create`](/cli/projects/#projects-create), MCP [`sendmock_project_create`](/mcp/projects/#sendmock_project_create)
 
-### 49. Send to shop
+### 50. Send to shop
 
 Heading.
 
 - **What it does:** How an app sends to a project, shown for the first project after Default (or `shop` until one exists).
 
-### 50. Traffic that names no project goes to Default. A project you have not created is refused, so a typo shows at once.
+### 51. Traffic that names no project goes to Default. A project you have not created is refused, so a typo shows at once.
 
 Text.
 
 - **What it does:** Explains where traffic without a project goes, and that unknown projects are refused.
 
-### 51. Copy the SMTP username
+### 52. Copy the SMTP username
 
 Button.
 
 - **What it does:** Copies the SMTP username that sends mail to the project.
 
-### 52. Copy the header
+### 53. Copy the header
 
 Button.
 
 - **What it does:** Copies the `X-SendMock-Project` header for the REST and provider APIs.
 
-### 53. Copy the base URL
+### 54. Copy the base URL
 
 Button.
 
@@ -353,214 +360,214 @@ Button.
 
 ## Email section
 
-### 54. Receiving and delivery outcomes
+### 55. Receiving and delivery outcomes
 
 Heading.
 
 - **What it does:** How arriving mail is tagged and what happens to it next.
 
-### 55. user+invoice@app.test gets the tag invoice.
+### 56. user+invoice@app.test gets the tag invoice.
 
 Text.
 
 - **What it does:** An example of plus-address tagging.
 
-### 56. Tag by plus address
+### 57. Tag by plus address
 
 Switch.
 
 - **What it does:** Tags an email with the part after `+` in its recipient.
 
-### 57. Off: the SES simulator and SendMock addresses below behave like any other address.
+### 58. Off: the SES simulator and SendMock addresses below behave like any other address.
 
 Text.
 
 - **What it does:** Explains Magic addresses.
 
-### 58. Magic addresses
+### 59. Magic addresses
 
 Switch.
 
 - **What it does:** Whether the magic addresses decide an outcome.
 - **Links to:** [Magic numbers and addresses](../reference/magic-numbers.md).
 
-### 59. Off No delivery events unless you simulate one or use a magic address.
+### 60. Off No delivery events unless you simulate one or use a magic address.
 
 Choice.
 
 - **What it does:** No delivery outcome by itself.
 
-### 60. Auto-delivered Every email gets email.delivered after a short delay.
+### 61. Auto-delivered Every email gets email.delivered after a short delay.
 
 Choice.
 
 - **What it does:** Every email is delivered after a short delay.
 
-### 61. Realistic A delay, plus the bounce and complaint rates below.
+### 62. Realistic A delay, plus the bounce and complaint rates below.
 
 Choice.
 
 - **What it does:** Delivered after a delay, with some bounces and complaints at the rates you set.
 
-### 62. Remove inbound.app.test
+### 63. Remove inbound.app.test
 
 Button.
 
 - **What it does:** Removes an inbound domain (here the demo's).
 
-### 63. Remove reply.app.test
+### 64. Remove reply.app.test
 
 Button.
 
 - **What it does:** Removes an inbound domain (here the demo's reply domain).
 
-### 64. Inbound domains
+### 65. Inbound domains
 
 Field.
 
 - **What it does:** A domain whose mail counts as incoming.
 
-### 65. Add
+### 66. Add
 
 Button.
 
 - **What it does:** Adds the inbound domain.
 
-### 66. Mail for these domains is incoming (replies, support inboxes) and fires email.inbound.
+### 67. Mail for these domains is incoming (replies, support inboxes) and fires email.inbound.
 
 Text.
 
 - **What it does:** Explains inbound domains.
 - **Links to:** [Inbound routes](../webhooks/inbound-routes.md).
 
-### 67. SpamAssassin address
+### 68. SpamAssassin address
 
 Field.
 
 - **What it does:** The `host:port` of a running `spamd` for the spam check.
 
-### 68. host:port of a running spamd. Leave empty to turn the spam check off.
+### 69. host:port of a running spamd. Leave empty to turn the spam check off.
 
 Text.
 
 - **What it does:** Explains the SpamAssassin address.
 
-### 69. Release to real SMTP
+### 70. Release to real SMTP
 
 Heading.
 
 - **What it does:** The relay that Release and auto-forward send through.
 - **Links to:** [Release](../mail/release.md).
 
-### 70. Release and auto-forward send through this relay, and only to allowed recipients.
+### 71. Release and auto-forward send through this relay, and only to allowed recipients.
 
 Text.
 
 - **What it does:** Explains the relay.
 
-### 71. Relay SMTP URL
+### 72. Relay SMTP URL
 
 Field.
 
 - **What it does:** The relay, such as `smtp://user:password@smtp.example.com:587`.
 
-### 72. The password is stored and shown masked.
+### 73. The password is stored and shown masked.
 
 Text.
 
 - **What it does:** Explains the masking.
 
-### 73. Allowed recipients
+### 74. Allowed recipients
 
 Field.
 
 - **What it does:** Globs of addresses Release may send to, such as `*@yourcompany.com`.
 
-### 74. Release stays off until at least one pattern is added.
+### 75. Release stays off until at least one pattern is added.
 
 Text.
 
 - **What it does:** Explains the safety rule.
 
-### 75. Tag rules
+### 76. Tag rules
 
 Heading.
 
 - **What it does:** Rules that tag arriving emails.
 - **Same action elsewhere:** REST [`GET /api/v1/tag-rules`](/api/tag-rules/#getTagRules), CLI [`sendmock email tag-rules list`](/cli/tag-rules/#email-tag-rules-list), MCP [`sendmock_tag_rule_list`](/mcp/tag-rules/#sendmock_tag_rule_list)
 
-### 76. Add a tag to arriving emails that match a filter, in this order. Tags show in the list and the tag: search.
+### 77. Add a tag to arriving emails that match a filter, in this order. Tags show in the list and the tag: search.
 
 Text.
 
 - **What it does:** Explains tag rules.
 
-### 77. Rule
+### 78. Rule
 
 Column.
 
 - **What it does:** The rule's name.
 
-### 78. When
+### 79. When
 
 Column.
 
 - **What it does:** Its filter, in words.
 
-### 79. Tag
+### 80. Tag
 
 Column.
 
 - **What it does:** The tag it adds.
 
-### 80. Enabled
+### 81. Enabled
 
 Column.
 
 - **What it does:** Whether it runs.
 
-### 81. Actions
+### 82. Actions
 
 Column.
 
 - **What it does:** Move, Edit and Delete.
 
-### 82. Billing mail enabled
+### 83. Billing mail enabled
 
 Switch.
 
 - **What it does:** Turns the tag rule on or off (here the demo's "Billing mail").
 - **Same action elsewhere:** REST [`PATCH /api/v1/tag-rules/{ruleId}`](/api/tag-rules/#patchTagRulesByRuleId), CLI [`sendmock email tag-rules update`](/cli/tag-rules/#email-tag-rules-update), MCP [`sendmock_tag_rule_update`](/mcp/tag-rules/#sendmock_tag_rule_update)
 
-### 83. Move Billing mail up
+### 84. Move Billing mail up
 
 Button.
 
 - **What it does:** Runs the rule earlier.
 - **Same action elsewhere:** REST [`POST /api/v1/tag-rules/{ruleId}/move`](/api/tag-rules/#postTagRulesByRuleIdMove), CLI [`sendmock email tag-rules move`](/cli/tag-rules/#email-tag-rules-move), MCP [`sendmock_tag_rule_move`](/mcp/tag-rules/#sendmock_tag_rule_move)
 
-### 84. Move Billing mail down
+### 85. Move Billing mail down
 
 Button.
 
 - **What it does:** Runs the rule later.
 - **Same action elsewhere:** REST [`POST /api/v1/tag-rules/{ruleId}/move`](/api/tag-rules/#postTagRulesByRuleIdMove), CLI [`sendmock email tag-rules move`](/cli/tag-rules/#email-tag-rules-move), MCP [`sendmock_tag_rule_move`](/mcp/tag-rules/#sendmock_tag_rule_move)
 
-### 85. Edit Billing mail
+### 86. Edit Billing mail
 
 Button.
 
 - **What it does:** Opens the rule's editor: its name, its filter and what it does.
 - **Same action elsewhere:** REST [`PATCH /api/v1/tag-rules/{ruleId}`](/api/tag-rules/#patchTagRulesByRuleId), CLI [`sendmock email tag-rules update`](/cli/tag-rules/#email-tag-rules-update), MCP [`sendmock_tag_rule_update`](/mcp/tag-rules/#sendmock_tag_rule_update)
 
-### 86. Delete Billing mail
+### 87. Delete Billing mail
 
 Button.
 
 - **What it does:** Deletes the rule after you confirm.
 - **Same action elsewhere:** REST [`DELETE /api/v1/tag-rules/{ruleId}`](/api/tag-rules/#deleteTagRulesByRuleId), CLI [`sendmock email tag-rules delete`](/cli/tag-rules/#email-tag-rules-delete), MCP [`sendmock_tag_rule_delete`](/mcp/tag-rules/#sendmock_tag_rule_delete)
 
-### 87. Add rule
+### 88. Add rule
 
 Button.
 
@@ -568,208 +575,208 @@ Button.
 - **Same action elsewhere:** REST [`POST /api/v1/tag-rules`](/api/tag-rules/#postTagRules), CLI [`sendmock email tag-rules create`](/cli/tag-rules/#email-tag-rules-create), MCP [`sendmock_tag_rule_create`](/mcp/tag-rules/#sendmock_tag_rule_create)
 - **Same action elsewhere:** REST [`POST /api/v1/forward-rules`](/api/forward-rules/#postForwardRules), CLI [`sendmock email forward-rules create`](/cli/forward-rules/#email-forward-rules-create), MCP [`sendmock_forward_rule_create`](/mcp/forward-rules/#sendmock_forward_rule_create)
 
-### 88. Auto-forward rules
+### 89. Auto-forward rules
 
 Heading.
 
 - **What it does:** Rules that send a real copy of arriving emails.
 - **Same action elsewhere:** REST [`GET /api/v1/forward-rules`](/api/forward-rules/#getForwardRules), CLI [`sendmock email forward-rules list`](/cli/forward-rules/#email-forward-rules-list), MCP [`sendmock_forward_rule_list`](/mcp/forward-rules/#sendmock_forward_rule_list)
 
-### 89. Release a real copy of arriving emails that match a filter, through the relay above and only to allowed recipients.
+### 90. Release a real copy of arriving emails that match a filter, through the relay above and only to allowed recipients.
 
 Text.
 
 - **What it does:** Explains auto-forward.
 
-### 90. Forward to
+### 91. Forward to
 
 Column.
 
 - **What it does:** Where the copy goes.
 
-### 91. QA inbox to the team enabled
+### 92. QA inbox to the team enabled
 
 Switch.
 
 - **What it does:** Turns the forward rule on or off (here the demo's "QA inbox to the team").
 - **Same action elsewhere:** REST [`PATCH /api/v1/forward-rules/{ruleId}`](/api/forward-rules/#patchForwardRulesByRuleId), CLI [`sendmock email forward-rules update`](/cli/forward-rules/#email-forward-rules-update), MCP [`sendmock_forward_rule_update`](/mcp/forward-rules/#sendmock_forward_rule_update)
 
-### 92. Move QA inbox to the team up
+### 93. Move QA inbox to the team up
 
 Button.
 
 - **What it does:** Runs the rule earlier.
 - **Same action elsewhere:** REST [`POST /api/v1/forward-rules/{ruleId}/move`](/api/forward-rules/#postForwardRulesByRuleIdMove), CLI [`sendmock email forward-rules move`](/cli/forward-rules/#email-forward-rules-move), MCP [`sendmock_forward_rule_move`](/mcp/forward-rules/#sendmock_forward_rule_move)
 
-### 93. Move QA inbox to the team down
+### 94. Move QA inbox to the team down
 
 Button.
 
 - **What it does:** Runs the rule later.
 - **Same action elsewhere:** REST [`POST /api/v1/forward-rules/{ruleId}/move`](/api/forward-rules/#postForwardRulesByRuleIdMove), CLI [`sendmock email forward-rules move`](/cli/forward-rules/#email-forward-rules-move), MCP [`sendmock_forward_rule_move`](/mcp/forward-rules/#sendmock_forward_rule_move)
 
-### 94. Edit QA inbox to the team
+### 95. Edit QA inbox to the team
 
 Button.
 
 - **What it does:** Opens the rule's editor: its name, its filter and what it does.
 - **Same action elsewhere:** REST [`PATCH /api/v1/forward-rules/{ruleId}`](/api/forward-rules/#patchForwardRulesByRuleId), CLI [`sendmock email forward-rules update`](/cli/forward-rules/#email-forward-rules-update), MCP [`sendmock_forward_rule_update`](/mcp/forward-rules/#sendmock_forward_rule_update)
 
-### 95. Delete QA inbox to the team
+### 96. Delete QA inbox to the team
 
 Button.
 
 - **What it does:** Deletes the rule after you confirm.
 - **Same action elsewhere:** REST [`DELETE /api/v1/forward-rules/{ruleId}`](/api/forward-rules/#deleteForwardRulesByRuleId), CLI [`sendmock email forward-rules delete`](/cli/forward-rules/#email-forward-rules-delete), MCP [`sendmock_forward_rule_delete`](/mcp/forward-rules/#sendmock_forward_rule_delete)
 
-### 96. Custom outcome addresses
+### 97. Custom outcome addresses
 
 Heading.
 
 - **What it does:** Your own addresses with a fixed delivery outcome.
 - **Same action elsewhere:** REST [`GET /api/v1/outcome-rules/email`](/api/outcome-rules/#getOutcomeRulesEmail), CLI [`sendmock outcome-rule email list`](/cli/outcome-rules/#outcome-rule-email-list), MCP [`sendmock_outcome_rule_list`](/mcp/outcome-rules/#sendmock_outcome_rule_list)
 
-### 97. Your own test addresses. The first enabled match wins, before the magic addresses and the profile.
+### 98. Your own test addresses. The first enabled match wins, before the magic addresses and the profile.
 
 Text.
 
 - **What it does:** Explains the order outcomes are decided in.
 - **Links to:** [Advanced: email outcome addresses](../advanced/email-outcome-addresses.md).
 
-### 98. #
+### 99. #
 
 Column.
 
 - **What it does:** The rule's place.
 
-### 99. Address
+### 100. Address
 
 Column.
 
 - **What it does:** The address or pattern.
 
-### 100. Outcome
+### 101. Outcome
 
 Column.
 
 - **What it does:** What happens to mail for it.
 
-### 101. On
+### 102. On
 
 Column.
 
 - **What it does:** Whether it is on.
 
-### 102. Rule # enabled
+### 103. Rule # enabled
 
 Switch.
 
 - **What it does:** Turns the rule on or off.
 - **Same action elsewhere:** REST [`PATCH /api/v1/outcome-rules/email/{ruleId}`](/api/outcome-rules/#patchOutcomeRulesEmailByRuleId), CLI [`sendmock outcome-rule email update`](/cli/outcome-rules/#outcome-rule-email-update), MCP [`sendmock_outcome_rule_update`](/mcp/outcome-rules/#sendmock_outcome_rule_update)
 
-### 103. Move rule # up
+### 104. Move rule # up
 
 Button.
 
 - **What it does:** Checks the rule earlier.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/email/{ruleId}/move`](/api/outcome-rules/#postOutcomeRulesEmailByRuleIdMove), CLI [`sendmock outcome-rule email move`](/cli/outcome-rules/#outcome-rule-email-move), MCP [`sendmock_outcome_rule_move`](/mcp/outcome-rules/#sendmock_outcome_rule_move)
 
-### 104. Move rule # down
+### 105. Move rule # down
 
 Button.
 
 - **What it does:** Checks the rule later.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/email/{ruleId}/move`](/api/outcome-rules/#postOutcomeRulesEmailByRuleIdMove), CLI [`sendmock outcome-rule email move`](/cli/outcome-rules/#outcome-rule-email-move), MCP [`sendmock_outcome_rule_move`](/mcp/outcome-rules/#sendmock_outcome_rule_move)
 
-### 105. Edit rule #
+### 106. Edit rule #
 
 Button.
 
 - **What it does:** Opens the rule's editor.
 - **Same action elsewhere:** REST [`PATCH /api/v1/outcome-rules/email/{ruleId}`](/api/outcome-rules/#patchOutcomeRulesEmailByRuleId), CLI [`sendmock outcome-rule email update`](/cli/outcome-rules/#outcome-rule-email-update), MCP [`sendmock_outcome_rule_update`](/mcp/outcome-rules/#sendmock_outcome_rule_update)
 
-### 106. Delete rule #
+### 107. Delete rule #
 
 Button.
 
 - **What it does:** Deletes the rule after you confirm.
 - **Same action elsewhere:** REST [`DELETE /api/v1/outcome-rules/email/{ruleId}`](/api/outcome-rules/#deleteOutcomeRulesEmailByRuleId), CLI [`sendmock outcome-rule email delete`](/cli/outcome-rules/#outcome-rule-email-delete), MCP [`sendmock_outcome_rule_delete`](/mcp/outcome-rules/#sendmock_outcome_rule_delete)
 
-### 107. Add address
+### 108. Add address
 
 Button.
 
 - **What it does:** Adds an outcome address.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/email`](/api/outcome-rules/#postOutcomeRulesEmail), CLI [`sendmock outcome-rule email create`](/cli/outcome-rules/#outcome-rule-email-create), MCP [`sendmock_outcome_rule_create`](/mcp/outcome-rules/#sendmock_outcome_rule_create)
 
-### 108. Test an address
+### 109. Test an address
 
 Field.
 
 - **What it does:** Shows which rule, magic address or profile decides an address's outcome.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/email/test`](/api/outcome-rules/#postOutcomeRulesEmailTest), CLI [`sendmock outcome-rule email test`](/cli/outcome-rules/#outcome-rule-email-test), MCP [`sendmock_outcome_rule_test`](/mcp/outcome-rules/#sendmock_outcome_rule_test)
 
-### 109. Magic address: Hard bounce (# #.#.#)
+### 110. Magic address: Hard bounce (# #.#.#)
 
 Text.
 
 - **What it does:** The answer for the address tested (here a magic address that bounces).
 
-### 110. Magic addresses
+### 111. Magic addresses
 
 Heading.
 
 - **What it does:** The built-in test addresses.
 
-### 111. Send to these to get a delivery outcome without touching any setting. Built in and read-only.
+### 112. Send to these to get a delivery outcome without touching any setting. Built in and read-only.
 
 Text.
 
 - **What it does:** Explains magic addresses.
 
-### 112. Recipients
+### 113. Recipients
 
 Heading.
 
 - **What it does:** The magic addresses and what each does.
 
-### 113. Recipient
+### 114. Recipient
 
 Column.
 
 - **What it does:** The address.
 
-### 114. Code
+### 115. Code
 
 Column.
 
 - **What it does:** The SMTP code or outcome it gives.
 
-### 115. Copy success@simulator.amazonses.com
+### 116. Copy success@simulator.amazonses.com
 
 Button.
 
 - **What it does:** Copies the Amazon SES simulator address `success@simulator.amazonses.com`.
 
-### 116. Copy bounce@simulator.amazonses.com
+### 117. Copy bounce@simulator.amazonses.com
 
 Button.
 
 - **What it does:** Copies the Amazon SES simulator address `bounce@simulator.amazonses.com`.
 
-### 117. Copy complaint@simulator.amazonses.com
+### 118. Copy complaint@simulator.amazonses.com
 
 Button.
 
 - **What it does:** Copies the Amazon SES simulator address `complaint@simulator.amazonses.com`.
 
-### 118. Copy ooto@simulator.amazonses.com
+### 119. Copy ooto@simulator.amazonses.com
 
 Button.
 
 - **What it does:** Copies the Amazon SES simulator address `ooto@simulator.amazonses.com`.
 
-### 119. Copy suppressionlist@simulator.amazonses.com
+### 120. Copy suppressionlist@simulator.amazonses.com
 
 Button.
 
@@ -777,257 +784,257 @@ Button.
 
 ## SMS section
 
-### 120. Delivery simulation
+### 121. Delivery simulation
 
 Heading.
 
 - **What it does:** How sent SMS move on from `queued`.
 
-### 121. Instant Delivered as soon as it is sent.
+### 122. Instant Delivered as soon as it is sent.
 
 Choice.
 
 - **What it does:** Delivered at once.
 
-### 122. Realistic Queued, sent after about # ms, delivered after # to # s.
+### 123. Realistic Queued, sent after about # ms, delivered after # to # s.
 
 Choice.
 
 - **What it does:** Queued, then sent, then delivered after a short delay, as a carrier would.
 
-### 123. Manual Stays sent until you set a status in the message drawer.
+### 124. Manual Stays sent until you set a status in the message drawer.
 
 Choice.
 
 - **What it does:** Stays sent until you choose its status by hand.
 
-### 124. Failure rate
+### 125. Failure rate
 
 Slider.
 
 - **What it does:** A share of sends that end undelivered or failed at random.
 
-### 125. This share of sends ends undelivered or failed at random.
+### 126. This share of sends ends undelivered or failed at random.
 
 Text.
 
 - **What it does:** Explains the failure rate.
 
-### 126. Reject From numbers that are not Twilio magic numbers with #, like real test credentials.
+### 127. Reject From numbers that are not Twilio magic numbers with #, like real test credentials.
 
 Text.
 
 - **What it does:** Explains Strict Twilio test mode.
 
-### 127. Strict Twilio test mode
+### 128. Strict Twilio test mode
 
 Switch.
 
 - **What it does:** Refuses any `From` that is not one of Twilio's test numbers, with 21606, as Twilio's test credentials do.
 
-### 128. Off: the Twilio test numbers and SendMock outcome numbers below behave like any other number.
+### 129. Off: the Twilio test numbers and SendMock outcome numbers below behave like any other number.
 
 Text.
 
 - **What it does:** Explains Magic numbers.
 
-### 129. Magic numbers
+### 130. Magic numbers
 
 Switch.
 
 - **What it does:** Whether the magic numbers decide an outcome.
 - **Links to:** [Magic numbers and addresses](../reference/magic-numbers.md).
 
-### 130. Verify defaults
+### 131. Verify defaults
 
 Heading.
 
 - **What it does:** What new Verify services start with.
 
-### 131. New Verify services start with this code length and lifetime. A fixed code here is sent by every service that has none of its own.
+### 132. New Verify services start with this code length and lifetime. A fixed code here is sent by every service that has none of its own.
 
 Text.
 
 - **What it does:** Explains the defaults.
 
-### 132. Code length
+### 133. Code length
 
 Number field.
 
 - **What it does:** The default code length, 4 to 10.
 
-### 133. Code lifetime
+### 134. Code lifetime
 
 Number field.
 
 - **What it does:** How long codes stay valid by default.
 
-### 134. Fixed code for every service
+### 135. Fixed code for every service
 
 Field.
 
 - **What it does:** A code every service without its own fixed code sends.
 
-### 135. Leave it empty for random codes.
+### 136. Leave it empty for random codes.
 
 Text.
 
 - **What it does:** Explains an empty fixed code.
 
-### 136. Custom outcome numbers
+### 137. Custom outcome numbers
 
 Heading.
 
 - **What it does:** Your own numbers with a fixed outcome.
 - **Same action elsewhere:** REST [`GET /api/v1/outcome-rules/sms`](/api/outcome-rules/#getOutcomeRulesSms), CLI [`sendmock outcome-rule sms list`](/cli/outcome-rules/#outcome-rule-sms-list), MCP [`sendmock_outcome_rule_list`](/mcp/outcome-rules/#sendmock_outcome_rule_list)
 
-### 137. Your own test numbers. The first enabled match wins, before the magic numbers and the profile.
+### 138. Your own test numbers. The first enabled match wins, before the magic numbers and the profile.
 
 Text.
 
 - **What it does:** Explains the order outcomes are decided in.
 - **Links to:** [Advanced: SMS outcome numbers](../advanced/sms-outcome-numbers.md).
 
-### 138. #
+### 139. #
 
 Column.
 
 - **What it does:** The rule's place.
 
-### 139. Number
+### 140. Number
 
 Column.
 
 - **What it does:** The number or pattern.
 
-### 140. Outcome
+### 141. Outcome
 
 Column.
 
 - **What it does:** What happens to mail for it.
 
-### 141. On
+### 142. On
 
 Column.
 
 - **What it does:** Whether it is on.
 
-### 142. Actions
+### 143. Actions
 
 Column.
 
 - **What it does:** Move, Edit and Delete.
 
-### 143. Rule # enabled
+### 144. Rule # enabled
 
 Switch, in each row.
 
 - **What it does:** Turns the rule on or off.
 - **Same action elsewhere:** REST [`PATCH /api/v1/outcome-rules/sms/{ruleId}`](/api/outcome-rules/#patchOutcomeRulesSmsByRuleId), CLI [`sendmock outcome-rule sms update`](/cli/outcome-rules/#outcome-rule-sms-update), MCP [`sendmock_outcome_rule_update`](/mcp/outcome-rules/#sendmock_outcome_rule_update)
 
-### 144. Move rule # up
+### 145. Move rule # up
 
 Button, in each row.
 
 - **What it does:** Checks the rule earlier.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/sms/{ruleId}/move`](/api/outcome-rules/#postOutcomeRulesSmsByRuleIdMove), CLI [`sendmock outcome-rule sms move`](/cli/outcome-rules/#outcome-rule-sms-move), MCP [`sendmock_outcome_rule_move`](/mcp/outcome-rules/#sendmock_outcome_rule_move)
 
-### 145. Move rule # down
+### 146. Move rule # down
 
 Button, in each row.
 
 - **What it does:** Checks the rule later.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/sms/{ruleId}/move`](/api/outcome-rules/#postOutcomeRulesSmsByRuleIdMove), CLI [`sendmock outcome-rule sms move`](/cli/outcome-rules/#outcome-rule-sms-move), MCP [`sendmock_outcome_rule_move`](/mcp/outcome-rules/#sendmock_outcome_rule_move)
 
-### 146. Edit rule #
+### 147. Edit rule #
 
 Button, in each row.
 
 - **What it does:** Opens the rule's editor.
 - **Same action elsewhere:** REST [`PATCH /api/v1/outcome-rules/sms/{ruleId}`](/api/outcome-rules/#patchOutcomeRulesSmsByRuleId), CLI [`sendmock outcome-rule sms update`](/cli/outcome-rules/#outcome-rule-sms-update), MCP [`sendmock_outcome_rule_update`](/mcp/outcome-rules/#sendmock_outcome_rule_update)
 
-### 147. Delete rule #
+### 148. Delete rule #
 
 Button, in each row.
 
 - **What it does:** Deletes the rule after you confirm.
 - **Same action elsewhere:** REST [`DELETE /api/v1/outcome-rules/sms/{ruleId}`](/api/outcome-rules/#deleteOutcomeRulesSmsByRuleId), CLI [`sendmock outcome-rule sms delete`](/cli/outcome-rules/#outcome-rule-sms-delete), MCP [`sendmock_outcome_rule_delete`](/mcp/outcome-rules/#sendmock_outcome_rule_delete)
 
-### 148. Add number
+### 149. Add number
 
 Button.
 
 - **What it does:** Adds an outcome number.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/sms`](/api/outcome-rules/#postOutcomeRulesSms), CLI [`sendmock outcome-rule sms create`](/cli/outcome-rules/#outcome-rule-sms-create), MCP [`sendmock_outcome_rule_create`](/mcp/outcome-rules/#sendmock_outcome_rule_create)
 
-### 149. Number is the
+### 150. Number is the
 
 Drop-down.
 
 - **What it does:** Whether the number tested is the recipient (`To`) or the sender (`From`).
 
-### 150. Test a number
+### 151. Test a number
 
 Field.
 
 - **What it does:** Shows which rule, magic number or profile decides a number's outcome.
 - **Same action elsewhere:** REST [`POST /api/v1/outcome-rules/sms/test`](/api/outcome-rules/#postOutcomeRulesSmsTest), CLI [`sendmock outcome-rule sms test`](/cli/outcome-rules/#outcome-rule-sms-test), MCP [`sendmock_outcome_rule_test`](/mcp/outcome-rules/#sendmock_outcome_rule_test)
 
-### 151. Magic number: Invalid number (#)
+### 152. Magic number: Invalid number (#)
 
 Text.
 
 - **What it does:** The answer for the number tested (here a magic number refused with 21211).
 
-### 152. Magic numbers
+### 153. Magic numbers
 
 Heading.
 
 - **What it does:** The built-in test numbers.
 
-### 153. Twilio's official test numbers, plus SendMock numbers for outcomes after sending. Built in and read-only.
+### 154. Twilio's official test numbers, plus SendMock numbers for outcomes after sending. Built in and read-only.
 
 Text.
 
 - **What it does:** Explains magic numbers.
 
-### 154. To numbers (Twilio)
+### 155. To numbers (Twilio)
 
 Heading.
 
 - **What it does:** Twilio's recipient test numbers.
 
-### 155. To
+### 156. To
 
 Column.
 
 - **What it does:** The number.
 
-### 156. Code
+### 157. Code
 
 Column.
 
 - **What it does:** The SMTP code or outcome it gives.
 
-### 157. Copy +#
+### 158. Copy +#
 
 Button, in each row.
 
 - **What it does:** Copies the number.
 
-### 158. From numbers (Twilio)
+### 159. From numbers (Twilio)
 
 Heading.
 
 - **What it does:** Twilio's sender test numbers.
 
-### 159. From
+### 160. From
 
 Column.
 
 - **What it does:** The number.
 
-### 160. After-send outcomes (SendMock)
+### 161. After-send outcomes (SendMock)
 
 Heading.
 
@@ -1035,165 +1042,165 @@ Heading.
 
 ## Payments section
 
-### 161. Checkout
+### 162. Checkout
 
 Heading.
 
 - **What it does:** The hosted checkout's settings.
 
-### 162. Applies to the next hosted checkout.
+### 163. Applies to the next hosted checkout.
 
 Text.
 
 - **What it does:** Explains when changes apply.
 
-### 163. Merchant name
+### 164. Merchant name
 
 Field.
 
 - **What it does:** The shop name on checkout pages.
 
-### 164. Shown on checkout pages and as \{merchant\} in flow labels.
+### 165. Shown on checkout pages and as \{merchant\} in flow labels.
 
 Text.
 
 - **What it does:** Explains the merchant name.
 
-### 165. Default currency
+### 166. Default currency
 
 Drop-down.
 
 - **What it does:** The currency of checkouts made without one.
 
-### 166. For checkouts created without a currency.
+### 167. For checkouts created without a currency.
 
 Text.
 
 - **What it does:** Explains the default currency.
 
-### 167. Interactive Each checkout waits for you on its checkout page.
+### 168. Interactive Each checkout waits for you on its checkout page.
 
 Choice.
 
 - **What it does:** Each checkout waits for you to pay or decline on its page.
 
-### 168. Always succeed New checkouts are paid at once, with their redirect and notifications.
+### 169. Always succeed New checkouts are paid at once, with their redirect and notifications.
 
 Choice.
 
 - **What it does:** Every checkout is paid at once.
 
-### 169. Always decline New checkouts are declined at once (generic decline).
+### 170. Always decline New checkouts are declined at once (generic decline).
 
 Choice.
 
 - **What it does:** Every checkout is declined at once.
 
-### 170. Random New checkouts succeed at the rate below, else are declined.
+### 171. Random New checkouts succeed at the rate below, else are declined.
 
 Choice.
 
 - **What it does:** Checkouts succeed at a rate you set.
 
-### 171. Test values
+### 172. Test values
 
 Heading.
 
 - **What it does:** What the methods accept.
 
-### 172. What the enabled methods accept on checkout pages, as each method's flow asks for it. Any future expiry and any CVC work with the test cards.
+### 173. What the enabled methods accept on checkout pages, as each method's flow asks for it. Any future expiry and any CVC work with the test cards.
 
 Text.
 
 - **What it does:** Explains the test values.
 
-### 173. Test cards
+### 174. Test cards
 
 Heading.
 
 - **What it does:** The test cards and their outcomes.
 - **Same action elsewhere:** REST [`GET /api/v1/payments/test-cards`](/api/payments/#getPaymentsTestCards), CLI [`sendmock payments test-cards`](/cli/payments/#payments-test-cards), MCP [`sendmock_payment_test_cards`](/mcp/payments/#sendmock_payment_test_cards)
 
-### 174. Method
+### 175. Method
 
 Column.
 
 - **What it does:** The method.
 
-### 175. Offered by
+### 176. Offered by
 
 Column.
 
 - **What it does:** The gateways that offer it.
 
-### 176. Card number
+### 177. Card number
 
 Column.
 
 - **What it does:** The card number.
 
-### 177. Outcome
+### 178. Outcome
 
 Column.
 
 - **What it does:** What happens to mail for it.
 
-### 178. Copy # # # #
+### 179. Copy # # # #
 
 Button, in each row.
 
 - **What it does:** Copies the card number.
 
-### 179. Test numbers and codes
+### 180. Test numbers and codes
 
 Heading.
 
 - **What it does:** Wallet numbers and codes.
 
-### 180. Number or code
+### 181. Number or code
 
 Column.
 
 - **What it does:** The number or code.
 
-### 181. OTP and PIN
+### 182. OTP and PIN
 
 Column.
 
 - **What it does:** The OTP and PIN that go with it.
 
-### 182. Copy #
+### 183. Copy #
 
 Button, in each row.
 
 - **What it does:** Copies the number or code.
 
-### 183. Other methods
+### 184. Other methods
 
 Heading.
 
 - **What it does:** Methods with no test value to type.
 
-### 184. What happens
+### 185. What happens
 
 Column.
 
 - **What it does:** What the method does on the checkout page.
 
-### 185. Merchant credentials are set per gateway in Payments > Gateways ; test values are edited in Payments > Methods .
+### 186. Merchant credentials are set per gateway in Payments > Gateways ; test values are edited in Payments > Methods .
 
 Text.
 
 - **What it does:** Says where to change them.
 
-### 186. Payments > Gateways
+### 187. Payments > Gateways
 
 Link.
 
 - **What it does:** Opens Payments > Gateways.
 - **Links to:** [Gateways](../payments/gateways.md).
 
-### 187. Payments > Methods
+### 188. Payments > Methods
 
 Link.
 
@@ -1202,61 +1209,61 @@ Link.
 
 ## Notifications section
 
-### 188. Notifications
+### 189. Notifications
 
 Heading.
 
 - **What it does:** Pop-up toasts for new traffic.
 
-### 189. New emails, SMS and failed webhook deliveries. Saved in this browser only, and applied at once.
+### 190. New emails, SMS and failed webhook deliveries. Saved in this browser only, and applied at once.
 
 Text.
 
 - **What it does:** Explains what notifies and where it is saved.
 
-### 190. Off: no pop-ups; the bell at the top right still counts and lists every notification.
+### 191. Off: no pop-ups; the bell at the top right still counts and lists every notification.
 
 Text.
 
 - **What it does:** Explains turning toasts off.
 
-### 191. Show pop-up toasts
+### 192. Show pop-up toasts
 
 Switch.
 
 - **What it does:** Shows a toast for each new email, SMS and failed delivery.
 
-### 192. Top right Under the bell.
+### 193. Top right Under the bell.
 
 Choice.
 
 - **What it does:** Shows toasts at the top right, under the bell.
 
-### 193. Top center Above the page title.
+### 194. Top center Above the page title.
 
 Choice.
 
 - **What it does:** Shows toasts at the top center.
 
-### 194. Top left Over the sidebar.
+### 195. Top left Over the sidebar.
 
 Choice.
 
 - **What it does:** Shows toasts at the top left.
 
-### 195. Bottom right The default, out of the way of the header.
+### 196. Bottom right The default, out of the way of the header.
 
 Choice.
 
 - **What it does:** Shows toasts at the bottom right, the default.
 
-### 196. Bottom center Above the page bottom.
+### 197. Bottom center Above the page bottom.
 
 Choice.
 
 - **What it does:** Shows toasts at the bottom center.
 
-### 197. Bottom left Over the sidebar footer.
+### 198. Bottom left Over the sidebar footer.
 
 Choice.
 
@@ -1264,38 +1271,38 @@ Choice.
 
 ## Opened events section
 
-### 198. Opened events
+### 199. Opened events
 
 Heading.
 
 - **What it does:** When opens are recorded.
 
-### 199. email.opened and sms.opened stand in for the recipient reading the message.
+### 200. email.opened and sms.opened stand in for the recipient reading the message.
 
 Text.
 
 - **What it does:** Explains opened events.
 
-### 200. Opening an email or scrolling an SMS into view counts as the recipient reading it.
+### 201. Opening an email or scrolling an SMS into view counts as the recipient reading it.
 
 Text.
 
 - **What it does:** Explains what counts as an open.
 
-### 201. Fire opened events when I view messages
+### 202. Fire opened events when I view messages
 
 Switch.
 
 - **What it does:** Fires `email.opened` and `sms.opened` when you look at a message in SendMock.
 - **Same action elsewhere:** REST [`PATCH /api/v1/settings`](/api/system/#patchSettings), CLI [`sendmock settings set`](/cli/system/#settings-set), MCP [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update)
 
-### 202. First open only One event per message, like most providers report.
+### 203. First open only One event per message, like most providers report.
 
 Choice.
 
 - **What it does:** One opened event per message.
 
-### 203. Every open An event each time, for testing open counters.
+### 204. Every open An event each time, for testing open counters.
 
 Choice.
 
@@ -1303,61 +1310,61 @@ Choice.
 
 ## Chaos section
 
-### 204. Chaos
+### 205. Chaos
 
 Heading.
 
 - **What it does:** SMTP failures on purpose.
 
-### 205. Make SMTP fail on purpose to test retries and error handling. SMS failures use the failure rate in SMS settings.
+### 206. Make SMTP fail on purpose to test retries and error handling. SMS failures use the failure rate in SMS settings.
 
 Text.
 
 - **What it does:** Explains chaos.
 
-### 206. Reject the next
+### 207. Reject the next
 
 Number field.
 
 - **What it does:** How many of the next messages are refused.
 
-### 207. Counts down as messages arrive. # turns it off.
+### 208. Counts down as messages arrive. # turns it off.
 
 Text.
 
 - **What it does:** Explains the countdown.
 
-### 208. With code
+### 209. With code
 
 Drop-down.
 
 - **What it does:** The SMTP code they are refused with, such as 421 or 554.
 
-### 209. Reject recipients matching
+### 210. Reject recipients matching
 
 Field.
 
 - **What it does:** A glob of recipients refused with 550.
 
-### 210. Glob; matching recipients get # No such user. Leave empty to turn it off.
+### 211. Glob; matching recipients get # No such user. Leave empty to turn it off.
 
 Text.
 
 - **What it does:** Explains the recipient glob.
 
-### 211. Latency per SMTP command
+### 212. Latency per SMTP command
 
 Number field.
 
 - **What it does:** A delay before each SMTP reply.
 
-### 212. The client sees the connection close mid-message and nothing is stored.
+### 213. The client sees the connection close mid-message and nothing is stored.
 
 Text.
 
 - **What it does:** Explains dropping the connection.
 
-### 213. Drop the connection during DATA
+### 214. Drop the connection during DATA
 
 Switch.
 
@@ -1365,50 +1372,50 @@ Switch.
 
 ## OTP patterns section
 
-### 214. OTP patterns
+### 215. OTP patterns
 
 Heading.
 
 - **What it does:** How one-time codes are found.
 - **Links to:** [Advanced: OTP patterns](../advanced/otp-patterns.md).
 
-### 215. Tried in order on every new email and SMS; the first capture group of the first match is the code.
+### 216. Tried in order on every new email and SMS; the first capture group of the first match is the code.
 
 Text.
 
 - **What it does:** Explains the patterns.
 
-### 216. Pattern #
+### 217. Pattern #
 
 Field, in each row.
 
 - **What it does:** A regular expression; its first capture group is the code.
 
-### 217. Remove pattern #
+### 218. Remove pattern #
 
 Button, in each row.
 
 - **What it does:** Removes the pattern.
 
-### 218. Add pattern
+### 219. Add pattern
 
 Button.
 
 - **What it does:** Adds a pattern.
 
-### 219. Restore defaults
+### 220. Restore defaults
 
 Button.
 
 - **What it does:** Brings back the built-in patterns.
 
-### 220. Try a message
+### 221. Try a message
 
 Field.
 
 - **What it does:** Text to try the patterns on.
 
-### 221. Pattern # found #
+### 222. Pattern # found #
 
 Text.
 
@@ -1416,179 +1423,179 @@ Text.
 
 ## Connection section
 
-### 222. Connect your app
+### 223. Connect your app
 
 Heading.
 
 - **What it does:** Snippets for pointing your app at SendMock.
 
-### 223. Point your app at SendMock. Provider SDKs are below, under Provider APIs; recipes are in the docs.
+### 224. Point your app at SendMock. Provider SDKs are below, under Provider APIs; recipes are in the docs.
 
 Text.
 
 - **What it does:** Explains the section.
 - **Links to:** [Connect your app](../connect/index.md).
 
-### 224. Language
+### 225. Language
 
 Drop-down.
 
 - **What it does:** The language or framework of the snippets.
 
-### 225. Where does your app run?
+### 226. Where does your app run?
 
 Drop-down.
 
 - **What it does:** This machine, a container reaching the host, or the same Compose project; shared with the empty states.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 226. SMTP
+### 227. SMTP
 
 Heading.
 
 - **What it does:** The SMTP snippet for the chosen language.
 
-### 227. Copy SMTP snippet
+### 228. Copy SMTP snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 228. Email API
+### 229. Email API
 
 Heading.
 
 - **What it does:** The Email API snippet for the chosen language.
 
-### 229. Copy Email API snippet
+### 230. Copy Email API snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 230. SMS API
+### 231. SMS API
 
 Heading.
 
 - **What it does:** The SMS API snippet for the chosen language.
 
-### 231. Copy SMS API snippet
+### 232. Copy SMS API snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 232. HTTP Catcher (point Slack, push or other webhooks here)
+### 233. HTTP Catcher (point Slack, push or other webhooks here)
 
 Heading.
 
 - **What it does:** The HTTP Catcher (point Slack, push or other webhooks here) snippet for the chosen language.
 
-### 233. Copy HTTP Catcher (point Slack, push or other webhooks here) snippet
+### 234. Copy HTTP Catcher (point Slack, push or other webhooks here) snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 234. Provider APIs
+### 235. Provider APIs
 
 Heading.
 
 - **What it does:** Base URLs to give the providers' SDKs.
 
-### 235. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
+### 236. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
 
 Text.
 
 - **What it does:** Explains the base URLs and the provider port.
 
-### 236. Email
+### 237. Email
 
 Heading.
 
 - **What it does:** The email providers' base URLs.
 
-### 237. …
+### 238. …
 
 Link, in each row.
 
 - **What it does:** A provider's name; opens it in Mail > Providers or SMS > Providers.
 
-### 238. Copy the … base URL
+### 239. Copy the … base URL
 
 Button, in each row.
 
 - **What it does:** Copies the provider's base URL.
 
-### 239. SMS
+### 240. SMS
 
 Heading.
 
 - **What it does:** The SMS providers' base URLs.
 
-### 240. AI agents
+### 241. AI agents
 
 Heading.
 
 - **What it does:** Setting up an AI coding agent.
 - **Links to:** [AI](../ai/index.md).
 
-### 241. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
+### 242. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
 
 Text.
 
 - **What it does:** Explains the section.
 
-### 242. AI agent
+### 243. AI agent
 
 Drop-down.
 
 - **What it does:** The agent to set up.
 - **Same action elsewhere:** REST [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents), CLI [`sendmock ai install`](/cli/automation/#ai-install), MCP [`sendmock_ai_agents`](/mcp/automation/#sendmock_ai_agents)
 
-### 243. Installed
+### 244. Installed
 
 Choice.
 
 - **What it does:** Shows the commands for an installed SendMock: the agent starts `sendmock mcp`.
 
-### 244. npx (no install)
+### 245. npx (no install)
 
 Choice.
 
 - **What it does:** Shows the commands for SendMock run through npx with nothing installed: the agent starts `npx -y sendmock mcp`, and the install command is `npx sendmock ai install`, which writes that form by itself.
 
-### 245. Install command
+### 246. Install command
 
 Heading.
 
 - **What it does:** The command that sets the agent up.
 
-### 246. Copy install command
+### 247. Copy install command
 
 Button.
 
 - **What it does:** Copies `sendmock ai install` for the chosen agent.
 
-### 247. MCP configuration
+### 248. MCP configuration
 
 Heading.
 
 - **What it does:** The MCP configuration, to add by hand instead.
 
-### 248. Copy mcp configuration
+### 249. Copy mcp configuration
 
 Button.
 
 - **What it does:** Copies the MCP configuration.
 
-### 249. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 250. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
 - **What it does:** Says what the install command writes for the chosen agent (here Claude Code).
 
-### 250. Download the skill
+### 251. Download the skill
 
 Link.
 
@@ -1597,98 +1604,98 @@ Link.
 
 ## About section
 
-### 251. About SendMock
+### 252. About SendMock
 
 Heading.
 
 - **What it does:** The version and channel of the running SendMock.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 252. Help and feedback
+### 253. Help and feedback
 
 Heading.
 
 - **What it does:** The help links, as in the Help menu.
 
-### 253. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
+### 254. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
 
 Text.
 
 - **What it does:** Explains what the issue forms carry.
 
-### 254. Documentation
+### 255. Documentation
 
 Link.
 
 - **What it does:** Opens the docs in a new tab.
 
-### 255. Keyboard shortcuts
+### 256. Keyboard shortcuts
 
 Button.
 
 - **What it does:** Opens the list of keyboard shortcuts.
 
-### 256. What's new
+### 257. What's new
 
 Link.
 
 - **What it does:** Opens the changelog.
 
-### 257. Report an issue
+### 258. Report an issue
 
 Link.
 
 - **What it does:** Opens GitHub's bug report form, filled in.
 
-### 258. Request a feature
+### 259. Request a feature
 
 Link.
 
 - **What it does:** Opens GitHub's feature request form, filled in.
 
-### 259. Report a security issue
+### 260. Report a security issue
 
 Link.
 
 - **What it does:** Opens GitHub's private security report form.
 
-### 260. Star on GitHub
+### 261. Star on GitHub
 
 Link.
 
 - **What it does:** Opens the repository.
 
-### 261. Updates
+### 262. Updates
 
 Heading.
 
 - **What it does:** Whether SendMock looks for new releases.
 
-### 262. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
+### 263. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
 
 Text.
 
 - **What it does:** Explains the update check.
 
-### 263. Off SendMock never calls out.
+### 264. Off SendMock never calls out.
 
 Choice.
 
 - **What it does:** Never checks.
 
-### 264. Manual Only when you press Check for updates.
+### 265. Manual Only when you press Check for updates.
 
 Choice.
 
 - **What it does:** Checks only when you ask.
 
-### 265. Daily On start and once a day; a new version shows in the notifications.
+### 266. Daily On start and once a day; a new version shows in the notifications.
 
 Choice.
 
 - **What it does:** Checks on start and once a day.
 
-### 266. Check for updates
+### 267. Check for updates
 
 Button.
 
@@ -1697,14 +1704,14 @@ Button.
 
 ## AI agents through npx
 
-### 267. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
+### 268. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
 
 Text.
 
 - **What it does:** Explains the npx form and the Windows workaround.
 - **Links to:** [Install: npx (no install)](../install.md#npx-no-install).
 
-### 268. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 269. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
@@ -1712,25 +1719,25 @@ Text.
 
 ## Delete all emails dialog
 
-### 269. Delete all emails?
+### 270. Delete all emails?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every email.
 
-### 270. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
+### 271. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
 
 Text.
 
 - **What it does:** Says what is deleted.
 
-### 271. Cancel
+### 272. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 272. Delete all emails
+### 273. Delete all emails
 
 Button.
 
@@ -1739,25 +1746,25 @@ Button.
 
 ## Delete all SMS dialog
 
-### 273. Delete all SMS?
+### 274. Delete all SMS?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every SMS.
 
-### 274. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
+### 275. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
 
 Text.
 
 - **What it does:** Says what is deleted.
 
-### 275. Cancel
+### 276. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 276. Delete all SMS
+### 277. Delete all SMS
 
 Button.
 
@@ -1766,25 +1773,25 @@ Button.
 
 ## Reset to seed dialog
 
-### 277. Reset to seed?
+### 278. Reset to seed?
 
 Heading.
 
 - **What it does:** The confirmation before a reset.
 
-### 278. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
+### 279. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
 
 Text.
 
 - **What it does:** Says what a reset does.
 
-### 279. Cancel
+### 280. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 280. Reset
+### 281. Reset
 
 Button.
 
@@ -1793,20 +1800,20 @@ Button.
 
 ## When the data cannot load
 
-### 281. Could not load the settings. Try again
+### 282. Could not load the settings. Try again
 
 Message.
 
 - **What it does:** Shown when the settings could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 282. Could not load the settings.
+### 283. Could not load the settings.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 283. Try again
+### 284. Try again
 
 Button.
 

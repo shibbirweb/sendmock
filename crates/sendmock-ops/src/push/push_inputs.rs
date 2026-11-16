@@ -31,6 +31,15 @@ pub struct PushFilterQuery {
     pub status: Option<String>,
 }
 
+/// `PATCH /api/v1/push/{pushId}`.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct PushUpdateInput {
+    /// The notification's id, from `GET /api/v1/push`.
+    pub push_id: String,
+    /// Marks the notification read (true) or unread (false).
+    pub is_read: bool,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct PushReference {
     /// The notification's id, from `GET /api/v1/push`.

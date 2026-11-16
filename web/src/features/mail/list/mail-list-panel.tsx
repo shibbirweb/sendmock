@@ -4,6 +4,8 @@ import { toast } from "sonner";
 
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCheckedItems } from "@/hooks/use-checked-items";
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { MailListEmptyState } from "@/features/mail/list/mail-list-empty-state";
 import { MailListToolbar } from "@/features/mail/list/mail-list-toolbar";
 import { MailSearchBar } from "@/features/mail/list/mail-search-bar";
@@ -41,9 +43,7 @@ export function MailListPanel({
   const deleteEmail = useDeleteEmail();
   const deleteAllEmails = useDeleteAllEmails();
   const updateEmail = useUpdateEmail();
-  const [checkedEmailIds, setCheckedEmailIds] = React.useState<Set<string>>(
-    () => new Set(),
-  );
+  const projectKey = useSelectedProjectKey();
 
   const emails = React.useMemo(
     () =>
@@ -51,6 +51,14 @@ export function MailListPanel({
     [emailListQuery.data],
   );
   const totalEmailCount = emailListQuery.data?.pages[0]?.total_count ?? 0;
+  const loadedEmailIds = React.useMemo(
+    () => emails.map((email) => email.id),
+    [emails],
+  );
+  const checkedEmails = useCheckedItems(
+    loadedEmailIds,
+    `${searchText}|${projectKey ?? ""}`,
+  );
   const { hasNextPage, isFetchingNextPage, fetchNextPage } = emailListQuery;
 
   const loadNextPage = React.useCallback(() => {
@@ -65,13 +73,6 @@ export function MailListPanel({
     [deleteEmail],
   );
 
-  const runForCheckedEmails = (emailAction: (emailId: string) => void) => {
-    for (const emailId of checkedEmailIds) {
-      emailAction(emailId);
-    }
-    setCheckedEmailIds(new Set());
-  };
-
   const clearSearch = () => {
     void navigate({
       search: (previousSearch) => ({ ...previousSearch, q: undefined }),
@@ -84,28 +85,24 @@ export function MailListPanel({
       <MailListToolbar
         loadedEmailCount={emails.length}
         totalEmailCount={totalEmailCount}
-        checkedEmailCount={checkedEmailIds.size}
-        onToggleAllChecked={(isChecked) => {
-          setCheckedEmailIds(
-            isChecked ? new Set(emails.map((email) => email.id)) : new Set(),
-          );
-        }}
-        onMarkCheckedRead={() => {
-          runForCheckedEmails((emailId) => {
-            updateEmail.mutate({ emailId, emailUpdate: { is_read: true } });
+        checkedEmails={checkedEmails}
+        onMarkCheckedRead={(isRead) => {
+          checkedEmails.runForCheckedItems((emailId) => {
+            updateEmail.mutate({ emailId, emailUpdate: { is_read: isRead } });
           });
         }}
         onDeleteChecked={() => {
-          const deletedCount = checkedEmailIds.size;
-          runForCheckedEmails((emailId) => {
+          const deletedCount = checkedEmails.checkedItemCount;
+          checkedEmails.runForCheckedItems((emailId) => {
             deleteEmail.mutate(emailId);
           });
           toast(`${deletedCount} emails deleted`);
         }}
         emailFilters={emailFilters}
         isFiltered={searchText.trim() !== ""}
+        projectKey={projectKey}
         onDeleteAll={() => {
-          deleteAllEmails.mutate(emailFilters);
+          deleteAllEmails.mutate({ ...emailFilters, project: projectKey });
           void navigate({
             to: "/mail",
             search: (previousSearch) => previousSearch,
@@ -133,19 +130,7 @@ export function MailListPanel({
         <MailVirtualList
           emails={emails}
           selectedEmailId={selectedEmailId}
-          checkedEmailIds={checkedEmailIds}
-          onCheckedChange={(emailId, isChecked) => {
-            setCheckedEmailIds((previousIds) => {
-              const nextIds = new Set(previousIds);
-              if (isChecked) {
-                nextIds.add(emailId);
-              } else {
-                nextIds.delete(emailId);
-              }
-
-              return nextIds;
-            });
-          }}
+          checkedEmails={checkedEmails}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onLoadNextPage={loadNextPage}

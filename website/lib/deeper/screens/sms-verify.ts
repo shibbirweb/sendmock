@@ -1,5 +1,6 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { describeChooseWebhooks } from "./webhook-target-entries";
+import { describeListToolbar } from "./list-toolbar-entries";
 
 const verificationEntries: DeeperEntry[] = [
   {
@@ -261,6 +262,14 @@ export const smsVerifyPage: DeeperPage = {
     "SMS > Verify shows every one-time code your app requested through the Twilio Verify API, and lets you force any outcome.",
   entries: [
     ...verificationEntries,
+    ...describeListToolbar({
+      itemsName: "verifications",
+      rowCheckboxNames: ["Select verification for …"],
+      hasReadState: false,
+      isTable: true,
+      keepsNote: "Verify services stay.",
+      deleteAllOperationId: "deleteVerify",
+    }),
     ...verifyServiceEntries,
     ...verifyEmptyAndFailingEntries,
   ],

@@ -6,6 +6,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+readme = "README.md"
 
 # The tray shell needs GTK on Linux, so it is behind a feature: workspace builds, clippy and
 # packaging check the library without it, and `cargo install sendmock-tray --features gui`

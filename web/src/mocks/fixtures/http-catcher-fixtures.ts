@@ -9,6 +9,7 @@ import {
   createMockUlid,
   minutesAgo,
   minutesAgoInMs,
+  olderThanReadMinutes,
 } from "@/mocks/fixtures/fixture-helpers";
 
 const binSpecs: { name: string; preset: HttpBinPreset | null }[] = [
@@ -282,6 +283,7 @@ export function buildCapturedHttpRequestFixtures(
         matched_rule_name: matchedRule?.name ?? null,
         is_simulated_failure: false,
         duration_ms: 2,
+        is_read: requestSpec.minutesAgo > olderThanReadMinutes,
         created_at: minutesAgo(requestSpec.minutesAgo),
       },
     ];

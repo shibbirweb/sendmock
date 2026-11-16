@@ -1,5 +1,9 @@
 import { Link } from "@tanstack/react-router";
 
+import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
 import { CopyButton } from "@/components/common/copy-button";
 import {
   Table,
@@ -9,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import { ExpiryCountdown } from "@/features/verify/verifications/expiry-countdown";
 import { VerificationStatusBadge } from "@/features/verify/verifications/verification-status-badge";
 import {
@@ -23,12 +28,14 @@ import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
 
 type VerificationTableProps = {
   verifications: Verification[];
+  checkedVerifications: CheckedItems;
   currentTimeMs: number;
   onCodeExpired: () => void;
 };
 
 function VerificationRow({
   verification,
+  checkedVerifications,
   currentTimeMs,
   onCodeExpired,
 }: { verification: Verification } & Omit<
@@ -38,7 +45,11 @@ function VerificationRow({
   const ChannelIcon = verifyChannelIcons[verification.channel];
 
   return (
-    <TableRow className="relative">
+    <CheckableTableRow
+      itemId={verification.sid}
+      itemLabel={`verification for ${verification.to}`}
+      checkedItems={checkedVerifications}
+    >
       <TableCell className="max-w-36 font-medium sm:max-w-48">
         <span className="flex min-w-0 items-center gap-1.5">
           {/* On phones the channel column hides, so its icon moves here. */}
@@ -102,13 +113,14 @@ function VerificationRow({
           </time>
         )}
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
 /** Verifications, newest first; a row opens its drawer. */
 export function VerificationTable({
   verifications,
+  checkedVerifications,
   currentTimeMs,
   onCodeExpired,
 }: VerificationTableProps) {
@@ -116,6 +128,7 @@ export function VerificationTable({
     <Table>
       <TableHeader>
         <TableRow>
+          <CheckColumnHead />
           <TableHead>To</TableHead>
           <TableHead className="hidden sm:table-cell">Channel</TableHead>
           <TableHead className="hidden md:table-cell">Service</TableHead>
@@ -130,6 +143,7 @@ export function VerificationTable({
           <VerificationRow
             key={verification.sid}
             verification={verification}
+            checkedVerifications={checkedVerifications}
             currentTimeMs={currentTimeMs}
             onCodeExpired={onCodeExpired}
           />

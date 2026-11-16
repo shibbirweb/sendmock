@@ -31,6 +31,7 @@ import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
 import { simulatedErrorHandler } from "@/mocks/handlers/simulated-error-handler";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
+import { smsThreadHandlers } from "@/mocks/handlers/sms-thread-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
@@ -67,6 +68,8 @@ export const mockHandlers = [
   ...emailClickHandlers,
   ...emailResponseHandlers,
   ...smsSendHandlers,
+  // Before the SMS handlers, so `/sms/threads` is not read as an SMS id.
+  ...smsThreadHandlers,
   ...smsHandlers,
   ...verifyHandlers,
   ...numbersHandlers,

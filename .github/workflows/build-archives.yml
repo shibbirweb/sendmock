@@ -74,6 +74,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
+          save-if: ${{ github.event_name != 'pull_request' }}
 
       - uses: oven-sh/setup-bun@v2
 

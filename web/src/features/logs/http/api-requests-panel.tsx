@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { GlobeIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
+import { CheckedListToolbar } from "@/components/common/checked-list-toolbar";
 import { FilterChip } from "@/components/common/filter-chip";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { Input } from "@/components/ui/input";
@@ -33,7 +38,12 @@ import { ConnectHint } from "@/features/onboarding/connect-hint";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
 import { SampleButton } from "@/features/onboarding/sample-button";
-import { useApiRequestLog } from "@/lib/api/hooks/use-logs-queries";
+import { type CheckedItems, useCheckedItems } from "@/hooks/use-checked-items";
+import {
+  useApiRequestLog,
+  useDeleteApiRequest,
+  useDeleteApiRequests,
+} from "@/lib/api/hooks/use-logs-queries";
 import type { ApiRequestLogEntry, ApiStatusClass } from "@/lib/api/types";
 import {
   formatDateTime,
@@ -43,12 +53,21 @@ import {
 import { cn } from "@/lib/utils";
 
 const allApis = "all";
+const apiRequestNoun = { one: "API request", many: "API requests" };
 
-function ApiRequestRow({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
+function ApiRequestRow({
+  apiRequest,
+  checkedRequests,
+}: {
+  apiRequest: ApiRequestLogEntry;
+  checkedRequests: CheckedItems;
+}) {
   return (
-    <TableRow
+    <CheckableTableRow
+      itemId={apiRequest.id}
+      itemLabel={`${apiRequest.method} ${apiRequest.path}`}
+      checkedItems={checkedRequests}
       className={cn(
-        "relative",
         isRejectedStatus(apiRequest.response_status) && "bg-destructive/5",
       )}
     >
@@ -83,7 +102,7 @@ function ApiRequestRow({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
       <TableCell className="hidden whitespace-nowrap tabular-nums md:table-cell">
         {formatDurationMs(apiRequest.duration_ms)}
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
@@ -94,14 +113,29 @@ export function ApiRequestsPanel() {
   );
   const [apiFilter, setApiFilter] = React.useState(allApis);
   const [pathSearch, setPathSearch] = React.useState("");
-  const requestsQuery = useApiRequestLog({
+  const requestFilters = {
     status_class: statusClass ?? undefined,
     api: apiFilter === allApis ? undefined : apiFilter,
     path: pathSearch.trim() || undefined,
-  });
-  const loadedPages = requestsQuery.data?.pages ?? [];
-  const apiRequests = loadedPages.flatMap((loadedPage) => loadedPage.items);
-  const totalCount = loadedPages[0]?.total_count ?? 0;
+  };
+  const requestsQuery = useApiRequestLog(requestFilters);
+  const apiRequests = React.useMemo(
+    () =>
+      requestsQuery.data?.pages.flatMap((loadedPage) => loadedPage.items) ?? [],
+    [requestsQuery.data],
+  );
+  const totalCount = requestsQuery.data?.pages[0]?.total_count ?? 0;
+  const isFiltered =
+    statusClass !== null || apiFilter !== allApis || pathSearch !== "";
+  const checkedRequests = useCheckedItems(
+    React.useMemo(
+      () => apiRequests.map((apiRequest) => apiRequest.id),
+      [apiRequests],
+    ),
+    `${statusClass ?? ""}|${apiFilter}|${pathSearch}`,
+  );
+  const deleteRequest = useDeleteApiRequest();
+  const deleteRequests = useDeleteApiRequests();
   const { fetchNextPage } = requestsQuery;
   const loadNextPage = React.useCallback(() => {
     void fetchNextPage();
@@ -152,6 +186,20 @@ export function ApiRequestsPanel() {
         </div>
       </div>
       <div className="min-w-0 rounded-lg border">
+        <CheckedListToolbar
+          itemNoun={apiRequestNoun}
+          checkedItems={checkedRequests}
+          loadedItemCount={apiRequests.length}
+          totalItemCount={totalCount}
+          isFiltered={isFiltered}
+          deleteAllKeepsNote="The emails, SMS and payments those requests made stay."
+          onDeleteItem={(requestId) => {
+            deleteRequest.mutate(requestId);
+          }}
+          onDeleteAll={() => {
+            deleteRequests.mutate(requestFilters);
+          }}
+        />
         {requestsQuery.isPending && (
           <div className="grid gap-2 p-4">
             <Skeleton className="h-8 w-full" />
@@ -166,9 +214,7 @@ export function ApiRequestsPanel() {
         )}
         {requestsQuery.isSuccess &&
           apiRequests.length === 0 &&
-          (statusClass !== null ||
-          apiFilter !== allApis ||
-          pathSearch !== "" ? (
+          (isFiltered ? (
             <NoMatchState
               message="No requests match this filter or search."
               onClearFilter={() => {
@@ -191,6 +237,7 @@ export function ApiRequestsPanel() {
           <Table>
             <TableHeader>
               <TableRow>
+                <CheckColumnHead />
                 <TableHead>Time</TableHead>
                 <TableHead className="hidden sm:table-cell">API</TableHead>
                 <TableHead>Request</TableHead>
@@ -200,7 +247,11 @@ export function ApiRequestsPanel() {
             </TableHeader>
             <TableBody>
               {apiRequests.map((apiRequest) => (
-                <ApiRequestRow key={apiRequest.id} apiRequest={apiRequest} />
+                <ApiRequestRow
+                  key={apiRequest.id}
+                  apiRequest={apiRequest}
+                  checkedRequests={checkedRequests}
+                />
               ))}
             </TableBody>
           </Table>

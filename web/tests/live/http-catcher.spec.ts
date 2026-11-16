@@ -40,10 +40,10 @@ test("HC-01.6 live bins list their captured requests, and are added, cleared and
   await page.getByRole("button", { name: "Delete", exact: true }).click();
 
   await openBin(page, binName);
-  await page.getByRole("button", { name: "Clear requests" }).click();
+  await page.getByRole("button", { name: "Delete all requests" }).click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Clear requests" })
+    .getByRole("button", { name: "Delete all" })
     .click();
   await expect(page.getByText(`No requests in ${binName} yet.`)).toBeVisible();
   expect(failedApiCalls).toEqual([]);

@@ -58,6 +58,7 @@ function useVerifyMutation<MutationInput, MutationResult>(
     mutationFn: mutationRequest,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.verify.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
     },
   });
 }
@@ -106,5 +107,23 @@ export function useUpdateVerifyService() {
 export function useDeleteVerifyService() {
   return useVerifyMutation((serviceSid: string) =>
     requestApi<void>(`/verify/services/${serviceSid}`, { method: "DELETE" }),
+  );
+}
+
+export function useDeleteVerification() {
+  return useVerifyMutation((verificationSid: string) =>
+    requestApi<void>(`/verify/${verificationSid}`, { method: "DELETE" }),
+  );
+}
+
+/** Deletes the verifications the filters match in the chosen project, or all of them. */
+export function useDeleteVerifications() {
+  const projectKey = useSelectedProjectKey();
+
+  return useVerifyMutation((verificationFilters: VerificationListFilters) =>
+    requestApi<void>("/verify", {
+      method: "DELETE",
+      queryParameters: { ...verificationFilters, project: projectKey },
+    }),
   );
 }

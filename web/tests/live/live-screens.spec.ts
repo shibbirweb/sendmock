@@ -19,6 +19,23 @@ for (const sectionId of settingsSectionIds) {
   });
 }
 
+test("UI-01.5 the sidebar shows the version the running binary reports", async ({
+  page,
+  request,
+}) => {
+  const infoResponse = await request.get("/api/v1/info");
+  expect(infoResponse.status()).toBe(200);
+  const { version: serverVersion } = (await infoResponse.json()) as {
+    version: string;
+  };
+
+  await page.goto("/");
+
+  const sidebarStatus = page.getByRole("status").filter({ hasText: "server" });
+  await expect(sidebarStatus).toContainText(`v${serverVersion}`);
+  await expect(sidebarStatus).not.toContainText("0.0.0-dev");
+});
+
 test("UI-12.2 an email opens with every tab and no failing calls", async ({
   page,
   request,

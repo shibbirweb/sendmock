@@ -28,7 +28,7 @@ fn read_payment_row(row: &Row<'_>) -> rusqlite::Result<PaymentRecord> {
     })
 }
 
-fn build_conditions(filter: &PaymentListFilter) -> (String, Vec<SqlValue>) {
+pub(super) fn build_conditions(filter: &PaymentListFilter) -> (String, Vec<SqlValue>) {
     let mut conditions = vec!["1 = 1".to_owned()];
     let mut parameters = Vec::new();
     if !filter.statuses.is_empty() {
@@ -241,6 +241,10 @@ impl PaymentRepository {
         self.database
             .read(move |connection| Ok(read_payment_totals_since(connection, since_unix_ms)?))
             .await
+    }
+
+    pub(super) fn database(&self) -> &Database {
+        &self.database
     }
 
     pub async fn delete_all_payments(&self) -> Result<u64, StoreError> {

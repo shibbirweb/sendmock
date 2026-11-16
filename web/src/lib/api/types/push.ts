@@ -38,7 +38,18 @@ export type PushNotification = {
   response: unknown;
   /** @example "default" */
   project: string;
+  /** Notifications arrive unread; opening one marks it read. */
+  is_read: boolean;
   created_at: IsoTimestamp;
+};
+
+/** Body of PATCH /api/v1/push/{pushId}. */
+export type PushNotificationUpdate = {
+  /**
+   * Marks the notification read (true) or unread (false).
+   * @example false
+   */
+  is_read: boolean;
 };
 
 /** Query of GET /api/v1/push; the filters match exactly. */
