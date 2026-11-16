@@ -45,6 +45,7 @@ export const settingsGeneralEntries: DeeperEntry[] = [
   },
   { control: "heading: Danger zone", does: "Actions that delete data." },
   { control: "paragraph: These cannot be undone. Each asks first.", does: "Warns that these cannot be undone." },
+  { control: "button: Delete all traffic", does: "Asks first, then deletes every email, SMS, verification, push notification, captured HTTP request, finished webhook delivery, payment, subscription and log entry, in every project; settings and configuration stay.", operationIds: ["deleteTraffic"] },
   { control: "button: Delete all emails", does: "Asks first, then deletes every email.", operationIds: ["deleteEmails"] },
   { control: "button: Delete all SMS", does: "Asks first, then deletes every SMS.", operationIds: ["deleteSms"] },
   { control: "button: Reset to seed", does: "Asks first, then wipes all traffic and puts the configuration back to the seed file.", operationIds: ["postReset"] },

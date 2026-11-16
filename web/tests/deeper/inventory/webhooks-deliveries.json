@@ -13,6 +13,9 @@
       "button: Pending",
       "combobox: Endpoint filter",
       "combobox: Event filter",
+      "checkbox: Select all loaded deliveries",
+      "button: Delete all deliveries",
+      "columnheader: Select",
       "columnheader: Time",
       "columnheader: Event",
       "columnheader: Endpoint",
@@ -20,6 +23,7 @@
       "columnheader: Status",
       "columnheader: Duration",
       "columnheader: Attempt",
+      "each item, checkbox: Select …",
       "each item, link: …",
       "button: Load more"
     ],

@@ -7,6 +7,8 @@
       "link: Read the Subscriptions guide",
       "paragraph: Each subscription keeps its own clock: advance it to charge the next renewal through its gateway, or cancel it.",
       "button: New subscription",
+      "checkbox: Select all loaded subscriptions",
+      "button: Delete all subscriptions",
       "paragraph: No subscriptions yet",
       "paragraph: Start one with New subscription, or POST /api/v#/payments/subscriptions, to test renewals, failed payments and cancellations."
     ],

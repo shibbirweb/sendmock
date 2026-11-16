@@ -15,11 +15,15 @@
       "button: Disputed",
       "combobox: Provider",
       "combobox: Currency",
+      "checkbox: Select all loaded payments",
+      "button: Delete all payments",
+      "columnheader: Select",
       "columnheader: Amount",
       "columnheader: Provider",
       "columnheader: Status",
       "columnheader: Customer",
       "columnheader: Time",
+      "each item, checkbox: Select payment of …",
       "each item, link: …"
     ],
     "New payment dialog": [

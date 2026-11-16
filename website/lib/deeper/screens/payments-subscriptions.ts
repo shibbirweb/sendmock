@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeListToolbar } from "./list-toolbar-entries";
 
 const subscriptionEntries: DeeperEntry[] = [
   {
@@ -93,5 +94,15 @@ export const paymentsSubscriptionsPage: DeeperPage = {
   guideTitle: "Subscriptions",
   intro:
     "Payments > Subscriptions tests renewals, failed renewal payments and cancellations, each subscription on its own clock.",
-  entries: subscriptionEntries,
+  entries: [
+    ...subscriptionEntries,
+    ...describeListToolbar({
+      itemsName: "subscriptions",
+      rowCheckboxNames: [],
+      hasReadState: false,
+      isTable: false,
+      keepsNote: "The payments they charged stay in Payments.",
+      deleteAllOperationId: "deletePaymentsSubscriptions",
+    }),
+  ],
 };

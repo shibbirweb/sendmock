@@ -103,7 +103,7 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
   {
     method: "DELETE",
     path: "/api/v1/http/requests",
-    summary: "Delete captured requests, every bin's or one bin's.",
+    summary: "Delete captured requests, all or one bin's.",
     queryParameters: [binIdQueryParameter],
     response: null,
     successStatus: 204,

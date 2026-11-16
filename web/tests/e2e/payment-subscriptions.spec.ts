@@ -44,7 +44,7 @@ test("PY-07.4 a subscription starts, renews when advanced and ends at the period
   await expect(row).toContainText("Active");
 
   await chooseRowAction(page, "sam@example.test", "Advance to renewal");
-  await expect(row.getByRole("cell").nth(4)).toHaveText("2");
+  await expect(row.getByRole("cell").nth(5)).toHaveText("2");
   await chooseRowAction(page, "sam@example.test", "Cancel at period end");
   await expect(row).toContainText("Ends at period end");
   await chooseRowAction(page, "sam@example.test", "Advance to renewal");

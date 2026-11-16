@@ -89,37 +89,63 @@ Drop-down.
 
 - **What it does:** Shows payments in one currency, or all.
 
-### 13. Amount
+### 13. Select all loaded payments
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be deleted together. X ticks the open or focused row.
+
+### 14. Delete all payments
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. Each payment's events, refunds and checkout go with it; subscriptions, gateways, methods and flows stay.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/payments`](/api/payments/#deletePayments), CLI [`sendmock payments delete-all`](/cli/payments/#payments-delete-all), MCP [`sendmock_payment_delete_all`](/mcp/payments/#sendmock_payment_delete_all)
+
+### 15. Select
+
+Column.
+
+- **What it does:** The column of tick boxes; it has no visible title.
+
+### 16. Amount
 
 Column.
 
 - **What it does:** The amount and currency.
 
-### 14. Provider
+### 17. Provider
 
 Column.
 
 - **What it does:** The gateway it went through, such as Stripe or SSLCommerz.
 
-### 15. Status
+### 18. Status
 
 Column.
 
 - **What it does:** Its status, such as succeeded, requires action or refunded.
 
-### 16. Customer
+### 19. Customer
 
 Column.
 
 - **What it does:** The customer's email.
 
-### 17. Time
+### 20. Time
 
 Column.
 
 - **What it does:** When it was created.
 
-### 18. …
+### 21. Select payment of …
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 22. …
 
 Link, in each row.
 
@@ -128,63 +154,63 @@ Link, in each row.
 
 ## New payment dialog
 
-### 19. New payment
+### 23. New payment
 
 Heading.
 
 - **What it does:** The New payment dialog.
 
-### 20. Paid at once with the test card, as your app's server does without a checkout page. The card's outcome decides it.
+### 24. Paid at once with the test card, as your app's server does without a checkout page. The card's outcome decides it.
 
 Text.
 
 - **What it does:** Explains a direct payment: the test card decides success, decline or 3-D Secure.
 - **Links to:** [Payments](../../payments/index.md).
 
-### 21. Gateway
+### 25. Gateway
 
 Drop-down.
 
 - **What it does:** The gateway the payment goes through.
 
-### 22. Capture
+### 26. Capture
 
 Drop-down.
 
 - **What it does:** Capture at once, or only authorize and capture later.
 
-### 23. Amount
+### 27. Amount
 
 Field.
 
 - **What it does:** The amount, in the currency's main unit.
 
-### 24. Currency
+### 28. Currency
 
 Field.
 
 - **What it does:** The three-letter currency code, such as `USD`.
 
-### 25. Test card
+### 29. Test card
 
 Field.
 
 - **What it does:** A documented test card number; its outcome decides the payment.
 - **Errors:** A real card number is refused with "use a test card" and nothing is stored.
 
-### 26. Customer email
+### 30. Customer email
 
 Field.
 
 - **What it does:** The customer's email.
 
-### 27. Cancel
+### 31. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 28. Pay
+### 32. Pay
 
 Button.
 
@@ -192,7 +218,7 @@ Button.
 - **What it changes:** Fires `payment.created` and then `payment.succeeded` or `payment.failed`, and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments`](/api/payments/#postPayments), CLI [`sendmock payments create`](/cli/payments/#payments-create), MCP [`sendmock_payment_create`](/mcp/payments/#sendmock_payment_create)
 
-### 29. Close
+### 33. Close
 
 Button.
 
@@ -200,105 +226,105 @@ Button.
 
 ## A payment is open
 
-### 30. Payment
+### 34. Payment
 
 Heading.
 
 - **What it does:** The payment drawer.
 
-### 31. Test payment: no real money moved.
+### 35. Test payment: no real money moved.
 
 Text.
 
 - **What it does:** Reminds that nothing real happened.
 
-### 32. Copy checkout_session
+### 36. Copy checkout_session
 
 Button.
 
 - **What it does:** Copies the provider's checkout session id.
 
-### 33. Copy payment_intent
+### 37. Copy payment_intent
 
 Button.
 
 - **What it does:** Copies the provider's payment id (here a Stripe PaymentIntent).
 
-### 34. Simulate
+### 38. Simulate
 
 Button.
 
 - **What it does:** Opens what can happen next to this payment: capture, void, refund, dispute, expire and more, by its status.
 
-### 35. Resend notification
+### 39. Resend notification
 
 Button.
 
 - **What it does:** Sends the gateway's notification for the payment's current status again.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/notify`](/api/payments/#postPaymentsByPaymentIdNotify), CLI [`sendmock payments notify`](/cli/payments/#payments-notify), MCP [`sendmock_payment_notify`](/mcp/payments/#sendmock_payment_notify)
 
-### 36. Line items
+### 40. Line items
 
 Heading.
 
 - **What it does:** What was bought.
 
-### 37. Item
+### 41. Item
 
 Column.
 
 - **What it does:** The item.
 
-### 38. Qty
+### 42. Qty
 
 Column.
 
 - **What it does:** How many.
 
-### 39. Price
+### 43. Price
 
 Column.
 
 - **What it does:** The price of one.
 
-### 40. Total
+### 44. Total
 
 Column.
 
 - **What it does:** The line's total.
 
-### 41. Metadata: order_id=ord_XJD#C
+### 45. Metadata: order_id=ord_XJD#C
 
 Text.
 
 - **What it does:** The metadata your app sent (here an order id).
 
-### 42. Timeline
+### 46. Timeline
 
 Heading.
 
 - **What it does:** Every step the payment went through, with times.
 
-### 43. Redirects
+### 47. Redirects
 
 Heading.
 
 - **What it does:** Where the customer was sent back to, with the fields of each redirect.
 
-### 44. Notifications
+### 48. Notifications
 
 Heading.
 
 - **What it does:** The notifications the gateway sent your app.
 
-### 45. # … # minutes ago
+### 49. # … # minutes ago
 
 Link, in each row.
 
 - **What it does:** A notification: its status code, event and time; opens its delivery.
 - **Links to:** [Deliveries](../../webhooks/deliveries.md).
 
-### 46. Close
+### 50. Close
 
 Button.
 
@@ -306,13 +332,13 @@ Button.
 
 ## Simulate menu
 
-### 47. Refund...
+### 51. Refund...
 
 Menu item.
 
 - **What it does:** Opens Refund payment. Under the label, and read out by screen readers as its description: the endpoints the event will reach through your webhook rules, or No webhook.
 
-### 48. Choose webhooks for Refund
+### 52. Choose webhooks for Refund
 
 Menu item.
 
@@ -322,7 +348,7 @@ Menu item.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/rules/match`](/api/webhook-rules/#postWebhooksRulesMatch), CLI [`sendmock webhook rule match`](/cli/webhook-rules/#webhook-rule-match), MCP [`sendmock_webhook_rule_match`](/mcp/webhook-rules/#sendmock_webhook_rule_match)
 
-### 49. Open dispute
+### 53. Open dispute
 
 Menu item.
 
@@ -330,7 +356,7 @@ Menu item.
 - **What it changes:** Fires `payment.dispute_opened` and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
-### 50. Choose webhooks for Open dispute
+### 54. Choose webhooks for Open dispute
 
 Menu item.
 
@@ -342,31 +368,31 @@ Menu item.
 
 ## Refund payment dialog
 
-### 51. Refund payment
+### 55. Refund payment
 
 Heading.
 
 - **What it does:** The Refund payment dialog.
 
-### 52. $#.# can be refunded.
+### 56. $#.# can be refunded.
 
 Text.
 
 - **What it does:** How much is left to refund.
 
-### 53. Amount (USD)
+### 57. Amount (USD)
 
 Field.
 
 - **What it does:** How much to refund; less than the whole is a partial refund.
 
-### 54. Cancel
+### 58. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 55. Refund
+### 59. Refund
 
 Button.
 
@@ -374,7 +400,7 @@ Button.
 - **What it changes:** Fires `payment.refunded` or `payment.partially_refunded` and the gateway's notification.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
-### 56. Close
+### 60. Close
 
 Button.
 
@@ -382,31 +408,31 @@ Button.
 
 ## Answer dispute dialog
 
-### 57. Answer dispute
+### 61. Answer dispute
 
 Heading.
 
 - **What it does:** The Answer dispute dialog.
 
-### 58. The dispute goes under review until it is won or lost.
+### 62. The dispute goes under review until it is won or lost.
 
 Text.
 
 - **What it does:** Explains what answering does.
 
-### 59. Evidence
+### 63. Evidence
 
 Field.
 
 - **What it does:** What you send the card network as evidence.
 
-### 60. Cancel
+### 64. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 61. Send answer
+### 65. Send answer
 
 Button.
 
@@ -414,7 +440,7 @@ Button.
 - **What it changes:** Fires `payment.dispute_updated`.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate), CLI [`sendmock payments simulate`](/cli/payments/#payments-simulate), MCP [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate)
 
-### 62. Close
+### 66. Close
 
 Button.
 
@@ -422,13 +448,13 @@ Button.
 
 ## With no data yet
 
-### 63. No payments yet
+### 67. No payments yet
 
 Text.
 
 - **What it does:** Shown when no payment was made yet.
 
-### 64. Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz.
+### 68. Payments appear here when your app creates one through POST /api/v#/payments, a hosted checkout (POST /api/v#/payments/checkout) or an emulated provider such as Stripe or SSLCommerz.
 
 Text.
 
@@ -436,20 +462,20 @@ Text.
 
 ## When the data cannot load
 
-### 65. Could not load the payments. Try again
+### 69. Could not load the payments. Try again
 
 Message.
 
 - **What it does:** Shown when the payments could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 66. Could not load the payments.
+### 70. Could not load the payments.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 67. Try again
+### 71. Try again
 
 Button.
 

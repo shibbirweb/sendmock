@@ -3,6 +3,7 @@ import {
   describeChooseWebhooks,
   webhookTargetsUnderLabel,
 } from "./webhook-target-entries";
+import { describeListToolbar } from "./list-toolbar-entries";
 
 const paymentListEntries: DeeperEntry[] = [
   {
@@ -239,5 +240,16 @@ export const paymentsListPage: DeeperPage = {
   guideTitle: "Payments",
   intro:
     "Payments > All payments lists every test payment, from any gateway, and lets you simulate what happens next.",
-  entries: [...paymentListEntries, ...paymentDialogEntries],
+  entries: [
+    ...paymentListEntries,
+    ...paymentDialogEntries,
+    ...describeListToolbar({
+      itemsName: "payments",
+      rowCheckboxNames: ["Select payment of …"],
+      hasReadState: false,
+      isTable: true,
+      keepsNote: "Each payment's events, refunds and checkout go with it; subscriptions, gateways, methods and flows stay.",
+      deleteAllOperationId: "deletePayments",
+    }),
+  ],
 };

@@ -1,5 +1,6 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { describeChooseWebhooks } from "./webhook-target-entries";
+import { describeListToolbar } from "./list-toolbar-entries";
 
 const logEntries: DeeperEntry[] = [
   { control: "heading: Logs", does: "Names the screen, in the header and above the tabs." },
@@ -116,7 +117,25 @@ export const logsPage: DeeperPage = {
   guidePage: "logs.md",
   guideTitle: "Logs",
   intro: "Logs keeps every SMTP session and every API request, failed ones included, to see why a client was refused.",
-  entries: logEntries,
+  entries: [
+    ...logEntries,
+    ...describeListToolbar({
+      itemsName: "SMTP sessions",
+      rowCheckboxNames: ["Select SMTP session from …"],
+      hasReadState: false,
+      isTable: true,
+      keepsNote: "The emails they delivered stay in Mail.",
+      deleteAllOperationId: "deleteLogsSmtp",
+    }),
+    ...describeListToolbar({
+      itemsName: "API requests",
+      rowCheckboxNames: ["Select POST …"],
+      hasReadState: false,
+      isTable: false,
+      keepsNote: "The emails, SMS and payments they made stay.",
+      deleteAllOperationId: "deleteLogsHttp",
+    }),
+  ],
 };
 
 /** Scenarios: multi-step checks. */

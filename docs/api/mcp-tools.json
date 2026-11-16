@@ -7178,7 +7178,7 @@
     {
       "name": "sendmock_http_clear",
       "toolset": "http",
-      "summary": "Delete captured requests, every bin's or one bin's.",
+      "summary": "Delete captured requests, all or one bin's.",
       "area": "HTTP Catcher",
       "area_slug": "http-catcher",
       "operations": [
@@ -7186,7 +7186,7 @@
           "method": "DELETE",
           "path": "/api/v1/http/requests",
           "operation_id": "deleteHttpRequests",
-          "summary": "Delete captured requests, every bin's or one bin's.",
+          "summary": "Delete captured requests, all or one bin's.",
           "area_slug": "http-catcher",
           "selector": null
         }

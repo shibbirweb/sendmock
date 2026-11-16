@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { pushProviderLabels } from "@/features/push/push-labels";
 import { PushStatusBadge } from "@/features/push/push-status-badge";
+import { UnreadDot } from "@/components/common/unread-dot";
 import type { CheckedItems } from "@/hooks/use-checked-items";
 import type { PushNotification } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
@@ -35,6 +36,7 @@ function PushRow({
       checkedItems={checkedPushes}
     >
       <TableCell className="max-w-40 sm:max-w-64">
+        {isUnread && <UnreadDot className="mr-1.5 inline-block align-middle" />}
         <Link
           to="/push"
           search={(previousSearch) => ({
@@ -46,7 +48,6 @@ function PushRow({
             isUnread ? "font-semibold" : "font-medium",
           )}
         >
-          {isUnread && <span className="sr-only">Unread: </span>}
           {pushNotification.title ?? pushNotification.body ?? "(no text)"}
         </Link>
       </TableCell>

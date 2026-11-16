@@ -72,49 +72,75 @@ Field.
 
 - **What it does:** Filters by client, address or reply.
 
-### 10. Time
+### 10. Select all loaded SMTP sessions
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be deleted together. X ticks the open or focused row.
+
+### 11. Delete all SMTP sessions
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. The emails they delivered stay in Mail.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/logs/smtp`](/api/logs/#deleteLogsSmtp), CLI [`sendmock logs smtp delete-all`](/cli/logs/#logs-smtp-delete-all), MCP [`sendmock_logs_smtp_delete_all`](/mcp/logs/#sendmock_logs_smtp_delete_all)
+
+### 12. Select
+
+Column.
+
+- **What it does:** The column of tick boxes; it has no visible title.
+
+### 13. Time
 
 Column.
 
 - **What it does:** When the session started.
 
-### 11. Client
+### 14. Client
 
 Column.
 
 - **What it does:** The client's address and its `EHLO` name.
 
-### 12. TLS
+### 15. TLS
 
 Column.
 
 - **What it does:** Whether it used STARTTLS or implicit TLS.
 
-### 13. AUTH
+### 16. AUTH
 
 Column.
 
 - **What it does:** The login it used, if any.
 
-### 14. Result
+### 17. Result
 
 Column.
 
 - **What it does:** How it ended: delivered, or the error code and reply.
 
-### 15. Emails
+### 18. Emails
 
 Column.
 
 - **What it does:** How many emails it stored.
 
-### 16. Duration
+### 19. Duration
 
 Column.
 
 - **What it does:** How long it lasted.
 
-### 17. …
+### 20. Select SMTP session from …
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 21. …
 
 Link, in each row.
 
@@ -123,50 +149,50 @@ Link, in each row.
 
 ## An SMTP session is open
 
-### 18. SMTP session
+### 22. SMTP session
 
 Heading.
 
 - **What it does:** The session drawer.
 
-### 19. Every command your app sent and every reply SendMock gave.
+### 23. Every command your app sent and every reply SendMock gave.
 
 Text.
 
 - **What it does:** Explains the drawer.
 
-### 20. Transcript
+### 24. Transcript
 
 Heading.
 
 - **What it does:** The conversation, line by line.
 
-### 21. Open email
+### 25. Open email
 
 Link.
 
 - **What it does:** Opens the email the session delivered.
 - **Links to:** [Inbox](../../mail/index.md).
 
-### 22. Copy transcript
+### 26. Copy transcript
 
 Button.
 
 - **What it does:** Copies the whole transcript.
 
-### 23. [message # bytes, stored as email]
+### 27. [message # bytes, stored as email]
 
 Link, in each row.
 
 - **What it does:** Where the message was sent in the transcript; opens the email it became.
 
-### 24. AUTH secrets are masked, and the message content is not repeated here: it is stored as the email.
+### 28. AUTH secrets are masked, and the message content is not repeated here: it is stored as the email.
 
 Text.
 
 - **What it does:** Explains what the transcript leaves out.
 
-### 25. Close
+### 29. Close
 
 Button.
 
@@ -174,43 +200,63 @@ Button.
 
 ## API requests tab
 
-### 26. #xx
+### 30. #xx
 
 Button.
 
 - **What it does:** Shows only rejected requests (4xx answers).
 
-### 27. Filter by API
+### 31. Filter by API
 
 Drop-down.
 
 - **What it does:** Shows one API's requests, such as Twilio or SendGrid, or all.
 
-### 28. Search request paths
+### 32. Search request paths
 
 Field.
 
 - **What it does:** Filters by path.
 
-### 29. API
+### 33. Select all loaded API requests
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be deleted together. X ticks the open or focused row.
+
+### 34. Delete all API requests
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. The emails, SMS and payments they made stay.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/logs/http`](/api/logs/#deleteLogsHttp), CLI [`sendmock logs http delete-all`](/cli/logs/#logs-http-delete-all), MCP [`sendmock_logs_http_delete_all`](/mcp/logs/#sendmock_logs_http_delete_all)
+
+### 35. API
 
 Column.
 
 - **What it does:** The API the request was for.
 
-### 30. Request
+### 36. Request
 
 Column.
 
 - **What it does:** Its method and path.
 
-### 31. Status
+### 37. Status
 
 Column.
 
 - **What it does:** The status SendMock answered.
 
-### 32. POST …
+### 38. Select POST …
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 39. POST …
 
 Link, in each row.
 
@@ -219,68 +265,68 @@ Link, in each row.
 
 ## An API request is open
 
-### 33. API request
+### 40. API request
 
 Heading.
 
 - **What it does:** The request drawer.
 
-### 34. Exactly what your app sent and what SendMock answered.
+### 41. Exactly what your app sent and what SendMock answered.
 
 Text.
 
 - **What it does:** Explains the drawer.
 
-### 35. POST /#-#-#/Accounts/AC#/Messages.json
+### 42. POST /#-#-#/Accounts/AC#/Messages.json
 
 Text.
 
 - **What it does:** The request's method and path (here a Twilio send).
 
-### 36. Open SMS
+### 43. Open SMS
 
 Link.
 
 - **What it does:** Opens the SMS the request created.
 - **Links to:** [SMS](../../sms/index.md).
 
-### 37. Request headers
+### 44. Request headers
 
 Heading.
 
 - **What it does:** The headers received.
 
-### 38. Request body
+### 45. Request body
 
 Heading.
 
 - **What it does:** The body received.
 
-### 39. Copy request body
+### 46. Copy request body
 
 Button.
 
 - **What it does:** Copies the request body.
 
-### 40. Response body
+### 47. Response body
 
 Heading.
 
 - **What it does:** What SendMock answered, exactly.
 
-### 41. Copy response body
+### 48. Copy response body
 
 Button.
 
 - **What it does:** Copies the response body.
 
-### 42. Credentials such as API keys and passwords are masked before logging.
+### 49. Credentials such as API keys and passwords are masked before logging.
 
 Text.
 
 - **What it does:** Explains the masking.
 
-### 43. Close
+### 50. Close
 
 Button.
 
@@ -288,19 +334,19 @@ Button.
 
 ## With no data yet
 
-### 44. No SMTP sessions yet
+### 51. No SMTP sessions yet
 
 Text.
 
 - **What it does:** Shown while no app has connected over SMTP.
 
-### 45. Point your app's SMTP settings at SendMock; every connection shows up here, even the ones that fail.
+### 52. Point your app's SMTP settings at SendMock; every connection shows up here, even the ones that fail.
 
 Text.
 
 - **What it does:** Explains how sessions arrive.
 
-### 46. This machine
+### 53. This machine
 
 Choice.
 
@@ -308,45 +354,45 @@ Choice.
 - **What it changes:** Shared with Settings > Connection and remembered in the browser.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 47. Docker host
+### 54. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host.
 
-### 48. Compose
+### 55. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project.
 
-### 49. Copy SMTP host
+### 56. Copy SMTP host
 
 Button.
 
 - **What it does:** Copies the SMTP host.
 
-### 50. Copy SMTP port
+### 57. Copy SMTP port
 
 Button.
 
 - **What it does:** Copies the SMTP port.
 
-### 51. More snippets
+### 58. More snippets
 
 Link.
 
 - **What it does:** Opens Settings > Connection.
 - **Links to:** [Settings](../../settings.md).
 
-### 52. Send a sample email
+### 59. Send a sample email
 
 Button.
 
 - **What it does:** Stores a sample email.
 - **Same action elsewhere:** REST [`POST /api/v1/samples/{kind}`](/api/system/#postSamplesByKind), CLI [`sendmock sample`](/cli/system/#sample), MCP [`sendmock_sample_send`](/mcp/system/#sendmock_sample_send)
 
-### 53. Choose webhooks for Send a sample email
+### 60. Choose webhooks for Send a sample email
 
 Button.
 
@@ -358,20 +404,20 @@ Button.
 
 ## When the data cannot load
 
-### 54. Could not load the SMTP log. Try again
+### 61. Could not load the SMTP log. Try again
 
 Message.
 
 - **What it does:** Shown when the log could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 55. Could not load the SMTP log.
+### 62. Could not load the SMTP log.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 56. Try again
+### 63. Try again
 
 Button.
 

@@ -27,6 +27,7 @@
       "button: Save changes",
       "heading: Danger zone",
       "paragraph: These cannot be undone. Each asks first.",
+      "button: Delete all traffic",
       "button: Delete all emails",
       "button: Delete all SMS",
       "button: Reset to seed"

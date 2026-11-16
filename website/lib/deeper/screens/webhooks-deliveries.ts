@@ -1,4 +1,5 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import { describeListToolbar } from "./list-toolbar-entries";
 
 const deliveryListEntries: DeeperEntry[] = [
   {
@@ -162,5 +163,16 @@ export const webhooksDeliveriesPage: DeeperPage = {
   guideTitle: "Deliveries",
   intro:
     "Webhooks > Deliveries lists every request SendMock sent to your endpoints, with what each answered, and replays any of them.",
-  entries: [...deliveryListEntries, ...deliveryDetailEntries],
+  entries: [
+    ...deliveryListEntries,
+    ...deliveryDetailEntries,
+    ...describeListToolbar({
+      itemsName: "deliveries",
+      rowCheckboxNames: ["Select …"],
+      hasReadState: false,
+      isTable: true,
+      keepsNote: "Deliveries still queued or waiting for a retry stay; cancel them first.",
+      deleteAllOperationId: "deleteWebhooksDeliveries",
+    }),
+  ],
 };

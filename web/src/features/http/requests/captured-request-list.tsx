@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { HttpStatusBadge } from "@/components/common/http-status-badge";
 import { ListRowCheckbox } from "@/components/common/list-row-checkbox";
+import { UnreadDot } from "@/components/common/unread-dot";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CapturedRequestToolbar } from "@/features/http/requests/captured-request-toolbar";
@@ -56,6 +57,7 @@ function CapturedRequestRow({
           checkedRequests.setItemChecked(capturedRequest.id, isChecked);
         }}
       />
+      {isUnread && <UnreadDot />}
       <button
         type="button"
         aria-current={isSelected ? "true" : undefined}
@@ -71,7 +73,6 @@ function CapturedRequestRow({
               isUnread && "font-semibold",
             )}
           >
-            {isUnread && <span className="sr-only">Unread: </span>}
             {isShowingBin ? `${capturedRequest.bin_name} ` : ""}
             {pathInBin}
           </span>

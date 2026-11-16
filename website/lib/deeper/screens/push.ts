@@ -1,4 +1,9 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
+import {
+  describeDeleteAllDialog,
+  describeListToolbar,
+  describeUnreadDot,
+} from "./list-toolbar-entries";
 
 const pushListEntries: DeeperEntry[] = [
   { control: "heading: Push", does: "Names the screen." },
@@ -40,10 +45,6 @@ const pushListEntries: DeeperEntry[] = [
   {
     control: "textbox: Filter by device token",
     does: "Shows only notifications to this exact device token, Expo push token, OneSignal subscription or alias (`external_id:user-7`).",
-  },
-  {
-    control: "button: Clear all",
-    does: "Asks, then deletes every notification the filters show.",
   },
   {
     control: "columnheader: Notification",
@@ -120,22 +121,6 @@ const pushDrawerEntries: DeeperEntry[] = [
 
 const pushDialogAndStateEntries: DeeperEntry[] = [
   {
-    control: "heading: Clear every push notification?",
-    does: "Asks before Clear all.",
-  },
-  {
-    control:
-      "paragraph: Every notification this list shows is deleted; tests waiting for one see only new ones.",
-    does: "Explains what Clear all deletes.",
-  },
-  { control: "button: Keep them", does: "Closes the dialog without deleting." },
-  {
-    control: "button: Clear all",
-    state: "Clear all dialog",
-    does: "Deletes every notification the filters show.",
-    operationIds: ["deletePush"],
-  },
-  {
     control: "paragraph: No push notifications yet",
     does: "Shown when no app has sent a notification yet.",
   },
@@ -203,6 +188,15 @@ export const pushPage: DeeperPage = {
     "Push shows every notification your app sends through FCM, Expo or OneSignal, as a phone's lock screen would show it.",
   entries: [
     ...pushListEntries,
+    ...describeListToolbar({
+      itemsName: "push notifications",
+      rowCheckboxNames: ["Select push to …"],
+      hasReadState: true,
+      isTable: true,
+      deleteAllOperationId: "deletePush",
+    }),
+    describeUnreadDot("notification"),
+    ...describeDeleteAllDialog("push notifications", "deletePush"),
     ...pushDrawerEntries,
     ...pushDialogAndStateEntries,
   ],

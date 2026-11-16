@@ -47,7 +47,7 @@ test("PY-07.4 a live subscription is charged, renewed when advanced and ends at 
   const row = subscriptionRow(page, customerEmail);
   await expect(row).toContainText("Active");
   await chooseRowAction(page, customerEmail, "Advance to renewal");
-  await expect(row.getByRole("cell").nth(4)).toHaveText("2");
+  await expect(row.getByRole("cell").nth(5)).toHaveText("2");
   await chooseRowAction(page, customerEmail, "Cancel at period end");
   await expect(row).toContainText("Ends at period end");
   await chooseRowAction(page, customerEmail, "Advance to renewal");

@@ -95,22 +95,24 @@ describe("list actions in the mock API", () => {
     if (pushNotification === undefined || capturedRequest === undefined) {
       throw new Error("the demo data has no push or captured request");
     }
+    const wasPushRead = pushNotification.is_read;
+    const wasRequestRead = capturedRequest.is_read;
     const statsBefore = await readJson<AppStats>("GET", "/stats");
 
     const updatedPush = (await (
       await callApi("PATCH", `/push/${pushNotification.id}`, {
-        is_read: !pushNotification.is_read,
+        is_read: !wasPushRead,
       })
     ).json()) as PushNotification;
     const updatedRequest = (await (
       await callApi("PATCH", `/http/requests/${capturedRequest.id}`, {
-        is_read: !capturedRequest.is_read,
+        is_read: !wasRequestRead,
       })
     ).json()) as CapturedHttpRequest;
     const statsAfter = await readJson<AppStats>("GET", "/stats");
 
-    expect(updatedPush.is_read).toBe(!pushNotification.is_read);
-    expect(updatedRequest.is_read).toBe(!capturedRequest.is_read);
+    expect(updatedPush.is_read).toBe(!wasPushRead);
+    expect(updatedRequest.is_read).toBe(!wasRequestRead);
     expect(statsAfter.unread_push_count).not.toBe(
       statsBefore.unread_push_count,
     );

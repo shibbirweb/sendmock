@@ -4538,7 +4538,7 @@ paths:
       x-sendmock-ui: HTTP Catcher > Requests
     delete:
       operationId: deleteHttpRequests
-      summary: Delete captured requests, every bin's or one bin's.
+      summary: Delete captured requests, all or one bin's.
       tags:
         - HTTP Catcher
       parameters:

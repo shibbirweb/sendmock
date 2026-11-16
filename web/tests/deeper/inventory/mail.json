@@ -101,6 +101,7 @@
     ],
     "Emails are selected": [
       "button: Mark read",
+      "button: Mark unread",
       "button: Delete"
     ],
     "Simulate an event menu": [
@@ -161,8 +162,8 @@
       "button: Close"
     ],
     "Delete all emails dialog": [
-      "heading: Delete all emails?",
-      "paragraph: This removes all # captured emails. It cannot be undone.",
+      "heading: Delete all # emails?",
+      "paragraph: Settings and configuration stay. This cannot be undone.",
       "button: Cancel",
       "button: Delete all"
     ],
