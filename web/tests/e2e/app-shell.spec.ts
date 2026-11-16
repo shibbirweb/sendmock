@@ -186,7 +186,8 @@ test("UI-01.4 sidebar shows the live connection status and version", async ({
   page,
 }) => {
   await expect(page.getByRole("status")).toContainText("Live · demo data");
-  await expect(page.getByRole("status")).toContainText("v0.0.0-dev");
+  // The demo's /info answers as the default mock install profile.
+  await expect(page.getByRole("status")).toContainText("v0.1.0-beta.2");
 });
 
 test("UI-02.1 every screen renders in mock mode without a backend", async ({
