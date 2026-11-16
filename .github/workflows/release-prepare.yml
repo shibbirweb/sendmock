@@ -34,7 +34,7 @@ jobs:
       BUMP: ${{ inputs.bump }}
       GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # A token other than GITHUB_TOKEN lets the release pull request start CI.
