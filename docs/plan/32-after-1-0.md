@@ -4,31 +4,31 @@ The features planned for after 1.0 ([GitHub milestone "After 1.0"](https://githu
 
 ## Order
 
-Smallest change with the most users first; items that need an outside party (a distribution's maintainers, Docker's extension review) last.
+Smallest change with the most users first; items that need an outside party (a distribution's maintainers, Docker's extension review) last. Each item has a release milestone on GitHub (decided 2026-11-16 by owner request, replacing the single "After 1.0" milestone): the Release column, which the feature's acceptance intro starts with, so the roadmap sync files its issue there. Work that waits for an outside party is in "Waiting on others".
 
-| # | Item | Issue | Feature |
-|---|------|-------|---------|
-| A1 | Mailpit API compatibility | #163 | EM-19 (new) |
-| A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) |
-| A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) |
-| A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) |
-| A5 | Multi-project inboxes | #167 | PL-10 (new) |
-| A6 | POP3 read access | #159 | EM-21 (new) |
-| A7 | Push notification emulation | #166 | PN-01 (new) |
-| A8 | WhatsApp Business Cloud API, in full | #161 | to be written |
-| A9 | System tray app | #168 | to be written |
-| A10 | Helm chart and Docker Desktop extension | #162 | to be written |
-| A11 | Official distribution repositories | #169 | needs maintainers ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) |
-| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) |
-| A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) |
-| A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
-| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
-| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) |
-| A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new), ships in 1.1.0 |
-| A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) |
-| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) |
-| A20 | Search engines and link previews for the website | #293 | WS-13 (new) |
-| A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) |
+| # | Item | Issue | Feature | Release |
+|---|------|-------|---------|---------|
+| A1 | Mailpit API compatibility | #163 | EM-19 (new) | 0.1.0-beta.1 |
+| A2 | `email.clicked` link-click tracking | #164 | EM-20 (new) | 0.1.0-beta.1 |
+| A3 | More SMS provider formats (AWS SNS SMS, Infobip) | #165 | SM-17 (new) | 0.1.0-beta.1 |
+| A4 | Vonage Verify v2 and other verify APIs | #160 | VF-05 (new) | 0.1.0-beta.1 |
+| A5 | Multi-project inboxes | #167 | PL-10 (new) | 0.1.0-beta.1 |
+| A6 | POP3 read access | #159 | EM-21 (new) | 0.1.0-beta.1 |
+| A7 | Push notification emulation | #166 | PN-01 (new) | 0.1.0-beta.1 |
+| A8 | WhatsApp Business Cloud API, in full | #161 | to be written | 0.1.0-beta.1 |
+| A9 | System tray app | #168 | to be written | 0.1.0-beta.1 |
+| A10 | Helm chart and Docker Desktop extension | #162 | to be written | 1.0.0 |
+| A11 | Official distribution repositories | #169 | needs maintainers ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) | Waiting on others |
+| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.6.0 |
+| A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) | 2.0.0 |
+| A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) | 2.0.0 |
+| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.5.0 |
+| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.5.0 |
+| A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) | 1.1.0 |
+| A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) | 1.3.0 |
+| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.4.0 |
+| A20 | Search engines and link previews for the website | #293 | WS-13 (new) | 1.2.0 |
+| A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) | 1.2.0 |
 
 ## A1. Mailpit API compatibility (EM-19)
 

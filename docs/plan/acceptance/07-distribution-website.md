@@ -77,7 +77,7 @@ Phase 5 (enforced in CI).
 
 ## DS-08 System tray app
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a9-system-tray-app-ds-08).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a9-system-tray-app-ds-08).
 
 - [x] DS-08.1 With no SendMock answering, the tray app starts `sendmock serve` and shows it running at its address; with one already running it uses that one; Quit stops only a server the tray started. (#48)
 - [x] DS-08.2 The menu shows the unread email and SMS counts, refreshed every few seconds, and Open SendMock opens the web UI in the default browser. (#48)
@@ -87,7 +87,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## DS-09 Helm chart
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
+1.0.0 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
 
 - [x] DS-09.1 The chart runs SendMock as the image's non-root user with health probes on `/api/v1/health`, and a Service for SMTP and HTTP (and the provider port when enabled). (#48)
 - [x] DS-09.2 Values set the image, resources, persistence for `/data` (a claim, or an empty directory), extra `SENDMOCK_*` settings, the provider port and an optional Ingress for the web UI. (#48)
@@ -97,7 +97,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## DS-10 Docker Desktop extension
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
+1.0.0 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a10-helm-chart-and-docker-desktop-extension-ds-09-ds-10).
 
 - [x] DS-10.1 The extension image has `metadata.json` and every label Docker requires, and its VM service runs SendMock with SMTP and HTTP published on the host. (#48)
 - [x] DS-10.2 Its dashboard tab shows whether SendMock answers and opens the web UI. (#48)
@@ -137,7 +137,7 @@ Phase U3.
 
 ## WS-03 Docs and versions
 
-U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
+1.2.0 (left over from 1.0.0, moved 2026-11-16: WS-03.2 needs a test that names it). Before that: U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
 
 - [x] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher. (#276)
 - [x] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift. (#48)
@@ -220,7 +220,7 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 
 ## WS-11 Docs traffic analytics
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11) (A15).
+1.5.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11) (A15).
 
 - [ ] WS-11.1 The website loads Google Analytics 4 only when the build has a measurement ID (`NEXT_PUBLIC_GA_MEASUREMENT_ID`); local builds, pull request previews and forks load no analytics script.
 - [ ] WS-11.2 Consent Mode v2 starts with every storage type denied; nothing is stored or sent before the visitor accepts the banner, the choice is remembered and can be changed from the footer, and Do Not Track or Global Privacy Control count as a no.
@@ -231,7 +231,7 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 ## WS-12 Code examples on every page
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12) (A16).
+1.5.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12) (A16).
 
 - [ ] WS-12.1 Every docs page under a menu, sub-pages included, has a "From your code" section with an example for each task it explains, as tabs in CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#; a test fails when a page has no such section or misses a language.
 - [ ] WS-12.2 Each example runs as written against a default SendMock, with its imports, and shows the answer it gets back; pages about a provider API use that provider's SDK where one exists.
@@ -240,7 +240,7 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 ## WS-13 Search engines and link previews
 
-After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a20-search-engines-and-link-previews-ws-13) (A20). The site is served at https://shibbir.me/sendmock/ (the user site shibbirweb.github.io owns that domain); its `robots.txt` belongs to the portfolio at the domain root.
+1.2.0 (planned as After 1.0), planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a20-search-engines-and-link-previews-ws-13) (A20). The site is served at https://shibbir.me/sendmock/ (the user site shibbirweb.github.io owns that domain); its `robots.txt` belongs to the portfolio at the domain root.
 
 - [x] WS-13.1 Every page of the site root (home, docs, API, CLI, MCP, changelog, playground) has its own title and meta description and names itself canonical with an absolute URL under https://shibbir.me/sendmock/ that ends in `/`.
 - [x] WS-13.2 Every page of `/next/` and of each older version names the same page of the site root as canonical, or is `noindex, follow` when the site root has no such page; the versions have no sitemap.
@@ -253,10 +253,10 @@ After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-af
 
 ## WS-14 What's new and Upgrade guide
 
-After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a21-whats-new-and-upgrade-guide-in-the-docs-sidebar-ws-14) (A21).
+1.2.0 (planned as After 1.0), planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a21-whats-new-and-upgrade-guide-in-the-docs-sidebar-ws-14) (A21).
 
-- [ ] WS-14.1 Every docs version's sidebar shows, under the Version menu, a "What's new in vX.Y" link (in the beta docs, "What's new in the beta") and an "Upgrade guide" link, both opening that version's page.
-- [ ] WS-14.2 What's new lists the releases of the version's minor from its changelog, newest first (in the beta docs, what the newest beta holds), and links the full changelog.
-- [ ] WS-14.3 The Upgrade guide shows the version's upgrade notes from the changelog, or says nothing needs changing, then numbered one-command steps for every install channel, the beta channel's in the beta docs, each linking its Install section.
-- [ ] WS-14.4 Prepare release refuses a new major version, and its betas, when `[Unreleased]` has no `### Upgrade notes`.
+- [x] WS-14.1 Every docs version's sidebar shows, under the Version menu, a "What's new in vX.Y" link (in the beta docs, "What's new in the beta") and an "Upgrade guide" link, both opening that version's page.
+- [x] WS-14.2 What's new lists the releases of the version's minor from its changelog, newest first (in the beta docs, what the newest beta holds), and links the full changelog.
+- [x] WS-14.3 The Upgrade guide shows the version's upgrade notes from the changelog, or says nothing needs changing, then numbered one-command steps for every install channel, the beta channel's in the beta docs, each linking its Install section.
+- [x] WS-14.4 Prepare release refuses a new major version, and its betas, when `[Unreleased]` has no `### Upgrade notes`.
 

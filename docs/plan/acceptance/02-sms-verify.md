@@ -193,7 +193,7 @@ UI in U1, backend Phase 2.
 
 ## VF-05 Vonage Verify v2
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a4-vonage-verify-v2-vf-05).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a4-vonage-verify-v2-vf-05).
 
 - [x] VF-05.1 `POST /v2/verify` with an `sms` workflow starts a verification, delivers its code by SMS into SendMock, and answers 202 with a `request_id`; an `email` workflow delivers it by email. (#48)
 - [x] VF-05.2 `POST /v2/verify/{request_id}` with the right code answers 200 `completed`, a wrong code 400 `Invalid Code`, and a finished, cancelled or unknown request 404 `Not Found`, each in Vonage's problem shape. (#48)
@@ -202,7 +202,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 - [x] VF-05.4 The Vonage Node SDK's `Verify2` client starts and checks a verification against SendMock, with the code read from SendMock's API. (#48)
 ## SM-17 More SMS providers
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a3-more-sms-providers-sm-17).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a3-more-sms-providers-sm-17).
 
 - [x] SM-17.1 Infobip's send API captures the SMS and answers in Infobip's shape, with its errors; delivery reports reach the `notifyUrl` in Infobip's format; the Infobip Node SDK sends through it. (#48)
 - [x] SM-17.2 Telnyx's send API captures the SMS and answers in Telnyx's shape, with its errors; status webhooks reach the `webhook_url` in Telnyx's format; the Telnyx Node SDK sends through it. (#48)
@@ -213,7 +213,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## SM-18 WhatsApp Business Cloud API
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a8-whatsapp-business-cloud-api-sm-18).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a8-whatsapp-business-cloud-api-sm-18).
 
 - [x] SM-18.1 `POST /{version}/{phone_number_id}/messages` stores text, template, media, location, contacts, interactive and reaction messages as WhatsApp messages with a readable body and answers Meta's `messaging_product`, `contacts` and `messages` shape (`message_status` for templates). (#48)
 - [x] SM-18.2 An invalid request is refused with Graph's error object (`OAuthException`, code `100`, `error_data.details`) and nothing is stored; `status: "read"` with a message id marks the message read and answers `{ success: true }`. (#48)
