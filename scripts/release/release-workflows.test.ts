@@ -270,8 +270,9 @@ describe("Docker image", () => {
       ?.map((step) => step.run ?? "")
       .join("\n");
 
+    // A crates-only run (#291) skips it.
     expect(registryJob?.if).toBe(
-      "needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'",
+      "inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'",
     );
     expect(registryJob?.needs).toEqual(["plan", "npm"]);
     expect(registryJob?.permissions?.["id-token"]).toBe("write");
