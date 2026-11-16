@@ -936,9 +936,11 @@ expression: command_descriptions
     "command": "sendmock sms delete-all",
     "usage": "sendmock sms delete-all --yes",
     "aliases": [],
-    "summary": "Delete every message.",
+    "summary": "Delete every message, or one project's.",
     "arguments": [],
-    "flags": [],
+    "flags": [
+      "--project"
+    ],
     "operations": [
       {
         "method": "DELETE",
@@ -997,6 +999,50 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_sms_threads"
+    ]
+  },
+  {
+    "command": "sendmock sms threads update",
+    "usage": "sendmock sms threads update <threadId>",
+    "aliases": [],
+    "summary": "Mark a conversation read, or its newest message unread.",
+    "arguments": [
+      "threadId"
+    ],
+    "flags": [
+      "--read"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/sms/threads/{threadId}",
+        "operation_id": "patchSmsThreadsByThreadId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_thread_update"
+    ]
+  },
+  {
+    "command": "sendmock sms threads delete",
+    "usage": "sendmock sms threads delete <threadId>",
+    "aliases": [],
+    "summary": "Delete a conversation with its messages.",
+    "arguments": [
+      "threadId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/threads/{threadId}",
+        "operation_id": "deleteSmsThreadsByThreadId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_thread_delete"
     ]
   },
   {
@@ -1811,6 +1857,50 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_payment_list"
+    ]
+  },
+  {
+    "command": "sendmock payments delete-all",
+    "usage": "sendmock payments delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every payment, or those the filters match, with their events, refunds and checkout sessions.",
+    "arguments": [],
+    "flags": [
+      "--currency",
+      "--provider",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments",
+        "operation_id": "deletePayments",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock payments delete",
+    "usage": "sendmock payments delete <paymentId>",
+    "aliases": [],
+    "summary": "Delete one payment with its events, refunds and checkout session.",
+    "arguments": [
+      "paymentId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/{paymentId}",
+        "operation_id": "deletePaymentsByPaymentId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_payment_delete"
     ]
   },
   {
@@ -2724,6 +2814,29 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock push update",
+    "usage": "sendmock push update <pushId>",
+    "aliases": [],
+    "summary": "Mark a push notification read or unread.",
+    "arguments": [
+      "pushId"
+    ],
+    "flags": [
+      "--read"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/push/{pushId}",
+        "operation_id": "patchPushByPushId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_push_update"
+    ]
+  },
+  {
     "command": "sendmock push clear",
     "usage": "sendmock push clear",
     "aliases": [],
@@ -3056,6 +3169,50 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock http update",
+    "usage": "sendmock http update <requestId>",
+    "aliases": [],
+    "summary": "Mark a captured request read or unread.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [
+      "--read"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/http/requests/{requestId}",
+        "operation_id": "patchHttpRequestsByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_update"
+    ]
+  },
+  {
+    "command": "sendmock http delete",
+    "usage": "sendmock http delete <requestId>",
+    "aliases": [],
+    "summary": "Delete one captured request with its uploaded files.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/http/requests/{requestId}",
+        "operation_id": "deleteHttpRequestsByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_delete"
+    ]
+  },
+  {
     "command": "sendmock http file",
     "usage": "sendmock http file <requestId> <fileIndex>",
     "aliases": [],
@@ -3298,6 +3455,46 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_subscription_get"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions delete",
+    "usage": "sendmock payments subscriptions delete <subscriptionId>",
+    "aliases": [],
+    "summary": "Delete one subscription; its past payments stay.",
+    "arguments": [
+      "subscriptionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+        "operation_id": "deletePaymentsSubscriptionsBySubscriptionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_delete"
+    ]
+  },
+  {
+    "command": "sendmock payments subscriptions delete-all",
+    "usage": "sendmock payments subscriptions delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every subscription; their past payments stay.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/payments/subscriptions",
+        "operation_id": "deletePaymentsSubscriptions",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_subscription_delete_all"
     ]
   },
   {
@@ -3627,6 +3824,51 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_verify_get"
+    ]
+  },
+  {
+    "command": "sendmock verify delete",
+    "usage": "sendmock verify delete <verificationSid>",
+    "aliases": [],
+    "summary": "Delete one verification with its check attempts.",
+    "arguments": [
+      "verificationSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/verify/{verificationSid}",
+        "operation_id": "deleteVerifyByVerificationSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_delete"
+    ]
+  },
+  {
+    "command": "sendmock verify delete-all",
+    "usage": "sendmock verify delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every verification, or those the filters match.",
+    "arguments": [],
+    "flags": [
+      "--channel",
+      "--project",
+      "--status",
+      "--to"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/verify",
+        "operation_id": "deleteVerify",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_verify_delete_all"
     ]
   },
   {
@@ -4485,6 +4727,51 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_webhook_delivery_list"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries delete-all",
+    "usage": "sendmock webhook deliveries delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every finished delivery, or those the filters match; queued and retrying ones stay.",
+    "arguments": [],
+    "flags": [
+      "--endpoint-id",
+      "--event-type",
+      "--status",
+      "--subject-id"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/deliveries",
+        "operation_id": "deleteWebhooksDeliveries",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock webhook deliveries delete",
+    "usage": "sendmock webhook deliveries delete <deliveryId>",
+    "aliases": [],
+    "summary": "Delete a finished delivery; 409 while it is queued or waiting for a retry.",
+    "arguments": [
+      "deliveryId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/webhooks/deliveries/{deliveryId}",
+        "operation_id": "deleteWebhooksDeliveriesByDeliveryId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_delivery_delete"
     ]
   },
   {
@@ -5443,6 +5730,93 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock logs smtp delete-all",
+    "usage": "sendmock logs smtp delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every SMTP session, or those the filters match.",
+    "arguments": [],
+    "flags": [
+      "--query",
+      "--result"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/logs/smtp",
+        "operation_id": "deleteLogsSmtp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock logs smtp delete",
+    "usage": "sendmock logs smtp delete <sessionId>",
+    "aliases": [],
+    "summary": "Delete one SMTP session.",
+    "arguments": [
+      "sessionId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/logs/smtp/{sessionId}",
+        "operation_id": "deleteLogsSmtpBySessionId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_smtp_delete"
+    ]
+  },
+  {
+    "command": "sendmock logs http delete-all",
+    "usage": "sendmock logs http delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every API request log entry, or those the filters match.",
+    "arguments": [],
+    "flags": [
+      "--api",
+      "--path",
+      "--status-class"
+    ],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/logs/http",
+        "operation_id": "deleteLogsHttp",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http_delete_all"
+    ]
+  },
+  {
+    "command": "sendmock logs http delete",
+    "usage": "sendmock logs http delete <requestId>",
+    "aliases": [],
+    "summary": "Delete one API request log entry.",
+    "arguments": [
+      "requestId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/logs/http/{requestId}",
+        "operation_id": "deleteLogsHttpByRequestId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_logs_http_delete"
+    ]
+  },
+  {
     "command": "sendmock settings get",
     "usage": "sendmock settings get",
     "aliases": [],
@@ -5530,6 +5904,25 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_reset"
+    ]
+  },
+  {
+    "command": "sendmock traffic delete-all",
+    "usage": "sendmock traffic delete-all --yes",
+    "aliases": [],
+    "summary": "Delete every captured item in every project and keep every setting and configuration list.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/traffic",
+        "operation_id": "deleteTraffic",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_traffic_delete_all"
     ]
   },
   {
