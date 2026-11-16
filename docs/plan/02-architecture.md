@@ -351,6 +351,7 @@ Behaviour:
 - **`sendmock seed export`** (and a Settings button) writes the current configuration back to a seed file, so a setup built in the UI (or by an AI agent) can be committed to the app's repo.
 - `sendmock seed apply <file>` applies a seed to a running instance; `sendmock seed validate <file>` checks it without applying.
 - Seed items show a "from seed" badge in the UI; editing them in the UI marks them as diverged until the next export.
+- **Planned after 1.0:** a version header on every export, older files upgraded and newer ones refused with the version to update to, JSON and YAML alongside TOML, import from a URL, encrypted secrets for moving to your own machine, and a merge or replace preview ([32](32-after-1-0.md#a18-share-and-move-a-setup-versioned-export-and-import-pl-18), A18, PL-18); loading it from a URL at startup for CI is A19 (WH-15).
 
 ## Code organisation
 

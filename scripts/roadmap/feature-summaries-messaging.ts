@@ -337,6 +337,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "See exactly what your handler will receive, and test it with the payload you need.",
   },
+  "WH-15": {
+    summary:
+      "Run webhook tests in any CI/CD pipeline: SendMock loads its whole setup from a JSON or YAML file at a URL, `sendmock ci run` checks the webhooks your app receives and sends (real signatures, retries, idempotency) and writes a JUnit report, and `sendmock ci init` or any AI agent writes the pipeline job for GitHub Actions, GitLab CI and the other big CI systems.",
+    outcome:
+      "Catch a broken webhook handler or a wrong signature in the pull request, with one file and one command in the pipeline.",
+  },
   "HC-01": {
     summary:
       "An HTTP catcher that captures any request sent to a bin URL or the catch-all port, with headers, body and timing.",
@@ -452,5 +458,11 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
       "Forwarding rules for email and SMS: match messages by project, sender, recipient, content or provider, then forward to their recipients or redirect to fixed ones, with caps, retries and a dry run.",
     outcome:
       "Route the messages that matter, such as every OTP to the tester's phone, to real people automatically while everything else stays caught.",
+  },
+  "PL-18": {
+    summary:
+      "Export your whole setup as a versioned file (TOML, JSON or YAML) and import it on another machine or give it to a teammate, from a file or a URL, with older files upgraded automatically, newer ones refused with the version to update to, secrets kept out or encrypted with a passphrase, and a preview before anything changes.",
+    outcome:
+      "Move or share a working SendMock setup in one step, without rebuilding it by hand or worrying which version wrote it.",
   },
 };

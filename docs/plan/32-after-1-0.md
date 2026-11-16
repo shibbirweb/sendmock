@@ -25,6 +25,8 @@ Smallest change with the most users first; items that need an outside party (a d
 | A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
 | A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) |
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new), ships in 1.1.0 |
+| A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) |
+| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -509,3 +511,103 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 **Order:** the contract and the mock handlers, then the shared toolbar with Mail moved onto it, then the other screens one by one (SMS first), then the operations, REST, CLI and MCP, then the guide pages.
 
 **Not in this part:** undo after a delete (export the seed first), deleting on a schedule (retention, PL-08, does that), selecting across pages beyond the loaded rows (Delete matching covers that), and these actions on configuration lists.
+
+## A18. Share and move a setup: versioned export and import (PL-18)
+
+**Why (owner request, 2026-11-16):** someone who has built a setup (endpoints, rules, templates, numbers, providers, payments, settings) wants to export it and give it to a teammate, or import it on their other machine and carry on, without rebuilding anything by hand. A file written by one SendMock version has to work in another, or say clearly why not.
+
+**What exists:** the seed file (`sendmock.seed.toml`, [02](02-architecture.md#configuration-and-seed-file)) with `sendmock seed export|apply|validate|status`, Settings > Seed and the `share-your-setup` recipe. Its gaps for this job: the file carries no version, so a file from a newer SendMock fails on an unknown key with no hint and a file from an older one cannot be upgraded when a section changes; it is TOML only; it is read from a path, never a URL; secrets come out only as `${ENV_VAR}` references, so moving to your own machine means setting every variable again; and apply always merges, with no preview of what it adds, changes or removes.
+
+**How others do it** (read 2026-11-16):
+
+- **Mockoon** ([CLI](https://www.npmjs.com/package/@mockoon/cli), [import and export](https://mockoon.com/docs/latest/import-export-data/)): the data file is migrated automatically when it comes from an older version, on a copy, never the user's file; a file from a newer version asks for a newer CLI; `--data` takes a path or a URL; migration is one-way.
+- **Grafana** ([dashboard JSON model](https://grafana.com/docs/grafana/latest/visualizations/dashboards/build-dashboards/view-dashboard-json-model/)): an integer `schemaVersion`, raised whenever the shape changes, and migrations from each version to the next; a file older than the oldest supported migration gets a "minimum version" error instead of a half-imported dashboard.
+- **WireMock** ([import and export](https://docs.wiremock.io/import-export/wiremock)): export is a GET of every stub as JSON, import a POST of the same document, so the round trip is lossless.
+
+**The design:**
+
+- **One format, stamped with its version.** The setup file is the seed file with a header table; nothing else changes, so every existing seed file still works:
+
+  ```toml
+  [sendmock]
+  format = "sendmock.setup"
+  format_version = 2              # an integer, raised only when the shape changes
+  exported_by = "1.4.0"           # the SendMock that wrote it
+  exported_at = "2026-11-16T10:00:00Z"
+  ```
+
+  A file without the header is read as `format_version = 1`, today's seed. `format_version` is not the SendMock version: it changes only when a section or key changes shape, and only in a minor or major release, never a patch. The docs' Versions page keeps a table of each format version and the SendMock release that introduced it.
+- **The version rules on import** (one place, `SetupVersionPolicy`, used by the UI, REST, CLI, MCP and `--setup`):
+  - The same format version: applied as it is.
+  - Older: upgraded in memory, one step at a time, by a registry of migrations (`SetupMigration` from 1 to 2, from 2 to 3, ...), each with fixture files of the older shape kept in the tests. The user's file is never rewritten; the import summary says "upgraded from format 1 to 3", and `sendmock setup migrate <file>` writes the upgraded copy for committing.
+  - Older than the oldest migration this build keeps: refused, naming the last SendMock release that reads it. Every release reads every format version written since 1.0.
+  - Newer than this build understands: refused before anything is applied, with "This setup was exported by SendMock 1.6.0 (format 4); this is 1.4.0 (format 2). Update SendMock to import it.", the update command for the way it was installed (from `GET /info`), and nothing half-applied.
+  - A newer `exported_by` with the same format version is fine and only noted. An unknown section or key in a known format version is an error with its line number, as `seed validate` does today.
+- **What a setup holds:** all configuration, the seed's sections plus every Settings section, projects, providers, HTTP Catcher bins and their mock responses, and scenarios. Never traffic (emails, SMS, deliveries, payments, logs) or the server's own runtime options (`sendmock.toml`: ports, database path, auth), which belong to each machine. `--project <key>` exports one project's items; `--only` and `--except` take section names.
+- **Formats:** TOML (the default, as today), JSON and YAML, chosen by the file extension or `--format`, with one structure, so a file converts losslessly between them. A JSON Schema per format version is generated from the types and published on the website (`/schema/setup/v2.json`) and submitted to SchemaStore, so editors and AI agents validate a file as it is written. YAML reuses `serde_yaml_ng`, already a workspace dependency.
+- **Secrets:** exported as `${ENV_VAR}` references by default, as today, so a shared file holds none. For moving to your own machine, `--include-secrets` asks for a passphrase and writes each secret encrypted (AES-256-GCM, key from PBKDF2-HMAC-SHA256 with a random salt, both from `ring`, already a dependency), marked `{ encrypted = "..." }`; import asks for the passphrase (the UI field, a CLI prompt or `SENDMOCK_SETUP_PASSPHRASE`). A secret is never written in plain text, in line with the safe defaults.
+- **Import from a file or a URL:** a path, an upload, pasted text or an `https://` URL (a raw file in a repository, a gist, an internal server). The fetch is capped at 1 MB and 10 seconds, follows at most 3 redirects and only to `https`, takes an optional `--sha256` that must match, and sends optional headers for a private URL (`--header "Authorization: Bearer ..."`, masked wherever it is shown or logged). Plain `http` is allowed only for loopback and private addresses, for a file served inside the CI network.
+- **Preview, then merge or replace:** validation lists, per section, what would be added, changed and removed. **Merge** (the default, today's `seed apply`) upserts by name and keeps everything else; **Replace** also removes the configuration the file does not have, after a confirmation that names how many items go. Nothing is applied unless the whole file validates.
+- **Every surface:** Settings > Seed becomes Settings > Setup (Export, Import, Validate, the status card), with Export offering the format, project, sections and the secrets choice, and Import a file, a paste or a URL with the preview. REST: `GET /setup/export`, `POST /setup/import`, `POST /setup/validate` and `POST /setup/migrate`, with `/seed/*` kept as aliases. CLI: `sendmock setup export|import|validate|migrate`, with `sendmock seed ...` kept as aliases. MCP: `sendmock_setup_export`, `sendmock_setup_import` (destructive with Replace), `sendmock_setup_validate`. The API change starts in [06](06-api.md), then the registry and types, then the regenerated spec.
+- **Docs:** the `share-your-setup` recipe gains "Move to another machine" and "Import from a URL", the configuration reference documents the header and every section, and the Versions page lists the format versions.
+
+**Proof:** a round trip on every surface (export, import into a fresh instance, export again: the two files are equal); a fixture file for every older format version, upgraded and applied; a file from a newer format refused with nothing applied; encrypted secrets that import with the passphrase and fail cleanly without it; URL import against a local test server (size cap, timeout, redirect rules, `--sha256`, headers masked); and a CI job that exports with the previous stable release and imports with the current build.
+
+**Not in this part:** syncing setups between running instances, hosting shared setups on a SendMock service, a diff view between two files beyond the import preview, and exporting traffic.
+
+## A19. SendMock in CI/CD pipelines for webhook tests (WH-15)
+
+**Why (owner request, 2026-11-16):** teams want to test their webhooks in CI/CD: that their app accepts and verifies the webhooks a provider sends, and that the webhooks their app sends arrive with the right body and signature. The pipeline should get SendMock's whole setup from one JSON or YAML file at a URL, and any AI agent should be able to add SendMock to a pipeline without a person working out the steps.
+
+**What exists:** the Docker image as a CI service container ([09](09-distribution.md#docker)), `--ready-json` with free ports, the Testcontainers modules, the seed file, the wait helpers, the HTTP Catcher, and scenarios ([14](14-ai-integration.md#scenarios), AI-04: `sendmock scenario run` stops at the first failed `assert` with exit code `5`). Missing: a setup read from a URL (a service container starts before the repository is checked out, so it cannot be given a file), one command that runs a whole webhook test and reports it in the form CI systems show, webhook-specific checks, and ready-made pipeline snippets.
+
+**How others do it** (read 2026-11-16): Mockoon's CLI starts a mock from a data file at a URL (`mockoon-cli start --data https://...`) and is run in GitHub Actions; WireMock runs as a service container and is loaded through its import API; Postman's Newman runs a collection from a URL and writes JUnit reports, which every CI system displays.
+
+**The design:**
+
+- **The setup from a URL:** `sendmock serve --setup <path|url>` and `SENDMOCK_SETUP` (with `SENDMOCK_SETUP_SHA256` and `SENDMOCK_SETUP_HEADERS`) load an A18 setup file, in TOML, JSON or YAML, at startup, with A18's version rules and fetch limits; the server only reports ready (`--ready-json`, `/health/ready`, PL-13) once the setup is applied, and a setup that fails to load or validate stops startup with the reason. So a service container needs one environment variable:
+
+  ```yaml
+  services:
+    sendmock:
+      image: ghcr.io/shibbirweb/sendmock:1
+      ports: ["8025:8025", "1025:1025"]
+      env:
+        SENDMOCK_DB: memory
+        SENDMOCK_SETUP: https://raw.githubusercontent.com/acme/shop/main/sendmock.setup.yml
+  ```
+- **A CI run file and one command:** `sendmock ci run <path|url>` reads a CI file (JSON or YAML, `format = "sendmock.ci"`, versioned like A18) that names the setup, the app's base URL and the scenarios (inline or as files or URLs). It starts SendMock in-process on free ports (or uses `--server <url>` for a running one), applies the setup, runs each scenario, and writes a JUnit XML report (`--junit <file>`), a JSON report (`--json`) and, when `GITHUB_STEP_SUMMARY` is set, a Markdown summary. Exit codes: `0` passed, `5` a scenario failed, `2` the files are invalid. Scenarios gain JSON and YAML alongside TOML, with the same steps.
+
+  ```yaml
+  sendmock:
+    format: sendmock.ci
+    format_version: 1
+  setup: https://raw.githubusercontent.com/acme/shop/main/sendmock.setup.yml
+  app_url: http://localhost:8000
+  scenarios:
+    - name: a paid order is accepted once
+      steps:
+        - run: payment.simulate
+          with: { gateway: stripe, event: payment_intent.succeeded, amount: 4200 }
+        - run: webhook.delivery.wait
+          with: { endpoint: shop-stripe, status: succeeded, timeout: 10s }
+        - run: http
+          with: { method: GET, url: "{{ app_url }}/orders/latest" }
+          save: order
+        - run: assert
+          with: { that: "{{ order.body.status }} == 'paid'" }
+  report:
+    junit: sendmock-report.xml
+  ```
+- **Both directions of a webhook test:**
+  - *The app receives webhooks:* SendMock sends the provider's real webhook (Stripe, PayPal, Twilio status and inbound SMS, inbound email in Postmark, SendGrid or Mailgun shape, Standard Webhooks), signed with the endpoint's secret, so the app's signature check runs for real; steps check the response code, a retry after a failure (chaos and retry policies) and that a replayed webhook is handled once (idempotency).
+  - *The app sends webhooks:* the app is pointed at an HTTP Catcher bin; new steps wait for a captured request (`http.request.wait` with method, path and body filters), check its signature (`webhook.signature.verify` for Standard Webhooks, Stripe-style and HMAC headers, with the secret from the setup) and assert on its body with JSONPath; the bin's mock responses return errors, timeouts or delays to test the app's own retries.
+- **Pipeline snippets:** the docs give a tested, copy-paste job for GitHub Actions, GitLab CI, CircleCI, Bitbucket Pipelines, Azure Pipelines, Jenkins and Buildkite, each as numbered steps with each command in its own block: start SendMock (service container, Docker or the install script), start the app, `sendmock ci run`, publish the JUnit report. A GitHub Action (`shibbirweb/setup-sendmock`, in its own repository, since a Marketplace action's repository cannot hold workflows) installs a given version with its checksum, starts it with a setup path or URL, waits until ready, and outputs the SMTP and HTTP addresses; it can also run a CI file. Creating that repository is an owner step.
+- **Any AI can set it up:** `sendmock ci init` looks at the repository (`.github/workflows`, `.gitlab-ci.yml`, `.circleci`, `bitbucket-pipelines.yml`, `azure-pipelines.yml`, `Jenkinsfile`), exports the running setup as YAML, and writes the setup file, a starter CI file with one scenario per webhook endpoint, and the pipeline job for the CI it found (`--provider` to choose), so an agent and a person get the same files. The skill gains a `ci-setup` section with these steps, MCP gains `sendmock_ci_init`, `sendmock_ci_validate` and a `setup-ci` prompt that walks an agent through it, `llms.txt` links the CI page, and the setup and CI JSON Schemas (A18) let the agent check its files before committing.
+- **Every surface:** REST `POST /ci/run` (runs a CI file against this instance and answers the report), `POST /ci/validate` and `POST /ci/init`; the Scenarios screen imports a CI file from a file or a URL, runs it and shows the report per scenario and step, and offers the JUnit download; Settings > Setup gets a "Use in CI" card with the snippet for each CI system, filled in with the setup URL.
+
+**Proof:** `examples/ci/` holds a small app that receives Stripe and Twilio webhooks and sends Standard Webhooks; a workflow runs it in GitHub Actions three ways: a service container with `SENDMOCK_SETUP` pointing at a URL (a local static server in the job, then the raw file on `develop`), `sendmock ci run` with the binary, and the GitHub Action. It checks the JUnit report and that a broken app fails the run with exit code `5`. The other CI systems' snippets are checked against their published schemas where one exists, and each is run by hand once before the docs page ships. `sendmock ci init` has snapshot tests for each CI system.
+
+**Order:** A18 first (the versioned format, YAML and JSON, and the URL import are what A19 loads), then A19: `--setup` and `SENDMOCK_SETUP`, then `sendmock ci run` and the reports, then the webhook steps, then `ci init`, the MCP prompt and the docs, then the GitHub Action.
+
+**Not in this part:** a hosted SendMock for CI, load testing, recording and replaying production webhooks, and CI systems' own plugins beyond the GitHub Action.
