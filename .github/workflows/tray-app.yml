@@ -44,6 +44,8 @@ jobs:
         run: rustup toolchain install
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Lint the tray app with its GUI
         run: cargo clippy -p sendmock-tray --all-targets --features gui --locked -- -D warnings
