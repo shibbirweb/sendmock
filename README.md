@@ -1,9 +1,12 @@
 # SendMock
 
-[![CI](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml?query=branch%3Adevelop)
+[![CI](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml?query=branch%3Amain)
 [![Release](https://img.shields.io/github/v/release/shibbirweb/sendmock?include_prereleases&sort=semver&label=release)](https://github.com/shibbirweb/sendmock/releases)
 [![npm](https://img.shields.io/npm/v/sendmock?label=npm)](https://www.npmjs.com/package/sendmock)
 [![crates.io](https://img.shields.io/crates/v/sendmock?label=crates.io)](https://crates.io/crates/sendmock)
+[![Downloads](https://img.shields.io/github/downloads/shibbirweb/sendmock/total?label=downloads)](https://github.com/shibbirweb/sendmock/releases)
+[![npm downloads](https://img.shields.io/npm/dm/sendmock?label=npm%20downloads)](https://www.npmjs.com/package/sendmock)
+[![crates.io downloads](https://img.shields.io/crates/d/sendmock?label=crates.io%20downloads)](https://crates.io/crates/sendmock)
 [![Docker pulls](https://img.shields.io/docker/pulls/shibbirweb/sendmock?label=docker%20pulls)](https://hub.docker.com/r/shibbirweb/sendmock)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#license)
 [![Docs](https://img.shields.io/badge/docs-shibbirweb.github.io%2Fsendmock-informational)](https://shibbirweb.github.io/sendmock/docs/)
