@@ -24,6 +24,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) |
 | A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) |
 | A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) |
+| A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new), ships in 1.1.0 |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -463,3 +464,48 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 - **Order:** Push first (it lacks the tabs), then Webhooks, SMS, Mail, Payments, HTTP and Providers, one menu per pull request.
 
 **Not in this part:** examples for languages beyond the nine, and interactive "run in the browser" examples (the API playground covers that).
+
+## A17. List actions on every traffic screen: select, mark read or unread, delete, delete all (UI-14)
+
+**Release:** ships in **1.1.0**, the next stable minor, with the fix for bug #278 (owner decision, 2026-11-16; see [16](16-website-and-releases.md#roadmap-placement)).
+
+**Why (owner request, 2026-11-16):** Mail's list has a toolbar: a checkbox on each row and a select-all checkbox, Mark read and Delete for the checked emails, and Delete all (or Delete matching while a filter is on). No other screen has it. SMS's conversation list has only its search and channel chips, so a conversation cannot be marked unread, several cannot be deleted at once, and the only way to empty SMS is Settings > General. The HTTP Catcher can only clear one bin, Push only clear everything, and Verify, webhook deliveries, Payments and the Logs cannot be emptied at all, short of Reset to seed, which also throws away the configuration. The owner asked for the same actions on every service.
+
+**How others do it:** mail clients and catchers (Gmail, Mailpit, Mailtrap) put the same toolbar above every list: a select-all checkbox, then actions that apply to the checked rows (mark read, mark unread, delete), and Delete all; webhook.site has Delete all requests on each URL. The toolbar looks and works the same on every list.
+
+**One toolbar for every list:** a shared compound component in `components/common` (`ListActionToolbar`, with a row checkbox for the list items) that Mail moves onto and every other list uses, so the actions look, sit and behave the same everywhere:
+
+- **Select:** a checkbox on each row (shown on hover and while anything is checked, always on touch screens) and a select-all checkbox for the loaded rows, which reads "3 selected" and turns indeterminate when only some are checked. `x` toggles the focused row, beside the `j`, `k`, `Enter` and `d` keys Mail already has, which every list gets.
+- **Act on the selection:** **Mark read** and **Mark unread** (on lists with read state) and **Delete**, shown while something is checked; deleting asks first with the count. The selection clears after an action and when the filter changes.
+- **Delete all:** always in the toolbar, disabled while the list is empty; while a filter is on it reads **Delete matching** and deletes only what the filter shows, as Mail does today. One confirmation names what goes, how many and what stays; confirming deletes at once.
+
+**Per screen:**
+
+| Screen | Read state | Delete one | Delete all |
+|---|---|---|---|
+| Mail | exists; adds bulk **Mark unread** | exists | exists |
+| SMS (conversations) | `unread_count` exists (opening marks read); new mark read or unread per conversation | new: a conversation with its messages | exists (`DELETE /sms`), moved from Settings onto the list |
+| SMS > Verify > Verifications | none | new | new |
+| Push | new, as Mail's | exists | exists (Clear all becomes the toolbar's Delete all) |
+| HTTP Catcher (a bin, or All requests) | new, as Mail's | new | exists per bin (`DELETE /http/requests`); also on All requests |
+| Webhooks > Deliveries | none | new (finished deliveries only) | new |
+| Payments, Subscriptions | none | new | new |
+| Logs > SMTP, Logs > HTTP | none | new | new |
+| Settings > General | | | also **Delete all traffic**: every list above at once, configuration kept |
+
+Read state follows Mail's: new items arrive unread, opening one marks it read, and the sidebar shows an unread count for SMS, Push and the HTTP Catcher as it does for Mail. Lists without read state (records of what happened, not an inbox) get Select, Delete and Delete all only.
+
+**API (contract first in [06](06-api.md), then the registry and types, the regenerated spec and the mock):** `PATCH /sms/threads/{threadId}` (`is_read`) and `DELETE /sms/threads/{threadId}`; `is_read` on push notifications and captured HTTP requests with `PATCH /push/{pushId}` and `PATCH /http/requests/{requestId}`; `DELETE` for one verification, HTTP request, webhook delivery, payment, subscription, SMTP session and API request log entry; `DELETE /verify`, `/webhooks/deliveries`, `/payments`, `/payments/subscriptions`, `/logs/smtp` and `/logs/http` for all, taking the list's filters as `DELETE /emails` does; `project` on `DELETE /emails` and `DELETE /sms` (`DELETE /push` has it); and `DELETE /traffic` for Delete all traffic. The UI runs the per-item operation for each checked row, as Mail does.
+
+**How it behaves:**
+
+- **Scoped like the list:** with a project picked, Mail, SMS, Verify and Push act only on that project's traffic; "All projects" acts on every project.
+- **Children go with their parent:** an email's attachments, timeline, opens and clicks; an SMS's media, status history and callback attempts; a verification's attempts; a payment's events, refunds and checkout session; a captured request's files.
+- **Configuration stays:** providers, bins and their rules, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, numbers, gateways, methods and flows, projects and settings. Only Reset to seed touches them.
+- **Work in flight is kept:** webhook deliveries that are queued or waiting for a retry cannot be deleted (cancel them first); Delete all keeps them and its confirmation says how many stay.
+- **Every tab updates:** a delete all publishes one `traffic.cleared` event (`{ "kinds": ["sms"], "project": "shop", "deleted_count": 128 }`, `project` null for all) instead of one event per row, and read changes refresh the unread counts, so every open tab drops the deleted rows and updates its badges without a reload. Like `traffic.pruned` (PL-08.5), webhook rules cannot pick `traffic.cleared`.
+- **Every surface:** each action is one `sendmock-ops` operation served by REST, the CLI (deletes of everything need `--yes`, as `sendmock email delete-all --yes`) and MCP (deletes annotated destructive), named after each area's existing commands and tools (for example `sendmock verify delete-all --yes` and `sendmock_verify_delete_all`), recorded in the surface catalogue, and described on each screen's guide page.
+
+**Order:** the contract and the mock handlers, then the shared toolbar with Mail moved onto it, then the other screens one by one (SMS first), then the operations, REST, CLI and MCP, then the guide pages.
+
+**Not in this part:** undo after a delete (export the seed first), deleting on a schedule (retention, PL-08, does that), selecting across pages beyond the loaded rows (Delete matching covers that), and these actions on configuration lists.

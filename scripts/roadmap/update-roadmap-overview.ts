@@ -52,6 +52,13 @@ const areaOrder = [
 ];
 const featureIssues = issues.filter((issue) => issue.target === "1.0");
 const backlogIssues = issues.filter((issue) => issue.target === "After 1.0");
+const releaseTargets = [
+  ...new Set(
+    issues
+      .map((issue) => issue.target)
+      .filter((target) => target !== "1.0" && target !== "After 1.0"),
+  ),
+].sort((left, right) => left.localeCompare(right, "en", { numeric: true }));
 const countWith = (status: string) =>
   featureIssues.filter((issue) => issue.status === status).length;
 const taskLine = (issue: FeatureIssue) =>
@@ -93,13 +100,21 @@ const overviewBody = [
       "",
     ];
   }),
+  ...releaseTargets.flatMap((releaseTarget) => [
+    `### Planned for ${releaseTarget}`,
+    "",
+    `Everything in this release, features and bug fixes: ${searchLink(`milestone ${releaseTarget}`, `is:issue milestone:"${releaseTarget}"`)}.`,
+    "",
+    ...issues.filter((issue) => issue.target === releaseTarget).map(taskLine),
+    "",
+  ]),
   "### After 1.0",
   "",
   ...backlogIssues.map(taskLine),
   "",
   "### How this is kept current",
   "",
-  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/feat/phase-0/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/feat/phase-0/docs/plan/acceptance) are the source of truth. When a pull request ticks criteria, the matching feature issues are updated, and closed once the feature is accepted.`,
+  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/develop/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/develop/docs/plan/acceptance) are the source of truth. When a pull request ticks criteria, the matching feature issues are updated, and closed once the feature is accepted.`,
   "",
 ].join("\n");
 

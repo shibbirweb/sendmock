@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { posix } from "node:path";
 
 export const repositoryUrl = "https://github.com/shibbirweb/sendmock";
-export const branch = "feat/phase-0";
+export const branch = "develop";
 export const blobBase = `${repositoryUrl}/blob/${branch}`;
 export const acceptanceFolder = "docs/plan/acceptance";
 

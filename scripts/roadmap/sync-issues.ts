@@ -49,12 +49,13 @@ const state = JSON.parse(
 const issues = JSON.parse(
   readFileSync(generatedIssuesPath, "utf8"),
 ) as FeatureIssue[];
-const milestoneFor = (issue: FeatureIssue) =>
-  issue.target === "After 1.0"
-    ? "After 1.0"
-    : issue.status === "Done"
-      ? "First beta (0.1.0-beta.1)"
-      : "1.0.0";
+const milestoneFor = (issue: FeatureIssue) => {
+  if (issue.target === "1.0") {
+    return issue.status === "Done" ? "First beta (0.1.0-beta.1)" : "1.0.0";
+  }
+  // "After 1.0" and each planned release ("1.1.0") are milestones of the same name.
+  return issue.target;
+};
 
 let changedCount = 0;
 for (const issue of issues) {
