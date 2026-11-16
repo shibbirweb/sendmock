@@ -19,6 +19,7 @@ import { readGatewayName } from "@/mocks/payments/payment-gateway-record";
 import { recordPaymentNotification } from "@/mocks/payments/record-payment-notification";
 import { simulatePayment } from "@/mocks/payments/simulate-payment";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { publishTrafficCleared } from "@/mocks/realtime/publish-traffic-cleared";
 import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
 
@@ -58,6 +59,23 @@ const refusalCodes: Record<number, string> = {
 };
 
 /** Tells live screens a payment and the delivery log changed. */
+/** The list's status (comma-separated), provider and currency filters. */
+function matchesPaymentFilters(
+  paymentDetail: PaymentDetail,
+  searchParameters: URLSearchParams,
+): boolean {
+  const statusFilter = searchParameters.get("status")?.split(",");
+  const providerFilter = searchParameters.get("provider");
+  const currencyFilter = searchParameters.get("currency");
+
+  return (
+    (statusFilter === undefined ||
+      statusFilter.includes(paymentDetail.status)) &&
+    (providerFilter === null || paymentDetail.provider === providerFilter) &&
+    (currencyFilter === null || paymentDetail.currency === currencyFilter)
+  );
+}
+
 function publishPaymentChange(paymentDetail: PaymentDetail) {
   const lastNotification = paymentDetail.notifications.at(-1);
   publishMockEvent(lastNotification?.event_type ?? "payment.created", {
@@ -72,19 +90,26 @@ export const paymentHandlers = [
   http.get("*/api/v1/payments", async ({ request }) => {
     await applyMockConditions();
     const requestUrl = new URL(request.url);
-    const statusFilter = requestUrl.searchParams.get("status")?.split(",");
-    const providerFilter = requestUrl.searchParams.get("provider");
-    const currencyFilter = requestUrl.searchParams.get("currency");
-    const matchingPayments = mockDatabase.payments.filter(
-      (payment) =>
-        (statusFilter === undefined || statusFilter.includes(payment.status)) &&
-        (providerFilter === null || payment.provider === providerFilter) &&
-        (currencyFilter === null || payment.currency === currencyFilter),
+    const matchingPayments = mockDatabase.payments.filter((payment) =>
+      matchesPaymentFilters(payment, requestUrl.searchParams),
     );
 
     return HttpResponse.json(
       paginateItems(matchingPayments.map(toPaymentSummary), requestUrl),
     );
+  }),
+
+  http.delete("*/api/v1/payments", async ({ request }) => {
+    await applyMockConditions();
+    const searchParameters = new URL(request.url).searchParams;
+    const keptPayments = mockDatabase.payments.filter(
+      (payment) => !matchesPaymentFilters(payment, searchParameters),
+    );
+    const deletedCount = mockDatabase.payments.length - keptPayments.length;
+    mockDatabase.payments = keptPayments;
+    publishTrafficCleared(["payment"], null, deletedCount);
+
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.post("*/api/v1/payments", async ({ request }) => {
@@ -112,6 +137,15 @@ export const paymentHandlers = [
     return paymentDetail === undefined
       ? createNotFoundResponse("Payment")
       : HttpResponse.json(presentPayment(paymentDetail));
+  }),
+
+  http.delete("*/api/v1/payments/:paymentId", async ({ params }) => {
+    await applyMockConditions();
+    mockDatabase.payments = mockDatabase.payments.filter(
+      (payment) => payment.id !== params.paymentId,
+    );
+
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.post(

@@ -4,6 +4,7 @@ import type {
   WebhookDeliveryDetail,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 function findDeliverySubject(
   mockDatabase: MockDatabase,
@@ -29,16 +30,11 @@ function findDeliverySubject(
     (existingMessage) => existingMessage.id === webhookDelivery.subject_id,
   );
   if (smsMessage !== undefined) {
-    const isOutbound = smsMessage.direction === "outbound";
-    const threadNumbers = isOutbound
-      ? `${smsMessage.from_number}|${smsMessage.to_number}`
-      : `${smsMessage.to_number}|${smsMessage.from_number}`;
-
     return {
       kind: "sms",
       id: smsMessage.id,
       title: smsMessage.body,
-      sms_thread_id: threadNumbers,
+      sms_thread_id: readSmsThreadId(smsMessage),
     };
   }
 

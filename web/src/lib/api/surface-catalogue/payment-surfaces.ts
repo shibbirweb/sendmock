@@ -11,6 +11,12 @@ export const paymentSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_payment_list",
     ui: "Payments",
   },
+  "DELETE /api/v1/payments": {
+    phase: "A17",
+    cli: "sendmock payments delete-all --yes",
+    mcp: "sendmock_payment_delete_all",
+    ui: "Payments > Delete all",
+  },
   "POST /api/v1/payments": {
     phase: "4",
     cli: "sendmock payments create",
@@ -28,6 +34,12 @@ export const paymentSurfaces: SurfaceCatalogue = {
     cli: "sendmock payments show <paymentId>",
     mcp: "sendmock_payment_get",
     ui: "Payments > open payment",
+  },
+  "DELETE /api/v1/payments/{paymentId}": {
+    phase: "A17",
+    cli: "sendmock payments delete <paymentId>",
+    mcp: "sendmock_payment_delete",
+    ui: "Payments > select payments > Delete",
   },
   "POST /api/v1/payments/{paymentId}/notify": {
     phase: "3P",
@@ -54,6 +66,12 @@ export const paymentSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_subscription_list",
     ui: "Payments > Subscriptions",
   },
+  "DELETE /api/v1/payments/subscriptions": {
+    phase: "A17",
+    cli: "sendmock payments subscriptions delete-all --yes",
+    mcp: "sendmock_subscription_delete_all",
+    ui: "Payments > Subscriptions > Delete all",
+  },
   "POST /api/v1/payments/subscriptions": {
     phase: "4",
     cli: "sendmock payments subscriptions create",
@@ -65,6 +83,12 @@ export const paymentSurfaces: SurfaceCatalogue = {
     cli: "sendmock payments subscriptions show <subscriptionId>",
     mcp: "sendmock_subscription_get",
     ui: "Payments > Subscriptions > open subscription",
+  },
+  "DELETE /api/v1/payments/subscriptions/{subscriptionId}": {
+    phase: "A17",
+    cli: "sendmock payments subscriptions delete <subscriptionId>",
+    mcp: "sendmock_subscription_delete",
+    ui: "Payments > Subscriptions > select subscriptions > Delete",
   },
   "POST /api/v1/payments/subscriptions/{subscriptionId}/advance": {
     phase: "4",

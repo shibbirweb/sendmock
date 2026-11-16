@@ -7,33 +7,43 @@ import {
   typeRef,
 } from "./endpoint-definition";
 
+const paymentFilterParameters = [
+  {
+    name: "status",
+    description: "succeeded, pending, failed, refunded or disputed.",
+    schema: "string" as const,
+    example: "succeeded",
+  },
+  {
+    name: "provider",
+    description: "Gateway key.",
+    schema: "string" as const,
+    example: "stripe",
+  },
+  {
+    name: "currency",
+    description: "ISO 4217 code.",
+    schema: "string" as const,
+    example: "USD",
+  },
+];
+
 const paymentEndpoints = tagEndpoints("Payments", [
   {
     method: "GET",
     path: "/api/v1/payments",
     summary: "Test payments, newest first, with filters.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "status",
-        description: "succeeded, pending, failed, refunded or disputed.",
-        schema: "string",
-        example: "succeeded",
-      },
-      {
-        name: "provider",
-        description: "Gateway key.",
-        schema: "string",
-        example: "stripe",
-      },
-      {
-        name: "currency",
-        description: "ISO 4217 code.",
-        schema: "string",
-        example: "USD",
-      },
-    ],
+    queryParameters: [...pageQueryParameters, ...paymentFilterParameters],
     response: pageOf("PaymentSummary"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/payments",
+    summary:
+      "Delete every payment, or those the filters match, with their events, refunds and checkout sessions.",
+    queryParameters: paymentFilterParameters,
+    response: null,
+    successStatus: 204,
   },
   {
     method: "POST",
@@ -58,6 +68,14 @@ const paymentEndpoints = tagEndpoints("Payments", [
       "One payment with line items, timeline, redirects and notifications.",
     response: typeRef("PaymentDetail"),
     errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/payments/{paymentId}",
+    summary:
+      "Delete one payment with its events, refunds and checkout session.",
+    response: null,
+    successStatus: 204,
   },
   {
     method: "POST",
@@ -94,6 +112,13 @@ const subscriptionEndpoints = tagEndpoints("Payments", [
     response: listOf("PaymentSubscription"),
   },
   {
+    method: "DELETE",
+    path: "/api/v1/payments/subscriptions",
+    summary: "Delete every subscription; their past payments stay.",
+    response: null,
+    successStatus: 204,
+  },
+  {
     method: "POST",
     path: "/api/v1/payments/subscriptions",
     summary: "Start a subscription on a gateway, with an optional trial.",
@@ -108,6 +133,13 @@ const subscriptionEndpoints = tagEndpoints("Payments", [
     summary: "One subscription with its timeline and renewal payments.",
     response: typeRef("PaymentSubscription"),
     errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/payments/subscriptions/{subscriptionId}",
+    summary: "Delete one subscription; its past payments stay.",
+    response: null,
+    successStatus: 204,
   },
   {
     method: "POST",

@@ -8,34 +8,43 @@ import {
   typeRef,
 } from "./endpoint-definition";
 
+const verificationFilterParameters = [
+  {
+    name: "status",
+    description: "pending, approved or failed.",
+    schema: "string" as const,
+    example: "pending",
+  },
+  {
+    name: "to",
+    description: "Number or email.",
+    schema: "string" as const,
+    example: "+8801700000000",
+  },
+  {
+    name: "channel",
+    description: "How the code was sent.",
+    schema: typeRef("VerifyChannel"),
+    example: "sms",
+  },
+  projectQueryParameter("verifications"),
+];
+
 const verifyEndpoints = tagEndpoints("Verify", [
   {
     method: "GET",
     path: "/api/v1/verify",
     summary: "Verifications your app started, newest first.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "status",
-        description: "pending, approved or failed.",
-        schema: "string",
-        example: "pending",
-      },
-      {
-        name: "to",
-        description: "Number or email.",
-        schema: "string",
-        example: "+8801700000000",
-      },
-      {
-        name: "channel",
-        description: "How the code was sent.",
-        schema: typeRef("VerifyChannel"),
-        example: "sms",
-      },
-      projectQueryParameter("verifications"),
-    ],
+    queryParameters: [...pageQueryParameters, ...verificationFilterParameters],
     response: pageOf("Verification"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/verify",
+    summary: "Delete every verification, or those the filters match.",
+    queryParameters: verificationFilterParameters,
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",
@@ -43,6 +52,13 @@ const verifyEndpoints = tagEndpoints("Verify", [
     summary: "One verification with its code, attempts and timeline.",
     response: typeRef("VerificationDetail"),
     errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/verify/{verificationSid}",
+    summary: "Delete one verification with its check attempts.",
+    response: null,
+    successStatus: 204,
   },
   {
     method: "POST",

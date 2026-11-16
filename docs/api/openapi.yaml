@@ -181,6 +181,20 @@ paths:
       x-sendmock-cli: sendmock reset --yes
       x-sendmock-mcp: sendmock_reset
       x-sendmock-ui: Settings > General > Reset to seed
+  /api/v1/traffic:
+    delete:
+      operationId: deleteTraffic
+      summary: Delete every captured item in every project and keep every setting and configuration list.
+      tags:
+        - System
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock traffic delete-all --yes
+      x-sendmock-mcp: sendmock_traffic_delete_all
+      x-sendmock-ui: Settings > General > Delete all traffic
   /api/v1/samples/{kind}:
     post:
       operationId: postSamplesByKind
@@ -349,6 +363,34 @@ paths:
       x-sendmock-cli: sendmock logs smtp
       x-sendmock-mcp: sendmock_logs_smtp
       x-sendmock-ui: Logs > SMTP sessions
+    delete:
+      operationId: deleteLogsSmtp
+      summary: Delete every SMTP session, or those the filters match.
+      tags:
+        - Logs
+      parameters:
+        - name: result
+          in: query
+          required: false
+          description: delivered or failed.
+          schema:
+            type: string
+          example: delivered
+        - name: query
+          in: query
+          required: false
+          description: Client, EHLO name or user.
+          schema:
+            type: string
+          example: laravel.test
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs smtp delete-all --yes
+      x-sendmock-mcp: sendmock_logs_smtp_delete_all
+      x-sendmock-ui: Logs > SMTP sessions > Delete all
   /api/v1/logs/smtp/{sessionId}:
     get:
       operationId: getLogsSmtpBySessionId
@@ -377,6 +419,27 @@ paths:
       x-sendmock-cli: sendmock logs smtp show <sessionId>
       x-sendmock-mcp: sendmock_logs_smtp_get
       x-sendmock-ui: Logs > SMTP sessions > open a session
+    delete:
+      operationId: deleteLogsSmtpBySessionId
+      summary: Delete one SMTP session.
+      tags:
+        - Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          description: The SMTP session's ID, from `GET /api/v1/logs/smtp`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs smtp delete <sessionId>
+      x-sendmock-mcp: sendmock_logs_smtp_delete
+      x-sendmock-ui: Logs > SMTP sessions > select sessions > Delete
   /api/v1/logs/http:
     get:
       operationId: getLogsHttp
@@ -431,6 +494,41 @@ paths:
       x-sendmock-cli: sendmock logs http
       x-sendmock-mcp: sendmock_logs_http
       x-sendmock-ui: Logs > API requests
+    delete:
+      operationId: deleteLogsHttp
+      summary: Delete every API request log entry, or those the filters match.
+      tags:
+        - Logs
+      parameters:
+        - name: api
+          in: query
+          required: false
+          description: Which API, e.g. twilio.
+          schema:
+            type: string
+          example: twilio
+        - name: status_class
+          in: query
+          required: false
+          description: 2xx, 4xx or 5xx.
+          schema:
+            $ref: "#/components/schemas/ApiStatusClass"
+          example: 4xx
+        - name: path
+          in: query
+          required: false
+          description: Part of the path.
+          schema:
+            type: string
+          example: /Messages.json
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs http delete-all --yes
+      x-sendmock-mcp: sendmock_logs_http_delete_all
+      x-sendmock-ui: Logs > API requests > Delete all
   /api/v1/logs/http/{requestId}:
     get:
       operationId: getLogsHttpByRequestId
@@ -459,6 +557,27 @@ paths:
       x-sendmock-cli: sendmock logs http show <requestId>
       x-sendmock-mcp: sendmock_logs_http_get
       x-sendmock-ui: Logs > API requests > open a request
+    delete:
+      operationId: deleteLogsHttpByRequestId
+      summary: Delete one API request log entry.
+      tags:
+        - Logs
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          description: The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock logs http delete <requestId>
+      x-sendmock-mcp: sendmock_logs_http_delete
+      x-sendmock-ui: Logs > API requests > select requests > Delete
   /api/v1/wait/email:
     get:
       operationId: getWaitEmail
@@ -2442,9 +2561,17 @@ paths:
       x-sendmock-ui: SMS
     delete:
       operationId: deleteSms
-      summary: Delete every message.
+      summary: Delete every message, or one project's.
       tags:
         - SMS
+      parameters:
+        - name: project
+          in: query
+          required: false
+          description: Only this project's messages (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
       responses:
         "204":
           description: No content.
@@ -2452,7 +2579,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock sms delete-all --yes
       x-sendmock-mcp: sendmock_sms_delete_all
-      x-sendmock-ui: Settings > General > Delete all SMS
+      x-sendmock-ui: SMS > Delete all
     post:
       operationId: postSms
       summary: Native send, with optional media URLs or inline media.
@@ -2506,6 +2633,57 @@ paths:
       x-sendmock-cli: sendmock sms threads
       x-sendmock-mcp: sendmock_sms_threads
       x-sendmock-ui: SMS > conversation list
+  /api/v1/sms/threads/{threadId}:
+    patch:
+      operationId: patchSmsThreadsByThreadId
+      summary: Mark a conversation read, or its newest message unread.
+      tags:
+        - SMS
+      parameters:
+        - name: threadId
+          in: path
+          required: true
+          description: The conversation's `thread_id`, from `GET /api/v1/sms/threads`.
+          schema:
+            type: string
+          example: sms-15550001111-8801700000000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsThreadUpdate"
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms threads update <threadId>
+      x-sendmock-mcp: sendmock_sms_thread_update
+      x-sendmock-ui: SMS > select conversations > Mark read or Mark unread
+    delete:
+      operationId: deleteSmsThreadsByThreadId
+      summary: Delete a conversation with its messages.
+      tags:
+        - SMS
+      parameters:
+        - name: threadId
+          in: path
+          required: true
+          description: The conversation's `thread_id`, from `GET /api/v1/sms/threads`.
+          schema:
+            type: string
+          example: sms-15550001111-8801700000000
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms threads delete <threadId>
+      x-sendmock-mcp: sendmock_sms_thread_delete
+      x-sendmock-ui: SMS > select conversations > Delete
   /api/v1/sms/{smsId}:
     get:
       operationId: getSmsBySmsId
@@ -3128,6 +3306,48 @@ paths:
       x-sendmock-cli: sendmock verify list
       x-sendmock-mcp: sendmock_verify_list
       x-sendmock-ui: SMS > Verify
+    delete:
+      operationId: deleteVerify
+      summary: Delete every verification, or those the filters match.
+      tags:
+        - Verify
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: pending, approved or failed.
+          schema:
+            type: string
+          example: pending
+        - name: to
+          in: query
+          required: false
+          description: Number or email.
+          schema:
+            type: string
+          example: "+8801700000000"
+        - name: channel
+          in: query
+          required: false
+          description: How the code was sent.
+          schema:
+            $ref: "#/components/schemas/VerifyChannel"
+          example: sms
+        - name: project
+          in: query
+          required: false
+          description: Only this project's verifications (its key); every project's when not set.
+          schema:
+            type: string
+          example: shop
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify delete-all --yes
+      x-sendmock-mcp: sendmock_verify_delete_all
+      x-sendmock-ui: SMS > Verify > Delete all
   /api/v1/verify/{verificationSid}:
     get:
       operationId: getVerifyByVerificationSid
@@ -3156,6 +3376,27 @@ paths:
       x-sendmock-cli: sendmock verify show <verificationSid>
       x-sendmock-mcp: sendmock_verify_get
       x-sendmock-ui: SMS > Verify > open a verification
+    delete:
+      operationId: deleteVerifyByVerificationSid
+      summary: Delete one verification with its check attempts.
+      tags:
+        - Verify
+      parameters:
+        - name: verificationSid
+          in: path
+          required: true
+          description: The verification's SID, from `GET /api/v1/verify`.
+          schema:
+            type: string
+          example: VE00000000000000000000000000000001
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock verify delete <verificationSid>
+      x-sendmock-mcp: sendmock_verify_delete
+      x-sendmock-ui: SMS > Verify > select verifications > Delete
   /api/v1/verify/{verificationSid}/force:
     post:
       operationId: postVerifyByVerificationSidForce
@@ -4297,7 +4538,7 @@ paths:
       x-sendmock-ui: HTTP Catcher > Requests
     delete:
       operationId: deleteHttpRequests
-      summary: Delete captured requests, all or one bin's.
+      summary: Delete captured requests, every bin's or one bin's.
       tags:
         - HTTP Catcher
       parameters:
@@ -4315,7 +4556,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock http clear
       x-sendmock-mcp: sendmock_http_clear
-      x-sendmock-ui: HTTP Catcher > bin > Clear requests
+      x-sendmock-ui: HTTP Catcher > bin or All requests > Delete all
   /api/v1/http/requests/{requestId}:
     get:
       operationId: getHttpRequestsByRequestId
@@ -4344,6 +4585,60 @@ paths:
       x-sendmock-cli: sendmock http show <requestId>
       x-sendmock-mcp: sendmock_http_get
       x-sendmock-ui: HTTP Catcher > open a request
+    patch:
+      operationId: patchHttpRequestsByRequestId
+      summary: Mark a captured request read or unread.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          description: The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapturedHttpRequestUpdate"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapturedHttpRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http update <requestId>
+      x-sendmock-mcp: sendmock_http_update
+      x-sendmock-ui: HTTP Catcher > select requests > Mark read or Mark unread
+    delete:
+      operationId: deleteHttpRequestsByRequestId
+      summary: Delete one captured request with its uploaded files.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          description: The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http delete <requestId>
+      x-sendmock-mcp: sendmock_http_delete
+      x-sendmock-ui: HTTP Catcher > select requests > Delete
   /api/v1/http/requests/{requestId}/files/{fileIndex}:
     get:
       operationId: getHttpRequestsByRequestIdFilesByFileIndex
@@ -4622,6 +4917,41 @@ paths:
       x-sendmock-cli: sendmock payments list
       x-sendmock-mcp: sendmock_payment_list
       x-sendmock-ui: Payments
+    delete:
+      operationId: deletePayments
+      summary: Delete every payment, or those the filters match, with their events, refunds and checkout sessions.
+      tags:
+        - Payments
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: succeeded, pending, failed, refunded or disputed.
+          schema:
+            type: string
+          example: succeeded
+        - name: provider
+          in: query
+          required: false
+          description: Gateway key.
+          schema:
+            type: string
+          example: stripe
+        - name: currency
+          in: query
+          required: false
+          description: ISO 4217 code.
+          schema:
+            type: string
+          example: USD
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments delete-all --yes
+      x-sendmock-mcp: sendmock_payment_delete_all
+      x-sendmock-ui: Payments > Delete all
     post:
       operationId: postPayments
       summary: Create a payment and pay it with a test card, as an app's server does without a checkout page.
@@ -4699,6 +5029,27 @@ paths:
       x-sendmock-cli: sendmock payments show <paymentId>
       x-sendmock-mcp: sendmock_payment_get
       x-sendmock-ui: Payments > open payment
+    delete:
+      operationId: deletePaymentsByPaymentId
+      summary: Delete one payment with its events, refunds and checkout session.
+      tags:
+        - Payments
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          description: The payment's ID, from `GET /api/v1/payments`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments delete <paymentId>
+      x-sendmock-mcp: sendmock_payment_delete
+      x-sendmock-ui: Payments > select payments > Delete
   /api/v1/payments/{paymentId}/notify:
     post:
       operationId: postPaymentsByPaymentIdNotify
@@ -4815,6 +5166,19 @@ paths:
       x-sendmock-cli: sendmock payments subscriptions list
       x-sendmock-mcp: sendmock_subscription_list
       x-sendmock-ui: Payments > Subscriptions
+    delete:
+      operationId: deletePaymentsSubscriptions
+      summary: Delete every subscription; their past payments stay.
+      tags:
+        - Payments
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions delete-all --yes
+      x-sendmock-mcp: sendmock_subscription_delete_all
+      x-sendmock-ui: Payments > Subscriptions > Delete all
     post:
       operationId: postPaymentsSubscriptions
       summary: Start a subscription on a gateway, with an optional trial.
@@ -4872,6 +5236,27 @@ paths:
       x-sendmock-cli: sendmock payments subscriptions show <subscriptionId>
       x-sendmock-mcp: sendmock_subscription_get
       x-sendmock-ui: Payments > Subscriptions > open subscription
+    delete:
+      operationId: deletePaymentsSubscriptionsBySubscriptionId
+      summary: Delete one subscription; its past payments stay.
+      tags:
+        - Payments
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          description: The subscription's ID, from `GET /api/v1/payments/subscriptions`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock payments subscriptions delete <subscriptionId>
+      x-sendmock-mcp: sendmock_subscription_delete
+      x-sendmock-ui: Payments > Subscriptions > select subscriptions > Delete
   /api/v1/payments/subscriptions/{subscriptionId}/advance:
     post:
       operationId: postPaymentsSubscriptionsBySubscriptionIdAdvance
@@ -6314,6 +6699,48 @@ paths:
       x-sendmock-cli: sendmock webhook deliveries list
       x-sendmock-mcp: sendmock_webhook_delivery_list
       x-sendmock-ui: Webhooks > Deliveries
+    delete:
+      operationId: deleteWebhooksDeliveries
+      summary: Delete every finished delivery, or those the filters match; queued and retrying ones stay.
+      tags:
+        - Webhook deliveries
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: succeeded, failed or pending.
+          schema:
+            type: string
+          example: failed
+        - name: endpoint_id
+          in: query
+          required: false
+          description: Only this endpoint.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        - name: event_type
+          in: query
+          required: false
+          description: Only this event.
+          schema:
+            $ref: "#/components/schemas/AppEventType"
+          example: email.received
+        - name: subject_id
+          in: query
+          required: false
+          description: Only the deliveries an email, SMS or other message caused, by its ID.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9E
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries delete-all --yes
+      x-sendmock-mcp: sendmock_webhook_delivery_delete_all
+      x-sendmock-ui: Webhooks > Deliveries > Delete all
   /api/v1/webhooks/deliveries/{deliveryId}:
     get:
       operationId: getWebhooksDeliveriesByDeliveryId
@@ -6342,6 +6769,29 @@ paths:
       x-sendmock-cli: sendmock webhook deliveries show <deliveryId>
       x-sendmock-mcp: sendmock_webhook_delivery_get
       x-sendmock-ui: Webhooks > Deliveries > open a delivery
+    delete:
+      operationId: deleteWebhooksDeliveriesByDeliveryId
+      summary: Delete a finished delivery; 409 while it is queued or waiting for a retry.
+      tags:
+        - Webhook deliveries
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          description: The webhook delivery's ID, from `GET /api/v1/webhooks/deliveries`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      responses:
+        "204":
+          description: No content.
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook deliveries delete <deliveryId>
+      x-sendmock-mcp: sendmock_webhook_delivery_delete
+      x-sendmock-ui: Webhooks > Deliveries > select deliveries > Delete
   /api/v1/webhooks/deliveries/{deliveryId}/cancel:
     post:
       operationId: postWebhooksDeliveriesByDeliveryIdCancel
@@ -7389,7 +7839,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock push clear
       x-sendmock-mcp: sendmock_push_delete_all
-      x-sendmock-ui: Push > Clear all
+      x-sendmock-ui: Push > Delete all
   /api/v1/push/{pushId}:
     get:
       operationId: getPushByPushId
@@ -7439,6 +7889,39 @@ paths:
       x-sendmock-cli: sendmock push delete <pushId>
       x-sendmock-mcp: sendmock_push_delete
       x-sendmock-ui: Push > open a notification > Delete
+    patch:
+      operationId: patchPushByPushId
+      summary: Mark a push notification read or unread.
+      tags:
+        - Push
+      parameters:
+        - name: pushId
+          in: path
+          required: true
+          description: The notification's id, from `GET /api/v1/push`.
+          schema:
+            type: string
+          example: 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PushNotificationUpdate"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PushNotification"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock push update <pushId>
+      x-sendmock-mcp: sendmock_push_update
+      x-sendmock-ui: Push > select notifications > Mark read or Mark unread
   /api/v1/wait/push:
     get:
       operationId: getWaitPush
@@ -7699,6 +8182,7 @@ components:
         - webhook.failed
         - test.ping
         - traffic.pruned
+        - traffic.cleared
     AppInfo:
       type: object
       properties:
@@ -8172,6 +8656,12 @@ components:
           type: number
         http_requests_today:
           type: number
+        unread_http_request_count:
+          type: number
+          description: Captured HTTP requests nobody opened yet, for the sidebar badge.
+        unread_push_count:
+          type: number
+          description: Push notifications nobody opened yet, for the sidebar badge.
         webhook_delivery_count:
           type: number
         webhook_success_rate:
@@ -8228,6 +8718,8 @@ components:
         - pending_verification_count
         - http_request_count
         - http_requests_today
+        - unread_http_request_count
+        - unread_push_count
         - webhook_delivery_count
         - webhook_success_rate
         - webhook_p95_latency_ms
@@ -8354,6 +8846,9 @@ components:
           type: boolean
         duration_ms:
           type: number
+        is_read:
+          type: boolean
+          description: Requests arrive unread; opening one marks it read.
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -8376,7 +8871,19 @@ components:
         - matched_rule_name
         - is_simulated_failure
         - duration_ms
+        - is_read
         - created_at
+    CapturedHttpRequestUpdate:
+      type: object
+      properties:
+        is_read:
+          type: boolean
+          description: Marks the request read (true) or unread (false).
+          examples:
+            - false
+      required:
+        - is_read
+      description: Body of PATCH /api/v1/http/requests/{requestId}.
     CardTestOutcome:
       type: string
       enum:
@@ -13555,6 +14062,9 @@ components:
           type: string
           examples:
             - default
+        is_read:
+          type: boolean
+          description: Notifications arrive unread; opening one marks it read.
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -13573,8 +14083,20 @@ components:
         - response_status
         - response
         - project
+        - is_read
         - created_at
       description: A push notification as the provider's API received it, with what SendMock answered.
+    PushNotificationUpdate:
+      type: object
+      properties:
+        is_read:
+          type: boolean
+          description: Marks the notification read (true) or unread (false).
+          examples:
+            - false
+      required:
+        - is_read
+      description: Body of PATCH /api/v1/push/{pushId}.
     PushProvider:
       type: string
       enum:
@@ -14352,6 +14874,9 @@ components:
             - type: "null"
         open_count:
           type: number
+        is_read:
+          type: boolean
+          description: "Whether someone looked at it in SendMock: inbound messages arrive unread, messages your app sent arrive read, and marking a conversation unread marks its newest message unread."
         reply_webhook:
           anyOf:
             - $ref: "#/components/schemas/SmsReplyWebhookResult"
@@ -14391,6 +14916,7 @@ components:
         - extracted
         - opened_at
         - open_count
+        - is_read
         - reply_webhook
         - in_reply_to_sms_id
         - created_at
@@ -14471,6 +14997,9 @@ components:
             - type: "null"
         open_count:
           type: number
+        is_read:
+          type: boolean
+          description: "Whether someone looked at it in SendMock: inbound messages arrive unread, messages your app sent arrive read, and marking a conversation unread marks its newest message unread."
         reply_webhook:
           anyOf:
             - $ref: "#/components/schemas/SmsReplyWebhookResult"
@@ -14505,6 +15034,7 @@ components:
         - from_number
         - id
         - in_reply_to_sms_id
+        - is_read
         - media
         - messaging_service_sid
         - open_count
@@ -14888,6 +15418,17 @@ components:
         - message_count
         - unread_count
       description: A conversation between two numbers.
+    SmsThreadUpdate:
+      type: object
+      properties:
+        is_read:
+          type: boolean
+          description: True marks every message in the conversation read; false marks its newest message unread.
+          examples:
+            - false
+      required:
+        - is_read
+      description: Body of PATCH /api/v1/sms/threads/{threadId}.
     SmtpSession:
       type: object
       properties:

@@ -56,6 +56,14 @@ const systemEndpoints = tagEndpoints("System", [
     successStatus: 204,
   },
   {
+    method: "DELETE",
+    path: "/api/v1/traffic",
+    summary:
+      "Delete every captured item in every project and keep every setting and configuration list.",
+    response: null,
+    successStatus: 204,
+  },
+  {
     method: "POST",
     path: "/api/v1/samples/{kind}",
     summary:
@@ -97,27 +105,57 @@ const seedEndpoints = tagEndpoints("Seed", [
   },
 ]);
 
+const smtpSessionFilterParameters = [
+  {
+    name: "result",
+    description: "delivered or failed.",
+    schema: "string" as const,
+    example: "delivered",
+  },
+  {
+    name: "query",
+    description: "Client, EHLO name or user.",
+    schema: "string" as const,
+    example: "laravel.test",
+  },
+];
+
+const apiRequestFilterParameters = [
+  {
+    name: "api",
+    description: "Which API, e.g. twilio.",
+    schema: "string" as const,
+    example: "twilio",
+  },
+  {
+    name: "status_class",
+    description: "2xx, 4xx or 5xx.",
+    schema: typeRef("ApiStatusClass"),
+    example: "4xx",
+  },
+  {
+    name: "path",
+    description: "Part of the path.",
+    schema: "string" as const,
+    example: "/Messages.json",
+  },
+];
+
 const logEndpoints = tagEndpoints("Logs", [
   {
     method: "GET",
     path: "/api/v1/logs/smtp",
     summary: "SMTP sessions, newest first, including rejected ones.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "result",
-        description: "delivered or failed.",
-        schema: "string",
-        example: "delivered",
-      },
-      {
-        name: "query",
-        description: "Client, EHLO name or user.",
-        schema: "string",
-        example: "laravel.test",
-      },
-    ],
+    queryParameters: [...pageQueryParameters, ...smtpSessionFilterParameters],
     response: pageOf("SmtpSession"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/logs/smtp",
+    summary: "Delete every SMTP session, or those the filters match.",
+    queryParameters: smtpSessionFilterParameters,
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",
@@ -127,31 +165,26 @@ const logEndpoints = tagEndpoints("Logs", [
     errorStatuses: [404],
   },
   {
+    method: "DELETE",
+    path: "/api/v1/logs/smtp/{sessionId}",
+    summary: "Delete one SMTP session.",
+    response: null,
+    successStatus: 204,
+  },
+  {
     method: "GET",
     path: "/api/v1/logs/http",
     summary: "Requests to the native and provider APIs, newest first.",
-    queryParameters: [
-      ...pageQueryParameters,
-      {
-        name: "api",
-        description: "Which API, e.g. twilio.",
-        schema: "string",
-        example: "twilio",
-      },
-      {
-        name: "status_class",
-        description: "2xx, 4xx or 5xx.",
-        schema: typeRef("ApiStatusClass"),
-        example: "4xx",
-      },
-      {
-        name: "path",
-        description: "Part of the path.",
-        schema: "string",
-        example: "/Messages.json",
-      },
-    ],
+    queryParameters: [...pageQueryParameters, ...apiRequestFilterParameters],
     response: pageOf("ApiRequestLogEntry"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/logs/http",
+    summary: "Delete every API request log entry, or those the filters match.",
+    queryParameters: apiRequestFilterParameters,
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",
@@ -159,6 +192,13 @@ const logEndpoints = tagEndpoints("Logs", [
     summary: "One API request with its request and response.",
     response: typeRef("ApiRequestLogEntry"),
     errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/logs/http/{requestId}",
+    summary: "Delete one API request log entry.",
+    response: null,
+    successStatus: 204,
   },
 ]);
 

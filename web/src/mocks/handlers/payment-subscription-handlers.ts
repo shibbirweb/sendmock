@@ -21,6 +21,7 @@ import {
   type SubscriptionResult,
 } from "@/mocks/payments/subscriptions/payment-subscriptions";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
+import { publishTrafficCleared } from "@/mocks/realtime/publish-traffic-cleared";
 
 function findSubscription(
   subscriptionId: unknown,
@@ -80,6 +81,15 @@ export const paymentSubscriptionHandlers = [
     );
   }),
 
+  http.delete("*/api/v1/payments/subscriptions", async () => {
+    await applyMockConditions();
+    const deletedCount = mockDatabase.paymentSubscriptions.length;
+    mockDatabase.paymentSubscriptions = [];
+    publishTrafficCleared(["subscription"], null, deletedCount);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   http.post("*/api/v1/payments/subscriptions", async ({ request }) => {
     await applyMockConditions();
     const createRequest =
@@ -124,6 +134,19 @@ export const paymentSubscriptionHandlers = [
       return subscription === undefined
         ? createNotFoundResponse("Subscription")
         : HttpResponse.json(presentSubscription(subscription));
+    },
+  ),
+
+  http.delete(
+    "*/api/v1/payments/subscriptions/:subscriptionId",
+    async ({ params }) => {
+      await applyMockConditions();
+      mockDatabase.paymentSubscriptions =
+        mockDatabase.paymentSubscriptions.filter(
+          (subscription) => subscription.id !== params.subscriptionId,
+        );
+
+      return new HttpResponse(null, { status: 204 });
     },
   ),
 

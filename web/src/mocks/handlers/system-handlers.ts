@@ -4,8 +4,10 @@ import { apiEndpoints } from "@/lib/api/endpoint-registry";
 import { buildOperationId } from "@/lib/api/endpoint-registry/operation-id";
 import type { AppInfo, HealthStatus } from "@/lib/api/types";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
+import { deleteAllTraffic } from "@/mocks/db/delete-all-traffic";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { applyMockConditions } from "@/mocks/handlers/handler-utils";
+import { publishTrafficCleared } from "@/mocks/realtime/publish-traffic-cleared";
 import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
 import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
 
@@ -40,6 +42,29 @@ export const systemHandlers = [
   http.get("*/api/v1/health", () =>
     HttpResponse.json({ status: "ok" } satisfies HealthStatus),
   ),
+
+  http.delete("*/api/v1/traffic", async () => {
+    await applyMockConditions();
+    const deletedCount = deleteAllTraffic(mockDatabase);
+    publishTrafficCleared(
+      [
+        "email",
+        "sms",
+        "verification",
+        "push",
+        "http_request",
+        "webhook_delivery",
+        "payment",
+        "subscription",
+        "smtp_session",
+        "api_request",
+      ],
+      null,
+      deletedCount,
+    );
+
+    return new HttpResponse(null, { status: 204 });
+  }),
 
   http.get("*/api/v1/stats", async () => {
     const conditionResponse = await applyMockConditions();

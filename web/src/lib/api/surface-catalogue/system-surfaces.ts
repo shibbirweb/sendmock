@@ -53,6 +53,12 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_reset",
     ui: "Settings > General > Reset to seed",
   },
+  "DELETE /api/v1/traffic": {
+    phase: "A17",
+    cli: "sendmock traffic delete-all --yes",
+    mcp: "sendmock_traffic_delete_all",
+    ui: "Settings > General > Delete all traffic",
+  },
   "POST /api/v1/samples/{kind}": {
     phase: "1",
     cli: "sendmock sample <kind>",
@@ -94,11 +100,23 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_logs_smtp",
     ui: "Logs > SMTP sessions",
   },
+  "DELETE /api/v1/logs/smtp": {
+    phase: "A17",
+    cli: "sendmock logs smtp delete-all --yes",
+    mcp: "sendmock_logs_smtp_delete_all",
+    ui: "Logs > SMTP sessions > Delete all",
+  },
   "GET /api/v1/logs/smtp/{sessionId}": {
     phase: "1",
     cli: "sendmock logs smtp show <sessionId>",
     mcp: "sendmock_logs_smtp_get",
     ui: "Logs > SMTP sessions > open a session",
+  },
+  "DELETE /api/v1/logs/smtp/{sessionId}": {
+    phase: "A17",
+    cli: "sendmock logs smtp delete <sessionId>",
+    mcp: "sendmock_logs_smtp_delete",
+    ui: "Logs > SMTP sessions > select sessions > Delete",
   },
   "GET /api/v1/logs/http": {
     phase: "1",
@@ -106,10 +124,22 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_logs_http",
     ui: "Logs > API requests",
   },
+  "DELETE /api/v1/logs/http": {
+    phase: "A17",
+    cli: "sendmock logs http delete-all --yes",
+    mcp: "sendmock_logs_http_delete_all",
+    ui: "Logs > API requests > Delete all",
+  },
   "GET /api/v1/logs/http/{requestId}": {
     phase: "1",
     cli: "sendmock logs http show <requestId>",
     mcp: "sendmock_logs_http_get",
     ui: "Logs > API requests > open a request",
+  },
+  "DELETE /api/v1/logs/http/{requestId}": {
+    phase: "A17",
+    cli: "sendmock logs http delete <requestId>",
+    mcp: "sendmock_logs_http_delete",
+    ui: "Logs > API requests > select requests > Delete",
   },
 };

@@ -12,7 +12,7 @@ export const pushSurfaces: SurfaceCatalogue = {
     phase: "A7",
     cli: "sendmock push clear",
     mcp: "sendmock_push_delete_all",
-    ui: "Push > Clear all",
+    ui: "Push > Delete all",
   },
   "GET /api/v1/push/{pushId}": {
     phase: "A7",
@@ -25,6 +25,12 @@ export const pushSurfaces: SurfaceCatalogue = {
     cli: "sendmock push delete <pushId>",
     mcp: "sendmock_push_delete",
     ui: "Push > open a notification > Delete",
+  },
+  "PATCH /api/v1/push/{pushId}": {
+    phase: "A17",
+    cli: "sendmock push update <pushId>",
+    mcp: "sendmock_push_update",
+    ui: "Push > select notifications > Mark read or Mark unread",
   },
   "GET /api/v1/wait/push": {
     phase: "A7",

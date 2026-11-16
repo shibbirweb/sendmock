@@ -19,6 +19,7 @@ const unselectableEvents: AppEventType[] = [
   "webhook.delivered",
   "sms.reply_webhook",
   "traffic.pruned",
+  "traffic.cleared",
 ];
 
 /** Events grouped by the part before the dot: email, sms, verify, ... */

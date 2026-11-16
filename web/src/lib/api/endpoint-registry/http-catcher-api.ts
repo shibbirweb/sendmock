@@ -103,7 +103,7 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
   {
     method: "DELETE",
     path: "/api/v1/http/requests",
-    summary: "Delete captured requests, all or one bin's.",
+    summary: "Delete captured requests, every bin's or one bin's.",
     queryParameters: [binIdQueryParameter],
     response: null,
     successStatus: 204,
@@ -114,6 +114,21 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
     summary: "One captured request and what SendMock answered.",
     response: typeRef("CapturedHttpRequest"),
     errorStatuses: [404],
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/http/requests/{requestId}",
+    summary: "Mark a captured request read or unread.",
+    requestBody: typeRef("CapturedHttpRequestUpdate"),
+    response: typeRef("CapturedHttpRequest"),
+    errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/http/requests/{requestId}",
+    summary: "Delete one captured request with its uploaded files.",
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",

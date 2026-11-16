@@ -1,5 +1,8 @@
 import type { PushNotification } from "@/lib/api/types";
-import { minutesAgo } from "@/mocks/fixtures/fixture-helpers";
+import {
+  minutesAgo,
+  olderThanReadMinutes,
+} from "@/mocks/fixtures/fixture-helpers";
 import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
 
 type PushSpec = Pick<
@@ -137,6 +140,7 @@ export function buildPushFixtures(): PushNotification[] {
       ...pushSpec,
       id: `01JR0000000000000000000${String(index + 1).padStart(3, "0")}`,
       project: defaultProjectKey,
+      is_read: sentMinutesAgo > olderThanReadMinutes,
       created_at: minutesAgo(sentMinutesAgo),
     }),
   );

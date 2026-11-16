@@ -3,6 +3,7 @@ import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { recordNativeApiRequest } from "@/mocks/handlers/record-api-request";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 /**
  * Sends an outbound SMS through the native API path, so it also shows in
@@ -33,14 +34,14 @@ export function sendOutboundSmsSample({
     linkedMessage: {
       kind: "sms",
       id: outboundMessage.id,
-      sms_thread_id: `${fromNumber}|${toNumber}`,
+      sms_thread_id: readSmsThreadId(outboundMessage),
     },
   });
   mockDatabase.smsMessages.unshift(outboundMessage);
   publishMockEvent("sms.sent", {
     id: outboundMessage.id,
     to_number: outboundMessage.to_number,
-    thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
+    thread_id: readSmsThreadId(outboundMessage),
     body: outboundMessage.body,
   });
   simulateSmsDelivery(outboundMessage);
