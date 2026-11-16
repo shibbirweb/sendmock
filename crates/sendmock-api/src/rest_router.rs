@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use axum::Json;
 use axum::Router;
@@ -94,7 +94,9 @@ fn build_operation_route(
     method_filter: MethodFilter,
     reads_body: bool,
 ) -> MethodRouter {
-    let input_schema = Arc::new(operation.input_schema().to_value());
+    // Built on the route's first request: holding every operation's schema from the start
+    // costs idle memory for routes a server may never answer.
+    let input_schema = Arc::new(OnceLock::new());
     on(
         method_filter,
         move |path_parameters: RawPathParams,
@@ -118,7 +120,8 @@ fn build_operation_route(
                 Ok(request_context) => request_context,
                 Err(error_response) => return error_response.into_response(),
             };
-            match assemble_input(operation.as_ref(), &input_schema, request_parts) {
+            let input_schema = input_schema.get_or_init(|| operation.input_schema().to_value());
+            match assemble_input(operation.as_ref(), input_schema, request_parts) {
                 Ok(input) => run_operation(operation.as_ref(), &request_context, input).await,
                 Err(error_response) => error_response.into_response(),
             }

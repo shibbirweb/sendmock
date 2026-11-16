@@ -77,56 +77,82 @@ Drop-down.
 
 - **What it does:** Shows deliveries of one event type, or all.
 
-### 11. Time
+### 11. Select all loaded deliveries
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be deleted together. X ticks the open or focused row.
+
+### 12. Delete all deliveries
+
+Button.
+
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches. Deliveries still queued or waiting for a retry stay; cancel them first.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/webhooks/deliveries`](/api/webhook-deliveries/#deleteWebhooksDeliveries), CLI [`sendmock webhook deliveries delete-all`](/cli/webhook-deliveries/#webhook-deliveries-delete-all), MCP [`sendmock_webhook_delivery_delete_all`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_delete_all)
+
+### 13. Select
+
+Column.
+
+- **What it does:** The column of tick boxes; it has no visible title.
+
+### 14. Time
 
 Column.
 
 - **What it does:** When the delivery was made.
 
-### 12. Event
+### 15. Event
 
 Column.
 
 - **What it does:** The event it carried, such as `email.received`.
 
-### 13. Endpoint
+### 16. Endpoint
 
 Column.
 
 - **What it does:** Where it went.
 
-### 14. Trigger
+### 17. Trigger
 
 Column.
 
 - **What it does:** What started it: a rule, a test, a manual send, a replay, a saved delivery, or an endpoint chosen for one simulation.
 
-### 15. Status
+### 18. Status
 
 Column.
 
 - **What it does:** Succeeded, failed, retrying, pending, canceled, exhausted or render failed, with the HTTP status.
 
-### 16. Duration
+### 19. Duration
 
 Column.
 
 - **What it does:** How long the endpoint took to answer.
 
-### 17. Attempt
+### 20. Attempt
 
 Column.
 
 - **What it does:** Which attempt this is, of the endpoint's maximum.
 
-### 18. …
+### 21. Select …
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 22. …
 
 Link, in each row.
 
 - **What it does:** Opens the delivery: its request, its answer and every attempt.
 - **Same action elsewhere:** REST [`GET /api/v1/webhooks/deliveries/{deliveryId}`](/api/webhook-deliveries/#getWebhooksDeliveriesByDeliveryId), CLI [`sendmock webhook deliveries show`](/cli/webhook-deliveries/#webhook-deliveries-show), MCP [`sendmock_webhook_delivery_get`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_get)
 
-### 19. Load more
+### 23. Load more
 
 Button.
 
@@ -134,31 +160,31 @@ Button.
 
 ## A delivery is open
 
-### 20. Delivery
+### 24. Delivery
 
 Heading.
 
 - **What it does:** The delivery drawer.
 
-### 21. The request SendMock sent and what your endpoint answered.
+### 25. The request SendMock sent and what your endpoint answered.
 
 Text.
 
 - **What it does:** Explains the drawer.
 
-### 22. Your Acme verification code is #. It expires in # minutes.
+### 26. Your Acme verification code is #. It expires in # minutes.
 
 Link.
 
 - **What it does:** The message the delivery is about (here an SMS); opens it.
 
-### 23. Copy as cURL
+### 27. Copy as cURL
 
 Button.
 
 - **What it does:** Copies the request as a curl command, to run it yourself.
 
-### 24. Replay
+### 28. Replay
 
 Button.
 
@@ -166,14 +192,14 @@ Button.
 - **What it changes:** Records a replay delivery, linked to this one.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/deliveries/{deliveryId}/replay`](/api/webhook-deliveries/#postWebhooksDeliveriesByDeliveryIdReplay), CLI [`sendmock webhook deliveries replay`](/cli/webhook-deliveries/#webhook-deliveries-replay), MCP [`sendmock_webhook_delivery_replay`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_replay)
 
-### 25. Edit and replay
+### 29. Edit and replay
 
 Button.
 
 - **What it does:** Opens the request in an editor, then sends your changed copy as a new delivery.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/deliveries/{deliveryId}/replay`](/api/webhook-deliveries/#postWebhooksDeliveriesByDeliveryIdReplay), CLI [`sendmock webhook deliveries replay`](/cli/webhook-deliveries/#webhook-deliveries-replay), MCP [`sendmock_webhook_delivery_replay`](/mcp/webhook-deliveries/#sendmock_webhook_delivery_replay)
 
-### 26. Save
+### 30. Save
 
 Button.
 
@@ -181,55 +207,55 @@ Button.
 - **Links to:** [Saved](../../webhooks/composer-and-saved.md).
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/saved`](/api/saved-deliveries/#postWebhooksSaved), CLI [`sendmock webhook saved create`](/cli/saved-deliveries/#webhook-saved-create), MCP [`sendmock_webhook_saved_create`](/mcp/saved-deliveries/#sendmock_webhook_saved_create)
 
-### 27. Request POST
+### 31. Request POST
 
 Heading.
 
 - **What it does:** The request's method and URL.
 
-### 28. Request headers
+### 32. Request headers
 
 Heading.
 
 - **What it does:** The headers sent, signature included.
 
-### 29. Request body
+### 33. Request body
 
 Heading.
 
 - **What it does:** The body sent.
 
-### 30. Copy request body
+### 34. Copy request body
 
 Button.
 
 - **What it does:** Copies the request body.
 
-### 31. Response #
+### 35. Response #
 
 Heading.
 
 - **What it does:** Your endpoint's HTTP status and how long it took.
 
-### 32. Response headers
+### 36. Response headers
 
 Heading.
 
 - **What it does:** The headers your endpoint answered with.
 
-### 33. Response body
+### 37. Response body
 
 Heading.
 
 - **What it does:** What your endpoint answered.
 
-### 34. Copy response body
+### 38. Copy response body
 
 Button.
 
 - **What it does:** Copies the response body.
 
-### 35. Close
+### 39. Close
 
 Button.
 
@@ -237,13 +263,13 @@ Button.
 
 ## With no data yet
 
-### 36. No deliveries yet
+### 40. No deliveries yet
 
 Text.
 
 - **What it does:** Shown when no webhook has been delivered yet.
 
-### 37. Deliveries appear here when a rule sends an event to an endpoint, or when you send a test from Endpoints.
+### 41. Deliveries appear here when a rule sends an event to an endpoint, or when you send a test from Endpoints.
 
 Text.
 
@@ -252,20 +278,20 @@ Text.
 
 ## When the data cannot load
 
-### 38. Could not load the deliveries. Try again
+### 42. Could not load the deliveries. Try again
 
 Message.
 
 - **What it does:** Shown when the deliveries could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 39. Could not load the deliveries.
+### 43. Could not load the deliveries.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 40. Try again
+### 44. Try again
 
 Button.
 

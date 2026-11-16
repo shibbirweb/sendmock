@@ -48,6 +48,7 @@ pub async fn store_push_notification(
         response_json: new_notification.response.to_string(),
         project_key: operation_context.request.project_key.clone(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
+        is_read: false,
     };
     operation_context
         .push_notifications

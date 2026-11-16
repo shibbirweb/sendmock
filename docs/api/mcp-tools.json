@@ -7229,7 +7229,69 @@
         "sendmock http clear"
       ],
       "ui": [
-        "HTTP Catcher > bin > Clear requests"
+        "HTTP Catcher > bin or All requests > Delete all"
+      ]
+    },
+    {
+      "name": "sendmock_http_delete",
+      "toolset": "http",
+      "summary": "Delete one captured request with its uploaded files.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/http/requests/{requestId}",
+          "operation_id": "deleteHttpRequestsByRequestId",
+          "summary": "Delete one captured request with its uploaded files.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "request_id",
+          "input": {
+            "name": "requestId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "request_id"
+        ]
+      },
+      "example_arguments": {
+        "request_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock http delete <requestId>"
+      ],
+      "ui": [
+        "HTTP Catcher > select requests > Delete"
       ]
     },
     {
@@ -8174,6 +8236,89 @@
       ],
       "ui": [
         "HTTP Catcher > Send a sample request"
+      ]
+    },
+    {
+      "name": "sendmock_http_update",
+      "toolset": "http",
+      "summary": "Mark a captured request read or unread.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/http/requests/{requestId}",
+          "operation_id": "patchHttpRequestsByRequestId",
+          "summary": "Mark a captured request read or unread.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "request_id",
+          "input": {
+            "name": "requestId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "is_read",
+          "input": {
+            "name": "is_read",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Marks the request read (true) or unread (false).",
+          "example": false
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "is_read": {
+            "type": "boolean",
+            "description": "Marks the request read (true) or unread (false).",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "request_id",
+          "is_read"
+        ]
+      },
+      "example_arguments": {
+        "request_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "is_read": false
+      },
+      "output": "CapturedHttpRequest",
+      "cli": [
+        "sendmock http update <requestId>"
+      ],
+      "ui": [
+        "HTTP Catcher > select requests > Mark read or Mark unread"
       ]
     },
     {
@@ -9648,6 +9793,180 @@
       ]
     },
     {
+      "name": "sendmock_logs_http_delete",
+      "toolset": "logs",
+      "summary": "Delete one API request log entry.",
+      "area": "Logs",
+      "area_slug": "logs",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/logs/http/{requestId}",
+          "operation_id": "deleteLogsHttpByRequestId",
+          "summary": "Delete one API request log entry.",
+          "area_slug": "logs",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "request_id",
+          "input": {
+            "name": "requestId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The captured request's ID, from `GET /api/v1/http/requests` or `GET /api/v1/logs/http`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "request_id"
+        ]
+      },
+      "example_arguments": {
+        "request_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock logs http delete <requestId>"
+      ],
+      "ui": [
+        "Logs > API requests > select requests > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_logs_http_delete_all",
+      "toolset": "logs",
+      "summary": "Delete every API request log entry, or those the filters match.",
+      "area": "Logs",
+      "area_slug": "logs",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/logs/http",
+          "operation_id": "deleteLogsHttp",
+          "summary": "Delete every API request log entry, or those the filters match.",
+          "area_slug": "logs",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "api",
+          "input": {
+            "name": "api",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Which API, e.g. twilio.",
+          "example": "twilio"
+        },
+        {
+          "name": "status_class",
+          "input": {
+            "name": "status_class",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "2xx",
+            "4xx",
+            "5xx"
+          ],
+          "description": "2xx, 4xx or 5xx.",
+          "example": "4xx"
+        },
+        {
+          "name": "path",
+          "input": {
+            "name": "path",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Part of the path.",
+          "example": "/Messages.json"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "api": {
+            "type": "string",
+            "description": "Which API, e.g. twilio.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "status_class": {
+            "$ref": "#/$defs/ApiStatusClass",
+            "description": "2xx, 4xx or 5xx.",
+            "examples": [
+              "4xx"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "Part of the path.",
+            "examples": [
+              "/Messages.json"
+            ]
+          }
+        },
+        "$defs": {
+          "ApiStatusClass": {
+            "type": "string",
+            "enum": [
+              "2xx",
+              "4xx",
+              "5xx"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "api": "twilio",
+        "status_class": "4xx"
+      },
+      "output": null,
+      "cli": [
+        "sendmock logs http delete-all --yes"
+      ],
+      "ui": [
+        "Logs > API requests > Delete all"
+      ]
+    },
+    {
       "name": "sendmock_logs_http_get",
       "toolset": "logs",
       "summary": "One API request with its request and response.",
@@ -9824,6 +10143,147 @@
       ],
       "ui": [
         "Logs > SMTP sessions"
+      ]
+    },
+    {
+      "name": "sendmock_logs_smtp_delete",
+      "toolset": "logs",
+      "summary": "Delete one SMTP session.",
+      "area": "Logs",
+      "area_slug": "logs",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/logs/smtp/{sessionId}",
+          "operation_id": "deleteLogsSmtpBySessionId",
+          "summary": "Delete one SMTP session.",
+          "area_slug": "logs",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "session_id",
+          "input": {
+            "name": "sessionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The SMTP session's ID, from `GET /api/v1/logs/smtp`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "The SMTP session's ID, from `GET /api/v1/logs/smtp`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      },
+      "example_arguments": {
+        "session_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock logs smtp delete <sessionId>"
+      ],
+      "ui": [
+        "Logs > SMTP sessions > select sessions > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_logs_smtp_delete_all",
+      "toolset": "logs",
+      "summary": "Delete every SMTP session, or those the filters match.",
+      "area": "Logs",
+      "area_slug": "logs",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/logs/smtp",
+          "operation_id": "deleteLogsSmtp",
+          "summary": "Delete every SMTP session, or those the filters match.",
+          "area_slug": "logs",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "result",
+          "input": {
+            "name": "result",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "delivered or failed.",
+          "example": "delivered"
+        },
+        {
+          "name": "query",
+          "input": {
+            "name": "query",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Client, EHLO name or user.",
+          "example": "laravel.test"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "delivered or failed.",
+            "examples": [
+              "delivered"
+            ]
+          },
+          "query": {
+            "type": "string",
+            "description": "Client, EHLO name or user.",
+            "examples": [
+              "laravel.test"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "result": "delivered",
+        "query": "laravel.test"
+      },
+      "output": null,
+      "cli": [
+        "sendmock logs smtp delete-all --yes"
+      ],
+      "ui": [
+        "Logs > SMTP sessions > Delete all"
       ]
     },
     {
@@ -12396,6 +12856,166 @@
       ],
       "ui": [
         "Payments > Gateways > gateway > Checkout > Open a test checkout"
+      ]
+    },
+    {
+      "name": "sendmock_payment_delete",
+      "toolset": "payments",
+      "summary": "Delete one payment with its events, refunds and checkout session.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/payments/{paymentId}",
+          "operation_id": "deletePaymentsByPaymentId",
+          "summary": "Delete one payment with its events, refunds and checkout session.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "payment_id",
+          "input": {
+            "name": "paymentId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The payment's ID, from `GET /api/v1/payments`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "payment_id": {
+            "type": "string",
+            "description": "The payment's ID, from `GET /api/v1/payments`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "payment_id"
+        ]
+      },
+      "example_arguments": {
+        "payment_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock payments delete <paymentId>"
+      ],
+      "ui": [
+        "Payments > select payments > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_payment_delete_all",
+      "toolset": "payments",
+      "summary": "Delete every payment, or those the filters match, with their events, refunds and checkout sessions.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/payments",
+          "operation_id": "deletePayments",
+          "summary": "Delete every payment, or those the filters match, with their events, refunds and checkout sessions.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "succeeded, pending, failed, refunded or disputed.",
+          "example": "succeeded"
+        },
+        {
+          "name": "provider",
+          "input": {
+            "name": "provider",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Gateway key.",
+          "example": "stripe"
+        },
+        {
+          "name": "currency",
+          "input": {
+            "name": "currency",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "ISO 4217 code.",
+          "example": "USD"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "succeeded, pending, failed, refunded or disputed.",
+            "examples": [
+              "succeeded"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "description": "Gateway key.",
+            "examples": [
+              "stripe"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 code.",
+            "examples": [
+              "USD"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "status": "succeeded",
+        "provider": "stripe"
+      },
+      "output": null,
+      "cli": [
+        "sendmock payments delete-all --yes"
+      ],
+      "ui": [
+        "Payments > Delete all"
       ]
     },
     {
@@ -17414,7 +18034,7 @@
         "sendmock push clear"
       ],
       "ui": [
-        "Push > Clear all"
+        "Push > Delete all"
       ]
     },
     {
@@ -17656,6 +18276,89 @@
       ],
       "ui": [
         "Push"
+      ]
+    },
+    {
+      "name": "sendmock_push_update",
+      "toolset": "core",
+      "summary": "Mark a push notification read or unread.",
+      "area": "Push",
+      "area_slug": "push",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/push/{pushId}",
+          "operation_id": "patchPushByPushId",
+          "summary": "Mark a push notification read or unread.",
+          "area_slug": "push",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "push_id",
+          "input": {
+            "name": "pushId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The notification's id, from `GET /api/v1/push`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "is_read",
+          "input": {
+            "name": "is_read",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Marks the notification read (true) or unread (false).",
+          "example": false
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "push_id": {
+            "type": "string",
+            "description": "The notification's id, from `GET /api/v1/push`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "is_read": {
+            "type": "boolean",
+            "description": "Marks the notification read (true) or unread (false).",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "push_id",
+          "is_read"
+        ]
+      },
+      "example_arguments": {
+        "push_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+        "is_read": false
+      },
+      "output": "PushNotification",
+      "cli": [
+        "sendmock push update <pushId>"
+      ],
+      "ui": [
+        "Push > select notifications > Mark read or Mark unread"
       ]
     },
     {
@@ -19233,7 +19936,7 @@
     {
       "name": "sendmock_sms_delete_all",
       "toolset": "sms",
-      "summary": "Delete every message.",
+      "summary": "Delete every message, or one project's.",
       "area": "SMS",
       "area_slug": "sms",
       "operations": [
@@ -19241,7 +19944,7 @@
           "method": "DELETE",
           "path": "/api/v1/sms",
           "operation_id": "deleteSms",
-          "summary": "Delete every message.",
+          "summary": "Delete every message, or one project's.",
           "area_slug": "sms",
           "selector": null
         }
@@ -19252,18 +19955,41 @@
         "destructive_hint": true,
         "idempotent_hint": true
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's messages (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Only this project's messages (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          }
+        }
       },
-      "example_arguments": {},
+      "example_arguments": {
+        "project": "shop"
+      },
       "output": null,
       "cli": [
         "sendmock sms delete-all --yes"
       ],
       "ui": [
-        "Settings > General > Delete all SMS"
+        "SMS > Delete all"
       ]
     },
     {
@@ -22897,6 +23623,151 @@
       ]
     },
     {
+      "name": "sendmock_sms_thread_delete",
+      "toolset": "sms",
+      "summary": "Delete a conversation with its messages.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/threads/{threadId}",
+          "operation_id": "deleteSmsThreadsByThreadId",
+          "summary": "Delete a conversation with its messages.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "thread_id",
+          "input": {
+            "name": "threadId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The conversation's `thread_id`, from `GET /api/v1/sms/threads`.",
+          "example": "sms-15550001111-8801700000000"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "thread_id": {
+            "type": "string",
+            "description": "The conversation's `thread_id`, from `GET /api/v1/sms/threads`.",
+            "examples": [
+              "sms-15550001111-8801700000000"
+            ]
+          }
+        },
+        "required": [
+          "thread_id"
+        ]
+      },
+      "example_arguments": {
+        "thread_id": "sms-15550001111-8801700000000"
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms threads delete <threadId>"
+      ],
+      "ui": [
+        "SMS > select conversations > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_sms_thread_update",
+      "toolset": "sms",
+      "summary": "Mark a conversation read, or its newest message unread.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/sms/threads/{threadId}",
+          "operation_id": "patchSmsThreadsByThreadId",
+          "summary": "Mark a conversation read, or its newest message unread.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "thread_id",
+          "input": {
+            "name": "threadId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The conversation's `thread_id`, from `GET /api/v1/sms/threads`.",
+          "example": "sms-15550001111-8801700000000"
+        },
+        {
+          "name": "is_read",
+          "input": {
+            "name": "is_read",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "True marks every message in the conversation read; false marks its newest message unread.",
+          "example": false
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "thread_id": {
+            "type": "string",
+            "description": "The conversation's `thread_id`, from `GET /api/v1/sms/threads`.",
+            "examples": [
+              "sms-15550001111-8801700000000"
+            ]
+          },
+          "is_read": {
+            "type": "boolean",
+            "description": "True marks every message in the conversation read; false marks its newest message unread.",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "thread_id",
+          "is_read"
+        ]
+      },
+      "example_arguments": {
+        "thread_id": "sms-15550001111-8801700000000",
+        "is_read": false
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms threads update <threadId>"
+      ],
+      "ui": [
+        "SMS > select conversations > Mark read or Mark unread"
+      ]
+    },
+    {
       "name": "sendmock_sms_threads",
       "toolset": "sms",
       "summary": "Conversations, one per contact and your number.",
@@ -23632,6 +24503,104 @@
       ],
       "ui": [
         "Payments > Subscriptions > New subscription"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_delete",
+      "toolset": "core",
+      "summary": "Delete one subscription; its past payments stay.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/payments/subscriptions/{subscriptionId}",
+          "operation_id": "deletePaymentsSubscriptionsBySubscriptionId",
+          "summary": "Delete one subscription; its past payments stay.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "subscription_id",
+          "input": {
+            "name": "subscriptionId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription's ID, from `GET /api/v1/payments/subscriptions`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "example_arguments": {
+        "subscription_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock payments subscriptions delete <subscriptionId>"
+      ],
+      "ui": [
+        "Payments > Subscriptions > select subscriptions > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_subscription_delete_all",
+      "toolset": "core",
+      "summary": "Delete every subscription; their past payments stay.",
+      "area": "Payments",
+      "area_slug": "payments",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/payments/subscriptions",
+          "operation_id": "deletePaymentsSubscriptions",
+          "summary": "Delete every subscription; their past payments stay.",
+          "area_slug": "payments",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": null,
+      "cli": [
+        "sendmock payments subscriptions delete-all --yes"
+      ],
+      "ui": [
+        "Payments > Subscriptions > Delete all"
       ]
     },
     {
@@ -24408,6 +25377,42 @@
       ]
     },
     {
+      "name": "sendmock_traffic_delete_all",
+      "toolset": "admin",
+      "summary": "Delete every captured item in every project and keep every setting and configuration list.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/traffic",
+          "operation_id": "deleteTraffic",
+          "summary": "Delete every captured item in every project and keep every setting and configuration list.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": null,
+      "cli": [
+        "sendmock traffic delete-all --yes"
+      ],
+      "ui": [
+        "Settings > General > Delete all traffic"
+      ]
+    },
+    {
       "name": "sendmock_update_check",
       "toolset": "admin",
       "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
@@ -24441,6 +25446,201 @@
       ],
       "ui": [
         "Settings > About > Check GitHub Releases for updates"
+      ]
+    },
+    {
+      "name": "sendmock_verify_delete",
+      "toolset": "verify",
+      "summary": "Delete one verification with its check attempts.",
+      "area": "Verify",
+      "area_slug": "verify",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/verify/{verificationSid}",
+          "operation_id": "deleteVerifyByVerificationSid",
+          "summary": "Delete one verification with its check attempts.",
+          "area_slug": "verify",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "verification_sid",
+          "input": {
+            "name": "verificationSid",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The verification's SID, from `GET /api/v1/verify`.",
+          "example": "VE00000000000000000000000000000001"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "verification_sid": {
+            "type": "string",
+            "description": "The verification's SID, from `GET /api/v1/verify`.",
+            "examples": [
+              "VE00000000000000000000000000000001"
+            ]
+          }
+        },
+        "required": [
+          "verification_sid"
+        ]
+      },
+      "example_arguments": {
+        "verification_sid": "VE00000000000000000000000000000001"
+      },
+      "output": null,
+      "cli": [
+        "sendmock verify delete <verificationSid>"
+      ],
+      "ui": [
+        "SMS > Verify > select verifications > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_verify_delete_all",
+      "toolset": "verify",
+      "summary": "Delete every verification, or those the filters match.",
+      "area": "Verify",
+      "area_slug": "verify",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/verify",
+          "operation_id": "deleteVerify",
+          "summary": "Delete every verification, or those the filters match.",
+          "area_slug": "verify",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "pending, approved or failed.",
+          "example": "pending"
+        },
+        {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Number or email.",
+          "example": "+8801700000000"
+        },
+        {
+          "name": "channel",
+          "input": {
+            "name": "channel",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "sms",
+            "whatsapp",
+            "email",
+            "call"
+          ],
+          "description": "How the code was sent.",
+          "example": "sms"
+        },
+        {
+          "name": "project",
+          "input": {
+            "name": "project",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this project's verifications (its key); every project's when not set.",
+          "example": "shop"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "pending, approved or failed.",
+            "examples": [
+              "pending"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "description": "Number or email.",
+            "examples": [
+              "+8801700000000"
+            ]
+          },
+          "channel": {
+            "$ref": "#/$defs/VerifyChannel",
+            "description": "How the code was sent.",
+            "examples": [
+              "sms"
+            ]
+          },
+          "project": {
+            "type": "string",
+            "description": "Only this project's verifications (its key); every project's when not set.",
+            "examples": [
+              "shop"
+            ]
+          }
+        },
+        "$defs": {
+          "VerifyChannel": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "whatsapp",
+              "email",
+              "call"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "status": "pending",
+        "to": "+8801700000000"
+      },
+      "output": null,
+      "cli": [
+        "sendmock verify delete-all --yes"
+      ],
+      "ui": [
+        "SMS > Verify > Delete all"
       ]
     },
     {
@@ -25211,6 +26411,279 @@
       ]
     },
     {
+      "name": "sendmock_webhook_delivery_delete",
+      "toolset": "webhooks",
+      "summary": "Delete a finished delivery; 409 while it is queued or waiting for a retry.",
+      "area": "Webhook deliveries",
+      "area_slug": "webhook-deliveries",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/webhooks/deliveries/{deliveryId}",
+          "operation_id": "deleteWebhooksDeliveriesByDeliveryId",
+          "summary": "Delete a finished delivery; 409 while it is queued or waiting for a retry.",
+          "area_slug": "webhook-deliveries",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "delivery_id",
+          "input": {
+            "name": "deliveryId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The webhook delivery's ID, from `GET /api/v1/webhooks/deliveries`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "delivery_id": {
+            "type": "string",
+            "description": "The webhook delivery's ID, from `GET /api/v1/webhooks/deliveries`.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          }
+        },
+        "required": [
+          "delivery_id"
+        ]
+      },
+      "example_arguments": {
+        "delivery_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+      },
+      "output": null,
+      "cli": [
+        "sendmock webhook deliveries delete <deliveryId>"
+      ],
+      "ui": [
+        "Webhooks > Deliveries > select deliveries > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_webhook_delivery_delete_all",
+      "toolset": "webhooks",
+      "summary": "Delete every finished delivery, or those the filters match; queued and retrying ones stay.",
+      "area": "Webhook deliveries",
+      "area_slug": "webhook-deliveries",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/webhooks/deliveries",
+          "operation_id": "deleteWebhooksDeliveries",
+          "summary": "Delete every finished delivery, or those the filters match; queued and retrying ones stay.",
+          "area_slug": "webhook-deliveries",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "succeeded, failed or pending.",
+          "example": "failed"
+        },
+        {
+          "name": "endpoint_id",
+          "input": {
+            "name": "endpoint_id",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this endpoint.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "name": "event_type",
+          "input": {
+            "name": "event_type",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "email.received",
+            "email.inbound",
+            "email.opened",
+            "email.clicked",
+            "email.delivered",
+            "email.deferred",
+            "email.bounced",
+            "email.complained",
+            "email.unsubscribed",
+            "email.released",
+            "email.deleted",
+            "sms.sent",
+            "sms.status",
+            "sms.opened",
+            "sms.inbound",
+            "sms.reply_webhook",
+            "verify.started",
+            "verify.checked",
+            "verify.expired",
+            "push.sent",
+            "push.failed",
+            "http.captured",
+            "payment.created",
+            "payment.authorized",
+            "payment.succeeded",
+            "payment.failed",
+            "payment.canceled",
+            "payment.refunded",
+            "payment.partially_refunded",
+            "payment.dispute_opened",
+            "payment.dispute_updated",
+            "payment.dispute_closed",
+            "checkout.completed",
+            "checkout.expired",
+            "subscription.created",
+            "subscription.renewed",
+            "subscription.payment_failed",
+            "subscription.canceled",
+            "webhook.delivered",
+            "webhook.failed",
+            "test.ping",
+            "traffic.pruned",
+            "traffic.cleared"
+          ],
+          "description": "Only this event.",
+          "example": "email.received"
+        },
+        {
+          "name": "subject_id",
+          "input": {
+            "name": "subject_id",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "succeeded, failed or pending.",
+            "examples": [
+              "failed"
+            ]
+          },
+          "endpoint_id": {
+            "type": "string",
+            "description": "Only this endpoint.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+            ]
+          },
+          "event_type": {
+            "$ref": "#/$defs/AppEventType",
+            "description": "Only this event.",
+            "examples": [
+              "email.received"
+            ]
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "Only the deliveries an email, SMS or other message caused, by its ID.",
+            "examples": [
+              "01JB7T9Q2R5W8X3Y6Z1A4B7C9E"
+            ]
+          }
+        },
+        "$defs": {
+          "AppEventType": {
+            "type": "string",
+            "enum": [
+              "email.received",
+              "email.inbound",
+              "email.opened",
+              "email.clicked",
+              "email.delivered",
+              "email.deferred",
+              "email.bounced",
+              "email.complained",
+              "email.unsubscribed",
+              "email.released",
+              "email.deleted",
+              "sms.sent",
+              "sms.status",
+              "sms.opened",
+              "sms.inbound",
+              "sms.reply_webhook",
+              "verify.started",
+              "verify.checked",
+              "verify.expired",
+              "push.sent",
+              "push.failed",
+              "http.captured",
+              "payment.created",
+              "payment.authorized",
+              "payment.succeeded",
+              "payment.failed",
+              "payment.canceled",
+              "payment.refunded",
+              "payment.partially_refunded",
+              "payment.dispute_opened",
+              "payment.dispute_updated",
+              "payment.dispute_closed",
+              "checkout.completed",
+              "checkout.expired",
+              "subscription.created",
+              "subscription.renewed",
+              "subscription.payment_failed",
+              "subscription.canceled",
+              "webhook.delivered",
+              "webhook.failed",
+              "test.ping",
+              "traffic.pruned",
+              "traffic.cleared"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "status": "failed",
+        "event_type": "email.received"
+      },
+      "output": null,
+      "cli": [
+        "sendmock webhook deliveries delete-all --yes"
+      ],
+      "ui": [
+        "Webhooks > Deliveries > Delete all"
+      ]
+    },
+    {
       "name": "sendmock_webhook_delivery_get",
       "toolset": "webhooks",
       "summary": "One delivery: request, response and every attempt.",
@@ -25393,7 +26866,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "Only this event.",
           "example": "email.received"
@@ -25502,7 +26976,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           }
         }
@@ -28179,7 +29654,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -28327,7 +29803,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           },
           "RuleCondition": {
@@ -28677,7 +30154,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "The event the action fires.",
           "example": "email.bounced"
@@ -28845,7 +30323,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           },
           "Ulid": {
@@ -29032,7 +30511,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "The event types to test, as in the rule.",
           "example": [
@@ -29142,7 +30622,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           },
           "RuleCondition": {
@@ -29360,7 +30841,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "The event types the rule listens to.",
           "example": [
@@ -29512,7 +30994,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           },
           "RuleCondition": {
@@ -31765,7 +33248,8 @@
             "webhook.delivered",
             "webhook.failed",
             "test.ping",
-            "traffic.pruned"
+            "traffic.pruned",
+            "traffic.cleared"
           ],
           "description": "The event types the template is made for.",
           "example": [
@@ -31977,7 +33461,8 @@
               "webhook.delivered",
               "webhook.failed",
               "test.ping",
-              "traffic.pruned"
+              "traffic.pruned",
+              "traffic.cleared"
             ]
           },
           "HttpMethod": {

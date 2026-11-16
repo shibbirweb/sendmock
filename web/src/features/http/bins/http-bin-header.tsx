@@ -1,6 +1,5 @@
-import { EraserIcon, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 
-import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { CopyButton } from "@/components/common/copy-button";
 import { Button } from "@/components/ui/button";
@@ -62,31 +61,12 @@ function BinActions({
       <Button
         variant="ghost"
         size="sm"
-        disabled={httpBin.request_count === 0}
-        onClick={binActions.askToClear}
-      >
-        <EraserIcon />
-        Clear requests
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
         className="text-destructive"
         onClick={binActions.askToDelete}
       >
         <Trash2Icon />
         Delete bin
       </Button>
-      <ConfirmActionDialog
-        isOpen={binActions.pendingAction === "clear"}
-        title={`Clear the requests in ${httpBin.name}?`}
-        consequence="The captured requests go; the bin, its rules and its catch URL stay."
-        confirmLabel="Clear requests"
-        onConfirm={() => {
-          binActions.clearRequests(httpBin);
-        }}
-        onClose={binActions.closeDialog}
-      />
       <ConfirmDeleteDialog
         itemName={binActions.pendingAction === "delete" ? httpBin.name : null}
         consequence="Its requests and response rules go too. A new request to its catch URL creates it again, without rules."

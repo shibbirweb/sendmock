@@ -58,6 +58,25 @@ pub fn publish_email_deleted(
     );
 }
 
+/// `traffic.cleared`: one event for a whole delete all, so live views refetch the lists of
+/// those kinds once instead of once per row. `project` is `None` when every project went.
+pub fn publish_traffic_cleared(
+    operation_context: &OperationContext,
+    cleared_kinds: &[&str],
+    project_key: Option<&str>,
+    deleted_count: u64,
+) {
+    publish_event(
+        operation_context,
+        AppEventType::TrafficCleared,
+        json!({
+            "kinds": cleared_kinds,
+            "project": project_key,
+            "deleted_count": deleted_count,
+        }),
+    );
+}
+
 /// `traffic.pruned`, so live views refetch the lists and counts retention trimmed.
 pub fn publish_traffic_pruned(operation_context: &OperationContext, pruned_count: u64) {
     publish_event(

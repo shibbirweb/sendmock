@@ -8,6 +8,7 @@ import {
   includesText,
   paginateItems,
 } from "@/mocks/handlers/handler-utils";
+import { publishTrafficCleared } from "@/mocks/realtime/publish-traffic-cleared";
 
 function matchesSmtpFilters(
   smtpSession: SmtpSession,
@@ -79,6 +80,28 @@ export const logsHandlers = [
       : createNotFoundResponse("SMTP session");
   }),
 
+  http.delete("*/api/v1/logs/smtp", async ({ request }) => {
+    await applyMockConditions();
+    const requestUrl = new URL(request.url);
+    const keptSessions = mockDatabase.smtpSessions.filter(
+      (smtpSession) => !matchesSmtpFilters(smtpSession, requestUrl),
+    );
+    const deletedCount = mockDatabase.smtpSessions.length - keptSessions.length;
+    mockDatabase.smtpSessions = keptSessions;
+    publishTrafficCleared(["smtp_session"], null, deletedCount);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.delete("*/api/v1/logs/smtp/:sessionId", async ({ params }) => {
+    await applyMockConditions();
+    mockDatabase.smtpSessions = mockDatabase.smtpSessions.filter(
+      (smtpSession) => smtpSession.id !== params.sessionId,
+    );
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   http.get("*/api/v1/logs/http", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
     if (conditionResponse) {
@@ -106,5 +129,28 @@ export const logsHandlers = [
     return apiRequest
       ? HttpResponse.json(apiRequest)
       : createNotFoundResponse("API request");
+  }),
+
+  http.delete("*/api/v1/logs/http", async ({ request }) => {
+    await applyMockConditions();
+    const requestUrl = new URL(request.url);
+    const keptRequests = mockDatabase.apiRequestLog.filter(
+      (apiRequest) => !matchesApiRequestFilters(apiRequest, requestUrl),
+    );
+    const deletedCount =
+      mockDatabase.apiRequestLog.length - keptRequests.length;
+    mockDatabase.apiRequestLog = keptRequests;
+    publishTrafficCleared(["api_request"], null, deletedCount);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.delete("*/api/v1/logs/http/:requestId", async ({ params }) => {
+    await applyMockConditions();
+    mockDatabase.apiRequestLog = mockDatabase.apiRequestLog.filter(
+      (apiRequest) => apiRequest.id !== params.requestId,
+    );
+
+    return new HttpResponse(null, { status: 204 });
   }),
 ];

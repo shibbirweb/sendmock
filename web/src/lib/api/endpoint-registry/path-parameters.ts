@@ -132,6 +132,11 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "The SMS's ID, from `GET /api/v1/sms`.",
     example: exampleUlid,
   },
+  threadId: {
+    description:
+      "The conversation's `thread_id`, from `GET /api/v1/sms/threads`.",
+    example: "sms-15550001111-8801700000000",
+  },
   stack: {
     description:
       "Your app's stack: a language (`laravel`, `node`, `python`, `go`, `java`, `ruby`, `dotnet`, `curl`) or a framework (`php`, `express`, `nestjs`, `django`, `flask`, `fastapi`, `spring`, `rails`, `aspnet`).",

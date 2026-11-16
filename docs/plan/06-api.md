@@ -28,7 +28,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | POST | `/emails/{emailId}/open` | record an open and fire `email.opened`; body `{ "source": "ui" \| "manual" \| "api", "user_agent"? }` (default `api`); a `ui` open the opened-events settings leave out records nothing and still answers 204 |
 | GET | `/emails/{emailId}/opens` | open history, oldest first: `opened_at`, `source`, `user_agent` |
 | DELETE | `/emails/{emailId}` | delete one |
-| DELETE | `/emails` | delete all, or only those matching the list's filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`) |
+| DELETE | `/emails` | delete all, or only those matching the list's filters (`query`, `from`, `to`, `tag`, `is_unread`, `has_attachment`, `source`, `direction`, and `project` since A17); answers 204 and publishes one `traffic.cleared` |
 | GET | `/emails/latest` | newest message, optionally filtered by `to` |
 | POST | `/send` | native HTTP send (JSON, with base64 `attachments`, see [03-email.md](03-email.md#native-send-attachments)); provider-compatible send APIs live under `/providers/*` and the provider port ([03-email.md](03-email.md#http-send-apis)) |
 | POST | `/emails/{emailId}/simulate` | simulate `delivered`, `deferred`, `bounced` (hard/soft), `complained`, `unsubscribed` |
@@ -61,13 +61,15 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/sms` | list, filters (`query`, `to`, `from`, `status`, `direction`, `thread_id`) |
 | GET | `/sms/{smsId}` | one message with status history |
 | GET | `/sms/{smsId}/media/{mediaIndex}` | one stored media file (MMS or WhatsApp), with its content type |
-| GET | `/sms/threads` | conversations grouped by number pair |
+| GET | `/sms/threads` | conversations grouped by number pair; `unread_count` counts the conversation's unread messages (A17) |
+| PATCH | `/sms/threads/{threadId}` | `{ "is_read": true }` marks every message in the conversation read (opening it in the UI does this); `false` marks its newest message unread (A17, UI-14) |
+| DELETE | `/sms/threads/{threadId}` | delete a conversation with its messages, media and history (A17, UI-14) |
 | POST | `/sms/{smsId}/status` | manually set status (manual profile) |
 | POST | `/sms/{smsId}/open` | record a simulated read and fire `sms.opened` (outbound only, 409 `inbound_sms` for inbound); same body and settings as the email open |
 | GET | `/sms/{smsId}/opens` | read history, oldest first |
 | POST | `/sms/inbound` | simulate incoming SMS |
 | POST | `/sms/{smsId}/reply-webhook/resend` | send an inbound message's reply webhook again (Twilio-style request URL, fallback and TwiML replies) |
-| DELETE | `/sms/{smsId}`, `/sms` | delete one / all |
+| DELETE | `/sms/{smsId}`, `/sms` | delete one / all (`project` since A17; all publishes one `traffic.cleared`) |
 | GET/POST/PATCH/DELETE | `/numbers` | virtual number registry |
 | GET/POST/PATCH/DELETE | `/outcome-rules/sms` | custom outcome numbers; `POST /outcome-rules/sms/{ruleId}/move` with `up` or `down` reorders |
 | GET/POST/PATCH/DELETE | `/messaging-services` | Twilio-style Messaging Services (sender pools) |
@@ -83,6 +85,7 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET | `/verify` | verifications list (filters `to`, `status`, `channel`) |
 | GET | `/verify/{verificationSid}` | one verification with code, attempts, timeline |
 | POST | `/verify/{verificationSid}/force` | force `approved`, `canceled`, `expired`, `max_attempts` |
+| DELETE | `/verify/{verificationSid}`, `/verify` | delete one verification, or all (the list's `to`, `status`, `channel` and `project` filters narrow it) with their check attempts (A17, UI-14) |
 
 The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider port ([04-sms.md](04-sms.md#twilio-verify)).
 
@@ -95,13 +98,15 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | GET/PUT | `/http/bins/{binId}/responses` | the bin's response rules, in order; `PUT` replaces the list (order, enabled, edits) |
 | POST | `/http/bins/{binId}/responses/preview` | `{ "rule": ..., "request_id": ... }`: whether the rule matches that captured request, and the rendered response with template problems |
 | GET | `/http/requests`, `/http/requests/{requestId}` | captured requests (`?bin_id=`), newest first, paged; each with the response sent and the rule that produced it |
-| DELETE | `/http/requests?bin_id=` | clear a bin's requests |
+| DELETE | `/http/requests?bin_id=` | clear a bin's requests, or every bin's without `bin_id` (publishes one `traffic.cleared`) |
+| PATCH | `/http/requests/{requestId}` | `{ "is_read": false }` marks a captured request unread, `true` read; requests arrive unread and opening one marks it read (A17, UI-14) |
+| DELETE | `/http/requests/{requestId}` | delete one captured request with its uploaded files (A17, UI-14) |
 | GET | `/http/requests/{requestId}/files/{fileIndex}` | download a file uploaded in a multipart request |
 | POST | `/http/requests/{requestId}/forward` | resend a captured request to `{ "url": ... }`; returns the status, duration and body it got |
 
 ## Payments
 
-Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute` with `dispute_evidence`, the dispute's `under_review` status and `evidence`, and the `payment.dispute_updated` event; and subscriptions at `/payments/subscriptions` with advance and cancel and the `subscription.*` events), resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...) are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
+Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute` with `dispute_evidence`, the dispute's `under_review` status and `evidence`, and the `payment.dispute_updated` event; and subscriptions at `/payments/subscriptions` with advance and cancel and the `subscription.*` events), resend IPN, test cards and `wait/payment`; provider wire APIs (Stripe, PayPal, SSLCommerz, ...). Since A17 (UI-14): `DELETE /payments/{paymentId}` and `DELETE /payments` (the list's filters narrow it) delete payments with their events, refunds and checkout sessions, and `DELETE /payments/subscriptions/{subscriptionId}` and `DELETE /payments/subscriptions` delete subscriptions; gateways, methods and flows stay. are on the provider port. Full table in [17-payments.md](17-payments.md#api-sendmock-native).
 
 ## Logs
 
@@ -109,6 +114,8 @@ Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute
 |--------|------|---------|
 | GET | `/logs/smtp`, `/logs/smtp/{sessionId}` | SMTP sessions with full transcripts (incl. failed sessions) |
 | GET | `/logs/http`, `/logs/http/{requestId}` | requests to native and provider APIs, including rejected ones |
+| DELETE | `/logs/smtp/{sessionId}`, `/logs/smtp` | delete one SMTP session, or all (the list's filters narrow it) (A17, UI-14) |
+| DELETE | `/logs/http/{requestId}`, `/logs/http` | delete one API request log entry, or all (the list's filters narrow it) (A17, UI-14) |
 
 ## Webhooks
 
@@ -128,6 +135,8 @@ Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute
 | GET | `/webhooks/deliveries/{deliveryId}` | full request and response, plus `max_attempts`, the other attempts of the same event and the email or SMS that caused it |
 | POST | `/webhooks/deliveries/{deliveryId}/replay` | resend: `{ "rerender": false }` as-is, `true` with fresh variables (`409 gateway_notification` for a payment gateway's notification, which is resent from the payment), or with `body` and `headers` to send an edited request; returns the new delivery |
 | POST | `/webhooks/deliveries/{deliveryId}/cancel` | stop pending retries |
+| DELETE | `/webhooks/deliveries/{deliveryId}` | delete a finished delivery; `409 delivery_in_flight` while it is queued or waiting for a retry (cancel it first) (A17, UI-14) |
+| DELETE | `/webhooks/deliveries` | delete every finished delivery, or those the list's `status`, `endpoint_id` and `event_type` filters match; queued and retrying ones stay (A17, UI-14) |
 | GET/POST/PATCH/DELETE | `/webhooks/variables` | global and endpoint variables; values are checked per kind and secrets are always returned masked (an empty value on `PATCH` keeps the stored secret); a Fixed random variable carries its `fixed_value` |
 | POST | `/webhooks/variables/preview` | what a variable resolves to against the sample message: `{ "kind": ..., "value": ... }`, returns the value, warnings and errors |
 | POST | `/webhooks/variables/{variableId}/regenerate` | refresh a Fixed random variable |
@@ -175,6 +184,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration, for the installed binary and through npx (`npx_install_command`, `npx_mcp_config`, added 2026-11-07 for AI-05.9); the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
 | POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
+| DELETE | `/traffic` | delete every captured item in every project (emails, SMS, verifications, push notifications, HTTP requests, finished webhook deliveries, payments, subscriptions and both logs) and keep every setting and configuration list; publishes one `traffic.cleared` (A17, UI-14) |
 | POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
 | GET | `/seed/status` | seed file path, when it was applied, and items added or changed since |
@@ -213,6 +223,7 @@ Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01).
 | GET | `/push` | notifications, newest first, with `project`, `device_token`, `provider` and `status` filters |
 | DELETE | `/push` | delete every notification, or those the same filters match |
 | GET/DELETE | `/push/{pushId}` | one notification with its request and answer; delete it |
+| PATCH | `/push/{pushId}` | `{ "is_read": false }` marks a notification unread, `true` read; notifications arrive unread and opening one marks it read (A17, UI-14) |
 | GET | `/wait/push` | wait for a notification to a `device_token` (and `project`) since a time; `408` on timeout |
 
 ## Realtime
@@ -222,6 +233,8 @@ Built after 1.0 as [32](32-after-1-0.md#a7-push-notifications-pn-01) A7 (PN-01).
 Under load (W19 in [30](30-phase-5.md), 2026-11-12): the UI batches events and flushes them every 250 ms, writes list-view `data` straight into the cached first page of each list, and refetches what it cannot patch at most once per flush without cancelling a request in flight. A client that falls more than 1,024 events behind is closed with the reason `lagged`, and refetches its lists once after reconnecting.
 
 Retention (2026-11-13, #238): when the retention task deletes traffic past the limits in Settings, it publishes `traffic.pruned` with `{ "pruned_count": n }`, and the UI refetches every live list and the stats once, since rows it placed in its cache may be gone. The event drives live views only: webhook rules cannot pick it.
+
+Delete all (A17, UI-14): every delete-all operation and `DELETE /traffic` publish one `traffic.cleared` with `{ "kinds": ["sms"], "project": "shop", "deleted_count": n }` (`kinds` from `email`, `sms`, `verification`, `push`, `http_request`, `webhook_delivery`, `payment`, `subscription`, `smtp_session`, `api_request`; `project` null when every project was cleared) instead of one event per row, and the UI refetches the lists of those kinds and the stats. Like `traffic.pruned`, webhook rules cannot pick it.
 
 ## Conventions
 

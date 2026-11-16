@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { ListRowCheckbox } from "@/components/common/list-row-checkbox";
 import { SmsContactAvatar } from "@/features/sms/sms-contact-avatar";
 import { describeMediaOnlyMessage } from "@/features/sms/media/sms-media-urls";
 import { SmsStatusTicks } from "@/features/sms/sms-status-ticks";
@@ -12,28 +13,58 @@ import { cn } from "@/lib/utils";
 export function SmsThreadListItem({
   smsThread,
   isSelected,
+  isChecked,
+  isAnyChecked,
+  onCheckedChange,
 }: {
   smsThread: SmsThread;
   isSelected: boolean;
+  isChecked: boolean;
+  isAnyChecked: boolean;
+  onCheckedChange: (isChecked: boolean) => void;
 }) {
   const lastMessage = smsThread.last_message;
   const isLastMessageOutbound = lastMessage.direction === "outbound";
+  const isUnread = smsThread.unread_count > 0;
+  const contactLabel = stripChannelPrefix(smsThread.contact_number);
 
   return (
-    <li>
+    <li
+      className={cn(
+        "group/list-row flex items-start gap-2 border-b pl-3 hover:bg-muted/60",
+        isSelected && "bg-muted",
+      )}
+    >
+      <div className="flex w-4 shrink-0 flex-col items-center gap-2 pt-3.5">
+        <ListRowCheckbox
+          itemLabel={`conversation with ${contactLabel}`}
+          isChecked={isChecked}
+          isAnyChecked={isAnyChecked}
+          onCheckedChange={onCheckedChange}
+        />
+        {isUnread && (
+          <span
+            role="img"
+            aria-label="Unread"
+            className="size-2 rounded-full bg-primary"
+          />
+        )}
+      </div>
       <Link
         to="/sms/$threadId"
         params={{ threadId: smsThread.thread_id }}
-        className={cn(
-          "flex gap-3 border-b px-3 py-3 outline-none hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-          isSelected && "bg-muted",
-        )}
+        className="flex min-w-0 flex-1 gap-3 py-3 pr-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
         <SmsContactAvatar channel={smsThread.channel} />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="flex min-w-0 items-center gap-2 text-sm">
-            <span className="min-w-0 truncate font-medium">
-              {stripChannelPrefix(smsThread.contact_number)}
+            <span
+              className={cn(
+                "min-w-0 truncate",
+                isUnread ? "font-semibold" : "font-medium",
+              )}
+            >
+              {contactLabel}
             </span>
             <time
               dateTime={lastMessage.created_at}

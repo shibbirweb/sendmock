@@ -14,12 +14,14 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMarkReadOnOpen } from "@/hooks/use-mark-read-on-open";
 import { pushProviderLabels } from "@/features/push/push-labels";
 import { PushPhonePreview } from "@/features/push/push-phone-preview";
 import { PushStatusBadge } from "@/features/push/push-status-badge";
 import {
   useDeletePushNotification,
   usePushNotification,
+  useUpdatePushNotification,
 } from "@/lib/api/hooks/use-push-queries";
 import type { PushNotification } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format/format-values";
@@ -148,6 +150,18 @@ function PushDrawerContent({
   onDeleted: () => void;
 }) {
   const pushQuery = usePushNotification(pushId);
+  const { mutate: updatePushNotification } = useUpdatePushNotification();
+  const markPushRead = React.useCallback(
+    (readPushId: string) => {
+      updatePushNotification({ pushId: readPushId, isRead: true });
+    },
+    [updatePushNotification],
+  );
+  useMarkReadOnOpen({
+    openItemId: pushQuery.data?.id,
+    isUnread: pushQuery.data?.is_read === false,
+    markItemRead: markPushRead,
+  });
 
   if (pushQuery.isPending) {
     return (

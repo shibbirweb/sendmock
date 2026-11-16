@@ -1,4 +1,5 @@
 import { ArrowLeftIcon } from "lucide-react";
+import * as React from "react";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { HttpHeadersList } from "@/components/common/http-headers-list";
@@ -10,7 +11,11 @@ import { CapturedBodyView } from "@/features/http/requests/captured-body-view";
 import { CapturedRequestActions } from "@/features/http/requests/captured-request-actions";
 import { CapturedResponseView } from "@/features/http/requests/captured-response-view";
 import { HttpMethodBadge } from "@/features/http/requests/http-method-badge";
-import { useCapturedHttpRequest } from "@/lib/api/hooks/use-http-catcher-queries";
+import { useMarkReadOnOpen } from "@/hooks/use-mark-read-on-open";
+import {
+  useCapturedHttpRequest,
+  useUpdateCapturedHttpRequest,
+} from "@/lib/api/hooks/use-http-catcher-queries";
 import type { HttpBin } from "@/lib/api/types";
 import { formatDateTime, formatDurationMs } from "@/lib/format/format-values";
 import { parseMessagePreview } from "@/lib/http/parse-message-preview";
@@ -27,6 +32,18 @@ export function CapturedRequestDetail({
 }) {
   const requestQuery = useCapturedHttpRequest(requestId);
   const capturedRequest = requestQuery.data;
+  const { mutate: updateRequest } = useUpdateCapturedHttpRequest();
+  const markRequestRead = React.useCallback(
+    (readRequestId: string) => {
+      updateRequest({ requestId: readRequestId, isRead: true });
+    },
+    [updateRequest],
+  );
+  useMarkReadOnOpen({
+    openItemId: capturedRequest?.id,
+    isUnread: capturedRequest?.is_read === false,
+    markItemRead: markRequestRead,
+  });
   if (requestQuery.isPending) {
     return <Skeleton className="m-4 h-80" />;
   }

@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router";
 
 import {
+  CheckableTableRow,
+  CheckColumnHead,
+} from "@/components/common/checkable-table-row";
+import {
   Table,
   TableBody,
   TableCell,
@@ -9,13 +13,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaymentStatusBadge } from "@/features/payments/payment-status-badge";
+import type { CheckedItems } from "@/hooks/use-checked-items";
 import type { PaymentSummary } from "@/lib/api/types";
 import { formatDateTime, formatRelativeTime } from "@/lib/format/format-values";
 import { formatMinorAmount } from "@/lib/payments/format-money";
 
-function PaymentRow({ paymentSummary }: { paymentSummary: PaymentSummary }) {
+function PaymentRow({
+  paymentSummary,
+  checkedPayments,
+}: {
+  paymentSummary: PaymentSummary;
+  checkedPayments: CheckedItems;
+}) {
   return (
-    <TableRow className="relative" data-testid="payment-row">
+    <CheckableTableRow
+      itemId={paymentSummary.id}
+      itemLabel={`payment of ${formatMinorAmount(paymentSummary.amount_minor, paymentSummary.currency)}`}
+      checkedItems={checkedPayments}
+      data-testid="payment-row"
+    >
       <TableCell className="font-medium whitespace-nowrap tabular-nums">
         <Link
           to="/payments"
@@ -53,20 +69,23 @@ function PaymentRow({ paymentSummary }: { paymentSummary: PaymentSummary }) {
       >
         {formatRelativeTime(paymentSummary.created_at)}
       </TableCell>
-    </TableRow>
+    </CheckableTableRow>
   );
 }
 
 /** Payments newest first; each row opens its detail (PY-09.1). */
 export function PaymentsTable({
   paymentSummaries,
+  checkedPayments,
 }: {
   paymentSummaries: PaymentSummary[];
+  checkedPayments: CheckedItems;
 }) {
   return (
     <Table aria-label="Payments">
       <TableHeader>
         <TableRow>
+          <CheckColumnHead />
           <TableHead>Amount</TableHead>
           <TableHead>Provider</TableHead>
           <TableHead>Status</TableHead>
@@ -76,7 +95,11 @@ export function PaymentsTable({
       </TableHeader>
       <TableBody>
         {paymentSummaries.map((paymentSummary) => (
-          <PaymentRow key={paymentSummary.id} paymentSummary={paymentSummary} />
+          <PaymentRow
+            key={paymentSummary.id}
+            paymentSummary={paymentSummary}
+            checkedPayments={checkedPayments}
+          />
         ))}
       </TableBody>
     </Table>

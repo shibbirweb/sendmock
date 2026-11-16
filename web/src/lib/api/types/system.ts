@@ -142,6 +142,10 @@ export type AppStats = {
   pending_verification_count: number;
   http_request_count: number;
   http_requests_today: number;
+  /** Captured HTTP requests nobody opened yet, for the sidebar badge. */
+  unread_http_request_count: number;
+  /** Push notifications nobody opened yet, for the sidebar badge. */
+  unread_push_count: number;
   webhook_delivery_count: number;
   webhook_success_rate: number | null;
   webhook_p95_latency_ms: number | null;

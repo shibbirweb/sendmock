@@ -14,9 +14,11 @@ const MESSAGE_TOTALS_QUERY: &str = "SELECT \
     (SELECT count(*) FROM emails WHERE is_read = 0), \
     (SELECT count(*) FROM sms_messages), \
     (SELECT count(*) FROM sms_messages WHERE created_at >= ?1), \
-    (SELECT count(*) FROM sms_messages WHERE direction = 'inbound' AND is_read = 0), \
+    (SELECT count(*) FROM sms_messages WHERE is_read = 0), \
     (SELECT count(*) FROM verifications), \
-    (SELECT count(*) FROM verifications WHERE status = 'pending')";
+    (SELECT count(*) FROM verifications WHERE status = 'pending'), \
+    (SELECT count(*) FROM push_notifications WHERE is_read = 0), \
+    (SELECT count(*) FROM http_captured_requests WHERE is_read = 0)";
 
 /// Counts across emails, SMS and verifications for the Overview, read in one place so the
 /// message repositories keep to their own lists.
@@ -48,6 +50,8 @@ impl ActivityStatsRepository {
                             unread_sms_count: read_count(row, 5)?,
                             verification_count: read_count(row, 6)?,
                             pending_verification_count: read_count(row, 7)?,
+                            unread_push_count: read_count(row, 8)?,
+                            unread_http_request_count: read_count(row, 9)?,
                         })
                     })?,
                 )

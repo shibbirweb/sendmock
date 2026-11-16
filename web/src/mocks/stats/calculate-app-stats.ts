@@ -132,7 +132,7 @@ export function calculateAppStats(
       startOfTodayMs,
     ),
     unread_sms_count: mockDatabase.smsMessages.filter(
-      (smsMessage) => smsMessage.direction === "inbound",
+      (smsMessage) => !smsMessage.is_read,
     ).length,
     verification_count: mockDatabase.verifications.length,
     pending_verification_count: mockDatabase.verifications.filter(
@@ -145,6 +145,12 @@ export function calculateAppStats(
       ),
       startOfTodayMs,
     ),
+    unread_http_request_count: mockDatabase.capturedHttpRequests.filter(
+      (capturedRequest) => !capturedRequest.is_read,
+    ).length,
+    unread_push_count: mockDatabase.pushNotifications.filter(
+      (pushNotification) => !pushNotification.is_read,
+    ).length,
     webhook_delivery_count: mockDatabase.webhookDeliveries.length,
     webhook_success_rate: calculateSuccessRate(mockDatabase.webhookDeliveries),
     webhook_p95_latency_ms: percentile(

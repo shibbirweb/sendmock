@@ -18,6 +18,19 @@ pub struct DeliveryListInput {
     pub subject_id: Option<String>,
 }
 
+/// `DELETE /api/v1/webhooks/deliveries`: the list's filters without paging.
+#[derive(Debug, Clone, Default, Deserialize, JsonSchema)]
+pub struct DeliveryFilterQuery {
+    /// succeeded, failed or pending.
+    pub status: Option<String>,
+    /// Only this endpoint.
+    pub endpoint_id: Option<String>,
+    /// Only this event.
+    pub event_type: Option<String>,
+    /// Only the deliveries an email, SMS or other message caused, by its ID.
+    pub subject_id: Option<String>,
+}
+
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct DeliveryReference {
     /// The delivery's ID, from `GET /api/v1/webhooks/deliveries`.

@@ -125,8 +125,31 @@ export function useOpenSms() {
   );
 }
 
+/** Deletes one project's messages, or every project's when no key is given. */
 export function useDeleteAllSms() {
-  return useSmsMutation(() => requestApi<void>("/sms", { method: "DELETE" }));
+  return useSmsMutation((projectKey: string | undefined) =>
+    requestApi<void>("/sms", {
+      method: "DELETE",
+      queryParameters: { project: projectKey },
+    }),
+  );
+}
+
+/** True marks the whole conversation read; false marks its newest message unread. */
+export function useUpdateSmsThread() {
+  return useSmsMutation(
+    ({ threadId, isRead }: { threadId: string; isRead: boolean }) =>
+      requestApi<void>(`/sms/threads/${threadId}`, {
+        method: "PATCH",
+        requestBody: { is_read: isRead },
+      }),
+  );
+}
+
+export function useDeleteSmsThread() {
+  return useSmsMutation((threadId: string) =>
+    requestApi<void>(`/sms/threads/${threadId}`, { method: "DELETE" }),
+  );
 }
 
 export function useDeleteSms() {

@@ -12,7 +12,7 @@ export const smsSurfaces: SurfaceCatalogue = {
     phase: "2",
     cli: "sendmock sms delete-all --yes",
     mcp: "sendmock_sms_delete_all",
-    ui: "Settings > General > Delete all SMS",
+    ui: "SMS > Delete all",
   },
   "POST /api/v1/sms": {
     phase: "2",
@@ -25,6 +25,18 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock sms threads",
     mcp: "sendmock_sms_threads",
     ui: "SMS > conversation list",
+  },
+  "PATCH /api/v1/sms/threads/{threadId}": {
+    phase: "A17",
+    cli: "sendmock sms threads update <threadId>",
+    mcp: "sendmock_sms_thread_update",
+    ui: "SMS > select conversations > Mark read or Mark unread",
+  },
+  "DELETE /api/v1/sms/threads/{threadId}": {
+    phase: "A17",
+    cli: "sendmock sms threads delete <threadId>",
+    mcp: "sendmock_sms_thread_delete",
+    ui: "SMS > select conversations > Delete",
   },
   "GET /api/v1/sms/{smsId}": {
     phase: "2",
@@ -83,11 +95,23 @@ export const smsSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_verify_list",
     ui: "SMS > Verify",
   },
+  "DELETE /api/v1/verify": {
+    phase: "A17",
+    cli: "sendmock verify delete-all --yes",
+    mcp: "sendmock_verify_delete_all",
+    ui: "SMS > Verify > Delete all",
+  },
   "GET /api/v1/verify/{verificationSid}": {
     phase: "2",
     cli: "sendmock verify show <verificationSid>",
     mcp: "sendmock_verify_get",
     ui: "SMS > Verify > open a verification",
+  },
+  "DELETE /api/v1/verify/{verificationSid}": {
+    phase: "A17",
+    cli: "sendmock verify delete <verificationSid>",
+    mcp: "sendmock_verify_delete",
+    ui: "SMS > Verify > select verifications > Delete",
   },
   "POST /api/v1/verify/{verificationSid}/force": {
     phase: "2",

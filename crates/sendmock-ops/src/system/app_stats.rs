@@ -33,6 +33,10 @@ pub struct AppStats {
     pub pending_verification_count: u64,
     pub http_request_count: u64,
     pub http_requests_today: u64,
+    /// Captured HTTP requests nobody opened yet, for the sidebar badge.
+    pub unread_http_request_count: u64,
+    /// Push notifications nobody opened yet, for the sidebar badge.
+    pub unread_push_count: u64,
     pub webhook_delivery_count: u64,
     #[schemars(required, schema_with = "crate::nullable_schema::<f64>")]
     pub webhook_success_rate: Option<f64>,

@@ -219,6 +219,7 @@ fn build_captured_record(
         is_simulated_failure: false,
         duration_ms: 1,
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
+        is_read: false,
         files,
     }
 }

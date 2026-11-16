@@ -1,12 +1,9 @@
 import { http, HttpResponse } from "msw";
 
-import type {
-  SmsMessageDetail,
-  SmsStatusUpdate,
-  SmsThread,
-} from "@/lib/api/types";
+import type { SmsMessageDetail, SmsStatusUpdate } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
 import { buildPlaceholderSvg } from "@/mocks/fixtures/fixture-helpers";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 import {
   applyMockConditions,
   createErrorResponse,
@@ -31,45 +28,6 @@ function findSms(smsId: unknown): SmsMessageDetail | undefined {
   return mockDatabase.smsMessages.find((smsMessage) => smsMessage.id === smsId);
 }
 
-function readThreadParticipants(smsMessage: SmsMessageDetail) {
-  const isOutbound = smsMessage.direction === "outbound";
-
-  return {
-    appNumber: isOutbound ? smsMessage.from_number : smsMessage.to_number,
-    contactNumber: isOutbound ? smsMessage.to_number : smsMessage.from_number,
-  };
-}
-
-function buildSmsThreads(searchParameters: URLSearchParams): SmsThread[] {
-  const threadsById = new Map<string, SmsThread>();
-
-  for (const smsMessage of keepRequestedProject(
-    mockDatabase.smsMessages,
-    searchParameters,
-  )) {
-    const { appNumber, contactNumber } = readThreadParticipants(smsMessage);
-    const threadId = `${appNumber}|${contactNumber}`;
-    const existingThread = threadsById.get(threadId);
-
-    if (existingThread) {
-      existingThread.message_count += 1;
-      continue;
-    }
-
-    threadsById.set(threadId, {
-      thread_id: threadId,
-      app_number: appNumber,
-      contact_number: contactNumber,
-      channel: smsMessage.channel,
-      last_message: smsMessage,
-      message_count: 1,
-      unread_count: smsMessage.direction === "inbound" ? 1 : 0,
-    });
-  }
-
-  return [...threadsById.values()];
-}
-
 export const smsHandlers = [
   http.get("*/api/v1/sms", async ({ request }) => {
     const conditionResponse = await applyMockConditions();
@@ -84,8 +42,7 @@ export const smsHandlers = [
       mockDatabase.smsMessages,
       requestUrl.searchParams,
     ).filter((smsMessage) => {
-      const { appNumber, contactNumber } = readThreadParticipants(smsMessage);
-      if (threadFilter && `${appNumber}|${contactNumber}` !== threadFilter) {
+      if (threadFilter && readSmsThreadId(smsMessage) !== threadFilter) {
         return false;
       }
 
@@ -93,15 +50,6 @@ export const smsHandlers = [
     });
 
     return HttpResponse.json(paginateItems(matchingMessages, requestUrl));
-  }),
-
-  http.get("*/api/v1/sms/threads", async ({ request }) => {
-    const conditionResponse = await applyMockConditions();
-
-    return (
-      conditionResponse ??
-      HttpResponse.json(buildSmsThreads(new URL(request.url).searchParams))
-    );
   }),
 
   http.get("*/api/v1/sms/:smsId", async ({ params }) => {

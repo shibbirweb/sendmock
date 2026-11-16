@@ -6,7 +6,7 @@ use super::{WebhookDeliveryFilter, WebhookDeliveryPage, WebhookDeliveryRecord};
 pub const DELIVERY_COLUMNS: &str = "id, endpoint_id, endpoint_name, rule_id, event_id, event_type, subject_id, trigger, attempt, status, retry_policy, rendered_request, sent_request, response, duration_ms, error_message, next_attempt_at, created_at, event, is_signed, is_edited";
 
 /// The filter as SQL conditions joined with AND, with their parameters in the same order.
-fn build_conditions(filter: &WebhookDeliveryFilter) -> (String, Vec<SqlValue>) {
+pub fn build_conditions(filter: &WebhookDeliveryFilter) -> (String, Vec<SqlValue>) {
     let mut conditions: Vec<String> = vec!["1 = 1".to_owned()];
     let mut parameters: Vec<SqlValue> = Vec::new();
     if !filter.statuses.is_empty() {

@@ -15,7 +15,6 @@ import {
   applyMockConditions,
   createErrorResponse,
 } from "@/mocks/handlers/handler-utils";
-import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
 import { runMockUpdateCheck } from "@/mocks/updates/run-mock-update-check";
 
@@ -146,14 +145,6 @@ export const settingsHandlers = [
             endpointNamesById.get(savedDelivery.endpoint_id ?? ""),
         )?.id ?? savedDelivery.endpoint_id,
     }));
-
-    return new HttpResponse(null, { status: 204 });
-  }),
-
-  http.delete("*/api/v1/sms", async () => {
-    await applyMockConditions();
-    mockDatabase.smsMessages = [];
-    publishMockEvent("sms.status", { id: null, status: "deleted" });
 
     return new HttpResponse(null, { status: 204 });
   }),

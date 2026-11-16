@@ -2,7 +2,8 @@ use sendmock_store::{VerificationFilter, VerificationRecord};
 
 use super::verification_outcomes::{expire_overdue_verifications, finish_verification};
 use super::verify_inputs::{
-    ForcedVerificationState, VerificationForceInput, VerificationListInput, VerificationReference,
+    ForcedVerificationState, VerificationFilterQuery, VerificationForceInput,
+    VerificationListInput, VerificationReference,
 };
 use super::verify_views::{Verification, VerificationDetail, VerificationTimelineEntry};
 use crate::{
@@ -12,6 +13,25 @@ use crate::{
 
 const DEFAULT_PAGE_SIZE: u32 = 50;
 const MAXIMUM_PAGE_SIZE: u32 = 200;
+
+/// The list's filters as the store reads them; `status` may name several, comma-separated.
+pub fn build_verification_filter(filter_query: VerificationFilterQuery) -> VerificationFilter {
+    VerificationFilter {
+        statuses: filter_query
+            .status
+            .map(|statuses| {
+                statuses
+                    .split(',')
+                    .map(|status| status.trim().to_owned())
+                    .filter(|status| !status.is_empty())
+                    .collect()
+            })
+            .unwrap_or_default(),
+        to_text: filter_query.to,
+        channel: filter_query.channel,
+        project_key: filter_query.project,
+    }
+}
 
 pub async fn find_verification_or_not_found(
     operation_context: &OperationContext,
@@ -68,21 +88,12 @@ impl Operation for ListVerificationsOperation {
         input: VerificationListInput,
     ) -> Result<PageOf<Verification>, OperationError> {
         expire_overdue_verifications(operation_context).await?;
-        let filter = VerificationFilter {
-            statuses: input
-                .status
-                .map(|statuses| {
-                    statuses
-                        .split(',')
-                        .map(|status| status.trim().to_owned())
-                        .filter(|status| !status.is_empty())
-                        .collect()
-                })
-                .unwrap_or_default(),
-            to_text: input.to,
+        let filter = build_verification_filter(VerificationFilterQuery {
+            status: input.status,
+            to: input.to,
             channel: input.channel,
-            project_key: input.project,
-        };
+            project: input.project,
+        });
         let page_size = input
             .limit
             .unwrap_or(DEFAULT_PAGE_SIZE)

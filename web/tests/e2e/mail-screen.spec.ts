@@ -44,7 +44,9 @@ test("EM-03.5 with a search on, delete removes only the matching emails", async 
 
   await page.getByRole("button", { name: "Delete matching emails" }).click();
   await expect(
-    page.getByRole("alertdialog", { name: "Delete the matching emails?" }),
+    page.getByRole("alertdialog", {
+      name: /^Delete the \d+ emails? that match\?$/,
+    }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Delete matching", exact: true })

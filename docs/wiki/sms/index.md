@@ -258,6 +258,10 @@ public class SmsTests
 }
 ```
 
+## Select, mark and delete
+
+The toolbar above the conversations ticks conversations (hover a row, or press **x** on the open one) to **Mark read**, **Mark unread** or **Delete** them. A new incoming message makes its conversation unread, shown with a dot and a bold number; opening the conversation marks it read, and the sidebar counts unread messages. **Delete all** deletes every conversation in the picked project, or only the ones the search and channel show, after asking.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
@@ -265,6 +269,8 @@ public class SmsTests
 | send | [`sendmock sms send`](/cli/sms/#sms-send) | [`POST /api/v1/sms`](/api/sms/#postSms) | [`sendmock_sms_send`](/mcp/sms/#sendmock_sms_send) |
 | list | [`sendmock sms list`](/cli/sms/#sms-list) | [`GET /api/v1/sms`](/api/sms/#getSms) | [`sendmock_sms_list`](/mcp/sms/#sendmock_sms_list) |
 | conversations | [`sendmock sms threads`](/cli/sms/#sms-threads) | [`GET /api/v1/sms/threads`](/api/sms/#getSmsThreads) | [`sendmock_sms_threads`](/mcp/sms/#sendmock_sms_threads) |
+| mark a conversation read or unread | [`sendmock sms threads update <threadId>`](/cli/sms/#sms-threads-update) | [`PATCH /api/v1/sms/threads/{threadId}`](/api/sms/#patchSmsThreadsByThreadId) | [`sendmock_sms_thread_update`](/mcp/sms/#sendmock_sms_thread_update) |
+| delete a conversation | [`sendmock sms threads delete <threadId>`](/cli/sms/#sms-threads-delete) | [`DELETE /api/v1/sms/threads/{threadId}`](/api/sms/#deleteSmsThreadsByThreadId) | [`sendmock_sms_thread_delete`](/mcp/sms/#sendmock_sms_thread_delete) |
 | one message with its history | [`sendmock sms show <smsId>`](/cli/sms/#sms-show) | [`GET /api/v1/sms/{smsId}`](/api/sms/#getSmsBySmsId) | [`sendmock_sms_get`](/mcp/sms/#sendmock_sms_get) |
 | wait in a test | [`sendmock sms wait`](/cli/test-helpers/#sms-wait) | [`GET /api/v1/wait/sms`](/api/test-helpers/#getWaitSms) | [`sendmock_sms_wait`](/mcp/test-helpers/#sendmock_sms_wait) |
 | read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |

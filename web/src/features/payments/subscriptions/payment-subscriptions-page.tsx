@@ -2,6 +2,7 @@ import { PlusIcon, RepeatIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
+import { CheckedListToolbar } from "@/components/common/checked-list-toolbar";
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,14 +12,19 @@ import {
   PaymentSubscriptionsTable,
   type SubscriptionAction,
 } from "@/features/payments/subscriptions/payment-subscriptions-table";
+import { useCheckedItems } from "@/hooks/use-checked-items";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { ApiError } from "@/lib/api/api-client";
 import {
   useAdvancePaymentSubscription,
   useCancelPaymentSubscription,
+  useDeleteAllPaymentSubscriptions,
+  useDeletePaymentSubscription,
   usePaymentSubscriptions,
 } from "@/lib/api/hooks/use-payment-subscription-queries";
 import type { PaymentSubscription } from "@/lib/api/types";
+
+const subscriptionNoun = { one: "subscription", many: "subscriptions" };
 
 /** Runs a row's action; each refreshes the list and the payments it charged. */
 function useSubscriptionActions() {
@@ -58,7 +64,19 @@ export function PaymentSubscriptionsPage() {
   const subscriptionsQuery = usePaymentSubscriptions();
   const runAction = useSubscriptionActions();
   const [isNewOpen, setNewOpen] = React.useState(false);
-  const subscriptions = subscriptionsQuery.data ?? [];
+  const subscriptions = React.useMemo(
+    () => subscriptionsQuery.data ?? [],
+    [subscriptionsQuery.data],
+  );
+  const checkedSubscriptions = useCheckedItems(
+    React.useMemo(
+      () => subscriptions.map((subscription) => subscription.id),
+      [subscriptions],
+    ),
+    "all",
+  );
+  const deleteSubscription = useDeletePaymentSubscription();
+  const deleteAllSubscriptions = useDeleteAllPaymentSubscriptions();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -77,6 +95,20 @@ export function PaymentSubscriptionsPage() {
           </Button>
         </header>
         <div className="min-w-0 rounded-lg border">
+          <CheckedListToolbar
+            itemNoun={subscriptionNoun}
+            checkedItems={checkedSubscriptions}
+            loadedItemCount={subscriptions.length}
+            totalItemCount={subscriptions.length}
+            isFiltered={false}
+            deleteAllKeepsNote="The payments they charged stay in Payments."
+            onDeleteItem={(subscriptionId) => {
+              deleteSubscription.mutate(subscriptionId);
+            }}
+            onDeleteAll={() => {
+              deleteAllSubscriptions.mutate();
+            }}
+          />
           {subscriptionsQuery.isPending ? (
             <Skeleton className="m-4 h-40" />
           ) : subscriptionsQuery.isError ? (
@@ -93,6 +125,7 @@ export function PaymentSubscriptionsPage() {
           ) : (
             <PaymentSubscriptionsTable
               subscriptions={subscriptions}
+              checkedSubscriptions={checkedSubscriptions}
               onAction={runAction}
             />
           )}

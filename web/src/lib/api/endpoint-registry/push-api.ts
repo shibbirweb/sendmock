@@ -61,6 +61,14 @@ export const pushApi: ApiEndpoint[] = tagEndpoints("Push", [
     successStatus: 204,
   },
   {
+    method: "PATCH",
+    path: "/api/v1/push/{pushId}",
+    summary: "Mark a push notification read or unread.",
+    requestBody: typeRef("PushNotificationUpdate"),
+    response: typeRef("PushNotification"),
+    errorStatuses: [404],
+  },
+  {
     method: "GET",
     path: "/api/v1/wait/push",
     summary: "Wait until a matching push notification arrives; 408 on timeout.",

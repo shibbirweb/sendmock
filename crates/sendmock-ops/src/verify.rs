@@ -1,4 +1,5 @@
 mod verification_code_delivery;
+mod verification_delete_operations;
 mod verification_flow;
 mod verification_lookups;
 mod verification_operations;
@@ -7,6 +8,9 @@ mod verify_inputs;
 mod verify_service_operations;
 mod verify_views;
 
+pub use verification_delete_operations::{
+    DeleteVerificationOperation, DeleteVerificationsOperation,
+};
 pub use verification_flow::{
     VerificationStart, VerifyRefusal, check_verification, start_verification,
 };
@@ -29,6 +33,8 @@ use crate::OperationRegistry;
 pub fn register_verify_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ListVerificationsOperation);
     operation_registry.register(GetVerificationOperation);
+    operation_registry.register(DeleteVerificationOperation);
+    operation_registry.register(DeleteVerificationsOperation);
     operation_registry.register(ForceVerificationOperation);
     operation_registry.register(ListVerifyServicesOperation);
     operation_registry.register(CreateVerifyServiceOperation);

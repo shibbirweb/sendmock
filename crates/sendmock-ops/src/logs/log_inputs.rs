@@ -16,6 +16,15 @@ pub struct SmtpSessionListInput {
     pub query: Option<String>,
 }
 
+/// `DELETE /api/v1/logs/smtp`: the list's filters without paging.
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+pub struct SmtpSessionFilterQuery {
+    /// delivered or failed.
+    pub result: Option<String>,
+    /// Client, EHLO name or user.
+    pub query: Option<String>,
+}
+
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct SmtpSessionReference {
     /// The SMTP session's ID, from `GET /api/v1/logs/smtp`.
@@ -49,6 +58,17 @@ pub struct ApiRequestListInput {
     pub cursor: Option<String>,
     /// Items per page, 1 to 200 (default 50).
     pub limit: Option<u32>,
+    /// Which API, e.g. twilio.
+    pub api: Option<String>,
+    /// 2xx, 4xx or 5xx.
+    pub status_class: Option<ApiStatusClass>,
+    /// Part of the path.
+    pub path: Option<String>,
+}
+
+/// `DELETE /api/v1/logs/http`: the list's filters without paging.
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+pub struct ApiRequestFilterQuery {
     /// Which API, e.g. twilio.
     pub api: Option<String>,
     /// 2xx, 4xx or 5xx.

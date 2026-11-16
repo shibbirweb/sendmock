@@ -9,11 +9,13 @@ type ListKeyboardShortcutOptions = {
   onOpenItemAt: (itemIndex: number) => void;
   /** Leave out on lists where D should do nothing. */
   onDeleteSelectedItem?: (itemId: string) => void;
+  /** Ticks or clears the open item's checkbox (X); leave out on lists without one. */
+  onToggleCheckedItem?: (itemId: string) => void;
 };
 
 /**
  * Shortcuts shared by the list screens: J / K open the next or previous item,
- * Enter opens the first one, D deletes the open item and / focuses search.
+ * Enter opens the first one, D deletes the open item, X ticks it and / focuses search.
  */
 export function useListKeyboardShortcuts({
   itemIds,
@@ -21,6 +23,7 @@ export function useListKeyboardShortcuts({
   searchInputRef,
   onOpenItemAt,
   onDeleteSelectedItem,
+  onToggleCheckedItem,
 }: ListKeyboardShortcutOptions) {
   React.useEffect(() => {
     const openItemAt = (itemIndex: number) => {
@@ -59,6 +62,12 @@ export function useListKeyboardShortcuts({
       ) {
         onDeleteSelectedItem(selectedItemId);
         openItemAt(Math.min(selectedIndex + 1, itemIds.length - 1));
+      } else if (
+        pressedKey === "x" &&
+        selectedItemId !== undefined &&
+        onToggleCheckedItem !== undefined
+      ) {
+        onToggleCheckedItem(selectedItemId);
       }
     };
 
@@ -73,5 +82,6 @@ export function useListKeyboardShortcuts({
     searchInputRef,
     onOpenItemAt,
     onDeleteSelectedItem,
+    onToggleCheckedItem,
   ]);
 }

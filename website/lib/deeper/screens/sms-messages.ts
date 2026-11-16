@@ -4,6 +4,7 @@ import {
   describeChangeWebhooks,
   describeChooseWebhooks,
 } from "./webhook-target-entries";
+import { describeListToolbar, describeUnreadDot } from "./list-toolbar-entries";
 
 const smsListEntries: DeeperEntry[] = [
   { control: "heading: SMS", does: "Names the open screen in the header." },
@@ -181,6 +182,15 @@ export const smsMessagesPage: DeeperPage = {
     "SMS > Messages groups every SMS, MMS and WhatsApp message into conversations by phone number, and simulates the other side's replies.",
   entries: [
     ...smsListEntries,
+    ...describeListToolbar({
+      itemsName: "conversations",
+      rowCheckboxNames: ["Select conversation with +#"],
+      hasReadState: true,
+      isTable: false,
+      keepsNote: "With a search or channel on, only the conversations it shows go.",
+      deleteAllOperationId: "deleteSms",
+    }),
+    describeUnreadDot("conversation"),
     ...smsConversationEntries,
     ...smsMessageDetailEntries,
   ],

@@ -24,6 +24,10 @@ import { applyEmailOutcome } from "@/mocks/realtime/apply-email-outcome";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { runWithWebhookChoice } from "@/mocks/realtime/webhook-choice-scope";
 import { refuseUnavailableEndpoint } from "@/mocks/webhooks/webhook-choice";
+import {
+  publishTrafficCleared,
+  readRequestedProjectKey,
+} from "@/mocks/realtime/publish-traffic-cleared";
 
 function matchesEmailFilters(email: EmailDetail, requestUrl: URL): boolean {
   const searchParameters = requestUrl.searchParams;
@@ -220,10 +224,17 @@ export const emailHandlers = [
   http.delete("*/api/v1/emails", async ({ request }) => {
     await applyMockConditions();
     const requestUrl = new URL(request.url);
-    mockDatabase.emails = mockDatabase.emails.filter(
+    const keptEmails = mockDatabase.emails.filter(
       (email) => !matchesEmailFilters(email, requestUrl),
     );
+    const deletedCount = mockDatabase.emails.length - keptEmails.length;
+    mockDatabase.emails = keptEmails;
     publishMockEvent("email.deleted", { id: null });
+    publishTrafficCleared(
+      ["email"],
+      readRequestedProjectKey(requestUrl.searchParams),
+      deletedCount,
+    );
 
     return new HttpResponse(null, { status: 204 });
   }),

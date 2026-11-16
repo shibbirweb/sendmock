@@ -6,6 +6,7 @@ mod reset_operation;
 mod setting_choices;
 mod settings_operations;
 mod settings_validation;
+mod traffic_delete_operation;
 mod traffic_retention;
 
 pub use app_settings::{AppSettings, mask_url_password};
@@ -18,6 +19,7 @@ pub use setting_choices::{
 };
 pub use settings_operations::{GetSettingsOperation, UpdateSettingsOperation};
 pub(crate) use settings_validation::validate_settings_update;
+pub use traffic_delete_operation::DeleteAllTrafficOperation;
 pub use traffic_retention::{
     build_ingest_options, list_unbounded_traffic, prune_traffic, read_ingest_options,
 };
@@ -28,4 +30,5 @@ pub fn register_settings_operations(operation_registry: &mut OperationRegistry) 
     operation_registry.register(GetSettingsOperation);
     operation_registry.register(UpdateSettingsOperation);
     operation_registry.register(ResetOperation);
+    operation_registry.register(DeleteAllTrafficOperation);
 }

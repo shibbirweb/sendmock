@@ -97,6 +97,9 @@ fn system_samples() -> Vec<(&'static str, Vec<Value>)> {
             ],
         ),
         ("postReset", vec![json!({})]),
+        // Deleting all traffic would take away what the later samples read; list_delete_api.rs
+        // covers it.
+        ("deleteTraffic", vec![]),
         (
             "postSamplesByKind",
             vec![
@@ -233,6 +236,14 @@ async fn prepare_http_catcher_samples(
             vec![json!({ "request_id": request_id })],
         ),
         (
+            "patchHttpRequestsByRequestId",
+            vec![json!({ "request_id": request_id, "is_read": true })],
+        ),
+        (
+            "deleteHttpRequestsByRequestId",
+            vec![json!({ "request_id": "missing-request" })],
+        ),
+        (
             "getHttpRequestsByRequestIdFilesByFileIndex",
             vec![json!({ "request_id": request_id, "file_index": 0 })],
         ),
@@ -349,6 +360,10 @@ async fn prepare_push_samples(app_router: &axum::Router) -> Vec<(&'static str, V
             vec![json!({}), json!({ "device_token": "kept-device-token" })],
         ),
         ("getPushByPushId", vec![json!({ "push_id": push_ids[1] })]),
+        (
+            "patchPushByPushId",
+            vec![json!({ "push_id": push_ids[1], "is_read": true })],
+        ),
         (
             "deletePushByPushId",
             vec![json!({ "push_id": push_ids[0] })],
@@ -602,6 +617,11 @@ async fn prepare_verify_samples(app_router: &axum::Router) -> Vec<(&'static str,
             vec![json!({ "verification_sid": verification_sid })],
         ),
         (
+            "deleteVerifyByVerificationSid",
+            vec![json!({ "verification_sid": "VEmissing" })],
+        ),
+        ("deleteVerify", vec![json!({ "to": "nobody" })]),
+        (
             "postVerifyByVerificationSidForce",
             vec![json!({ "verification_sid": verification_sid, "state": "approved" })],
         ),
@@ -787,7 +807,7 @@ async fn prepare_webhook_delivery_samples(
         .unwrap_or_else(|error| panic!("the pass runs: {error}"));
     let queued_delivery_id =
         queue_sample_delivery(operation_context, endpoint_id, "evt_queued").await;
-    vec![
+    let mut delivery_samples = vec![
         (
             "getWebhooksDeliveries",
             vec![
@@ -800,6 +820,9 @@ async fn prepare_webhook_delivery_samples(
             "getWebhooksDeliveriesByDeliveryId",
             vec![json!({ "delivery_id": sent_delivery_id })],
         ),
+    ];
+    delivery_samples.extend(webhook_delivery_delete_samples());
+    delivery_samples.extend(vec![
         (
             "getWebhooksMetrics",
             vec![
@@ -814,6 +837,21 @@ async fn prepare_webhook_delivery_samples(
         (
             "getWaitWebhook",
             vec![json!({ "endpoint": "Deliveries", "event": "email.received", "timeout": "1s" })],
+        ),
+    ]);
+    delivery_samples
+}
+
+/// Deletes of a delivery and an endpoint that do not exist, so the queued samples stay.
+fn webhook_delivery_delete_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "deleteWebhooksDeliveriesByDeliveryId",
+            vec![json!({ "delivery_id": "missing-delivery" })],
+        ),
+        (
+            "deleteWebhooksDeliveries",
+            vec![json!({ "endpoint_id": "missing-endpoint" })],
         ),
     ]
 }
@@ -1507,6 +1545,11 @@ async fn prepare_payment_samples(app_router: &axum::Router) -> Vec<(&'static str
             vec![json!({ "payment_id": payment_id })],
         ),
         (
+            "deletePaymentsByPaymentId",
+            vec![json!({ "payment_id": "missing-payment" })],
+        ),
+        ("deletePayments", vec![json!({ "provider": "nowhere" })]),
+        (
             "getCheckoutSessionsBySessionId",
             vec![json!({ "session_id": payment_id })],
         ),
@@ -1596,7 +1639,9 @@ async fn prepare_sms_samples(app_router: &axum::Router) -> Vec<(&'static str, Ve
     )
     .await["id"]
         .clone();
-    vec![
+    let sms_threads = send_json(app_router, "GET", "/api/v1/sms/threads", &Value::Null).await;
+    let mut sms_samples = sms_thread_samples(&sms_threads[0]["thread_id"]);
+    sms_samples.extend(vec![
         (
             "getSms",
             vec![
@@ -1626,11 +1671,39 @@ async fn prepare_sms_samples(app_router: &axum::Router) -> Vec<(&'static str, Ve
             "getWaitSms",
             vec![json!({ "to": "+8801700000000", "timeout": "1s" })],
         ),
+    ]);
+    sms_samples.extend(sms_delete_samples(&deleted_sms_id));
+    sms_samples
+}
+
+/// Marking a conversation unread and read again, and deleting one that does not exist.
+fn sms_thread_samples(thread_id: &Value) -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "patchSmsThreadsByThreadId",
+            vec![
+                json!({ "thread_id": thread_id, "is_read": false }),
+                json!({ "thread_id": thread_id, "is_read": true }),
+            ],
+        ),
+        (
+            "deleteSmsThreadsByThreadId",
+            vec![json!({ "thread_id": "sms-0-0" })],
+        ),
+    ]
+}
+
+/// Runs last: the delete all without a project empties the SMS store.
+fn sms_delete_samples(deleted_sms_id: &Value) -> Vec<(&'static str, Vec<Value>)> {
+    vec![
         (
             "deleteSmsBySmsId",
             vec![json!({ "sms_id": deleted_sms_id })],
         ),
-        ("deleteSms", vec![json!({})]),
+        (
+            "deleteSms",
+            vec![json!({ "project": "nowhere" }), json!({})],
+        ),
     ]
 }
 
@@ -1692,7 +1765,7 @@ async fn prepare_log_samples(
         .first()
         .map(|request| request.request_id.clone())
         .unwrap_or_else(|| panic!("the email samples were logged"));
-    vec![
+    let mut log_samples = vec![
         (
             "getLogsSmtp",
             vec![
@@ -1715,6 +1788,24 @@ async fn prepare_log_samples(
             "getLogsHttpByRequestId",
             vec![json!({ "request_id": logged_request_id })],
         ),
+    ];
+    log_samples.extend(log_delete_samples());
+    log_samples
+}
+
+/// Deletes that match nothing, so the stored session and request stay for the reads.
+fn log_delete_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "deleteLogsSmtpBySessionId",
+            vec![json!({ "session_id": "missing-session" })],
+        ),
+        ("deleteLogsSmtp", vec![json!({ "query": "nobody" })]),
+        (
+            "deleteLogsHttpByRequestId",
+            vec![json!({ "request_id": "missing-request" })],
+        ),
+        ("deleteLogsHttp", vec![json!({ "api": "nowhere" })]),
     ]
 }
 
@@ -2353,6 +2444,13 @@ async fn prepare_subscription_samples(
             "getPaymentsSubscriptionsBySubscriptionId",
             vec![json!({ "subscription_id": advanced["id"] })],
         ),
+        (
+            "deletePaymentsSubscriptionsBySubscriptionId",
+            vec![json!({ "subscription_id": "missing-subscription" })],
+        ),
+        // Deleting every subscription would take away the one the advance and cancel samples
+        // use; list_delete_api.rs covers it.
+        ("deletePaymentsSubscriptions", vec![]),
         (
             "postPaymentsSubscriptionsBySubscriptionIdAdvance",
             vec![json!({ "subscription_id": advanced["id"] })],

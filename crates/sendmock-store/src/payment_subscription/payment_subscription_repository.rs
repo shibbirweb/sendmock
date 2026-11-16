@@ -83,6 +83,19 @@ impl PaymentSubscriptionRepository {
             .await
     }
 
+    /// Deletes one subscription; its past payments stay. Answers whether it existed.
+    pub async fn delete_subscription(&self, subscription_id: &str) -> Result<bool, StoreError> {
+        let subscription_id = subscription_id.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(connection.execute(
+                    "DELETE FROM payment_subscriptions WHERE id = ?1",
+                    [subscription_id],
+                )? > 0)
+            })
+            .await
+    }
+
     pub async fn delete_all_subscriptions(&self) -> Result<u64, StoreError> {
         self.database
             .write(|connection| {

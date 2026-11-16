@@ -272,6 +272,10 @@ public class PaymentsTests
 }
 ```
 
+## Select and delete
+
+The toolbar above the table ticks payments (or **x** on a focused row) to **Delete** them, and **Delete all** deletes every payment the filters show, after asking. A payment's events, refunds and checkout go with it; subscriptions, gateways, methods and flows stay.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
@@ -280,6 +284,8 @@ public class PaymentsTests
 | create a checkout | [`sendmock payments checkout create`](/cli/payments/#payments-checkout-create) | [`POST /api/v1/payments/checkout`](/api/payments/#postPaymentsCheckout) | [`sendmock_payment_create_checkout`](/mcp/payments/#sendmock_payment_create_checkout) |
 | list | [`sendmock payments list`](/cli/payments/#payments-list) | [`GET /api/v1/payments`](/api/payments/#getPayments) | [`sendmock_payment_list`](/mcp/payments/#sendmock_payment_list) |
 | one payment | [`sendmock payments show <paymentId>`](/cli/payments/#payments-show) | [`GET /api/v1/payments/{paymentId}`](/api/payments/#getPaymentsByPaymentId) | [`sendmock_payment_get`](/mcp/payments/#sendmock_payment_get) |
+| delete one | [`sendmock payments delete <paymentId>`](/cli/payments/#payments-delete) | [`DELETE /api/v1/payments/{paymentId}`](/api/payments/#deletePaymentsByPaymentId) | [`sendmock_payment_delete`](/mcp/payments/#sendmock_payment_delete) |
+| delete everything, or what the filters match | [`sendmock payments delete-all --yes`](/cli/payments/#payments-delete-all) | [`DELETE /api/v1/payments`](/api/payments/#deletePayments) | [`sendmock_payment_delete_all`](/mcp/payments/#sendmock_payment_delete_all) |
 | simulate | [`sendmock payments simulate <paymentId> <action>`](/cli/payments/#payments-simulate) | [`POST /api/v1/payments/{paymentId}/simulate`](/api/payments/#postPaymentsByPaymentIdSimulate) | [`sendmock_payment_simulate`](/mcp/payments/#sendmock_payment_simulate) |
 | resend the notification | [`sendmock payments notify <paymentId>`](/cli/payments/#payments-notify) | [`POST /api/v1/payments/{paymentId}/notify`](/api/payments/#postPaymentsByPaymentIdNotify) | [`sendmock_payment_notify`](/mcp/payments/#sendmock_payment_notify) |
 | test values | [`sendmock payments test-cards`](/cli/payments/#payments-test-cards) | [`GET /api/v1/payments/test-cards`](/api/payments/#getPaymentsTestCards) | [`sendmock_payment_test_cards`](/mcp/payments/#sendmock_payment_test_cards) |

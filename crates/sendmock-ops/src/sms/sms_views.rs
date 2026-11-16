@@ -52,6 +52,9 @@ pub struct SmsMessage {
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub opened_at: Option<String>,
     pub open_count: u64,
+    /// Whether someone looked at it in SendMock: inbound messages arrive unread, messages your
+    /// app sent arrive read, and marking a conversation unread marks its newest message unread.
+    pub is_read: bool,
     /// Inbound only: what the number's reply webhook answered last; null when none ran.
     #[schemars(
         required,
@@ -96,6 +99,7 @@ impl From<&SmsRecord> for SmsMessage {
             },
             opened_at: sms.opened_at_unix_ms.map(format_rfc3339),
             open_count: sms.open_count,
+            is_read: sms.is_read,
             reply_webhook: sms
                 .reply_webhook_json
                 .as_deref()

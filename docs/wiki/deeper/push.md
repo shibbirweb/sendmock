@@ -77,43 +77,70 @@ Field.
 
 - **What it does:** Shows only notifications to this exact device token, Expo push token, OneSignal subscription or alias (`external_id:user-7`).
 
-### 11. Clear all
+### 11. Select all loaded push notifications
+
+Checkbox.
+
+- **What it does:** Ticks every row loaded in the list, or clears the ticks; it shows a dash when only some are ticked, and the toolbar says how many are selected. Ticked rows can be marked read, marked unread or deleted together. X ticks the open or focused row.
+
+### 12. Delete all push notifications
 
 Button.
 
-- **What it does:** Asks, then deletes every notification the filters show.
+- **What it does:** Asks first, naming how many go and what stays, then deletes every row the list shows, in the picked project. While a search or filter is on it reads Delete matching and deletes only what it matches.
+- **What it changes:** Publishes one `traffic.cleared` event, so every open tab refreshes; settings and configuration stay.
+- **Same action elsewhere:** REST [`DELETE /api/v1/push`](/api/push/#deletePush), CLI [`sendmock push clear`](/cli/push/#push-clear), MCP [`sendmock_push_delete_all`](/mcp/push/#sendmock_push_delete_all)
 
-### 12. Notification
+### 13. Select
+
+Column.
+
+- **What it does:** The column of tick boxes; it has no visible title.
+
+### 14. Notification
 
 Column.
 
 - **What it does:** The notification's title, or its body when it has no title.
 
-### 13. Device token
+### 15. Device token
 
 Column.
 
 - **What it does:** Where it went: a token, `topic:<name>`, `condition:<expression>`, `<alias>:<id>` or `segment:<names>`.
 
-### 14. Provider
+### 16. Provider
 
 Column.
 
 - **What it does:** FCM, Expo or OneSignal.
 
-### 15. Status
+### 17. Status
 
 Column.
 
 - **What it does:** Sent, or Failed when the provider refused it.
 
-### 16. Time
+### 18. Time
 
 Column.
 
 - **What it does:** When your app sent it.
 
-### 17. …
+### 19. Select push to …
+
+Checkbox, in each row.
+
+- **What it does:** Ticks this row, so the toolbar can act on it. Shown on hover, on focus and while anything is ticked, and always on touch screens.
+
+### 20. Unread
+
+Badge, in each row.
+
+- **What it does:** Marks a notification nobody opened yet. Opening it marks it read; Mark unread puts the dot back, and the sidebar counts the unread ones.
+- **Where its text comes from:** The item's `is_read` field.
+
+### 21. …
 
 Link, in each row.
 
@@ -122,129 +149,129 @@ Link, in each row.
 
 ## A notification is open
 
-### 18. Push notification
+### 22. Push notification
 
 Heading.
 
 - **What it does:** The drawer of one notification; its id is in the URL as `?push=`.
 
-### 19. As the phone shows it, with its data, the request and the answer.
+### 23. As the phone shows it, with its data, the request and the answer.
 
 Text.
 
 - **What it does:** Explains the drawer.
 
-### 20. iOS
+### 24. iOS
 
 Choice.
 
 - **What it does:** Shows the lock screen card as iOS draws it, with the image beside the text.
 
-### 21. Android
+### 25. Android
 
 Choice.
 
 - **What it does:** Shows the card as Android draws it, with the image below the text. The message's platform picks the style first.
 
-### 22. Flash sale
+### 26. Flash sale
 
 Text.
 
 - **What it does:** The notification's title on the card.
 - **Where its text comes from:** FCM's `notification.title` (or a platform block's), Expo's `title`, OneSignal's `headings` in English.
 
-### 23. #% off everything until midnight.
+### 27. #% off everything until midnight.
 
 Text.
 
 - **What it does:** The notification's body on the card.
 - **Where its text comes from:** FCM's `notification.body`, Expo's `body`, OneSignal's `contents` in English.
 
-### 24. Data
+### 28. Data
 
 Heading.
 
 - **What it does:** The data payload as key and value rows, as the app receives it.
 
-### 25. Request
+### 29. Request
 
 Heading.
 
 - **What it does:** The request body as your app sent it (for Expo, the one message).
 
-### 26. Copy request
+### 30. Copy request
 
 Button.
 
 - **What it does:** Copies the request as JSON.
 
-### 27. Answer (#)
+### 31. Answer (#)
 
 Heading.
 
 - **What it does:** What SendMock answered, in the provider's own shape, with its HTTP status.
 
-### 28. Copy answer (#)
+### 32. Copy answer (#)
 
 Button.
 
 - **What it does:** Copies the answer as JSON.
 
-### 29. Delete
+### 33. Delete
 
 Button.
 
 - **What it does:** Asks, then deletes this notification and closes the drawer.
 - **Same action elsewhere:** REST [`DELETE /api/v1/push/{pushId}`](/api/push/#deletePushByPushId), CLI [`sendmock push delete`](/cli/push/#push-delete), MCP [`sendmock_push_delete`](/mcp/push/#sendmock_push_delete)
 
-### 30. Close
+### 34. Close
 
 Button.
 
 - **What it does:** Closes the drawer (or press `Esc`).
 
-## Clear all dialog
+## Delete all dialog
 
-### 31. Clear every push notification?
+### 35. Delete all # push notifications?
 
 Heading.
 
-- **What it does:** Asks before Clear all.
+- **What it does:** The confirmation before deleting every row the list shows; the number is how many go.
 
-### 32. Every notification this list shows is deleted; tests waiting for one see only new ones.
+### 36. Settings and configuration stay. This cannot be undone.
 
 Text.
 
-- **What it does:** Explains what Clear all deletes.
+- **What it does:** Says what stays.
 
-### 33. Keep them
+### 37. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without deleting.
 
-### 34. Clear all
+### 38. Delete all
 
 Button.
 
-- **What it does:** Deletes every notification the filters show.
+- **What it does:** Deletes every row the list shows.
 - **Same action elsewhere:** REST [`DELETE /api/v1/push`](/api/push/#deletePush), CLI [`sendmock push clear`](/cli/push/#push-clear), MCP [`sendmock_push_delete_all`](/mcp/push/#sendmock_push_delete_all)
 
 ## With no data yet
 
-### 35. No push notifications yet
+### 39. No push notifications yet
 
 Text.
 
 - **What it does:** Shown when no app has sent a notification yet.
 
-### 36. Point your app's FCM, Expo or OneSignal SDK at SendMock and send one. It shows up here as the phone would show it.
+### 40. Point your app's FCM, Expo or OneSignal SDK at SendMock and send one. It shows up here as the phone would show it.
 
 Text.
 
 - **What it does:** Explains how notifications arrive.
 
-### 37. This machine
+### 41. This machine
 
 Choice.
 
@@ -252,37 +279,37 @@ Choice.
 - **What it changes:** Shared with Settings > Connection and remembered in the browser.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 38. Docker host
+### 42. Docker host
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in a container reaching SendMock on the host.
 
-### 39. Compose
+### 43. Compose
 
 Choice.
 
 - **What it does:** Shows the addresses for an app in the same Docker Compose project.
 
-### 40. Copy FCM base URL
+### 44. Copy FCM base URL
 
 Button.
 
 - **What it does:** Copies the address to send FCM HTTP v1 requests to.
 
-### 41. Copy EXPO_BASE_URL
+### 45. Copy EXPO_BASE_URL
 
 Button.
 
 - **What it does:** Copies the value for the `EXPO_BASE_URL` environment variable, which `expo-server-sdk` reads.
 
-### 42. Copy OneSignal base URL
+### 46. Copy OneSignal base URL
 
 Button.
 
 - **What it does:** Copies the address to give the OneSignal SDK as its server.
 
-### 43. More snippets
+### 47. More snippets
 
 Link.
 
@@ -291,20 +318,20 @@ Link.
 
 ## When the data cannot load
 
-### 44. Could not load push notifications. Try again
+### 48. Could not load push notifications. Try again
 
 Message.
 
 - **What it does:** Shown when the notifications could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 45. Could not load push notifications.
+### 49. Could not load push notifications.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 46. Try again
+### 50. Try again
 
 Button.
 

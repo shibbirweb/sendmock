@@ -475,7 +475,7 @@ Meta's webhooks go to the one callback URL of the app, as `{ object: "whatsapp_b
 
 **One toolbar for every list:** a shared compound component in `components/common` (`ListActionToolbar`, with a row checkbox for the list items) that Mail moves onto and every other list uses, so the actions look, sit and behave the same everywhere:
 
-- **Select:** a checkbox on each row (shown on hover and while anything is checked, always on touch screens) and a select-all checkbox for the loaded rows, which reads "3 selected" and turns indeterminate when only some are checked. `x` toggles the focused row, beside the `j`, `k`, `Enter` and `d` keys Mail already has, which every list gets.
+- **Select:** a checkbox on each row (shown on hover and while anything is checked, always on touch screens) and a select-all checkbox for the loaded rows, which reads "3 selected" and turns indeterminate when only some are checked. `x` ticks the open item on the Mail and SMS lists (beside their `j`, `k`, `Enter` and `d` keys) and the focused row on the table screens, and the shortcut help lists it.
 - **Act on the selection:** **Mark read** and **Mark unread** (on lists with read state) and **Delete**, shown while something is checked; deleting asks first with the count. The selection clears after an action and when the filter changes.
 - **Delete all:** always in the toolbar, disabled while the list is empty; while a filter is on it reads **Delete matching** and deletes only what the filter shows, as Mail does today. One confirmation names what goes, how many and what stays; confirming deletes at once.
 

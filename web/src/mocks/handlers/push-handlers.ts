@@ -8,7 +8,12 @@ import {
   createNotFoundResponse,
   keepRequestedProject,
   paginateItems,
+  readIsReadUpdate,
 } from "@/mocks/handlers/handler-utils";
+import {
+  publishTrafficCleared,
+  readRequestedProjectKey,
+} from "@/mocks/realtime/publish-traffic-cleared";
 
 /** The list filters the binary takes: project, token, provider and status. */
 function matchesPushFilters(
@@ -52,13 +57,19 @@ export const pushHandlers = [
 
   http.delete("*/api/v1/push", async ({ request }) => {
     await applyMockConditions();
+    const searchParameters = new URL(request.url).searchParams;
     const deletedIds = new Set(
-      listMatchingPushes(new URL(request.url).searchParams).map(
+      listMatchingPushes(searchParameters).map(
         (pushNotification) => pushNotification.id,
       ),
     );
     mockDatabase.pushNotifications = mockDatabase.pushNotifications.filter(
       (pushNotification) => !deletedIds.has(pushNotification.id),
+    );
+    publishTrafficCleared(
+      ["push"],
+      readRequestedProjectKey(searchParameters),
+      deletedIds.size,
     );
 
     return new HttpResponse(null, { status: 204 });
@@ -73,6 +84,23 @@ export const pushHandlers = [
     return pushNotification === undefined
       ? createNotFoundResponse("Push notification")
       : HttpResponse.json(pushNotification);
+  }),
+
+  http.patch("*/api/v1/push/:pushId", async ({ params, request }) => {
+    await applyMockConditions();
+    const pushNotification = mockDatabase.pushNotifications.find(
+      (storedPush) => storedPush.id === params.pushId,
+    );
+    if (pushNotification === undefined) {
+      return createNotFoundResponse("Push notification");
+    }
+    const isRead = readIsReadUpdate(await request.json());
+    if (isRead === null) {
+      return createErrorResponse(400, "invalid_body", "is_read is required");
+    }
+    pushNotification.is_read = isRead;
+
+    return HttpResponse.json(pushNotification);
   }),
 
   http.delete("*/api/v1/push/:pushId", async ({ params }) => {

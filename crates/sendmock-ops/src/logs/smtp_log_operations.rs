@@ -4,6 +4,19 @@ use super::log_inputs::{SmtpSessionListInput, SmtpSessionReference, read_page_si
 use super::smtp_session_log_entry::SmtpSessionLogEntry;
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, PageOf};
 
+/// The `result` filter as the store reads it: `failed` is true, `delivered` false.
+pub(super) fn read_failed_filter(result: Option<&str>) -> Result<Option<bool>, OperationError> {
+    match result {
+        None => Ok(None),
+        Some("delivered") => Ok(Some(false)),
+        Some("failed") => Ok(Some(true)),
+        Some(other_result) => Err(OperationError::InvalidInput {
+            message: format!("result must be delivered or failed, not {other_result}"),
+            field: Some("result".to_owned()),
+        }),
+    }
+}
+
 pub struct ListSmtpSessionsOperation;
 
 impl Operation for ListSmtpSessionsOperation {
@@ -28,17 +41,7 @@ impl Operation for ListSmtpSessionsOperation {
         operation_context: &OperationContext,
         input: SmtpSessionListInput,
     ) -> Result<PageOf<SmtpSessionLogEntry>, OperationError> {
-        let is_failed = match input.result.as_deref() {
-            None => None,
-            Some("delivered") => Some(false),
-            Some("failed") => Some(true),
-            Some(other_result) => {
-                return Err(OperationError::InvalidInput {
-                    message: format!("result must be delivered or failed, not {other_result}"),
-                    field: Some("result".to_owned()),
-                });
-            }
-        };
+        let is_failed = read_failed_filter(input.result.as_deref())?;
         let filter = SmtpSessionFilter {
             is_failed,
             search_text: input.query.filter(|query| !query.trim().is_empty()),

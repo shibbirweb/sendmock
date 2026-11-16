@@ -1,12 +1,13 @@
-import { BellRingIcon, SearchIcon, Trash2Icon } from "lucide-react";
+import { BellRingIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
-import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { FilterChip } from "@/components/common/filter-chip";
+import { ListActionToolbar } from "@/components/common/list-action-toolbar";
 import { QueryErrorState } from "@/components/common/query-error-state";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCheckedItems } from "@/hooks/use-checked-items";
+import { useSelectedProjectKey } from "@/hooks/use-selected-project";
 import { ConnectHint } from "@/features/onboarding/connect-hint";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
@@ -18,14 +19,18 @@ import {
 } from "@/features/push/push-labels";
 import { PushTable } from "@/features/push/push-table";
 import {
+  useDeletePushNotification,
   useDeletePushNotifications,
   usePushNotifications,
+  useUpdatePushNotification,
 } from "@/lib/api/hooks/use-push-queries";
 import type {
   PushListFilters,
   PushProvider,
   PushStatus,
 } from "@/lib/api/types";
+
+const pushNoun = { one: "push notification", many: "push notifications" };
 
 function PushEmptyState({
   isFiltered,
@@ -54,12 +59,11 @@ function PushEmptyState({
   );
 }
 
-/** Push notifications with provider and status chips, a token search and Clear all. */
+/** Push notifications with provider and status chips, a token search and the list toolbar. */
 export function PushListPanel() {
   const [providerFilter, setProviderFilter] = React.useState<PushProvider>();
   const [statusFilter, setStatusFilter] = React.useState<PushStatus>();
   const [tokenSearch, setTokenSearch] = React.useState("");
-  const [isConfirmingClear, setIsConfirmingClear] = React.useState(false);
   const pushFilters: PushListFilters = {
     provider: providerFilter,
     status: statusFilter,
@@ -67,7 +71,20 @@ export function PushListPanel() {
   };
   const pushQuery = usePushNotifications(pushFilters);
   const deletePushes = useDeletePushNotifications();
-  const pushNotifications = pushQuery.data?.items ?? [];
+  const deletePush = useDeletePushNotification();
+  const updatePush = useUpdatePushNotification();
+  const projectKey = useSelectedProjectKey();
+  const pushNotifications = React.useMemo(
+    () => pushQuery.data?.items ?? [],
+    [pushQuery.data],
+  );
+  const checkedPushes = useCheckedItems(
+    React.useMemo(
+      () => pushNotifications.map((pushNotification) => pushNotification.id),
+      [pushNotifications],
+    ),
+    `${providerFilter ?? ""}|${statusFilter ?? ""}|${tokenSearch}|${projectKey ?? ""}`,
+  );
   const isFiltered =
     providerFilter !== undefined ||
     statusFilter !== undefined ||
@@ -127,19 +144,35 @@ export function PushListPanel() {
             className="pl-8"
           />
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={pushNotifications.length === 0}
-          onClick={() => {
-            setIsConfirmingClear(true);
-          }}
-        >
-          <Trash2Icon />
-          Clear all
-        </Button>
       </div>
       <div className="min-w-0 rounded-lg border">
+        <ListActionToolbar
+          itemNoun={pushNoun}
+          loadedItemCount={pushNotifications.length}
+          totalItemCount={pushQuery.data?.total_count ?? 0}
+          checkedItemCount={checkedPushes.checkedItemCount}
+          onToggleAllChecked={checkedPushes.setAllItemsChecked}
+          onMarkCheckedRead={() => {
+            checkedPushes.runForCheckedItems((pushId) => {
+              updatePush.mutate({ pushId, isRead: true });
+            });
+          }}
+          onMarkCheckedUnread={() => {
+            checkedPushes.runForCheckedItems((pushId) => {
+              updatePush.mutate({ pushId, isRead: false });
+            });
+          }}
+          onDeleteChecked={() => {
+            checkedPushes.runForCheckedItems((pushId) => {
+              deletePush.mutate(pushId);
+            });
+          }}
+          isFiltered={isFiltered}
+          projectKey={projectKey}
+          onDeleteAll={() => {
+            deletePushes.mutate(pushFilters);
+          }}
+        />
         {pushQuery.isPending && (
           <div className="grid gap-2 p-4">
             <Skeleton className="h-8 w-full" />
@@ -160,22 +193,12 @@ export function PushListPanel() {
               onClearFilter={clearFilters}
             />
           ) : (
-            <PushTable pushNotifications={pushNotifications} />
+            <PushTable
+              pushNotifications={pushNotifications}
+              checkedPushes={checkedPushes}
+            />
           ))}
       </div>
-      <ConfirmActionDialog
-        isOpen={isConfirmingClear}
-        title="Clear every push notification?"
-        consequence="Every notification this list shows is deleted; tests waiting for one see only new ones."
-        confirmLabel="Clear all"
-        cancelLabel="Keep them"
-        onConfirm={() => {
-          deletePushes.mutate(pushFilters);
-        }}
-        onClose={() => {
-          setIsConfirmingClear(false);
-        }}
-      />
     </div>
   );
 }

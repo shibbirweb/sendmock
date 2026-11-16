@@ -6,6 +6,7 @@ import { createProviderId } from "@/mocks/fixtures/fixture-helpers";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { sendOutboundSmsSample } from "@/mocks/samples/create-sample-sms";
 import { defaultProjectKey } from "@/mocks/fixtures/project-fixtures";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 const sampleRecipient = "+14155550100";
 const verifySenderNumber = "+15550002222";
@@ -62,7 +63,7 @@ export function createSampleVerification(): string {
     ).toISOString(),
     created_at: createdAt,
     linked_message_id: codeMessage.id,
-    linked_thread_id: `${verifySenderNumber}|${sampleRecipient}`,
+    linked_thread_id: readSmsThreadId(codeMessage),
     timeline: [
       {
         kind: "started",

@@ -61,7 +61,8 @@ const smsEndpoints = tagEndpoints("SMS", [
   {
     method: "DELETE",
     path: "/api/v1/sms",
-    summary: "Delete every message.",
+    summary: "Delete every message, or one project's.",
+    queryParameters: [projectQueryParameter("messages")],
     response: null,
     successStatus: 204,
   },
@@ -80,6 +81,22 @@ const smsEndpoints = tagEndpoints("SMS", [
     summary: "Conversations, one per contact and your number.",
     queryParameters: [projectQueryParameter("messages")],
     response: listOf("SmsThread"),
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/sms/threads/{threadId}",
+    summary: "Mark a conversation read, or its newest message unread.",
+    requestBody: typeRef("SmsThreadUpdate"),
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/sms/threads/{threadId}",
+    summary: "Delete a conversation with its messages.",
+    response: null,
+    successStatus: 204,
   },
   {
     method: "GET",

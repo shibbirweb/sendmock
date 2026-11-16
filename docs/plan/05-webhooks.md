@@ -29,6 +29,7 @@ Every attempt is logged with full request and response, and can be replayed.
 | `webhook.failed` | a delivery exhausted retries (useful to chain alerts) |
 | `webhook.delivered` | a delivery attempt finished, whatever the outcome; drives the live deliveries log and cannot be picked in rules, so a delivery never triggers another |
 | `traffic.pruned` | retention deleted traffic past the limits in Settings (`data.pruned_count`); drives the live lists and counts and cannot be picked in rules, like `webhook.delivered` |
+| `traffic.cleared` | a delete all removed captured traffic (`data.kinds`, `data.project`, `data.deleted_count`; A17, UI-14); drives the live lists and counts and cannot be picked in rules, like `traffic.pruned` |
 | `test.ping` | "Send test" button on an endpoint |
 
 ## Opened events

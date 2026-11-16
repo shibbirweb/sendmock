@@ -19,10 +19,8 @@ export function usePaymentSubscriptions() {
 }
 
 /** A change refreshes the subscriptions and the payments its charges made. */
-function useSubscriptionMutation<MutationInput>(
-  mutationRequest: (
-    mutationInput: MutationInput,
-  ) => Promise<PaymentSubscription>,
+function useSubscriptionMutation<MutationInput, MutationResult>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<MutationResult>,
 ) {
   const queryClient = useQueryClient();
 
@@ -31,6 +29,7 @@ function useSubscriptionMutation<MutationInput>(
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.payments.all });
       void queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.system.stats });
     },
   });
 }
@@ -67,5 +66,19 @@ export function useCancelPaymentSubscription() {
         `/payments/subscriptions/${subscriptionId}/cancel`,
         { method: "POST", requestBody: cancelRequest },
       ),
+  );
+}
+
+export function useDeletePaymentSubscription() {
+  return useSubscriptionMutation((subscriptionId: string) =>
+    requestApi<void>(`/payments/subscriptions/${subscriptionId}`, {
+      method: "DELETE",
+    }),
+  );
+}
+
+export function useDeleteAllPaymentSubscriptions() {
+  return useSubscriptionMutation(() =>
+    requestApi<void>("/payments/subscriptions", { method: "DELETE" }),
   );
 }

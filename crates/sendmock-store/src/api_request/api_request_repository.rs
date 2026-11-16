@@ -103,6 +103,32 @@ impl ApiRequestRepository {
             .await
     }
 
+    /// Deletes one log entry; answers whether it existed.
+    pub async fn delete_request(&self, request_id: &str) -> Result<bool, StoreError> {
+        let request_id = request_id.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(connection.execute("DELETE FROM api_requests WHERE id = ?1", [request_id])? > 0)
+            })
+            .await
+    }
+
+    /// Deletes the log entries the list's filter matches; answers how many went.
+    pub async fn delete_matching_requests(
+        &self,
+        filter: ApiRequestFilter,
+    ) -> Result<u64, StoreError> {
+        self.database
+            .write(move |connection| {
+                let deleted_count = connection.execute(
+                    &format!("DELETE FROM api_requests WHERE {FILTER_CONDITIONS}"),
+                    params![filter.api, filter.status_hundreds, filter.path_contains],
+                )?;
+                Ok(u64::try_from(deleted_count).unwrap_or_default())
+            })
+            .await
+    }
+
     pub async fn delete_all_requests(&self) -> Result<u64, StoreError> {
         self.database
             .write(|connection| Ok(connection.execute("DELETE FROM api_requests", [])? as u64))

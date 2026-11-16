@@ -10,6 +10,7 @@ import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { toEmailSummary } from "@/mocks/fixtures/email-summary";
 import { simulateSmsDelivery } from "@/mocks/realtime/simulate-sms-delivery";
+import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 /** Adds one new email and announces it, like an app sending over SMTP. */
 export function generateSampleEmail() {
@@ -53,7 +54,7 @@ export function generateSampleSms() {
   publishMockEvent("sms.sent", {
     id: outboundMessage.id,
     to_number: outboundMessage.to_number,
-    thread_id: `${outboundMessage.from_number}|${outboundMessage.to_number}`,
+    thread_id: readSmsThreadId(outboundMessage),
     body: outboundMessage.body,
   });
   simulateSmsDelivery(outboundMessage);

@@ -2,6 +2,7 @@ import { useSearch } from "@tanstack/react-router";
 import { ActivityIcon } from "lucide-react";
 import * as React from "react";
 
+import { useCheckedItems } from "@/hooks/use-checked-items";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { LoadMoreRows } from "@/components/common/load-more-rows";
 import { QueryErrorState } from "@/components/common/query-error-state";
@@ -14,6 +15,7 @@ import {
   type DeliveryFilterValues,
   noDeliveryFilters,
 } from "@/features/webhooks/deliveries/delivery-filters";
+import { DeliveryListToolbar } from "@/features/webhooks/deliveries/delivery-list-toolbar";
 import { deliveryStatusFilters } from "@/features/webhooks/deliveries/delivery-status";
 import { DeliveryDrawer } from "@/features/webhooks/deliveries/detail/delivery-drawer";
 import { WebhookDeliveriesTable } from "@/features/webhooks/deliveries/webhook-deliveries-table";
@@ -52,17 +54,25 @@ export function WebhookDeliveriesPage() {
       endpointId: initialSearch.endpoint ?? noDeliveryFilters.endpointId,
     }),
   );
-  const deliveriesQuery = useWebhookDeliveries(
-    toDeliveryListFilters(filterValues),
-  );
+  const deliveryFilters = toDeliveryListFilters(filterValues);
+  const deliveriesQuery = useWebhookDeliveries(deliveryFilters);
   const endpointsQuery = useWebhookEndpoints();
-  const loadedPages = deliveriesQuery.data?.pages ?? [];
-  const webhookDeliveries = loadedPages.flatMap(
-    (loadedPage) => loadedPage.items,
+  const webhookDeliveries = React.useMemo(
+    () =>
+      deliveriesQuery.data?.pages.flatMap((loadedPage) => loadedPage.items) ??
+      [],
+    [deliveriesQuery.data],
   );
-  const totalCount = loadedPages[0]?.total_count ?? 0;
-  const hasFilters =
-    JSON.stringify(filterValues) !== JSON.stringify(noDeliveryFilters);
+  const totalCount = deliveriesQuery.data?.pages[0]?.total_count ?? 0;
+  const filterKey = JSON.stringify(filterValues);
+  const hasFilters = filterKey !== JSON.stringify(noDeliveryFilters);
+  const checkedDeliveries = useCheckedItems(
+    React.useMemo(
+      () => webhookDeliveries.map((webhookDelivery) => webhookDelivery.id),
+      [webhookDeliveries],
+    ),
+    filterKey,
+  );
   const { fetchNextPage } = deliveriesQuery;
   const loadNextPage = React.useCallback(() => {
     void fetchNextPage();
@@ -89,6 +99,13 @@ export function WebhookDeliveriesPage() {
           }}
         />
         <div className="min-w-0 rounded-lg border">
+          <DeliveryListToolbar
+            webhookDeliveries={webhookDeliveries}
+            checkedDeliveries={checkedDeliveries}
+            totalDeliveryCount={totalCount}
+            deliveryFilters={deliveryFilters}
+            isFiltered={hasFilters}
+          />
           {deliveriesQuery.isPending && <Skeleton className="m-4 h-32" />}
           {deliveriesQuery.isError && (
             <QueryErrorState
@@ -114,7 +131,10 @@ export function WebhookDeliveriesPage() {
             ))}
           {webhookDeliveries.length > 0 && (
             <>
-              <WebhookDeliveriesTable webhookDeliveries={webhookDeliveries} />
+              <WebhookDeliveriesTable
+                webhookDeliveries={webhookDeliveries}
+                checkedDeliveries={checkedDeliveries}
+              />
               <LoadMoreRows
                 shownCount={webhookDeliveries.length}
                 totalCount={totalCount}

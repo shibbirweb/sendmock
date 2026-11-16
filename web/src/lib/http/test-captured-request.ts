@@ -27,6 +27,7 @@ export function buildTestCapturedRequest(
     matched_rule_name: null,
     is_simulated_failure: false,
     duration_ms: 1,
+    is_read: false,
     created_at: "2026-10-25T10:00:00.000Z",
     ...changedFields,
   };

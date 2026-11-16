@@ -1,5 +1,6 @@
 mod chosen_delivery;
 mod delivery_attempt_recording;
+mod delivery_delete_operations;
 mod delivery_detail;
 mod delivery_dispatch;
 mod delivery_inputs;
@@ -79,6 +80,9 @@ mod webhook_choice_input;
 mod webhook_sender;
 mod webhook_template_functions;
 
+pub use delivery_delete_operations::{
+    DeleteWebhookDeliveriesOperation, DeleteWebhookDeliveryOperation,
+};
 pub use delivery_detail::WebhookDeliveryDetail;
 pub use delivery_dispatch::{run_due_deliveries, run_webhook_dispatcher};
 pub use delivery_operations::{
@@ -181,6 +185,18 @@ pub(crate) use webhook_template_functions::sign_sslcommerz_arguments;
 
 use crate::OperationRegistry;
 
+/// The delivery log: list, delete, detail, cancel, replay, wait and metrics.
+fn register_delivery_operations(operation_registry: &mut OperationRegistry) {
+    operation_registry.register(ListWebhookDeliveriesOperation);
+    operation_registry.register(DeleteWebhookDeliveriesOperation);
+    operation_registry.register(DeleteWebhookDeliveryOperation);
+    operation_registry.register(GetWebhookDeliveryOperation);
+    operation_registry.register(CancelWebhookDeliveryOperation);
+    operation_registry.register(ReplayWebhookDeliveryOperation);
+    operation_registry.register(WaitForWebhookOperation);
+    operation_registry.register(GetWebhookMetricsOperation);
+}
+
 /// Every webhook operation this build serves.
 pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ListWebhookEndpointsOperation);
@@ -194,12 +210,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(SaveWebhookEndpointAsTemplateOperation);
     operation_registry.register(TestWebhookEndpointOperation);
     operation_registry.register(SendWebhookOperation);
-    operation_registry.register(ListWebhookDeliveriesOperation);
-    operation_registry.register(GetWebhookDeliveryOperation);
-    operation_registry.register(CancelWebhookDeliveryOperation);
-    operation_registry.register(ReplayWebhookDeliveryOperation);
-    operation_registry.register(WaitForWebhookOperation);
-    operation_registry.register(GetWebhookMetricsOperation);
+    register_delivery_operations(operation_registry);
     operation_registry.register(ListSavedWebhookDeliveriesOperation);
     operation_registry.register(CreateSavedWebhookDeliveryOperation);
     operation_registry.register(RenameSavedWebhookDeliveryOperation);

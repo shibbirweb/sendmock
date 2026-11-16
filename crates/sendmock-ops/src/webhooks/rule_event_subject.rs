@@ -8,8 +8,13 @@ use crate::{AppEvent, OperationContext, OperationError};
 
 /// Events that drive a live view only: `webhook.delivered` (a rule on it would loop),
 /// `sms.reply_webhook` (the result already went with `sms.inbound`'s message) and
-/// `traffic.pruned` (housekeeping, about no message).
-const UNRULED_EVENT_TYPES: [&str; 3] = ["webhook.delivered", "sms.reply_webhook", "traffic.pruned"];
+/// `traffic.pruned` and `traffic.cleared` (housekeeping, about no message).
+const UNRULED_EVENT_TYPES: [&str; 4] = [
+    "webhook.delivered",
+    "sms.reply_webhook",
+    "traffic.pruned",
+    "traffic.cleared",
+];
 
 /// What an event is about, which decides where its filter fields come from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

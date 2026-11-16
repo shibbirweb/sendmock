@@ -1,6 +1,7 @@
 mod api_request_log_entry;
 mod api_request_recording;
 mod http_log_operations;
+mod log_delete_operations;
 mod log_inputs;
 mod smtp_log_operations;
 mod smtp_session_log_entry;
@@ -11,6 +12,10 @@ pub use api_request_recording::{
     record_provider_request,
 };
 pub use http_log_operations::{GetApiRequestOperation, ListApiRequestsOperation};
+pub use log_delete_operations::{
+    DeleteApiRequestOperation, DeleteApiRequestsOperation, DeleteSmtpSessionOperation,
+    DeleteSmtpSessionsOperation,
+};
 pub use smtp_log_operations::{GetSmtpSessionOperation, ListSmtpSessionsOperation};
 pub use smtp_session_log_entry::SmtpSessionLogEntry;
 
@@ -21,4 +26,8 @@ pub fn register_log_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(GetSmtpSessionOperation);
     operation_registry.register(ListApiRequestsOperation);
     operation_registry.register(GetApiRequestOperation);
+    operation_registry.register(DeleteSmtpSessionsOperation);
+    operation_registry.register(DeleteSmtpSessionOperation);
+    operation_registry.register(DeleteApiRequestsOperation);
+    operation_registry.register(DeleteApiRequestOperation);
 }

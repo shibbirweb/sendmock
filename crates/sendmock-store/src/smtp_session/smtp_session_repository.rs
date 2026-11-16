@@ -102,6 +102,35 @@ impl SmtpSessionRepository {
 }
 
 impl SmtpSessionRepository {
+    /// Deletes one session; answers whether it existed.
+    pub async fn delete_session(&self, session_id: &str) -> Result<bool, StoreError> {
+        let session_id = session_id.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(
+                    connection.execute("DELETE FROM smtp_sessions WHERE id = ?1", [session_id])?
+                        > 0,
+                )
+            })
+            .await
+    }
+
+    /// Deletes the sessions the list's filter matches; answers how many went.
+    pub async fn delete_matching_sessions(
+        &self,
+        filter: SmtpSessionFilter,
+    ) -> Result<u64, StoreError> {
+        self.database
+            .write(move |connection| {
+                let deleted_count = connection.execute(
+                    &format!("DELETE FROM smtp_sessions WHERE {FILTER_CONDITIONS}"),
+                    params![filter.is_failed, filter.search_text],
+                )?;
+                Ok(u64::try_from(deleted_count).unwrap_or_default())
+            })
+            .await
+    }
+
     pub async fn delete_all_sessions(&self) -> Result<u64, StoreError> {
         self.database
             .write(|connection| Ok(connection.execute("DELETE FROM smtp_sessions", [])? as u64))

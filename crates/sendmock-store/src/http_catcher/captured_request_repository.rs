@@ -7,7 +7,7 @@ use crate::{Database, StoreError};
 
 const REQUEST_SELECT: &str = "SELECT r.id, r.bin_id, b.name, r.method, r.url, r.path, r.query_json, r.headers_json, r.body, \
      r.content_type, r.client_ip, r.response_status, r.response_headers_json, r.response_body, r.matched_rule_id, \
-     r.matched_rule_name, r.is_simulated_failure, r.duration_ms, r.created_at \
+     r.matched_rule_name, r.is_simulated_failure, r.duration_ms, r.created_at, r.is_read \
      FROM http_captured_requests r JOIN http_bins b ON b.id = r.bin_id";
 
 fn read_request_row(row: &Row<'_>) -> rusqlite::Result<CapturedRequestRecord> {
@@ -31,6 +31,7 @@ fn read_request_row(row: &Row<'_>) -> rusqlite::Result<CapturedRequestRecord> {
         is_simulated_failure: row.get(16)?,
         duration_ms: row.get(17)?,
         created_at_unix_ms: row.get(18)?,
+        is_read: row.get(19)?,
         files: Vec::new(),
     })
 }
@@ -191,6 +192,43 @@ impl CapturedRequestRepository {
                     |row| row.get(0),
                 )?;
                 Ok(u64::try_from(request_count).unwrap_or_default())
+            })
+            .await
+    }
+
+    /// Marks a request read or unread; answers whether it existed.
+    pub async fn mark_request_read(
+        &self,
+        request_id: &str,
+        is_read: bool,
+    ) -> Result<bool, StoreError> {
+        let request_id = request_id.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(connection.execute(
+                    "UPDATE http_captured_requests SET is_read = ?1 WHERE id = ?2",
+                    params![is_read, request_id],
+                )? > 0)
+            })
+            .await
+    }
+
+    /// Deletes one request with its files; answers whether it existed.
+    pub async fn delete_request(&self, request_id: &str) -> Result<bool, StoreError> {
+        let request_id = request_id.to_owned();
+        self.database
+            .write(move |connection| {
+                let transaction = connection.transaction()?;
+                transaction.execute(
+                    "DELETE FROM http_captured_files WHERE request_id = ?1",
+                    [&request_id],
+                )?;
+                let deleted_count = transaction.execute(
+                    "DELETE FROM http_captured_requests WHERE id = ?1",
+                    [&request_id],
+                )?;
+                transaction.commit()?;
+                Ok(deleted_count > 0)
             })
             .await
     }

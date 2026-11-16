@@ -229,6 +229,8 @@ Check: every channel passes on every operating system it serves. This is the Pha
 
 ## 9. Make `main` the default branch
 
+**When (owner decision, 2026-11-16):** right after `1.1.0` is released and promoted to `main` ([16](16-website-and-releases.md#roadmap-placement)), not before.
+
 ```sh
 gh repo edit shibbirweb/sendmock --default-branch main
 ```

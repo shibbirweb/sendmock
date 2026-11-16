@@ -12,6 +12,9 @@
       "button: Delivered",
       "button: Failed",
       "textbox: Search SMTP sessions",
+      "checkbox: Select all loaded SMTP sessions",
+      "button: Delete all SMTP sessions",
+      "columnheader: Select",
       "columnheader: Time",
       "columnheader: Client",
       "columnheader: TLS",
@@ -19,6 +22,7 @@
       "columnheader: Result",
       "columnheader: Emails",
       "columnheader: Duration",
+      "each item, checkbox: Select SMTP session from …",
       "each item, link: …"
     ],
     "An SMTP session is open": [
@@ -35,9 +39,12 @@
       "button: #xx",
       "combobox: Filter by API",
       "textbox: Search request paths",
+      "checkbox: Select all loaded API requests",
+      "button: Delete all API requests",
       "columnheader: API",
       "columnheader: Request",
       "columnheader: Status",
+      "each item, checkbox: Select POST …",
       "each item, link: POST …"
     ],
     "An API request is open": [

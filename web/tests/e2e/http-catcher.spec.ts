@@ -43,10 +43,10 @@ test("HC-01.6 bins list their requests, and can be added, cleared and deleted", 
   await expect(binList.getByRole("button", { name: /^orders/ })).toBeHidden();
 
   await openBin(page, "slack");
-  await page.getByRole("button", { name: "Clear requests" }).click();
+  await page.getByRole("button", { name: "Delete all requests" }).click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Clear requests" })
+    .getByRole("button", { name: "Delete all" })
     .click();
   await expect(page.getByText("No requests in slack yet.")).toBeVisible();
 });

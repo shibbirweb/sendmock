@@ -69,10 +69,12 @@ test("PN-01.6 deleting a notification removes it and Clear all empties the list"
     .click();
   await expect(rows).toHaveCount(3);
 
-  await page.getByRole("button", { name: "Clear all" }).click();
+  await page
+    .getByRole("button", { name: "Delete all push notifications" })
+    .click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Clear all" })
+    .getByRole("button", { name: "Delete all" })
     .click();
   await expect(page.getByText("No push notifications yet")).toBeVisible();
 });

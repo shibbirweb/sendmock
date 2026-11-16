@@ -8,11 +8,23 @@ export const webhookDeliverySurfaces: SurfaceCatalogue = {
     mcp: "sendmock_webhook_delivery_list",
     ui: "Webhooks > Deliveries",
   },
+  "DELETE /api/v1/webhooks/deliveries": {
+    phase: "A17",
+    cli: "sendmock webhook deliveries delete-all --yes",
+    mcp: "sendmock_webhook_delivery_delete_all",
+    ui: "Webhooks > Deliveries > Delete all",
+  },
   "GET /api/v1/webhooks/deliveries/{deliveryId}": {
     phase: "3",
     cli: "sendmock webhook deliveries show <deliveryId>",
     mcp: "sendmock_webhook_delivery_get",
     ui: "Webhooks > Deliveries > open a delivery",
+  },
+  "DELETE /api/v1/webhooks/deliveries/{deliveryId}": {
+    phase: "A17",
+    cli: "sendmock webhook deliveries delete <deliveryId>",
+    mcp: "sendmock_webhook_delivery_delete",
+    ui: "Webhooks > Deliveries > select deliveries > Delete",
   },
   "POST /api/v1/webhooks/deliveries/{deliveryId}/cancel": {
     phase: "3",
