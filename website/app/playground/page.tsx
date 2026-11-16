@@ -3,12 +3,14 @@ import type { Metadata } from "next";
 import { PlaygroundWorkbench } from "@/components/api/playground-workbench";
 import { TargetPicker } from "@/components/api/target-picker";
 import { loadApiReference } from "@/lib/openapi/load-openapi";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "API playground",
   description:
     "Call any SendMock endpoint in your browser, watch the events it triggers and run multi-step scenarios.",
-};
+  pagePath: "/playground",
+});
 
 export default function PlaygroundPage() {
   const { operations, tagNames, schemas } = loadApiReference();

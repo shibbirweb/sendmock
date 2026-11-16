@@ -55,7 +55,7 @@ function buildFakeOperation(
 }
 
 describe("CLI and MCP references (WS-07.5)", () => {
-  test("WS-07.5 the committed references equal a fresh build from the spec and the catalogue", () => {
+  test("WS-03.2 WS-07.5 the committed references equal a fresh build from the spec and the catalogue", () => {
     for (const filePath of [cliReferenceFilePath, mcpToolsFilePath]) {
       expect(
         readFileSync(filePath, "utf8") ===

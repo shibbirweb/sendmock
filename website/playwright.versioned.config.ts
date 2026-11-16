@@ -23,7 +23,7 @@ export default defineConfig({
       "rm -rf .versioned-site",
       `mkdir -p .versioned-site${pagesBasePath}`,
       `cp -R out/. .versioned-site${pagesBasePath}/`,
-      `bunx --bun serve .versioned-site -l ${versionedSitePort} --no-clipboard`,
+      `bun scripts/serve-static-site.ts .versioned-site ${versionedSitePort} ${pagesBasePath.replace(/^\//, "")}/404.html`,
     ].join(" && "),
     url: `http://127.0.0.1:${versionedSitePort}${pagesBasePath}/`,
     reuseExistingServer: !process.env.CI,

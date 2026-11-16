@@ -227,6 +227,28 @@ gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.0.0
 
 Check: every channel passes on every operating system it serves. This is the Phase 5 done-when proof.
 
+**Chocolatey holds every new version until the first one is approved** (found 2026-11-16, #298). Chocolatey moderates a new package by hand: `sendmock` 1.0.0 passed its automated validation, verification and virus scan on 14 and 15 Nov 2026 and waits for a human moderator, and until it is approved Chocolatey answers `403 (Forbidden)` to every later push, so the 1.1.0 release's Chocolatey job failed. Nothing on our side speeds the review up. When the owner reports the approval:
+
+1. Re-run the Chocolatey job of each stable released while 1.0.0 waited, starting with 1.1.0 (Publish stable run 43861488747). Find the job's ID:
+
+   ```sh
+   gh run view 43861488747 --repo shibbirweb/sendmock --json jobs --jq '.jobs[] | select(.name | test("Chocolatey")) | .databaseId'
+   ```
+
+2. Re-run that job:
+
+   ```sh
+   gh run rerun 43861488747 --repo shibbirweb/sendmock --job <job ID>
+   ```
+
+3. Once Chocolatey has taken the new version (it moderates each version, faster after the first), install it:
+
+   ```sh
+   gh workflow run install-channels.yml --repo shibbirweb/sendmock -f version=1.1.0 -f channel=stable -f channels=chocolatey
+   ```
+
+4. Close #298.
+
 ## 9. Make `main` the default branch
 
 **When (owner decision, 2026-11-16):** right after `1.1.0` is released and promoted to `main` ([16](16-website-and-releases.md#roadmap-placement)), not before.

@@ -10,11 +10,21 @@
  * A tag is built in a temporary git worktree with the current website code
  * copied over it (scripts/docs-version-worktree.ts), so the working tree is
  * never changed (WS-03.5).
+ * The root version is built first: the others read its page list, so each of
+ * their pages names the root's page as canonical, or is kept out of search
+ * when the root has no such page. Only the root keeps a sitemap.
+ *
  * Output: website/out (upload it as the Pages artifact).
  */
 
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -23,6 +33,7 @@ import {
   resolveDocsVersions,
 } from "../website/lib/docs-versions";
 import { buildPagesSite } from "./build-pages-site";
+import { listBuiltPagePaths } from "./docs-version-pages";
 import { prepareTagWorktree, removeTagWorktree } from "./docs-version-worktree";
 
 const repositoryRoot = join(import.meta.dir, "..");
@@ -53,12 +64,24 @@ function serialiseDocsVersions(docsVersions: DocsVersion[]): string {
   );
 }
 
+type DocsVersionBuild = {
+  docsVersionsJson: string;
+  worktreesDirectory: string;
+  stagingDirectory: string;
+  /** Left out for the root version, which is built first. */
+  rootPagePathsFile?: string;
+};
+
 function buildDocsVersion(
   docsVersion: DocsVersion,
-  docsVersionsJson: string,
-  worktreesDirectory: string,
-  stagingDirectory: string,
+  docsVersionBuild: DocsVersionBuild,
 ) {
+  const {
+    docsVersionsJson,
+    worktreesDirectory,
+    stagingDirectory,
+    rootPagePathsFile,
+  } = docsVersionBuild;
   console.log(
     `\nBuilding ${docsVersion.label} at ${docsVersion.path || "/"} from ${docsVersion.gitRef ?? "the working tree"}`,
   );
@@ -76,7 +99,11 @@ function buildDocsVersion(
     basePath: `${pagesBasePath}${docsVersion.path}`,
     docsVersionKey: docsVersion.key,
     docsVersionsJson,
+    rootPagePathsFile,
   });
+  if (docsVersion.path !== "") {
+    rmSync(join(outputDirectory, "sitemap.xml"), { force: true });
+  }
   cpSync(outputDirectory, join(stagingDirectory, docsVersion.path), {
     recursive: true,
   });
@@ -94,13 +121,41 @@ const stagingDirectory = join(workDirectory, "site");
 mkdirSync(stagingDirectory, { recursive: true });
 
 try {
-  for (const docsVersion of docsVersions) {
-    buildDocsVersion(
-      docsVersion,
+  const rootVersion = docsVersions.find(
+    (docsVersion) => docsVersion.path === "",
+  );
+  if (rootVersion === undefined) {
+    throw new Error("No docs version is served at the site root.");
+  }
+  buildDocsVersion(rootVersion, {
+    docsVersionsJson,
+    worktreesDirectory,
+    stagingDirectory,
+  });
+
+  const rootPagePathsFile = join(workDirectory, "root-page-paths.json");
+  const otherVersions = docsVersions.filter(
+    (docsVersion) => docsVersion !== rootVersion,
+  );
+  writeFileSync(
+    rootPagePathsFile,
+    JSON.stringify(
+      listBuiltPagePaths(
+        stagingDirectory,
+        new Set([
+          "demo",
+          ...otherVersions.map((docsVersion) => docsVersion.path.slice(1)),
+        ]),
+      ),
+    ),
+  );
+  for (const docsVersion of otherVersions) {
+    buildDocsVersion(docsVersion, {
       docsVersionsJson,
       worktreesDirectory,
       stagingDirectory,
-    );
+      rootPagePathsFile,
+    });
   }
 
   const finalOutputDirectory = join(repositoryRoot, "website", "out");

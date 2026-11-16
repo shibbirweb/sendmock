@@ -6,18 +6,31 @@ import {
   McpResourceReference,
   McpToolReference,
 } from "@/components/reference/mcp-tool-reference";
+import { StructuredDataScript } from "@/components/seo/structured-data-script";
 import {
   indexCliCommandUrls,
   listAreas,
   loadMcpReference,
   toNamedLinks,
 } from "@/lib/reference/load-references";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
+import { buildReferencePageStructuredData } from "@/lib/seo/reference-page-structured-data";
 
 type AreaPageProps = { params: Promise<{ area: string }> };
 
 function listMcpAreas() {
   const mcpReference = loadMcpReference();
   return listAreas([...mcpReference.tools, ...mcpReference.resources]);
+}
+
+function describeMcpAreaPage(areaName: string, area: string) {
+  return {
+    sectionName: "MCP reference",
+    sectionPath: "/mcp",
+    title: `${areaName} tools`,
+    description: `The ${areaName} tools of the SendMock MCP server, with every input.`,
+    pagePath: `/mcp/${area}`,
+  };
 }
 
 export function generateStaticParams() {
@@ -31,10 +44,10 @@ export async function generateMetadata({
   const areaName = listMcpAreas().find(
     (listedArea) => listedArea.slug === area,
   )?.name;
-  return {
-    title: `${areaName ?? "MCP"} tools`,
-    description: `The ${areaName} tools of the SendMock MCP server, with every input.`,
-  };
+  if (areaName === undefined) {
+    notFound();
+  }
+  return buildPageMetadata(describeMcpAreaPage(areaName, area));
 }
 
 export default async function McpAreaPage({ params }: AreaPageProps) {
@@ -50,6 +63,11 @@ export default async function McpAreaPage({ params }: AreaPageProps) {
 
   return (
     <main className="mx-auto grid w-full max-w-5xl gap-2 px-4 py-12">
+      <StructuredDataScript
+        structuredData={buildReferencePageStructuredData(
+          describeMcpAreaPage(areaName, area),
+        )}
+      />
       <p className="text-sm">
         <Link href="/mcp" className="text-fd-muted-foreground hover:underline">
           MCP reference

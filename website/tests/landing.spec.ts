@@ -424,7 +424,7 @@ test("WS-09.4 the quick start's AI tab shows an agent window with the whole prom
   ).toHaveAttribute("href", "/docs/install/#install-with-ai");
   await expect(
     page.locator('head link[rel="alternate"][type="text/plain"]'),
-  ).toHaveAttribute("href", "/llms.txt");
+  ).toHaveAttribute("href", "https://shibbir.me/llms.txt");
 });
 
 test("WS-09.4 the AI tab shows the prompt, copies it, then opens the agent window", async ({

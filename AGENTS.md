@@ -38,7 +38,7 @@ The product is **SendMock** (the binary, crates, packages and image are `sendmoc
 - **Every commit names its GitHub issue.** The ticket is the number of the issue the change belongs to, `#` included (`fix:[#171] ...`), so GitHub links the commit to the issue. Before committing, find that issue: a roadmap feature's issue is in `scripts/roadmap/roadmap-issue-numbers.json` (by feature ID, such as `DS-10`), anything else through `gh issue list --search "<words>" --state all`. If no issue fits, create one first and use its number:
   - a title in the roadmap's style: `<Area>: <what>` for a feature (`Distribution: Helm chart`), a plain sentence for a bug or a docs change;
   - labels: one type label (`feature`, `bug`, `documentation` or `enhancement`) and the area label (`area: email`, `area: sms`, `area: verify`, `area: webhooks`, `area: http catcher`, `area: payments`, `area: push`, `area: platform`, `area: ai`, `area: web ui`, `area: distribution` or `area: website`; a new area label is created before it is used, with `gh label create`);
-  - the milestone the change ships in: `First beta (0.1.0-beta.1)`, `1.0.0` or `After 1.0`;
+  - the release milestone the change ships in: the next release, such as `1.2.0` (the releases are listed in `scripts/roadmap/release-milestones.ts`; a new one is created on GitHub and added there first), or `Waiting on others` for work an outside party must act on first;
   - the "SendMock roadmap" project (number 6): `gh project item-add 6 --owner shibbirweb --url <issue url>`, with its status set on the board.
   
   One issue can collect several commits of the same work; a new piece of work gets its own issue.

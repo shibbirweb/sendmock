@@ -1,15 +1,21 @@
 # SendMock
 
-[![CI](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml?query=branch%3Adevelop)
+[![CI](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/shibbirweb/sendmock/actions/workflows/ci.yml?query=branch%3Amain)
 [![Release](https://img.shields.io/github/v/release/shibbirweb/sendmock?include_prereleases&sort=semver&label=release)](https://github.com/shibbirweb/sendmock/releases)
 [![npm](https://img.shields.io/npm/v/sendmock?label=npm)](https://www.npmjs.com/package/sendmock)
 [![crates.io](https://img.shields.io/crates/v/sendmock?label=crates.io)](https://crates.io/crates/sendmock)
+[![Downloads](https://img.shields.io/github/downloads/shibbirweb/sendmock/total?label=downloads)](https://github.com/shibbirweb/sendmock/releases)
+[![npm downloads](https://img.shields.io/npm/dm/sendmock?label=npm%20downloads)](https://www.npmjs.com/package/sendmock)
+[![crates.io downloads](https://img.shields.io/crates/d/sendmock?label=crates.io%20downloads)](https://crates.io/crates/sendmock)
 [![Docker pulls](https://img.shields.io/docker/pulls/shibbirweb/sendmock?label=docker%20pulls)](https://hub.docker.com/r/shibbirweb/sendmock)
+[![GHCR](https://ghcr-badge.egpl.dev/shibbirweb/sendmock/latest_tag?ignore=sha256-*,latest,edge,beta,*-debug,?.?,?.??,?&label=ghcr)](https://github.com/shibbirweb/sendmock/pkgs/container/sendmock)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#license)
 [![Docs](https://img.shields.io/badge/docs-shibbirweb.github.io%2Fsendmock-informational)](https://shibbirweb.github.io/sendmock/docs/)
 [![Live demo](https://img.shields.io/badge/demo-try%20it%20in%20your%20browser-success)](https://shibbirweb.github.io/sendmock/demo/)
 
-**SendMock is a local stand-in for the email, SMS, push and payment services your app talks to.** It is one small program you run on your machine, in Docker or in CI.
+**SendMock is a local stand-in for the email, SMS, push and payment services your app talks to, and for the webhooks they send back.** It is one small program you run on your machine, in Docker or in CI.
+
+**Webhook simulation built in:** fire a delivered, bounced, opened, inbound reply or payment succeeded webhook whenever you need one, signed the way the real provider signs it, straight to your app on `localhost`. You test your webhook handlers without a tunnel, a public URL or a provider sandbox.
 
 **The problem:** while you build and test an app, it sends real things. A sign-up test emails a real address, an OTP test texts a real phone and costs money, a checkout test needs a payment sandbox, and the webhooks those services send back are hard to trigger on demand. Teams end up with shared test inboxes, borrowed phones, provider sandboxes and flaky tests.
 

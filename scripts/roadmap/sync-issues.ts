@@ -1,5 +1,5 @@
 // Brings the feature issues in line with the acceptance files: body, title, labels, project
-// status and Criteria met, milestone, open or closed. Run build-feature-issues.ts first, and
+// status, Target and Criteria met, release milestone, open or closed. Run build-feature-issues.ts first, and
 // publish-new-issues.ts for features that have no issue yet.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -49,12 +49,24 @@ const state = JSON.parse(
 const issues = JSON.parse(
   readFileSync(generatedIssuesPath, "utf8"),
 ) as FeatureIssue[];
-const milestoneFor = (issue: FeatureIssue) => {
-  if (issue.target === "1.0") {
-    return issue.status === "Done" ? "First beta (0.1.0-beta.1)" : "1.0.0";
+// A feature's target is its release milestone (release-milestones.ts). Released milestones
+// are closed, and `gh issue edit --milestone` finds only open ones, so the number is used.
+const milestoneNumbers = new Map(
+  (
+    JSON.parse(
+      run("gh", [
+        "api",
+        `repos/${repository}/milestones?state=all&per_page=100`,
+      ]),
+    ) as { number: number; title: string }[]
+  ).map((milestone) => [milestone.title, milestone.number]),
+);
+const findMilestoneNumber = (milestoneTitle: string) => {
+  const milestoneNumber = milestoneNumbers.get(milestoneTitle);
+  if (milestoneNumber === undefined) {
+    throw new Error(`No milestone named ${milestoneTitle}`);
   }
-  // "After 1.0" and each planned release ("1.1.0") are milestones of the same name.
-  return issue.target;
+  return milestoneNumber;
 };
 
 let changedCount = 0;
@@ -93,7 +105,7 @@ for (const issue of issues) {
   const isLabelChanged =
     [...currentLabels].sort().join() !== [...issue.labels].sort().join();
   const wantedState = issue.isClosed ? "CLOSED" : "OPEN";
-  const isMilestoneChanged = current.milestone?.title !== milestoneFor(issue);
+  const isMilestoneChanged = current.milestone?.title !== issue.target;
   if (
     !isBodyChanged &&
     !isLabelChanged &&
@@ -115,8 +127,6 @@ for (const issue of issues) {
     issue.title,
     "--body-file",
     bodyPath,
-    "--milestone",
-    milestoneFor(issue),
   ];
   for (const label of currentLabels.filter(
     (name) => !issue.labels.includes(name),
@@ -129,8 +139,19 @@ for (const issue of issues) {
     editArguments.push("--add-label", label);
   }
   run("gh", editArguments);
+  if (isMilestoneChanged) {
+    run("gh", [
+      "api",
+      "-X",
+      "PATCH",
+      `repos/${repository}/issues/${entry.number}`,
+      "-F",
+      `milestone=${findMilestoneNumber(issue.target)}`,
+    ]);
+  }
   const mutation = `mutation {
   status: updateProjectV2ItemFieldValue(input: {projectId: "${projectId}", itemId: "${entry.itemId}", fieldId: "${findField("Status").id}", value: {singleSelectOptionId: "${findOption("Status", issue.status)}"}}) { clientMutationId }
+  target: updateProjectV2ItemFieldValue(input: {projectId: "${projectId}", itemId: "${entry.itemId}", fieldId: "${findField("Target").id}", value: {singleSelectOptionId: "${findOption("Target", issue.target)}"}}) { clientMutationId }
   criteria: updateProjectV2ItemFieldValue(input: {projectId: "${projectId}", itemId: "${entry.itemId}", fieldId: "${findField("Criteria met").id}", value: {text: ${JSON.stringify(issue.criteriaSummary)}}}) { clientMutationId }
 }`;
   run("gh", ["api", "graphql", "-f", `query=${mutation}`]);

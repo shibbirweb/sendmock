@@ -8,6 +8,19 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-16
+
+### Added
+
+- **Website in search and link previews:** every page of https://shibbir.me/sendmock/ has a canonical link, Open Graph and Twitter card tags with a preview image, and structured data, and `sitemap.xml` lists every current page. Older docs versions and `/next/` point search engines to the current pages.
+- **What's new and Upgrade guide in the docs:** under the **Version** menu of every docs version, **What's new** shows that version's release notes and **Upgrade guide** shows how to upgrade on your install channel and what to change, if anything.
+
+### Fixed
+
+- **Chocolatey package:** shows the SendMock icon, links to its source and to the website at https://shibbir.me/sendmock/, and its description no longer holds a local address that Chocolatey's checks flag.
+- **`cargo install sendmock`:** each stable release reaches crates.io again. 1.1.0 was released everywhere else but not to crates.io.
+- **APT and YUM repositories:** the website deploy, which also publishes the `apt` and `dnf` repositories, no longer stops at the docs of an older version (`/v1.0/`), so `apt install sendmock` and `dnf install sendmock` get the newest stable.
+
 ## [1.1.0] - 2026-11-16
 
 ### Added

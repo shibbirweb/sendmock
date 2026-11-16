@@ -133,7 +133,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 ## PL-10 Projects
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a5-projects-multi-project-inboxes-pl-10).
 
 - [x] PL-10.1 Projects are listed, created, renamed and deleted through REST, CLI and MCP; keys are lowercase letters, digits and dashes; `default` always exists and cannot be deleted; deleting a project deletes its emails, SMS and verifications. (#48)
 - [x] PL-10.2 An email sent over SMTP with an AUTH username that is a project's key is stored in that project; without AUTH, or with any other username, it is stored in `default`. (#48)
@@ -146,7 +146,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## PL-11 Prometheus metrics
 
-After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12a).
+1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12a).
 
 - [ ] PL-11.1 Without `--metrics`, `GET /metrics` answers 404; `--metrics`, `SENDMOCK_METRICS=true` or `metrics = true` in `sendmock.toml` turn it on, with flags over the environment over the file.
 - [ ] PL-11.2 When on, `GET /metrics` answers the Prometheus text format (`text/plain; version=0.0.4`) with `# HELP` and `# TYPE` for every family, and `promtool check metrics` finds no problem in it.
@@ -161,7 +161,7 @@ After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-af
 
 ## PL-12 OpenTelemetry export
 
-After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12b).
+1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12b).
 
 - [ ] PL-12.1 Without an OTLP endpoint variable, or with `OTEL_SDK_DISABLED=true`, nothing is exported and no exporter runs; `OTEL_EXPORTER_OTLP_ENDPOINT` (or a per-signal endpoint) turns export on over OTLP `http/protobuf`.
 - [ ] PL-12.2 `OTEL_SERVICE_NAME` (default `sendmock`), `OTEL_RESOURCE_ATTRIBUTES`, `OTEL_EXPORTER_OTLP_HEADERS` and `OTEL_METRIC_EXPORT_INTERVAL` work as the OpenTelemetry specification defines them, and header values are masked wherever SendMock shows its settings or logs.
@@ -173,7 +173,7 @@ After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-af
 
 ## PL-13 Log files and readiness
 
-After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12c).
+1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12c).
 
 - [ ] PL-13.1 `--log-file <path>` (`SENDMOCK_LOG_FILE`, `log_file` in `sendmock.toml`) also writes the logs to that file in the chosen format, rotated daily or past `--log-file-max-size` (default 10 MB), keeping `--log-file-keep` files (default 7); stdout is unchanged.
 - [ ] PL-13.2 JSON log lines keep their fields and add `trace_id` and `span_id` while a span is active, and the docs list every field.
@@ -183,7 +183,7 @@ After 1.0, planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-af
 
 ## PL-14 Accounts and login
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13a).
+2.0.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13a).
 
 - [ ] PL-14.1 Without `--auth accounts` SendMock needs no sign-in, as before; `--auth accounts` (`SENDMOCK_AUTH`, `auth = "accounts"` in `sendmock.toml`) turns accounts on, `--ui-auth` keeps working unchanged, and setting both fails at startup with a clear message.
 - [ ] PL-14.2 On an instance with no users, `SENDMOCK_ADMIN_USERNAME` and `SENDMOCK_ADMIN_PASSWORD` (or their `_FILE` variants) create the first Admin; without them the setup page creates it only with the one-time code printed in the log at start, and `sendmock users reset-password` recovers a lost password from the data file.
@@ -198,7 +198,7 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 ## PL-15 Roles: Admin, Developer, Viewer
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13b).
+2.0.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a13-accounts-login-and-roles-admin-developer-viewer-pl-14-pl-15) (A13b).
 
 - [ ] PL-15.1 Every operation in the registry declares the role it needs (read-only operations Viewer, others Developer, instance administration Admin), and a snapshot test lists every operation with its role.
 - [ ] PL-15.2 A Viewer can call every read-only operation and nothing else; opening an email or SMS does not mark it read for a Viewer.
@@ -210,7 +210,7 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 ## PL-16 Real provider connections
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14a).
+2.0.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14a).
 
 - [ ] PL-16.1 Named connections to SMTP, SendGrid, Mailgun, Amazon SES, Postmark and Resend for email and Twilio, Vonage, Plivo, Telnyx, Infobip and Amazon SNS for SMS are created, edited, tested and deleted through the UI, REST, CLI, MCP and the seed file; the existing relay settings become the `relay` connection and keep working.
 - [ ] PL-16.2 Each provider adapter sends the provider's documented request and maps its answer and errors, proven against SendMock's own emulation of that provider.
@@ -222,7 +222,7 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 
 ## PL-17 Forwarding rules for email and SMS
 
-After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14b).
+2.0.0 (planned as After 1.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a14-real-forwarding-provider-connections-and-routing-rules-for-email-and-sms-pl-16-pl-17) (A14b).
 
 - [ ] PL-17.1 Email and SMS forwarding rules are listed, created, edited, reordered, switched on and off and deleted through Settings > Forwarding, REST, CLI, MCP and the seed file; the existing email auto-forward rules move over unchanged and their commands keep working.
 - [ ] PL-17.2 A rule's filter matches on project, direction, from, to, subject or body, the provider API used, email tags and headers and the presence of an OTP, with the webhook rules' operators.
@@ -232,3 +232,17 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 - [ ] PL-17.6 Each forward records its status, provider message id and error, is retried on network, rate-limit and server errors but not on refused recipients or bad credentials, shows in the message's timeline and the Logs screen's Forwards tab, and fires `email.forwarded`, `sms.forwarded` or `forward.failed`.
 - [ ] PL-17.7 A forwarded email that comes back is never forwarded again, and a rule cannot target SendMock's own SMTP address or provider APIs.
 - [ ] PL-17.8 CI forwards email and SMS through every adapter to a second SendMock acting as the real provider.
+
+## PL-18 Versioned setup export and import
+
+1.3.0 (planned as After 1.0), planned 2026-11-16 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a18-share-and-move-a-setup-versioned-export-and-import-pl-18) (A18).
+
+- [ ] PL-18.1 An export writes a `[sendmock]` header with `format`, `format_version`, `exported_by` and `exported_at`, and holds every configuration item (the seed's sections, every Settings section, projects, providers, HTTP Catcher bins and their responses, scenarios) and no traffic or runtime options; exporting, importing into a fresh instance and exporting again gives an equal file, on the UI, REST, CLI and MCP.
+- [ ] PL-18.2 A file of the current format version is applied as it is; a file without the header is read as format 1, today's seed files, and still applies.
+- [ ] PL-18.3 A file of an older format version is upgraded in memory one step at a time by the registered migrations and applied, its summary says which versions it was upgraded from and to, the user's file is unchanged, and `sendmock setup migrate` writes the upgraded copy; each older format has a fixture file that upgrades and applies.
+- [ ] PL-18.4 A file of a newer format version than the build understands, or older than its oldest migration, is refused before anything is applied, with a message naming the exporting version and the SendMock version needed, and the update command for the way SendMock was installed.
+- [ ] PL-18.5 Export and import work in TOML, JSON and YAML, chosen by extension or `--format`, and a file converts between them without loss; the JSON Schema of each format version is published on the website and validates the exported files.
+- [ ] PL-18.6 Secrets are exported as `${ENV_VAR}` references by default; with `--include-secrets` they are encrypted with a passphrase (AES-256-GCM, PBKDF2-HMAC-SHA256 with a random salt), import with the right passphrase and are refused with a clear error and nothing applied without it, and no secret is ever written in plain text.
+- [ ] PL-18.7 Import takes a path, an upload, pasted text or an `https://` URL, capped at 1 MB and 10 seconds with at most 3 redirects to `https`, with an optional `--sha256` that must match and optional headers that are masked wherever shown or logged; plain `http` is accepted only for loopback and private addresses.
+- [ ] PL-18.8 Import first shows, per section, what would be added, changed and removed; Merge upserts by name and keeps the rest, Replace also removes what the file does not have after a confirmation with the count, and an invalid file applies nothing.
+- [ ] PL-18.9 A CI job exports a setup with the previous stable release and imports it with the current build.

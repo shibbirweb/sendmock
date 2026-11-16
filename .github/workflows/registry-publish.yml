@@ -17,6 +17,14 @@ on:
         description: ID of the Publish beta or Publish stable run that released the version
         required: true
         type: string
+      registries:
+        description: Which registries to send it to; crates sends only the crates.io job
+        required: false
+        type: choice
+        default: all
+        options:
+          - all
+          - crates
 
 permissions:
   contents: read
@@ -89,7 +97,7 @@ jobs:
   npm:
     name: npm packages
     needs: plan
-    if: needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
+    if: inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -152,7 +160,7 @@ jobs:
   mcp-registry:
     name: MCP registry
     needs: [plan, npm]
-    if: needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'
+    if: inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -176,11 +184,31 @@ jobs:
           mcp-publisher login github-oidc
           mcp-publisher publish server.json
 
+  # crates.io trusted publishing refuses a `workflow_run` OIDC token, so a stable that came in
+  # through `workflow_run` starts a hand run of this same file for its crates, on the default
+  # branch the trusted publisher names; `workflow_dispatch` is the one event a GITHUB_TOKEN can
+  # start a run with.
+  crates-handoff:
+    name: crates.io (sent to a hand-started run)
+    needs: plan
+    if: github.event_name == 'workflow_run' && needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Start this workflow for crates.io only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          gh workflow run registry-publish.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH" \
+            -f release_run_id="$RELEASE_RUN_ID" -f registries=crates
+
   # The crates on crates.io for a stable (`cargo install sendmock`, DS-03.1).
   crates:
     name: crates.io
     needs: plan
-    if: needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
+    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.should_publish == 'true' && needs.plan.outputs.channel == 'stable' && vars.CRATES_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -225,7 +253,7 @@ jobs:
   testcontainers-node:
     name: npm (sendmock-testcontainers)
     needs: plan
-    if: needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
+    if: inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && vars.NPM_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -267,7 +295,7 @@ jobs:
   testcontainers-python:
     name: PyPI (sendmock-testcontainers)
     needs: plan
-    if: needs.plan.outputs.should_publish == 'true' && vars.PYPI_PUBLISHING == 'true'
+    if: inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && vars.PYPI_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -296,7 +324,7 @@ jobs:
   testcontainers-dotnet:
     name: NuGet (SendMock.Testcontainers)
     needs: plan
-    if: needs.plan.outputs.should_publish == 'true' && vars.NUGET_PUBLISHING == 'true'
+    if: inputs.registries != 'crates' && needs.plan.outputs.should_publish == 'true' && vars.NUGET_PUBLISHING == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
