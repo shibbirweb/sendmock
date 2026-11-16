@@ -3,6 +3,7 @@ use serde::Deserialize;
 
 use super::http_catcher_views::present_captured_request;
 use super::http_catcher_wire::CapturedHttpRequest;
+use crate::events::publish_traffic_cleared;
 use crate::{
     AnswerKind, FileAnswer, HttpMethod, NoContent, Operation, OperationContext,
     OperationDefinition, OperationError, PageOf, SuccessStatus,
@@ -118,11 +119,17 @@ impl Operation for DeleteHttpRequestsOperation {
         operation_context: &OperationContext,
         input: HttpRequestsDeleteQuery,
     ) -> Result<NoContent, OperationError> {
-        operation_context
+        let deleted_count = operation_context
             .http_catcher_stores
             .requests
             .delete_requests(input.bin_id)
             .await?;
+        publish_traffic_cleared(
+            operation_context,
+            &["http_request"],
+            None,
+            u64::try_from(deleted_count).unwrap_or_default(),
+        );
         Ok(NoContent)
     }
 }

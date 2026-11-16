@@ -1,6 +1,7 @@
 use super::email_inputs::{EmailFilterQuery, EmailReference, EmailUpdateInput};
 use super::email_search_query::build_email_list_filter;
 use super::email_summary::EmailSummary;
+use crate::events::publish_traffic_cleared;
 use crate::{
     HttpMethod, NoContent, Operation, OperationContext, OperationDefinition, OperationError,
     SuccessStatus, publish_email_deleted,
@@ -117,6 +118,12 @@ impl Operation for DeleteAllEmailsOperation {
         if deleted_count > 0 {
             publish_email_deleted(operation_context, None, deleted_count);
         }
+        publish_traffic_cleared(
+            operation_context,
+            &["email"],
+            input.project.as_deref(),
+            deleted_count,
+        );
         Ok(NoContent)
     }
 }

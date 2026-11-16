@@ -97,5 +97,7 @@ pub struct CapturedHttpRequest {
     pub matched_rule_name: Option<String>,
     pub is_simulated_failure: bool,
     pub duration_ms: u32,
+    /// Requests arrive unread; opening one marks it read.
+    pub is_read: bool,
     pub created_at: String,
 }

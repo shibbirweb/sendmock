@@ -22,6 +22,8 @@ pub struct PushNotificationRecord {
     pub response_json: String,
     pub project_key: String,
     pub created_at_unix_ms: i64,
+    /// Notifications arrive unread; opening one in the UI marks it read.
+    pub is_read: bool,
 }
 
 /// Which notifications a list returns; every set condition must hold.

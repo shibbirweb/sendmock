@@ -14,6 +14,7 @@ mod sms_read_operations;
 mod sms_reply_webhook_views;
 mod sms_send_decision;
 mod sms_send_operations;
+mod sms_thread_operations;
 mod sms_views;
 mod status_callback;
 mod status_callback_attempt;
@@ -47,6 +48,7 @@ pub use sms_send_decision::{
     decide_outbound_send, describe_rejection, load_custom_outcome_rules, to_simulation_profile,
 };
 pub use sms_send_operations::{SendSmsOperation, SimulateInboundSmsOperation};
+pub use sms_thread_operations::{DeleteSmsThreadOperation, UpdateSmsThreadOperation};
 pub use sms_views::{RecordedHttpRequest, RecordedHttpResponse, SmsMessage, SmsThread};
 pub use status_callback_dispatch::{run_due_status_callbacks, run_status_callback_dispatcher};
 pub use status_callback_sender::StatusCallbackSender;
@@ -59,6 +61,8 @@ pub fn register_sms_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(DeleteAllSmsOperation);
     operation_registry.register(SendSmsOperation);
     operation_registry.register(ListSmsThreadsOperation);
+    operation_registry.register(UpdateSmsThreadOperation);
+    operation_registry.register(DeleteSmsThreadOperation);
     operation_registry.register(GetSmsOperation);
     operation_registry.register(DeleteSmsOperation);
     operation_registry.register(DownloadSmsMediaOperation);

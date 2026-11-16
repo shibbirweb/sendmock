@@ -31,7 +31,7 @@ fn read_only_payment_definition(
     }
 }
 
-fn split_statuses(status_text: Option<&str>) -> Vec<String> {
+pub(super) fn split_statuses(status_text: Option<&str>) -> Vec<String> {
     status_text
         .unwrap_or_default()
         .split(',')

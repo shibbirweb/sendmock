@@ -52,6 +52,10 @@ Every control and text, one by one: [Subscriptions in depth](../deeper/payments/
 
 Write the renewal into a test: start a subscription with the API, advance it, and wait for the renewal's payment with `sendmock payments wait`.
 
+## Select and delete
+
+The toolbar above the table ticks subscriptions (or **x** on a focused row) to **Delete** them, and **Delete all** deletes every subscription, after asking. The payments they charged stay in Payments.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
@@ -59,6 +63,8 @@ Write the renewal into a test: start a subscription with the API, advance it, an
 | list | [`sendmock payments subscriptions list`](/cli/payments/#payments-subscriptions-list) | [`GET /api/v1/payments/subscriptions`](/api/payments/#getPaymentsSubscriptions) | [`sendmock_subscription_list`](/mcp/payments/#sendmock_subscription_list) |
 | start one | [`sendmock payments subscriptions create`](/cli/payments/#payments-subscriptions-create) | [`POST /api/v1/payments/subscriptions`](/api/payments/#postPaymentsSubscriptions) | [`sendmock_subscription_create`](/mcp/payments/#sendmock_subscription_create) |
 | one subscription | [`sendmock payments subscriptions show <subscriptionId>`](/cli/payments/#payments-subscriptions-show) | [`GET /api/v1/payments/subscriptions/{subscriptionId}`](/api/payments/#getPaymentsSubscriptionsBySubscriptionId) | [`sendmock_subscription_get`](/mcp/payments/#sendmock_subscription_get) |
+| delete one | [`sendmock payments subscriptions delete <subscriptionId>`](/cli/payments/#payments-subscriptions-delete) | [`DELETE /api/v1/payments/subscriptions/{subscriptionId}`](/api/payments/#deletePaymentsSubscriptionsBySubscriptionId) | [`sendmock_subscription_delete`](/mcp/payments/#sendmock_subscription_delete) |
+| delete every subscription | [`sendmock payments subscriptions delete-all --yes`](/cli/payments/#payments-subscriptions-delete-all) | [`DELETE /api/v1/payments/subscriptions`](/api/payments/#deletePaymentsSubscriptions) | [`sendmock_subscription_delete_all`](/mcp/payments/#sendmock_subscription_delete_all) |
 | advance to the next renewal | [`sendmock payments subscriptions advance <subscriptionId>`](/cli/payments/#payments-subscriptions-advance) | [`POST /api/v1/payments/subscriptions/{subscriptionId}/advance`](/api/payments/#postPaymentsSubscriptionsBySubscriptionIdAdvance) | [`sendmock_subscription_advance`](/mcp/payments/#sendmock_subscription_advance) |
 | cancel | [`sendmock payments subscriptions cancel <subscriptionId>`](/cli/payments/#payments-subscriptions-cancel) | [`POST /api/v1/payments/subscriptions/{subscriptionId}/cancel`](/api/payments/#postPaymentsSubscriptionsBySubscriptionIdCancel) | [`sendmock_subscription_cancel`](/mcp/payments/#sendmock_subscription_cancel) |
 

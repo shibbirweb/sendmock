@@ -3,7 +3,9 @@ use std::sync::Arc;
 use rusqlite::types::Value as SqlValue;
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter};
 
-use super::verification_reader::{VERIFICATION_COLUMNS, read_verification_row, select_page};
+use super::verification_reader::{
+    VERIFICATION_COLUMNS, build_conditions, read_verification_row, select_page,
+};
 use super::{VerificationFilter, VerificationPage, VerificationRecord, VerificationTimelineRecord};
 use crate::{Database, StoreError};
 
@@ -210,6 +212,36 @@ impl VerificationRepository {
                 }
                 transaction.commit()?;
                 Ok(overdue)
+            })
+            .await
+    }
+
+    /// Deletes one verification with its timeline; answers whether it existed.
+    pub async fn delete_verification(&self, verification_sid: &str) -> Result<bool, StoreError> {
+        let verification_sid = verification_sid.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(connection.execute(
+                    "DELETE FROM verifications WHERE sid = ?1",
+                    [verification_sid],
+                )? > 0)
+            })
+            .await
+    }
+
+    /// Deletes the verifications the list's filter matches; answers how many went.
+    pub async fn delete_matching_verifications(
+        &self,
+        filter: VerificationFilter,
+    ) -> Result<u64, StoreError> {
+        self.database
+            .write(move |connection| {
+                let (condition_text, parameters) = build_conditions(&filter);
+                let deleted_count = connection.execute(
+                    &format!("DELETE FROM verifications WHERE {condition_text}"),
+                    params_from_iter(parameters.iter()),
+                )?;
+                Ok(u64::try_from(deleted_count).unwrap_or_default())
             })
             .await
     }

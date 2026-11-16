@@ -223,6 +223,10 @@ public class MailTests
 }
 ```
 
+## Select, mark and delete
+
+The toolbar above the list ticks emails (hover a row, or press **x** on the open email) to **Mark read**, **Mark unread** or **Delete** them. **Delete all** deletes every email, or only the ones the search matches (it then reads **Delete matching**), in the picked project, after asking.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

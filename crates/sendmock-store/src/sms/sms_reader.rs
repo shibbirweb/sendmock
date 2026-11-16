@@ -91,7 +91,7 @@ pub fn list_threads(
     let mut statement = connection.prepare(&format!(
         "SELECT {SMS_COLUMNS}, thread_counts.message_count, thread_counts.unread_count FROM sms_messages \
          JOIN (SELECT thread_id AS counted_thread_id, max(id) AS last_id, count(*) AS message_count, \
-               sum(CASE WHEN direction = 'inbound' AND is_read = 0 THEN 1 ELSE 0 END) AS unread_count \
+               sum(CASE WHEN is_read = 0 THEN 1 ELSE 0 END) AS unread_count \
                FROM sms_messages WHERE ?1 IS NULL OR project_key = ?1 GROUP BY thread_id) AS thread_counts \
            ON sms_messages.id = thread_counts.last_id \
          ORDER BY sms_messages.id DESC"

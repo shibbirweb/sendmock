@@ -1,5 +1,6 @@
 //! The HTTP catcher: bins, captured requests and the replies SendMock gives.
 
+mod captured_request_change_operations;
 mod captured_request_operations;
 mod http_bin_operations;
 mod http_bin_presets;
@@ -11,6 +12,9 @@ mod http_response_rules;
 mod http_rule_operations;
 mod http_wait_operation;
 
+pub use captured_request_change_operations::{
+    DeleteHttpRequestOperation, UpdateHttpRequestOperation,
+};
 pub use captured_request_operations::{
     DeleteHttpRequestsOperation, DownloadHttpRequestFileOperation, GetHttpRequestOperation,
     ListHttpRequestsOperation,
@@ -37,6 +41,8 @@ pub fn register_http_catcher_operations(operation_registry: &mut OperationRegist
     operation_registry.register(ListHttpRequestsOperation);
     operation_registry.register(DeleteHttpRequestsOperation);
     operation_registry.register(GetHttpRequestOperation);
+    operation_registry.register(UpdateHttpRequestOperation);
+    operation_registry.register(DeleteHttpRequestOperation);
     operation_registry.register(DownloadHttpRequestFileOperation);
     operation_registry.register(WaitForHttpRequestOperation);
     operation_registry.register(ListHttpResponseRulesOperation);

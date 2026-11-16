@@ -242,7 +242,7 @@ async fn keeps_callback_attempts_and_prunes_old_messages() -> Result<(), StoreEr
             .await?
             .is_empty()
     );
-    assert_eq!(repository.delete_all_messages().await?, 1);
+    assert_eq!(repository.delete_all_messages(None).await?, 1);
     Ok(())
 }
 

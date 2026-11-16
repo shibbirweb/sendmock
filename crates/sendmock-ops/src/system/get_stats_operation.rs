@@ -94,6 +94,8 @@ fn build_app_stats(
         pending_verification_count: message_totals.pending_verification_count,
         http_request_count: 0,
         http_requests_today: 0,
+        unread_http_request_count: message_totals.unread_http_request_count,
+        unread_push_count: message_totals.unread_push_count,
         webhook_delivery_count: delivery_summary.delivery_count,
         webhook_success_rate: delivery_summary.success_rate,
         webhook_p95_latency_ms: delivery_summary.p95_latency_ms,

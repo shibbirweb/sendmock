@@ -25378,7 +25378,7 @@
     },
     {
       "name": "sendmock_traffic_delete_all",
-      "toolset": "core",
+      "toolset": "admin",
       "summary": "Delete every captured item in every project and keep every setting and configuration list.",
       "area": "System",
       "area_slug": "system",

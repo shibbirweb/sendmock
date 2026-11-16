@@ -46,5 +46,7 @@ pub struct CapturedRequestRecord {
     pub is_simulated_failure: bool,
     pub duration_ms: u32,
     pub created_at_unix_ms: i64,
+    /// Requests arrive unread; opening one in the UI marks it read.
+    pub is_read: bool,
     pub files: Vec<CapturedFileRecord>,
 }

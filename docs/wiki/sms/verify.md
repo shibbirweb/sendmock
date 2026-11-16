@@ -68,12 +68,18 @@ Every control and text, one by one: [Verify in depth](../deeper/sms/verify.md).
 - The code length and lifetime follow what your production service uses.
 - Services go into the seed file, so your team and CI get the same ones ([Advanced: seed file](../advanced/seed-file.md)).
 
+## Select and delete
+
+The toolbar above the table ticks verifications (or **x** on a focused row) to **Delete** them, and **Delete all** deletes every verification the filters show, in the picked project, after asking. Verify services stay.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
 | list | [`sendmock verify list`](/cli/verify/#verify-list) | [`GET /api/v1/verify`](/api/verify/#getVerify) | [`sendmock_verify_list`](/mcp/verify/#sendmock_verify_list) |
 | one verification | [`sendmock verify show <verificationSid>`](/cli/verify/#verify-show) | [`GET /api/v1/verify/{verificationSid}`](/api/verify/#getVerifyByVerificationSid) | [`sendmock_verify_get`](/mcp/verify/#sendmock_verify_get) |
+| delete one | [`sendmock verify delete <verificationSid>`](/cli/verify/#verify-delete) | [`DELETE /api/v1/verify/{verificationSid}`](/api/verify/#deleteVerifyByVerificationSid) | [`sendmock_verify_delete`](/mcp/verify/#sendmock_verify_delete) |
+| delete everything, or what the filters match | [`sendmock verify delete-all --yes`](/cli/verify/#verify-delete-all) | [`DELETE /api/v1/verify`](/api/verify/#deleteVerify) | [`sendmock_verify_delete_all`](/mcp/verify/#sendmock_verify_delete_all) |
 | read the latest code | [`sendmock otp --to <recipient>`](/cli/test-helpers/#otp) | [`GET /api/v1/otp`](/api/test-helpers/#getOtp) | [`sendmock_otp_get`](/mcp/test-helpers/#sendmock_otp_get) |
 | force an outcome | [`sendmock verify force <verificationSid> <status>`](/cli/verify/#verify-force) | [`POST /api/v1/verify/{verificationSid}/force`](/api/verify/#postVerifyByVerificationSidForce) | [`sendmock_verify_force`](/mcp/verify/#sendmock_verify_force) |
 | list services | [`sendmock verify services list`](/cli/verify/#verify-services-list) | [`GET /api/v1/verify/services`](/api/verify/#getVerifyServices) | [`sendmock_verify_service_list`](/mcp/verify/#sendmock_verify_service_list) |

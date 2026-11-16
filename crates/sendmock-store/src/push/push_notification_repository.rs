@@ -8,7 +8,7 @@ use crate::{Database, StoreError};
 
 const PUSH_COLUMNS: &str = "id, provider, provider_message_id, device_token, platform, title, body, \
      image_url, data_json, status, error_reason, request_json, response_status, response_json, \
-     project_key, created_at";
+     project_key, created_at, is_read";
 
 fn read_push_row(row: &Row<'_>) -> rusqlite::Result<PushNotificationRecord> {
     Ok(PushNotificationRecord {
@@ -28,6 +28,7 @@ fn read_push_row(row: &Row<'_>) -> rusqlite::Result<PushNotificationRecord> {
         response_json: row.get(13)?,
         project_key: row.get(14)?,
         created_at_unix_ms: row.get(15)?,
+        is_read: row.get(16)?,
     })
 }
 
@@ -114,7 +115,7 @@ impl PushNotificationRepository {
         self.database
             .write(move |connection| {
                 connection.execute(
-                    &format!("INSERT INTO push_notifications ({PUSH_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)"),
+                    &format!("INSERT INTO push_notifications ({PUSH_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)"),
                     params![
                         notification.push_id,
                         notification.provider,
@@ -132,6 +133,7 @@ impl PushNotificationRepository {
                         notification.response_json,
                         notification.project_key,
                         notification.created_at_unix_ms,
+                        notification.is_read,
                     ],
                 )?;
                 Ok(())
@@ -185,6 +187,23 @@ impl PushNotificationRepository {
     ) -> Result<PushNotificationPage, StoreError> {
         self.database
             .read(move |connection| Ok(select_page(connection, &filter, cursor.as_deref(), limit)?))
+            .await
+    }
+
+    /// Marks a notification read or unread; answers whether it existed.
+    pub async fn mark_notification_read(
+        &self,
+        push_id: &str,
+        is_read: bool,
+    ) -> Result<bool, StoreError> {
+        let push_id = push_id.to_owned();
+        self.database
+            .write(move |connection| {
+                Ok(connection.execute(
+                    "UPDATE push_notifications SET is_read = ?1 WHERE id = ?2",
+                    params![is_read, push_id],
+                )? > 0)
+            })
             .await
     }
 

@@ -6,10 +6,12 @@ pub struct MessageTotalsRecord {
     pub unread_email_count: u64,
     pub sms_count: u64,
     pub sms_since: u64,
-    /// Incoming SMS not read yet, as the thread list counts them.
+    /// SMS not read yet, as the thread list counts them.
     pub unread_sms_count: u64,
     pub verification_count: u64,
     pub pending_verification_count: u64,
+    pub unread_push_count: u64,
+    pub unread_http_request_count: u64,
 }
 
 /// How many items arrived in one hour, counted from the start of the window.

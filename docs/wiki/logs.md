@@ -191,14 +191,22 @@ public class LogsTests
 }
 ```
 
+## Select and delete
+
+Each tab has the list toolbar: tick sessions or requests (or **x** on a focused row) to **Delete** them, and **Delete all** deletes every entry the filters show, after asking. The emails, SMS and payments they made stay.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
 | SMTP sessions | [`sendmock logs smtp`](/cli/logs/#logs-smtp) | [`GET /api/v1/logs/smtp`](/api/logs/#getLogsSmtp) | [`sendmock_logs_smtp`](/mcp/logs/#sendmock_logs_smtp) |
 | one session | [`sendmock logs smtp show <sessionId>`](/cli/logs/#logs-smtp-show) | [`GET /api/v1/logs/smtp/{sessionId}`](/api/logs/#getLogsSmtpBySessionId) | [`sendmock_logs_smtp_get`](/mcp/logs/#sendmock_logs_smtp_get) |
+| delete one session | [`sendmock logs smtp delete <sessionId>`](/cli/logs/#logs-smtp-delete) | [`DELETE /api/v1/logs/smtp/{sessionId}`](/api/logs/#deleteLogsSmtpBySessionId) | [`sendmock_logs_smtp_delete`](/mcp/logs/#sendmock_logs_smtp_delete) |
+| delete every session, or what the filters match | [`sendmock logs smtp delete-all --yes`](/cli/logs/#logs-smtp-delete-all) | [`DELETE /api/v1/logs/smtp`](/api/logs/#deleteLogsSmtp) | [`sendmock_logs_smtp_delete_all`](/mcp/logs/#sendmock_logs_smtp_delete_all) |
 | API requests | [`sendmock logs http`](/cli/logs/#logs-http) | [`GET /api/v1/logs/http`](/api/logs/#getLogsHttp) | [`sendmock_logs_http`](/mcp/logs/#sendmock_logs_http) |
 | one request | [`sendmock logs http show <requestId>`](/cli/logs/#logs-http-show) | [`GET /api/v1/logs/http/{requestId}`](/api/logs/#getLogsHttpByRequestId) | [`sendmock_logs_http_get`](/mcp/logs/#sendmock_logs_http_get) |
+| delete one request | [`sendmock logs http delete <requestId>`](/cli/logs/#logs-http-delete) | [`DELETE /api/v1/logs/http/{requestId}`](/api/logs/#deleteLogsHttpByRequestId) | [`sendmock_logs_http_delete`](/mcp/logs/#sendmock_logs_http_delete) |
+| delete every request, or what the filters match | [`sendmock logs http delete-all --yes`](/cli/logs/#logs-http-delete-all) | [`DELETE /api/v1/logs/http`](/api/logs/#deleteLogsHttp) | [`sendmock_logs_http_delete_all`](/mcp/logs/#sendmock_logs_http_delete_all) |
 
 ## Related
 

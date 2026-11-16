@@ -6,6 +6,7 @@ use sendmock_store::PushNotificationFilter;
 use super::push_inputs::{PushFilterQuery, PushListQuery, PushReference, PushWaitQuery};
 use super::push_views::PushNotification;
 use crate::email::read_wait_duration;
+use crate::events::publish_traffic_cleared;
 use crate::{
     HttpMethod, NoContent, Operation, OperationContext, OperationDefinition, OperationError,
     PageOf, SuccessStatus,
@@ -170,6 +171,7 @@ impl Operation for DeletePushesOperation {
         operation_context: &OperationContext,
         input: PushFilterQuery,
     ) -> Result<NoContent, OperationError> {
+        let input_project = input.project.clone();
         let page = operation_context
             .push_notifications
             .list_notifications(
@@ -184,12 +186,22 @@ impl Operation for DeletePushesOperation {
                 u32::MAX,
             )
             .await?;
+        let mut deleted_count = 0;
         for notification in page.notifications {
-            operation_context
+            if operation_context
                 .push_notifications
                 .delete_notification(&notification.push_id)
-                .await?;
+                .await?
+            {
+                deleted_count += 1;
+            }
         }
+        publish_traffic_cleared(
+            operation_context,
+            &["push"],
+            input_project.as_deref(),
+            deleted_count,
+        );
         Ok(NoContent)
     }
 }
