@@ -55,7 +55,7 @@ fn sms(sms_id: &str, direction: &str, body: &str) -> SmsRecord {
         api_request_id: None,
         opened_at_unix_ms: None,
         open_count: 0,
-        is_read: false,
+        is_read: direction == "outbound",
         in_reply_to_sms_id: None,
         created_at_unix_ms: 1_000,
         updated_at_unix_ms: 1_000,
