@@ -99,7 +99,7 @@ const overviewBody = [
   "",
   "### How this is kept current",
   "",
-  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/feat/phase-0/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/feat/phase-0/docs/plan/acceptance) are the source of truth. When a pull request ticks criteria, the matching feature issues are updated, and closed once the feature is accepted.`,
+  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/develop/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/develop/docs/plan/acceptance) are the source of truth. When a pull request ticks criteria, the matching feature issues are updated, and closed once the feature is accepted.`,
   "",
 ].join("\n");
 

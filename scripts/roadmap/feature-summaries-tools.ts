@@ -102,6 +102,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "Every icon-only button, link and toggle shows a tooltip naming its action, and its shortcut when it has one, on hover and on keyboard focus.",
     outcome: "Know what an icon does before clicking it.",
   },
+  "UI-14": {
+    summary:
+      "Mail's list toolbar on every traffic screen (SMS, Verify, Push, HTTP Catcher, webhook deliveries, Payments, Subscriptions and Logs): row checkboxes and select all, mark read or unread, delete the selection, delete all or the matching ones, plus Delete all traffic in Settings, from the UI, REST, CLI and MCP.",
+    outcome:
+      "Tidy any list the way you tidy a mail inbox, and start the next test run from an empty list with one click, without losing any configuration.",
+  },
   "DS-01": {
     summary:
       "A single self-contained binary for macOS, Linux and Windows on x64 and arm64, with the web UI embedded.",
