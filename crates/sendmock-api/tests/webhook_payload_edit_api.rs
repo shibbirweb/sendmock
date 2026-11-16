@@ -7,8 +7,6 @@ mod support {
     pub mod webhook_send_fixture;
 }
 
-use std::time::Duration;
-
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
 use ring::hmac;
@@ -16,7 +14,7 @@ use sendmock_ops::{RecordedHttpRequest, run_webhook_rule_subscriber};
 use serde_json::{Value, json};
 use support::scripted_webhook_sender::ScriptedAnswer;
 use support::test_app::call_api;
-use support::webhook_samples::{create_rule, send_email};
+use support::webhook_samples::{create_rule, send_email, wait_for_deliveries_at};
 use support::webhook_send_fixture::{WebhookSendFixture, build_send_fixture};
 
 const MATCH_PATH: &str = "/api/v1/webhooks/rules/match";
@@ -62,25 +60,24 @@ async fn simulate_bounce(
         .await
 }
 
+fn email_deliveries_path(email_id: &str) -> String {
+    format!("/api/v1/webhooks/deliveries?subject_id={email_id}")
+}
+
 async fn list_email_deliveries(fixture: &WebhookSendFixture, email_id: &str) -> Vec<Value> {
     let (_, page) = call_api(
         &fixture.app_router,
         "GET",
-        &format!("/api/v1/webhooks/deliveries?subject_id={email_id}"),
+        &email_deliveries_path(email_id),
         None,
     )
     .await;
     page["items"].as_array().cloned().unwrap_or_default()
 }
 
-/// Waits up to two seconds for the email's first delivery to be queued, then sends it.
+/// Waits for the email's first delivery to be queued, then sends it.
 async fn send_first_delivery(fixture: &WebhookSendFixture, email_id: &str) -> Value {
-    for _ in 0..200 {
-        if !list_email_deliveries(fixture, email_id).await.is_empty() {
-            break;
-        }
-        tokio::time::sleep(Duration::from_millis(10)).await;
-    }
+    wait_for_deliveries_at(&fixture.app_router, &email_deliveries_path(email_id), 1).await;
     fixture.run_due().await;
     list_email_deliveries(fixture, email_id)
         .await
