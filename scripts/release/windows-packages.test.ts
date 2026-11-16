@@ -63,4 +63,23 @@ describe("Chocolatey package", () => {
       'checksum64     = "abcdef01"',
     );
   });
+
+  test("DS-03.4 the nuspec meets Chocolatey's guidelines: an icon, its source and no local URL in the description", () => {
+    const nuspecText =
+      buildChocolateyFiles("1.2.0", checksums).get("sendmock.nuspec") ?? "";
+    const descriptionText =
+      /<description>([^<]*)<\/description>/.exec(nuspecText)?.[1] ?? "";
+
+    expect(nuspecText).toContain(
+      "<projectUrl>https://shibbir.me/sendmock/</projectUrl>",
+    );
+    expect(nuspecText).toContain(
+      "<iconUrl>https://cdn.jsdelivr.net/gh/shibbirweb/sendmock@v1.2.0/website/app/icon.svg</iconUrl>",
+    );
+    expect(nuspecText).toContain(
+      "<packageSourceUrl>https://github.com/shibbirweb/sendmock/blob/v1.2.0/scripts/release/chocolatey-package.ts</packageSourceUrl>",
+    );
+    expect(descriptionText).not.toBe("");
+    expect(descriptionText).not.toMatch(/https?:\/\//);
+  });
 });

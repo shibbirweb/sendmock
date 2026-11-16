@@ -3,7 +3,8 @@
  * The Chocolatey package for a stable release (`sendmock`, DS-03.4): `sendmock.nuspec` and
  * `tools/chocolateyinstall.ps1`, which downloads the x64 archive and checks its SHA256 from the
  * release's SHA256SUMS. Chocolatey runs x64 tools on Arm64 Windows too. Release build packs and
- * pushes it.
+ * pushes it. The icon and the package source are pinned to the release's tag, and the
+ * description holds no local address, which Chocolatey's validator flags as an invalid URL.
  *
  *     bun scripts/release/chocolatey-package.ts <version> <SHA256SUMS> <output folder> [download URL]
  */
@@ -32,13 +33,15 @@ export function buildChocolateyFiles(
     <version>${version}</version>
     <title>SendMock</title>
     <authors>MD. Shibbir Ahmed</authors>
-    <projectUrl>https://shibbirweb.github.io/sendmock/</projectUrl>
+    <projectUrl>https://shibbir.me/sendmock/</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/shibbirweb/sendmock@v${version}/website/app/icon.svg</iconUrl>
     <projectSourceUrl>${repositoryUrl}</projectSourceUrl>
+    <packageSourceUrl>${repositoryUrl}/blob/v${version}/scripts/release/chocolatey-package.ts</packageSourceUrl>
     <licenseUrl>${repositoryUrl}#licence</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>email sms smtp testing webhooks</tags>
     <summary>Catch email, SMS, payments and webhooks from any app on your machine.</summary>
-    <description>SendMock catches the email, SMS, payments and webhooks your app sends, on your machine, so nothing reaches real people. Run sendmock and open http://127.0.0.1:8025.</description>
+    <description>SendMock catches the email, SMS, payments and webhooks your app sends, on your machine, so nothing reaches real people. Run sendmock, then open its web UI on port 8025 of your machine.</description>
     <releaseNotes>${repositoryUrl}/releases/tag/v${version}</releaseNotes>
   </metadata>
   <files>
