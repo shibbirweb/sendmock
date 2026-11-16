@@ -70,6 +70,8 @@ jobs:
         run: rustup toolchain install
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Release build
         run: cargo build --release --locked -p sendmock

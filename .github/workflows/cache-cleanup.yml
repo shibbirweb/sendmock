@@ -1,0 +1,39 @@
+# Deletes the Actions caches a pull request or a branch saved once it is closed or deleted, so
+# they do not hold the repository's 10 GB cache space until GitHub evicts them a week later.
+# pull_request_target gives Dependabot pull requests a token that can delete caches; it is safe
+# here because nothing from the pull request is checked out or run.
+name: Cache cleanup
+
+on:
+  pull_request_target:
+    types: [closed]
+  delete:
+
+permissions:
+  actions: write
+
+jobs:
+  delete-caches:
+    name: Delete the caches of ${{ github.event_name == 'delete' && 'the deleted branch' || 'the closed pull request' }}
+    if: github.event_name == 'pull_request_target' || github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      CACHE_REF: ${{ github.event_name == 'delete' && format('refs/heads/{0}', github.event.ref) || format('refs/pull/{0}/merge', github.event.pull_request.number) }}
+    steps:
+      - name: Delete every cache saved on the ref
+        run: |
+          deleted_count=0
+          while true; do
+            cache_ids=$(gh cache list --ref "$CACHE_REF" --limit 100 --json id --jq '.[].id')
+            if [ -z "$cache_ids" ]; then
+              break
+            fi
+            for cache_id in $cache_ids; do
+              gh cache delete "$cache_id"
+              deleted_count=$((deleted_count + 1))
+            done
+          done
+          echo "Deleted $deleted_count caches saved on $CACHE_REF."

@@ -471,6 +471,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: crates-package
+          save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Put the UI and the skill inside the crates that embed them
         run: sh scripts/release/stage-crate-files.sh
