@@ -235,6 +235,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Copy working code for any task straight from the page that explains it.",
   },
+  "WS-13": {
+    summary:
+      "Canonical links, Open Graph and Twitter cards, a sitemap and JSON-LD on the website at shibbir.me/sendmock, with older docs versions pointing at the current pages.",
+    outcome:
+      "Find SendMock's docs in search engines and share links that show a proper preview.",
+  },
   "PY-01": {
     summary:
       "Payment safety: only documented test cards are accepted, and no card number or CVC is ever stored.",

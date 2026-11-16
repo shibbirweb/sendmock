@@ -10,7 +10,15 @@
  */
 
 import { execSync } from "node:child_process";
-import { cpSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join, relative } from "node:path";
 
 export type PagesSiteBuild = {
@@ -21,7 +29,22 @@ export type PagesSiteBuild = {
   /** NEXT_PUBLIC_DOCS_VERSION and NEXT_PUBLIC_DOCS_VERSIONS; left out for a plain build. */
   docsVersionKey?: string;
   docsVersionsJson?: string;
+  /**
+   * The root version's page list (DOCS_ROOT_PAGE_PATHS_FILE): the build of
+   * another version names those pages canonical and keeps the rest out of search.
+   */
+  rootPagePathsFile?: string;
 };
+
+const noindexMetaTag = '<meta name="robots" content="noindex" />';
+
+/** The demo is an app with sample data, not a page to find in search. */
+export function addNoindexMetaTag(pageHtml: string): string {
+  if (pageHtml.includes('name="robots"')) {
+    return pageHtml;
+  }
+  return pageHtml.replace(/<head>/i, (headTag) => `${headTag}\n    ${noindexMetaTag}`);
+}
 
 function runCommand(
   command: string,
@@ -94,6 +117,10 @@ export function buildPagesSite(pagesSiteBuild: PagesSiteBuild): string {
     versionEnvironment.NEXT_PUBLIC_DOCS_VERSIONS =
       pagesSiteBuild.docsVersionsJson;
   }
+  if (pagesSiteBuild.rootPagePathsFile !== undefined) {
+    versionEnvironment.DOCS_ROOT_PAGE_PATHS_FILE =
+      pagesSiteBuild.rootPagePathsFile;
+  }
 
   runCommand("bun run build", webDirectory, {
     VITE_BASE_PATH: `${pagesSiteBuild.basePath}/demo/`,
@@ -110,6 +137,11 @@ export function buildPagesSite(pagesSiteBuild: PagesSiteBuild): string {
   const demoOutputDirectory = join(outputDirectory, "demo");
   rmSync(demoOutputDirectory, { recursive: true, force: true });
   cpSync(join(webDirectory, "dist"), demoOutputDirectory, { recursive: true });
+  const demoIndexPath = join(demoOutputDirectory, "index.html");
+  writeFileSync(
+    demoIndexPath,
+    addNoindexMetaTag(readFileSync(demoIndexPath, "utf8")),
+  );
 
   // Pages has no SPA fallback: give every app route its own copy of index.html,
   // so deep links like /demo/webhooks/rules load the app instead of a 404.

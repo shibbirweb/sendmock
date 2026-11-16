@@ -27,6 +27,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new), ships in 1.1.0 |
 | A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) |
 | A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) |
+| A20 | Search engines and link previews for the website | #293 | WS-13 (new) |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -611,3 +612,23 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 **Order:** A18 first (the versioned format, YAML and JSON, and the URL import are what A19 loads), then A19: `--setup` and `SENDMOCK_SETUP`, then `sendmock ci run` and the reports, then the webhook steps, then `ci init`, the MCP prompt and the docs, then the GitHub Action.
 
 **Not in this part:** a hosted SendMock for CI, load testing, recording and replaying production webhooks, and CI systems' own plugins beyond the GitHub Action.
+
+## A20. Search engines and link previews (WS-13)
+
+**Why (owner request, 2026-11-16):** the website at https://shibbir.me/sendmock/ had a title and description on its pages and nothing else search engines and link previews use: no canonical link, no Open Graph or Twitter tags, no structured data and no sitemap. The older docs versions and `/next/` repeat the current pages, so search engines saw duplicates.
+
+**Where it is served:** the user site shibbirweb.github.io owns the custom domain shibbir.me, so the project site is served at https://shibbir.me/sendmock/ and shibbirweb.github.io/sendmock/ redirects there. That is the canonical origin. Search engines read `robots.txt` only at the domain root, which the portfolio serves, so the website has no `app/robots.ts`; a page is kept out of search with its robots meta tag, and the portfolio's `robots.txt` names the sitemap.
+
+**How:**
+
+- **One URL helper** (`website/lib/seo/site-url.ts`): `https://shibbir.me` plus the site root's base path, taken from the stable entry of the docs version list so every version links to the current site. Next does not add the base path to metadata URLs, so every URL is built absolute here and ends in `/` as Pages serves it; `metadataBase` is set as a fallback.
+- **Every page's metadata from one helper** (`lib/seo/page-metadata.ts`): title, description (the docs frontmatter for docs pages), canonical, Open Graph and Twitter. Next replaces a layout's `alternates` and `openGraph` with a page's instead of merging, so the helper returns all of them.
+- **Versions:** every docs version is built with today's website code, so this needs no change to old tags. `scripts/build-docs-versions.ts` builds the site root first and writes its page list; each other version reads it (`DOCS_ROOT_PAGE_PATHS_FILE`), names the root's page canonical when it exists, and is `noindex, follow` otherwise (owner decision: noindex rather than a canonical to the docs root, which search engines ignore for a different page). The decision is made in the page metadata, not by editing the HTML afterwards, so the HTML and Next's page data agree. Only the site root keeps `sitemap.xml`.
+- **Link previews:** static 1200x630 images in `website/public/social/` (landing and docs), rendered by `bun run social-images` (`scripts/write-social-images.ts`) and committed.
+- **Sitemap** (`app/sitemap.ts`, static): home, every docs page, the API, CLI and MCP references with their area pages, and the changelog. The playground (a tool with little text) and the demo (an app, `noindex`) are left out. No `lastmod`: wrong dates are worse than none.
+- **JSON-LD** (`lib/seo/structured-data.ts`): the landing page's `WebSite` and SendMock as `SoftwareApplication` and `SoftwareSourceCode` (for `codeRepository`), free, MIT or Apache-2.0, with its GitHub, npm and Docker Hub pages; its author is `https://shibbir.me#person`, the Person the portfolio publishes, with only the name repeated. Google shows a software rich result only with ratings or reviews, which SendMock does not invent; the data still links the project to its author. Docs pages are `TechArticle` with a `BreadcrumbList`, the API, CLI and MCP area pages `WebPage` with one.
+- **Basics:** the demo gets `noindex` when it is copied into the site (`scripts/build-pages-site.ts`); Next already marks the 404 page `noindex`.
+- **Tests:** unit tests for the helpers, `website/tests/versioned-site/seo-export.spec.ts` over every page of the versioned export, and Lighthouse's SEO category at 100 on six pages.
+
+**After it ships:** once `https://shibbir.me/sendmock/sitemap.xml` answers, the portfolio adds `Sitemap: https://shibbir.me/sendmock/sitemap.xml` to its `robots.txt`.
+

@@ -10,6 +10,7 @@
     "typecheck": "bun --bun tsc --noEmit",
     "lint": "bun --bun eslint .",
     "screenshots": "bun scripts/capture-screenshots.ts",
+    "social-images": "bun scripts/write-social-images.ts",
     "sync-docs": "bun scripts/sync-docs.ts",
     "examples": "bun scripts/write-examples.ts",
     "examples:check": "bun scripts/write-examples.ts --check",

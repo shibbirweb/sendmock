@@ -7,12 +7,14 @@ import {
   unreleasedVersion,
 } from "@/lib/changelog/parse-changelog";
 import { repositoryUrl } from "@/lib/community-links";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Changelog",
   description:
     "What changed in each SendMock release: what the newest beta holds, then every stable release.",
-};
+  pagePath: "/changelog",
+});
 
 function EntryText({ text }: { text: string }) {
   return splitInlineMarkdown(text).map((part, partIndex) => {

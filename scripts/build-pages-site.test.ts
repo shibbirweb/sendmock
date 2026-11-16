@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { toAppRoutePath } from "./build-pages-site";
+import { addNoindexMetaTag, toAppRoutePath } from "./build-pages-site";
 
 describe("the demo's deep links", () => {
   test("WS-01.2 a route file gives the address the app serves it at", () => {
@@ -17,5 +17,23 @@ describe("the demo's deep links", () => {
   test("WS-01.2 layouts and groups add nothing to the address", () => {
     expect(toAppRoutePath("_shell/settings.tsx")).toBe("settings");
     expect(toAppRoutePath("(screens)/numbers.tsx")).toBe("numbers");
+  });
+});
+
+describe("the demo in search", () => {
+  test("WS-13.7 the demo's page is kept out of search", () => {
+    expect(
+      addNoindexMetaTag(
+        '<!doctype html><html><head><meta charset="UTF-8" /></head></html>',
+      ),
+    ).toBe(
+      '<!doctype html><html><head>\n    <meta name="robots" content="noindex" /><meta charset="UTF-8" /></head></html>',
+    );
+  });
+
+  test("WS-13.7 a page that already has a robots tag is left as it is", () => {
+    const pageHtml =
+      '<html><head><meta name="robots" content="noindex" /></head></html>';
+    expect(addNoindexMetaTag(pageHtml)).toBe(pageHtml);
   });
 });

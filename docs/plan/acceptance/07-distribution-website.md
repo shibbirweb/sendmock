@@ -237,3 +237,16 @@ After 1.0, planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.m
 - [ ] WS-12.2 Each example runs as written against a default SendMock, with its imports, and shows the answer it gets back; pages about a provider API use that provider's SDK where one exists.
 - [ ] WS-12.3 The contract check covers every new example: each method, path, JSON key, query name and `sendmock` command exists.
 - [ ] WS-12.4 The cross-language matrix runs every new example against a real `sendmock` binary in CI.
+
+## WS-13 Search engines and link previews
+
+After 1.0, planned 2026-11-16 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a20-search-engines-and-link-previews-ws-13) (A20). The site is served at https://shibbir.me/sendmock/ (the user site shibbirweb.github.io owns that domain); its `robots.txt` belongs to the portfolio at the domain root.
+
+- [ ] WS-13.1 Every page of the site root (home, docs, API, CLI, MCP, changelog, playground) has its own title and meta description and names itself canonical with an absolute URL under https://shibbir.me/sendmock/ that ends in `/`.
+- [ ] WS-13.2 Every page of `/next/` and of each older version names the same page of the site root as canonical, or is `noindex, follow` when the site root has no such page; the versions have no sitemap.
+- [ ] WS-13.3 `sitemap.xml` at the site root lists every current page except the playground and the demo, with absolute URLs ending in `/`, each served by the site.
+- [ ] WS-13.4 Every page has Open Graph tags (site name SendMock, type website, its URL, title, description and a 1200x630 image) and a `summary_large_image` Twitter card, with absolute image URLs; the landing page and the docs have their own image.
+- [ ] WS-13.5 The landing page has JSON-LD for SendMock as free `DeveloperApplication` software (operating systems, licence, repository and npm and Docker Hub pages), its author the portfolio's Person (`https://shibbir.me#person`).
+- [ ] WS-13.6 Docs pages have `TechArticle` and `BreadcrumbList` JSON-LD, and API, CLI and MCP area pages `WebPage` and `BreadcrumbList`; every JSON-LD block parses.
+- [ ] WS-13.7 The demo and the 404 page are `noindex`, and every page has one `h1` and alt text on every image.
+- [ ] WS-13.8 Lighthouse scores 100 for SEO on the landing, docs, API, CLI and changelog pages.

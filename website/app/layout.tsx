@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import { VersionBanner } from "@/components/docs/version-banner";
 import { basePath } from "@/lib/layout.shared";
+import { buildVersionFileUrl, siteUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
   title: {
@@ -14,8 +15,10 @@ export const metadata: Metadata = {
   },
   description:
     "A single binary that catches email, SMS and payments from any app, shows them in a web UI and calls your webhooks.",
+  // Every page's metadata URLs are absolute (lib/seo); this catches any left relative.
+  metadataBase: new URL(siteUrl),
   // Agents given only the site's address find the docs and install steps (WS-09.4).
-  alternates: { types: { "text/plain": `${basePath}/llms.txt` } },
+  alternates: { types: { "text/plain": buildVersionFileUrl("llms.txt") } },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -7,12 +7,14 @@ import {
   loadCliReference,
   toCliCommandUrl,
 } from "@/lib/reference/load-references";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "CLI reference",
   description:
     "Every sendmock command with its arguments, flags, an example, output and exit codes, generated from the API contract.",
-};
+  pagePath: "/cli",
+});
 
 function ConventionsSection() {
   return (

@@ -11,12 +11,14 @@ import {
   toMcpToolUrl,
 } from "@/lib/reference/load-references";
 import type { McpReference } from "@/lib/reference/reference-types";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "MCP reference",
   description:
     "Every SendMock MCP tool and resource with its inputs, hints, an example call and the result, generated from the API contract.",
-};
+  pagePath: "/mcp",
+});
 
 /** On unless the server starts with another `--toolsets` list (docs/plan/14-ai-integration.md). */
 const defaultToolsets = [
