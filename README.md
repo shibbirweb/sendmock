@@ -13,7 +13,9 @@
 [![Docs](https://img.shields.io/badge/docs-shibbirweb.github.io%2Fsendmock-informational)](https://shibbirweb.github.io/sendmock/docs/)
 [![Live demo](https://img.shields.io/badge/demo-try%20it%20in%20your%20browser-success)](https://shibbirweb.github.io/sendmock/demo/)
 
-**SendMock is a local stand-in for the email, SMS, push and payment services your app talks to.** It is one small program you run on your machine, in Docker or in CI.
+**SendMock is a local stand-in for the email, SMS, push and payment services your app talks to, and for the webhooks they send back.** It is one small program you run on your machine, in Docker or in CI.
+
+**Webhook simulation built in:** fire a delivered, bounced, opened, inbound reply or payment succeeded webhook whenever you need one, signed the way the real provider signs it, straight to your app on `localhost`. You test your webhook handlers without a tunnel, a public URL or a provider sandbox.
 
 **The problem:** while you build and test an app, it sends real things. A sign-up test emails a real address, an OTP test texts a real phone and costs money, a checkout test needs a payment sandbox, and the webhooks those services send back are hard to trigger on demand. Teams end up with shared test inboxes, borrowed phones, provider sandboxes and flaky tests.
 
